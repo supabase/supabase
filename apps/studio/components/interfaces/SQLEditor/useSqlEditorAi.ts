@@ -7,10 +7,12 @@ import type { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { DiffType, type IStandaloneDiffEditor } from './SQLEditor.types'
 import {
   assembleCompletionDiff,
+  buildCompletionRequestBody,
   buildDebugChatArgs,
   buildDebugPromptText,
   createSqlSnippetSkeletonV2,
   extractDebugContext,
+  planDiffRequestApplication,
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
@@ -198,13 +200,14 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
             'Content-Type': 'application/json',
             ...(options?.headers ?? {}),
           },
-          body: JSON.stringify({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            language: 'sql',
-            orgSlug: org?.slug,
-            ...(options?.body ?? {}),
-          }),
+          body: JSON.stringify(
+            buildCompletionRequestBody({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              orgSlug: org?.slug,
+              options: options?.body,
+            })
+          ),
         })
 
         if (!response.ok) {
@@ -325,21 +328,19 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     // on mount and re-runs this effect, so the request applies once mounted.
     if (!editorModel) return
 
-    const { diffType, sql } = request
     const existingValue = editorRef.current?.getValue() ?? ''
-    if (existingValue.length === 0) {
+    const plan = planDiffRequestApplication({ existingValue, request })
+    if (plan.kind === 'replace') {
       // if the editor is empty, just copy over the code
       editorRef.current?.executeEdits('apply-ai-message', [
         {
-          text: `${sql}`,
+          text: plan.text,
           range: editorModel.getFullModelRange(),
         },
       ])
     } else {
-      const currentSql = editorRef.current?.getValue()
-      const diff = { original: currentSql || '', modified: sql }
-      setSourceSqlDiff(diff)
-      setSelectedDiffType(diffType)
+      setSourceSqlDiff(plan.diff)
+      setSelectedDiffType(plan.diffType)
     }
 
     // One-shot: drain the request so it can't re-apply to a later editor or session.

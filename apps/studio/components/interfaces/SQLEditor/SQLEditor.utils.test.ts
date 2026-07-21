@@ -3,12 +3,13 @@ import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
-import type { IStandaloneCodeEditor } from './SQLEditor.types'
+import { DiffType, type IStandaloneCodeEditor } from './SQLEditor.types'
 import {
   analyzeQueryIssues,
   appendEnableRLSStatements,
   applyAutoLimit,
   assembleCompletionDiff,
+  buildCompletionRequestBody,
   buildDebugChatArgs,
   buildDebugPromptText,
   buildExecuteParams,
@@ -23,6 +24,7 @@ import {
   hasActiveEnsureRLSTrigger,
   hasBlockingIssues,
   isUpdateWithoutWhere,
+  planDiffRequestApplication,
   resolveConnectionString,
   shouldAutoGenerateTitle,
   trimTrailingSemicolons,
@@ -393,6 +395,71 @@ describe('SQLEditor.utils.ts:buildDebugChatArgs', () => {
       sqlSnippets: ['select 1;'],
       initialInput:
         'Help me to debug the attached sql snippet which gives the following error: \n\nrelation does not exist',
+    })
+  })
+})
+
+describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
+  test('builds the base request body with no extra options', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: 'postgresql://example',
+        orgSlug: 'acme',
+      })
+    ).toEqual({
+      projectRef: 'default',
+      connectionString: 'postgresql://example',
+      language: 'sql',
+      orgSlug: 'acme',
+    })
+  })
+  test('merges options on top of the base fields', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: 'postgresql://example',
+        orgSlug: 'acme',
+        options: { completionMetadata: { prompt: 'add a where clause' } },
+      })
+    ).toEqual({
+      projectRef: 'default',
+      connectionString: 'postgresql://example',
+      language: 'sql',
+      orgSlug: 'acme',
+      completionMetadata: { prompt: 'add a where clause' },
+    })
+  })
+})
+
+describe('SQLEditor.utils.ts:planDiffRequestApplication', () => {
+  test('replaces the editor content when it is empty', () => {
+    const plan = planDiffRequestApplication({
+      existingValue: '',
+      request: { diffType: DiffType.Modification, sql: 'select 1;' },
+    })
+    expect(plan).toEqual({ kind: 'replace', text: 'select 1;' })
+  })
+  test('opens a diff against the existing content when it is not empty', () => {
+    const plan = planDiffRequestApplication({
+      existingValue: 'select 0;',
+      request: { diffType: DiffType.Modification, sql: 'select 1;' },
+    })
+    expect(plan).toEqual({
+      kind: 'diff',
+      diff: { original: 'select 0;', modified: 'select 1;' },
+      diffType: DiffType.Modification,
+    })
+  })
+  test('carries through the requested diff type', () => {
+    const plan = planDiffRequestApplication({
+      existingValue: 'select 0;',
+      request: { diffType: DiffType.NewSnippet, sql: 'select 1;' },
+    })
+    expect(plan).toEqual({
+      kind: 'diff',
+      diff: { original: 'select 0;', modified: 'select 1;' },
+      diffType: DiffType.NewSnippet,
     })
   })
 })

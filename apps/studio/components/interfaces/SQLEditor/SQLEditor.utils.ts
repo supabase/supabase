@@ -15,7 +15,12 @@ import {
   untitledSnippetTitle,
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
-import { ContentDiff, type IStandaloneCodeEditor, type PotentialIssues } from './SQLEditor.types'
+import {
+  ContentDiff,
+  DiffType,
+  type IStandaloneCodeEditor,
+  type PotentialIssues,
+} from './SQLEditor.types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import type { Database } from '@/data/read-replicas/replicas-query'
@@ -468,6 +473,37 @@ export function assembleCompletionDiff(
 }
 
 /**
+ * Builds the request body sent to the AI completion endpoint. `options` is
+ * the caller-provided extra fields (e.g. `completionMetadata`), merged in
+ * last so it can override the defaults if it ever needs to.
+ */
+export function buildCompletionRequestBody({
+  projectRef,
+  connectionString,
+  orgSlug,
+  options,
+}: {
+  projectRef: string | undefined
+  connectionString: string | undefined | null
+  orgSlug: string | undefined
+  options?: { completionMetadata?: unknown }
+}): {
+  projectRef: string | undefined
+  connectionString: string | undefined | null
+  language: 'sql'
+  orgSlug: string | undefined
+  completionMetadata?: unknown
+} {
+  return {
+    projectRef,
+    connectionString,
+    language: 'sql',
+    orgSlug,
+    ...(options ?? {}),
+  }
+}
+
+/**
  * Builds the prompt text used to ask the assistant to debug a failing snippet.
  */
 export function buildDebugPromptText(sql: string, errorMessage: string): string {
@@ -507,5 +543,33 @@ export function buildDebugChatArgs(
     name: 'Debug SQL snippet',
     sqlSnippets: [sql],
     initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`,
+  }
+}
+
+/** What `drainDiffRequest` should do with a pending diff request, given the editor's current value. */
+export type DiffRequestPlan =
+  | { kind: 'replace'; text: string }
+  | { kind: 'diff'; diff: ContentDiff; diffType: DiffType }
+
+/**
+ * Decides how to apply a pending diff request to the editor: if the editor is
+ * empty, just copy the request's SQL straight in; otherwise open a diff
+ * between what's there and the requested SQL. Pure decision only — the
+ * effect (`drainDiffRequest`) is left to actually touch the editor/diff state.
+ */
+export function planDiffRequestApplication({
+  existingValue,
+  request,
+}: {
+  existingValue: string
+  request: { diffType: DiffType; sql: string }
+}): DiffRequestPlan {
+  if (existingValue.length === 0) {
+    return { kind: 'replace', text: request.sql }
+  }
+  return {
+    kind: 'diff',
+    diff: { original: existingValue, modified: request.sql },
+    diffType: request.diffType,
   }
 }
