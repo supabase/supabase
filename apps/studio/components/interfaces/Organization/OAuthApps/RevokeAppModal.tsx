@@ -49,15 +49,15 @@ export const RevokeAppModal = ({
         <AlertDialogHeader>
           <AlertDialogTitle>{`Revoke access for ${selectedApp?.name}?`}</AlertDialogTitle>
           <AlertDialogDescription>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-4">
               <Admonition
                 type="warning"
                 title="This action cannot be undone"
                 description={`${selectedApp?.name} will no longer have access to your organization's settings
           and projects.`}
               />
-              <ul className="space-y-5">
-                <li className="flex gap-3 text-sm">
+              <div className="space-y-5">
+                <div className="flex gap-2 text-sm">
                   <Lock size={14} className="shrink-0" />
                   <div>
                     <strong>Before you remove this app, consider:</strong>
@@ -80,8 +80,8 @@ export const RevokeAppModal = ({
                       </li>
                     </ul>
                   </div>
-                </li>
-              </ul>
+                </div>
+              </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
