@@ -1,6 +1,6 @@
 import Image from 'next/image'
-
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import type Author from '@/types/author'
 
 interface Props {
@@ -25,7 +25,7 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
       : allNames
 
   const content = (
-    <div className="flex items-center gap-2 min-w-0">
+    <div className="flex items-center gap-2 min-w-0" tabIndex={valid.length >= 2 ? 0 : undefined}>
       <div className="flex items-center -space-x-1.5 shrink-0">
         {visibleAvatars.map((author, i) => (
           <div key={i} className={`relative ${px} rounded-full bg-background shrink-0 p-px`}>
@@ -46,9 +46,7 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
           </div>
         ))}
       </div>
-      {showName && (
-        <p className="text-foreground-lighter text-xs truncate min-w-0">{nameLabel}</p>
-      )}
+      {showName && <p className="text-foreground-lighter text-xs truncate min-w-0">{nameLabel}</p>}
     </div>
   )
 
