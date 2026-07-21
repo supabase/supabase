@@ -316,20 +316,29 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
         <TableCell className="max-w-[300px]">
           <HoverCard openDelay={100} closeDelay={100}>
             <HoverCardTrigger>
-              <p className="truncate font-mono tracking-tighter">{activity.query}</p>
-            </HoverCardTrigger>
-            <HoverCardContent align="start" className="w-96 p-0">
-              <CodeBlock
-                hideLineNumbers
+              <p
                 className={cn(
-                  'max-w-96 border-none [&>code]:text-xs max-h-64',
-                  '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11'
+                  'truncate font-mono tracking-tighter',
+                  activity.query === null && 'text-foreground-lighter'
                 )}
-                wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-0')}
-                language="pgsql"
-                value={formatSql(activity.query)}
-              />
-            </HoverCardContent>
+              >
+                {activity.query ?? 'No query'}
+              </p>
+            </HoverCardTrigger>
+            {activity.query && (
+              <HoverCardContent align="start" className="w-96 p-0">
+                <CodeBlock
+                  hideLineNumbers
+                  className={cn(
+                    'max-w-96 border-none [&>code]:text-xs max-h-64',
+                    '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11'
+                  )}
+                  wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-0')}
+                  language="pgsql"
+                  value={formatSql(activity.query)}
+                />
+              </HoverCardContent>
+            )}
           </HoverCard>
           <p className="text-xs text-foreground-lighter flex items-center gap-x-1 mt-0.5 truncate">
             <span>PID: {activity.pid}</span>

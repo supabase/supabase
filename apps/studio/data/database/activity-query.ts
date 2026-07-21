@@ -66,7 +66,7 @@ export type DatabaseActivity = {
   role_name: string
   application_name: string
   blocked_by: number[]
-  query: string
+  query: string | null
   query_start: string | null
   transaction_start: string | null
   state_change: string | null
