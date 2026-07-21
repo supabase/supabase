@@ -573,3 +573,35 @@ export function planDiffRequestApplication({
     diffType: request.diffType,
   }
 }
+
+/** What the window keydown handler should do for a key event, given the diff/prompt state. */
+export type DiffKeyAction =
+  | { type: 'accept' }
+  | { type: 'escape'; shouldDiscard: boolean }
+  | { type: 'none' }
+
+/**
+ * Decides how the SQL editor's window-level keydown handler should react:
+ * accept an open diff on Cmd/Ctrl+Enter, or discard-and-dismiss on Escape.
+ * No-ops when neither a diff nor the AI prompt is open, or for any other key.
+ */
+export function resolveDiffKeyAction(
+  e: Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey'>,
+  {
+    isDiffOpen,
+    isPromptOpen,
+    os,
+  }: { isDiffOpen: boolean; isPromptOpen: boolean; os: 'macos' | 'windows' | undefined }
+): DiffKeyAction {
+  if (!isDiffOpen && !isPromptOpen) return { type: 'none' }
+
+  switch (e.key) {
+    case 'Enter':
+      if ((os === 'macos' ? e.metaKey : e.ctrlKey) && isDiffOpen) return { type: 'accept' }
+      return { type: 'none' }
+    case 'Escape':
+      return { type: 'escape', shouldDiscard: isDiffOpen }
+    default:
+      return { type: 'none' }
+  }
+}

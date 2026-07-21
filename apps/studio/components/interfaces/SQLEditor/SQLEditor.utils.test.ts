@@ -26,6 +26,7 @@ import {
   isUpdateWithoutWhere,
   planDiffRequestApplication,
   resolveConnectionString,
+  resolveDiffKeyAction,
   shouldAutoGenerateTitle,
   trimTrailingSemicolons,
 } from './SQLEditor.utils'
@@ -461,6 +462,88 @@ describe('SQLEditor.utils.ts:planDiffRequestApplication', () => {
       diff: { original: 'select 0;', modified: 'select 1;' },
       diffType: DiffType.NewSnippet,
     })
+  })
+})
+
+const keyEvent = (overrides: Partial<Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey'>> = {}) => ({
+  key: 'a',
+  metaKey: false,
+  ctrlKey: false,
+  ...overrides,
+})
+
+describe('SQLEditor.utils.ts:resolveDiffKeyAction', () => {
+  test('does nothing when neither a diff nor the prompt is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
+      isDiffOpen: false,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('does nothing for keys other than Enter/Escape', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'a' }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('accepts on Cmd+Enter on macOS when a diff is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', metaKey: true }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'accept' })
+  })
+  test('accepts on Ctrl+Enter on Windows when a diff is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', ctrlKey: true }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'windows',
+    })
+    expect(action).toEqual({ type: 'accept' })
+  })
+  test('does not accept on Ctrl+Enter on macOS (wrong modifier for the OS)', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', ctrlKey: true }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('does not accept on Enter without the modifier key', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter' }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('does not accept on Cmd+Enter when the diff is not open, even if the prompt is', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', metaKey: true }), {
+      isDiffOpen: false,
+      isPromptOpen: true,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('escapes with shouldDiscard true when a diff is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'escape', shouldDiscard: true })
+  })
+  test('escapes with shouldDiscard false when only the prompt is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
+      isDiffOpen: false,
+      isPromptOpen: true,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'escape', shouldDiscard: false })
   })
 })
 
