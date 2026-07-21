@@ -3,7 +3,7 @@ import { ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
-import { Button, cn, CriticalIcon, Separator } from 'ui'
+import { Button, cn, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -11,7 +11,11 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
 import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { LogTypeIcon } from '@/components/interfaces/UnifiedLogs/components/LogTypeIcon'
+import { getLevelRowClassName } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { User } from '@/data/auth/users-infinite-query'
 import useLogsPreview from '@/hooks/analytics/useLogsPreview'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
@@ -129,55 +133,63 @@ export const UserLogs = ({ user }: UserLogsProps) => {
           />
         ) : (
           <div>
-            <div className="border border-b-0 rounded-t-md divide-y overflow-hidden">
-              {authLogs.map((log) => {
-                const status = ((log.status ?? '-') as any).toString()
-                const is400 = status.startsWith('4')
-                const is500 = status.startsWith('5')
+            <div className="border border-b-0 rounded-t-md overflow-x-auto">
+              <div className="min-w-[640px] divide-y">
+                {authLogs.map((log) => {
+                  const status =
+                    log.status !== undefined && log.status !== null ? String(log.status) : undefined
+                  const level = status?.startsWith('5')
+                    ? 'error'
+                    : status?.startsWith('4')
+                      ? 'warning'
+                      : 'success'
+                  const method = log.method ? String(log.method) : ''
 
-                return (
-                  <div
-                    key={log.id}
-                    className="flex items-center transition font-mono px-2 py-1.5 bg-surface-100 divide-x"
-                  >
-                    <p className="text-xs text-foreground-light min-w-[125px] w-[125px] px-1">
-                      <TimestampInfo utcTimestamp={log.timestamp / 1000} />
-                    </p>
-                    <div className="flex items-center text-xs text-foreground-light h-[22px] min-w-[70px] w-[70px] px-2">
-                      <div
-                        className={cn(
-                          'flex items-center justify-center gap-x-1',
-                          !!log.status && 'border px-1 py-0.5 rounded-sm',
-                          is400
-                            ? 'text-warning border-warning bg-warning-300'
-                            : is500
-                              ? 'text-destructive border-destructive bg-destructive-300'
-                              : ''
-                        )}
-                      >
-                        {(is400 || is500) && (
-                          <CriticalIcon hideBackground className={cn(is400 && 'text-warning')} />
-                        )}
-                        {status}
+                  return (
+                    <div
+                      key={log.id}
+                      className={cn(
+                        'group relative flex items-center h-[30px] pl-3 text-xs hover:bg-surface-200',
+                        getLevelRowClassName(level)
+                      )}
+                    >
+                      <DataTableColumnLevelIndicator
+                        value={level}
+                        className="w-2 min-w-2 shrink-0"
+                      />
+                      <div className="font-mono tracking-tight text-foreground-light w-[140px] shrink-0 truncate pl-3 pr-2">
+                        <TimestampInfo utcTimestamp={log.timestamp / 1000} />
                       </div>
-                    </div>
-                    <p className="group relative flex items-center py-1.5 text-xs text-foreground-light px-2 truncate w-full">
-                      {`${log.path} | ${log.msg}`}
+                      <div className="w-[32px] shrink-0 flex items-center justify-end pr-2">
+                        <LogTypeIcon type="auth" size={14} className="text-foreground-lighter" />
+                      </div>
+                      <div className="w-[60px] shrink-0 flex items-center px-2">
+                        <DataTableColumnStatusCode value={status} level={level} />
+                      </div>
+                      <div className="font-mono tracking-tight text-foreground-lighter w-[64px] shrink-0 truncate px-2">
+                        {method}
+                      </div>
+                      <div className="font-mono tracking-tight text-foreground w-[200px] shrink-0 truncate px-2">
+                        {String(log.path ?? '')}
+                      </div>
+                      <div className="font-mono tracking-tight text-muted-foreground flex-1 min-w-[160px] truncate px-2">
+                        {String(log.msg ?? '')}
+                      </div>
 
                       <ButtonTooltip
                         variant="outline"
                         asChild
                         tooltip={{ content: { text: 'Open in logs' } }}
-                        className="px-1.5 absolute right-0 top-0 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
+                        className="px-1.5 absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition bg-background focus-visible:opacity-100"
                       >
                         <Link href={`/project/${ref}/logs/auth-logs?log=${log.id}`}>
                           <ExternalLink size="12" className="text-foreground-light" />
                         </Link>
                       </ButtonTooltip>
-                    </p>
-                  </div>
-                )
-              })}
+                    </div>
+                  )
+                })}
+              </div>
             </div>
             <Button
               block

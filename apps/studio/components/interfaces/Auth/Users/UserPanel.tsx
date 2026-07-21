@@ -15,6 +15,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
+import { UserJourney } from './UserJourney'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
@@ -30,7 +31,7 @@ export const UserPanel = () => {
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
+  const [view, setView] = useState<'overview' | 'raw' | 'logs' | 'journey'>('overview')
   const [searchQuery, setSearchQuery] = useState('')
 
   const { data: selectedUser, isPending } = useUserQuery({
@@ -67,7 +68,7 @@ export const UserPanel = () => {
         <Tabs
           value={view}
           className="flex flex-col h-full"
-          onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs')}
+          onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs' | 'journey')}
         >
           {isPending ? (
             <div>
@@ -92,6 +93,12 @@ export const UserPanel = () => {
                   Logs
                 </TabsTrigger>
                 <TabsTrigger
+                  value="journey"
+                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
+                >
+                  Journey
+                </TabsTrigger>
+                <TabsTrigger
                   value="raw"
                   className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                 >
@@ -106,6 +113,9 @@ export const UserPanel = () => {
               </TabsContent>
               <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                 {selectedUser && <UserLogs user={selectedUser} />}
+              </TabsContent>
+              <TabsContent value="journey" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
+                {selectedUser && <UserJourney user={selectedUser} />}
               </TabsContent>
               <TabsContent
                 value="raw"
