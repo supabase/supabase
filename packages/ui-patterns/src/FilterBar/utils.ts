@@ -261,8 +261,10 @@ export function resolvePropertyChange(
     return { operator: currentOperator, value: '', focusTarget: 'value' }
   }
 
-  if (newProperty.options && Array.isArray(newProperty.options)) {
-    // New property has fixed options — only preserve value if it's in the list
+  if (currentOperator !== 'is' && newProperty.options && Array.isArray(newProperty.options)) {
+    // New property has fixed options — only preserve value if it's in the list.
+    // The `is` operator is excluded: its value is a null-check token
+    // (`null` / `not null`), which is independent of the property's options.
     const optionValues = newProperty.options.map((opt) =>
       typeof opt === 'string' ? opt : 'value' in opt ? opt.value : ''
     )
