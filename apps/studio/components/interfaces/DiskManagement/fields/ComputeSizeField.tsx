@@ -35,7 +35,6 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
 import { DOCS_URL } from '@/lib/constants'
 
 const INITIALLY_VISIBLE_COUNT = 6
@@ -197,8 +196,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               ) : (
                 <>
                   {visibleOptions.map((compute) => {
-                    const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
-
                     const lockedMicroDueToPITR =
                       compute.identifier === 'ci_micro' && !!subscriptionPitr
                     const lockedNanoDueToPlan =
@@ -220,7 +217,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                     const cpuLabel = (() => {
                       const cpuCores = compute.meta?.cpu_cores
                       if (typeof cpuCores === 'number') {
-                        return `${cpuCores}-core ${cpuArchitecture} CPU`
+                        return `${cpuCores}-core CPU`
                       }
                       if (cpuCores) {
                         return `${cpuCores} CPU`
