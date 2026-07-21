@@ -58,7 +58,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   } = diff
   const { promptState, setPromptState, resetPrompt } = prompt
 
-  const { editorRef, diffEditorRef, refocusEditor } = useSQLEditorContext()
+  const { editor, diff: diffController, refocusEditor } = useSQLEditorContext()
 
   const router = useRouter()
   const { ref } = useParams()
@@ -131,25 +131,16 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
       setIsAcceptDiffLoading(true)
 
       // TODO: show error if undefined
-      if (!sourceSqlDiff || !editorRef.current || !diffEditorRef.current) return
+      if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) return
 
-      const editorModel = editorRef.current.getModel()
-      const diffModel = diffEditorRef.current.getModel()
-
-      if (!editorModel || !diffModel) return
-
-      const sql = diffModel.modified.getValue()
+      const sql = diffController.getModifiedValue()
+      if (sql === undefined) return
 
       if (selectedDiffType === DiffType.NewSnippet) {
         const { title } = await generateSqlTitle({ sql })
         await handleNewQuery(sql, title)
       } else {
-        editorRef.current.executeEdits('apply-ai-edit', [
-          {
-            text: sql,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
+        editor.replaceAll(sql, 'apply-ai-edit')
       }
 
       track('assistant_sql_diff_handler_evaluated', { handlerAccepted: true })
@@ -162,8 +153,8 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
       setIsAcceptDiffLoading(false)
     }
   }, [
-    editorRef,
-    diffEditorRef,
+    editor,
+    diffController,
     sourceSqlDiff,
     selectedDiffType,
     generateSqlTitle,
@@ -284,11 +275,11 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   )
 
   const handleDiffEditorMount = useCallback(
-    (editor: IStandaloneDiffEditor) => {
-      diffEditorRef.current = editor
+    (mountedDiffEditor: IStandaloneDiffEditor) => {
+      diffController.attach(mountedDiffEditor)
       setIsDiffEditorMounted(true)
     },
-    [diffEditorRef]
+    [diffController]
   )
 
   const resetDiff = useEffectEvent(() => {
@@ -303,19 +294,14 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  useEffect(() => {
+  const syncDiffEditor = useEffectEvent(() => {
     if (isDiffOpen) {
-      const diffEditor = diffEditorRef.current
-      const model = diffEditor?.getModel()
-      if (model && model.original && model.modified) {
-        model.original.setValue(defaultSqlDiff.original)
-        model.modified.setValue(defaultSqlDiff.modified)
-        // scroll to the start line of the modification
-        const modifiedEditor = diffEditor!.getModifiedEditor()
-        const startLine = promptState.startLineNumber
-        modifiedEditor.revealLineInCenter(startLine)
-      }
+      diffController.setDiff(defaultSqlDiff, promptState.startLineNumber)
     }
+  })
+  useEffect(() => {
+    syncDiffEditor()
+    // Temporary until we update eslint to ignore useEffectEvent
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDiffType, sourceSqlDiff])
 
@@ -323,21 +309,15 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     const request = diffRequest.pending
     if (request === undefined) return
 
-    const editorModel = editorRef.current?.getModel()
     // Editor isn't ready yet; leave the request pending. editorMountCount bumps
     // on mount and re-runs this effect, so the request applies once mounted.
-    if (!editorModel) return
+    if (!editor.isReady()) return
 
-    const existingValue = editorRef.current?.getValue() ?? ''
+    const existingValue = editor.getValue() ?? ''
     const plan = planDiffRequestApplication({ existingValue, request })
     if (plan.kind === 'replace') {
       // if the editor is empty, just copy over the code
-      editorRef.current?.executeEdits('apply-ai-message', [
-        {
-          text: plan.text,
-          range: editorModel.getFullModelRange(),
-        },
-      ])
+      editor.replaceAll(plan.text, 'apply-ai-message')
     } else {
       setSourceSqlDiff(plan.diff)
       setSelectedDiffType(plan.diffType)
@@ -358,11 +338,11 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     if (!isDiffOpen) {
       setIsDiffEditorMounted(false)
       setShowWidget(false)
-    } else if (diffEditorRef.current && isDiffEditorMounted) {
+    } else if (diffController.isMounted() && isDiffEditorMounted) {
       setShowWidget(true)
       return () => setShowWidget(false)
     }
-  }, [diffEditorRef, isDiffOpen, isDiffEditorMounted])
+  }, [diffController, isDiffOpen, isDiffEditorMounted])
 
   return useMemo(
     () => ({

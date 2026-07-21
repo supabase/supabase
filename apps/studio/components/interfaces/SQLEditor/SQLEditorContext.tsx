@@ -10,7 +10,13 @@ import {
   type RefObject,
 } from 'react'
 
-import type { IStandaloneCodeEditor, IStandaloneDiffEditor } from './SQLEditor.types'
+import type {
+  ContentDiff,
+  DiffController,
+  EditorController,
+  IStandaloneCodeEditor,
+  IStandaloneDiffEditor,
+} from './SQLEditor.types'
 import { computeErrorHighlightLine, getEditorSql } from './SQLEditor.utils'
 
 type SQLEditorContextValue = {
@@ -26,14 +32,10 @@ type SQLEditorContextValue = {
   markRefocusAfterRun: () => void
   /** Refocus the editor iff a run-refocus was requested, then clear the flag. */
   refocusEditorAfterRunIfNeeded: () => void
-  getEditorSql: (snippetContent?: UntrustedSqlFragment) => UntrustedSqlFragment | undefined
-  /** Clear any active error-highlight decorations. */
-  clearHighlights: () => void
-  /** Highlight and reveal the line referenced by an execute error's position. */
-  applyErrorHighlight: (
-    error: { position?: unknown; formattedError?: string },
-    hasSelection: boolean
-  ) => void
+  /** Semantic port onto the main editor — no hook should touch `editorRef.current` directly. */
+  editor: EditorController
+  /** Semantic port onto the diff editor — no hook should touch `diffEditorRef.current` directly. */
+  diff: DiffController
 }
 
 const SQLEditorContext = createContext<SQLEditorContextValue | null>(null)
@@ -77,10 +79,34 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
     refocusEditor()
   }, [refocusEditor])
 
-  const getEditorSqlFromEditor = useCallback((snippetContent?: UntrustedSqlFragment) => {
-    const editor = editorRef.current
-    if (!editor) return undefined
-    return getEditorSql(editor, snippetContent)
+  const isEditorReady = useCallback(() => editorRef.current !== null, [])
+
+  const getEditorValue = useCallback(() => editorRef.current?.getValue(), [])
+
+  const getSelectionStartLine = useCallback(
+    () => editorRef.current?.getSelection()?.startLineNumber,
+    []
+  )
+
+  const getSqlFromEditor = useCallback((snippetContent?: UntrustedSqlFragment) => {
+    const editorInstance = editorRef.current
+    if (!editorInstance) return undefined
+    return getEditorSql(editorInstance, snippetContent)
+  }, [])
+
+  const replaceAll = useCallback((text: string, source: string) => {
+    const editorInstance = editorRef.current
+    const model = editorInstance?.getModel()
+    if (!editorInstance || !model) return
+    editorInstance.executeEdits(source, [{ text, range: model.getFullModelRange() }])
+  }, [])
+
+  const focusEditor = useCallback(() => {
+    editorRef.current?.focus()
+  }, [])
+
+  const revealLineInCenter = useCallback((line: number) => {
+    editorRef.current?.revealLineInCenter(line)
   }, [])
 
   const clearHighlights = useCallback(() => {
@@ -90,17 +116,19 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
     }
   }, [])
 
-  const applyErrorHighlight = useCallback(
+  const highlightErrorLine = useCallback(
     (error: { position?: unknown; formattedError?: string }, hasSelection: boolean) => {
       if (!error.position || !monacoRef.current) return
 
-      const editor = editorRef.current
+      const editorInstance = editorRef.current
       const monaco = monacoRef.current
-      const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
+      const startLineNumber = hasSelection
+        ? (editorInstance?.getSelection()?.startLineNumber ?? 0)
+        : 0
       const line = computeErrorHighlightLine(error, startLineNumber)
       if (isNaN(line)) return
 
-      const decorations = editor?.deltaDecorations(
+      const decorations = editorInstance?.deltaDecorations(
         [],
         [
           {
@@ -113,11 +141,67 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
         ]
       )
       if (decorations) {
-        editor?.revealLineInCenter(line)
+        editorInstance?.revealLineInCenter(line)
         lineHighlightsRef.current = decorations
       }
     },
     []
+  )
+
+  const editor = useMemo<EditorController>(
+    () => ({
+      isReady: isEditorReady,
+      getValue: getEditorValue,
+      getSelectionStartLine,
+      getSql: getSqlFromEditor,
+      replaceAll,
+      focus: focusEditor,
+      revealLineInCenter,
+      highlightErrorLine,
+      clearHighlights,
+    }),
+    [
+      isEditorReady,
+      getEditorValue,
+      getSelectionStartLine,
+      getSqlFromEditor,
+      replaceAll,
+      focusEditor,
+      revealLineInCenter,
+      highlightErrorLine,
+      clearHighlights,
+    ]
+  )
+
+  const isDiffMounted = useCallback(() => diffEditorRef.current !== null, [])
+
+  const getModifiedValue = useCallback(
+    () => diffEditorRef.current?.getModel()?.modified.getValue(),
+    []
+  )
+
+  const setDiff = useCallback((contentDiff: ContentDiff, revealLine: number) => {
+    const diffEditorInstance = diffEditorRef.current
+    const model = diffEditorInstance?.getModel()
+    if (!diffEditorInstance || !model || !model.original || !model.modified) return
+
+    model.original.setValue(contentDiff.original)
+    model.modified.setValue(contentDiff.modified)
+    diffEditorInstance.getModifiedEditor().revealLineInCenter(revealLine)
+  }, [])
+
+  const attachDiffEditor = useCallback((editorInstance: IStandaloneDiffEditor) => {
+    diffEditorRef.current = editorInstance
+  }, [])
+
+  const diff = useMemo<DiffController>(
+    () => ({
+      isMounted: isDiffMounted,
+      getModifiedValue,
+      setDiff,
+      attach: attachDiffEditor,
+    }),
+    [isDiffMounted, getModifiedValue, setDiff, attachDiffEditor]
   )
 
   const value = useMemo<SQLEditorContextValue>(
@@ -130,18 +214,16 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
       clearPendingRunRefocus,
       markRefocusAfterRun,
       refocusEditorAfterRunIfNeeded,
-      getEditorSql: getEditorSqlFromEditor,
-      clearHighlights,
-      applyErrorHighlight,
+      editor,
+      diff,
     }),
     [
       refocusEditor,
       clearPendingRunRefocus,
       markRefocusAfterRun,
       refocusEditorAfterRunIfNeeded,
-      getEditorSqlFromEditor,
-      clearHighlights,
-      applyErrorHighlight,
+      editor,
+      diff,
     ]
   )
 

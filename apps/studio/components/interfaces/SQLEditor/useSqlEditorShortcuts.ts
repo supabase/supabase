@@ -33,7 +33,7 @@ export function useSqlEditorShortcuts({
   const os = detectOS()
   const router = useRouter()
   const { ref } = useParams()
-  const { editorRef, refocusEditor } = useSQLEditorContext()
+  const { editor, refocusEditor } = useSQLEditorContext()
 
   const openNewSnippet = useCallback(() => {
     if (!ref) return
@@ -67,7 +67,7 @@ export function useSqlEditorShortcuts({
         case 'escape':
           if (action.shouldDiscard) discardAiHandler()
           resetPrompt()
-          editorRef.current?.focus()
+          editor.focus()
           return
         case 'none':
           return
@@ -75,5 +75,5 @@ export function useSqlEditorShortcuts({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [editorRef, os, isDiffOpen, isPromptOpen, acceptAiHandler, discardAiHandler, resetPrompt])
+  }, [editor, os, isDiffOpen, isPromptOpen, acceptAiHandler, discardAiHandler, resetPrompt])
 }
