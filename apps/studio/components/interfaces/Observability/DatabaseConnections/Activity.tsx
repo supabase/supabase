@@ -187,7 +187,7 @@ export const Activity = ({ live }: ActivityProps) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>State</TableHead>
+              <TableHead className="w-[70px]">State</TableHead>
               <TableHead className="max-w-[300px]">Query · Session</TableHead>
               <TableHead>Duration</TableHead>
               <TableHead>Blocked by</TableHead>
@@ -307,7 +307,7 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
   return (
     <>
       <TableRow id={activity.pid.toString()} key={activity.pid}>
-        <TableCell className="relative">
+        <TableCell className="relative w-[70px]">
           {selectedPid === activity.pid && (
             <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter"></div>
           )}
