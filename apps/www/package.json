@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "pnpm run content:build && next --port 3000",
-    "prebuild": "pnpm --filter=docs run build:guides-markdown",
+    "prebuild": "pnpm --filter=docs run build:federated-content && pnpm --filter=docs run build:guides-markdown",
     "build": "pnpm run content:build && next build",
     "export": "next export",
     "start": "next start",
