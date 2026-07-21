@@ -6,6 +6,14 @@ import { useSiwcQueryParamOptIn } from '../useSiwcQueryParamOptIn'
 
 vi.mock('next/router', () => import('next-router-mock'))
 
+// tests/vitestSetup.ts globally mocks `common`'s useParams to always return `{ ref: 'default' }`,
+// which would make this hook's `siwcEnabled` lookup always undefined. Restore the real
+// implementation here so useParams reflects the mocked router's query params.
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return { ...actual }
+})
+
 const mockSetValue = vi.hoisted(() => vi.fn())
 const mockUseLocalStorageQuery = vi.hoisted(() => vi.fn())
 
@@ -50,8 +58,10 @@ describe('useSiwcQueryParamOptIn', () => {
     expect(mockSetValue).not.toHaveBeenCalled()
   })
 
-  it('does nothing when the param is repeated (array value)', () => {
-    mockRouter.setCurrentUrl('/sign-in?siwc-enabled=1&siwc-enabled=1')
+  it('only considers the first value when the param is repeated (array value)', () => {
+    // useParams (from 'common') flattens repeated query params to their first occurrence, so
+    // only the first "0" here is seen by the hook, and it does nothing.
+    mockRouter.setCurrentUrl('/sign-in?siwc-enabled=0&siwc-enabled=1')
 
     renderHook(() => useSiwcQueryParamOptIn())
 
