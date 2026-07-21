@@ -2601,6 +2601,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "connect-interstitial-demo": {
+      name: "connect-interstitial-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-demo")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "connect-interstitial-logo-pair": {
+      name: "connect-interstitial-logo-pair",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logo-pair")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-logo-pair.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "connect-interstitial-logo-single": {
+      name: "connect-interstitial-logo-single",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logo-single")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-logo-single.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "page-layout-auth-emails": {
       name: "page-layout-auth-emails",
       type: "components:example",

@@ -1,0 +1,138 @@
+---
+title: 'Supabase Pipelines is now in Public Alpha'
+description: 'Supabase Pipelines is now in public alpha with schema change support, a faster initial copy, and a new destination request form for ClickHouse, Snowflake, and DuckLake.'
+author: riccardo_busetti
+imgSocial: supabase-pipelines-public-alpha/og.png
+imgThumb: supabase-pipelines-public-alpha/thumb.png
+categories:
+  - product
+tags:
+  - pipelines
+  - bigquery
+  - postgres
+date: '2026-07-21'
+toc_depth: 2
+---
+
+Today we're moving **Supabase Pipelines** into public alpha. The biggest addition is schema change support: Pipelines can now detect supported schema changes in your source tables and apply them to the destination automatically. This release also brings a faster initial copy and a new destination request form for ClickHouse, Snowflake, and DuckLake.
+
+Supabase Pipelines replicates your Supabase Postgres data to external analytical systems in near real time. It is powered by [Supabase ETL](https://github.com/supabase/etl), our open source change-data-capture pipeline written in Rust. Supabase ETL reads changes from Postgres through logical replication, copies existing table data, streams inserts, updates, deletes, and truncates, and writes them to your destination.
+
+The first destination available to everyone in public alpha is **Google BigQuery**.
+
+## Why Supabase Pipelines?
+
+Postgres is excellent for transactional workloads: reading a user profile, inserting an order, updating a subscription, or serving your application.
+
+Analytics workloads are different. They often scan large amounts of data, aggregate across many rows, and power dashboards, reports, notebooks, and downstream systems. Running those queries directly on your production database can add load to the same system your application depends on.
+
+Supabase Pipelines gives you a reliable way to move production data into systems built for analytics, while keeping your application workload on Postgres.
+
+You get:
+
+- A complete initial copy of your selected tables.
+- Near real-time replication after the initial copy finishes.
+- At-least-once delivery for database changes.
+- Destination-side tables that stay aligned with your source schema.
+- A managed Dashboard experience for creating, monitoring, and controlling pipelines.
+- The ability to add and remove tables to your replication pipeline without having to restart replication from scratch.
+
+If you are deciding between Supabase Realtime and Supabase Pipelines, read [Realtime or Pipelines? How to choose the right tool](https://supabase.com/blog/realtime-or-pipelines-how-to-choose-the-right-tool). The short version: Realtime is for live user experiences over WebSocket. Supabase Pipelines is for reliable data movement into analytical systems.
+
+## What changed since private alpha
+
+Since introducing Supabase Pipelines, we've been focused on making it faster, more predictable, and easier to operate.
+
+We improved performance across the board, reduced memory usage, and lowered replication latency. This work is ongoing. Supabase Pipelines is still in alpha, and we're continuing to tune throughput, batching, and backpressure as we learn from more workloads.
+
+We also improved the initial sync. It can now be parallelized across tables and within a table, which lets pipelines load existing data much faster before switching into streaming mode.
+
+The biggest new feature is **schema change support**.
+
+## Schema changes are now replicated
+
+When your Postgres schema changes in a supported way, Pipelines applies the same change to your destination automatically.
+
+That means your BigQuery schema can stay up to date as your Postgres schema changes, without requiring a manual destination migration for every supported change.
+
+The current version supports:
+
+- Adding columns.
+- Removing columns.
+- Renaming columns.
+- Changing column nullability and defaults.
+
+This is an important step toward one-to-one replication between your operational database and your analytical destination.
+
+There is more to do. We're working on expanding schema change support to cover more cases, including additional type changes and other table-level changes. Some destinations may also support the operations above in different ways due to their inherent limitations. For now, unsupported schema changes may still require manual handling depending on the change and destination.
+
+## How it works
+
+Supabase Pipelines uses Postgres logical replication under the hood.
+
+When you create a pipeline:
+
+1. You choose the tables you want to replicate.
+2. Supabase Pipelines creates an initial sync of the selected tables.
+3. The initial sync runs with parallel workers based on the configured parallelism level.
+4. After the sync completes, the pipeline switches to streaming mode.
+5. New changes are read from the replication slot, batched, and written to the destination.
+6. Supported schema changes are detected and applied to the destination schema.
+
+The pipeline is designed for reliable data movement. If a destination is temporarily unavailable or the pipeline restarts, replication resumes from the last acknowledged position. It can also detect and recover from many transient failures automatically, while surfacing issues that require intervention.
+
+## Available destinations
+
+BigQuery is the first destination available to everyone in public alpha.
+
+BigQuery is Google's serverless data warehouse. It works well for large-scale analytics, integrates with BI tools, and gives teams a familiar place to query operational data without running heavy analytical workloads against Postgres.
+
+When you replicate to BigQuery, Supabase Pipelines keeps a destination representation of your source tables up to date. You can query the replicated data in BigQuery while your application continues using Postgres.
+
+## Request new destinations
+
+We want Supabase Pipelines to connect Supabase Postgres to the systems your team already uses.
+
+We're opening a [destination request form](https://supabase.com/go/supabase-pipelines-new-destinations) for:
+
+- ClickHouse
+- Snowflake
+- DuckLake
+
+This form helps us prioritize the next destinations based on real use cases: scale, data volume, expected latency, destination setup, and how teams want to query replicated data.
+
+We're always looking to add more destinations. If there is another warehouse, lakehouse, database, or local analytics engine you want to see supported, let us know.
+
+## Pricing
+
+Supabase Pipelines uses a pipeline-based and usage-based pricing model:
+
+- **$0.053 per hour per active pipeline**
+- **$0.60 per GB** for the initial table copy
+- **$3 per GB** for replicated data after the initial copy
+
+A pipeline becomes billable as soon as it is created and is charged hourly, including while replication is paused or inactive. Initial sync usage covers the first load of existing data, while ongoing replication usage covers changes processed after that initial sync. Pricing may change during the public alpha, and we will provide advance notice before any updates take effect.
+
+## Things to know during public alpha
+
+Supabase Pipelines is now available in public alpha, which means more teams can start using it, but we're still improving the product quickly.
+
+A few things to keep in mind:
+
+- BigQuery is currently the only destination, available on all paid plans.
+- More schema changes, including broader type change support, are on the roadmap.
+- Performance, memory usage, and latency will continue to improve.
+- Destination support will expand based on customer demand and product feedback.
+- Multi-region support for reduced latency is being evaluated.
+
+We're especially interested in feedback from teams using Supabase Pipelines for analytics, reporting, audit trails, ML workflows, and workload isolation.
+
+## Get started
+
+![Supabase Pipelines dashboard](/images/blog/supabase-pipelines-public-alpha/pipelines-screenshot-1.png)
+
+Supabase Pipelines is available in public alpha on all paid plans, from the Supabase Dashboard.
+
+Create a pipeline, choose BigQuery as your destination, select the tables you want to replicate, and start moving your Postgres data into your warehouse.
+
+To explore the underlying technology, visit the open-source [Supabase ETL repository](https://github.com/supabase/etl). If you want to understand when to use Supabase Pipelines instead of Realtime, read [Realtime or Pipelines? How to choose the right tool](https://supabase.com/blog/realtime-or-etl-how-to-choose-the-right-tool).

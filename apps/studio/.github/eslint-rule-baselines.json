@@ -742,8 +742,6 @@
       "components/layouts/DatabaseLayout/DatabaseLayout.tsx": 1,
       "components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout.tsx": 1,
       "components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout.tsx": 1,
-      "components/layouts/IntegrationsLayout/IntegrationWindowLayout.tsx": 1,
-      "components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout.tsx": 1,
       "components/layouts/JWTKeys/JWTKeysLayout.tsx": 1,
       "components/layouts/LogsLayout/LogsLayout.tsx": 1,
       "components/layouts/Navigation/NavigationBar/MobileNavigationBar.tsx": 1,

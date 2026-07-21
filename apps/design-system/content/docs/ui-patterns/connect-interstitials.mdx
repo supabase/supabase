@@ -1,0 +1,161 @@
+---
+title: Connect Interstitials
+description: Shared layout guidance for focused authorisation, invite, marketplace, CLI, and credit redemption flows.
+---
+
+Connect interstitials are focused, single-card flows that sit outside the main
+Studio shell. Use the shared `InterstitialLayout` family instead of building
+bespoke centered cards, logos, account rows, or organisation selectors.
+
+<ComponentPreview
+  name="connect-interstitial-demo"
+  description="Centered 400px card with partner branding, account row, and a single primary action"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+## Use this pattern for
+
+This pattern fits short-lived connect flows: partner authorisation and consent
+(OAuth, MCP, Stripe Projects), organisation invites, marketplace and billing
+connections (AWS Marketplace, Vercel install, credit redemption), and CLI or
+device-code sign-in. Use the same shell for their loading, error, success, and
+wrong-account states.
+
+Do not use it for normal authenticated Studio pages. Those should use the
+standard [page layout](./layout) patterns.
+
+## Source of truth
+
+```tsx
+import { OrganizationSelector } from '@/components/interfaces/Connect/OrganizationSelector'
+import {
+  InterstitialAccountRow,
+  InterstitialLayout,
+  LogoBox,
+  LogoPair,
+  PartnerLogo,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
+```
+
+## Basic shape
+
+Use `InterstitialLayout` for the outer card, then put route-specific content in
+`px-6 pb-6`. Widen the card only when the flow embeds a real tool, such as
+project linking.
+
+```tsx
+<InterstitialLayout
+  logo={
+    <LogoPair
+      left={<PartnerLogo src={`${BASE_PATH}/img/icons/stripe-icon.svg`} alt="Stripe" />}
+      right={<SupabaseLogo />}
+    />
+  }
+  title="Authorize Stripe Projects"
+  description="This will create an organization on your behalf in Supabase"
+>
+  <div className="px-6 pb-6">
+    <InterstitialAccountRow displayName={displayName} />
+    <Button variant="primary" block>
+      Continue
+    </Button>
+  </div>
+</InterstitialLayout>
+```
+
+```tsx
+<InterstitialLayout
+  logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
+  title="Connect Vercel project"
+  containerClassName="items-start"
+  cardClassName="max-w-[900px]"
+>
+  <div className="px-6 pb-6">{projectLinker}</div>
+</InterstitialLayout>
+```
+
+## Logos
+
+Use `LogoPair` when the user is connecting two services, and `SupabaseLogo`
+alone for first-party flows. `PartnerLogo` fills the 48px box edge-to-edge;
+`LogoBox` is for custom inset marks or logos that need their own background.
+Store new partner icons in `apps/studio/public/img/icons`.
+
+<ComponentPreview
+  name="connect-interstitial-logo-pair"
+  description="LogoPair when the user is connecting two services"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+<ComponentPreview
+  name="connect-interstitial-logo-single"
+  description="SupabaseLogo alone for first-party flows"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+```tsx
+const AwsLogo = () => (
+  <LogoBox className="border-[#232f3e] bg-[#232f3e]">
+    <img alt="AWS" src={`${BASE_PATH}/img/icons/aws-icon.svg`} className="w-8" />
+  </LogoBox>
+)
+
+<LogoPair left={<AwsLogo />} right={<SupabaseLogo />} />
+```
+
+## Account row
+
+Use `InterstitialAccountRow` for signed-in context. Do not recreate it locally.
+
+```tsx
+<InterstitialAccountRow avatarUrl={avatarUrl} displayName={displayName} action={signOutButton} />
+```
+
+## Organisation selection
+
+Use `OrganizationSelector` when the flow needs an organisation pick. Extend it
+for new states instead of inventing a parallel card style.
+
+```tsx
+<OrganizationSelector
+  organizations={linkableOrganizations}
+  selectedSlug={selectedOrgSlug}
+  onSelect={setSelectedOrgSlug}
+  createLabel="Create new organization"
+  onCreate={() => setShowOrgCreationDialog(true)}
+/>
+```
+
+## Actions
+
+Prefer one full-width primary action. A full-width text button is fine for a
+secondary action that still belongs in the flow.
+
+## States
+
+Keep loading, invalid, error, and success states inside the same card when the
+route can explain them. Use `ShimmeringLoader` for loading, and `Admonition`
+for warning, error, note, and success copy.
+
+## Copy
+
+Use sentence case. Prefer `sign in` over `login`. Titles and primary actions
+should follow `Verb -> Thing`, for example `Authorize Stripe Projects` or
+`Install Vercel`.
+
+Keep the layout title static across states and put state-specific copy in the
+body. Header descriptions should stay short and should not end with a full
+stop.

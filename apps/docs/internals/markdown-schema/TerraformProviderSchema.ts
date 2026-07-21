@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 
 const SCHEMA_PATH = path.join(process.cwd(), 'features/docs/generated/terraform.schema.json')
@@ -15,6 +15,12 @@ function attributesTable(attributes: Record<string, any>, extraColumns: string[]
 }
 
 export const TerraformProviderSchema = (): string => {
+  // `build:guides-markdown` can run standalone (e.g. apps/www's prebuild) without
+  // `build:federated-content`, so this generated artifact may not exist yet.
+  if (!existsSync(SCHEMA_PATH)) {
+    return ''
+  }
+
   const schema = JSON.parse(readFileSync(SCHEMA_PATH, 'utf-8'))
   const provider = schema.provider_schemas['registry.terraform.io/supabase/supabase']
 
