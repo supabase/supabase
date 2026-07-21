@@ -80,7 +80,7 @@ export const RevokeAppModal = ({
                         <InlineLink
                           href={`/dashboard/project/_/integrations/${selectedApp?.id}/settings`}
                         >
-                          Integration's page
+                          Integration's Settings
                         </InlineLink>
                         , and remove any listed Secret API key to fully revoke its access.
                       </li>
