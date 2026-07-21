@@ -63,6 +63,13 @@ const getDuration = (activity: DatabaseActivity) => {
   return null
 }
 
+const getBadgeVariant = (activity: DatabaseActivity) => {
+  const { state } = activity
+  if (state === 'active') return 'success'
+  if (state === 'idle in transaction' || state === 'idle in transaction (aborted)') return 'warning'
+  return 'default'
+}
+
 const DEFAULT_ROLES_FILTER = ['anon', 'authenticated', 'postgres']
 
 interface ActivityProps {
@@ -72,7 +79,6 @@ interface ActivityProps {
 export const Activity = ({ live }: ActivityProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [, setNow] = useState(() => dayjs())
   const [selectedPid] = useQueryState('pid', parseAsInteger)
   const [stateFilter, setStateFilter] = useQueryState(
     'state',
@@ -90,7 +96,7 @@ export const Activity = ({ live }: ActivityProps) => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { refetchInterval: live ? 3000 : false }
+    { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
 
   const { data: roles } = useDatabaseRolesQuery({
@@ -146,12 +152,6 @@ export const Activity = ({ live }: ActivityProps) => {
       if (bIndex !== -1) return 1
       return 0
     })
-
-  // [Joshen] Just to trigger a UI re-render for the duration to be "live"
-  useEffect(() => {
-    const interval = setInterval(() => setNow(dayjs()), 1000)
-    return () => clearInterval(interval)
-  }, [])
 
   useEffect(() => {
     if (selectedPid && isSuccess) {
@@ -280,13 +280,8 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
     },
   })
 
-  const getBadgeVariant = (state: DatabaseActivity['state']) => {
-    if (state === 'active') return 'success'
-    if (state === 'idle in transaction') return 'warning'
-    return 'default'
-  }
-
   const durationSeconds = getDuration(activity)
+  const badgeVariant = getBadgeVariant(activity)
 
   /**
    * Queries in "active state": 30s threshold is long enough (most CRUD queries should be quick)
@@ -295,7 +290,9 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
   const queryRunningLongWarning =
     !!durationSeconds &&
     ((activity.state === 'active' && durationSeconds >= 30) ||
-      (activity.state === 'idle in transaction' && durationSeconds >= 10))
+      ((activity.state === 'idle in transaction' ||
+        activity.state === 'idle in transaction (aborted)') &&
+        durationSeconds >= 10))
 
   const onConfirmTerminate = async () => {
     try {
@@ -314,7 +311,7 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
           {selectedPid === activity.pid && (
             <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter"></div>
           )}
-          <Badge variant={getBadgeVariant(activity.state)}>{activity.state}</Badge>
+          <Badge variant={badgeVariant}>{activity.state}</Badge>
         </TableCell>
         <TableCell className="max-w-[300px]">
           <HoverCard openDelay={100} closeDelay={100}>
@@ -325,7 +322,7 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
                   activity.query === null && 'text-foreground-lighter'
                 )}
               >
-                {activity.query ?? 'No query'}
+                {!!activity.query ? activity.query : 'No query'}
               </p>
             </HoverCardTrigger>
             {activity.query && (
@@ -360,7 +357,11 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
           <p
             className={cn(
               'tabular-nums truncate',
-              queryRunningLongWarning ? 'text-warning' : undefined
+              queryRunningLongWarning
+                ? activity.state === 'active'
+                  ? 'text-warning'
+                  : 'text-destructive'
+                : undefined
             )}
           >
             {durationSeconds !== null ? (
