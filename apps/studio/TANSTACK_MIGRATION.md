@@ -78,7 +78,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/_app/account.tsx` — AccountLayout (reads `accountLayoutTitle` from leaf `staticData`)
 - [x] `routes/_app/org.tsx` — OrganizationLayout (reads `orgLayoutTitle` from leaf `staticData`). **Delta vs plan:** placed at `_app/org.tsx` (wraps both `/org/` index and `/org/$slug/*`) instead of `_app/org/$slug.tsx`. PageLayout stays inline on `/org/$slug/index.tsx` since only that one route uses it.
 - [x] `routes/_app/new.tsx` — skipped; only `_app/new/index.tsx` lives under \_app (inlines WizardLayout). `new/$slug` is top-level (no AppLayout) so a sub-shell would not actually share state.
-- [x] `routes/integrations/vercel.tsx` — VercelIntegrationWindowLayout. **Delta vs plan:** placed at top-level rather than under `_app/` — Next getLayout for all three leaves wraps only in VercelIntegrationWindowLayout, no AppLayout/DefaultLayout.
+- [x] `routes/integrations/vercel.tsx` — passthrough `Outlet` only (no shared window layout). **Delta vs plan:** placed at top-level rather than under `_app/`. All three Vercel leaves (install, marketplace choose-project, deploy-button new-project) render their own `InterstitialLayout` inline; the old `VercelIntegrationWindowLayout` was removed.
 
 ### Project shell
 

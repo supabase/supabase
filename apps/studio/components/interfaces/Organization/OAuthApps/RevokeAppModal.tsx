@@ -13,6 +13,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthorizedAppRevokeMutation } from '@/data/oauth/authorized-app-revoke-mutation'
 import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'
 
@@ -49,15 +50,15 @@ export const RevokeAppModal = ({
         <AlertDialogHeader>
           <AlertDialogTitle>{`Revoke access for ${selectedApp?.name}?`}</AlertDialogTitle>
           <AlertDialogDescription>
-            <div className="flex flex-col space-y-2">
+            <div className="flex flex-col space-y-4">
               <Admonition
                 type="warning"
                 title="This action cannot be undone"
                 description={`${selectedApp?.name} will no longer have access to your organization's settings
           and projects.`}
               />
-              <ul className="space-y-5">
-                <li className="flex gap-3 text-sm">
+              <div className="space-y-5">
+                <div className="flex gap-2 text-sm">
                   <Lock size={14} className="shrink-0" />
                   <div>
                     <strong>Before you remove this app, consider:</strong>
@@ -73,10 +74,20 @@ export const RevokeAppModal = ({
                         Restoring access will require an organization administrator to re-authorize
                         the application.
                       </li>
+                      <li className="list-disc ml-4">
+                        The application may also have a <strong>Secret API key</strong> with access.
+                        Go to the{' '}
+                        <InlineLink
+                          href={`/dashboard/project/_/integrations/${selectedApp?.id}/settings`}
+                        >
+                          Integration's Settings
+                        </InlineLink>
+                        , and remove any listed Secret API key to fully revoke its access.
+                      </li>
                     </ul>
                   </div>
-                </li>
-              </ul>
+                </div>
+              </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
