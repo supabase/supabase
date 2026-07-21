@@ -75,7 +75,7 @@ When you create a pipeline:
 1. You choose the tables you want to replicate.
 2. Supabase Pipelines creates an initial sync of the selected tables.
 3. The initial sync runs with parallel workers based on the configured parallelism level.
-4. After the copy completes, the pipeline switches to streaming mode.
+4. After the sync completes, the pipeline switches to streaming mode.
 5. New changes are read from the replication slot, batched, and written to the destination.
 6. Supported schema changes are detected and applied to the destination schema.
 
@@ -137,4 +137,3 @@ Supabase Pipelines is available in public alpha on all paid plans, from the Supa
 Create a pipeline, choose BigQuery as your destination, select the tables you want to replicate, and start moving your Postgres data into your warehouse.
 
 To explore the underlying technology, visit the open-source [[Supabase ETL repository](https://github.com/supabase/etl)](https://github.com/supabase/etl). If you want to understand when to use Supabase Pipelines instead of Realtime, read [Realtime or Pipelines? How to choose the right tool](https://supabase.com/blog/realtime-or-etl-how-to-choose-the-right-tool).
-
