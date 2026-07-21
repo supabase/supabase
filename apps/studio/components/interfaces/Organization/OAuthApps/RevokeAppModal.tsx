@@ -77,7 +77,7 @@ export const RevokeAppModal = ({
                         There may also be a Secret Key remaining with access, go to the Project this
                         was installed, and navigate to Integrations. Check and remove any{' '}
                         <strong>Secret API key</strong> that is noted to ensure all access is
-                        removed for Grafana
+                        removed for Grafana.
                       </li>
                     </ul>
                   </div>
