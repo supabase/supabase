@@ -73,6 +73,12 @@ export const RevokeAppModal = ({
                         Restoring access will require an organization administrator to re-authorize
                         the application.
                       </li>
+                      <li className="list-disc ml-4">
+                        There may also be a Secret Key remaining with access, go to the Project this
+                        was installed, and navigate to Integrations. Check and remove any{' '}
+                        <strong>Secret API key</strong> that is noted to ensure all access is
+                        removed for Grafana
+                      </li>
                     </ul>
                   </div>
                 </li>
