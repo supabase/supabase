@@ -602,9 +602,6 @@ importers:
       '@graphql-codegen/typescript-resolvers':
         specifier: 4.5.0
         version: 4.5.0(encoding@0.1.13)(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)
-      '@playwright/test':
-        specifier: ^1.59.1
-        version: 1.59.1
       '@redocly/cli':
         specifier: ^2.26.0
         version: 2.34.0
@@ -2009,6 +2006,12 @@ importers:
       vite:
         specifier: ^7.3.2
         version: 7.3.5(@types/node@22.13.14)(jiti@2.7.0)(lightningcss@1.32.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  e2e/docs:
+    dependencies:
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
 
   e2e/studio:
     dependencies:

@@ -5,7 +5,7 @@ import { collectDocsOwnedLinks } from '../utils/docs-links.js'
 const QUICKSTART_PATH = '/docs/guides/getting-started/quickstarts/nextjs'
 const ARTICLE_SELECTOR = '#sb-docs-guide-main-article'
 
-test.describe('Next.js quickstart @quickstart', () => {
+test.describe('Next.js quickstart', () => {
   test('loads and docs-owned article links resolve', async ({ page }, testInfo) => {
     const baseURL = testInfo.project.use.baseURL
     expect(baseURL, 'A Playwright base URL should be configured').toBeTruthy()
