@@ -16,7 +16,7 @@ toc_depth: 2
 
 Today we're moving **Supabase Pipelines** into public alpha. The biggest addition is schema change support: Pipelines can now detect supported schema changes in your source tables and apply them to the destination automatically. This release also brings a faster initial copy and a new destination request form for ClickHouse, Snowflake, and DuckLake.
 
-Supabase Pipelines replicates your Supabase Postgres data to external analytical systems in near real time. It is powered by [Supabase ETL](https://supabase.com/blog/introducing-supabase-etl), our open source change-data-capture pipeline written in Rust. Supabase ETL reads changes from Postgres through logical replication, copies existing table data, streams inserts, updates, deletes, and truncates, and writes them to your destination.
+Supabase Pipelines replicates your Supabase Postgres data to external analytical systems in near real time. It is powered by [Supabase ETL](https://github.com/supabase/etl), our open source change-data-capture pipeline written in Rust. Supabase ETL reads changes from Postgres through logical replication, copies existing table data, streams inserts, updates, deletes, and truncates, and writes them to your destination.
 
 The first destination available to everyone in public alpha is **Google BigQuery**.
 
@@ -41,11 +41,11 @@ If you are deciding between Supabase Realtime and Supabase Pipelines, read [Real
 
 ## What changed since private alpha
 
-Since introducing Supabase ETL, we've been focused on making the pipeline faster, more predictable, and easier to operate.
+Since introducing Supabase Pipelines, we've been focused on making it faster, more predictable, and easier to operate.
 
-We improved performance across the pipeline, reduced memory usage, and lowered replication latency. This work is ongoing. Supabase Pipelines is still in alpha, and we're continuing to tune throughput, batching, backpressure, and destination writes as we learn from more workloads.
+We improved performance across the board, reduced memory usage, and lowered replication latency. This work is ongoing. Supabase Pipelines is still in alpha, and we're continuing to tune throughput, batching, and backpressure as we learn from more workloads.
 
-We also improved the initial table copy. It can now be parallelized across tables and within a table, which lets pipelines load existing data much faster before switching into streaming mode.
+We also improved the initial sync. It can now be parallelized across tables and within a table, which lets pipelines load existing data much faster before switching into streaming mode.
 
 The biggest new feature is **schema change support**.
 
@@ -73,8 +73,8 @@ Supabase Pipelines uses Postgres logical replication under the hood.
 When you create a pipeline:
 
 1. You choose the tables you want to replicate.
-2. Supabase Pipelines creates an initial copy of the selected tables.
-3. The initial copy runs with parallel workers based on the configured parallelism level.
+2. Supabase Pipelines creates an initial sync of the selected tables.
+3. The initial sync runs with parallel workers based on the configured parallelism level.
 4. After the copy completes, the pipeline switches to streaming mode.
 5. New changes are read from the replication slot, batched, and written to the destination.
 6. Supported schema changes are detected and applied to the destination schema.
@@ -103,9 +103,6 @@ This form helps us prioritize the next destinations based on real use cases: sca
 
 We're always looking to add more destinations. If there is another warehouse, lakehouse, database, or local analytics engine you want to see supported, let us know.
 
-## On the roadmap
-
-When the DuckLake destination becomes available, we plan for Supabase to run routine performance maintenance for you, so your data stays optimized for queries.
 
 ## Pricing
 
@@ -115,7 +112,7 @@ Supabase Pipelines uses a pipeline-based and usage-based pricing model:
 - **$0.60 per GB** for the initial table copy
 - **$3 per GB** for replicated data after the initial copy
 
-An active pipeline is a pipeline that is configured and running replication, billed hourly. Initial table copy usage is measured during the first load of existing data. Replicated data usage is measured from changes processed after the initial copy. Pricing is subject to change during the public alpha. We'll give notice before any change takes effect.
+A pipeline becomes billable as soon as it is created and is charged hourly, including while replication is paused or inactive. Initial sync usage covers the first load of existing data, while ongoing replication usage covers changes processed after that initial sync. Pricing may change during the public alpha, and we will provide advance notice before any updates take effect.
 
 ## Things to know during public alpha
 
@@ -139,6 +136,5 @@ Supabase Pipelines is available in public alpha on all paid plans, from the Supa
 
 Create a pipeline, choose BigQuery as your destination, select the tables you want to replicate, and start moving your Postgres data into your warehouse.
 
-If you want to understand the underlying technology, read [Introducing Supabase ETL](https://supabase.com/blog/introducing-supabase-etl). If you want to understand when to use Supabase Pipelines instead of Realtime, read [Realtime or Pipelines? How to choose the right tool](https://supabase.com/blog/realtime-or-etl-how-to-choose-the-right-tool).
+To explore the underlying technology, visit the open-source [[Supabase ETL repository](https://github.com/supabase/etl)](https://github.com/supabase/etl). If you want to understand when to use Supabase Pipelines instead of Realtime, read [Realtime or Pipelines? How to choose the right tool](https://supabase.com/blog/realtime-or-etl-how-to-choose-the-right-tool).
 
-Supabase ETL is open source. You can find the code at [github.com/supabase/etl](https://github.com/supabase/etl).
