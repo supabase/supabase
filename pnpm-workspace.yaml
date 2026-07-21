@@ -14,11 +14,11 @@ catalog:
   '@monaco-editor/react': ^4.7.0
   '@sentry/nextjs': ^10.59.0
   '@sentry/tanstackstart-react': ^10.59.0
-  '@supabase/auth-js': 2.110.6
-  '@supabase/postgrest-js': 2.110.6
-  '@supabase/realtime-js': 2.110.6
+  '@supabase/auth-js': 2.110.8
+  '@supabase/postgrest-js': 2.110.8
+  '@supabase/realtime-js': 2.110.8
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.110.6
+  '@supabase/supabase-js': 2.110.8
   '@tanstack/react-router': ^1.169.2
   '@tanstack/react-start': ^1.167.65
   '@tanstack/react-table': ^8.21.3
