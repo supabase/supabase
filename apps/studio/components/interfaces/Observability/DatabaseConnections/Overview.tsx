@@ -10,6 +10,7 @@ import {
 } from 'ui-patterns/MetricCard'
 
 import { buildDatabaseConnectionsSummaryPrompt } from './DatabaseConnections.ai'
+import { WARN_DURATION_ACTIVE_QUERY, WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
@@ -17,7 +18,6 @@ import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { WARN_DURATION_ACTIVE_QUERY, WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
 
 const LONG_RUNNING_STATES: (DatabaseActivity['state'] | undefined)[] = [
   'active',
@@ -69,7 +69,8 @@ export const Overview = ({ live, refreshTimestamp }: OverviewProps) => {
     }, null)
   const queryRunningLongWarning =
     !!longestRunningQuery &&
-    ((longestRunningQuery.activity.state === 'active' && longestRunningQuery.duration >= WARN_DURATION_ACTIVE_QUERY) ||
+    ((longestRunningQuery.activity.state === 'active' &&
+      longestRunningQuery.duration >= WARN_DURATION_ACTIVE_QUERY) ||
       ((longestRunningQuery.activity.state === 'idle in transaction' ||
         longestRunningQuery.activity.state === 'idle in transaction (aborted)') &&
         longestRunningQuery.duration >= WARN_DURATION_IDLE_TXN))
