@@ -129,6 +129,7 @@ describe('Storage.utils: formatPoliciesForStorage', () => {
   test('should group a policy under a bucket referenced only in its check clause', () => {
     const policies = [
       mockPolicy({
+        id: 42,
         definition: rawSql(`((select auth.uid()::text) = owner)`),
         check: rawSql(`(bucket_id = 'avatars'::text)`),
       }),
@@ -137,6 +138,8 @@ describe('Storage.utils: formatPoliciesForStorage', () => {
 
     expect(output).toHaveLength(1)
     expect(output[0].name).toBe('avatars')
+    expect(output[0].policies).toHaveLength(1)
+    expect(output[0].policies[0].id).toBe(42)
   })
 
   test('should return an empty array when there are no policies', () => {
