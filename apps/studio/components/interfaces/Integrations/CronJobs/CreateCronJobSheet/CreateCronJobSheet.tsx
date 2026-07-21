@@ -133,6 +133,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     name: selectedCronJob?.jobname || '',
     schedule: selectedCronJob?.schedule || '*/5 * * * *',
     supportsSeconds,
+    values: cronJobValues,
   }
 
   const form = useForm<CreateCronJobForm>({
