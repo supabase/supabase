@@ -11,6 +11,7 @@ import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
 import { McpCiConfigBlock } from '~/components/McpCiConfigBlock'
 import { Mermaid } from '~/components/Mermaid'
+import { LogDrainDestinationCards } from '~/components/LogDrainDestinationCards'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
@@ -94,6 +95,7 @@ const components = {
   McpCiConfigBlock,
   McpConfigPanel,
   Mermaid,
+  LogDrainDestinationCards,
   MetricsStackCards,
   NamedCodeBlock,
   NavData,
