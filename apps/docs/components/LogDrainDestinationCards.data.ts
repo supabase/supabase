@@ -2,7 +2,16 @@ export type LogDrainDestinationOption = {
   title: string
   description: string
   href: string
-  iconKind: 'braces' | 'otlp' | 'datadog' | 'grafana' | 'cloud' | 'sentry' | 'axiom' | 'last9' | 'server'
+  iconKind:
+    | 'braces'
+    | 'otlp'
+    | 'datadog'
+    | 'grafana'
+    | 'cloud'
+    | 'sentry'
+    | 'axiom'
+    | 'last9'
+    | 'server'
   iconColor: string
   iconBg: string
 }

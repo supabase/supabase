@@ -3,7 +3,10 @@ import { Braces, Cloud, Server } from 'lucide-react'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { logDrainDestinationOptions, type LogDrainDestinationOption } from './LogDrainDestinationCards.data'
+import {
+  logDrainDestinationOptions,
+  type LogDrainDestinationOption,
+} from './LogDrainDestinationCards.data'
 
 const ICONS: Record<LogDrainDestinationOption['iconKind'], ReactNode> = {
   braces: <Braces className="h-5 w-5" strokeWidth={1.5} />,
