@@ -478,5 +478,5 @@ div[data-radix-portal]:not(.portal--toast) {
 .prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)),
 strong[class~='not-prose'],
 strong {
-  font-weight: 700;
+  @apply font-semibold;
 }
