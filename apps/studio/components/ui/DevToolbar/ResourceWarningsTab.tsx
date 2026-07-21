@@ -7,8 +7,8 @@ import { useEffect, useRef, useState } from 'react'
 import { cn, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-import { invoicesKeys } from '@/data/invoices/keys'
 import type { OverdueInvoicesResponse } from '@/data/invoices/invoices-overdue-query'
+import { invoicesKeys } from '@/data/invoices/keys'
 import { organizationKeys } from '@/data/organizations/keys'
 import { usageKeys } from '@/data/usage/keys'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
@@ -89,9 +89,12 @@ export const ResourceWarningsTab = () => {
         queryClient.invalidateQueries({
           queryKey: usageKeys.resourceWarnings(currentOrgSlug, undefined),
         })
+        queryClient.invalidateQueries({ queryKey: organizationKeys.list() })
+        queryClient.invalidateQueries({ queryKey: invoicesKeys.overdueInvoices() })
       }
       setSeverities(INITIAL_STATE)
       setIsReadOnly(false)
+      setOrgWarning('none')
       hasOverridesRef.current = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
