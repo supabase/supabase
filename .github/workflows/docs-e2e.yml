@@ -59,7 +59,7 @@ jobs:
               - 'apps/docs/**'
 
       - name: Wait for Vercel docs preview
-        if: github.event_name == 'pull_request' && steps.filter.outputs.docs_app == 'true'
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.filter.outputs.docs_app == 'true'
         id: deployment
         uses: vercel/wait-for-deployment-action@0e2b0c5c5cce31f1648108aeec56467187aca037
         with:
