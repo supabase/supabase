@@ -74,10 +74,9 @@ export const RevokeAppModal = ({
                         the application.
                       </li>
                       <li className="list-disc ml-4">
-                        There may also be a Secret Key remaining with access, go to the Project this
-                        was installed, and navigate to Integrations. Check and remove any{' '}
-                        <strong>Secret API key</strong> that is noted to ensure all access is
-                        removed for Grafana.
+                        The application may also have a <strong>Secret API key</strong> with access.
+                        Go to the project where it was installed, open Integrations, and remove any
+                        listed Secret API key to fully revoke its access.
                       </li>
                     </ul>
                   </div>
