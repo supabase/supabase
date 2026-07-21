@@ -9,18 +9,18 @@ import { IS_DEV } from '~/lib/constants'
 
 type Params = { slug?: string[] }
 
-const TerraformDocs = async (props: { params: Promise<Params> }) => {
+const PythonClientDocs = async (props: { params: Promise<Params> }) => {
   const params = await props.params
-  const slug = ['deployment', 'terraform', ...(params.slug ?? [])]
+  const slug = ['ai', 'python', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 
   return <GuideTemplate {...data!} />
 }
 
-const generateStaticParams = !IS_DEV ? genGuidesStaticParams('deployment/terraform') : getEmptyArray
+const generateStaticParams = !IS_DEV ? genGuidesStaticParams('ai/python') : getEmptyArray
 const generateMetadata = genGuideMeta((params: { slug?: string[] }) =>
-  getGuidesMarkdown(['deployment', 'terraform', ...(params.slug ?? [])])
+  getGuidesMarkdown(['ai', 'python', ...(params.slug ?? [])])
 )
 
-export default TerraformDocs
+export default PythonClientDocs
 export { generateStaticParams, generateMetadata }
