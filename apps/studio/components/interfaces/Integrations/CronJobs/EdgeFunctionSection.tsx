@@ -34,10 +34,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import {
-  CreateCronJobForm,
-  DEFAULT_TIMEOUT,
-} from './CreateCronJobSheet/CreateCronJobSheet.constants'
+import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { buildDatabaseEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
@@ -198,12 +195,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" layout="vertical" className="gap-1">
             <InputGroup>
-              <InputGroupInput
-                {...rest}
-                type="number"
-                placeholder="1000"
-                defaultValue={DEFAULT_TIMEOUT}
-              />
+              <InputGroupInput {...rest} type="number" placeholder="1000" />
               <InputGroupAddon align="inline-end">
                 <InputGroupText> ms</InputGroupText>
               </InputGroupAddon>

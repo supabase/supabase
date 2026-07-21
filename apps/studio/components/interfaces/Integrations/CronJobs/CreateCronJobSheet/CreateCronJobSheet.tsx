@@ -40,6 +40,7 @@ import { HttpRequestSection } from '../HttpRequestSection'
 import { SqlFunctionSection } from '../SqlFunctionSection'
 import { SqlSnippetSection } from '../SqlSnippetSection'
 import {
+  DEFAULT_TIMEOUT,
   FormSchema,
   type CreateCronJobForm,
   type CronJobType,
@@ -132,7 +133,6 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     name: selectedCronJob?.jobname || '',
     schedule: selectedCronJob?.schedule || '*/5 * * * *',
     supportsSeconds,
-    values: cronJobValues,
   }
 
   const form = useForm<CreateCronJobForm>({
@@ -268,6 +268,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     endpoint,
     method,
     // for some reason, the httpHeaders are not memoized and cause the useEffect to trigger even when the value is the same
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     JSON.stringify(httpHeaders),
     httpBody,
     timeoutMs,
@@ -334,7 +335,21 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                               name="function_type"
                               value={field.value}
                               disabled={field.disabled}
-                              onValueChange={(value) => field.onChange(value)}
+                              onValueChange={(value) => {
+                                // Reset the snippet field when the function type changes, otherwise users might
+                                // see SQL to call an edge_function, database function or http function and this
+                                // SQL might be incomplete or full of undefined depending on how far they went
+                                // in configuring the previous type inputs
+                                form.setValue('values.snippet', '')
+                                field.onChange(value)
+
+                                if (value === 'http_request' || value === 'edge_function') {
+                                  form.setValue('values.timeoutMs', DEFAULT_TIMEOUT, {
+                                    shouldDirty: false,
+                                    shouldTouch: false,
+                                  })
+                                }
+                              }}
                             >
                               {CRONJOB_DEFINITIONS.map((definition) => (
                                 <RadioGroupStackedItem
