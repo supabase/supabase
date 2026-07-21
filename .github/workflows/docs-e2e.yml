@@ -1,0 +1,110 @@
+name: Docs E2E Tests
+
+on:
+  pull_request:
+    branches: ['master']
+    paths:
+      - 'apps/docs/**'
+      - 'packages/ui/**'
+      - 'packages/ui-patterns/**'
+      - 'packages/common/**'
+      - 'packages/icons/**'
+      - 'packages/shared-data/**'
+      - 'packages/config/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docs-e2e.yml'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL to test against'
+        required: false
+        default: 'https://supabase.com'
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: read
+  statuses: read
+
+env:
+  CI: true
+
+jobs:
+  e2e:
+    name: Docs E2E
+    timeout-minutes: 30
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            apps/docs
+            packages
+            patches
+
+      - name: Wait for Vercel docs preview
+        if: github.event_name == 'pull_request'
+        id: deployment
+        uses: vercel/wait-for-deployment-action@0e2b0c5c5cce31f1648108aeec56467187aca037
+        with:
+          project-slug: docs
+          environment: preview
+          timeout: '900'
+
+      - name: Resolve base URL
+        id: base-url
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "url=${{ inputs.base_url }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=${{ steps.deployment.outputs.deployment-url }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter=docs...
+
+      - name: Install Playwright Chromium
+        run: pnpm -C apps/docs exec playwright install chromium --with-deps --only-shell
+
+      - name: Run docs E2E (quickstart)
+        if: github.event_name == 'pull_request'
+        working-directory: apps/docs
+        run: pnpm run e2e:quickstart
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_DOCS }}
+
+      - name: Run docs E2E (full suite)
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: apps/docs
+        run: pnpm run e2e
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_DOCS }}
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: docs-playwright-report
+          path: |
+            apps/docs/e2e/playwright-report/
+            apps/docs/e2e/test-results/
+          retention-days: 7
