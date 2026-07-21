@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
-import { extractBucketNameFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
+import { extractBucketNamesFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -16,10 +16,12 @@ export function useBucketPolicyCount() {
     const countMap = new Map<string, number>()
     for (const policy of policiesData) {
       if (policy.table !== 'objects') continue
-      const bucketName =
-        extractBucketNameFromDefinition(policy.definition) ??
-        extractBucketNameFromDefinition(policy.check)
-      if (bucketName) {
+      const definitionBuckets = extractBucketNamesFromDefinition(policy.definition)
+      const bucketNames =
+        definitionBuckets.length > 0
+          ? definitionBuckets
+          : extractBucketNamesFromDefinition(policy.check)
+      for (const bucketName of bucketNames) {
         countMap.set(bucketName, (countMap.get(bucketName) ?? 0) + 1)
       }
     }

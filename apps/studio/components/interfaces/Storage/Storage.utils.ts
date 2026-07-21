@@ -63,43 +63,62 @@ const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const formattedPolicies = policies.map((policy) => {
     const { definition: policyDefinition, check: policyCheck } = policy
 
-    const bucketName =
+    const bucketNames =
       policyDefinition !== null
-        ? extractBucketNameFromDefinition(policyDefinition)
-        : extractBucketNameFromDefinition(policyCheck)
+        ? extractBucketNamesFromDefinition(policyDefinition)
+        : extractBucketNamesFromDefinition(policyCheck)
 
-    if (bucketName) {
-      const isBucketLoaded = availableBuckets.includes(bucketName)
-
-      return {
-        ...policy,
-        bucket: isBucketLoaded ? bucketName : UNKNOWN_BUCKET_SYMBOL,
-      }
+    if (bucketNames.length === 0) {
+      return { ...policy, buckets: [UNGROUPED_POLICY_SYMBOL] }
     }
 
-    return { ...policy, bucket: UNGROUPED_POLICY_SYMBOL }
+    const groups = Array.from(
+      new Set(
+        bucketNames.map((name) => (availableBuckets.includes(name) ? name : UNKNOWN_BUCKET_SYMBOL))
+      )
+    )
+
+    return { ...policy, buckets: groups }
   })
 
   return formattedPolicies
 }
 
-export const extractBucketNameFromDefinition = (definition: string | null) => {
-  if (!definition) return null
+/**
+ * Extracts every bucket name a policy applies to from its pg_policies definition.
+ * Handles single-bucket equality (`bucket_id = 'name'`) and multi-bucket membership,
+ * which Postgres renders as `bucket_id = ANY (ARRAY['a'::text, 'b'::text])`.
+ * Negated conditions (`bucket_id <> 'name'`) contribute no buckets since the policy
+ * applies to every bucket except the named one — callers treat an empty result as
+ * "not attributable to specific buckets".
+ */
+export const extractBucketNamesFromDefinition = (definition: string | null): string[] => {
+  if (!definition) return []
 
-  const definitionSegments = definition?.split(' AND ') ?? []
-  const [bucketDefinition] = definitionSegments.filter((segment: string) =>
-    segment.includes('bucket_id')
-  )
-  return bucketDefinition ? bucketDefinition.split("'")[1] : null
+  const names = new Set<string>()
+
+  for (const match of definition.matchAll(/bucket_id\s*=\s*'([^']*)'/g)) {
+    names.add(match[1])
+  }
+
+  for (const match of definition.matchAll(/bucket_id\s*=\s*ANY\s*\(\s*ARRAY\[([^\]]*)\]/gi)) {
+    for (const quoted of match[1].matchAll(/'([^']*)'/g)) {
+      names.add(quoted[1])
+    }
+  }
+
+  return Array.from(names)
 }
 
-const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {
+const groupPoliciesByBucket = (policies: (Policy & { buckets: (string | Symbol)[] })[]) => {
   const policiesByBucket = new Map<string | Symbol, Policy[]>()
   policies.forEach((policy) => {
-    if (!policiesByBucket.has(policy.bucket)) {
-      policiesByBucket.set(policy.bucket, [])
-    }
-    policiesByBucket.get(policy.bucket)?.push(policy)
+    policy.buckets.forEach((bucket) => {
+      if (!policiesByBucket.has(bucket)) {
+        policiesByBucket.set(bucket, [])
+      }
+      policiesByBucket.get(bucket)?.push(policy)
+    })
   })
   return Array.from(policiesByBucket).map(([bucketName, policies]) => ({
     name: bucketName,
