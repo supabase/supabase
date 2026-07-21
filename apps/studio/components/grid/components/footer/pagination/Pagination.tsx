@@ -299,6 +299,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
           variant="text"
           className="w-7"
           icon={<Loader2 size={12} className="animate-spin" />}
+          aria-label="Loading"
         />
       ) : isError ? (
         <Tooltip>
@@ -309,6 +310,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
               className="w-7"
               loading={isFetching}
               icon={<AlertCircle />}
+              aria-label="Failed to retrieve row count"
             />
           </TooltipTrigger>
           <TooltipContent side="top">Failed to retrieve count: {error?.message}</TooltipContent>
@@ -322,7 +324,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
             </p>
           )}
 
-          {data.is_estimate && (
+          {true && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -331,6 +333,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
                   className="w-7"
                   loading={isFetching}
                   icon={<HelpCircle />}
+                  aria-label="Get exact row count"
                   onClick={() => {
                     // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
                     if (rowsCountEstimate === null || count === -1 || count > THRESHOLD_COUNT) {
