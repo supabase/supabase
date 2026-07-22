@@ -104,7 +104,7 @@ export const getEndpointsAndMCPToolsForAPI = (
   return { scopes, endpoints, mcp_tools }
 }
 
-const NEXT_PUBLIC_API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN || 'https://api.supabase.com'
+const NEXT_PUBLIC_API_DOMAIN = 'https://api.supabase.com'
 
 const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
   const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/api/${version}-json`, {
