@@ -92,7 +92,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
-          name: 'Integrations layout',
+          name: 'One-Click Integrations',
           discussionsUrl: undefined,
           enabled: isMarketplaceEnabled,
           isNew: true,
