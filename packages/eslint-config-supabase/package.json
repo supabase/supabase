@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "test": "node rules/require-focus-visible-outline.test.js"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.0.0",
@@ -17,6 +18,7 @@
     "eslint-config-prettier": "^10.0.0",
     "eslint-config-turbo": "^2.5.0",
     "@typescript/native": "catalog:",
+    "eslint": "^9.0.0",
     "typescript": "catalog:"
   }
 }

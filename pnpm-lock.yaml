@@ -2337,6 +2337,9 @@ importers:
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
+      eslint:
+        specifier: ^9.0.0
+        version: 9.37.0(jiti@2.7.0)(supports-color@8.1.1)
       eslint-config-next:
         specifier: ^15.5.0
         version: 15.5.4(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.2)

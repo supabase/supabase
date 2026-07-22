@@ -21,7 +21,8 @@
     "jsx-a11y/heading-has-content": 2,
     "jsx-a11y/no-distracting-elements": 0,
     "valtio/state-snapshot-rule": 1,
-    "react-hook-form/no-use-watch": 76
+    "react-hook-form/no-use-watch": 76,
+    "supabase/require-focus-visible-outline": 11
   },
   "ruleFiles": {
     "react-hooks/exhaustive-deps": {
@@ -1111,6 +1112,18 @@
       "components/interfaces/Storage/EditBucketModal.tsx": 2,
       "components/interfaces/Storage/StorageSettings/StorageSettings.tsx": 1,
       "components/interfaces/Support/LinkSupportTicketForm.tsx": 1
+    },
+    "supabase/require-focus-visible-outline": {
+      "components/grid/components/editor/DateTimeEditor.tsx": 1,
+      "components/interfaces/APIKeys/APIKeyRow.tsx": 1,
+      "components/interfaces/Auth/EmailTemplates/TemplateEditor.tsx": 1,
+      "components/interfaces/Integrations/CronJobs/HttpBodyFieldSection.tsx": 1,
+      "components/interfaces/Observability/ServiceHealthTable.tsx": 1,
+      "components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet/CreateAppSheet.tsx": 1,
+      "components/layouts/Navigation/LayoutHeader/BreadcrumbsView.tsx": 1,
+      "components/ui/AIAssistantPanel/AIAssistant.tsx": 1,
+      "components/ui/DataTable/primitives/InputWithAddons.tsx": 2,
+      "components/ui/EditorPanel/EditorPanel.tsx": 1
     }
   }
 }
