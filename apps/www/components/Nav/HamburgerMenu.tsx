@@ -9,6 +9,7 @@ type HamburgerButtonProps = {
 const HamburgerButton = (props: HamburgerButtonProps) => (
   <div className="inset-y-0 flex items-center lg:hidden" onClick={() => props.toggleFlyOut()}>
     <button
+      tabIndex={0}
       className={cn(
         'text-foreground-lighter focus:ring-brand bg-transparent hover:text-foreground-light transition-colors hover:bg-overlay inline-flex items-center justify-center rounded-md p-2 focus:outline-hidden focus:ring-2 focus:ring-inset'
       )}

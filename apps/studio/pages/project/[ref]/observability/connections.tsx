@@ -25,7 +25,11 @@ export const DatabaseConnections: NextPageWithLayout = () => {
   const [live, setLive] = useState(true)
   const [now, setNow] = useState(() => dayjs.utc())
 
-  const { data, isPending: isLoadingActivity } = useDatabaseActivityQuery(
+  const {
+    data,
+    isPending: isLoadingActivity,
+    refetch: refetchActivity,
+  } = useDatabaseActivityQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -51,9 +55,10 @@ export const DatabaseConnections: NextPageWithLayout = () => {
 
   // [Joshen] Just to trigger a UI re-render for the duration to be "live"
   useEffect(() => {
+    if (!live) return
     const interval = setInterval(() => setNow(dayjs.utc()), 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [live])
 
   return (
     <ReportPadding className="gap-y-12">
@@ -77,7 +82,14 @@ export const DatabaseConnections: NextPageWithLayout = () => {
         <div className="flex items-center gap-x-2">
           <Button
             variant={live ? 'default' : 'primary'}
-            onClick={() => setLive((prev) => !prev)}
+            onClick={() => {
+              const nextLive = !live
+              setLive(nextLive)
+              if (nextLive) {
+                setNow(dayjs.utc())
+                refetchActivity()
+              }
+            }}
             icon={live ? <Pause /> : <Play />}
           >
             {live ? 'Pause' : 'Live'}

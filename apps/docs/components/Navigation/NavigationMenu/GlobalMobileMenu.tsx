@@ -142,6 +142,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
               <div className="flex gap-4 items-center">
                 <ThemeToggle contentClassName="bg-surface-200" />
                 <button
+                  tabIndex={0}
                   onClick={() => setOpen(false)}
                   type="button"
                   className="inline-flex items-center justify-center focus:ring-brand bg-surface-100 hover:bg-surface-200 focus:outline-hidden focus:ring-2 focus:ring-inset border border-default bg-surface-100/75 text-foreground-light rounded-sm min-w-[30px] w-[30px] h-[30px]"

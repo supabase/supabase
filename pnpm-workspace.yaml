@@ -8,7 +8,7 @@ blockExoticSubdeps: true
 engineStrict: true
 updateNotifier: false
 # Doesn't work because of Typescript issues with peer dependencies, see https://github.com/pnpm/pnpm/issues/9739
-enableGlobalVirtualStore: false 
+enableGlobalVirtualStore: false
 
 catalog:
   '@monaco-editor/react': ^4.7.0
@@ -83,12 +83,12 @@ minimumReleaseAgeExclude:
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
   'monaco-editor': 'catalog:'
-  '@mapbox/node-pre-gyp>tar': ^7.5.11
+  '@mapbox/node-pre-gyp>tar': ^7.5.19
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
   braintrust>uuid: ^11.1.1
-  cacache>tar: ^7.5.11
+  cacache>tar: ^7.5.19
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
   # Pin h3 v1 to a single version so the Nuxt registry example (vue-blocks)
@@ -98,15 +98,17 @@ overrides:
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   mdx-bundler>uuid: ^11.1.1
-  node-gyp>tar: ^7.5.11
+  node-gyp>tar: ^7.5.19
   nodemailer: ^7.0.11
   postcss: 'catalog:'
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
-  supabase>tar: ^7.5.11
+  supabase>tar: ^7.5.19
   tmp: ^0.2.7
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1
+  'codemirror-graphql>@codemirror/language': 6.11.0
+  '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch

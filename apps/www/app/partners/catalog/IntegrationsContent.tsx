@@ -310,6 +310,7 @@ export default function IntegrationsContent({
               </span>
               <div className="flex items-center rounded-lg border border-muted">
                 <button
+                  tabIndex={0}
                   title="Grid view"
                   onClick={() => setFilters({ view: 'grid' })}
                   className={cn(
@@ -322,6 +323,7 @@ export default function IntegrationsContent({
                   <LayoutGrid size={14} />
                 </button>
                 <button
+                  tabIndex={0}
                   title="List view"
                   onClick={() => setFilters({ view: 'list' })}
                   className={cn(

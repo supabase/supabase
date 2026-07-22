@@ -316,6 +316,7 @@ export default function FormPatternsSidePanel() {
                       <FormControl className="col-span-6">
                         <div className="flex gap-4 items-center">
                           <button
+                            tabIndex={0}
                             type="button"
                             onClick={() => uploadButtonRef.current?.click()}
                             className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
@@ -424,6 +425,7 @@ export default function FormPatternsSidePanel() {
                             <p className="text-xs text-foreground-lighter">
                               Drag and drop or{' '}
                               <button
+                                tabIndex={0}
                                 type="button"
                                 onClick={() => fileUploadRef.current?.click()}
                                 className="underline cursor-pointer hover:text-foreground-light"

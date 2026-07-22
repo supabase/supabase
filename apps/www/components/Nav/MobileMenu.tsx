@@ -229,6 +229,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                 <SupabaseWordmark />
               </Link>
               <button
+                tabIndex={0}
                 onClick={() => setOpen(false)}
                 type="button"
                 className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand hover:text-foreground-light transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset"

@@ -187,6 +187,7 @@ const PricingComputeSection = () => {
           </div>
         </div>
         <button
+          tabIndex={0}
           onClick={() => setShowTable(!showTable)}
           className="w-full p-2 border-t border-muted text-foreground focus-visible:outline-brand-600 focus-visible:rounded-b-xl text-sm bg-alternative flex items-center justify-center gap-2"
         >

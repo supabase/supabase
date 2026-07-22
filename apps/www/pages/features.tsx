@@ -276,6 +276,7 @@ function FeaturesPage() {
               </span>
               <div className="flex items-center rounded-lg border border-muted">
                 <button
+                  tabIndex={0}
                   title="Grid view"
                   onClick={() => setViewMode('grid')}
                   className={cn(
@@ -288,6 +289,7 @@ function FeaturesPage() {
                   <LayoutGrid size={14} />
                 </button>
                 <button
+                  tabIndex={0}
                   title="Matrix view"
                   onClick={() => setViewMode('matrix')}
                   className={cn(

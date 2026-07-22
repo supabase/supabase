@@ -60,6 +60,7 @@ const ColorPalette = () => {
                 const isCopied = copied === reference
                 return (
                   <button
+                    tabIndex={0}
                     key={step * 100}
                     type="button"
                     onClick={() => handleCopy(reference)}

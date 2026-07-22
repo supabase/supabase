@@ -25,15 +25,13 @@ const Button = (props: Props) => {
     buttonStyles.textShadow = '0px 0px 6px rgba(13, 128, 86, 0.8)'
   }
 
-  const renderButton = () => (
-    <button
-      type="button"
-      className={`
+  const sharedClassName = `
         group inline-flex items-center rounded-md text-sm
         leading-4 transition focus:outline-hidden ${colorClass} ${className}
-      `}
-      style={buttonStyles}
-    >
+      `
+
+  const content = (
+    <>
       <span
         className={`
         relative transition-all ${url ? textClass : ''}
@@ -41,15 +39,27 @@ const Button = (props: Props) => {
       >
         {text}
       </span>
-      {url && (
+      {url && !hideArrow && (
         <span className={`ml-2 opacity-0 transition-all group-hover:opacity-100 ${arrowClass}`}>
           →
         </span>
       )}
-    </button>
+    </>
   )
 
-  return url ? <a href={url}>{renderButton()}</a> : renderButton()
+  if (url) {
+    return (
+      <a href={url} className={sharedClassName} style={buttonStyles}>
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <button tabIndex={0} type="button" className={sharedClassName} style={buttonStyles}>
+      {content}
+    </button>
+  )
 }
 
 export default Button
