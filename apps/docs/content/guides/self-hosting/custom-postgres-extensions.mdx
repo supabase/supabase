@@ -22,15 +22,15 @@ If the extension's maintainer already publishes a prebuilt Supabase Postgres ima
 
 </Admonition>
 
-The *proper* way to add an extension is to compile it into the image's [Nix build](#alternative-build-the-extension-into-the-nix-image), so it's built with the same toolchain as everything else. That's the most robust route, but it's involved - it needs Nix, building the image from source, and maintaining a fork. If that's heavier than you want, the rest of this guide is a lighter-weight alternative: build just your extension in an ordinary Docker builder and layer it onto the published image. The approach can work for many standard [PGXS](https://www.postgresql.org/docs/current/extend-pgxs.html) extensions - but since it cuts against the way the image is meant to be assembled, your mileage may vary, and the constraints in the next section are the trade-off.
+The _proper_ way to add an extension is to compile it into the image's [Nix build](#alternative-build-the-extension-into-the-nix-image), so it's built with the same toolchain as everything else. That's the most robust route, but it's involved - it needs Nix, building the image from source, and maintaining a fork. If that's heavier than you want, the rest of this guide is a lighter-weight alternative: build just your extension in an ordinary Docker builder and layer it onto the published image. The approach can work for many standard [PGXS](https://www.postgresql.org/docs/current/extend-pgxs.html) extensions - but since it cuts against the way the image is meant to be assembled, your mileage may vary, and the constraints in the next section are the trade-off.
 
 ### Why these images need special handling
 
 The image is Alpine Linux, but the PostgreSQL binaries and every bundled extension live in a `/nix` store. Three facts drive every step below:
 
 1. **The runtime is glibc, not musl.** Even though the base OS is Alpine (which uses musl libc), the Nix-built `postgres` and its extensions are linked against **glibc**. If you compile an extension with Alpine's native toolchain (`apk add build-base`), it links musl and **fails to load** at `CREATE EXTENSION` with an error like `libc.musl-aarch64.so.1: cannot open shared object file`. You must build in a **glibc** environment.
-2. **Match the major version, and keep the builder's glibc no newer than the image's.** Extensions are ABI-stable across an entire Postgres major version, so *any* 17.x builder works against *any* 17.x image - the **minor** version doesn't matter (a build against 17.10 loads fine on 17.6). What *does* matter is glibc: a `.so` built against a **newer** glibc than the runtime provides fails to load (`version 'GLIBC_2.xx' not found`). The Supabase image currently ships **glibc 2.40**, so this guide builds on **Debian bookworm** (`postgres:17-bookworm`, glibc 2.36), which stays safely below it. Avoid the default `postgres:17` tag, which is currently Debian trixie (glibc 2.41 - *newer* than the runtime).
-3. **The module directory is redirected.** The running `postgres` is a wrapper script that overrides its library directory via a `NIX_PGLIBDIR` environment variable. Your compiled `.so` must be installed into that directory - *not* the path `pg_config --pkglibdir` reports. This is why you can't just follow an extension's upstream install instructions (which typically use `make install` or copy to `pg_config --pkglibdir`): on these images `$libdir` resolves to `NIX_PGLIBDIR`, so a `.so` placed in `pkglibdir` loads with `could not access file "$libdir/<name>"`.
+2. **Match the major version, and keep the builder's glibc no newer than the image's.** Extensions are ABI-stable across an entire Postgres major version, so _any_ 17.x builder works against _any_ 17.x image - the **minor** version doesn't matter (a build against 17.10 loads fine on 17.6). What _does_ matter is glibc: a `.so` built against a **newer** glibc than the runtime provides fails to load (`version 'GLIBC_2.xx' not found`). The Supabase image currently ships **glibc 2.40**, so this guide builds on **Debian bookworm** (`postgres:17-bookworm`, glibc 2.36), which stays safely below it. Avoid the default `postgres:17` tag, which is currently Debian trixie (glibc 2.41 - _newer_ than the runtime).
+3. **The module directory is redirected.** The running `postgres` is a wrapper script that overrides its library directory via a `NIX_PGLIBDIR` environment variable. Your compiled `.so` must be installed into that directory - _not_ the path `pg_config --pkglibdir` reports. This is why you can't just follow an extension's upstream install instructions (which typically use `make install` or copy to `pg_config --pkglibdir`): on these images `$libdir` resolves to `NIX_PGLIBDIR`, so a `.so` placed in `pkglibdir` loads with `could not access file "$libdir/<name>"`.
 
 The cleanest way to satisfy 1 and 2 is to compile inside a glibc `postgres:<major>-bookworm` image and then copy the artifacts into the Supabase runtime image.
 
@@ -97,11 +97,11 @@ RUN set -eux; \
     rm -rf /tmp/pg_uuidv7.* /tmp/ext-sql
 ```
 
-Building your own extension? The same Dockerfile works - just `COPY` your PGXS source into the builder instead of `git clone`. If you're authoring a *new* extension from scratch, add it to the Nix build instead (see [Alternative: build the extension into the Nix image](#alternative-build-the-extension-into-the-nix-image) below).
+Building your own extension? The same Dockerfile works - just `COPY` your PGXS source into the builder instead of `git clone`. If you're authoring a _new_ extension from scratch, add it to the Nix build instead (see [Alternative: build the extension into the Nix image](#alternative-build-the-extension-into-the-nix-image) below).
 
 ### Handle dependencies beyond libc
 
-Copying a `.so` onto the image works cleanly only when its **sole** runtime dependency is libc - libc is already loaded in the `postgres` process, so it resolves for free. Any *other* shared library the extension links (libcurl, OpenSSL, etc.) must also be present **and findable** at runtime. Because the image is Nix-built, it has no `ld.so.cache` and no glibc libraries under `/usr/lib` - Nix resolves each binary's dependencies through a per-binary `RUNPATH` into the store instead - so a Debian-built `.so`, which relies on the usual library search, won't find them and `CREATE EXTENSION` fails with `libX.so: cannot open shared object file`.
+Copying a `.so` onto the image works cleanly only when its **sole** runtime dependency is libc - libc is already loaded in the `postgres` process, so it resolves for free. Any _other_ shared library the extension links (libcurl, OpenSSL, etc.) must also be present **and findable** at runtime. Because the image is Nix-built, it has no `ld.so.cache` and no glibc libraries under `/usr/lib` - Nix resolves each binary's dependencies through a per-binary `RUNPATH` into the store instead - so a Debian-built `.so`, which relies on the usual library search, won't find them and `CREATE EXTENSION` fails with `libX.so: cannot open shared object file`.
 
 The build happens inside Docker, so check the compiled `.so` in the builder stage rather than on your host (`readelf` is already available there via `build-essential`):
 
@@ -118,9 +118,9 @@ docker run --rm --entrypoint sh ext-builder -c 'readelf -d /src/*.so | grep NEED
 
 A few things make this more involved than it sounds:
 
-- **The distro's own static archive is often not enough.** A feature-rich `libcurl.a`, for example, drags in a large transitive chain (HTTP/2, IDN, brotli, SSH…) whose static archives aren't all installable - so you typically build a *minimal* static version of the dependency from source and link that, forcing the static archives (`-l:libfoo.a`).
+- **The distro's own static archive is often not enough.** A feature-rich `libcurl.a`, for example, drags in a large transitive chain (HTTP/2, IDN, brotli, SSH…) whose static archives aren't all installable - so you typically build a _minimal_ static version of the dependency from source and link that, forcing the static archives (`-l:libfoo.a`).
 - **PGXS may ignore the extension's `CFLAGS`.** Pass extra include paths via `PG_CPPFLAGS` on the `make` command line rather than editing the Makefile.
-- **Static linking has limits.** It won't help a dependency that `dlopen`s plugins at runtime, and linking a library that's *also* loaded by another extension (two copies of OpenSSL in one process, say) can clash.
+- **Static linking has limits.** It won't help a dependency that `dlopen`s plugins at runtime, and linking a library that's _also_ loaded by another extension (two copies of OpenSSL in one process, say) can clash.
 - **Some extensions hard-code their own name**, so you can't rename one to sidestep a collision with a bundled extension.
 
 When static linking isn't practical, use the [Nix path](#alternative-build-the-extension-into-the-nix-image), which resolves every dependency against the image's own libraries automatically.
@@ -142,21 +142,21 @@ docker build \
 Point the `db` service at your custom image in `docker-compose.yml`:
 
 ```yaml name=docker-compose.yml
-  db:
-    image: myorg/supabase-postgres-custom:17.6.1.136
-    # ...leave the rest of the service definition unchanged
+db:
+  image: myorg/supabase-postgres-custom:17.6.1.136
+  # ...leave the rest of the service definition unchanged
 ```
 
 Or build it as part of the stack with a `build:` block instead of `image:`:
 
 ```yaml name=docker-compose.yml
-  db:
-    # replace the `image:` line with this; leave the rest of the service unchanged
-    build:
-      context: ./my-extension
-      args:
-        SUPABASE_POSTGRES_TAG: 17.6.1.136
-        PG_MAJOR: '17'
+db:
+  # replace the `image:` line with this; leave the rest of the service unchanged
+  build:
+    context: ./my-extension
+    args:
+      SUPABASE_POSTGRES_TAG: 17.6.1.136
+      PG_MAJOR: '17'
 ```
 
 Then recreate the database service so it picks up the new image:
@@ -199,10 +199,10 @@ docker compose exec db psql -U postgres -c "CREATE EXTENSION pg_uuidv7;"
 The image's init scripts run as `supabase_admin` (a superuser) on first boot. Drop a SQL file into the init directory to create the extension automatically for **new** databases:
 
 ```yaml name=docker-compose.yml
-  db:
-    volumes:
-      # ...keep the existing mounts (the data dir, roles.sql, etc.) and add:
-      - ./volumes/db/pg_uuidv7.sql:/docker-entrypoint-initdb.d/migrations/99-pg_uuidv7.sql:Z
+db:
+  volumes:
+    # ...keep the existing mounts (the data dir, roles.sql, etc.) and add:
+    - ./volumes/db/pg_uuidv7.sql:/docker-entrypoint-initdb.d/migrations/99-pg_uuidv7.sql:Z
 ```
 
 ```sql name=volumes/db/pg_uuidv7.sql
