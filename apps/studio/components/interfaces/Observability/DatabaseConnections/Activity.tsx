@@ -86,7 +86,9 @@ export const Activity = ({ live }: ActivityProps) => {
   })
 
   const hasNoFiltersApplied =
-    statesFilter.length === 0 && isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
+    statesFilter.length === 0 &&
+    applicationsFilter.length === 0 &&
+    isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
 
   const { data, isPending, isSuccess } = useDatabaseActivityQuery(
     {
