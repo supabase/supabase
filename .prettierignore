@@ -38,6 +38,3 @@ packages/ui/src/components/Form/examples/PhoneProvidersSchema.json
 apps/www/_blog/2025-07-14-supabase-ui-platform-kit.mdx
 # vitest file snapshots — JSON.stringify owns the format, not Prettier
 apps/docs/scripts/__snapshots__/
-
-# byte-identity SQL fixtures - must not be reformatted (see packages/pg-meta/test/sql/studio/legacy-sql-identity.test.ts)
-packages/pg-meta/test/fixtures/legacy-sql/

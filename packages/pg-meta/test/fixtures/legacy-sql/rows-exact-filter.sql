@@ -1,1 +1,0 @@
-select (select count(*) from public.my_table where status = 'active'), false as is_estimate;
