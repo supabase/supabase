@@ -30,7 +30,7 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 
 ## Orientation
 
-- **Data layer** — all platform API calls go through `data/fetchers.ts` (`openapi-fetch`, typed by `packages/api-types`) with `handleError`; never raw `fetch`. One folder per resource in `data/`, each with a `keys.ts` query-key factory.
+- **Data layer** — all platform API calls go through `data/fetchers.ts` (`openapi-fetch`, typed by the generated `api-types` package) with `handleError`; never raw `fetch`. One folder per resource in `data/`, most with a `keys.ts` query-key factory.
 - **State** — valtio for global state (`state/`), nuqs for URL state, react-hook-form + zod for forms.
 - **Platform vs self-hosted** — `IS_PLATFORM` gates platform-only behavior; `withAuth` is a no-op when self-hosted.
 - **Telemetry** — `useTrack()` from `lib/telemetry/track`; event types live in `packages/common/telemetry-constants.ts`.
@@ -41,13 +41,13 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 
 ## Defaults that differ here
 
-- **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, `exhaustive-deps` suppression, or default export fails the build even though it's "only a warning". Check locally with `pnpm --filter studio run lint:ratchet`.
+- **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, unresolved `exhaustive-deps` warning, or default export fails the build even though it's "only a warning". Check locally with `pnpm --filter studio run lint:ratchet`.
 - **Clipboard**: `copyToClipboard` from `'ui'`, and never `await` anything before calling it (Safari requires the write inside the user gesture; lint-enforced) — pass a Promise as the argument instead.
 - **`useParams()` comes from `'common'`**, not `next/navigation` — it camelCases keys and returns `string | undefined`.
 - **Permissions**: `useAsyncCheckPermissions` from `hooks/misc/useCheckPermissions` (returns `can: true` when self-hosted).
 - **Gating**: `useIsFeatureEnabled` for product features, `useFlag` from `'common'` for feature flags — two different systems.
-- **Dates**: `dayjs` (plugins pre-loaded in `_app.tsx`), not `date-fns`. **Toasts**: `toast` from `'sonner'`.
+- **Dates**: `dayjs` (plugins pre-loaded at both entries, `pages/_app.tsx` and `routes/__root.tsx`), not `date-fns`. **Toasts**: `toast` from `'sonner'`.
 - **Import split**: `'ui'` = primitives, `'ui-patterns'` = composed patterns (`ConfirmationModal`, …), `@ui/*` = alias into `packages/ui/src`. Icons come from `lucide-react`.
 - **New tables** use `@tanstack/react-table`; `react-data-grid` is banned for new code.
-- **Ad-hoc SQL** against the user's database goes through `executeSql` / `useExecuteSqlQuery` (`data/sql/execute-sql-mutation`).
+- **Ad-hoc SQL** against the user's database goes through `executeSql` / `useExecuteSqlMutation` (`data/sql/execute-sql-mutation`).
 - **Confirmations**: `ConfirmationModal` / `TextConfirmModal` from `ui-patterns`, never `window.confirm`. Disabled buttons needing an explanation use `ButtonTooltip`; inline warnings use `Admonition`.
