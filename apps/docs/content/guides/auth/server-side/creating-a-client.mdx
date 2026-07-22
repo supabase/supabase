@@ -868,12 +868,12 @@ TanStack Start has no global middleware layer, so protect each route explicitly.
 
 To protect your routes:
 
-1. Write a server function that checks the user's session and redirects if the session isn't valid.
-1. Call that server function from a layout route's `beforeLoad` hook, before any nested route renders.
+1. Write a server function, `fetchClaims`, that calls `supabase.auth.getClaims()` and returns the claims, or `null` if the session isn't valid.
+1. Call `fetchClaims` from a layout route's `beforeLoad` hook — for example, `_protected.tsx` — before any nested route renders, and redirect to `/login` when it returns `null`.
 
 <Admonition type="danger">
 
-Skipping the check inside the server function exposes private data to unauthenticated users. `beforeLoad` only controls what the client renders — it's a UX guard, not a security boundary. Because there's no proxy re-checking every request, the server function is the only checkpoint before a redirect happens or private data returns, so it must call `supabase.auth.getClaims()` to authorize the request itself.
+Skipping the check inside the server function exposes private data to unauthenticated users. `beforeLoad` runs on the server for the initial request and on the client for later navigation, but either way it only gates the route's render — it doesn't stop the server function from being called directly. Because there's no proxy re-checking every request, the server function is the only checkpoint that always runs, so it must call `supabase.auth.getClaims()` to authorize the request itself.
 
 </Admonition>
 
