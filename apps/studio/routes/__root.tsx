@@ -2,7 +2,6 @@
 
 import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
-import '@/styles/focus.css'
 // Vite-only: defines @font-face for the custom fonts. The Next pipeline
 // (pages/_app.tsx) loads these via next/font instead, so this import has no
 // counterpart there — but dropping it under Vite makes the browser fall back

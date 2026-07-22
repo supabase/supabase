@@ -585,7 +585,7 @@ const MultiSelectorItem = React.forwardRef<
           'peer h-4 w-4 shrink-0 rounded-sm border border-control bg-control/25 ring-offset-background',
           'transition-colors duration-150 ease-in-out',
           'hover:border-strong',
-          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'focus-ring',
           'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background',
           isSelected ? 'bg-foreground text-background' : '[&_svg]:invisible'
         )}

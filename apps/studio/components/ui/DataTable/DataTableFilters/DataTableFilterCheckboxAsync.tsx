@@ -123,7 +123,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                     className={cn(
                       'text-xs text-muted-foreground hover:text-foreground',
                       'absolute inset-y-0 right-0 hidden bg-surface-100 group-hover:flex group-focus-within:flex items-center cursor-pointer',
-                      'ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                      'focus-ring'
                     )}
                   >
                     <span className="px-2">Only</span>
