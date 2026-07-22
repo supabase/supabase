@@ -89,6 +89,11 @@ jobs:
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]
 
               if (latest?.state === 'success') {
+                if (!latest.target_url) {
+                  core.setFailed('Vercel docs commit status succeeded but had no target_url to resolve a deployment from')
+                  return
+                }
+
                 const rawId = latest.target_url.split('/').filter(Boolean).pop()
                 const deploymentId = rawId.startsWith('dpl_') ? rawId : `dpl_${rawId}`
 
