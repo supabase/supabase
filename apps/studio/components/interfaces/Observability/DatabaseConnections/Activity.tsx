@@ -37,7 +37,11 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportsSelectFilter, selectFilterSchema } from '../../Reports/v2/ReportsSelectFilter'
-import { WARN_DURATION_ACTIVE_QUERY, WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
+import {
+  QUERY_STATE_TOOLTIP,
+  WARN_DURATION_ACTIVE_QUERY,
+  WARN_DURATION_IDLE_TXN,
+} from './DatabaseConnections.constants'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -312,7 +316,14 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
           {selectedPid === activity.pid && (
             <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter"></div>
           )}
-          <Badge variant={badgeVariant}>{activity.state}</Badge>
+          <Tooltip>
+            <TooltipTrigger>
+              <Badge variant={badgeVariant}>{activity.state}</Badge>
+            </TooltipTrigger>
+            {activity.state && (
+              <TooltipContent side="bottom">{QUERY_STATE_TOOLTIP[activity.state]}</TooltipContent>
+            )}
+          </Tooltip>
         </TableCell>
         <TableCell className="max-w-[300px]">
           <HoverCard openDelay={100} closeDelay={100}>
