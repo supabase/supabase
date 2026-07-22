@@ -70,18 +70,21 @@ const unscheduleJobByIdViaAPI = async (page: Page, ref: string, jobId: number) =
   })
 }
 
-// The job name is hardcoded in the product (CRON_CLEANUP_JOB_NAME in pg-meta), so tests
-// touching the cleanup feature contend on this single global name. Runs in the page context
-// (supabase_admin) because cron.unschedule by name only finds jobs the calling role can
-// manage, and the UI schedules the job as supabase_admin. Deletes tolerantly since the job
-// may or may not exist.
+// Mirrors CRON_CLEANUP_JOB_NAME in @supabase/pg-meta (not a dependency of this package).
+// The name is hardcoded in the product, so tests touching the cleanup feature contend on
+// this single global name.
+const CLEANUP_JOB_NAME = 'delete-job-run-details'
+
+// Runs in the page context (supabase_admin) because cron.unschedule by name only finds jobs
+// the calling role can manage, and the UI schedules the job as supabase_admin. Deletes
+// tolerantly since the job may or may not exist.
 const unscheduleCleanupJobIfExists = async (page: Page, ref: string) => {
   await page.request.post(toUrl(`/api/platform/pg-meta/${ref}/query`), {
     failOnStatusCode: true,
     data: {
       query: `do $$ begin
-        if exists (select 1 from cron.job where jobname = 'delete-job-run-details') then
-          perform cron.unschedule('delete-job-run-details');
+        if exists (select 1 from cron.job where jobname = '${CLEANUP_JOB_NAME}') then
+          perform cron.unschedule('${CLEANUP_JOB_NAME}');
         end if;
       end $$;`,
     },
@@ -415,7 +418,7 @@ test.describe('Cron Jobs', () => {
         ).toBeVisible({ timeout: 15000 })
 
         // The scheduled job shows up in the grid and the header button hides, both without a reload
-        const jobRow = page.getByRole('row', { name: /delete-job-run-details/ })
+        const jobRow = page.getByRole('row', { name: new RegExp(CLEANUP_JOB_NAME) })
         await expect(jobRow, 'Scheduled cleanup job should appear in the grid').toBeVisible({
           timeout: 10000,
         })
@@ -428,8 +431,8 @@ test.describe('Cron Jobs', () => {
         await jobRow.click({ button: 'right' })
         await page.getByRole('menuitem', { name: 'Delete job' }).click()
         await expect(page.getByRole('heading', { name: 'Delete this cron job' })).toBeVisible()
-        await page.getByPlaceholder('Type in name of cron job').fill('delete-job-run-details')
-        await page.getByRole('button', { name: 'Delete cron job delete-job-run-details' }).click()
+        await page.getByPlaceholder('Type in name of cron job').fill(CLEANUP_JOB_NAME)
+        await page.getByRole('button', { name: `Delete cron job ${CLEANUP_JOB_NAME}` }).click()
 
         await expect(page.getByText(/Successfully removed cron job/)).toBeVisible({
           timeout: 10000,
