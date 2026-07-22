@@ -585,7 +585,7 @@ export const ProjectCreationForm = ({
           loading={!isOrganizationsSuccess}
           noMargin={isVercelIntegrationFlow}
           className={cn(
-            !isVercelIntegrationFlow && 'border-0 shadow-none rounded-none bg-transparent'
+            isVercelIntegrationFlow && 'border-0 shadow-none rounded-none bg-transparent'
           )}
           title={
             !isVercelIntegrationFlow && (

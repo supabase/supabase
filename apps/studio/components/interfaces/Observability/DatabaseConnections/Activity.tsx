@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { isEqual } from 'lodash'
-import { Minus, MoreVertical, StopCircle } from 'lucide-react'
-import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { Minus, MoreVertical, StopCircle, X } from 'lucide-react'
+import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs'
 import { Fragment, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -17,6 +17,7 @@ import {
   Button,
   Card,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
@@ -36,8 +37,14 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ReportsSelectFilter, selectFilterSchema } from '../../Reports/v2/ReportsSelectFilter'
+import { ReportsSelectFilter } from '../../Reports/v2/ReportsSelectFilter'
+import {
+  QUERY_STATE_TOOLTIP,
+  WARN_DURATION_ACTIVE_QUERY,
+  WARN_DURATION_IDLE_TXN,
+} from './DatabaseConnections.constants'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
@@ -63,6 +70,13 @@ const getDuration = (activity: DatabaseActivity) => {
   return null
 }
 
+const getBadgeVariant = (activity: DatabaseActivity) => {
+  const { state } = activity
+  if (state === 'active') return 'success'
+  if (state === 'idle in transaction' || state === 'idle in transaction (aborted)') return 'warning'
+  return 'default'
+}
+
 const DEFAULT_ROLES_FILTER = ['anon', 'authenticated', 'postgres']
 
 interface ActivityProps {
@@ -72,25 +86,28 @@ interface ActivityProps {
 export const Activity = ({ live }: ActivityProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [, setNow] = useState(() => dayjs())
   const [selectedPid] = useQueryState('pid', parseAsInteger)
-  const [stateFilter, setStateFilter] = useQueryState(
-    'state',
-    parseAsJson(selectFilterSchema.parse).withDefault([])
-  )
-  const [rolesFilter, setRolesFilter] = useQueryState(
-    'roles',
-    parseAsArrayOf(parseAsString, ',').withDefault(DEFAULT_ROLES_FILTER)
-  )
 
-  const hasNoFiltersApplied = stateFilter.length === 0 && isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
+  const [
+    { states: statesFilter, applications: applicationsFilter, roles: rolesFilter },
+    setQueryStates,
+  ] = useQueryStates({
+    states: parseAsArrayOf(parseAsString, ',').withDefault([]),
+    applications: parseAsArrayOf(parseAsString, ',').withDefault([]),
+    roles: parseAsArrayOf(parseAsString, ',').withDefault(DEFAULT_ROLES_FILTER),
+  })
+
+  const hasNoFiltersApplied =
+    statesFilter.length === 0 &&
+    applicationsFilter.length === 0 &&
+    isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
 
   const { data, isPending, isSuccess } = useDatabaseActivityQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { refetchInterval: live ? 3000 : false }
+    { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
 
   const { data: roles } = useDatabaseRolesQuery({
@@ -100,11 +117,13 @@ export const Activity = ({ live }: ActivityProps) => {
 
   const activities = data?.filter((activity) => {
     const matchesState =
-      !stateFilter ||
-      stateFilter.length === 0 ||
-      (activity.state !== null && stateFilter.includes(activity.state))
+      !statesFilter ||
+      statesFilter.length === 0 ||
+      (activity.state !== null && statesFilter.includes(activity.state))
     const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
-    return matchesState && matchesRole
+    const matchesApplication =
+      applicationsFilter.length === 0 || applicationsFilter.includes(activity.application_name)
+    return matchesState && matchesRole && matchesApplication
   })
 
   const stateOptions = [
@@ -120,9 +139,26 @@ export const Activity = ({ live }: ActivityProps) => {
     quantity: data?.filter(
       (y) =>
         y.state === x.toLowerCase() &&
-        (rolesFilter.length === 0 || rolesFilter.includes(y.role_name))
+        (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
+        (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name))
     ).length,
   }))
+
+  const applicationOptions = Array.from(new Set(data?.map((x) => x.application_name) ?? []))
+    .sort()
+    .map((x) => ({
+      label: x,
+      value: x,
+      quantity: data?.filter(
+        (y) =>
+          y.application_name === x &&
+          (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
+          (!statesFilter ||
+            statesFilter.length === 0 ||
+            (y.state !== null && statesFilter.includes(y.state)))
+      ).length,
+    }))
+    .filter((x) => !!x.value)
 
   const priorityRoles = ['anon', 'authenticated', 'postgres']
 
@@ -133,9 +169,10 @@ export const Activity = ({ live }: ActivityProps) => {
       quantity: data?.filter(
         (y) =>
           y.role_name === x.name &&
-          (!stateFilter ||
-            stateFilter.length === 0 ||
-            (y.state !== null && stateFilter.includes(y.state)))
+          (!statesFilter ||
+            statesFilter.length === 0 ||
+            (y.state !== null && statesFilter.includes(y.state))) &&
+          (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name))
       ).length,
     }))
     .sort((a, b) => {
@@ -146,12 +183,6 @@ export const Activity = ({ live }: ActivityProps) => {
       if (bIndex !== -1) return 1
       return 0
     })
-
-  // [Joshen] Just to trigger a UI re-render for the duration to be "live"
-  useEffect(() => {
-    const interval = setInterval(() => setNow(dayjs()), 1000)
-    return () => clearInterval(interval)
-  }, [])
 
   useEffect(() => {
     if (selectedPid && isSuccess) {
@@ -167,22 +198,43 @@ export const Activity = ({ live }: ActivityProps) => {
         <h2>Sessions</h2>
         <div className="flex gap-x-2">
           <ReportsSelectFilter
+            label="State"
+            options={stateOptions}
+            value={statesFilter ?? []}
+            onChange={(states) => setQueryStates({ states })}
+            isLoading={isPending}
+            popoverClassName="w-60"
+          />
+          <ReportsSelectFilter
             showSearch
             label="Roles"
             options={roleOptions}
             value={rolesFilter ?? []}
-            onChange={setRolesFilter}
+            onChange={(roles) => setQueryStates({ roles })}
             isLoading={isPending}
             popoverClassName="w-72"
           />
           <ReportsSelectFilter
-            label="State"
-            options={stateOptions}
-            value={stateFilter ?? []}
-            onChange={setStateFilter}
+            showSearch
+            label="Application"
+            options={applicationOptions}
+            value={applicationsFilter ?? []}
+            onChange={(applications) => setQueryStates({ applications })}
             isLoading={isPending}
             popoverClassName="w-60"
           />
+          {!hasNoFiltersApplied && (
+            <ButtonTooltip
+              variant="text"
+              className="px-1"
+              icon={<X />}
+              onClick={() =>
+                setQueryStates({ states: [], roles: DEFAULT_ROLES_FILTER, applications: [] })
+              }
+              aria-label="Reset filters"
+              tooltip={{ content: { side: 'bottom', text: 'Reset filters' } }}
+            />
+          )}
         </div>
       </div>
 
@@ -237,8 +289,11 @@ export const Activity = ({ live }: ActivityProps) => {
                       variant="default"
                       className="mt-2"
                       onClick={() => {
-                        setStateFilter([])
-                        setRolesFilter(DEFAULT_ROLES_FILTER)
+                        setQueryStates({
+                          states: [],
+                          roles: DEFAULT_ROLES_FILTER,
+                          applications: [],
+                        })
                       }}
                     >
                       Reset filters
@@ -280,13 +335,8 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
     },
   })
 
-  const getBadgeVariant = (state: DatabaseActivity['state']) => {
-    if (state === 'active') return 'success'
-    if (state === 'idle in transaction') return 'warning'
-    return 'default'
-  }
-
   const durationSeconds = getDuration(activity)
+  const badgeVariant = getBadgeVariant(activity)
 
   /**
    * Queries in "active state": 30s threshold is long enough (most CRUD queries should be quick)
@@ -294,8 +344,10 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
    */
   const queryRunningLongWarning =
     !!durationSeconds &&
-    ((activity.state === 'active' && durationSeconds >= 30) ||
-      (activity.state === 'idle in transaction' && durationSeconds >= 10))
+    ((activity.state === 'active' && durationSeconds >= WARN_DURATION_ACTIVE_QUERY) ||
+      ((activity.state === 'idle in transaction' ||
+        activity.state === 'idle in transaction (aborted)') &&
+        durationSeconds >= WARN_DURATION_IDLE_TXN))
 
   const onConfirmTerminate = async () => {
     try {
@@ -314,18 +366,25 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
           {selectedPid === activity.pid && (
             <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter"></div>
           )}
-          <Badge variant={getBadgeVariant(activity.state)}>{activity.state}</Badge>
+          <Tooltip>
+            <TooltipTrigger>
+              <Badge variant={badgeVariant}>{activity.state}</Badge>
+            </TooltipTrigger>
+            {activity.state && (
+              <TooltipContent side="bottom">{QUERY_STATE_TOOLTIP[activity.state]}</TooltipContent>
+            )}
+          </Tooltip>
         </TableCell>
         <TableCell className="max-w-[300px]">
-          <HoverCard openDelay={100} closeDelay={100}>
+          <HoverCard openDelay={250} closeDelay={100}>
             <HoverCardTrigger>
               <p
                 className={cn(
-                  'truncate font-mono tracking-tighter',
-                  activity.query === null && 'text-foreground-lighter'
+                  'truncate',
+                  !activity.query ? 'text-foreground-lighter' : 'font-mono tracking-tighter'
                 )}
               >
-                {activity.query ?? 'No query'}
+                {!!activity.query ? activity.query : 'No query'}
               </p>
             </HoverCardTrigger>
             {activity.query && (
@@ -343,8 +402,19 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
               </HoverCardContent>
             )}
           </HoverCard>
-          <p className="text-xs text-foreground-lighter flex items-center gap-x-1 mt-0.5 truncate">
-            <span>PID: {activity.pid}</span>
+          <div className="text-xs text-foreground-lighter flex items-center gap-x-1 mt-0.5 truncate">
+            <Tooltip>
+              <TooltipTrigger
+                className="cursor-pointer"
+                onClick={() => {
+                  toast.success('Copied PID')
+                  copyToClipboard(activity.pid.toString())
+                }}
+              >
+                <span>PID: {activity.pid}</span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Click to copy</TooltipContent>
+            </Tooltip>
             <span>·</span>
             <span>{activity.role_name}</span>
             {activity.application_name && (
@@ -353,14 +423,18 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
                 <span>{activity.application_name}</span>
               </>
             )}
-          </p>
+          </div>
         </TableCell>
 
         <TableCell>
           <p
             className={cn(
               'tabular-nums truncate',
-              queryRunningLongWarning ? 'text-warning' : undefined
+              queryRunningLongWarning
+                ? activity.state === 'active'
+                  ? 'text-warning'
+                  : 'text-destructive'
+                : undefined
             )}
           >
             {durationSeconds !== null ? (

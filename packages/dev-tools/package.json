@@ -33,9 +33,7 @@
     "tsconfig": "workspace:*",
     "@typescript/native": "catalog:",
     "typescript": "catalog:",
-    "vitest": "catalog:"
-  },
-  "peerDependencies": {
+    "vitest": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

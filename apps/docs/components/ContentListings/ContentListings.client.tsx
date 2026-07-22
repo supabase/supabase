@@ -13,6 +13,8 @@ import { Badge } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
+import { resolveContentListingIcon } from './iconChip'
+
 const GRID_ITEM_CLASS = {
   2: 'col-span-12 md:col-span-6',
   3: 'col-span-12 md:col-span-4',
@@ -77,8 +79,8 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                   >
                     <GlassPanel
                       title={item.title}
-                      icon={item.icon}
-                      hasLightIcon={item.hasLightIcon ?? Boolean(item.icon)}
+                      icon={resolveContentListingIcon(item.icon)}
+                      hasLightIcon={item.hasLightIcon ?? typeof item.icon === 'string'}
                       badge={item.badge ? <Badge variant="success">{item.badge}</Badge> : undefined}
                     >
                       {item.description}

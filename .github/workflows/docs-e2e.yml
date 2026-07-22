@@ -1,0 +1,122 @@
+name: Docs E2E Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    branches: ['master']
+    paths:
+      - 'apps/docs/content/guides/getting-started/quickstarts/nextjs.mdx'
+      - 'apps/docs/content/_partials/quickstart_db_setup.mdx'
+      - 'apps/docs/content/_partials/api_settings.mdx'
+      - 'e2e/docs/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docs-e2e.yml'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL to test against'
+        required: false
+        default: 'https://supabase.com'
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: read
+  statuses: read
+  pull-requests: read
+
+env:
+  CI: true
+
+jobs:
+  e2e:
+    name: Docs E2E
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    timeout-minutes: 30
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            e2e/docs
+            patches
+
+      # Vercel skips the docs preview when a PR only changes the harness
+      # (e2e/docs, workflow). Wait for a preview only when apps/docs changed.
+      - name: Detect docs app changes
+        if: github.event_name == 'pull_request'
+        id: filter
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            docs_app:
+              - 'apps/docs/**'
+
+      - name: Wait for Vercel docs preview
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.filter.outputs.docs_app == 'true'
+        id: deployment
+        uses: vercel/wait-for-deployment-action@0e2b0c5c5cce31f1648108aeec56467187aca037
+        with:
+          project-slug: docs
+          environment: preview
+          timeout: '900'
+
+      - name: Resolve base URL
+        id: base-url
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_URL_INPUT: ${{ inputs.base_url }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+          DOCS_APP_CHANGED: ${{ steps.filter.outputs.docs_app }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            printf 'url=%s\n' "$BASE_URL_INPUT" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          elif [ "$DOCS_APP_CHANGED" = "true" ] && [ -n "$DEPLOYMENT_URL" ]; then
+            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+          else
+            # Harness-only PRs have no docs preview; test against production.
+            echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter=e2e-docs...
+
+      - name: Install Playwright Chromium
+        run: pnpm -C e2e/docs exec playwright install chromium --with-deps --only-shell
+
+      - name: Run docs E2E
+        working-directory: e2e/docs
+        run: pnpm run e2e:docs
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_DOCS || '' }}
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: docs-playwright-report
+          path: |
+            e2e/docs/playwright-report/
+            e2e/docs/test-results/
+          retention-days: 7
