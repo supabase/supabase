@@ -123,7 +123,6 @@ next-env.d.ts
 !.claude/scripts/
 !.claude/skills/
 .claude/skills/me-*
-CLAUDE.md
 !.claude/CLAUDE.md
 
 #include template .env file for docker-compose
