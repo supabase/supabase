@@ -96,7 +96,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           discussionsUrl: undefined,
           enabled: isMarketplaceEnabled,
           isNew: true,
-          isPlatformOnly: true,
+          isPlatformOnly: false,
           isDefaultOptIn: true,
           getRoute: (ref?: string) => `/project/${ref}/integrations`,
         },

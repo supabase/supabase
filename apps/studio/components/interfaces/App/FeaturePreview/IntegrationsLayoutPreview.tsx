@@ -3,7 +3,7 @@ import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 
 export const IntegrationsLayoutPreview = () => (
   <div>
-    <p className="text-sm text-foreground-light">
+    <p className="text-sm text-foreground-light mb-4">
       Install integrations in a single click, with improved filtering and search to help you find
       the one you need.
     </p>
@@ -13,7 +13,7 @@ export const IntegrationsLayoutPreview = () => (
       src={`${BASE_PATH}/img/previews/integrations-layout-preview.png`}
       width={1296}
       height={900}
-      className="rounded-sm border mb-4"
+      className="rounded-sm border"
     />
   </div>
 )
