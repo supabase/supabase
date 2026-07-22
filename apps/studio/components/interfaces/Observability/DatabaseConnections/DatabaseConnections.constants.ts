@@ -1,3 +1,8 @@
+// [Joshen] These are opinionated thresholds for when things might need attention
+// For queries in "active" state - show warning variant if running longer than 30 seconds
+// - Typically Not a problem unless its running longer than expected
+// For queries in "idle in transaction" state - show warning variant if running longer than 30 seconds
+// - Shorter threshold as it indicates a lock
 export const WARN_DURATION_ACTIVE_QUERY = 30 // seconds
 export const WARN_DURATION_IDLE_TXN = 10 // seconds
 
