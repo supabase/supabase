@@ -66,7 +66,7 @@ select
 
 <Admonition type="caution">
 
-Never use a publishable key here. Publishable keys are meant to be embedded in public clients, so with `verify_jwt` disabled, anyone holding your project's publishable key — which ships in your web or mobile app — could call this function directly, not just your cron job.
+Never use a publishable key here. With `verify_jwt` disabled, requests reach the function without platform JWT validation, so it's the handler's `auth: 'secret'` check that rejects callers without a secret key. A publishable key ships in your web or mobile app, so anyone holding it could reach the function too — don't rely on the platform check alone to keep it private.
 
 </Admonition>
 
