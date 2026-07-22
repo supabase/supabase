@@ -8,7 +8,7 @@ blockExoticSubdeps: true
 engineStrict: true
 updateNotifier: false
 # Doesn't work because of Typescript issues with peer dependencies, see https://github.com/pnpm/pnpm/issues/9739
-enableGlobalVirtualStore: false 
+enableGlobalVirtualStore: false
 
 catalog:
   '@monaco-editor/react': ^4.7.0
@@ -107,6 +107,8 @@ overrides:
   tmp: ^0.2.7
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1
+  'codemirror-graphql>@codemirror/language': 6.11.0
+  '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch
