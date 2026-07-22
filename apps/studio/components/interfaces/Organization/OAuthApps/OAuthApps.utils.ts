@@ -116,14 +116,17 @@ export function getRequesterLogo({
 }
 
 export type OAuthImpersonationWarning = {
+  /** Trusted partner label used for “not X” in the caution copy. */
   brandDisplayName: string
+  /** Exact requester-provided name shown in the caution. */
+  requesterName: string
   redirectHost: string
 }
 
 /**
  * Warn when the requester name looks like a known partner but redirect_uri is a
  * remote host outside that partner's allowlist. Localhost redirects are skipped
- * (common for local MCP clients).
+ * (common for local MCP clients). Missing or malformed redirect URIs are skipped.
  */
 export function getOAuthImpersonationWarning({
   name,
@@ -136,14 +139,15 @@ export function getOAuthImpersonationWarning({
   if (!namedPartner) return null
 
   const hostname = getRedirectHostname(redirectUri)
-  if (isLocalRedirectHost(hostname)) return null
+  if (!hostname || isLocalRedirectHost(hostname)) return null
 
-  if (hostname && hostMatchesAllowlist(hostname, namedPartner.redirectHosts)) {
+  if (hostMatchesAllowlist(hostname, namedPartner.redirectHosts)) {
     return null
   }
 
   return {
     brandDisplayName: namedPartner.displayName,
-    redirectHost: hostname ?? 'an unexpected address',
+    requesterName: name,
+    redirectHost: hostname,
   }
 }

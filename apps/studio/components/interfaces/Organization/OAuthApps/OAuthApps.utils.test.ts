@@ -98,7 +98,11 @@ describe('getOAuthImpersonationWarning', () => {
         name: 'Claude Desktop',
         redirectUri: 'https://evil.com/callback',
       })
-    ).toEqual({ brandDisplayName: 'Claude', redirectHost: 'evil.com' })
+    ).toEqual({
+      brandDisplayName: 'Claude',
+      requesterName: 'Claude Desktop',
+      redirectHost: 'evil.com',
+    })
   })
 
   test('skips localhost MCP redirects', () => {
@@ -124,6 +128,21 @@ describe('getOAuthImpersonationWarning', () => {
       getOAuthImpersonationWarning({
         name: 'Acme Tools',
         redirectUri: 'https://evil.com/callback',
+      })
+    ).toBe(null)
+  })
+
+  test('skips missing or unparsable redirect URIs', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: null,
+      })
+    ).toBe(null)
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: 'not-a-url',
       })
     ).toBe(null)
   })

@@ -242,7 +242,7 @@ export const AuthorizeImpersonationWarning = ({
     <Admonition
       type="caution"
       title="Redirect does not match this app name"
-      description={`This request uses the name ${warning.brandDisplayName}, but after you authorize you will be redirected to ${warning.redirectHost}, not ${warning.brandDisplayName}.`}
+      description={`This request uses the name “${warning.requesterName}”, which looks like ${warning.brandDisplayName}, but after you authorize you will be redirected to ${warning.redirectHost}, not ${warning.brandDisplayName}.`}
     />
   )
 }
