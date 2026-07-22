@@ -77,12 +77,11 @@ function Feedback({ className }: { className?: string }) {
 
   const pathname = usePathname() ?? ''
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   const supabase = useConstant(() =>
-    IS_PLATFORM
-      ? createClient<Database>(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        )
+    IS_PLATFORM && supabaseUrl && supabaseAnonKey
+      ? createClient<Database>(supabaseUrl, supabaseAnonKey)
       : undefined
   )
 
