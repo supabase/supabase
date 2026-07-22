@@ -1449,7 +1449,7 @@ importers:
         version: link:../../packages/api-types
       axios:
         specifier: ^1.12.0
-        version: 1.16.0
+        version: 1.18.1(supports-color@8.1.1)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -9489,8 +9489,8 @@ packages:
     resolution: {integrity: sha512-Xm7bpRXnDSX2YE2YFfBk2FnF0ep6tmG7xPh8iHee8MIcrgq762Nkce856dYtJYLkuIoYZvGfTs/PbZhideTcEg==}
     engines: {node: '>=4'}
 
-  axios@1.16.0:
-    resolution: {integrity: sha512-6hp5CwvTPlN2A31g5dxnwAX0orzM7pmCRDLnZSX772mv8WDqICwFjowHuPs04Mc8deIld1+ejhtaMn5vp6b+1w==}
+  axios@1.18.1:
+    resolution: {integrity: sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==}
 
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -23496,7 +23496,7 @@ snapshots:
       papaparse: 5.4.1
       pg: 8.16.3
       stripe: 17.7.0
-      supabase-management-js: 2.0.2
+      supabase-management-js: 2.0.2(supports-color@8.1.1)
       ws: 8.21.0
       yesql: 7.0.0
     transitivePeerDependencies:
@@ -25552,13 +25552,15 @@ snapshots:
 
   axe-core@4.10.3: {}
 
-  axios@1.16.0:
+  axios@1.18.1(supports-color@8.1.1):
     dependencies:
       follow-redirects: 1.16.0
       form-data: 4.0.6
+      https-proxy-agent: 5.0.1(supports-color@8.1.1)
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   axobject-query@4.1.0: {}
 
@@ -34051,12 +34053,13 @@ snapshots:
 
   stylis@4.3.6: {}
 
-  supabase-management-js@2.0.2:
+  supabase-management-js@2.0.2(supports-color@8.1.1):
     dependencies:
-      axios: 1.16.0
+      axios: 1.18.1(supports-color@8.1.1)
       zod: 4.4.3
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   supabase@2.76.14(supports-color@8.1.1):
     dependencies:
