@@ -39,6 +39,7 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
 import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from '../ui/PromptPanel'
@@ -69,6 +70,7 @@ const components = {
   AccordionItem,
   Admonition: AdmonitionWithMargin,
   AgentPluginsPanel,
+  AiPrompt,
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
