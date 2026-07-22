@@ -324,7 +324,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
             </p>
           )}
 
-          {true && (
+          {data.is_estimate && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
