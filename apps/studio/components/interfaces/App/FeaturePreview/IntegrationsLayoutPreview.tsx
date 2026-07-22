@@ -4,8 +4,8 @@ import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 export const IntegrationsLayoutPreview = () => (
   <div>
     <p className="text-sm text-foreground-light mb-4">
-      Install integrations in a single click, with improved filtering and search to help you find
-      the one you need.
+      Install Dashboard Integrations in a single click, with improved filtering and search to help
+      you find the one you need.
     </p>
 
     <Image
