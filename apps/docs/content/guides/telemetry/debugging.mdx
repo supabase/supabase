@@ -6,6 +6,12 @@ description: 'Isolate and fix Supabase issues by reading the error, isolating th
 
 Debug by evidence, not by guessing. A Supabase error almost always surfaces at one layer but originates at another, so the fastest path to a fix is finding _where_ the problem is, not pattern-matching the symptom. Retrying a failed request rarely helps; isolating the layer does.
 
+<Admonition type="tip">
+
+If you are using an AI agent with the Supabase MCP server, the `get_logs` tool queries logs by service name without requiring SQL. The `supabase` skill (`npx skills add supabase`) gives the agent this debugging workflow and routes it to the guides in this section.
+
+</Admonition>
+
 ## The debugging loop
 
 Work through these steps in order, skipping straight to a fix before you have evidence for the cause is the most common way to waste time on a bug.
@@ -76,3 +82,15 @@ Supabase updates these troubleshooting guides continuously, so treat this table 
 For query performance and schema-design questions such as indexing, `EXPLAIN`, N+1 queries, or partitioning, see the [Postgres guides](/docs/guides/database).
 
 Debugging is complete only once you've re-run the failing operation, confirmed it succeeds, and checked that the layer's logs show a clean result.
+
+## For AI agents
+
+AI agents following this guide should apply the same debugging loop:
+
+1. **Identify the layer** from the error code and symptom using the table above.
+2. **Query that layer's logs** using the MCP `get_logs` tool. Pass the service name (`auth`, `edge`, `postgres`, `storage`, `realtime`, `functions`) and a bounded time window. Do not open with an all-source scan.
+3. **Widen along an anchor** — once you have a timestamp, request ID, or error code, use it to correlate across adjacent sources rather than re-scanning from scratch.
+4. **Fetch the troubleshooting guide** for the specific symptom (append `.md` to the docs URL, or use `search_docs`). Apply the fix described there, not a guess from training data.
+5. **Verify** by re-running the failing operation and confirming the log is clean.
+
+The [Logging guide](/docs/guides/telemetry/logs) covers the `get_logs` tool, available sources, and the ClickHouse query model for when raw SQL is needed.
