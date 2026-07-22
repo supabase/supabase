@@ -9,7 +9,7 @@ import {
   MetricCardValue,
 } from 'ui-patterns/MetricCard'
 
-import { WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
+import { WARN_DURATION_ACTIVE_QUERY, WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
@@ -62,6 +62,12 @@ export const Overview = ({ live }: OverviewProps) => {
       const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
       return longest === null || duration > longest.duration ? { activity, duration } : longest
     }, null)
+  const warnLongestRunningQuery =
+    (longestRunningQuery?.activity.state === 'active' &&
+      longestRunningQuery.duration >= WARN_DURATION_ACTIVE_QUERY) ||
+    ((longestRunningQuery?.activity.state === 'idle in transaction' ||
+      longestRunningQuery?.activity.state === 'idle in transaction (aborted)') &&
+      longestRunningQuery.duration >= WARN_DURATION_IDLE_TXN)
 
   const { data: roles, isPending: isLoadingRoles } = useDatabaseRolesQuery(
     {
@@ -122,11 +128,11 @@ export const Overview = ({ live }: OverviewProps) => {
 
           <MetricCard
             isLoading={isLoadingActivity}
-            className={cn(longestRunningQuery && 'bg-warning-200 border-warning-400')}
+            className={cn(warnLongestRunningQuery && 'bg-warning-200 border-warning-400')}
           >
             <MetricCardHeader>
               <MetricCardLabel
-                className={cn(longestRunningQuery && 'text-foreground')}
+                className={cn(warnLongestRunningQuery && 'text-foreground')}
                 tooltip="Only considers active or idle-in-transaction queries"
               >
                 Longest running
@@ -136,7 +142,11 @@ export const Overview = ({ live }: OverviewProps) => {
               <MetricCardValue
                 className={cn(
                   'space-x-2',
-                  longestRunningQuery === null ? 'text-foreground-lighter' : 'text-warning'
+                  longestRunningQuery === null
+                    ? 'text-foreground-lighter'
+                    : warnLongestRunningQuery
+                      ? 'text-warning'
+                      : 'text-foreground'
                 )}
               >
                 {longestRunningQuery === null ? (

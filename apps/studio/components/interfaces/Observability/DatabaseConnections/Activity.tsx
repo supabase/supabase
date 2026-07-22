@@ -330,8 +330,8 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
             <HoverCardTrigger>
               <p
                 className={cn(
-                  'truncate font-mono tracking-tighter',
-                  activity.query === null && 'text-foreground-lighter'
+                  'truncate',
+                  !activity.query ? 'text-foreground-lighter' : 'font-mono tracking-tighter'
                 )}
               >
                 {!!activity.query ? activity.query : 'No query'}
