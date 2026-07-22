@@ -54,7 +54,6 @@ interface AgentEntry {
   label: string
   plugin: boolean
   mcp: boolean
-  href?: string
 }
 
 const PLUGIN_KEYS = new Set(PLUGIN_CLIENTS.map((client) => client.key))
@@ -71,23 +70,17 @@ function buildAgents(): AgentEntry[] {
       label: client.label,
       plugin: PLUGIN_KEYS.has(key),
       mcp: true,
-      href: client.externalDocsUrl || undefined,
     })
   }
 
   for (const client of PLUGIN_CLIENTS) {
     if (EXCLUDED_KEYS.has(client.key)) continue
-    const existing = byKey.get(client.key)
-    if (existing) {
-      existing.href = existing.href || client.docsUrl
-      continue
-    }
+    if (byKey.has(client.key)) continue
     byKey.set(client.key, {
       key: client.key,
       label: client.label,
       plugin: true,
       mcp: MCP_KEYS.has(client.key),
-      href: client.docsUrl,
     })
   }
 
@@ -100,10 +93,8 @@ function badgeFor(plugin: boolean, mcp: boolean): string {
   return 'MCP'
 }
 
-// Fallback for clients with no external docs URL — send them to our own setup page instead
-// of silently dropping the card.
+// Route to our own setup instructions rather than each vendor's external docs.
 function hrefFor(agent: AgentEntry): string {
-  if (agent.href) return agent.href
   return agent.plugin ? '/guides/ai-tools/plugins' : '/guides/ai-tools/mcp'
 }
 

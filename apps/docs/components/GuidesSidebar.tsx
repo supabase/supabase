@@ -3,6 +3,7 @@
 import { Feedback } from '~/components/Feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { isFeatureEnabled } from 'common'
+import { Chatgpt, Claude } from 'icons'
 import { Check, Copy, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -83,6 +84,30 @@ function AiTools({ className }: { className?: string }) {
           <Sparkles size={14} strokeWidth={1.5} />
           Connect your AI agent
         </Link>
+        <a
+          href={`https://chatgpt.com/?hint=search&q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
+          target="_blank"
+          onClick={() =>
+            sendTelemetryEvent({ action: 'ask_ai_clicked', properties: { agent: 'chatgpt' } })
+          }
+          rel="noreferrer noopener"
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+        >
+          <Chatgpt size={14} />
+          Ask ChatGPT
+        </a>
+        <a
+          href={`https://claude.ai/new?q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
+          target="_blank"
+          onClick={() =>
+            sendTelemetryEvent({ action: 'ask_ai_clicked', properties: { agent: 'claude' } })
+          }
+          rel="noreferrer noopener"
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+        >
+          <Claude size={14} />
+          Ask Claude
+        </a>
       </div>
     </section>
   )

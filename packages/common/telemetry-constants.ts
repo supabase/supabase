@@ -909,6 +909,19 @@ export interface AgentSetupClickedEvent {
 }
 
 /**
+ * User clicked "Ask..." to open a new window to consult an agent about the current page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AskAiClickedEvent {
+  action: 'ask_ai_clicked'
+  properties: {
+    agent: 'chatgpt' | 'claude'
+  }
+}
+
+/**
  * User clicked a curated orientation link from a content listings MDX component.
  *
  * @group Events
@@ -3576,6 +3589,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | AskAiClickedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
