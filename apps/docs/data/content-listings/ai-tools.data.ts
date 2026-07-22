@@ -88,7 +88,7 @@ function buildAgents(): AgentEntry[] {
 }
 
 function badgeFor(plugin: boolean, mcp: boolean): string {
-  if (plugin && mcp) return 'MCP + Plugin'
+  if (plugin && mcp) return 'Plugin + MCP'
   if (plugin) return 'Plugin'
   return 'MCP'
 }
