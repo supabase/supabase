@@ -133,7 +133,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
         tabIndex={0}
         type="button"
         onClick={() => setIsExpanded((expanded) => !expanded)}
-        className="mt-2 text-sm text-brand-link hover:text-brand focus-ring"
+        className="mt-2 text-sm text-brand-link transition-colors hover:text-brand focus-ring"
         aria-expanded={isExpanded}
       >
         {isExpanded ? 'Show less' : 'Show more'}
@@ -192,7 +192,7 @@ function CopyButton({ label, value }: { label: string; value: string }) {
           setCopied(true)
         })
       }}
-      className="rounded-sm p-1.5 text-foreground-muted hover:bg-surface-200 hover:text-foreground focus-ring"
+      className="rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
       aria-label={copied ? `${label} copied` : `Copy ${label}`}
       title={copied ? 'Copied' : 'Copy to clipboard'}
     >
