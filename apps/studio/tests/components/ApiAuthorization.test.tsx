@@ -381,7 +381,7 @@ describe('ApiAuthorizationScreen', () => {
           ).toBeInTheDocument()
           expect(
             screen.getByText(
-              'This request uses the name “Claude”, which looks like Claude, but after you authorize you will be redirected to evil.com, not Claude.'
+              'This request uses the name Claude, but after you authorize you will be redirected to evil.com, not Claude.'
             )
           ).toBeInTheDocument()
           expect(screen.queryByAltText('Claude')).not.toBeInTheDocument()

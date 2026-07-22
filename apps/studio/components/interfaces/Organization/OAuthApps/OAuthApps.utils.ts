@@ -140,10 +140,8 @@ export function getRequesterLogo({
 }
 
 export type OAuthImpersonationWarning = {
-  /** Trusted partner label used for “not X” in the caution copy. */
+  /** Trusted partner label used in the caution copy. */
   brandDisplayName: string
-  /** Exact requester-provided name shown in the caution. */
-  requesterName: string
   redirectHost: string
 }
 
@@ -171,7 +169,6 @@ export function getOAuthImpersonationWarning({
 
   return {
     brandDisplayName: namedPartner.displayName,
-    requesterName: name,
     redirectHost: hostname,
   }
 }

@@ -120,7 +120,6 @@ describe('getOAuthImpersonationWarning', () => {
       })
     ).toEqual({
       brandDisplayName: 'Claude',
-      requesterName: 'Claude Desktop',
       redirectHost: 'evil.com',
     })
   })
