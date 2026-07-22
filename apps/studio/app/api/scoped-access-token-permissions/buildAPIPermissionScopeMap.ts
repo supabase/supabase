@@ -1,4 +1,5 @@
 import lodash from 'lodash'
+import { ensurePresent } from 'openai/core.mjs'
 import z from 'zod'
 
 // We don't have an OpenAPI that describes mcp tools security requirements so
@@ -44,12 +45,10 @@ export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> 
 //   "paths": {
 //     "/v2/projects/{ref}/analytics/log-drains": {
 //       "get": {
-//         "security": [
-//           {
-//             "fga_permissions": [
-//               "analytics_config_read"
-//             ]
-//           }
+//         "x-fga-permissions": [
+//           [
+//             "analytics_config_read"
+//           ]
 //         ]
 //       }
 //     }
@@ -67,14 +66,11 @@ export const getEndpointsAndMCPToolsForAPI = (
   Object.entries(apiSpecs.paths).forEach(([path, methods]) => {
     // Loop over each API path method (get, post, etc.)
     Object.entries(methods).forEach(([method, methodSpecs]) => {
-      if (methodSpecs.security == null) return
+      const endpoint = `${method.toUpperCase()} ${path}`
+      if (methodSpecs['x-fga-permissions'] == null) return
 
-      methodSpecs.security.forEach((security) => {
-        if (security.fga_permissions == null) return
-
-        security.fga_permissions.forEach((permission) => {
-          const endpoint = `${method.toUpperCase()} ${path}`
-
+      methodSpecs['x-fga-permissions'].forEach((permissions) => {
+        permissions.forEach((permission) => {
           // Initialize scope object if needed
           scopes[permission] = scopes[permission] || { endpoints: [], mcp_tools: [] }
 
@@ -104,7 +100,7 @@ export const getEndpointsAndMCPToolsForAPI = (
   return { scopes, endpoints, mcp_tools }
 }
 
-const NEXT_PUBLIC_API_DOMAIN = 'https://api.supabase.com'
+const NEXT_PUBLIC_API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN || 'https://api.supabase.com'
 
 const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
   const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/api/${version}-json`, {
@@ -122,13 +118,7 @@ const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
 // Simplified OPEN API specs schemas that only defines what we care about for scoped tokens
 
 const OPEN_API_PATH_METHOD_SCHEMA = z.object({
-  security: z
-    .array(
-      z.object({
-        fga_permissions: z.array(z.string()).optional(),
-      })
-    )
-    .optional(),
+  'x-fga-permissions': z.array(z.string().array().optional()).optional(),
 })
 
 const API_SPECS_SCHEMA = z.object({
