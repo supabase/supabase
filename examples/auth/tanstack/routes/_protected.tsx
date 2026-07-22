@@ -1,17 +1,17 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { fetchUser } from '@/lib/supabase/fetch-user-server-fn'
+import { fetchClaims } from '@/lib/supabase/fetch-claims-server-fn'
 
 export const Route = createFileRoute('/_protected')({
   beforeLoad: async () => {
-    const user = await fetchUser()
+    const claims = await fetchClaims()
 
-    if (!user) {
+    if (!claims) {
       throw redirect({ to: '/login' })
     }
 
     return {
-      user,
+      claims,
     }
   },
 })
