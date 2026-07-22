@@ -47,9 +47,10 @@ export const TwoOptionToggle = ({
           <button
             key={`toggle_${index}`}
             type="button"
-            tabIndex={isDisabled ? -1 : 0}
+            tabIndex={0}
             aria-pressed={isActive}
-            disabled={isDisabled}
+            // Prefer aria-disabled so TooltipTrigger asChild still receives hover/focus
+            aria-disabled={isDisabled || undefined}
             style={{ width: width + 1 }}
             className={cn(
               isActive ? 'text-foreground' : 'text-foreground-light',
