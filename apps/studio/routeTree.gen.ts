@@ -26,6 +26,7 @@ import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
+import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
 import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
@@ -400,6 +401,12 @@ const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
   path: '/api/status-override',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiScopedAccessTokenPermissionsRoute =
+  ApiScopedAccessTokenPermissionsRouteImport.update({
+    id: '/api/scoped-access-token-permissions',
+    path: '/api/scoped-access-token-permissions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiParseQueryRoute = ApiParseQueryRouteImport.update({
   id: '/api/parse-query',
   path: '/api/parse-query',
@@ -2060,6 +2067,7 @@ export interface FileRoutesByFullPath {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
+  '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2365,6 +2373,7 @@ export interface FileRoutesByTo {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
+  '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2663,6 +2672,7 @@ export interface FileRoutesById {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
+  '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2971,6 +2981,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
+    | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -3276,6 +3287,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
+    | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -3573,6 +3585,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
+    | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -3871,6 +3884,7 @@ export interface RootRouteChildren {
   ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
   ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiParseQueryRoute: typeof ApiParseQueryRoute
+  ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   NewSlugRoute: typeof NewSlugRoute
@@ -4089,6 +4103,13 @@ declare module '@tanstack/react-router' {
       path: '/api/status-override'
       fullPath: '/api/status-override'
       preLoaderRoute: typeof ApiStatusOverrideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/scoped-access-token-permissions': {
+      id: '/api/scoped-access-token-permissions'
+      path: '/api/scoped-access-token-permissions'
+      fullPath: '/api/scoped-access-token-permissions'
+      preLoaderRoute: typeof ApiScopedAccessTokenPermissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/parse-query': {
@@ -6814,6 +6835,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIncidentBannerRoute: ApiIncidentBannerRoute,
   ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiParseQueryRoute: ApiParseQueryRoute,
+  ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   NewSlugRoute: NewSlugRoute,

@@ -547,6 +547,10 @@ export default defineConfig(({ command, mode }) => {
       postcss: { plugins: [] },
     },
     ssr: {
+      optimizeDeps: {
+        include: ['lodash'],
+      },
+
       // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and

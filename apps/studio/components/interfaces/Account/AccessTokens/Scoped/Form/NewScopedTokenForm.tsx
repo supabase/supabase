@@ -12,6 +12,7 @@ import { PermissionsAccordion } from './PermissionsAccordion'
 import { ResourceAccessStep } from './ResourceAccessStep'
 import { StepIndicator } from './StepIndicator'
 import { TokenDetails } from './TokenDetails'
+import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 const FORM_ID = 'scoped-token-form'
 
@@ -50,6 +51,7 @@ export const NewScopedTokenForm = ({
   const values = form.watch()
   const selection = values.permissions
   const configuredCount = countConfigured(selection)
+  const { data: permissionScopeMap } = useGetEnabledEndpointsForCapability()
 
   const handleReviewAccess = async () => {
     if (configuredCount === 0) {
@@ -76,7 +78,11 @@ export const NewScopedTokenForm = ({
                 <ResourceAccessStep form={form} />
               </div>
               <Separator />
-              <PermissionsAccordion selection={selection} onChange={handlePermissionChange} />
+              <PermissionsAccordion
+                selection={selection}
+                onChange={handlePermissionChange}
+                permissionScopeMap={permissionScopeMap}
+              />
               {showMissingPermissionsWarning && (
                 <div className="space-y-3 px-5 sm:px-6 pb-6">
                   <Admonition
@@ -92,7 +98,7 @@ export const NewScopedTokenForm = ({
             </form>
           </Form>
         ) : (
-          <NewScopedTokenFormReview values={values} />
+          <NewScopedTokenFormReview values={values} permissionScopeMap={permissionScopeMap} />
         )}
       </ScrollArea>
       <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">

@@ -18,13 +18,19 @@ import {
   type PermissionSelection,
 } from '../../AccessToken.permissions'
 import { PermissionRow } from './PermissionRow'
+import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface PermissionsAccordionProps {
   selection: PermissionSelection
   onChange: (key: string, mode: PermissionMode) => void
+  permissionScopeMap: PermissionScopeMap | undefined
 }
 
-export const PermissionsAccordion = ({ selection, onChange }: PermissionsAccordionProps) => {
+export const PermissionsAccordion = ({
+  selection,
+  onChange,
+  permissionScopeMap,
+}: PermissionsAccordionProps) => {
   const [openCategories, setOpenCategories] = useState<string[]>([
     PERMISSION_CATALOG_BY_CATEGORY[0]?.key,
   ])
@@ -80,6 +86,7 @@ export const PermissionsAccordion = ({ selection, onChange }: PermissionsAccordi
                       entry={entry}
                       mode={selection[entry.key] ?? 'none'}
                       onChange={(mode) => onChange(entry.key, mode)}
+                      permissionScopeMap={permissionScopeMap}
                     />
                   ))}
                 </div>
