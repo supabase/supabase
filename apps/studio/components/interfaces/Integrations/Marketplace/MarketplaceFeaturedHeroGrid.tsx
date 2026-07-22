@@ -1,29 +1,82 @@
 import { useParams } from 'common'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Badge, Card } from 'ui'
+import { Badge, Card, cn } from 'ui'
 
 import { IntegrationLogo } from '../Integration/IntegrationLogo'
 import { getMarketplaceSource, MarketplaceSourceBadge } from './Marketplace.constants'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { BASE_PATH } from '@/lib/constants'
 
-const FEATURED_INTEGRATION_IMAGES: Record<string, string> = {
-  cron: `${BASE_PATH}/img/integrations/covers/cron-cover.webp`,
-  queues: `${BASE_PATH}/img/integrations/covers/queues-cover.png`,
-  stripe_wrapper: `${BASE_PATH}/img/integrations/covers/stripe-cover.png`,
-  stripe_sync_engine: `${BASE_PATH}/img/integrations/covers/stripe-cover.png`,
-  grafana: `${BASE_PATH}/img/integrations/covers/grafana-cover.png`,
+const FEATURED_INTEGRATION_IMAGES: Record<string, { dark: string; light?: string }> = {
+  cron: {
+    dark: `${BASE_PATH}/img/integrations/covers/cron-cover.webp`,
+    light: `${BASE_PATH}/img/integrations/covers/cron-cover-light.webp`,
+  },
+  queues: {
+    dark: `${BASE_PATH}/img/integrations/covers/queues-cover.png`,
+    light: `${BASE_PATH}/img/integrations/covers/queues-cover-light.webp`,
+  },
+  stripe_sync_engine: {
+    dark: `${BASE_PATH}/img/integrations/covers/stripe-cover.png`,
+    light: `${BASE_PATH}/img/integrations/covers/stripe-cover-light.webp`,
+  },
+  grafana: {
+    dark: `${BASE_PATH}/img/integrations/covers/grafana-cover.png`,
+    light: `${BASE_PATH}/img/integrations/covers/grafana-cover-light.webp`,
+  },
 }
 
-function getIntegrationImage(integration: IntegrationDefinition) {
+interface ThemedImage {
+  dark: string
+  light?: string
+}
+
+// Resolves a cover image. `dark` is required; `light` is optional and only set when a distinct
+// light-mode asset exists. Fallback (marketplace/partner) images are a single asset (dark only).
+function getIntegrationImage(integration: IntegrationDefinition): ThemedImage | undefined {
   const featuredImage = FEATURED_INTEGRATION_IMAGES[integration.id]
-  if (featuredImage) return featuredImage
+  if (featuredImage) {
+    return { dark: featuredImage.dark, light: featuredImage.light }
+  }
   if (integration.files?.length) {
     const heroImage = integration.files[0]
-    return typeof heroImage === 'string' ? heroImage : (heroImage?.src ?? undefined)
+    const src = typeof heroImage === 'string' ? heroImage : heroImage?.src
+    if (src) return { dark: src }
   }
+  return undefined
 }
+
+const CoverImage = ({
+  image,
+  alt,
+  sizes,
+  className,
+}: {
+  image: ThemedImage
+  alt: string
+  sizes?: string
+  className?: string
+}) => (
+  <>
+    <Image
+      fill
+      src={image.dark}
+      alt={alt}
+      sizes={sizes}
+      className={cn('object-cover', image.light ? 'hidden dark:block' : '', className)}
+    />
+    {image.light && (
+      <Image
+        fill
+        src={image.light}
+        alt={alt}
+        sizes={sizes}
+        className={cn('object-cover dark:hidden', className)}
+      />
+    )}
+  </>
+)
 
 interface MarketplaceFeaturedHeroGridProps {
   integrations: IntegrationDefinition[]
@@ -56,8 +109,8 @@ export const MarketplaceFeaturedHeroGrid = ({
       <div className="mb-2">
         <h2 className="text-sm">Featured integrations</h2>
       </div>
-      <div className="grid grid-cols-1 @lg:grid-cols-2 @3xl:grid-cols-4 gap-3 items-stretch">
-        <div className="col-span-1 @lg:col-span-2">
+      <div className="grid grid-cols-1 @xl:grid-cols-2 @3xl:grid-cols-4 gap-3 items-stretch">
+        <div className="col-span-1 @xl:col-span-2">
           <Link
             href={`/project/${ref}/integrations/${primaryIntegration.id}/overview`}
             className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
@@ -68,7 +121,7 @@ export const MarketplaceFeaturedHeroGrid = ({
                   <IntegrationLogo integration={primaryIntegration} />
                   {primaryInstalled && <Badge variant="success">Installed</Badge>}
                 </div>
-                <div className="@lg:max-w-2/3">
+                <div className="@xl:max-w-2/3">
                   <div className="mb-1 text-sm font-medium text-pretty">
                     {primaryIntegration.name}
                   </div>
@@ -92,20 +145,17 @@ export const MarketplaceFeaturedHeroGrid = ({
                   </div>
                 </div>
               </div>
-              <div className="absolute inset-0 left-auto w-2/5 @lg:w-3/5 shrink-0 bg-surface-400">
-                {primaryImage ? (
-                  <Image
-                    fill
-                    src={primaryImage}
-                    alt={`${primaryIntegration.name} integration`}
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center">
-                    {primaryIntegration.icon({ className: 'w-10 h-10 text-foreground' })}
-                  </div>
+              <div className="absolute inset-0 left-auto w-2/5 @xl:w-3/5 shrink-0">
+                {primaryImage && (
+                  <>
+                    <CoverImage
+                      image={primaryImage}
+                      alt={`${primaryIntegration.name} integration`}
+                    />
+                    <div className="absolute inset-0 bg-linear-to-r from-surface-100 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-radial-[ellipse_50%_100%_at_top_left] from-surface-100 to-transparent" />
+                  </>
                 )}
-                <div className="absolute inset-0 bg-linear-to-r from-surface-100 to-transparent" />
               </div>
             </Card>
           </Link>
@@ -123,17 +173,14 @@ export const MarketplaceFeaturedHeroGrid = ({
                 className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
               >
                 <Card className="flex flex-col overflow-hidden h-full hover:border-stronger">
-                  <div className="hidden @lg:block relative w-full h-28 bg-alternative shrink-0">
+                  <div className="hidden @xl:block relative w-full h-28 bg-black/90 dark:bg-black/50 shrink-0">
                     {image ? (
-                      <Image
-                        fill
-                        src={image}
-                        alt={`${integration.name} integration`}
-                        className="object-cover"
-                      />
+                      <CoverImage image={image} alt={`${integration.name} integration`} />
                     ) : (
-                      <div className="flex h-full items-center justify-center">
-                        {integration.icon({ className: 'w-8 h-8 text-foreground' })}
+                      <div className="flex h-full items-center p-6 justify-center">
+                        {integration.icon({
+                          className: 'w-8 h-8 object-contain aspect-square text-white',
+                        })}
                       </div>
                     )}
                   </div>
