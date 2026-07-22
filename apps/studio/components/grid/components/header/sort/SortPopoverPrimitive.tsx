@@ -105,13 +105,15 @@ export const SortPopoverPrimitive = ({
     })
   }, [snap?.table?.columns, localSorts])
 
-  // Format the columns for the dropdown
+  // Format the columns for the dropdown.
+  // Prefer `format` (e.g. geography, citext) over `dataType`, which is the
+  // coarse information_schema-style label "USER-DEFINED" for extension types.
   const dropdownOptions = useMemo(() => {
     return (
       columns?.map((x) => ({
         value: x.name,
         label: x.name,
-        postLabel: x.dataType,
+        postLabel: x.format,
         disabled: x.dataType === 'json' || x.dataType === 'jsonb',
         tooltip:
           x.dataType === 'json' || x.dataType === 'jsonb'
