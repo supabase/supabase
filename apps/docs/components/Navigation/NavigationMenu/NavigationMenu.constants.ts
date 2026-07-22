@@ -2988,16 +2988,16 @@ export const telemetry: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/telemetry' },
     {
-      name: 'Logging & observability',
+      name: 'Debugging',
       url: undefined,
       items: [
         {
-          name: 'Logging',
-          url: '/guides/telemetry/logs' as `/${string}`,
+          name: 'Debugging guide',
+          url: '/guides/telemetry/debugging' as `/${string}`,
         },
         {
-          name: 'Debugging',
-          url: '/guides/telemetry/debugging' as `/${string}`,
+          name: 'Logging',
+          url: '/guides/telemetry/logs' as `/${string}`,
         },
         {
           name: 'Advanced log filtering',
@@ -3007,13 +3007,15 @@ export const telemetry: NavMenuConstant = {
           name: 'Logs field reference',
           url: '/guides/telemetry/log-field-reference' as `/${string}`,
         },
+      ],
+    },
+    {
+      name: 'Monitoring',
+      url: undefined,
+      items: [
         {
           name: 'Log drains',
           url: '/guides/telemetry/log-drains' as `/${string}`,
-        },
-        {
-          name: 'Tracing with the JS SDK',
-          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Reports',
@@ -3048,6 +3050,20 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Sentry integration',
           url: '/guides/telemetry/sentry-monitoring' as `/${string}`,
+        },
+        {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'AI & automation',
+      url: undefined,
+      items: [
+        {
+          name: 'AI agents and MCP',
+          url: '/guides/telemetry/ai-agents' as `/${string}`,
         },
       ],
     },
