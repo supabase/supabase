@@ -90,8 +90,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               rounded-lg border
               bg-alternative-200 text-foreground-light
               hover:text-foreground hover:border-foreground-muted
-              focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-hidden
-              focus-visible:rounded-sm focus-visible:ring-foreground-lighter
+              focus-visible:text-foreground focus-ring
             "
             onClick={() => setOpen(false)}
           >
@@ -194,10 +193,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
             ) : (
               <Link
                 href={menuItem.url ?? '/'}
-                className={cn(
-                  className,
-                  'block focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:rounded-sm'
-                )}
+                className={cn(className, 'block focus-ring rounded-sm')}
                 onClick={() => setOpen(false)}
               >
                 {menuItem.title}
@@ -224,7 +220,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               <Link
                 href="/"
                 as="/"
-                className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs"
+                className="block w-auto h-6 focus-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative rounded-xs"
               >
                 <SupabaseWordmark />
               </Link>
@@ -232,7 +228,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                 tabIndex={0}
                 onClick={() => setOpen(false)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand hover:text-foreground-light transition-colors focus:outline-hidden focus:ring-2 focus:ring-inset"
+                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter hover:text-foreground-light focus-ring"
               >
                 <span className="sr-only">Close menu</span>
                 <svg

@@ -93,7 +93,7 @@ const RightClickBrandLogo = () => {
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
           onKeyDown={(e) => e.key === 'Enter' && router?.push('/')}
-          className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs"
+          className="block w-auto h-6 focus-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative rounded-xs"
         >
           <SupabaseWordmark />
         </Link>

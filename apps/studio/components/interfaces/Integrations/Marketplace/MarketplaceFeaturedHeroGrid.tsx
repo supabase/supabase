@@ -113,7 +113,7 @@ export const MarketplaceFeaturedHeroGrid = ({
         <div className="col-span-1 @xl:col-span-2">
           <Link
             href={`/project/${ref}/integrations/${primaryIntegration.id}/overview`}
-            className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+            className="block h-full rounded-md focus-ring"
           >
             <Card className="relative flex flex-row overflow-hidden h-full min-h-[168px] hover:border-stronger">
               <div className="relative z-10 flex flex-col gap-2.5 p-4 flex-1 min-w-0">
@@ -170,7 +170,7 @@ export const MarketplaceFeaturedHeroGrid = ({
             <div key={integration.id} className="col-span-1">
               <Link
                 href={`/project/${ref}/integrations/${integration.id}/overview`}
-                className="block h-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+                className="block h-full rounded-md focus-ring"
               >
                 <Card className="flex flex-col overflow-hidden h-full hover:border-stronger">
                   <div className="hidden @xl:block relative w-full h-28 bg-black/90 dark:bg-black/50 shrink-0">

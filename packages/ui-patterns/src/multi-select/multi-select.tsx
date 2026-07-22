@@ -293,10 +293,10 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           className={cn(
             'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
             'border-alternative bg-control px-3 py-2 text-sm',
-            'ring-offset-background placeholder:text-muted-foreground',
-            'focus:outline-hidden focus:ring-2 focus:ring-background-control focus:ring-offset-2 focus-visible:ring-offset-foreground-muted',
+            'placeholder:text-muted-foreground',
+            'focus-ring',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'hover:border-primary transition-colors duration-200',
+            'hover:border-primary',
             className
           )}
           {...props}

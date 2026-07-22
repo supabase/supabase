@@ -54,9 +54,7 @@ export const tabsListVariants = cva(cn('flex'), {
 })
 
 export const tabsTriggerListVariants = cva(
-  cn(
-    'relative cursor-pointer flex items-center space-x-2 text-center transition focus:outline-hidden focus-visible:ring-3 focus-visible:ring-foreground-muted focus-visible:border-foreground-muted'
-  ),
+  cn('relative cursor-pointer flex items-center space-x-2 text-center focus-ring'),
   {
     variants: {
       type: {
