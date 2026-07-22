@@ -100,8 +100,6 @@ function hrefFor(agent: AgentEntry): string {
 
 export const aiToolsSupportedAgents: ContentListingGroup = {
   id: 'ai-tools-supported-agents',
-  heading: "What's supported?",
-  headingLevel: 'h3',
   type: 'grid',
   columns: 3,
   items: buildAgents().map((agent) => ({
