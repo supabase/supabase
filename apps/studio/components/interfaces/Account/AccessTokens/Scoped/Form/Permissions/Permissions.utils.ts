@@ -17,6 +17,13 @@ export const sortActions = (actions: string[]): string[] => {
   return sorted
 }
 
+// The default action(s) selected when a resource is first added. Newly added
+// resources should be least-privilege by default: just `read` when available,
+// otherwise the first available action — never the resource's full action set.
+export const getDefaultActions = (resource: PermissionResource): string[] => {
+  return resource.actions.includes('read') ? ['read'] : [resource.actions[0]]
+}
+
 export const togglePermissionResource = (
   permissionRows: PermissionRow[],
   resource: PermissionResource
@@ -27,6 +34,5 @@ export const togglePermissionResource = (
     return permissionRows.filter((row) => row.resource !== resource.resource)
   }
 
-  const defaultActions = resource.actions.includes('read') ? ['read'] : [resource.actions[0]]
-  return [...permissionRows, { resource: resource.resource, actions: defaultActions }]
+  return [...permissionRows, { resource: resource.resource, actions: getDefaultActions(resource) }]
 }
