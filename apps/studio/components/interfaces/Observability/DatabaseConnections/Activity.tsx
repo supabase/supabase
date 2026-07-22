@@ -107,7 +107,9 @@ export const Activity = ({ live }: ActivityProps) => {
       statesFilter.length === 0 ||
       (activity.state !== null && statesFilter.includes(activity.state))
     const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
-    return matchesState && matchesRole
+    const matchesApplication =
+      applicationsFilter.length === 0 || applicationsFilter.includes(activity.application_name)
+    return matchesState && matchesRole && matchesApplication
   })
 
   const stateOptions = [
@@ -216,7 +218,9 @@ export const Activity = ({ live }: ActivityProps) => {
               variant="text"
               className="px-1"
               icon={<X />}
-              onClick={() => setQueryStates({ states: [], roles: DEFAULT_ROLES_FILTER })}
+              onClick={() =>
+                setQueryStates({ states: [], roles: DEFAULT_ROLES_FILTER, applications: [] })
+              }
               tooltip={{ content: { side: 'bottom', text: 'Reset filters' } }}
             />
           )}
@@ -274,7 +278,11 @@ export const Activity = ({ live }: ActivityProps) => {
                       variant="default"
                       className="mt-2"
                       onClick={() => {
-                        setQueryStates({ states: [], roles: DEFAULT_ROLES_FILTER })
+                        setQueryStates({
+                          states: [],
+                          roles: DEFAULT_ROLES_FILTER,
+                          applications: [],
+                        })
                       }}
                     >
                       Reset filters
