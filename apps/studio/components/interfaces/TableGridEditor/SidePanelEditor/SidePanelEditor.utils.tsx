@@ -564,7 +564,6 @@ export const createTable = async ({
         connectionString,
         name: payload.name,
         schema: payload.schema,
-        scoped,
       })
     }
   )
@@ -762,8 +761,7 @@ export const updateTable = async ({
     queryKey: tableKeys.retrieve(
       projectRef,
       payload.name ?? table.name,
-      payload.schema ?? table.schema,
-      { scoped: !!scoped }
+      payload.schema ?? table.schema
     ),
     queryFn: ({ signal }) =>
       getTable(
@@ -772,7 +770,6 @@ export const updateTable = async ({
           connectionString,
           name: payload.name ?? table.name,
           schema: payload.schema ?? table.schema,
-          scoped,
         },
         signal
       ),
