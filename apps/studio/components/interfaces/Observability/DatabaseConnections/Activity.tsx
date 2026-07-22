@@ -17,6 +17,7 @@ import {
   Button,
   Card,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
@@ -37,6 +38,11 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportsSelectFilter } from '../../Reports/v2/ReportsSelectFilter'
+import {
+  QUERY_STATE_TOOLTIP,
+  WARN_DURATION_ACTIVE_QUERY,
+  WARN_DURATION_IDLE_TXN,
+} from './DatabaseConnections.constants'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
@@ -64,6 +70,13 @@ const getDuration = (activity: DatabaseActivity) => {
   return null
 }
 
+const getBadgeVariant = (activity: DatabaseActivity) => {
+  const { state } = activity
+  if (state === 'active') return 'success'
+  if (state === 'idle in transaction' || state === 'idle in transaction (aborted)') return 'warning'
+  return 'default'
+}
+
 const DEFAULT_ROLES_FILTER = ['anon', 'authenticated', 'postgres']
 
 interface ActivityProps {
@@ -73,7 +86,6 @@ interface ActivityProps {
 export const Activity = ({ live }: ActivityProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const [, setNow] = useState(() => dayjs())
   const [selectedPid] = useQueryState('pid', parseAsInteger)
 
   const [
@@ -95,7 +107,7 @@ export const Activity = ({ live }: ActivityProps) => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { refetchInterval: live ? 3000 : false }
+    { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
 
   const { data: roles } = useDatabaseRolesQuery({
@@ -171,12 +183,6 @@ export const Activity = ({ live }: ActivityProps) => {
       if (bIndex !== -1) return 1
       return 0
     })
-
-  // [Joshen] Just to trigger a UI re-render for the duration to be "live"
-  useEffect(() => {
-    const interval = setInterval(() => setNow(dayjs()), 1000)
-    return () => clearInterval(interval)
-  }, [])
 
   useEffect(() => {
     if (selectedPid && isSuccess) {
@@ -329,13 +335,8 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
     },
   })
 
-  const getBadgeVariant = (state: DatabaseActivity['state']) => {
-    if (state === 'active') return 'success'
-    if (state === 'idle in transaction') return 'warning'
-    return 'default'
-  }
-
   const durationSeconds = getDuration(activity)
+  const badgeVariant = getBadgeVariant(activity)
 
   /**
    * Queries in "active state": 30s threshold is long enough (most CRUD queries should be quick)
@@ -343,8 +344,10 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
    */
   const queryRunningLongWarning =
     !!durationSeconds &&
-    ((activity.state === 'active' && durationSeconds >= 30) ||
-      (activity.state === 'idle in transaction' && durationSeconds >= 10))
+    ((activity.state === 'active' && durationSeconds >= WARN_DURATION_ACTIVE_QUERY) ||
+      ((activity.state === 'idle in transaction' ||
+        activity.state === 'idle in transaction (aborted)') &&
+        durationSeconds >= WARN_DURATION_IDLE_TXN))
 
   const onConfirmTerminate = async () => {
     try {
@@ -363,18 +366,25 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
           {selectedPid === activity.pid && (
             <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter"></div>
           )}
-          <Badge variant={getBadgeVariant(activity.state)}>{activity.state}</Badge>
+          <Tooltip>
+            <TooltipTrigger>
+              <Badge variant={badgeVariant}>{activity.state}</Badge>
+            </TooltipTrigger>
+            {activity.state && (
+              <TooltipContent side="bottom">{QUERY_STATE_TOOLTIP[activity.state]}</TooltipContent>
+            )}
+          </Tooltip>
         </TableCell>
         <TableCell className="max-w-[300px]">
-          <HoverCard openDelay={100} closeDelay={100}>
+          <HoverCard openDelay={250} closeDelay={100}>
             <HoverCardTrigger>
               <p
                 className={cn(
-                  'truncate font-mono tracking-tighter',
-                  activity.query === null && 'text-foreground-lighter'
+                  'truncate',
+                  !activity.query ? 'text-foreground-lighter' : 'font-mono tracking-tighter'
                 )}
               >
-                {activity.query ?? 'No query'}
+                {!!activity.query ? activity.query : 'No query'}
               </p>
             </HoverCardTrigger>
             {activity.query && (
@@ -392,8 +402,19 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
               </HoverCardContent>
             )}
           </HoverCard>
-          <p className="text-xs text-foreground-lighter flex items-center gap-x-1 mt-0.5 truncate">
-            <span>PID: {activity.pid}</span>
+          <div className="text-xs text-foreground-lighter flex items-center gap-x-1 mt-0.5 truncate">
+            <Tooltip>
+              <TooltipTrigger
+                className="cursor-pointer"
+                onClick={() => {
+                  toast.success('Copied PID')
+                  copyToClipboard(activity.pid.toString())
+                }}
+              >
+                <span>PID: {activity.pid}</span>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Click to copy</TooltipContent>
+            </Tooltip>
             <span>·</span>
             <span>{activity.role_name}</span>
             {activity.application_name && (
@@ -402,14 +423,18 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
                 <span>{activity.application_name}</span>
               </>
             )}
-          </p>
+          </div>
         </TableCell>
 
         <TableCell>
           <p
             className={cn(
               'tabular-nums truncate',
-              queryRunningLongWarning ? 'text-warning' : undefined
+              queryRunningLongWarning
+                ? activity.state === 'active'
+                  ? 'text-warning'
+                  : 'text-destructive'
+                : undefined
             )}
           >
             {durationSeconds !== null ? (

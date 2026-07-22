@@ -389,6 +389,8 @@ allow_list = [
     "Spotify",
     "Sqitch",
     "Supabase",
+    "[Ss]yslog(s)?",
+    "mTLS",
     "Supavisor",
     "SvelteKit",
     "SwiftUI",
