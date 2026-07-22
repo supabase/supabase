@@ -1,13 +1,47 @@
 ---
-title: Telemetry
+title: Monitoring and Debugging
 ---
 
-Telemetry helps you understand what’s happening inside your app by collecting logs, metrics, and traces.
+Monitor your project, debug errors, and understand what's happening across the Supabase stack.
 
-- **Logs** capture individual events, such as errors or warnings, providing details about what happened at a specific moment.
-- **Metrics** track numerical data over time, like request latency or database query performance, helping you spot trends.
-- **Traces** show the flow of a request through different services, helping you debug slow or failing operations.
+Supabase exposes four types of observability signals:
 
-Supabase is working towards full support for the [OpenTelemetry](https://opentelemetry.io/) standard, making it easier to integrate with observability tools.
+| Signal      | Description                                                        | Guide                                                             |
+| ----------- | ------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| **Logs**    | Events from each service — auth, database, edge, storage, and more | [Logging](/docs/guides/telemetry/logs)                            |
+| **Metrics** | Prometheus-compatible database performance series                  | [Metrics](/docs/guides/telemetry/metrics)                         |
+| **Traces**  | End-to-end request correlation via W3C Trace Context               | [Client-side tracing](/docs/guides/telemetry/client-side-tracing) |
+| **Reports** | Built-in dashboards for API, Auth, Storage, and Realtime           | [Reports](/docs/guides/telemetry/reports)                         |
 
-This section provides guidance on telemetry in Supabase, including how to work with Supabase Logs.
+## Debugging an error
+
+If a request is failing or behaving unexpectedly, start with the [Debugging guide](/docs/guides/telemetry/debugging). It covers:
+
+- The Supabase request-stack model (which layer owns which error code)
+- A symptom-to-layer router with links to specific troubleshooting guides
+- How to read logs as evidence before applying a fix
+
+## Querying logs
+
+The [Logs Explorer](/docs/guides/telemetry/logs) lets you query events from any Supabase service using SQL. The Explorer defaults to ClickHouse, where all sources share a single `logs` table and nested fields are accessed via `log_attributes['field_name']`.
+
+For advanced filtering with regular expressions and field discovery, see [Advanced log filtering](/docs/guides/telemetry/advanced-log-filtering).
+
+## Streaming logs externally
+
+To forward logs to Datadog, Loki, Axiom, S3, Sentry, or a custom HTTP destination, configure a [Log drain](/docs/guides/telemetry/log-drains).
+
+## AI agents and MCP
+
+The Supabase MCP server exposes a `get_logs` tool that lets AI agents query logs by service name without writing SQL. It is engine-agnostic and works across all projects.
+
+To give an AI agent the ability to debug your Supabase project:
+
+1. Install the [Supabase MCP server](/docs/guides/getting-started/mcp).
+2. Add the `supabase` skill: `npx skills add supabase`.
+
+The skill routes debugging tasks to the guides in this section, so the agent always uses current documentation rather than frozen training data.
+
+## Automated monitoring
+
+The [chaos-o11y project](https://chaos-o11y-web-q2uy.vercel.app/) is an experimental self-healing agent that runs nightly: it detects anomalies in your logs and advisors, diagnoses the root cause, applies safe fixes, and reports what it found.

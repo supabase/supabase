@@ -212,7 +212,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'security',
           },
           {
-            label: 'Telemetry',
+            label: 'Monitoring and Debugging',
             icon: 'telemetry',
             href: '/guides/telemetry' as `/${string}`,
             level: 'telemetry',
@@ -2983,7 +2983,7 @@ export const platform: NavMenuConstant = {
 
 export const telemetry: NavMenuConstant = {
   icon: 'telemetry',
-  title: 'Telemetry',
+  title: 'Monitoring and Debugging',
   url: '/guides/telemetry',
   items: [
     { name: 'Overview', url: '/guides/telemetry' },
