@@ -26,7 +26,8 @@ pnpm 11 + Turborepo monorepo. Requires Node >= 22.13.
 ```bash
 pnpm install                 # install dependencies
 pnpm dev:studio              # run Studio dev server → http://localhost:8082
-pnpm dev:docs / dev:www      # run docs / www dev servers
+pnpm dev:docs                # run docs dev server
+pnpm dev:www                 # run www dev server
 pnpm test:studio             # Studio unit tests (vitest)
 pnpm e2e                     # Studio E2E tests (playwright)
 pnpm build --filter=studio   # build Studio
