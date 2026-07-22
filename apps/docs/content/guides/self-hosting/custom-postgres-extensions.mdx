@@ -24,6 +24,12 @@ If the extension's maintainer already publishes a prebuilt Supabase Postgres ima
 
 The _proper_ way to add an extension is to compile it into the image's [Nix build](#alternative-build-the-extension-into-the-nix-image), so it's built with the same toolchain. That's the most robust route, but it requires Nix, building the image from source, and maintaining a fork. If that's heavier than you want, the rest of this guide is a lighter-weight alternative: build your extension in an ordinary Docker builder and layer it onto the published image. The approach can work for many standard [PGXS](https://www.postgresql.org/docs/current/extend-pgxs.html) extensions - but your mileage may vary, and the constraints in the next section are the trade-off.
 
+<Admonition type="caution">
+
+Supabase builds, tests, and maintains the official `supabase/postgres` images and their bundled extensions. A custom image built by following this guide is **unofficial and unsupported** - it's not guaranteed to work, and may break with future changes to the base image. Testing, quality assurance, and ongoing maintenance (rebuilding and re-verifying after every upgrade) are your responsibility.
+
+</Admonition>
+
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Why Postgres images need special handling
@@ -60,7 +66,9 @@ Always build against the **same major version** you run, and rebuild your custom
 
 </Admonition>
 
-## Step 1: Write the dockerfile
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+## Step 1: Write the Dockerfile
 
 Use a multi-stage build: a `glibc` builder stage (`postgres:<major>-bookworm`) to compile, and the **Supabase image** as the runtime stage that installs the artifacts into the correct Nix locations.
 
@@ -101,9 +109,9 @@ RUN set -eux; \
 
 The same Dockerfile structure works for your own extensions - `COPY` your PGXS source into the builder instead of `git clone`. However, when authoring a _new_ extension from scratch, it's best to use the Nix build instead (see [Alternative: build the extension into the Nix image](#alternative-build-the-extension-into-the-nix-image) below).
 
-### Handle dependencies
+### Handle dependencies beyond the standard library
 
-Copying a `.so` onto the image works cleanly only when its **sole** runtime dependency is `libc` - it's already loaded in the `postgres` process, so it resolves automatically. Any _other_ shared library the extension links (`libcurl`, `OpenSSL`, etc.) must also be present and linkable at runtime.
+Copying a `.so` onto the image works cleanly only when its **sole** runtime dependency is the C library (`libc.so.6`) - that's the image's `glibc`, already loaded in the `postgres` process, so it resolves automatically. Any _other_ shared library the extension links (`libcurl`, `OpenSSL`, etc.) must also be present and loadable at runtime.
 
 The build happens inside Docker - check the compiled `.so` in the builder stage rather than on your host:
 
@@ -116,7 +124,7 @@ docker run --rm --entrypoint sh ext-builder -c 'readelf -d /src/*.so | grep NEED
 - **Only `libc.so.6` and `ld-linux-*`** - the Dockerfile above is sufficient (`pg_uuidv7` is this case).
 - **Anything else listed** - handle those dependencies with one of the options below.
 
-**Recommended: statically link the extra dependencies** into the `.so`, so its only remaining `NEEDED` is `libc`. After building, re-run the check above and confirm only `libc.so.6` and `ld-linux-*` remain.
+**Recommended: statically link the extra dependencies** into the `.so`, so its only remaining `NEEDED` is `libc.so.6`. After building, re-run the check above and confirm only `libc.so.6` and `ld-linux-*` remain.
 
 A few things make this more involved than it sounds:
 
