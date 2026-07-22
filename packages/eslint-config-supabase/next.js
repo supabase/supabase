@@ -48,8 +48,8 @@ const typescriptConfig = {
 }
 
 module.exports = defineConfig([
-  // Global ignore for the .next folder
-  { ignores: ['.next', 'public', '.contentlayer'] },
+  // Global ignore for build output and static assets
+  { ignores: ['.next', 'dist', 'public', '.contentlayer'] },
   turboConfig,
   prettierConfig,
   tanstackQuery.configs['flat/recommended'],
