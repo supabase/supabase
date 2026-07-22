@@ -21,7 +21,6 @@ import {
   getFlags,
   TelemetryTagManager,
   ThemeProvider,
-  useFlag,
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -52,8 +51,6 @@ import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalEr
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
 import { useRootQueryClient } from '@/data/query-client'
-import { setScopedIntrospection } from '@/data/scoped-introspection'
-import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -130,20 +127,6 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }
   return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
 }
 
-// Hydrates the imperative `isScopedIntrospection()` accessor (see
-// @/data/scoped-introspection) from the pgMetaScopedIntrospection flag, so
-// query hooks that read pg-meta's scoped introspection SQL outside of React
-// Query keys stay in sync with the flag without prop-drilling it.
-const ScopedIntrospectionFlagBridge = ({ children }: { children: React.ReactNode }) => {
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
-
-  useEffect(() => {
-    setScopedIntrospection(scoped)
-  }, [scoped])
-
-  return <>{children}</>
-}
-
 configureMonacoLoader()
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
@@ -194,70 +177,68 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
               <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
-                <ScopedIntrospectionFlagBridge>
-                  <ProfileProvider>
-                    <TimezoneProvider>
-                      <TimestampInfoTimezoneBridge>
-                        <Head>
-                          <title>{appTitle ?? 'Supabase'}</title>
-                          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                          <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
-                          <meta name="googlebot" content="notranslate" />
-                          {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
-                          <style
-                            dangerouslySetInnerHTML={{
-                              __html: `:root{--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
-                            }}
-                          />
-                          {/* Speed up initial API loading times by pre-connecting to the API domain */}
-                          {IS_PLATFORM && (
-                            <link
-                              rel="preconnect"
-                              href={new URL(API_URL).origin}
-                              crossOrigin="use-credentials"
-                            />
-                          )}
-                        </Head>
-                        <MetaFaviconsPagesRouter
-                          includeManifest
-                          applicationName="Supabase Studio"
-                          route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                <ProfileProvider>
+                  <TimezoneProvider>
+                    <TimestampInfoTimezoneBridge>
+                      <Head>
+                        <title>{appTitle ?? 'Supabase'}</title>
+                        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                        <meta property="og:image" content={`${BASE_PATH}/img/supabase-og.png`} />
+                        <meta name="googlebot" content="notranslate" />
+                        {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
+                        <style
+                          dangerouslySetInnerHTML={{
+                            __html: `:root{--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                          }}
                         />
-                        <TooltipProvider>
-                          <RouteValidationWrapper>
-                            <ThemeProvider>
-                              <DevToolbarProvider apiUrl={API_URL}>
-                                <AiAssistantStateContextProvider>
-                                  <CommandProvider>
-                                    <BannerStackProvider>
-                                      <FeaturePreviewContextProvider>
-                                        <MainScrollContainerProvider>
-                                          {getLayout(<Component {...pageProps} />)}
-                                        </MainScrollContainerProvider>
-                                        <GlobalShortcuts />
-                                        <StudioCommandMenu />
-                                        <FeaturePreviewModal />
-                                      </FeaturePreviewContextProvider>
-                                    </BannerStackProvider>
-                                    <Toaster />
-                                    <MonacoThemeProvider />
-                                  </CommandProvider>
-                                </AiAssistantStateContextProvider>
-                                <DevToolbar extraTabs={devToolbarExtraTabs} />
-                                <DevToolbarTrigger />
-                              </DevToolbarProvider>
-                            </ThemeProvider>
-                          </RouteValidationWrapper>
-                        </TooltipProvider>
-                        <Telemetry />
-                        <ToastErrorTracker />
-                        {!isTestEnv && (
-                          <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+                        {/* Speed up initial API loading times by pre-connecting to the API domain */}
+                        {IS_PLATFORM && (
+                          <link
+                            rel="preconnect"
+                            href={new URL(API_URL).origin}
+                            crossOrigin="use-credentials"
+                          />
                         )}
-                      </TimestampInfoTimezoneBridge>
-                    </TimezoneProvider>
-                  </ProfileProvider>
-                </ScopedIntrospectionFlagBridge>
+                      </Head>
+                      <MetaFaviconsPagesRouter
+                        includeManifest
+                        applicationName="Supabase Studio"
+                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                      />
+                      <TooltipProvider>
+                        <RouteValidationWrapper>
+                          <ThemeProvider>
+                            <DevToolbarProvider apiUrl={API_URL}>
+                              <AiAssistantStateContextProvider>
+                                <CommandProvider>
+                                  <BannerStackProvider>
+                                    <FeaturePreviewContextProvider>
+                                      <MainScrollContainerProvider>
+                                        {getLayout(<Component {...pageProps} />)}
+                                      </MainScrollContainerProvider>
+                                      <GlobalShortcuts />
+                                      <StudioCommandMenu />
+                                      <FeaturePreviewModal />
+                                    </FeaturePreviewContextProvider>
+                                  </BannerStackProvider>
+                                  <Toaster />
+                                  <MonacoThemeProvider />
+                                </CommandProvider>
+                              </AiAssistantStateContextProvider>
+                              <DevToolbar extraTabs={devToolbarExtraTabs} />
+                              <DevToolbarTrigger />
+                            </DevToolbarProvider>
+                          </ThemeProvider>
+                        </RouteValidationWrapper>
+                      </TooltipProvider>
+                      <Telemetry />
+                      <ToastErrorTracker />
+                      {!isTestEnv && (
+                        <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
+                      )}
+                    </TimestampInfoTimezoneBridge>
+                  </TimezoneProvider>
+                </ProfileProvider>
               </FeatureFlagProviderWithOrgContext>
             </AuthProvider>
           </HydrationBoundary>
