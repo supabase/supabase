@@ -16334,8 +16334,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svgo@4.0.1:
-    resolution: {integrity: sha512-XDpWUOPC6FEibaLzjfe0ucaV0YrOjYotGJO1WpF0Zd+n6ZGEQUsSugaoLq9QkEZtAfQIxT42UChcssDVPP3+/w==}
+  svgo@4.0.2:
+    resolution: {integrity: sha512-ekx94z1rRc5LDi6oSUaeRnYhd0UOJxdtQCL2rF8xpWxD3TPAsISWOrxezqGovqS38GRZOdpDfvQe3ts6F7nsng==}
     engines: {node: '>=16'}
     hasBin: true
 
@@ -32199,7 +32199,7 @@ snapshots:
     dependencies:
       postcss: 8.5.10
       postcss-value-parser: 4.2.0
-      svgo: 4.0.1
+      svgo: 4.0.2
 
   postcss-unique-selectors@8.0.0(postcss@8.5.10):
     dependencies:
@@ -34088,7 +34088,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svgo@4.0.1:
+  svgo@4.0.2:
     dependencies:
       commander: 11.1.0
       css-select: 5.1.0
