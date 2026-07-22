@@ -109,6 +109,9 @@ const NEXT_PUBLIC_API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN || 'https://ap
 const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
   const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/api/${version}-json`, {
     method: 'get',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
   if (response.ok) {
     return response.json()
