@@ -25,7 +25,6 @@ concurrency:
 
 permissions:
   contents: read
-  deployments: read
   statuses: read
   pull-requests: read
 
@@ -58,14 +57,73 @@ jobs:
             docs_app:
               - 'apps/docs/**'
 
+      # Vercel's GitHub App stopped writing GitHub Deployment objects on
+      # 2026-02-17 (broken app auth), so vercel/wait-for-deployment-action
+      # times out polling that API even though the preview builds fine.
+      # Poll the "Vercel – docs" commit status instead — Vercel keeps posting
+      # those — then resolve the deployment it points to via Vercel's own API
+      # to get the actual preview URL.
       - name: Wait for Vercel docs preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.filter.outputs.docs_app == 'true'
         id: deployment
-        uses: vercel/wait-for-deployment-action@0e2b0c5c5cce31f1648108aeec56467187aca037
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
         with:
-          project-slug: docs
-          environment: preview
-          timeout: '900'
+          script: |
+            const sha = context.payload.pull_request.head.sha
+            const timeoutMs = 900 * 1000
+            const pollIntervalMs = 15 * 1000
+            const start = Date.now()
+
+            for (;;) {
+              const { data: statuses } = await github.rest.repos.listCommitStatusesForRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: sha,
+              })
+
+              const latest = statuses
+                .filter((s) => s.context === 'Vercel – docs')
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0]
+
+              if (latest?.state === 'success') {
+                const rawId = latest.target_url.split('/').filter(Boolean).pop()
+                const deploymentId = rawId.startsWith('dpl_') ? rawId : `dpl_${rawId}`
+
+                const teamId = process.env.VERCEL_TEAM_ID
+                const url = teamId
+                  ? `https://api.vercel.com/v13/deployments/${deploymentId}?teamId=${teamId}`
+                  : `https://api.vercel.com/v13/deployments/${deploymentId}`
+
+                const response = await fetch(url, {
+                  headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` },
+                })
+                if (!response.ok) {
+                  core.setFailed(
+                    `Failed to resolve Vercel deployment ${deploymentId}: ${response.status} ${response.statusText}`
+                  )
+                  return
+                }
+
+                const deployment = await response.json()
+                core.setOutput('deployment-url', `https://${deployment.url}`)
+                return
+              }
+
+              if (latest?.state === 'failure' || latest?.state === 'error') {
+                core.setFailed(`Vercel docs deployment failed (commit status: ${latest.state})`)
+                return
+              }
+
+              if (Date.now() - start > timeoutMs) {
+                core.setFailed('Timed out after 900s waiting for the Vercel docs preview deployment')
+                return
+              }
+
+              await new Promise((resolve) => setTimeout(resolve, pollIntervalMs))
+            }
 
       - name: Resolve base URL
         id: base-url
