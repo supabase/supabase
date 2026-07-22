@@ -304,6 +304,13 @@ const tweets = [
     img_url: '/images/twitter-profiles/k0aPYRHF_400x400.jpg',
     weight: 6,
   },
+  {
+    text: 'Supabase is really good. ⚡',
+    url: 'https://x.com/shadcn/status/1672913636132790272',
+    handle: 'shadcn',
+    img_url: '/images/twitter-profiles/TUYae5z7.jpg',
+    weight: 10,
+  },
 ]
 
 export const getWeightedTweets = (count: number): typeof tweets => {
