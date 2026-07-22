@@ -12,7 +12,13 @@ export { getCategoryIcon, CATEGORY_ICONS } from 'common/marketplace-categories'
 export type { MarketplaceSource } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
 // Defines featured integrations and their order in the featured hero
-export const FEATURED_INTEGRATION_IDS = ['grafana', 'cron', 'queues', 'data_api'] as const
+export const FEATURED_INTEGRATION_IDS = [
+  'grafana',
+  'cron',
+  'queues',
+  'stripe_sync_engine',
+  'data_api',
+] as const
 
 export type MarketplaceIntegrationType = 'oauth' | 'postgres_extension' | 'template' | 'wrapper'
 
