@@ -156,8 +156,16 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span>{formatDuration(longestRunningQuery.duration * 1000, 0)}</span>
                     <span className="text-foreground-lighter text-sm">·</span>
                     <span
+                      role="button"
+                      tabIndex={0}
                       className="text-foreground-lighter text-sm hover:text-foreground transition cursor-pointer"
                       onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelectedPid(longestRunningQuery.activity.pid)
+                        }
+                      }}
                     >
                       PID: {longestRunningQuery.activity.pid}
                     </span>

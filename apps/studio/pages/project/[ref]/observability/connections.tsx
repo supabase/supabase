@@ -25,7 +25,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
   const [live, setLive] = useState(true)
   const [now, setNow] = useState(() => dayjs.utc())
 
-  const { data } = useDatabaseActivityQuery(
+  const { data, isPending: isLoadingActivity } = useDatabaseActivityQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -86,6 +86,8 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             label="Summarize activity"
             buildPrompt={buildPrompt}
             onOpenAssistant={handleSummarizeActivity}
+            disabled={isLoadingActivity}
+            isLoading={isLoadingActivity}
             // @ts-ignore [Joshen] To add proper telemetry source in subsequent PR
             telemetrySource="database_connections"
             size="tiny"
