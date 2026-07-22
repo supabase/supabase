@@ -41,7 +41,6 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 
 ## Defaults that differ here
 
-- **Named exports only** for components/hooks/utils — `export default` is allowed only in `pages/**` and `app/**` (lint-enforced).
 - **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, `exhaustive-deps` suppression, or default export fails the build even though it's "only a warning". Check locally with `pnpm --filter studio run lint:ratchet`.
 - **Clipboard**: `copyToClipboard` from `'ui'`, and never `await` anything before calling it (Safari requires the write inside the user gesture; lint-enforced) — pass a Promise as the argument instead.
 - **`useParams()` comes from `'common'`**, not `next/navigation` — it camelCases keys and returns `string | undefined`.

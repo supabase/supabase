@@ -50,6 +50,8 @@ Never hand-edit generated files: `packages/api-types/types/**`, `**/routeTree.ge
 
 **Styling** — Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors.
 
+**Exports** — named exports only; default exports are allowed only where a framework requires them (`pages/**`, `app/**`, config files). Lint-enforced across all apps via `eslint-config-supabase` (severity `warn` everywhere; hard-enforced in Studio by the lint ratchet).
+
 **Language** — Use U.S. English everywhere.
 
 ## Skills
