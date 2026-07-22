@@ -65,6 +65,14 @@ function AiTools({ className }: { className?: string }) {
         AI Tools
       </h3>
       <div className="flex flex-col gap-2">
+        <Link
+          href="/guides/ai-tools"
+          onClick={handleAgentSetupClick}
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+        >
+          <Sparkles size={14} strokeWidth={1.5} />
+          Connect your AI agent
+        </Link>
         <button
           onClick={copyMarkdown}
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
@@ -76,14 +84,6 @@ function AiTools({ className }: { className?: string }) {
           )}
           {copied ? 'Copied!' : 'Copy as Markdown'}
         </button>
-        <Link
-          href="/guides/ai-tools"
-          onClick={handleAgentSetupClick}
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-        >
-          <Sparkles size={14} strokeWidth={1.5} />
-          Connect your AI agent
-        </Link>
         <a
           href={`https://chatgpt.com/?hint=search&q=Read from https://supabase.com/docs${path} so I can ask questions about its contents`}
           target="_blank"
