@@ -15,8 +15,10 @@ import { safeSql, type SafeSqlFragment } from '../pg-format'
  * the outgoing/incoming FK rows the unscoped query would have matched by name.
  *
  * When `targetOid` is omitted the injected fragments are empty and the rendered
- * SQL is byte-identical to the legacy full-catalog query -- `TABLES_SQL` below
- * is exactly that rendering, so every existing consumer is unaffected.
+ * SQL is the legacy full-catalog query -- `TABLES_SQL` below is exactly that
+ * rendering, so every existing consumer is unaffected. Behavioral equivalence
+ * between the scoped and unscoped forms is enforced by execution-based tests in
+ * test/tables.test.ts, not by a byte-for-byte SQL snapshot.
  */
 export const getTablesSql = (targetOid?: SafeSqlFragment) => {
   const mainScope = targetOid
@@ -131,4 +133,8 @@ group by
 `
 }
 
+// FROZEN legacy path: the unscoped rendering served while the
+// pgMetaScopedIntrospection flag is off. Do not edit its shape -- it must keep
+// matching production behavior until the flag cleanup deletes it. The scoped
+// form is getTablesSql(targetOid) (used by tables.retrieve).
 export const TABLES_SQL = getTablesSql()

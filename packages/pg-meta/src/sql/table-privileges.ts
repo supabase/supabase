@@ -1,6 +1,10 @@
 import { safeSql, type SafeSqlFragment } from '../pg-format'
 
 export const TABLE_PRIVILEGES_SQL = /* SQL */ safeSql`
+-- FROZEN legacy path: served while the pgMetaScopedIntrospection flag is off.
+-- Do not edit -- it must keep matching production behavior until the flag
+-- cleanup deletes it. getScopedTablePrivilegesSql is the replacement.
+--
 -- Despite the name \`table_privileges\`, this includes other kinds of relations:
 -- views, matviews, etc. "Relation privileges" just doesn't roll off the tongue.
 --

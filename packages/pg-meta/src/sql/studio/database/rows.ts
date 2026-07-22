@@ -106,6 +106,8 @@ from approximation;
 
         return sql
       }
+      // FROZEN legacy path (pgMetaScopedIntrospection off): do not edit -- it
+      // must keep matching production behavior until the flag cleanup deletes it.
       const sql = safeSql`
 with approximation as (
     select reltuples as estimate
@@ -154,6 +156,8 @@ from approximation;
 
         return sql
       }
+      // FROZEN legacy path (pgMetaScopedIntrospection off): do not edit -- it
+      // must keep matching production behavior until the flag cleanup deletes it.
       const sql = safeSql`
 ${COUNT_ESTIMATE_SQL}
 

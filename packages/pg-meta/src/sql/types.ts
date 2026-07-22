@@ -21,9 +21,14 @@ import { safeSql } from '../pg-format'
  *   either base.
  *
  * `scoped` defaults to false so Studio can roll the optimization out behind a
- * feature flag; the legacy rendering must stay byte-identical when scoped=false.
+ * feature flag. `TYPES_SQL` is the FROZEN legacy path (see the comment on it);
+ * behavioral equivalence between the two is enforced by execution-based tests in
+ * test/types.test.ts, not by a byte-for-byte SQL snapshot.
  */
 export const TYPES_SQL = /* SQL */ safeSql`
+-- FROZEN legacy path: served while the pgMetaScopedIntrospection flag is off.
+-- Do not edit -- it must keep matching production behavior until the flag
+-- cleanup deletes it. SCOPED_TYPES_SQL is the replacement.
 select
   t.oid::int8 as id,
   t.typname as name,
