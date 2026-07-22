@@ -20,9 +20,9 @@ Next.js pages router + TanStack Start (mid-migration, see below), React 19. Dev 
 
 ## TanStack Start migration
 
-Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start (`routes/**`). Both runtimes ship side-by-side; the `STUDIO_FRAMEWORK` env var selects which one `pnpm dev`/`build` runs (default: tanstack). Full route map and strategy: `TANSTACK_MIGRATION.md`.
+Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start (`routes/**`). Both runtimes ship side-by-side; the `STUDIO_FRAMEWORK` env var selects which one `pnpm dev`/`build` runs (default: `next`, resolved in `scripts/dispatch.js`). Full route map and strategy: `TANSTACK_MIGRATION.md`.
 
-- **Never delete a page file.** Most `routes/**` files are thin wrappers re-exporting the default export of their `pages/**` counterpart, so the Next file is load-bearing for both runtimes until the final cleanup pass (FE-3106).
+- **Never delete a page file.** Most `routes/**` files are thin wrappers re-exporting the default export of their `pages/**` counterpart, so the Next file is load-bearing for both runtimes until the final cleanup pass.
 - Pure page-body edits propagate to the route automatically. Mirror a change by hand into the corresponding `routes/**` file only when it touches what the route duplicates: `getLayout`/layout wrapping, page titles or other `staticData` (incl. `skip*Layout` flags), `withAuth`, or redirect paths.
 - A new page under `pages/**` needs a matching route under `routes/**` plus a checklist entry in `TANSTACK_MIGRATION.md`.
 - New code uses native TanStack APIs — no `next/router` or `next/link`. The `compat/next/` shims exist only for legacy re-exported pages.
@@ -41,8 +41,8 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 
 ## Defaults that differ here
 
-- **Named exports only** for components/hooks/utils — `export default` is allowed only in `pages/**` and `app/**` (lint-enforced; the default-export template in `components/README.md` is outdated).
-- **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, `exhaustive-deps` suppression, or default export fails the build even though it's "only a warning".
+- **Named exports only** for components/hooks/utils — `export default` is allowed only in `pages/**` and `app/**` (lint-enforced).
+- **ESLint warnings are ratcheted in CI**: the per-rule occurrence count must not increase, so a new `any`, `exhaustive-deps` suppression, or default export fails the build even though it's "only a warning". Check locally with `pnpm --filter studio run lint:ratchet`.
 - **Clipboard**: `copyToClipboard` from `'ui'`, and never `await` anything before calling it (Safari requires the write inside the user gesture; lint-enforced) — pass a Promise as the argument instead.
 - **`useParams()` comes from `'common'`**, not `next/navigation` — it camelCases keys and returns `string | undefined`.
 - **Permissions**: `useAsyncCheckPermissions` from `hooks/misc/useCheckPermissions` (returns `can: true` when self-hosted).
