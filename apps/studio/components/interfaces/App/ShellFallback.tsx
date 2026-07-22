@@ -10,12 +10,18 @@ export function ShellFallback() {
   return (
     <>
       <style>{`
+        /* visibility (not just opacity) so the text is also hidden from
+           screen readers until the reveal. */
         #studio-shell-help {
+          visibility: hidden;
           opacity: 0;
           animation: studio-shell-help-reveal 0.3s ease-out 7s forwards;
         }
         @keyframes studio-shell-help-reveal {
-          to { opacity: 1; }
+          to {
+            visibility: visible;
+            opacity: 1;
+          }
         }
       `}</style>
       <div
