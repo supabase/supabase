@@ -12,7 +12,9 @@ export type TrustedOAuthPartner = {
 
 /**
  * High-traffic MCP / OAuth partners with curated Connect logos.
- * Logos resolve from redirect_uri host only — never from self-asserted name/website.
+ * Logos resolve from allowlisted redirect_uri hosts, or from a trusted name when
+ * redirect_uri is localhost / loopback (common for local MCP clients).
+ * Never from self-asserted name alone on a remote host.
  */
 export const TRUSTED_OAUTH_PARTNERS: readonly TrustedOAuthPartner[] = [
   {
@@ -93,23 +95,45 @@ export function findTrustedPartnerByName(name: string): TrustedOAuthPartner | nu
   )
 }
 
+function curatedLogoForPartner(
+  partner: TrustedOAuthPartner,
+  useDarkVariant: boolean
+): { src: string; isKnownClient: boolean } | null {
+  const customLogoUrl = getMcpClientIconSrc({
+    icon: partner.icon,
+    useDarkVariant,
+    hasDistinctDarkIcon: partner.hasDistinctDarkIcon,
+  })
+  if (!customLogoUrl) return null
+  return { src: customLogoUrl, isKnownClient: true }
+}
+
 export function getRequesterLogo({
   icon,
+  name,
   redirectUri,
   useDarkVariant,
 }: {
   icon: string | null
+  name?: string | null
   redirectUri: string | null | undefined
   useDarkVariant: boolean
 }): { src: string; isKnownClient: boolean } {
-  const trusted = findTrustedPartnerByRedirectUri(redirectUri)
-  if (trusted) {
-    const customLogoUrl = getMcpClientIconSrc({
-      icon: trusted.icon,
-      useDarkVariant,
-      hasDistinctDarkIcon: trusted.hasDistinctDarkIcon,
-    })
-    if (customLogoUrl) return { src: customLogoUrl, isKnownClient: true }
+  const byRedirect = findTrustedPartnerByRedirectUri(redirectUri)
+  if (byRedirect) {
+    const curated = curatedLogoForPartner(byRedirect, useDarkVariant)
+    if (curated) return curated
+  }
+
+  // Local MCP clients (Claude Desktop, Cursor, etc.) use loopback redirects.
+  // Name match is enough there — remote hosts still require the allowlist.
+  const hostname = getRedirectHostname(redirectUri)
+  if (hostname && isLocalRedirectHost(hostname) && name) {
+    const byName = findTrustedPartnerByName(name)
+    if (byName) {
+      const curated = curatedLogoForPartner(byName, useDarkVariant)
+      if (curated) return curated
+    }
   }
 
   return { src: icon || '', isKnownClient: false }

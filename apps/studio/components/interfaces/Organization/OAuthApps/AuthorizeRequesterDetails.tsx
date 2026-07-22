@@ -197,10 +197,11 @@ export const AuthorizeConnectLogo = ({
     () =>
       getRequesterLogo({
         icon,
+        name,
         redirectUri,
         useDarkVariant: resolvedTheme === 'dark',
       }),
-    [icon, redirectUri, resolvedTheme]
+    [icon, name, redirectUri, resolvedTheme]
   )
 
   const hasUsableLogo = Boolean(logo.src) && failedIcon !== logo.src

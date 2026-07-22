@@ -106,14 +106,14 @@ export function ApiAuthorizationMainView({
       <div className="px-6 pb-6">
         <span className="sr-only">Authorize API access for {requester.name}</span>
         <div className="flex flex-col gap-5">
-          <AuthorizeImpersonationWarning
-            name={requester.name}
-            redirectUri={requester.redirect_uri}
-          />
           {isExpired ? (
             <ExpiredNotice />
           ) : (
             <>
+              <AuthorizeImpersonationWarning
+                name={requester.name}
+                redirectUri={requester.redirect_uri}
+              />
               {organizations._tag === 'loading' && <OrganizationsLoader />}
               {organizations._tag === 'error' && (
                 <OrganizationsErrorNotice error={organizations.error} />

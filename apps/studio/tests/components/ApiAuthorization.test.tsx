@@ -148,6 +148,22 @@ describe('AuthorizeConnectLogo', () => {
     expect(screen.queryByAltText('Claude')).not.toBeInTheDocument()
   })
 
+  test('pairs curated logos for localhost when the name matches a trusted partner', () => {
+    customRender(
+      <AuthorizeConnectLogo
+        icon={null}
+        name="Claude"
+        redirectUri="http://127.0.0.1:42813/callback"
+      />
+    )
+
+    expect(screen.getByAltText('Claude')).toHaveAttribute(
+      'src',
+      getMcpClientIconSrc({ icon: 'claude', useDarkVariant: false })
+    )
+    expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+  })
+
   test('shows Supabase alone when the requester has no icon', () => {
     customRender(<AuthorizeConnectLogo icon={null} name="Acme" />)
 
@@ -392,14 +408,19 @@ describe('ApiAuthorizationScreen', () => {
       describe('expiration', () => {
         test('shows expiration warning and hides action buttons when request has expired', async () => {
           mockBothEndpoints(
-            createMockAuthResponse({ expires_at: dayjs().subtract(1, 'hour').toISOString() })
+            createMockAuthResponse({
+              name: 'Claude',
+              redirect_uri: 'https://evil.com/callback',
+              expires_at: dayjs().subtract(1, 'hour').toISOString(),
+            })
           )
           renderScreen()
           await screen.findByText('Authorization request expired')
-          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
           expect(
-            screen.queryByRole('button', { name: /Authorize Test App/ })
+            screen.queryByText('Redirect does not match this app name')
           ).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+          expect(screen.queryByRole('button', { name: /Authorize Claude/ })).not.toBeInTheDocument()
         })
 
         test('does not show expiration warning when request has not expired', async () => {
