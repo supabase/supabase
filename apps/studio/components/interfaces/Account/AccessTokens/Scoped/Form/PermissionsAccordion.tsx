@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   Badge,
+  cn,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -44,19 +45,18 @@ export const PermissionsAccordion = ({
         </p>
       </div>
 
-      <Accordion
-        type="multiple"
-        value={openCategories}
-        onValueChange={setOpenCategories}
-        className="space-y-2"
-      >
-        {PERMISSION_CATALOG_BY_CATEGORY.map((category) => {
+      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
+        {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
           const configuredCount = countConfiguredInCategory(selection, category.key)
           return (
             <AccordionItem
               key={category.key}
               value={category.key}
-              className="rounded-md border bg-surface-100 overflow-hidden"
+              className={cn('border', {
+                'border-b-0': index < PERMISSION_CATALOG_BY_CATEGORY.length - 1,
+                'rounded-t-md': index === 0,
+                'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
+              })}
             >
               <AccordionTrigger className="px-4 py-3 hover:no-underline">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
@@ -78,16 +78,17 @@ export const PermissionsAccordion = ({
                   )}
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-background px-4">
+              <AccordionContent className="bg-surface-100 *:pb-0">
                 <div className="divide-y">
                   {category.entries.map((entry) => (
-                    <PermissionRow
-                      key={entry.key}
-                      entry={entry}
-                      mode={selection[entry.key] ?? 'none'}
-                      onChange={(mode) => onChange(entry.key, mode)}
-                      permissionScopeMap={permissionScopeMap}
-                    />
+                    <div className="px-4" key={entry.key}>
+                      <PermissionRow
+                        entry={entry}
+                        mode={selection[entry.key] ?? 'none'}
+                        onChange={(mode) => onChange(entry.key, mode)}
+                        permissionScopeMap={permissionScopeMap}
+                      />
+                    </div>
                   ))}
                 </div>
               </AccordionContent>
