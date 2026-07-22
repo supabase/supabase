@@ -34,10 +34,7 @@ import InformationBox from '@/components/ui/InformationBox'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import {
-  filterSchemasForHighAvailability,
-  useHighAvailability,
-} from '@/hooks/misc/useHighAvailability'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -89,17 +86,14 @@ export const ForeignKeySelector = ({
   const hasTypeErrors = (errors.types ?? []).length > 0
   const hasTypeNotices = (errors.typeNotice ?? []).length > 0
 
-  const { isHighAvailability } = useHighAvailability()
   const { data: schemas = [] } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
   const sortedSchemas = useMemo(
-    () =>
-      [...filterSchemasForHighAvailability(schemas, isHighAvailability)].sort((a, b) =>
-        a.name.localeCompare(b.name)
-      ),
-    [schemas, isHighAvailability]
+    () => [...visibleSchemas].sort((a, b) => a.name.localeCompare(b.name)),
+    [visibleSchemas]
   )
 
   const { data: tables } = useTablesQuery({

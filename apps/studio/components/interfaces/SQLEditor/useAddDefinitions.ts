@@ -1,7 +1,7 @@
 import { Monaco } from '@monaco-editor/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import type { IDisposable } from 'monaco-editor'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 import getPgsqlCompletionProvider from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
@@ -9,10 +9,7 @@ import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-fu
 import { useKeywordsQuery } from '@/data/database/keywords-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableColumnsQuery } from '@/data/database/table-columns-query'
-import {
-  filterSchemasForHighAvailability,
-  useHighAvailability,
-} from '@/hooks/misc/useHighAvailability'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
@@ -20,7 +17,6 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state
 
 export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -59,10 +55,7 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
 
   const pgInfoRef = useRef<any>(null)
 
-  const filteredSchemas = useMemo(
-    () => filterSchemasForHighAvailability(schemas ?? [], isHighAvailability),
-    [schemas, isHighAvailability]
-  )
+  const filteredSchemas = useSchemasFilteredForHighAvailability(schemas)
 
   const isPgInfoReady =
     intellisenseEnabled &&

@@ -21,10 +21,7 @@ import { type ExtensionsSchema, type InstallIntegrationSheetProps } from './Inst
 import { extensionsWithRecommendedSchemas } from '@/components/interfaces/Database/Extensions/Extensions.constants'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import {
-  filterSchemasForHighAvailability,
-  useHighAvailability,
-} from '@/hooks/misc/useHighAvailability'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
@@ -52,14 +49,14 @@ export const AdvancedSettings = ({
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: involvesExtensions }
   )
-  const { isHighAvailability } = useHighAvailability()
+  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
   const availableSchemas = useMemo(
     () =>
-      filterSchemasForHighAvailability(schemas, isHighAvailability).filter(
+      visibleSchemas.filter(
         (schema) =>
           !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
       ),
-    [schemas, isHighAvailability, protectedSchemas]
+    [visibleSchemas, protectedSchemas]
   )
 
   return (

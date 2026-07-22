@@ -19,9 +19,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { getExposedSchemaCounts } from './ExposedSchemaSelector.utils'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import {
-  filterSchemasForHighAvailability,
   MULTIGRES_SCHEMA_NAME,
   useHighAvailability,
+  useSchemasFilteredForHighAvailability,
 } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
@@ -65,12 +65,13 @@ export const ExposedSchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
+  const visibleSchemas = useSchemasFilteredForHighAvailability(allSchemas)
   const schemas = useMemo(
     () =>
-      filterSchemasForHighAvailability(allSchemas ?? [], isHighAvailability)
+      visibleSchemas
         .filter((s) => !internalSchemasCannotExpose.has(s.name))
         .sort((a, b) => a.name.localeCompare(b.name)),
-    [allSchemas, isHighAvailability]
+    [visibleSchemas]
   )
 
   // Persisted selections go through the same HA filtering as the schema list, so a
