@@ -124,6 +124,7 @@ next-env.d.ts
 !.claude/skills/
 .claude/skills/me-*
 !.claude/CLAUDE.md
+CLAUDE.local.md
 
 #include template .env file for docker-compose
 !docker/.env
