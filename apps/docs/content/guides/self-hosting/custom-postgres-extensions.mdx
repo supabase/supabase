@@ -26,17 +26,17 @@ The _proper_ way to add an extension is to compile it into the image's [Nix buil
 
 ### Why these images need special handling
 
-The image is Alpine Linux, but the Postgres binaries and every bundled extension live in a `/nix` store. Three facts drive every step below:
+The image is Alpine Linux, but the Postgres binaries and every bundled extension live in a `/nix` store:
 
 1. **The runtime is `glibc`, not `musl`.** Even though the base OS is Alpine (which uses `musl`), the Nix-built `postgres` and its extensions are linked against `glibc`. If you compile an extension with Alpine's native toolchain (`apk add build-base`), it links `musl` and **fails to load** at `CREATE EXTENSION` with an error like `libc.musl-aarch64.so.1: cannot open shared object file`. You must build in a `glibc` environment.
-2. **Match the major version, and keep the builder's `glibc` no newer than the image's.** Extensions are ABI-stable across an entire Postgres major version, so _any_ 17.x builder works against _any_ 17.x image - the **minor** version doesn't matter (a build against 17.10 loads fine on 17.6). What _does_ matter is `glibc`: a `.so` built against a **newer** `glibc` than the runtime provides fails to load (`version 'GLIBC_2.xx' not found`). The Supabase image currently ships `glibc 2.40`, so this guide builds on **Debian bookworm** (`postgres:17-bookworm`, `glibc 2.36`), which stays safely below it. Avoid the default `postgres:17` tag, which is currently Debian 13 (`glibc 2.41` - _newer_ than the runtime).
+2. **Match the major version, and keep the builder's `glibc` no newer than the image's.** Extensions are ABI-stable across an entire Postgres major version, so _any_ 17.x builder works against _any_ 17.x image - the **minor** version doesn't matter (a build against 17.10 loads fine on 17.6). An extension built against a **newer** `glibc` than the runtime provides fails to load (`version 'GLIBC_2.xx' not found`). The Supabase image currently ships `glibc 2.40`, so this guide builds on **Debian bookworm** (`postgres:17-bookworm`, `glibc 2.36`), which stays safely below it. Avoid the default `postgres:17` tag, which is currently Debian 13 (and has `glibc 2.41` - _newer_ than the runtime).
 3. **The module directory is redirected.** The running `postgres` is a wrapper script that overrides its library directory via a `NIX_PGLIBDIR` environment variable. Your compiled `.so` must be installed into that directory - _not_ the path `pg_config --pkglibdir` reports. This is why you can't follow an extension's upstream install instructions (which typically use `make install` or copy to `pg_config --pkglibdir`): on these images `$libdir` resolves to `NIX_PGLIBDIR`, so a `.so` placed in `pkglibdir` loads with `could not access file "$libdir/<name>"`.
 
 The cleanest way to satisfy 1 and 2 is to compile inside a `postgres:<major>-bookworm` image and then copy the artifacts into the Supabase runtime image.
 
 <Admonition type="note" title="How the image is versioned">
 
-The tag starts with the Postgres version (`17.6`) followed by Supabase's own release numbers - so `17.6.1.136` is **Postgres 17.6** (the trailing `.1.136` is Supabase's versioning, not part of the Postgres version). Every tag beginning `17.6` is the same Postgres version; only Supabase's build number changes. Because extension ABI is stable across a major version, you don't need to match the minor - but if a future image bumps its `glibc`, re-check the rule in point 2. You can read the image's `glibc` version with:
+The tag starts with the Postgres version (`17.6`) followed by Supabase's own release numbers - so `17.6.1.136` is **Postgres 17.6** (the trailing `.1.136` is Supabase's versioning, not part of the official Postgres version). Every tag beginning `17.6` is the same Postgres version; only Supabase's build number changes. Because extension ABI is stable across a major version, you don't need to match the minor - but if a future image bumps its `glibc`, re-check the rule in point 2. You can read the image's `glibc` version with:
 
 ```sh
 docker run --rm --entrypoint sh supabase/postgres:17.6.1.136 -c \
@@ -97,13 +97,13 @@ RUN set -eux; \
     rm -rf /tmp/pg_uuidv7.* /tmp/ext-sql
 ```
 
-Building your own extension? The same Dockerfile works - `COPY` your PGXS source into the builder instead of `git clone`. If you're authoring a _new_ extension from scratch, add it to the Nix build instead (see [Alternative: build the extension into the Nix image](#alternative-build-the-extension-into-the-nix-image) below).
+The same Dockerfile structure works for your own extensions - `COPY` your PGXS source into the builder instead of `git clone`. However, when authoring a _new_ extension from scratch, it's best to use the Nix build instead (see [Alternative: build the extension into the Nix image](#alternative-build-the-extension-into-the-nix-image) below).
 
 ### Handle dependencies
 
 Copying a `.so` onto the image works cleanly only when its **sole** runtime dependency is `libc` - it's already loaded in the `postgres` process, so it resolves automatically. Any _other_ shared library the extension links (`libcurl`, `OpenSSL`, etc.) must also be present **and findable** at runtime. Because the image is Nix-built, it has no `ld.so.cache` and no `glibc` libraries under `/usr/lib` - Nix resolves each binary's dependencies through a per-binary `RUNPATH` into the store instead - so a Debian-built `.so`, which relies on the usual library search, won't find them and `CREATE EXTENSION` fails with `libX.so: cannot open shared object file`.
 
-The build happens inside Docker, so check the compiled `.so` in the builder stage rather than on your host (`readelf` is already available there via `build-essential`):
+The build happens inside Docker - check the compiled `.so` in the builder stage rather than on your host:
 
 ```sh
 # build only the builder stage, then inspect the .so it produced
@@ -111,10 +111,10 @@ docker build --target builder -t ext-builder .
 docker run --rm --entrypoint sh ext-builder -c 'readelf -d /src/*.so | grep NEEDED'
 ```
 
-- **Only `libc.so.6` and `ld-linux-*`** → you're done; the Dockerfile above is sufficient (`pg_uuidv7` is this case).
-- **Anything else listed** → handle those dependencies with one of the options below.
+- **Only `libc.so.6` and `ld-linux-*`** - the Dockerfile above is sufficient (`pg_uuidv7` is this case).
+- **Anything else listed** - handle those dependencies with one of the options below.
 
-**Recommended: statically link the extra dependencies** into the `.so`, so its only remaining `NEEDED` is `libc` (keep `libc` itself dynamic - never statically link against `glibc`). After building, re-run the check above and confirm only `libc.so.6` and `ld-linux-*` remain.
+**Recommended: statically link the extra dependencies** into the `.so`, so its only remaining `NEEDED` is `libc`. After building, re-run the check above and confirm only `libc.so.6` and `ld-linux-*` remain.
 
 A few things make this more involved than it sounds:
 
@@ -257,20 +257,14 @@ The Docker approach above layers a separately-compiled `.so` onto the published 
 
 Rough guide to choosing:
 
-- **One-off extension on the stock image, minimal tooling** → the Docker approach in this guide.
-- **Bulletproof ABI match, want it merged upstream, or it needs preload / `supautils` wiring done "the Supabase way"** → the Nix build below.
+- **One-off extension on the stock image, minimal tooling** - the Docker approach in this guide.
+- **Bulletproof ABI match, want it merged upstream, or it needs preload / `supautils` wiring done "the Supabase way"** - the Nix build below.
 
 This guide intentionally doesn't teach Nix. The authoritative, maintained instructions live in the `supabase/postgres` repository:
 
 - [Adding a new extension package](https://github.com/supabase/postgres/blob/develop/nix/docs/adding-new-package.md) - the main walkthrough (C/C++ and Rust/pgrx patterns, where to register the extension, generating hashes)
 - [Creating a `pgrx` extension](https://github.com/supabase/postgres/blob/develop/nix/docs/creating-pgrx-extension.md) - for Rust extensions
 - [Building Postgres](https://github.com/supabase/postgres/blob/develop/nix/docs/build-postgres.md) and the full [`nix/docs`](https://github.com/supabase/postgres/tree/develop/nix/docs) directory
-
-<Admonition type="note">
-
-These steps are maintained in the `supabase/postgres` repo, not here. Follow that repository for the current process.
-
-</Admonition>
 
 ## Keeping the image up to date
 
