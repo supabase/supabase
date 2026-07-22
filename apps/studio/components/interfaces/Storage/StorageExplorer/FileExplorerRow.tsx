@@ -268,6 +268,11 @@ export const FileExplorerRow = ({
   const mimeType = item.metadata ? item.metadata.mimetype : '-'
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
+  const isColumnsView = view === STORAGE_VIEWS.COLUMNS
+  const isFile = item.type === STORAGE_ROW_TYPES.FILE
+  // Columns view keeps the file icon when selected so keyboard selection stays clear.
+  // List view may swap icon → checkbox on hover/select (existing, clearer layout).
+  const showRowIcon = isColumnsView || !isSelected
 
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
@@ -290,12 +295,14 @@ export const FileExplorerRow = ({
     >
       <div
         className={cn(
-          'storage-row group flex h-full items-center px-2.5',
+          'storage-row group flex h-full items-center px-2.5 rounded-sm',
           'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-selection' : ''}`,
-          `${isSelected ? 'bg-selection' : ''}`,
-          `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+          isOpened && 'bg-selection',
+          isSelected && 'bg-selection',
+          isPreviewed && 'bg-selection hover:bg-selection',
+          item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
+          // Keyboard focus on the checkbox: ring the whole row (esp. columns view)
+          'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
         )}
         onClick={(event) => {
           event.stopPropagation()
@@ -313,13 +320,21 @@ export const FileExplorerRow = ({
             view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
           )}
         >
-          <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
-            {!isSelected && (
+          <div
+            className={cn(
+              'relative flex shrink-0 items-center',
+              isColumnsView ? 'w-[42px] gap-1' : 'w-[30px]'
+            )}
+            onClick={(event) => event.stopPropagation()}
+          >
+            {showRowIcon && (
               <div
-                className={`absolute ${
-                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
-                }`}
-                style={{ top: '2px' }}
+                className={cn(
+                  !isColumnsView && 'absolute',
+                  // List: reveal checkbox by hiding icon on hover/focus. Columns: keep icon.
+                  !isColumnsView && isFile && 'group-hover:hidden group-focus-within:hidden'
+                )}
+                style={!isColumnsView ? { top: '2px' } : undefined}
               >
                 <RowIcon
                   view={view}
@@ -331,9 +346,13 @@ export const FileExplorerRow = ({
               </div>
             )}
             <Checkbox
-              className={`${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
-                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-              }`}
+              className={cn(
+                !isFile && 'invisible',
+                isSelected
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100',
+                isColumnsView && 'order-first'
+              )}
               checked={isSelected}
               // use onClick instead of onCheckedChange to handle shift-key selection
               onClick={(event) => {
