@@ -127,7 +127,8 @@ export const Activity = ({ live }: ActivityProps) => {
     quantity: data?.filter(
       (y) =>
         y.state === x.toLowerCase() &&
-        (rolesFilter.length === 0 || rolesFilter.includes(y.role_name))
+        (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
+        (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name))
     ).length,
   }))
 
@@ -158,7 +159,8 @@ export const Activity = ({ live }: ActivityProps) => {
           y.role_name === x.name &&
           (!statesFilter ||
             statesFilter.length === 0 ||
-            (y.state !== null && statesFilter.includes(y.state)))
+            (y.state !== null && statesFilter.includes(y.state))) &&
+          (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name))
       ).length,
     }))
     .sort((a, b) => {
@@ -223,6 +225,7 @@ export const Activity = ({ live }: ActivityProps) => {
               onClick={() =>
                 setQueryStates({ states: [], roles: DEFAULT_ROLES_FILTER, applications: [] })
               }
+              aria-label="Reset filters"
               tooltip={{ content: { side: 'bottom', text: 'Reset filters' } }}
             />
           )}
