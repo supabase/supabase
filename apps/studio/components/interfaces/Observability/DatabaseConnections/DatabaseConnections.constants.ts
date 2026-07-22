@@ -8,5 +8,6 @@ export const QUERY_STATE_TOOLTIP = {
   ['idle in transaction']: 'Has an open transaction but isn’t currently running a query.',
   ['idle in transaction (aborted)']:
     'The last statement in this transaction failed and hasn’t been rolled back yet.',
-  ['fastpath function call']: 'Executing a function call via Postgres’s low-level fastpath protocol.',
+  ['fastpath function call']:
+    'Executing a function call via Postgres’s low-level fastpath protocol.',
 }
