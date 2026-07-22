@@ -58,10 +58,12 @@ export const PermissionsAccordion = ({
                 'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
               })}
             >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm text-foreground">{category.name}</span>
+                    <span className="font-mono uppercase tracking-widest text-xs">
+                      {category.name}
+                    </span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span tabIndex={0} className="text-foreground-lighter">
