@@ -85,7 +85,10 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             onClick={() => {
               const nextLive = !live
               setLive(nextLive)
-              if (nextLive) refetchActivity()
+              if (nextLive) {
+                setNow(dayjs.utc())
+                refetchActivity()
+              }
             }}
             icon={live ? <Pause /> : <Play />}
           >
