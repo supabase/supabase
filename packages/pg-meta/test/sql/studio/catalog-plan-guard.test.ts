@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
 import {
-  createPgGetTabledefSql,
+  CREATE_PG_GET_TABLEDEF_SQL,
   getEntityDefinitionsSql,
   getEntityTypesSQL,
   getForeignKeyConstraintsSql,
@@ -32,12 +32,8 @@ import { cleanupRoot, createTestDatabase } from '../../db/utils'
  * Editor query full-scanned pg_index/pg_constraint on every open -- O(catalog)
  * work regardless of which table was opened, taking 30-58s at incident scale.
  *
- * NOTE: the scoped introspection behavior from PR #47894 defaults to OFF and is
- * gated behind a `scoped` flag so Studio can enable it progressively via a
- * feature flag. The legacy (scoped:false) path is intentionally NOT exercised
- * here -- this guard tests the SCOPED path, so every builder below is called
- * with `scoped: true`. Once the rollout completes, drop the legacy path and the
- * flag, and this guard becomes the only shape.
+ * NOTE: the builders below emit the sole (index-scoped) introspection queries
+ * that Studio ships, and this guard asserts their plans stay scoped.
  */
 
 let db: Awaited<ReturnType<typeof createTestDatabase>>
@@ -82,18 +78,18 @@ const TABLE_EDITOR_BUDGET = {
 }
 
 test('getTableEditorSql: plan stays scoped for a mid-chain table (stress.t_1000)', async () => {
-  const result = await explainAnalyze(db, getTableEditorSql({ id: midChainTableId, scoped: true }))
+  const result = await explainAnalyze(db, getTableEditorSql({ id: midChainTableId }))
   assertPlanWithinBudget(result, TABLE_EDITOR_BUDGET)
 }, 60_000)
 
 test('getTableEditorSql: plan stays scoped for the hub table with many incoming FKs (stress.t_0)', async () => {
-  const result = await explainAnalyze(db, getTableEditorSql({ id: hubTableId, scoped: true }))
+  const result = await explainAnalyze(db, getTableEditorSql({ id: hubTableId }))
   assertPlanWithinBudget(result, TABLE_EDITOR_BUDGET)
 }, 60_000)
 
 test('getTableEditorSql: real (non-EXPLAIN) query returns a well-formed entity for t_1000', async () => {
   const [{ entity }] = await db.executeQuery<Array<{ entity: any }>>(
-    getTableEditorSql({ id: midChainTableId, scoped: true })
+    getTableEditorSql({ id: midChainTableId })
   )
 
   expect(entity.schema).toBe('stress')
@@ -241,7 +237,7 @@ test('getIndexesSQL: plan stays scoped for a schema', async () => {
 // setup on the (single, pooled) connection first, then EXPLAIN only the tail
 // SELECT -- which is the part whose plan we actually care about.
 async function explainDefinitionQuery(fullSql: string) {
-  const setup = createPgGetTabledefSql({ scoped: true }) as unknown as string
+  const setup = CREATE_PG_GET_TABLEDEF_SQL as unknown as string
   const tail = fullSql.slice(fullSql.indexOf(setup) + setup.length)
   await db.executeQuery(setup)
   return explainAnalyze(db, tail)
@@ -251,9 +247,7 @@ async function explainDefinitionQuery(fullSql: string) {
 // Only the outer table_info lookup is planned (pg_get_tabledef is an opaque
 // plpgsql function); it resolves the table by oid, so no scaling seq scans.
 test('getTableDefinitionSql: plan stays scoped for a single table', async () => {
-  const result = await explainDefinitionQuery(
-    getTableDefinitionSql({ id: midChainTableId, scoped: true })
-  )
+  const result = await explainDefinitionQuery(getTableDefinitionSql({ id: midChainTableId }))
   assertPlanWithinBudget(result, {})
 }, 60_000)
 
@@ -272,7 +266,7 @@ test('getTableDefinitionSql: plan stays scoped for a single table', async () => 
 // on a 12K-table catalog measured ~0.9s post-fix.
 test('getEntityDefinitionsSql: plan stays scoped for a schema', async () => {
   const result = await explainDefinitionQuery(
-    getEntityDefinitionsSql({ schemas: ['stress'], limit: 100, scoped: true })
+    getEntityDefinitionsSql({ schemas: ['stress'], limit: 100 })
   )
   assertPlanWithinBudget(result, {
     // ~0.3s measured at 2000 tables post-fix for a 100-entity page; loose
