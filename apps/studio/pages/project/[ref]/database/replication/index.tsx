@@ -47,10 +47,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Replication</PageHeaderTitle>
-            <PageHeaderDescription>
-              Deploy Read Replicas across multiple regions, or use Pipelines to replicate database
-              changes to analytics destinations.
-            </PageHeaderDescription>
+            <PageHeaderDescription>Read replicas and analytics pipelines</PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
