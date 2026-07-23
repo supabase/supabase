@@ -285,8 +285,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('restricts to auth_logs/edge_logs and skips the default postgres+edge restriction', () => {
       const sql = getUnifiedLogsQuery(withUser('user-123'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).toContain(`log_attributes['auth_event.actor_id'] = 'user-123'`)
-      expect(where).toContain(`source = 'edge_logs'`)
+      expect(where).toContain(
+        `(source = 'auth_logs' AND log_attributes['auth_event.actor_id'] = 'user-123')`
+      )
+      expect(where).toContain(
+        `(source = 'edge_logs' AND log_attributes['request.sb.jwt.authorization.payload.subject'] = 'user-123')`
+      )
       // The unfiltered default (edge_logs OR postgres_logs) would incorrectly exclude
       // auth_logs, the primary attributable source, so it must not appear here.
       expect(where).not.toContain(`(source = 'edge_logs') OR (source = 'postgres_logs')`)
