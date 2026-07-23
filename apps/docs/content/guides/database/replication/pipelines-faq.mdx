@@ -209,7 +209,9 @@ Removing a table from the publication and restarting the pipeline does not delet
 
 ## Can data be processed more than once?
 
-Yes. Pipelines uses at-least-once processing. If a destination accepted a batch but the pipeline did not persist its checkpoint before a retry, restart, or interruption, that batch can be processed again.
+Yes. Pipelines uses at-least-once processing. Failed destination write attempts that Pipelines retries are not counted. Data is counted only after the destination acknowledges successful processing.
+
+In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count the same data again.
 
 BigQuery uses the replicated source primary key and CDC ordering metadata to converge on the current table state. Pipelines does not provide a history of each delivery attempt that you can query or guarantee exactly-once event processing.
 

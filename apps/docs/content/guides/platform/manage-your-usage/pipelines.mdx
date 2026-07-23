@@ -15,18 +15,16 @@ Destination-provider charges are separate. For example, Google Cloud can charge 
 
 ## How data processed is measured
 
-Pipeline data processed is the amount of Postgres row data successfully processed by a pipeline and accepted by its destination. It is measured from the source row representation emitted by Postgres, making usage consistent across destinations.
+Pipeline data processed is the amount of logical row data emitted by Postgres for replication, successfully processed by a pipeline, and accepted by its destination. It is not based on physical table storage or destination-specific encoding, making usage consistent across destinations.
 
 The measurement includes:
 
-- **Initial sync and resynchronization**: Postgres COPY row payloads.
-- **Inserts**: Inserted tuple values.
-- **Updates**: New tuple values and any previous identity values Postgres emits.
-- **Deletes**: Identity values Postgres emits.
+- **Initial sync and resynchronization**: Row data emitted by Postgres COPY.
+- **Ongoing replication**: Row values Postgres emits for inserts, updates, and deletes. Updates include new row values and any previous identity values Postgres emits. Deletes include the emitted identity values.
 
-Only Postgres row data is measured. Protocol- and destination-specific overhead is not included.
+Failed destination write attempts that Pipelines retries are not counted. Data is counted only after the destination acknowledges successful processing. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count the same data again.
 
-Failed destination writes are not counted. Data successfully processed again as part of a user-requested resynchronization, table restart, or pipeline reset is counted again. In rare cases, recovery may cause successfully delivered data to be processed more than once.
+Data successfully processed again as part of a user-requested resynchronization, table restart, or pipeline reset is also counted again.
 
 ### Cost estimates
 
