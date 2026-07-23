@@ -252,6 +252,7 @@ export const SupabaseProjectSelector = ({
 }
 
 export const ActionButtons = ({
+  slug,
   mode,
   variant,
   showCreateProject,
@@ -265,17 +266,19 @@ export const ActionButtons = ({
   connectDisabled: boolean
   foreignProjectId: string | undefined
   onCreateConnections: () => void
-} & Pick<ProjectLinkerProps, 'variant' | 'mode' | 'onSkip' | 'isLoading'>) => {
-  const { slug, next, externalId, currentProjectId } = useParams()
+} & Pick<ProjectLinkerProps, 'slug' | 'variant' | 'mode' | 'onSkip' | 'isLoading'>) => {
+  const { next, externalId, currentProjectId } = useParams()
+  const organizationSlug = slug
   const vercelProjectId = foreignProjectId ?? currentProjectId
+  // Deploy-button create is only for the install interstitial; settings side panels use /new.
   const newProjectURL =
-    mode === 'Vercel'
-      ? `/integrations/vercel/${slug}/deploy-button/new-project?${new URLSearchParams({
+    mode === 'Vercel' && variant === 'interstitial' && organizationSlug
+      ? `/integrations/vercel/${organizationSlug}/deploy-button/new-project?${new URLSearchParams({
           ...(next ? { next } : {}),
           ...(vercelProjectId ? { currentProjectId: vercelProjectId } : {}),
           ...(externalId ? { externalId } : {}),
         })}`
-      : `/new/${slug}`
+      : `/new/${organizationSlug}`
 
   return (
     <div

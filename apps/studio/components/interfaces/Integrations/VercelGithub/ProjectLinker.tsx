@@ -159,6 +159,7 @@ export const ProjectLinker = ({
         )}
 
         <ActionButtons
+          slug={slug}
           mode={mode}
           variant={variant}
           showCreateProject={showNoEntitiesState && noSupabaseProjects}
@@ -241,6 +242,7 @@ export const ProjectLinker = ({
 
       <div className="flex w-full justify-end gap-2 p-4 bg-surface-75">
         <ActionButtons
+          slug={slug}
           mode={mode}
           variant={variant}
           showCreateProject={showNoEntitiesState && noSupabaseProjects}
