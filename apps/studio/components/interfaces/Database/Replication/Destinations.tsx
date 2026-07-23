@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { Database } from 'icons'
 import { ChartArea, MoreVertical, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
@@ -8,7 +9,6 @@ import {
   Button,
   Card,
   CardContent,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -22,6 +22,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
@@ -306,8 +307,9 @@ export const Destinations = () => {
 
         {isLocalETLNotSetUp && (
           <Admonition
-            type="default"
-            title="ETL API not set up locally — destinations cannot be managed"
+            type="warning"
+            title="Replication unavailable locally"
+            description="Configure the replication API to manage destinations in local development."
           />
         )}
 
@@ -368,27 +370,21 @@ export const Destinations = () => {
         ) : (
           !isLoading &&
           !hasErrorsFetchingData && (
-            <div
-              className={cn(
-                'w-full',
-                'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-16 rounded-lg justify-center items-center py-8 mt-4'
-              )}
+            <EmptyStatePresentational
+              icon={Database}
+              title="Add a replication destination"
+              description="Deploy a Read Replica for lower latency and workload isolation, or connect a Pipelines destination for analytics workloads."
+              className="mt-4"
             >
-              <h4>Replication keeps your data in sync across systems</h4>
-              <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                Deploy Read Replicas for lower latency and workload isolation, or add a Pipelines
-                destination for analytics workloads.
-              </p>
               <Button
+                variant="default"
                 icon={<Plus />}
                 disabled={!newDestinationDefaultType}
                 onClick={openDestinationPanel}
-                className="mt-4"
               >
                 Add destination
               </Button>
-            </div>
+            </EmptyStatePresentational>
           )
         )}
       </div>
