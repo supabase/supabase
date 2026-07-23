@@ -15,7 +15,7 @@ import {
 import { TokenFormValues } from '../../../AccessToken.schemas'
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 import { PermissionsProps } from './Permissions.types'
-import { sortActions } from './Permissions.utils'
+import { getDefaultPermissionActions, sortActions } from './Permissions.utils'
 import { ACCESS_TOKEN_RESOURCES } from '@/components/interfaces/Account/AccessTokens/AccessToken.constants'
 import { formatAccessText } from '@/components/interfaces/Account/AccessTokens/AccessToken.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -67,7 +67,10 @@ export const Permissions = ({
                 if (index > -1) {
                   return remove(index)
                 }
-                append(resource)
+                append({
+                  resource: resource.resource,
+                  actions: getDefaultPermissionActions(resource.actions),
+                })
               }}
               align="end"
             />

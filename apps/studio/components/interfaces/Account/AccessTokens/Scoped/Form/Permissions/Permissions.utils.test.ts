@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import type { PermissionResource, PermissionRow } from './Permissions.types'
-import { sortActions, togglePermissionResource } from './Permissions.utils'
+import {
+  getDefaultPermissionActions,
+  sortActions,
+  togglePermissionResource,
+} from './Permissions.utils'
 
 // --- sortActions ---
 
@@ -50,6 +54,28 @@ describe('sortActions', () => {
   })
 })
 
+// --- getDefaultPermissionActions ---
+
+describe('getDefaultPermissionActions', () => {
+  it('should default to "read" when available', () => {
+    expect(getDefaultPermissionActions(['write', 'read', 'delete'])).toEqual(['read'])
+  })
+
+  it('should default to the first action when "read" is not available', () => {
+    expect(getDefaultPermissionActions(['write', 'create'])).toEqual(['write'])
+  })
+
+  it('should return an empty array when no actions are available', () => {
+    expect(getDefaultPermissionActions([])).toEqual([])
+  })
+
+  it('should not mutate the original array', () => {
+    const original = ['write', 'read']
+    getDefaultPermissionActions(original)
+    expect(original).toEqual(['write', 'read'])
+  })
+})
+
 // --- togglePermissionResource ---
 
 describe('togglePermissionResource', () => {
@@ -79,6 +105,16 @@ describe('togglePermissionResource', () => {
   it('should add a resource with the first action as default when "read" is not available', () => {
     const result = togglePermissionResource([], storageResource)
     expect(result).toEqual([{ resource: 'project:storage', actions: ['write'] }])
+  })
+
+  it('should add a resource with no selected actions when no actions are available', () => {
+    const result = togglePermissionResource([], {
+      resource: 'project:empty',
+      title: 'Empty',
+      actions: [],
+    })
+
+    expect(result).toEqual([{ resource: 'project:empty', actions: [] }])
   })
 
   it('should remove a resource if it is already in the list', () => {
