@@ -8,7 +8,7 @@ export const coalesceRowsToArray = (
   // (plan-order) rendering byte-for-byte identical for existing callers.
   orderBy?: SafeSqlFragment
 ) => {
-  const orderClause = orderBy ? safeSql` ORDER BY ${orderBy}` : (safeSql`` as SafeSqlFragment)
+  const orderClause = orderBy ? safeSql` ORDER BY ${orderBy}` : safeSql``
   return safeSql`
 COALESCE(
   (

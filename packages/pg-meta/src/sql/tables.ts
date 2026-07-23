@@ -24,22 +24,22 @@ export const getTablesSql = (targetOid?: SafeSqlFragment) => {
   const mainScope = targetOid
     ? safeSql`
   AND c.oid = ${targetOid}`
-    : (safeSql`` as SafeSqlFragment)
+    : safeSql``
   const pkScope = targetOid
     ? safeSql`
       and c.oid = ${targetOid}`
-    : (safeSql`` as SafeSqlFragment)
+    : safeSql``
   const relScope = targetOid
     ? safeSql`
       and (c.conrelid = ${targetOid} or c.confrelid = ${targetOid})`
-    : (safeSql`` as SafeSqlFragment)
+    : safeSql``
   // Scoped path only: deterministic relationships order (plan-order dependent
   // otherwise). A composite FK expands to one entry per source×target column
   // pair sharing constraint_name, so tie-break on the column names. Empty for
   // legacy, keeping TABLES_SQL byte-for-byte unchanged.
   const relOrder = targetOid
     ? safeSql` order by relationships.constraint_name, relationships.source_column_name, relationships.target_column_name`
-    : (safeSql`` as SafeSqlFragment)
+    : safeSql``
 
   return /* SQL */ safeSql`
 SELECT

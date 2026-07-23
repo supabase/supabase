@@ -92,7 +92,7 @@ group by
  * standalone template so the legacy constant stays byte-identical; rows match.
  */
 export const getScopedTablePrivilegesSql = (
-  scopeFilter: SafeSqlFragment = safeSql`` as SafeSqlFragment
+  scopeFilter: SafeSqlFragment = safeSql``
 ): SafeSqlFragment => safeSql`
 select
   c.oid as relation_id,
