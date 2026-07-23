@@ -255,7 +255,7 @@ const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY'): SafeLogSqlFragmen
  * inlined so the result can be referenced (or filtered) at the same query
  * level — the OTEL endpoint rejects subqueries.
  */
-const rowProjection = (): SafeLogSqlFragment => safeSql`
+const ROW_PROJECTION: SafeLogSqlFragment = safeSql`
     id,
     null AS source_id,
     timestamp,
@@ -416,7 +416,7 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildBaseWhere(search)
   return safeSql`-- unified logs: row list
-SELECT ${rowProjection()}
+SELECT ${ROW_PROJECTION}
 FROM logs
 ${whereClause(conditions)}
 `
