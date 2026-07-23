@@ -142,6 +142,22 @@ function resolveDateFromFilename(filename) {
 }
 
 /**
+ * Coerces a frontmatter date to a `YYYY-MM-DD` string.
+ *
+ * YAML parses an *unquoted* date (`publish_date: 2026-07-22`) into a JS `Date`
+ * object, while a quoted one (`publish_date: "2026-07-22"`) stays a string.
+ * A `Date` here is poison: it breaks the string sort comparator and, worse,
+ * Next.js cannot JSON-serialize it into page props, which throws and 500s the
+ * whole changelog. Normalizing to a string keeps `sortDate` uniformly typed
+ * regardless of how an entry happens to quote its date.
+ */
+function toDateString(value) {
+  if (value == null) return null
+  if (value instanceof Date) return value.toISOString().slice(0, 10)
+  return String(value)
+}
+
+/**
  * `legacy_gh_discussion-suffix` for backfilled entries
  * (preserves old supabase.com/changelog URLs)
  * or the filename without timestamp and extension.
@@ -166,7 +182,7 @@ export function parseChangelogEntryFile(filename, raw) {
     filename,
     // Allowlisted so private frontmatter (e.g. `internal:`) never reaches the client.
     frontmatter: toPublicFrontmatter(frontmatter),
-    sortDate: frontmatter.publish_date ?? resolveDateFromFilename(filename) ?? '',
+    sortDate: toDateString(frontmatter.publish_date) ?? resolveDateFromFilename(filename) ?? '',
     summary: extractSection(publicBody, 'Summary'),
     bodySection: extractSection(publicBody, 'Body', ['Migration steps']),
     migrationSteps: extractSection(publicBody, 'Migration steps'),

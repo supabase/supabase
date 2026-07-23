@@ -63,7 +63,6 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
   const entries = await getChangelogEntries()
   const allIndex = entries.map(toChangelogTimelineIndexItem)
   const firstEntries = entries.slice(0, FEATURED_COUNT)
-  const restIndex = allIndex.slice(FEATURED_COUNT)
 
   // Serialized independently so one entry's MDX failure doesn't drop the others.
   const featuredResults = await Promise.allSettled(
@@ -85,6 +84,12 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
     }
     return [result.value]
   })
+
+  // Everything not successfully featured falls back to the timeline list — including
+  // a featured entry whose MDX failed to serialize, which would otherwise vanish
+  // from the page entirely (it lives only in `featured`, never in the sliced rest).
+  const featuredSlugs = new Set(featured.map((entry) => entry.slug))
+  const restIndex = allIndex.filter((item) => !featuredSlugs.has(item.slug))
 
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
   return { props: { featured, restIndex, allIndex } }

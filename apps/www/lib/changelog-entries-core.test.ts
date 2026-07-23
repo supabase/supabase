@@ -70,4 +70,28 @@ describe('parseChangelogEntryFile', () => {
     expect(frontmatter.public).toBe(true)
     expect(frontmatter.affected_products).toEqual(['pipelines'])
   })
+
+  it('always yields a string sortDate, even for an unquoted (Date-parsed) publish_date', () => {
+    // Unquoted YAML dates are parsed into JS Date objects by gray-matter; a Date
+    // in sortDate breaks the string sort and Next.js prop serialization.
+    const unquoted = parseChangelogEntryFile(
+      '20260722-unquoted.md',
+      `---\ntitle: Unquoted\nchange_type: improvement\npublic: true\npublish_date: 2026-05-18\n---\n\n# Body\n\nx\n`
+    )
+    expect(typeof unquoted.sortDate).toBe('string')
+    expect(unquoted.sortDate).toBe('2026-05-18')
+
+    const quoted = parseChangelogEntryFile(
+      '20260722-quoted.md',
+      `---\ntitle: Quoted\nchange_type: improvement\npublic: true\npublish_date: "2026-05-18"\n---\n\n# Body\n\nx\n`
+    )
+    expect(quoted.sortDate).toBe('2026-05-18')
+
+    // publish_date: null falls back to the filename date, also as a string.
+    const nullDate = parseChangelogEntryFile(
+      '20260722-null-date.md',
+      `---\ntitle: Null date\nchange_type: improvement\npublic: true\npublish_date: null\n---\n\n# Body\n\nx\n`
+    )
+    expect(nullDate.sortDate).toBe('2026-07-22')
+  })
 })
