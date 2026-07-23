@@ -276,6 +276,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/observability/query-performance.tsx` ← `pages/project/[ref]/observability/query-performance.tsx`
 - [x] A `routes/project/$ref/observability/realtime.tsx` ← `pages/project/[ref]/observability/realtime.tsx`
 - [x] A `routes/project/$ref/observability/storage.tsx` ← `pages/project/[ref]/observability/storage.tsx`
+- [x] A `routes/project/$ref/observability/user-activity.tsx` ← `pages/project/[ref]/observability/user-activity.tsx`
 
 ### Project shell — `/advisors/*`
 

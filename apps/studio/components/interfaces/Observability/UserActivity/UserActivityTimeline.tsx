@@ -1,0 +1,43 @@
+import dayjs from 'dayjs'
+
+import type { UserActivityEvent } from './UserActivity.constants'
+import { UserActivityEventItem } from './UserActivityEventItem'
+
+interface UserActivityTimelineProps {
+  events: UserActivityEvent[]
+}
+
+/** Group events by calendar day, preserving chronological order. */
+const groupEventsByDay = (events: UserActivityEvent[]) => {
+  const groups = new Map<string, UserActivityEvent[]>()
+  for (const event of events) {
+    const day = dayjs(event.timestamp).format('YYYY-MM-DD')
+    const existing = groups.get(day)
+    if (existing) existing.push(event)
+    else groups.set(day, [event])
+  }
+  return Array.from(groups.entries())
+}
+
+export const UserActivityTimeline = ({ events }: UserActivityTimelineProps) => {
+  const dayGroups = groupEventsByDay(events)
+
+  return (
+    <div className="flex flex-col gap-y-6">
+      {dayGroups.map(([day, dayEvents]) => (
+        <div key={day} className="flex flex-col gap-y-2">
+          <p className="text-sm text-foreground-light">{dayjs(day).format('MMM D, YYYY')}</p>
+          <div className="flex flex-col">
+            {dayEvents.map((event, index) => (
+              <UserActivityEventItem
+                key={event.id}
+                event={event}
+                isLast={index === dayEvents.length - 1}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}

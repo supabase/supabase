@@ -64,6 +64,11 @@ export const useGenerateObservabilityMenu = () => {
           },
         ]
       : []),
+    {
+      name: 'User Activity',
+      key: 'user-activity',
+      url: `${baseUrl}/user-activity${preservedQueryParams}`,
+    },
     ...(isSupamonitorEnabled
       ? [
           {
