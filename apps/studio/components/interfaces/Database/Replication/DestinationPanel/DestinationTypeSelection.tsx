@@ -40,8 +40,6 @@ interface DestinationTypeGroup {
   options: DestinationTypeOption[]
 }
 
-const LUCIDE_DESTINATION_TYPES = new Set<DestinationType>(['Snowflake'])
-
 function DestinationOptionIcon({ option }: { option: DestinationTypeOption }) {
   const Icon = option.icon
 
