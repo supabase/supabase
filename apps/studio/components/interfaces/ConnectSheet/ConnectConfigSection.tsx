@@ -247,21 +247,66 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   const count = modes.length
   // 2-col layout leaves an empty cell when count is odd; hide it once we switch to a single row
   const emptySlots = count % 2 === 1 ? 1 : 0
-  const hideEmptyClass =
-    count === 3
-      ? '@[28rem]:hidden'
-      : count === 4
-        ? '@[30rem]:hidden'
-        : count === 5
-          ? '@[32rem]:hidden'
-          : '@[36rem]:hidden'
+  const narrowLastRowStart = (Math.ceil(count / 2) - 1) * 2
+
+  // Full class strings so Tailwind can see them (no dynamic fragment concatenation)
+  const wideCornerClasses = {
+    clearTopRight:
+      count === 3
+        ? '@[28rem]:rounded-tr-none'
+        : count === 4
+          ? '@[30rem]:rounded-tr-none'
+          : count === 5
+            ? '@[32rem]:rounded-tr-none'
+            : '@[36rem]:rounded-tr-none',
+    clearBottomLeft:
+      count === 3
+        ? '@[28rem]:rounded-bl-none'
+        : count === 4
+          ? '@[30rem]:rounded-bl-none'
+          : count === 5
+            ? '@[32rem]:rounded-bl-none'
+            : '@[36rem]:rounded-bl-none',
+    clearBottomRight:
+      count === 3
+        ? '@[28rem]:rounded-br-none'
+        : count === 4
+          ? '@[30rem]:rounded-br-none'
+          : count === 5
+            ? '@[32rem]:rounded-br-none'
+            : '@[36rem]:rounded-br-none',
+    singleRowLeft:
+      count === 3
+        ? '@[28rem]:rounded-tl-lg @[28rem]:rounded-bl-lg'
+        : count === 4
+          ? '@[30rem]:rounded-tl-lg @[30rem]:rounded-bl-lg'
+          : count === 5
+            ? '@[32rem]:rounded-tl-lg @[32rem]:rounded-bl-lg'
+            : '@[36rem]:rounded-tl-lg @[36rem]:rounded-bl-lg',
+    singleRowRight:
+      count === 3
+        ? '@[28rem]:rounded-tr-lg @[28rem]:rounded-br-lg'
+        : count === 4
+          ? '@[30rem]:rounded-tr-lg @[30rem]:rounded-br-lg'
+          : count === 5
+            ? '@[32rem]:rounded-tr-lg @[32rem]:rounded-br-lg'
+            : '@[36rem]:rounded-tr-lg @[36rem]:rounded-br-lg',
+    hideEmpty:
+      count === 3
+        ? '@[28rem]:hidden'
+        : count === 4
+          ? '@[30rem]:hidden'
+          : count === 5
+            ? '@[32rem]:hidden'
+            : '@[36rem]:hidden',
+  }
 
   return (
     // Container query: 2-col when the sheet is narrow; one equal row when there's room
     <div className="@container">
       <div
         className={cn(
-          'grid overflow-hidden rounded-lg',
+          'grid',
           'grid-cols-2',
           count === 3 && '@[28rem]:grid-cols-3',
           count === 4 && '@[30rem]:grid-cols-4',
@@ -269,8 +314,13 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
           count >= 6 && '@[36rem]:grid-cols-6'
         )}
       >
-        {modes.map((mode) => {
+        {modes.map((mode, index) => {
           const isSelected = selected === mode.id
+          const isLast = index === count - 1
+          const isNarrowTopLeft = index === 0
+          const isNarrowTopRight = index === 1
+          const isNarrowBottomLeft = index === narrowLastRowStart
+          const isNarrowBottomRight = emptySlots === 0 && isLast
 
           return (
             <button
@@ -283,9 +333,19 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
                 // Each cell owns a border; adjacent edges overlap (RadioGroupStacked-style)
                 'relative -mb-px -mr-px flex flex-col items-center gap-2 border bg-overlay/50 p-4 shadow-xs transition-colors',
                 'focus-visible:z-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+                isNarrowTopLeft && 'rounded-tl-lg',
+                isNarrowTopRight && 'rounded-tr-lg',
+                isNarrowBottomLeft && 'rounded-bl-lg',
+                isNarrowBottomRight && 'rounded-br-lg',
+                // Once wide enough for a single row, reshape corners to left/right caps
+                index === 0 && wideCornerClasses.singleRowLeft,
+                isLast && wideCornerClasses.singleRowRight,
+                isNarrowTopRight && !isLast && wideCornerClasses.clearTopRight,
+                isNarrowBottomLeft && index !== 0 && wideCornerClasses.clearBottomLeft,
+                isNarrowBottomRight && !isLast && wideCornerClasses.clearBottomRight,
                 isSelected
                   ? 'z-1 border-foreground-muted bg-surface-300 ring-1 ring-border'
-                  : 'hover:z-1 hover:border-strong hover:bg-surface-100 dark:hover:bg-surface-200'
+                  : 'hover:z-1 hover:border-foreground-muted hover:bg-background dark:hover:bg-surface-200'
               )}
             >
               <span className={cn(isSelected ? 'text-foreground' : 'text-foreground-light')}>
@@ -318,8 +378,8 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
             key={`empty-${index}`}
             aria-hidden
             className={cn(
-              'relative -mb-px -mr-px border border-dashed bg-surface-100/30 dark:bg-surface-75/10',
-              hideEmptyClass
+              'relative -mb-px -mr-px rounded-br-lg border bg-surface-100/20 dark:bg-surface-75/10',
+              wideCornerClasses.hideEmpty
             )}
           />
         ))}
