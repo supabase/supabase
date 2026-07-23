@@ -372,7 +372,8 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
             key={`empty-${index}`}
             aria-hidden
             className={cn(
-              'relative -mb-px -mr-px rounded-br-lg border border-dashed border-muted bg-transparent opacity-30',
+              // One token sunk vs mode tiles (bg-overlay/50), solid border so the empty slot still reads
+              'relative -mb-px -mr-px rounded-br-lg border bg-surface-100',
               wideCornerClasses.hideEmpty
             )}
           />
