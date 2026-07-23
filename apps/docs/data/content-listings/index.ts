@@ -11,6 +11,7 @@ import {
   functionsExamplesWebhooksPayments,
   functionsGetStarted,
 } from './functions.data'
+import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
 import {
   selfHostingCommunity,
@@ -35,6 +36,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   functionsExamplesAiMedia,
   functionsExamplesMessaging,
   functionsExamplesOperations,
+  logDrainsDestinations,
   realtimeGetStarted,
   realtimeExamples,
   realtimeResources,

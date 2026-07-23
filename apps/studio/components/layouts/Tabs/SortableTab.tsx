@@ -158,7 +158,7 @@ export const SortableTab = ({
             'absolute top-1/2 right-2.5 z-10 -translate-y-1/2',
             'flex size-5 items-center justify-center rounded-xs',
             'opacity-0 group-hover/tab:opacity-100 group-focus-within/tab:opacity-100 focus-visible:opacity-100',
-            'hover:bg-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            'hover:bg-200 focus-ring',
             'cursor-pointer'
           )}
         >

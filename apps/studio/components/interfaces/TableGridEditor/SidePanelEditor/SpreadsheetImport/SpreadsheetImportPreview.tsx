@@ -179,7 +179,7 @@ export const SpreadsheetImportPreview = ({
                             <button
                               type="button"
                               tabIndex={0}
-                              className="flex items-center space-x-2 cursor-pointer focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+                              className="flex cursor-pointer items-center space-x-2 focus-ring"
                               onClick={() => onSelectExpandError(key)}
                               aria-expanded={isExpanded}
                               aria-controls={`${key}-panel`}

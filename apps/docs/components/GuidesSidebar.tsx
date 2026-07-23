@@ -74,6 +74,7 @@ function AiTools({ className }: { className?: string }) {
           Connect your AI agent
         </Link>
         <button
+          tabIndex={0}
           onClick={copyMarkdown}
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >

@@ -220,7 +220,7 @@ export const MarketplaceFilterBar = ({
           onClick={() => onViewModeChange('grid')}
           className={cn(
             'border-r px-2 py-1.5 rounded-l-md cursor-pointer',
-            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            'focus-visible:z-10 focus-ring',
             viewMode === 'grid'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'
@@ -235,7 +235,7 @@ export const MarketplaceFilterBar = ({
           onClick={() => onViewModeChange('list')}
           className={cn(
             'px-2 py-1.5 rounded-r-md cursor-pointer',
-            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            'focus-visible:z-10 focus-ring',
             viewMode === 'list'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'

@@ -7,9 +7,10 @@ const KEY_ALIASES: Record<string, string> = {
   'copilot-cli': 'github-copilot',
 }
 
-// ContentListings defaults hasLightIcon to true whenever an icon is set (see
-// ContentListings.client.tsx: `item.hasLightIcon ?? Boolean(item.icon)`), so single-variant
-// icons must set `hasLightIcon: false` explicitly or they'll request a nonexistent "-light" file.
+// ContentListings defaults hasLightIcon to true for string icon paths (see
+// ContentListings.client.tsx: `item.hasLightIcon ?? typeof item.icon === 'string'`), so
+// single-variant icons must set `hasLightIcon: false` explicitly or they'll request a
+// nonexistent "-light" file.
 const ICON_ASSETS: Record<string, { icon: string; hasLightIcon?: boolean }> = {
   'claude-code': { icon: '/docs/img/icons/agent-claude-icon', hasLightIcon: false },
   codex: { icon: '/docs/img/icons/agent-openai-icon', hasLightIcon: true },

@@ -20,7 +20,6 @@
     "jsx-a11y/anchor-is-valid": 7,
     "jsx-a11y/heading-has-content": 2,
     "jsx-a11y/no-distracting-elements": 0,
-    "supabase/require-explicit-tabindex": 0,
     "valtio/state-snapshot-rule": 1,
     "react-hook-form/no-use-watch": 76
   },
@@ -1060,7 +1059,6 @@
       "components/layouts/Scaffold.tsx": 2
     },
     "jsx-a11y/no-distracting-elements": {},
-    "supabase/require-explicit-tabindex": {},
     "valtio/state-snapshot-rule": {
       "state/storage-explorer.tsx": 1
     },
