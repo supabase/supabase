@@ -244,69 +244,64 @@ interface ModeSelectorProps {
 }
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
-  const cols = 3
-  const rows = Math.ceil(modes.length / cols)
-  const lastRowStart = (rows - 1) * cols
-  const lastRowCount = modes.length - lastRowStart
+  const count = modes.length
 
   return (
-    // 6-col grid so full rows span 2 (3-up) and a short last row can span evenly (e.g. 3+3 for two items)
-    <div className="grid grid-cols-6">
-      {modes.map((mode, index) => {
-        const isSelected = selected === mode.id
-        const isLastRow = index >= lastRowStart
-        const span = isLastRow && lastRowCount < cols ? 6 / lastRowCount : 2
-        const isTopLeft = index === 0
-        const isTopRight = index === Math.min(cols, modes.length) - 1
-        const isBottomLeft = index === lastRowStart
-        const isBottomRight = index === modes.length - 1
+    // Container query: 2-col when the sheet is narrow; one equal row when there's room
+    <div className="@container">
+      <div
+        className={cn(
+          'grid gap-px overflow-hidden rounded-lg border bg-border',
+          'grid-cols-2',
+          count === 3 && '@[28rem]:grid-cols-3',
+          count === 4 && '@[30rem]:grid-cols-4',
+          count === 5 && '@[32rem]:grid-cols-5',
+          count >= 6 && '@[36rem]:grid-cols-6'
+        )}
+      >
+        {modes.map((mode) => {
+          const isSelected = selected === mode.id
 
-        return (
-          <button
-            key={mode.id}
-            type="button"
-            tabIndex={0}
-            onClick={() => onChange(mode.id)}
-            aria-pressed={isSelected}
-            className={cn(
-              // Match RadioGroupStackedItem: each cell owns a border, adjacent edges overlap
-              'relative -mb-px -mr-px flex flex-col items-center gap-2 border bg-overlay/50 p-4 shadow-xs transition',
-              span === 2 && 'col-span-2',
-              span === 3 && 'col-span-3',
-              span === 6 && 'col-span-6',
-              isTopLeft && 'rounded-tl-lg',
-              isTopRight && 'rounded-tr-lg',
-              isBottomLeft && 'rounded-bl-lg',
-              isBottomRight && 'rounded-br-lg',
-              isSelected
-                ? 'z-1 border-foreground-muted bg-surface-300 ring-1 ring-border'
-                : 'hover:z-1 hover:bg-surface-200'
-            )}
-          >
-            <span className={cn(isSelected ? 'text-foreground' : 'text-foreground-light')}>
-              {MODE_ICONS[mode.id]}
-            </span>
-            <div>
-              <p
-                className={cn(
-                  'heading-default text-center',
-                  isSelected ? 'text-foreground' : 'text-foreground-light'
-                )}
-              >
-                {mode.label}
-              </p>
-              <p
-                className={cn(
-                  'text-sm leading-tight text-center',
-                  isSelected ? 'text-foreground-light' : 'text-foreground-lighter'
-                )}
-              >
-                {mode.description}
-              </p>
-            </div>
-          </button>
-        )
-      })}
+          return (
+            <button
+              key={mode.id}
+              type="button"
+              tabIndex={0}
+              onClick={() => onChange(mode.id)}
+              aria-pressed={isSelected}
+              className={cn(
+                'relative flex flex-col items-center gap-2 bg-overlay/50 p-4 transition-colors',
+                'focus-visible:z-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+                isSelected
+                  ? 'z-1 bg-surface-300 ring-1 ring-border'
+                  : 'hover:z-1 hover:bg-surface-200'
+              )}
+            >
+              <span className={cn(isSelected ? 'text-foreground' : 'text-foreground-light')}>
+                {MODE_ICONS[mode.id]}
+              </span>
+              <div>
+                <p
+                  className={cn(
+                    'heading-default text-center',
+                    isSelected ? 'text-foreground' : 'text-foreground-light'
+                  )}
+                >
+                  {mode.label}
+                </p>
+                <p
+                  className={cn(
+                    'text-sm leading-tight text-center',
+                    isSelected ? 'text-foreground-light' : 'text-foreground-lighter'
+                  )}
+                >
+                  {mode.description}
+                </p>
+              </div>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }
