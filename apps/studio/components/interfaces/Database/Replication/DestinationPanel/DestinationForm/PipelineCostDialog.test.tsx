@@ -3,9 +3,9 @@ import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { PipelineCostDialog } from './PipelineCostDialog'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { PipelineCostDialog } from './PipelineCostDialog'
 
 type CostEstimateResponse = components['schemas']['CostEstimateResponse']
 type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']

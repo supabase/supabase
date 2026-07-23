@@ -11,7 +11,6 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 import { PipelineStatusName } from './Replication.constants'
 import { RestartCostEstimate } from './RestartCostEstimate'
 import {
@@ -19,6 +18,7 @@ import {
   type ReplicationTableIdentity,
   type TableSyncCopyConfig,
 } from './TableSyncCopy.utils'
+import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
 interface RestartTableDialogProps {
   open: boolean

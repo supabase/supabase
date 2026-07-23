@@ -5,10 +5,10 @@ import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
 import { describe, expect, it } from 'vitest'
 
-import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { TableCopySelection } from './TableCopySelection'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
 type ReplicationPublicationsResponse = components['schemas']['ReplicationPublicationsResponse']
@@ -142,9 +142,7 @@ describe('TableCopySelection', () => {
       <TableCopySelectionHarness editMode mode="include_tables" selectedTableIds={['101']} />
     )
 
-    expect(
-      await screen.findByText(/Publication tables could not be loaded/)
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/Publication tables could not be loaded/)).toBeInTheDocument()
     expect(screen.queryByText(/previously selected table/)).not.toBeInTheDocument()
   })
 
@@ -153,11 +151,7 @@ describe('TableCopySelection', () => {
     mockPublicationsPending()
 
     customRender(
-      <TableCopySelectionHarness
-        editMode
-        mode="include_tables"
-        selectedTableIds={['101', '999']}
-      />
+      <TableCopySelectionHarness editMode mode="include_tables" selectedTableIds={['101', '999']} />
     )
 
     const loadingLabel = await screen.findByText('Loading publication tables...')

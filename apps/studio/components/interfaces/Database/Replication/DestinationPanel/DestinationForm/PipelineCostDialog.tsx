@@ -21,14 +21,14 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
-import { useReplicationSourceId } from '@/data/replication/sources-query'
 import {
   getTableCopyTargets,
   summarizeTableCopyEstimate,
   type ReplicationTableIdentity,
   type TableSyncCopyConfig,
 } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
+import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
 
