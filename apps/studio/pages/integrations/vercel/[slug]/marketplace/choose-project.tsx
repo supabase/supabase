@@ -17,10 +17,8 @@ import {
   VercelIntegrationInterstitialErrorState,
   VercelIntegrationLogo,
 } from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
-import {
-  ProjectLinker,
-  type ForeignProject,
-} from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import { ProjectLinker } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import type { ForeignProject } from '@/components/interfaces/Integrations/VercelGithub/VercelGithub.types'
 import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
@@ -176,7 +174,8 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
               title="Unable to load project connection"
               errorMessage="Organization not found. Retry the installation from Vercel."
             />
-          ) : integrationNotFound ? (
+          ) : // [JOSHEN TODO BEFORE MERGING] Please flip this back to integrationNotFound
+          false ? (
             <VercelIntegrationInterstitialErrorState
               title="Unable to load project connection"
               errorMessage="Vercel integration not found for this organization. Retry the installation from Vercel."
@@ -205,7 +204,8 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
                     window.location.href = next
                   }
                 }}
-                loadingForeignProjects={isLoadingVercelProjectsData}
+                // // [JOSHEN TODO BEFORE MERGING] Please uncomment this out
+                // loadingForeignProjects={isLoadingVercelProjectsData}
                 mode="Vercel"
               />
             </div>
