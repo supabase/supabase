@@ -30,7 +30,22 @@ Line two.`
     )
   })
 
+  it('parses Prettier single-quoted multiline expression source', () => {
+    expect(
+      AiPrompt({
+        props: { prompt: "\n    'Help me.\\nLine two.'\n  " },
+        children: '',
+      })
+    ).toBe(
+      `**AI Prompt**
+
+Help me.
+Line two.`
+    )
+  })
+
   it('keeps the title when the prompt is empty', () => {
     expect(AiPrompt({ props: { prompt: '""' }, children: '' })).toBe('**AI Prompt**')
+    expect(AiPrompt({ props: { prompt: "''" }, children: '' })).toBe('**AI Prompt**')
   })
 })
