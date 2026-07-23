@@ -12,11 +12,15 @@ export const THRESHOLD_COUNT = 50000
  * table_block_relation_estimate_size in src/backend/access/table/tableam.c), so
  * an EXPLAIN estimate on a truly empty table reports ~2K phantom rows.
  *
- * So for `reltuples = -1` we instead gate on the real heap size via
- * pg_relation_size (a cheap stat() of the file -- unlike pg_class.relpages,
- * which is also stale/0 before the first vacuum): at or below this many bytes an
- * exact count(*) is subsecond by construction, so we run it; only above it do we
- * fall back to the EXPLAIN estimate (non-readonly) or -1 (readonly).
+ * So for `reltuples = -1` we instead gate on the real heap size (a cheap stat()
+ * of the file -- unlike pg_class.relpages, which is also stale/0 before the first
+ * vacuum): at or below this many bytes an exact count(*) is subsecond by
+ * construction, so we run it; only above it do we fall back to the EXPLAIN
+ * estimate (non-readonly) or -1 (readonly). The size is the whole-tree heap size
+ * -- pg_relation_size for a plain table, plus the pg_partition_tree sum for a
+ * partitioned parent (relkind 'p'), whose own pg_relation_size is 0 while its
+ * partitions hold the data -- so a large never-analyzed partitioned table is not
+ * misclassified as small.
  *
  * Derived as THRESHOLD_COUNT rows at a conservative ~200 bytes/row (~10 MB); an
  * exact count over a heap that small is subsecond.

@@ -13,7 +13,8 @@ import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT, THRESHOLD_ESTIMATE_BYTES } from '.
  * ANALYZE, so the legacy path runs an exact `count(*)` and can hit a statement
  * timeout on a multi-million-row table. The opt-in `scoped` path fixes this
  * WITHOUT breaking the (also `reltuples = -1`) empty/small new-table case: for a
- * never-analyzed table it gates on the real heap size (pg_relation_size) against
+ * never-analyzed table it gates on the whole-tree heap size (pg_relation_size,
+ * plus the pg_partition_tree sum for partitioned parents) against
  * THRESHOLD_ESTIMATE_BYTES -- a physically large one uses the EXPLAIN estimate
  * (non-readonly) or reports -1 (readonly), while a small/empty one still gets a
  * fast exact count instead of Postgres's ~10-page minimum phantom estimate.
@@ -91,7 +92,17 @@ export const getTableRowsCountSql = ({
         // CASE and the is_estimate flag use the same condition.
         const sql = safeSql`
 with approximation as (
-    select reltuples as estimate, pg_relation_size(oid) as bytes
+    select
+      reltuples as estimate,
+      -- Whole-tree heap size: pg_relation_size(oid) covers a plain table's own
+      -- heap (pg_partition_tree returns NO rows for a non-partitioned table), and
+      -- the pg_partition_tree sum covers a partitioned PARENT (relkind 'p') whose
+      -- own storage is 0 but whose partitions hold the data. greatest() picks
+      -- whichever applies; views/foreign tables yield 0 (-> exact count).
+      greatest(
+        pg_relation_size(oid),
+        (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
+      ) as bytes
     from pg_class
     where oid = ${literal(table.id)}
 )
@@ -128,10 +139,11 @@ from approximation;
       if (scoped) {
         // A never-analyzed table reports estimate = -1, which covers BOTH a
         // freshly bulk-loaded huge table AND a brand-new empty/small one. Gate
-        // that case on the real heap size (pg_relation_size): only a physically
-        // large -1 table uses the EXPLAIN estimate (which works without ANALYZE);
-        // a small/empty -1 table falls through to an exact, fast count(*) so it
-        // never reports Postgres's ~10-page minimum phantom estimate. The
+        // that case on the whole-tree heap size (see the CTE below): only a
+        // physically large -1 table uses the EXPLAIN estimate (which works
+        // without ANALYZE); a small/empty -1 table falls through to an exact,
+        // fast count(*) so it never reports Postgres's ~10-page minimum phantom
+        // estimate. The
         // over-threshold branch keeps the legacy behavior (raw estimate when
         // unfiltered, count_estimate over the filtered select otherwise). The
         // CASE and is_estimate flag share one condition.
@@ -140,7 +152,17 @@ from approximation;
 ${COUNT_ESTIMATE_SQL}
 
 with approximation as (
-    select reltuples as estimate, pg_relation_size(oid) as bytes
+    select
+      reltuples as estimate,
+      -- Whole-tree heap size: pg_relation_size(oid) covers a plain table's own
+      -- heap (pg_partition_tree returns NO rows for a non-partitioned table), and
+      -- the pg_partition_tree sum covers a partitioned PARENT (relkind 'p') whose
+      -- own storage is 0 but whose partitions hold the data. greatest() picks
+      -- whichever applies; views/foreign tables yield 0 (-> exact count).
+      greatest(
+        pg_relation_size(oid),
+        (select coalesce(sum(pg_relation_size(relid)), 0) from pg_partition_tree(oid))
+      ) as bytes
     from pg_class
     where oid = ${literal(table.id)}
 )

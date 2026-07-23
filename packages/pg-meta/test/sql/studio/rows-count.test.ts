@@ -211,3 +211,113 @@ withTestDatabase(
     })
   }
 )
+
+// A partitioned PARENT (relkind 'p') has no storage of its own, so
+// pg_relation_size(parent) is 0. The size gate must use the whole partition tree
+// or a large never-analyzed partitioned table would be misclassified as small
+// and exact-counted across all partitions -- the exact timeout being fixed.
+withTestDatabase(
+  'scoped: large never-analyzed PARTITIONED table -> estimate (partition-tree size gate)',
+  async (db) => {
+    await db.executeQuery(`
+      create table public.part_big (id int, region text, val text) partition by list (region);
+      create table public.part_big_e partition of public.part_big for values in ('east')
+        with (autovacuum_enabled = false);
+      create table public.part_big_w partition of public.part_big for values in ('west')
+        with (autovacuum_enabled = false);
+      insert into public.part_big
+        select g, case when g % 2 = 0 then 'east' else 'west' end, repeat('x', 300)
+        from generate_series(1, 45000) g;
+    `)
+    // Parent is never-analyzed (reltuples = -1) and has zero own heap size...
+    expect(await reltuplesOf(db, 'public.part_big')).toBe(-1)
+    const [{ own, tree }] = await db.executeQuery<{ own: number; tree: number }[]>(`
+      select
+        pg_relation_size('public.part_big'::regclass)::int8 as own,
+        (select coalesce(sum(pg_relation_size(relid)), 0)
+         from pg_partition_tree('public.part_big'::regclass))::int8 as tree;
+    `)
+    expect(Number(own)).toBe(0) // ...so pg_relation_size alone would say "small"
+    expect(Number(tree)).toBeGreaterThan(10_000_000) // the tree sum clears the gate
+    const table = await tableOf(db, 'public.part_big', 'part_big', 'public')
+
+    const scoped = await runCount(db, { table, scoped: true })
+    expect(scoped.is_estimate).toBe(true)
+    expect(scoped.count).toBeGreaterThan(1000)
+    expect(scoped.count).not.toBe(-1)
+
+    expect(await runCount(db, { table, scoped: true, isReadOnlyContext: true })).toEqual({
+      count: -1,
+      is_estimate: true,
+    })
+
+    // Legacy still exact-counts across all partitions (the pre-fix behavior).
+    expect(await runCount(db, { table })).toEqual({ count: 45000, is_estimate: false })
+  }
+)
+
+withTestDatabase(
+  'scoped: small never-analyzed PARTITIONED table -> exact count (both modes)',
+  async (db) => {
+    await db.executeQuery(`
+      create table public.part_small (id int, region text) partition by list (region);
+      create table public.part_small_e partition of public.part_small for values in ('east')
+        with (autovacuum_enabled = false);
+      create table public.part_small_w partition of public.part_small for values in ('west')
+        with (autovacuum_enabled = false);
+      insert into public.part_small
+        select g, case when g % 2 = 0 then 'east' else 'west' end from generate_series(1, 100) g;
+    `)
+    expect(await reltuplesOf(db, 'public.part_small')).toBe(-1)
+    const table = await tableOf(db, 'public.part_small', 'part_small', 'public')
+
+    expect(await runCount(db, { table, scoped: true })).toEqual({ count: 100, is_estimate: false })
+    expect(await runCount(db, { table, scoped: true, isReadOnlyContext: true })).toEqual({
+      count: 100,
+      is_estimate: false,
+    })
+  }
+)
+
+withTestDatabase(
+  'scoped == legacy for an ANALYZED partitioned table below THRESHOLD_COUNT',
+  async (db) => {
+    await db.executeQuery(`
+      create table public.part_analyzed (id int, region text) partition by list (region);
+      create table public.part_analyzed_e partition of public.part_analyzed for values in ('east');
+      create table public.part_analyzed_w partition of public.part_analyzed for values in ('west');
+      insert into public.part_analyzed
+        select g, case when g % 2 = 0 then 'east' else 'west' end from generate_series(1, 100) g;
+      analyze public.part_analyzed;
+    `)
+    const table = await tableOf(db, 'public.part_analyzed', 'part_analyzed', 'public')
+    expect(await assertScopedEqualsLegacy(db, { table })).toEqual({
+      count: 100,
+      is_estimate: false,
+    })
+    expect(await assertScopedEqualsLegacy(db, { table, isReadOnlyContext: true })).toEqual({
+      count: 100,
+      is_estimate: false,
+    })
+  }
+)
+
+withTestDatabase(
+  'scoped == legacy for a view flowing through the row-count builder',
+  async (db) => {
+    await db.executeQuery(`
+    create table public.view_src (id int primary key);
+    insert into public.view_src select generate_series(1, 7);
+    create view public.v_rows as select * from public.view_src;
+  `)
+    const table = await tableOf(db, 'public.v_rows', 'v_rows', 'public')
+
+    // A view has no heap (pg_relation_size 0, no partition tree) -> the gate keeps
+    // an exact count; scoped and legacy agree.
+    expect(await assertScopedEqualsLegacy(db, { table })).toEqual({ count: 7, is_estimate: false })
+    expect(await assertScopedEqualsLegacy(db, { table, isReadOnlyContext: true })).toEqual({
+      count: 7,
+      is_estimate: false,
+    })
+  }
+)
