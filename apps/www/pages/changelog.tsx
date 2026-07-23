@@ -12,6 +12,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
 import { Badge, Button, cn, IconYCombinator, Input } from 'ui'
 
+import { ChangelogEntryTitle } from '@/components/Changelog/ChangelogEntryTitle'
 import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmMarkdownButton'
 import {
   ChangelogTimelineList,
@@ -510,8 +511,8 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                         <div className="flex w-full flex-col gap-1">
                           {entry.title && (
                             <Link href={`/changelog/${entry.slug}`}>
-                              <h3 className="text-foreground text-lg hover:underline">
-                                {entry.title}
+                              <h3 className="text-foreground text-lg hover:underline [&_code]:align-middle">
+                                <ChangelogEntryTitle title={entry.title} />
                               </h3>
                             </Link>
                           )}

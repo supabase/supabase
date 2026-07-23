@@ -27,6 +27,22 @@ export function toChangelogTimelineIndexItem(entry: ChangelogEntry): ChangelogTi
   }
 }
 
+/**
+ * Strips inline markdown from a title for plain-text contexts — the document
+ * `<title>`, meta description, and Open Graph title — which take text, not HTML.
+ * Keeps the visible word (drops the backticks, asterisks, and link URL) so
+ * "Migrate `logs.all`" reads as "Migrate logs.all".
+ */
+export function stripTitleMarkdown(title: string) {
+  return title
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // [text](url) / ![alt](src) → text/alt
+    .replace(/(\*\*|__)(.*?)\1/g, '$2') // bold
+    .replace(/(\*|_)(.*?)\1/g, '$2') // italic
+    .replace(/~~(.*?)~~/g, '$1') // strikethrough
+    .replace(/`+([^`]*)`+/g, '$1') // inline code
+    .trim()
+}
+
 const CHANGE_TYPE_BADGE_VARIANT: Record<
   ChangeType,
   'default' | 'warning' | 'success' | 'destructive'
