@@ -20,6 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -301,6 +302,14 @@ export const Destinations = () => {
           <AlertError
             error={destinationsError || databasesError}
             subject="Failed to retrieve destinations"
+          />
+        )}
+
+        {isLocalETLNotSetUp && (
+          <Admonition
+            type="warning"
+            title="Replication unavailable locally"
+            description="Configure the replication API to manage Pipelines destinations in local development."
           />
         )}
 

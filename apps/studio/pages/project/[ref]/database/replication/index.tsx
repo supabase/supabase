@@ -43,7 +43,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   return (
     <PipelineRequestStatusProvider>
-      <PageHeader size="large">
+      <PageHeader size="large" className="pb-12">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Replication</PageHeaderTitle>
