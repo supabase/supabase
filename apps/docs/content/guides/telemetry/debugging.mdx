@@ -83,14 +83,3 @@ For query performance and schema-design questions such as indexing, `EXPLAIN`, N
 
 Debugging is complete only once you've re-run the failing operation, confirmed it succeeds, and checked that the layer's logs show a clean result.
 
-## For AI agents
-
-AI agents following this guide should apply the same debugging loop:
-
-1. **Identify the layer** from the error code and symptom using the table above.
-2. **Query that layer's logs** using the MCP `get_logs` tool. Pass the service name (`auth`, `edge`, `postgres`, `storage`, `realtime`, `functions`) and a bounded time window. Do not open with an all-source scan.
-3. **Widen along an anchor** — once you have a timestamp, request ID, or error code, use it to correlate across adjacent sources rather than re-scanning from scratch.
-4. **Fetch the troubleshooting guide** for the specific symptom (append `.md` to the docs URL, or use `search_docs`). Apply the fix described there, not a guess from training data.
-5. **Verify** by re-running the failing operation and confirming the log is clean.
-
-The [Logging guide](/docs/guides/telemetry/logs) covers the `get_logs` tool, available sources, and the ClickHouse query model for when raw SQL is needed.
