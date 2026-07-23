@@ -1,29 +1,13 @@
 import { safeSql } from '../pg-format'
 
 /**
- * Introspection SQL for user-defined types (enums, composites, ...).
- *
- * Two complete, standalone templates are kept so each rendered statement is
- * easy to read and diff:
- *
- * - `TYPES_SQL` (legacy, default): left-joins two subqueries that are GROUP-BY
- *   aggregated over the ENTIRE catalog -- `t_enums` over all of pg_enum and
- *   `t_attributes` over the attributes of ALL composite relations. The wrapper's
- *   schema/array filters are applied OUTSIDE, so the planner materializes both
- *   aggregates over the full catalog and discards almost everything (5.7-9.6s on
- *   a ~465K-row catalog).
- * - `SCOPED_TYPES_SQL` (opt-in via `scoped: true`): identical output, but enums
- *   and attributes are computed per-surviving-row via correlated scalar
- *   subqueries (index scans on pg_enum's (enumtypid, enumsortorder) unique index
- *   and pg_attribute's (attrelid, attnum) index) AFTER the row has passed the
- *   schema/typrelid/array filters. Both templates end at the same trailing WHERE
- *   `)` so `pg-meta-types.ts#list` can append the same filter/limit fragments to
- *   either base.
- *
- * `scoped` defaults to false so Studio can roll the optimization out behind a
- * feature flag. `TYPES_SQL` is the FROZEN legacy path (see the comment on it);
- * behavioral equivalence between the two is enforced by execution-based tests in
- * test/types.test.ts, not by a byte-for-byte SQL snapshot.
+ * User-defined types introspection. TYPES_SQL (legacy, FROZEN below) left-joins
+ * two catalog-wide GROUP BY aggregates (slow on a large catalog). SCOPED_TYPES_SQL
+ * (opt-in) returns identical rows but computes enums/attrs per surviving row via
+ * correlated index-scan subqueries after the schema/array filters. Both end at
+ * the same trailing WHERE so pg-meta-types.ts#list appends the same filter/limit
+ * fragments (and, scoped-only, ORDER BY t.oid) to either. Equivalence is proven
+ * by execution tests in test/types.test.ts, not a byte snapshot.
  */
 export const TYPES_SQL = /* SQL */ safeSql`
 -- FROZEN legacy path: served while the pgMetaScopedIntrospection flag is off.

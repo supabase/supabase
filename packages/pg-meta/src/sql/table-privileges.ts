@@ -84,20 +84,12 @@ group by
 `
 
 /**
- * Scoped variant of {@link TABLE_PRIVILEGES_SQL}.
- *
- * The legacy query scans ALL relations (relkind r,v,m,f,p), runs `aclexplode`
- * laterally per relation and GROUP-BYs, and only THEN gets filtered by the
- * wrapper (schema for list(); oid or schema+name for retrieve()) -- 20-47s on a
- * large catalog. This builder injects the wrapper's predicate directly into the
- * base WHERE (before the aclexplode lateral / GROUP BY) so pg_class is pruned to
- * the relevant relations first. `scopeFilter` must be a `safeSql` fragment that
- * starts with `and ` (e.g. `and c.oid = 123`, `and nc.nspname = 'x' and ...`) or
- * be empty; it references the base aliases `c` (pg_class) and `nc`
- * (pg_namespace). Output rows are identical to filtering the legacy CTE.
- *
- * Kept as a complete standalone template (rather than parameterizing the legacy
- * constant) so the legacy rendering stays byte-identical.
+ * Scoped variant of {@link TABLE_PRIVILEGES_SQL}: injects the wrapper's
+ * predicate into the base WHERE (before the aclexplode lateral / GROUP BY) so
+ * pg_class is pruned first, instead of scanning all relations then filtering.
+ * `scopeFilter` must be a `safeSql` fragment starting with `and ` (or empty)
+ * referencing base aliases `c` (pg_class) and `nc` (pg_namespace). Kept as a
+ * standalone template so the legacy constant stays byte-identical; rows match.
  */
 export const getScopedTablePrivilegesSql = (
   scopeFilter: SafeSqlFragment = safeSql`` as SafeSqlFragment
