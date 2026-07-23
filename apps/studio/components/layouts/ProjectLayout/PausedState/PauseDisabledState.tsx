@@ -21,6 +21,7 @@ import { useStorageArchiveCreateMutation } from '@/data/storage/storage-archive-
 import { useStorageArchiveQuery } from '@/data/storage/storage-archive-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
+import { formatRestoreWindow } from '@/lib/helpers'
 
 export const PauseDisabledState = () => {
   const { ref } = useParams()
@@ -128,7 +129,7 @@ export const PauseDisabledState = () => {
         <p className="leading-normal!">
           This project has been paused for over{' '}
           <span className="text-foreground">
-            {pauseStatus?.max_days_till_restore_disabled ?? 90} days
+            {formatRestoreWindow(pauseStatus?.max_days_till_restore_disabled ?? 90)}
           </span>{' '}
           and cannot be restored through the dashboard. However, your data remains intact and can be
           downloaded as a backup.

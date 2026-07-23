@@ -110,7 +110,7 @@ export const PauseProjectButton = () => {
             <AlertDialogTitle>Pause {entityLabel}?</AlertDialogTitle>
             <AlertDialogDescription>
               This {entityLabel} will be unavailable while paused. Paused {entityLabel} can be
-              resumed for 90 days. After that, backups remain available to download.
+              resumed for up to 1 year. After that, backups remain available to download.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
