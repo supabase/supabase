@@ -26,6 +26,35 @@ export function getVercelInstallSource(
   }
 }
 
+/**
+ * Vercel sometimes sends source=marketplace with Deploy Button params
+ * (currentProjectId + external-id). Treat that as deploy-button for routing.
+ */
+export function hasVercelDeployButtonSignals({
+  currentProjectId,
+  externalId,
+}: {
+  currentProjectId?: string
+  externalId?: string
+}): boolean {
+  return Boolean(currentProjectId && externalId)
+}
+
+export function resolveVercelInstallSource({
+  source,
+  currentProjectId,
+  externalId,
+}: {
+  source: string | undefined
+  currentProjectId?: string
+  externalId?: string
+}): VercelInstallSource | undefined {
+  if (hasVercelDeployButtonSignals({ currentProjectId, externalId })) {
+    return 'deploy-button'
+  }
+  return getVercelInstallSource(source)
+}
+
 type BuildVercelInstallRouteQueryArgs = {
   source?: VercelInstallSource
   organizationSlug?: string

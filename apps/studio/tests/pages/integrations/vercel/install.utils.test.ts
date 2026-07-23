@@ -4,6 +4,8 @@ import {
   buildVercelInstallRouteQuery,
   getErrorMessage,
   getVercelInstallSource,
+  hasVercelDeployButtonSignals,
+  resolveVercelInstallSource,
 } from '@/lib/integrations/vercel-install.utils'
 
 describe('getErrorMessage', () => {
@@ -99,5 +101,49 @@ describe('getVercelInstallSource', () => {
   test('returns undefined for unsupported sources', () => {
     expect(getVercelInstallSource('deploybutton')).toBeUndefined()
     expect(getVercelInstallSource(undefined)).toBeUndefined()
+  })
+})
+
+describe('hasVercelDeployButtonSignals', () => {
+  test('requires both currentProjectId and externalId', () => {
+    expect(
+      hasVercelDeployButtonSignals({
+        currentProjectId: 'prj_123',
+        externalId: 'https://github.com/org/repo',
+      })
+    ).toBe(true)
+    expect(hasVercelDeployButtonSignals({ currentProjectId: 'prj_123' })).toBe(false)
+    expect(hasVercelDeployButtonSignals({ externalId: 'https://github.com/org/repo' })).toBe(false)
+    expect(hasVercelDeployButtonSignals({})).toBe(false)
+  })
+})
+
+describe('resolveVercelInstallSource', () => {
+  test('overrides marketplace and external when deploy-button signals are present', () => {
+    expect(
+      resolveVercelInstallSource({
+        source: 'marketplace',
+        currentProjectId: 'prj_123',
+        externalId: 'https://github.com/org/repo',
+      })
+    ).toBe('deploy-button')
+    expect(
+      resolveVercelInstallSource({
+        source: 'external',
+        currentProjectId: 'prj_123',
+        externalId: 'https://github.com/org/repo',
+      })
+    ).toBe('deploy-button')
+  })
+
+  test('keeps the declared source when deploy-button signals are incomplete', () => {
+    expect(
+      resolveVercelInstallSource({
+        source: 'marketplace',
+        currentProjectId: 'prj_123',
+      })
+    ).toBe('marketplace')
+    expect(resolveVercelInstallSource({ source: 'deploy-button' })).toBe('deploy-button')
+    expect(resolveVercelInstallSource({ source: undefined })).toBeUndefined()
   })
 })

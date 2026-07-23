@@ -117,7 +117,8 @@ export const ProjectLinker = ({
         ) : showNoEntitiesState && (noSupabaseProjects || noForeignProjects) ? (
           <div className="text-sm text-foreground-lighter text-balance">
             No {missingEntity} projects found. Create a {missingEntity} project to link to a{' '}
-            {oppositeMissingEntity} project, or skip and connect later.
+            {oppositeMissingEntity} project
+            {onSkip !== undefined ? ', or skip and connect later.' : '.'}
           </div>
         ) : (
           <>
@@ -192,8 +193,12 @@ export const ProjectLinker = ({
             <p className="text-foreground-light text-sm">
               You will need to create a {missingEntity} Project to link to a {oppositeMissingEntity}{' '}
               Project.
-              <br />
-              You can skip this and create a Project Connection later.
+              {onSkip !== undefined && (
+                <>
+                  <br />
+                  You can skip this and create a Project Connection later.
+                </>
+              )}
             </p>
           </div>
         ) : (
