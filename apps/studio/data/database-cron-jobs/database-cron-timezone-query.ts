@@ -21,7 +21,7 @@ export async function getDatabaseCronTimezone({
     connectionString,
     sql: safeSql`select setting from pg_settings where name = 'cron.timezone';`,
   })
-  return result[0].setting
+  return result[0]?.setting
 }
 
 export type DatabaseCronJobError = ResponseError

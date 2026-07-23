@@ -24,7 +24,7 @@ export async function getDatabaseCronJobsCount({
     sql: cronJobCountSql,
     queryKey: ['cron-jobs-count'],
   })
-  return result[0].count
+  return result[0]?.count
 }
 
 export type DatabaseCronJobData = number
