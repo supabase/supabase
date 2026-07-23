@@ -23,7 +23,7 @@ import {
   shouldShowSelfHostedMcpNotice,
   shouldShowSessionPoolerNotice,
 } from './ConnectStepsSection.utils'
-import { CopyPromptAdmonition } from './CopyPromptAdmonition'
+import { CopyPromptButton } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -242,7 +242,10 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
   return (
     <div className="bg-muted/50 flex-1">
       <div className="p-8 flex flex-col gap-y-6">
-        <h3>Connect your app</h3>
+        <div className="flex items-center justify-between gap-4">
+          <h3>Follow these steps</h3>
+          <CopyPromptButton stepsContainerRef={stepsContainerRef} />
+        </div>
 
         {showDataApiDisabledWarning && (
           <Admonition
@@ -290,8 +293,6 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
             ]}
           />
         )}
-
-        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
 
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (

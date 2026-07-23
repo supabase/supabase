@@ -378,7 +378,7 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
             key={`empty-${index}`}
             aria-hidden
             className={cn(
-              'relative -mb-px -mr-px rounded-br-lg border bg-surface-100/20 dark:bg-surface-75/10',
+              'relative -mb-px -mr-px rounded-br-lg border border-dashed border-muted bg-transparent opacity-30',
               wideCornerClasses.hideEmpty
             )}
           />
