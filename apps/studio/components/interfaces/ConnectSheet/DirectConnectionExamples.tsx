@@ -1,6 +1,5 @@
 export type Example = {
   installCommands?: string[]
-  postInstallCommands?: string[]
   files?: {
     name: string
     content: string
@@ -56,9 +55,6 @@ func main() {
   },
   dotnet: {
     installCommands: [
-      'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION',
-    ],
-    postInstallCommands: [
       'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION',
     ],
   },

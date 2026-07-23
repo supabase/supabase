@@ -11,8 +11,21 @@ interface ConnectionParametersProps {
 }
 
 export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParametersProps) => {
+  const copyAllText = parameters.map((param) => `${param.key}=${param.value}`).join('\n')
+
   return (
     <div className="overflow-hidden rounded-lg border bg-surface-75">
+      <div className="flex items-center justify-between border-b bg-surface-100 px-4 py-2">
+        <span className="font-mono text-xs text-foreground-light">Connection parameters</span>
+        <CopyButton
+          variant="default"
+          size="tiny"
+          copyLabel="Copy all"
+          text={copyAllText}
+          aria-label="Copy all connection parameters"
+          onClick={() => onCopy?.('all')}
+        />
+      </div>
       <div className="divide-y">
         {parameters.map((param) => (
           <div key={param.key} className="flex items-center gap-x-2 px-4 py-2.5 font-mono text-sm">
