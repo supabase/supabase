@@ -153,7 +153,15 @@ test('getEntityTypesSQL: plan stays scoped for a schema listing', async () => {
       page: 0,
     })
   )
-  assertPlanWithinBudget(result, {})
+  assertPlanWithinBudget(result, {
+    allowedSeqScans: {
+      pg_class: {
+        max: 1,
+        reason:
+          'per-schema entity listing must read every relation in the schema; no index leads on pg_class.relnamespace, so the filter cannot prune it. The planner choice between a seq scan and a full-index bitmap scan is marginal and version/stats dependent (observed flipping on PG17) -- one filtered pass of pg_class either way',
+      },
+    },
+  })
 }, 60_000)
 
 // ── getTablesPaginatedSql (database/tables-paginated.ts) — per-schema page ───
