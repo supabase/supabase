@@ -113,6 +113,10 @@ export const LOCAL_STORAGE_KEYS = {
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
+  // Stores the `initiated_at` of the failed upgrade attempt that was dismissed, so a later
+  // failed attempt (different `initiated_at`) still shows the banner
+  PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
+    `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
