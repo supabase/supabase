@@ -24,6 +24,7 @@ function ServerEnvContent() {
           <CopyButton
             variant="default"
             size="tiny"
+            copyLabel="Copy all"
             asyncText={buildEnv}
             aria-label="Copy all variables"
             disabled={!canReadAPIKeys}

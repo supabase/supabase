@@ -145,8 +145,8 @@ export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPrompt
       }}
       tooltip={{
         content: {
-          side: 'bottom',
-          text: 'Or copy these steps for your coding agent',
+          side: 'left',
+          text: 'Copy these steps for your coding agent',
         },
       }}
     >

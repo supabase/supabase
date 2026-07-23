@@ -157,7 +157,7 @@ const claudeAuthenticateStep: StepDefinition = {
   id: 'claude-authenticate',
   title: 'Authenticate',
   description:
-    'After configuring the MCP server, you need to authenticate. Run this in a regular terminal (not an IDE extension).',
+    'After configuring the MCP server, you need to authenticate. Run this in a regular terminal, not an IDE extension.',
   content: 'steps/mcp/claude-code/authenticate',
 }
 
@@ -193,7 +193,8 @@ const serverEnvStep: StepDefinition = {
 
 const skillsInstallStep: StepDefinition = {
   id: 'install-skills',
-  title: 'Install Agent Skills (optional)',
+  title: 'Install Agent Skills',
+  optional: true,
   description:
     'Agent Skills give AI coding tools ready-made instructions, scripts, and resources for working with Supabase more accurately and efficiently.',
   content: 'steps/skills-install',
@@ -201,7 +202,8 @@ const skillsInstallStep: StepDefinition = {
 
 const serverSkillsInstallStep: StepDefinition = {
   id: 'install-skills',
-  title: 'Install the Supabase Server skill (optional)',
+  title: 'Install the Supabase Server skill',
+  optional: true,
   description:
     'Gives AI coding tools ready-made instructions for building APIs with @supabase/server.',
   content: 'steps/skills-install',
@@ -378,7 +380,7 @@ export const connectSchema: ConnectSchema = {
       type: 'multi-select',
       label: 'Feature groups',
       description:
-        'Choose which MCP tools to include. Storage is off by default to keep tool counts manageable.',
+        'Which MCP tools to include. Storage is off by default to keep tool counts manageable.',
       options: { source: 'mcpFeatures' },
       defaultValue: DEFAULT_MCP_FEATURES,
     },

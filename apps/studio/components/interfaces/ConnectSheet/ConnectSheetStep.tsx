@@ -5,6 +5,7 @@ interface ConnectSheetStepProps {
   number: number
   title: string
   description: string
+  optional?: boolean
   className?: string
 }
 
@@ -12,14 +13,17 @@ export const ConnectSheetStep = ({
   number,
   title,
   description,
+  optional = false,
   className,
   children,
 }: PropsWithChildren<ConnectSheetStepProps>) => {
+  const displayTitle = optional ? `${title} (optional)` : title
+
   return (
     <div
       className={cn('group', className)}
       data-connect-step
-      data-step-title={title}
+      data-step-title={displayTitle}
       data-step-description={description}
     >
       <div className="flex items-start gap-6 self-stretch">
@@ -40,7 +44,10 @@ export const ConnectSheetStep = ({
 
         <div className="grid grid-cols-1 2xl:grid-cols-5 gap-x-6 gap-y-4 pb-12 w-full">
           <div className="flex flex-col 2xl:col-span-2">
-            <p className="text-sm font-medium text-foreground">{title}</p>
+            <p className="text-sm font-medium text-foreground">
+              {title}
+              {optional && <span className="font-normal text-foreground-muted"> (optional)</span>}
+            </p>
             <p className="text-sm text-foreground-light">{description}</p>
           </div>
           <div className="2xl:col-span-3 [&_pre.code-block]:bg-surface-75!" data-step-content>

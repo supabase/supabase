@@ -301,6 +301,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
               number={index + 1}
               title={step.title}
               description={step.description}
+              optional={step.optional}
             >
               <StepContent
                 contentId={step.content}
