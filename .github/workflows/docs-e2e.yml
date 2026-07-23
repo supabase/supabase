@@ -58,8 +58,9 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'pnpm'
 
-      # Vercel skips the docs preview when a PR only changes the harness
-      # (e2e/docs, workflow). Wait for a preview only when apps/docs changed.
+      # Vercel skips the docs preview when a PR only changes the e2e/docs
+      # directory or this workflow file. Wait for a preview only when
+      # apps/docs changes.
       - name: Detect docs app changes
         if: github.event_name == 'pull_request'
         id: filter
@@ -70,11 +71,12 @@ jobs:
               - 'apps/docs/**'
 
       # Vercel's GitHub App stopped writing GitHub Deployment objects on
-      # 2026-02-17 (broken app auth), so vercel/wait-for-deployment-action
-      # times out polling that API even though the preview builds fine.
-      # Poll the "Vercel – docs" commit status instead — Vercel keeps posting
-      # those — then resolve the deployment it points to via Vercel's own API
-      # to get the actual preview URL. See scripts/waitForVercelDocsPreview.js.
+      # 2026-02-17. The app's authentication is broken.
+      # vercel/wait-for-deployment-action polls that API, so it times out even
+      # though the preview builds fine. This step polls the "Vercel – docs"
+      # commit status instead, because Vercel still posts that status. It then
+      # resolves the actual preview URL through Vercel's own API. See
+      # scripts/waitForVercelDocsPreview.js.
       - name: Wait for Vercel docs preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.filter.outputs.docs_app == 'true'
         id: deployment
@@ -100,7 +102,7 @@ jobs:
             printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
             echo "use_bypass=true" >> "$GITHUB_OUTPUT"
           else
-            # Harness-only PRs have no docs preview; test against production.
+            # Harness-only PRs have no docs preview. Test against production instead.
             echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
             echo "use_bypass=false" >> "$GITHUB_OUTPUT"
           fi

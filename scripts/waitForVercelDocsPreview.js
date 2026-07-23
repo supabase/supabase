@@ -1,8 +1,10 @@
-// Vercel's GitHub App has stopped writing GitHub Deployment objects since
-// 2026-02-17 (broken app auth), so polling the Deployments API (as
-// vercel/wait-for-deployment-action does) times out even though the docs
-// preview builds fine. Poll the "Vercel – docs" commit status instead, then
-// resolve the actual preview URL via Vercel's own deployments API.
+// Vercel's GitHub App stopped writing GitHub Deployment objects on
+// 2026-02-17. The app's authentication is broken.
+// vercel/wait-for-deployment-action polls the Deployments API, so it times
+// out even though the docs preview builds fine. This script polls the
+// "Vercel – docs" commit status instead, because Vercel still posts that
+// status. It then resolves the actual preview URL through Vercel's own
+// deployments API.
 const { appendFileSync } = require('fs')
 
 const STATUS_CONTEXT = 'Vercel – docs'
