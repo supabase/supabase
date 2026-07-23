@@ -147,25 +147,32 @@ export const DestinationTypeSelection = () => {
     .flatMap((group) => group.options)
     .find((option) => option.value === destinationType)
 
-  const typeDescription =
-    !editMode || selectedOption?.stage ? (
+  const stageDescription =
+    selectedOption?.stage === 'Public Alpha' ? (
       <>
-        {!editMode && <span className="block">Cannot be changed after creation.</span>}
-        {selectedOption?.stage && (
-          <span className="block">
-            {selectedOption.stage === 'Public Alpha'
-              ? 'This destination type is in public alpha and may change as we iterate based on customer feedback. '
-              : selectedOption.stage === 'Deprecated'
-                ? 'This destination type is deprecated.'
-                : 'This destination type is available through early access and may change as we iterate based on customer feedback. '}
-            {selectedOption.stage !== 'Deprecated' && (
-              <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-                Leave feedback
-              </InlineLink>
-            )}
-          </span>
-        )}
+        In public alpha and may change.{' '}
+        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+          Leave feedback
+        </InlineLink>
       </>
+    ) : selectedOption?.stage === 'Early Access' ? (
+      <>
+        In early access and may change.{' '}
+        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+          Leave feedback
+        </InlineLink>
+      </>
+    ) : selectedOption?.stage === 'Deprecated' ? (
+      'This destination type is deprecated.'
+    ) : null
+
+  const typeDescription =
+    !editMode || stageDescription ? (
+      <span>
+        {!editMode && 'Cannot be changed after creation.'}
+        {!editMode && stageDescription ? ' ' : null}
+        {stageDescription}
+      </span>
     ) : undefined
 
   return (
