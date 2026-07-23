@@ -3092,7 +3092,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
         {
-          name: 'Build a custom Postgres extension image',
+          name: 'Custom Postgres Extensions',
           url: '/guides/self-hosting/custom-postgres-extensions',
         },
       ],
