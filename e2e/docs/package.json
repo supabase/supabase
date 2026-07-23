@@ -1,0 +1,13 @@
+{
+  "name": "e2e-docs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "e2e:docs": "playwright test",
+    "e2e:ui": "playwright test --ui"
+  },
+  "dependencies": {
+    "@playwright/test": "^1.59.1"
+  }
+}

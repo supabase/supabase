@@ -1,10 +1,30 @@
 import { z } from 'zod'
 
+const contentListingIconKindSchema = z.enum([
+  'braces',
+  'otlp',
+  'datadog',
+  'grafana',
+  'cloud',
+  'sentry',
+  'axiom',
+  'last9',
+  'server',
+])
+
+const contentListingIconChipSchema = z.object({
+  kind: contentListingIconKindSchema,
+  color: z.string().min(1),
+  bg: z.string().min(1),
+})
+
+export const contentListingIconSchema = z.union([z.string().min(1), contentListingIconChipSchema])
+
 export const contentListingItemSchema = z.object({
   title: z.string().min(1),
   href: z.string().min(1),
   description: z.string().min(1),
-  icon: z.string().min(1).optional(),
+  icon: contentListingIconSchema.optional(),
   hasLightIcon: z.boolean().optional(),
   badge: z.string().min(1).optional(),
 })

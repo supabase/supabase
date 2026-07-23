@@ -162,6 +162,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
               <div className="flex">
                 {allListings.map((listing, i) => (
                   <button
+                    tabIndex={0}
                     key={listing.slug}
                     type="button"
                     onClick={() => {

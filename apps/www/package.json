@@ -6,7 +6,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "pnpm run content:build && next --port 3000",
-    "prebuild": "pnpm --filter=docs run build:guides-markdown",
+    "prebuild": "pnpm --filter=docs run build:federated-content && pnpm --filter=docs run build:guides-markdown",
     "build": "pnpm run content:build && next build",
     "export": "next export",
     "start": "next start",
@@ -118,6 +118,7 @@
     "react-hook-form": "^7.71.2",
     "remark-mdx": "^3.0.1",
     "tailwindcss": "catalog:",
+    "tar-stream": "^3.1.7",
     "tsconfig": "workspace:*",
     "unist-util-visit": "^5.1.0",
     "unist-util-visit-parents": "5.1.3",

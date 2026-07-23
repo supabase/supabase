@@ -178,7 +178,7 @@ export const RolesList = () => {
         <div className="flex items-center space-x-6">
           <Tooltip>
             <TooltipTrigger>
-              <div className="w-42">
+              <div className="w-44">
                 <SparkBar
                   type="horizontal"
                   // if the maxConnectionLimit is undefined, set totalActiveConnections so that

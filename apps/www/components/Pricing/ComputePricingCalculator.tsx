@@ -218,6 +218,7 @@ const ComputePricingCalculator = ({
                 <div className="flex items-center gap-2">
                   {activeInstances.length > 1 && (
                     <button
+                      tabIndex={0}
                       aria-label="Remove item"
                       title="Remove item"
                       className="p-1 text-lighter hover:text-foreground rounded-sm opacity-0 group-hover:opacity-100 transition-opacity"

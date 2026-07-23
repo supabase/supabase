@@ -51,6 +51,7 @@ import type { AvailableColumn, Table, TableOption } from './Wrappers.types'
 import { getTableFormSchema } from './Wrappers.utils'
 import { ActionBar } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ActionBar'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export type WrapperTableEditorProps = {
@@ -239,10 +240,11 @@ const TableForm = ({
   initialData: any
 }) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: schemas, isPending: isLoading } = useSchemasQuery({
+  const { data: allSchemas, isPending: isLoading } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = useSchemasFilteredForHighAvailability(allSchemas)
 
   const requiredOptions: TableOption[] = []
   const optionalOptions: TableOption[] = []

@@ -195,7 +195,7 @@ export const ProjectNeedsSecuringView = ({
                       return (
                         <TableRow
                           key={getTableKey(table)}
-                          className="relative cursor-pointer inset-focus"
+                          className="relative cursor-pointer focus-inset"
                           onClick={(event) => {
                             trackViewPolicies()
                             handleNavigation(event)

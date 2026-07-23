@@ -24,7 +24,7 @@ const MAX_ATTACHMENTS = 5
 
 const removeAttachmentButtonClassName = cn(
   'absolute -top-1 -right-1 size-4 shrink-0 rounded-full bg-red-900 p-0 cursor-pointer',
-  'outline-hidden focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background'
+  'focus-ring'
 )
 
 const RemoveAttachmentIcon = () => (
@@ -257,9 +257,9 @@ export function AttachmentUploadDisplay({
             tabIndex={0}
             aria-label="Add attachment"
             className={cn(
-              'border border-stronger opacity-50 transition hover:opacity-100',
+              'border border-stronger opacity-50 hover:opacity-100',
               'group flex h-14 w-14 cursor-pointer items-center justify-center rounded-sm',
-              'outline-hidden focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background'
+              'focus-visible:opacity-100 focus-ring'
             )}
             onClick={addFile}
           >

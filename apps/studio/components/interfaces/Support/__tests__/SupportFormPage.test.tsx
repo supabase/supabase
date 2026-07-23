@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -14,6 +15,9 @@ import { createMockOrganizationResponse, createMockProject } from '@/tests/helpe
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+
+// The project selector's infinite-scroll sentinel uses IntersectionObserver, which jsdom lacks
+mockIntersectionObserver()
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
@@ -314,6 +318,19 @@ const getDashboardLogsToggle = (screen: Screen, type: 'find' | 'query' = 'find')
   return type === 'find'
     ? screen.findByRole('switch', { name: labelMatcher })
     : screen.queryByRole('switch', { name: labelMatcher })
+}
+
+const getSupportAccessToggle = (screen: Screen, type: 'find' | 'query' = 'find') => {
+  const labelMatcher = /allow support access to your project/i
+  return type === 'find'
+    ? screen.findByRole('switch', { name: labelMatcher })
+    : screen.queryByRole('switch', { name: labelMatcher })
+}
+
+const selectNoSpecificProject = async (screen: Screen) => {
+  await userEvent.click(getProjectSelector(screen))
+  const option = await screen.findByRole('option', { name: /no specific project/i })
+  await userEvent.click(option)
 }
 
 const getSupportForm = () => {
@@ -633,6 +650,64 @@ describe('SupportFormPage', () => {
       { timeout: 5_000 }
     )
   })
+
+  test('hides support access toggle and submits allowSupportAccess: false when no project is selected', async () => {
+    const submitSpy = vi.fn()
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
+
+    await selectCategoryOption(screen, 'Dashboard bug')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+
+    // A project is selected, so the toggle to grant support access is available
+    await expect(getSupportAccessToggle(screen)).resolves.toBeInTheDocument()
+
+    await selectNoSpecificProject(screen)
+    await waitFor(() => {
+      expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
+    })
+
+    // Support access is granted on a per-project basis, so the toggle should disappear
+    // once no project is selected, rather than allowing it to be enabled with nothing to grant access to
+    await waitFor(() => {
+      expect(getSupportAccessToggle(screen, 'query')).not.toBeInTheDocument()
+    })
+
+    await fillField(getSummaryField(screen), 'Cannot access my account')
+    await fillField(getMessageField(screen), 'I need help accessing my Supabase account')
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    const payload = submitSpy.mock.calls[0]?.[0]
+    expect(payload).toMatchObject({
+      projectRef: NO_PROJECT_MARKER,
+      organizationSlug: 'org-1',
+      allowSupportAccess: false,
+    })
+  }, 10_000)
 
   test('loading a URL with an invalid project slug falls back to first organization and project', async () => {
     mswServer.use(
@@ -1805,6 +1880,9 @@ describe('SupportFormPage', () => {
     await userEvent.click(dashboardLogToggle!)
     expect(dashboardLogToggle).not.toBeChecked()
 
+    // Support access is per-project, so with no project selected the toggle shouldn't be offered
+    expect(getSupportAccessToggle(screen, 'query')).not.toBeInTheDocument()
+
     await fillField(getSummaryField(screen), 'Cannot access my account')
     await fillField(getMessageField(screen), 'I need help accessing my Supabase account')
 
@@ -1822,7 +1900,7 @@ describe('SupportFormPage', () => {
       organizationSlug: NO_ORG_MARKER,
       library: '',
       affectedServices: '',
-      allowSupportAccess: true,
+      allowSupportAccess: false,
       verified: true,
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',
