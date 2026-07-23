@@ -328,8 +328,8 @@ export const connectSchema: ConnectSchema = {
     useSharedPooler: {
       id: 'useSharedPooler',
       type: 'switch',
-      label: 'Use IPv4 connection (Shared Pooler)',
-      description: 'Recommended when your network does not support IPv6',
+      label: 'Use IPv4 connection',
+      description: 'Uses the shared pooler. Recommended on networks that do not support IPv6.',
       defaultValue: false,
       dependsOn: { connectionMethod: ['transaction'] },
     },

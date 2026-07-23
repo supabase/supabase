@@ -26,7 +26,7 @@ export const ConnectSheetStep = ({
       data-step-title={displayTitle}
       data-step-description={description}
     >
-      <div className="flex items-start gap-6 self-stretch">
+      <div className="flex items-start gap-5 self-stretch">
         <div className="relative self-stretch shrink-0 w-6">
           <div className="absolute inset-0 flex items-start justify-center">
             <div
@@ -46,7 +46,7 @@ export const ConnectSheetStep = ({
             Viewport 2xl never applied inside max-w-4xl sheets. */}
         <div className="@container w-full min-w-0">
           <div className="grid grid-cols-1 @[36rem]:grid-cols-5 gap-x-6 gap-y-3 pb-8 w-full">
-            <div className="flex flex-col @[36rem]:col-span-2">
+            <div className="flex flex-col @[36rem]:col-span-2 gap-y-0.5">
               <p className="text-sm font-medium text-foreground">
                 {title}
                 {optional && <span className="font-normal text-foreground-muted"> (optional)</span>}

@@ -15,8 +15,8 @@ export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParameter
 
   return (
     <div className="overflow-hidden rounded-lg border bg-surface-75">
-      <div className="flex items-center justify-between border-b bg-surface-100 px-4 py-2">
-        <span className="font-mono text-xs text-foreground-light">Connection parameters</span>
+      <div className="flex items-center justify-between border-b bg-surface-100 py-2 pl-4 pr-2">
+        <span className="text-xs text-foreground-light">Connection parameters</span>
         <CopyButton
           variant="default"
           size="tiny"
@@ -28,7 +28,10 @@ export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParameter
       </div>
       <div className="divide-y">
         {parameters.map((param) => (
-          <div key={param.key} className="flex items-center gap-x-2 px-4 py-2.5 font-mono text-sm">
+          <div
+            key={param.key}
+            className="flex items-center gap-x-2 py-2.5 pl-4 pr-2 font-mono text-sm"
+          >
             <span className="shrink-0 text-foreground-lighter">{param.key}:</span>
             <span className="flex-1 truncate text-foreground" title={param.value}>
               {param.value}

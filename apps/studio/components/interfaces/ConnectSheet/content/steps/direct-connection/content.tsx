@@ -224,21 +224,36 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const poolerBadge =
     connectionMethod === 'transaction'
       ? useSharedPooler || !hasDedicatedPooler
-        ? 'Shared Pooler'
-        : 'Dedicated Pooler'
+        ? 'Shared pooler'
+        : 'Dedicated pooler'
       : connectionMethod === 'session'
-        ? 'Shared Pooler'
+        ? 'Shared pooler'
         : null
 
   const showPasswordPlaceholder = connectionString.includes(PASSWORD_PLACEHOLDER)
   const showSelfHostedDirectNotice = deploymentMode.isSelfHosted && connectionMethod === 'direct'
+  const showPoolerTitle = deploymentMode.isPlatform && !!poolerBadge && !isHighAvailability
+  const showResetInTitle =
+    deploymentMode.isPlatform && showPasswordPlaceholder && !temporaryDatabasePassword
+  const showStringTitleRow = showPoolerTitle || showResetInTitle
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <div className="overflow-hidden rounded-lg border bg-surface-75">
-        {deploymentMode.isPlatform && poolerBadge && !isHighAvailability && (
-          <div className="flex items-center border-b bg-surface-100 px-4 py-2">
-            <span className="text-xs text-foreground-light">{poolerBadge}</span>
+        {showStringTitleRow && (
+          <div className="flex items-center justify-between gap-2 border-b bg-surface-100 py-2 pl-4 pr-2">
+            {showPoolerTitle ? (
+              <span className="text-xs text-foreground-light">{poolerBadge}</span>
+            ) : (
+              <span />
+            )}
+            {showResetInTitle && (
+              <ResetDbPasswordDialog
+                triggerLabel="Reset database password"
+                triggerIcon={<KeyRound />}
+                onPasswordReset={setTemporaryDatabasePassword}
+              />
+            )}
           </div>
         )}
         <div data-connect-copy-value={redactedConnectionString}>
@@ -257,15 +272,6 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
           <div className="flex items-center gap-2 border-t px-4 py-3 text-sm text-foreground-light">
             <Check size={16} className="text-brand shrink-0" />
             <span>New password shown until refresh.</span>
-          </div>
-        )}
-        {deploymentMode.isPlatform && showPasswordPlaceholder && !temporaryDatabasePassword && (
-          <div className="flex justify-end border-t px-4 py-3">
-            <ResetDbPasswordDialog
-              triggerLabel="Reset database password"
-              triggerIcon={<KeyRound />}
-              onPasswordReset={setTemporaryDatabasePassword}
-            />
           </div>
         )}
       </div>

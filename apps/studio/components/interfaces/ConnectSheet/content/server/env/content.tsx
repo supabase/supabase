@@ -17,7 +17,7 @@ function ServerEnvContent() {
   return (
     <div className="flex flex-col gap-y-2">
       <div className="overflow-hidden rounded-lg border bg-surface-75">
-        <div className="flex items-center justify-between border-b bg-surface-100 px-4 py-2">
+        <div className="flex items-center justify-between border-b bg-surface-100 py-2 pl-4 pr-2">
           <span className="font-mono text-xs text-foreground-light">.env</span>
           <CopyButton
             variant="default"

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
-import { InlineLink } from '@/components/ui/inlineLink'
+import { InlineLink } from '@/components/ui/InlineLink'
 
 function getShadcnCommand(state: StepContentProps['state']): string | null {
   if (state.framework === 'nextjs') {
