@@ -30,7 +30,7 @@ const ReplicationDiagramContent = () => {
     resolvedTheme === 'dark' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.4)'
 
   return (
-    <div className="nowheel relative min-h-[350px]">
+    <div className="nowheel relative min-h-[350px] border-y">
       <ReactFlow
         // FIXME: https://github.com/xyflow/xyflow/issues/4876
         colorMode={'' as unknown as ColorMode}
