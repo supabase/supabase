@@ -131,12 +131,17 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={onClose}>
+      <Sheet
+        open={visible}
+        onOpenChange={(open) => {
+          if (!open) onClose()
+        }}
+      >
         <SheetContent size="lg" showClose={false}>
           <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
               <div>
-                <SheetTitle>{editMode ? 'Edit destination' : 'Add new destination'}</SheetTitle>
+                <SheetTitle>{editMode ? 'Edit destination' : 'Add destination'}</SheetTitle>
                 <SheetDescription>
                   {editMode
                     ? 'Update the configuration for this destination.'

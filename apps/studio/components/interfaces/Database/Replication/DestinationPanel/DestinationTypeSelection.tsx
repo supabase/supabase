@@ -1,6 +1,7 @@
 import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
 import { Snowflake } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import type { ElementType } from 'react'
 import {
   Badge,
   Select,
@@ -29,7 +30,7 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  icon: typeof Database
+  icon: ElementType<{ size?: number; className?: string; strokeWidth?: number }>
   stage: 'Public Alpha' | 'Early Access' | 'Deprecated' | null
   enabled: boolean
 }
@@ -37,6 +38,19 @@ interface DestinationTypeOption {
 interface DestinationTypeGroup {
   label: string
   options: DestinationTypeOption[]
+}
+
+const LUCIDE_DESTINATION_TYPES = new Set<DestinationType>(['Snowflake'])
+
+function DestinationOptionIcon({ option }: { option: DestinationTypeOption }) {
+  const Icon = option.icon
+  const className = 'shrink-0 text-foreground-light'
+
+  if (LUCIDE_DESTINATION_TYPES.has(option.value)) {
+    return <Icon size={20} strokeWidth={1.5} className={className} />
+  }
+
+  return <Icon size={20} className={className} />
 }
 
 export const DestinationTypeSelection = () => {
@@ -191,7 +205,7 @@ export const DestinationTypeSelection = () => {
         <SelectTrigger className="h-auto py-2">
           {selectedOption ? (
             <div className="flex items-center gap-x-3 text-left">
-              <selectedOption.icon size={20} className="shrink-0 text-foreground-light" />
+              <DestinationOptionIcon option={selectedOption} />
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
                 {selectedOption.stage && (
@@ -221,7 +235,7 @@ export const DestinationTypeSelection = () => {
               {group.options.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="py-2">
                   <div className="flex items-center gap-x-3">
-                    <option.icon size={20} className="shrink-0 text-foreground-light" />
+                    <DestinationOptionIcon option={option} />
                     <div className="flex flex-col gap-y-0.5">
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>
