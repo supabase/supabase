@@ -37,6 +37,7 @@
     "e2e:ui": "pnpm --prefix e2e/studio run e2e:ui",
     "e2e:docs": "pnpm --prefix e2e/docs run e2e:docs",
     "e2e:docs:ui": "pnpm --prefix e2e/docs run e2e:ui",
+    "e2e:docs:local-smoke": "pnpm --prefix e2e/docs run e2e:docs:local-smoke",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
