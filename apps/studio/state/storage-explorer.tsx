@@ -1776,6 +1776,7 @@ function createStorageExplorerState({
 
     onUploadProgress: (toastId?: string | number) => {
       const totalFiles = state.uploadProgresses.length
+      if (totalFiles === 0) return
       const progress =
         (state.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles) *
         100
