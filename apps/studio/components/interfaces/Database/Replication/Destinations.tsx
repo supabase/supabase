@@ -225,74 +225,70 @@ export const Destinations = () => {
   }, [isDatabasesSuccess, readReplicas])
 
   return (
-    <>
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Input
-              ref={searchInputRef}
-              placeholder="Filter destinations"
-              size="tiny"
-              icon={<Search />}
-              value={filterString}
-              className="w-full lg:w-52"
-              onChange={(e) => setFilterString(e.target.value)}
-              actions={
-                filterString.length > 0 && (
-                  <Button
-                    aria-label="Clear filter"
-                    variant="text"
-                    icon={<X />}
-                    className="p-0 h-5 w-5"
-                    onClick={() => setFilterString('')}
-                  />
-                )
-              }
-            />
-          </div>
-          <div className="flex items-center gap-x-2">
-            {hasDestinations && organization?.slug && (
-              <Button asChild variant="default" icon={<ChartArea />}>
-                <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>
-                  Usage
-                </Link>
-              </Button>
-            )}
-            <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-            {canDisablePipelines && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    aria-label="More actions"
-                    variant="default"
-                    icon={<MoreVertical />}
-                    className="w-7"
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>
-                    Disable Pipelines
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <Shortcut
-              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-              label="Add destination"
-              onTrigger={openDestinationPanel}
-              options={{ enabled: !!newDestinationDefaultType }}
-              side="bottom"
+    <div className="w-full space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Input
+            ref={searchInputRef}
+            placeholder="Filter destinations"
+            size="tiny"
+            icon={<Search />}
+            value={filterString}
+            className="w-full lg:w-52"
+            onChange={(e) => setFilterString(e.target.value)}
+            actions={
+              filterString.length > 0 && (
+                <Button
+                  aria-label="Clear filter"
+                  variant="text"
+                  icon={<X />}
+                  className="p-0 h-5 w-5"
+                  onClick={() => setFilterString('')}
+                />
+              )
+            }
+          />
+        </div>
+        <div className="flex items-center gap-x-2">
+          {hasDestinations && organization?.slug && (
+            <Button asChild variant="default" icon={<ChartArea />}>
+              <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>Usage</Link>
+            </Button>
+          )}
+          <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+          {canDisablePipelines && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  aria-label="More actions"
+                  variant="default"
+                  icon={<MoreVertical />}
+                  className="w-7"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>
+                  Disable Pipelines
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+            label="Add destination"
+            onTrigger={openDestinationPanel}
+            options={{ enabled: !!newDestinationDefaultType }}
+            side="bottom"
+          >
+            <Button
+              variant="primary"
+              icon={<Plus />}
+              disabled={!newDestinationDefaultType}
+              onClick={openDestinationPanel}
             >
-              <Button
-                variant="primary"
-                icon={<Plus />}
-                disabled={!newDestinationDefaultType}
-                onClick={openDestinationPanel}
-              >
-                Add destination
-              </Button>
-            </Shortcut>
-          </div>
+              Add destination
+            </Button>
+          </Shortcut>
         </div>
       </div>
 
@@ -364,7 +360,7 @@ export const Destinations = () => {
             <EmptyStatePresentational
               icon={Database}
               title="Add a replication destination"
-              description="Deploy a Read Replica for lower latency and workload isolation, or connect a Pipelines destination for analytics workloads."
+              description="Deploy a read replica for lower latency and workload isolation, or connect a Pipelines destination for analytics workloads."
             >
               <Button
                 variant="default"
@@ -385,6 +381,6 @@ export const Destinations = () => {
         open={showDisablePipelinesDialog}
         setOpen={setShowDisablePipelinesDialog}
       />
-    </>
+    </div>
   )
 }
