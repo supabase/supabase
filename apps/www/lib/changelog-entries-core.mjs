@@ -71,6 +71,42 @@ export async function fetchChangelogEntryFilesFromTarball(
   return files
 }
 
+/**
+ * Public frontmatter keys — the only fields ever exposed to the browser.
+ *
+ * `matter()` parses EVERY YAML key in an entry, including private blocks like
+ * `internal:` (escalation teams, notes, etc.). Because the page passes
+ * `entry.frontmatter` straight into Next.js props, anything left on the object
+ * is serialized into the page's `__NEXT_DATA__` and visible in View Source —
+ * even when it's never rendered. We allowlist rather than denylist so a new
+ * private field added upstream doesn't silently start leaking.
+ *
+ * Keep in sync with `ChangelogEntryFrontmatter` in `changelog-repo.ts`.
+ */
+export const PUBLIC_FRONTMATTER_KEYS = [
+  'title',
+  'change_type',
+  'product_stage',
+  'affected_products',
+  'affects_self_hosted',
+  'version',
+  'public',
+  'publish_date',
+  'sunset_date',
+  'learn_more_url',
+  'rfc_url',
+  'legacy_gh_discussion',
+]
+
+/** Projects raw parsed frontmatter down to the public allowlist, dropping `internal:` and any other private keys. */
+export function toPublicFrontmatter(frontmatter) {
+  const publicFrontmatter = {}
+  for (const key of PUBLIC_FRONTMATTER_KEYS) {
+    if (frontmatter[key] !== undefined) publicFrontmatter[key] = frontmatter[key]
+  }
+  return publicFrontmatter
+}
+
 export function stripInternalBlock(body) {
   let sanitized = body.replace(/<!--\s*internal\s*-->[\s\S]*?<!--\s*\/internal\s*-->/gi, '')
   // MDX doesn't support raw HTML comments (only {/* */}) — strip any that are left
@@ -128,7 +164,8 @@ export function parseChangelogEntryFile(filename, raw) {
   return {
     slug: computeChangelogEntrySlug(filename, frontmatter),
     filename,
-    frontmatter,
+    // Allowlisted so private frontmatter (e.g. `internal:`) never reaches the client.
+    frontmatter: toPublicFrontmatter(frontmatter),
     sortDate: frontmatter.publish_date ?? resolveDateFromFilename(filename) ?? '',
     summary: extractSection(publicBody, 'Summary'),
     bodySection: extractSection(publicBody, 'Body', ['Migration steps']),
