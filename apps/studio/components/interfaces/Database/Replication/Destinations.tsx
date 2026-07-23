@@ -50,6 +50,7 @@ import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -236,6 +237,7 @@ export const Destinations = () => {
             value={filterString}
             className="w-full lg:w-52"
             onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             actions={
               filterString.length > 0 && (
                 <Button

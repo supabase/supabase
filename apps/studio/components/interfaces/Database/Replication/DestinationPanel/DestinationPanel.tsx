@@ -96,7 +96,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   }
 
   const docsUrl =
-    urlDestinationType === 'BigQuery'
+    destinationType === 'BigQuery'
       ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
       : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
 
@@ -117,7 +117,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   const pipelinesTypeSelection = (
     <>
       {typeSelection}
-      {isLocalETLNotSetUp && (
+      {destinationType != null && isLocalETLNotSetUp && (
         <SheetSection className="pb-0!">
           <Admonition
             type="warning"
@@ -148,7 +148,10 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                     : 'Add a read replica or an external destination.'}
                 </SheetDescription>
               </div>
-              <DocsButton href={docsUrl} topic={`${urlDestinationType} pipeline settings`} />
+              <DocsButton
+                href={docsUrl}
+                topic={`${destinationType ?? 'destination'} pipeline settings`}
+              />
             </SheetHeader>
 
             {destinationType === 'Read Replica' ? (
