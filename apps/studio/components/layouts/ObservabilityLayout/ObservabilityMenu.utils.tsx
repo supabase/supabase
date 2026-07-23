@@ -48,6 +48,7 @@ export const useGenerateObservabilityMenu = () => {
 
   const showOverview = useFlag('observabilityOverview')
   const topForPostgres = useFlag('topForPostgres')
+  const userActivity = useFlag('UserActivity')
   const { isSupamonitorEnabled } = useSupamonitorStatus()
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
@@ -64,11 +65,15 @@ export const useGenerateObservabilityMenu = () => {
           },
         ]
       : []),
-    {
-      name: 'User Activity',
-      key: 'user-activity',
-      url: `${baseUrl}/user-activity${preservedQueryParams}`,
-    },
+    ...(userActivity
+      ? [
+          {
+            name: 'User Activity',
+            key: 'user-activity',
+            url: `${baseUrl}/user-activity${preservedQueryParams}`,
+          },
+        ]
+      : []),
     ...(isSupamonitorEnabled
       ? [
           {
