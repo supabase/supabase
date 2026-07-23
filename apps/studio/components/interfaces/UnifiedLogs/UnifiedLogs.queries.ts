@@ -350,7 +350,7 @@ const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFrag
   )`
 }
 
-const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_SOURCE.postgres])
+const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_SOURCE.edge])
 
 /**
  * True when the user filter is active but an explicit log_type filter restricts the
