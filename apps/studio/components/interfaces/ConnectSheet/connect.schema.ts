@@ -172,7 +172,7 @@ const serverInstallStep: StepDefinition = {
   id: 'server-install',
   title: 'Install package',
   description:
-    'Add @supabase/server to your backend or API framework of choice. On Supabase Edge Functions you can import it directly, no install needed.',
+    'Add @supabase/server to your backend. On Edge Functions you can import it directly — no install needed.',
   content: 'server/install',
 }
 
@@ -365,7 +365,7 @@ export const connectSchema: ConnectSchema = {
       id: 'mcpReadonly',
       type: 'switch',
       label: 'Read-only',
-      description: 'Only allows read operations on your database when enabled.',
+      description: 'Only allow read operations on your database.',
       defaultValue: false,
     },
     mcpFeatures: {
