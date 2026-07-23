@@ -94,7 +94,6 @@ export const PUBLIC_FRONTMATTER_KEYS = [
   'publish_date',
   'sunset_date',
   'learn_more_url',
-  'rfc_url',
   'legacy_gh_discussion',
 ]
 
