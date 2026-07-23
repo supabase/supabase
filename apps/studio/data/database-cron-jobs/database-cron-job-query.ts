@@ -30,6 +30,7 @@ export async function getDatabaseCronJob({
     queryKey: ['cron-job', id],
   })
 
+  if (!result.length) throw new Error('Cron job not found')
   return result[0]
 }
 
