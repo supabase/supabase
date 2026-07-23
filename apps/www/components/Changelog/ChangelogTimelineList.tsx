@@ -38,8 +38,8 @@ export function LabelBadges({
           href={changelogTagFilterUrl(label.name)}
           className={
             tiny
-              ? 'inline-flex shrink-0 no-underline focus-visible:ring-brand-default rounded-sm focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:outline-hidden'
-              : 'inline-flex shrink-0 no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden'
+              ? 'inline-flex shrink-0 no-underline focus-ring rounded-sm'
+              : 'inline-flex shrink-0 no-underline focus-ring rounded-md'
           }
           onClick={onBadgeClick}
         >

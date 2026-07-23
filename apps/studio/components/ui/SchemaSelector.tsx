@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
-import { ComponentPropsWithoutRef, forwardRef, useState } from 'react'
+import { ComponentPropsWithoutRef, forwardRef, useMemo, useState } from 'react'
 import {
   Alert,
   AlertDescription,
@@ -22,6 +22,7 @@ import {
 
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
@@ -40,6 +41,8 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   onOpenChange?: (open: boolean) => void
 }
 
+const DEFAULT_EXCLUDED_SCHEMAS: string[] = []
+
 export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
   (
     {
@@ -50,7 +53,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       selectedSchemaName,
       placeholderLabel = 'Choose a schema...',
       supportSelectAll = false,
-      excludedSchemas = [],
+      excludedSchemas = DEFAULT_EXCLUDED_SCHEMAS,
       stopScrollPropagation = false,
       onSelectSchema,
       onSelectCreateSchema,
@@ -86,9 +89,15 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       connectionString: project?.connectionString,
     })
 
-    const schemas = (data || [])
-      .filter((schema) => !excludedSchemas.includes(schema.name))
-      .sort((a, b) => a.name.localeCompare(b.name))
+    const visibleSchemas = useSchemasFilteredForHighAvailability(data)
+
+    const schemas = useMemo(
+      () =>
+        visibleSchemas
+          .filter((schema) => !excludedSchemas.includes(schema.name))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      [visibleSchemas, excludedSchemas]
+    )
 
     return (
       <div ref={ref} className={className} {...rest}>

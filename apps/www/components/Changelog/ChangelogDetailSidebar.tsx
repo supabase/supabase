@@ -57,6 +57,7 @@ export function ChangelogDetailSidebar({ slug, url, labels, className }: Props) 
             View discussion on GitHub
           </a>
           <button
+            tabIndex={0}
             type="button"
             onClick={() => void copyMarkdown(mdPath)}
             className="text-foreground-lighter hover:text-foreground flex items-center gap-1.5 text-left text-xs transition-colors"

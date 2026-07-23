@@ -158,9 +158,12 @@ export const DestinationLogo = ({ icon, name }: { icon?: ReactNode; name: string
   </LogoBox>
 )
 
+/** Fixed light tile chrome for Connect pairs with unclassified (uploaded) marks. */
+export const CONNECT_LOGO_LIGHT_TILE_CLASSNAME = 'border-black/10 bg-white'
+
 /** Supabase symbol (not the wordmark) rendered inset inside a LogoBox. */
-export const SupabaseLogo = () => (
-  <LogoBox className="bg-surface-75">
+export const SupabaseLogo = ({ forceLight = false }: { forceLight?: boolean } = {}) => (
+  <LogoBox className={forceLight ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}>
     <img alt="Supabase" src={`${BASE_PATH}/img/supabase-logo.svg`} className="size-7" />
   </LogoBox>
 )

@@ -23,8 +23,10 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
+import { getColumnFormat } from '@/components/grid/components/grid/ColumnHeader.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { Sort } from '@/components/grid/types'
+import { getColumnType } from '@/components/grid/utils/gridColumns'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -105,13 +107,14 @@ export const SortPopoverPrimitive = ({
     })
   }, [snap?.table?.columns, localSorts])
 
-  // Format the columns for the dropdown
+  // Prefer display labels that match column headers (format, with arrays as int4[]).
+  // Avoid raw dataType, which is "USER-DEFINED" for extension types like geography.
   const dropdownOptions = useMemo(() => {
     return (
       columns?.map((x) => ({
         value: x.name,
         label: x.name,
-        postLabel: x.dataType,
+        postLabel: getColumnFormat(getColumnType(x), x.format),
         disabled: x.dataType === 'json' || x.dataType === 'jsonb',
         tooltip:
           x.dataType === 'json' || x.dataType === 'jsonb'

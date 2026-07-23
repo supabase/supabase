@@ -291,7 +291,12 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   {CHANGELOG_PRODUCT_TAGS.map(({ slug, label }) => {
                     const on = selectedTags.has(slug)
                     return (
-                      <button key={slug} type="button" onClick={() => toggleProductTag(slug)}>
+                      <button
+                        tabIndex={0}
+                        key={slug}
+                        type="button"
+                        onClick={() => toggleProductTag(slug)}
+                      >
                         <Badge
                           variant={on ? 'success' : 'default'}
                           className={cn(!on && 'hover:text-foreground')}
@@ -379,7 +384,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                                 <a
                                   key={`${entry.number}-${label.name}`}
                                   href={changelogTagFilterUrl(label.name)}
-                                  className="group inline-flex no-underline focus-visible:ring-brand-default rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden"
+                                  className="group inline-flex no-underline focus-ring rounded-md"
                                 >
                                   <Badge className="group-hover:text-foreground-light text-foreground-lighter group-hover:border-foreground-muted px-1.5 py-px text-[11px] tracking-normal lowercase">
                                     {changelogLabelDisplayName(label.name)}

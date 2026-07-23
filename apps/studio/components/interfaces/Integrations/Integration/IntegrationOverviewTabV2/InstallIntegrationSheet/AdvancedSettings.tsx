@@ -1,4 +1,4 @@
-import { type Dispatch, type SetStateAction } from 'react'
+import { useMemo, type Dispatch, type SetStateAction } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +21,7 @@ import { type ExtensionsSchema, type InstallIntegrationSheetProps } from './Inst
 import { extensionsWithRecommendedSchemas } from '@/components/interfaces/Database/Extensions/Extensions.constants'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
@@ -48,8 +49,14 @@ export const AdvancedSettings = ({
     { projectRef: project?.ref, connectionString: project?.connectionString },
     { enabled: involvesExtensions }
   )
-  const availableSchemas = schemas.filter(
-    (schema) => !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
+  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
+  const availableSchemas = useMemo(
+    () =>
+      visibleSchemas.filter(
+        (schema) =>
+          !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
+      ),
+    [visibleSchemas, protectedSchemas]
   )
 
   return (

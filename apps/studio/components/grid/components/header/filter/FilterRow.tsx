@@ -4,7 +4,9 @@ import { Button, Input } from 'ui'
 
 import { FilterOperatorOptions } from './Filter.constants'
 import { DropdownControl } from '@/components/grid/components/common/DropdownControl'
+import { getColumnFormat } from '@/components/grid/components/grid/ColumnHeader.utils'
 import type { Filter, FilterOperator } from '@/components/grid/types'
+import { getColumnType } from '@/components/grid/utils/gridColumns'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterRowProps {
@@ -18,9 +20,15 @@ export interface FilterRowProps {
 const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
   const snap = useTableEditorTableStateSnapshot()
   const column = snap.table.columns.find((x) => x.name === filter.column)
+  // Prefer display labels that match column headers (format, with arrays as int4[]).
+  // Avoid raw dataType, which is "USER-DEFINED" for extension types like geography.
   const columnOptions =
     snap.table.columns?.map((x) => {
-      return { value: x.name, label: x.name, postLabel: x.dataType }
+      return {
+        value: x.name,
+        label: x.name,
+        postLabel: getColumnFormat(getColumnType(x), x.format),
+      }
     }) || []
 
   const placeholder =
