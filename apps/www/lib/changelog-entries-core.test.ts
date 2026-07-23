@@ -56,16 +56,18 @@ describe('toPublicFrontmatter', () => {
 describe('parseChangelogEntryFile', () => {
   it('never exposes the internal block on the parsed entry frontmatter', () => {
     const entry = parseChangelogEntryFile('20260101-pipelines.md', ENTRY_WITH_INTERNAL)
+    // The .mjs source has no type declarations, so `frontmatter` is inferred as {}.
+    const frontmatter = entry.frontmatter as Record<string, unknown>
 
-    expect(entry.frontmatter.internal).toBeUndefined()
-    expect(entry.frontmatter.reviewers).toBeUndefined()
-    expect(JSON.stringify(entry.frontmatter)).not.toContain('team-etl')
-    expect(JSON.stringify(entry.frontmatter)).not.toContain('escalation_teams')
+    expect(frontmatter.internal).toBeUndefined()
+    expect(frontmatter.reviewers).toBeUndefined()
+    expect(JSON.stringify(frontmatter)).not.toContain('team-etl')
+    expect(JSON.stringify(frontmatter)).not.toContain('escalation_teams')
 
     // Public fields still flow through untouched.
-    expect(entry.frontmatter.title).toBe('Supabase Pipelines')
-    expect(entry.frontmatter.change_type).toBe('new-feature')
-    expect(entry.frontmatter.public).toBe(true)
-    expect(entry.frontmatter.affected_products).toEqual(['pipelines'])
+    expect(frontmatter.title).toBe('Supabase Pipelines')
+    expect(frontmatter.change_type).toBe('new-feature')
+    expect(frontmatter.public).toBe(true)
+    expect(frontmatter.affected_products).toEqual(['pipelines'])
   })
 })
