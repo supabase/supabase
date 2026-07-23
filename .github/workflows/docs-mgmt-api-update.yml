@@ -27,7 +27,6 @@ jobs:
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
         with:
-          version: 9
           run_install: false
 
       - name: Use Node.js
@@ -38,6 +37,12 @@ jobs:
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
+
+      - name: Debug pnpm env
+        run: |
+          echo "NODE_ENV=$NODE_ENV"
+          pnpm config list
+          ls apps/docs/node_modules/.bin/ | grep redocly || echo "redocly bin missing"
 
       - name: Change to apps/docs/spec directory and run make command
         working-directory: apps/docs/spec
