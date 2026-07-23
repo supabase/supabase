@@ -61,6 +61,7 @@ function AiTools({ className }: { className?: string }) {
       </h3>
       <div className="flex flex-col gap-2">
         <button
+          tabIndex={0}
           onClick={copyMarkdown}
           className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >

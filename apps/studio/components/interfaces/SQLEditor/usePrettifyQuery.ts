@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 
-import { getEditorSql } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
@@ -14,7 +13,7 @@ import {
  * the formatted SQL back to the snippet store. No-op while a diff is open.
  */
 export function usePrettifyQuery({ id, isDiffOpen }: { id: string; isDiffOpen: boolean }) {
-  const { editorRef } = useSQLEditorContext()
+  const { editor } = useSQLEditorContext()
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
@@ -25,21 +24,13 @@ export function usePrettifyQuery({ id, isDiffOpen }: { id: string; isDiffOpen: b
     const state = getSqlEditorV2StateSnapshot()
     const snippet = state.snippets[id]
 
-    if (editorRef.current && project) {
-      const editor = editorRef.current
-      const sql = getEditorSql(editor, snippet?.snippet.content?.unchecked_sql)
-      const formattedSql = formatSql(sql)
+    if (editor.isReady() && project) {
+      const sql = editor.getSql(snippet?.snippet.content?.unchecked_sql)
+      if (sql === undefined) return
 
-      const editorModel = editorRef?.current?.getModel()
-      if (editorRef.current && editorModel) {
-        editorRef.current.executeEdits('apply-prettify-edit', [
-          {
-            text: formattedSql,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
-        snapV2.setSql({ id, sql: formattedSql })
-      }
+      const formattedSql = formatSql(sql)
+      editor.replaceAll(formattedSql, 'apply-prettify-edit')
+      snapV2.setSql({ id, sql: formattedSql })
     }
-  }, [editorRef, id, isDiffOpen, project, snapV2])
+  }, [editor, id, isDiffOpen, project, snapV2])
 }

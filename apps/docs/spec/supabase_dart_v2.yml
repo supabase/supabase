@@ -886,6 +886,60 @@ functions:
             providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92',
           );
           ```
+  - id: sign-in-with-web3
+    title: 'signInWithWeb3()'
+    description: |
+      Signs in a user by verifying a message signed with their Web3 wallet.
+    notes: |
+      - Supports Ethereum (Sign-In with Ethereum) and Solana (Sign-In with Solana), both of which derive from the [EIP-4361](https://eips.ethereum.org/EIPS/eip-4361) standard.
+      - Handle the wallet interaction and message signing yourself with the wallet library of your choice, then provide the signed `message` together with its `signature`.
+      - For `Web3Chain.ethereum` the signature is a hex encoded string. For `Web3Chain.solana` it is a base64url encoded string.
+      - On success, it signs the user in and returns a session. On failure, it throws an `AuthException`.
+    params:
+      - name: chain
+        isOptional: false
+        type: Web3Chain
+        description: The blockchain used to sign in. One of `Web3Chain.ethereum` or `Web3Chain.solana`.
+      - name: message
+        isOptional: false
+        type: String
+        description: The EIP-4361 message that was signed by the user's wallet.
+      - name: signature
+        isOptional: false
+        type: String
+        description: The signature produced by the wallet. Hex encoded for Ethereum, base64url encoded for Solana.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The verification token received when the user completes the captcha on the app.
+    examples:
+      - id: sign-in-with-ethereum
+        name: Sign in with an Ethereum wallet
+        isSpotlight: true
+        description: |
+          Sign the EIP-4361 message with the user's Ethereum wallet, then pass the message and its hex encoded signature.
+        code: |
+          ```dart
+          final response = await supabase.auth.signInWithWeb3(
+            chain: Web3Chain.ethereum,
+            message: message, // The EIP-4361 message signed by the wallet.
+            signature: signature, // Hex encoded signature.
+          );
+          final session = response.session;
+          ```
+      - id: sign-in-with-solana
+        name: Sign in with a Solana wallet
+        description: |
+          Sign the message with the user's Solana wallet, then pass the message and its base64url encoded signature.
+        code: |
+          ```dart
+          final response = await supabase.auth.signInWithWeb3(
+            chain: Web3Chain.solana,
+            message: message, // The message signed by the wallet.
+            signature: signature, // base64url encoded signature.
+          );
+          final session = response.session;
+          ```
   - id: sign-in-with-passkey
     title: 'signInWithPasskey()'
     notes: |
@@ -935,6 +989,10 @@ functions:
         isOptional: false
         type: PasskeyAuthenticatorInterface
         description: Performs the platform passkey ceremony (FaceID/TouchID/security key). For example, a `PasskeyAuthenticator` from the `passkeys` package.
+      - name: friendlyName
+        isOptional: true
+        type: String
+        description: Human readable name for the passkey. Used as a fallback for the WebAuthn `user.name`/`displayName` when the server omits them, and stored as the passkey's friendly name. Defaults to `Passkey` when not provided.
     examples:
       - id: register-passkey
         name: Register a passkey for the current user
@@ -945,7 +1003,10 @@ functions:
 
           final authenticator = PasskeyAuthenticator();
 
-          final Passkey passkey = await supabase.auth.registerPasskey(authenticator);
+          final Passkey passkey = await supabase.auth.registerPasskey(
+            authenticator,
+            friendlyName: 'Work laptop',
+          );
           ```
   - id: sign-out
     title: 'signOut()'
@@ -1108,6 +1169,9 @@ functions:
     title: 'currentSession'
     description: |
       Returns the session data, if there is an active session.
+    notes: |
+      - `currentSession` is a synchronous getter that returns whatever session is stored, even one whose access token has already expired.
+      - `getSession()` is an asynchronous alternative that guarantees a valid access token when it resolves: a still-valid session is returned as-is, while an expired one is refreshed on demand first. It returns `null` when there is no session and throws an `AuthException` when an expired session cannot be refreshed.
     examples:
       - id: get-the-session-data
         name: Get the session data
@@ -1157,6 +1221,14 @@ functions:
               updatedAt: '2024-01-01T00:00:00Z',
             ),
           );
+          ```
+      - id: get-the-session-data-async
+        name: Get the session data, refreshing if needed
+        description: |
+          Use the asynchronous `getSession()` to get a session whose access token is guaranteed to be valid, refreshing it on demand when it has expired.
+        code: |
+          ```dart
+          final session = await supabase.auth.getSession();
           ```
   - id: get-user
     title: 'currentUser'
@@ -1239,6 +1311,10 @@ functions:
             isOptional: true
             type: String
             description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: currentPassword
+            isOptional: true
+            type: String
+            description: The user's current password. Serialized as `current_password`. Required when changing the password and the auth server enforces the current password on password changes.
       - name: emailRedirectTo
         isOptional: true
         type: String
@@ -1303,6 +1379,21 @@ functions:
           final UserResponse res = await supabase.auth.updateUser(
             UserAttributes(
               password: 'new password',
+            ),
+          );
+          final User? updatedUser = res.user;
+          ```
+      - id: update-the-password-with-current-password
+        name: Update the password with the current password
+        description: |
+          When the auth server is configured to require the current password on password changes, pass it in `currentPassword`. It is serialized as `current_password` and used to verify the change.
+        isSpotlight: false
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.updateUser(
+            UserAttributes(
+              password: 'new password',
+              currentPassword: 'current password',
             ),
           );
           final User? updatedUser = res.user;
@@ -1941,6 +2032,10 @@ functions:
         isOptional: false
         type: String
         description: System assigned identifier for authenticator device as returned by enroll
+      - name: channel
+        isOptional: true
+        type: OtpChannel
+        description: Messaging channel to use for phone factors (e.g. `OtpChannel.whatsapp` or `OtpChannel.sms`). Defaults to the server's behavior (SMS) when omitted. Ignored for TOTP factors.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -1956,6 +2051,17 @@ functions:
           AuthMFAChallengeResponse(
             id: '<ID>',
             expiresAt: DateTime.fromMillisecondsSinceEpoch(1700000000),
+          );
+          ```
+      - id: create-mfa-challenge-with-channel
+        name: Create a challenge for a phone factor over WhatsApp
+        description: |
+          For phone factors you can choose the messaging channel used to deliver the verification code.
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.challenge(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            channel: OtpChannel.whatsapp,
           );
           ```
   - id: mfa-verify
@@ -2251,6 +2357,12 @@ functions:
       Starts the registration of a new passkey for the signed in user.
       - Requires a signed in (non-anonymous) user.
       - Pass the returned `options` to the platform's passkey API to create the credential, then call [`passkey.verifyRegistration()`](/docs/reference/dart/auth-passkey-verifyregistration) with the result.
+      - When the server omits `user.name`/`displayName` in the registration options, they are backfilled with `friendlyName` (or a generic `Passkey` default) before the platform ceremony.
+    params:
+      - name: friendlyName
+        isOptional: true
+        type: String
+        description: Human readable name used as a fallback for the WebAuthn `user.name`/`displayName` when the server omits them. Defaults to `Passkey` when not provided.
     examples:
       - id: start-passkey-registration
         name: Start a passkey registration
@@ -2258,7 +2370,9 @@ functions:
         code: |
           ```dart
           final PasskeyRegistrationOptionsResponse registration =
-              await supabase.auth.passkey.startRegistration();
+              await supabase.auth.passkey.startRegistration(
+            friendlyName: 'Work laptop',
+          );
 
           // Hand registration.options to the platform passkey API.
           ```
@@ -2409,6 +2523,41 @@ functions:
           final consent =
               await supabase.auth.oauth.denyAuthorization(authorizationId);
           // Redirect the user to consent.redirectUrl
+          ```
+  - id: oauth-list-grants
+    title: 'oauth.listGrants()'
+    description: |
+      Lists the OAuth grants the signed-in user has issued to third-party OAuth clients.
+    notes: |
+      - Requires an authenticated user. Returns the grants issued by the current user.
+    examples:
+      - id: list-oauth-grants
+        name: List OAuth grants
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<OAuthGrant> grants = await supabase.auth.oauth.listGrants();
+
+          for (final grant in grants) {
+            print('${grant.client.clientId}: ${grant.scopes}');
+          }
+          ```
+  - id: oauth-revoke-grant
+    title: 'oauth.revokeGrant()'
+    description: |
+      Revokes a grant the signed-in user previously issued to a third-party OAuth client.
+    params:
+      - name: clientId
+        isOptional: false
+        type: String
+        description: The identifier of the OAuth client whose grant should be revoked.
+    examples:
+      - id: revoke-oauth-grant
+        name: Revoke an OAuth grant
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.oauth.revokeGrant('client-id');
           ```
   - id: admin-api
     title: 'Overview'
@@ -3104,6 +3253,10 @@ functions:
         isOptional: true
         type: HttpMethod
         description: HTTP method of the request. Defaults to POST.
+      - name: abortSignal
+        isOptional: true
+        type: Future<void>
+        description: Cancels the in-flight request when the provided `Future` completes. It must not complete with an error. On abort, an `http.RequestAbortedException` (from `package:http`) is thrown. Useful for cancelling a request in response to an event or for setting a request timeout.
     examples:
       - id: basic-invocation
         name: Basic invocation.
@@ -3127,6 +3280,25 @@ functions:
               'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}'
             },
           );
+          ```
+      - id: aborting-a-request
+        name: Aborting a request
+        description: |
+          Pass an `abortSignal` to cancel the in-flight request. When the `Future` completes the request is aborted and an `http.RequestAbortedException` (from `package:http`) is thrown. A `Future.delayed` gives you a per-invocation timeout.
+        code: |
+          ```dart
+          import 'package:http/http.dart' as http;
+
+          try {
+            final res = await supabase.functions.invoke(
+              'hello',
+              body: {'foo': 'baa'},
+              abortSignal: Future.delayed(const Duration(seconds: 5)),
+            );
+            final data = res.data;
+          } on http.RequestAbortedException catch (error) {
+            print('Request was aborted: $error');
+          }
           ```
   - id: database-api
     title: 'Database'
@@ -4496,14 +4668,6 @@ functions:
     subcategory: File Buckets
     notes: |
       This section contains methods for working with File Buckets.
-  # - id: analytics-buckets
-  #   title: 'Overview'
-  #   notes: |
-  #     This section contains methods for working with Analytics Buckets.
-  # - id: vector-buckets
-  #   title: 'Overview'
-  #   notes: |
-  #     This section contains methods for working with Vector Buckets.
 
   - id: list-buckets
     description: |
@@ -4514,6 +4678,32 @@ functions:
         - `buckets` permissions: `select`
         - `objects` permissions: none
       - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: options
+        isOptional: true
+        type: ListBucketsOptions
+        description: Optionally filter, sort and paginate the returned buckets. Calling `listBuckets()` without any options returns all buckets.
+        subContent:
+          - name: limit
+            isOptional: true
+            type: int
+            description: The maximum number of buckets to return.
+          - name: offset
+            isOptional: true
+            type: int
+            description: The number of buckets to skip.
+          - name: search
+            isOptional: true
+            type: String
+            description: A search term used to filter buckets by name.
+          - name: sortColumn
+            isOptional: true
+            type: BucketSortColumn
+            description: The column to sort the buckets by. One of `BucketSortColumn.id`, `BucketSortColumn.name`, `BucketSortColumn.createdAt` or `BucketSortColumn.updatedAt`.
+          - name: sortOrder
+            isOptional: true
+            type: BucketSortOrder
+            description: The direction to sort the buckets in. Either `BucketSortOrder.ascending` or `BucketSortOrder.descending`.
     examples:
       - id: list-buckets
         name: List buckets
@@ -4540,6 +4730,22 @@ functions:
               updated_at: '2024-05-22T22:26:05.100Z'
             ),
           ]
+          ```
+      - id: list-buckets-with-options
+        name: With filter, sort and pagination
+        code: |
+          ```dart
+          final List<Bucket> buckets = await supabase
+            .storage
+            .listBuckets(
+              const ListBucketsOptions(
+                limit: 10,
+                offset: 0,
+                search: 'avatar',
+                sortColumn: BucketSortColumn.createdAt,
+                sortOrder: BucketSortOrder.descending,
+              ),
+            );
           ```
 
   - id: get-bucket
@@ -4728,6 +4934,37 @@ functions:
         response: |
           ```json
           'Successfully deleted'
+          ```
+
+  - id: purge-bucket-cache
+    description: |
+      Invalidates the CDN cache for every object in a bucket.
+    title: 'purgeBucketCache()'
+    notes: |
+      - Requires the `secret` key and the `purgeCache` feature enabled for your project on the storage server.
+      - When `transformations` is `true`, only the resized/formatted variants are purged, leaving the original cached objects intact. Otherwise the bucket's object cache is purged.
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The unique identifier of the bucket whose CDN cache should be purged.
+      - name: transformations
+        isOptional: true
+        type: bool
+        description: When true, only the transformed (resized/formatted) variants are purged, leaving the original cached objects intact. Defaults to false.
+    examples:
+      - id: purge-bucket-cache
+        name: Purge the CDN cache for a bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final String res = await supabase
+            .storage
+            .purgeBucketCache('avatars');
           ```
 
   - id: from-upload
@@ -4936,6 +5173,10 @@ functions:
         isOptional: true
         type: DownloadBehavior
         description: Triggers the file to be downloaded rather than opened in the browser. Use `DownloadBehavior.withOriginalName` to keep the original file name or `DownloadBehavior.named('custom.png')` to override it.
+      - name: cacheNonce
+        isOptional: true
+        type: String
+        description: Appends a `cacheNonce` query parameter to the signed URL to bypass CDN caching for a specific file version.
       - name: transform
         isOptional: true
         type: TransformOptions
@@ -5005,6 +5246,19 @@ functions:
               download: DownloadBehavior.withOriginalName,
             );
           ```
+      - id: create-signed-url-with-cache-nonce
+        name: Bypass the CDN cache
+        code: |
+          ```dart
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl(
+              'avatar1.png',
+              60,
+              cacheNonce: 'v2',
+            );
+          ```
 
   - id: from-create-signed-upload-url
     description: |
@@ -5067,6 +5321,10 @@ functions:
         isOptional: true
         type: DownloadBehavior
         description: Triggers the file to be downloaded rather than opened in the browser. Use `DownloadBehavior.withOriginalName` to keep the original file name or `DownloadBehavior.named('custom.png')` to override it.
+      - name: cacheNonce
+        isOptional: true
+        type: String
+        description: Appends a `cacheNonce` query parameter to the URL to bypass CDN caching for a specific file version.
       - name: transform
         isOptional: true
         type: TransformOptions
@@ -5139,6 +5397,22 @@ functions:
               download: DownloadBehavior.withOriginalName,
             );
           ```
+      - id: returns-the-url-for-an-asset-with-cache-nonce
+        name: Bypass the CDN cache
+        code: |
+          ```dart
+          final String publicUrl = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl(
+              'avatar1.png',
+              cacheNonce: 'v2',
+            );
+          ```
+        response: |
+          ```json
+          'https://example.supabase.co/storage/v1/object/public/public-bucket/avatar1.png?cacheNonce=v2'
+          ```
 
   - id: from-download
     description: |
@@ -5154,6 +5428,10 @@ functions:
         isOptional: false
         type: String
         description: The full path and file name of the file to be downloaded. For example folder/image.png.
+      - name: cacheNonce
+        isOptional: true
+        type: String
+        description: Adds a `cacheNonce` query parameter to bypass CDN caching for a specific file version.
       - name: transform
         isOptional: true
         type: TransformOptions
@@ -5213,6 +5491,124 @@ functions:
         response: |
           ```json
           <Blob>
+          ```
+      - id: download-file-with-cache-nonce
+        name: Bypass the CDN cache
+        code: |
+          ```dart
+          final Uint8List file = await supabase
+            .storage
+            .from('avatars')
+            .download(
+              'avatar1.png',
+              cacheNonce: 'v2',
+            );
+          ```
+        response: |
+          ```json
+          <Blob>
+          ```
+
+  - id: from-download-stream
+    description: |
+      Downloads a file as a lazy `Stream<Uint8List>`, streaming the bytes instead of buffering the whole file into memory like `download()`.
+    title: 'from.downloadStream()'
+    notes: |
+      - The request is sent when the stream is listened to. A non-success response surfaces as a `StorageException` on the stream before any bytes are emitted.
+      - Prefer this over [`download()`](/docs/reference/dart/storage-from-download) for large files to keep memory usage low.
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The full path and file name of the file to be downloaded. For example folder/image.png.
+      - name: cacheNonce
+        isOptional: true
+        type: String
+        description: Adds a `cacheNonce` query parameter to bypass CDN caching for a specific file version.
+      - name: transform
+        isOptional: true
+        type: TransformOptions
+        description: Transform the asset before serving it to the client.
+        subContent:
+          - name: width
+            isOptional: true
+            type: int
+            description: The width of the image in pixels.
+          - name: height
+            isOptional: true
+            type: int
+            description: The height of the image in pixels.
+          - name: resize
+            isOptional: true
+            type: ResizeMode
+            description: Specifies how image cropping should be handled when performing image transformations. Defaults to `ResizeMode.cover`.
+          - name: quality
+            isOptional: true
+            type: int
+            description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80
+          - name: format
+            isOptional: true
+            type: RequestImageFormat
+            description: Specify the format of the image requested. When using 'origin' we force the format to be the same as the original image. When this option is not passed in, images are optimized to modern image formats like Webp.
+    examples:
+      - id: download-file-as-stream
+        name: Download a file as a stream
+        isSpotlight: true
+        code: |
+          ```dart
+          final Stream<Uint8List> stream = supabase
+            .storage
+            .from('avatars')
+            .downloadStream('avatar1.png');
+
+          await for (final chunk in stream) {
+            // Handle each chunk of bytes as it arrives
+          }
+          ```
+
+  - id: from-purge-cache
+    description: |
+      Invalidates the CDN cache for a single object in a bucket.
+    title: 'from.purgeCache()'
+    notes: |
+      - Requires the `secret` key and the `purgeCache` feature enabled for your project on the storage server.
+      - When `transformations` is `true`, only the resized/formatted variants are purged, leaving the original cached object intact. Otherwise the object's cache is purged.
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path and name of the object to purge from the CDN cache. For example folder/image.png.
+      - name: transformations
+        isOptional: true
+        type: bool
+        description: When true, only the transformed (resized/formatted) variants are purged, leaving the original cached object intact. Defaults to false.
+    examples:
+      - id: purge-object-cache
+        name: Purge the CDN cache for an object
+        isSpotlight: true
+        code: |
+          ```dart
+          final String res = await supabase
+            .storage
+            .from('avatars')
+            .purgeCache('avatar1.png');
+          ```
+      - id: purge-object-transformations-cache
+        name: Purge only the transformed variants
+        code: |
+          ```dart
+          final String res = await supabase
+            .storage
+            .from('avatars')
+            .purgeCache('avatar1.png', transformations: true);
           ```
 
   - id: from-remove
@@ -5333,6 +5729,610 @@ functions:
               httpStatusCode: 200
             ),
           ]
+          ```
+  - id: storagefile-list-v2
+    description: |
+      Lists files and folders within a bucket with cursor-based pagination and hierarchical (delimiter) listing.
+    title: 'from.listPaginated()'
+    notes: |
+      - Folder entries in `PaginatedListResult.folders` only contain a name (and optionally a key). Full metadata is only available on the file entries in `PaginatedListResult.objects`.
+      - To fetch the next page, pass the `PaginatedListResult.nextCursor` value from the previous request as `PaginatedSearchOptions.cursor`. Use `PaginatedListResult.hasNext` to check whether more results are available.
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: options
+        isOptional: true
+        type: PaginatedSearchOptions
+        description: Options for the paginated search operation.
+        subContent:
+          - name: limit
+            isOptional: true
+            type: int
+            description: The number of files to return. Defaults to 1000 on the server when omitted.
+          - name: prefix
+            isOptional: true
+            type: String
+            description: The prefix to filter files by.
+          - name: cursor
+            isOptional: true
+            type: String
+            description: The cursor used for pagination. Pass the `PaginatedListResult.nextCursor` value from the previous request to fetch the next page.
+          - name: withDelimiter
+            isOptional: true
+            type: bool
+            description: Whether to emulate a hierarchical listing of objects using delimiters. When `false` (default) all objects are listed as a flat list. When `true` the response groups objects by delimiter, separating them into `PaginatedListResult.folders` and `PaginatedListResult.objects`.
+          - name: sortBy
+            isOptional: true
+            type: FileSort
+            description: The column and direction to sort by.
+            subContent:
+              - name: column
+                isOptional: true
+                type: FileSortColumn
+                description: The column to sort by. One of `FileSortColumn.name`, `FileSortColumn.updatedAt` or `FileSortColumn.createdAt`. Defaults to `FileSortColumn.name`.
+              - name: order
+                isOptional: true
+                type: FileSortOrder
+                description: The sort direction. Either `FileSortOrder.ascending` or `FileSortOrder.descending`. Defaults to `FileSortOrder.ascending`.
+    examples:
+      - id: list-files-paginated
+        name: List files with pagination
+        isSpotlight: true
+        code: |
+          ```dart
+          final PaginatedListResult result = await supabase
+            .storage
+            .from('avatars')
+            .listPaginated(
+              options: const PaginatedSearchOptions(
+                prefix: 'folder/',
+                limit: 100,
+                withDelimiter: true,
+                sortBy: FileSort(
+                  column: FileSortColumn.createdAt,
+                  order: FileSortOrder.descending,
+                ),
+              ),
+            );
+
+          for (final folder in result.folders) {
+            // Handle each folder
+          }
+          for (final object in result.objects) {
+            // Handle each file
+          }
+          ```
+      - id: list-files-paginated-next-page
+        name: Fetch the next page
+        code: |
+          ```dart
+          var result = await supabase
+            .storage
+            .from('avatars')
+            .listPaginated();
+
+          while (result.hasNext) {
+            result = await supabase
+              .storage
+              .from('avatars')
+              .listPaginated(
+                options: PaginatedSearchOptions(cursor: result.nextCursor),
+              );
+          }
+          ```
+  - id: analytics-buckets
+    title: 'Overview'
+    category: Storage
+    subcategory: Analytics Buckets
+    notes: |
+      This section contains methods for working with Analytics Buckets.
+  - id: storageanalytics-from
+    description: |
+      Returns an Iceberg REST Catalog client for an analytics bucket, used to manage the namespaces and tables (the warehouse) inside it.
+    title: 'storage.analyticsCatalog()'
+    notes: |
+      - Analytics buckets are backed by the Apache Iceberg table format.
+      - `analyticsCatalog()` returns an `IcebergRestCatalog` scoped to a single analytics bucket. Use it to create and manage namespaces and tables within that bucket.
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: bucketId
+        isOptional: false
+        type: String
+        description: The identifier of the analytics bucket (the warehouse) whose namespaces and tables you want to manage.
+      - name: accessDelegation
+        isOptional: true
+        type: List<AccessDelegation>
+        description: Requests server side access delegation for the catalog operations.
+    examples:
+      - id: get-analytics-catalog
+        name: Get an analytics catalog client
+        isSpotlight: true
+        code: |
+          ```dart
+          final catalog = supabase
+            .storage
+            .analyticsCatalog('my-analytics-bucket');
+
+          await catalog.createNamespace(['analytics']);
+          ```
+  - id: storageanalytics-createbucket
+    description: |
+      Creates a new analytics bucket backed by the Apache Iceberg table format.
+    title: 'createAnalyticsBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `insert`
+        - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: A unique identifier for the analytics bucket you are creating.
+    examples:
+      - id: create-analytics-bucket
+        name: Create analytics bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final AnalyticsBucket bucket = await supabase
+            .storage
+            .createAnalyticsBucket('warehouse');
+          ```
+        response: |
+          ```json
+          AnalyticsBucket(
+            id: 'warehouse',
+            name: 'warehouse',
+            created_at: '2024-01-01T00:00:00.000Z',
+            updated_at: '2024-01-02T00:00:00.000Z'
+          )
+          ```
+  - id: storageanalytics-listbuckets
+    description: |
+      Retrieves the details of all analytics buckets within an existing project.
+    title: 'listAnalyticsBuckets()'
+    notes: |
+      - Calling `listAnalyticsBuckets()` without any options returns all analytics buckets.
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: options
+        isOptional: true
+        type: ListBucketsOptions
+        description: Optionally filter, sort and paginate the returned buckets.
+        subContent:
+          - name: limit
+            isOptional: true
+            type: int
+            description: The maximum number of buckets to return.
+          - name: offset
+            isOptional: true
+            type: int
+            description: The number of buckets to skip.
+          - name: search
+            isOptional: true
+            type: String
+            description: A search term used to filter buckets by name.
+          - name: sortColumn
+            isOptional: true
+            type: BucketSortColumn
+            description: The column to sort the buckets by. One of `BucketSortColumn.id`, `BucketSortColumn.name`, `BucketSortColumn.createdAt` or `BucketSortColumn.updatedAt`.
+          - name: sortOrder
+            isOptional: true
+            type: BucketSortOrder
+            description: The direction to sort the buckets in. Either `BucketSortOrder.ascending` or `BucketSortOrder.descending`.
+    examples:
+      - id: list-analytics-buckets
+        name: List analytics buckets
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<AnalyticsBucket> buckets = await supabase
+            .storage
+            .listAnalyticsBuckets();
+          ```
+        response: |
+          ```json
+          [
+            AnalyticsBucket(
+              id: 'warehouse',
+              name: 'warehouse',
+              created_at: '2024-01-01T00:00:00.000Z',
+              updated_at: '2024-01-02T00:00:00.000Z'
+            ),
+          ]
+          ```
+      - id: list-analytics-buckets-with-options
+        name: With filter, sort and pagination
+        code: |
+          ```dart
+          final List<AnalyticsBucket> buckets = await supabase
+            .storage
+            .listAnalyticsBuckets(
+              const ListBucketsOptions(
+                limit: 10,
+                offset: 0,
+                search: 'ware',
+                sortColumn: BucketSortColumn.createdAt,
+                sortOrder: BucketSortOrder.descending,
+              ),
+            );
+          ```
+  - id: storageanalytics-deletebucket
+    description: |
+      Deletes an existing analytics bucket. A bucket can't be deleted while it still contains namespaces or tables.
+    title: 'deleteAnalyticsBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select` and `delete`
+        - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The unique identifier of the analytics bucket you would like to delete.
+    examples:
+      - id: delete-analytics-bucket
+        name: Delete analytics bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final String res = await supabase
+            .storage
+            .deleteAnalyticsBucket('warehouse');
+          ```
+        response: |
+          ```json
+          'Successfully deleted'
+          ```
+
+  # ---------------------------------------------------------------------------
+  # Paginated file listing (list-v2)
+  # ---------------------------------------------------------------------------
+  - id: vector-buckets
+    title: 'Overview'
+    category: Storage
+    subcategory: Vector Buckets
+    notes: |
+      This section contains methods for working with Vector Buckets.
+  - id: storagevectors-from
+    title: 'from()'
+    notes: |
+      Scopes index operations to a single vector bucket. Returns a `StorageVectorBucketApi`.
+    examples:
+      - id: vectors-from
+        name: Scope operations to a bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final bucket = supabase.storage.vectors.from('embeddings');
+
+          await bucket.createIndex(
+            name: 'documents',
+            dimension: 3,
+            distanceMetric: DistanceMetric.cosine,
+          );
+          ```
+  - id: storagevectors-create-bucket
+    title: 'createBucket()'
+    notes: |
+      Creates a new vector bucket. Access the vectors client through `supabase.storage.vectors`.
+    examples:
+      - id: create-vector-bucket
+        name: Create a vector bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final vectors = supabase.storage.vectors;
+
+          await vectors.createBucket('embeddings');
+          ```
+  - id: storagevectors-delete-bucket
+    title: 'deleteBucket()'
+    notes: |
+      Deletes a vector bucket. The bucket must have no indexes before it can be deleted.
+    examples:
+      - id: delete-vector-bucket
+        name: Delete a vector bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final vectors = supabase.storage.vectors;
+
+          await vectors.deleteBucket('embeddings');
+          ```
+  - id: storagevectors-get-bucket
+    title: 'getBucket()'
+    notes: |
+      Retrieves the metadata of an existing vector bucket.
+    examples:
+      - id: get-vector-bucket
+        name: Get a vector bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final vectors = supabase.storage.vectors;
+
+          final VectorBucket bucket = await vectors.getBucket('embeddings');
+          ```
+  - id: storagevectors-list-buckets
+    title: 'listBuckets()'
+    notes: |
+      Lists vector buckets. Use `prefix` to filter by name and `maxResults` / `nextToken` to paginate.
+    examples:
+      - id: list-vector-buckets
+        name: List vector buckets
+        isSpotlight: true
+        code: |
+          ```dart
+          final vectors = supabase.storage.vectors;
+
+          final VectorBucketList result = await vectors.listBuckets();
+
+          for (final bucket in result.buckets) {
+            print(bucket.name);
+          }
+          ```
+      - id: list-vector-buckets-paginated
+        name: Paginate and filter buckets
+        code: |
+          ```dart
+          final vectors = supabase.storage.vectors;
+
+          final result = await vectors.listBuckets(
+            prefix: 'prod-',
+            maxResults: 50,
+          );
+
+          final nextToken = result.nextToken;
+          ```
+  - id: vectorbucket-createindex
+    title: 'createIndex()'
+    notes: |
+      Creates a new vector index in the scoped bucket. `dimension` is the length of the vectors the index will store and `distanceMetric` is the metric used for similarity queries. Keys listed in `nonFilterableMetadataKeys` can be stored on vectors but not used in query filters. `dataType` defaults to `VectorDataType.float32`.
+    examples:
+      - id: create-index
+        name: Create an index
+        isSpotlight: true
+        code: |
+          ```dart
+          final bucket = supabase.storage.vectors.from('embeddings');
+
+          await bucket.createIndex(
+            name: 'documents',
+            dimension: 3,
+            distanceMetric: DistanceMetric.cosine,
+          );
+          ```
+      - id: create-index-non-filterable
+        name: Create an index with non-filterable metadata
+        code: |
+          ```dart
+          final bucket = supabase.storage.vectors.from('embeddings');
+
+          await bucket.createIndex(
+            name: 'documents',
+            dimension: 3,
+            distanceMetric: DistanceMetric.euclidean,
+            nonFilterableMetadataKeys: ['rawText'],
+          );
+          ```
+  - id: vectorbucket-deleteindex
+    title: 'deleteIndex()'
+    notes: |
+      Deletes an index and all of its vectors from the scoped bucket.
+    examples:
+      - id: delete-index
+        name: Delete an index
+        isSpotlight: true
+        code: |
+          ```dart
+          final bucket = supabase.storage.vectors.from('embeddings');
+
+          await bucket.deleteIndex('documents');
+          ```
+  - id: vectorbucket-getindex
+    title: 'getIndex()'
+    notes: |
+      Retrieves the metadata of an index in the scoped bucket.
+    examples:
+      - id: get-index
+        name: Get an index
+        isSpotlight: true
+        code: |
+          ```dart
+          final bucket = supabase.storage.vectors.from('embeddings');
+
+          final VectorIndex index = await bucket.getIndex('documents');
+
+          print(index.dimension);
+          print(index.distanceMetric);
+          ```
+  - id: vectorbucket-listindexes
+    title: 'listIndexes()'
+    notes: |
+      Lists indexes in the scoped bucket. Use `prefix` to filter by name and `maxResults` / `nextToken` to paginate.
+    examples:
+      - id: list-indexes
+        name: List indexes
+        isSpotlight: true
+        code: |
+          ```dart
+          final bucket = supabase.storage.vectors.from('embeddings');
+
+          final VectorIndexList result = await bucket.listIndexes();
+
+          for (final index in result.indexes) {
+            print(index.name);
+          }
+          ```
+  - id: vectorbucket-index
+    title: 'index()'
+    notes: |
+      Scopes vector data operations to a single index within a bucket. Returns a `StorageVectorIndexApi`.
+    examples:
+      - id: bucket-index
+        name: Scope operations to an index
+        isSpotlight: true
+        code: |
+          ```dart
+          final bucket = supabase.storage.vectors.from('embeddings');
+
+          final index = bucket.index('documents');
+
+          await index.putVectors([
+            Vector(key: 'doc-1', data: [0.1, 0.2, 0.3]),
+          ]);
+          ```
+  - id: vectorindex-deletevectors
+    title: 'deleteVectors()'
+    notes: |
+      Deletes vectors by their keys. The batch must contain between 1 and 500 keys.
+    examples:
+      - id: delete-vectors
+        name: Delete vectors
+        isSpotlight: true
+        code: |
+          ```dart
+          final index = supabase.storage.vectors
+              .from('embeddings')
+              .index('documents');
+
+          await index.deleteVectors(['doc-1', 'doc-2']);
+          ```
+  - id: vectorindex-getvectors
+    title: 'getVectors()'
+    notes: |
+      Retrieves vectors by their keys. Set `returnData` and `returnMetadata` to include the embeddings and metadata in the result. Keys that do not exist are omitted from the returned list.
+    examples:
+      - id: get-vectors
+        name: Get vectors by key
+        isSpotlight: true
+        code: |
+          ```dart
+          final index = supabase.storage.vectors
+              .from('embeddings')
+              .index('documents');
+
+          final List<VectorMatch> vectors = await index.getVectors(
+            keys: ['doc-1', 'doc-2'],
+            returnData: true,
+            returnMetadata: true,
+          );
+
+          for (final vector in vectors) {
+            print('${vector.key}: ${vector.metadata}');
+          }
+          ```
+  - id: vectorindex-listvectors
+    title: 'listVectors()'
+    notes: |
+      Lists vectors in the scoped index with pagination. A full-index scan can be distributed across multiple workers by giving each worker a different `segmentIndex` (0 to `segmentCount - 1`) for the same `segmentCount` (1 to 16).
+    examples:
+      - id: list-vectors
+        name: List vectors
+        isSpotlight: true
+        code: |
+          ```dart
+          final index = supabase.storage.vectors
+              .from('embeddings')
+              .index('documents');
+
+          final VectorList result = await index.listVectors(
+            maxResults: 100,
+            returnMetadata: true,
+          );
+
+          for (final vector in result.vectors) {
+            print(vector.key);
+          }
+          ```
+      - id: list-vectors-parallel-scan
+        name: Parallel scan with segments
+        code: |
+          ```dart
+          final index = supabase.storage.vectors
+              .from('embeddings')
+              .index('documents');
+
+          // Worker 2 of a 4-way parallel scan.
+          final result = await index.listVectors(
+            segmentCount: 4,
+            segmentIndex: 2,
+          );
+          ```
+  - id: vectorindex-putvectors
+    title: 'putVectors()'
+    notes: |
+      Inserts or updates a batch of vectors in the scoped index. The batch must contain between 1 and 500 vectors, and each vector's `data` length must match the index dimension.
+    examples:
+      - id: put-vectors
+        name: Put vectors
+        isSpotlight: true
+        code: |
+          ```dart
+          final index = supabase.storage.vectors
+              .from('embeddings')
+              .index('documents');
+
+          await index.putVectors([
+            Vector(
+              key: 'doc-1',
+              data: [0.1, 0.2, 0.3],
+              metadata: {'title': 'Intro'},
+            ),
+            Vector(
+              key: 'doc-2',
+              data: [0.4, 0.5, 0.6],
+              metadata: {'title': 'Guide'},
+            ),
+          ]);
+          ```
+  - id: vectorindex-queryvectors
+    title: 'queryVectors()'
+    notes: |
+      Searches the scoped index for the vectors most similar to `queryVector`. `topK` limits the number of matches returned. `filter` restricts the search to vectors whose metadata matches the given expression. Set `returnDistance` and `returnMetadata` to include the distance scores and metadata in the result.
+    examples:
+      - id: query-vectors
+        name: Query vectors
+        isSpotlight: true
+        code: |
+          ```dart
+          final index = supabase.storage.vectors
+              .from('embeddings')
+              .index('documents');
+
+          final VectorQueryResult result = await index.queryVectors(
+            queryVector: [0.1, 0.2, 0.3],
+            topK: 5,
+            returnDistance: true,
+            returnMetadata: true,
+          );
+
+          for (final match in result.matches) {
+            print('${match.key}: ${match.distance}');
+          }
+          ```
+      - id: query-vectors-filter
+        name: Query with a metadata filter
+        code: |
+          ```dart
+          final index = supabase.storage.vectors
+              .from('embeddings')
+              .index('documents');
+
+          final result = await index.queryVectors(
+            queryVector: [0.1, 0.2, 0.3],
+            topK: 10,
+            filter: {'category': 'docs'},
+            returnMetadata: true,
+          );
           ```
   - id: using-modifiers
     title: Using Modifiers
@@ -5958,6 +6958,23 @@ functions:
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
         isSpotlight: false
+  - id: strip-nulls
+    title: 'stripNulls()'
+    description: |
+      Omits `null`-valued properties from the response objects.
+    notes: |
+      - This uses the `nulls=stripped` variant of the `Accept` header and requires PostgREST 11.2 or higher.
+    examples:
+      - id: strip-null-values-from-the-response
+        name: Strip null values from the response
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .select()
+            .stripNulls();
+          ```
   - id: using-filters
     title: Using Filters
     category: Database

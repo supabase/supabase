@@ -23,6 +23,14 @@ Realtime uses the `messages` table in your database's `realtime` schema to gener
 
 By creating RLS policies on the `realtime.messages` table you can control the access users have to a Channel topic, and features within a Channel topic.
 
+<Admonition type="caution">
+
+Realtime locks down the `realtime` schema to protect it against unexpected changes to guarantee the healthy operation of the Realtime service and avoid conflicts that could be caused by future migrations. Creating a table or function in `realtime` is expected to fail with `permission denied for schema realtime`, whether you run the SQL yourself or through the dashboard. Managing RLS policies on `realtime.messages` is allowed.
+
+Row level security (RLS) is enabled by default on table `realtime.messages`, you don't need to execute `ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY`.
+
+</Admonition>
+
 The validation is done when the user connects. When their WebSocket connection is established and a Channel topic is joined, their permissions are calculated based on:
 
 - The RLS policies on the `realtime.messages` table

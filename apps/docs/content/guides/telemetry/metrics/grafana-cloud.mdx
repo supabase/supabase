@@ -6,37 +6,55 @@ description: 'Use Grafana Cloud’s managed Prometheus to visualize Supabase met
 
 Grafana Cloud gives you a fully managed Prometheus endpoint plus hosted Grafana dashboards, which makes it the fastest way to explore the Supabase Metrics API without operating your own infrastructure.
 
-<Admonition type="note">
+## Installation
 
-Grafana maintains a [Supabase integration guide](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/) for Grafana Cloud. It runs on the same Metrics API documented here, but is community-maintained by Grafana, so feature coverage might differ from what Supabase officially supports.
+The Grafana Cloud integration is available in the Supabase Dashboard. [Add the integration](/dashboard/project/_/integrations/grafana-cloud/overview?utm_source=metrics-api&utm_medium=docs&utm_campaign=supabase_grafana_cloud_one_click_integration) and select a project to get a fully-configured instance in one click: authentication, metric scraping, and a pre-built dashboard tracking 200+ metrics, set up automatically.
+
+By integrating Supabase with Grafana Cloud, users gain monitoring capabilities for Supabase performance and operations. The included dashboard offers a comprehensive overview of Supabase performance, supplemented with Postgres metrics.
+
+## Manual setup
+
+The [Grafana Cloud integration](/dashboard/project/_/integrations/grafana-cloud/overview?utm_source=metrics-api&utm_medium=docs&utm_campaign=supabase_grafana_cloud_one_click_integration) available in the Supabase Dashboard is the recommended path. You can still configure and run the setup manually by following the steps below.
+
+<Admonition type="caution">
+
+Use this guide only if you need full manual control (custom scrape topology, self-hosted
+Prometheus or non-standard auth).
 
 </Admonition>
 
-## Prerequisites
+### Prerequisites
 
 - A Supabase project with access to the Metrics API (Secret API key `sb_secret_...`).
 - A Grafana Cloud account with Prometheus metrics enabled (Free or Pro tier).
 - A Grafana API token with the `metrics:write` and `metrics:read` scopes if you plan to push data manually.
 
-<$Partial path="metrics_access.mdx" />
-
-## 1. Create a Grafana Cloud stack
+### 1. Create a Grafana Cloud stack
 
 1. Sign in to [Grafana Cloud](https://grafana.com/auth/sign-in).
-2. Create (or select) a stack that has **Prometheus Metrics** enabled (Free and Pro tiers both work for this guide).
+2. Create or select a stack that has **Prometheus Metrics** enabled.
 
-## 2. Configure the Supabase integration
+### 2. Install the Supabase integration for Grafana Cloud
+
+1. In your Grafana Cloud stack, click **Connections** in the left-hand menu.
+2. Select the **Supabase** integration and follow the steps outlined on the **Configuration** page:
+3. Give your scrape job a descriptive name like `production-eu-central-1`.
+4. Set your Project ID and enter the service account API key.
+5. Test the connection and save the scrape job.
+6. Once scrape jobs are configured, click Install to add the prebuilt dashboards to your Grafana Cloud instance.
+
+### 3. Configure the Supabase integration
 
 1. Navigate to **Connections → Add new connection → Supabase** inside Grafana Cloud.
 2. Provide:
    - Your Supabase project ref (e.g. `abcd1234`).
-   - The Metrics API endpoint: `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`.
+   - The Metrics API endpoint (e.g. `https://<project-ref>.supabase.co/customer/v1/privileged/metrics`).
    - HTTP Basic Auth credentials (`sb_secret_...`).
-3. Choose the scrape interval (1 minute recommended) and test the connection. Grafana Cloud will deploy an agent in the background that scrapes the Metrics API and forwards the data to Prometheus.
+3. Choose the scrape interval. 1 minute is recommended, and test the connection. Grafana Cloud will deploy an agent in the background that scrapes the Metrics API and forwards the data to Prometheus.
 
 If you prefer to reuse an existing Grafana Agent deployment, configure an [integration pipeline](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/) with the same URL and credentials.
 
-## 3. Import the Supabase dashboard
+### 4. Import the Supabase dashboard
 
 1. Open your Grafana Cloud dashboard list and click **New → Import**.
 2. Paste the raw contents of [`supabase-grafana/dashboard.json`](https://raw.githubusercontent.com/supabase/supabase-grafana/refs/heads/main/grafana/dashboard.json).
@@ -51,11 +69,11 @@ This dashboard includes 200+ charts grouped by CPU, IO, connections, replication
   height="1509"
 />
 
-## 4. Configure alerts (optional)
+### 5. Configure alerts (optional)
 
 The [`docs/example-alerts.md`](https://github.com/supabase/supabase-grafana/blob/main/docs/example-alerts.md) file contains suggested alert rules (disk saturation, long-running queries, replication lag, etc.). Import the alert rules into Grafana Cloud’s Alerting UI or translate them into Grafana Cloud’s managed alert rule format.
 
-## 5. Troubleshooting
+### 6. Troubleshooting
 
 - Metrics missing? Ensure the Grafana Cloud agent can reach `https://<project-ref>.supabase.co` and that the selected Secret API key is still valid.
 - 401 errors? Create/rotate a Secret API key in [Project Settings → API Keys](/dashboard/project/_/settings/api-keys) and update the Grafana Cloud credentials.

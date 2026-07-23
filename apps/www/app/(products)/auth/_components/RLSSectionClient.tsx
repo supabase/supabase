@@ -111,6 +111,7 @@ export function RLSSectionClient({ examples }: { examples: RLSExample[] }) {
             const isActive = index === activeIdx
             return (
               <button
+                tabIndex={0}
                 key={example.title}
                 role="tab"
                 aria-selected={isActive}

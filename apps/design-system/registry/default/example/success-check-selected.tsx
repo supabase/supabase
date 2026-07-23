@@ -15,6 +15,7 @@ export default function SuccessCheckSelected() {
 
         return (
           <button
+            tabIndex={0}
             key={option}
             type="button"
             aria-pressed={isSelected}

@@ -67,6 +67,8 @@ const HEADER_IDS = new Set([
   'database-api',
   'realtime-api',
   'file-buckets',
+  'analytics-buckets',
+  'vector-buckets',
   'using-modifiers',
   'using-filters',
 ])
