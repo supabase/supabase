@@ -11,7 +11,7 @@ import Link from 'next/link'
 import { type MouseEvent } from 'react'
 import { Badge, cn } from 'ui'
 
-import { ChangelogEntryTitle } from '@/components/Changelog/ChangelogEntryTitle'
+import { ChangelogInlineMarkdown } from '@/components/Changelog/ChangelogInlineMarkdown'
 
 function groupChangelogIndexByYear(
   items: ChangelogTimelineIndexItem[]
@@ -102,11 +102,15 @@ function TimelineRow({ item, href }: { item: ChangelogTimelineIndexItem; href: s
         <div className="min-w-0">
           <Link href={href} prefetch={false} className="min-w-0 text-left">
             <h3 className="text-foreground text-lg leading-snug hover:underline [&_code]:align-middle">
-              <ChangelogEntryTitle title={item.title} />
+              <ChangelogInlineMarkdown>{item.title}</ChangelogInlineMarkdown>
             </h3>
           </Link>
         </div>
-        {item.summary && <p className="text-foreground-lighter text-sm">{item.summary}</p>}
+        {item.summary && (
+          <p className="text-foreground-lighter text-sm">
+            <ChangelogInlineMarkdown>{item.summary}</ChangelogInlineMarkdown>
+          </p>
+        )}
         <div className="flex min-w-0 gap-2 pt-0.5">
           <time
             dateTime={item.sortDate}

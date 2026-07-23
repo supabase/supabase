@@ -6,7 +6,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 
 import { ChangelogDetailSidebar } from '@/components/Changelog/ChangelogDetailSidebar'
-import { ChangelogEntryTitle } from '@/components/Changelog/ChangelogEntryTitle'
+import { ChangelogInlineMarkdown } from '@/components/Changelog/ChangelogInlineMarkdown'
 import CTABanner from '@/components/CTABanner'
 import DefaultLayout from '@/components/Layouts/Default'
 import { getChangelogEntries, type ChangelogEntryFrontmatter } from '@/lib/changelog-repo'
@@ -50,7 +50,7 @@ const ChangelogDetailPage = ({ title, created_at, slug, frontmatter, source }: P
           </nav>
           <header className="border-default mb-8 flex flex-col gap-2 border-b pb-6">
             <h1 className="h1 text-2xl sm:text-3xl [&_code]:align-middle">
-              <ChangelogEntryTitle title={title} />
+              <ChangelogInlineMarkdown>{title}</ChangelogInlineMarkdown>
             </h1>
             <div className="flex items-center gap-2">
               <p className="text-foreground-lighter font-mono text-xs">
