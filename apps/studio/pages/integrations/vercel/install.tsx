@@ -311,7 +311,7 @@ const VercelIntegration: NextPageWithLayout = () => {
                   loading={dataLoading}
                   onClick={onInstall}
                 >
-                  {alreadyInstalled ? 'Continue' : 'Install integration'}
+                  {selectedOrg && installed[selectedOrg.slug] ? 'Continue' : 'Install integration'}
                 </Button>
               </div>
             </div>
