@@ -8,7 +8,9 @@ import {
   buildUserActivitySearch,
   isErrorLevel,
   mapLogRowToActivityEvent,
+  type UserActivityEvent,
 } from './UserActivity.constants'
+import { UserActivityEventDetailSheet } from './UserActivityEventDetailSheet'
 import { UserActivitySelector } from './UserActivitySelector'
 import { UserActivityTimeline } from './UserActivityTimeline'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -29,6 +31,7 @@ export const UserActivity = () => {
   const [selectedUserId, setSelectedUserId] = useQueryState('user', parseAsString)
   const [filter, setFilter] = useState<UserActivityFilter>('all')
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [payloadEvent, setPayloadEvent] = useState<UserActivityEvent | null>(null)
 
   const {
     selectedDateRange,
@@ -121,7 +124,11 @@ export const UserActivity = () => {
         <AlertError error={error} subject="Failed to load user activity" />
       ) : (
         <>
-          <UserActivityTimeline events={events} />
+          <UserActivityTimeline
+            events={events}
+            projectRef={projectRef}
+            onViewPayload={setPayloadEvent}
+          />
           {hasNextPage && (
             <Button
               variant="outline"
@@ -135,6 +142,8 @@ export const UserActivity = () => {
           )}
         </>
       )}
+
+      <UserActivityEventDetailSheet event={payloadEvent} onClose={() => setPayloadEvent(null)} />
     </div>
   )
 }

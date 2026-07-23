@@ -4,38 +4,54 @@ import type { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/
 
 export type UserActivityLevel = 'success' | 'warning' | 'error'
 
-export interface UserActivityEvent {
+export interface UserActivityLogEntry {
   id: string
   timestamp: string
+  event_message: string
+  level: string
+  event_type: string
+}
+
+export interface UserActivityEvent {
+  id: string
+  /** Epoch milliseconds — sourced from the row's already-parsed `date`, not the raw `timestamp`
+   * (which can be an epoch-microseconds string or an ISO string depending on the log source). */
+  timestampMs: number
   logType: string
   eventMessage: string
   method: string | null
   pathname: string | null
   status: number | null
   level: UserActivityLevel
+  headers: Record<string, unknown>
+  logs: UserActivityLogEntry[]
 }
 
 /** Row shape returned by `getUnifiedLogs()` (data/logs/unified-logs-infinite-query.ts). */
 interface UnifiedLogRow {
   id: string
-  timestamp: string
+  date: Date
   event_message: string
   log_type: string
   method: string | null
   pathname: string | null
   status: number | null
   level: UserActivityLevel
+  headers: Record<string, unknown>
+  logs: UserActivityLogEntry[]
 }
 
 export const mapLogRowToActivityEvent = (row: UnifiedLogRow): UserActivityEvent => ({
   id: row.id,
-  timestamp: row.timestamp,
+  timestampMs: row.date.getTime(),
   logType: row.log_type,
   eventMessage: row.event_message,
   method: row.method,
   pathname: row.pathname,
   status: row.status,
   level: row.level,
+  headers: row.headers ?? {},
+  logs: row.logs ?? [],
 })
 
 /**

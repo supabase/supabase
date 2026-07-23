@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
-import { Badge, cn } from 'ui'
+import { ExternalLink, FileJson2 } from 'lucide-react'
+import Link from 'next/link'
+import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import {
   isErrorLevel,
@@ -7,18 +9,27 @@ import {
   levelBadgeVariant,
   type UserActivityEvent,
 } from './UserActivity.constants'
-import { LOG_TYPES_LABELS } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+
+/** How far before/after the event to open the Logs Explorer's date range. */
+const LOGS_JUMP_WINDOW_MS = 5 * 60 * 1000
 
 interface UserActivityEventItemProps {
   event: UserActivityEvent
+  projectRef: string | undefined
+  onViewPayload: (event: UserActivityEvent) => void
   /** Hide the connector line below the last item */
   isLast?: boolean
 }
 
-export const UserActivityEventItem = ({ event, isLast = false }: UserActivityEventItemProps) => {
+export const UserActivityEventItem = ({
+  event,
+  projectRef,
+  onViewPayload,
+  isLast = false,
+}: UserActivityEventItemProps) => {
   const hasError = isErrorLevel(event.level)
-  const logTypeLabel =
-    LOG_TYPES_LABELS[event.logType as keyof typeof LOG_TYPES_LABELS] ?? event.logType
+  const logsHref = `/project/${projectRef}/logs?date=${event.timestampMs - LOGS_JUMP_WINDOW_MS}-${event.timestampMs + LOGS_JUMP_WINDOW_MS}&id=${event.id}`
 
   return (
     <div className="relative flex gap-x-4">
@@ -45,32 +56,39 @@ export const UserActivityEventItem = ({ event, isLast = false }: UserActivityEve
           hasError ? 'border border-destructive-300 bg-destructive-200/30' : 'bg-surface-100/50'
         )}
       >
-        <div className="flex items-start justify-between gap-x-4">
-          <p className="text-sm text-foreground">{event.eventMessage}</p>
-          <span className="font-mono text-xs text-foreground-lighter tabular-nums">
-            {dayjs(event.timestamp).format('HH:mm:ss')}
-          </span>
-        </div>
-
-        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
-          <Badge variant="default" className="gap-x-1.5">
-            <span
-              className={cn('h-1.5 w-1.5 rounded-full', LEVEL_DOT_COLOR[event.level])}
-              aria-hidden
-            />
-            {logTypeLabel}
-          </Badge>
-          {(event.method || event.pathname) && (
-            <span className="font-mono text-xs text-foreground-light">
+        <div className="flex items-center justify-between gap-x-4">
+          <div className="flex items-center gap-x-2 min-w-0">
+            {event.status !== null && (
+              <Badge variant={levelBadgeVariant(event.level)}>{event.status}</Badge>
+            )}
+            <span className="font-mono text-xs text-foreground-light truncate">
               {event.method} {event.pathname}
             </span>
-          )}
-          {event.status !== null && (
-            <>
-              <span className="text-foreground-lighter">·</span>
-              <Badge variant={levelBadgeVariant(event.level)}>{event.status}</Badge>
-            </>
-          )}
+          </div>
+
+          <div className="flex items-center gap-x-1 shrink-0">
+            <span className="font-mono text-xs text-foreground-lighter tabular-nums">
+              {dayjs(event.timestampMs).format('HH:mm:ss')}
+            </span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild variant="text" size="tiny" className="px-1">
+                  <Link href={logsHref}>
+                    <ExternalLink size={14} strokeWidth={1.5} />
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">View in Logs Explorer</TooltipContent>
+            </Tooltip>
+            <ButtonTooltip
+              variant="text"
+              size="tiny"
+              className="px-1"
+              icon={<FileJson2 size={14} strokeWidth={1.5} />}
+              onClick={() => onViewPayload(event)}
+              tooltip={{ content: { side: 'top', text: 'View payload' } }}
+            />
+          </div>
         </div>
       </div>
     </div>

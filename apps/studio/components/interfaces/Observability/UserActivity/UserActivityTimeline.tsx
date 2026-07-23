@@ -5,13 +5,15 @@ import { UserActivityEventItem } from './UserActivityEventItem'
 
 interface UserActivityTimelineProps {
   events: UserActivityEvent[]
+  projectRef: string | undefined
+  onViewPayload: (event: UserActivityEvent) => void
 }
 
 /** Group events by calendar day, preserving chronological order. */
 const groupEventsByDay = (events: UserActivityEvent[]) => {
   const groups = new Map<string, UserActivityEvent[]>()
   for (const event of events) {
-    const day = dayjs(event.timestamp).format('YYYY-MM-DD')
+    const day = dayjs(event.timestampMs).format('YYYY-MM-DD')
     const existing = groups.get(day)
     if (existing) existing.push(event)
     else groups.set(day, [event])
@@ -19,7 +21,11 @@ const groupEventsByDay = (events: UserActivityEvent[]) => {
   return Array.from(groups.entries())
 }
 
-export const UserActivityTimeline = ({ events }: UserActivityTimelineProps) => {
+export const UserActivityTimeline = ({
+  events,
+  projectRef,
+  onViewPayload,
+}: UserActivityTimelineProps) => {
   const dayGroups = groupEventsByDay(events)
 
   if (events.length === 0) {
@@ -36,6 +42,8 @@ export const UserActivityTimeline = ({ events }: UserActivityTimelineProps) => {
               <UserActivityEventItem
                 key={event.id}
                 event={event}
+                projectRef={projectRef}
+                onViewPayload={onViewPayload}
                 isLast={index === dayEvents.length - 1}
               />
             ))}
