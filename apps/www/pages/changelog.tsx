@@ -86,9 +86,8 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
     return [result.value]
   })
 
-  // Everything not successfully featured falls back to the timeline list — including
-  // a featured entry whose MDX failed to serialize, which would otherwise vanish
-  // from the page entirely (it lives only in `featured`, never in the sliced rest).
+  // Anything not successfully featured falls back to the timeline, so a featured
+  // entry whose MDX failed to serialize doesn't vanish from the page.
   const featuredSlugs = new Set(featured.map((entry) => entry.slug))
   const restIndex = allIndex.filter((item) => !featuredSlugs.has(item.slug))
 

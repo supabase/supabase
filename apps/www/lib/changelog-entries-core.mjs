@@ -72,16 +72,10 @@ export async function fetchChangelogEntryFilesFromTarball(
 }
 
 /**
- * Public frontmatter keys — the only fields ever exposed to the browser.
- *
- * `matter()` parses EVERY YAML key in an entry, including private blocks like
- * `internal:` (escalation teams, notes, etc.). Because the page passes
- * `entry.frontmatter` straight into Next.js props, anything left on the object
- * is serialized into the page's `__NEXT_DATA__` and visible in View Source —
- * even when it's never rendered. We allowlist rather than denylist so a new
- * private field added upstream doesn't silently start leaking.
- *
- * Keep in sync with `ChangelogEntryFrontmatter` in `changelog-repo.ts`.
+ * The only frontmatter fields exposed to the browser. `matter()` also parses
+ * private blocks like `internal:`, and the page ships `entry.frontmatter` into
+ * props — so we allowlist to keep them out of the page source. Keep in sync with
+ * `ChangelogEntryFrontmatter` in `changelog-repo.ts`.
  */
 export const PUBLIC_FRONTMATTER_KEYS = [
   'title',
@@ -97,19 +91,9 @@ export const PUBLIC_FRONTMATTER_KEYS = [
   'legacy_gh_discussion',
 ]
 
-/**
- * Allowlisted fields that YAML may parse into a JS `Date` (when the value is
- * left unquoted). They must be coerced to a string before reaching page props.
- */
 const DATE_FRONTMATTER_KEYS = new Set(['publish_date', 'sunset_date'])
 
-/**
- * Projects raw parsed frontmatter down to the public allowlist, dropping
- * `internal:` and any other private keys. Date fields are normalized to a
- * `YYYY-MM-DD` string so an unquoted YAML date (a JS `Date`) can't break
- * Next.js prop serialization — `entry.frontmatter` is passed straight into the
- * detail page's props — or render as `[object Date]` in the sidebar.
- */
+/** Projects raw frontmatter to the public allowlist; date fields are stringified. */
 export function toPublicFrontmatter(frontmatter) {
   const publicFrontmatter = {}
   for (const key of PUBLIC_FRONTMATTER_KEYS) {
@@ -156,14 +140,8 @@ function resolveDateFromFilename(filename) {
 }
 
 /**
- * Coerces a frontmatter date to a `YYYY-MM-DD` string.
- *
- * YAML parses an *unquoted* date (`publish_date: 2026-07-22`) into a JS `Date`
- * object, while a quoted one (`publish_date: "2026-07-22"`) stays a string.
- * A `Date` here is poison: it breaks the string sort comparator and, worse,
- * Next.js cannot JSON-serialize it into page props, which throws and 500s the
- * whole changelog. Normalizing to a string keeps `sortDate` uniformly typed
- * regardless of how an entry happens to quote its date.
+ * Coerces a frontmatter date to `YYYY-MM-DD`. An unquoted YAML date parses to a
+ * JS `Date`, which breaks the string sort and can't be serialized into props.
  */
 function toDateString(value) {
   if (value == null) return null
@@ -194,7 +172,6 @@ export function parseChangelogEntryFile(filename, raw) {
   return {
     slug: computeChangelogEntrySlug(filename, frontmatter),
     filename,
-    // Allowlisted so private frontmatter (e.g. `internal:`) never reaches the client.
     frontmatter: toPublicFrontmatter(frontmatter),
     sortDate: toDateString(frontmatter.publish_date) ?? resolveDateFromFilename(filename) ?? '',
     summary: extractSection(publicBody, 'Summary'),

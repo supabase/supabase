@@ -93,9 +93,8 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
 
   const entries = await getChangelogEntries()
   const entry = entries.find((e) => e.slug === slug)
-  // `revalidate` is required on the notFound branch too: without it Next.js caches
-  // the 404 indefinitely, so an entry requested before it went live (or before the
-  // in-process cache refreshed) would keep 404ing even once it's published.
+  // `revalidate` on notFound too, else Next.js caches the 404 forever — an entry
+  // requested before it went live would keep 404ing after publish.
   if (!entry) return { notFound: true, revalidate: 900 }
 
   const source = await mdxSerialize(entry.bodySection)

@@ -53,8 +53,6 @@ describe('toPublicFrontmatter', () => {
   })
 
   it('normalizes Date-valued date fields to YYYY-MM-DD strings', () => {
-    // gray-matter parses an unquoted YAML date into a JS Date; the projected
-    // public frontmatter must be a string so it survives Next.js prop serialization.
     const publicFrontmatter = toPublicFrontmatter({
       title: 'Hello',
       publish_date: new Date('2026-05-18T00:00:00.000Z'),
@@ -70,7 +68,7 @@ describe('toPublicFrontmatter', () => {
 describe('parseChangelogEntryFile', () => {
   it('never exposes the internal block on the parsed entry frontmatter', () => {
     const entry = parseChangelogEntryFile('20260101-pipelines.md', ENTRY_WITH_INTERNAL)
-    // The .mjs source has no type declarations, so `frontmatter` is inferred as {}.
+    // Untyped .mjs export, so `frontmatter` is inferred as {}.
     const frontmatter = entry.frontmatter as Record<string, unknown>
 
     expect(frontmatter.internal).toBeUndefined()
@@ -78,7 +76,6 @@ describe('parseChangelogEntryFile', () => {
     expect(JSON.stringify(frontmatter)).not.toContain('team-etl')
     expect(JSON.stringify(frontmatter)).not.toContain('escalation_teams')
 
-    // Public fields still flow through untouched.
     expect(frontmatter.title).toBe('Supabase Pipelines')
     expect(frontmatter.change_type).toBe('new-feature')
     expect(frontmatter.public).toBe(true)
@@ -86,8 +83,6 @@ describe('parseChangelogEntryFile', () => {
   })
 
   it('always yields a string sortDate, even for an unquoted (Date-parsed) publish_date', () => {
-    // Unquoted YAML dates are parsed into JS Date objects by gray-matter; a Date
-    // in sortDate breaks the string sort and Next.js prop serialization.
     const unquoted = parseChangelogEntryFile(
       '20260722-unquoted.md',
       `---\ntitle: Unquoted\nchange_type: improvement\npublic: true\npublish_date: 2026-05-18\n---\n\n# Body\n\nx\n`
@@ -110,8 +105,7 @@ describe('parseChangelogEntryFile', () => {
   })
 
   it('normalizes date frontmatter reaching detail-page props, even when unquoted', () => {
-    // `[slug].tsx` passes `entry.frontmatter` straight into getStaticProps props,
-    // so a Date here would throw during serialization. Verify it is a string.
+    // `[slug].tsx` ships `entry.frontmatter` into props; a Date would break serialization.
     const entry = parseChangelogEntryFile(
       '20260722-unquoted-dates.md',
       `---\ntitle: Unquoted dates\nchange_type: deprecation\npublic: true\npublish_date: 2026-05-18\nsunset_date: 2026-08-05\n---\n\n# Body\n\nx\n`
