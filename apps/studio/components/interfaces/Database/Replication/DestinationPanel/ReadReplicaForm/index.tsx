@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -24,11 +24,12 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
+  typeSelection?: ReactNode
   onSuccess: () => void
   onClose: () => void
 }
 
-export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) => {
+export const ReadReplicaForm = ({ typeSelection, onSuccess, onClose }: ReadReplicaFormProps) => {
   const { ref: projectRef } = useParams()
   const { data } = useReadReplicasQuery({ projectRef })
 
@@ -66,13 +67,13 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
 
   return (
     <>
-      {!canDeployReplica && (
-        <SheetSection>
-          <ReadReplicaEligibilityWarnings />
-        </SheetSection>
-      )}
-
       <SheetSection className="grow overflow-auto px-0 py-0">
+        {typeSelection}
+        {!canDeployReplica && (
+          <SheetSection>
+            <ReadReplicaEligibilityWarnings />
+          </SheetSection>
+        )}
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"

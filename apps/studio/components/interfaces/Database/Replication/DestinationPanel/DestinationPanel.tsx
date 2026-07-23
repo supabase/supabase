@@ -107,11 +107,33 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
     }
   }, [edit, invalidExistingDestination, setEdit])
 
+  const typeSelection = (
+    <>
+      <DestinationTypeSelection />
+      <DialogSectionSeparator />
+    </>
+  )
+
+  const pipelinesTypeSelection = (
+    <>
+      {typeSelection}
+      {isLocalETLNotSetUp && (
+        <SheetSection className="pb-0!">
+          <Admonition
+            type="warning"
+            title="Replication unavailable locally"
+            description="Configure the replication API to manage Pipelines destinations in local development."
+          />
+        </SheetSection>
+      )}
+    </>
+  )
+
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent size="lg" showClose={false}>
-          <div className="flex flex-col h-full" tabIndex={-1}>
+          <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
               <div>
                 <SheetTitle>{editMode ? 'Edit destination' : 'Add new destination'}</SheetTitle>
@@ -124,64 +146,61 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <DocsButton href={docsUrl} topic={`${urlDestinationType} pipeline settings`} />
             </SheetHeader>
 
-            <DestinationTypeSelection />
-
-            <DialogSectionSeparator />
-
-            {destinationType !== 'Read Replica' && isLocalETLNotSetUp && (
-              <SheetSection className="pb-0!">
-                <Admonition
-                  type="warning"
-                  title="Replication unavailable locally"
-                  description="Configure the replication API to manage Pipelines destinations in local development."
-                />
-              </SheetSection>
-            )}
-
             {destinationType === 'Read Replica' ? (
-              <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
+              <ReadReplicaForm
+                typeSelection={typeSelection}
+                onClose={onClose}
+                onSuccess={() => onSuccessCreateReadReplica?.()}
+              />
             ) : !enablePgReplicate ? (
-              <SheetSection>
-                <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
-                  <div className="flex flex-col gap-y-1">
-                    <h4>Request Pipelines access</h4>
-                    <p className="text-sm text-foreground-light">
-                      Pipelines is in <span className="text-foreground">public alpha</span> and
-                      being rolled out gradually. Request access below to join the waitlist. Read
-                      replicas are available now.
-                    </p>
-                  </div>
-                  <div className="flex gap-x-2">
-                    <Button
-                      asChild
-                      variant="secondary"
-                      iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
-                    >
-                      <Link
-                        target="_blank"
-                        rel="noreferrer"
-                        href="https://forms.supabase.com/pg_replicate"
+              <div className="grow overflow-auto min-h-0">
+                {pipelinesTypeSelection}
+                <SheetSection>
+                  <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
+                    <div className="flex flex-col gap-y-1">
+                      <h4>Request Pipelines access</h4>
+                      <p className="text-sm text-foreground-light">
+                        Pipelines is in <span className="text-foreground">public alpha</span> and
+                        being rolled out gradually. Request access below to join the waitlist. Read
+                        replicas are available now.
+                      </p>
+                    </div>
+                    <div className="flex gap-x-2">
+                      <Button
+                        asChild
+                        variant="secondary"
+                        iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
                       >
-                        Request Pipelines access
-                      </Link>
-                    </Button>
-                    <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
+                        <Link
+                          target="_blank"
+                          rel="noreferrer"
+                          href="https://forms.supabase.com/pg_replicate"
+                        >
+                          Request Pipelines access
+                        </Link>
+                      </Button>
+                      <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
+                    </div>
                   </div>
-                </div>
-              </SheetSection>
+                </SheetSection>
+              </div>
             ) : replicationNotEnabled ? (
-              <SheetSection>
-                <EnablePipelinesCallout
-                  className="p-6!"
-                  type={destinationType}
-                  hasAccess={hasETLReplicationAccess}
-                />
-              </SheetSection>
+              <div className="grow overflow-auto min-h-0">
+                {pipelinesTypeSelection}
+                <SheetSection>
+                  <EnablePipelinesCallout
+                    className="p-6!"
+                    type={destinationType}
+                    hasAccess={hasETLReplicationAccess}
+                  />
+                </SheetSection>
+              </div>
             ) : (
               <DestinationForm
                 visible={visible}
                 selectedType={destinationType ?? 'Read Replica'}
                 existingDestination={existingDestination}
+                typeSelection={pipelinesTypeSelection}
                 onClose={onClose}
               />
             )}
