@@ -15,7 +15,7 @@ export function castOrganizationSlugResponseToOrganization(org: OrganizationDeta
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
     managed_by: getManagedByFromOrganizationPartner(org.billing_partner, org.integration_source),
-    partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
+    partner_id: org.slug?.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }
 

@@ -14,7 +14,7 @@ export function castOrganizationResponseToOrganization(org: OrganizationBase): O
     ...org,
     billing_email: org.billing_email ?? 'Unknown',
     managed_by: getManagedByFromOrganizationPartner(org.billing_partner, org.integration_source),
-    partner_id: org.slug.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
+    partner_id: org.slug?.startsWith('vercel_') ? org.slug.replace('vercel_', '') : undefined,
   }
 }
 
@@ -32,7 +32,7 @@ export async function getOrganizations({
 
   return data
     .map(castOrganizationResponseToOrganization)
-    .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''))
 }
 
 export type OrganizationsData = Awaited<ReturnType<typeof getOrganizations>>

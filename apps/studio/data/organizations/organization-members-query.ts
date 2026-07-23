@@ -35,8 +35,7 @@ export async function getOrganizationMembers(
   if (orgMembersError) handleError(orgMembersError)
   if (orgInvitesError) handleError(orgInvitesError)
 
-  // Remap invite data to look like existing members data
-  const invitedMembers = orgInvites.invitations.map((invite) => {
+  const invitedMembers = orgInvites?.invitations?.map((invite) => {
     const member = {
       invited_at: invite.invited_at,
       invited_id: invite.id,
@@ -47,7 +46,7 @@ export async function getOrganizationMembers(
     return { ...member, role_ids: [invite.role_id] }
   })
 
-  return [...orgMembers, ...invitedMembers] as OrganizationMember[]
+  return [...(orgMembers ?? []), ...(invitedMembers ?? [])] as OrganizationMember[]
 }
 
 export type OrganizationMembersData = Awaited<ReturnType<typeof getOrganizationMembers>>
