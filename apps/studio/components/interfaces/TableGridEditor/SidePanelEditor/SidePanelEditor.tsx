@@ -443,6 +443,11 @@ export const SidePanelEditor = ({
         queryClient.invalidateQueries({
           queryKey: tableKeys.infiniteListPrefix(project?.ref, selectedTable?.schema),
         }),
+        // useTableQuery (FK selectors/formatters) has a 5min staleTime -- without this,
+        // an edited column can serve stale data to any FK target cell pointing at this table.
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.retrieve(project?.ref, selectedTable?.name, selectedTable?.schema),
+        }),
       ])
 
       // We need to invalidate tableRowsAndCount after tableEditor
