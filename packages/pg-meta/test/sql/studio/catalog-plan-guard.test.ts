@@ -295,15 +295,27 @@ test('getViewDefinitionSql: plan stays scoped for a single view', async () => {
 // The scoped rewrite filters pg_type by schema FIRST and then computes enums /
 // composite attributes per surviving row via correlated subqueries (index scans
 // on pg_enum's (enumtypid) and pg_attribute's (attrelid, attnum)), instead of
-// the legacy catalog-wide GROUP BY aggregates. At stress scale the plan carries
-// no seq scan over a scaling catalog (pg_type/pg_attribute/pg_enum), so the
-// budget is empty.
+// the legacy catalog-wide GROUP BY aggregates. The one structurally unavoidable
+// pass is over pg_type itself: a per-schema type listing must read every type in
+// the schema, and pg_type has no index leading on typnamespace (only
+// pg_type_typname_nsp_index on (typname, typnamespace)), so the schema filter
+// cannot prune the scan -- one filtered pass of pg_type either way. Same class
+// as the pg_constraint.confrelid / pg_class.relnamespace justifications.
+const TYPES_LIST_BUDGET = {
+  allowedSeqScans: {
+    pg_type: {
+      max: 1,
+      reason:
+        'per-schema type listing must read every type in the schema; no index leads on pg_type.typnamespace (only (typname, typnamespace)), so the filter cannot prune it. The planner picks a seq scan (PG17) or a full-index bitmap scan (PG14/15) depending on version/stats -- one filtered pass of pg_type either way',
+    },
+  },
+}
 test('types.list: scoped plan stays scoped for a schema', async () => {
   const result = await explainAnalyze(
     db,
     types.list({ includedSchemas: ['stress'], scoped: true }).sql
   )
-  assertPlanWithinBudget(result, {})
+  assertPlanWithinBudget(result, TYPES_LIST_BUDGET)
 }, 60_000)
 
 test('types.list: scoped real query returns the schema’s enums and composites', async () => {
