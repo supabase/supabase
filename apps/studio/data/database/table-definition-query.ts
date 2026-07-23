@@ -34,6 +34,7 @@ export async function getTableDefinition(
     signal
   )
 
+  if (!result.length) throw new Error('Table not found')
   return result[0].definition.trim() as string
 }
 

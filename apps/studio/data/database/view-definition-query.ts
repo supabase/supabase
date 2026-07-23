@@ -32,6 +32,7 @@ export async function getViewDefinition(
     signal
   )
 
+  if (!result.length) throw new Error('View not found')
   return result[0].definition.trim()
 }
 

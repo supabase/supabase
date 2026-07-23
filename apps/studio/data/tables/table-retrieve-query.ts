@@ -29,7 +29,7 @@ export async function getTable(
     },
     signal
   )
-  // pg-meta sources `check` from pg_catalog; treat it as SafeSqlFragment for DDL composition.
+  if (!result.length) throw new Error('Table not found')
   return zod.parse(result[0]) as unknown as SafePostgresTable
 }
 

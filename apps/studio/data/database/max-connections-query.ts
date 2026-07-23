@@ -23,6 +23,7 @@ export async function getMaxConnections(
     signal
   )
 
+  if (!result.length) throw new Error('max_connections query returned no results')
   const connections = parseInt(result[0].max_connections)
 
   return { maxConnections: connections }

@@ -59,6 +59,7 @@ export async function getDatabaseQueuesMetrics({
       connectionString,
       sql: preciseMetricsSqlQuery(queueName),
     })
+    if (!result.length) throw new Error('Queue table not found')
     return {
       queue_name: queueName,
       queue_length: result[0].row_count,
@@ -72,6 +73,7 @@ export async function getDatabaseQueuesMetrics({
         connectionString,
         sql: estimateMetricsSqlQuery(queueName),
       })
+      if (!result.length) throw new Error('Queue table not found for estimate')
       return {
         queue_name: queueName,
         queue_length: result[0].estimated_rows,
