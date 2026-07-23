@@ -126,6 +126,7 @@ vi.mock('@/data/config/project-settings-v2-query', () => ({
 
 vi.mock('@/data/replication/sources-query', () => ({
   useReplicationSourcesQuery: () => ({ data: sourcesData }),
+  useReplicationSourceId: () => sourcesData.sources[0]?.id,
 }))
 
 vi.mock('@/data/replication/publications-query', () => ({
