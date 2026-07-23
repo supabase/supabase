@@ -1,5 +1,13 @@
 [
   {
+    "author_id": "andrey_alekseev",
+    "author": "Andrey Alekseev",
+    "username": "aantti",
+    "position": "Self-hosting Lead",
+    "author_url": "https://github.com/aantti",
+    "author_image_url": "https://github.com/aantti.png"
+  },
+  {
     "author_id": "angelico_de_los_reyes",
     "author": "Angelico de los Reyes",
     "position": "Engineering",
@@ -349,7 +357,7 @@
   {
     "author_id": "saltcod",
     "author": "Terry Sutton",
-    "position": "Engineering",
+    "position": "Community",
     "author_url": "https://github.com/saltcod",
     "author_image_url": "https://github.com/saltcod.png"
   },
