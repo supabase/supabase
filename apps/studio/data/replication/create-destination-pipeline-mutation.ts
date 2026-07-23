@@ -2,13 +2,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { optionalSecret } from './destination-secret-utils'
-import { replicationKeys } from './keys'
-import type { TableSyncCopyConfig } from './table-sync-copy'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
+import { optionalSecret } from './destination-secret-utils'
+import { replicationKeys } from './keys'
 
-export type { TableSyncCopyConfig } from './table-sync-copy'
+export type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 
 export type DestinationConfig =
   | { bigQuery: BigQueryDestinationConfig }

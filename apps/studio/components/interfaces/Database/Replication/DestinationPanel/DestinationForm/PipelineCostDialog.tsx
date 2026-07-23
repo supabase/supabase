@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { useEffect, useMemo } from 'react'
 import {
   Button,
@@ -21,12 +22,13 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 import {
   getTableCopyTargets,
   summarizeTableCopyEstimate,
   type ReplicationTableIdentity,
   type TableSyncCopyConfig,
-} from '@/data/replication/table-sync-copy'
+} from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
 
@@ -35,8 +37,6 @@ const MAX_VISIBLE_TABLES = 10
 interface PipelineCostDialogProps {
   open: boolean
   isConfirming: boolean
-  projectRef?: string
-  sourceId?: number
   publicationName?: string
   publicationTables: ReplicationTableIdentity[]
   tableSyncCopy?: TableSyncCopyConfig
@@ -54,14 +54,15 @@ interface PipelineCostDialogProps {
 export const PipelineCostDialog = ({
   open,
   isConfirming,
-  projectRef,
-  sourceId,
   publicationName,
   publicationTables,
   tableSyncCopy,
   onOpenChange,
   onConfirm,
 }: PipelineCostDialogProps) => {
+  const { ref: projectRef } = useParams()
+  const sourceId = useReplicationSourceId({ projectRef })
+
   const onConfirmRef = useLatest(onConfirm)
 
   const {

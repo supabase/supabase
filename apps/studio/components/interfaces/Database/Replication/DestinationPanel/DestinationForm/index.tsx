@@ -68,7 +68,7 @@ import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-que
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
@@ -131,13 +131,10 @@ export const DestinationForm = ({
   ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
-  const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
+  const sourceId = useReplicationSourceId({ projectRef })
 
   const {
     data: publications = [],
-    isPending: isLoadingPublications,
-    isError: isErrorPublications,
     isSuccess: isSuccessPublications,
     refetch: refetchPublications,
   } = useReplicationPublicationsQuery({ projectRef, sourceId })
@@ -446,17 +443,9 @@ export const DestinationForm = ({
                     <DestinationNameInput form={form} />
                     <PublicationSelection
                       form={form}
-                      sourceId={sourceId}
-                      visible={visible}
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}
                     />
-                    <TableCopySelection
-                      form={form}
-                      publications={publications}
-                      isLoadingPublications={isLoadingPublications}
-                      isErrorPublications={isErrorPublications}
-                      editMode={editMode}
-                    />
+                    <TableCopySelection form={form} editMode={editMode} />
                     <FormItemLayout
                       isReactForm={false}
                       layout="horizontal"
@@ -585,7 +574,6 @@ export const DestinationForm = ({
       </SheetFooter>
 
       <NewPublicationPanel
-        sourceId={sourceId}
         visible={publicationPanelVisible}
         onClose={(newPublication?: string) => {
           if (newPublication) {
@@ -618,8 +606,6 @@ export const DestinationForm = ({
       <PipelineCostDialog
         open={showCostDialog}
         isConfirming={isSaving}
-        projectRef={projectRef}
-        sourceId={sourceId}
         publicationName={pendingFormValues?.publicationName}
         publicationTables={pendingPublicationTables}
         tableSyncCopy={pendingTableSyncCopy}

@@ -26,10 +26,6 @@ async function fetchReplicationPipelineById(
 
 export type ReplicationPipelineByIdData = components['schemas']['ReplicationPipelineResponse']
 
-export type ReplicationTableSyncCopyConfig = NonNullable<
-  ReplicationPipelineByIdData['config']['table_sync_copy']
->
-
 export const useReplicationPipelineByIdQuery = <TData = ReplicationPipelineByIdData>(
   { projectRef, pipelineId }: ReplicationPipelineByIdParams,
   {

@@ -2,12 +2,12 @@ import { useMemo } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
+import { formatBytes, formatCurrency } from '@/lib/helpers'
 import {
   summarizeTableCopyEstimate,
   type ReplicationTableIdentity,
   type TableCopyEstimate,
-} from '@/data/replication/table-sync-copy'
-import { formatBytes, formatCurrency } from '@/lib/helpers'
+} from './TableSyncCopy.utils'
 
 interface RestartCostEstimateProps {
   open: boolean

@@ -12,11 +12,11 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
-import { PipelineStatusName } from './Replication.constants'
-import { RestartCostEstimate } from './RestartCostEstimate'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
-import { getTableCopyTargets, type TableSyncCopyConfig } from '@/data/replication/table-sync-copy'
+import { PipelineStatusName } from './Replication.constants'
+import { RestartCostEstimate } from './RestartCostEstimate'
+import { getTableCopyTargets, type TableSyncCopyConfig } from './TableSyncCopy.utils'
 
 interface BatchRestartDialogProps {
   open: boolean

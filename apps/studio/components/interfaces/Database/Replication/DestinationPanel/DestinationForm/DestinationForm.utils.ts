@@ -75,40 +75,24 @@ export const generateDefaultValues = ({
   editMode: boolean
 }): DestinationPanelSchemaType => {
   const config = destinationData?.config
-  const isBigQueryConfig = config && 'big_query' in config
+
+  const bigQueryConfig = config && 'big_query' in config ? config.big_query : undefined
   const icebergConfig =
     config && 'iceberg' in config && 'supabase' in config.iceberg
       ? config.iceberg.supabase
       : undefined
-  const ducklakeConfigValue =
-    config && 'ducklake' in (config as Record<string, unknown>)
-      ? (config as Record<string, unknown>).ducklake
-      : undefined
   const ducklakeConfig =
-    ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
-      ? (ducklakeConfigValue as DucklakeApiConfig)
-      : undefined
-  const snowflakeConfigValue =
-    config && 'snowflake' in (config as Record<string, unknown>)
-      ? (config as Record<string, unknown>).snowflake
-      : undefined
+    config && 'ducklake' in config ? (config.ducklake as DucklakeApiConfig) : undefined
   const snowflakeConfig =
-    snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
-      ? (snowflakeConfigValue as SnowflakeApiConfig)
-      : undefined
+    config && 'snowflake' in config ? (config.snowflake as SnowflakeApiConfig) : undefined
+  const clickhouseConfig =
+    config && 'clickhouse' in config ? (config.clickhouse as ClickHouseApiConfig) : undefined
+
   const tableSyncCopy = pipelineData?.config.table_sync_copy ?? {
     type: 'include_all_tables' as const,
   }
   const tableSyncCopyTableIds =
     'table_ids' in tableSyncCopy ? tableSyncCopy.table_ids.map((id) => String(id)) : []
-  const clickhouseConfigValue =
-    config && 'clickhouse' in (config as Record<string, unknown>)
-      ? (config as Record<string, unknown>).clickhouse
-      : undefined
-  const clickhouseConfig =
-    clickhouseConfigValue && typeof clickhouseConfigValue === 'object'
-      ? (clickhouseConfigValue as ClickHouseApiConfig)
-      : undefined
 
   return {
     // Common fields
@@ -126,15 +110,15 @@ export const generateDefaultValues = ({
       (pipelineData?.config as { invalidated_slot_behavior?: 'error' | 'recreate' } | undefined)
         ?.invalidated_slot_behavior ?? undefined,
     // BigQuery fields
-    projectId: isBigQueryConfig ? config.big_query.project_id : '',
-    datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
+    projectId: bigQueryConfig?.project_id ?? '',
+    datasetId: bigQueryConfig?.dataset_id ?? '',
     // Destination response DTOs intentionally omit stored secrets. Edit submissions
     // leave blank secret fields unset so the existing values are preserved.
     serviceAccountKey: '',
     connectionPoolSize:
       (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
         ?.connection_pool_size ?? DEFAULT_CONNECTION_POOL_SIZE,
-    maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined, // Default: null
+    maxStalenessMins: bigQueryConfig?.max_staleness_mins ?? undefined, // Default: null
     // Analytics Bucket fields
     warehouseName: icebergConfig?.warehouse_name ?? '',
     namespace: icebergConfig?.namespace ?? '',

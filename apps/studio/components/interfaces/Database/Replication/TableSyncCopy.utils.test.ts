@@ -5,7 +5,7 @@ import {
   shouldCopyTable,
   summarizeTableCopyEstimate,
   type TableSyncCopyConfig,
-} from './table-sync-copy'
+} from './TableSyncCopy.utils'
 
 const tables = [
   { id: 101, schema: 'public', name: 'orders' },

@@ -1,50 +1,44 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
+import type { components } from 'api-types'
+import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 import { PipelineCostDialog } from './PipelineCostDialog'
 
-const mocks = vi.hoisted(() => {
-  const tables = [
-    {
-      schema: 'public',
-      name: 'orders',
-      estimated_bytes: 600_000_000,
-      estimated_cost: 0.6,
-      is_row_filtered: false,
-    },
-    {
-      schema: 'billing',
-      name: 'invoices',
-      estimated_bytes: 9_400_000_000,
-      estimated_cost: 9.4,
-      is_row_filtered: false,
-    },
-  ]
+type CostEstimateResponse = components['schemas']['CostEstimateResponse']
+type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
 
-  return {
-    tables,
-    estimate: {
-      currency: 'usd' as const,
-      pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
-      streaming: { rate_per_gb: 3 },
-      table_copy: {
-        rate_per_gb: 0.6,
-        total_bytes: 10_000_000_000,
-        total_cost: 10,
-        tables: [...tables],
-      },
-    },
-  }
-})
+const tables = [
+  {
+    schema: 'public',
+    name: 'orders',
+    estimated_bytes: 600_000_000,
+    estimated_cost: 0.6,
+    is_row_filtered: false,
+  },
+  {
+    schema: 'billing',
+    name: 'invoices',
+    estimated_bytes: 9_400_000_000,
+    estimated_cost: 9.4,
+    is_row_filtered: false,
+  },
+]
 
-vi.mock('@/data/replication/cost-estimate-query', () => ({
-  useReplicationCostEstimateQuery: () => ({
-    data: mocks.estimate,
-    isLoading: false,
-    isError: false,
-    isSuccess: true,
-  }),
-}))
+let costEstimateTables = tables
+
+const mockSources: ReplicationSourcesResponse = {
+  sources: [
+    {
+      id: 1,
+      name: 'default',
+      tenant_id: 'tenant',
+      config: { host: 'db.internal', name: 'main-db', port: 5432, username: 'etl_user' },
+    },
+  ],
+}
 
 const publicationTables = [
   { id: 101, schema: 'public', name: 'orders' },
@@ -53,13 +47,33 @@ const publicationTables = [
 
 const renderDialog = (
   tableSyncCopy: { type: 'include_tables'; table_ids: number[] } | { type: 'skip_all_tables' }
-) =>
-  render(
+) => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: () => HttpResponse.json<ReplicationSourcesResponse>(mockSources),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+    response: () =>
+      HttpResponse.json<CostEstimateResponse>({
+        currency: 'usd',
+        pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
+        streaming: { rate_per_gb: 3 },
+        table_copy: {
+          rate_per_gb: 0.6,
+          total_bytes: 10_000_000_000,
+          total_cost: 10,
+          tables: costEstimateTables,
+        },
+      }),
+  })
+
+  return customRender(
     <PipelineCostDialog
       open
       isConfirming={false}
-      projectRef="project-ref"
-      sourceId={42}
       publicationName="analytics"
       publicationTables={publicationTables}
       tableSyncCopy={tableSyncCopy}
@@ -67,38 +81,39 @@ const renderDialog = (
       onConfirm={vi.fn()}
     />
   )
+}
 
 describe('PipelineCostDialog', () => {
   beforeEach(() => {
-    mocks.estimate.table_copy.tables = [...mocks.tables]
+    costEstimateTables = tables
   })
 
-  it('shows only the initial-copy tables selected by the policy', () => {
+  it('shows only the initial-copy tables selected by the policy', async () => {
     renderDialog({ type: 'include_tables', table_ids: [101] })
 
-    expect(screen.getByText('public.orders')).toBeInTheDocument()
+    expect(await screen.findByText('public.orders')).toBeInTheDocument()
     expect(screen.queryByText('billing.invoices')).not.toBeInTheDocument()
     expect(screen.getAllByText('$0.60')).toHaveLength(3)
     expect(screen.queryByText('$10.00')).not.toBeInTheDocument()
   })
 
-  it('shows a zero initial-copy charge while retaining ongoing rates', () => {
+  it('shows a zero initial-copy charge while retaining ongoing rates', async () => {
     renderDialog({ type: 'skip_all_tables' })
 
-    expect(screen.getByText(/No tables will be initially copied/)).toBeInTheDocument()
+    expect(await screen.findByText(/No tables will be initially copied/)).toBeInTheDocument()
     expect(screen.getByText('$0.00')).toBeInTheDocument()
     expect(screen.getByText('$0.05/hour')).toBeInTheDocument()
     expect(screen.getByText('$3.00/GB')).toBeInTheDocument()
     expect(screen.queryByText('public.orders')).not.toBeInTheDocument()
   })
 
-  it('does not show a partial total when a selected table estimate is missing', () => {
-    mocks.estimate.table_copy.tables = [mocks.estimate.table_copy.tables[0]]
+  it('does not show a partial total when a selected table estimate is missing', async () => {
+    costEstimateTables = [tables[0]]
 
     renderDialog({ type: 'include_tables', table_ids: [101, 202] })
 
     expect(
-      screen.getByText(/estimate is unavailable for one or more selected tables/)
+      await screen.findByText(/estimate is unavailable for one or more selected tables/)
     ).toBeInTheDocument()
     expect(screen.getByText('Unavailable')).toBeInTheDocument()
     expect(screen.queryByText('$0.60')).not.toBeInTheDocument()
