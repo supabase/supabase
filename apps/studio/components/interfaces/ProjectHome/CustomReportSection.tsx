@@ -301,8 +301,12 @@ export function CustomReportSection() {
 
       const data = e.dataTransfer.getData('application/json')
       if (!data) return
-
-      const { label, sql } = JSON.parse(data)
+      let label, sql
+      try {
+        ;({ label, sql } = JSON.parse(data))
+      } catch {
+        return
+      }
       if (!label || !sql) return
 
       const toastId = toast.loading(`Creating new query: ${label}`)

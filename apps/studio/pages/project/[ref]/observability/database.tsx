@@ -411,10 +411,9 @@ const DatabaseUsage = () => {
                       </Table.th>,
                     ]}
                     body={props.data?.map((object) => {
-                      const percentage = (
-                        ((object.table_size as number) / databaseSizeBytes) *
-                        100
-                      ).toFixed(2)
+                      const percentage = databaseSizeBytes > 0
+                        ? (((object.table_size as number) / databaseSizeBytes) * 100).toFixed(2)
+                        : '0.00'
 
                       return (
                         <Table.tr key={`${object.schema_name}.${object.relname}`}>

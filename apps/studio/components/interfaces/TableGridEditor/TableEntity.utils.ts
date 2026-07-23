@@ -55,7 +55,14 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
         if (val === null) {
           return 'null'
         } else if (dataType === 'ARRAY') {
-          const array = Array.isArray(val) ? val : JSON.parse(val as string)
+          let array = val
+          if (!Array.isArray(val)) {
+            try {
+              array = JSON.parse(val as string)
+            } catch {
+              return `'${String(val).replaceAll("'", "''")}'`
+            }
+          }
           return `${formatArrayForSql(array as unknown[])}`
         } else if (format?.includes('json')) {
           return `${JSON.stringify(val).replace(/\\"/g, '"').replace(/'/g, "''").replace('"', "'").replace(/.$/, "'")}`
