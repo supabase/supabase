@@ -1,6 +1,6 @@
 import { afterAll, expect, test } from 'vitest'
 
-import { COUNT_ESTIMATE_SQL, getTableRowsCountSql, SCOPED_COUNT_ESTIMATE_SQL } from '../../../src'
+import { getTableRowsCountSql } from '../../../src'
 import type { Filter } from '../../../src/query'
 import { cleanupRoot, createTestDatabase } from '../../db/utils'
 
@@ -336,7 +336,7 @@ withTestDatabase(
     const [{ id }] = await db.executeQuery<{ id: number }[]>(
       `select 'public."wei\\rd"'::regclass::oid::int8 as id;`
     )
-    // reltuples > THRESHOLD_COUNT + a filter -> the estimate (count_estimate_big)
+    // reltuples > THRESHOLD_COUNT + a filter -> the estimate (count_estimate)
     // branch runs, embedding the filtered select (with the backslash names) as a
     // literal inside the function call.
     const table = { id: Number(id), name: 'wei\\rd', schema: 'public' }
@@ -365,29 +365,5 @@ withTestDatabase(
     await expect(
       db.executeQuery(withScsOff(getTableRowsCountSql({ table, filters })))
     ).rejects.toThrow()
-  }
-)
-
-// ── Fix #2: the scoped estimate function RETURNS bigint (distinct name so it
-// never collides with the frozen integer count_estimate on a pooled session),
-// so multi-billion-row estimates don't overflow.
-withTestDatabase(
-  'scoped count_estimate_big returns >2^31 estimates without integer overflow',
-  async (db) => {
-    // The planner estimates generate_series row counts from the argument without
-    // executing it, so this is a cheap way to produce a ~3e9-row estimate.
-    const hugeSelect = `select from generate_series(1, 3000000000)`
-    const [big] = await db.executeQuery<{ est: string }[]>(
-      `${SCOPED_COUNT_ESTIMATE_SQL} select pg_temp.count_estimate_big('${hugeSelect}') as est;`
-    )
-    expect(Number(big.est)).toBe(3000000000)
-
-    // The frozen legacy integer function overflows on the same estimate -- this
-    // is exactly the case the scoped bigint variant fixes.
-    await expect(
-      db.executeQuery(
-        `${COUNT_ESTIMATE_SQL} select pg_temp.count_estimate('${hugeSelect}') as est;`
-      )
-    ).rejects.toThrow(/out of range for type integer/)
   }
 )
