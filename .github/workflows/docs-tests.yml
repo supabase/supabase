@@ -10,6 +10,7 @@ on:
       - 'apps/docs/package.json'
       - 'e2e/docs/local-smoke/**'
       - 'e2e/docs/playwright.local-smoke.config.ts'
+      - 'e2e/docs/package.json'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
