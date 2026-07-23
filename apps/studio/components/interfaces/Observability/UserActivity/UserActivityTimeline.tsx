@@ -22,6 +22,10 @@ const groupEventsByDay = (events: UserActivityEvent[]) => {
 export const UserActivityTimeline = ({ events }: UserActivityTimelineProps) => {
   const dayGroups = groupEventsByDay(events)
 
+  if (events.length === 0) {
+    return <p className="text-sm text-foreground-light">No activity found in this date range.</p>
+  }
+
   return (
     <div className="flex flex-col gap-y-6">
       {dayGroups.map(([day, dayEvents]) => (
