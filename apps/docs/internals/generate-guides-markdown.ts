@@ -32,6 +32,7 @@ import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
 import { PromptPanel } from './markdown-schema/PromptPanel'
+import { QuickstartAiPrompt } from './markdown-schema/QuickstartAiPrompt'
 import { RealtimeLimitsEstimator } from './markdown-schema/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
@@ -185,6 +186,7 @@ const SCHEMA: ComponentSchema = {
   Admonition,
   AiPrompt,
   AiSkillsIndex,
+  QuickstartAiPrompt,
   IconCheck,
   IconX,
   Image,
