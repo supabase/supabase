@@ -193,6 +193,7 @@ const UserActivitySelectorRow = ({
   return (
     <button
       type="button"
+      tabIndex={0}
       onClick={() => onClick(user)}
       className="w-full flex items-center gap-x-3 px-3 py-2 text-left hover:bg-surface-200"
     >
