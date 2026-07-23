@@ -101,17 +101,18 @@ export function ConnectConfigSection({
                 <RadioGroupStacked
                   value={String(value ?? '')}
                   onValueChange={(v) => onFieldChange(field.id, v)}
+                  className="min-w-0 w-full"
                 >
                   {options.map((option) => (
                     <RadioGroupStackedItem
                       key={option.value}
                       id={`connect-${field.id}-${option.value}`}
                       value={option.value}
-                      className="w-full text-left"
+                      className="min-w-0 w-full text-left"
                       label={
-                        <span className="flex items-center gap-2">
+                        <span className="flex min-w-0 items-center gap-2">
                           {option.icon && <ConnectionIcon icon={option.icon} />}
-                          {option.label}
+                          <span className="truncate">{option.label}</span>
                         </span>
                       }
                       description={option.description}
@@ -372,8 +373,8 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
             key={`empty-${index}`}
             aria-hidden
             className={cn(
-              // One token sunk vs mode tiles (bg-overlay/50), solid border so the empty slot still reads
-              'relative -mb-px -mr-px rounded-br-lg border bg-surface-100',
+              // Sunk vs mode tiles (bg-overlay/50); surface-200 reads clearly recessed on light
+              'relative -mb-px -mr-px rounded-br-lg border bg-surface-200 dark:bg-surface-100',
               wideCornerClasses.hideEmpty
             )}
           />

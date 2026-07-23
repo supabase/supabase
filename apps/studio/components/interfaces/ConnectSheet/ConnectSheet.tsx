@@ -161,7 +161,7 @@ export const ConnectSheet = () => {
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
       <SheetContent
         size="lg"
-        className="flex flex-col gap-0 p-0 space-y-0 max-w-4xl"
+        className="flex w-full min-w-0 flex-col gap-0 space-y-0 p-0 max-w-4xl"
         tabIndex={undefined}
       >
         <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
@@ -169,7 +169,7 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-1 flex-col overflow-y-auto divide-y">
+        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
           <div className="p-8">
             <ModeSelector
               modes={availableModes}
