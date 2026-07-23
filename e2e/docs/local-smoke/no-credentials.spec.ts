@@ -46,13 +46,7 @@ test.describe('docs dev runs locally without credentials', () => {
     expect(response?.status()).toBe(404)
   })
 
-  // Expected to fail: the wrappers page's federated-content fetch has no
-  // guard, so it crashes without GitHub App credentials. After it's fixed,
-  // this will surface as an unexpected pass, signaling it should become a
-  // real assertion instead.
   test('a federated wrappers page does not crash without GitHub credentials', async ({ page }) => {
-    test.fail()
-
     const response = await page.goto('/docs/guides/database/extensions/wrappers/stripe')
     expect(response?.ok(), `expected 200, got ${response?.status()}`).toBeTruthy()
   })
