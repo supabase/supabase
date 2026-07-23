@@ -3,7 +3,8 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 export const telemetryDebugging: ContentListingGroup = {
   id: 'telemetry-debugging',
   heading: 'Debugging',
-  type: 'list',
+  type: 'grid',
+  columns: 2,
   items: [
     {
       title: 'Debugging',
@@ -32,7 +33,8 @@ export const telemetryDebugging: ContentListingGroup = {
 export const telemetryMonitoring: ContentListingGroup = {
   id: 'telemetry-monitoring',
   heading: 'Monitoring',
-  type: 'list',
+  type: 'grid',
+  columns: 2,
   items: [
     {
       title: 'Log drains',
@@ -50,14 +52,14 @@ export const telemetryMonitoring: ContentListingGroup = {
       description: 'Prometheus-compatible database metrics for Grafana and other tools.',
     },
     {
-      title: 'Sentry integration',
-      href: '/guides/telemetry/sentry-monitoring',
-      description: 'Send errors to Sentry for alerting and grouping.',
-    },
-    {
       title: 'Client-side tracing',
       href: '/guides/telemetry/client-side-tracing',
       description: 'Correlate browser requests end-to-end using W3C Trace Context.',
+    },
+    {
+      title: 'Sentry integration',
+      href: '/guides/telemetry/sentry-monitoring',
+      description: 'Send errors to Sentry for alerting and grouping.',
     },
   ],
 }
@@ -65,13 +67,19 @@ export const telemetryMonitoring: ContentListingGroup = {
 export const telemetryAI: ContentListingGroup = {
   id: 'telemetry-ai',
   heading: 'AI & automation',
-  type: 'list',
+  type: 'grid',
+  columns: 2,
   items: [
     {
       title: 'AI agents and MCP',
       href: '/guides/telemetry/ai-agents',
       description:
         'Use the Supabase MCP server and debugging skill to let agents monitor and debug your project.',
+    },
+    {
+      title: 'MCP server setup',
+      href: '/guides/getting-started/mcp',
+      description: 'Connect Claude, Cursor, or any MCP-compatible agent to your Supabase project.',
     },
   ],
 }
