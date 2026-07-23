@@ -27,7 +27,7 @@ export async function getOngoingQueries(
     signal
   )
 
-  return (result ?? []).filter((x: OngoingQuery) => !x.query.startsWith(sql)) as OngoingQuery[]
+  return (result ?? []).filter((x: OngoingQuery) => x.query?.startsWith(sql)) as OngoingQuery[]
 }
 
 export type OngoingQueriesData = Awaited<ReturnType<typeof getOngoingQueries>>

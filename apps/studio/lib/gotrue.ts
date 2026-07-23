@@ -62,7 +62,7 @@ export const buildPathWithParams = (pathname: string) => {
 
   // Merge the parameters, with pathname parameters taking precedence
   // over the current location's search parameters
-  const mergedParams = new URLSearchParams(location.search)
+  const mergedParams = new URLSearchParams(typeof location !== 'undefined' ? location.search : '')
   for (const [key, value] of pathnameSearchParams.entries()) {
     mergedParams.set(key, value)
   }

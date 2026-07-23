@@ -140,7 +140,7 @@ export async function getUnifiedLogs(
       host: row.host,
       event_message: row.event_message || row.body || '',
       headers:
-        typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
+        typeof row.headers === 'string' ? tryParseJson(row.headers || '{}') : row.headers || {},
       regions: row.region ? [row.region] : [],
       log_type: row.log_type || '',
       latency: row.latency || 0,
