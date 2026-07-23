@@ -136,7 +136,7 @@ export const formatBytes = (
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
-  if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
+  if (bytes === 0 || bytes === undefined || Number.isNaN(bytes)) return size !== undefined ? `0 ${size}` : '0 bytes'
 
   // Handle negative values
   const isNegative = bytes < 0

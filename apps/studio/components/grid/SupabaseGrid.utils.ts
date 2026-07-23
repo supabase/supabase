@@ -157,8 +157,12 @@ export function loadTableEditorStateFromLocalStorage(
   // Prefer sessionStorage (scoped to current tab) over localStorage
   const jsonStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
   if (!jsonStr) return
-  const json = JSON.parse(jsonStr)
-  return json[tableId]
+  try {
+    const json = JSON.parse(jsonStr)
+    return json[tableId]
+  } catch {
+    return undefined
+  }
 }
 
 /**
@@ -218,7 +222,11 @@ export function saveTableEditorStateToLocalStorage({
 
   let savedJson
   if (savedStr) {
-    savedJson = JSON.parse(savedStr)
+    try {
+      savedJson = JSON.parse(savedStr)
+    } catch {
+      savedJson = {}
+    }
     const previousConfig = savedJson[tableId]
     savedJson = { ...savedJson, [tableId]: { ...previousConfig, ...config } }
   } else {

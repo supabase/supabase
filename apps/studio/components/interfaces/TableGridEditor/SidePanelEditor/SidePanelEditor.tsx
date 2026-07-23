@@ -314,7 +314,13 @@ export const SidePanelEditor = ({
     if (snap.sidePanel?.type === 'json') {
       const selectedValueForJsonEdit = snap.sidePanel.jsonValue
       const { row, column } = selectedValueForJsonEdit
-      payload = { [column]: value === null ? null : JSON.parse(value as any) }
+      let parsed
+      try {
+        parsed = JSON.parse(value as any)
+      } catch {
+        parsed = undefined
+      }
+      payload = { [column]: value === null ? null : parsed }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
       configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     } else if (snap.sidePanel?.type === 'cell') {
