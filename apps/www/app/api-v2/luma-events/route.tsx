@@ -63,6 +63,13 @@ interface LumaResponse {
   next_cursor?: string
 }
 
+// Luma expects ISO-8601 datetimes for `after`/`before`. Validate before forwarding so bad
+// client input (e.g. `after=121`) is rejected here instead of triggering an upstream 400.
+const ISO_8601_REGEX = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})?)?$/
+function isValidDateParam(value: string | null) {
+  return value === null || (ISO_8601_REGEX.test(value) && !Number.isNaN(Date.parse(value)))
+}
+
 async function fetchLumaCalendar(apiKey: string, after: string | null, before: string | null) {
   const lumaUrl = new URL('https://public-api.lu.ma/public/v1/calendar/list-events')
   if (after) lumaUrl.searchParams.append('after', after)
@@ -77,7 +84,10 @@ async function fetchLumaCalendar(apiKey: string, after: string | null, before: s
   })
 
   if (!response.ok) {
-    throw new Error(`Luma API error: ${response.status} ${response.statusText}`)
+    const error = new Error(`Luma API error: ${response.status} ${response.statusText}`)
+    // Expose the upstream status so the caller can decide whether to report it to Sentry.
+    ;(error as Error & { status?: number }).status = response.status
+    throw error
   }
 
   const data: LumaResponse = await response.json()
@@ -115,6 +125,13 @@ export async function GET(request: NextRequest) {
     const after = searchParams.get('after')
     const before = searchParams.get('before')
 
+    if (!isValidDateParam(after) || !isValidDateParam(before)) {
+      return NextResponse.json(
+        { error: 'Invalid `after`/`before` — must be an ISO-8601 datetime' },
+        { status: 400 }
+      )
+    }
+
     const events = (await fetchLumaCalendar(apiKey, after, before)).sort(
       (a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime()
     )
@@ -126,7 +143,14 @@ export async function GET(request: NextRequest) {
       filters: { after, before },
     })
   } catch (error) {
-    Sentry.captureException(error)
+    // Don't page Sentry for upstream 4xx responses driven by bad client input; still capture
+    // genuine 5xx and unexpected/network errors.
+    const upstreamStatus = (error as { status?: number } | null)?.status
+    const isUpstreamClientError =
+      typeof upstreamStatus === 'number' && upstreamStatus >= 400 && upstreamStatus < 500
+    if (!isUpstreamClientError) {
+      Sentry.captureException(error)
+    }
     console.error('Error fetching events from Luma:', error)
     return NextResponse.json(
       {
