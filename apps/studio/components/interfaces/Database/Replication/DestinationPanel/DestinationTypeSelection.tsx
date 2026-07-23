@@ -147,16 +147,12 @@ export const DestinationTypeSelection = () => {
     .flatMap((group) => group.options)
     .find((option) => option.value === destinationType)
 
-  return (
-    <FormItemLayout
-      isReactForm={false}
-      layout="horizontal"
-      className="p-5 [&>div]:gap-y-1"
-      label="Type"
-      labelOptional="Destination type cannot be changed after creation"
-      description={
-        selectedOption?.stage && (
-          <span className="block text-sm text-foreground-lighter mb-1">
+  const typeDescription =
+    !editMode || selectedOption?.stage ? (
+      <>
+        {!editMode && <span className="block">Cannot be changed after creation.</span>}
+        {selectedOption?.stage && (
+          <span className="block">
             {selectedOption.stage === 'Public Alpha'
               ? 'This destination type is in public alpha and may change as we iterate based on customer feedback. '
               : selectedOption.stage === 'Deprecated'
@@ -168,8 +164,17 @@ export const DestinationTypeSelection = () => {
               </InlineLink>
             )}
           </span>
-        )
-      }
+        )}
+      </>
+    ) : undefined
+
+  return (
+    <FormItemLayout
+      isReactForm={false}
+      layout="horizontal"
+      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+      label="Type"
+      description={typeDescription}
     >
       <Select
         disabled={editMode}
