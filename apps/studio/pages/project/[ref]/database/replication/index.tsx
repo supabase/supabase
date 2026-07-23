@@ -43,7 +43,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
 
   return (
     <PipelineRequestStatusProvider>
-      <PageHeader size="large" className="pb-12">
+      <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Replication</PageHeaderTitle>
@@ -55,22 +55,18 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
 
-      {isPending ? (
-        <PageContainer size="large">
+      <PageContainer size="large">
+        {isPending ? (
           <GenericSkeletonLoader />
-        </PageContainer>
-      ) : (
-        <>
-          <ReplicationDiagram />
-          <PageContainer size="large">
-            <PageSection>
-              <PageSectionContent>
-                <Destinations />
-              </PageSectionContent>
-            </PageSection>
-          </PageContainer>
-        </>
-      )}
+        ) : (
+          <PageSection>
+            <PageSectionContent className="flex flex-col gap-6">
+              <ReplicationDiagram />
+              <Destinations />
+            </PageSectionContent>
+          </PageSection>
+        )}
+      </PageContainer>
     </PipelineRequestStatusProvider>
   )
 }
