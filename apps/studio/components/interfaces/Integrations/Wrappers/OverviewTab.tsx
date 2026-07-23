@@ -13,7 +13,6 @@ import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -192,10 +191,6 @@ export const WrapperContent = () => {
 }
 
 export const WrapperOverviewTab = () => {
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  if (isMarketplaceEnabled) return <RequiredExtensionsSection />
-
   return (
     <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
       <div className="mx-10">

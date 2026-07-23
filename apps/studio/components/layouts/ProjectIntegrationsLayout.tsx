@@ -4,7 +4,6 @@ import { PropsWithChildren } from 'react'
 import { Menu, Separator } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import { AlertError } from '@/components/ui/AlertError'
@@ -46,7 +45,6 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const router = useRouter()
   const { ref } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const urlParams = new URLSearchParams(router.asPath.split('?')[1] || '')
   const categoryParam = urlParams.get('category')
@@ -54,10 +52,10 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
 
   const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
   const { data: categories = [], isPending: isPendingCategories } = useMarketplaceCategoriesQuery({
-    enabled: isMarketplaceEnabled,
+    enabled: true,
   })
   const { data: listings = [], isPending: isPendingListings } = useMarketplaceIntegrationsQuery({
-    enabled: isMarketplaceEnabled,
+    enabled: true,
   })
 
   const populatedCategoryIds = new Set(
@@ -68,7 +66,7 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   )
 
   const isLoading = IS_PLATFORM
-    ? !flagsLoaded || (isMarketplaceEnabled && (isPendingCategories || isPendingListings))
+    ? !flagsLoaded || (isPendingCategories || isPendingListings)
     : false
 
   const allCategories = [

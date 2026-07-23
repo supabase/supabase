@@ -134,12 +134,6 @@ export const useIsSqlEditorManualSaveEnabled = () => {
   return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
-export const useIsMarketplaceEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
-  return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
-}
-
 export const useFeaturePreviewModal = () => {
   const featurePreviews = useFeaturePreviews()
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')

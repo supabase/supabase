@@ -11,7 +11,6 @@ import {
   getInstallActionType,
   type InstallActionType,
 } from './useIntegrationDetail.utils'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -27,7 +26,6 @@ export const useIntegrationDetail = () => {
   const { ref, id, pageId, childId } = useParams()
 
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: project } = useSelectedProjectQuery()
   const { data: extensions } = useDatabaseExtensionsQuery({
@@ -65,10 +63,9 @@ export const useIntegrationDetail = () => {
       getFilteredNavItems({
         integration,
         isInstalled,
-        isMarketplaceEnabled,
         areRequiredExtensionsInstalled,
       }),
-    [integration, isInstalled, isMarketplaceEnabled, areRequiredExtensionsInstalled]
+    [integration, isInstalled, areRequiredExtensionsInstalled]
   )
 
   const activeRoute = pageId ?? 'overview'
@@ -105,11 +102,10 @@ export const useIntegrationDetail = () => {
     () =>
       getInstallActionType({
         integration,
-        isMarketplaceEnabled,
         areRequiredExtensionsInstalled,
         isInstalled,
       }),
-    [integration, isMarketplaceEnabled, areRequiredExtensionsInstalled, isInstalled]
+    [integration, areRequiredExtensionsInstalled, isInstalled]
   )
 
   const isReady = !!router?.isReady

@@ -4,9 +4,7 @@ import { toast } from 'sonner'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
@@ -89,11 +87,5 @@ const WebhooksContent = () => {
 }
 
 export const WebhooksOverviewTab = () => {
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  if (isMarketplaceEnabled) {
-    return <RequiredExtensionsSection />
-  }
-
-  return <IntegrationOverviewTab hideRequiredExtensionsSection actions={<WebhooksContent />} />
+  return <RequiredExtensionsSection />
 }

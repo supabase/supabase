@@ -27,17 +27,15 @@ export function areRequiredExtensionsInstalledFor(
 export function getFilteredNavItems({
   integration,
   isInstalled,
-  isMarketplaceEnabled,
   areRequiredExtensionsInstalled,
 }: {
   integration: IntegrationDefinition | undefined
   isInstalled: boolean
-  isMarketplaceEnabled: boolean
   areRequiredExtensionsInstalled: boolean
 }): Navigation[] {
   if (!integration?.navigation) return []
   if (isInstalled || integration.type !== 'wrapper') return integration.navigation
-  if (isMarketplaceEnabled || areRequiredExtensionsInstalled) return integration.navigation
+  if (areRequiredExtensionsInstalled) return integration.navigation
   return integration.navigation.filter((nav) => nav.route !== 'wrappers')
 }
 
@@ -46,18 +44,16 @@ export function getFilteredNavItems({
  */
 export function getInstallActionType({
   integration,
-  isMarketplaceEnabled,
   areRequiredExtensionsInstalled,
   isInstalled,
 }: {
   integration: IntegrationDefinition | undefined
-  isMarketplaceEnabled: boolean
   areRequiredExtensionsInstalled: boolean
   isInstalled: boolean
 }): InstallActionType {
   if (!integration) return null
   if (integration.type === 'oauth') return 'oauth'
-  if (integration.type === 'wrapper' && (isMarketplaceEnabled || areRequiredExtensionsInstalled)) {
+  if (integration.type === 'wrapper' && areRequiredExtensionsInstalled) {
     return 'add-wrapper'
   }
   if (isInstalled) return 'installed'
