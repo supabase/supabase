@@ -59,9 +59,12 @@ export function buildVercelInstallRouteQuery({
       })
     case 'marketplace':
     case 'external':
+      // Keep Deploy Button ids when present so choose-project → create can seed + link.
       return removeUndefinedValues({
         organizationSlug,
         configurationId,
+        currentProjectId,
+        externalId,
         next,
       })
     default:

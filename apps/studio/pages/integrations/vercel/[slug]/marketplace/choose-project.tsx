@@ -40,7 +40,7 @@ const PAGE_TITLE = buildStudioPageTitle({
 })
 
 const VercelChooseProjectPage: NextPageWithLayout = () => {
-  const { slug, configurationId, next } = useParams()
+  const { slug, configurationId, next, currentProjectId } = useParams()
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
   const displayName = primaryEmail ?? username ?? ''
 
@@ -198,6 +198,7 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
                 integrationIcon={VERCEL_INTEGRATION_ICON}
                 getForeignProjectIcon={getForeignProjectIcon}
                 choosePrompt="Choose Vercel project"
+                defaultForeignProjectId={currentProjectId}
                 onSkip={() => {
                   if (next && isVercelUrl(next)) {
                     window.location.href = next

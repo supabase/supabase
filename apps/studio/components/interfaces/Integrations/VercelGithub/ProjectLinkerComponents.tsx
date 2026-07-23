@@ -266,12 +266,14 @@ export const ActionButtons = ({
   foreignProjectId: string | undefined
   onCreateConnections: () => void
 } & Pick<ProjectLinkerProps, 'variant' | 'mode' | 'onSkip' | 'isLoading'>) => {
-  const { slug, next } = useParams()
+  const { slug, next, externalId, currentProjectId } = useParams()
+  const vercelProjectId = foreignProjectId ?? currentProjectId
   const newProjectURL =
     mode === 'Vercel'
       ? `/integrations/vercel/${slug}/deploy-button/new-project?${new URLSearchParams({
           ...(next ? { next } : {}),
-          ...(foreignProjectId ? { currentProjectId: foreignProjectId } : {}),
+          ...(vercelProjectId ? { currentProjectId: vercelProjectId } : {}),
+          ...(externalId ? { externalId } : {}),
         })}`
       : `/new/${slug}`
 
