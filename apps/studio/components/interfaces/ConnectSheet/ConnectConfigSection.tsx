@@ -245,13 +245,23 @@ interface ModeSelectorProps {
 
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   const count = modes.length
+  // 2-col layout leaves an empty cell when count is odd; hide it once we switch to a single row
+  const emptySlots = count % 2 === 1 ? 1 : 0
+  const hideEmptyClass =
+    count === 3
+      ? '@[28rem]:hidden'
+      : count === 4
+        ? '@[30rem]:hidden'
+        : count === 5
+          ? '@[32rem]:hidden'
+          : '@[36rem]:hidden'
 
   return (
     // Container query: 2-col when the sheet is narrow; one equal row when there's room
     <div className="@container">
       <div
         className={cn(
-          'grid gap-px overflow-hidden rounded-lg border bg-border',
+          'grid overflow-hidden rounded-lg',
           'grid-cols-2',
           count === 3 && '@[28rem]:grid-cols-3',
           count === 4 && '@[30rem]:grid-cols-4',
@@ -270,11 +280,12 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
               onClick={() => onChange(mode.id)}
               aria-pressed={isSelected}
               className={cn(
-                'relative flex flex-col items-center gap-2 bg-overlay/50 p-4 transition-colors',
+                // Each cell owns a border; adjacent edges overlap (RadioGroupStacked-style)
+                'relative -mb-px -mr-px flex flex-col items-center gap-2 border bg-overlay/50 p-4 shadow-xs transition-colors',
                 'focus-visible:z-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
                 isSelected
-                  ? 'z-1 bg-surface-300 ring-1 ring-border'
-                  : 'hover:z-1 hover:bg-surface-200'
+                  ? 'z-1 border-foreground-muted bg-surface-300 ring-1 ring-border'
+                  : 'hover:z-1 hover:border-strong hover:bg-surface-100 dark:hover:bg-surface-200'
               )}
             >
               <span className={cn(isSelected ? 'text-foreground' : 'text-foreground-light')}>
@@ -301,6 +312,17 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
             </button>
           )
         })}
+
+        {Array.from({ length: emptySlots }, (_, index) => (
+          <div
+            key={`empty-${index}`}
+            aria-hidden
+            className={cn(
+              'relative -mb-px -mr-px border border-dashed bg-surface-100/30 dark:bg-surface-75/10',
+              hideEmptyClass
+            )}
+          />
+        ))}
       </div>
     </div>
   )

@@ -159,7 +159,11 @@ export const ConnectSheet = () => {
 
   return (
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
-      <SheetContent size="lg" className="flex flex-col gap-0 p-0 space-y-0" tabIndex={undefined}>
+      <SheetContent
+        size="lg"
+        className="flex flex-col gap-0 p-0 space-y-0 max-w-4xl"
+        tabIndex={undefined}
+      >
         <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
           <SheetTitle>Connect to your project</SheetTitle>
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
