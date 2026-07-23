@@ -23,7 +23,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../../Integration/RequiredExtensionsSection'
 import { InstallationError } from './InstallationError'
 import { IntegrationInstalledActions, IntegrationNotInstalledActions } from './IntegrationActions'
@@ -38,7 +37,6 @@ import {
   isUninstalling,
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { useStripeSyncInstallMutation } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
 import { useStripeSyncUninstallMutation } from '@/data/database-integrations/stripe/stripe-sync-uninstall-mutation'
@@ -391,23 +389,9 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
   )
 }
 
-export const StripeSyncEngineOverviewTab = () => {
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  if (isMarketplaceEnabled) {
-    return (
-      <>
-        <RequiredExtensionsSection />
-        <StripeSyncContent hideInstallCTA />
-      </>
-    )
-  }
-
-  return (
-    <IntegrationOverviewTab>
-      <div className="px-4 md:px-10 max-w-4xl space-y-4">
-        <StripeSyncContent />
-      </div>
-    </IntegrationOverviewTab>
-  )
-}
+export const StripeSyncEngineOverviewTab = () => (
+  <>
+    <RequiredExtensionsSection />
+    <StripeSyncContent hideInstallCTA />
+  </>
+)

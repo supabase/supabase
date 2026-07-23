@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
-import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
+import { ProjectMarketplaceLayout } from '@/components/layouts/ProjectMarketplaceLayout'
 
 export const Route = createFileRoute('/project/$ref/integrations')({
   component: IntegrationsShell,
@@ -8,8 +8,8 @@ export const Route = createFileRoute('/project/$ref/integrations')({
 
 function IntegrationsShell() {
   return (
-    <ProjectIntegrationsLayoutDispatch>
+    <ProjectMarketplaceLayout>
       <Outlet />
-    </ProjectIntegrationsLayoutDispatch>
+    </ProjectMarketplaceLayout>
   )
 }

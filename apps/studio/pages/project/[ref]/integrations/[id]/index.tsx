@@ -6,7 +6,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
+import { ProjectMarketplaceLayout } from '@/components/layouts/ProjectMarketplaceLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const INTEGRATION_FLAGS: Record<string, string> = {
@@ -57,7 +57,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
+    <ProjectMarketplaceLayout>{page}</ProjectMarketplaceLayout>
   </DefaultLayout>
 )
 

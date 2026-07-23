@@ -1,17 +1,5 @@
-import { BadgeCheck } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Badge, Card, CardContent, cn } from 'ui'
+import { cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-import { IntegrationDefinition } from './Integrations.constants'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-type IntegrationCardProps = IntegrationDefinition & {
-  isInstalled?: boolean
-  featured?: boolean
-  image?: string
-}
 
 const INTEGRATION_CARD_STYLE = cn(
   'w-full h-full bg-surface-100 hover:bg-surface-200 hover:border-strong',
@@ -31,83 +19,5 @@ export const IntegrationLoadingCard = () => {
         </div>
       </div>
     </div>
-  )
-}
-
-export const IntegrationCard = ({
-  id,
-  listingId,
-  status,
-  name,
-  icon,
-  description,
-  isInstalled,
-  featured = false,
-  image,
-}: IntegrationCardProps) => {
-  const { data: project } = useSelectedProjectQuery()
-  const shouldShowOfficialBadge = !listingId
-
-  if (featured) {
-    return (
-      <Link href={`/project/${project?.ref}/integrations/${id}/overview`} className="h-full">
-        <Card className="h-full">
-          {/* Full-width image/icon at the top */}
-          <div className="w-full h-24 bg-surface-400 rounded-t-md flex items-center justify-center overflow-hidden relative">
-            {image ? (
-              <Image
-                fill
-                src={image}
-                alt={`${name} integration`}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-12 h-12 text-foreground relative">
-                {icon({ className: 'w-full h-full text-foreground' })}
-              </div>
-            )}
-          </div>
-          <CardContent className="p-6 px-4">
-            <div className="flex-col justify-start items-center text-center gap-y-0.5 flex">
-              <h3>{name}</h3>
-              <p className="text-foreground-light text-sm line-clamp-3">{description}</p>
-              <div className="flex items-center gap-x-1 mt-4">
-                {status && <Badge variant="warning">{status}</Badge>}
-                {shouldShowOfficialBadge && <Badge>Official</Badge>}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </Link>
-    )
-  }
-
-  return (
-    <Link href={`/project/${project?.ref}/integrations/${id}/overview`} className="h-full">
-      <Card className="h-full">
-        <CardContent className="flex flex-col p-4 @2xl:p-6 h-full">
-          <div className="flex items-start justify-between mb-4">
-            <div className="shrink-0 w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
-              {icon()}
-            </div>
-            {isInstalled && (
-              <div className="flex items-center gap-x-1">
-                <BadgeCheck size={14} className="text-brand-link" />
-                <span className="text-brand-link text-xs">Installed</span>
-              </div>
-            )}
-          </div>
-          <div className="flex-col justify-start items-start gap-y-0.5 flex flex-1">
-            <h3 className="text-foreground text-sm">{name}</h3>
-
-            <p className="text-foreground-light text-xs flex-1">{description}</p>
-            <div className="flex items-center gap-x-1 mt-4">
-              {status && <Badge variant="warning">{status}</Badge>}
-              {shouldShowOfficialBadge && <Badge>Official</Badge>}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </Link>
   )
 }

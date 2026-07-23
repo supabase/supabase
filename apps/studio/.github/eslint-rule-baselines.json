@@ -639,7 +639,6 @@
       "components/interfaces/Functions/EdgeFunctionSecrets/EdgeFunctionSecret.tsx": 1,
       "components/interfaces/Integrations/CronJobs/CronJobsEmptyState.tsx": 1,
       "components/interfaces/Integrations/CronJobs/CronSyntaxChart.tsx": 1,
-      "components/interfaces/Integrations/Integration/LegacyIntegrationPage.tsx": 1,
       "components/interfaces/Integrations/Vercel/OrganizationPicker.tsx": 1,
       "components/interfaces/Integrations/Wrappers/InputField.tsx": 1,
       "components/interfaces/Integrations/Wrappers/WrapperTableEditor.tsx": 1,

@@ -32,7 +32,6 @@ import {
   NewTable,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
@@ -66,7 +65,6 @@ export const CreateWrapperSheet = ({
   onCloseWithConfirmation,
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const { integration } = useIntegrationDetail()
 
   const { data: project } = useSelectedProjectQuery()
@@ -85,8 +83,8 @@ export const CreateWrapperSheet = ({
 
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
   const hasRequiredVersionForeignSchema = hasForeignSchemaSupport(wrappersExtension)
-  const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
-  const isExtensionDataLoading = isMarketplaceEnabled && requiredExtensionsToInstall === null
+  const needsExtensions = (requiredExtensionsToInstall?.length ?? 0) > 0
+  const isExtensionDataLoading = requiredExtensionsToInstall === null
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref!,
@@ -261,18 +259,16 @@ export const CreateWrapperSheet = ({
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
             <div className="grow overflow-y-auto">
-              {isMarketplaceEnabled && (
-                <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-                  {needsExtensions && (
-                    <Admonition
-                      type="warning"
-                      title="Required extensions will be installed"
-                      description="Proceeding will also install the extensions required by this wrapper."
-                    />
-                  )}
-                  <RequiredExtensionsSection hideSeparator />
-                </div>
-              )}
+              <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
+                {needsExtensions && (
+                  <Admonition
+                    type="warning"
+                    title="Required extensions will be installed"
+                    description="Proceeding will also install the extensions required by this wrapper."
+                  />
+                )}
+                <RequiredExtensionsSection hideSeparator />
+              </div>
               <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField

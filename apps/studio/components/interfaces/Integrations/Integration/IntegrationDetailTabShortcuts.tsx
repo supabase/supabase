@@ -8,9 +8,7 @@ const TAB_DIGIT_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const
 
 /**
  * Binds digit keys 1-9 to whichever tabs the active integration declares in
- * its `navigation` array. Render this once per integration detail page —
- * shared between `LegacyIntegrationPage` and the marketplace `MarketplaceDetail`
- * since both surfaces drive off the same `tabs` shape from `useIntegrationDetail`.
+ * its `navigation` array. Render this once per integration detail page.
  *
  * The dynamic shortcut registry handles per-tab label overrides ("Go to Jobs",
  * "Go to Wrappers", etc.) so the reference sheet and Cmd+K pick up the actual
