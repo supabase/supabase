@@ -44,13 +44,8 @@ const LUCIDE_DESTINATION_TYPES = new Set<DestinationType>(['Snowflake'])
 
 function DestinationOptionIcon({ option }: { option: DestinationTypeOption }) {
   const Icon = option.icon
-  const className = 'shrink-0 text-foreground-light'
 
-  if (LUCIDE_DESTINATION_TYPES.has(option.value)) {
-    return <Icon size={20} strokeWidth={1.5} className={className} />
-  }
-
-  return <Icon size={20} className={className} />
+  return <Icon size={20} strokeWidth={1.5} className="shrink-0 text-foreground-light" />
 }
 
 export const DestinationTypeSelection = () => {

@@ -165,8 +165,8 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                     <div className="flex flex-col gap-y-1">
                       <h4>Request Pipelines access</h4>
                       <p className="text-sm text-foreground-light">
-                        Pipelines is in <span className="text-foreground">alpha</span> and being
-                        rolled out gradually. Request access below to join the waitlist. Read
+                        Pipelines is in <span className="text-foreground">public alpha</span> and
+                        being rolled out gradually. Request access below to join the waitlist. Read
                         replicas are available now.
                       </p>
                     </div>
@@ -181,7 +181,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                           rel="noreferrer"
                           href="https://forms.supabase.com/pg_replicate"
                         >
-                          Request alpha access
+                          Request Pipelines access
                         </Link>
                       </Button>
                       <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
