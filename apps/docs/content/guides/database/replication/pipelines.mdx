@@ -199,7 +199,7 @@ Follow these steps to configure your destination. Each destination has its own s
 
    Leave these settings at their defaults unless you need to tune initial sync speed, latency, or recovery behavior.
 
-   Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline starts after Postgres has invalidated the main replication slot, the pipeline resets its saved table-sync state, creates a new slot, and replaces each destination table through a new initial sync. This destructive restart is required for consistency because the old slot can no longer provide every change the pipeline missed, and the new initial sync is billed as initial sync data.
+   Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline starts after Postgres has invalidated the main replication slot, the pipeline resets its saved table-sync state, creates a new slot, and replaces each destination table through a new initial sync. This destructive restart is required for consistency because the old slot can no longer provide every change the pipeline missed, and the data processed during the new initial sync is billed again.
 
 7. Click **Create and start pipeline** to begin replication
 

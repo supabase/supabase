@@ -5,13 +5,43 @@ title: 'Manage Pipelines usage'
 
 ## What you are charged for
 
-You are charged for configured pipelines, initial sync data, and ongoing replication data. Pipelines are charged by the hour for as long as they are configured, including while they are stopped.
+You are charged for configured pipelines and pipeline data processed. Data processed is billed at different rates during initial sync and ongoing replication. Pipelines are charged by the hour for as long as they are configured, including while they are stopped.
 
 - **Pipeline hours** measure how long each pipeline remains configured. Delete a pipeline to end this charge.
-- **Initial sync data** is the volume of destination-write data processed when a table is first synchronized or synchronized again.
-- **Ongoing replication data** is the volume of destination-write data processed for subsequent database changes. It depends on how much your published data changes, not on the source table size, WAL size, or destination's compressed storage size.
+- **Initial sync data processed** is the Postgres row data accepted by the destination when a table is first synchronized or synchronized again.
+- **Ongoing replication data processed** is the Postgres row data accepted by the destination for subsequent database changes. It depends on how much your published data changes, not on the source table size, WAL size, or destination's compressed storage size.
 
 Destination-provider charges are separate. For example, Google Cloud can charge for BigQuery ingestion, storage, and CDC compute.
+
+## How data processed is measured
+
+Pipeline data processed is the amount of Postgres row data successfully processed by a pipeline and accepted by its destination. It is measured from the source row representation emitted by Postgres, making usage consistent across destinations.
+
+The measurement includes:
+
+- **Initial sync and resynchronization**: Postgres COPY row payloads.
+- **Inserts**: Inserted tuple values.
+- **Updates**: New tuple values and any previous identity values Postgres emits.
+- **Deletes**: Identity values Postgres emits.
+
+Only Postgres row data is measured. Protocol- and destination-specific overhead is not included.
+
+Failed destination writes are not counted. Data successfully processed again as part of a user-requested resynchronization, table restart, or pipeline reset is counted again. In rare cases, recovery may cause successfully delivered data to be processed more than once.
+
+### Cost estimates
+
+The Dashboard shows a storage-based approximation of initial sync volume. It starts with the physical size of the published Postgres tables and scales that size using Postgres planner statistics for the published columns. It does not measure the logical text COPY data that Pipelines processes.
+
+The estimate can differ substantially from the actual volume because:
+
+- Physical table size includes row and page overhead, dead rows, and free space that COPY does not send.
+- Postgres data types can use very different amounts of space in physical storage and text COPY output. TOAST storage, compression, escaping, and COPY framing can increase the difference.
+- Published-column filtering is approximated from average column widths, while publication row-filter selectivity is not estimated.
+- Planner statistics can be stale or unavailable. Missing variable-width statistics use a fallback width.
+
+This is a rough planning estimate, not the billable measurement. It is most directionally useful for recently analyzed, moderately wide tables with most columns published, little bloat, and no row filters. Treat it as especially rough for narrow, heavily filtered, TOAST-heavy, or bloated tables and for schemas whose text values differ substantially from their physical representation.
+
+Actual charges use the logical Postgres row data copied after publication column and row filters and accepted by the destination.
 
 ### Usage on your invoice
 
@@ -39,7 +69,7 @@ The project has a configured pipeline for the entire month.
 
 ### Multiple projects with initial syncs
 
-Multiple projects had a configured pipeline for the entire month and processed initial sync data and ongoing replication data.
+Multiple projects had a configured pipeline for the entire month and processed data during initial sync and ongoing replication.
 
 | Line Item                           | Units     | Costs                         |
 | ----------------------------------- | --------- | ----------------------------- |

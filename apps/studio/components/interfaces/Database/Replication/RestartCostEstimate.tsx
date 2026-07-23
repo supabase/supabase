@@ -57,10 +57,10 @@ export const RestartCostEstimate = ({
       ) : restartEstimate?.isComplete ? (
         <div className="flex items-center justify-between gap-x-6">
           <div className="min-w-0">
-            <p className="text-sm font-medium">Estimated additional initial sync</p>
+            <p className="text-sm font-medium">Estimated additional initial sync cost</p>
             <p className="text-xs text-foreground-lighter">
-              {formatBytes(restartEstimate.estimatedBytes)} across {tableNames.length}{' '}
-              {tableNames.length === 1 ? 'table' : 'tables'}
+              Based on {formatBytes(restartEstimate.estimatedBytes)} estimated initial sync volume
+              across {tableNames.length} {tableNames.length === 1 ? 'table' : 'tables'}
             </p>
           </div>
           <span className="shrink-0 font-mono text-lg font-semibold" translate="no">
@@ -76,7 +76,13 @@ export const RestartCostEstimate = ({
       )}
       {restartEstimate?.isComplete && restartEstimate.hasRowFilteredTables && (
         <p className="mt-2 text-xs text-foreground-lighter">
-          *Tables with row filters may cost less than shown.
+          *Tables with row filters may process less data and cost less than shown.
+        </p>
+      )}
+      {restartEstimate?.isComplete && (
+        <p className="mt-2 text-xs text-foreground-lighter">
+          Rough storage-based estimate; actual charges can differ substantially. A successful
+          restart bills processed data again.
         </p>
       )}
     </div>

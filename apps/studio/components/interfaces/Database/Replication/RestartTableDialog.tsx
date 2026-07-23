@@ -86,8 +86,8 @@ export const RestartTableDialog = ({
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 <li>
                   <strong>The table's initial sync will restart.</strong> All existing data will be
-                  copied again from the source. This initial sync is billed in addition to previous
-                  initial syncs.
+                  copied again from the source. The data successfully processed during this initial
+                  sync is billed again.
                 </li>
                 <li>
                   <strong>Existing downstream data will be deleted.</strong> Any replicated data for
