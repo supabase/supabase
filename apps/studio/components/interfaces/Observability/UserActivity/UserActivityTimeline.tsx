@@ -1,4 +1,6 @@
 import dayjs from 'dayjs'
+import { SearchX } from 'lucide-react'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import type { UserActivityEvent } from './UserActivity.constants'
 import { UserActivityEventItem } from './UserActivityEventItem'
@@ -29,7 +31,13 @@ export const UserActivityTimeline = ({
   const dayGroups = groupEventsByDay(events)
 
   if (events.length === 0) {
-    return <p className="text-sm text-foreground-light">No activity found in this date range.</p>
+    return (
+      <EmptyStatePresentational
+        icon={SearchX}
+        title="No activity found"
+        description="No activity found in this date range."
+      />
+    )
   }
 
   return (

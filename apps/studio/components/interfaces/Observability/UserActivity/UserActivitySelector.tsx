@@ -15,6 +15,7 @@ import {
 
 import { getAvatarUrl, getDisplayName } from '@/components/interfaces/Auth/Users/Users.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { useUserQuery } from '@/data/auth/user-query'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 
 interface UserActivitySelectorProps {
@@ -35,10 +36,18 @@ export const UserActivitySelector = ({
   const debouncedSearchText = useDebounce(searchText, 300)
 
   // The last user picked from the list, kept locally so the trigger can show a display
-  // name/avatar immediately. `value` (the id) is the source of truth and is all that's
-  // persisted to the URL — on a fresh page load with only `?user=<id>`, the trigger falls
-  // back to the raw id until a search happens to resolve it.
+  // name/avatar immediately without waiting on a lookup.
   const [resolvedUser, setResolvedUser] = useState<User | null>(null)
+
+  // On a fresh page load with only `?user=<id>` in the URL (no picked-user cache yet),
+  // look the user up by id so the trigger can show their name instead of the raw id.
+  const isResolved = resolvedUser?.id === value
+  const { data: fetchedUser, isLoading: isLoadingUser } = useUserQuery(
+    { projectRef, connectionString, userId: value },
+    { enabled: !!value && !isResolved }
+  )
+  const displayUser = isResolved ? resolvedUser : (fetchedUser ?? null)
+  const isResolvingUser = !!value && !displayUser && isLoadingUser
 
   const {
     data,
@@ -63,18 +72,9 @@ export const UserActivitySelector = ({
     setSearchText('')
   }
 
-  const handleClear = () => {
-    setResolvedUser(null)
-    onChange(null)
-  }
-
-  const displayName =
-    resolvedUser?.id === value
-      ? getDisplayName(
-          resolvedUser,
-          resolvedUser.email ?? resolvedUser.phone ?? resolvedUser.id ?? 'Unknown'
-        )
-      : value
+  const displayName = displayUser
+    ? getDisplayName(displayUser, displayUser.email ?? displayUser.phone ?? displayUser.id ?? '')
+    : null
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
@@ -85,13 +85,15 @@ export const UserActivitySelector = ({
           className="h-7 justify-start"
           iconRight={<ChevronDown className="text-foreground-muted" size={14} strokeWidth={1.5} />}
         >
-          {value ? (
+          {isResolvingUser ? (
             <span className="flex items-center gap-x-2">
-              <UserAvatar user={resolvedUser?.id === value ? resolvedUser : null} />
-              <span className="flex flex-col items-start leading-tight">
-                <span className="text-xs text-foreground">{displayName}</span>
-                <span className="font-mono text-[10px] text-foreground-lighter">{value}</span>
-              </span>
+              <Loader2 className="animate-spin text-foreground-lighter" size={14} />
+              <span className="text-xs text-foreground-light">Loading user...</span>
+            </span>
+          ) : value ? (
+            <span className="flex items-center gap-x-2">
+              <UserAvatar user={displayUser} />
+              <span className="text-xs text-foreground">{displayName ?? value}</span>
             </span>
           ) : (
             'Select a user'
@@ -155,12 +157,6 @@ export const UserActivitySelector = ({
                 </p>
               </div>
             ))}
-
-          {value && (
-            <Button variant="text" size="tiny" onClick={handleClear} className="self-start">
-              Clear selection
-            </Button>
-          )}
         </div>
       </PopoverContent>
     </Popover>

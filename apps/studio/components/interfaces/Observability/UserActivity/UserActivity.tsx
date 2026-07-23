@@ -1,7 +1,9 @@
 import { useParams } from 'common'
+import { UserSearch } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { Badge, Button, ToggleGroup, ToggleGroupItem } from 'ui'
+import { Badge, Button, cn } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -66,58 +68,72 @@ export const UserActivity = () => {
   return (
     <div className="flex flex-col gap-y-6">
       <div className="flex flex-col gap-y-3">
-        <div className="flex items-center gap-x-2">
-          <h1 className="text-xl text-foreground">User Activity</h1>
-          <Badge variant="warning">Beta</Badge>
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div className="flex items-center gap-x-2">
+            <h1 className="text-xl text-foreground">User Activity</h1>
+            <Badge variant="warning">Beta</Badge>
+          </div>
         </div>
 
-        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-2">
           <UserActivitySelector
             projectRef={projectRef}
             connectionString={project?.connectionString}
             value={selectedUserId}
             onChange={setSelectedUserId}
           />
-
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-            <ToggleGroup
-              type="single"
-              value={filter}
-              variant="outline"
-              size="sm"
-              onValueChange={(value) => {
-                if (value) setFilter(value as UserActivityFilter)
-              }}
+          <div className="flex items-center border border-strong rounded-full w-min h-7">
+            <button
+              tabIndex={0}
+              className={cn(
+                'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
+                filter === 'all'
+                  ? 'bg-overlay-hover text-foreground'
+                  : 'hover:bg-surface-200 text-foreground-light'
+              )}
+              onClick={() => setFilter('all')}
             >
-              <ToggleGroupItem value="all" className="px-2 py-1 h-7 text-xs">
-                Show all
-              </ToggleGroupItem>
-              <ToggleGroupItem value="errors" className="px-2 py-1 h-7 text-xs">
-                Errors only
-              </ToggleGroupItem>
-            </ToggleGroup>
-
-            <LogsDatePicker
-              onSubmit={handleDatePickerChange}
-              value={datePickerValue}
-              helpers={datePickerHelpers}
-              open={showDatePicker}
-              onOpenChange={setShowDatePicker}
-              shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
-            />
-            <UpgradePrompt
-              show={showUpgradePrompt}
-              setShowUpgradePrompt={setShowUpgradePrompt}
-              title="Report date range"
-              description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
-              source="userActivityDateRange"
-            />
+              All events
+            </button>
+            <div className="h-full w-px border-r border-strong" />
+            <button
+              tabIndex={0}
+              className={cn(
+                'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
+                filter === 'errors'
+                  ? 'bg-overlay-hover text-foreground'
+                  : 'hover:bg-surface-200 text-foreground-light'
+              )}
+              onClick={() => setFilter('errors')}
+            >
+              Errors only
+            </button>
           </div>
+
+          <LogsDatePicker
+            onSubmit={handleDatePickerChange}
+            value={datePickerValue}
+            helpers={datePickerHelpers}
+            open={showDatePicker}
+            onOpenChange={setShowDatePicker}
+            shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
+          />
+          <UpgradePrompt
+            show={showUpgradePrompt}
+            setShowUpgradePrompt={setShowUpgradePrompt}
+            title="Report date range"
+            description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+            source="userActivityDateRange"
+          />
         </div>
       </div>
 
       {!selectedUserId ? (
-        <p className="text-sm text-foreground-light">Select a user to view their activity.</p>
+        <EmptyStatePresentational
+          icon={UserSearch}
+          title="Select a user"
+          description="Choose a user from the dropdown above to view their activity."
+        />
       ) : isLoading ? (
         <GenericSkeletonLoader />
       ) : isError ? (
