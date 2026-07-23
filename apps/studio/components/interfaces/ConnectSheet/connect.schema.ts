@@ -171,8 +171,7 @@ const ormConfigureStep: StepDefinition = {
 const serverInstallStep: StepDefinition = {
   id: 'server-install',
   title: 'Install package',
-  description:
-    'Add @supabase/server to your backend. On Edge Functions you can import it directly — no install needed.',
+  description: 'Add @supabase/server to your backend.',
   content: 'server/install',
 }
 
@@ -197,8 +196,7 @@ const serverSkillsInstallStep: StepDefinition = {
   id: 'install-skills',
   title: 'Install the Supabase Server skill',
   optional: true,
-  description:
-    'Gives AI coding tools ready-made instructions for building APIs with @supabase/server.',
+  description: 'Give AI coding tools instructions for building APIs with @supabase/server.',
   content: 'steps/skills-install',
 }
 
