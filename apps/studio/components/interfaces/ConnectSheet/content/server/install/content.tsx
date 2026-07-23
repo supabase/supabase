@@ -30,7 +30,7 @@ function ServerInstallContent() {
           className="m-0 data-[state=inactive]:hidden"
         >
           <div className="flex items-center gap-x-2 bg-surface-75 px-4 py-3">
-            <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm text-foreground-light">
+            <code className="flex-1 overflow-x-auto whitespace-nowrap font-mono text-sm text-foreground">
               {option.command}
             </code>
             <CopyButton

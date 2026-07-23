@@ -142,7 +142,7 @@ const codexAuthenticateStep: StepDefinition = {
 const codexVerifyStep: StepDefinition = {
   id: 'codex-verify',
   title: 'Verify authentication',
-  description: 'Run /mcp inside Codex to verify.',
+  description: 'Confirm the MCP server is authenticated.',
   content: 'steps/mcp/codex/verify',
 }
 
@@ -187,7 +187,7 @@ const serverEnvStep: StepDefinition = {
   id: 'server-env',
   title: 'Set environment variables',
   description:
-    'Copy these into your environment so you can verify users and use the client/admin supabase-js library from the context of your handler. On Supabase Edge Functions they are injected automatically.',
+    'Copy these into your environment so your handler can verify users and use supabase-js.',
   content: 'server/env',
 }
 

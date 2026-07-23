@@ -107,21 +107,15 @@ export function ConnectConfigSection({
                       key={option.value}
                       id={`connect-${field.id}-${option.value}`}
                       value={option.value}
-                      label=""
                       className="w-full text-left"
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-2">
+                      label={
+                        <span className="flex items-center gap-2">
                           {option.icon && <ConnectionIcon icon={option.icon} />}
-                          <span className="text-sm">{option.label}</span>
-                        </div>
-                        {option.description && (
-                          <span className="text-sm text-foreground-lighter">
-                            {option.description}
-                          </span>
-                        )}
-                      </div>
-                    </RadioGroupStackedItem>
+                          {option.label}
+                        </span>
+                      }
+                      description={option.description}
+                    />
                   ))}
                 </RadioGroupStacked>
               </FormItemLayout>

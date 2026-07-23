@@ -179,7 +179,7 @@ export const ConnectSheet = () => {
           </div>
 
           {activeFields.length > 0 && (
-            <div className="border-b p-8">
+            <div className="p-8">
               <ConnectConfigSection
                 state={state}
                 activeFields={activeFields}

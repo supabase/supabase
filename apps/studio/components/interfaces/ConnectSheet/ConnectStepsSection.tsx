@@ -243,7 +243,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     <div className="bg-muted/50 flex-1">
       <div className="p-8 flex flex-col gap-y-6">
         <div className="flex items-center justify-between gap-4">
-          <h3>Follow these steps</h3>
+          <h3 className="heading-default">Follow these steps</h3>
           <CopyPromptButton stepsContainerRef={stepsContainerRef} />
         </div>
 
@@ -294,7 +294,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
           />
         )}
 
-        <div className="mt-6" ref={stepsContainerRef}>
+        <div ref={stepsContainerRef}>
           {steps.map((step, index) => (
             <ConnectSheetStep
               key={step.id}
