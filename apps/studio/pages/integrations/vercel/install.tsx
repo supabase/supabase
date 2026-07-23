@@ -215,12 +215,6 @@ const VercelIntegration: NextPageWithLayout = () => {
     return isOrganizationsDataSuccess && organizationsData?.length === 0 ? true : false
   }, [isOrganizationsDataSuccess, organizationsData])
 
-  const alreadyInstalled = useMemo(() => {
-    return selectedOrg && installed[selectedOrg.slug] && source === 'marketplace' && !dataLoading
-      ? true
-      : false
-  }, [dataLoading, installed, selectedOrg, source])
-
   const missingParams = [
     !code ? 'code' : undefined,
     !configurationId ? 'configurationId' : undefined,
