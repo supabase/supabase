@@ -38,12 +38,6 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Debug pnpm env
-        run: |
-          echo "NODE_ENV=$NODE_ENV"
-          pnpm config list
-          ls apps/docs/node_modules/.bin/ | grep redocly || echo "redocly bin missing"
-
       - name: Change to apps/docs/spec directory and run make command
         working-directory: apps/docs/spec
         run: make download.api.v1 dereference.api.v1 generate.sections.api.v1 format
