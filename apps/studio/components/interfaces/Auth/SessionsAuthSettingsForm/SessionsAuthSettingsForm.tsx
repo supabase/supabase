@@ -48,6 +48,15 @@ function HoursOrNeverText({ value }: { value: number }) {
   }
 }
 
+const MAX_JWT_EXP = 604800
+
+const AccessTokenSchema = z.object({
+  JWT_EXP: z.coerce
+    .number()
+    .positive('Must be greater than 0')
+    .max(MAX_JWT_EXP, `Must be less than ${MAX_JWT_EXP}`),
+})
+
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
   SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
@@ -73,6 +82,7 @@ export const SessionsAuthSettingsForm = () => {
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
 
   // Separate loading states for each form
+  const [isUpdatingAccessToken, setIsUpdatingAccessToken] = useState(false)
   const [isUpdatingRefreshTokens, setIsUpdatingRefreshTokens] = useState(false)
   const [isUpdatingUserSessions, setIsUpdatingUserSessions] = useState(false)
 
@@ -88,6 +98,13 @@ export const SessionsAuthSettingsForm = () => {
   const { hasAccess: hasUserSessionsEntitlement, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('auth.user_sessions')
   const promptProPlanUpgrade = IS_PLATFORM && !hasUserSessionsEntitlement
+
+  const accessTokenForm = useForm<z.infer<typeof AccessTokenSchema>>({
+    resolver: zodResolver(AccessTokenSchema),
+    defaultValues: {
+      JWT_EXP: 3600,
+    },
+  })
 
   const refreshTokenForm = useForm<z.infer<typeof RefreshTokenSchema>>({
     resolver: zodResolver(RefreshTokenSchema),
@@ -109,6 +126,12 @@ export const SessionsAuthSettingsForm = () => {
   useEffect(() => {
     if (authConfig) {
       // Only reset forms if they're not currently being updated
+      if (!isUpdatingAccessToken) {
+        accessTokenForm.reset({
+          JWT_EXP: authConfig.JWT_EXP ?? 3600,
+        })
+      }
+
       if (!isUpdatingRefreshTokens) {
         refreshTokenForm.reset({
           REFRESH_TOKEN_ROTATION_ENABLED: authConfig.REFRESH_TOKEN_ROTATION_ENABLED || false,
@@ -124,7 +147,26 @@ export const SessionsAuthSettingsForm = () => {
         })
       }
     }
-  }, [authConfig, isUpdatingRefreshTokens, isUpdatingUserSessions])
+  }, [authConfig, isUpdatingAccessToken, isUpdatingRefreshTokens, isUpdatingUserSessions])
+
+  const onSubmitAccessToken = (values: z.infer<typeof AccessTokenSchema>) => {
+    const payload = { ...values }
+    setIsUpdatingAccessToken(true)
+
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      {
+        onError: (error) => {
+          toast.error(`Failed to update access token settings: ${error?.message}`)
+          setIsUpdatingAccessToken(false)
+        },
+        onSuccess: () => {
+          toast.success('Successfully updated access token settings')
+          setIsUpdatingAccessToken(false)
+        },
+      }
+    )
+  }
 
   const onSubmitRefreshTokens = (values: any) => {
     const payload = { ...values }
@@ -196,6 +238,71 @@ export const SessionsAuthSettingsForm = () => {
 
   return (
     <>
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Access Tokens</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form {...accessTokenForm}>
+            <form
+              onSubmit={accessTokenForm.handleSubmit(onSubmitAccessToken)}
+              className="space-y-4"
+            >
+              <Card>
+                <CardContent>
+                  <FormField
+                    control={accessTokenForm.control}
+                    name="JWT_EXP"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Access token expiry time"
+                        description="How long access tokens are valid for before it must be refreshed. Recommendation: 3600 seconds."
+                      >
+                        <FormControl className="w-full">
+                          <InputGroup>
+                            <FormInputGroupInput
+                              type="number"
+                              min={0}
+                              {...field}
+                              disabled={!canUpdateConfig}
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>seconds</InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+                <CardFooter className="justify-end space-x-2">
+                  {accessTokenForm.formState.isDirty && (
+                    <Button variant="default" onClick={() => accessTokenForm.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingAccessToken ||
+                      !accessTokenForm.formState.isDirty
+                    }
+                    loading={isUpdatingAccessToken}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form>
+        </PageSectionContent>
+      </PageSection>
+
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
