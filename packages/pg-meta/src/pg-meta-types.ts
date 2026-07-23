@@ -62,6 +62,11 @@ function list({
   if (filter) {
     sql = safeSql`${sql} and n.nspname ${filter}`
   }
+  if (scoped) {
+    // Scoped only: legacy TYPES_SQL has no ORDER BY (plan-dependent order); sort
+    // the scoped result by t.oid for a stable, comparable order. Before LIMIT.
+    sql = safeSql`${sql} order by t.oid`
+  }
   if (limit) {
     sql = safeSql`${sql} limit ${literal(limit)}`
   }

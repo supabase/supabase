@@ -91,21 +91,6 @@ withTestDatabase('list table privileges', async ({ executeQuery }) => {
 type Priv = { grantor: string; grantee: string; privilege_type: string; is_grantable: boolean }
 type PrivRow = { relation_id: number; schema: string; name: string; privileges: Priv[] }
 
-// Row order (no ORDER BY) and the intra-row privilege aggregation order can
-// differ between the legacy (aggregate-then-filter) and scoped (filter-then-
-// aggregate) plans, so normalize both before comparing row *content*.
-const normalize = (rows: PrivRow[]): PrivRow[] =>
-  [...rows]
-    .map((r) => ({
-      ...r,
-      privileges: [...r.privileges].sort((a, b) =>
-        `${a.privilege_type}|${a.grantee}|${a.grantor}|${a.is_grantable}`.localeCompare(
-          `${b.privilege_type}|${b.grantee}|${b.grantor}|${b.is_grantable}`
-        )
-      ),
-    }))
-    .sort((a, b) => a.relation_id - b.relation_id)
-
 withTestDatabase(
   'scoped tablePrivileges.list/retrieve matches legacy (multiple grantees incl PUBLIC)',
   async ({ executeQuery }) => {
@@ -124,12 +109,13 @@ withTestDatabase(
       grant select on public.priv_demo to public;
     `)
 
-    // list(): default and schema-filtered combos.
+    // list(): default and schema-filtered combos. RAW comparison -- no
+    // normalization, no sorting of rows or the privileges array.
     for (const options of [{}, { includedSchemas: ['public'] }, { excludedSchemas: ['public'] }]) {
       const legacy = await pgMeta.tablePrivileges.list(options)
       const scoped = await pgMeta.tablePrivileges.list({ ...options, scoped: true })
-      const legacyRes = normalize(legacy.zod.parse(await executeQuery(legacy.sql)) as PrivRow[])
-      const scopedRes = normalize(scoped.zod.parse(await executeQuery(scoped.sql)) as PrivRow[])
+      const legacyRes = legacy.zod.parse(await executeQuery(legacy.sql)) as PrivRow[]
+      const scopedRes = scoped.zod.parse(await executeQuery(scoped.sql)) as PrivRow[]
       expect(scopedRes, `list options: ${JSON.stringify(options)}`).toEqual(legacyRes)
     }
 
@@ -148,9 +134,9 @@ withTestDatabase(
       id: demo.relation_id,
       scoped: true,
     })
-    expect(
-      normalize([scopedById.zod.parse((await executeQuery(scopedById.sql))[0]) as PrivRow])
-    ).toEqual(normalize([legacyById.zod.parse((await executeQuery(legacyById.sql))[0]) as PrivRow]))
+    expect(scopedById.zod.parse((await executeQuery(scopedById.sql))[0])).toEqual(
+      legacyById.zod.parse((await executeQuery(legacyById.sql))[0])
+    )
 
     const legacyByName = await pgMeta.tablePrivileges.retrieve({
       name: 'priv_demo',
@@ -161,10 +147,8 @@ withTestDatabase(
       schema: 'public',
       scoped: true,
     })
-    expect(
-      normalize([scopedByName.zod.parse((await executeQuery(scopedByName.sql))[0]) as PrivRow])
-    ).toEqual(
-      normalize([legacyByName.zod.parse((await executeQuery(legacyByName.sql))[0]) as PrivRow])
+    expect(scopedByName.zod.parse((await executeQuery(scopedByName.sql))[0])).toEqual(
+      legacyByName.zod.parse((await executeQuery(legacyByName.sql))[0])
     )
   }
 )

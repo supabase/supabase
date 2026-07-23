@@ -115,16 +115,21 @@ withTestDatabase(
       create type point3 as (x float8, y float8, z float8);
     `)
 
-    const sortById = (rows: Array<{ id: number }>) => [...rows].sort((a, b) => a.id - b.id)
-
+    // Legacy types.list has no ORDER BY (plan-dependent row order), so sort ONLY
+    // the legacy side by id (t.oid) to match the scoped `order by t.oid`.
     for (const { label, options } of OPTION_MATRIX) {
       const legacy = await pgMeta.types.list(options)
       const scoped = await pgMeta.types.list({ ...options, scoped: true })
 
-      const legacyRes = sortById(legacy.zod.parse(await executeQuery(legacy.sql)))
-      const scopedRes = sortById(scoped.zod.parse(await executeQuery(scoped.sql)))
+      const legacyRes = [...legacy.zod.parse(await executeQuery(legacy.sql))].sort(
+        (a, b) => a.id - b.id
+      )
+      const scopedRes = scoped.zod.parse(await executeQuery(scoped.sql))
 
       expect(scopedRes, `option combo: ${label}`).toEqual(legacyRes)
+      // Scoped is already in t.oid order raw (no scoped-side sort).
+      const scopedIds = scopedRes.map((t) => t.id)
+      expect(scopedIds, `${label} oid-ordered`).toEqual([...scopedIds].sort((a, b) => a - b))
     }
 
     // Sanity: the enum/composite fixtures actually surface with correct

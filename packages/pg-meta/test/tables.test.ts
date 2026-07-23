@@ -35,22 +35,17 @@ const withTestDatabase = (name: string, fn: (db: TestDb) => Promise<void>) => {
   })
 }
 
-// Canonical ordering for the two arrays whose order is incidental in the LEGACY
-// plan (relationships and columns have no ORDER BY inside their aggregates
-// there). Values -- including OIDs (`id`, `table_id`) -- are NOT stripped: both
-// variants run against the same live database, so OIDs are data and must be
-// byte-equal. primary_keys is intentionally left untouched: its aggregate is
-// ordered by the index column position (indkey) in BOTH renderings, so it is
-// already deterministic and identical.
-const sortRelationships = (rels: any[]) =>
-  [...rels].sort((a, b) => a.constraint_name.localeCompare(b.constraint_name))
-const sortColumns = (cols: any[]) =>
-  [...(cols ?? [])].sort((a, b) => a.ordinal_position - b.ordinal_position)
-const canonical = (t: any) => ({
-  ...t,
-  relationships: sortRelationships(t.relationships),
-  columns: sortColumns(t.columns),
-})
+// Legacy relationships come out in plan-dependent order (frozen TABLES_SQL has
+// no ORDER BY; proven by the adversarial-FK test below), so canonicalize ONLY
+// the legacy side to the scoped ORDER BY: constraint_name, then the column names
+// (a composite FK expands to one entry per source×target column pair).
+const sortRels = (rels: any[]) =>
+  [...rels].sort(
+    (a, b) =>
+      a.constraint_name.localeCompare(b.constraint_name) ||
+      a.source_column_name.localeCompare(b.source_column_name) ||
+      a.target_column_name.localeCompare(b.target_column_name)
+  )
 
 withTestDatabase(
   'scoped tables.retrieve matches legacy (FKs both directions, PK, comment, enums)',
@@ -100,18 +95,12 @@ withTestDatabase(
       const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
       const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
 
-      // Same rows and same OID-bearing values (ids INCLUDED): scoped and legacy
-      // are byte-equal once the incidentally-ordered arrays are canonicalized.
-      expect(canonical(scopedRow), c.label).toEqual(canonical(legacyRow))
-
-      // The scoped SQL emits deterministic order itself (ORDER BY inside the
-      // aggregates), so its arrays already ARE canonical -- no test-side sort
-      // needed. This is what keeps the Studio UI stable across the flag flip.
-      expect(scopedRow.relationships, c.label).toEqual(sortRelationships(scopedRow.relationships))
-      expect(scopedRow.columns, c.label).toEqual(sortColumns(scopedRow.columns))
-      // columns are specifically in ascending ordinal_position order.
-      const ords = scopedRow.columns.map((col: any) => col.ordinal_position)
-      expect(ords, c.label).toEqual([...ords].sort((a: number, b: number) => a - b))
+      // Everything raw except the legacy relationships array, canonicalized to
+      // the scoped ORDER BY (legacy order is plan-dependent, see above).
+      legacyRow.relationships = sortRels(legacyRow.relationships)
+      expect(scopedRow, c.label).toEqual(legacyRow)
+      // Scoped's array is already in that order raw (no scoped-side sort).
+      expect(scopedRow.relationships, c.label).toEqual(sortRels(scopedRow.relationships))
     }
 
     // Sanity: the scoped parent retrieve surfaces the INCOMING FK from child.
@@ -122,6 +111,68 @@ withTestDatabase(
         (r: any) => r.source_table_name === 'child' && r.target_table_name === 'parent'
       )
     ).toBe(true)
+  }
+)
+
+// Regression proof for the relationships exception: FK creation order (zzz, aaa,
+// mmm) differs from constraint_name order, so legacy's plan order cannot match
+// scoped's without the legacy-side sort, while scoped is deterministic by name.
+withTestDatabase(
+  'scoped tables.retrieve orders relationships by constraint_name (adversarial)',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.ref (id int primary key);
+      create table public.multi (id int primary key, a int, b int, c int);
+      alter table public.multi add constraint zzz_fk foreign key (a) references public.ref (id);
+      alter table public.multi add constraint aaa_fk foreign key (b) references public.ref (id);
+      alter table public.multi add constraint mmm_fk foreign key (c) references public.ref (id);
+    `)
+    const legacy = pgMeta.tables.retrieve({ name: 'multi', schema: 'public' })
+    const scoped = pgMeta.tables.retrieve({ name: 'multi', schema: 'public', scoped: true })
+    const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+    const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+
+    // Scoped is deterministically constraint_name-ordered, raw.
+    expect(scopedRow.relationships.map((r: any) => r.constraint_name)).toEqual([
+      'aaa_fk',
+      'mmm_fk',
+      'zzz_fk',
+    ])
+    // Equal only after canonicalizing the (plan-dependent) legacy side.
+    legacyRow.relationships = sortRels(legacyRow.relationships)
+    expect(scopedRow).toEqual(legacyRow)
+  }
+)
+
+// Composite (multi-column) FK: the relationships subquery expands it to one
+// entry per source×target column pair, all sharing constraint_name, so the
+// scoped ORDER BY tie-breaks on the column names to stay deterministic.
+withTestDatabase(
+  'scoped tables.retrieve orders composite-FK relationship entries deterministically',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.ctgt (x int, y int, primary key (x, y));
+      create table public.csrc (a int, b int, foreign key (a, b) references public.ctgt (x, y));
+    `)
+    const scoped = pgMeta.tables.retrieve({ name: 'csrc', schema: 'public', scoped: true })
+    const legacy = pgMeta.tables.retrieve({ name: 'csrc', schema: 'public' })
+    const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+    const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+
+    // Four entries (2 source cols × 2 target cols), all one constraint_name.
+    expect(scopedRow.relationships).toHaveLength(4)
+    expect(new Set(scopedRow.relationships.map((r: any) => r.constraint_name)).size).toBe(1)
+    // Scoped is already ordered by (name, source col, target col), raw.
+    expect(
+      scopedRow.relationships.map((r: any) => [r.source_column_name, r.target_column_name])
+    ).toEqual([
+      ['a', 'x'],
+      ['a', 'y'],
+      ['b', 'x'],
+      ['b', 'y'],
+    ])
+    legacyRow.relationships = sortRels(legacyRow.relationships)
+    expect(scopedRow).toEqual(legacyRow)
   }
 )
 
