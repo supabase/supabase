@@ -515,7 +515,9 @@ function createStorageExplorerState({
             .from(state.selectedBucket.name)
             .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
         }
-      } catch (error) {}
+      } catch (error) {
+        toast.error(`Failed to create folder: ${(error as Error)?.message ?? 'Unknown error'}`)
+      }
     },
 
     deleteFolder: async (folder: StorageItemWithColumn) => {

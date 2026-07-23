@@ -99,7 +99,8 @@ export function sanitizeNameForDuplicateInColumn(
       const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
       const fileExt = fileNameSegments[fileNameSegments.length - 1]
 
-      const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
+      const escapedFileName = fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      const dupeNameRegex = new RegExp(`${escapedFileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
       const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
         item.name.match(dupeNameRegex)
       )

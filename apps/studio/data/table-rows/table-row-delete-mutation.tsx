@@ -90,11 +90,13 @@ export const useTableRowDeleteMutation = ({
 
         if (isFkError) {
           const sourceTable = table.name
-          const referencingTable = data.message.split('on table ')[2].replaceAll('"', '')
-          const fkName = data.message
+          const parts = data.message.split('on table ')
+          const referencingTable = parts.length > 2 ? parts[2].replaceAll('"', '') : 'unknown'
+          const fkParts = data.message
+
             .split('foreign key constraint')[1]
-            .split('on table')[0]
-            .replaceAll('"', '')
+            ?.split('on table')[0]
+            ?.replaceAll('"', '') ?? 'unknown'
           const initialMessage = isMultipleRows
             ? `Unable to delete rows as one of them is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`
             : `Unable to delete row as it is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`

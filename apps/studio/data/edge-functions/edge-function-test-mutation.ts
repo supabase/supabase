@@ -27,7 +27,7 @@ export async function testEdgeFunction({ url, method, body, headers }: EdgeFunct
     body: JSON.stringify({ url, method, body, headers }),
   })
 
-  let data: any
+  let data: any = {}
 
   try {
     data = await response.json()
