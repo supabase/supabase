@@ -28,7 +28,7 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
-import { ArrowDown, Check, Sparkles, X } from 'lucide-react'
+import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
 import { Badge, Button } from 'ui'
@@ -42,7 +42,6 @@ import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
-import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from '../ui/PromptPanel'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
@@ -100,15 +99,9 @@ const components = {
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
-  Prompt,
-  PromptContent,
-  PromptCopy,
-  PromptPanel,
-  PromptTitle,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,
-  Sparkles,
   SharedData,
   ShowUntil,
   SqlToRest,

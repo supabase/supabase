@@ -6,7 +6,7 @@ import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from './P
 
 type AiPromptProps = {
   /** Plain-text prompt copied to the clipboard and shown in the panel. */
-  children: string
+  prompt: string
 }
 
 /**
@@ -14,14 +14,17 @@ type AiPromptProps = {
  * children in this client module so detection does not cross the RSC
  * boundary (where child types arrive as `react.lazy` and the panel
  * would otherwise render nothing).
+ *
+ * The prompt is a prop (not children) so the markdown-export schema can
+ * read it — expression children are skipped by the guides markdown pipeline.
  */
-function AiPrompt({ children }: AiPromptProps) {
+function AiPrompt({ prompt }: AiPromptProps) {
   return (
     <PromptPanel>
       <Prompt value="prompt" expandable>
         <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
-        <PromptCopy>{children}</PromptCopy>
-        <PromptContent>{children}</PromptContent>
+        <PromptCopy>{prompt}</PromptCopy>
+        <PromptContent>{prompt}</PromptContent>
       </Prompt>
     </PromptPanel>
   )
