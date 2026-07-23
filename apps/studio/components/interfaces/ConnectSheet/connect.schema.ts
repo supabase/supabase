@@ -78,7 +78,7 @@ const frameworkReactFilesStep: StepDefinition = {
 const frameworkShadcnStep: StepDefinition = {
   id: 'shadcn-add',
   title: 'Add Supabase UI components',
-  description: 'Run this command to install the Supabase shadcn components.',
+  description: 'Install Supabase UI components via the shadcn registry.',
   content: 'steps/shadcn/command',
 }
 
@@ -87,13 +87,6 @@ const frameworkShadcnEnvStep: StepDefinition = {
   title: 'Set env variables',
   description: 'Add the following values to your env file.',
   content: 'steps/shadcn/env',
-}
-
-const frameworkShadcnExploreStep: StepDefinition = {
-  id: 'shadcn-explore',
-  title: 'Check out more UI components',
-  description: 'Add auth, realtime and storage functionality to your project',
-  content: 'steps/shadcn/explore',
 }
 
 const directConnectionStep: StepDefinition = {
@@ -106,7 +99,7 @@ const directConnectionStep: StepDefinition = {
 const directInstallStep: StepDefinition = {
   id: 'direct-install',
   title: 'Install dependencies',
-  description: 'Run this command to install the required dependencies.',
+  description: 'Install the required dependencies.',
   content: 'steps/direct-install',
 }
 
@@ -313,7 +306,7 @@ export const connectSchema: ConnectSchema = {
       id: 'frameworkUi',
       type: 'switch',
       label: 'Shadcn',
-      description: 'Install components via the Supabase shadcn registry.',
+      description: 'Includes Supabase UI components install step when enabled.',
       defaultValue: false,
       dependsOn: { framework: ['nextjs', 'react'] },
     },
@@ -364,7 +357,7 @@ export const connectSchema: ConnectSchema = {
       id: 'mcpClient',
       type: 'select',
       label: 'Client',
-      description: 'Choose the MCP client you are using.',
+      description: 'The MCP client you are using.',
       options: { source: 'mcpClients' },
       defaultValue: 'claude-code',
     },
@@ -372,7 +365,7 @@ export const connectSchema: ConnectSchema = {
       id: 'mcpReadonly',
       type: 'switch',
       label: 'Read-only',
-      description: 'Only allow read operations on your database.',
+      description: 'Only allows read operations on your database when turned on.',
       defaultValue: false,
     },
     mcpFeatures: {
@@ -402,7 +395,6 @@ export const connectSchema: ConnectSchema = {
                     frameworkInstallPackagesStep,
                     frameworkShadcnStep,
                     frameworkShadcnEnvStep,
-                    frameworkShadcnExploreStep,
                     skillsInstallStep,
                   ],
                   DEFAULT: [
@@ -418,7 +410,6 @@ export const connectSchema: ConnectSchema = {
                     frameworkInstallStep,
                     frameworkShadcnStep,
                     frameworkShadcnEnvStep,
-                    frameworkShadcnExploreStep,
                     skillsInstallStep,
                   ],
                   DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
@@ -432,7 +423,6 @@ export const connectSchema: ConnectSchema = {
                 frameworkInstallStep,
                 frameworkShadcnStep,
                 frameworkShadcnEnvStep,
-                frameworkShadcnExploreStep,
                 skillsInstallStep,
               ],
               DEFAULT: [frameworkInstallStep, frameworkReactFilesStep, skillsInstallStep],

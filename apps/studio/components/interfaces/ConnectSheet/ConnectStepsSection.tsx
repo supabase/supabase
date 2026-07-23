@@ -119,7 +119,7 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
 
 // Vite needs `import.meta.glob` to statically discover the step content
 // modules because the `${filePath}` template can span multiple directory
-// segments (`flask/supabasepy`, `steps/shadcn/explore`, ...) which Vite's
+// segments (`flask/supabasepy`, `steps/shadcn/command`, ...) which Vite's
 // dynamic-import-vars plugin can't analyze. Skip the glob on the SSR bundle
 // — Vite replaces `import.meta.env.SSR` at build time and tree-shakes the
 // call so the 37 content modules stay out of the server graph (pulling them

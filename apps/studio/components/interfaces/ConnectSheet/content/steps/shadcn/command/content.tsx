@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
+import { InlineLink } from '@/components/ui/inlineLink'
 
 function getShadcnCommand(state: StepContentProps['state']): string | null {
   if (state.framework === 'nextjs') {
@@ -21,15 +22,21 @@ function ShadcnCommandContent({ state }: StepContentProps) {
   if (!command) return null
 
   return (
-    <CodeBlock
-      className="[&_code]:text-foreground"
-      wrapperClassName="lg:col-span-2"
-      value={command}
-      hideLineNumbers
-      language="bash"
-    >
-      {command}
-    </CodeBlock>
+    <div className="flex flex-col gap-2">
+      <CodeBlock
+        className="[&_code]:text-foreground"
+        wrapperClassName="lg:col-span-2"
+        value={command}
+        hideLineNumbers
+        language="bash"
+      >
+        {command}
+      </CodeBlock>
+      <p className="text-sm text-foreground-lighter">
+        Check out more UI components at{' '}
+        <InlineLink href="https://supabase.com/ui">supabase.com/ui</InlineLink>.
+      </p>
+    </div>
   )
 }
 
