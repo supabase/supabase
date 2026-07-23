@@ -104,6 +104,13 @@ const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       ELSE 'success'
     END`
 
+// The `auth_user` column is derived from the source-specific fields that can be attributed to a user.
+const AUTH_USER_EXPR: SafeLogSqlFragment = safeSql`CASE
+      WHEN source = 'auth_logs' THEN log_attributes['auth_event.actor_id']
+      WHEN source = 'edge_logs' THEN log_attributes['request.sb.jwt.authorization.payload.subject']
+      ELSE auth_user
+    END`
+
 const logTypeWhereCondition = (logTypes: string[]): SafeLogSqlFragment => {
   const effective = logTypes.filter((t) => t in LOG_TYPE_CONDITION)
   const types = effective.length ? effective : [...DEFAULT_LOG_TYPES]
@@ -258,6 +265,7 @@ const rowProjection = (): SafeLogSqlFragment => safeSql`
     ${ATTR.path} AS pathname,
     event_message,
     ${ATTR.method} AS method,
+    ${AUTH_USER_EXPR} AS auth_user,
     null AS log_count,
     null AS logs
 `
