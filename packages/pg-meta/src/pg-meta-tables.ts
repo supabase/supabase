@@ -149,7 +149,7 @@ function retrieve(identifier: TableIdentifier & { scoped?: boolean }): {
   , columns as (${scopedColumns})
   select
     *
-    , ${coalesceRowsToArray('columns', safeSql`columns.table_id = tables.id`)}
+    , ${coalesceRowsToArray('columns', safeSql`columns.table_id = tables.id`, safeSql`columns.ordinal_position`)}
   from tables where ${whereClause};`
     return {
       sql,

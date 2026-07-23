@@ -33,6 +33,13 @@ export const getTablesSql = (targetOid?: SafeSqlFragment) => {
     ? safeSql`
       and (c.conrelid = ${targetOid} or c.confrelid = ${targetOid})`
     : (safeSql`` as SafeSqlFragment)
+  // Scoped path only: make the relationships array deterministic (the aggregate
+  // is otherwise plan-order dependent, and scoped/legacy use different plans).
+  // Empty for the legacy (unscoped) rendering, keeping TABLES_SQL byte-for-byte
+  // unchanged.
+  const relOrder = targetOid
+    ? safeSql` order by relationships.constraint_name`
+    : (safeSql`` as SafeSqlFragment)
 
   return /* SQL */ safeSql`
 SELECT
@@ -56,7 +63,7 @@ SELECT
   obj_description(c.oid) AS comment,
   coalesce(pk.primary_keys, '[]') as primary_keys,
   coalesce(
-    jsonb_agg(relationships) filter (where relationships is not null),
+    jsonb_agg(relationships${relOrder}) filter (where relationships is not null),
     '[]'
   ) as relationships
 FROM
