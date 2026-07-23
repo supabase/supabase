@@ -132,6 +132,15 @@ export const Activity = ({ live }: ActivityProps) => {
       return 0
     })
 
+  const onResetFilters = () => {
+    setQueryStates({
+      search: '',
+      states: [],
+      roles: DEFAULT_ROLES_FILTER,
+      applications: [],
+    })
+  }
+
   useEffect(() => {
     if (selectedPid && isSuccess) {
       document
@@ -183,9 +192,7 @@ export const Activity = ({ live }: ActivityProps) => {
             variant="text"
             className="px-1"
             icon={<X />}
-            onClick={() =>
-              setQueryStates({ states: [], roles: DEFAULT_ROLES_FILTER, applications: [] })
-            }
+            onClick={onResetFilters}
             aria-label="Reset filters"
             tooltip={{ content: { side: 'bottom', text: 'Reset filters' } }}
           />
@@ -239,17 +246,7 @@ export const Activity = ({ live }: ActivityProps) => {
                       There are no sessions that match the selected filters. Try adjusting or
                       clearing them.
                     </p>
-                    <Button
-                      variant="default"
-                      className="mt-2"
-                      onClick={() => {
-                        setQueryStates({
-                          states: [],
-                          roles: DEFAULT_ROLES_FILTER,
-                          applications: [],
-                        })
-                      }}
-                    >
+                    <Button variant="default" className="mt-2" onClick={onResetFilters}>
                       Reset filters
                     </Button>
                   </TableCell>
