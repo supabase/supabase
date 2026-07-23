@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ButtonHTMLAttributes, PropsWithChildren } from 'react'
+import type { UseFormReturn } from 'react-hook-form'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { DestinationForm } from './index'
 
 const mocks = vi.hoisted(() => ({
@@ -154,7 +156,11 @@ vi.mock('@/data/replication/pipeline-by-id-query', () => ({
 
 vi.mock('./DestinationNameInput', () => ({ DestinationNameInput: () => null }))
 vi.mock('./PublicationSelection', () => ({ PublicationSelection: () => null }))
-vi.mock('./TableCopySelection', () => ({ TableCopySelection: () => null }))
+vi.mock('./TableCopySelection', () => ({
+  TableCopySelection: ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => (
+    <div>{form.formState.errors.tableSyncCopyTableIds?.message}</div>
+  ),
+}))
 vi.mock('./AdvancedSettings', () => ({ AdvancedSettings: () => null }))
 vi.mock('./BigQuery/Fields', () => ({ BigQueryFields: () => null }))
 vi.mock('./AnalyticsBucket/Fields', () => ({ AnalyticsBucketFields: () => null }))
@@ -173,6 +179,7 @@ vi.mock('@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketS
 describe('DestinationForm edit submission', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    pipelineData.config.table_sync_copy.table_ids = [101, 999]
     mocks.submitPipeline.mockResolvedValue(undefined)
     mocks.validateConfiguration.mockResolvedValue({ canContinue: true, warnings: [] })
   })
@@ -204,5 +211,24 @@ describe('DestinationForm edit submission', () => {
       onSuccess: expect.any(Function),
       onClose,
     })
+  })
+
+  it('rejects an edit when every selected table has left the publication', async () => {
+    pipelineData.config.table_sync_copy.table_ids = [999]
+
+    render(
+      <DestinationForm
+        selectedType="BigQuery"
+        visible
+        existingDestination={existingDestination}
+        onClose={vi.fn()}
+      />
+    )
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply and restart pipeline' }))
+
+    expect(await screen.findByText('Select at least one table')).toBeInTheDocument()
+    expect(mocks.validateConfiguration).not.toHaveBeenCalled()
+    expect(mocks.submitPipeline).not.toHaveBeenCalled()
   })
 })

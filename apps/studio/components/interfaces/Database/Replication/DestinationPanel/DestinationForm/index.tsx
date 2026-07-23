@@ -211,10 +211,18 @@ export const DestinationForm = ({
           })
         }
 
+        const selectedPublicationTableIds = pruneStaleSelectedTableIds({
+          mode: data.tableSyncCopyMode,
+          selectedTableIds: data.tableSyncCopyTableIds,
+          publications,
+          publicationName: data.publicationName,
+        })
+
         if (
+          isSuccessPublications &&
           (data.tableSyncCopyMode === 'include_tables' ||
             data.tableSyncCopyMode === 'skip_tables') &&
-          data.tableSyncCopyTableIds.length === 0
+          selectedPublicationTableIds.length === 0
         ) {
           addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table')
         }
