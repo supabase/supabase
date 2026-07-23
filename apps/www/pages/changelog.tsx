@@ -345,6 +345,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     const on = selectedTypes.has(type)
                     return (
                       <button
+                        tabIndex={0}
                         key={type}
                         type="button"
                         aria-pressed={on}
@@ -398,6 +399,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     const on = selectedStages.has(slug)
                     return (
                       <button
+                        tabIndex={0}
                         key={slug}
                         type="button"
                         aria-pressed={on}
@@ -424,6 +426,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     const on = selectedSelfHosted.has(slug)
                     return (
                       <button
+                        tabIndex={0}
                         key={slug}
                         type="button"
                         aria-pressed={on}
