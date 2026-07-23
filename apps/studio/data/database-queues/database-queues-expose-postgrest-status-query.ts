@@ -22,7 +22,7 @@ export async function getDatabaseQueuesExposePostgrestStatus({
     connectionString,
     sql,
   })
-  return result[0].exists as boolean
+  return result[0]?.exists as boolean
 }
 
 export type DatabaseQueueData = boolean

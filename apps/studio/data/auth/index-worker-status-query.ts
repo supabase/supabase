@@ -30,7 +30,7 @@ export async function getIndexWorkerStatus(
     signal
   )
 
-  return result[0]
+  return result[0] ?? { is_in_progress: false }
 }
 
 export const useIndexWorkerStatusQuery = <TData = IndexWorkerStatusData>(

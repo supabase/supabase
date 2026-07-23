@@ -43,6 +43,7 @@ export async function getDiskBreakdown(
     signal
   )
 
+  if (!result.length) throw new Error('Disk breakdown query returned no results')
   return result[0] as DiskBreakdownResult
 }
 
