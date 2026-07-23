@@ -7,27 +7,15 @@ describe('getEndpointsAndMCPToolsForAPI', () => {
     paths: {
       '/v1/projects/{ref}/database/migrations': {
         get: {
-          security: [
-            {
-              fga_permissions: ['database_migrations_read'],
-            },
-          ],
+          'x-fga-permissions': [['database_migrations_read']],
         },
         post: {
-          security: [
-            {
-              fga_permissions: ['database_migrations_write'],
-            },
-          ],
+          'x-fga-permissions': [['database_migrations_write']],
         },
       },
       '/v1/projects/{ref}/database/migrations/{version}': {
         patch: {
-          security: [
-            {
-              fga_permissions: ['database_migrations_write'],
-            },
-          ],
+          'x-fga-permissions': [['database_migrations_write']],
         },
       },
     },

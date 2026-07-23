@@ -70,7 +70,7 @@ export const getEndpointsAndMCPToolsForAPI = (
       if (methodSpecs['x-fga-permissions'] == null) return
 
       methodSpecs['x-fga-permissions'].forEach((permissions) => {
-        permissions.forEach((permission) => {
+        permissions?.forEach((permission) => {
           // Initialize scope object if needed
           scopes[permission] = scopes[permission] || { endpoints: [], mcp_tools: [] }
 
