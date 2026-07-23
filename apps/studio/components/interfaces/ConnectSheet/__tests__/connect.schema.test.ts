@@ -123,6 +123,15 @@ describe('connect.schema:fields', () => {
     const field = connectSchema.fields.mcpFeatures
     expect(field.type).toBe('multi-select')
     expect(field.options).toEqual({ source: 'mcpFeatures' })
+    expect(field.defaultValue).toEqual([
+      'docs',
+      'account',
+      'database',
+      'debugging',
+      'development',
+      'functions',
+      'branching',
+    ])
   })
 })
 

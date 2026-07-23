@@ -15,7 +15,7 @@ import {
   resetDependentFields,
   resolveSteps,
 } from './connect.resolver'
-import { connectSchema } from './connect.schema'
+import { connectSchema, DEFAULT_MCP_FEATURES } from './connect.schema'
 import type {
   ConnectMode,
   ConnectSchema,
@@ -337,8 +337,13 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
           next.orm = ORMS[0]?.key ?? ''
         }
 
-        if (mode === 'mcp' && !next.mcpClient) {
-          next.mcpClient = MCP_CLIENTS[0]?.key ?? ''
+        if (mode === 'mcp') {
+          if (!next.mcpClient) {
+            next.mcpClient = MCP_CLIENTS[0]?.key ?? ''
+          }
+          if (next.mcpFeatures === undefined) {
+            next.mcpFeatures = DEFAULT_MCP_FEATURES
+          }
         }
 
         return next

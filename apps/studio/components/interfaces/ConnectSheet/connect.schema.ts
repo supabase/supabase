@@ -1,4 +1,13 @@
+import { FEATURE_GROUPS_PLATFORM } from 'ui-patterns/McpUrlBuilder'
+
 import type { ConnectSchema, StepDefinition } from './Connect.types'
+
+/**
+ * MCP feature groups enabled by default (Storage is excluded to keep tool counts manageable).
+ */
+export const DEFAULT_MCP_FEATURES = FEATURE_GROUPS_PLATFORM.filter(
+  (group) => group.id !== 'storage'
+).map((group) => group.id)
 
 /**
  * Base install commands for each library.
@@ -148,7 +157,7 @@ const claudeAuthenticateStep: StepDefinition = {
   id: 'claude-authenticate',
   title: 'Authenticate',
   description:
-    'After configuring the MCP server, you need to authenticate. In a regular terminal (not the IDE extension) run:',
+    'After configuring the MCP server, you need to authenticate. Run this in a regular terminal (not an IDE extension).',
   content: 'steps/mcp/claude-code/authenticate',
 }
 
@@ -184,7 +193,7 @@ const serverEnvStep: StepDefinition = {
 
 const skillsInstallStep: StepDefinition = {
   id: 'install-skills',
-  title: 'Install Agent Skills (Optional)',
+  title: 'Install Agent Skills (optional)',
   description:
     'Agent Skills give AI coding tools ready-made instructions, scripts, and resources for working with Supabase more accurately and efficiently.',
   content: 'steps/skills-install',
@@ -192,7 +201,7 @@ const skillsInstallStep: StepDefinition = {
 
 const serverSkillsInstallStep: StepDefinition = {
   id: 'install-skills',
-  title: 'Install the Supabase Server skill (Optional)',
+  title: 'Install the Supabase Server skill (optional)',
   description:
     'Gives AI coding tools ready-made instructions for building APIs with @supabase/server.',
   content: 'steps/skills-install',
@@ -361,7 +370,7 @@ export const connectSchema: ConnectSchema = {
       id: 'mcpReadonly',
       type: 'switch',
       label: 'Read-only',
-      description: 'Only allow read operations on your database',
+      description: 'Only allow read operations on your database.',
       defaultValue: false,
     },
     mcpFeatures: {
@@ -369,8 +378,9 @@ export const connectSchema: ConnectSchema = {
       type: 'multi-select',
       label: 'Feature groups',
       description:
-        'Only enable a subset of features. Helps keep the number of tools within MCP client limits.',
+        'Choose which MCP tools to include. Storage is off by default to keep tool counts manageable.',
       options: { source: 'mcpFeatures' },
+      defaultValue: DEFAULT_MCP_FEATURES,
     },
   },
 

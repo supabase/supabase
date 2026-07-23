@@ -201,7 +201,7 @@ export function ConnectConfigSection({
                 >
                   <MultiSelectorTrigger
                     className="w-full"
-                    label="All features except Storage enabled by default"
+                    label="Select features"
                     badgeLimit="wrap"
                     showIcon={true}
                   />
