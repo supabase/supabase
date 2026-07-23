@@ -57,7 +57,7 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
           <GenericSkeletonLoader />
         ) : (
           <PageSection>
-            <PageSectionContent className="flex flex-col gap-6">
+            <PageSectionContent className="flex flex-col gap-12">
               <ReplicationDiagram />
               <Destinations />
             </PageSectionContent>
