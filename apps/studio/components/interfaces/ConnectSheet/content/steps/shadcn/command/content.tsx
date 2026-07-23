@@ -33,7 +33,7 @@ function ShadcnCommandContent({ state }: StepContentProps) {
         {command}
       </CodeBlock>
       <p className="text-sm text-foreground-lighter">
-        Check out more UI components at{' '}
+        Add UI components for auth, realtime, storage, and more at{' '}
         <InlineLink href="https://supabase.com/ui">supabase.com/ui</InlineLink>.
       </p>
     </div>

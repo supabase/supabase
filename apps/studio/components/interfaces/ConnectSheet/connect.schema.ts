@@ -306,7 +306,7 @@ export const connectSchema: ConnectSchema = {
       id: 'frameworkUi',
       type: 'switch',
       label: 'Shadcn',
-      description: 'Includes Supabase UI components install step when enabled.',
+      description: 'Install Supabase UI components with shadcn.',
       defaultValue: false,
       dependsOn: { framework: ['nextjs', 'react'] },
     },
@@ -365,7 +365,7 @@ export const connectSchema: ConnectSchema = {
       id: 'mcpReadonly',
       type: 'switch',
       label: 'Read-only',
-      description: 'Only allows read operations on your database when turned on.',
+      description: 'Only allows read operations on your database when enabled.',
       defaultValue: false,
     },
     mcpFeatures: {
