@@ -246,17 +246,20 @@ interface ModeSelectorProps {
 export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
   const cols = 3
   const rows = Math.ceil(modes.length / cols)
+  const lastRowStart = (rows - 1) * cols
+  const lastRowCount = modes.length - lastRowStart
 
   return (
-    <div className="grid grid-cols-3">
+    // 6-col grid so full rows span 2 (3-up) and a short last row can span evenly (e.g. 3+3 for two items)
+    <div className="grid grid-cols-6">
       {modes.map((mode, index) => {
-        const col = index % cols
-        const row = Math.floor(index / cols)
         const isSelected = selected === mode.id
-        const isTopLeft = row === 0 && col === 0
-        const isTopRight = row === 0 && col === cols - 1
-        const isBottomLeft = row === rows - 1 && col === 0
-        const isBottomRight = row === rows - 1 && col === cols - 1
+        const isLastRow = index >= lastRowStart
+        const span = isLastRow && lastRowCount < cols ? 6 / lastRowCount : 2
+        const isTopLeft = index === 0
+        const isTopRight = index === Math.min(cols, modes.length) - 1
+        const isBottomLeft = index === lastRowStart
+        const isBottomRight = index === modes.length - 1
 
         return (
           <button
@@ -268,6 +271,9 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
             className={cn(
               // Match RadioGroupStackedItem: each cell owns a border, adjacent edges overlap
               'relative -mb-px -mr-px flex flex-col items-center gap-2 border bg-overlay/50 p-4 shadow-xs transition',
+              span === 2 && 'col-span-2',
+              span === 3 && 'col-span-3',
+              span === 6 && 'col-span-6',
               isTopLeft && 'rounded-tl-lg',
               isTopRight && 'rounded-tr-lg',
               isBottomLeft && 'rounded-bl-lg',
