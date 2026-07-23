@@ -35,20 +35,21 @@ const withTestDatabase = (name: string, fn: (db: TestDb) => Promise<void>) => {
   })
 }
 
-// Normalize a retrieved table for scoped-vs-legacy comparison: the scoped and
-// legacy plans can aggregate the relationships / columns arrays in a different
-// order, so sort them and strip volatile ids before deep comparison.
-const normTable = (t: any) => ({
+// Canonical ordering for the two arrays whose order is incidental in the LEGACY
+// plan (relationships and columns have no ORDER BY inside their aggregates
+// there). Values -- including OIDs (`id`, `table_id`) -- are NOT stripped: both
+// variants run against the same live database, so OIDs are data and must be
+// byte-equal. primary_keys is intentionally left untouched: its aggregate is
+// ordered by the index column position (indkey) in BOTH renderings, so it is
+// already deterministic and identical.
+const sortRelationships = (rels: any[]) =>
+  [...rels].sort((a, b) => a.constraint_name.localeCompare(b.constraint_name))
+const sortColumns = (cols: any[]) =>
+  [...(cols ?? [])].sort((a, b) => a.ordinal_position - b.ordinal_position)
+const canonical = (t: any) => ({
   ...t,
-  primary_keys: [...t.primary_keys]
-    .map(({ table_id, ...pk }: any) => pk)
-    .sort((a: any, b: any) => a.name.localeCompare(b.name)),
-  relationships: [...t.relationships]
-    .map(({ id, ...r }: any) => r)
-    .sort((a: any, b: any) => a.constraint_name.localeCompare(b.constraint_name)),
-  columns: [...(t.columns ?? [])]
-    .map(({ id, table_id, ...c }: any) => c)
-    .sort((a: any, b: any) => a.ordinal_position - b.ordinal_position),
+  relationships: sortRelationships(t.relationships),
+  columns: sortColumns(t.columns),
 })
 
 withTestDatabase(
@@ -96,9 +97,21 @@ withTestDatabase(
     for (const c of cases) {
       const legacy = pgMeta.tables.retrieve(c.legacy as any)
       const scoped = pgMeta.tables.retrieve(c.scoped as any)
-      const legacyRow = legacy.zod.parse((await executeQuery(legacy.sql))[0])
-      const scopedRow = scoped.zod.parse((await executeQuery(scoped.sql))[0])
-      expect(normTable(scopedRow), c.label).toEqual(normTable(legacyRow))
+      const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+      const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+
+      // Same rows and same OID-bearing values (ids INCLUDED): scoped and legacy
+      // are byte-equal once the incidentally-ordered arrays are canonicalized.
+      expect(canonical(scopedRow), c.label).toEqual(canonical(legacyRow))
+
+      // The scoped SQL emits deterministic order itself (ORDER BY inside the
+      // aggregates), so its arrays already ARE canonical -- no test-side sort
+      // needed. This is what keeps the Studio UI stable across the flag flip.
+      expect(scopedRow.relationships, c.label).toEqual(sortRelationships(scopedRow.relationships))
+      expect(scopedRow.columns, c.label).toEqual(sortColumns(scopedRow.columns))
+      // columns are specifically in ascending ordinal_position order.
+      const ords = scopedRow.columns.map((col: any) => col.ordinal_position)
+      expect(ords, c.label).toEqual([...ords].sort((a: number, b: number) => a - b))
     }
 
     // Sanity: the scoped parent retrieve surfaces the INCOMING FK from child.
@@ -109,6 +122,27 @@ withTestDatabase(
         (r: any) => r.source_table_name === 'child' && r.target_table_name === 'parent'
       )
     ).toBe(true)
+  }
+)
+
+withTestDatabase(
+  'scoped tables.retrieve preserves composite primary-key column order (indkey, not sorted)',
+  async ({ executeQuery }) => {
+    // PK declared (b, a) -- index column order is the reverse of alphabetical, so
+    // an accidental name-sort would be caught here.
+    await executeQuery(
+      `create table public.composite_pk (a int not null, b int not null, c int, primary key (b, a));`
+    )
+    const scoped = pgMeta.tables.retrieve({ name: 'composite_pk', schema: 'public', scoped: true })
+    const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+    // Emitted in index (indkey) order (b, a), the semantically meaningful order.
+    expect(scopedRow.primary_keys.map((pk: any) => pk.name)).toEqual(['b', 'a'])
+
+    // Legacy emits the same PK order (the PK aggregate is ordered identically in
+    // both renderings), so primary_keys match without any normalization.
+    const legacy = pgMeta.tables.retrieve({ name: 'composite_pk', schema: 'public' })
+    const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+    expect(scopedRow.primary_keys).toEqual(legacyRow.primary_keys)
   }
 )
 
