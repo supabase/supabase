@@ -42,7 +42,14 @@ interface Props {
 
 type ViewMode = 'grid' | 'list'
 
-const OFFICIAL_PARTNER_SLUGS = new Set(['grafana', 'stripe', 'aikido', 'doppler', 'resend'])
+const OFFICIAL_PARTNER_SLUGS = new Set([
+  'grafana',
+  'grafana-cloud',
+  'stripe',
+  'aikido',
+  'doppler',
+  'resend',
+])
 const PARTNERS_PAGE_SIZE = 24
 
 export default function IntegrationsContent({
