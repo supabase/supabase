@@ -1,0 +1,43 @@
+# Usage:
+#   Start with auth hot reload:  docker compose -f docker-compose.yml -f docker-compose.auth.yml up -d
+#
+# Auth runtime config (hot reload):
+#   GoTrue watches ./volumes/auth/config (via --config-dir) and live-reloads any
+#   .env / .json files dropped into it, without a container restart.
+#   Files are applied in alphabetical order; later files override earlier ones
+#   (a base.json takes precedence over a sibling base.env).
+#
+#   The `environment: !override` below keeps only the infrastructure vars (DB,
+#   JWT, API endpoints) in the container env, so the container boots without
+#   depending on the config directory. Business configs (signup toggles, SMTP,
+#   providers, ...) live only in ./volumes/auth/config and can be changed at
+#   runtime. A value repeated in the config directory wins over the env.
+
+services:
+
+  auth:
+    # Image default is CMD ["auth"] (migrate + serve); add the watch dir flag.
+    command: ["auth", "--config-dir", "/etc/auth/config"]
+    environment: !override
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL}
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY}
+      GOTRUE_JWT_ISSUER: ${API_EXTERNAL_URL}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_SITE_URL: ${SITE_URL}
+      GOTRUE_MAILER_URLPATHS_INVITE: ${MAILER_URLPATHS_INVITE}
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: ${MAILER_URLPATHS_CONFIRMATION}
+      GOTRUE_MAILER_URLPATHS_RECOVERY: ${MAILER_URLPATHS_RECOVERY}
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: ${MAILER_URLPATHS_EMAIL_CHANGE}
+    volumes:
+      - ./volumes/auth/config:/etc/auth/config:z
+
+  studio:
+    volumes:
+      - ./volumes/auth/config:/app/auth-config:z
