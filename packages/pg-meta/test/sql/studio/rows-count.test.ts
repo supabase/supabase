@@ -1,6 +1,6 @@
 import { afterAll, expect, test } from 'vitest'
 
-import { getTableRowsCountSql } from '../../../src'
+import { COUNT_ESTIMATE_SQL, getTableRowsCountSql, SCOPED_COUNT_ESTIMATE_SQL } from '../../../src'
 import type { Filter } from '../../../src/query'
 import { cleanupRoot, createTestDatabase } from '../../db/utils'
 
@@ -319,5 +319,75 @@ withTestDatabase(
       count: 7,
       is_estimate: false,
     })
+  }
+)
+
+// ── Fix #1: the embedded estimate select is quoted with literal(), so backslash
+// identifiers survive regardless of the session's standard_conforming_strings.
+withTestDatabase(
+  'scoped estimate path quotes the embedded select safely (backslash names, scs on & off)',
+  async (db) => {
+    // Names contain a backslash; in the JS template `\\` is one literal backslash.
+    await db.executeQuery(`
+      create table public."wei\\rd" ("col\\umn" int) with (autovacuum_enabled = false);
+      insert into public."wei\\rd" select g % 3 from generate_series(1, 60000) g;
+      analyze public."wei\\rd";
+    `)
+    const [{ id }] = await db.executeQuery<{ id: number }[]>(
+      `select 'public."wei\\rd"'::regclass::oid::int8 as id;`
+    )
+    // reltuples > THRESHOLD_COUNT + a filter -> the estimate (count_estimate_big)
+    // branch runs, embedding the filtered select (with the backslash names) as a
+    // literal inside the function call.
+    const table = { id: Number(id), name: 'wei\\rd', schema: 'public' }
+    const filters: Filter[] = [{ column: 'col\\umn', operator: '=', value: 1 }]
+
+    // Default standard_conforming_strings (on): both paths take the estimate
+    // branch and agree on the value.
+    const scopedOn = await runCount(db, { table, scoped: true, filters })
+    expect(scopedOn.is_estimate).toBe(true)
+    expect(Number.isFinite(scopedOn.count)).toBe(true)
+    expect(await assertScopedEqualsLegacy(db, { table, filters })).toEqual(scopedOn)
+
+    // standard_conforming_strings = off in the SAME connection: the SET, the
+    // CREATE FUNCTION, and the count must share one query (the test uses a pool).
+    const withScsOff = (sql: string) => `set standard_conforming_strings = off;\n${sql}`
+    const [scopedOff] = await db.executeQuery<CountRow[]>(
+      withScsOff(getTableRowsCountSql({ table, scoped: true, filters }))
+    )
+    // literal()/E'...' keeps the backslash identifiers intact under scs=off.
+    expect(scopedOff.is_estimate).toBe(true)
+    expect(Number.isFinite(Number(scopedOff.count))).toBe(true)
+
+    // The legacy apostrophe-only escaping mangles the backslashes under scs=off
+    // (the bug the scoped path fixes), so legacy errors there -- assert only the
+    // scoped behavior, per contract.
+    await expect(
+      db.executeQuery(withScsOff(getTableRowsCountSql({ table, filters })))
+    ).rejects.toThrow()
+  }
+)
+
+// ── Fix #2: the scoped estimate function RETURNS bigint (distinct name so it
+// never collides with the frozen integer count_estimate on a pooled session),
+// so multi-billion-row estimates don't overflow.
+withTestDatabase(
+  'scoped count_estimate_big returns >2^31 estimates without integer overflow',
+  async (db) => {
+    // The planner estimates generate_series row counts from the argument without
+    // executing it, so this is a cheap way to produce a ~3e9-row estimate.
+    const hugeSelect = `select from generate_series(1, 3000000000)`
+    const [big] = await db.executeQuery<{ est: string }[]>(
+      `${SCOPED_COUNT_ESTIMATE_SQL} select pg_temp.count_estimate_big('${hugeSelect}') as est;`
+    )
+    expect(Number(big.est)).toBe(3000000000)
+
+    // The frozen legacy integer function overflows on the same estimate -- this
+    // is exactly the case the scoped bigint variant fixes.
+    await expect(
+      db.executeQuery(
+        `${COUNT_ESTIMATE_SQL} select pg_temp.count_estimate('${hugeSelect}') as est;`
+      )
+    ).rejects.toThrow(/out of range for type integer/)
   }
 )

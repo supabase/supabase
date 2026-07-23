@@ -1,6 +1,11 @@
 import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 import { Filter, Query } from '../../../query'
-import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT, THRESHOLD_ESTIMATE_BYTES } from './get-count-estimate'
+import {
+  COUNT_ESTIMATE_SQL,
+  SCOPED_COUNT_ESTIMATE_SQL,
+  THRESHOLD_COUNT,
+  THRESHOLD_ESTIMATE_BYTES,
+} from './get-count-estimate'
 
 /**
  * [Joshen] Initially check reltuples from pg_class for an estimate of row count on the table
@@ -147,9 +152,14 @@ from approximation;
         // over-threshold branch keeps the legacy behavior (raw estimate when
         // unfiltered, count_estimate over the filtered select otherwise). The
         // CASE and is_estimate flag share one condition.
-        const estimateExpr = safeSql`pg_temp.count_estimate('${selectBaseSqlWithoutSemicolon.replaceAll("'", "''") as SafeSqlFragment}')`
+        // Quote the embedded select with literal() (not apostrophe-only
+        // replaceAll): literal() escapes backslashes correctly regardless of the
+        // session's standard_conforming_strings, and emits an E'...' string when
+        // needed. Uses the bigint count_estimate_big so multi-billion-row
+        // estimates don't overflow integer.
+        const estimateExpr = safeSql`pg_temp.count_estimate_big(${literal(selectBaseSqlWithoutSemicolon)})`
         const sql = safeSql`
-${COUNT_ESTIMATE_SQL}
+${SCOPED_COUNT_ESTIMATE_SQL}
 
 with approximation as (
     select
