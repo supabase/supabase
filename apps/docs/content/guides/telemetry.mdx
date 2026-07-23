@@ -4,55 +4,8 @@ title: Monitoring and Debugging
 
 Monitor your project, debug errors, and understand what's happening across the Supabase stack.
 
-## Start here
+<ContentListings id="telemetry-debugging" />
 
-| I want to…                                     | Go to                                                             |
-| ---------------------------------------------- | ----------------------------------------------------------------- |
-| Debug a failing request or unexpected behavior | [Debugging guide](/docs/guides/telemetry/debugging)               |
-| Query logs from the Logs Explorer              | [Logging](/docs/guides/telemetry/logs)                            |
-| Stream logs to Datadog, Loki, Axiom, or S3     | [Log drains](/docs/guides/telemetry/log-drains)                   |
-| View built-in performance dashboards           | [Reports](/docs/guides/telemetry/reports)                         |
-| Set up Prometheus metrics or Grafana           | [Metrics](/docs/guides/telemetry/metrics)                         |
-| Track errors in Sentry                         | [Sentry integration](/docs/guides/telemetry/sentry-monitoring)    |
-| Correlate requests end-to-end with traces      | [Client-side tracing](/docs/guides/telemetry/client-side-tracing) |
-| Let an AI agent debug my project               | [AI agents and MCP](#ai-agents-and-mcp)                           |
+<ContentListings id="telemetry-monitoring" />
 
-## Observability signals
-
-Supabase exposes four types of observability signals:
-
-| Signal      | Description                                                        | Guide                                                             |
-| ----------- | ------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| **Logs**    | Events from each service — auth, database, edge, storage, and more | [Logging](/docs/guides/telemetry/logs)                            |
-| **Metrics** | Prometheus-compatible database performance series                  | [Metrics](/docs/guides/telemetry/metrics)                         |
-| **Traces**  | End-to-end request correlation via W3C Trace Context               | [Client-side tracing](/docs/guides/telemetry/client-side-tracing) |
-| **Reports** | Built-in dashboards for API, Auth, Storage, and Realtime           | [Reports](/docs/guides/telemetry/reports)                         |
-
-## Debugging an error
-
-If a request is failing or behaving unexpectedly, start with the [Debugging guide](/docs/guides/telemetry/debugging). It covers:
-
-- The Supabase request-stack model (which layer owns which error code)
-- A symptom-to-layer router that maps error codes and symptoms to the right log source and troubleshooting guide
-- How to read logs as evidence before applying a fix
-
-## Querying logs
-
-The [Logs Explorer](/docs/guides/telemetry/logs) lets you query events from any Supabase service using SQL. The Explorer defaults to ClickHouse, where all sources share a single `logs` table and nested fields are accessed via `log_attributes['field_name']`.
-
-For advanced filtering with regular expressions, field discovery, and structured-field queries, see [Advanced log filtering](/docs/guides/telemetry/advanced-log-filtering).
-
-## Streaming logs externally
-
-To forward logs to Datadog, Loki, Axiom, S3, Sentry, or a custom HTTP destination, configure a [Log drain](/docs/guides/telemetry/log-drains).
-
-## AI agents and MCP
-
-The Supabase MCP server exposes a `get_logs` tool that lets AI agents query logs by service name without writing SQL. It is engine-agnostic and works across all projects.
-
-The `supabase` skill uses a **docs-first architecture**: instead of embedding cause-and-fix content that goes stale, it routes the agent to the relevant guide in this section. This means the agent always reads current documentation rather than frozen training data — and these pages are the source of truth it relies on.
-
-To give an AI agent the ability to debug your Supabase project:
-
-1. Install the [Supabase MCP server](/docs/guides/getting-started/mcp).
-2. Add the `supabase` skill: `npx skills add supabase`.
+<ContentListings id="telemetry-ai" />
