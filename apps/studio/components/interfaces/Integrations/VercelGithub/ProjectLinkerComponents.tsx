@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -251,38 +252,69 @@ export const SupabaseProjectSelector = ({
 }
 
 export const ActionButtons = ({
+  mode,
   variant,
+  showCreateProject,
   connectDisabled,
   isLoading,
+  foreignProjectId,
   onCreateConnections,
   onSkip,
-}: { connectDisabled: boolean; onCreateConnections: () => void } & Pick<
-  ProjectLinkerProps,
-  'variant' | 'onSkip' | 'isLoading'
->) => (
-  <div className={cn('flex w-full gap-2', variant === 'interstitial' ? 'flex-col' : 'justify-end')}>
-    <Button
-      size={variant === 'interstitial' ? undefined : 'medium'}
-      variant={variant === 'interstitial' ? 'primary' : 'default'}
-      block={variant === 'interstitial'}
-      className={variant === 'default' ? 'self-end' : undefined}
-      onClick={onCreateConnections}
-      loading={isLoading}
-      disabled={connectDisabled}
+}: {
+  showCreateProject: boolean
+  connectDisabled: boolean
+  foreignProjectId: string | undefined
+  onCreateConnections: () => void
+} & Pick<ProjectLinkerProps, 'variant' | 'mode' | 'onSkip' | 'isLoading'>) => {
+  const { slug, next } = useParams()
+  const newProjectURL =
+    mode === 'Vercel'
+      ? `/integrations/vercel/${slug}/deploy-button/new-project?${new URLSearchParams({
+          ...(next ? { next } : {}),
+          ...(foreignProjectId ? { currentProjectId: foreignProjectId } : {}),
+        })}`
+      : `/new/${slug}`
+
+  return (
+    <div
+      className={cn('flex w-full gap-2', variant === 'interstitial' ? 'flex-col' : 'justify-end')}
     >
-      Connect project
-    </Button>
-    {onSkip !== undefined && (
-      <Button
-        size={variant === 'interstitial' ? undefined : 'medium'}
-        variant={variant === 'interstitial' ? 'text' : 'default'}
-        block={variant === 'interstitial'}
-        onClick={() => {
-          onSkip()
-        }}
-      >
-        Skip
-      </Button>
-    )}
-  </div>
-)
+      {showCreateProject ? (
+        <Button
+          asChild
+          size={variant === 'interstitial' ? undefined : 'medium'}
+          variant={variant === 'interstitial' ? 'primary' : 'default'}
+          block={variant === 'interstitial'}
+          className={variant === 'default' ? 'self-end' : undefined}
+          loading={isLoading}
+        >
+          <Link href={newProjectURL}>Create project</Link>
+        </Button>
+      ) : (
+        <Button
+          size={variant === 'interstitial' ? undefined : 'medium'}
+          variant={variant === 'interstitial' ? 'primary' : 'default'}
+          block={variant === 'interstitial'}
+          className={variant === 'default' ? 'self-end' : undefined}
+          onClick={onCreateConnections}
+          loading={isLoading}
+          disabled={connectDisabled}
+        >
+          Connect project
+        </Button>
+      )}
+      {onSkip !== undefined && (
+        <Button
+          size={variant === 'interstitial' ? undefined : 'medium'}
+          variant={variant === 'interstitial' ? 'text' : 'default'}
+          block={variant === 'interstitial'}
+          onClick={() => {
+            onSkip()
+          }}
+        >
+          Skip
+        </Button>
+      )}
+    </div>
+  )
+}

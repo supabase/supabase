@@ -45,16 +45,6 @@ export const ProjectLinker = ({
   })
   const numProjects = orgProjects?.pages[0].pagination.count ?? 0
 
-  useEffect(() => {
-    if (defaultSupabaseProject !== undefined && selectedSupabaseProject === undefined)
-      setSelectedSupabaseProject(defaultSupabaseProject)
-  }, [defaultSupabaseProject, selectedSupabaseProject])
-
-  useEffect(() => {
-    if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
-      setForeignProjectId(defaultForeignProjectId)
-  }, [defaultForeignProjectId, foreignProjectId])
-
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
 
@@ -105,6 +95,16 @@ export const ProjectLinker = ({
     isLoading ||
     !selectedSupabaseProject ||
     !selectedForeignProject
+
+  useEffect(() => {
+    if (defaultSupabaseProject !== undefined && selectedSupabaseProject === undefined)
+      setSelectedSupabaseProject(defaultSupabaseProject)
+  }, [defaultSupabaseProject, selectedSupabaseProject])
+
+  useEffect(() => {
+    if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
+      setForeignProjectId(defaultForeignProjectId)
+  }, [defaultForeignProjectId, foreignProjectId])
 
   if (variant === 'interstitial') {
     return (
@@ -159,8 +159,11 @@ export const ProjectLinker = ({
         )}
 
         <ActionButtons
+          mode={mode}
           variant={variant}
+          showCreateProject={showNoEntitiesState && noSupabaseProjects}
           connectDisabled={connectDisabled}
+          foreignProjectId={foreignProjectId}
           isLoading={isLoading}
           onCreateConnections={onCreateConnections}
           onSkip={onSkip}
@@ -238,8 +241,11 @@ export const ProjectLinker = ({
 
       <div className="flex w-full justify-end gap-2 p-4 bg-surface-75">
         <ActionButtons
+          mode={mode}
           variant={variant}
+          showCreateProject={showNoEntitiesState && noSupabaseProjects}
           connectDisabled={connectDisabled}
+          foreignProjectId={foreignProjectId}
           isLoading={isLoading}
           onCreateConnections={onCreateConnections}
           onSkip={onSkip}

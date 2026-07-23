@@ -174,8 +174,7 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
               title="Unable to load project connection"
               errorMessage="Organization not found. Retry the installation from Vercel."
             />
-          ) : // [JOSHEN TODO BEFORE MERGING] Please flip this back to integrationNotFound
-          false ? (
+          ) : integrationNotFound ? (
             <VercelIntegrationInterstitialErrorState
               title="Unable to load project connection"
               errorMessage="Vercel integration not found for this organization. Retry the installation from Vercel."
@@ -204,8 +203,7 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
                     window.location.href = next
                   }
                 }}
-                // // [JOSHEN TODO BEFORE MERGING] Please uncomment this out
-                // loadingForeignProjects={isLoadingVercelProjectsData}
+                loadingForeignProjects={isLoadingVercelProjectsData}
                 mode="Vercel"
               />
             </div>
