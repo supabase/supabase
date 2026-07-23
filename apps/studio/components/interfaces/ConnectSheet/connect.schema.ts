@@ -1,13 +1,31 @@
-import { FEATURE_GROUPS_PLATFORM } from 'ui-patterns/McpUrlBuilder'
+import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM } from 'ui-patterns/McpUrlBuilder'
 
 import type { ConnectSchema, StepDefinition } from './Connect.types'
 
 /**
- * MCP feature groups enabled by default (Storage is excluded to keep tool counts manageable).
+ * MCP feature groups enabled by default on platform (Storage is excluded to keep
+ * tool counts manageable).
  */
 export const DEFAULT_MCP_FEATURES = FEATURE_GROUPS_PLATFORM.filter(
   (group) => group.id !== 'storage'
 ).map((group) => group.id)
+
+const NON_PLATFORM_MCP_FEATURE_IDS = new Set(FEATURE_GROUPS_NON_PLATFORM.map((group) => group.id))
+
+/** Defaults (and supported IDs) for the current deployment mode. */
+export function getDefaultMcpFeatures(isPlatform: boolean): string[] {
+  if (isPlatform) return DEFAULT_MCP_FEATURES
+  return DEFAULT_MCP_FEATURES.filter((id) => NON_PLATFORM_MCP_FEATURE_IDS.has(id))
+}
+
+export function getSupportedMcpFeatureGroups(isPlatform: boolean) {
+  return isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
+}
+
+export function normalizeMcpFeatures(features: string[], isPlatform: boolean): string[] {
+  if (isPlatform) return features
+  return features.filter((id) => NON_PLATFORM_MCP_FEATURE_IDS.has(id))
+}
 
 /**
  * Base install commands for each library.
