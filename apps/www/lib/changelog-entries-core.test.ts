@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  PUBLIC_FRONTMATTER_KEYS,
   parseChangelogEntryFile,
+  PUBLIC_FRONTMATTER_KEYS,
   toPublicFrontmatter,
 } from './changelog-entries-core.mjs'
 
@@ -51,6 +51,20 @@ describe('toPublicFrontmatter', () => {
       title: 'Hello',
     })
   })
+
+  it('normalizes Date-valued date fields to YYYY-MM-DD strings', () => {
+    // gray-matter parses an unquoted YAML date into a JS Date; the projected
+    // public frontmatter must be a string so it survives Next.js prop serialization.
+    const publicFrontmatter = toPublicFrontmatter({
+      title: 'Hello',
+      publish_date: new Date('2026-05-18T00:00:00.000Z'),
+      sunset_date: new Date('2026-08-05T00:00:00.000Z'),
+    }) as Record<string, unknown>
+
+    expect(publicFrontmatter.publish_date).toBe('2026-05-18')
+    expect(publicFrontmatter.sunset_date).toBe('2026-08-05')
+    expect(typeof publicFrontmatter.publish_date).toBe('string')
+  })
 })
 
 describe('parseChangelogEntryFile', () => {
@@ -93,5 +107,19 @@ describe('parseChangelogEntryFile', () => {
       `---\ntitle: Null date\nchange_type: improvement\npublic: true\npublish_date: null\n---\n\n# Body\n\nx\n`
     )
     expect(nullDate.sortDate).toBe('2026-07-22')
+  })
+
+  it('normalizes date frontmatter reaching detail-page props, even when unquoted', () => {
+    // `[slug].tsx` passes `entry.frontmatter` straight into getStaticProps props,
+    // so a Date here would throw during serialization. Verify it is a string.
+    const entry = parseChangelogEntryFile(
+      '20260722-unquoted-dates.md',
+      `---\ntitle: Unquoted dates\nchange_type: deprecation\npublic: true\npublish_date: 2026-05-18\nsunset_date: 2026-08-05\n---\n\n# Body\n\nx\n`
+    )
+    const frontmatter = entry.frontmatter as Record<string, unknown>
+
+    expect(frontmatter.publish_date).toBe('2026-05-18')
+    expect(frontmatter.sunset_date).toBe('2026-08-05')
+    expect(() => JSON.stringify(entry.frontmatter)).not.toThrow()
   })
 })

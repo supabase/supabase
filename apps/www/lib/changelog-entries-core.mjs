@@ -97,11 +97,26 @@ export const PUBLIC_FRONTMATTER_KEYS = [
   'legacy_gh_discussion',
 ]
 
-/** Projects raw parsed frontmatter down to the public allowlist, dropping `internal:` and any other private keys. */
+/**
+ * Allowlisted fields that YAML may parse into a JS `Date` (when the value is
+ * left unquoted). They must be coerced to a string before reaching page props.
+ */
+const DATE_FRONTMATTER_KEYS = new Set(['publish_date', 'sunset_date'])
+
+/**
+ * Projects raw parsed frontmatter down to the public allowlist, dropping
+ * `internal:` and any other private keys. Date fields are normalized to a
+ * `YYYY-MM-DD` string so an unquoted YAML date (a JS `Date`) can't break
+ * Next.js prop serialization — `entry.frontmatter` is passed straight into the
+ * detail page's props — or render as `[object Date]` in the sidebar.
+ */
 export function toPublicFrontmatter(frontmatter) {
   const publicFrontmatter = {}
   for (const key of PUBLIC_FRONTMATTER_KEYS) {
-    if (frontmatter[key] !== undefined) publicFrontmatter[key] = frontmatter[key]
+    if (frontmatter[key] === undefined) continue
+    publicFrontmatter[key] = DATE_FRONTMATTER_KEYS.has(key)
+      ? toDateString(frontmatter[key])
+      : frontmatter[key]
   }
   return publicFrontmatter
 }
