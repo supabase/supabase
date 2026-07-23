@@ -372,6 +372,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     return (
                       <button
                         key={slug}
+                        tabIndex={0}
                         type="button"
                         aria-pressed={on}
                         onClick={() => toggleProductTag(slug)}

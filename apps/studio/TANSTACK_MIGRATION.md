@@ -599,4 +599,5 @@ for the Vite pipeline:
 - Delete `pages/_app.tsx`, `pages/_document.tsx`, `pages/_error.jsx`, `pages/500.tsx`, `pages/404.tsx` (Next-only catch-alls; TanStack equivalents on `__root.tsx`).
 - Drop the `dev:next` / `build:next` / `start:next` scripts from `apps/studio/package.json` once we're committed to TanStack.
 - Remove the `apps/studio/pages/**` `path_instructions` guardrail entry from `.coderabbit.yaml` (added in FE-3423; remove it as part of this FE-3106 cleanup) — it's only useful while both runtimes coexist.
+- Remove the "TanStack Start migration" section from `apps/studio/CLAUDE.md` — it only applies while both runtimes coexist.
 - Delete this file.

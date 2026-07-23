@@ -114,7 +114,7 @@ const DialogContent = React.forwardRef<
           {!hideClose && (
             <DialogPrimitive.Close
               className={cn(
-                'absolute p-0.5 right-3.5 top-3.5 rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+                'absolute p-0.5 right-3.5 top-3.5 rounded-xs opacity-20 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
                 'hit-area-6'
               )}
             >
@@ -197,7 +197,7 @@ const DialogClose = React.forwardRef<
   <DialogPrimitive.Close
     ref={ref}
     className={cn(
-      'opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+      'opacity-70 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
       className
     )}
     {...props}

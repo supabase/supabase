@@ -259,7 +259,7 @@ export const EditorTabs = () => {
                   className={cn(
                     'absolute top-1/2 right-3 z-10 flex -translate-y-1/2 items-center justify-center rounded-xs',
                     'opacity-0 group-hover/new-tab:opacity-100 group-focus-within/new-tab:opacity-100 focus-visible:opacity-100',
-                    'hover:bg-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                    'hover:bg-200 focus-ring',
                     'cursor-pointer'
                   )}
                 >

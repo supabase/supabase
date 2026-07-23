@@ -204,6 +204,7 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
       )}
     >
       <button
+        tabIndex={0}
         className={cn(
           'h-8 w-8 flex group items-center justify-center mr-1',
           mobileMenuOpen && 'mt-0.5'

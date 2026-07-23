@@ -125,7 +125,10 @@ function Resources({ schema }: { schema: any }) {
                       {schema[resource].block.attributes[attribute].type ?? (
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="flex items-center justify-between gap-2">
+                            <button
+                              tabIndex={0}
+                              className="flex items-center justify-between gap-2"
+                            >
                               Nested type
                               <PlusCircle size={14} className="shrink-0" />
                             </button>
@@ -251,7 +254,10 @@ function DataSources({ schema }: { schema: any }) {
                       {schema[dataSource].block.attributes[attribute].type ?? (
                         <Popover>
                           <PopoverTrigger asChild>
-                            <button className="flex items-center justify-between gap-2">
+                            <button
+                              tabIndex={0}
+                              className="flex items-center justify-between gap-2"
+                            >
                               Nested type
                               <PlusCircle size={14} />
                             </button>

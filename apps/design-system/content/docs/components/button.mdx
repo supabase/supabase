@@ -144,5 +144,6 @@ Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions,
 - Enabled buttons default to `tabIndex={0}` (keyboard accessible)
 - Disabled buttons default to `tabIndex={-1}` (removed from tab order)
 - You can still override with an explicit `tabIndex` prop when needed
+- Keyboard focus uses the shared `focus-ring` utility; variants do not change ring colour
 
 You therefore don't need to manually set `tabIndex`, as Button handles it automatically based on its `disabled` state.
