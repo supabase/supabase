@@ -343,13 +343,10 @@ const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFrag
   const value = userFilterValue(search)
   if (!value) return null
   const exact = lit(value)
-  const contains = lit('%' + value + '%')
   return safeSql`(
-    (source = 'auth_logs' AND (
-      log_attributes['auth_event.actor_id'] = ${exact}
-      OR event_message ILIKE ${contains}
-    ))
-    OR (source = 'postgres_logs' AND event_message ILIKE ${contains})
+    (source = 'auth_logs' AND log_attributes['auth_event.actor_id'] = ${exact})
+    OR 
+    (source = 'edge_logs' AND log_attributes['request.sb.jwt.authorization.payload.subject'] = ${exact})
   )`
 }
 
