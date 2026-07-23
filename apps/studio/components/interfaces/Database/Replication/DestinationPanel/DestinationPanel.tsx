@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
@@ -14,6 +15,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
@@ -24,6 +26,8 @@ import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -32,8 +36,11 @@ interface DestinationPanelProps {
 }
 
 export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPanelProps) => {
+  const { ref: projectRef } = useParams()
   const enablePgReplicate = useIsETLPrivateAlpha()
   const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
+  const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
@@ -123,6 +130,14 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
 
             {destinationType === 'Read Replica' ? (
               <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
+            ) : isLocalETLNotSetUp ? (
+              <SheetSection>
+                <Admonition
+                  type="warning"
+                  title="Replication unavailable locally"
+                  description="Configure the replication API to manage Pipelines destinations in local development."
+                />
+              </SheetSection>
             ) : !enablePgReplicate ? (
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>

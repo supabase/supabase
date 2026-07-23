@@ -20,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -252,23 +251,7 @@ export const Destinations = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            <Shortcut
-              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-              label="Add destination"
-              onTrigger={openDestinationPanel}
-              options={{ enabled: !!newDestinationDefaultType }}
-              side="bottom"
-            >
-              <Button
-                variant="default"
-                icon={<Plus />}
-                disabled={!newDestinationDefaultType}
-                onClick={openDestinationPanel}
-              >
-                Add destination
-              </Button>
-            </Shortcut>
-            {organization?.slug && (
+            {hasDestinations && organization?.slug && (
               <Button asChild variant="default" icon={<ChartArea />}>
                 <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>
                   Usage
@@ -293,6 +276,22 @@ export const Destinations = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add destination"
+              onTrigger={openDestinationPanel}
+              options={{ enabled: !!newDestinationDefaultType }}
+              side="bottom"
+            >
+              <Button
+                variant="primary"
+                icon={<Plus />}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
+              >
+                Add destination
+              </Button>
+            </Shortcut>
           </div>
         </div>
       </div>
@@ -302,14 +301,6 @@ export const Destinations = () => {
           <AlertError
             error={destinationsError || databasesError}
             subject="Failed to retrieve destinations"
-          />
-        )}
-
-        {isLocalETLNotSetUp && (
-          <Admonition
-            type="warning"
-            title="Replication unavailable locally"
-            description="Configure the replication API to manage destinations in local development."
           />
         )}
 
@@ -374,7 +365,6 @@ export const Destinations = () => {
               icon={Database}
               title="Add a replication destination"
               description="Deploy a Read Replica for lower latency and workload isolation, or connect a Pipelines destination for analytics workloads."
-              className="mt-4"
             >
               <Button
                 variant="default"
