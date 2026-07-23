@@ -89,7 +89,7 @@ describe('generateAuthMenu', () => {
     expect(names).not.toContain('Performance')
   })
 
-  it('self-hosted hides OAuth Apps, Notifications, and platform-only Configuration items', () => {
+  it('self-hosted shows runtime-configurable sections and hides platform-only items', () => {
     const menu = generateAuthMenu({
       ...allFeaturesEnabled,
       isPlatform: false,
@@ -97,13 +97,23 @@ describe('generateAuthMenu', () => {
     const names = flatItemNames(menu)
     const groupTitles = menu.map((g) => g.title)
 
-    expect(names).not.toContain('OAuth Apps')
-    expect(groupTitles).not.toContain('Notifications')
+    // Backed by the folder-backed auth config API on self-hosted
+    expect(groupTitles).toContain('Notifications')
+    expect(names).toContain('Emails')
+    expect(names).toContain('Sign In / Providers')
+    expect(names).toContain('Sessions')
+    expect(names).toContain('Rate Limits')
+    expect(names).toContain('Multi-Factor')
+    expect(names).toContain('URL Configuration')
+    expect(names).toContain('Attack Protection')
+    expect(names).toContain('Auth Hooks')
+    expect(names).toContain('Performance')
+    expect(names).toContain('Policies')
 
-    // Configuration should only have Policies
-    const configGroup = menu.find((g) => g.title === 'Configuration')!
-    expect(configGroup.items).toHaveLength(1)
-    expect(configGroup.items[0].name).toBe('Policies')
+    // Platform-only items stay hidden
+    expect(names).not.toContain('OAuth Apps')
+    expect(names).not.toContain('OAuth Server')
+    expect(names).not.toContain('Audit Logs')
   })
 
   it('shows Overview when showOverview is true', () => {

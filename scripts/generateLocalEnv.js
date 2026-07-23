@@ -35,6 +35,7 @@ const defaultEnv = {
   NEXT_PUBLIC_NODE_ENV: 'test',
   SNIPPETS_MANAGEMENT_FOLDER: '../../supabase/snippets',
   EDGE_FUNCTIONS_MANAGEMENT_FOLDER: '../../supabase/functions', // path relative to studio project
+  AUTH_CONFIG_MANAGEMENT_FOLDER: '../../docker/volumes/auth/config', // path relative to studio project
 }
 
 const environment = { ...generatedEnv, ...defaultEnv }

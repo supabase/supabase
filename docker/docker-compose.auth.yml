@@ -12,6 +12,10 @@
 #   depending on the config directory. Business configs (signup toggles, SMTP,
 #   providers, ...) live only in ./volumes/auth/config and can be changed at
 #   runtime. A value repeated in the config directory wins over the env.
+#
+#   If a config file is invalid (e.g. a duration without unit), GoTrue keeps
+#   the previous config and logs `reloader: error loading config` — check
+#   `docker logs supabase-auth` when a change does not seem to apply.
 
 services:
 
@@ -39,5 +43,9 @@ services:
       - ./volumes/auth/config:/etc/auth/config:z
 
   studio:
+    environment:
+      # Enables the studio auth-config API backed by this folder (shared with
+      # the auth service, which live-reloads it).
+      AUTH_CONFIG_MANAGEMENT_FOLDER: /app/auth-config
     volumes:
       - ./volumes/auth/config:/app/auth-config:z
