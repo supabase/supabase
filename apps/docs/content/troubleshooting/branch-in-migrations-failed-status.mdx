@@ -1,0 +1,70 @@
+---
+title = "Why is my branch stuck in MIGRATIONS_FAILED?"
+topics = [ "branching" ]
+keywords = [ "branching", "migrations", "MIGRATIONS_FAILED", "failed" ]
+database_id = ""
+---
+
+When a Preview Branch is created via the Dashboard, it's built by replaying the migration history from your `main` branch against a fresh database. If that replay fails partway through, the branch is left either empty or partly complete and its status shows `MIGRATIONS_FAILED`. This almost always means the migration history on `main` is out of sync with its actual live schema — commonly because a change was made directly via the SQL Editor or another manual edit that was never captured as a migration file.
+
+The steps to resolve this differ slightly depending on whether you branch via the **Dashboard** or the **GitHub integration**. Follow the section that matches your setup.
+
+---
+
+## Part 1: Branching via the Dashboard
+
+#### 1. Confirm the branch failure and view its workflow
+
+- Go to [Branches](/dashboard/project/_/branches) and find the affected branch.
+- Click **View logs**. A popup shows the branch's creation workflow, including the failed step.
+
+---
+
+#### 2. Find the exact SQL error in your Postgres logs
+
+- Go to [Postgres Logs](/dashboard/project/_/logs?filter=log_type:eq:postgres).
+- Look for entries beginning with `execute <unnamed>:` — these are the individual migration statements being replayed.
+- Find the entry **highlighted in red**. This is the statement that failed, and its message explains why (e.g. relation already exists, column not found, permission denied).
+
+---
+
+#### 3. Prepare a local Supabase environment
+
+If you don't already have one, follow the [local development getting started guide](/docs/guides/local-development/cli/getting-started), then link your project:
+
+```bash
+supabase link
+```
+
+---
+
+#### 4. Pull down your production migration history
+
+```bash
+supabase migration fetch
+```
+
+This retrieves the migration files currently recorded against your `main` branch, so you can compare them against the actual live schema and locate the one causing the failure.
+
+---
+
+#### 5. Repair the culprit migration
+
+- Locate the migration file containing the SQL statement that matches the red error from step 2, and correct it so it reflects the real state of your production schema.
+- Once fixed, mark it as applied using its timestamp:
+
+```bash
+supabase migration repair <timestamp> --status applied
+```
+
+- Verify the repair took effect by checking [production migrations](/dashboard/project/_/database/migrations) in the Dashboard.
+
+---
+
+#### 6. Re-test branch creation
+
+Once repaired, either create a new branch or **rebase** the existing affected branch. Check the branch's workflow logs again (step 1) to confirm migrations now complete successfully.
+
+> If it fails again, repeat steps 2–6 — there may be more than one out-of-sync migration to work through, one at a time.
+
+---
