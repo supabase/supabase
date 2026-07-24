@@ -124,7 +124,7 @@ function PromptBody({
   const [shimmerMounted, setShimmerMounted] = useState(prompt.shimmer)
 
   return (
-    <div className="px-4 py-3.5 text-sm leading-6 text-foreground-light">
+    <div className="px-4 py-3.5 text-sm leading-6 text-foreground-light font-normal">
       <div
         className={cn(shimmerMounted && 'shimmer')}
         data-shimmer-fading={shimmerMounted && !shimmerEnabled ? true : undefined}
@@ -261,11 +261,24 @@ function PromptPanel({ children, className }: PromptPanelProps) {
       className={cn('w-full overflow-hidden rounded-lg border bg-background shadow-sm', className)}
     >
       {header}
-      {prompts.map((prompt) => (
-        <TabsContent key={prompt.value} value={prompt.value} className="m-0">
-          <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
-        </TabsContent>
-      ))}
+      {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
+      <div className="grid">
+        {prompts.map((prompt) => {
+          const isActive = prompt.value === activeTab
+
+          return (
+            <TabsContent
+              key={prompt.value}
+              value={prompt.value}
+              forceMount
+              tabIndex={isActive ? 0 : -1}
+              className="col-start-1 row-start-1 m-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
+            >
+              <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
+            </TabsContent>
+          )
+        })}
+      </div>
     </Tabs>
   )
 }
