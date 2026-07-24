@@ -120,19 +120,15 @@ describe('Admonition', () => {
     expect(within(screen.getByRole('alert')).queryByText(`${name}:`)).not.toBeInTheDocument()
   })
 
-  it('renders the title as a paragraph outside the body margin resets', () => {
+  it('renders the title as a paragraph with its own margin', () => {
     render(<Admonition type="note" title="Manual approval required" description="Body copy." />)
 
     const note = screen.getByRole('alert', { name: 'Note' })
     const title = within(note).getByText('Manual approval required')
-    const description = within(note).getByText('Body copy.')
-    const body = description.parentElement?.parentElement
 
     expect(note.querySelector('h1, h2, h3, h4, h5, h6')).not.toBeInTheDocument()
     expect(title.tagName).toBe('P')
-    expect(title).toHaveClass('mb-0.5')
-    expect(body).toHaveClass('[&_p]:!mb-1.5')
-    expect(body?.contains(title)).toBe(false)
+    expect(title).toHaveClass('!mb-0.5')
   })
 
   it('wraps a string description in a paragraph', () => {

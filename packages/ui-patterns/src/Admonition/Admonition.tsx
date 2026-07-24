@@ -66,29 +66,28 @@ export const Admonition = forwardRef<
               ]
             )}
           >
-            <div className="min-w-0">
+            <div
+              {...childProps?.description}
+              className={cn(
+                'text-foreground-light',
+                '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0',
+                '[&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5',
+                childProps?.description?.className
+              )}
+            >
               {title && (
                 <p
                   {...childProps?.title}
-                  className={cn('mb-0.5 font-medium text-foreground', childProps?.title?.className)}
+                  className={cn(
+                    '!mb-0.5 font-medium text-foreground',
+                    childProps?.title?.className
+                  )}
                 >
                   {title}
                 </p>
               )}
-              {(description || children) && (
-                <div
-                  {...childProps?.description}
-                  className={cn(
-                    'text-foreground-light',
-                    '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0',
-                    '[&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5',
-                    childProps?.description?.className
-                  )}
-                >
-                  {description && <AlertDescription>{description}</AlertDescription>}
-                  {children}
-                </div>
-              )}
+              {description && <AlertDescription>{description}</AlertDescription>}
+              {children}
             </div>
             {actions && (
               <div
