@@ -40,6 +40,7 @@ import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/Lo
 import { LogsQueryPanel } from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { useRecentLogSqlSnippets } from '@/components/interfaces/Settings/Logs/useRecentLogSqlSnippets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -151,10 +152,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     false
   )
 
-  const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
-    `project-content-${projectRef}-recent-log-sql`,
-    []
-  )
+  const [recentLogs, setRecentLogs] = useRecentLogSqlSnippets(projectRef)
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
