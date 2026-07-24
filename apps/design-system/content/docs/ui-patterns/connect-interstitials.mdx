@@ -81,10 +81,26 @@ project linking.
 
 ## Logos
 
-Use `LogoPair` when the user is connecting two services, and `SupabaseLogo`
-alone for first-party flows. `PartnerLogo` fills the 48px box edge-to-edge;
-`LogoBox` is for custom inset marks or logos that need their own background.
-Store new partner icons in `apps/studio/public/img/icons`.
+Use `LogoPair` when the user is connecting two known services, and
+`SupabaseLogo` alone for first-party flows or when the requester has no trusted
+mark. `PartnerLogo` fills the 48px box edge-to-edge; `LogoBox` is for custom
+inset marks or logos that need their own background. Store new partner icons in
+`apps/studio/public/img/icons`.
+
+### Pairing
+
+| Requester logo                                           | Header treatment                                     |
+| -------------------------------------------------------- | ---------------------------------------------------- |
+| Curated partner / MCP client, or a trusted uploaded icon | `LogoPair` with requester left, `SupabaseLogo` right |
+| Unknown, missing, blocked, or failed-to-load icon        | `SupabaseLogo` alone. Do not invent an initial tile. |
+
+The user is usually arriving from the third-party app. The interstitial should
+confirm they are connecting to Supabase. Put the requester name in the title and
+description; do not manufacture a letter avatar to fill the left side of a pair.
+
+**Known services.** When both sides are curated (or otherwise known), pair them.
+Theme-reactive tiles are fine when both marks have matching light/dark
+treatment.
 
 <ComponentPreview
   name="connect-interstitial-logo-pair"
@@ -96,9 +112,13 @@ Store new partner icons in `apps/studio/public/img/icons`.
   wide
 />
 
+**No trusted requester mark.** If the icon is missing, blocked, or fails to
+load, show `SupabaseLogo` alone. Do not invent an initial tile to fill the
+pair.
+
 <ComponentPreview
-  name="connect-interstitial-logo-single"
-  description="SupabaseLogo alone for first-party flows"
+  name="connect-interstitial-logo-unknown"
+  description="No trusted requester mark: Supabase alone"
   align="start"
   className="p-0"
   padded={false}
@@ -106,15 +126,51 @@ Store new partner icons in `apps/studio/public/img/icons`.
   wide
 />
 
-```tsx
-const AwsLogo = () => (
-  <LogoBox className="border-[#232f3e] bg-[#232f3e]">
-    <img alt="AWS" src={`${BASE_PATH}/img/icons/aws-icon.svg`} className="w-8" />
-  </LogoBox>
-)
+**Uploaded organisation OAuth icons.** Icons published via Studio’s OAuth app
+builder are unclassified bitmaps — we do not know if they were authored for
+light or dark. Treat the pair as light on both Studio themes: fixed light tile
+chrome (`border-black/10 bg-white`, `SupabaseLogo forceLight`) on both sides.
+Do not invent a dark variant for the upload. Toggle the docs theme to dark to
+see the light tiles hold against the Studio chrome.
 
-<LogoPair left={<AwsLogo />} right={<SupabaseLogo />} />
-```
+<ComponentPreview
+  name="connect-interstitial-logo-uploaded"
+  description="Uploaded OAuth app icon: forced-light tiles on both sides"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
+### Assets
+
+Treat Connect logos as assets, not theme tokens.
+
+**Default to light.** Prefer a single static light mark inside `LogoBox`.
+Light assets read fine on both light and dark Studio themes. That is the
+default for Connect tiles.
+
+**Keep pairs matched.** In a `LogoPair`, both marks must use the same
+treatment: both light, or both dark. Do not mix a light partner tile with a
+dark-theme-only Supabase treatment, or the reverse. Theme-aware dark variants
+are fine for curated partners that already have them, but then both sides of
+the pair should use the dark set together.
+
+**What not to do**
+
+- Do not invent light/dark pairs for arbitrary remote OAuth icons.
+- Do not recolour vendor SVGs with theme CSS. Monochrome identity-provider
+  masks (for example GitHub on sign-in) stay a separate pattern.
+
+**Where logos come from on `/authorize`**
+
+- Curated partner logos resolve from allowlisted `redirect_uri` hosts only,
+  not from self-asserted `name` or `website`. Those pairs may use theme tiles
+  and dark assets when the partner has them.
+- Published organisation OAuth app icons uploaded in Studio remain trusted
+  remote images, paired with forced-light tiles on both sides.
+- Everything else falls back to `SupabaseLogo` alone.
 
 ## Account row
 
@@ -149,6 +205,16 @@ secondary action that still belongs in the flow.
 Keep loading, invalid, error, and success states inside the same card when the
 route can explain them. Use `ShimmeringLoader` for loading, and `Admonition`
 for warning, error, note, and success copy.
+
+<ComponentPreview
+  name="connect-interstitial-logo-single"
+  description="Wrong-account warning inside the same interstitial card"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
 
 ## Copy
 

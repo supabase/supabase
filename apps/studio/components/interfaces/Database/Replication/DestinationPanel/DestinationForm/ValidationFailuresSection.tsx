@@ -34,12 +34,12 @@ export const ValidationFailuresSection = ({
     <Admonition
       type={hasCriticalFailures ? 'warning' : 'default'}
       className="px-5 rounded-none border-0"
-      title="Destination configuration issues"
+      title="Configuration issues"
     >
       <p className="text-sm text-foreground-light mb-2!">
         {hasCriticalFailures
           ? `Please fix all required issues below${hasWarnings ? ' and review the others' : ''} before continuing.`
-          : 'The following issues were identified, although you may still create the pipeline and start replication to the destination.'}
+          : 'The following issues were identified. You may still continue after reviewing them.'}
       </p>
       <p className="text-sm text-foreground-light mb-2!">
         Pipeline options are under <strong>Advanced settings</strong> above. Source database

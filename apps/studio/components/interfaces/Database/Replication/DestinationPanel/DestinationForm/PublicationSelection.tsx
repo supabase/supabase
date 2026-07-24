@@ -8,21 +8,21 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
-  sourceId?: number
-  visible: boolean
   onSelectNewPublication: () => void
 }
 
 export const PublicationSelection = ({
   form,
-  sourceId,
   onSelectNewPublication,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
   const { publicationName } = form.watch()
+
+  const sourceId = useReplicationSourceId({ projectRef })
 
   const { data: publications, isSuccess: isSuccessPublications } = useReplicationPublicationsQuery({
     projectRef,
@@ -45,7 +45,18 @@ export const PublicationSelection = ({
         >
           <FormControl>
             <PublicationsComboBox
-              field={field}
+              field={{
+                ...field,
+                onChange: (value) => {
+                  if (value !== field.value) {
+                    form.setValue('tableSyncCopyTableIds', [], {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                  field.onChange(value)
+                },
+              }}
               sourceId={sourceId}
               onNewPublicationClick={() => onSelectNewPublication()}
             />

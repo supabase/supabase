@@ -25,14 +25,68 @@ All interactive page elements should be reachable by keyboard. Given the below i
 
 Chromium-based browsers and Firefox handle this automatically via the Tab key. Safari, by default, requires the Option key to also be held down. Enabling _Keyboard navigation_ on macOS Settings [removes this requirement](https://mayank.co/blog/safari-focus/#keyboard-navigation) but makes links non-tabbable as a result.
 
-Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
+Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use one shared focus ring so users recognize this state instantly.
 
-[Button](components/button) has all of the above built-in. The same explicit `tabIndex` default is also baked into Checkbox, Switch, Select Trigger, Toggle, Accordion Trigger, Collapsible Trigger, Dropdown Menu Trigger, Popover Trigger, Dialog Trigger, Sheet Trigger, Alert Dialog Trigger, and the Sidebar Menu and action buttons. Bespoke interactive elements however, such as the below interactive [Table Row](components/table#examples), require these props to be added manually:
+### Focus ring recipe
+
+Prefer the shared utilities over inventing local styles:
+
+| Utility       | Use when                                                                   |
+| ------------- | -------------------------------------------------------------------------- |
+| `focus-ring`  | Buttons, inputs, and most controls (offset **ring**)                       |
+| `focus-inset` | Dense or flush surfaces such as interactive table rows (inset **outline**) |
+
+```tsx
+className = 'focus-ring'
+// or
+className = 'relative cursor-pointer focus-inset'
+```
+
+These expand to:
+
+**`focus-ring`**
+
+```txt
+outline-hidden
+focus-visible:ring-2
+focus-visible:ring-ring
+focus-visible:ring-offset-2
+focus-visible:ring-offset-background
+```
+
+**`focus-inset`**
+
+Uses `outline` (not `ring`) so it paints reliably on interactive `<tr>`s. Tailwind `ring` is `box-shadow`, which browsers often skip on `display: table-row` (notably Safari). Do not put `focus-ring` or raw `ring-*` on a `<tr>`, and do not add `outline-hidden` alongside `focus-inset`. `outline-hidden` sets `outline-style: none` and will hide the indicator.
+
+```txt
+&:focus-visible {
+  outline-style: solid
+  outline-width: 2px
+  outline-offset: -2px
+  outline-color: var(--ring)
+  border-radius: var(--radius-md)
+}
+```
+
+`outline-hidden` is always on (not `focus-visible:`-prefixed) so mouse click does not show the browser’s default outline; the focus indicator replaces it for keyboard focus only.
+
+Rules:
+
+- Prefer `:focus-visible` over `:focus` so click/tap does not show a focus indicator
+- Never use `outline-none` / `outline-hidden` without a ring or outline replacement
+- Always use the shared color (`ring-ring` / `outline-ring`). Variants (primary, danger, warning) do not change focus colour
+- Do not animate the focus indicator; avoid `transition-all` / `transition` on controls that show one (prefer `transition-colors`)
+- Prefer `focus-ring` / `focus-inset` over copy-pasting the class stack
+- On interactive `<tr>`s, use `focus-inset` only. `focus-ring` will look fine in some browsers and invisible in others
+
+When the focused element is not the thing that should show the ring (e.g. a wrapping `Link` with `group`, or an `InputGroup` parent using `:has()`), keep the explicit `group-focus-visible:ring-*` / `has-[…]:focus-visible:ring-*` stack. The utilities bake in `:focus-visible` on the same element and do not compose as `group-focus-visible:focus-ring`.
+
+[Button](components/button) has focus, `tabIndex`, and the shared ring built-in. The same explicit `tabIndex` default is also baked into Checkbox, Switch, Select Trigger, Toggle, Accordion Trigger, Collapsible Trigger, Dropdown Menu Trigger, Popover Trigger, Dialog Trigger, Sheet Trigger, Alert Dialog Trigger, and the Sidebar Menu and action buttons. Bespoke interactive elements however, such as the below interactive [Table Row](components/table#examples), require these props to be added manually:
 
 ```tsx showLineNumbers {4-14}
 <TableRow
   key={id}
-  className="relative cursor-pointer h-16 inset-focus"
+  className="relative cursor-pointer h-16 focus-inset"
   onClick={(event) => {
     if (event.currentTarget !== event.target) return
     handleBucketNavigation(bucket.id, event)

@@ -45,9 +45,9 @@ export function StripeLogo() {
   )
 }
 
-export function SupabaseLogo() {
+export function SupabaseLogo({ forceLight = false }: { forceLight?: boolean } = {}) {
   return (
-    <LogoBox className="bg-surface-75">
+    <LogoBox className={forceLight ? 'border-black/10 bg-white' : 'bg-surface-75'}>
       <svg viewBox="0 0 109 113" className="size-7" aria-hidden>
         <path
           d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97L53.974 40.063h45.22c8.19 0 12.758 9.46 7.665 15.874L63.708 110.284Z"

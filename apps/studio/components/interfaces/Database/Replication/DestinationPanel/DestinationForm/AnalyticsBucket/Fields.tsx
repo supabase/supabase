@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
@@ -27,11 +26,9 @@ import {
 } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 /**
  * [Joshen] JFYI I'd foresee a possible UX friction point here regarding S3 access key IDs and secret access keys
@@ -70,14 +67,6 @@ export const AnalyticsBucketFields = ({
 
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys }
-  )
-  const { serviceKey } = apiKeysData ?? {}
-  const serviceApiKey = serviceKey?.api_key ?? ''
-
   const {
     data: keysData,
     isSuccess: isSuccessKeys,
@@ -96,7 +85,7 @@ export const AnalyticsBucketFields = ({
     isError: isErrorBuckets,
   } = useAnalyticsBucketsQuery({ projectRef })
 
-  const canSelectNamespace = !!warehouseName && !!serviceApiKey
+  const canSelectNamespace = !!warehouseName
 
   const {
     data: namespaces = [],
@@ -104,7 +93,7 @@ export const AnalyticsBucketFields = ({
     isError: isErrorNamespaces,
   } = useIcebergNamespacesQuery(
     { projectRef, warehouse: warehouseName },
-    { enabled: !!serviceApiKey }
+    { enabled: !!warehouseName }
   )
 
   return (
@@ -293,7 +282,7 @@ export const AnalyticsBucketFields = ({
                 type={showCatalogToken ? 'text' : 'password'}
                 placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Auto-populated'}
                 actions={
-                  serviceApiKey ? (
+                  field.value ? (
                     <div className="flex items-center justify-center">
                       <Button
                         variant="default"
