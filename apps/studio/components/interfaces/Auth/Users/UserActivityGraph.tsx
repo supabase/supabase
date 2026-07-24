@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { useMemo } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -8,8 +9,6 @@ import {
   ContributionGraph,
   ContributionGraphBlock,
   ContributionGraphCalendar,
-  ContributionGraphFooter,
-  ContributionGraphLegend,
 } from './ContributionGraph'
 import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
@@ -32,6 +31,17 @@ const countToLevel = (count: number) => {
   if (count < 6) return 2
   if (count < 12) return 3
   return 4
+}
+
+const getUserActivityHref = (projectRef: string | undefined, userId: string, date: string) => {
+  const dayStart = dayjs.utc(date).startOf('day')
+  const params = new URLSearchParams({
+    user: userId,
+    its: dayStart.toISOString(),
+    ite: dayStart.add(1, 'day').toISOString(),
+  })
+
+  return `/project/${projectRef}/observability/user-activity?${params.toString()}`
 }
 
 export const UserActivityGraph = ({ userId }: { userId: string }) => {
@@ -84,27 +94,30 @@ export const UserActivityGraph = ({ userId }: { userId: string }) => {
         {({ activity, dayIndex, weekIndex }) => (
           <Tooltip>
             <TooltipTrigger asChild>
-              <g>
-                <ContributionGraphBlock
-                  activity={activity}
-                  className={cn(
-                    'data-[level="0"]:fill-green-100',
-                    'data-[level="1"]:fill-green-300',
-                    'data-[level="2"]:fill-green-500',
-                    'data-[level="3"]:fill-green-700',
-                    'data-[level="4"]:fill-green-900',
-                    isLoading && 'animate-pulse data-[level="0"]:fill-green-700'
-                  )}
-                  style={{ animationDelay: `${weekIndex * 80}ms` }}
-                  dayIndex={dayIndex}
-                  weekIndex={weekIndex}
-                />
-              </g>
+              <Link href={getUserActivityHref(projectRef, userId, activity.date)}>
+                <g className="cursor-pointer">
+                  <ContributionGraphBlock
+                    activity={activity}
+                    className={cn(
+                      'data-[level="0"]:fill-green-100',
+                      'data-[level="1"]:fill-green-300',
+                      'data-[level="2"]:fill-green-500',
+                      'data-[level="3"]:fill-green-700',
+                      'data-[level="4"]:fill-green-900',
+                      'hover:stroke-1 hover:stroke-brand-500',
+                      isLoading && 'animate-pulse data-[level="0"]:fill-green-700'
+                    )}
+                    style={{ animationDelay: `${weekIndex * 80}ms` }}
+                    dayIndex={dayIndex}
+                    weekIndex={weekIndex}
+                  />
+                </g>
+              </Link>
             </TooltipTrigger>
             <TooltipContent>
               <p className="font-semibold">{activity.date}</p>
               <p>
-                {activity.count} auth event{activity.count === 1 ? '' : 's'}
+                {activity.count} event{activity.count === 1 ? '' : 's'}
               </p>
             </TooltipContent>
           </Tooltip>
