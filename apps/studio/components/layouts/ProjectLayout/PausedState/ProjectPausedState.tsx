@@ -6,6 +6,7 @@ import { Button, Card, CardContent, CardFooter } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { DownloadBackupsSection } from './DownloadBackupsSection'
 import { PauseDisabledState } from './PauseDisabledState'
 import { ResumeProjectButton } from '@/components/interfaces/Project/ResumeProjectButton'
 import { AlertError } from '@/components/ui/AlertError'
@@ -135,17 +136,20 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
       )}
 
       {isPauseStatusSuccess && !isRestoreDisabled && (
-        <CardFooter className="flex flex-wrap justify-end items-center gap-2">
-          <ResumeProjectButton size="tiny" variant="default" />
+        <>
+          <CardFooter className="flex flex-wrap justify-end items-center gap-2">
+            <ResumeProjectButton size="tiny" variant="default" />
 
-          {isFreePlan ? (
-            <UpgradePlanButton source="projectPausedStateRestore" />
-          ) : (
-            <Button asChild variant="default">
-              <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
-            </Button>
-          )}
-        </CardFooter>
+            {isFreePlan ? (
+              <UpgradePlanButton source="projectPausedStateRestore" />
+            ) : (
+              <Button asChild variant="default">
+                <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
+              </Button>
+            )}
+          </CardFooter>
+          {pauseStatus.latest_downloadable_backup_id !== null && <DownloadBackupsSection />}
+        </>
       )}
 
       {isPauseStatusSuccess && isRestoreDisabled && <PauseDisabledState />}
