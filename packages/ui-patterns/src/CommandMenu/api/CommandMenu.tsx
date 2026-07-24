@@ -189,7 +189,7 @@ function CommandMenuTriggerInput({
           'pl-1.5 md:pl-2 pr-1',
           'flex items-center justify-between',
           // Match Button default (Connect): selection hover fill, stronger border.
-          'bg-transparent text-foreground-lighter border-strong',
+          'bg-transparent text-foreground-lighter border border-strong',
           'hover:bg-selection hover:border-stronger',
           'focus-ring',
           'transition-colors',
