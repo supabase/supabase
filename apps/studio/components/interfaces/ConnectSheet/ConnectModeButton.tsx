@@ -1,4 +1,3 @@
-import { cva } from 'class-variance-authority'
 import { Box, Cable, Database, Server, Sparkles } from 'lucide-react'
 import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 import { cn } from 'ui'
@@ -12,62 +11,6 @@ const MODE_ICONS: Record<string, ReactNode> = {
   mcp: <Sparkles size={16} strokeWidth={1.5} />,
   server: <Server size={16} strokeWidth={1.5} />,
 }
-
-const connectModeButtonVariants = cva(
-  [
-    // Each cell owns a border; adjacent edges overlap (RadioGroupStacked-style)
-    'relative -mb-px -mr-px flex cursor-pointer flex-col items-center gap-2 border bg-overlay/50 p-4 shadow-xs transition-colors',
-    'focus-visible:z-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
-  ],
-  {
-    variants: {
-      selected: {
-        true: 'z-1 border-foreground-muted bg-surface-300 ring-1 ring-border',
-        false:
-          'hover:z-1 hover:border-foreground-muted hover:bg-background dark:hover:bg-surface-200',
-      },
-    },
-    defaultVariants: {
-      selected: false,
-    },
-  }
-)
-
-const connectModeButtonIconVariants = cva('', {
-  variants: {
-    selected: {
-      true: 'text-foreground',
-      false: 'text-foreground-light',
-    },
-  },
-  defaultVariants: {
-    selected: false,
-  },
-})
-
-const connectModeButtonLabelVariants = cva('heading-default text-center', {
-  variants: {
-    selected: {
-      true: 'text-foreground',
-      false: 'text-foreground-light',
-    },
-  },
-  defaultVariants: {
-    selected: false,
-  },
-})
-
-const connectModeButtonDescriptionVariants = cva('text-sm leading-tight text-center', {
-  variants: {
-    selected: {
-      true: 'text-foreground-light',
-      false: 'text-foreground-lighter',
-    },
-  },
-  defaultVariants: {
-    selected: false,
-  },
-})
 
 export interface ConnectModeButtonProps extends Omit<
   ComponentPropsWithoutRef<'button'>,
@@ -93,13 +36,37 @@ export function ConnectModeButton({
       type={type}
       tabIndex={0}
       aria-pressed={selected}
-      className={cn(connectModeButtonVariants({ selected }), className)}
+      className={cn(
+        // Each cell owns a border; adjacent edges overlap (RadioGroupStacked-style)
+        'relative -mb-px -mr-px flex cursor-pointer flex-col items-center gap-2 border bg-overlay/50 p-4 shadow-xs transition-colors',
+        'focus-visible:z-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+        selected
+          ? 'z-1 border-foreground-muted bg-surface-300 ring-1 ring-border'
+          : 'hover:z-1 hover:border-foreground-muted hover:bg-background dark:hover:bg-surface-200',
+        className
+      )}
       {...props}
     >
-      <span className={connectModeButtonIconVariants({ selected })}>{MODE_ICONS[modeId]}</span>
+      <span className={cn(selected ? 'text-foreground' : 'text-foreground-light')}>
+        {MODE_ICONS[modeId]}
+      </span>
       <div>
-        <p className={connectModeButtonLabelVariants({ selected })}>{label}</p>
-        <p className={connectModeButtonDescriptionVariants({ selected })}>{description}</p>
+        <p
+          className={cn(
+            'heading-default text-center',
+            selected ? 'text-foreground' : 'text-foreground-light'
+          )}
+        >
+          {label}
+        </p>
+        <p
+          className={cn(
+            'text-sm leading-tight text-center',
+            selected ? 'text-foreground-light' : 'text-foreground-lighter'
+          )}
+        >
+          {description}
+        </p>
       </div>
     </button>
   )
