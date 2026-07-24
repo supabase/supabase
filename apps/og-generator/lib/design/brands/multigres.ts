@@ -29,6 +29,6 @@ export const multigres: Brand = {
     'text.muted': '#898989',
     'illustration.stroke': '#FFFFFF',
   },
-  illustration: { defaultStrokePx: 2.25 },
+  illustration: { defaultStrokePx: 4 },
   strokeWidthRange: { min: 1.22, max: 2 },
 }
