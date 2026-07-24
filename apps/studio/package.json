@@ -159,6 +159,7 @@
   },
   "devDependencies": {
     "@babel/core": "*",
+    "@eslint/compat": "^2.1.0",
     "@faker-js/faker": "^9.9.0",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-typed-document-node/core": "^3.2.0",
@@ -198,6 +199,8 @@
     "eslint-config-supabase": "workspace:*",
     "eslint-plugin-barrel-files": "^2.0.7",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hook-form": "^0.3.1",
+    "eslint-plugin-valtio": "^0.8.0",
     "graphql-ws": "5.14.1",
     "import-in-the-middle": "^2.0.0",
     "jsdom-testing-mocks": "^1.13.1",

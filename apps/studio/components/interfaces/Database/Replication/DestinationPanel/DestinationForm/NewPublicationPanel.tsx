@@ -21,20 +21,21 @@ import { MultiSelector } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
 import { useCreatePublicationMutation } from '@/data/replication/publication-create-mutation'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface NewPublicationPanelProps {
   visible: boolean
-  sourceId?: number
   onClose: (newPublication?: string) => void
 }
 
-export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
+export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const sourceId = useReplicationSourceId({ projectRef })
 
-  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId })
+  const { data: tables } = useReplicationTablesQuery({ projectRef, sourceId }, { enabled: visible })
 
   const { mutate: createPublication, isPending: creatingPublication } =
     useCreatePublicationMutation({
@@ -81,82 +82,80 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
   }
 
   return (
-    <>
-      <Sheet open={visible} onOpenChange={() => onClose()}>
-        <SheetContent size="default">
-          <div className="flex flex-col h-full">
-            <SheetHeader>
-              <SheetTitle>Create a new publication</SheetTitle>
-              <SheetDescription>Choose which tables to replicate to destinations.</SheetDescription>
-            </SheetHeader>
-            <SheetSection className="grow overflow-auto">
-              <Form {...form}>
-                <form
-                  id={formId}
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="flex flex-col gap-y-4"
-                >
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItemLayout label="Name" layout="vertical">
-                        <FormControl>
-                          <Input {...field} placeholder="Name" />
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="tables"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        label="Tables"
-                        description="Select at least one table to include in the publication."
-                      >
-                        <FormControl>
-                          <MultiSelector
-                            values={field.value}
-                            onValuesChange={field.onChange}
-                            disabled={creatingPublication}
-                          >
-                            <MultiSelector.Trigger
-                              badgeLimit="wrap"
-                              label="Select tables..."
-                              mode="inline-combobox"
-                            />
-                            <MultiSelector.Content>
-                              <MultiSelector.List>
-                                {tables?.map((table) => (
-                                  <MultiSelector.Item
-                                    key={`${table.schema}.${table.name}`}
-                                    value={`${table.schema}.${table.name}`}
-                                  >
-                                    {`${table.schema}.${table.name}`}
-                                  </MultiSelector.Item>
-                                ))}
-                              </MultiSelector.List>
-                            </MultiSelector.Content>
-                          </MultiSelector>
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-                </form>
-              </Form>
-            </SheetSection>
-            <SheetFooter>
-              <Button variant="default" disabled={creatingPublication} onClick={() => onClose()}>
-                Cancel
-              </Button>
-              <Button variant="primary" loading={creatingPublication} form={formId} type="submit">
-                Create publication
-              </Button>
-            </SheetFooter>
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+    <Sheet open={visible} onOpenChange={() => onClose()}>
+      <SheetContent size="default">
+        <div className="flex flex-col h-full">
+          <SheetHeader>
+            <SheetTitle>Create a new publication</SheetTitle>
+            <SheetDescription>Choose which tables to replicate to destinations.</SheetDescription>
+          </SheetHeader>
+          <SheetSection className="grow overflow-auto">
+            <Form {...form}>
+              <form
+                id={formId}
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col gap-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout label="Name" layout="vertical">
+                      <FormControl>
+                        <Input {...field} placeholder="Name" />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tables"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Tables"
+                      description="Select at least one table to include in the publication."
+                    >
+                      <FormControl>
+                        <MultiSelector
+                          values={field.value}
+                          onValuesChange={field.onChange}
+                          disabled={creatingPublication}
+                        >
+                          <MultiSelector.Trigger
+                            badgeLimit="wrap"
+                            label="Select tables..."
+                            mode="inline-combobox"
+                          />
+                          <MultiSelector.Content>
+                            <MultiSelector.List>
+                              {tables?.map((table) => (
+                                <MultiSelector.Item
+                                  key={`${table.schema}.${table.name}`}
+                                  value={`${table.schema}.${table.name}`}
+                                >
+                                  {`${table.schema}.${table.name}`}
+                                </MultiSelector.Item>
+                              ))}
+                            </MultiSelector.List>
+                          </MultiSelector.Content>
+                        </MultiSelector>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </form>
+            </Form>
+          </SheetSection>
+          <SheetFooter>
+            <Button variant="default" disabled={creatingPublication} onClick={() => onClose()}>
+              Cancel
+            </Button>
+            <Button variant="primary" loading={creatingPublication} form={formId} type="submit">
+              Create publication
+            </Button>
+          </SheetFooter>
+        </div>
+      </SheetContent>
+    </Sheet>
   )
 }

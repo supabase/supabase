@@ -124,6 +124,7 @@ export function SqlEditorSection() {
             const Icon = ICONS[tab.icon]
             return (
               <button
+                tabIndex={0}
                 key={tab.label}
                 onClick={() => handleTabClick(index)}
                 className={cn(

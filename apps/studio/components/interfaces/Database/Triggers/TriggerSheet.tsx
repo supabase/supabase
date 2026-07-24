@@ -420,6 +420,7 @@ export const TriggerSheet = ({
                             {function_name.length === 0 ? (
                               <button
                                 type="button"
+                                tabIndex={0}
                                 className={cn(
                                   'relative w-full rounded-sm border border-default',
                                   'bg-surface-200 px-5 py-1 shadow-xs transition-all',

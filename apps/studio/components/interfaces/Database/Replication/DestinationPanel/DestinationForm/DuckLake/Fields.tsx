@@ -76,6 +76,7 @@ const DuckLakeModeSelector = ({
           <button
             key={option.value}
             type="button"
+            tabIndex={0}
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option.value)}

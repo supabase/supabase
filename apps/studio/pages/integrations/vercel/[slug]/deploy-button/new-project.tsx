@@ -1,18 +1,28 @@
 import { useParams } from 'common'
+import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
+import {
+  VercelIntegrationFooter,
+  VercelIntegrationLogo,
+} from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
 import { ProjectCreationForm } from '@/components/interfaces/ProjectCreation/ProjectCreationForm'
-import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
 import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
 import type { NextPageWithLayout } from '@/types'
+
+const PAGE_TITLE = buildStudioPageTitle({
+  section: 'Create Vercel Project',
+  brand: 'Supabase',
+})
 
 const VercelIntegration: NextPageWithLayout = () => {
   const { slug, next, currentProjectId: foreignProjectId } = useParams()
@@ -91,23 +101,22 @@ const VercelIntegration: NextPageWithLayout = () => {
   }, [data, isSuccess])
 
   return (
-    <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-      <ScaffoldColumn className="mx-auto w-full max-w-2xl">
-        <Admonition
-          type="default"
-          layout="horizontal"
-          title="You can uninstall this Integration at any time."
-          description="You can remove this integration at any time via Vercel or the Supabase dashboard"
-        />
+    <>
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
 
+      <InterstitialLayout
+        logo={<VercelIntegrationLogo />}
+        title="Create a new project"
+        description="Your project will have its own dedicated instance and full Postgres database. An API will be set up so you can easily interact with your new database."
+        footer={<VercelIntegrationFooter />}
+        widthClassName="max-w-2xl"
+      >
         <ProjectCreationForm isVercelIntegrationFlow onCreateSuccess={setNewProjectRef} />
-      </ScaffoldColumn>
-    </ScaffoldContainer>
+      </InterstitialLayout>
+    </>
   )
 }
 
-VercelIntegration.getLayout = (page) => (
-  <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
-)
-
-export default VercelIntegration
+export default withAuth(VercelIntegration)

@@ -38,6 +38,7 @@ import {
   calculateTotalChartAggregate,
   CustomLabel,
   CustomTooltip,
+  getStackId,
   MultiAttribute,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
@@ -560,7 +561,7 @@ export function ComposedChart({
                 <Bar
                   key={attribute.name}
                   dataKey={attribute.name}
-                  stackId={attributes?.find((a) => a.attribute === attribute?.name)?.stackId ?? '1'}
+                  stackId={getStackId(attributes, attribute?.name, '1')}
                   fill={attribute.color}
                   radius={0.75}
                   opacity={1}
@@ -576,7 +577,7 @@ export function ComposedChart({
                   key={attribute.name}
                   type="linear"
                   dataKey={attribute.name}
-                  stackId="1"
+                  stackId={getStackId(attributes, attribute.name, attribute.name)}
                   fill={`url(#gradient-${attribute.name})`}
                   fillOpacity={1}
                   stroke={attribute.color}

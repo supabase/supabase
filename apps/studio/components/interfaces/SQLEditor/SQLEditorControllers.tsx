@@ -111,7 +111,7 @@ export const useSqlEditorRun = () => useGuardedContext(RunContext, 'useSqlEditor
 export const useSqlEditorUi = () => useGuardedContext(UiContext, 'useSqlEditorUi')
 
 export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) => {
-  const { monacoRef, scrollTopRef, getEditorSql: getEditorSqlFromEditor } = useSQLEditorContext()
+  const { monacoRef, scrollTopRef, editor } = useSQLEditorContext()
 
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -148,8 +148,8 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   // to safety (acceptUntrustedSql) happens at each user-action site, never here.
   const readEditorSql = useCallback((): UntrustedSqlFragment | undefined => {
     const snippet = getSqlEditorV2StateSnapshot().snippets[id]
-    return getEditorSqlFromEditor(snippet?.snippet.content?.unchecked_sql)
-  }, [getEditorSqlFromEditor, id])
+    return editor.getSql(snippet?.snippet.content?.unchecked_sql)
+  }, [editor, id])
 
   const { executeQuery, isExecuting, potentialIssues, resetPotentialIssues } =
     useSqlEditorExecution({

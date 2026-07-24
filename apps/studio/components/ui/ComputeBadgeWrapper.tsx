@@ -9,7 +9,6 @@ import { ProjectDetail } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { ResourceWarning } from '@/data/usage/resource-warnings-query'
-import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const ChevronsUpAnimated = () => (
@@ -65,9 +64,6 @@ export const ComputeBadgeWrapper = ({
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
-
-  // returns hardcoded values for infra
-  const cpuArchitecture = getCloudProviderArchitecture(cloudProvider)
 
   // fetches addons
   const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery(
@@ -159,7 +155,7 @@ export const ComputeBadgeWrapper = ({
                     <>
                       <Row
                         label="CPU"
-                        stat={`${meta.cpu_cores ?? '?'}-core ${cpuArchitecture} ${meta.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
+                        stat={`${meta.cpu_cores ?? '?'}-core ${meta.cpu_dedicated ? '(Dedicated)' : '(Shared)'}`}
                       />
                       <Row label="Memory" stat={`${meta.memory_gb ?? '-'} GB`} />
                     </>
@@ -189,8 +185,6 @@ export const ComputeBadgeWrapper = ({
                 <Button
                   asChild
                   variant="default"
-                  type="button"
-                  role="button"
                   onClick={() => {
                     track('compute_badge_upgrade_clicked', {
                       computeSize: computeSize ?? 'unknown',
