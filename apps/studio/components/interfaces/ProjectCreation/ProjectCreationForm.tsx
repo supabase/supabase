@@ -89,7 +89,7 @@ interface ProjectCreationFormProps {
  *  - "Internal configuration" section
  *  - "GitHub repository" field
  *  - "Free project info" at the bottom
- *  - "Cancel" button
+ * - Shows Cancel as "Return to Vercel" (via `next`) instead of navigating into Studio
  * - Shows the following:
  *  - "Data seeding" section
  * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
@@ -606,7 +606,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
-              hideCancelButton={isVercelIntegrationFlow}
+              cancelAction={isVercelIntegrationFlow ? 'vercel' : 'studio'}
             />
           }
         >
@@ -697,7 +697,10 @@ export const ProjectCreationForm = ({
                 {freePlanWithExceedingLimits ? (
                   isAdmin &&
                   slug && (
-                    <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
+                    <FreeProjectLimitWarning
+                      membersExceededLimit={membersExceededLimit || []}
+                      showVercelReturnHint={isVercelIntegrationFlow}
+                    />
                   )
                 ) : hasOutstandingInvoices ? (
                   <Panel.Content>
