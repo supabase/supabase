@@ -640,7 +640,7 @@ export const EditorPanel = () => {
                     owner_id: profile.id,
                     content: {
                       ...activeSnippet.content,
-                      sql: currentValue,
+                      unchecked_sql: untrustedSql(currentValue),
                     },
                   },
                 })

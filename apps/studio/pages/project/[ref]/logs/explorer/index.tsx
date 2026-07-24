@@ -53,6 +53,7 @@ import {
 } from '@/data/content/content-upsert-mutation'
 import { constructHeaders } from '@/data/fetchers'
 import { fetchOtelLogKeys } from '@/data/logs/otel-log-keys-query'
+import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -216,7 +217,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
-      sql: '',
+      unchecked_sql: untrustedLogSql(''),
       content_id: '',
     }
     setRecentLogs([...recentLogs, { ...defaults, ...snippet }])
@@ -241,7 +242,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       editorRef.current.focus()
     }
 
-    addRecentLogSqlSnippet({ sql: template.searchString })
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(template.searchString) })
   }
 
   const handleRewrite = async () => {
@@ -321,7 +322,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setTimeRange('', '')
     }
     setSearch(query)
-    addRecentLogSqlSnippet({ sql: query })
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(query) })
   }
 
   const handleInsertSource = (source: string) => {
@@ -367,7 +368,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       type: 'log_sql' as const,
       content: {
         content_id: editorId,
-        sql: editorValue,
+        unchecked_sql: untrustedLogSql(editorValue),
         schema_version: '1',
         favorite: false,
       } as LogSqlSnippets.Content,
@@ -393,7 +394,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         projectRef: projectRef!,
         payload: {
           ...query,
-          content: { ...(query.content as LogSqlSnippets.Content), sql: currentSql },
+          content: {
+            ...(query.content as LogSqlSnippets.Content),
+            unchecked_sql: untrustedLogSql(currentSql),
+          },
         },
       })
 
@@ -429,7 +433,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }))
   }
 
-  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.sql
+  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.unchecked_sql
   useEffect(() => {
     if (search) {
       setEditorValue(search)

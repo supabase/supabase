@@ -36,7 +36,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
             </>
           }
           body={recent.map((item: LogSqlSnippets.Content) => (
-            <RecentQueriesItem key={item.sql} item={item} />
+            <RecentQueriesItem key={item.unchecked_sql} item={item} />
           ))}
         />
       )}
