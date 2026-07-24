@@ -128,7 +128,8 @@ describe('Admonition', () => {
 
     expect(note.querySelector('h1, h2, h3, h4, h5, h6')).not.toBeInTheDocument()
     expect(title.tagName).toBe('P')
-    expect(title).toHaveClass('!mb-0.5')
+    expect(title).toHaveAttribute('data-admonition-title')
+    expect(title).toHaveClass('mb-0.5')
   })
 
   it('wraps a string description in a paragraph', () => {

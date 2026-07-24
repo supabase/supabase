@@ -70,7 +70,9 @@ export const Admonition = forwardRef<
               {...childProps?.description}
               className={cn(
                 'text-foreground-light',
-                '[&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0',
+                // Exclude the title <p> so these MDX body resets don't override its mb-0.5
+                // ([&_p]:!mb-1.5 beats !mb-0.5 on specificity: class+element vs class).
+                '[&_p:not([data-admonition-title])]:!mt-0 [&_p:not([data-admonition-title])]:!mb-1.5 [&_p:not([data-admonition-title]):last-child]:!mb-0',
                 '[&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5',
                 childProps?.description?.className
               )}
@@ -78,10 +80,8 @@ export const Admonition = forwardRef<
               {title && (
                 <p
                   {...childProps?.title}
-                  className={cn(
-                    '!mb-0.5 font-medium text-foreground',
-                    childProps?.title?.className
-                  )}
+                  data-admonition-title
+                  className={cn('mb-0.5 font-medium text-foreground', childProps?.title?.className)}
                 >
                   {title}
                 </p>
