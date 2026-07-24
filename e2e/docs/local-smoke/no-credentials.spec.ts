@@ -52,14 +52,21 @@ test.describe('docs dev runs locally without credentials', () => {
     expect(response?.status()).toBe(404)
   })
 
-  test('a federated wrappers page does not crash without GitHub credentials', async ({ page }) => {
+  test('the wrappers overview page renders without GitHub credentials', async ({ page }) => {
     const errors = collectPageErrors(page)
 
-    const response = await page.goto('/docs/guides/database/extensions/wrappers/stripe')
+    const response = await page.goto('/docs/guides/database/extensions/wrappers/overview')
     expect(response?.status(), `expected 200, got ${response?.status()}`).toBe(200)
 
-    await expect(page.getByRole('heading', { name: 'Stripe' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Foreign Data Wrappers' })).toBeVisible()
 
     expect(errors.some((message) => SUPABASE_URL_ERROR.test(message))).toBeFalsy()
+  })
+
+  test('a federated wrappers page missing locally returns a clean 404, not a crash', async ({
+    page,
+  }) => {
+    const response = await page.goto('/docs/guides/database/extensions/wrappers/stripe')
+    expect(response?.status()).toBe(404)
   })
 })
