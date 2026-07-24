@@ -59,7 +59,7 @@ Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel
 
 #### İstemci kütüphaneleri
 
-İstemci kütüphaneleri için yaklaşımımız modülerdir. Her bir alt kütüphane, tek bir harici sistem için bağımsız bir uygulamadır. Bu, mevcut araçları destekleme yöntemlerimizden biridir.
+İstemci kütüphaneleri için yaklaşımımız modülerdir. Her bir alt kütüphane, tek bir harici system için bağımsız bir uygulamadır. Bu, mevcut araçları destekleme yöntemlerimizden biridir.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>

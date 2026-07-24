@@ -154,7 +154,7 @@ describe('Database', () => {
     db = await createDb()
   })
 
-  afterAll(async () => {
+  after all(async () => {
     await db.close()
   })
 

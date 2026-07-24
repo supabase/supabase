@@ -33,7 +33,7 @@ Da vidite kako možete doprineti razvoju, posetite [Getting Started](../DEVELOPE
 
 - [Forum zajednice](https://github.com/supabase/supabase/discussions). Najbolje mesto za: pomoć u razvijanju, diskusije o najboljim praksama u vezi baze.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Najbolje mesto za: bagove i greške sa kojima se susretnete tokom korišćenja Supabase.
-- [Email Podrška](https://supabase.com/docs/support#business-support). Najbolje mesto za: probleme sa vašom bazom ili infrastrukturom.
+- [Email Podrška](https://supabase.com/docs/support#business-support). Najbolje mesto za: problem sa vašom bazom ili infrastrukturom.
 - [Discord](https://discord.supabase.com). Najbolje mesto za: deljenje vaših aplikacija i druženje sa zajednicom.
 
 ## Status
@@ -55,22 +55,22 @@ Supabase je kombinacija open source alata. Razvijamo funkcionalnosti Firebase-a 
 
 **Arhitektura**
 
-Supabase je [hostovana platforma](https://supabase.com/dashboard). Možete se prijaviti i početi sa korišćenjem Supabase-a bez instaliranja bilo čega.
+Supabase je [hostovana platforms](https://supabase.com/dashboard). Možete se prijaviti i početi sa korišćenjem Supabase-a bez instaliranja bilo čega.
 Takođe možete da [hostujete sami](https://supabase.com/docs/guides/hosting/overview) i da [razvijate u lokalu](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) je sistem objektno-relacione baze sa preko 30 godina aktivnog razvoja čime je zaslužio jaku reputaciju za pouzdanost, robustnost funkcionalnosti i performanse.
+- [PostgreSQL](https://www.postgresql.org/) je system objektno-relacione baze sa preko 30 godina aktivnog razvoja čime je zaslužio jaku reputaciju za pouzdanost, robustnost funkcionalnosti i performanse.
 - [Realtime](https://github.com/supabase/realtime) je Elixir server koji vam omogućava da slušate PostgreSQL inserte, updateove, i brisanja koristeći websokete. Realtime polluje Postgres-ovu ugrađenu funkcionalnost replikacije za promene nad bazom, konvertuje promene u JSON, zatim broadcastuje taj JSON kroz websoket autorizovanim klijentima.
 - [PostgREST](http://postgrest.org/) je web server koji pretvara vašu PostgreSQL bazu direktno u RESTful API
 - [Storage](https://github.com/supabase/storage-api) daje RESTful interfejs za upravljanje fajlovima sačuvanim na S3, koristeći Postgres za upravljanje permisijama.
-- [postgres-meta](https://github.com/supabase/postgres-meta) je RESTful API za upravljanje vašom Postgres isntancom, omogućavajući vam da dohvatite tabele, dodate role, izvršavate upite, itd.
+- [postgres-meta](https://github.com/supabase/postgres-meta) je RESTful API za upravljanje vašom Postgres isntancom, omogućavajući vam da dohvatite table, dodate role, izvršavate upite, itd.
 - [GoTrue](https://github.com/netlify/gotrue) je SWT baziran API za upravljanje korisnicima i izdavanje SWT tokena.
 - [Kong](https://github.com/Kong/kong) je cloud-nativan API gateway.
 
 #### Klijentske biblioteke
 
-Naš pristup klijentskim bibliotekama je modularan. Svaka pod-biblioteka je samostalna implementacija za jedan eksterni sistem. Ovo je jedan od načina na koji podržavamo postojeće alate.
+Naš pristup klijentskim bibliotekama je modularan. Svaka pod-biblioteka je samostalna implementacija za jedan eksterni system. Ovo je jedan od načina na koji podržavamo postojeće alate.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>

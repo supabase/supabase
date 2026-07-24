@@ -10,14 +10,14 @@
 [Supabase](https://supabase.com) est une alternative open source à Firebase. Nous construisons les fonctionnalités de Firebase en utilisant des outils open source de niveau entreprise.
 
 - [x] Base de données Postgres hébergée. [Docs](https://supabase.com/docs/guides/database)
-- [x] Authentification et autorisation. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Authentication et authorisation. [Docs](https://supabase.com/docs/guides/auth)
 - [x] API générées automatiquement.
   - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
   - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
   - [x] Abonnements en temps réel. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
-- [x] Fonctions.
-  - [x] Fonctions de base de données. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Fonctions Edge [Docs](https://supabase.com/docs/guides/functions)
+- [x] Functions.
+  - [x] Functions de base de données. [Docs](https://supabase.com/docs/guides/database/functions)
+  - [x] Functions Edge [Docs](https://supabase.com/docs/guides/functions)
 - [x] Stockage de fichiers. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Tableau de bord
 
@@ -51,7 +51,7 @@ Nous sommes actuellement en bêta publique. Surveillez les "releases" de ce repo
 
 ## Comment ça marche
 
-Supabase est une combinaison d'outils open source. Nous construisons les fonctionnalités de Firebase en utilisant des produits open source de qualité professionnelle. Si les outils et les communautés existent, avec une licence MIT, Apache 2, ou une licence ouverte équivalente, nous utiliserons et supporterons cet outil. Si l'outil n'existe pas, nous le construisons et l'ouvrons nous-mêmes. Supabase n'est pas un mapping 1 pour 1 de Firebase. Notre objectif est de donner aux développeurs une expérience de développement similaire à celle de Firebase en utilisant des outils open source.
+Supabase est une combination d'outils open source. Nous construisons les fonctionnalités de Firebase en utilisant des produits open source de qualité professionnelle. Si les outils et les communautés existent, avec une licence MIT, Apache 2, ou une licence ouverte équivalente, nous utiliserons et supporterons cet outil. Si l'outil n'existe pas, nous le construisons et l'ouvrons nous-mêmes. Supabase n'est pas un mapping 1 pour 1 de Firebase. Notre objectif est de donner aux développeurs une expérience de développement similaire à cell de Firebase en utilisant des outils open source.
 
 **Architecture**
 
@@ -60,7 +60,7 @@ Vous pouvez également [auto-héberger](https://supabase.com/docs/guides/hosting
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) est un système de base de données objet-relationnel avec plus de 30 ans de développement actif qui lui a valu une solide réputation de fiabilité, de robustesse et de performance.
+- [PostgreSQL](https://www.postgresql.org/) est un système de base de données objet-relationnel avec plus de 30 and de développement actif qui lui a value une solide réputation de fiabilité, de robustesse et de performance.
 - [Realtime](https://github.com/supabase/realtime) est un serveur Elixir qui vous permet d'écouter les insertions, les mises à jour et les suppressions de PostgreSQL en utilisant des websockets. Realtime interroge la fonctionnalité de réplication intégrée de Postgres pour les changements de base de données, convertit les changements en JSON, puis diffuse le JSON via des websockets aux clients autorisés.
 - [PostgREST](http://postgrest.org/) est un serveur web qui transforme votre base de données PostgreSQL en une API RESTful
 - [pg_graphql](http://github.com/supabase/pg_graphql/) est une extension de PostgreSQL qui expose une API GraphQL
@@ -71,7 +71,7 @@ Vous pouvez également [auto-héberger](https://supabase.com/docs/guides/hosting
 
 #### Bibliothèques client
 
-Notre approche des bibliothèques clientes est modulaire. Chaque sous-bibliothèque est une implémentation autonome pour un seul système externe. C'est l'une des façons dont nous soutenons les outils existants.
+Notre approach des bibliothèques clientes est modulaire. Chaque sous-bibliothèque est une implémentation autonome pour un seul système externe. C'est l'une des façons dont nous soutenons les outils existants.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>

@@ -1,6 +1,6 @@
 ---
 name: lifecycle-hooks
-description: beforeEach, afterEach, beforeAll, afterAll, and around hooks
+description: beforeEach, afterEach, beforeAll, after all, and around hooks
 ---
 
 # Lifecycle Hooks
@@ -8,14 +8,14 @@ description: beforeEach, afterEach, beforeAll, afterAll, and around hooks
 ## Basic Hooks
 
 ```ts
-import { afterAll, afterEach, beforeAll, beforeEach, test } from 'vitest'
+import { after all, afterEach, beforeAll, beforeEach, test } from 'vitest'
 
 beforeAll(async () => {
   // Runs once before all tests in file/suite
   await setupDatabase()
 })
 
-afterAll(async () => {
+after all(async () => {
   // Runs once after all tests in file/suite
   await teardownDatabase()
 })
@@ -39,7 +39,7 @@ Return cleanup function from `before*` hooks:
 beforeAll(async () => {
   const server = await startServer()
   
-  // Returned function runs as afterAll
+  // Returned function runs as after all
   return async () => {
     await server.close()
   }
@@ -216,7 +216,7 @@ Default order (stack):
 2. `beforeEach` (in order)
 3. Test
 4. `afterEach` (reverse order)
-5. `afterAll` (reverse order)
+5. `after all` (reverse order)
 
 Configure with `sequence.hooks`:
 

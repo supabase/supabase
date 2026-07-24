@@ -32,7 +32,7 @@ Para ver como contribuir, visite [Getting Started](../DEVELOPERS.md)
 ## Comunidade & Suporte
 
 - [Fórum da Comunidade](https://github.com/supabase/supabase/discussions). Melhor para: ajuda com a construção, discussão sobre as melhores práticas de banco de dados.
-- [Problemas no GitHub](https://github.com/supabase/supabase/issues). Melhor para: bugs e erros que encontra ao usar o Supabase.
+- [Problemas no GitHub](https://github.com/supabase/supabase/issues). Melhor para: bugs e errors que encontra ao usar o Supabase.
 - [Suporte por Email](https://supabase.com/docs/support#business-support). Melhor para: problemas com a sua base de dados ou infra-estrutura.
 - [Discord](https://discord.supabase.com). Ideal para: partilhar as suas aplicações e conviver com a comunidade.
 
@@ -43,7 +43,7 @@ Para ver como contribuir, visite [Getting Started](../DEVELOPERS.md)
 - [x] Beta Público: Estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: Disponibilidade geral [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
-Estamos actualmente em Beta Pública. Veja "releases" deste repositório para ser notificado das principais actualizações.
+Estamos actualmente em Beta Pública. Veja "releases" deste repositório para set notificado das principais actualizações.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
@@ -60,7 +60,7 @@ Pode também [auto-hospedar](https://supabase.com/docs/guides/hosting/overview) 
 
 ![Arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
-- [PostgreSQL](https://www.postgresql.org/) é um sistema de base de dados objecto-relacional com mais de 30 anos de desenvolvimento activo que lhe valeu uma forte reputação de fiabilidade, robustez de características e desempenho.
+- [PostgreSQL](https://www.postgresql.org/) é um sistema de base de dados objecto-relacional com mais de 30 anos de desenvolvimento activo que lhe value uma forte reputação de fiabilidade, robustez de características e desempenho.
 - [Realtime](https://github.com/supabase/realtime) é um servidor Elixir que permite ouvir inserções, atualizações e exclusões do PostgreSQL usando websockets. Realtime pesquisa a funcionalidade de replicação embutida do Postgres para mudanças no banco de dados, converte as mudanças para JSON, e então transmite o JSON através de websockets para clientes autorizados.
 - [PostgREST](http://postgrest.org/) é um servidor web que transforma seu banco de dados PostgreSQL diretamente em uma API RESTful
 - [pg_graphql](http://github.com/supabase/pg_graphql/) uma extensão do PostgreSQL que expõe uma API GraphQL
@@ -101,7 +101,7 @@ A nossa abordagem para as bibliotecas de clientes é modular. Cada sub-bibliotec
   </tr>
   END ROW -->
   
-  <th colspan="7">⚡️ Oficial ⚡️</th>
+  <th colspan="7">⚡️ Official ⚡️</th>
   
   <tr>
     <td>JavaScript (TypeScript)</td>
