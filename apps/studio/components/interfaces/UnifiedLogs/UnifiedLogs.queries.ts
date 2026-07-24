@@ -477,12 +477,8 @@ LIMIT ${lit(MAX_FACETS_QUANTITY)}
  * counts every matching log for the count badge.
  */
 export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
-  const grouped = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
-
-  const whereFor = (excludeField?: string): SafeLogSqlFragment => {
-    const conditions = buildBaseWhere(search, excludeField)
-    return conditions.length > 0 ? joinSqlFragments(conditions, ' AND ') : safeSql`1`
-  }
+  const andConditions = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
+    conditions.length > 0 ? safeSql`(${joinSqlFragments(conditions, ' AND ')})` : safeSql`1`
 
   const VALUE_EXPR = {
     total: safeSql`'all'`,
@@ -490,48 +486,54 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
     level: LEVEL_EXPR,
     method: ATTR.method,
     status: STATUS_EXPR,
-  }
+  } as const
 
-  const scanBlock = (
-    facets: (keyof typeof VALUE_EXPR)[],
-    where: SafeLogSqlFragment
-  ): SafeLogSqlFragment => {
-    const facetArray = joinSqlFragments(
-      facets.map((facet) => lit(facet)),
-      ','
-    )
-    const branches = facets.map((facet) => safeSql`facet = ${lit(facet)}, ${VALUE_EXPR[facet]}`)
-    return safeSql`
+  // Every facet is derived in ONE pass over `logs`. Each facet keeps its own
+  // filter semantics — its badge counts its *other* values, so it excludes its
+  // own filter, and log_type also drops the default-types restriction to span
+  // all sources — by moving that per-facet WHERE inline as an `if(...)` guard
+  // rather than giving each facet its own `FROM logs` scan. Because every
+  // `FROM logs` reference re-decompresses the whole log_attributes map over the
+  // time window, N branches cost ~N× the bytes of a single scan; collapsing
+  // them recovers that multiplier. #47088 first collapsed facets that shared a
+  // WHERE; this extends the collapse across facets whose WHEREs differ.
+  const facets = ['total', 'log_type', 'level', 'method', 'status'] as const
+  const facetArray = joinSqlFragments(
+    facets.map((facet) => lit(facet)),
+    ','
+  )
+  const branches = facets.map(
+    (facet) =>
+      safeSql`facet = ${lit(facet)}, if(${andConditions(
+        buildBaseWhere(search, facet === 'total' ? undefined : facet)
+      )}, (${VALUE_EXPR[facet]}), '')`
+  )
+
+  // Cross-cutting search-param filters (user attribution, connection/edge-service
+  // toggles) apply to every facet, so they bound the single scan; keeping them in
+  // the WHERE narrows the rows read when a user filter is active. All facet-specific
+  // conditions live in the inline guards above, which redundantly (but harmlessly)
+  // re-assert these same cross-cutting conditions.
+  const scanWhere = applySearchParamsFilter(search) ?? safeSql`1`
+
+  const scanBlock = safeSql`
 SELECT
   arrayJoin([${facetArray}]) AS facet,
   multiIf(${joinSqlFragments([...branches, safeSql`''`], ', ')}) AS value,
   count() AS count
 FROM logs
-WHERE ${where}
+WHERE ${scanWhere}
 GROUP BY facet, value
 HAVING value != ''
 `
-  }
 
-  // log_type always scans alone: excluding it also drops the default-types
-  // filter, so its counts differ from the base scan even when unfiltered.
-  const blocks = [scanBlock(['log_type'], whereFor('log_type'))]
-
-  // A filtered facet gets its own scan so it can exclude its own filter and
-  // still count its other values; the rest share the base scan.
-  const baseFacets: (keyof typeof VALUE_EXPR)[] = ['total']
-  for (const facet of ['level', 'method', 'status'] as const) {
-    if (grouped[facet]) blocks.push(scanBlock([facet], whereFor(facet)))
-    else baseFacets.push(facet)
-  }
-  blocks.push(scanBlock(baseFacets, whereFor()))
-
-  // pathname is high-cardinality, so it needs its own LIMIT (the endpoint
-  // rejects LIMIT BY inside the shared arrayJoin).
-  blocks.push(safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`)
+  // pathname stays a dedicated scan: it is high-cardinality and needs a per-facet
+  // LIMIT, which the OTEL endpoint can't express via LIMIT BY inside the shared
+  // arrayJoin. Its single scan is a small price next to an unbounded value list.
+  const pathnameBlock = safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`
 
   return safeSql`-- unified logs: sidebar facet counts
-${joinSqlFragments(blocks, ' UNION ALL ')}`
+${joinSqlFragments([scanBlock, pathnameBlock], ' UNION ALL ')}`
 }
 
 /**
