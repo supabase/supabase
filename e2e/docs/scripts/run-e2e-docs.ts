@@ -17,6 +17,23 @@ import { parseChangedFilesList, resolveDocsScope } from '../utils/resolve-docs-s
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const E2E_DOCS_ROOT = join(__dirname, '..')
 
+// Mirrors the default in playwright.config.ts.
+const DEFAULT_BASE_URL = 'http://localhost:3001'
+const PREFLIGHT_TIMEOUT_MS = 3_000
+
+async function isBaseUrlReachable(baseUrl: string): Promise<boolean> {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), PREFLIGHT_TIMEOUT_MS)
+  try {
+    await fetch(baseUrl, { signal: controller.signal })
+    return true
+  } catch {
+    return false
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
 function git(args: string[], cwd: string): string {
   const result = spawnSync('git', args, {
     cwd,
@@ -95,6 +112,18 @@ async function main() {
   const pages = await resolvePagePaths()
   if (pages === null) {
     process.exit(0)
+  }
+
+  const baseUrl = process.env.PLAYWRIGHT_BASE_URL?.trim() || DEFAULT_BASE_URL
+  if (!(await isBaseUrlReachable(baseUrl))) {
+    console.error(`No docs server responding at ${baseUrl}.`)
+    if (!process.env.PLAYWRIGHT_BASE_URL) {
+      console.error('Start it with `pnpm dev:docs`, or point at a deployed site:')
+      console.error('  PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs')
+    } else {
+      console.error('Check that the URL is correct and reachable.')
+    }
+    process.exit(1)
   }
 
   const env = {
