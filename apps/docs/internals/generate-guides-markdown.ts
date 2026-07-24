@@ -16,7 +16,6 @@ import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuil
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
-import { AiPrompt } from './markdown-schema/AiPrompt'
 import { AiSkillsIndex } from './markdown-schema/AiSkillsIndex'
 import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
@@ -32,7 +31,6 @@ import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
 import { PromptPanel } from './markdown-schema/PromptPanel'
-import { QuickstartAiPrompt } from './markdown-schema/QuickstartAiPrompt'
 import { RealtimeLimitsEstimator } from './markdown-schema/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
@@ -184,9 +182,7 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
 const SCHEMA: ComponentSchema = {
   AccordionItem,
   Admonition,
-  AiPrompt,
   AiSkillsIndex,
-  QuickstartAiPrompt,
   IconCheck,
   IconX,
   Image,

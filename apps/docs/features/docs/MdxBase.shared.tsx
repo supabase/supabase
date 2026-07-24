@@ -42,7 +42,6 @@ import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
-import { QuickstartAiPrompt } from '../ui/QuickstartAiPrompt'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
@@ -72,7 +71,6 @@ const components = {
   AgentPluginsPanel,
   AiPrompt,
   AiPromptsIndex,
-  QuickstartAiPrompt,
   AiSkillsIndex,
   AuthSmsProviderConfig,
   AppleSecretGenerator,
