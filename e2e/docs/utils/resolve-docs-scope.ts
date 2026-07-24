@@ -267,6 +267,36 @@ export async function resolveDocsScope(
   }
 }
 
+/**
+ * List every in-scope docs page — all guides (excluding federated sections)
+ * and all troubleshooting entries — regardless of what changed. Used for
+ * full-suite runs rather than the default changed-files scope.
+ */
+export async function resolveAllDocsPages(repoRoot: string): Promise<string[]> {
+  const guidesDir = join(repoRoot, 'apps/docs/content/guides')
+  const troubleshootingDir = join(repoRoot, 'apps/docs/content/troubleshooting')
+
+  const [guideFiles, troubleshootingFiles] = await Promise.all([
+    walkMdxFiles(guidesDir).catch(() => [] as string[]),
+    walkMdxFiles(troubleshootingDir).catch(() => [] as string[]),
+  ])
+
+  const pages = new Set<string>()
+
+  for (const file of guideFiles) {
+    const relFromGuides = normalizeRepoPath(relative(guidesDir, file)).replace(/\.mdx$/, '')
+    if (isFederatedGuideSlug(relFromGuides)) continue
+    pages.add(`${DOCS_GUIDES_URL_PREFIX}${relFromGuides}`)
+  }
+
+  for (const file of troubleshootingFiles) {
+    const slug = basename(file, '.mdx')
+    pages.add(`${DOCS_TROUBLESHOOTING_URL_PREFIX}${slug}`)
+  }
+
+  return [...pages].sort()
+}
+
 /** Parse changed-file list from stdin or newline/comma-separated string. */
 export function parseChangedFilesList(input: string): string[] {
   return input

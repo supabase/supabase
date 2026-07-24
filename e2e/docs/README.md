@@ -77,6 +77,13 @@ For a protected Vercel preview, also set `VERCEL_AUTOMATION_BYPASS_SECRET`.
 
 The local server needs a full monorepo install and credentials for some content.
 
+Local runs are unreliable for pages whose docs-owned links point into
+`/docs/reference/*` or `/docs/guides/auth/server-side/*`: reference pages can
+take over a minute to compile on first request in dev mode, which exceeds the
+suite's per-test timeout, and `server-side` auth guides have a known local-only
+routing issue that 404s even though the page serves correctly in production.
+Prefer a deployed site for pages that link into either of those sections.
+
 ## Override which pages run
 
 Leave `DOCS_E2E_PAGE_PATHS` unset to keep the default changed-files scope.
@@ -98,6 +105,29 @@ DOCS_E2E_BASE_REF=origin/develop \
 `DOCS_E2E_PAGE_PATHS` accepts a comma- or newline-separated list of `/docs/...`
 paths.
 
+### Run every in-scope page
+
+To test every guide and troubleshooting entry instead of a changed-files scope
+— for example, a periodic full-site check — run:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all
+```
+
+This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described below, and
+tests every page listed by `pnpm -C e2e/docs resolve-docs-scope` across the
+whole `guides` and `troubleshooting` trees — several hundred pages as of this
+writing. Expect a long run: the suite runs one worker at a time by default, so
+pass extra Playwright flags to speed it up or bound failures, for example:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all -- --workers=4 --max-failures=0
+```
+
+Run this against a deployed site, not the local dev server — see
+[Local docs server](#local-docs-server) for why local runs are unreliable for
+pages linking into reference docs or server-side auth guides.
+
 ## What the suite covers
 
 ### In scope
@@ -118,7 +148,9 @@ paths.
 ### Limits
 
 Resolved scope is capped at 20 pages so a widely shared partial cannot explode
-runtime. To inspect the resolved list without running Playwright:
+runtime. To test beyond the cap, use `pnpm e2e:docs:all` (see
+[Run every in-scope page](#run-every-in-scope-page)) instead of raising it. To
+inspect the resolved list without running Playwright:
 
 ```bash
 git diff --name-only --diff-filter=ACMR origin/master...HEAD \

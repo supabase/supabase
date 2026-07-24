@@ -6,13 +6,20 @@
  * runs Playwright with that list. Otherwise resolves pages from files changed
  * vs DOCS_E2E_BASE_REF (default origin/master), including the working tree.
  *
+ * Pass `--all` to test every in-scope guide and troubleshooting page instead
+ * (hundreds of pages — expect a long run against a deployed site).
+ *
  * Extra CLI args are forwarded to Playwright (e.g. --ui, a spec file path).
  */
 import { spawn, spawnSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { parseChangedFilesList, resolveDocsScope } from '../utils/resolve-docs-scope.ts'
+import {
+  parseChangedFilesList,
+  resolveAllDocsPages,
+  resolveDocsScope,
+} from '../utils/resolve-docs-scope.ts'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const E2E_DOCS_ROOT = join(__dirname, '..')
@@ -77,6 +84,13 @@ function collectChangedFiles(repoRoot: string, baseRef: string): string[] {
   return [...files].sort()
 }
 
+async function resolveAllPagePaths(): Promise<string[]> {
+  const repoRoot = repoRootFromCwd()
+  const pages = await resolveAllDocsPages(repoRoot)
+  console.error(`Resolved all ${pages.length} in-scope docs page(s) (guides + troubleshooting).`)
+  return pages
+}
+
 async function resolvePagePaths(): Promise<string[] | null> {
   const existing = process.env.DOCS_E2E_PAGE_PATHS?.trim()
   if (existing) {
@@ -106,10 +120,14 @@ async function resolvePagePaths(): Promise<string[] | null> {
 }
 
 async function main() {
-  const playwrightArgs = process.argv
-    .slice(2)
-    .filter((arg, index) => !(index === 0 && arg === '--'))
-  const pages = await resolvePagePaths()
+  const rawArgs = process.argv.slice(2)
+  const runAll = rawArgs.includes('--all')
+  const withoutAll = rawArgs.filter((arg) => arg !== '--all')
+  // pnpm's `--` separator (from `pnpm run ... -- --list`) can land at index 0
+  // or, once `--all` is stripped, wherever `--all` used to precede it.
+  const playwrightArgs = withoutAll[0] === '--' ? withoutAll.slice(1) : withoutAll
+
+  const pages = runAll ? await resolveAllPagePaths() : await resolvePagePaths()
   if (pages === null) {
     process.exit(0)
   }
