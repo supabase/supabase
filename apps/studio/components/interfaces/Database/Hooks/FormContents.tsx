@@ -112,7 +112,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     httpHeaders,
     httpUrl,
     isSuccessEdgeFunctions,
-    legacyServiceRole,
+    edgeFunctionApiKey,
     ref,
     restUrl,
   ])
