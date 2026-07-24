@@ -221,6 +221,14 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(guardOfFacet(sql, 'log_type')).not.toContain(`source = 'postgrest_logs'`)
     })
 
+    it('excludes the status filter from the status guard but keeps it on total', () => {
+      const sql = getLogsCountQuery(withFilters('status:eq:500'))
+      // total still restricts to the filtered status...
+      expect(guardOfFacet(sql, 'total')).toContain(`IN ('500')`)
+      // ...but status drops its own filter so its badge shows every status's count.
+      expect(guardOfFacet(sql, 'status')).not.toContain(`IN ('500')`)
+    })
+
     it('applies the connection-logs filter to every count scan so badges match the list', () => {
       const sql = getLogsCountQuery({ ...baseSearch, show_connection_logs: false } as any)
       const scans = sql.split(/\bUNION ALL\b/)
