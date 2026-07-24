@@ -158,7 +158,9 @@ const MetricCardLabel = React.forwardRef<HTMLDivElement, MetricCardLabelProps>(
         {tooltip && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <HelpCircle size={14} strokeWidth={1.5} />
+              <button type="button" aria-label="More info">
+                <HelpCircle size={14} strokeWidth={1.5} />
+              </button>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">{tooltip}</TooltipContent>
           </Tooltip>
