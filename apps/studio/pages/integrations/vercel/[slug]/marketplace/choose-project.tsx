@@ -41,7 +41,11 @@ const PAGE_TITLE = buildStudioPageTitle({
 })
 
 const VercelChooseProjectPage: NextPageWithLayout = () => {
+<<<<<<< HEAD
   const { slug, configurationId, next, currentProjectId, externalId } = useParams()
+=======
+  const { slug, configurationId, next, currentProjectId } = useParams()
+>>>>>>> master
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
   const displayName = primaryEmail ?? username ?? ''
   const isDeployButtonFlow = hasVercelDeployButtonSignals({ currentProjectId, externalId })

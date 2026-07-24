@@ -1932,6 +1932,9 @@ importers:
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
+      tar-stream:
+        specifier: ^3.1.7
+        version: 3.1.7
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig

@@ -5,6 +5,8 @@ import { DestinationPanelFormSchema } from './DestinationForm.schema'
 const requiredFields = {
   name: 'BigQuery warehouse',
   publicationName: 'analytics_publication',
+  tableSyncCopyMode: 'include_all_tables' as const,
+  tableSyncCopyTableIds: [],
 }
 
 describe('DestinationPanelFormSchema', () => {

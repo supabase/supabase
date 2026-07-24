@@ -25,6 +25,7 @@ import {
 import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
 import {
+  BatchConfig,
   BigQueryDestinationConfig,
   ClickHouseDestinationConfig,
   DestinationConfig,
@@ -33,9 +34,11 @@ import {
   DucklakeSupabaseDestinationConfig,
   IcebergDestinationConfig,
   SnowflakeDestinationConfig,
+  TableSyncCopyConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
 import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
 import { type ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
+import { type ReplicationPublication } from '@/data/replication/publications-query'
 import { type ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import {
   type CreateS3AccessKeyCredentialVariables,
@@ -72,37 +75,31 @@ export const generateDefaultValues = ({
   editMode: boolean
 }): DestinationPanelSchemaType => {
   const config = destinationData?.config
-  const isBigQueryConfig = config && 'big_query' in config
-  const isIcebergConfig = config && 'iceberg' in config
-  const ducklakeConfigValue =
-    config && 'ducklake' in (config as Record<string, unknown>)
-      ? (config as Record<string, unknown>).ducklake
+
+  const bigQueryConfig = config && 'big_query' in config ? config.big_query : undefined
+  const icebergConfig =
+    config && 'iceberg' in config && 'supabase' in config.iceberg
+      ? config.iceberg.supabase
       : undefined
   const ducklakeConfig =
-    ducklakeConfigValue && typeof ducklakeConfigValue === 'object'
-      ? (ducklakeConfigValue as DucklakeApiConfig)
-      : undefined
-  const snowflakeConfigValue =
-    config && 'snowflake' in (config as Record<string, unknown>)
-      ? (config as Record<string, unknown>).snowflake
-      : undefined
+    config && 'ducklake' in config ? (config.ducklake as DucklakeApiConfig) : undefined
   const snowflakeConfig =
-    snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
-      ? (snowflakeConfigValue as SnowflakeApiConfig)
-      : undefined
-  const clickhouseConfigValue =
-    config && 'clickhouse' in (config as Record<string, unknown>)
-      ? (config as Record<string, unknown>).clickhouse
-      : undefined
+    config && 'snowflake' in config ? (config.snowflake as SnowflakeApiConfig) : undefined
   const clickhouseConfig =
-    clickhouseConfigValue && typeof clickhouseConfigValue === 'object'
-      ? (clickhouseConfigValue as ClickHouseApiConfig)
-      : undefined
+    config && 'clickhouse' in config ? (config.clickhouse as ClickHouseApiConfig) : undefined
+
+  const tableSyncCopy = pipelineData?.config.table_sync_copy ?? {
+    type: 'include_all_tables' as const,
+  }
+  const tableSyncCopyTableIds =
+    'table_ids' in tableSyncCopy ? tableSyncCopy.table_ids.map((id) => String(id)) : []
 
   return {
     // Common fields
     name: destinationData?.name ?? '',
     publicationName: pipelineData?.config.publication_name ?? '',
+    tableSyncCopyMode: tableSyncCopy.type,
+    tableSyncCopyTableIds,
     maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? DEFAULT_MAX_FILL_MS,
     maxTableSyncWorkers:
       pipelineData?.config?.max_table_sync_workers ?? DEFAULT_MAX_TABLE_SYNC_WORKERS,
@@ -113,21 +110,23 @@ export const generateDefaultValues = ({
       (pipelineData?.config as { invalidated_slot_behavior?: 'error' | 'recreate' } | undefined)
         ?.invalidated_slot_behavior ?? undefined,
     // BigQuery fields
-    projectId: isBigQueryConfig ? config.big_query.project_id : '',
-    datasetId: isBigQueryConfig ? config.big_query.dataset_id : '',
-    serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
+    projectId: bigQueryConfig?.project_id ?? '',
+    datasetId: bigQueryConfig?.dataset_id ?? '',
+    // Destination response DTOs intentionally omit stored secrets. Edit submissions
+    // leave blank secret fields unset so the existing values are preserved.
+    serviceAccountKey: '',
     connectionPoolSize:
       (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
         ?.connection_pool_size ?? DEFAULT_CONNECTION_POOL_SIZE,
-    maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined, // Default: null
+    maxStalenessMins: bigQueryConfig?.max_staleness_mins ?? undefined, // Default: null
     // Analytics Bucket fields
-    warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
-    namespace: isIcebergConfig ? config.iceberg.supabase.namespace : '',
+    warehouseName: icebergConfig?.warehouse_name ?? '',
+    namespace: icebergConfig?.namespace ?? '',
     newNamespaceName: '',
-    catalogToken: isIcebergConfig ? config.iceberg.supabase.catalog_token : catalogToken,
-    s3AccessKeyId: isIcebergConfig ? config.iceberg.supabase.s3_access_key_id : '',
-    s3SecretAccessKey: isIcebergConfig ? config.iceberg.supabase.s3_secret_access_key : '',
-    s3Region: region ?? (isIcebergConfig ? config.iceberg.supabase.s3_region : ''),
+    catalogToken: editMode || icebergConfig ? '' : catalogToken,
+    s3AccessKeyId: '',
+    s3SecretAccessKey: '',
+    s3Region: region ?? icebergConfig?.s3_region ?? '',
     // DuckLake fields
     // New destinations default to the managed "Use Supabase" mode with the current project
     // pre-selected as both catalog and storage. Existing destinations always read back as the
@@ -161,6 +160,78 @@ export const generateDefaultValues = ({
     clickhouseDatabase: clickhouseConfig?.database ?? '',
     clickhouseEngine: clickhouseConfig?.engine ?? 'replacing_merge_tree',
   }
+}
+
+export const buildTableSyncCopyConfig = ({
+  mode,
+  selectedTableIds,
+}: {
+  mode: DestinationPanelSchemaType['tableSyncCopyMode']
+  selectedTableIds: string[]
+}): TableSyncCopyConfig => {
+  if (mode === 'include_all_tables' || mode === 'skip_all_tables') return { type: mode }
+
+  if (selectedTableIds.length === 0) {
+    throw new Error('Select at least one table for the initial copy')
+  }
+
+  const tableIds = selectedTableIds.map(Number)
+  if (tableIds.some((id) => !Number.isSafeInteger(id) || id <= 0)) {
+    throw new Error('The selected table IDs are invalid. Refresh and try again.')
+  }
+
+  return {
+    type: mode,
+    table_ids: tableIds,
+  }
+}
+
+export const buildBatchConfig = ({
+  maxFillMs,
+  existingBatch,
+}: {
+  maxFillMs?: number
+  existingBatch?: ReplicationPipelineByIdData['config']['batch']
+}): BatchConfig | undefined => {
+  if (maxFillMs === undefined && existingBatch === undefined) return undefined
+
+  return {
+    maxFillMs,
+    maxBytes: existingBatch?.max_bytes,
+    memoryBudgetRatio: existingBatch?.memory_budget_ratio,
+  }
+}
+
+// The set of table ids (as strings, matching form state) currently in the
+// selected publication. Selective table-copy only ever offers/keeps ids that
+// are in this set; ids selected previously that fall out of it are dropped at
+// submit time rather than resolved or displayed.
+export const getPublicationTableIds = (
+  publications: ReplicationPublication[],
+  publicationName: string
+): Set<string> => {
+  const publication = publications.find(({ name }) => name === publicationName)
+  return new Set((publication?.tables ?? []).map(({ id }) => String(id)))
+}
+
+// Drops selected table ids that are no longer in the current publication.
+// Create validation rejects ids that aren't published, while edits are checked
+// against the latest loaded publication before submitting.
+export const pruneStaleSelectedTableIds = ({
+  mode,
+  selectedTableIds,
+  publications,
+  publicationName,
+}: {
+  mode: DestinationPanelSchemaType['tableSyncCopyMode']
+  selectedTableIds: string[]
+  publications: ReplicationPublication[]
+  publicationName: string
+}): string[] => {
+  if (mode === 'include_all_tables' || mode === 'skip_all_tables') return selectedTableIds
+
+  const publicationTableIds = getPublicationTableIds(publications, publicationName)
+  return selectedTableIds.filter((id) => publicationTableIds.has(id))
 }
 
 const buildBigQueryConfig = (

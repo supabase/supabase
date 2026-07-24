@@ -25,6 +25,10 @@ const FEATURED_INTEGRATION_IMAGES: Record<string, { dark: string; light?: string
     dark: `${BASE_PATH}/img/integrations/covers/grafana-cover.png`,
     light: `${BASE_PATH}/img/integrations/covers/grafana-cover-light.webp`,
   },
+  'grafana-cloud': {
+    dark: `${BASE_PATH}/img/integrations/covers/grafana-cover.png`,
+    light: `${BASE_PATH}/img/integrations/covers/grafana-cover-light.webp`,
+  },
 }
 
 interface ThemedImage {

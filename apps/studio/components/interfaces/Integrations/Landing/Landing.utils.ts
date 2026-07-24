@@ -169,7 +169,7 @@ export const isOAuthInstalled = ({
     )
   }
 
-  if (integration.id === 'grafana') {
+  if (integration.id === 'grafana' || integration.id === 'grafana-cloud') {
     // Grafana is not yet sending integration status, so just use presence of API key.
     return (
       isOAuthAppAuthorized(projectData, integration) ||

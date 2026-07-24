@@ -4,7 +4,7 @@ Next.js pages router + TanStack Start (mid-migration, see below), React 19. Dev 
 
 ## Skills — load before working
 
-**Always load the `studio-best-practices` skill before writing or modifying any Studio code.** Then stack the area-specific skills:
+Load the skills matching the task; stack them when a task spans areas:
 
 | Task                                                   | Additional skills                                                                                 |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
@@ -38,6 +38,37 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 - **Shortcuts** — use the registry in `state/shortcuts/` and `components/ui/Shortcut*.tsx`; keep `G then …` chords for navigation; no one-off keyboard listeners.
 - **Reuse first** — before writing a new hook or helper, search for an existing one (`hooks/`, `lib/`, `packages/common`, `packages/ui-patterns`). If you do need a new one, make it as reusable as possible: general naming, no page-specific coupling, placed where other callers can find it.
 - Co-locate sub-components with their parent; avoid barrel re-export files.
+
+## Code style
+
+Older Studio code predates some of these conventions. For new or modified code, follow them rather than mirroring nearby legacy patterns:
+
+- **Booleans** read as `is`/`has`/`can`/`should`. Derive them from existing state (`const isFormValid = name.length > 0 && email.includes('@')`) — mirroring a derivable value into `useState` synced by `useEffect` is a bug pattern. Give multi-condition logic a name (`const canShowAddButton = !isSchemaLocked && canUpdateColumns && …`) instead of inlining the chain in JSX.
+- **Ternaries**: one is fine for a binary choice; never nest them. Anything bigger flattens — early returns in statement position, sibling `&&` blocks in JSX.
+- **Fetch states** render with early returns at the top level, or a flat `&&` chain with mutually exclusive guards inline — never a nested ternary:
+
+  ```tsx
+  // Top level: early return per state
+  if (isLoading) return <GenericSkeletonLoader />
+  if (isError) return <AlertError error={error} subject="Failed to retrieve data" />
+  if (isSuccess && data.length === 0) return <EmptyState />
+  return <DataDisplay data={data} />
+
+  // Inline: flat `&&` blocks, mutually exclusive guards
+  <div>
+    {isLoading && <ShimmeringLoader />}
+    {isError && <AlertError error={error} />}
+    {isSuccess && data.length === 0 && <EmptyState />}
+    {isSuccess && data.length > 0 && <DataDisplay data={data} />}
+  </div>
+  ```
+
+- **`useEffect` is for synchronizing with external systems** (subscriptions, DOM, timers) — not for deriving data (compute it in render), reacting to user actions (do it in the handler), or fetching (React Query). Older code uses effects for all of these; don't copy it.
+- **State** stays as local as possible — lift it only when it's actually shared. Related form fields belong in a single react-hook-form + zod form, not parallel `useState` calls.
+- **Component size**: split at ~200–300 lines — or sooner when a component grows multiple distinct UI sections, tangled conditional rendering, or clusters of unrelated `useState`. Extract repeated JSX into small components, non-trivial pure logic into `.utils.ts` functions (which get unit tests), and reusable stateful logic into custom hooks.
+- **Memoization is not the default**: `useMemo`/`useCallback` only for measured expense or referential stability a memoized child depends on.
+- **TypeScript**: avoid `as` casts — where external data enters, parse it with zod (`schema.parse`/`safeParse`) instead. Model multi-state values as discriminated unions (`{ status: 'success'; data: T } | { status: 'error'; error: Error }`) rather than independent boolean flags.
+- **Naming**: prop callbacks are `onX`, internal handlers are `handleX`. Custom hooks return objects, not tuples.
 
 ## Defaults that differ here
 

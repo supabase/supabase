@@ -3,11 +3,11 @@ title: 'Advanced Log Querying and Filtering'
 description: 'Query and filter logs with regular expressions'
 ---
 
-The [Logs Explorer](/dashboard/project/_/logs-explorer) exposes logs from each part of the Supabase stack as a separate table that can be queried and joined using SQL.
+The [Logs Explorer](/dashboard/project/_/logs-explorer) exposes logs from each part of the Supabase stack, which you can query and filter using SQL.
 
 ![Logs Explorer](/docs/img/guides/platform/logs/logs-explorer.png)
 
-You can access the following logs from the **Sources** drop-down:
+You can access the following log sources from the **Sources** drop-down:
 
 - `auth_logs`: GoTrue server logs, containing authentication/authorization activity.
 - `edge_logs`: Edge network logs, containing request and response metadata retrieved from Cloudflare.
@@ -17,92 +17,86 @@ You can access the following logs from the **Sources** drop-down:
 - `realtime_logs`: Realtime server logs, containing client connection information.
 - `storage_logs`: Storage server logs, containing object upload and retrieval information.
 
-The Logs Explorer uses BigQuery and supports all [available SQL functions and operators](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators).
+The Logs Explorer runs on ClickHouse. Every log line from every source is one row in a single `logs` table, tagged by a `source` column. Structured fields live in a `log_attributes` map, and the raw line is in `event_message`. Filter by `source` to scope a query to one service.
+
+<Admonition type="note">
+
+ClickHouse has been the default engine since June 2026. Projects created before this date use BigQuery, whose `cross join unnest(metadata)` syntax is deprecated. We recommend rewriting those queries in the ClickHouse syntax shown in this guide.
+
+</Admonition>
 
 ## Timestamp display and behavior
 
-BigQuery stores each log entry with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to use the `timestamp` field in a query.
-
-BigQuery renders raw top-level timestamp values as Unix microseconds. To render the timestamps in a human-readable format, use the `DATETIME()` function to convert the Unix timestamp display into an ISO-8601 timestamp.
+The `timestamp` column is a `DateTime64` value in UTC, formatted as an ISO-8601 string like `2026-06-22T09:34:06.215000`. You can order and compare it directly, so no conversion function is needed. In the Logs Explorer the selected time range is applied for you, so you rarely need to filter on `timestamp` by hand.
 
 ```sql
--- timestamp column without datetime()
-select timestamp from ....
---  1664270180000
-
--- timestamp column with datetime()
-select datetime(timestamp) from ....
--- 2022-09-27T09:17:10.439Z
+select timestamp, event_message
+from logs
+where source = 'edge_logs'
+order by timestamp desc
+limit 100;
 ```
 
-## Unnesting arrays
+## Reading fields from log_attributes
 
-Each log event stores metadata as an array of objects with multiple levels, as you can see by selecting single log events in the Logs Explorer. To query arrays, use `unnest()` on each array field and add it to the query as a join. This allows you to reference the nested objects with an alias and select their individual fields.
-
-For example, to query the edge logs without any joins:
+Structured fields live in the `log_attributes` map. Read a field with bracket access, keeping the full dotted key. There are no unnesting joins.
 
 ```sql
-select timestamp, metadata from edge_logs as t;
+select
+  log_attributes['request.method'] as method,
+  log_attributes['request.path'] as path,
+  log_attributes['response.status_code'] as status
+from logs
+where source = 'edge_logs'
+limit 100;
 ```
 
-The Logs Explorer renders the resulting `metadata` key as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects:
+The key keeps the full dotted path, with the `metadata` root dropped. What BigQuery expressed as `metadata.request.cf.country` is `log_attributes['request.cf.country']`. Keep the full prefix rather than shortening it.
 
-![Without Unnesting](/docs/img/unnesting-none.png)
-
-Perform a `cross join unnest()` to work with the keys nested in the `metadata` key.
-
-To query for a nested value, add a join for each array level:
+Map values are always strings. To compare or aggregate a numeric field, wrap it in `toInt32OrZero`, which returns `0` for a missing or non-numeric value:
 
 ```sql
-select timestamp, request.method, header.cf_ipcountry
-from
-  edge_logs as t
-  cross join unnest(t.metadata) as metadata
-  cross join unnest(metadata.request) as request
-  cross join unnest(request.headers) as header;
+select count() as server_errors
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) between 500 and 599;
 ```
 
-This surfaces the following columns available for selection:
-![With Two Level Unnesting](/docs/img/unnesting-2.png)
+Do not guess keys. Discover the keys a source sets from recent rows:
 
-This allows you to select the `method` and `cf_ipcountry` columns. In JS dot notation, the full paths for each selected column are:
-
-- `metadata[].request[].method`
-- `metadata[].request[].headers[].cf_ipcountry`
+```sql
+select arrayJoin(mapKeys(log_attributes)) as key, count() as n
+from logs
+where source = 'postgres_logs'
+group by key
+order by n desc
+limit 100;
+```
 
 ## LIMIT and result row limitations
 
-The Logs Explorer has a maximum of 1000 rows per run. Use `LIMIT` to optimize your queries by reducing the number of rows returned further.
+The Logs Explorer has a maximum of 1000 rows per run. Use `LIMIT` to reduce the number of rows returned further.
 
 ## Best practices
 
-1. Include a filter over **timestamp**
+1. **Use a narrow time range.**
 
-Querying your entire log history might seem appealing. For **Enterprise** customers that have a large retention range, you run the risk of timeouts due to additional time required to scan the larger dataset.
+The Logs Explorer applies the time range you select, so keep it tight. Querying a very large range risks timeouts, especially for Enterprise customers with long retention, because of the extra data scanned.
 
-2. Avoid selecting large nested objects. Select individual values instead.
+2. **Select only the fields you need.**
 
-When querying large objects, the columnar storage engine selects each column associated with each nested key, resulting in a large number of columns being selected. This inadvertently impacts the query speed and may result in timeouts or memory errors, especially for projects with a lot of logs.
-
-Instead, select only the values required.
+Selecting the whole `log_attributes` map, or every column, reads far more data than you need and slows the query down. Select the specific keys instead.
 
 ```sql
--- ❌ Avoid doing this
-select
-  datetime(timestamp),
-  m as metadata -- <- metadata contains many nested keys
-from
-  edge_logs as t
-  cross join unnest(t.metadata) as m;
+-- ❌ Avoid this: selecting the whole attributes map
+select timestamp, log_attributes
+from logs
+where source = 'edge_logs';
 
--- ✅ Do this
-select
-  datetime(timestamp),
-  r.method -- <- select only the required values
-from
-  edge_logs as t
-  cross join unnest(t.metadata) as m
-  cross join unnest(m.request) as r;
+-- ✅ Do this: select only the keys you need
+select timestamp, log_attributes['request.method'] as method
+from logs
+where source = 'edge_logs';
 ```
 
 ## Examples and templates
@@ -112,62 +106,59 @@ The Logs Explorer includes **Templates** (available in the Templates tab or the 
 For example, you can enter the following query in the SQL Editor to retrieve each user's IP address:
 
 ```sql
-select datetime(timestamp), h.x_real_ip
-from
-  edge_logs
-  cross join unnest(metadata) as m
-  cross join unnest(m.request) as r
-  cross join unnest(r.headers) as h
-where h.x_real_ip is not null and r.method = "GET";
+select timestamp, log_attributes['request.headers.x_real_ip'] as x_real_ip
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.headers.x_real_ip'] != ''
+  and log_attributes['request.method'] = 'GET'
+order by timestamp desc
+limit 100;
 ```
 
 ## Understanding field references
 
-You query log tables with a subset of BigQuery SQL syntax. They all have three columns: `event_message`, `timestamp`, and `metadata`.
+Every log source shares the same `logs` table. Each row has these columns:
 
-| column          | description                 |
-| --------------- | --------------------------- |
-| `timestamp`     | time event was recorded     |
-| `event_message` | the log's message           |
-| `metadata`      | information about the event |
+| column           | description                                        |
+| ---------------- | -------------------------------------------------- |
+| `id`             | unique log identifier                              |
+| `timestamp`      | time the event was recorded                        |
+| `event_message`  | the log's message                                  |
+| `severity_text`  | log level, when the source sets one                |
+| `source`         | the service the log came from                      |
+| `log_attributes` | structured per-source fields, keyed by dotted path |
 
-The `metadata` column is an array of JSON objects that stores important details about each recorded event. For example, in the Postgres table, the `metadata.parsed.error_severity` field indicates the error level of an event. To work with its values, you need to `unnest` them using a `cross join`.
-
-This approach is commonly used with JSON and array columns, so it might look a bit unfamiliar if you're not used to working with these data types.
+Service-specific details live in `log_attributes`. For example, in `postgres_logs` the `log_attributes['parsed.error_severity']` field holds the error level of an event. Read those fields with bracket access:
 
 ```sql
 select
   event_message,
-  parsed.error_severity,
-  parsed.user_name
-from
-  postgres_logs
-  -- extract first layer
-  cross join unnest(postgres_logs.metadata) as metadata
-  -- extract second layer
-  cross join unnest(metadata.parsed) as parsed;
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name
+from logs
+where source = 'postgres_logs'
+limit 100;
 ```
 
 ## Expanding results
 
-Logs returned by queries may be difficult to read in table format. A row can be double-clicked to expand the results into more readable JSON:
+Logs returned by queries may be difficult to read in table format. Double-click a row to expand the result into more readable JSON:
 
 ![Expanding log results](/docs/img/guides/platform/expanded-log-results.png)
 
 ## Filtering with [regular expressions](https://en.wikipedia.org/wiki/Regular_expression)
 
-The Logs use BigQuery-style regular expressions with the [regexp_contains function](https://cloud.google.com/bigquery/docs/reference/standard-sql/string_functions#regexp_contains). In its most basic form, it checks if a string is present in a specified column.
+Use the ClickHouse [`match` function](https://clickhouse.com/docs/sql-reference/functions/string-search-functions#match) for regular expressions. In its most basic form, it checks whether a pattern is present in a column.
 
 ```sql
-select
-  cast(timestamp as datetime) as timestamp,
-  event_message,
-  metadata
-from postgres_logs
-where regexp_contains(event_message, 'is present');
+select timestamp, event_message
+from logs
+where source = 'postgres_logs'
+  and match(event_message, 'is present')
+limit 100;
 ```
 
-There are multiple operators that you should consider using:
+There are multiple operators to consider using.
 
 ### Find messages that start with a phrase
 
@@ -175,46 +166,53 @@ There are multiple operators that you should consider using:
 
 ```sql
 -- find only messages that start with connection
-regexp_contains(event_message, '^connection')
+match(event_message, '^connection')
 ```
 
-### Find messages that end with a phrase:
+### Find messages that end with a phrase
 
 `$` only looks for values at the end of the string
 
 ```sql
--- find only messages that ends with port=12345
-regexp_contains(event_message, 'port=12345$')
+-- find only messages that end with port=12345
+match(event_message, 'port=12345$')
 ```
 
-### Ignore case sensitivity:
+### Ignore case sensitivity
 
 `(?i)` ignores capitalization for all proceeding characters
 
 ```sql
 -- find all event_messages with the word "connection"
-regexp_contains(event_message, '(?i)COnnecTion')
+match(event_message, '(?i)COnnecTion')
 ```
 
-### Wildcards:
+For a plain case-insensitive substring match, `ilike` is simpler:
 
-`.` can represent any string of characters
+```sql
+-- find all event_messages containing "connection", in any case
+event_message ilike '%connection%'
+```
+
+### Wildcards
+
+`.` matches any single character, and `.*` matches any sequence of characters
 
 ```sql
 -- find event_messages like "hello<anything>world"
-regexp_contains(event_message, 'hello.world')
+match(event_message, 'hello.*world')
 ```
 
-### Alphanumeric ranges:
+### Alphanumeric ranges
 
-`[1-9a-zA-Z]` finds any strings with only numbers and letters
+`[0-9a-zA-Z]` matches a single alphanumeric character. Anchor it with `^[0-9a-zA-Z]+$` to match a value that is entirely alphanumeric.
 
 ```sql
--- find event_messages that contain a number between 1 and 5 (inclusive)
-regexp_contains(event_message, '[1-5]')
+-- find event_messages that contain a digit between 1 and 5 (inclusive)
+match(event_message, '[1-5]')
 ```
 
-### Repeated values:
+### Repeated values
 
 `x*` zero or more x
 `x+` one or more x
@@ -223,87 +221,70 @@ regexp_contains(event_message, '[1-5]')
 `x{3}` exactly 3 x
 
 ```sql
--- find event_messages that contains any sequence of 3 digits
-regexp_contains(event_message, '[0-9]{3}')
+-- find event_messages that contain any sequence of 3 digits
+match(event_message, '[0-9]{3}')
 ```
 
-### Escaping reserved characters:
+### Escaping reserved characters
 
-`\.` interpreted as period `.` instead of as a wildcard
+`\.` is interpreted as a period `.` instead of as a wildcard
 
 ```sql
 -- escapes .
-regexp_contains(event_message, 'hello world\.')
+match(event_message, 'hello world\.')
 ```
 
-### `or` statements:
+### `or` statements
 
 `x|y` any string with `x` or `y` present
 
 ```sql
--- find event_messages that have the word 'started' followed by either the word "host" or "authenticated"
-regexp_contains(event_message, 'started host|authenticated')
+-- find event_messages that have the word 'started' followed by either "host" or "authenticated"
+match(event_message, 'started (host|authenticated)')
 ```
 
-### `and`/`or`/`not` statements in SQL:
+### `and`/`or`/`not` statements in SQL
 
-`and`, `or`, and `not` are all native terms in SQL and can be used in conjunction with regular expressions to filter results
+`and`, `or`, and `not` are native terms in SQL and can be used with regular expressions to filter results
+
+```sql
+select timestamp, event_message
+from logs
+where source = 'postgres_logs'
+  and (
+    (match(event_message, 'connection') and match(event_message, 'host'))
+    or not match(event_message, 'received')
+  )
+limit 100;
+```
+
+### Filtering example
+
+Filter for Postgres errors:
 
 ```sql
 select
-  cast(timestamp as datetime) as timestamp,
-  event_message,
-  metadata
-from postgres_logs
-where
-  (regexp_contains(event_message, 'connection') and regexp_contains(event_message, 'host'))
-  or not regexp_contains(event_message, 'received');
-```
-
-### Filtering and unnesting example
-
-Filter for Postgres:
-
-```sql
-select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
-  parsed.error_severity,
-  parsed.user_name,
+  timestamp,
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
   event_message
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
-where regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
+from logs
+where source = 'postgres_logs'
+  and match(log_attributes['parsed.error_severity'], 'ERROR|FATAL|PANIC')
 order by timestamp desc
 limit 100;
 ```
 
 ## Limitations
 
-### Log tables cannot be joined together
+### The wildcard operator `*` is not supported
 
-Each product table operates independently without the ability to join with other log tables. This may change in the future.
-
-### The `with` keyword and subqueries are not supported
-
-The parser does not yet support `with` and subquery statements.
-
-### The `ilike` and `similar to` keywords are not supported
-
-Although you can use `like` and other comparison operators, `ilike` and `similar to` are incompatible with BigQuery's variant of SQL. Use `regexp_contains` as an alternative.
-
-### The wildcard operator `*` to select columns is not supported
-
-The log parser is not able to parse the `*` operator for column selection. Instead, you can access all fields from the `metadata` column:
+The logs query surface rejects `select *` and `count(*)`. List the columns you need, and use `count()` for row counts:
 
 ```sql
-select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
-  event_message,
-  metadata
-from
-  <log_table_name>
+select timestamp, event_message, log_attributes['parsed.error_severity'] as error_severity
+from logs
+where source = 'postgres_logs'
 order by timestamp desc
 limit 100;
 ```
