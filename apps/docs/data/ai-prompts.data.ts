@@ -1,5 +1,5 @@
-/** Framework quickstart AI prompts keyed by quickstart filename stem. */
-export const quickstartPrompts = {
+/** Embedded AI prompt bodies keyed by `AiPrompt` `id`. */
+export const aiPrompts = {
   astrojs: `Help me add Supabase to my Astro project. Create a Supabase project at
 database.new and run the instruments table SQL. Then:
 1. Run \`npm create astro@latest my-app\` to scaffold the app.
@@ -14,7 +14,7 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/astrojs.md`,
-  "expo-react-native": `Help me add Supabase to my Expo React Native project. Create a Supabase project
+  'expo-react-native': `Help me add Supabase to my Expo React Native project. Create a Supabase project
 at database.new and run the instruments table SQL. Then:
 1. Run \`npx create-expo-app my-app --template blank-typescript\` to scaffold the
    app.
@@ -65,7 +65,7 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/hono.md`,
-  "ios-swiftui": `Help me add Supabase to my iOS SwiftUI project. Create a Supabase project at
+  'ios-swiftui': `Help me add Supabase to my iOS SwiftUI project. Create a Supabase project at
 database.new and run the instruments table SQL. Then:
 1. Create a new iOS App project in Xcode.
 2. Add the \`supabase-swift\` package via File > Add Package Dependencies using
@@ -177,7 +177,7 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/refine.md`,
-  "ruby-on-rails": `Help me add Supabase to my Ruby on Rails project. Create a Supabase project at
+  'ruby-on-rails': `Help me add Supabase to my Ruby on Rails project. Create a Supabase project at
 database.new and run the instruments table SQL. Then:
 1. Run \`rails new blog -d=postgresql\` to scaffold a new Rails project.
 2. Set \`DATABASE_URL\` to the Supabase Session Pooler connection string in
@@ -242,5 +242,4 @@ REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/vue.md`,
 } as const
 
-export type QuickstartPromptFramework = keyof typeof quickstartPrompts
-
+export type AiPromptId = keyof typeof aiPrompts

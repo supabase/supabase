@@ -1,13 +1,13 @@
 'use client'
 
-import { quickstartPrompts, type QuickstartPromptFramework } from '~/data/quickstart-prompts.data'
+import { aiPrompts, type AiPromptId } from '~/data/ai-prompts.data'
 import { Sparkles } from 'lucide-react'
 
 import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from './PromptPanel'
 
 type AiPromptProps = {
-  /** Quickstart filename stem; looks up text from `quickstartPrompts`. */
-  id: QuickstartPromptFramework | string
+  /** Looks up prompt text from `aiPrompts`. */
+  id: AiPromptId | string
 }
 
 /**
@@ -16,11 +16,11 @@ type AiPromptProps = {
  * boundary (where child types arrive as `react.lazy` and the panel
  * would otherwise render nothing).
  *
- * Prompt text lives in `~/data/quickstart-prompts.data`. Markdown export
+ * Prompt text lives in `~/data/ai-prompts.data`. Markdown export
  * intentionally omits this component (HTML-only copy panel).
  */
 function AiPrompt({ id }: AiPromptProps) {
-  const prompt = quickstartPrompts[id as QuickstartPromptFramework]
+  const prompt = aiPrompts[id as AiPromptId]
   if (!prompt) {
     throw new Error(`Unknown AiPrompt id: ${id}`)
   }
