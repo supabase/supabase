@@ -6,6 +6,15 @@ description: 'Isolate and fix Supabase issues by reading the error, isolating th
 
 Debug by evidence, not by guessing. A Supabase error almost always surfaces at one layer but originates at another, so the fastest path to a fix is finding _where_ the problem is, not pattern-matching the symptom. Retrying a failed request rarely helps; isolating the layer does.
 
+<<<<<<< HEAD:apps/docs/content/guides/monitoring-and-debugging/debugging.mdx
+=======
+<Admonition type="tip">
+
+If you are using an AI agent with the Supabase MCP server, the `get_logs` tool queries logs by service name without requiring SQL. The `supabase` skill (`npx skills add supabase`) gives the agent this debugging workflow and routes it to the guides in this section.
+
+</Admonition>
+
+>>>>>>> caacbeb071 (update headers and add links for agents):apps/docs/content/guides/telemetry/debugging.mdx
 ## Follow these debugging steps
 
 Work through these steps in order, skipping straight to a fix before you have evidence for the cause is the most common way to waste time on a bug.
@@ -77,7 +86,6 @@ For query performance and schema-design questions such as indexing, `EXPLAIN`, N
 
 Debugging is complete only once you've re-run the failing operation, confirmed it succeeds, and checked that the layer's logs show a clean result.
 
-<<<<<<< HEAD:apps/docs/content/guides/monitoring-and-debugging/debugging.mdx
 ## Per-product debugging
 
 Each Supabase product has its own debugging resources. Use these as a starting point when the error originates in a specific service.
@@ -86,5 +94,3 @@ Each Supabase product has its own debugging resources. Use these as a starting p
 - [Auth — Error codes](/docs/guides/auth/debugging/error-codes)
 - [Storage — Debugging](/docs/guides/storage/debugging/logs)
 - [Edge Functions — Local debugging](/docs/guides/functions/debugging-tools)
-=======
->>>>>>> 6e428103c7 (addressing some feedback):apps/docs/content/guides/telemetry/debugging.mdx
