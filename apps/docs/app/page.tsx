@@ -330,8 +330,9 @@ const HomePage = () => (
           </div>
 
           <ul className="col-span-8 grid grid-cols-12 gap-3 not-prose">
-            {MIGRATION_PAGES.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(
-              (guide) => {
+            {[...MIGRATION_PAGES]
+              .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+              .map((guide) => {
                 if (!guide.name || !guide.url || typeof guide.icon !== 'string') return null
 
                 return (
@@ -343,8 +344,7 @@ const HomePage = () => (
                     />
                   </li>
                 )
-              }
-            )}
+              })}
           </ul>
         </div>
       )}
