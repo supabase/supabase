@@ -22,7 +22,7 @@ import type { ConnectMode, FieldOption, ResolvedField } from './Connect.types'
 import { ConnectionIcon } from './ConnectionIcon'
 import {
   ConnectModeButton,
-  getConnectModeButtonCornerClasses,
+  getConnectModeButtonCornerVariants,
   getConnectModeEmptySlotClasses,
 } from './ConnectModeButton'
 
@@ -260,7 +260,7 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
             description={mode.description}
             selected={selected === mode.id}
             onClick={() => onChange(mode.id)}
-            className={getConnectModeButtonCornerClasses({ index, count, emptySlots })}
+            {...getConnectModeButtonCornerVariants({ index, count, emptySlots })}
           />
         ))}
 
