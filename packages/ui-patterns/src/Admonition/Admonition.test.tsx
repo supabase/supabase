@@ -120,12 +120,12 @@ describe('Admonition', () => {
     expect(within(screen.getByRole('alert')).queryByText(`${name}:`)).not.toBeInTheDocument()
   })
 
-  it('renders the title as a div by default', () => {
+  it('renders the title as a paragraph by default', () => {
     render(<Admonition type="note" title="Manual approval required" description="Body copy." />)
 
     const note = screen.getByRole('alert', { name: 'Note' })
     expect(note.querySelector('h1, h2, h3, h4, h5, h6')).not.toBeInTheDocument()
-    expect(within(note).getByText('Manual approval required').tagName).toBe('DIV')
+    expect(within(note).getByText('Manual approval required').tagName).toBe('P')
   })
 
   it('renders the title as the given heading level', () => {

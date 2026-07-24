@@ -23,7 +23,7 @@ export interface AdmonitionProps {
   children?: ReactNode
   showIcon?: boolean
   childProps?: {
-    title?: HTMLAttributes<HTMLHeadingElement | HTMLDivElement>
+    title?: HTMLAttributes<HTMLHeadingElement | HTMLParagraphElement>
     description?: HTMLAttributes<HTMLDivElement>
   }
   layout?: AdmonitionLayout

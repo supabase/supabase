@@ -35,7 +35,7 @@ export const Admonition = forwardRef<
     ref
   ) => {
     const label = TYPE_LABEL[type]
-    const TitleTag: AdmonitionHeadingLevel | 'div' = headingLevel ?? 'div'
+    const TitleTag: AdmonitionHeadingLevel | 'p' = headingLevel ?? 'p'
 
     return (
       <Alert
