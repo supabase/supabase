@@ -17,20 +17,21 @@ Once installed, the agent can debug failing requests, query logs, run advisors, 
 
 The Supabase MCP server exposes several tools relevant to monitoring and debugging:
 
-| Tool           | Description                                                                                                                |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `get_logs`     | Query logs for a project by service name and time window. Engine-agnostic — works across ClickHouse and BigQuery projects. |
-| `get_advisors` | Run the Supabase security and performance advisors against a project.                                                      |
-| `execute_sql`  | Run a SQL query directly against the database.                                                                             |
-| `search_docs`  | Search Supabase documentation by keyword or error string.                                                                  |
+| Tool           | Description                                                                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `query_logs`   | Run a custom ClickHouse SQL query against a hosted project's unified logs stream. Use for field-level filtering, aggregation, and correlation. |
+| `get_logs`     | Query logs by service name, no SQL required. Works on local and self-hosted projects. Deprecated on hosted in favor of `query_logs`.          |
+| `get_advisors` | Run the Supabase security and performance advisors against a project.                                                                         |
+| `execute_sql`  | Run a SQL query directly against the database.                                                                                                |
+| `search_docs`  | Search Supabase documentation by keyword or error string.                                                                                     |
 
-### Querying logs with `get_logs`
+### Querying logs
 
-`get_logs` takes a service name (`auth`, `edge`, `postgres`, `storage`, `realtime`, `functions`) and an optional time window. It is the primary log-querying path for agents because it is engine-agnostic and does not require knowledge of the ClickHouse or BigQuery query model.
+On **hosted** projects, use `query_logs` with a ClickHouse SQL query — the same syntax used in the Logs Explorer (see the [Logging guide](/docs/guides/telemetry/logs)). It supports field-level filtering, aggregation, and correlating across log fields.
 
-When `get_logs` returns an empty result, widen along an anchor — a timestamp, request ID, or error code — rather than broadening the service scope.
+On **local** and **self-hosted** projects, use `get_logs` with a service name and optional time window — `query_logs` is not available there.
 
-For cases where raw SQL is needed (field-level filtering, aggregation), use the `execute_sql` tool against the [Logs Explorer endpoint](/docs/guides/telemetry/logs). The [Logging guide](/docs/guides/telemetry/logs) covers ClickHouse syntax.
+When either tool returns an empty result, widen along an anchor — a timestamp, request ID, or error code — rather than broadening the query.
 
 ## Using the debugging skill
 
@@ -38,7 +39,7 @@ The `supabase` skill's debugging workflow follows the same loop as the [Debuggin
 
 1. Read the error precisely — status code, error code, full message.
 2. Locate the failing layer using the request-stack model.
-3. Query that layer's logs using `get_logs` with a bounded time window.
+3. Query that layer's logs using `query_logs` (hosted) or `get_logs` (local/self-hosted) with a bounded time window.
 4. Fetch the troubleshooting guide for the specific symptom (append `.md` to the docs URL, or use `search_docs`).
 5. Apply the fix, then verify by re-running the failing operation.
 
