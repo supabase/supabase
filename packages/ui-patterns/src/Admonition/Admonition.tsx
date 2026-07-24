@@ -14,7 +14,10 @@ export type { AdmonitionHeadingLevel, AdmonitionLayout, AdmonitionProps, Admonit
 
 export const Admonition = forwardRef<
   React.ComponentRef<typeof Alert>,
-  Omit<React.ComponentPropsWithoutRef<typeof Alert>, keyof AdmonitionProps | 'children'> &
+  Omit<
+    React.ComponentPropsWithoutRef<typeof Alert>,
+    keyof AdmonitionProps | 'children' | 'variant'
+  > &
     AdmonitionProps
 >(
   (
