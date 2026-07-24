@@ -8,10 +8,9 @@ import { BRAND_OPTIONS, DEFAULT_BRAND_ID, type BrandId } from '@/lib/design/bran
 import { DEFAULT_FORMAT_ID, FORMAT_OPTIONS, getFormat, type FormatId } from '@/lib/design/formats'
 import {
   DEFAULT_NEWSLETTER_TEMPLATE_ID,
-  DEFAULT_SOCIAL_TEMPLATE_ID,
   DEFAULT_TEMPLATE_ID,
+  INSTAGRAM_TEMPLATE_ID,
   NEWSLETTER_TEMPLATES,
-  SOCIAL_TEMPLATES,
   TEMPLATE_MAP,
   TEMPLATES,
 } from '@/lib/design/templates'
@@ -508,10 +507,11 @@ export default function Page() {
     ],
     [primarySlotLabel, secondSlotLabel, hasSecondSlot]
   )
-  // Newsletter and Social each have their own two-tile layout set instead
-  // of the standard 4 templates.
-  const activeTemplates =
-    formatId === 'newsletter' ? NEWSLETTER_TEMPLATES : formatId === 'twitter' ? SOCIAL_TEMPLATES : TEMPLATES
+  // Newsletter has its own two-tile layout set. Social's primary composition
+  // (1200x627) is close enough to OG's (1200x630) to reuse the same
+  // TEMPLATES registry directly — its Instagram secondary gets its own
+  // dedicated layout instead (INSTAGRAM_TEMPLATE_ID, forced below).
+  const activeTemplates = formatId === 'newsletter' ? NEWSLETTER_TEMPLATES : TEMPLATES
 
   const [view, setView] = useState<View>('og')
   const [headline, setHeadline] = useState('Postgres full text search just got faster')
@@ -619,17 +619,11 @@ export default function Page() {
       .catch(() => {})
   }, [brandId])
 
-  // Newsletter/Social swap in their own layout sets — reset to a valid
-  // default when the active template isn't in the set the current format offers.
+  // Newsletter swaps in its own layout set — reset to a valid default when
+  // the active template isn't in the set the current format offers.
   useEffect(() => {
     if (!activeTemplates.some((t) => t.id === template)) {
-      setTemplate(
-        formatId === 'newsletter'
-          ? DEFAULT_NEWSLETTER_TEMPLATE_ID
-          : formatId === 'twitter'
-            ? DEFAULT_SOCIAL_TEMPLATE_ID
-            : DEFAULT_TEMPLATE_ID
-      )
+      setTemplate(formatId === 'newsletter' ? DEFAULT_NEWSLETTER_TEMPLATE_ID : DEFAULT_TEMPLATE_ID)
     }
   }, [formatId, activeTemplates, template])
 
@@ -938,22 +932,18 @@ export default function Page() {
     if (brandId !== DEFAULT_BRAND_ID) p.set('brand', brandId)
     if (formatId !== DEFAULT_FORMAT_ID) p.set('format', formatId)
     if (hasSecondary) {
-      // Full second composition (e.g. Instagram) — same recipe as the
-      // primary render, just a different canvas via `variant`.
+      // Full second composition — currently only Social's Instagram variant
+      // (portrait, 1080x1350). Always renders through its own dedicated
+      // layout (INSTAGRAM_TEMPLATE_ID), not whichever template is active for
+      // the primary composition — none of the landscape-tuned arrangements
+      // (fixed pixel icon offsets, etc.) translate to a portrait canvas.
       p.set('headline', headline)
       if (eyebrow.trim()) {
         p.set('eyebrow', eyebrow.trim())
         p.set('eyebrowStyle', 'pill')
       }
-      p.set('template', template)
-      if (template === 'logo-grid') {
-        const names = logoTileIcons.filter((n): n is string => !!n)
-        if (names.length) p.set('icons', names.join(','))
-        if (!showBrandLogo) p.set('showLogo', '0')
-      } else if (icon) {
-        p.set('icon', icon)
-      }
-      if (arrangement) p.set('arrangement', String(arrangement))
+      p.set('template', INSTAGRAM_TEMPLATE_ID)
+      if (icon) p.set('icon', icon)
       p.set('variant', 'secondary')
     } else {
       // The classic icon-only Thumb still needs `template` — some templates

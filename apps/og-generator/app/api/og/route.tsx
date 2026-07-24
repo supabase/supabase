@@ -272,6 +272,7 @@ export async function GET(req: Request) {
         maxLines: template.maxHeadlineLines ?? 3,
         letterSpacingEm: HEADLINE.letterSpacing,
         manualBreaks,
+        singleLineMaxFraction: template.singleLineMaxFractionForArrangement?.(arrangement),
       })
     let fit = fitAt(initialTier)
     if (!manualSize && !template.headlineSizeTier && initialTier === HEADLINE.sizeTiers.default && fit.lineCount === 3) {

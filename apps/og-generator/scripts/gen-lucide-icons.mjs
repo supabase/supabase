@@ -50,6 +50,31 @@ const CURATED = [
   { name: 'lock-keyhole', label: 'Lock keyhole', tags: ['security', 'private', 'encryption', 'rls', 'access', 'protected'] },
   { name: 'table', label: 'Table', tags: ['table', 'data', 'rows', 'columns', 'postgres', 'schema', 'sql'] },
   { name: 'workflow', label: 'Workflow', tags: ['workflow', 'automation', 'pipeline'] },
+  // Metrics/graphs.
+  { name: 'trending-up', label: 'Trending up', tags: ['metrics', 'growth', 'analytics', 'performance', 'trend', 'benchmark'] },
+  { name: 'chart-line', label: 'Line chart', tags: ['analytics', 'chart', 'metrics', 'graph', 'trend', 'reporting', 'dashboard'] },
+  { name: 'chart-pie', label: 'Pie chart', tags: ['analytics', 'chart', 'metrics', 'breakdown', 'distribution', 'reporting'] },
+  { name: 'chart-area', label: 'Area chart', tags: ['analytics', 'chart', 'metrics', 'usage', 'reporting', 'dashboard'] },
+  { name: 'gauge', label: 'Gauge', tags: ['performance', 'metrics', 'benchmark', 'speed', 'latency', 'monitoring'] },
+  { name: 'layout-dashboard', label: 'Dashboard', tags: ['dashboard', 'observability', 'overview', 'admin', 'studio', 'metrics'] },
+  { name: 'monitor', label: 'Monitor', tags: ['monitoring', 'observability', 'uptime', 'dashboard', 'alerts', 'metrics'] },
+  // Postgres/data.
+  { name: 'database-backup', label: 'Database backup', tags: ['backup', 'postgres', 'database', 'recovery', 'snapshot', 'disaster recovery'] },
+  { name: 'binary', label: 'Binary', tags: ['data', 'encoding', 'bits', 'storage', 'compute', 'types'] },
+  { name: 'function-square', label: 'Function', tags: ['edge functions', 'serverless', 'compute', 'functions', 'deno'] },
+  { name: 'braces', label: 'Braces', tags: ['json', 'api', 'schema', 'data', 'config', 'payload'] },
+  { name: 'columns-3', label: 'Columns', tags: ['schema', 'postgres', 'columns', 'table', 'data model', 'migrations'] },
+  { name: 'list-tree', label: 'Tree', tags: ['schema', 'hierarchy', 'structure', 'nested', 'tree', 'relationships'] },
+  // Realtime/collaboration.
+  { name: 'refresh-cw', label: 'Refresh', tags: ['realtime', 'sync', 'replication', 'refresh', 'live', 'streaming'] },
+  { name: 'share-2', label: 'Share', tags: ['realtime', 'collaboration', 'sharing', 'broadcast', 'multiplayer', 'presence'] },
+  // Auth/security.
+  { name: 'fingerprint', label: 'Fingerprint', tags: ['auth', 'biometric', 'identity', 'security', 'mfa', 'authentication'] },
+  { name: 'globe-lock', label: 'Globe lock', tags: ['security', 'global', 'compliance', 'data residency', 'privacy'] },
+  // Dev workflow / ecosystem.
+  { name: 'git-merge', label: 'Git merge', tags: ['git', 'version control', 'branch', 'merge', 'ci', 'pull request'] },
+  { name: 'history', label: 'History', tags: ['changelog', 'migrations', 'audit log', 'version history', 'timeline'] },
+  { name: 'puzzle', label: 'Puzzle', tags: ['integrations', 'extensions', 'plugins', 'ecosystem', 'add-ons'] },
 ]
 
 function extract(name) {

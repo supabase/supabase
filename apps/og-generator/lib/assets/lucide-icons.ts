@@ -429,5 +429,282 @@ export const LUCIDE_ICONS: SeedIcon[] = [
     ],
     "viewBox": "0 0 24 24",
     "body": "<path d=\"M12 3v18\" /> <rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"M3 15h18\" />"
+  },
+  {
+    "name": "trending-up",
+    "label": "Trending up",
+    "tags": [
+      "metrics",
+      "growth",
+      "analytics",
+      "performance",
+      "trend",
+      "benchmark"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M16 7h6v6\" /> <path d=\"m22 7-8.5 8.5-5-5L2 17\" />"
+  },
+  {
+    "name": "chart-line",
+    "label": "Line chart",
+    "tags": [
+      "analytics",
+      "chart",
+      "metrics",
+      "graph",
+      "trend",
+      "reporting",
+      "dashboard"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M3 3v16a2 2 0 0 0 2 2h16\" /> <path d=\"m19 9-5 5-4-4-3 3\" />"
+  },
+  {
+    "name": "chart-pie",
+    "label": "Pie chart",
+    "tags": [
+      "analytics",
+      "chart",
+      "metrics",
+      "breakdown",
+      "distribution",
+      "reporting"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z\" /> <path d=\"M21.21 15.89A10 10 0 1 1 8 2.83\" />"
+  },
+  {
+    "name": "chart-area",
+    "label": "Area chart",
+    "tags": [
+      "analytics",
+      "chart",
+      "metrics",
+      "usage",
+      "reporting",
+      "dashboard"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M3 3v16a2 2 0 0 0 2 2h16\" /> <path d=\"M7 11.207a.5.5 0 0 1 .146-.353l2-2a.5.5 0 0 1 .708 0l3.292 3.292a.5.5 0 0 0 .708 0l4.292-4.292a.5.5 0 0 1 .854.353V16a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z\" />"
+  },
+  {
+    "name": "gauge",
+    "label": "Gauge",
+    "tags": [
+      "performance",
+      "metrics",
+      "benchmark",
+      "speed",
+      "latency",
+      "monitoring"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"m12 14 4-4\" /> <path d=\"M3.34 19a10 10 0 1 1 17.32 0\" />"
+  },
+  {
+    "name": "layout-dashboard",
+    "label": "Dashboard",
+    "tags": [
+      "dashboard",
+      "observability",
+      "overview",
+      "admin",
+      "studio",
+      "metrics"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\" /> <rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\" /> <rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\" />"
+  },
+  {
+    "name": "monitor",
+    "label": "Monitor",
+    "tags": [
+      "monitoring",
+      "observability",
+      "uptime",
+      "dashboard",
+      "alerts",
+      "metrics"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<rect width=\"20\" height=\"14\" x=\"2\" y=\"3\" rx=\"2\" /> <line x1=\"8\" x2=\"16\" y1=\"21\" y2=\"21\" /> <line x1=\"12\" x2=\"12\" y1=\"17\" y2=\"21\" />"
+  },
+  {
+    "name": "database-backup",
+    "label": "Database backup",
+    "tags": [
+      "backup",
+      "postgres",
+      "database",
+      "recovery",
+      "snapshot",
+      "disaster recovery"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<ellipse cx=\"12\" cy=\"5\" rx=\"9\" ry=\"3\" /> <path d=\"M3 12a9 3 0 0 0 5 2.69\" /> <path d=\"M21 9.3V5\" /> <path d=\"M3 5v14a9 3 0 0 0 6.47 2.88\" /> <path d=\"M12 12v4h4\" /> <path d=\"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16\" />"
+  },
+  {
+    "name": "binary",
+    "label": "Binary",
+    "tags": [
+      "data",
+      "encoding",
+      "bits",
+      "storage",
+      "compute",
+      "types"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<rect x=\"14\" y=\"14\" width=\"4\" height=\"6\" rx=\"2\" /> <rect x=\"6\" y=\"4\" width=\"4\" height=\"6\" rx=\"2\" /> <path d=\"M6 20h4\" /> <path d=\"M14 10h4\" /> <path d=\"M6 14h2v6\" /> <path d=\"M14 4h2v6\" />"
+  },
+  {
+    "name": "function-square",
+    "label": "Function",
+    "tags": [
+      "edge functions",
+      "serverless",
+      "compute",
+      "functions",
+      "deno"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" ry=\"2\" /> <path d=\"M9 17c2 0 2.8-1 2.8-2.8V10c0-2 1-3.3 3.2-3\" /> <path d=\"M9 11.2h5.7\" />"
+  },
+  {
+    "name": "braces",
+    "label": "Braces",
+    "tags": [
+      "json",
+      "api",
+      "schema",
+      "data",
+      "config",
+      "payload"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1\" /> <path d=\"M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1\" />"
+  },
+  {
+    "name": "columns-3",
+    "label": "Columns",
+    "tags": [
+      "schema",
+      "postgres",
+      "columns",
+      "table",
+      "data model",
+      "migrations"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"3\" rx=\"2\" /> <path d=\"M9 3v18\" /> <path d=\"M15 3v18\" />"
+  },
+  {
+    "name": "list-tree",
+    "label": "Tree",
+    "tags": [
+      "schema",
+      "hierarchy",
+      "structure",
+      "nested",
+      "tree",
+      "relationships"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M8 5h13\" /> <path d=\"M13 12h8\" /> <path d=\"M13 19h8\" /> <path d=\"M3 10a2 2 0 0 0 2 2h3\" /> <path d=\"M3 5v12a2 2 0 0 0 2 2h3\" />"
+  },
+  {
+    "name": "refresh-cw",
+    "label": "Refresh",
+    "tags": [
+      "realtime",
+      "sync",
+      "replication",
+      "refresh",
+      "live",
+      "streaming"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8\" /> <path d=\"M21 3v5h-5\" /> <path d=\"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16\" /> <path d=\"M8 16H3v5\" />"
+  },
+  {
+    "name": "share-2",
+    "label": "Share",
+    "tags": [
+      "realtime",
+      "collaboration",
+      "sharing",
+      "broadcast",
+      "multiplayer",
+      "presence"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<circle cx=\"18\" cy=\"5\" r=\"3\" /> <circle cx=\"6\" cy=\"12\" r=\"3\" /> <circle cx=\"18\" cy=\"19\" r=\"3\" /> <line x1=\"8.59\" x2=\"15.42\" y1=\"13.51\" y2=\"17.49\" /> <line x1=\"15.41\" x2=\"8.59\" y1=\"6.51\" y2=\"10.49\" />"
+  },
+  {
+    "name": "fingerprint",
+    "label": "Fingerprint",
+    "tags": [
+      "auth",
+      "biometric",
+      "identity",
+      "security",
+      "mfa",
+      "authentication"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4\" /> <path d=\"M14 13.12c0 2.38 0 6.38-1 8.88\" /> <path d=\"M17.29 21.02c.12-.6.43-2.3.5-3.02\" /> <path d=\"M2 12a10 10 0 0 1 18-6\" /> <path d=\"M2 16h.01\" /> <path d=\"M21.8 16c.2-2 .131-5.354 0-6\" /> <path d=\"M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2\" /> <path d=\"M8.65 22c.21-.66.45-1.32.57-2\" /> <path d=\"M9 6.8a6 6 0 0 1 9 5.2v2\" />"
+  },
+  {
+    "name": "globe-lock",
+    "label": "Globe lock",
+    "tags": [
+      "security",
+      "global",
+      "compliance",
+      "data residency",
+      "privacy"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M15.686 15A14.5 14.5 0 0 1 12 22a14.5 14.5 0 0 1 0-20 10 10 0 1 0 9.542 13\" /> <path d=\"M2 12h8.5\" /> <path d=\"M20 6V4a2 2 0 1 0-4 0v2\" /> <rect width=\"8\" height=\"5\" x=\"14\" y=\"6\" rx=\"1\" />"
+  },
+  {
+    "name": "git-merge",
+    "label": "Git merge",
+    "tags": [
+      "git",
+      "version control",
+      "branch",
+      "merge",
+      "ci",
+      "pull request"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<circle cx=\"18\" cy=\"18\" r=\"3\" /> <circle cx=\"6\" cy=\"6\" r=\"3\" /> <path d=\"M6 21V9a9 9 0 0 0 9 9\" />"
+  },
+  {
+    "name": "history",
+    "label": "History",
+    "tags": [
+      "changelog",
+      "migrations",
+      "audit log",
+      "version history",
+      "timeline"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\" /> <path d=\"M3 3v5h5\" /> <path d=\"M12 7v5l4 2\" />"
+  },
+  {
+    "name": "puzzle",
+    "label": "Puzzle",
+    "tags": [
+      "integrations",
+      "extensions",
+      "plugins",
+      "ecosystem",
+      "add-ons"
+    ],
+    "viewBox": "0 0 24 24",
+    "body": "<path d=\"M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z\" />"
   }
 ]

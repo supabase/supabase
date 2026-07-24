@@ -87,6 +87,8 @@ export interface Template {
   maxHeadlineLines?: number
   /** Pins the auto-fit font-size range instead of the default hasIcon-based tier (e.g. Announcement's fixed 72px-at-one-line). */
   headlineSizeTier?: { minSize: number; maxSize: number }
+  /** Per-arrangement override of fitHeadline's singleLineMaxFraction (default 0.7) — for arrangements whose headline box is already narrower than the format's full width, so the same fraction would force a 2-line wrap much sooner than the canvas actually needs. */
+  singleLineMaxFractionForArrangement?: (arrangement: number) => number | undefined
 }
 
 // Shared icon "chip" bounding box (Partner logos' tile look, reused by
@@ -317,6 +319,11 @@ export const TEMPLATES: Template[] = [
     headlineSizeTier: { minSize: 48, maxSize: 64 },
     // Centered (3/4) has no room for an eyebrow above the headline.
     noEyebrowForArrangement: (arrangement) => arrangement === 2,
+    // Arrangements 1-3 (graph-paper, centered, concentric-circles) each use
+    // a headline box already narrower than the format's full width, so the
+    // default 0.7 fraction forces a 2-line wrap much sooner than the canvas
+    // actually needs — loosen it so more headlines stay on one line.
+    singleLineMaxFractionForArrangement: (arrangement) => (arrangement >= 1 && arrangement <= 3 ? 0.85 : undefined),
     build: (p) => {
       const arrangement = p.arrangement ?? 0
       // Icon renders inside the same dark chip bounding box Partner logos
@@ -752,3 +759,9 @@ export const TEMPLATE_MAP: Record<string, Template> = Object.fromEntries(
 export const DEFAULT_TEMPLATE_ID = 'icon-layout'
 export const DEFAULT_NEWSLETTER_TEMPLATE_ID = 'newsletter-cover'
 export const DEFAULT_SOCIAL_TEMPLATE_ID = 'social-twitter'
+// Social's Instagram secondary (portrait, 1080x1350) always renders through
+// its own dedicated centered layout, decoupled from whichever template the
+// user picked for the primary Twitter/X/LinkedIn composition — none of the
+// landscape-tuned icon-layout arrangements (fixed pixel offsets, etc.)
+// translate to a portrait canvas.
+export const INSTAGRAM_TEMPLATE_ID = 'social-instagram'
