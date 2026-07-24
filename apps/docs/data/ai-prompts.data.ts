@@ -34,10 +34,10 @@ https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native.m
 database.new and run the instruments table SQL. Then:
 1. Create a project directory and activate a virtual environment with
    \`python3 -m venv venv && source venv/bin/activate\`.
-2. Install dependencies with \`pip install flask supabase python-dotenv\`.
+2. Install dependencies with \`pip install flask supabase\`.
 3. Create \`.env\` and set \`SUPABASE_URL\` and \`SUPABASE_PUBLISHABLE_KEY\`.
-4. Create \`app.py\` with a Flask route that queries and renders the instruments
-   table using the Supabase client.
+4. Install \`python-dotenv\` and create \`app.py\` with a Flask route that queries
+   and renders the instruments table using the Supabase client.
 5. Run \`python app.py\` and open http://localhost:5000.
 
 REFERENCE
@@ -96,7 +96,7 @@ database.new and run the instruments table SQL. Then:
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/kotlin.md`,
   laravel: `Help me add Supabase to my Laravel project. Create a Supabase project at
-database.new and run the instruments table SQL. Then:
+database.new. Then:
 1. Run \`composer create-project laravel/laravel example-app\` to scaffold the
    project.
 2. Install Laravel Breeze with \`composer require laravel/breeze --dev &&
