@@ -275,7 +275,7 @@ export default function MarketingForm({
       setErrorMessages(validationErrors)
       return
     }
-    
+
     // Required checkboxes aren't covered by HTML5 validation; check them manually.
     const uncheckedRequired = visibleFields.filter(
       (f) => f.type === 'checkbox' && f.required && !f.group && values[f.name] !== 'true'
