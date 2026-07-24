@@ -27,6 +27,17 @@ export function toChangelogTimelineIndexItem(entry: ChangelogEntry): ChangelogTi
   }
 }
 
+/** Strips inline markdown from a title for plain-text contexts (`<title>`, meta, Open Graph). */
+export function stripTitleMarkdown(title: string) {
+  return title
+    .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1') // links / images
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
+    .replace(/~~(.*?)~~/g, '$1')
+    .replace(/`+([^`]*)`+/g, '$1') // inline code
+    .trim()
+}
+
 const CHANGE_TYPE_BADGE_VARIANT: Record<
   ChangeType,
   'default' | 'warning' | 'success' | 'destructive'

@@ -25,7 +25,6 @@ concurrency:
 
 permissions:
   contents: read
-  deployments: read
   statuses: read
   pull-requests: read
 
@@ -45,7 +44,19 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             e2e/docs
+            scripts
             patches
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       # Vercel skips the docs preview when a PR only changes the harness
       # (e2e/docs, workflow). Wait for a preview only when apps/docs changed.
@@ -58,14 +69,21 @@ jobs:
             docs_app:
               - 'apps/docs/**'
 
+      # Vercel's GitHub App stopped writing GitHub Deployment objects on
+      # 2026-02-17 (broken app auth), so vercel/wait-for-deployment-action
+      # times out polling that API even though the preview builds fine.
+      # Poll the "Vercel – docs" commit status instead — Vercel keeps posting
+      # those — then resolve the deployment it points to via Vercel's own API
+      # to get the actual preview URL. See scripts/waitForVercelDocsPreview.js.
       - name: Wait for Vercel docs preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.filter.outputs.docs_app == 'true'
         id: deployment
-        uses: vercel/wait-for-deployment-action@0e2b0c5c5cce31f1648108aeec56467187aca037
-        with:
-          project-slug: docs
-          environment: preview
-          timeout: '900'
+        run: node scripts/waitForVercelDocsPreview.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
 
       - name: Resolve base URL
         id: base-url
@@ -86,17 +104,6 @@ jobs:
             echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
             echo "use_bypass=false" >> "$GITHUB_OUTPUT"
           fi
-
-      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-        name: Install pnpm
-        with:
-          run_install: false
-
-      - name: Use Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter=e2e-docs...
