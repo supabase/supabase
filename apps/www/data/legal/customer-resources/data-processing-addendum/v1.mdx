@@ -194,7 +194,7 @@ Logs and metrics used for observability and debugging are automatically extracte
 Stored data is encrypted where appropriate, including any backup copies of the data.
 
 - All hard disks are encrypted-at-rest using the industry-standard AES-256 algorithm. Similarly, the regularly scheduled backups are also encrypted-at-rest using AES-256.
-- The encryption keys are generated per-project, and are in turn protected by keys stored using FIPS 140-2 compliant HSMs.
+- The encryption keys are protected by keys stored using FIPS 140-2 compliant HSMs.
 
 All network communication is conducted over encrypted links protected by modern security standards (TLS 1.2, modern cipher suites) to preserve confidentiality and integrity of the data.
 
