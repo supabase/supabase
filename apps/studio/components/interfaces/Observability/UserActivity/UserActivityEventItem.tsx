@@ -9,6 +9,7 @@ import {
   levelBadgeVariant,
   type UserActivityEvent,
 } from './UserActivity.constants'
+import { describeUserActivityEvent } from './UserActivity.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 /** How far before/after the event to open the Logs Explorer's date range. */
@@ -30,6 +31,8 @@ export const UserActivityEventItem = ({
 }: UserActivityEventItemProps) => {
   const hasError = isErrorLevel(event.level)
   const logsHref = `/project/${projectRef}/logs?date=${event.timestampMs - LOGS_JUMP_WINDOW_MS}-${event.timestampMs + LOGS_JUMP_WINDOW_MS}&id=${event.id}`
+  const description = describeUserActivityEvent(event.logType, event.eventMessage)
+  const requestLine = `${event.method ?? ''} ${event.pathname ?? ''}`.trim()
 
   return (
     <div className="relative flex gap-x-4">
@@ -61,9 +64,23 @@ export const UserActivityEventItem = ({
             {event.status !== null && (
               <Badge variant={levelBadgeVariant(event.level)}>{event.status}</Badge>
             )}
-            <span className="font-mono text-xs text-foreground-light truncate">
-              {event.method} {event.pathname}
-            </span>
+            <div className="flex flex-col min-w-0">
+              <span
+                className={cn(
+                  'truncate',
+                  description
+                    ? 'text-sm text-foreground'
+                    : 'font-mono text-xs text-foreground-light'
+                )}
+              >
+                {description ?? requestLine}
+              </span>
+              {description && requestLine && (
+                <span className="font-mono text-xs text-foreground-lighter truncate">
+                  {requestLine}
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-x-1 shrink-0">
