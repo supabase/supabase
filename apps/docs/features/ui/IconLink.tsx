@@ -39,7 +39,7 @@ export function IconLink({
     >
       <div
         className={cn(
-          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-200 transition-colors group-hover:border-strong',
+          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong',
           sizeStyles[size].tile
         )}
       >
