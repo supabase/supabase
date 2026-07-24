@@ -80,6 +80,8 @@ export function ServiceFlowPanel({
 
   const { logsMetadata } = useIsFeatureEnabled(['logs:metadata'])
 
+  const timestampMs = getRowTimestampMs(selectedRow)
+
   // Query the logs API directly
   const {
     data: serviceFlowData,
@@ -91,13 +93,13 @@ export function ServiceFlowPanel({
       logId: selectedRow?.id,
       type: serviceFlowType,
       search: searchParameters,
+      logTimestampMs: timestampMs,
     },
     { enabled: Boolean(selectedRow?.id) && Boolean(serviceFlowType) }
   )
 
   if (!selectedRowKey || !selectedRow) return null
 
-  const timestampMs = getRowTimestampMs(selectedRow)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
 
   // Prepare JSON data for Raw JSON tab

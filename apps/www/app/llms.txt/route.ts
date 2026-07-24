@@ -67,6 +67,7 @@ async function getSources(): Promise<Source[]> {
     { title: 'Supabase Reference (Kotlin)', relPath: 'llms/kotlin.txt', enabled: sdkKotlin },
     { title: 'Supabase Reference (Python)', relPath: 'llms/python.txt', enabled: sdkPython },
     { title: 'Supabase Reference (C#)', relPath: 'llms/csharp.txt', enabled: sdkCsharp },
+    { title: 'Supabase Server SDK Reference', relPath: 'llms/server.txt', enabled: true },
     { title: 'Supabase CLI Reference', relPath: 'llms/cli.txt', enabled: true },
     { title: 'Supabase Management API Reference', relPath: 'llms/api.txt', enabled: true },
   ]

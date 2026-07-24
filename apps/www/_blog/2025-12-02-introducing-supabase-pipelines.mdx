@@ -13,7 +13,7 @@ toc_depth: 2
 
 Today we're introducing **Supabase Pipelines**: managed change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.
 
-Pipelines reads changes from your Postgres database and writes them to external destinations. It uses logical replication to capture inserts, updates, deletes, and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
+Pipelines reads changes from your Postgres database and writes them to supported destination systems. It uses logical replication to capture inserts, updates, deletes, and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
 
 The first supported destination is Google BigQuery.
 
@@ -29,7 +29,7 @@ Analytical systems are designed for this. They can aggregate massive datasets **
 
 ## How it works
 
-Pipelines captures every change in your Postgres database and delivers it to your analytics destination in near real time.
+Pipelines captures the changes selected by your Postgres publication and delivers them to your analytics destination in near real time.
 
 Here's how:
 
@@ -43,7 +43,7 @@ Here's how:
 
 5. Your data is available for querying in the destination
 
-The pipeline starts with an initial copy of your selected tables, then switches to streaming mode. **Your analytics stay fresh with latency measured in milliseconds to seconds.**
+The pipeline starts with an initial sync of your selected tables, then begins ongoing replication. Changes are batched, so replication latency depends on source activity, network conditions, and destination throughput.
 
 ## Setting up Pipelines
 
@@ -109,7 +109,7 @@ Read replicas and Pipelines solve different problems.
 
 Read replicas help when you need to scale concurrent queries, but they're still Postgres. They don't make analytics faster.
 
-Pipelines moves your data to systems built for analytics. You get **faster queries on large datasets**, **lower storage costs** through compression, and **complete separation** between your production workload and analytics.
+Pipelines moves your data to systems built for analytics, keeping heavy analytical queries away from your production database. Query performance, storage format, compression, and destination costs depend on the destination you choose.
 
 You can use both: read replicas for application read scaling, Pipelines for analytics.
 
@@ -117,22 +117,22 @@ You can use both: read replicas for application read scaling, Pipelines for anal
 
 Replication with Pipelines has a few constraints to be aware of:
 
-- Tables must have primary keys (this is a Postgres logical replication requirement)
+- BigQuery requires every source table to have a primary key, and the publication must include its columns
 - Generated columns are not supported
 - Custom data types are replicated as strings
-- Schema changes are not automatically propagated to destinations
+- Schema change support is currently in beta and limited to the supported BigQuery changes
 - Data is replicated as-is, without transformation
-- During the initial copy phase, changes accumulate in the WAL and are replayed once streaming begins
+- During the initial sync, changes continue accumulating in the WAL and are applied as each table catches up
 
-We're working on schema change support and additional destinations, and evaluating different streaming techniques to improve flexibility and performance.
+BigQuery is currently available. You can [request early access to ClickHouse, Snowflake, and DuckLake](/go/supabase-pipelines-new-destinations) while we expand destination support.
 
 ## Pricing
 
-Pipelines pricing is still being finalized during alpha. You can request access now; we'll announce pricing later and notify you before any charges apply.
+Pipelines is billed for configured pipeline hours, initial sync data, and ongoing replication data. See [Pipelines pricing](/docs/guides/platform/manage-your-usage/pipelines) for current rates and billing examples. Destination-provider charges, such as BigQuery charges from Google Cloud, are separate.
 
 ## Get started
 
-**Pipelines is currently in alpha.** Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback. To request access, contact your account manager or fill out the form in the Dashboard.
+**Supabase Pipelines is currently in public alpha.** Features and behavior may change as we continue developing the product. If Pipelines isn't available for your organization yet, request access in the Dashboard or contact your account manager.
 
 If you want to dive into the code, **the underlying Supabase ETL engine is open source** and written in Rust. Check out the repository at [github.com/supabase/etl](https://github.com/supabase/etl).
 

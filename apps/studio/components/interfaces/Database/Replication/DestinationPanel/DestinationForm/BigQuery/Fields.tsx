@@ -54,7 +54,7 @@ export const BigQueryFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Service Account Key"
+              label="Service account key"
               description={
                 editMode
                   ? 'Stored credentials are hidden. Enter new credentials to replace them.'

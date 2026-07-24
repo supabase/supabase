@@ -105,7 +105,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: table.schema,
+      schemas: [table.schema],
     },
     { enabled: !!table }
   )
@@ -332,14 +332,19 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           <RoleImpersonationPopover header="View data as a role" align="center" />
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="default"
-                icon={<MoreVertical />}
-                className="h-7 w-7"
-                aria-label="More actions"
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="default"
+                    icon={<MoreVertical />}
+                    className="h-7 w-7"
+                    aria-label={`More options for ${table.name}`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent className="w-48">
               {isTable && realtimeEnabled && (
                 <DropdownMenuItem className="gap-x-2" onClick={() => setRealtimeDialogOpen(true)}>

@@ -127,7 +127,7 @@ export function JitDbAccessRulesTable({
                 return (
                   <TableRow
                     key={user.id}
-                    className={rowIsInteractive ? 'relative inset-focus cursor-pointer' : undefined}
+                    className={rowIsInteractive ? 'relative focus-inset cursor-pointer' : undefined}
                     onClick={
                       rowIsInteractive
                         ? (event) => {

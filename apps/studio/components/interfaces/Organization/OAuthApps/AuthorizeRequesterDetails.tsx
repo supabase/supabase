@@ -12,10 +12,15 @@ import {
   CollapsibleTrigger,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
-import { LogoBox } from '@/components/layouts/InterstitialLayout'
+import { getRequesterLogo } from './OAuthApps.utils'
+import {
+  CONNECT_LOGO_LIGHT_TILE_CLASSNAME,
+  LogoBox,
+  LogoPair,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -24,7 +29,6 @@ const PERMISSION_DETAILS_TRIGGER_CLASSNAME =
   'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground'
 
 export interface AuthorizeRequesterDetailsProps {
-  icon: string | null
   name: string
   domain: string
   scopes: OAuthScope[]
@@ -167,64 +171,59 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-const CUSTOM_LOGO_KEYS = {
-  perplexity: { icon: 'perplexity', hasDistinctDarkIcon: true },
-  cursor: { icon: 'cursor', hasDistinctDarkIcon: true },
-  claude: { icon: 'claude', hasDistinctDarkIcon: false },
-  chatgpt: { icon: 'openai', hasDistinctDarkIcon: true },
-  openai: { icon: 'openai', hasDistinctDarkIcon: true },
-} as const
-
-function getRequesterLogo({
+/**
+ * Connect interstitial header mark for `/authorize`.
+ * Curated logos resolve from allowlisted redirect_uri hosts; otherwise pair only
+ * when a usable remote icon is present, else show Supabase alone.
+ *
+ * Uploaded / unknown bitmaps have no light/dark metadata, so both tiles use
+ * fixed light chrome (`forceLight`) across Studio themes. Curated partners keep
+ * theme-reactive tiles and may swap dark assets when available.
+ */
+export const AuthorizeConnectLogo = ({
   icon,
   name,
-  useDarkVariant,
+  redirectUri,
 }: {
   icon: string | null
   name: string
-  useDarkVariant: boolean
-}) {
-  const searchableText = `${icon ?? ''} ${name}`.toLowerCase()
-
-  for (const [match, asset] of Object.entries(CUSTOM_LOGO_KEYS)) {
-    if (searchableText.includes(match)) {
-      const customLogoUrl = getMcpClientIconSrc({
-        icon: asset.icon,
-        useDarkVariant,
-        hasDistinctDarkIcon: asset.hasDistinctDarkIcon,
-      })
-
-      if (customLogoUrl) return { src: customLogoUrl, isKnownClient: true }
-    }
-  }
-
-  return { src: icon || '', isKnownClient: false }
-}
-
-export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
+  redirectUri?: string | null
+}) => {
   const [failedIcon, setFailedIcon] = useState<string | null>(null)
   const { resolvedTheme } = useTheme()
 
   const logo = useMemo(
-    () => getRequesterLogo({ icon, name, useDarkVariant: resolvedTheme === 'dark' }),
-    [icon, name, resolvedTheme]
+    () =>
+      getRequesterLogo({
+        icon,
+        redirectUri,
+        useDarkVariant: resolvedTheme === 'dark',
+      }),
+    [icon, redirectUri, resolvedTheme]
   )
 
-  const showLetter = !logo.src || failedIcon === logo.src
+  const hasUsableLogo = Boolean(logo.src) && failedIcon !== logo.src
+
+  if (!hasUsableLogo) {
+    return <SupabaseLogo />
+  }
+
+  const forceLightPair = !logo.isKnownClient
 
   return (
-    <LogoBox className="bg-surface-75">
-      {showLetter ? (
-        <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
-      ) : (
-        <img
-          alt={name}
-          src={logo.src}
-          className={cn(logo.isKnownClient ? 'size-7 object-contain' : 'size-full object-cover')}
-          onError={() => setFailedIcon(logo.src)}
-        />
-      )}
-    </LogoBox>
+    <LogoPair
+      left={
+        <LogoBox className={forceLightPair ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}>
+          <img
+            alt={name}
+            src={logo.src}
+            className={cn(logo.isKnownClient ? 'size-7 object-contain' : 'size-full object-cover')}
+            onError={() => setFailedIcon(logo.src)}
+          />
+        </LogoBox>
+      }
+      right={<SupabaseLogo forceLight={forceLightPair} />}
+    />
   )
 }
 

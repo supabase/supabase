@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -22,16 +21,7 @@ export const HighAvailabilityInput = ({ form }: HighAvailabilityInputProps) => {
       render={({ field }) => (
         <FormItemLayout
           label="High Availability"
-          description={
-            <>
-              Powered by{' '}
-              <Link href="https://multigres.com/" target="_blank" className="text-link">
-                Multigres
-              </Link>
-              : horizontally scalable Postgres for multi-tenant, highly available, globally
-              distributed deployments while staying true to standard Postgres.
-            </>
-          }
+          description="Horizontally scalable Postgres for highly available, globally distributed deployments while staying true to standard Postgres."
           layout="horizontal"
         >
           <FormControl>

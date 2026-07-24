@@ -103,6 +103,8 @@ export interface StepDefinition {
   id: string
   title: string
   description: string
+  /** When true, renders a muted "(optional)" label next to the title. */
+  optional?: boolean
   // Component identifier or content file path, can be conditional
   content: ConditionalValue<string | null>
 }
@@ -142,6 +144,7 @@ export interface ResolvedStep {
   id: string
   title: string
   description: string
+  optional?: boolean
   content: string // Resolved component identifier
 }
 

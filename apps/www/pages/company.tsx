@@ -91,9 +91,7 @@ const Team = () => {
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
             <a href="https://supabase.com/careers">
-              <Button size="medium" className="text-white">
-                Join the team
-              </Button>
+              <Button size="medium">Join the team</Button>
             </a>
           </div>
         </div>
@@ -171,24 +169,18 @@ const Investors = () => {
       <div className="mx-auto mt-5 mb-16 grid max-w-lg gap-0.5 lg:max-w-none lg:grid-cols-4">
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
-            <div
-              className="
-              bg-surface-100
-              col-span-1 flex h-32 content-end
-              items-center justify-center"
-            >
-              <div className="relative h-8 w-full overflow-auto">
+            <div className="bg-surface-100 col-span-1 flex h-32 content-end items-center justify-center">
+              <div
+                className="relative w-full overflow-hidden"
+                style={{ height: `${(x.scale ?? 1) * 2}rem` }}
+              >
                 <Image
                   layout="fill"
                   src={`${x.img}`}
                   alt={x.name}
                   objectFit="scale-down"
                   objectPosition="center"
-                  className="
-                    opacity-50
-                    contrast-0
-                    filter
-                  "
+                  className="opacity-50 contrast-0 filter"
                 />
               </div>
             </div>
@@ -228,7 +220,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover
@@ -255,7 +247,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover

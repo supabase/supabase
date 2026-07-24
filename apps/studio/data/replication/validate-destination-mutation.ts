@@ -1,7 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
-import { buildDucklakeApiConfig, DestinationConfig } from './create-destination-pipeline-mutation'
+import {
+  buildDucklakeApiConfig,
+  DestinationConfig,
+  TableSyncCopyConfig,
+} from './create-destination-pipeline-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -14,6 +18,7 @@ type ValidateDestinationParams = {
   maxTableSyncWorkers?: number
   maxCopyConnectionsPerTable?: number
   invalidatedSlotBehavior?: 'error' | 'recreate'
+  tableSyncCopy?: TableSyncCopyConfig
 }
 
 type ValidateDestinationResponse = components['schemas']['ValidateDestinationResponse']
@@ -29,6 +34,7 @@ async function validateDestination(
     maxTableSyncWorkers,
     maxCopyConnectionsPerTable,
     invalidatedSlotBehavior,
+    tableSyncCopy,
   }: ValidateDestinationParams,
   signal?: AbortSignal
 ): Promise<ValidateDestinationResponse> {
@@ -92,10 +98,22 @@ async function validateDestination(
         schema,
         role,
       },
-    } as unknown as components['schemas']['ValidateReplicationDestinationBody']['config']
+    } as components['schemas']['ValidateReplicationDestinationBody']['config']
+  } else if ('clickHouse' in destinationConfig) {
+    const { url, user, password, database, engine } = destinationConfig.clickHouse
+
+    config = {
+      clickhouse: {
+        url,
+        user,
+        password,
+        database,
+        engine,
+      },
+    } as components['schemas']['ValidateReplicationDestinationBody']['config']
   } else {
     throw new Error(
-      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
     )
   }
 
@@ -108,6 +126,7 @@ async function validateDestination(
           max_table_sync_workers: maxTableSyncWorkers,
           max_copy_connections_per_table: maxCopyConnectionsPerTable,
           invalidated_slot_behavior: invalidatedSlotBehavior,
+          table_sync_copy: tableSyncCopy,
           batch: batchConfig,
         }
 

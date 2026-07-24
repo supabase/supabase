@@ -3,10 +3,10 @@ import type { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns/admonition'
 
 import {
+  AuthorizeConnectLogo,
   AuthorizeRequesterDetails,
-  RequesterLogo,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import { InterstitialLayout, LogoPair, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization } from '@/types'
 
@@ -24,9 +24,10 @@ export function ApiAuthorizationApprovedScreen({
   return (
     <InterstitialLayout
       logo={
-        <LogoPair
-          left={<RequesterLogo icon={requester.icon} name={requester.name} />}
-          right={<SupabaseLogo />}
+        <AuthorizeConnectLogo
+          icon={requester.icon}
+          name={requester.name}
+          redirectUri={requester.redirect_uri}
         />
       }
       title={requester.name}
@@ -40,7 +41,6 @@ export function ApiAuthorizationApprovedScreen({
         />
         <AuthorizeRequesterDetails
           showOnlyScopes
-          icon={requester.icon}
           name={requester.name}
           domain={requester.domain}
           scopes={requester.scopes}
