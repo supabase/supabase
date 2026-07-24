@@ -2,13 +2,12 @@ import { isFeatureEnabled } from 'common'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
 import { cn } from 'ui'
-import { IconPanel } from 'ui-patterns/IconPanel'
 import { TextLink } from 'ui-patterns/TextLink'
 
-import { FrameworkQuickstarts } from '@/components/HomePageCover'
+import { FrameworkQuickstarts } from '@/components/FrameworkQuickstarts'
 import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
-import { IconPanelWithIconPicker } from '@/features/ui/IconPanelWithIconPicker'
+import { IconLink, IconLinkImage, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
 import { BASE_PATH } from '@/lib/constants'
 
@@ -234,7 +233,7 @@ const HomePage = () => (
               Connect a framework
             </h2>
             <p className="m-0 p-0 text-sm text-foreground-light">
-              Start with a framework quickstart and connect your project in minutes.
+              Start with a quickstart guide to connect your project in minutes.
             </p>
           </div>
 
@@ -277,18 +276,17 @@ const HomePage = () => (
             Extend your database with built-in tools for AI, APIs, scheduled jobs, and queues.
           </p>
         </div>
-        <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+        <ul className="col-span-8 grid grid-cols-12 gap-3 not-prose">
           {postgresIntegrations.map((integration) => (
-            <Link
-              href={integration.href}
-              key={integration.title}
-              passHref
-              className="col-span-6 md:col-span-4"
-            >
-              <IconPanelWithIconPicker {...integration} />
-            </Link>
+            <li key={integration.title} className="col-span-6 md:col-span-4">
+              <IconLink
+                href={integration.href}
+                title={integration.title}
+                icon={<IconLinkMenuIcon icon={integration.icon} />}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
       <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
@@ -301,23 +299,19 @@ const HomePage = () => (
           </p>
         </div>
 
-        <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+        <ul className="col-span-8 grid grid-cols-12 gap-3 not-prose">
           {clientLibraries
             .filter((library) => library.enabled)
-
-            .map((library) => {
-              return (
-                <Link
+            .map((library) => (
+              <li key={library.title} className="col-span-6 md:col-span-4">
+                <IconLink
                   href={library.href}
-                  key={library.title}
-                  passHref
-                  className="col-span-6 md:col-span-4"
-                >
-                  <IconPanelWithIconPicker {...library} />
-                </Link>
-              )
-            })}
-        </div>
+                  title={library.title}
+                  icon={<IconLinkMenuIcon icon={library.icon} />}
+                />
+              </li>
+            ))}
+        </ul>
       </div>
       {isFeatureEnabled('docs:full_getting_started') && (
         <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
@@ -335,14 +329,18 @@ const HomePage = () => (
             />
           </div>
 
-          <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+          <ul className="col-span-8 grid grid-cols-12 gap-3 not-prose">
             {MIGRATION_PAGES.sort((a, b) => (a.name || '').localeCompare(b.name || '')).map(
               (guide) => {
+                if (!guide.name || !guide.url || typeof guide.icon !== 'string') return null
+
                 return (
                   <li key={guide.name} className="col-span-6 md:col-span-4">
-                    <Link href={guide.url || '#'} passHref>
-                      <IconPanel {...guide} title={guide.name} background={true} showLink={false} />
-                    </Link>
+                    <IconLink
+                      href={guide.url}
+                      title={guide.name}
+                      icon={<IconLinkImage path={guide.icon} hasLightIcon={guide.hasLightIcon} />}
+                    />
                   </li>
                 )
               }
@@ -370,7 +368,7 @@ const HomePage = () => (
                   passHref
                   target={resource.external ? '_blank' : undefined}
                 >
-                  <GlassPanelWithIconPicker {...resource} background={false}>
+                  <GlassPanelWithIconPicker {...resource}>
                     {resource.description}
                   </GlassPanelWithIconPicker>
                 </Link>
@@ -399,17 +397,17 @@ const HomePage = () => (
             </div>
           </div>
 
-          <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-            <ul className="col-span-full lg:col-span-8 grid grid-cols-12 gap-6">
-              {selfHostingOptions.map((option) => {
-                return (
-                  <li key={option.title} className="col-span-6">
-                    <Link href={option.href} passHref>
-                      <IconPanelWithIconPicker {...option} background={true} showLink={false} />
-                    </Link>
-                  </li>
-                )
-              })}
+          <div className="col-span-8 grid grid-cols-12 not-prose">
+            <ul className="col-span-full grid grid-cols-12 gap-3 lg:col-span-8">
+              {selfHostingOptions.map((option) => (
+                <li key={option.title} className="col-span-6">
+                  <IconLink
+                    href={option.href}
+                    title={option.title}
+                    icon={<IconLinkMenuIcon icon={option.icon} />}
+                  />
+                </li>
+              ))}
             </ul>
           </div>
         </div>
