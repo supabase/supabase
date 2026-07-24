@@ -78,6 +78,18 @@ describe('markdown alternate drift', () => {
     }
   })
 
+  it('pages/_app.tsx advertises the .md sibling for Pages Router pages', async () => {
+    const source = await fs.readFile(path.join(process.cwd(), 'pages', '_app.tsx'), 'utf-8')
+    expect(
+      source.includes('MD_PAGES.has('),
+      'pages/_app.tsx must gate the markdown alternate on MD_PAGES membership'
+    ).toBe(true)
+    expect(
+      source.includes('rel="alternate" type="text/markdown"'),
+      'pages/_app.tsx must render the text/markdown alternate link for markdown-served slugs'
+    ).toBe(true)
+  })
+
   it.for(MDX_SECTIONS)('%s pages advertise their .md sibling', async (urlPrefix) => {
     const appPagePath = path.join(process.cwd(), 'app', urlPrefix, '[slug]', 'page.tsx')
     if (!existsSync(appPagePath)) {
