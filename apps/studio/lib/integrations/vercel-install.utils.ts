@@ -13,19 +13,6 @@ export function getErrorMessage(error: unknown): string | undefined {
 
 export type VercelInstallSource = 'deploy-button' | 'marketplace' | 'external'
 
-export function getVercelInstallSource(
-  source: string | undefined
-): VercelInstallSource | undefined {
-  switch (source) {
-    case 'deploy-button':
-    case 'marketplace':
-    case 'external':
-      return source
-    default:
-      return undefined
-  }
-}
-
 /**
  * Vercel sometimes sends source=marketplace with Deploy Button params
  * (currentProjectId + external-id). Treat that as deploy-button for routing.
@@ -52,7 +39,15 @@ export function resolveVercelInstallSource({
   if (hasVercelDeployButtonSignals({ currentProjectId, externalId })) {
     return 'deploy-button'
   }
-  return getVercelInstallSource(source)
+
+  switch (source) {
+    case 'deploy-button':
+    case 'marketplace':
+    case 'external':
+      return source
+    default:
+      return undefined
+  }
 }
 
 type BuildVercelInstallRouteQueryArgs = {

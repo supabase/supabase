@@ -3,7 +3,6 @@ import { describe, expect, test } from 'vitest'
 import {
   buildVercelInstallRouteQuery,
   getErrorMessage,
-  getVercelInstallSource,
   hasVercelDeployButtonSignals,
   resolveVercelInstallSource,
 } from '@/lib/integrations/vercel-install.utils'
@@ -88,19 +87,6 @@ describe('buildVercelInstallRouteQuery', () => {
         next: 'https://vercel.com/callback',
       })
     ).toStrictEqual({ organizationSlug: 'acme' })
-  })
-})
-
-describe('getVercelInstallSource', () => {
-  test('returns supported Vercel install sources', () => {
-    expect(getVercelInstallSource('deploy-button')).toBe('deploy-button')
-    expect(getVercelInstallSource('marketplace')).toBe('marketplace')
-    expect(getVercelInstallSource('external')).toBe('external')
-  })
-
-  test('returns undefined for unsupported sources', () => {
-    expect(getVercelInstallSource('deploybutton')).toBeUndefined()
-    expect(getVercelInstallSource(undefined)).toBeUndefined()
   })
 })
 
