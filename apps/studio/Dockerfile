@@ -86,7 +86,14 @@ RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build:tansta
 # single CMD that works for both frameworks. `.env` is kept because
 # serve.js loads it as the base of the runtime env cascade (container env
 # vars always win over file values).
-RUN pnpm --filter studio deploy --prod --legacy /srv/apps/studio && \
+#
+# --ignore-scripts: pnpm 11 hard-errors (ERR_PNPM_IGNORED_BUILDS) on
+# dependency build scripts without an allowBuilds entry, and deploy turns
+# the workspace packages into file: deps whose `only-allow pnpm` preinstall
+# guards trip it. No lifecycle script is needed here anyway: the tree is
+# fully prebuilt, and nothing in studio's prod graph is approved to build
+# (allowBuilds only permits node-pty and supabase, both dev-only).
+RUN pnpm --filter studio deploy --prod --legacy --ignore-scripts /srv/apps/studio && \
   cd /srv/apps/studio && \
   find . -mindepth 1 -maxdepth 1 \
   ! -name node_modules ! -name package.json ! -name scripts \
