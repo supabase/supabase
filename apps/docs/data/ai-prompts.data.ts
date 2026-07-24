@@ -178,13 +178,13 @@ database.new and run the instruments table SQL. Then:
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/refine.md`,
   'ruby-on-rails': `Help me add Supabase to my Ruby on Rails project. Create a Supabase project at
-database.new and run the instruments table SQL. Then:
+database.new. Then:
 1. Run \`rails new blog -d=postgresql\` to scaffold a new Rails project.
 2. Set \`DATABASE_URL\` to the Supabase Session Pooler connection string in
    \`.env\`.
-3. Generate an Instrument model with \`bin/rails generate model Instrument
-   name:string --skip-migration\`.
-4. Use \`bin/rails console\` to create and query instruments.
+3. Generate an Article model with \`bin/rails generate model Article
+   title:string body:text\` and run \`bin/rails db:migrate\`.
+4. Use \`bin/rails console\` to create and query articles.
 5. Run \`bin/rails server\` and open http://127.0.0.1:3000.
 
 REFERENCE
@@ -216,13 +216,14 @@ REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/sveltekit.md`,
   tanstack: `Help me add Supabase to my TanStack Start project. Create a Supabase project at
 database.new and run the instruments table SQL. Then:
-1. Run \`npm create @tanstack/start@latest my-app\` to scaffold the app.
-2. Run \`npm install @supabase/supabase-js\`.
-3. Create \`.env\` and set \`VITE_SUPABASE_URL\` and
+1. Run \`npx @tanstack/cli@latest create my-app\` to scaffold the app.
+2. Run \`npm install @supabase/supabase-js @supabase/ssr\`.
+3. Create \`.env.local\` and set \`VITE_SUPABASE_URL\` and
    \`VITE_SUPABASE_PUBLISHABLE_KEY\`.
-4. Create \`src/utils/supabase.ts\` to initialize the Supabase client.
+4. Create \`src/lib/supabase/client.ts\` and \`src/lib/supabase/server.ts\` for
+   browser and server clients.
 5. Update \`src/routes/index.tsx\` with a loader that queries and displays the
-   instruments table.
+   instruments table using the server client.
 6. Run \`npm run dev\` and open http://localhost:3000.
 
 REFERENCE
