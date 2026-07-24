@@ -53,6 +53,7 @@ const MAX_JWT_EXP = 604800
 const AccessTokenSchema = z.object({
   JWT_EXP: z.coerce
     .number()
+    .int('Must be a whole number')
     .positive('Must be greater than 0')
     .max(MAX_JWT_EXP, `Must be less than ${MAX_JWT_EXP}`),
 })
@@ -265,7 +266,7 @@ export const SessionsAuthSettingsForm = () => {
                           <InputGroup>
                             <FormInputGroupInput
                               type="number"
-                              min={0}
+                              min={1}
                               {...field}
                               disabled={!canUpdateConfig}
                             />
