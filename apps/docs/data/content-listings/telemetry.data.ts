@@ -7,7 +7,7 @@ export const telemetryDebugging: ContentListingGroup = {
   columns: 2,
   items: [
     {
-      title: 'Debugging',
+      title: 'Debugging guide',
       href: '/guides/telemetry/debugging',
       description:
         'Isolate the failing layer, read logs as evidence, and match symptoms to troubleshooting guides.',
