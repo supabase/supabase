@@ -5,6 +5,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -87,9 +88,12 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
       <DialogTrigger asChild>
         <Button variant="default">Enable cleanup</Button>
       </DialogTrigger>
-      <DialogContent aria-describedby={undefined}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Enable automatic cleanup</DialogTitle>
+          <DialogDescription>
+            Schedules a daily job that deletes old cron job run records
+          </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-4">
@@ -97,10 +101,6 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
             Every cron job run is recorded in the{' '}
             <code className="text-code-inline break-keep!">cron.job_run_details</code> table.
             Without periodic cleanup, the table grows indefinitely and bloats the database.
-          </p>
-          <p className="text-sm">
-            This schedules a daily cron job that deletes runs older than the selected retention
-            period.
           </p>
           <div className="flex flex-col gap-y-2 text-sm">
             <p className="text-foreground">Delete run history</p>
