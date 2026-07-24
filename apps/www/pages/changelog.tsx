@@ -12,6 +12,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
 import { Badge, Button, cn, IconYCombinator, Input } from 'ui'
 
+import { ChangelogInlineMarkdown } from '@/components/Changelog/ChangelogInlineMarkdown'
 import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmMarkdownButton'
 import {
   ChangelogTimelineList,
@@ -63,7 +64,6 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
   const entries = await getChangelogEntries()
   const allIndex = entries.map(toChangelogTimelineIndexItem)
   const firstEntries = entries.slice(0, FEATURED_COUNT)
-  const restIndex = allIndex.slice(FEATURED_COUNT)
 
   // Serialized independently so one entry's MDX failure doesn't drop the others.
   const featuredResults = await Promise.allSettled(
@@ -85,6 +85,11 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async ({ res })
     }
     return [result.value]
   })
+
+  // Anything not successfully featured falls back to the timeline, so a featured
+  // entry whose MDX failed to serialize doesn't vanish from the page.
+  const featuredSlugs = new Set(featured.map((entry) => entry.slug))
+  const restIndex = allIndex.filter((item) => !featuredSlugs.has(item.slug))
 
   res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
   return { props: { featured, restIndex, allIndex } }
@@ -505,8 +510,8 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                         <div className="flex w-full flex-col gap-1">
                           {entry.title && (
                             <Link href={`/changelog/${entry.slug}`}>
-                              <h3 className="text-foreground text-lg hover:underline">
-                                {entry.title}
+                              <h3 className="text-foreground text-lg hover:underline [&_code]:align-middle">
+                                <ChangelogInlineMarkdown>{entry.title}</ChangelogInlineMarkdown>
                               </h3>
                             </Link>
                           )}

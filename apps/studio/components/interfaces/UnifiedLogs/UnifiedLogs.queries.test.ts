@@ -282,14 +282,18 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('user filter', () => {
-    it('restricts to auth_logs/postgres_logs and skips the default postgres+edge restriction', () => {
+    it('restricts to auth_logs/edge_logs and skips the default postgres+edge restriction', () => {
       const sql = getUnifiedLogsQuery(withUser('user-123'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).toContain(`log_attributes['auth_event.actor_id'] = 'user-123'`)
-      expect(where).toContain(`source = 'postgres_logs'`)
-      // The unfiltered default (postgres_logs OR edge_logs) would incorrectly exclude
+      expect(where).toContain(
+        `(source = 'auth_logs' AND log_attributes['auth_event.actor_id'] = 'user-123')`
+      )
+      expect(where).toContain(
+        `(source = 'edge_logs' AND log_attributes['request.sb.jwt.authorization.payload.subject'] = 'user-123')`
+      )
+      // The unfiltered default (edge_logs OR postgres_logs) would incorrectly exclude
       // auth_logs, the primary attributable source, so it must not appear here.
-      expect(where).not.toContain(`(source = 'postgres_logs') OR (source = 'edge_logs')`)
+      expect(where).not.toContain(`(source = 'edge_logs') OR (source = 'postgres_logs')`)
     })
 
     it('does not restrict sources when the user filter is inactive', () => {
@@ -321,8 +325,8 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:auth'))).toBe(false)
     })
 
-    it('is false when the explicit log_type filter includes an attributable source (postgres)', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:postgres'))).toBe(false)
+    it('is false when the explicit log_type filter includes an attributable source (edge)', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge'))).toBe(false)
     })
 
     it('is false when at least one of several selected log types is attributable', () => {
@@ -332,12 +336,12 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('is true when the explicit log_type filter restricts to a single non-attributable source', () => {
-      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge'))).toBe(true)
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:storage'))).toBe(true)
     })
 
     it('is true when every selected log type is non-attributable', () => {
       expect(
-        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge', 'log_type:eq:storage'))
+        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:realtime', 'log_type:eq:storage'))
       ).toBe(true)
     })
 
@@ -347,7 +351,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 
     it('(neq) is true only when both attributable sources are excluded', () => {
       expect(
-        isUserFilterUnreachable(withUser('user-123', 'log_type:neq:auth', 'log_type:neq:postgres'))
+        isUserFilterUnreachable(withUser('user-123', 'log_type:neq:auth', 'log_type:neq:edge'))
       ).toBe(true)
     })
   })

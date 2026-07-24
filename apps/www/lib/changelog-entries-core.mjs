@@ -71,6 +71,40 @@ export async function fetchChangelogEntryFilesFromTarball(
   return files
 }
 
+/**
+ * The only frontmatter fields exposed to the browser. `matter()` also parses
+ * private blocks like `internal:`, and the page ships `entry.frontmatter` into
+ * props — so we allowlist to keep them out of the page source. Keep in sync with
+ * `ChangelogEntryFrontmatter` in `changelog-repo.ts`.
+ */
+export const PUBLIC_FRONTMATTER_KEYS = [
+  'title',
+  'change_type',
+  'product_stage',
+  'affected_products',
+  'affects_self_hosted',
+  'version',
+  'public',
+  'publish_date',
+  'sunset_date',
+  'learn_more_url',
+  'legacy_gh_discussion',
+]
+
+const DATE_FRONTMATTER_KEYS = new Set(['publish_date', 'sunset_date'])
+
+/** Projects raw frontmatter to the public allowlist; date fields are stringified. */
+export function toPublicFrontmatter(frontmatter) {
+  const publicFrontmatter = {}
+  for (const key of PUBLIC_FRONTMATTER_KEYS) {
+    if (frontmatter[key] === undefined) continue
+    publicFrontmatter[key] = DATE_FRONTMATTER_KEYS.has(key)
+      ? toDateString(frontmatter[key])
+      : frontmatter[key]
+  }
+  return publicFrontmatter
+}
+
 export function stripInternalBlock(body) {
   let sanitized = body.replace(/<!--\s*internal\s*-->[\s\S]*?<!--\s*\/internal\s*-->/gi, '')
   // MDX doesn't support raw HTML comments (only {/* */}) — strip any that are left
@@ -106,6 +140,16 @@ function resolveDateFromFilename(filename) {
 }
 
 /**
+ * Coerces a frontmatter date to `YYYY-MM-DD`. An unquoted YAML date parses to a
+ * JS `Date`, which breaks the string sort and can't be serialized into props.
+ */
+function toDateString(value) {
+  if (value == null) return null
+  if (value instanceof Date) return value.toISOString().slice(0, 10)
+  return String(value)
+}
+
+/**
  * `legacy_gh_discussion-suffix` for backfilled entries
  * (preserves old supabase.com/changelog URLs)
  * or the filename without timestamp and extension.
@@ -128,8 +172,8 @@ export function parseChangelogEntryFile(filename, raw) {
   return {
     slug: computeChangelogEntrySlug(filename, frontmatter),
     filename,
-    frontmatter,
-    sortDate: frontmatter.publish_date ?? resolveDateFromFilename(filename) ?? '',
+    frontmatter: toPublicFrontmatter(frontmatter),
+    sortDate: toDateString(frontmatter.publish_date) ?? resolveDateFromFilename(filename) ?? '',
     summary: extractSection(publicBody, 'Summary'),
     bodySection: extractSection(publicBody, 'Body', ['Migration steps']),
     migrationSteps: extractSection(publicBody, 'Migration steps'),

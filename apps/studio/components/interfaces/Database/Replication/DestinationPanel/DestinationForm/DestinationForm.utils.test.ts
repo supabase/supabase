@@ -5,15 +5,23 @@ import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
+  buildBatchConfig,
   buildDestinationConfig,
   buildDestinationConfigForValidation,
+  buildTableSyncCopyConfig,
+  generateDefaultValues,
+  pruneStaleSelectedTableIds,
 } from './DestinationForm.utils'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
+import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
+import type { ReplicationPublication } from '@/data/replication/publications-query'
 
 const baseDucklakeFormData = {
   name: 'DuckLake Destination',
   publicationName: 'pub',
+  tableSyncCopyMode: 'include_all_tables' as const,
+  tableSyncCopyTableIds: [],
   maxFillMs: undefined,
   maxTableSyncWorkers: undefined,
   maxCopyConnectionsPerTable: undefined,
@@ -45,6 +53,8 @@ const baseDucklakeFormData = {
 const baseSnowflakeFormData = {
   name: 'Snowflake Destination',
   publicationName: 'pub',
+  tableSyncCopyMode: 'include_all_tables' as const,
+  tableSyncCopyTableIds: [],
   maxFillMs: undefined,
   maxTableSyncWorkers: undefined,
   maxCopyConnectionsPerTable: undefined,
@@ -80,9 +90,120 @@ const baseSnowflakeFormData = {
   snowflakeRole: ' PIPELINES_ROLE ',
 }
 
+describe('DestinationForm.utils table copy selection', () => {
+  it('preserves server-managed batch fields while changing the exposed fill interval', () => {
+    expect(
+      buildBatchConfig({
+        maxFillMs: 500,
+        existingBatch: {
+          max_fill_ms: 200,
+          max_bytes: 8_388_608,
+          memory_budget_ratio: 0.2,
+        },
+      })
+    ).toEqual({
+      maxFillMs: 500,
+      maxBytes: 8_388_608,
+      memoryBudgetRatio: 0.2,
+    })
+  })
+
+  it.each(['include_all_tables', 'skip_all_tables'] as const)(
+    'builds the %s config without table ids',
+    (mode) => {
+      expect(
+        buildTableSyncCopyConfig({
+          mode,
+          selectedTableIds: [],
+        })
+      ).toEqual({ type: mode })
+    }
+  )
+
+  it.each(['include_tables', 'skip_tables'] as const)('uses selected table ids for %s', (mode) => {
+    expect(
+      buildTableSyncCopyConfig({
+        mode,
+        selectedTableIds: ['202', '101'],
+      })
+    ).toEqual({ type: mode, table_ids: [202, 101] })
+  })
+
+  it('rejects an invalid selected table id', () => {
+    expect(() =>
+      buildTableSyncCopyConfig({
+        mode: 'skip_tables',
+        selectedTableIds: ['not-an-id'],
+      })
+    ).toThrow('The selected table IDs are invalid')
+  })
+
+  it('hydrates configured pipeline table ids as selected table ids in edit mode', () => {
+    const pipelineData = {
+      config: {
+        publication_name: 'analytics',
+        table_sync_copy: {
+          type: 'include_tables',
+          table_ids: [202, 101],
+        },
+      },
+    } as unknown as ReplicationPipelineByIdData
+
+    const defaults = generateDefaultValues({
+      pipelineData,
+      catalogToken: '',
+      editMode: true,
+    })
+
+    expect(defaults.tableSyncCopyMode).toBe('include_tables')
+    expect(defaults.tableSyncCopyTableIds).toEqual(['202', '101'])
+  })
+
+  it('never hydrates an edit form with a newly revealed catalog token', () => {
+    const defaults = generateDefaultValues({
+      catalogToken: 'newly-revealed-token',
+      editMode: true,
+    })
+
+    expect(defaults.catalogToken).toBe('')
+  })
+
+  it('drops selected ids that are no longer in the publication', () => {
+    const publications = [
+      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
+    ] as ReplicationPublication[]
+
+    expect(
+      pruneStaleSelectedTableIds({
+        mode: 'include_tables',
+        selectedTableIds: ['101', '202'],
+        publications,
+        publicationName: 'analytics',
+      })
+    ).toEqual(['101'])
+  })
+
+  it('leaves selected ids untouched for non-selective modes', () => {
+    const publications = [
+      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
+    ] as ReplicationPublication[]
+
+    expect(
+      pruneStaleSelectedTableIds({
+        mode: 'include_all_tables',
+        selectedTableIds: ['202'],
+        publications,
+        publicationName: 'analytics',
+      })
+    ).toEqual(['202'])
+  })
+})
+
 const baseClickHouseFormData = {
   name: 'ClickHouse Destination',
   publicationName: 'pub',
+  tableSyncCopyMode: 'include_all_tables' as const,
+  tableSyncCopyTableIds: [],
   maxFillMs: undefined,
   maxTableSyncWorkers: undefined,
   maxCopyConnectionsPerTable: undefined,

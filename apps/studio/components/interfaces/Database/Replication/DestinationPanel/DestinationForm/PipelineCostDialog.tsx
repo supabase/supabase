@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useParams } from 'common'
+import { useEffect, useMemo } from 'react'
 import {
   Button,
   Card,
@@ -20,8 +21,15 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  getTableCopyTargets,
+  summarizeTableCopyEstimate,
+  type ReplicationTableIdentity,
+  type TableSyncCopyConfig,
+} from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
@@ -31,9 +39,9 @@ const MAX_VISIBLE_TABLES = 10
 interface PipelineCostDialogProps {
   open: boolean
   isConfirming: boolean
-  projectRef?: string
-  sourceId?: number
   publicationName?: string
+  publicationTables: ReplicationTableIdentity[]
+  tableSyncCopy?: TableSyncCopyConfig
   onOpenChange: (open: boolean) => void
   onConfirm: () => void
 }
@@ -48,12 +56,15 @@ interface PipelineCostDialogProps {
 export const PipelineCostDialog = ({
   open,
   isConfirming,
-  projectRef,
-  sourceId,
   publicationName,
+  publicationTables,
+  tableSyncCopy,
   onOpenChange,
   onConfirm,
 }: PipelineCostDialogProps) => {
+  const { ref: projectRef } = useParams()
+  const sourceId = useReplicationSourceId({ projectRef })
+
   const onConfirmRef = useLatest(onConfirm)
 
   const {
@@ -63,13 +74,25 @@ export const PipelineCostDialog = ({
     isSuccess,
   } = useReplicationCostEstimateQuery({ projectRef, sourceId, publicationName }, { enabled: open })
 
-  const tables = estimate?.table_copy.tables ?? []
-  const tableCount = tables.length
+  const copyTargets = useMemo(
+    () => getTableCopyTargets(publicationTables, tableSyncCopy),
+    [publicationTables, tableSyncCopy]
+  )
+  const copyEstimate = useMemo(
+    () =>
+      estimate === undefined
+        ? undefined
+        : summarizeTableCopyEstimate(estimate.table_copy.tables, copyTargets),
+    [copyTargets, estimate]
+  )
+  const tables = copyEstimate?.tables ?? []
+  const tableCount = publicationTables.length
+  const copyTableCount = copyTargets.length
   const visibleTables = tables.slice(0, MAX_VISIBLE_TABLES)
-  const hiddenTableCount = tableCount - visibleTables.length
-  const hasRowFilteredTables = tables.some((table) => table.is_row_filtered)
+  const hiddenTableCount = tables.length - visibleTables.length
+  const hasRowFilteredTables = copyEstimate?.hasRowFilteredTables ?? false
 
-  const initialSyncTotal = estimate?.table_copy.total_cost ?? 0
+  const initialSyncTotal = copyEstimate?.estimatedCost ?? 0
 
   useEffect(() => {
     if (open && isError) onConfirmRef.current()
@@ -123,7 +146,12 @@ export const PipelineCostDialog = ({
                     shape, filters, and statistics.
                   </p>
 
-                  {tableCount > 0 ? (
+                  {copyTableCount === 0 ? (
+                    <p className="text-sm text-foreground-light">
+                      No tables will run an initial sync. Ongoing replication will still process new
+                      changes for every publication table, with no initial sync charge.
+                    </p>
+                  ) : copyEstimate?.isComplete ? (
                     <Card>
                       <Table>
                         <TableHeader className="[&_th]:h-auto [&_th]:py-2">
@@ -137,7 +165,7 @@ export const PipelineCostDialog = ({
                         </TableHeader>
                         <TableBody className="[&_td]:py-2">
                           {visibleTables.map((table) => (
-                            <TableRow key={`${table.schema}.${table.name}`}>
+                            <TableRow key={JSON.stringify([table.schema, table.name])}>
                               <TableCell className="font-mono text-xs" translate="no">
                                 {table.schema}.{table.name}
                               </TableCell>
@@ -162,10 +190,10 @@ export const PipelineCostDialog = ({
                           <TableRow>
                             <TableCell className="py-2">Total</TableCell>
                             <TableCell className="text-right py-2 text-xs">
-                              {formatBytes(estimate.table_copy.total_bytes)}
+                              {formatBytes(copyEstimate.estimatedBytes)}
                             </TableCell>
                             <TableCell className="text-right py-2 font-mono" translate="no">
-                              {formatCurrency(estimate.table_copy.total_cost)}
+                              {formatCurrency(copyEstimate.estimatedCost)}
                             </TableCell>
                           </TableRow>
                         </TableFooter>
@@ -173,7 +201,8 @@ export const PipelineCostDialog = ({
                     </Card>
                   ) : (
                     <p className="text-sm text-foreground-light">
-                      This publication has no tables to copy.
+                      An initial sync estimate is unavailable for one or more selected tables. You
+                      can still create the pipeline.
                     </p>
                   )}
                 </div>
@@ -224,12 +253,12 @@ export const PipelineCostDialog = ({
                       className="shrink-0 text-right font-mono text-lg font-semibold text-foreground"
                       translate="no"
                     >
-                      {formatCurrency(initialSyncTotal)}
-                      {hasRowFilteredTables ? '*' : null}
+                      {copyEstimate?.isComplete ? formatCurrency(initialSyncTotal) : 'Unavailable'}
+                      {copyEstimate?.isComplete && hasRowFilteredTables ? '*' : null}
                     </span>
                   </div>
 
-                  {hasRowFilteredTables && (
+                  {copyEstimate?.isComplete && hasRowFilteredTables && (
                     <p className="text-xs text-foreground-lighter">
                       *Tables with row filters may process less data and cost less than shown.
                     </p>

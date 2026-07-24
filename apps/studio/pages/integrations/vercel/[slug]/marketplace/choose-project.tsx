@@ -17,10 +17,8 @@ import {
   VercelIntegrationInterstitialErrorState,
   VercelIntegrationLogo,
 } from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
-import {
-  ProjectLinker,
-  type ForeignProject,
-} from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import { ProjectLinker } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import type { ForeignProject } from '@/components/interfaces/Integrations/VercelGithub/VercelGithub.types'
 import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
@@ -42,7 +40,7 @@ const PAGE_TITLE = buildStudioPageTitle({
 })
 
 const VercelChooseProjectPage: NextPageWithLayout = () => {
-  const { slug, configurationId, next } = useParams()
+  const { slug, configurationId, next, currentProjectId } = useParams()
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
   const displayName = primaryEmail ?? username ?? ''
 
@@ -200,6 +198,7 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
                 integrationIcon={VERCEL_INTEGRATION_ICON}
                 getForeignProjectIcon={getForeignProjectIcon}
                 choosePrompt="Choose Vercel project"
+                defaultForeignProjectId={currentProjectId}
                 onSkip={() => {
                   if (next && isVercelUrl(next)) {
                     window.location.href = next

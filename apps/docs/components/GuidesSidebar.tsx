@@ -4,7 +4,8 @@ import { Feedback } from '~/components/Feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { isFeatureEnabled } from 'common'
 import { Chatgpt, Claude } from 'icons'
-import { Check, Copy, ExternalLink } from 'lucide-react'
+import { Check, Copy, Sparkles } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { cn } from 'ui'
@@ -24,6 +25,10 @@ function AiTools({ className }: { className?: string }) {
   const [copied, setCopied] = useState(false)
   const path = usePathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
+
+  function handleAgentSetupClick() {
+    sendTelemetryEvent({ action: 'agent_setup_clicked' })
+  }
 
   async function copyMarkdown() {
     const mdUrl = `/docs/${path}.md`
@@ -52,14 +57,22 @@ function AiTools({ className }: { className?: string }) {
   }
 
   return (
-    <section className={cn(className)} aria-labelledby="ask-ai-title">
+    <section className={cn(className)} aria-labelledby="ai-tools-title">
       <h3
-        id="ask-ai-title"
+        id="ai-tools-title"
         className="block font-mono uppercase text-xs text-foreground-light mb-3"
       >
         AI Tools
       </h3>
       <div className="flex flex-col gap-2">
+        <Link
+          href="/guides/ai-tools"
+          onClick={handleAgentSetupClick}
+          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+        >
+          <Sparkles size={14} strokeWidth={1.5} />
+          Connect your AI agent
+        </Link>
         <button
           tabIndex={0}
           onClick={copyMarkdown}

@@ -17,10 +17,7 @@ export const metricsStackOptions: MetricsStackOption[] = [
     iconKind: 'grafana',
     iconColor: '#F05A28',
     iconBg: 'rgba(240,90,40,0.1)',
-    badges: [
-      { label: 'Supabase guide', variant: 'default' },
-      { label: 'Community', variant: 'community' },
-    ],
+    badges: [{ label: 'Supabase guide', variant: 'default' }],
   },
   {
     title: 'Grafana + self-hosted Prometheus',
