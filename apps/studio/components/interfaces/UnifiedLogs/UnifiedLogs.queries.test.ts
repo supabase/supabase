@@ -229,6 +229,28 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(guardOfFacet(sql, 'status')).not.toContain(`IN ('500')`)
     })
 
+    it('drops only a facet own filter, keeping every other facet filter in its guard', () => {
+      const sql = getLogsCountQuery(withFilters('method:eq:GET', 'status:eq:500'))
+      // status guard: own (status) filter dropped, method filter retained.
+      const statusGuard = guardOfFacet(sql, 'status')
+      expect(statusGuard).toContain(`IN ('GET')`)
+      expect(statusGuard).not.toContain(`IN ('500')`)
+      // method guard: own (method) filter dropped, status filter retained.
+      const methodGuard = guardOfFacet(sql, 'method')
+      expect(methodGuard).toContain(`IN ('500')`)
+      expect(methodGuard).not.toContain(`IN ('GET')`)
+    })
+
+    it('scans all sources for log_type but keeps the other facets on default types', () => {
+      const sql = getLogsCountQuery(baseSearch)
+      // log_type's badge must span every source, so its guard carries no
+      // default-types restriction...
+      expect(guardOfFacet(sql, 'log_type')).not.toContain(`source = 'postgres_logs'`)
+      // ...while total (and the other shared facets) stay scoped to postgres + edge.
+      expect(guardOfFacet(sql, 'total')).toContain(`source = 'postgres_logs'`)
+      expect(guardOfFacet(sql, 'total')).toContain(`source = 'edge_logs'`)
+    })
+
     it('applies the connection-logs filter to every count scan so badges match the list', () => {
       const sql = getLogsCountQuery({ ...baseSearch, show_connection_logs: false } as any)
       const scans = sql.split(/\bUNION ALL\b/)
