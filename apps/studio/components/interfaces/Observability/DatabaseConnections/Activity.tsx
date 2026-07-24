@@ -40,6 +40,7 @@ export const Activity = ({ live }: ActivityProps) => {
   })
 
   const hasNoFiltersApplied =
+    searchFilter.length === 0 &&
     statesFilter.length === 0 &&
     applicationsFilter.length === 0 &&
     isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
