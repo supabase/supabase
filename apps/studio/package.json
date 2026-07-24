@@ -91,6 +91,7 @@
     "ai": "^6.0.174",
     "ai-commands": "workspace:*",
     "awesome-debounce-promise": "^2.1.0",
+    "class-variance-authority": "^0.7.1",
     "common": "workspace:*",
     "common-tags": "^1.8.2",
     "config": "workspace:*",
