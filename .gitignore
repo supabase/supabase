@@ -82,14 +82,9 @@ next-env.d.ts
 .yarn-integrity
 
 # dotenv environment variables file
-.env
 # excempt the apps/www .env
 !apps/www/.env
 .env.tmp
-.env.test
-.env.local
-.env.staging
-.env.production
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -167,3 +162,4 @@ keys.json
 examples/**/package-lock.json
 examples/**/yarn.lock
 examples/**/pnpm-lock.yaml
+config.bat
