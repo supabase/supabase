@@ -390,7 +390,7 @@ const HomePage = () => (
                 Get started with self-hosting Supabase.
               </p>
               <TextLink
-                label="More on Self-Hosting"
+                label="More on self-hosting"
                 url="/guides/self-hosting"
                 className="no-underline text-brand-link text-sm"
               />
