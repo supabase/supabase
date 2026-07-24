@@ -25,3 +25,16 @@ export const getBadgeVariant = (activity: DatabaseActivity) => {
   if (state === 'idle in transaction' || state === 'idle in transaction (aborted)') return 'warning'
   return 'default'
 }
+
+// Resolves the timestamp that duration should be measured from for a given state -
+// query_start while actively running, transaction_start while idle in transaction.
+export const getActivityStart = (activity: DatabaseActivity) => {
+  if (activity.state === 'active') return activity.query_start
+  if (
+    activity.state === 'idle in transaction' ||
+    activity.state === 'idle in transaction (aborted)'
+  ) {
+    return activity.transaction_start
+  }
+  return null
+}
