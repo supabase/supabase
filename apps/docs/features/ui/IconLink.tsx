@@ -33,13 +33,13 @@ export function IconLink({
     <Link
       href={href}
       className={cn(
-        'group flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-surface-200',
+        'group flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent',
         className
       )}
     >
       <div
         className={cn(
-          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong',
+          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-200 transition-colors group-hover:border-strong',
           sizeStyles[size].tile
         )}
       >
