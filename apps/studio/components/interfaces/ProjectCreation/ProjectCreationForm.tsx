@@ -34,6 +34,7 @@ import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
 import { SecurityOptions } from './SecurityOptions'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import { getValidVercelReturnUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import {
   GitHubRepositoryField,
   useGitHubRepositoryOptions,
@@ -104,7 +105,8 @@ export const ProjectCreationForm = ({
   const track = useTrack()
   const router = useRouter()
   const { profile } = useProfile()
-  const { slug, projectName, externalId } = useParams()
+  const { slug, projectName, externalId, next } = useParams()
+  const canReturnToVercel = getValidVercelReturnUrl(next) !== undefined
   const trackFunnelError = useTrackFunnelError()
   const defaultProvider = useDefaultProvider()
 
@@ -699,7 +701,7 @@ export const ProjectCreationForm = ({
                   slug && (
                     <FreeProjectLimitWarning
                       membersExceededLimit={membersExceededLimit || []}
-                      showVercelReturnHint={isVercelIntegrationFlow}
+                      showVercelReturnHint={isVercelIntegrationFlow && canReturnToVercel}
                     />
                   )
                 ) : hasOutstandingInvoices ? (

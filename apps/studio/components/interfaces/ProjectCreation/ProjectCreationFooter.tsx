@@ -16,7 +16,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
-import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
+import { getValidVercelReturnUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -57,7 +57,8 @@ export const ProjectCreationFooter = ({
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
-  const canReturnToVercel = typeof next === 'string' && isVercelUrl(next)
+  const vercelReturnUrl = getValidVercelReturnUrl(next)
+  const canReturnToVercel = cancelAction === 'vercel' && vercelReturnUrl !== undefined
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -72,14 +73,19 @@ export const ProjectCreationFooter = ({
     // compute credits
     10
 
+  const navigateToStudio = () => {
+    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+    else router.push('/organizations')
+  }
+
   const onCancel = () => {
-    if (cancelAction === 'vercel') {
-      if (canReturnToVercel) window.location.href = next
+    if (canReturnToVercel && vercelReturnUrl) {
+      window.location.href = vercelReturnUrl
       return
     }
 
-    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-    else router.push('/organizations')
+    // Fall back to Studio when cancelAction is studio, or when vercel next is missing/invalid
+    navigateToStudio()
   }
 
   return (
@@ -188,14 +194,10 @@ export const ProjectCreationFooter = ({
         {cancelAction !== 'hidden' && (
           <Button
             variant="default"
-            disabled={
-              isCreatingNewProject ||
-              isSuccessNewProject ||
-              (cancelAction === 'vercel' && !canReturnToVercel)
-            }
+            disabled={isCreatingNewProject || isSuccessNewProject}
             onClick={onCancel}
           >
-            {cancelAction === 'vercel' ? 'Return to Vercel' : 'Cancel'}
+            {canReturnToVercel ? 'Return to Vercel' : 'Cancel'}
           </Button>
         )}
         <Button
