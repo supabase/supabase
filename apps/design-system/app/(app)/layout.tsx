@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
             </ScrollArea>
           </aside>
           {/* Content-only landmark: sidebar must stay outside so skip/Tab don't land in the nav */}
-          <main id="main" tabIndex={-1} className="outline-hidden scroll-mt-10 min-w-0">
+          <main id="main" tabIndex={-1} className="outline-hidden scroll-mt-12 min-w-0">
             {children}
           </main>
         </div>
