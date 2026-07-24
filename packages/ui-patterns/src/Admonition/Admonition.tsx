@@ -1,16 +1,11 @@
 import { forwardRef } from 'react'
-import { Alert, cn } from 'ui'
+import { Alert, AlertDescription, cn } from 'ui'
 
 import { TYPE_LABEL, TYPE_TO_VARIANT } from './Admonition.constants'
-import type {
-  AdmonitionHeadingLevel,
-  AdmonitionLayout,
-  AdmonitionProps,
-  AdmonitionType,
-} from './Admonition.types'
+import type { AdmonitionLayout, AdmonitionProps, AdmonitionType } from './Admonition.types'
 import { AdmonitionTypeIcon } from './AdmonitionIcons'
 
-export type { AdmonitionHeadingLevel, AdmonitionLayout, AdmonitionProps, AdmonitionType }
+export type { AdmonitionLayout, AdmonitionProps, AdmonitionType }
 
 export const Admonition = forwardRef<
   React.ComponentRef<typeof Alert>,
@@ -25,7 +20,6 @@ export const Admonition = forwardRef<
       type = 'note',
       showIcon = true,
       title,
-      headingLevel,
       description,
       children,
       layout = 'vertical',
@@ -38,7 +32,6 @@ export const Admonition = forwardRef<
     ref
   ) => {
     const label = TYPE_LABEL[type]
-    const TitleTag: AdmonitionHeadingLevel | 'p' = headingLevel ?? 'p'
 
     return (
       <Alert
@@ -83,14 +76,14 @@ export const Admonition = forwardRef<
               )}
             >
               {title && (
-                <TitleTag
+                <p
                   {...childProps?.title}
                   className={cn('mb-0.5 font-medium text-foreground', childProps?.title?.className)}
                 >
                   {title}
-                </TitleTag>
+                </p>
               )}
-              {description}
+              {description && <AlertDescription>{description}</AlertDescription>}
               {children}
             </div>
             {actions && (

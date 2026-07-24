@@ -13,17 +13,14 @@ export type AdmonitionType =
 
 export type AdmonitionLayout = 'horizontal' | 'vertical' | 'responsive'
 
-export type AdmonitionHeadingLevel = 'h2' | 'h3' | 'h4' | 'h5'
-
 export interface AdmonitionProps {
   type?: AdmonitionType
   title?: string
-  headingLevel?: AdmonitionHeadingLevel
   description?: ReactNode
   children?: ReactNode
   showIcon?: boolean
   childProps?: {
-    title?: HTMLAttributes<HTMLHeadingElement | HTMLParagraphElement>
+    title?: HTMLAttributes<HTMLParagraphElement>
     description?: HTMLAttributes<HTMLDivElement>
   }
   layout?: AdmonitionLayout
