@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Storage · Snapshots & Versioning — Design Prototype</title>
+<style>
+  :root{
+    --bg:#1c1c1c; --studio:#181818; --surface-100:#1f1f1f; --surface-200:#242424; --surface-300:#2b2b2b;
+    --overlay:#232323; --border:#2e2e2e; --border-strong:#3d3d3d;
+    --fg:#ededed; --fg-light:#b4b4b4; --fg-lighter:#7e7e7e; --fg-muted:#5c5c5c;
+    --brand:#3ecf8e; --brand-600:#24b47e; --brand-dim:rgba(62,207,142,.14);
+    --amber:#f5a623; --amber-dim:rgba(245,166,35,.15);
+    --violet:#a78bfa; --violet-dim:rgba(167,139,250,.16);
+    --red:#f16969; --red-dim:rgba(241,105,105,.14);
+    --blue:#4a8cff; --selection:rgba(62,207,142,.10);
+    --radius:6px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#333;border-radius:6px;border:2px solid var(--bg)}
+  .app{display:grid;grid-template-columns:52px 240px 1fr;grid-template-rows:100vh}
+
+  /* ---- rail (icon nav) ---- */
+  .rail{background:var(--studio);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:6px}
+  .rail .logo{width:30px;height:30px;border-radius:7px;background:var(--brand);display:grid;place-items:center;color:#0b3b28;font-weight:800;margin-bottom:8px}
+  .rail .ic{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;color:var(--fg-lighter);cursor:default}
+  .rail .ic.active{background:var(--surface-300);color:var(--fg)}
+
+  /* ---- product nav ---- */
+  .nav{background:var(--studio);border-right:1px solid var(--border);padding:14px 10px;overflow:auto}
+  .nav h1{font-size:13px;margin:2px 6px 14px;letter-spacing:.2px}
+  .nav .grp{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--fg-muted);margin:16px 8px 6px}
+  .pill{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 8px;border-radius:var(--radius);color:var(--fg-light);cursor:pointer;font-size:13px}
+  .pill:hover{background:var(--surface-200);color:var(--fg)}
+  .pill.active{background:var(--surface-300);color:var(--fg)}
+  .pill .badge-new{font-size:9px}
+  .nav .hint{margin:18px 6px 6px;padding:10px;border:1px dashed var(--border-strong);border-radius:var(--radius);color:var(--fg-lighter);font-size:11px;line-height:1.5}
+
+  /* ---- main ---- */
+  .main{overflow:auto;background:var(--bg)}
+  .page{display:none;padding:0 0 60px}
+  .page.active{display:block}
+  .phead{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border);padding:18px 26px 14px}
+  .phead .crumbs{font-size:12px;color:var(--fg-lighter);margin-bottom:6px}
+  .phead h2{margin:0;font-size:18px;font-weight:600}
+  .phead p{margin:6px 0 0;color:var(--fg-light);font-size:13px;max-width:760px}
+  .tabs{display:flex;gap:2px;margin-top:14px}
+  .tab{padding:7px 12px;font-size:13px;color:var(--fg-lighter);border-bottom:2px solid transparent;cursor:pointer}
+  .tab.active{color:var(--fg);border-color:var(--brand)}
+  .body{padding:22px 26px}
+
+  /* ---- generic bits ---- */
+  .card{background:var(--surface-100);border:1px solid var(--border);border-radius:8px}
+  .card .chd{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .card .chd h3{margin:0;font-size:13px;font-weight:600}
+  .card .cbd{padding:16px}
+  .row{display:flex;align-items:center;gap:10px}
+  .between{justify-content:space-between}
+  .muted{color:var(--fg-lighter)}
+  .muted2{color:var(--fg-muted)}
+  .small{font-size:12px}
+  .xs{font-size:11px}
+  .mono{font-family:var(--mono)}
+  .stack{display:flex;flex-direction:column}
+  .gap4{gap:4px}.gap8{gap:8px}.gap12{gap:12px}.gap16{gap:16px}.gap24{gap:24px}
+  .grow{flex:1}
+  .sep{height:1px;background:var(--border);margin:14px 0}
+  .toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:var(--radius);border:1px solid var(--border-strong);background:var(--surface-200);color:var(--fg);font-size:13px;cursor:pointer;font-family:inherit}
+  .btn:hover{background:var(--surface-300)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#08301f;font-weight:600}
+  .btn.primary:hover{background:var(--brand-600)}
+  .btn.warn{background:var(--amber);border-color:var(--amber);color:#3a2600;font-weight:600}
+  .btn.danger{background:var(--red);border-color:var(--red);color:#3a0d0d;font-weight:600}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--fg-light)}
+  .btn.ghost:hover{background:var(--surface-200);color:var(--fg)}
+  .btn.sm{padding:4px 8px;font-size:12px}
+  .input{background:var(--surface-200);border:1px solid var(--border-strong);border-radius:var(--radius);color:var(--fg);padding:6px 9px;font-size:13px;font-family:inherit}
+  .input.sm{padding:4px 7px;font-size:12px;width:64px}
+  .search{flex:1;max-width:280px}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:999px;font-size:11px;border:1px solid var(--border-strong);color:var(--fg-light);background:var(--surface-200);white-space:nowrap}
+  .badge.green{color:var(--brand);border-color:transparent;background:var(--brand-dim)}
+  .badge.amber{color:var(--amber);border-color:transparent;background:var(--amber-dim)}
+  .badge.violet{color:var(--violet);border-color:transparent;background:var(--violet-dim)}
+  .badge.red{color:var(--red);border-color:transparent;background:var(--red-dim)}
+  .badge.blue{color:var(--blue);border-color:transparent;background:rgba(74,140,255,.14)}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .dot.green{background:var(--brand)}.dot.amber{background:var(--amber)}.dot.violet{background:var(--violet)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{text-align:left;font-weight:500;color:var(--fg-lighter);font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:9px 14px;border-bottom:1px solid var(--border)}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--fg-light)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--surface-200)}
+  tbody tr.click{cursor:pointer}
+  td .name{color:var(--fg);display:flex;align-items:center;gap:8px}
+
+  .switch{width:34px;height:19px;border-radius:999px;background:#3a3a3a;position:relative;cursor:pointer;flex:none;transition:background .15s}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#e6e6e6;transition:left .15s}
+  .switch.on{background:var(--brand)}
+  .switch.on::after{left:17px;background:#08301f}
+
+  .admon{border:1px solid var(--border-strong);border-radius:var(--radius);padding:11px 13px;display:flex;gap:10px;font-size:12.5px;line-height:1.55;color:var(--fg-light);background:var(--surface-200)}
+  .admon .ai{flex:none;margin-top:1px}
+  .admon.warn{background:var(--amber-dim);border-color:rgba(245,166,35,.35)}
+  .admon.warn .ai{color:var(--amber)}
+  .admon.info .ai{color:var(--blue)}
+  .admon strong{color:var(--fg)}
+
+  /* modal */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:50;padding:24px}
+  .scrim.open{display:grid}
+  .modal{width:520px;max-width:100%;max-height:90vh;overflow:auto;background:var(--surface-100);border:1px solid var(--border-strong);border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .modal .mhd{padding:16px 18px;border-bottom:1px solid var(--border)}
+  .modal .mhd h3{margin:0;font-size:15px}
+  .msec{padding:16px 18px;border-bottom:1px solid var(--border)}
+  .mft{padding:14px 18px;display:flex;justify-content:flex-end;gap:8px}
+  .field{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+  .field .lbl{font-size:13px;color:var(--fg)}
+  .field .desc{font-size:12px;color:var(--fg-lighter);margin-top:2px;max-width:330px}
+  .reveal{margin-top:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-200)}
+  .radio{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--fg-light);cursor:pointer}
+  .radio .rc{width:14px;height:14px;border-radius:50%;border:1px solid var(--border-strong);display:grid;place-items:center}
+  .radio.on .rc{border-color:var(--brand)}
+  .radio.on .rc::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--brand)}
+  .check{width:15px;height:15px;border-radius:3px;border:1px solid var(--border-strong);display:grid;place-items:center;cursor:pointer;flex:none}
+  .check.on{background:var(--brand);border-color:var(--brand);color:#08301f}
+
+  /* drawer */
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:430px;background:var(--surface-100);border-left:1px solid var(--border-strong);transform:translateX(100%);transition:transform .22s;z-index:40;overflow:auto;box-shadow:-16px 0 40px rgba(0,0,0,.35)}
+  .drawer.open{transform:none}
+  .drawer .dhd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+
+  /* explorer */
+  .explorer{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .exhd{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface-100);border-bottom:1px solid var(--border)}
+  .exrow{display:grid;grid-template-columns:1fr 90px 120px 130px 40px;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px}
+  .exrow:hover{background:var(--surface-200)}
+  .exrow.sel{background:var(--selection)}
+  .exrow .fn{display:flex;align-items:center;gap:9px;color:var(--fg);min-width:0}
+  .exrow .fn .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .verrow{display:grid;grid-template-columns:1fr 90px 120px 130px 40px;gap:8px;padding:7px 12px 7px 40px;border-bottom:1px solid var(--border);background:var(--studio);font-size:12px;color:var(--fg-lighter)}
+
+  .vitem{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+  .vitem:last-child{border:none}
+  .vitem .vln{display:flex;flex-direction:column;align-items:center;gap:3px;padding-top:3px}
+  .vitem .vln .vd{width:9px;height:9px;border-radius:50%;background:var(--border-strong)}
+  .vitem .vln .vd.cur{background:var(--brand)}
+  .vitem .vln .vl{flex:1;width:1px;background:var(--border)}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+  .legend .li{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--fg-light)}
+  .sparkwrap{height:14px;border-radius:5px;overflow:hidden;display:flex;background:var(--surface-300)}
+  .sparkwrap span{height:100%}
+  .bars{display:flex;align-items:flex-end;gap:10px;height:180px;padding:8px 4px 0}
+  .barcol{flex:1;display:flex;flex-direction:column-reverse;height:100%;border-radius:4px 4px 0 0;overflow:hidden;background:transparent}
+  .barcol span{width:100%}
+  .bx{display:flex;gap:10px;margin-top:6px}
+  .bx div{flex:1;text-align:center;font-size:10px;color:var(--fg-muted)}
+
+  .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .kpi .k{background:var(--surface-100);border:1px solid var(--border);border-radius:8px;padding:14px}
+  .kpi .k .v{font-size:22px;font-weight:600;margin-top:4px}
+  .kpi .k .l{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--fg-lighter)}
+
+  .term{background:#111;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:12.5px;line-height:1.7;padding:16px 18px;overflow:auto;color:#cfcfcf}
+  .term .p{color:var(--brand)}
+  .term .c{color:#e6e6e6}
+  .term .o{color:var(--fg-lighter)}
+  .term .cm{color:var(--fg-muted)}
+  .term .hl{color:var(--amber)}
+
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .cols12{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  @media(max-width:1080px){.cols2,.cols12{grid-template-columns:1fr}}
+  .ovcard{background:var(--surface-100);border:1px solid var(--border);border-radius:8px;padding:16px;cursor:pointer}
+  .ovcard:hover{border-color:var(--border-strong);background:var(--surface-200)}
+  .ovcard h4{margin:0 0 6px;font-size:14px}
+  .ovcard p{margin:0;color:var(--fg-lighter);font-size:12.5px}
+  .ovcard .n{font-family:var(--mono);font-size:11px;color:var(--brand)}
+  .icon{width:16px;height:16px;flex:none}
+  .rail-note{position:fixed;bottom:8px;left:0;width:52px;text-align:center;font-size:9px;color:var(--fg-muted)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- rail -->
+  <div class="rail">
+    <div class="logo">S</div>
+    <div class="ic" title="Table editor">▤</div>
+    <div class="ic" title="SQL">≡</div>
+    <div class="ic" title="Database">⛁</div>
+    <div class="ic active" title="Storage">▧</div>
+    <div class="ic" title="Auth">◉</div>
+    <div class="ic" title="Reports">▦</div>
+    <div class="rail-note">prototype</div>
+  </div>
+
+  <!-- product nav -->
+  <div class="nav">
+    <h1>Storage</h1>
+    <div class="grp">Manage</div>
+    <div class="pill" data-go="files">Files</div>
+    <div class="pill" data-go="snapshots">Snapshots <span class="badge green badge-new">New</span></div>
+    <div class="pill" data-go="analytics" style="opacity:.55">Analytics</div>
+    <div class="pill" data-go="vectors" style="opacity:.55">Vectors</div>
+    <div class="grp">Configuration</div>
+    <div class="pill" data-go="usage">Usage &amp; retention <span class="badge green badge-new">New</span></div>
+    <div class="pill" data-go="s3" style="opacity:.55">S3</div>
+
+    <div class="hint">
+      <strong style="color:var(--fg-light)">Design prototype.</strong> Every screen maps to a deliverable in
+      the PRFAQ. Jump around:
+      <div class="stack gap4" style="margin-top:8px">
+        <a data-go="overview">↳ Overview</a>
+        <a data-go="files">↳ Enable + bucket list</a>
+        <a data-go="explorer">↳ Object versions</a>
+        <a data-go="snapshots">↳ Snapshots</a>
+        <a data-go="restore">↳ Snapshot ↔ DB backup</a>
+        <a data-go="usage">↳ Usage breakdown</a>
+        <a data-go="trash">↳ Trash</a>
+        <a data-go="cli">↳ CLI</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- main -->
+  <div class="main">
+
+    <!-- ========== OVERVIEW ========== -->
+    <section class="page active" id="p-overview">
+      <div class="phead">
+        <div class="crumbs">Storage · Snapshots &amp; Versioning</div>
+        <h2>Recover deleted and overwritten objects</h2>
+        <p>Two independent, per-bucket, opt-in features. Every surface is designed backwards from the one question the
+          PRFAQ flags as the biggest risk: <em>“when is my object truly gone, and when do I stop paying for it?”</em></p>
+      </div>
+      <div class="body stack gap24">
+        <div class="cols2">
+          <div class="ovcard" data-go="files">
+            <div class="row between"><h4>1 · Enable versioning &amp; snapshots</h4><span class="badge green">per bucket</span></div>
+            <p>A new “Data protection” section in the create/edit bucket modal. Switch-gated, with lifecycle policies revealed on toggle.</p>
+          </div>
+          <div class="ovcard" data-go="explorer">
+            <div class="row between"><h4>2 · Object versions</h4><span class="badge amber">in explorer</span></div>
+            <p>Version history lives in the preview pane. Restore, download, or delete any version — with snapshot-pin protection.</p>
+          </div>
+          <div class="ovcard" data-go="snapshots">
+            <div class="row between"><h4>3 · Snapshots</h4><span class="badge violet">bucket-wide</span></div>
+            <p>A new nav section. Take, browse, and restore point-in-time snapshots with a pre-restore diff.</p>
+          </div>
+          <div class="ovcard" data-go="restore">
+            <div class="row between"><h4>4 · Snapshot ↔ DB backup</h4><span class="badge blue">aligned</span></div>
+            <p>“Also restore storage” checkbox in the database restore flow — DB and objects return to the same point in time.</p>
+          </div>
+          <div class="ovcard" data-go="usage">
+            <div class="row between"><h4>5 · Usage breakdown</h4><span class="badge green">cost clarity</span></div>
+            <p>Storage size splits into live / prior versions / snapshots, so a growing bill is always explainable.</p>
+          </div>
+          <div class="ovcard" data-go="trash">
+            <div class="row between"><h4>6 · Trash</h4><span class="badge red">soft-deletes</span></div>
+            <p>Soft-deleted objects are out of the way but one click from restore, with an “auto-removes” honesty column.</p>
+          </div>
+        </div>
+        <div class="admon info">
+          <span class="ai">ⓘ</span>
+          <div>Built against real Studio components — <span class="mono xs">StorageMenuV2</span>, <span class="mono xs">EditBucketModal</span>,
+            <span class="mono xs">PreviewPane</span>, <span class="mono xs">AttributeUsage</span>, <span class="mono xs">BackupsList</span>.
+            See <span class="mono xs">README.md</span> for the component-level spec and open questions.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== FILES / BUCKET LIST + ENABLE ========== -->
+    <section class="page" id="p-files">
+      <div class="phead">
+        <div class="crumbs">Storage · Files</div>
+        <h2>Buckets</h2>
+        <div class="tabs">
+          <div class="tab active">Buckets</div><div class="tab">Settings</div><div class="tab">Policies</div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="toolbar">
+          <input class="input search" placeholder="Search buckets…" />
+          <button class="btn sm">Sort: Name ▾</button>
+          <div class="grow"></div>
+          <button class="btn primary sm" onclick="openBucketModal()">＋ New bucket</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Name</th><th>Protection</th><th>Policies</th><th>File size limit</th><th>Objects</th><th></th></tr></thead>
+            <tbody>
+              <tr class="click" onclick="go('explorer')">
+                <td><div class="name">▧ avatars <span class="badge green">Public</span></div></td>
+                <td><div class="row gap8"><span class="badge amber">Versioned</span><span class="badge violet">Snapshots</span></div></td>
+                <td>3</td><td>50 MB</td><td>1,204</td><td class="muted">›</td>
+              </tr>
+              <tr class="click" onclick="go('explorer')">
+                <td><div class="name">▧ uploads</div></td>
+                <td><div class="row gap8"><span class="badge amber">Versioned</span></div></td>
+                <td>2</td><td>—</td><td>842</td><td class="muted">›</td>
+              </tr>
+              <tr class="click" onclick="openBucketModal()">
+                <td><div class="name">▧ invoices</div></td>
+                <td><span class="badge">Not protected</span></td>
+                <td>4</td><td>10 MB</td><td>63</td><td class="muted">›</td>
+              </tr>
+              <tr class="click" onclick="openBucketModal()">
+                <td><div class="name">▧ public-assets <span class="badge green">Public</span></div></td>
+                <td><span class="badge">Not protected</span></td>
+                <td>1</td><td>—</td><td>318</td><td class="muted">›</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted small" style="margin-top:12px">Click <strong>avatars</strong> to see object versions, or an unprotected bucket to open the enable flow. The
+          <span class="badge amber">Versioned</span> / <span class="badge violet">Snapshots</span> badges make protection status scannable across every bucket.</p>
+      </div>
+    </section>
+
+    <!-- ========== EXPLORER + VERSIONS ========== -->
+    <section class="page" id="p-explorer">
+      <div class="phead">
+        <div class="crumbs">Storage · Files · <span class="muted">avatars</span></div>
+        <h2 class="row gap12" style="align-items:center">avatars <span class="badge amber">Versioned</span> <span class="badge violet">Snapshots</span></h2>
+        <div class="row between" style="margin-top:10px">
+          <p style="margin:0">Retained storage: <strong>2.4 GB</strong> — 1.6 GB live · 0.5 GB prior versions · 0.3 GB held by snapshots.
+            <a onclick="go('usage')">Manage lifecycle →</a></p>
+        </div>
+      </div>
+      <div class="body">
+        <div class="toolbar">
+          <button class="btn sm">▤ List</button>
+          <button class="btn sm on" id="showVerBtn" onclick="toggleShowVersions()">
+            <span class="check" id="showVerChk" style="display:inline-grid"></span> Show all versions</button>
+          <input class="input search" placeholder="Search this bucket…" />
+          <div class="grow"></div>
+          <button class="btn sm" onclick="go('trash')">🗑 Trash <span class="badge red" style="margin-left:4px">4</span></button>
+          <button class="btn sm">↑ Upload</button>
+        </div>
+        <div class="explorer">
+          <div class="exrow" style="background:var(--surface-100);cursor:default;color:var(--fg-lighter);font-size:11px;text-transform:uppercase;letter-spacing:.4px">
+            <div>Name</div><div>Size</div><div>Type</div><div>Last modified</div><div></div>
+          </div>
+          <div class="exrow" onclick="openVersions()">
+            <div class="fn"><span>🖼</span><span class="t">profile-jane.png</span> <span class="mono xs" style="color:var(--fg-lighter)">v3</span></div>
+            <div class="muted">412 KB</div><div class="muted">image/png</div><div class="muted">2 days ago</div><div class="muted">⋯</div>
+          </div>
+          <div class="verrow ver">
+            <div class="mono">↳ v2 · 9f8e7d</div><div>398 KB</div><div>overwritten</div><div>6 days ago</div><div>⋯</div>
+          </div>
+          <div class="verrow ver">
+            <div class="mono">↳ v1 · 4c5d6e</div><div>405 KB</div><div>created</div><div>14 days ago</div><div>⋯</div>
+          </div>
+          <div class="exrow" onclick="openVersions()">
+            <div class="fn"><span>🖼</span><span class="t">profile-alex.png</span> <span class="mono xs" style="color:var(--fg-lighter)">v2</span></div>
+            <div class="muted">288 KB</div><div class="muted">image/png</div><div class="muted">1 day ago</div><div class="muted">⋯</div>
+          </div>
+          <div class="verrow ver">
+            <div class="mono">↳ v1 · 2b3c4d</div><div>301 KB</div><div>created</div><div>9 days ago</div><div>⋯</div>
+          </div>
+          <div class="exrow" onclick="openVersions()">
+            <div class="fn"><span>🖼</span><span class="t">banner.jpg</span></div>
+            <div class="muted">1.1 MB</div><div class="muted">image/jpeg</div><div class="muted">3 hours ago</div><div class="muted">⋯</div>
+          </div>
+          <div class="exrow" onclick="openVersions()">
+            <div class="fn"><span>📄</span><span class="t">bio.pdf</span> <span class="mono xs" style="color:var(--fg-lighter)">v5</span></div>
+            <div class="muted">92 KB</div><div class="muted">application/pdf</div><div class="muted">5 hours ago</div><div class="muted">⋯</div>
+          </div>
+        </div>
+        <p class="muted small" style="margin-top:12px">The <span class="mono">v3</span> chip shows objects with history. Click any row to open its version history. “Show all versions” expands history inline for auditing a whole folder.</p>
+      </div>
+    </section>
+
+    <!-- ========== SNAPSHOTS ========== -->
+    <section class="page" id="p-snapshots">
+      <div class="phead">
+        <div class="crumbs">Storage · Snapshots</div>
+        <h2>Snapshots</h2>
+        <p>Point-in-time restore points for whole buckets. Auto-taken before each database backup, or created manually.</p>
+      </div>
+      <div class="body">
+        <div class="toolbar">
+          <input class="input search" placeholder="Search snapshots…" />
+          <button class="btn sm">Bucket: All ▾</button>
+          <div class="grow"></div>
+          <button class="btn primary sm" onclick="openSnapModal()">＋ Take snapshot</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Snapshot</th><th>Bucket</th><th>Objects</th><th>Size held</th><th>Source</th><th>Created</th><th>Expires</th><th></th></tr></thead>
+            <tbody>
+              <tr class="click" onclick="openSnapDetail()">
+                <td class="mono" style="color:var(--fg)">snap_2026-07-24_0300</td><td>avatars</td><td>1,204</td>
+                <td><span class="badge violet">0.3 GB</span></td><td><span class="badge blue">DB backup</span></td><td>2 days ago</td><td>in 88 days</td><td class="muted">›</td>
+              </tr>
+              <tr class="click" onclick="openSnapDetail()">
+                <td class="mono" style="color:var(--fg)">snap_2026-07-23_0300</td><td>avatars</td><td>1,201</td>
+                <td><span class="badge violet">0.1 GB</span></td><td><span class="badge blue">DB backup</span></td><td>3 days ago</td><td>in 87 days</td><td class="muted">›</td>
+              </tr>
+              <tr class="click" onclick="openSnapDetail()">
+                <td class="mono" style="color:var(--fg)">pre-migration</td><td>avatars</td><td>1,190</td>
+                <td><span class="badge violet">1.7 GB</span></td><td><span class="badge">Manual</span></td><td>5 days ago</td>
+                <td><span class="row gap4" style="color:var(--amber)">Never ⚠</span></td><td class="muted">›</td>
+              </tr>
+              <tr class="click" onclick="openSnapDetail()">
+                <td class="mono" style="color:var(--fg)">snap_2026-07-24_0300</td><td>uploads</td><td>842</td>
+                <td><span class="badge violet">0 B</span></td><td><span class="badge blue">DB backup</span></td><td>2 days ago</td><td>in 88 days</td><td class="muted">›</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="admon info" style="margin-top:16px">
+          <span class="ai">ⓘ</span>
+          <div><strong>“Size held”</strong> is the bytes retained <em>only because the snapshot exists</em> — data a lifecycle policy or delete
+            would otherwise have removed. It’s exactly what the customer is paying extra for. A snapshot whose objects are all still live shows <strong>0 B</strong>.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== RESTORE / DB BACKUP ALIGNMENT ========== -->
+    <section class="page" id="p-restore">
+      <div class="phead">
+        <div class="crumbs">Database · Backups</div>
+        <h2>Backups</h2>
+        <div class="tabs"><div class="tab active">Scheduled backups</div><div class="tab">Point in time</div><div class="tab">Restore to new project</div></div>
+        <p>Each scheduled backup that has correlated storage snapshots can restore both together — to the same point in time.</p>
+      </div>
+      <div class="body">
+        <div class="card">
+          <table>
+            <thead><tr><th>Backup</th><th>Type</th><th>Storage</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="name">Jul 24, 2026 · 03:00 UTC</td><td><span class="badge">Physical</span></td>
+                <td><span class="badge violet">📷 2 buckets</span></td>
+                <td style="text-align:right"><button class="btn sm">↓ Download</button> <button class="btn warn sm" onclick="openRestoreModal()">Restore</button></td>
+              </tr>
+              <tr>
+                <td class="name">Jul 23, 2026 · 03:00 UTC</td><td><span class="badge">Physical</span></td>
+                <td><span class="badge violet">📷 2 buckets</span></td>
+                <td style="text-align:right"><button class="btn sm">↓ Download</button> <button class="btn warn sm" onclick="openRestoreModal()">Restore</button></td>
+              </tr>
+              <tr>
+                <td class="name">Jul 22, 2026 · 03:00 UTC</td><td><span class="badge">Physical</span></td>
+                <td class="muted xs">No snapshot (enabled Jul 23)</td>
+                <td style="text-align:right"><button class="btn sm">↓ Download</button> <button class="btn warn sm" onclick="openRestoreModal(true)">Restore</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="muted small" style="margin-top:12px">Click <strong>Restore</strong> to see the aligned DB + storage restore dialog — the customer-journey moment from the press release.</p>
+      </div>
+    </section>
+
+    <!-- ========== USAGE ========== -->
+    <section class="page" id="p-usage">
+      <div class="phead">
+        <div class="crumbs">Organization · Usage</div>
+        <h2>Storage size</h2>
+        <p>The single Storage Size bar splits into three attributes, so a growing bill is always explainable — the make-or-break surface per the PRFAQ.</p>
+      </div>
+      <div class="body stack gap24">
+        <div class="admon info">
+          <span class="ai">ⓘ</span>
+          <div><strong>When is an object truly gone (and unbilled)?</strong> An object stops counting only when <em>all</em> are true: it isn’t the current
+            version, no lifecycle policy retains it, no snapshot references it, and it isn’t in the trash.
+            <a onclick="go('trash')">See what’s retaining your objects →</a></div>
+        </div>
+
+        <div class="card">
+          <div class="chd"><h3>Storage size · this billing period</h3><span class="muted small">Average 3.2 GB</span></div>
+          <div class="cbd">
+            <div class="row between" style="margin-bottom:6px">
+              <span class="small muted">Used in period</span><span class="small">3.2 GB of 8 GB included</span>
+            </div>
+            <div class="sparkwrap" style="height:16px">
+              <span style="width:50%;background:var(--brand)"></span>
+              <span style="width:16%;background:var(--amber)"></span>
+              <span style="width:9%;background:var(--violet)"></span>
+            </div>
+            <div class="legend">
+              <div class="li"><span class="dot green"></span>Live objects · 1.6 GB</div>
+              <div class="li"><span class="dot amber"></span>Prior versions · 0.5 GB</div>
+              <div class="li"><span class="dot violet"></span>Snapshots · 0.3 GB</div>
+              <div class="li muted2">Free headroom · 5.6 GB</div>
+            </div>
+
+            <div class="sep"></div>
+
+            <!-- stacked bar chart over time -->
+            <div class="bars" id="usageBars"></div>
+            <div class="bx" id="usageX"></div>
+          </div>
+        </div>
+
+        <div class="cols2">
+          <div class="card">
+            <div class="chd"><h3>What’s driving this — by bucket</h3></div>
+            <div class="cbd">
+              <table>
+                <thead><tr><th>Bucket</th><th>Live</th><th>Versions</th><th>Snapshots</th><th>Total</th></tr></thead>
+                <tbody>
+                  <tr><td class="name">avatars</td><td>1.6 GB</td><td class="mono" style="color:var(--amber)">0.5 GB</td><td class="mono" style="color:var(--violet)">0.3 GB</td><td>2.4 GB</td></tr>
+                  <tr><td class="name">uploads</td><td>0.7 GB</td><td class="mono" style="color:var(--amber)">0.1 GB</td><td>0 B</td><td>0.8 GB</td></tr>
+                  <tr><td class="name">invoices</td><td>28 MB</td><td>0 B</td><td>0 B</td><td>28 MB</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="chd"><h3>Retention policies</h3><button class="btn ghost sm" onclick="openBucketModal()">Edit</button></div>
+            <div class="cbd stack gap12">
+              <div class="row between"><div><div class="small">Prior versions (avatars)</div><div class="xs muted">Expire after 30 days · keep ≤ 10 newer</div></div><span class="badge amber">Active</span></div>
+              <div class="sep" style="margin:0"></div>
+              <div class="row between"><div><div class="small">Snapshots (avatars)</div><div class="xs muted">Expire after 90 days</div></div><span class="badge violet">Active</span></div>
+              <div class="sep" style="margin:0"></div>
+              <div class="row between"><div><div class="small">Snapshot “pre-migration”</div><div class="xs muted" style="color:var(--amber)">No expiry — held indefinitely ⚠</div></div><button class="btn sm" onclick="openSnapDetail()">Review</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== TRASH ========== -->
+    <section class="page" id="p-trash">
+      <div class="phead">
+        <div class="crumbs">Storage · Files · avatars · <span class="muted">Trash</span></div>
+        <h2>Trash — avatars</h2>
+        <p>Soft-deleted objects. Out of the way in normal browsing, one click from restore, until a lifecycle policy removes them.</p>
+      </div>
+      <div class="body">
+        <div class="toolbar">
+          <input class="input search" placeholder="Search trash…" />
+          <div class="grow"></div>
+          <button class="btn sm">↺ Restore all</button>
+          <button class="btn danger sm" onclick="confirmEmpty()">Empty trash</button>
+        </div>
+        <div class="card">
+          <table>
+            <thead><tr><th>Name</th><th>Size</th><th>Deleted</th><th>Deleted by</th><th>Auto-removes</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="name">🖼 old-profile.png</td><td>405 KB</td><td>3 days ago</td><td class="muted">jane@acme.co</td>
+                <td>in 27 days</td>
+                <td style="text-align:right"><button class="btn sm" onclick="toast('Restored old-profile.png')">Restore</button> <button class="btn ghost sm">Delete forever</button></td>
+              </tr>
+              <tr>
+                <td class="name">📄 draft.pdf</td><td>1.2 MB</td><td>8 days ago</td><td class="muted">api key ····a91</td>
+                <td>in 22 days</td>
+                <td style="text-align:right"><button class="btn sm" onclick="toast('Restored draft.pdf')">Restore</button> <button class="btn ghost sm">Delete forever</button></td>
+              </tr>
+              <tr>
+                <td class="name">🖼 hero-v1.jpg</td><td>2.1 MB</td><td>12 days ago</td><td class="muted">jane@acme.co</td>
+                <td><span class="row gap4" style="color:var(--violet)">Held by snapshot 🔒</span></td>
+                <td style="text-align:right"><button class="btn sm" onclick="toast('Restored hero-v1.jpg')">Restore</button> <button class="btn ghost sm" onclick="openPinBlock()">Delete forever</button></td>
+              </tr>
+              <tr>
+                <td class="name">📄 contract.pdf</td><td>88 KB</td><td>20 days ago</td><td class="muted">jane@acme.co</td>
+                <td><span style="color:var(--amber)">in 10 days</span></td>
+                <td style="text-align:right"><button class="btn sm" onclick="toast('Restored contract.pdf')">Restore</button> <button class="btn ghost sm">Delete forever</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="admon warn" style="margin-top:16px">
+          <span class="ai">⚠</span>
+          <div><strong>hero-v1.jpg</strong> can’t be permanently deleted yet — it’s pinned by snapshot <span class="mono">pre-migration</span>.
+          It’ll be removed when that snapshot expires or is deleted. This is how we make surprise retention <em>visible and actionable</em> instead of a mystery line on the bill.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CLI ========== -->
+    <section class="page" id="p-cli">
+      <div class="phead">
+        <div class="crumbs">CLI</div>
+        <h2>CLI surface</h2>
+        <p>For automation and CI. The version-ID scheme and command shape are a one-way door, so the surface is deliberately minimal and S3-compatible in spirit.</p>
+      </div>
+      <div class="body stack gap16">
+        <div class="term">
+<span class="cm"># Enable / configure (per bucket)</span>
+<span class="p">$</span> <span class="c">supabase storage buckets update avatars <span class="hl">--versioning enabled</span></span>
+<span class="p">$</span> <span class="c">supabase storage buckets update avatars <span class="hl">--snapshots enabled --snapshot-on-db-backup</span></span>
+<span class="p">$</span> <span class="c">supabase storage buckets update avatars \</span>
+    <span class="c">--version-expiry-days 30 --max-noncurrent-versions 10 --snapshot-expiry-days 90</span>
+<span class="o">  ✓ Updated bucket "avatars" · versioning=enabled snapshots=enabled</span>
+        </div>
+        <div class="term">
+<span class="cm"># Object versions</span>
+<span class="p">$</span> <span class="c">supabase storage versions list avatars/profile-jane.png</span>
+<span class="o">  VERSION   SIZE    CURRENT  HELD BY SNAPSHOT   MODIFIED</span>
+<span class="o">  1a2b3c    412 KB  yes      —                  2d ago</span>
+<span class="o">  9f8e7d    398 KB  no       snap_...24_0300    6d ago</span>
+<span class="o">  4c5d6e    405 KB  no       pre-migration      14d ago</span>
+<span class="p">$</span> <span class="c">supabase storage versions restore avatars/profile-jane.png <span class="hl">--version-id 9f8e7d</span></span>
+<span class="o">  ✓ Promoted 9f8e7d to current (new version 7a8b9c)</span>
+        </div>
+        <div class="term">
+<span class="cm"># Snapshots — restore prints the same diff the dashboard shows</span>
+<span class="p">$</span> <span class="c">supabase storage snapshots restore snap_2026-07-20_0300 <span class="hl">--dry-run</span></span>
+<span class="o">  Restoring snap_2026-07-20_0300 → bucket "avatars":</span>
+<span class="o">    + 14 objects added back</span>
+<span class="o">    ~  3 objects reverted to earlier content</span>
+<span class="o">    - 22 objects created after the snapshot will be removed</span>
+<span class="o">  Re-run with --yes to apply.</span>
+<span class="p">$</span> <span class="c">supabase storage trash list avatars</span>
+<span class="p">$</span> <span class="c">supabase storage trash restore avatars/old-profile.png</span>
+        </div>
+        <p class="muted small">Full command reference in <span class="mono">README.md</span> §8. Note: no <span class="mono">versioning disabled</span> — only <span class="mono">suspended</span>, matching the External FAQ one-way-door.</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ============ MODAL: EDIT BUCKET (ENABLE) ============ -->
+<div class="scrim" id="bucketScrim">
+  <div class="modal">
+    <div class="mhd"><h3>Edit bucket “avatars”</h3></div>
+    <div class="msec">
+      <div class="field"><div><div class="lbl">Public bucket</div><div class="desc">Allow anyone to read objects without authorization</div></div><div class="switch on" data-toggle></div></div>
+    </div>
+    <div class="msec">
+      <div class="field"><div><div class="lbl">Restrict file size</div><div class="desc">Prevent uploading of files larger than a limit</div></div><div class="switch on" data-toggle></div></div>
+    </div>
+
+    <!-- NEW: Data protection -->
+    <div class="msec" style="background:var(--surface-200)">
+      <div class="row gap8" style="margin-bottom:14px"><span class="mono xs" style="color:var(--fg-muted);letter-spacing:.6px">DATA PROTECTION</span><span class="badge green">New</span></div>
+
+      <div class="field">
+        <div><div class="lbl">Object versioning</div><div class="desc">Keep previous versions when an object is overwritten or deleted, so you can restore them later.</div></div>
+        <div class="switch on" id="verToggle" onclick="toggleReveal('verReveal',this)"></div>
+      </div>
+      <div class="reveal" id="verReveal">
+        <div class="small" style="margin-bottom:8px;color:var(--fg-light)">Lifecycle for noncurrent versions</div>
+        <div class="row gap16" style="margin-bottom:10px">
+          <label class="radio" onclick="pick(this)"><span class="rc"></span>Keep indefinitely</label>
+          <label class="radio on" onclick="pick(this)"><span class="rc"></span>Expire after <input class="input sm" value="30" onclick="event.stopPropagation()" /> days</label>
+        </div>
+        <div class="row gap8 small muted">Retain at most <input class="input sm" value="10" /> newer noncurrent versions <span class="xs">(max 100)</span></div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="field">
+        <div><div class="lbl">Bucket snapshots</div><div class="desc">Capture the whole bucket at a point in time so you can restore it — and align it with database backups.</div></div>
+        <div class="switch on" id="snapToggle" onclick="toggleReveal('snapReveal',this)"></div>
+      </div>
+      <div class="reveal" id="snapReveal">
+        <label class="row gap8 small" style="cursor:pointer;margin-bottom:10px" onclick="tickCheck(this)">
+          <span class="check on">✓</span><span style="color:var(--fg-light)">Snapshot before every scheduled database backup</span></label>
+        <div class="row gap16">
+          <label class="radio" onclick="pick(this)"><span class="rc"></span>Keep indefinitely</label>
+          <label class="radio on" onclick="pick(this)"><span class="rc"></span>Expire after <input class="input sm" value="90" onclick="event.stopPropagation()" /> days</label>
+        </div>
+      </div>
+
+      <div class="admon" style="margin-top:14px">
+        <span class="ai" style="color:var(--fg-lighter)">ⓘ</span>
+        <div>Once enabled, deleting or overwriting an object keeps the previous copy. Retained copies still count toward
+          storage usage until a lifecycle policy or a manual delete removes them. <a onclick="closeScrim();go('usage')">View what’s retained →</a></div>
+      </div>
+    </div>
+
+    <div class="mft"><button class="btn" onclick="closeScrim()">Cancel</button><button class="btn primary" onclick="closeScrim();toast('Bucket updated · protection enabled')">Save</button></div>
+  </div>
+</div>
+
+<!-- ============ MODAL: TAKE SNAPSHOT ============ -->
+<div class="scrim" id="snapScrim">
+  <div class="modal" style="width:460px">
+    <div class="mhd"><h3>Take snapshot</h3></div>
+    <div class="msec stack gap12">
+      <div><div class="small" style="margin-bottom:5px">Bucket</div><select class="input" style="width:100%"><option>avatars</option><option>uploads</option></select></div>
+      <div><div class="small" style="margin-bottom:5px">Name <span class="muted xs">(optional)</span></div><input class="input" style="width:100%" placeholder="e.g. pre-migration" /></div>
+      <div><div class="small" style="margin-bottom:5px">Expiry</div>
+        <div class="row gap16">
+          <label class="radio on" onclick="pick(this)"><span class="rc"></span>90 days (bucket default)</label>
+          <label class="radio" onclick="pick(this)"><span class="rc"></span>Keep indefinitely</label>
+        </div>
+      </div>
+      <div class="admon info"><span class="ai">ⓘ</span><div>Captures <strong>1,204 objects</strong> (current versions only). Est. additional storage held: <strong>~1.8 GB</strong>.</div></div>
+    </div>
+    <div class="mft"><button class="btn" onclick="closeScrim()">Cancel</button><button class="btn primary" onclick="closeScrim();toast('Snapshot queued')">Take snapshot</button></div>
+  </div>
+</div>
+
+<!-- ============ MODAL: RESTORE (DB + STORAGE) ============ -->
+<div class="scrim" id="restoreScrim">
+  <div class="modal">
+    <div class="mhd"><h3>Restore backup — Jul 24, 2026 · 03:00 UTC</h3></div>
+    <div class="msec">
+      <div class="admon warn"><span class="ai">⚠</span><div>Restoring will overwrite your current database with this backup. This action <strong>cannot be undone</strong>.</div></div>
+    </div>
+    <div class="msec" id="restoreStorageOn">
+      <label class="row gap8" style="cursor:pointer;align-items:flex-start" onclick="toggleStorageRestore(this)">
+        <span class="check on" id="stChk">✓</span>
+        <span><span class="lbl">Also restore storage to the matching snapshot from this point in time</span>
+          <div class="desc">Buckets: <span class="mono">avatars</span>, <span class="mono">uploads</span> · ~3.1 GB. Restoring storage overwrites current objects to match the snapshot. Uncheck to restore the database only.</div></span>
+      </label>
+      <div id="stWarn" style="display:none;margin-top:12px">
+        <div class="admon warn"><span class="ai">⚠</span><div>Restoring the database without storage may leave records that reference files that no longer exist (or the reverse). Keep this checked to restore both to the same point in time.</div></div>
+      </div>
+    </div>
+    <div class="msec">
+      <div class="small muted" style="margin-bottom:6px">Type <span class="mono" style="color:var(--fg)">avatars-prod</span> to confirm</div>
+      <input class="input" style="width:100%" placeholder="Project name" />
+    </div>
+    <div class="mft"><button class="btn" onclick="closeScrim()">Cancel</button><button class="btn warn" onclick="closeScrim();toast('Restore started · DB + storage')">Restore</button></div>
+  </div>
+</div>
+
+<!-- ============ MODAL: PIN BLOCK ============ -->
+<div class="scrim" id="pinScrim">
+  <div class="modal" style="width:440px">
+    <div class="mhd"><h3>Can’t delete permanently yet</h3></div>
+    <div class="msec">
+      <div class="admon warn"><span class="ai">⚠</span><div><strong>hero-v1.jpg</strong> is part of snapshot <span class="mono">pre-migration</span> (no expiry set). It will be removed automatically when that snapshot expires — or you can delete the snapshot now.</div></div>
+    </div>
+    <div class="mft"><button class="btn" onclick="closeScrim()">Close</button><button class="btn" onclick="closeScrim();go('snapshots')">Go to snapshot →</button></div>
+  </div>
+</div>
+
+<!-- ============ SNAPSHOT DETAIL DRAWER ============ -->
+<div class="drawer" id="snapDrawer">
+  <div class="dhd"><div class="row gap8"><strong class="mono small">pre-migration</strong><span class="badge violet">Snapshot</span></div><button class="btn ghost sm" onclick="closeDrawer('snapDrawer')">✕</button></div>
+  <div style="padding:16px" class="stack gap16">
+    <div class="kpi" style="grid-template-columns:1fr 1fr">
+      <div class="k"><div class="l">Objects</div><div class="v" style="font-size:18px">1,190</div></div>
+      <div class="k"><div class="l">Size held</div><div class="v" style="font-size:18px;color:var(--violet)">1.7 GB</div></div>
+    </div>
+    <div class="stack gap8 small">
+      <div class="row between"><span class="muted">Bucket</span><span>avatars</span></div>
+      <div class="row between"><span class="muted">Source</span><span class="badge">Manual</span></div>
+      <div class="row between"><span class="muted">Created</span><span>Jul 19, 2026 · 14:02</span></div>
+      <div class="row between"><span class="muted">Expires</span><span style="color:var(--amber)">Never ⚠</span></div>
+    </div>
+    <div class="admon"><span class="ai" style="color:var(--fg-lighter)">ⓘ</span><div><strong>Restoring</strong> makes <span class="mono">avatars</span> match this snapshot: objects not in it are removed, changed objects revert. Current versions only.</div></div>
+    <div class="stack gap8">
+      <button class="btn warn" onclick="openRestoreSnap()">Restore this snapshot</button>
+      <button class="btn">Edit expiry</button>
+      <button class="btn ghost" style="color:var(--red)">Delete snapshot</button>
+    </div>
+    <div>
+      <div class="mono xs muted" style="margin-bottom:6px">CONTENTS (read-only)</div>
+      <div class="explorer">
+        <div class="exrow" style="cursor:default"><div class="fn">🖼 profile-jane.png <span class="mono xs muted">v1</span></div><div class="muted">405 KB</div><div></div><div></div><div></div></div>
+        <div class="exrow" style="cursor:default"><div class="fn">🖼 banner.jpg</div><div class="muted">980 KB</div><div></div><div></div><div></div></div>
+        <div class="exrow" style="cursor:default"><div class="fn">📄 bio.pdf <span class="mono xs muted">v3</span></div><div class="muted">88 KB</div><div></div><div></div><div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SNAPSHOT RESTORE CONFIRM ============ -->
+<div class="scrim" id="snapRestoreScrim">
+  <div class="modal" style="width:480px">
+    <div class="mhd"><h3>Restore snapshot “pre-migration”</h3></div>
+    <div class="msec">
+      <div class="small muted" style="margin-bottom:10px">Restoring to bucket <span class="mono" style="color:var(--fg)">avatars</span> will:</div>
+      <div class="stack gap8 small">
+        <div class="row gap8"><span class="badge green">+ 14</span> objects added back</div>
+        <div class="row gap8"><span class="badge amber">~ 3</span> objects reverted to earlier content</div>
+        <div class="row gap8"><span class="badge red">− 22</span> objects created after the snapshot will be <strong style="color:var(--red)">removed</strong></div>
+      </div>
+      <div class="admon warn" style="margin-top:14px"><span class="ai">⚠</span><div>This can’t be undone.</div></div>
+      <div class="small muted" style="margin:12px 0 6px">Type <span class="mono" style="color:var(--fg)">avatars</span> to confirm</div>
+      <input class="input" style="width:100%" placeholder="Bucket name" />
+    </div>
+    <div class="mft"><button class="btn" onclick="closeScrim()">Cancel</button><button class="btn warn" onclick="closeScrim();toast('Bucket restore started')">Restore bucket</button></div>
+  </div>
+</div>
+
+<!-- ============ VERSION HISTORY DRAWER ============ -->
+<div class="drawer" id="verDrawer">
+  <div class="dhd"><strong class="small">profile-jane.png</strong><button class="btn ghost sm" onclick="closeDrawer('verDrawer')">✕</button></div>
+  <div style="padding:16px">
+    <div style="border:1px solid var(--border);border-radius:6px;height:150px;display:grid;place-items:center;background:var(--studio);color:var(--fg-muted);margin-bottom:14px">🖼 preview</div>
+    <div class="stack gap4 small" style="margin-bottom:8px">
+      <div class="row between"><span class="muted">Type</span><span>image/png · 412 KB</span></div>
+      <div class="row between"><span class="muted">Last modified</span><span>2 days ago</span></div>
+    </div>
+    <div class="row gap8" style="margin:12px 0">
+      <button class="btn sm">↓ Download</button><button class="btn sm">Get URL ▾</button>
+    </div>
+    <div class="sep"></div>
+    <div class="row between" style="margin-bottom:8px"><div class="mono xs muted">VERSION HISTORY</div><span class="xs muted">3 versions</span></div>
+
+    <div class="vitem">
+      <div class="vln"><div class="vd cur"></div><div class="vl"></div></div>
+      <div class="grow">
+        <div class="row between"><div class="row gap8"><span class="mono small" style="color:var(--fg)">v3 · 1a2b3c</span><span class="badge green">Current</span></div><span class="xs muted">2d ago</span></div>
+        <div class="xs muted" style="margin-top:2px">412 KB · uploaded · jane@acme.co</div>
+        <div class="row gap8" style="margin-top:6px"><button class="btn ghost sm">Download</button><button class="btn ghost sm">Get URL</button></div>
+      </div>
+    </div>
+    <div class="vitem">
+      <div class="vln"><div class="vd"></div><div class="vl"></div></div>
+      <div class="grow">
+        <div class="row between"><span class="mono small" style="color:var(--fg)">v2 · 9f8e7d</span><span class="xs muted">6d ago</span></div>
+        <div class="xs muted" style="margin-top:2px">398 KB · overwritten</div>
+        <div class="row gap8" style="margin-top:6px"><button class="btn ghost sm">Download</button><button class="btn sm" onclick="toast('Restored v2 as current')">Restore this version</button><button class="btn ghost sm" style="color:var(--red)">Delete</button></div>
+      </div>
+    </div>
+    <div class="vitem">
+      <div class="vln"><div class="vd"></div></div>
+      <div class="grow">
+        <div class="row between"><span class="mono small" style="color:var(--fg)">v1 · 4c5d6e</span><span class="xs muted">14d ago</span></div>
+        <div class="xs muted" style="margin-top:2px">405 KB · created</div>
+        <div class="row gap8" style="margin-top:6px"><button class="btn ghost sm">Download</button><button class="btn sm" onclick="toast('Restored v1 as current')">Restore this version</button>
+          <button class="btn ghost sm" onclick="openPinBlock()" title="pinned by snapshot" style="color:var(--fg-muted)">🔒 Delete</button></div>
+        <div class="admon warn" style="margin-top:8px;padding:8px 10px"><span class="ai">⚠</span><div class="xs">Pinned by snapshot <span class="mono">pre-migration</span> — can’t delete until it expires or is removed.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- toast -->
+<div id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface-300);border:1px solid var(--border-strong);color:var(--fg);padding:9px 16px;border-radius:8px;font-size:13px;opacity:0;transition:opacity .2s;z-index:100;box-shadow:0 8px 30px rgba(0,0,0,.4)"></div>
+
+<script>
+  const pages=['overview','files','explorer','snapshots','restore','usage','trash','cli','analytics','vectors','s3'];
+  function go(id){
+    if(id==='analytics'||id==='vectors'||id==='s3'){toast('Existing surface — unchanged in this proposal');id='files';}
+    pages.forEach(p=>{const el=document.getElementById('p-'+p);if(el)el.classList.remove('active');});
+    const t=document.getElementById('p-'+id);if(t){t.classList.add('active');t.parentElement.scrollTop=0;}
+    document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+    const navMap={files:'files',explorer:'files',trash:'files',snapshots:'snapshots',usage:'usage',restore:'snapshots'};
+    document.querySelectorAll('.pill[data-go="'+(navMap[id]||id)+'"]').forEach(p=>p.classList.add('active'));
+  }
+  document.querySelectorAll('[data-go]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();go(el.dataset.go);}));
+
+  // modals / drawers
+  function openScrim(id){document.getElementById(id).classList.add('open');}
+  function closeScrim(){document.querySelectorAll('.scrim').forEach(s=>s.classList.remove('open'));}
+  document.querySelectorAll('.scrim').forEach(s=>s.addEventListener('click',e=>{if(e.target===s)closeScrim();}));
+  function openBucketModal(){openScrim('bucketScrim');}
+  function openSnapModal(){openScrim('snapScrim');}
+  function openPinBlock(){openScrim('pinScrim');}
+  function openRestoreSnap(){closeDrawer('snapDrawer');openScrim('snapRestoreScrim');}
+  function openRestoreModal(noSnap){
+    openScrim('restoreScrim');
+    const sec=document.getElementById('restoreStorageOn');
+    sec.style.display= noSnap ? 'none':'block';
+  }
+  function openDrawer(id){document.getElementById(id).classList.add('open');}
+  function closeDrawer(id){document.getElementById(id).classList.remove('open');}
+  function openVersions(){openDrawer('verDrawer');}
+  function openSnapDetail(){openDrawer('snapDrawer');}
+
+  // toggles
+  function toggleReveal(id,el){el.classList.toggle('on');document.getElementById(id).style.display=el.classList.contains('on')?'block':'none';}
+  document.querySelectorAll('.switch[data-toggle]').forEach(s=>s.addEventListener('click',()=>s.classList.toggle('on')));
+  function pick(el){el.parentElement.querySelectorAll('.radio').forEach(r=>r.classList.remove('on'));el.classList.add('on');}
+  function tickCheck(el){const c=el.querySelector('.check');c.classList.toggle('on');c.textContent=c.classList.contains('on')?'✓':'';}
+  function toggleStorageRestore(el){
+    const c=document.getElementById('stChk');c.classList.toggle('on');c.textContent=c.classList.contains('on')?'✓':'';
+    document.getElementById('stWarn').style.display=c.classList.contains('on')?'none':'block';
+  }
+  let showVersions=true;
+  function toggleShowVersions(){
+    showVersions=!showVersions;
+    document.getElementById('showVerBtn').classList.toggle('on',showVersions);
+    document.getElementById('showVerChk').style.display=showVersions?'inline-grid':'none';
+    document.querySelectorAll('.verrow.ver').forEach(r=>r.style.display=showVersions?'grid':'none');
+  }
+
+  function confirmEmpty(){toast('Type-to-confirm modal (TextConfirmModal) would open here');}
+
+  // toast
+  let tT;
+  function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(tT);tT=setTimeout(()=>t.style.opacity=0,2200);}
+
+  // usage stacked bars
+  (function(){
+    const data=[[52,4,0],[54,5,0],[51,7,3],[55,9,3],[58,12,6],[60,14,9],[62,16,9]];
+    const days=['Jul 18','19','20','21','22','23','24'];
+    const wrap=document.getElementById('usageBars'),x=document.getElementById('usageX');
+    if(!wrap)return;
+    const max=90;
+    data.forEach(d=>{
+      const col=document.createElement('div');col.className='barcol';
+      const parts=[['var(--brand)',d[0]],['var(--amber)',d[1]],['var(--violet)',d[2]]];
+      parts.forEach(([c,v])=>{const s=document.createElement('span');s.style.background=c;s.style.height=(v/max*100)+'%';col.appendChild(s);});
+      wrap.appendChild(col);
+    });
+    days.forEach(dy=>{const d=document.createElement('div');d.textContent=dy;x.appendChild(d);});
+  })();
+
+  go('overview');
+</script>
+</body>
+</html>
