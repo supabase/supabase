@@ -244,11 +244,14 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     it('scans all sources for log_type but keeps the other facets on default types', () => {
       const sql = getLogsCountQuery(baseSearch)
       // log_type's badge must span every source, so its guard carries no
-      // default-types restriction...
+      // default-types restriction at all (neither postgres nor edge)...
       expect(guardOfFacet(sql, 'log_type')).not.toContain(`source = 'postgres_logs'`)
-      // ...while total (and the other shared facets) stay scoped to postgres + edge.
-      expect(guardOfFacet(sql, 'total')).toContain(`source = 'postgres_logs'`)
-      expect(guardOfFacet(sql, 'total')).toContain(`source = 'edge_logs'`)
+      expect(guardOfFacet(sql, 'log_type')).not.toContain(`source = 'edge_logs'`)
+      // ...while the other shared facets stay scoped to the full postgres + edge default.
+      for (const facet of ['total', 'level', 'method', 'status']) {
+        expect(guardOfFacet(sql, facet)).toContain(`source = 'postgres_logs'`)
+        expect(guardOfFacet(sql, facet)).toContain(`source = 'edge_logs'`)
+      }
     })
 
     it('applies the connection-logs filter to every count scan so badges match the list', () => {
