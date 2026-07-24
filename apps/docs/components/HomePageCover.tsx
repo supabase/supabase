@@ -28,7 +28,7 @@ const fullGettingStartedEnabled = isFeatureEnabled('docs:full_getting_started')
 function SetupPrompt({ cliCode }: { cliCode: ReactNode }) {
   return (
     <PromptPanel>
-      <Prompt value="prompt" expandable>
+      <Prompt value="prompt">
         <PromptTitle icon={<Sparkles />}>AI Prompt</PromptTitle>
         <PromptCopy>{setupPrompt}</PromptCopy>
         <PromptContent>
