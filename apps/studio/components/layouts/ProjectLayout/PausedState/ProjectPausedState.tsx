@@ -148,7 +148,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
               </Button>
             )}
           </CardFooter>
-          {pauseStatus.latest_downloadable_backup_id !== null && <DownloadBackupsSection />}
+          <DownloadBackupsSection />
         </>
       )}
 

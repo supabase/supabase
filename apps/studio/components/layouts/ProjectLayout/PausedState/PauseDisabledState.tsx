@@ -30,7 +30,7 @@ export const PauseDisabledState = () => {
         <p className="leading-normal!">
           This project has been paused for over{' '}
           <span className="text-foreground">
-            {formatRestoreWindow(pauseStatus?.max_days_till_restore_disabled ?? 90)}
+            {formatRestoreWindow(pauseStatus?.max_days_till_restore_disabled ?? 365)}
           </span>{' '}
           and cannot be restored through the dashboard. However, your data remains intact and can be
           downloaded as a backup.
