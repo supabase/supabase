@@ -189,7 +189,7 @@ describe('dashboard content listing hrefs', () => {
 describe('contentListingItemSchema icon', () => {
   const baseItem = {
     title: 'Datadog',
-    href: '/guides/telemetry/log-drains#datadog',
+    href: '/guides/monitoring-and-debugging/log-drains#datadog',
     description: 'Stream logs directly into Datadog for monitoring and analysis.',
   }
 

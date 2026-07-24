@@ -8,18 +8,18 @@ export const telemetryDebugging: ContentListingGroup = {
   items: [
     {
       title: 'Debugging guide',
-      href: '/guides/telemetry/debugging',
+      href: '/guides/monitoring-and-debugging/debugging',
       description:
         'Isolate the failing layer, read logs as evidence, and match symptoms to troubleshooting guides.',
     },
     {
       title: 'Logging',
-      href: '/guides/telemetry/logs',
+      href: '/guides/monitoring-and-debugging/logs',
       description: 'Query events from any Supabase service using the Logs Explorer.',
     },
     {
       title: 'Advanced log filtering',
-      href: '/guides/telemetry/advanced-log-filtering',
+      href: '/guides/monitoring-and-debugging/advanced-log-filtering',
       description: 'Regex filtering, structured-field queries, and field discovery in ClickHouse.',
     },
     {
@@ -38,27 +38,27 @@ export const telemetryMonitoring: ContentListingGroup = {
   items: [
     {
       title: 'Log drains',
-      href: '/guides/telemetry/log-drains',
+      href: '/guides/monitoring-and-debugging/log-drains',
       description: 'Forward logs to Datadog, Loki, Axiom, S3, or a custom HTTP endpoint.',
     },
     {
       title: 'Reports',
-      href: '/guides/telemetry/reports',
+      href: '/guides/monitoring-and-debugging/reports',
       description: 'Built-in dashboards for API, Auth, Storage, and Realtime activity.',
     },
     {
       title: 'Metrics',
-      href: '/guides/telemetry/metrics',
+      href: '/guides/monitoring-and-debugging/metrics',
       description: 'Prometheus-compatible database metrics for Grafana and other tools.',
     },
     {
       title: 'Client-side tracing',
-      href: '/guides/telemetry/client-side-tracing',
+      href: '/guides/monitoring-and-debugging/client-side-tracing',
       description: 'Correlate browser requests end-to-end using W3C Trace Context.',
     },
     {
       title: 'Sentry integration',
-      href: '/guides/telemetry/sentry-monitoring',
+      href: '/guides/monitoring-and-debugging/sentry-monitoring',
       description: 'Send errors to Sentry for alerting and grouping.',
     },
   ],

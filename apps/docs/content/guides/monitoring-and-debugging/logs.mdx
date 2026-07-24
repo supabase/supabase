@@ -8,7 +8,7 @@ The Supabase Platform includes a Logs Explorer that allows log tracing and debug
 
 <Admonition type="note">
 
-If you are debugging a specific error or unexpected behavior, start with the [Debugging guide](/docs/guides/telemetry/debugging) — it routes you to the right log source based on your error code or symptom before you open the Logs Explorer.
+If you are debugging a specific error or unexpected behavior, start with the [Debugging guide](/docs/guides/monitoring-and-debugging/debugging) — it routes you to the right log source based on your error code or symptom before you open the Logs Explorer.
 
 </Admonition>
 
@@ -18,7 +18,7 @@ Supabase provides a logging interface specific to each product. You can use regu
 
 <Admonition type="tip">
 
-For regular expression filtering, structured-field queries, and field discovery techniques, see [Advanced log filtering](/docs/guides/telemetry/advanced-log-filtering).
+For regular expression filtering, structured-field queries, and field discovery techniques, see [Advanced log filtering](/docs/guides/monitoring-and-debugging/advanced-log-filtering).
 
 </Admonition>
 
@@ -357,7 +357,6 @@ Identify which service owns the problem from the error or status code first, the
 5. **Reference only fields you have confirmed.**
 
 A misspelled or non-existent field name either errors or silently returns nothing, which leaves a working query look empty. Confirm field names in the [field reference](#logs-field-reference), or select `event_message` and inspect a sample row first.
-
 
 ### Logs field reference
 

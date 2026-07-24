@@ -214,7 +214,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           {
             label: 'Monitoring and Debugging',
             icon: 'telemetry',
-            href: '/guides/telemetry' as `/${string}`,
+            href: '/guides/monitoring-and-debugging' as `/${string}`,
             level: 'telemetry',
           },
           {
@@ -2984,28 +2984,28 @@ export const platform: NavMenuConstant = {
 export const telemetry: NavMenuConstant = {
   icon: 'telemetry',
   title: 'Monitoring and Debugging',
-  url: '/guides/telemetry',
+  url: '/guides/monitoring-and-debugging',
   items: [
-    { name: 'Overview', url: '/guides/telemetry' },
+    { name: 'Overview', url: '/guides/monitoring-and-debugging' },
     {
       name: 'Debugging',
       url: undefined,
       items: [
         {
           name: 'Debugging guide',
-          url: '/guides/telemetry/debugging' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/debugging' as `/${string}`,
         },
         {
           name: 'Logging',
-          url: '/guides/telemetry/logs' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/logs' as `/${string}`,
         },
         {
           name: 'Advanced log filtering',
-          url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
         },
         {
           name: 'Logs field reference',
-          url: '/guides/telemetry/log-field-reference' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/log-field-reference' as `/${string}`,
         },
       ],
     },
@@ -3015,27 +3015,27 @@ export const telemetry: NavMenuConstant = {
       items: [
         {
           name: 'Log drains',
-          url: '/guides/telemetry/log-drains' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/log-drains' as `/${string}`,
         },
         {
           name: 'Reports',
-          url: '/guides/telemetry/reports' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/reports' as `/${string}`,
         },
         {
           name: 'Metrics',
-          url: '/guides/telemetry/metrics' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
           items: [
             {
               name: 'Overview',
-              url: '/guides/telemetry/metrics' as `/${string}`,
+              url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
             },
             {
               name: 'Grafana Cloud',
-              url: '/guides/telemetry/metrics/grafana-cloud' as `/${string}`,
+              url: '/guides/monitoring-and-debugging/metrics/grafana-cloud' as `/${string}`,
             },
             {
               name: 'Grafana self-hosted',
-              url: '/guides/telemetry/metrics/grafana-self-hosted' as `/${string}`,
+              url: '/guides/monitoring-and-debugging/metrics/grafana-self-hosted' as `/${string}`,
             },
             {
               name: 'Datadog',
@@ -3043,17 +3043,17 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Vendor-agnostic setup',
-              url: '/guides/telemetry/metrics/vendor-agnostic' as `/${string}`,
+              url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
             },
           ],
         },
         {
           name: 'Sentry integration',
-          url: '/guides/telemetry/sentry-monitoring' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
         },
         {
           name: 'Tracing with the JS SDK',
-          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
       ],
     },

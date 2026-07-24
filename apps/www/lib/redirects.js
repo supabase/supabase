@@ -120,6 +120,11 @@ module.exports = [
     destination: '/docs/guides/observability/:match*',
   },
   {
+    permanent: true,
+    source: '/docs/guides/telemetry/:match*',
+    destination: '/docs/guides/monitoring-and-debugging/:match*',
+  },
+  {
     permanent: false,
     source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
     destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
