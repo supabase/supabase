@@ -1,5 +1,3 @@
-'use client'
-
 import { Check, ChevronsUpDown, Logs, Terminal } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
@@ -97,13 +95,13 @@ const logTypes = [
   },
 ]
 
-export function LogsManager({ projectRef }: { projectRef: string }) {
+export function LogsManager() {
   const [activeTab, setActiveTab] = useState<LogsTableName>(LogsTableName.FN_EDGE)
   const [open, setOpen] = useState(false)
 
   const sql = useMemo(() => genDefaultQuery(activeTab), [activeTab])
 
-  const { data: logs, isLoading, error } = useGetLogs(projectRef, { sql })
+  const { data: logs, isLoading, error } = useGetLogs({ sql })
 
   const selectedLogType = logTypes.find((type) => type.value === activeTab)
 

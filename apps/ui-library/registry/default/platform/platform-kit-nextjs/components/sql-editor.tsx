@@ -1,5 +1,3 @@
-'use client'
-
 import { Editor } from '@monaco-editor/react'
 import {
   AlertTriangle,
@@ -35,9 +33,12 @@ import { Switch } from '@/registry/default/components/ui/switch'
 import { ToggleGroup, ToggleGroupItem } from '@/registry/default/components/ui/toggle-group'
 import { ResultsTable } from '@/registry/default/platform/platform-kit-nextjs/components/results-table'
 import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
+import {
+  useFeatures,
+  usePlatformAdapter,
+} from '@/registry/default/platform/platform-kit-nextjs/lib/adapter/context'
 
 interface SqlEditorProps {
-  projectRef: string
   initialSql?: string
   queryKey?: any
   label?: string
@@ -52,7 +53,6 @@ interface SqlEditorProps {
 }
 
 export function SqlEditor({
-  projectRef,
   initialSql,
   queryKey,
   onResults,
@@ -65,10 +65,12 @@ export function SqlEditor({
   initialNaturalLanguageMode = false,
   hideChartOption = false,
 }: SqlEditorProps) {
+  const adapter = usePlatformAdapter()
+  const features = useFeatures()
   const [sql, setSql] = useState(initialSql || '')
   const [isSqlVisible, setIsSqlVisible] = useState(!hideSql)
   const [isNaturalLanguageMode, setIsNaturalLanguageMode] = useState(
-    process.env.NEXT_PUBLIC_ENABLE_AI_QUERIES === 'true' && initialNaturalLanguageMode
+    features.naturalLanguageSql && initialNaturalLanguageMode
   )
   const [naturalLanguageQuery, setNaturalLanguageQuery] = useState('')
   const { mutate: runQuery, data, isPending, error } = useRunQuery()
@@ -84,49 +86,27 @@ export function SqlEditor({
   }, [data])
 
   useEffect(() => {
-    if (initialSql) {
-      setSql(initialSql)
-    }
+    if (initialSql) setSql(initialSql)
   }, [initialSql])
 
   const handleRunNaturalLanguageQuery = async () => {
-    if (!naturalLanguageQuery) return
-
+    if (!naturalLanguageQuery || !adapter.generateSql) return
     setIsGeneratingSql(true)
     setAiError(null)
     try {
-      const response = await fetch('/api/ai/sql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: naturalLanguageQuery,
-          projectRef,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to generate SQL')
-      }
-
-      const { sql: generatedSql } = await response.json()
+      const { sql: generatedSql } = await adapter.generateSql(naturalLanguageQuery)
       setSql(generatedSql)
-      runQuery({ projectRef, query: generatedSql, readOnly: true })
-    } catch (error: any) {
-      console.error(error)
-      setAiError(error.message)
+      runQuery({ query: generatedSql, readOnly: true })
+    } catch (err: any) {
+      setAiError(err?.message || 'Failed to generate SQL')
     } finally {
       setIsGeneratingSql(false)
     }
   }
 
   const handleRunQuery = useCallback(() => {
-    if (sql) {
-      runQuery({ projectRef, query: sql, readOnly: true })
-    }
-  }, [sql, projectRef, runQuery])
+    if (sql) runQuery({ query: sql, readOnly: true })
+  }, [sql, runQuery])
 
   useEffect(() => {
     setIsSqlVisible(!hideSql)
@@ -134,20 +114,16 @@ export function SqlEditor({
 
   useEffect(() => {
     if (runAutomatically && initialSql) {
-      runQuery({ projectRef, query: initialSql, readOnly: true })
+      runQuery({ query: initialSql, readOnly: true })
     }
-  }, [runAutomatically, initialSql, projectRef, runQuery])
+  }, [runAutomatically, initialSql, runQuery])
 
   useEffect(() => {
-    if (refetch && refetch > 0) {
-      handleRunQuery()
-    }
+    if (refetch && refetch > 0) handleRunQuery()
   }, [refetch, handleRunQuery])
 
   useEffect(() => {
-    if (onResults) {
-      onResults(data)
-    }
+    if (onResults) onResults(data as any[] | undefined)
   }, [data, onResults])
 
   useEffect(() => {
@@ -155,14 +131,13 @@ export function SqlEditor({
     if (noResults && !isSqlVisible && !isNaturalLanguageMode && !readOnly && !isPending) {
       setIsSqlVisible(true)
     }
-  }, [data, isSqlVisible, isNaturalLanguageMode])
+  }, [data, isSqlVisible, isNaturalLanguageMode, readOnly, isPending])
 
-  const serverErrorMessage = (error as any)?.response?.data?.message || ''
+  const serverErrorMessage = (error as any)?.message || ''
   const isReadOnlyError =
     serverErrorMessage.includes('permission denied') || serverErrorMessage.includes('42501')
   const customReadOnlyError = "You can't directly alter your database schema, use chat instead"
 
-  // Build the toggle-group selection based on current UI state
   const toggleValues = useMemo(() => {
     const values: string[] = []
     if (isNaturalLanguageMode) values.push('chat')
@@ -174,16 +149,14 @@ export function SqlEditor({
   const handleToggleGroupChange = (values: string[]) => {
     setIsNaturalLanguageMode(values.includes('chat'))
     setIsSqlVisible(values.includes('sql'))
-    if (!hideChartOption) {
-      setIsChartVisible(values.includes('chart'))
-    }
+    if (!hideChartOption) setIsChartVisible(values.includes('chart'))
   }
 
   return (
     <div>
       <div className="px-6 pt-4 lg:px-8 lg:pt-8">
-        <div className="flex items-center gap-4 mb-4    ">
-          <h2 className="font-semibold flex-1">{label}</h2>
+        <div className="mb-4 flex items-center gap-4">
+          <h2 className="flex-1 font-semibold">{label}</h2>
           <ToggleGroup
             type="multiple"
             size="sm"
@@ -191,7 +164,7 @@ export function SqlEditor({
             onValueChange={handleToggleGroupChange}
             className="gap-1"
           >
-            {process.env.NEXT_PUBLIC_ENABLE_AI_QUERIES === 'true' && (
+            {features.naturalLanguageSql && (
               <ToggleGroupItem value="chat" aria-label="Chat">
                 <Wand className="h-4 w-4" />
               </ToggleGroupItem>
@@ -211,7 +184,7 @@ export function SqlEditor({
                     <div className="grid gap-2">
                       <div className="flex items-center space-x-2">
                         <div className="flex-1">
-                          <Label className="flex-1 mb-2 block">Show Chart</Label>
+                          <Label className="mb-2 block flex-1">Show Chart</Label>
                           <p className="text-xs text-muted-foreground">
                             Visualize your data with a chart.
                           </p>
@@ -226,7 +199,7 @@ export function SqlEditor({
                       </div>
                       {isChartVisible && (
                         <div className="mt-2">
-                          <div className="grid grid-cols-3 items-center gap-4 mb-2">
+                          <div className="mb-2 grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="x-axis">X-Axis</Label>
                             <Select
                               onValueChange={setXAxisColumn}
@@ -244,7 +217,7 @@ export function SqlEditor({
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className="grid grid-cols-3 items-center gap-4 mb-2">
+                          <div className="mb-2 grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="y-axis">Y-Axis</Label>
                             <Select
                               onValueChange={setYAxisColumn}
@@ -294,11 +267,9 @@ export function SqlEditor({
               <Button
                 onClick={handleRunNaturalLanguageQuery}
                 disabled={isGeneratingSql || isPending}
-                className="h-7 w-7 rounded-full p-0 shrink-0 absolute right-1 top-1/2 -translate-y-1/2"
+                className="absolute right-1 top-1/2 h-7 w-7 shrink-0 -translate-y-1/2 rounded-full p-0"
               >
-                {isGeneratingSql ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : isPending ? (
+                {isGeneratingSql || isPending ? (
                   <Loader2 size={16} className="animate-spin" />
                 ) : (
                   <ArrowUp size={16} />
@@ -307,7 +278,7 @@ export function SqlEditor({
             </div>
           )}
           {isSqlVisible && (
-            <div className="border-t border-b bg-muted overflow-hidden -mx-6 lg:-mx-8 mt-4 relative">
+            <div className="relative -mx-6 mt-4 overflow-hidden border-b border-t bg-muted lg:-mx-8">
               <Editor
                 height="200px"
                 language="sql"
@@ -319,10 +290,7 @@ export function SqlEditor({
                   minimap: { enabled: false },
                   fontSize: 14,
                   readOnly,
-                  padding: {
-                    top: 24,
-                    bottom: 24,
-                  },
+                  padding: { top: 24, bottom: 24 },
                 }}
               />
               <Button
@@ -342,13 +310,10 @@ export function SqlEditor({
           <Skeleton className="h-6 w-full" />
           <Skeleton className="h-6 w-full" />
           <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
-          <Skeleton className="h-6 w-full" />
         </div>
       )}
       {aiError && (
-        <div className="px-6 lg:px-8 py-4">
+        <div className="px-6 py-4 lg:px-8">
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Error generating SQL</AlertTitle>
@@ -357,7 +322,7 @@ export function SqlEditor({
         </div>
       )}
       {error && (
-        <div className="px-6 lg:px-8 py-4">
+        <div className="px-6 py-4 lg:px-8">
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Query Error</AlertTitle>
@@ -371,14 +336,14 @@ export function SqlEditor({
       )}
 
       {!hideChartOption && data && isChartVisible && xAxisColumn && yAxisColumn && (
-        <div className="px-8 mt-8 mb-4">
-          <QueryResultChart data={data} xAxis={xAxisColumn} yAxis={yAxisColumn} />
+        <div className="mb-4 mt-8 px-8">
+          <QueryResultChart data={data as any[]} xAxis={xAxisColumn} yAxis={yAxisColumn} />
         </div>
       )}
 
       {data && (
         <div>
-          <ResultsTable data={data} onRowClick={(row) => onRowClick?.(row, queryKey)} />
+          <ResultsTable data={data as any[]} onRowClick={(row) => onRowClick?.(row, queryKey)} />
         </div>
       )}
     </div>
@@ -387,22 +352,12 @@ export function SqlEditor({
 
 function QueryResultChart({ data, xAxis, yAxis }: { data: any[]; xAxis: string; yAxis: string }) {
   const chartConfig = {
-    [yAxis]: {
-      label: yAxis,
-      color: 'var(--chart-1)',
-    },
+    [yAxis]: { label: yAxis, color: 'var(--chart-1)' },
   } satisfies ChartConfig
 
   return (
     <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-      <BarChart
-        accessibilityLayer
-        data={data}
-        margin={{
-          left: -24,
-          right: 12,
-        }}
-      >
+      <BarChart accessibilityLayer data={data} margin={{ left: -24, right: 12 }}>
         <CartesianGrid vertical={false} />
         <XAxis dataKey={xAxis} tickLine={false} axisLine={false} tickMargin={8} minTickGap={32} />
         <YAxis

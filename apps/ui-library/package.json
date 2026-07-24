@@ -63,6 +63,7 @@
     "ui-patterns": "workspace:*",
     "unist-util-visit": "^5.0.0",
     "vaul": "^1.1.2",
+    "wouter": "^3.10.0",
     "y-monaco": "^0.1.6",
     "y-protocols": "^1.0.7",
     "yjs": "^13.6.29",
@@ -80,6 +81,7 @@
     "@types/lodash": "^4.17.16",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
     "config": "workspace:^",
     "lodash": "catalog:",
     "mdast-util-toc": "^6.1.1",
@@ -92,7 +94,6 @@
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:"
   }

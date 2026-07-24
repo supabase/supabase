@@ -1,5 +1,3 @@
-'use client'
-
 import { AlertTriangle, Folder } from 'lucide-react'
 
 import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
@@ -9,8 +7,8 @@ import { Skeleton } from '@/registry/default/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/registry/default/components/ui/tooltip'
 import { useGetBuckets } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-storage'
 
-export function StorageManager({ projectRef }: { projectRef: string }) {
-  const { data: buckets, isLoading, isError } = useGetBuckets(projectRef)
+export function StorageManager() {
+  const { data: buckets, isLoading, isError } = useGetBuckets()
 
   return (
     <div className="p-6 pt-4 lg:p-8 lg:pt-8">

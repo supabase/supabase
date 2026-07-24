@@ -1,5 +1,3 @@
-'use client'
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   ChevronLeft,
@@ -13,16 +11,12 @@ import {
   Shield,
   Users,
 } from 'lucide-react'
-import Link from 'next/link'
-import { ReactNode, useMemo, useState } from 'react'
+import { useMemo, useState, type ComponentType } from 'react'
+import { Route, Router, Switch, useLocation } from 'wouter'
+import { memoryLocation } from 'wouter/memory-location'
 
 import { Button } from '@/registry/default/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogTrigger,
-} from '@/registry/default/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/registry/default/components/ui/dialog'
 import {
   Drawer,
   DrawerContent,
@@ -35,110 +29,190 @@ import {
   HoverCardTrigger,
 } from '@/registry/default/components/ui/hover-card'
 import { LogoSupabase } from '@/registry/default/platform/platform-kit-nextjs/components/logo-supabase'
-import { AuthManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/auth'
-import { DatabaseManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/database'
+import {
+  AuthManager,
+  AuthProviderView,
+} from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/auth'
+import {
+  DatabaseManager,
+  DatabaseQueryView,
+  EditRowView,
+  TableRecordsView,
+} from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/database'
 import { LogsManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/logs'
+import { ManagerStateProvider } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/manager-state'
 import { SecretsManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/secrets'
 import { StorageManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/storage'
 import { SuggestionsManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/suggestions'
 import { UsersManager } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/users'
 import {
-  SheetNavigationProvider,
-  useSheetNavigation,
-} from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
+  PlatformProvider,
+  useFeatures,
+  usePlatformAdapter,
+} from '@/registry/default/platform/platform-kit-nextjs/lib/adapter/context'
+import type { PlatformAdapter } from '@/registry/default/platform/platform-kit-nextjs/lib/adapter/types'
+import { buildBreadcrumbs } from '@/registry/default/platform/platform-kit-nextjs/lib/router'
 
-const queryClient = new QueryClient()
+interface NavItem {
+  key: string
+  path: string
+  title: string
+  label: string
+  icon: ComponentType<{ className?: string }>
+  show: boolean
+}
 
-function DialogView({ projectRef, isMobile }: { projectRef: string; isMobile?: boolean }) {
-  const { stack, push, popTo, reset } = useSheetNavigation()
+function useNavItems(): NavItem[] {
+  const features = useFeatures()
+  return [
+    {
+      key: 'database',
+      path: '/database',
+      title: 'Database',
+      label: 'Database',
+      icon: Database,
+      show: features.introspection,
+    },
+    {
+      key: 'storage',
+      path: '/storage',
+      title: 'Storage',
+      label: 'Storage',
+      icon: HardDrive,
+      show: features.storage,
+    },
+    {
+      key: 'auth',
+      path: '/auth',
+      title: 'Authentication',
+      label: 'Auth',
+      icon: Shield,
+      show: features.authConfig,
+    },
+    {
+      key: 'users',
+      path: '/users',
+      title: 'Users',
+      label: 'Users',
+      icon: Users,
+      show: features.authUsers,
+    },
+    {
+      key: 'secrets',
+      path: '/secrets',
+      title: 'Secrets',
+      label: 'Secrets',
+      icon: KeyRound,
+      show: features.secrets,
+    },
+    {
+      key: 'logs',
+      path: '/logs',
+      title: 'Logs',
+      label: 'Logs',
+      icon: ScrollText,
+      show: features.logs,
+    },
+    {
+      key: 'suggestions',
+      path: '/suggestions',
+      title: 'Suggestions',
+      label: 'Suggestions',
+      icon: Lightbulb,
+      show: features.advisors,
+    },
+  ].filter((item) => item.show)
+}
 
-  const handleTopLevelNavigation = (title: string, component: ReactNode) => {
-    if (stack.length === 1 && stack[0].title === title) {
-      return
-    }
-    reset()
-    push({ title, component })
-  }
-
-  const currentView = stack[stack.length - 1]
-  const activeManager = stack.length > 0 ? stack[0].title : null
-
-  const navigationItems = useMemo(
-    () => [
-      {
-        title: 'Database',
-        icon: Database,
-        component: <DatabaseManager projectRef={projectRef} />,
-      },
-      {
-        title: 'Storage',
-        icon: HardDrive,
-        component: <StorageManager projectRef={projectRef} />,
-      },
-      {
-        title: 'Auth',
-        icon: Shield,
-        component: <AuthManager projectRef={projectRef} />,
-      },
-      {
-        title: 'Users',
-        icon: Users,
-        component: <UsersManager projectRef={projectRef} />,
-      },
-      {
-        title: 'Secrets',
-        icon: KeyRound,
-        component: <SecretsManager projectRef={projectRef} />,
-      },
-      {
-        title: 'Logs',
-        icon: ScrollText,
-        component: <LogsManager projectRef={projectRef} />,
-      },
-      {
-        title: 'Suggestions',
-        icon: Lightbulb,
-        component: <SuggestionsManager projectRef={projectRef} />,
-      },
-    ],
-    [projectRef]
+function ManagerRoutes() {
+  return (
+    <Switch>
+      <Route path="/database" component={DatabaseManager} />
+      <Route path="/database/query" component={DatabaseQueryView} />
+      <Route path="/database/:table/edit">
+        {(params) => <EditRowView tableName={decodeURIComponent(params.table)} />}
+      </Route>
+      <Route path="/database/:table">
+        {(params) => <TableRecordsView tableName={decodeURIComponent(params.table)} />}
+      </Route>
+      <Route path="/storage" component={StorageManager} />
+      <Route path="/auth" component={AuthManager} />
+      <Route path="/auth/:provider">
+        {(params) => <AuthProviderView providerName={decodeURIComponent(params.provider)} />}
+      </Route>
+      <Route path="/users" component={UsersManager} />
+      <Route path="/secrets" component={SecretsManager} />
+      <Route path="/logs" component={LogsManager} />
+      <Route path="/suggestions" component={SuggestionsManager} />
+    </Switch>
   )
+}
+
+function DashboardLink() {
+  const adapter = usePlatformAdapter()
+  const url = adapter.dashboardUrl?.()
+  if (!url) return null
+  return (
+    <footer className="-m-3 flex items-center gap-3 border-t p-0 text-sm text-muted-foreground">
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <a
+            href={url}
+            target="_blank"
+            rel="noreferrer"
+            className="flex h-auto w-full items-center justify-start gap-3 rounded-none px-4 py-4 text-left text-sm hover:bg-accent"
+          >
+            <LogoSupabase size={16} />
+            <span className="flex-1">Open in Supabase</span>
+            <ExternalLink className="ml-2 h-4 w-4 text-muted-foreground/50" />
+          </a>
+        </HoverCardTrigger>
+        <HoverCardContent
+          sideOffset={8}
+          align="start"
+          side="top"
+          className="w-[216px] bg-muted/50 text-sm"
+        >
+          <h4 className="mb-1 font-semibold">About Supabase</h4>
+          <p className="text-muted-foreground">
+            Access powerful back-end tools for database, auth, storage, and logs directly in
+            Supabase.
+          </p>
+        </HoverCardContent>
+      </HoverCard>
+    </footer>
+  )
+}
+
+function ManagerLayout({ isMobile }: { isMobile?: boolean }) {
+  const [location, navigate] = useLocation()
+  const navItems = useNavItems()
+  const crumbs = buildBreadcrumbs(location)
+
+  const isActive = (path: string) => location === path || location.startsWith(`${path}/`)
 
   if (isMobile) {
     return (
-      <div className="flex flex-col h-full overflow-hidden">
-        {/* Content Area */}
-        <div className="flex flex-col overflow-hidden h-full">
+      <div className="flex h-full flex-col overflow-hidden">
+        <div className="flex h-full flex-col overflow-hidden">
           <div className="grow overflow-y-auto">
-            {currentView ? (
-              currentView.component
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-muted-foreground">
-                  Select a manager from the bottom navigation to get started.
-                </p>
-              </div>
-            )}
+            <ManagerRoutes />
           </div>
         </div>
-
-        {/* Bottom Navigation Bar */}
         <div className="border-t bg-background">
           <div className="overflow-x-auto">
-            <div className="flex gap-1 p-2 min-w-max">
-              {navigationItems.map((item) => {
+            <div className="flex min-w-max gap-1 p-2">
+              {navItems.map((item) => {
                 const Icon = item.icon
                 return (
                   <Button
-                    key={item.title}
-                    variant={activeManager === item.title ? 'secondary' : 'ghost'}
-                    className="flex-col h-16 w-20 min-w-16 text-xs gap-1 px-2"
-                    onClick={() => handleTopLevelNavigation(item.title, item.component)}
+                    key={item.key}
+                    variant={isActive(item.path) ? 'secondary' : 'ghost'}
+                    className="h-16 w-20 min-w-16 flex-col gap-1 px-2 text-xs"
+                    onClick={() => navigate(item.path)}
                   >
                     <Icon className="h-5 w-5" />
-                    <span className="text-[10px] leading-tight text-center">
-                      {item.title === 'Auth' ? 'Auth' : item.title}
-                    </span>
+                    <span className="text-center text-[10px] leading-tight">{item.label}</span>
                   </Button>
                 )
               })}
@@ -150,87 +224,59 @@ function DialogView({ projectRef, isMobile }: { projectRef: string; isMobile?: b
   }
 
   return (
-    <div className="grid grid-cols-[240px_1fr] h-full overflow-hidden">
+    <div className="grid h-full grid-cols-[240px_1fr] overflow-hidden">
       {/* Sidebar */}
       <div className="flex flex-col border-r px-3 py-6 pb-3">
-        <div className="px-4 mb-4">
-          <h2 className="text-muted-foreground font-semibold text-sm">Manage your back-end</h2>
+        <div className="mb-4 px-4">
+          <h2 className="text-sm font-semibold text-muted-foreground">Manage your back-end</h2>
         </div>
         <div className="grow space-y-0.5">
-          {navigationItems.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon
             return (
               <Button
-                key={item.title}
-                variant={activeManager === item.title ? 'secondary' : 'ghost'}
+                key={item.key}
+                variant={isActive(item.path) ? 'secondary' : 'ghost'}
                 className="w-full justify-start text-sm"
-                onClick={() => handleTopLevelNavigation(item.title, item.component)}
+                onClick={() => navigate(item.path)}
               >
                 <Icon className="mr-2 text-muted-foreground" />
-                {item.title === 'Auth' ? 'Authentication' : item.title}
+                {item.title}
               </Button>
             )
           })}
         </div>
-        <footer className="p-0 text-sm text-muted-foreground flex items-center gap-3 -m-3 border-t">
-          <HoverCard>
-            <HoverCardTrigger asChild>
-              <Link
-                href={`https://supabase.com/dashboard/project/${projectRef}`}
-                target="_blank"
-                className="flex items-center px-4 w-full rounded-none text-sm py-4 h-auto justify-start gap-3 text-sm text-left hover:bg-accent"
-              >
-                <LogoSupabase size={16} />
-                <span className="flex-1">Open in Supabase</span>
-                <ExternalLink className="ml-2 h-4 w-4 text-muted-foreground/50" />
-              </Link>
-            </HoverCardTrigger>
-            <HoverCardContent
-              sideOffset={8}
-              align="start"
-              side="top"
-              className="text-sm bg-muted/50 w-[216px]"
-            >
-              <h4 className="font-semibold mb-1">About Supabase</h4>
-              <p className="text-muted-foreground">
-                Access powerful back-end tools for database, auth, storage, and logs directly in
-                Supabase.
-              </p>
-            </HoverCardContent>
-          </HoverCard>
-        </footer>
+        <DashboardLink />
       </div>
 
-      {/* Content Area */}
-      <div className="flex flex-col overflow-hidden h-full">
-        {/* Header with breadcrumbs */}
-        <div className="flex items-center h-12 shrink-0 px-4 relative border-b">
-          {stack.length > 1 && (
+      {/* Content */}
+      <div className="flex flex-col overflow-hidden">
+        <div className="relative flex h-12 shrink-0 items-center border-b px-4">
+          {crumbs.length > 1 && (
             <Button
               variant="outline"
               size="icon"
-              className="h-8 w-8 relative z-10"
-              onClick={() => popTo(stack.length - 2)}
+              className="relative z-10 h-8 w-8"
+              onClick={() => navigate(crumbs[crumbs.length - 2].path)}
             >
               <ChevronLeft className="h-4 w-4" />
               <span className="sr-only">Back</span>
             </Button>
           )}
-          {/* Breadcrumbs */}
-          <div className="ml-4 flex items-center gap-1.5 text-sm text-muted-foreground relative z-10">
-            {stack.map((item: { title: string }, index: number) => (
-              <div key={`${item.title}-${index}`} className="flex items-center gap-1.5">
+          <div className="relative z-10 ml-4 flex items-center gap-1.5 text-sm text-muted-foreground">
+            {crumbs.map((crumb, index) => (
+              <div key={crumb.path} className="flex items-center gap-1.5">
                 {index > 0 && <ChevronRight className="h-3 w-3" />}
-                {index === stack.length - 1 ? (
-                  <span className="font-semibold text-foreground">{item.title}</span>
+                {index === crumbs.length - 1 ? (
+                  <span className="font-semibold text-foreground">{crumb.title}</span>
                 ) : (
                   <button
                     type="button"
                     tabIndex={0}
-                    onClick={() => popTo(index)}
+                    onClick={() => navigate(crumb.path)}
                     className="hover:underline"
                   >
-                    {item.title}
+                    {crumb.title}
                   </button>
                 )}
               </div>
@@ -239,51 +285,52 @@ function DialogView({ projectRef, isMobile }: { projectRef: string; isMobile?: b
         </div>
 
         <div className="grow overflow-y-auto">
-          {currentView ? (
-            currentView.component
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground">
-                Select a manager from the sidebar to get started.
-              </p>
-            </div>
-          )}
+          <ManagerRoutes />
         </div>
       </div>
     </div>
   )
 }
 
+function ManagerShell({ isMobile }: { isMobile?: boolean }) {
+  const router = useMemo(() => memoryLocation({ path: '/database' }), [])
+  return (
+    <ManagerStateProvider>
+      <Router hook={router.hook}>
+        <ManagerLayout isMobile={isMobile} />
+      </Router>
+    </ManagerStateProvider>
+  )
+}
+
 export default function SupabaseManagerDialog({
-  projectRef,
+  adapter,
   open,
   onOpenChange,
   isMobile,
+  queryClient,
 }: {
-  projectRef: string
+  adapter: PlatformAdapter
   open: boolean
   onOpenChange: (open: boolean) => void
-  isMobile: boolean
+  isMobile?: boolean
+  /** Optional shared QueryClient; one is created if omitted. */
+  queryClient?: QueryClient
 }) {
+  const [fallbackClient] = useState(() => new QueryClient())
+  const client = queryClient ?? fallbackClient
+
   const content = (
-    <SheetNavigationProvider
-      onStackEmpty={() => {}}
-      initialStack={[
-        {
-          title: 'Database',
-          component: <DatabaseManager projectRef={projectRef} />,
-        },
-      ]}
-    >
-      <DialogView projectRef={projectRef} isMobile={isMobile} />
-    </SheetNavigationProvider>
+    <PlatformProvider adapter={adapter}>
+      <ManagerShell isMobile={isMobile} />
+    </PlatformProvider>
   )
 
   if (!isMobile) {
     return (
-      <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={client}>
         <Dialog open={open} onOpenChange={onOpenChange}>
-          <DialogContent className="w-full h-[80vh] max-h-[700px] sm:max-w-[calc(100%-2rem)] w-[1180px] p-0 overflow-hidden sm:rounded-lg">
+          <DialogContent className="h-[80vh] max-h-[700px] w-[1180px] overflow-hidden p-0 sm:max-w-[calc(100%-2rem)] sm:rounded-lg">
             <DialogTitle className="sr-only">Manage your back-end</DialogTitle>
             {content}
           </DialogContent>
@@ -293,9 +340,9 @@ export default function SupabaseManagerDialog({
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={client}>
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="h-[90vh] p-0 overflow-hidden">
+        <DrawerContent className="h-[90vh] overflow-hidden p-0">
           <DrawerHeader className="sr-only">
             <DrawerTitle>Manage your back-end</DrawerTitle>
           </DrawerHeader>

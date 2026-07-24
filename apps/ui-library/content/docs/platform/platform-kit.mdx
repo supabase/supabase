@@ -15,7 +15,7 @@ description: The easiest way to build platforms on top of Supabase
 
 <BlockItem
   name="platform-kit-nextjs"
-  description="Embeddable dialog for managing Supabase projects via the Management API."
+  description="Adapter-driven, client-side dialog for managing a Supabase or supalite project."
 />
 
 ## Folder structure
@@ -24,15 +24,17 @@ description: The easiest way to build platforms on top of Supabase
 
 ## Introduction
 
-The Platform Kit is a collection of customizable API's, hooks and components you can use to provide an embedded Supabase experience within your own platform. It comes in the form of a single dialog that enables the management of database, authentication, storage, users, secrets, logs, and performance monitoring.
+The Platform Kit is a collection of customizable hooks and components you can use to provide an embedded Supabase experience within your own platform. It ships a single dialog for managing your database, authentication, storage, users, secrets, logs, and performance monitoring.
+
+It is fully client-side and framework-agnostic (React + Vite, wouter for in-dialog routing). Data, auth, and storage go through `@supabase/supabase-js`; schema introspection goes through PostgREST. A pluggable **adapter** decides which backend the dialog talks to and which features are available, so the same UI works against hosted Supabase and [supalite](https://github.com/supabase/lite).
 
 **Features**
 
 - Database, Auth, Storage, User, Secrets, Logs, and Performance management
 - Responsive dialog/drawer interface (desktop & mobile)
-- API proxy for Management API
-- AI-powered SQL generation (optional)
-- Customize to your liking
+- Adapter-driven: works with Supabase or supalite, or bring your own
+- Feature flags: panels show/hide based on what the adapter supports
+- Natural-language SQL generation (optional)
 
 ## Who is it for
 
@@ -40,72 +42,99 @@ Anyone who is providing Postgres databases to their users.
 
 ## Usage
 
-Embed the manager dialog in your app and manage its state:
+Pass an adapter to the dialog. The bundled `createSupabaseAdapter` takes a `supabase-js` client:
 
 ```tsx
+import { createClient } from '@supabase/supabase-js'
 import { useState } from 'react'
 
 import SupabaseManagerDialog from '@/components/supabase-manager'
 import { Button } from '@/components/ui/button'
-import { useMobile } from '@/hooks/use-mobile'
+import { createSupabaseAdapter } from '@/lib/adapter/create-supabase-adapter'
+
+const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
+
+const adapter = createSupabaseAdapter({
+  supabase,
+  projectRef: 'your-project-ref',
+})
 
 export default function Example() {
   const [open, setOpen] = useState(false)
-  const projectRef = 'your-project-ref' // Replace with your actual project ref
-  const isMobile = useMobile()
 
   return (
     <>
       <Button onClick={() => setOpen(true)}>Open Supabase Manager</Button>
-      <SupabaseManagerDialog
-        projectRef={projectRef}
-        open={open}
-        onOpenChange={setOpen}
-        isMobile={isMobile}
-      />
+      <SupabaseManagerDialog adapter={adapter} open={open} onOpenChange={setOpen} />
     </>
   )
 }
 ```
 
-## Quick Start
+With only a `supabase` client, the kit is entirely client-side: database (introspection + row editing), users, and storage work out of the box. Management-only panels (Auth config, Logs, Secrets, Suggestions, and the SQL editor) light up when you supply your own Management API transport — a route in your app that injects the Management API token server-side so it never reaches the browser:
 
-1. **Set up environment variables:** in your `.env.local` file:
+```tsx
+const adapter = createSupabaseAdapter({
+  supabase,
+  projectRef: 'your-project-ref',
+  // Your own trusted proxy that forwards to https://api.supabase.com with the token attached.
+  management: { baseUrl: '/api/supabase-proxy', projectRef: 'your-project-ref' },
+  // Optional: your own natural-language → SQL endpoint.
+  generateSql: async (prompt) => {
+    const res = await fetch('/api/ai/sql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    })
+    return res.json()
+  },
+})
+```
 
-   ```bash
-   SUPABASE_MANAGEMENT_API_TOKEN=your-personal-access-token
-   NEXT_PUBLIC_ENABLE_AI_QUERIES=true
-   OPENAI_API_KEY=your-openai-api-key
-   ```
+### supalite
 
-2. **Add project-level authentication checks** in your API proxy at `app/api/supabase-proxy/[...path]/route.ts` as well as your ai/sql route at `app/api/ai/sql/route.ts` to ensure only authorized users can access their own project resources.
+Point the same dialog at a local [supalite](https://github.com/supabase/lite) instance with `createSupaliteAdapter`. It introspects via supalite's `/_system/introspect` and reads/writes rows through supabase-js. Management-only features are hidden automatically.
 
-3. **Add a Toaster for notifications:**  
-   Place the following component at the root of your app (e.g., in your `layout.tsx` or `App.tsx`) to enable toast notifications:
+```tsx
+import { createClient } from '@supabase/supabase-js'
 
-   ```tsx
-   import { Toaster } from '@/components/ui/sonner'
+import { createSupaliteAdapter } from '@/lib/adapter/create-supalite-adapter'
 
-   export default function RootLayout({ children }) {
-     return (
-       <html lang="en">
-         <head />
-         <body>
-           <main>{children}</main>
-           <Toaster />
-         </body>
-       </html>
-     )
-   }
-   ```
+const supabase = createClient(window.location.origin, 'any-string-works-for-now')
 
-That's it! The default setup uses your Supabase personal access token for the Management API.
+const adapter = createSupaliteAdapter({
+  supabase,
+  enableStorage: false, // set true if supalite EXPERIMENTAL_STORAGE is on
+})
+```
+
+### Toaster
+
+Add a `Toaster` at the root of your app for notifications:
+
+```tsx
+import { Toaster } from '@/components/ui/sonner'
+
+export default function App({ children }) {
+  return (
+    <>
+      {children}
+      <Toaster />
+    </>
+  )
+}
+```
+
+## Custom adapters
+
+Any object matching the `PlatformAdapter` interface (`lib/adapter/types.ts`) can be passed to the dialog. The `features` flag map on the adapter drives which panels and controls render, so a custom adapter can expose exactly the capabilities your backend supports.
 
 ## Security
 
-- Never expose your Management API token to the client
-- Always implement authentication and permission checks in your proxy
+- Never expose your Management API token to the client. Put it behind your own proxy and point the adapter's `management.baseUrl` at it.
+- The `supabase-js` client uses whatever key your security model allows — a `service_role` key only in trusted or local contexts, otherwise an anon key with RLS.
 
 ## Further reading
 
 - [Supabase Management API](https://supabase.com/docs/reference/api/introduction)
+- [supalite](https://github.com/supabase/lite)

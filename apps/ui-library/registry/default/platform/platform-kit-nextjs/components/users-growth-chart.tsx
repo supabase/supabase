@@ -1,5 +1,3 @@
-'use client'
-
 import { AlertTriangle } from 'lucide-react'
 import * as React from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
@@ -21,14 +19,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function UsersGrowthChart({
-  projectRef,
-  timeRange,
-}: {
-  projectRef: string
-  timeRange: number
-}) {
-  const { data: chartData, isLoading, isError } = useGetUserCountsByDay(projectRef, timeRange)
+export function UsersGrowthChart({ timeRange }: { timeRange: number }) {
+  const { data: chartData, isLoading, isError } = useGetUserCountsByDay(timeRange)
 
   return (
     <div>

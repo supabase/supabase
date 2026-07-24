@@ -1,28 +1,30 @@
-'use client'
-
 import { AlertTriangle, Table, Wand } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
+import { useLocation } from 'wouter'
 import { z, type ZodTypeAny } from 'zod'
 
 import { Alert, AlertDescription, AlertTitle } from '@/registry/default/components/ui/alert'
 import { Button } from '@/registry/default/components/ui/button'
 import { Skeleton } from '@/registry/default/components/ui/skeleton'
 import { DynamicForm } from '@/registry/default/platform/platform-kit-nextjs/components/dynamic-form'
+import { ResultsTable } from '@/registry/default/platform/platform-kit-nextjs/components/results-table'
 import { SqlEditor } from '@/registry/default/platform/platform-kit-nextjs/components/sql-editor'
-import { useSheetNavigation } from '@/registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext'
-import { useRunQuery } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-run-query'
+import { useManagerState } from '@/registry/default/platform/platform-kit-nextjs/components/supabase-manager/manager-state'
+import {
+  useTableRows,
+  useUpdateRow,
+} from '@/registry/default/platform/platform-kit-nextjs/hooks/use-table-rows'
 import { useListTables } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-tables'
+import { useFeatures } from '@/registry/default/platform/platform-kit-nextjs/lib/adapter/context'
+import type { IntrospectedTable } from '@/registry/default/platform/platform-kit-nextjs/lib/adapter/introspection-types'
 
-// Helper to generate a Zod schema from the table's column definitions
-function generateZodSchema(table: any): z.ZodObject<any, any, any> {
-  if (!table || !table.columns) {
-    return z.object({})
-  }
+// Build a Zod schema from a table's editable columns.
+function generateZodSchema(table: IntrospectedTable | undefined): z.ZodObject<any, any, any> {
+  if (!table?.columns) return z.object({})
 
   const shape: Record<string, ZodTypeAny> = {}
   for (const column of table.columns) {
-    // We can only edit updatable columns that are not generated
     if (!column.is_updatable || column.is_generated) continue
 
     let fieldSchema: ZodTypeAny
@@ -34,16 +36,9 @@ function generateZodSchema(table: any): z.ZodObject<any, any, any> {
       fieldSchema = z.number()
     } else if (dataType.includes('bool')) {
       fieldSchema = z.boolean()
-    } else if (
-      dataType === 'user-defined' &&
-      column.enums &&
-      Array.isArray(column.enums) &&
-      column.enums.length > 0
-    ) {
-      // Handle enum types
+    } else if (dataType === 'user-defined' && column.enums.length > 0) {
       fieldSchema = z.enum(column.enums as [string, ...string[]])
     } else {
-      // Default to string for text, varchar, timestamp, uuid, etc.
       fieldSchema = z.string()
     }
 
@@ -56,232 +51,170 @@ function generateZodSchema(table: any): z.ZodObject<any, any, any> {
   return z.object(shape)
 }
 
-const getPrimaryKeys = (table: any): string[] => {
-  if (!table || !table.primary_keys) {
-    return []
-  }
-  return table.primary_keys.map((pk: any) => pk.name)
+function getPrimaryKeys(table: IntrospectedTable | undefined): string[] {
+  return table?.primary_keys?.map((pk) => pk.name) ?? []
 }
 
-function EditRowView({
-  projectRef,
-  table,
-  row,
-  onSuccess,
-}: {
-  projectRef: string
-  table: any
-  row: any
-  onSuccess: () => void
-}) {
-  const { mutate: runUpdateQuery, isPending: isUpdatePending } = useRunQuery()
+export function EditRowView({ tableName }: { tableName: string }) {
+  const [, navigate] = useLocation()
+  const { editingRow } = useManagerState()
+  const { data: tables } = useListTables(['public'])
+  const table = tables?.find((t) => t.name === tableName)
+  const { mutate: updateRow, isPending } = useUpdateRow()
+
+  const backPath = `/database/${encodeURIComponent(tableName)}`
+
   const formSchema = useMemo(() => generateZodSchema(table), [table])
 
   const columnInfo = useMemo(() => {
-    if (!table || !table.columns) return {}
-
+    if (!table?.columns) return {}
     const info: Record<string, any> = {}
     for (const column of table.columns) {
-      // Only include updatable columns that are not generated
       if (!column.is_updatable || column.is_generated) continue
-
       const dataType = column.data_type.toLowerCase()
-      const displayType =
-        dataType === 'user-defined' &&
-        column.enums &&
-        Array.isArray(column.enums) &&
-        column.enums.length > 0
-          ? 'enum'
-          : dataType
-
-      info[column.name] = {
-        data_type: displayType,
-        is_nullable: column.is_nullable,
-      }
+      const displayType = dataType === 'user-defined' && column.enums.length > 0 ? 'enum' : dataType
+      info[column.name] = { data_type: displayType, is_nullable: column.is_nullable }
     }
     return info
   }, [table])
 
   const handleFormSubmit = useCallback(
     (formData: any) => {
+      if (!table || !editingRow) return
+
       const pks = getPrimaryKeys(table)
       if (pks.length === 0) {
         toast.error('Cannot update row. This table does not have a primary key.')
         return
       }
 
-      const setClauses = Object.entries(formData)
-        .map(([key, value]) => {
-          if (JSON.stringify(row[key]) === JSON.stringify(value)) return null
+      const values: Record<string, any> = {}
+      for (const [key, value] of Object.entries(formData)) {
+        if (JSON.stringify(editingRow[key]) === JSON.stringify(value)) continue
+        const column = table.columns.find((c) => c.name === key)
+        let next = value
+        if ((next === '' || next === undefined) && column?.is_nullable) {
+          next = null
+        }
+        values[key] = next
+      }
 
-          // Find the column type to determine formatting
-          const column = table.columns.find((col: any) => col.name === key)
-          const dataType = column?.data_type?.toLowerCase() || ''
-          const isNullable = column?.is_nullable || false
-
-          let formattedValue
-
-          // Handle empty/null values
-          if (
-            value === null ||
-            value === undefined ||
-            (typeof value === 'string' && value.trim() === '')
-          ) {
-            if (isNullable) {
-              formattedValue = 'NULL'
-            } else if (dataType.includes('array')) {
-              // Non-nullable array, set to empty array
-              const jsonObj = JSON.stringify({ [key]: [] })
-              formattedValue = `(select ${key} from json_populate_record(null::public."${
-                table.name
-              }", '${jsonObj.replace(/'/g, "''")}'))`
-            } else {
-              // Non-nullable text field, set to empty string
-              formattedValue = "''"
-            }
-          } else if (Array.isArray(value) && value.length === 0) {
-            // Explicitly empty array (different from null)
-            const jsonObj = JSON.stringify({ [key]: [] })
-            formattedValue = `(select ${key} from json_populate_record(null::public."${
-              table.name
-            }", '${jsonObj.replace(/'/g, "''")}'))`
-          } else if (dataType.includes('array')) {
-            // Array type with actual values - use json_populate_record syntax
-            const jsonObj = JSON.stringify({ [key]: value })
-            formattedValue = `(select ${key} from json_populate_record(null::public."${
-              table.name
-            }", '${jsonObj.replace(/'/g, "''")}'))`
-          } else if (dataType === 'user-defined' && column?.enums) {
-            // Handle enum values - treat as strings with proper escaping
-            formattedValue = `'${String(value).replace(/'/g, "''")}'`
-          } else if (typeof value === 'string') {
-            formattedValue = `'${value.replace(/'/g, "''")}'`
-          } else {
-            formattedValue = value
-          }
-
-          return `"${key}" = ${formattedValue}`
-        })
-        .filter(Boolean)
-        .join(', ')
-
-      if (!setClauses) {
+      if (Object.keys(values).length === 0) {
         toast.error('No changes to save')
-        onSuccess()
+        navigate(backPath)
         return
       }
 
-      const whereClauses = pks
-        .map((pk) => {
-          const value = row[pk]
-          const formattedValue =
-            typeof value === 'string' ? `'${value.replace(/'/g, "''")}'` : value
-          return `"${pk}" = ${formattedValue}`
-        })
-        .join(' AND ')
+      const match: Record<string, any> = {}
+      for (const pk of pks) match[pk] = editingRow[pk]
 
-      const updateSql = `UPDATE public."${table.name}" SET ${setClauses} WHERE ${whereClauses};`
-
-      runUpdateQuery({ projectRef, query: updateSql, readOnly: false }, { onSuccess })
+      updateRow(
+        { schema: 'public', table: tableName, values, match },
+        { onSuccess: () => navigate(backPath) }
+      )
     },
-    [projectRef, table, row, runUpdateQuery, onSuccess]
+    [table, editingRow, tableName, updateRow, navigate, backPath]
   )
 
+  if (!editingRow) {
+    return (
+      <div className="px-6 pt-4 lg:px-12 lg:pt-10">
+        <Alert>
+          <AlertTitle>No row selected</AlertTitle>
+          <AlertDescription>
+            <Button variant="outline" size="sm" className="mt-2" onClick={() => navigate(backPath)}>
+              Back to {tableName}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      </div>
+    )
+  }
+
   return (
-    <div className="px-6 pt-4 pb-10 lg:px-12 lg:pt-10">
-      <h2 className="text-base lg:text-xl font-semibold mb-4">Editing row in {table.name}</h2>
+    <div className="px-6 pb-10 pt-4 lg:px-12 lg:pt-10">
+      <h2 className="mb-4 text-base font-semibold lg:text-xl">Editing row in {tableName}</h2>
       <DynamicForm
         schema={formSchema}
-        initialValues={row}
+        initialValues={editingRow}
         onSubmit={handleFormSubmit}
-        isLoading={isUpdatePending}
+        isLoading={isPending}
         columnInfo={columnInfo}
       />
     </div>
   )
 }
 
-function TableRecordsView({ projectRef, table }: { projectRef: string; table: any }) {
-  const { push, pop } = useSheetNavigation()
-  const [refetchCounter, setRefetchCounter] = useState(0)
+export function TableRecordsView({ tableName }: { tableName: string }) {
+  const [, navigate] = useLocation()
+  const { setEditingRow } = useManagerState()
+  const { data, isLoading, isError } = useTableRows({ schema: 'public', table: tableName })
 
   const handleRowClick = useCallback(
     (row: any) => {
-      push({
-        title: `Editing row`,
-        component: (
-          <EditRowView
-            projectRef={projectRef}
-            table={table}
-            row={row}
-            onSuccess={() => {
-              pop()
-              setRefetchCounter((c) => c + 1)
-            }}
-          />
-        ),
-      })
+      setEditingRow(row)
+      navigate(`/database/${encodeURIComponent(tableName)}/edit`)
     },
-    [push, pop, projectRef, table]
+    [setEditingRow, navigate, tableName]
   )
 
   return (
-    <SqlEditor
-      hideChartOption={true}
-      projectRef={projectRef}
-      label={`View records in ${table.name}`}
-      initialSql={`SELECT * FROM public."${table.name}" LIMIT 100;`}
-      queryKey={table.id}
-      onRowClick={handleRowClick}
-      hideSql={true}
-      runAutomatically={true}
-      refetch={refetchCounter}
-      readOnly
-    />
+    <div>
+      <div className="px-6 pt-4 lg:px-8 lg:pt-8">
+        <h2 className="font-semibold">Records in {tableName}</h2>
+      </div>
+      {isLoading && (
+        <div className="space-y-2 p-4 px-6 lg:px-8">
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+          <Skeleton className="h-6 w-full" />
+        </div>
+      )}
+      {isError && (
+        <div className="px-6 py-4 lg:px-8">
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Error loading rows</AlertTitle>
+            <AlertDescription>There was a problem loading records for this table.</AlertDescription>
+          </Alert>
+        </div>
+      )}
+      {data && <ResultsTable data={data.rows} onRowClick={handleRowClick} />}
+    </div>
   )
 }
 
-export function DatabaseManager({ projectRef }: { projectRef: string }) {
-  const { push } = useSheetNavigation()
-  const { data: tables, isLoading, isError } = useListTables(projectRef, ['public'])
+export function DatabaseQueryView() {
+  const features = useFeatures()
+  return <SqlEditor initialNaturalLanguageMode={features.naturalLanguageSql} hideSql />
+}
 
-  const handleTableClick = useCallback(
-    (table: any) => {
-      push({
-        title: table.name,
-        component: <TableRecordsView projectRef={projectRef} table={table} />,
-      })
-    },
-    [push, projectRef]
-  )
+export function DatabaseManager() {
+  const [, navigate] = useLocation()
+  const features = useFeatures()
+  const { data: tables, isLoading, isError } = useListTables(['public'])
 
-  const handleNaturalLanguageQueryClick = useCallback(() => {
-    push({
-      title: 'Talk to your database',
-      component: (
-        <SqlEditor projectRef={projectRef} initialNaturalLanguageMode={true} hideSql={true} />
-      ),
-    })
-  }, [push, projectRef])
+  const canQuery = features.runSql || features.naturalLanguageSql
 
   return (
     <div className="p-6 pt-4 lg:p-8 lg:pt-8">
-      <div className="flex items-center justify-between mb-6 gap-6">
+      <div className="mb-6 flex items-center justify-between gap-6">
         <div className="flex-1">
-          <h1 className="text-base lg:text-xl font-semibold">Database</h1>
-          <p className="hidden lg:block text-sm lg:text-base text-muted-foreground mt-1">
+          <h1 className="text-base font-semibold lg:text-xl">Database</h1>
+          <p className="mt-1 hidden text-sm text-muted-foreground lg:block lg:text-base">
             View and manage the data stored in your app.
           </p>
         </div>
-        <Button
-          variant="outline"
-          key="talk-to-db"
-          className="flex-row justify-between"
-          onClick={handleNaturalLanguageQueryClick}
-        >
-          <Wand strokeWidth={1.5} size={16} />
-          Query your database
-        </Button>
+        {canQuery && (
+          <Button
+            variant="outline"
+            className="flex-row justify-between"
+            onClick={() => navigate('/database/query')}
+          >
+            <Wand strokeWidth={1.5} size={16} />
+            Query your database
+          </Button>
+        )}
       </div>
 
       {isError && (
@@ -293,7 +226,7 @@ export function DatabaseManager({ projectRef }: { projectRef: string }) {
       )}
 
       {isLoading && (
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
@@ -302,19 +235,19 @@ export function DatabaseManager({ projectRef }: { projectRef: string }) {
       )}
 
       {tables && tables.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-          {tables.map((table: any) => (
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
+          {tables.map((table) => (
             <Button
               variant="outline"
               key={table.id}
               size="lg"
               className="flex-row justify-between text-left"
-              onClick={() => handleTableClick(table)}
+              onClick={() => navigate(`/database/${encodeURIComponent(table.name)}`)}
             >
               <Table className="h-4 w-4 text-muted-foreground" />
-              <h2 className="text-sm font-medium font-mono truncate flex-1">{table.name}</h2>
-              <div className="text-sm text-muted-foreground font-mono shrink-0">
-                {table.live_rows_estimate} rows
+              <h2 className="flex-1 truncate font-mono text-sm font-medium">{table.name}</h2>
+              <div className="shrink-0 font-mono text-sm text-muted-foreground">
+                {table.live_rows_estimate == null ? '—' : `${table.live_rows_estimate} rows`}
               </div>
             </Button>
           ))}

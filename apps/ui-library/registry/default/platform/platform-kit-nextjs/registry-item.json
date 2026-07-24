@@ -2,8 +2,8 @@
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "platform-kit-nextjs",
   "type": "registry:block",
-  "title": "Platform Kit for Nextjs and Supabase",
-  "description": "Platform Kit for Nextjs and Supabase",
+  "title": "Platform Kit for Supabase",
+  "description": "Adapter-driven, client-side dialog for managing a Supabase or supalite project.",
   "registryDependencies": [
     "alert",
     "badge",
@@ -29,29 +29,18 @@
   "dependencies": [
     "@hookform/resolvers",
     "@monaco-editor/react",
+    "@supabase/supabase-js",
     "@tanstack/react-query",
-    "@tanstack/react-table",
-    "axios",
     "cmdk",
     "common-tags",
-    "openai",
     "openapi-fetch",
     "react-hook-form",
     "react-markdown",
     "recharts",
-    "sonner"
+    "sonner",
+    "wouter"
   ],
   "files": [
-    {
-      "path": "registry/default/platform/platform-kit-nextjs/app/api/ai/sql/route.ts",
-      "type": "registry:page",
-      "target": "app/api/ai/sql/route.ts"
-    },
-    {
-      "path": "registry/default/platform/platform-kit-nextjs/app/api/supabase-proxy/[...path]/route.ts",
-      "type": "registry:page",
-      "target": "app/api/supabase-proxy/[...path]/route.ts"
-    },
     {
       "path": "registry/default/platform/platform-kit-nextjs/components/dynamic-form.tsx",
       "type": "registry:component"
@@ -66,6 +55,10 @@
     },
     {
       "path": "registry/default/platform/platform-kit-nextjs/components/sql-editor.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/components/users-growth-chart.tsx",
       "type": "registry:component"
     },
     {
@@ -85,6 +78,10 @@
       "type": "registry:component"
     },
     {
+      "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/manager-state.tsx",
+      "type": "registry:component"
+    },
+    {
       "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/secrets.tsx",
       "type": "registry:component"
     },
@@ -98,10 +95,6 @@
     },
     {
       "path": "registry/default/platform/platform-kit-nextjs/components/supabase-manager/users.tsx",
-      "type": "registry:component"
-    },
-    {
-      "path": "registry/default/platform/platform-kit-nextjs/components/users-growth-chart.tsx",
       "type": "registry:component"
     },
     {
@@ -129,12 +122,60 @@
       "type": "registry:hook"
     },
     {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-table-rows.ts",
+      "type": "registry:hook"
+    },
+    {
       "path": "registry/default/platform/platform-kit-nextjs/hooks/use-tables.ts",
       "type": "registry:hook"
     },
     {
       "path": "registry/default/platform/platform-kit-nextjs/hooks/use-user-counts.ts",
       "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/hooks/use-users.ts",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/context.tsx",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/create-supabase-adapter.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/create-supalite-adapter.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/errors.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/introspection-types.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/supabase-rows.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/supabase-storage.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/adapter/types.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/introspection/postgrest.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/introspection/supalite.ts",
+      "type": "registry:lib"
     },
     {
       "path": "registry/default/platform/platform-kit-nextjs/lib/logs.ts",
@@ -149,15 +190,19 @@
       "type": "registry:lib"
     },
     {
-      "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/sql.ts",
-      "type": "registry:lib"
-    },
-    {
       "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/index.ts",
       "type": "registry:lib"
     },
     {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/sql.ts",
+      "type": "registry:lib"
+    },
+    {
       "path": "registry/default/platform/platform-kit-nextjs/lib/pg-meta/types.ts",
+      "type": "registry:lib"
+    },
+    {
+      "path": "registry/default/platform/platform-kit-nextjs/lib/router.ts",
       "type": "registry:lib"
     },
     {
@@ -167,11 +212,6 @@
     {
       "path": "registry/default/platform/platform-kit-nextjs/lib/schemas/secrets.ts",
       "type": "registry:lib"
-    },
-    {
-      "path": "registry/default/platform/platform-kit-nextjs/contexts/SheetNavigationContext.tsx",
-      "type": "registry:component",
-      "target": "contexts/SheetNavigationContext.tsx"
     }
   ]
 }

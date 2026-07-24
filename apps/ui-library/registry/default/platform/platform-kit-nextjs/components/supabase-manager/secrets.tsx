@@ -1,5 +1,3 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Key, Minus, PlusIcon } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -24,8 +22,8 @@ import {
   useGetSecrets,
 } from '@/registry/default/platform/platform-kit-nextjs/hooks/use-secrets'
 
-export function SecretsManager({ projectRef }: { projectRef: string }) {
-  const { data: secrets, isLoading, error } = useGetSecrets(projectRef)
+export function SecretsManager() {
+  const { data: secrets, isLoading, error } = useGetSecrets()
   const { mutate: createSecrets, isPending: isCreating } = useCreateSecrets()
   const { mutate: deleteSecrets, isPending: isDeleting } = useDeleteSecrets()
   const form = useForm<z.infer<typeof secretsSchema>>({
@@ -41,25 +39,16 @@ export function SecretsManager({ projectRef }: { projectRef: string }) {
   })
 
   const handleCreateSecrets = (formData: z.infer<typeof secretsSchema>) => {
-    createSecrets(
-      {
-        projectRef,
-        secrets: formData.secrets,
+    createSecrets(formData.secrets, {
+      onSuccess: () => {
+        form.reset({ secrets: [{ name: '', value: '' }] })
       },
-      {
-        onSuccess: () => {
-          form.reset({ secrets: [{ name: '', value: '' }] })
-        },
-      }
-    )
+    })
   }
 
   const handleDeleteSecret = (secretName: string) => {
     if (window.confirm(`Are you sure you want to delete the secret "${secretName}"?`)) {
-      deleteSecrets({
-        projectRef,
-        secretNames: [secretName],
-      })
+      deleteSecrets([secretName])
     }
   }
 
