@@ -574,6 +574,14 @@
       "import": "./src/SimpleCodeBlock/prism.ts",
       "types": "./src/SimpleCodeBlock/prism.ts"
     },
+    "./SkipToContent/SkipToContent": {
+      "import": "./src/SkipToContent/SkipToContent.tsx",
+      "types": "./src/SkipToContent/SkipToContent.tsx"
+    },
+    "./SkipToContent": {
+      "import": "./src/SkipToContent/index.tsx",
+      "types": "./src/SkipToContent/index.tsx"
+    },
     "./SqlToRest/assumptions": {
       "import": "./src/SqlToRest/assumptions.ts",
       "types": "./src/SqlToRest/assumptions.ts"

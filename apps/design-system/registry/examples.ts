@@ -1352,6 +1352,11 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'skip-to-content-demo',
+    type: 'components:example',
+    files: ['example/skip-to-content-demo.tsx'],
+  },
+  {
     name: 'page-container-demo',
     type: 'components:example',
     files: ['example/page-container-demo.tsx'],
