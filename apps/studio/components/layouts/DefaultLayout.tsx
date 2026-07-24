@@ -1,7 +1,14 @@
 import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
+import {
+  buttonVariants,
+  cn,
+  ResizablePanel,
+  ResizablePanelGroup,
+  SidebarProvider,
+  usePanelRef,
+} from 'ui'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
@@ -16,6 +23,7 @@ import {
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
+import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -42,6 +50,7 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
+  useSyncScopedIntrospection()
   useCheckLatestDeploy()
 
   const { ref } = useParams()
@@ -92,7 +101,17 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <a className="sr-only" href="#main" tabIndex={0}>
+              <a
+                className={cn(
+                  buttonVariants({
+                    size: 'xlarge',
+                    variant: 'primary',
+                  }),
+                  'absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full focus:translate-y-4'
+                )}
+                href="#main"
+                tabIndex={0}
+              >
                 Skip to content
               </a>
               {/* Top Banner */}

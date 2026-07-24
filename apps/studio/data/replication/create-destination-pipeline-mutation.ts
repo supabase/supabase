@@ -4,8 +4,11 @@ import { toast } from 'sonner'
 
 import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
+import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 
 export type DestinationConfig =
   | { bigQuery: BigQueryDestinationConfig }
@@ -139,20 +142,47 @@ export type ClickHouseDestinationConfig = {
 
 export type BatchConfig = {
   maxFillMs?: number
+  maxBytes?: number
+  memoryBudgetRatio?: number
 }
+
+export type PipelineConfig = {
+  publicationName: string
+  batch?: BatchConfig
+  maxTableSyncWorkers?: number
+  maxCopyConnectionsPerTable?: number
+  invalidatedSlotBehavior?: 'error' | 'recreate'
+  tableSyncCopy: TableSyncCopyConfig
+}
+
+export const buildPipelineApiConfig = ({
+  publicationName,
+  batch,
+  maxTableSyncWorkers,
+  maxCopyConnectionsPerTable,
+  invalidatedSlotBehavior,
+  tableSyncCopy,
+}: PipelineConfig) => ({
+  publication_name: publicationName,
+  max_table_sync_workers: maxTableSyncWorkers,
+  max_copy_connections_per_table: maxCopyConnectionsPerTable,
+  invalidated_slot_behavior: invalidatedSlotBehavior,
+  table_sync_copy: tableSyncCopy,
+  batch: batch
+    ? {
+        max_fill_ms: batch.maxFillMs,
+        max_bytes: batch.maxBytes,
+        memory_budget_ratio: batch.memoryBudgetRatio,
+      }
+    : undefined,
+})
 
 export type CreateDestinationPipelineParams = {
   projectRef: string
   destinationName: string
   destinationConfig: DestinationConfig
   sourceId: number
-  pipelineConfig: {
-    publicationName: string
-    batch?: BatchConfig
-    maxTableSyncWorkers?: number
-    maxCopyConnectionsPerTable?: number
-    invalidatedSlotBehavior?: 'error' | 'recreate'
-  }
+  pipelineConfig: PipelineConfig
 }
 
 async function createDestinationPipeline(
@@ -160,13 +190,7 @@ async function createDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: {
-      publicationName,
-      batch,
-      maxTableSyncWorkers,
-      maxCopyConnectionsPerTable,
-      invalidatedSlotBehavior,
-    },
+    pipelineConfig,
     sourceId,
   }: CreateDestinationPipelineParams,
   signal?: AbortSignal
@@ -250,13 +274,7 @@ async function createDestinationPipeline(
     )
   }
 
-  const pipeline_config = {
-    publication_name: publicationName,
-    max_table_sync_workers: maxTableSyncWorkers,
-    max_copy_connections_per_table: maxCopyConnectionsPerTable,
-    invalidated_slot_behavior: invalidatedSlotBehavior,
-    batch: batch ? { max_fill_ms: batch.maxFillMs } : undefined,
-  }
+  const pipeline_config = buildPipelineApiConfig(pipelineConfig)
 
   const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
     params: { path: { ref: projectRef } },

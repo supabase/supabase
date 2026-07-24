@@ -511,37 +511,14 @@ export const createAiAssistantState = (): AiAssistantState => {
       chat.updatedAt = new Date()
     },
 
-    saveMessage: (message: MessageType | MessageType[]) => {
-      const chat = state.activeChat
-      if (!chat) return
-
-      const incomingMessages = Array.isArray(message) ? message : [message]
-
-      const messagesToAdd: AssistantMessageType[] = []
-
-      incomingMessages.forEach((msg) => {
-        const index = chat.messages.findIndex((existing) => existing.id === msg.id)
-
-        if (index !== -1) {
-          state.updateMessage(msg)
-        } else {
-          messagesToAdd.push(msg)
-        }
-      })
-
-      if (messagesToAdd.length > 0) {
-        chat.messages.push(...messagesToAdd)
-        chat.updatedAt = new Date()
-      }
-    },
-
     updateMessage: (updatedMessage: MessageType) => {
       const chat = state.activeChat
       if (!chat) return
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage
+        // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
+        chat.messages[messageIndex] = sanitizeForCloning(updatedMessage)
         chat.updatedAt = new Date()
       }
     },
@@ -637,7 +614,6 @@ export type AiAssistantState = AiAssistantData & {
   renameChat: (id: string, name: string) => void
   clearMessages: () => void
   deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
-  saveMessage: (message: MessageType | MessageType[]) => void
   updateMessage: (message: MessageType) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void

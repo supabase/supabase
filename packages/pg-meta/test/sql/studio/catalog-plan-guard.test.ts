@@ -13,6 +13,9 @@ import {
   getTablesPaginatedSql,
   getViewDefinitionSql,
 } from '../../../src'
+import tablePrivileges from '../../../src/pg-meta-table-privileges'
+import * as tables from '../../../src/pg-meta-tables'
+import * as types from '../../../src/pg-meta-types'
 import { assertPlanWithinBudget, explainAnalyze } from '../../db/plan-guard'
 import { buildStressCatalog, STRESS_TABLE_COUNT } from '../../db/stress-catalog'
 import { cleanupRoot, createTestDatabase } from '../../db/utils'
@@ -150,7 +153,15 @@ test('getEntityTypesSQL: plan stays scoped for a schema listing', async () => {
       page: 0,
     })
   )
-  assertPlanWithinBudget(result, {})
+  assertPlanWithinBudget(result, {
+    allowedSeqScans: {
+      pg_class: {
+        max: 1,
+        reason:
+          'per-schema entity listing must read every relation in the schema; no index leads on pg_class.relnamespace, so the filter cannot prune it. The planner choice between a seq scan and a full-index bitmap scan is marginal and version/stats dependent (observed flipping on PG17) -- one filtered pass of pg_class either way',
+      },
+    },
+  })
 }, 60_000)
 
 // ── getTablesPaginatedSql (database/tables-paginated.ts) — per-schema page ───
@@ -286,4 +297,119 @@ test('getEntityDefinitionsSql: plan stays scoped for a schema', async () => {
 test('getViewDefinitionSql: plan stays scoped for a single view', async () => {
   const result = await explainAnalyze(db, getViewDefinitionSql({ id: viewId }))
   assertPlanWithinBudget(result, {})
+}, 60_000)
+
+// ── types.list (sql/types.ts) — per-schema user-defined types listing ────────
+// The scoped rewrite filters pg_type by schema FIRST and then computes enums /
+// composite attributes per surviving row via correlated subqueries (index scans
+// on pg_enum's (enumtypid) and pg_attribute's (attrelid, attnum)), instead of
+// the legacy catalog-wide GROUP BY aggregates. The one structurally unavoidable
+// pass is over pg_type itself: a per-schema type listing must read every type in
+// the schema, and pg_type has no index leading on typnamespace (only
+// pg_type_typname_nsp_index on (typname, typnamespace)), so the schema filter
+// cannot prune the scan -- one filtered pass of pg_type either way. Same class
+// as the pg_constraint.confrelid / pg_class.relnamespace justifications.
+const TYPES_LIST_BUDGET = {
+  allowedSeqScans: {
+    pg_type: {
+      max: 1,
+      reason:
+        'per-schema type listing must read every type in the schema; no index leads on pg_type.typnamespace (only (typname, typnamespace)), so the filter cannot prune it. The planner picks a seq scan (PG17) or a full-index bitmap scan (PG14/15) depending on version/stats -- one filtered pass of pg_type either way',
+    },
+  },
+}
+test('types.list: scoped plan stays scoped for a schema', async () => {
+  const result = await explainAnalyze(
+    db,
+    types.list({ includedSchemas: ['stress'], scoped: true }).sql
+  )
+  assertPlanWithinBudget(result, TYPES_LIST_BUDGET)
+}, 60_000)
+
+test('types.list: scoped real query returns the schema’s enums and composites', async () => {
+  const { sql, zod } = types.list({ includedSchemas: ['stress'], scoped: true })
+  const rows = zod.parse(await db.executeQuery(sql))
+  // stress has enums (mood/priority/e_*) and composites (addr/pair/ct_*).
+  const mood = rows.find((t) => t.name === 'mood')
+  expect(mood?.enums).toEqual(['ecstatic', 'sad', 'happy', 'ok'])
+  // `pair` dropped its middle attribute; the scoped path must skip it.
+  expect(rows.find((t) => t.name === 'pair')?.attributes.map((a) => a.name)).toEqual(['a', 'b'])
+  expect(rows.length).toBeGreaterThan(400)
+}, 60_000)
+
+// The grantee/grantor resolution joins pg_roles (a view over pg_authid) TWICE —
+// once for the grantor, once for the grantee UNION that appends PUBLIC — so the
+// plan seq-scans pg_authid twice. pg_authid holds a fixed handful of roles and
+// does NOT scale with schema size (tables/columns/constraints), so this is
+// structural and unrelated to the O(catalog) regression this harness guards.
+const TABLE_PRIVILEGES_BUDGET = {
+  allowedSeqScans: {
+    pg_authid: {
+      max: 2,
+      reason:
+        'grantee/grantor resolution joins pg_roles (view over pg_authid) twice (grantor + grantee-with-PUBLIC union); pg_authid scales with role count, not schema size',
+    },
+  },
+}
+
+// ── tablePrivileges.list (sql/table-privileges.ts) — per-schema listing ──────
+// Scoped pushes the schema filter into the base WHERE (before the aclexplode
+// lateral / GROUP BY) so pg_class is pruned before privileges are exploded.
+test('tablePrivileges.list: scoped plan stays scoped for a schema', async () => {
+  const result = await explainAnalyze(
+    db,
+    tablePrivileges.list({ includedSchemas: ['stress'], scoped: true }).sql
+  )
+  assertPlanWithinBudget(result, TABLE_PRIVILEGES_BUDGET)
+}, 60_000)
+
+// ── tablePrivileges.retrieve (sql/table-privileges.ts) — per-relation ────────
+// Scoped pushes the schema+name (or oid) predicate into the base WHERE so the
+// relation is resolved via pg_class's (relname, relnamespace) index.
+test('tablePrivileges.retrieve: scoped plan stays scoped for a single relation', async () => {
+  const result = await explainAnalyze(
+    db,
+    tablePrivileges.retrieve({ name: 't_1000', schema: 'stress', scoped: true }).sql
+  )
+  assertPlanWithinBudget(result, TABLE_PRIVILEGES_BUDGET)
+}, 60_000)
+
+// ── tables.retrieve (pg-meta-tables.ts / sql/tables.ts) — single table ───────
+// Scoped pushes the target OID (a literal, or an initplan scalar subquery
+// resolved via pg_class's (relname, relnamespace) index) into the base scan and
+// every enrichment subquery, so pg_class/pg_attribute/pg_type/pg_index are all
+// index-driven. Two scaling-catalog seq scans remain and are structural:
+//   - pg_constraint: the relationships subquery keeps BOTH FK directions and
+//     pg_constraint.confrelid has no index, so the incoming-FK half is a seq
+//     scan (identical to getTableEditorSql's relationships CTE);
+//   - pg_attrdef: the columns enrichment resolves column defaults; pg_attrdef is
+//     scanned once and hash-joined against the target's (few) attributes.
+const TABLES_RETRIEVE_BUDGET = {
+  allowedSeqScans: {
+    pg_constraint: {
+      max: 2,
+      reason:
+        'relationships subquery keeps both FK directions; no index on pg_constraint.confrelid, so the incoming-FK half is a seq scan (same as getTableEditorSql)',
+    },
+    pg_attrdef: {
+      max: 1,
+      reason: 'columns enrichment resolves defaults; pg_attrdef scanned once and hash-joined',
+    },
+  },
+}
+
+test('tables.retrieve: scoped plan stays scoped for a single table by id', async () => {
+  const result = await explainAnalyze(
+    db,
+    tables.retrieve({ id: midChainTableId, scoped: true }).sql
+  )
+  assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
+}, 60_000)
+
+test('tables.retrieve: scoped plan stays scoped for a single table by name+schema', async () => {
+  const result = await explainAnalyze(
+    db,
+    tables.retrieve({ name: 't_1000', schema: 'stress', scoped: true }).sql
+  )
+  assertPlanWithinBudget(result, TABLES_RETRIEVE_BUDGET)
 }, 60_000)

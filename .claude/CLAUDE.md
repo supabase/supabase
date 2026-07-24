@@ -24,7 +24,6 @@ pnpm 11 + Turborepo monorepo. Requires Node >= 22.13.
 ## Common Commands
 
 ```bash
-pnpm install                 # install dependencies
 pnpm dev:studio              # run Studio dev server → http://localhost:8082
 pnpm dev:docs                # run docs dev server
 pnpm dev:www                 # run www dev server
