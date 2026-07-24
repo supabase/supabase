@@ -16,7 +16,7 @@ export const typography = {
   family: 'Manrope',
   roles: {
     headline: {
-      weight: 500 as const,
+      weight: 400 as const,
       // Two auto-fit size tiers instead of one fixed range: `default` (no
       // icon, headline fits in <=2 lines) reads larger since there's nothing
       // else competing for attention; `compact` kicks in whenever an icon is
