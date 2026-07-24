@@ -31,7 +31,6 @@ export default function DataProcessingAddendumPage() {
           />
         }
         h1="Data Processing Addendum"
-        subheader="An addendum governing the processing of personal data under Supabase's Terms of Service."
       />
       <MDXProvider components={mdxComponents()}>
         <SectionContainer className="prose">
