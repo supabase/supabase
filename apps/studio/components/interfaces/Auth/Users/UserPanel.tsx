@@ -20,10 +20,12 @@ import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
 import { useUserQuery } from '@/data/auth/user-query'
 import { User } from '@/data/auth/users-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
+  const showLogs = useIsFeatureEnabled('logs:all')
 
   const [selectedId, setSelectedId] = useQueryState(
     'show',
@@ -85,12 +87,14 @@ export const UserPanel = () => {
                 >
                   Overview
                 </TabsTrigger>
-                <TabsTrigger
-                  value="logs"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Logs
-                </TabsTrigger>
+                {showLogs && (
+                  <TabsTrigger
+                    value="logs"
+                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
+                  >
+                    Logs
+                  </TabsTrigger>
+                )}
                 <TabsTrigger
                   value="raw"
                   className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
@@ -104,9 +108,11 @@ export const UserPanel = () => {
                   <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
               </TabsContent>
-              <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                {selectedUser && <UserLogs user={selectedUser} />}
-              </TabsContent>
+              {showLogs && (
+                <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
+                  {selectedUser && <UserLogs user={selectedUser} />}
+                </TabsContent>
+              )}
               <TabsContent
                 value="raw"
                 className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}

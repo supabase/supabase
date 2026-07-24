@@ -226,10 +226,21 @@ export function SideBarNavLink({
 }
 
 const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
+  const [sidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
+
+  // The nav icon only shifts right (pl-1.5 -> pl-2) when the sidebar is
+  // persistently open — not on hover-expand. Tie the dot to the same
+  // condition so it stays put while skimming the nav.
+  const isPersistentlyOpen = sidebarBehaviour === 'open'
+
   return (
     <div
       className={cn(
-        'absolute pointer-events-none flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
+        'absolute pointer-events-none flex h-2 w-2 top-2 z-10 rounded-full',
+        isPersistentlyOpen ? 'left-[20px]' : 'left-[18px]',
         hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
       )}
     />

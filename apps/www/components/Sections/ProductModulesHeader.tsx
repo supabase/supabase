@@ -102,7 +102,7 @@ const ProductModulesHeader = (props: Types) => (
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (
-            <Button size="small" className="text-white" asChild>
+            <Button size="small" asChild>
               <Link href={props.cta.link} as={props.cta.link}>
                 {props.cta.label ?? 'Start for free'}
               </Link>

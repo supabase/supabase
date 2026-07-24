@@ -295,35 +295,26 @@ const VercelIntegrationConnectionForm = ({
                   </FormControl>
                   <FormDescription className="col-start-5 col-span-8 text-xs">
                     e.g.{' '}
-                    <code
-                      className="cursor-pointer"
-                      role="button"
-                      onClick={() => {
-                        field.onChange('NEXT_PUBLIC_')
-                      }}
-                    >
-                      NEXT_PUBLIC_
-                    </code>
-                    ,{' '}
-                    <code
-                      className="cursor-pointer"
-                      role="button"
-                      onClick={() => {
-                        field.onChange('VITE_PUBLIC_')
-                      }}
-                    >
-                      VITE_PUBLIC_
-                    </code>
-                    ,{' '}
-                    <code
-                      className="cursor-pointer"
-                      role="button"
-                      onClick={() => {
-                        field.onChange('PUBLIC_')
-                      }}
-                    >
-                      PUBLIC_
-                    </code>
+                    {(
+                      [
+                        ['NEXT_PUBLIC_', 'NEXT_PUBLIC_'],
+                        ['VITE_PUBLIC_', 'VITE_PUBLIC_'],
+                        ['PUBLIC_', 'PUBLIC_'],
+                      ] as const
+                    ).map(([label, value], index) => (
+                      <span key={value}>
+                        {index > 0 && ', '}
+                        <button
+                          type="button"
+                          tabIndex={disabled ? -1 : 0}
+                          disabled={disabled}
+                          className="font-mono text-xs rounded-sm bg-surface-200 px-1 py-0.5 hover:bg-surface-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          onClick={() => field.onChange(value)}
+                        >
+                          {label}
+                        </button>
+                      </span>
+                    ))}
                     , etc.
                   </FormDescription>
 

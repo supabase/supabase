@@ -235,6 +235,26 @@ export interface CronJobHistoryClickedEvent {
 }
 
 /**
+ * Enable cleanup button clicked, either in the cron jobs page header (opens the
+ * confirmation dialog) or within the dialog itself (schedules the daily cleanup
+ * job that deletes old rows from cron.job_run_details).
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCleanupEnableButtonClickedEvent {
+  action: 'cron_job_cleanup_enable_button_clicked'
+  properties: {
+    /** Where the button was clicked from */
+    origin: 'header' | 'dialog'
+    /** Retention period chosen for the cleanup job, e.g. 7 days. Only sent on dialog confirm. */
+    retentionInterval?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * A feature preview was enabled by the user through the FeaturePreviewModal.
  *
  * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
@@ -896,6 +916,16 @@ export interface DocsFeedbackClickedEvent {
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
+}
+
+/**
+ * User clicked the sidebar link to set up an AI coding agent with Supabase.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AgentSetupClickedEvent {
+  action: 'agent_setup_clicked'
 }
 
 /**
@@ -3543,6 +3573,7 @@ export type TelemetryEvent =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
+  | CronJobCleanupEnableButtonClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | TimezonePickerClickedEvent
@@ -3578,6 +3609,7 @@ export type TelemetryEvent =
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
+  | AgentSetupClickedEvent
   | AskAiClickedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent

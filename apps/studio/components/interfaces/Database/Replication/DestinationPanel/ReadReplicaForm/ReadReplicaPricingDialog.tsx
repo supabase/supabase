@@ -37,6 +37,7 @@ export const ReadReplicaPricingDialog = () => {
         <DialogTrigger asChild>
           <button
             type="button"
+            tabIndex={0}
             className={cn(InlineLinkClassName, 'cursor-pointer text-foreground-light')}
           >
             Learn more

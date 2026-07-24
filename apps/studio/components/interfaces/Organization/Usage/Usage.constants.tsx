@@ -410,34 +410,34 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       description: 'Usage statistics related to your pipelines',
       attributes: [
         {
-          anchor: 'pipeline-backfill-data',
+          anchor: 'pipeline-initial-sync-data',
           key: PricingMetric.ETL_COPY_BACKFILL_DATA,
           attributes: [{ key: PricingMetric.ETL_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' }],
-          name: 'Pipeline Backfill Data',
+          name: 'Pipeline Initial Sync Data',
           unit: 'bytes',
           description:
-            'Total amount of backfill/initial copy data processed across all projects.\nBilling is based on the total amount of backfill/initial copy data processed in Gigabyte.',
+            'Total amount of initial sync data processed across all projects.\nBilling is based on the total amount of initial sync data processed in gigabytes.',
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Pipelines',
-              url: `${DOCS_URL}/guides/database/replication/pipelines`,
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
             },
           ],
         },
         {
-          anchor: 'pipeline-replicated-data',
+          anchor: 'pipeline-ongoing-replication-data',
           key: PricingMetric.ETL_REPLICATED_DATA,
           attributes: [{ key: PricingMetric.ETL_REPLICATED_DATA.toLowerCase(), color: 'white' }],
-          name: 'Pipeline Replicated Data',
+          name: 'Pipeline Ongoing Replication Data',
           unit: 'bytes',
           description:
-            'Total amount of replicated data processed across all projects.\nBilling is based on the total amount of replicated data processed in Gigabyte.',
+            'Total amount of ongoing replication data processed across all projects.\nBilling is based on the total amount of ongoing replication data processed in gigabytes.',
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
               name: 'Pipelines',
-              url: `${DOCS_URL}/guides/database/replication/pipelines`,
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
             },
           ],
         },
