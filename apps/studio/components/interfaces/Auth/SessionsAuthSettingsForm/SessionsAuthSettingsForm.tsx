@@ -242,6 +242,136 @@ export const SessionsAuthSettingsForm = () => {
       <PageSection>
         <PageSectionMeta>
           <PageSectionSummary>
+            <PageSectionTitle>User Sessions</PageSectionTitle>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Form {...userSessionsForm}>
+            <form
+              onSubmit={userSessionsForm.handleSubmit(onSubmitUserSessions)}
+              className="space-y-4"
+            >
+              <Card>
+                <CardContent>
+                  <FormField
+                    control={userSessionsForm.control}
+                    name="SESSIONS_SINGLE_PER_USER"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Enforce single session per user"
+                        description="If enabled, all but a user's most recently active session will be terminated."
+                      >
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardContent>
+                  <FormField
+                    control={userSessionsForm.control}
+                    name="SESSIONS_TIMEBOX"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Time-box user sessions"
+                        description="The amount of time before a user is forced to sign in again. Use 0 for never."
+                      >
+                        <FormControl className="w-full">
+                          <InputGroup>
+                            <FormInputGroupInput
+                              type="number"
+                              min={0}
+                              {...field}
+                              disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>
+                                <HoursOrNeverText value={field.value || 0} />
+                              </InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardContent>
+                  <FormField
+                    control={userSessionsForm.control}
+                    name="SESSIONS_INACTIVITY_TIMEOUT"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Inactivity timeout"
+                        description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
+                      >
+                        <FormControl className="w-full">
+                          <InputGroup>
+                            <FormInputGroupInput
+                              type="number"
+                              {...field}
+                              className="flex-1"
+                              disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
+                            />
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupText>
+                                <HoursOrNeverText value={field.value || 0} />
+                              </InputGroupText>
+                            </InputGroupAddon>
+                          </InputGroup>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                {promptProPlanUpgrade && (
+                  <UpgradeToPro
+                    fullWidth
+                    source="authSessions"
+                    featureProposition="configure user sessions"
+                    primaryText="Configuring user sessions is only available on the Pro Plan and above"
+                    secondaryText="Upgrade to Pro Plan to configure settings for user sessions."
+                  />
+                )}
+
+                <CardFooter className="justify-end space-x-2">
+                  {userSessionsForm.formState.isDirty && (
+                    <Button variant="default" onClick={() => userSessionsForm.reset()}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    variant={promptProPlanUpgrade ? 'default' : 'primary'}
+                    type="submit"
+                    disabled={
+                      !canUpdateConfig ||
+                      isUpdatingUserSessions ||
+                      !userSessionsForm.formState.isDirty
+                    }
+                    loading={isUpdatingUserSessions}
+                  >
+                    Save changes
+                  </Button>
+                </CardFooter>
+              </Card>
+            </form>
+          </Form>
+        </PageSectionContent>
+      </PageSection>
+
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
             <PageSectionTitle>Access Tokens</PageSectionTitle>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -260,7 +390,7 @@ export const SessionsAuthSettingsForm = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Access token expiry time"
-                        description="How long access tokens are valid for before it must be refreshed. Recommendation: 3600 seconds."
+                        description="How long access tokens are valid for before they must be refreshed. Recommendation: 3600 seconds."
                       >
                         <FormControl className="w-full">
                           <InputGroup>
@@ -380,136 +510,6 @@ export const SessionsAuthSettingsForm = () => {
                       !refreshTokenForm.formState.isDirty
                     }
                     loading={isUpdatingRefreshTokens}
-                  >
-                    Save changes
-                  </Button>
-                </CardFooter>
-              </Card>
-            </form>
-          </Form>
-        </PageSectionContent>
-      </PageSection>
-
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>User Sessions</PageSectionTitle>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          <Form {...userSessionsForm}>
-            <form
-              onSubmit={userSessionsForm.handleSubmit(onSubmitUserSessions)}
-              className="space-y-4"
-            >
-              <Card>
-                <CardContent>
-                  <FormField
-                    control={userSessionsForm.control}
-                    name="SESSIONS_SINGLE_PER_USER"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Enforce single session per user"
-                        description="If enabled, all but a user's most recently active session will be terminated."
-                      >
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
-                          />
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-
-                <CardContent>
-                  <FormField
-                    control={userSessionsForm.control}
-                    name="SESSIONS_TIMEBOX"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Time-box user sessions"
-                        description="The amount of time before a user is forced to sign in again. Use 0 for never."
-                      >
-                        <FormControl className="w-full">
-                          <InputGroup>
-                            <FormInputGroupInput
-                              type="number"
-                              min={0}
-                              {...field}
-                              disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
-                            />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>
-                                <HoursOrNeverText value={field.value || 0} />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-
-                <CardContent>
-                  <FormField
-                    control={userSessionsForm.control}
-                    name="SESSIONS_INACTIVITY_TIMEOUT"
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="flex-row-reverse"
-                        label="Inactivity timeout"
-                        description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
-                      >
-                        <FormControl className="w-full">
-                          <InputGroup>
-                            <FormInputGroupInput
-                              type="number"
-                              {...field}
-                              className="flex-1"
-                              disabled={!canUpdateConfig || !hasUserSessionsEntitlement}
-                            />
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupText>
-                                <HoursOrNeverText value={field.value || 0} />
-                              </InputGroupText>
-                            </InputGroupAddon>
-                          </InputGroup>
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-                </CardContent>
-
-                {promptProPlanUpgrade && (
-                  <UpgradeToPro
-                    fullWidth
-                    source="authSessions"
-                    featureProposition="configure user sessions"
-                    primaryText="Configuring user sessions is only available on the Pro Plan and above"
-                    secondaryText="Upgrade to Pro Plan to configure settings for user sessions."
-                  />
-                )}
-
-                <CardFooter className="justify-end space-x-2">
-                  {userSessionsForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => userSessionsForm.reset()}>
-                      Cancel
-                    </Button>
-                  )}
-                  <Button
-                    variant={promptProPlanUpgrade ? 'default' : 'primary'}
-                    type="submit"
-                    disabled={
-                      !canUpdateConfig ||
-                      isUpdatingUserSessions ||
-                      !userSessionsForm.formState.isDirty
-                    }
-                    loading={isUpdatingUserSessions}
                   >
                     Save changes
                   </Button>
