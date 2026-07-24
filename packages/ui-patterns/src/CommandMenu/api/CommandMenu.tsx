@@ -184,12 +184,14 @@ function CommandMenuTriggerInput({
         type="button"
         tabIndex={0}
         className={cn(
-          'group',
+          'group cursor-pointer',
           'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
           'pl-1.5 md:pl-2 pr-1',
           'flex items-center justify-between',
-          'bg-surface-100/75 text-foreground-lighter border',
-          'hover:bg-surface-100/100  hover:border-stronger',
+          // Match Button outline. Prefer accent over surface-100 for hover —
+          // surface-100 → --card, which brightens toward white in light mode.
+          'bg-transparent text-foreground-lighter border-strong',
+          'hover:bg-accent hover:border-foreground-muted',
           'focus-ring',
           'transition-colors',
           className
