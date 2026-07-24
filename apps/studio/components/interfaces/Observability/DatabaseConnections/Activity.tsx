@@ -1,8 +1,9 @@
 import { isEqual } from 'lodash'
-import { X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs'
 import { useEffect } from 'react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportsSelectFilter } from '../../Reports/v2/ReportsSelectFilter'
@@ -24,15 +25,22 @@ export const Activity = ({ live }: ActivityProps) => {
   const [selectedPid] = useQueryState('pid', parseAsInteger)
 
   const [
-    { states: statesFilter, applications: applicationsFilter, roles: rolesFilter },
+    {
+      search: searchFilter,
+      states: statesFilter,
+      applications: applicationsFilter,
+      roles: rolesFilter,
+    },
     setQueryStates,
   ] = useQueryStates({
+    search: parseAsString.withDefault(''),
     states: parseAsArrayOf(parseAsString, ',').withDefault([]),
     applications: parseAsArrayOf(parseAsString, ',').withDefault([]),
     roles: parseAsArrayOf(parseAsString, ',').withDefault(DEFAULT_ROLES_FILTER),
   })
 
   const hasNoFiltersApplied =
+    searchFilter.length === 0 &&
     statesFilter.length === 0 &&
     applicationsFilter.length === 0 &&
     isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
@@ -50,6 +58,9 @@ export const Activity = ({ live }: ActivityProps) => {
     connectionString: project?.connectionString,
   })
 
+  const matchesSearch = (activity: { query: string | null }) =>
+    !searchFilter || (activity.query?.toLowerCase().includes(searchFilter.toLowerCase()) ?? false)
+
   const activities = data?.filter((activity) => {
     const matchesState =
       !statesFilter ||
@@ -58,7 +69,7 @@ export const Activity = ({ live }: ActivityProps) => {
     const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
     const matchesApplication =
       applicationsFilter.length === 0 || applicationsFilter.includes(activity.application_name)
-    return matchesState && matchesRole && matchesApplication
+    return matchesState && matchesRole && matchesApplication && matchesSearch(activity)
   })
 
   const stateOptions = [
@@ -75,7 +86,8 @@ export const Activity = ({ live }: ActivityProps) => {
       (y) =>
         y.state === x.toLowerCase() &&
         (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
-        (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name))
+        (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
+        matchesSearch(y)
     ).length,
   }))
 
@@ -90,7 +102,8 @@ export const Activity = ({ live }: ActivityProps) => {
           (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
           (!statesFilter ||
             statesFilter.length === 0 ||
-            (y.state !== null && statesFilter.includes(y.state)))
+            (y.state !== null && statesFilter.includes(y.state))) &&
+          matchesSearch(y)
       ).length,
     }))
     .filter((x) => !!x.value)
@@ -107,7 +120,8 @@ export const Activity = ({ live }: ActivityProps) => {
           (!statesFilter ||
             statesFilter.length === 0 ||
             (y.state !== null && statesFilter.includes(y.state))) &&
-          (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name))
+          (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
+          matchesSearch(y)
       ).length,
     }))
     .sort((a, b) => {
@@ -119,6 +133,15 @@ export const Activity = ({ live }: ActivityProps) => {
       return 0
     })
 
+  const onResetFilters = () => {
+    setQueryStates({
+      search: '',
+      states: [],
+      roles: DEFAULT_ROLES_FILTER,
+      applications: [],
+    })
+  }
+
   useEffect(() => {
     if (selectedPid && isSuccess) {
       document
@@ -129,48 +152,52 @@ export const Activity = ({ live }: ActivityProps) => {
 
   return (
     <div className="flex flex-col gap-y-4">
-      <div className="flex gap-x-4">
-        <h2>Sessions</h2>
-        <div className="flex gap-x-2">
-          <ReportsSelectFilter
-            label="State"
-            options={stateOptions}
-            value={statesFilter ?? []}
-            onChange={(states) => setQueryStates({ states })}
-            isLoading={isPending}
-            popoverClassName="w-60"
+      <h2>Sessions</h2>
+      <div className="flex gap-x-2">
+        <Input
+          size="tiny"
+          icon={<Search />}
+          placeholder="Search query"
+          className="w-64"
+          value={searchFilter}
+          onChange={(e) => setQueryStates({ search: e.target.value })}
+        />
+        <ReportsSelectFilter
+          label="State"
+          options={stateOptions}
+          value={statesFilter ?? []}
+          onChange={(states) => setQueryStates({ states })}
+          isLoading={isPending}
+          popoverClassName="w-60"
+        />
+        <ReportsSelectFilter
+          showSearch
+          label="Roles"
+          options={roleOptions}
+          value={rolesFilter ?? []}
+          onChange={(roles) => setQueryStates({ roles })}
+          isLoading={isPending}
+          popoverClassName="w-72"
+        />
+        <ReportsSelectFilter
+          showSearch
+          label="Application"
+          options={applicationOptions}
+          value={applicationsFilter ?? []}
+          onChange={(applications) => setQueryStates({ applications })}
+          isLoading={isPending}
+          popoverClassName="w-60"
+        />
+        {!hasNoFiltersApplied && (
+          <ButtonTooltip
+            variant="text"
+            className="px-1"
+            icon={<X />}
+            onClick={onResetFilters}
+            aria-label="Reset filters"
+            tooltip={{ content: { side: 'bottom', text: 'Reset filters' } }}
           />
-          <ReportsSelectFilter
-            showSearch
-            label="Roles"
-            options={roleOptions}
-            value={rolesFilter ?? []}
-            onChange={(roles) => setQueryStates({ roles })}
-            isLoading={isPending}
-            popoverClassName="w-72"
-          />
-          <ReportsSelectFilter
-            showSearch
-            label="Application"
-            options={applicationOptions}
-            value={applicationsFilter ?? []}
-            onChange={(applications) => setQueryStates({ applications })}
-            isLoading={isPending}
-            popoverClassName="w-60"
-          />
-          {!hasNoFiltersApplied && (
-            <ButtonTooltip
-              variant="text"
-              className="px-1"
-              icon={<X />}
-              onClick={() =>
-                setQueryStates({ states: [], roles: DEFAULT_ROLES_FILTER, applications: [] })
-              }
-              aria-label="Reset filters"
-              tooltip={{ content: { side: 'bottom', text: 'Reset filters' } }}
-            />
-          )}
-        </div>
+        )}
       </div>
 
       <Card>
@@ -220,17 +247,7 @@ export const Activity = ({ live }: ActivityProps) => {
                       There are no sessions that match the selected filters. Try adjusting or
                       clearing them.
                     </p>
-                    <Button
-                      variant="default"
-                      className="mt-2"
-                      onClick={() => {
-                        setQueryStates({
-                          states: [],
-                          roles: DEFAULT_ROLES_FILTER,
-                          applications: [],
-                        })
-                      }}
-                    >
+                    <Button variant="default" className="mt-2" onClick={onResetFilters}>
                       Reset filters
                     </Button>
                   </TableCell>

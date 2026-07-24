@@ -1,10 +1,10 @@
-import { type RefObject } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Check, Copy } from 'lucide-react'
+import { useEffect, useState, type RefObject } from 'react'
+import { copyToClipboard } from 'ui'
 
-import CopyButton from '@/components/ui/CopyButton'
-import { BASE_PATH } from '@/lib/constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
-interface CopyPromptAdmonitionProps {
+interface CopyPromptButtonProps {
   stepsContainerRef: RefObject<HTMLDivElement | null>
   /** When set, the Copy prompt button uses this verbatim instead of scraping the steps. */
   customPrompt?: string
@@ -125,42 +125,32 @@ export const buildConnectPrompt = (stepsContainer: HTMLElement | null) => {
   return promptContent
 }
 
-export function CopyPromptAdmonition({
-  stepsContainerRef,
-  customPrompt,
-}: CopyPromptAdmonitionProps) {
-  const handleCopyPrompt = () => {
-    return customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
-  }
+export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPromptButtonProps) {
+  const [showCopied, setShowCopied] = useState(false)
+
+  useEffect(() => {
+    if (!showCopied) return
+    const timer = setTimeout(() => setShowCopied(false), 2000)
+    return () => clearTimeout(timer)
+  }, [showCopied])
 
   return (
-    <Admonition
-      type="tip"
-      showIcon={false}
-      layout="horizontal"
-      actions={
-        <CopyButton variant="default" copyLabel="Copy prompt" asyncText={handleCopyPrompt} />
-      }
+    <ButtonTooltip
+      variant="default"
+      icon={showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />}
+      onClick={() => {
+        const textToCopy = customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
+        setShowCopied(true)
+        copyToClipboard(textToCopy)
+      }}
+      tooltip={{
+        content: {
+          side: 'left',
+          text: 'Copy these steps for your coding agent',
+        },
+      }}
     >
-      <div className="absolute -inset-16 z-0 opacity-50">
-        <img
-          src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
-          alt="Supabase Grafana"
-          className="w-full h-full object-cover object-right hidden dark:block"
-        />
-        <img
-          src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
-          alt="Supabase Grafana"
-          className="w-full h-full object-cover object-right dark:hidden"
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />
-      </div>
-
-      <div className="relative flex flex-col md:flex-row md:items-center gap-y-2 md:gap-x-8 justify-between">
-        <div className="flex flex-col gap-y-0.5">
-          <p className="heading-default">Give your agent everything it needs</p>
-        </div>
-      </div>
-    </Admonition>
+      {showCopied ? 'Copied' : 'Copy prompt'}
+    </ButtonTooltip>
   )
 }

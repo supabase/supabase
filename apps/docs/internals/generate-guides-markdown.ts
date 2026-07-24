@@ -20,6 +20,7 @@ import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { ContentListings } from './markdown-schema/ContentListings'
 import { CustomContent } from './markdown-schema/CustomContent'
+import { DatabaseAdvisorsIndex } from './markdown-schema/DatabaseAdvisorsIndex'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
 import { IconCheck, IconX } from './markdown-schema/Icons'
 import { Image } from './markdown-schema/Image'
@@ -36,6 +37,7 @@ import { SharedData } from './markdown-schema/SharedData'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
 import { TerraformProviderSchema } from './markdown-schema/TerraformProviderSchema'
+import { WrapperDashboardIntegration } from './markdown-schema/WrapperDashboardIntegration'
 import {
   collectMarkdownSources,
   type FrontmatterFormat,
@@ -173,6 +175,7 @@ const SCHEMA: ComponentSchema = {
   AuthProviders,
   ComputeDiskLimitsTable,
   CustomContent,
+  DatabaseAdvisorsIndex,
   ErrorCodes,
   Link,
   McpCiConfigBlock,
@@ -191,6 +194,7 @@ const SCHEMA: ComponentSchema = {
   NavData,
   SharedData,
   TerraformProviderSchema,
+  WrapperDashboardIntegration,
 }
 
 function parseFrontmatter(raw: string, frontmatter: FrontmatterFormat) {

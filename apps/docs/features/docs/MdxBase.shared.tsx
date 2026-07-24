@@ -7,6 +7,7 @@ import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { ContentListings } from '~/components/ContentListings'
 import { CustomContent } from '~/components/CustomContent'
+import { DatabaseAdvisorsIndex } from '~/components/DatabaseAdvisorsIndex'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
 import { McpCiConfigBlock } from '~/components/McpCiConfigBlock'
@@ -20,6 +21,7 @@ import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
+import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
@@ -82,6 +84,7 @@ const components = {
   ComputeDiskLimitsTable,
   CustomContent,
   ContentListings,
+  DatabaseAdvisorsIndex,
   ErrorCodes,
   Extensions,
   GlassPanel,
@@ -113,6 +116,7 @@ const components = {
   Tabs,
   TabPanel,
   TerraformProviderSchema,
+  WrapperDashboardIntegration,
   InfoTooltip,
   a: MdxAnchor,
   h2: (props: ComponentPropsWithoutRef<'h2'>) => (

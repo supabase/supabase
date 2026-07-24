@@ -32,7 +32,7 @@ import { withAuth } from '@/hooks/misc/withAuth'
 import {
   buildVercelInstallRouteQuery,
   getErrorMessage,
-  getVercelInstallSource,
+  resolveVercelInstallSource,
 } from '@/lib/integrations/vercel-install.utils'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
@@ -115,7 +115,11 @@ const VercelIntegration: NextPageWithLayout = () => {
    */
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
-    const vercelInstallSource = getVercelInstallSource(source)
+    const vercelInstallSource = resolveVercelInstallSource({
+      source,
+      currentProjectId,
+      externalId,
+    })
     const query = buildVercelInstallRouteQuery({
       source: vercelInstallSource,
       organizationSlug: orgSlug,

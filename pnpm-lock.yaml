@@ -1053,6 +1053,9 @@ importers:
       braintrust:
         specifier: ^3.9.0
         version: 3.9.0(@aws-sdk/credential-provider-web-identity@3.972.38)(supports-color@8.1.1)(zod@3.25.76)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
       common:
         specifier: workspace:*
         version: link:../../packages/common
