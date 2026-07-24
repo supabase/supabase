@@ -297,7 +297,7 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="hover:underline cursor-pointer"
+                      className="normal-nums hover:underline cursor-pointer"
                       onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
