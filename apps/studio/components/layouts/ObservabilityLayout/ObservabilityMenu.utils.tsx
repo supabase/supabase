@@ -95,7 +95,7 @@ export const useGenerateObservabilityMenu = () => {
       ? [
           {
             name: 'Database Connections',
-            key: 'database-connections',
+            key: 'connections',
             url: `${baseUrl}/connections`,
             shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_API_GATEWAY,
           },

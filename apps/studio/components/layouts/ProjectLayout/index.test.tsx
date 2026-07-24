@@ -156,7 +156,11 @@ vi.mock('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarni
   ResourceExhaustionWarningBanner: () => null,
 }))
 vi.mock('@/components/ui/ButtonTooltip', () => ({
-  ButtonTooltip: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  ButtonTooltip: ({ children, ...props }: any) => (
+    <button tabIndex={0} {...props}>
+      {children}
+    </button>
+  ),
 }))
 vi.mock('@/components/ui/PartnerIcon', () => ({
   default: () => <div data-testid="partner-icon" />,

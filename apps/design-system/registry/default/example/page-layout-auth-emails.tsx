@@ -139,6 +139,7 @@ export default function PageLayoutAuthEmails() {
           {subPages.map((page) => (
             <NavMenuItem key={page.id} active={activePage === page.id}>
               <button
+                tabIndex={0}
                 type="button"
                 aria-pressed={activePage === page.id}
                 className="h-full cursor-pointer appearance-none bg-transparent text-inherit"
@@ -212,6 +213,7 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
               {AUTHENTICATION_TEMPLATES.map((template) => (
                 <CardContent key={template.title} className="p-0">
                   <button
+                    tabIndex={0}
                     type="button"
                     className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-surface-200"
                   >
@@ -248,7 +250,11 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
                         key={template.id}
                         className="flex h-full w-full items-center justify-between p-0 transition-colors hover:bg-surface-200"
                       >
-                        <button type="button" className="flex flex-1 flex-col px-6 py-4 text-left">
+                        <button
+                          tabIndex={0}
+                          type="button"
+                          className="flex flex-1 flex-col px-6 py-4 text-left"
+                        >
                           <h3 className="text-sm text-foreground">{template.title}</h3>
                           <p className="text-sm text-foreground-lighter">{template.purpose}</p>
                         </button>
@@ -263,7 +269,12 @@ function TemplatesPage({ onNavigateToSmtp }: { onNavigateToSmtp: () => void }) {
                               </FormControl>
                             )}
                           />
-                          <button type="button" className="py-6 pr-6" aria-label="Edit template">
+                          <button
+                            tabIndex={0}
+                            type="button"
+                            className="py-6 pr-6"
+                            aria-label="Edit template"
+                          >
                             <ChevronRight size={16} className="text-foreground-muted" />
                           </button>
                         </div>

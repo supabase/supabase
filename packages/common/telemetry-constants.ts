@@ -899,6 +899,16 @@ export interface CopyAsMarkdownClickedEvent {
 }
 
 /**
+ * User clicked the sidebar link to set up an AI coding agent with Supabase.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AgentSetupClickedEvent {
+  action: 'agent_setup_clicked'
+}
+
+/**
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
@@ -3578,6 +3588,7 @@ export type TelemetryEvent =
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
+  | AgentSetupClickedEvent
   | AskAiClickedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent

@@ -52,6 +52,7 @@ import { useDatabaseIndexCreateMutation } from '@/data/database-indexes/index-cr
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableColumnsQuery } from '@/data/database/table-columns-query'
 import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -98,10 +99,11 @@ export const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelP
   const [schemaSearchTerm, setSchemaSearchTerm] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const { data: schemas } = useSchemasQuery({
+  const { data: allSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = useSchemasFilteredForHighAvailability(allSchemas)
   const { data: entities, isPending: isLoadingEntities } = useEntityTypesQuery({
     schemas: [selectedSchema],
     sort: 'alphabetical',

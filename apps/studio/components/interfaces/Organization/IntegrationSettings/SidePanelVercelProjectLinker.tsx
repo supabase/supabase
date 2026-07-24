@@ -3,11 +3,9 @@ import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { SidePanel } from 'ui'
 
+import { type ForeignProject } from '../../Integrations/VercelGithub/VercelGithub.types'
 import { ENV_VAR_RAW_KEYS } from '@/components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
-import {
-  ForeignProject,
-  ProjectLinker,
-} from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import { ProjectLinker } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'

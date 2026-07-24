@@ -9,6 +9,13 @@ import { SnowflakeFormSchema } from './Snowflake/Snowflake.schema'
 const CommonFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
+  tableSyncCopyMode: z.enum([
+    'include_all_tables',
+    'skip_all_tables',
+    'include_tables',
+    'skip_tables',
+  ]),
+  tableSyncCopyTableIds: z.array(z.string()),
   maxFillMs: z
     .number()
     .int('Batch wait time must be a whole number of milliseconds')

@@ -253,6 +253,7 @@ export function ModeSelector({ modes, selected, onChange }: ModeSelectorProps) {
         <button
           key={mode.id}
           type="button"
+          tabIndex={0}
           onClick={() => onChange(mode.id)}
           className={cn(
             'flex flex-col items-center gap-2 p-4 transition-colors border-r last:border-r-0',

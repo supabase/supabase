@@ -538,11 +538,44 @@ export default defineConfig(({ command, mode }) => {
   if (command === 'build') {
     // Next's types declare NODE_ENV as read-only, so cast to assign it.
     ;(process.env as Record<string, string>).NODE_ENV = 'production'
+  } else if (process.env.NODE_ENV === 'test') {
+    // `pnpm dev:studio-local` runs with a shell NODE_ENV=test (the Next
+    // path needs it to load `.env.test`), and Vite's
+    // define plugin inlines `process.env.NODE_ENV || mode` into the client —
+    // which would bake 'test' in and trip the vitest-only API_URL path.
+    // `next dev` always runs the bundle at 'development' regardless of the
+    // shell NODE_ENV; mirror that. Env-file selection is unaffected — the
+    // vite dev path selects `.env.test` via MODE=test (see envMode below),
+    // not NODE_ENV.
+    ;(process.env as Record<string, string>).NODE_ENV = 'development'
   }
+
+  // `pnpm dev:studio-local` needs the `.env.test` cascade (self-hosted mode
+  // plus the supabase-cli keys that generateLocalEnv.js writes) — the Next
+  // path selects it via NODE_ENV=test, and the tanstack build via
+  // `--mode test` (e2e:setup:selfhosted). But `vite dev --mode test` is not
+  // an option: TanStack Start's dev-server plugin treats mode 'test' as
+  // "running under vitest" and skips installing its SSR middleware entirely,
+  // so every route 404s (see the `isTest` guard in devServerPlugin,
+  // @tanstack/start-plugin-core). So dev keeps mode 'development' and
+  // emulates the env cascade of the mode named by MODE instead: load it for
+  // the NEXT_PUBLIC_* defines below, and seed process.env for the SSR
+  // runtime. The seeding must not clobber shell-provided values (matching
+  // serve.js), and survives TanStack's own load-env plugin: that plugin
+  // Object.assigns loadEnv(mode) at configResolved — after this runs — and
+  // loadEnv gives existing process.env values priority over env-file values.
+  const envMode = command === 'serve' && process.env.MODE ? process.env.MODE : mode
 
   // Inline NEXT_PUBLIC_* env vars at build time so `process.env.NEXT_PUBLIC_*`
   // works in the browser bundle (mirrors Next.js behaviour).
-  const env = loadEnv(mode, rootDir, '')
+  const env = loadEnv(envMode, rootDir, '')
+
+  if (envMode !== mode) {
+    const processEnv = process.env as Record<string, string | undefined>
+    for (const [key, value] of Object.entries(env)) {
+      processEnv[key] ??= value
+    }
+  }
   const publicEnvDefines = Object.fromEntries(
     Object.entries(env)
       .filter(([key]) => key.startsWith('NEXT_PUBLIC_'))

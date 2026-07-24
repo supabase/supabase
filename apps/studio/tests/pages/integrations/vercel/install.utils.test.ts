@@ -45,7 +45,7 @@ describe('buildVercelInstallRouteQuery', () => {
     })
   })
 
-  test('only keeps marketplace destination params', () => {
+  test('keeps marketplace params and passes through deploy-button ids when present', () => {
     expect(
       buildVercelInstallRouteQuery({
         source: 'marketplace',
@@ -58,6 +58,8 @@ describe('buildVercelInstallRouteQuery', () => {
     ).toStrictEqual({
       organizationSlug: 'acme',
       configurationId: 'configuration-id',
+      currentProjectId: 'vercel-project',
+      externalId: 'github-repo',
       next: 'https://vercel.com/callback',
     })
   })

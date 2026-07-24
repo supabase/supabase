@@ -301,9 +301,10 @@ export function DiskManagementForm() {
 
       setIsDialogOpen(false)
       form.reset(data as DiskStorageSchemaType)
-      toast.success(
-        `Successfully updated disk settings!${willUpdateDiskConfiguration ? ' The requested changes will be applied to your disk shortly.' : ''}`
-      )
+      // Disk resizes get their own completion toast once polling confirms it's applied
+      if (!willUpdateDiskConfiguration) {
+        toast.success('Successfully updated disk settings!')
+      }
     } catch (error: unknown) {
       setMessageState({
         message: error instanceof Error ? error.message : 'An unknown error occurred',

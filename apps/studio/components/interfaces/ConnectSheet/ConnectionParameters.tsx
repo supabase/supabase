@@ -23,6 +23,9 @@ export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParameter
             <span className="text-foreground-lighter">{param.key}:</span>
             <span className="ml-1 text-foreground">{param.value}</span>
             <button
+              type="button"
+              tabIndex={0}
+              aria-label={`Copy ${param.key}`}
               onClick={() => {
                 copyToClipboard(param.value, () => {
                   setCopiedMap((prev) => ({ ...prev, [param.key]: true }))
@@ -34,7 +37,7 @@ export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParameter
               }}
               className={cn(
                 'text-foreground-lighter',
-                'ml-2 opacity-0 group-hover/param:opacity-100',
+                'ml-2 opacity-0 group-hover/param:opacity-100 focus-visible:opacity-100',
                 'hover:text-foreground rounded-xs p-1',
                 copiedMap[param.key] && 'opacity-100',
                 'transition-all'
