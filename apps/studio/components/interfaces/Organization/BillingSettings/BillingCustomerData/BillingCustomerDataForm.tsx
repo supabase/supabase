@@ -47,7 +47,6 @@ interface BillingCustomerDataFormProps {
   purchasingAs: PurchasingAs
   setPurchasingAs: (as: PurchasingAs) => void
   addressCountry?: string
-  taxId?: CustomerTaxId
 }
 
 export const TaxIdSchema = z.object({
