@@ -2190,12 +2190,6 @@ importers:
       posthog-js:
         specifier: ^1.391.2
         version: 1.391.2
-      react:
-        specifier: 'catalog:'
-        version: 19.2.6
-      react-dom:
-        specifier: 'catalog:'
-        version: 19.2.6(react@19.2.6)
       react-use:
         specifier: ^17.4.0
         version: 17.6.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -2203,6 +2197,9 @@ importers:
         specifier: 'catalog:'
         version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
     devDependencies:
+      '@testing-library/react':
+        specifier: ^16.0.0
+        version: 16.0.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@types/lodash':
         specifier: 4.17.5
         version: 4.17.5
@@ -2227,6 +2224,12 @@ importers:
       lucide-react:
         specifier: '*'
         version: 0.436.0(react@19.2.6)
+      react:
+        specifier: 'catalog:'
+        version: 19.2.6
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.6(react@19.2.6)
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig

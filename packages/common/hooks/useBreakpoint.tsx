@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useIsomorphicLayoutEffect, useWindowSize } from 'react-use'
+import { useIsomorphicLayoutEffect } from 'react-use'
 
 /**
  * Map of Tailwind default breakpoint values. Allows setting a value by
@@ -22,18 +22,21 @@ const twBreakpointMap = {
 }
 
 export function useBreakpoint(breakpoint: number | keyof typeof twBreakpointMap = 'lg') {
-  const [isBreakpoint, setIsBreakpoint] = useState(false)
-  const { width } = useWindowSize()
-
   const _breakpoint = typeof breakpoint === 'string' ? twBreakpointMap[breakpoint] : breakpoint
 
+  const [isBreakpoint, setIsBreakpoint] = useState(false)
+
   useIsomorphicLayoutEffect(() => {
-    if (width <= _breakpoint) {
-      setIsBreakpoint(true)
-    } else {
-      setIsBreakpoint(false)
-    }
-  }, [width])
+    // Rem, not px, to match Tailwind's breakpoints exactly — a px comparison
+    // can drift out of sync with co-located `md:`-style classes. `+1` recovers
+    // Tailwind's actual min-width from our offset value; range syntax keeps
+    // this the exact complement of it.
+    const mql = window.matchMedia(`(width < ${(_breakpoint + 1) / 16}rem)`)
+    const onChange = () => setIsBreakpoint(mql.matches)
+    onChange()
+    mql.addEventListener('change', onChange)
+    return () => mql.removeEventListener('change', onChange)
+  }, [_breakpoint])
 
   return isBreakpoint
 }
