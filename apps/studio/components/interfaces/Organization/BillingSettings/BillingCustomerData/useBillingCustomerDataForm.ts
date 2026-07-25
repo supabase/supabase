@@ -31,6 +31,8 @@ export type BillingAddressPayload = {
   tax_id: CustomerTaxId | null
 }
 
+export type PurchasingAs = 'business' | 'individual'
+
 type SubmittedBillingFormState = {
   addressValue: StripeAddressValue
   taxIdValues: TaxIdFormValues
@@ -66,6 +68,14 @@ export function useBillingCustomerDataForm({
     [customerProfile]
   )
 
+  const [purchasingAs, setPurchasingAs] = useState<PurchasingAs>(
+    taxId != null ? 'business' : 'individual'
+  )
+
+  useEffect(() => {
+    setPurchasingAs(taxId ? 'business' : 'individual')
+  }, [taxId])
+
   const addressOptions: StripeAddressElementOptions = useMemo(
     () => ({
       mode: 'billing',
@@ -74,10 +84,10 @@ export function useBillingCustomerDataForm({
         apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
         mode: 'google_maps_api' as const,
       },
-      display: { name: 'full' as const },
+      display: { name: purchasingAs === 'business' ? 'organization' : 'full' },
       defaultValues: initialStripeAddressValue,
     }),
-    [initialStripeAddressValue]
+    [initialStripeAddressValue, purchasingAs]
   )
 
   const initialTaxIdValues = useMemo(
@@ -119,6 +129,10 @@ export function useBillingCustomerDataForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialStripeAddressValue, initialTaxIdValues])
 
+  useEffect(() => {
+    setResetKey((c) => c + 1)
+  }, [purchasingAs])
+
   const onAddressChange = useCallback((evt: StripeAddressElementChangeEvent) => {
     stripeAddressRef.current = evt.value
     stripeAddressValidationRef.current = evt.complete ? 'complete' : 'incomplete'
@@ -133,7 +147,8 @@ export function useBillingCustomerDataForm({
     setIsAddressDirty(!isAddressEqual(result.value, savedStripeAddressRef.current))
   }, [])
 
-  const isDirty = isAddressDirty || form.formState.isDirty
+  const savedTaxIdButPurchasingAsIndividual = taxId && purchasingAs === 'individual'
+  const isDirty = isAddressDirty || form.formState.isDirty || savedTaxIdButPurchasingAsIndividual
 
   const syncCurrentState = useCallback(
     (addressValue: StripeAddressValue, taxIdValues: TaxIdFormValues) => {
@@ -179,7 +194,10 @@ export function useBillingCustomerDataForm({
       },
       billing_name: address.name.trim(),
       tax_id:
-        selectedTaxId && taxIdValues.tax_id_type?.length && taxIdValue.length
+        selectedTaxId &&
+        taxIdValues.tax_id_type?.length &&
+        taxIdValue.length &&
+        purchasingAs === 'business'
           ? {
               type: taxIdValues.tax_id_type,
               value: sanitizeTaxIdValue({
@@ -224,6 +242,8 @@ export function useBillingCustomerDataForm({
     markCurrentValuesAsSaved,
     addressCountry,
     addressOptions,
+    purchasingAs,
+    setPurchasingAs,
   }
 }
 

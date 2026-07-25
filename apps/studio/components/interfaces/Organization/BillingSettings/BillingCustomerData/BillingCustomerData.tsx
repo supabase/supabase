@@ -79,6 +79,8 @@ export const BillingCustomerData = () => {
     markCurrentValuesAsSaved,
     addressCountry,
     addressOptions,
+    purchasingAs,
+    setPurchasingAs,
   } = useBillingCustomerDataForm({
     customerProfile,
     taxId,
@@ -221,6 +223,8 @@ export const BillingCustomerData = () => {
                           addressElementRef.current = element
                         }}
                         addressCountry={addressCountry}
+                        purchasingAs={purchasingAs}
+                        setPurchasingAs={setPurchasingAs}
                       />
                       <CardFooter className="border-t justify-end px-8">
                         {!canUpdateBillingCustomerData && (

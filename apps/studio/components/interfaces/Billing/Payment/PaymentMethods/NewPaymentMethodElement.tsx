@@ -18,7 +18,6 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Checkbox,
   cn,
   Command,
   CommandEmpty,
@@ -34,6 +33,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  RadioGroup,
+  RadioGroupItem,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -144,7 +145,11 @@ export const NewPaymentMethodElement = forwardRef(
     const taxIdValue = rawTaxIdValue?.trim() ?? ''
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
-    const [purchasingAsBusiness, setPurchasingAsBusiness] = useState(currentTaxId != null)
+    const [purchasingAs, setPurchasingAs] = useState<'individual' | 'business'>(
+      currentTaxId != null ? 'business' : 'individual'
+    )
+    const purchasingAsBusiness = purchasingAs === 'business'
+
     const [stripeAddress, setStripeAddress] = useState<
       StripeAddressElementChangeEvent['value'] | undefined
     >(undefined)
@@ -286,6 +291,7 @@ export const NewPaymentMethodElement = forwardRef(
           apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
           mode: 'google_maps_api',
         },
+
         display: { name: purchasingAsBusiness ? 'organization' : 'full' },
         // Use live form state (stripeAddress) so the address survives remounts triggered
         // by the purchasingAsBusiness toggle (which changes the key prop). Without this,
@@ -341,28 +347,41 @@ export const NewPaymentMethodElement = forwardRef(
 
         {fullyLoaded && (
           <div className="flex items-center space-x-2 py-4">
-            <Checkbox
-              id="business"
-              checked={purchasingAsBusiness}
-              onCheckedChange={() => setPurchasingAsBusiness(!purchasingAsBusiness)}
-            />
-            <label htmlFor="business" className="text-foreground text-sm leading-none">
-              I’m purchasing as a business
-            </label>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle
-                  size={14}
-                  className="text-foreground-lighter hover:text-foreground transition"
+            <RadioGroup
+              defaultValue={'individual'}
+              value={purchasingAs}
+              onValueChange={(v) => setPurchasingAs(v === 'business' ? 'business' : 'individual')}
+              className="text-sm"
+            >
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value="individual"
+                  id="purchasing-as-individual"
+                  className="cursor-pointer"
                 />
-              </TooltipTrigger>
-              <TooltipContent side="top" className="w-72">
-                Check this only if you need a tax ID (e.g. US EIN, VAT, GST) on your invoice. You’ll
-                be asked to enter it, and it’ll appear on a compliant business invoice. If you don’t
-                have a tax ID, or don’t need one shown, leave this unchecked. You’ll still receive a
-                receipt.
-              </TooltipContent>
-            </Tooltip>
+                <label htmlFor="purchasing-as-individual">I'm purchasing as an individual</label>
+              </div>
+              <div className="flex items-center gap-3">
+                <RadioGroupItem
+                  value="business"
+                  id="purchasing-as-business"
+                  className="cursor-pointer"
+                />
+                <label htmlFor="purchasing-as-business">I'm purchasing as a business</label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle
+                      size={14}
+                      className="text-foreground-lighter hover:text-foreground transition"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="w-72">
+                    Purchasing as a business allows you to add a tax ID (e.g. US EIN, VAT, GST) to
+                    your account, which will then show up on your invoice.
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </RadioGroup>
           </div>
         )}
 
