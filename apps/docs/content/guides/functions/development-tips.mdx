@@ -29,15 +29,16 @@ We recommend this folder structure:
 ```bash
 └── supabase
     ├── functions
-    │   ├── import_map.json # A top-level import map to use across functions.
     │   ├── _shared
     │   │   ├── supabaseAdmin.ts # Supabase client with SECRET key.
     │   │   └── supabaseClient.ts # Supabase client with PUBLISHABLE key.
     │   │   └── cors.ts # Reusable CORS headers.
     │   ├── function-one # Use hyphens to name functions.
-    │   │   └── index.ts
+    │   │   ├── index.ts
+    │   │   └── deno.json # Function-specific Deno configuration.
     │   └── function-two
-    │   │   └── index.ts
+    │       ├── index.ts
+    │       └── deno.json # Function-specific Deno configuration.
     │   └── tests
     │       └── function-one-test.ts
     │       └── function-two-test.ts
@@ -45,14 +46,15 @@ We recommend this folder structure:
     └── config.toml
 ```
 
+Each function should have its own [`deno.json`](/docs/guides/functions/dependencies#using-denojson-recommended) to manage dependencies. Import maps are [supported but legacy](/docs/guides/functions/dependencies#using-import-maps-legacy) — if both exist, `deno.json` takes precedence.
+
 ### Using config.toml
 
-Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) can be set via the `config.toml` file.
 
 ```toml supabase/config.toml
 [functions.hello-world]
 verify_jwt = false
-import_map = './import_map.json'
 ```
 
 ### Not using TypeScript
