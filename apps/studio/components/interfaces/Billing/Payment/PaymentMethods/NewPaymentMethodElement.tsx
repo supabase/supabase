@@ -47,6 +47,7 @@ import {
   getEffectiveTaxCountry,
   resolveStoredTaxId,
 } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.utils'
+import { PurchasingAs } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/useBillingCustomerDataForm'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { getURL } from '@/lib/helpers'
 
@@ -145,7 +146,7 @@ export const NewPaymentMethodElement = forwardRef(
     const taxIdValue = rawTaxIdValue?.trim() ?? ''
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
-    const [purchasingAs, setPurchasingAs] = useState<'individual' | 'business'>(
+    const [purchasingAs, setPurchasingAs] = useState<PurchasingAs>(
       currentTaxId != null ? 'business' : 'individual'
     )
     const purchasingAsBusiness = purchasingAs === 'business'
