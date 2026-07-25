@@ -34,7 +34,6 @@ import { z } from 'zod'
 
 import { TAX_IDS } from './TaxID.constants'
 import { PurchasingAs } from './useBillingCustomerDataForm'
-import { CustomerTaxId } from '@/data/organizations/types'
 
 interface BillingCustomerDataFormProps {
   form: UseFormReturn<TaxIdFormValues>
