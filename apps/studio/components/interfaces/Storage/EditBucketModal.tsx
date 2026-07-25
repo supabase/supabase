@@ -28,6 +28,8 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { BucketDataProtectionFields } from '@/components/interfaces/Storage/BucketDataProtectionFields'
+import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -60,6 +62,7 @@ const formId = 'edit-storage-bucket-form'
 
 export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
   const { ref } = useParams()
+  const showProtection = useIsStorageProtectionEnabled()
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
@@ -424,6 +427,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                 />
               )}
             </DialogSection>
+
+            {showProtection && <BucketDataProtectionFields bucketName={bucket?.name} />}
           </form>
         </Form>
 

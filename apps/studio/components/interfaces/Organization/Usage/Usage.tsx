@@ -24,6 +24,8 @@ import {
   ScaffoldSection,
   ScaffoldTitle,
 } from '@/components/layouts/Scaffold'
+import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
+import { StorageRetentionUsage } from '@/components/interfaces/Storage/StorageRetentionUsage/StorageRetentionUsage'
 import { AlertError } from '@/components/ui/AlertError'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -41,6 +43,7 @@ export const Usage = () => {
 
   const [selectedProjectRef, setSelectedProjectRef] = useQueryState('projectRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
+  const showStorageRetention = useIsStorageProtectionEnabled()
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -325,6 +328,12 @@ export const Usage = () => {
         startDate={startDate}
         endDate={endDate}
       />
+
+      {showStorageRetention && (
+        <ScaffoldContainer className="mt-5">
+          <StorageRetentionUsage projectRef={selectedProjectRef ?? undefined} />
+        </ScaffoldContainer>
+      )}
 
       <Activity
         orgSlug={slug as string}

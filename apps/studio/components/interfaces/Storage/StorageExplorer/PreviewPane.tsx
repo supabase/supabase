@@ -7,14 +7,21 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
+import { useIsStorageProtectionEnabled } from '../StorageProtection.constants'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
+import { VersionHistory } from './VersionHistory'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useObjectVersionsQuery } from '@/data/storage/protection/object-versions-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { BASE_PATH } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
@@ -116,6 +123,7 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
 
 export const PreviewPane = () => {
   const {
+    projectRef,
     selectedBucket,
     selectedFilePreview: file,
     setSelectedItemsToDelete,
@@ -127,6 +135,16 @@ export const PreviewPane = () => {
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
+  // Prototype: show the Versions tab whenever protection is enabled. A real
+  // rollout would additionally gate on the bucket having versioning enabled.
+  const showVersions = useIsStorageProtectionEnabled()
+  const { data: versionsData } = useObjectVersionsQuery({
+    projectRef,
+    bucketId: selectedBucket?.id,
+    objectName: file?.name,
+  })
+  const versionCount = versionsData?.length
+
   if (!file) return null
 
   const width = 450
@@ -135,16 +153,8 @@ export const PreviewPane = () => {
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
-  return (
-    <div
-      className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
-      style={{ width }}
-    >
-      {/* Preview Header */}
-      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
-      </div>
-
+  const detailsContent = (
+    <>
       {/* Preview Thumbnail*/}
       <div className="my-4 border border-overlay">
         <div className="flex h-56 w-full items-center 2xl:h-72">
@@ -262,6 +272,40 @@ export const PreviewPane = () => {
           Delete file
         </ButtonTooltip>
       </div>
+    </>
+  )
+
+  return (
+    <div
+      className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
+      style={{ width }}
+    >
+      {/* Preview Header */}
+      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
+        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
+      </div>
+
+      {showVersions ? (
+        <Tabs defaultValue="details" className="mt-2">
+          <TabsList className="mb-2">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="versions">
+              Versions{versionCount !== undefined ? ` (${versionCount})` : ''}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="details">{detailsContent}</TabsContent>
+          <TabsContent value="versions" className="pt-2">
+            <VersionHistory
+              projectRef={projectRef}
+              bucketId={selectedBucket?.id}
+              objectName={file.name}
+              mimeType={file.metadata?.mimetype}
+            />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        detailsContent
+      )}
     </div>
   )
 }

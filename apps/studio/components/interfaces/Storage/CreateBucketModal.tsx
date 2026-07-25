@@ -28,7 +28,9 @@ import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { BucketDataProtectionFields } from './BucketDataProtectionFields'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
+import { useIsStorageProtectionEnabled } from './StorageProtection.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -84,6 +86,7 @@ interface CreateBucketModalProps {
 
 export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps) => {
   const { ref } = useParams()
+  const showProtection = useIsStorageProtectionEnabled()
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
 
@@ -395,6 +398,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                 />
               )}
             </DialogSection>
+
+            {showProtection && <BucketDataProtectionFields />}
           </form>
         </Form>
 

@@ -216,7 +216,14 @@ export const applyBucketIdToTemplateDefinition = (definition: string, bucketId: 
 
 export const useStorageV2Page = () => {
   const router = useRouter()
-  return router.pathname.split('/')[4] as undefined | 'files' | 'analytics' | 'vectors' | 's3'
+  return router.pathname.split('/')[4] as
+    | undefined
+    | 'files'
+    | 'analytics'
+    | 'vectors'
+    | 's3'
+    | 'snapshots'
+    | 'trash'
 }
 
 export const getDecryptedParameters = async ({
