@@ -11,6 +11,7 @@ concurrency:
 
 permissions:
   contents: read
+            write
 
 jobs:
   test:
