@@ -11,10 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetSection,
   SheetTitle,
@@ -77,6 +75,8 @@ const calculateTimeConsumedWidth = (data: QueryPerformanceRow[]) => {
   return Math.min(maxWidth, 300)
 }
 
+type View = 'details' | 'suggestion'
+
 export const QueryPerformanceGrid = ({
   aggregatedData,
   isLoading,
@@ -101,7 +101,7 @@ export const QueryPerformanceGrid = ({
   })
   const dataGridContainerRef = useRef<HTMLDivElement>(null)
 
-  const [view, setView] = useState<'details' | 'suggestion'>('details')
+  const [view, setView] = useState<View>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
 
   const columns = QUERY_PERFORMANCE_COLUMNS.map((col) => {
@@ -114,7 +114,7 @@ export const QueryPerformanceGrid = ({
       resizable: true,
       minWidth:
         col.id === 'prop_total_time'
-          ? calculateTimeConsumedWidth((aggregatedData as any) ?? [])
+          ? calculateTimeConsumedWidth((aggregatedData) ?? [])
           : (col.minWidth ?? 120),
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
@@ -611,11 +611,11 @@ export const QueryPerformanceGrid = ({
           </SheetHeader>
 
           <div className="overflow-auto grow px-0">
-            <SheetSection>
+            <SheetSection className='pt-0'>
               <Tabs
                 value={view}
                 className="flex flex-col h-full"
-                onValueChange={(value: any) => setView(value)}
+                onValueChange={(value) => setView(value as View)}
               >
                 <div className="border-b">
                   <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
@@ -653,11 +653,6 @@ export const QueryPerformanceGrid = ({
               </Tabs>
             </SheetSection>
           </div>
-          <SheetFooter>
-            <SheetClose asChild>
-              <Button variant="outline">Close</Button>
-            </SheetClose>
-          </SheetFooter>
         </SheetContent>
       </Sheet>
     </div>
