@@ -74,7 +74,6 @@ function resolveSrc(
 const Image = forwardRef(function Image(
   {
     src,
-    alt,
     width,
     height,
     layout,
@@ -141,6 +140,8 @@ const Image = forwardRef(function Image(
       : undefined
 
   return (
+    // alt is spread with rest
+    // eslint-disable-next-line jsx-a11y/alt-text
     <img
       {...rest}
       ref={(node) => {
@@ -149,7 +150,6 @@ const Image = forwardRef(function Image(
         else if (forwardedRef) forwardedRef.current = node
       }}
       src={resolvedSrc}
-      alt={alt}
       width={layout === 'fill' ? undefined : width}
       height={layout === 'fill' ? undefined : height}
       sizes={sizes}
