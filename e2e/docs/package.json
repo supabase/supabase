@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "e2e:docs": "playwright test",
-    "e2e:ui": "playwright test --ui"
+    "e2e:ui": "playwright test --ui",
+    "e2e:docs:local-smoke": "playwright test --config=playwright.local-smoke.config.ts"
   },
   "dependencies": {
     "@playwright/test": "^1.59.1"

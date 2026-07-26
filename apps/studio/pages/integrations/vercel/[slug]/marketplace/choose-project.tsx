@@ -28,6 +28,7 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { BASE_PATH } from '@/lib/constants'
 import { getErrorMessage } from '@/lib/get-error-message'
+import { hasVercelDeployButtonSignals } from '@/lib/integrations/vercel-install.utils'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { EMPTY_ARR } from '@/lib/void'
@@ -40,9 +41,10 @@ const PAGE_TITLE = buildStudioPageTitle({
 })
 
 const VercelChooseProjectPage: NextPageWithLayout = () => {
-  const { slug, configurationId, next, currentProjectId } = useParams()
+  const { slug, configurationId, next, currentProjectId, externalId } = useParams()
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
   const displayName = primaryEmail ?? username ?? ''
+  const isDeployButtonFlow = hasVercelDeployButtonSignals({ currentProjectId, externalId })
 
   const {
     data: integrationData,
@@ -199,11 +201,15 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
                 getForeignProjectIcon={getForeignProjectIcon}
                 choosePrompt="Choose Vercel project"
                 defaultForeignProjectId={currentProjectId}
-                onSkip={() => {
-                  if (next && isVercelUrl(next)) {
-                    window.location.href = next
-                  }
-                }}
+                onSkip={
+                  isDeployButtonFlow
+                    ? undefined
+                    : () => {
+                        if (next && isVercelUrl(next)) {
+                          window.location.href = next
+                        }
+                      }
+                }
                 loadingForeignProjects={isLoadingVercelProjectsData}
                 mode="Vercel"
               />

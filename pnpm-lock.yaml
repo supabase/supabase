@@ -951,6 +951,9 @@ importers:
       '@number-flow/react':
         specifier: ^0.3.2
         version: 0.3.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@radix-ui/react-use-escape-keydown':
+        specifier: ^1.1.1
+        version: 1.1.1(@types/react@19.2.14)(react@19.2.6)
       '@sentry/nextjs':
         specifier: 'catalog:'
         version: 10.59.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(encoding@0.1.13)(next@16.2.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react@19.2.6)(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))(webpack@5.105.4(esbuild@0.28.1))
@@ -960,6 +963,9 @@ importers:
       '@sentry/tanstackstart-react':
         specifier: 'catalog:'
         version: 10.59.0(encoding@0.1.13)(react@19.2.6)(rollup@4.60.3)(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@smithy/property-provider':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@std/path':
         specifier: npm:@jsr/std__path@^1.0.8
         version: '@jsr/std__path@1.0.8'
@@ -1044,6 +1050,12 @@ importers:
       awesome-debounce-promise:
         specifier: ^2.1.0
         version: 2.1.0
+      braintrust:
+        specifier: ^3.9.0
+        version: 3.9.0(@aws-sdk/credential-provider-web-identity@3.972.38)(supports-color@8.1.1)(zod@3.25.76)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
       common:
         specifier: workspace:*
         version: link:../../packages/common
@@ -1104,6 +1116,9 @@ importers:
       json-logic-js:
         specifier: ^2.0.2
         version: 2.0.2
+      libpg-query:
+        specifier: 17.6.0
+        version: 17.6.0
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
@@ -1255,12 +1270,6 @@ importers:
       '@jridgewell/remapping':
         specifier: ^2.3.5
         version: 2.3.5
-      '@radix-ui/react-use-escape-keydown':
-        specifier: ^1.1.1
-        version: 1.1.1(@types/react@19.2.14)(react@19.2.6)
-      '@smithy/property-provider':
-        specifier: ^4.0.4
-        version: 4.0.4
       '@tailwindcss/vite':
         specifier: 4.2.4
         version: 4.2.4(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -1342,9 +1351,6 @@ importers:
       autoevals:
         specifier: ^0.0.132
         version: 0.0.132(ws@8.21.0)
-      braintrust:
-        specifier: ^3.9.0
-        version: 3.9.0(@aws-sdk/credential-provider-web-identity@3.972.38)(supports-color@8.1.1)(zod@3.25.76)
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
@@ -1372,9 +1378,6 @@ importers:
       jsdom-testing-mocks:
         specifier: ^1.13.1
         version: 1.13.1
-      libpg-query:
-        specifier: 17.6.0
-        version: 17.6.0
       magic-string:
         specifier: ^0.30.21
         version: 0.30.21
