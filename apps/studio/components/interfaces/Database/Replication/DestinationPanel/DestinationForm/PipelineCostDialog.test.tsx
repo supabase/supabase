@@ -118,4 +118,13 @@ describe('PipelineCostDialog', () => {
     expect(screen.getByText('Unavailable')).toBeInTheDocument()
     expect(screen.queryByText('$0.60')).not.toBeInTheDocument()
   })
+
+  it('explains that row filters can reduce processed data compared with the estimate', async () => {
+    costEstimateTables = [{ ...tables[0], is_row_filtered: true }]
+
+    renderDialog({ type: 'include_tables', table_ids: [101] })
+
+    expect(await screen.findByText(/Row filters can reduce the data processed/)).toBeInTheDocument()
+    expect(screen.getByText(/Quick planning estimate/)).toBeInTheDocument()
+  })
 })

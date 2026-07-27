@@ -141,9 +141,8 @@ export const PipelineCostDialog = ({
                 <div className="flex flex-col gap-y-2">
                   <p className="text-sm font-medium text-foreground">Initial sync</p>
                   <p className="text-xs text-foreground-lighter">
-                    Rough storage-based estimate using Postgres table size and planner statistics.
-                    Actual initial sync volume and cost can differ substantially depending on table
-                    shape, filters, and statistics.
+                    Quick planning estimate using available source table information. Final usage is
+                    measured from the data successfully processed during initial sync.
                   </p>
 
                   {copyTableCount === 0 ? (
@@ -260,7 +259,7 @@ export const PipelineCostDialog = ({
 
                   {copyEstimate?.isComplete && hasRowFilteredTables && (
                     <p className="text-xs text-foreground-lighter">
-                      *Tables with row filters may process less data and cost less than shown.
+                      *Row filters can reduce the data processed compared with this estimate.
                     </p>
                   )}
                 </div>

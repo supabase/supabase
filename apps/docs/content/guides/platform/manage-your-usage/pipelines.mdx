@@ -28,18 +28,13 @@ Data successfully processed again as part of a user-requested resynchronization,
 
 ### Cost estimates
 
-The Dashboard shows a storage-based approximation of initial sync volume. It starts with the physical size of the published Postgres tables and scales that size using Postgres planner statistics for the published columns. It does not measure the logical text COPY data that Pipelines processes.
+The Dashboard provides a quick planning estimate of initial sync volume and cost using information already available about your source tables. It is designed to give you a useful indication before initial sync begins without first scanning and encoding all the data that the sync will process.
 
-The estimate can differ substantially from the actual volume because:
-
-- Physical table size includes row and page overhead, dead rows, and free space that COPY does not send.
-- Postgres data types can use very different amounts of space in physical storage and text COPY output. TOAST storage, compression, escaping, and COPY framing can increase the difference.
-- Published-column filtering is approximated from average column widths, while publication row-filter selectivity is not estimated.
-- Planner statistics can be stale or unavailable. Missing variable-width statistics use a fallback width.
+If an estimate is unavailable, you can still create the pipeline or restart tables.
 
 <Admonition type="note">
 
-This is a rough planning estimate, not the billable measurement. It is most directionally useful for recently analyzed, moderately wide tables with most columns published, little bloat, and no row filters. Treat it as especially rough for narrow, heavily filtered, TOAST-heavy, or bloated tables and for schemas whose text values differ substantially from their physical representation.
+Use this estimate as a planning guide rather than an exact quote. The final volume is measured from the data successfully processed during initial sync and can vary based on your published data and filters.
 
 </Admonition>
 

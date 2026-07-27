@@ -78,13 +78,13 @@ export const RestartCostEstimate = ({
       )}
       {restartEstimate?.isComplete && restartEstimate.hasRowFilteredTables && (
         <p className="mt-2 text-xs text-foreground-lighter">
-          *Tables with row filters may process less data and cost less than shown.
+          *Row filters can reduce the data processed compared with this estimate.
         </p>
       )}
       {restartEstimate?.isComplete && (
         <p className="mt-2 text-xs text-foreground-lighter">
-          Rough storage-based estimate; actual charges can differ substantially. Successfully
-          processed initial sync data is billed again.
+          Quick planning estimate; the final charge is based on successfully processed initial sync
+          data, which is billed again.
         </p>
       )}
     </div>
