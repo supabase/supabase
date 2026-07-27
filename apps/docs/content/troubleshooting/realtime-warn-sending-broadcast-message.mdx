@@ -28,14 +28,14 @@ The most common cause is a missing daily partition on `realtime.messages`. The t
 
 Partitions are created on two occasions:
 
-| Where                            | When it runs                                                                                                                                                                  |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| A client connects over WebSocket | The first time a client joins a channel for the project, after database migrations run                                                                                        |
-| The scheduled janitor            | Periodically (roughly every 3 hours), when it deletes old messages and recreates the partition window. It only runs for projects that have had a client connect at least once |
+| Where                            | When it runs                                                                                                                                                                                                                    |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A client connects over WebSocket | The first time a client joins a channel for the project, after database migrations run                                                                                                                                          |
+| The scheduled janitor            | Periodically (roughly every 3~4 hours depending on env config), when it deletes old messages and recreates the partition window. It only covers projects that are currently connected, or that connected since its previous run |
 
 Each of these creates a rolling window of partitions: yesterday, today, and the next three days.
 
-Both depend on a client connecting: the connection creates the partitions, and it also makes the project visible to the janitor.
+Both depend on a client connecting: the connection creates the partitions, and it also makes the project visible to the janitor on its next run. Janitor coverage is not permanent, so a project that stops connecting successfully drops out of it.
 
 <Admonition type="note" title="What's not included">
 
