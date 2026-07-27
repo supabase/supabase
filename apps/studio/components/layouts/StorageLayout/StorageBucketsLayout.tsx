@@ -15,6 +15,7 @@ import {
 
 import { BUCKET_TYPES } from '@/components/interfaces/Storage/Storage.constants'
 import { useStorageV2Page } from '@/components/interfaces/Storage/Storage.utils'
+import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
 
 export const StorageBucketsLayout = ({
@@ -26,6 +27,7 @@ export const StorageBucketsLayout = ({
   const pathname = usePathname()
   const page = useStorageV2Page()
   const config = !!page && page !== 's3' ? BUCKET_TYPES[page] : undefined
+  const showProtection = useIsStorageProtectionEnabled()
 
   const navigationItems =
     page === 'files'
@@ -34,6 +36,19 @@ export const StorageBucketsLayout = ({
             label: 'Buckets',
             href: `/project/${ref}/storage/files`,
           },
+          // Snapshots & Versioning — recovery views scoped to file buckets
+          ...(showProtection
+            ? [
+                {
+                  label: 'Snapshots',
+                  href: `/project/${ref}/storage/files/snapshots`,
+                },
+                {
+                  label: 'Trash',
+                  href: `/project/${ref}/storage/files/trash`,
+                },
+              ]
+            : []),
           ...(IS_PLATFORM
             ? [
                 {

@@ -6,14 +6,6 @@ import { Card } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import {
-  PageHeader,
-  PageHeaderAside,
-  PageHeaderDescription,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -62,29 +54,23 @@ export const Trash = () => {
 
   return (
     <>
-      <PageHeader>
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Trash</PageHeaderTitle>
-            <PageHeaderDescription>
-              {selectedBucket
-                ? `Soft-deleted objects in ${selectedBucket}. Restorable until their retention policy expires them.`
-                : 'Soft-deleted objects, restorable until their retention policy expires them.'}
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-          <PageHeaderAside>
-            <StorageBucketSelector
-              projectRef={ref}
-              value={selectedBucket}
-              onChange={setBucketParam}
-            />
-          </PageHeaderAside>
-        </PageHeaderMeta>
-      </PageHeader>
-
       <PageContainer>
         <PageSection>
           <PageSectionContent className="gap-y-4">
+            <div className="flex items-center gap-x-3">
+              <StorageBucketSelector
+                projectRef={ref}
+                value={selectedBucket}
+                onChange={setBucketParam}
+              />
+              {selectedBucket && (
+                <p className="text-sm text-foreground-lighter">
+                  Soft-deleted objects in {selectedBucket}, restorable until their retention policy
+                  expires them
+                </p>
+              )}
+            </div>
+
             {isPending && <GenericSkeletonLoader />}
             {isError && <AlertError error={error} subject="Failed to retrieve trash" />}
             {isSuccess && objects.length === 0 && (

@@ -1,5 +1,15 @@
 import { useState } from 'react'
-import { DialogSection, DialogSectionSeparator, Input, Label, Switch } from 'ui'
+import {
+  DialogSection,
+  DialogSectionSeparator,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Label,
+  Switch,
+} from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { type BucketProtection, getMockBucketProtection } from './StorageProtection.constants'
@@ -55,16 +65,18 @@ export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionF
               <Label htmlFor="version-expiry" className="font-normal text-foreground-light">
                 Expire noncurrent versions after
               </Label>
-              <div className="flex w-40 items-center gap-x-2">
-                <Input
+              <InputGroup className="w-40">
+                <InputGroupInput
                   id="version-expiry"
                   type="number"
                   min={1}
                   value={versionExpiryDays}
                   onChange={(e) => setVersionExpiryDays(e.target.valueAsNumber)}
                 />
-                <span className="text-sm text-foreground-lighter">days</span>
-              </div>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>days</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
             </div>
             <div className="flex items-center justify-between gap-x-4">
               <Label htmlFor="max-versions" className="font-normal text-foreground-light">
@@ -119,16 +131,18 @@ export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionF
               <Label htmlFor="snapshot-expiry" className="font-normal text-foreground-light">
                 Keep snapshots for
               </Label>
-              <div className="flex w-40 items-center gap-x-2">
-                <Input
+              <InputGroup className="w-40">
+                <InputGroupInput
                   id="snapshot-expiry"
                   type="number"
                   min={1}
                   value={snapshotExpiryDays}
                   onChange={(e) => setSnapshotExpiryDays(e.target.valueAsNumber)}
                 />
-                <span className="text-sm text-foreground-lighter">days</span>
-              </div>
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>days</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
             </div>
           </div>
         )}

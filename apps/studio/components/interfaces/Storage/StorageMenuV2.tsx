@@ -1,12 +1,10 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Fragment } from 'react'
 import { Badge, Menu } from 'ui'
 
 import { BUCKET_TYPES } from './Storage.constants'
 import { useStorageV2Page } from './Storage.utils'
-import { useIsStorageProtectionEnabled } from './StorageProtection.constants'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import {
   useIsAnalyticsBucketsEnabled,
@@ -37,7 +35,6 @@ export const StorageMenuV2 = () => {
 
   const isAnalyticsBucketsEnabled = useIsAnalyticsBucketsEnabled({ projectRef: ref })
   const isVectorBucketsEnabled = useIsVectorBucketsEnabled({ projectRef: ref })
-  const showProtection = useIsStorageProtectionEnabled()
 
   const showAnalytics = isPlatform && storageAnalytics
   const showVectors = (isPlatform && storageVectors) || isCli
@@ -88,43 +85,15 @@ export const StorageMenuV2 = () => {
             )
 
             return (
-              <Fragment key={type}>
-                <div>
-                  {shortcutId ? (
-                    <ShortcutTooltip shortcutId={shortcutId} side="right" delayDuration={1000}>
-                      {item}
-                    </ShortcutTooltip>
-                  ) : (
-                    item
-                  )}
-                </div>
-
-                {/* Snapshots & Trash sit directly under Files (Snapshots & Versioning) */}
-                {type === 'files' && showProtection && (
-                  <>
-                    <div>
-                      <Link href={`/project/${ref}/storage/snapshots`}>
-                        <Menu.Item rounded active={page === 'snapshots'}>
-                          <div className="flex items-center justify-between">
-                            <p className="truncate">Snapshots</p>
-                            <Badge variant="success">New</Badge>
-                          </div>
-                        </Menu.Item>
-                      </Link>
-                    </div>
-                    <div>
-                      <Link href={`/project/${ref}/storage/trash`}>
-                        <Menu.Item rounded active={page === 'trash'}>
-                          <div className="flex items-center justify-between">
-                            <p className="truncate">Trash</p>
-                            <Badge variant="success">New</Badge>
-                          </div>
-                        </Menu.Item>
-                      </Link>
-                    </div>
-                  </>
+              <div key={type}>
+                {shortcutId ? (
+                  <ShortcutTooltip shortcutId={shortcutId} side="right" delayDuration={1000}>
+                    {item}
+                  </ShortcutTooltip>
+                ) : (
+                  item
                 )}
-              </Fragment>
+              </div>
             )
           })}
         </div>

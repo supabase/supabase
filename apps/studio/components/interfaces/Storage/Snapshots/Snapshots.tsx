@@ -5,14 +5,6 @@ import { useMemo, useState } from 'react'
 import { Button, Card } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import {
-  PageHeader,
-  PageHeaderAside,
-  PageHeaderDescription,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -50,36 +42,31 @@ export const Snapshots = () => {
 
   return (
     <>
-      <PageHeader>
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Snapshots</PageHeaderTitle>
-            <PageHeaderDescription>
-              {selectedBucket
-                ? `Restore ${selectedBucket} to a previous point in time.`
-                : 'Restore a bucket to a previous point in time.'}
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-          <PageHeaderAside>
-            <StorageBucketSelector
-              projectRef={ref}
-              value={selectedBucket}
-              onChange={setBucketParam}
-            />
-            <Button
-              icon={<Camera />}
-              disabled={!selectedBucket}
-              onClick={() => setShowTakeSnapshot(true)}
-            >
-              Take snapshot
-            </Button>
-          </PageHeaderAside>
-        </PageHeaderMeta>
-      </PageHeader>
-
       <PageContainer>
         <PageSection>
           <PageSectionContent className="gap-y-4">
+            <div className="flex items-center justify-between gap-x-2">
+              <div className="flex items-center gap-x-3">
+                <StorageBucketSelector
+                  projectRef={ref}
+                  value={selectedBucket}
+                  onChange={setBucketParam}
+                />
+                {selectedBucket && (
+                  <p className="text-sm text-foreground-lighter">
+                    Restore {selectedBucket} to a previous point in time
+                  </p>
+                )}
+              </div>
+              <Button
+                icon={<Camera />}
+                disabled={!selectedBucket}
+                onClick={() => setShowTakeSnapshot(true)}
+              >
+                Take snapshot
+              </Button>
+            </div>
+
             {isPending && <GenericSkeletonLoader />}
             {isError && <AlertError error={error} subject="Failed to retrieve snapshots" />}
             {isSuccess && snapshots.length === 0 && (

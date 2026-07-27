@@ -219,8 +219,8 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/storage/analytics/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/analytics/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
 - [x] A `routes/project/$ref/storage/vectors/index.tsx` ← `pages/project/[ref]/storage/vectors/index.tsx`
 - [x] A `routes/project/$ref/storage/vectors/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/vectors/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
-- [x] A `routes/project/$ref/storage/snapshots/index.tsx` ← `pages/project/[ref]/storage/snapshots/index.tsx` (Snapshots & Versioning; renders own PageHeader)
-- [x] A `routes/project/$ref/storage/trash/index.tsx` ← `pages/project/[ref]/storage/trash/index.tsx` (Snapshots & Versioning; renders own PageHeader)
+- [x] A `routes/project/$ref/storage/files/snapshots/index.tsx` ← `pages/project/[ref]/storage/files/snapshots/index.tsx` (Snapshots & Versioning; Files sub-tab, uses StorageBucketsLayout)
+- [x] A `routes/project/$ref/storage/files/trash/index.tsx` ← `pages/project/[ref]/storage/files/trash/index.tsx` (Snapshots & Versioning; Files sub-tab, uses StorageBucketsLayout)
 
 ### Project shell — `/realtime/*`
 

@@ -34,11 +34,11 @@ localized swap later):
 | Design | Where | Key files |
 | --- | --- | --- |
 | **Data protection modal** | Create/Edit bucket → new "Data protection" section | `BucketDataProtectionFields.tsx`, wired into `CreateBucketModal.tsx` + `EditBucketModal.tsx` |
-| **Snapshots (2a)** | Storage → **Snapshots** nav item | `Snapshots/Snapshots.tsx`, `SnapshotsList.tsx`, `TakeSnapshotModal.tsx`, `RestoreSnapshotModal.tsx`; page `pages/project/[ref]/storage/snapshots/index.tsx` (+ route) |
+| **Snapshots (2a)** | Storage → Files → **Snapshots** tab (`/storage/files/snapshots`) | `Snapshots/Snapshots.tsx`, `SnapshotsList.tsx`, `TakeSnapshotModal.tsx`, `RestoreSnapshotModal.tsx`; page `pages/project/[ref]/storage/files/snapshots/index.tsx` (+ route) |
 | **Versions tab (3a)** | Storage explorer → select a file → preview pane | `StorageExplorer/VersionHistory.tsx`, tabs added to `StorageExplorer/PreviewPane.tsx` |
 | **Storage size breakdown (4a)** | Org → **Usage** page | `StorageRetentionUsage/StorageRetentionUsage.tsx`, mounted in `Organization/Usage/Usage.tsx` |
-| **Trash (6a)** | Storage → **Trash** nav item | `Trash/Trash.tsx`, `TrashList.tsx`; page `pages/project/[ref]/storage/trash/index.tsx` (+ route) |
-| Nav | Snapshots + Trash under Manage | `StorageMenuV2.tsx`, `Storage.utils.ts` (`useStorageV2Page`) |
+| **Trash (6a)** | Storage → Files → **Trash** tab (`/storage/files/trash`) | `Trash/Trash.tsx`, `TrashList.tsx`; page `pages/project/[ref]/storage/files/trash/index.tsx` (+ route) |
+| Nav | Snapshots + Trash as **Files sub-tabs** (not sidebar items — they're views over file buckets, not a bucket type) | `StorageLayout/StorageBucketsLayout.tsx` |
 | Shared | Bucket picker for Snapshots/Trash | `StorageBucketSelector.tsx` |
 
 ## Verification status
