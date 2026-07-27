@@ -10,7 +10,7 @@ export const TokenSchema = z
     tokenName: z.string().min(1, 'Please enter a name for the token'),
     expiresAt: z.preprocess((val) => (val === 'never' ? undefined : val), z.string().optional()),
     customExpiryDate: z.string().optional(),
-    resourceAccess: z.enum(['all-orgs', 'selected-orgs', 'selected-projects']),
+    resourceAccess: z.enum(['project', 'organization', 'account']),
     selectedOrganizations: z.array(z.string()).optional(),
     selectedProjects: z.array(z.string()).optional(),
     permissionRows: z.array(PermissionRowSchema).min(1, 'Please configure at least one permission'),

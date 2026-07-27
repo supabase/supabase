@@ -1,20 +1,35 @@
 import dayjs from 'dayjs'
-import { Badge, TableCell } from 'ui'
+import { Badge, TableCell, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 interface TokenNameCellProps {
   name: string
   tokenAlias: string
   isClassic: boolean
+  scopedTokensEnabled?: boolean
 }
 
-export const TokenNameCell = ({ name, tokenAlias, isClassic }: TokenNameCellProps) => (
+export const TokenNameCell = ({
+  name,
+  tokenAlias,
+  isClassic,
+  scopedTokensEnabled,
+}: TokenNameCellProps) => (
   <TableCell className="w-auto max-w-96">
     <div className="flex items-center gap-x-2">
       <p className="truncate" title={name}>
         {name}
       </p>
-      {isClassic && <Badge variant="default">Classic</Badge>}
+      {isClassic && scopedTokensEnabled && (
+        <Tooltip>
+          <TooltipTrigger>
+            <Badge variant="warning">Legacy</Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            Legacy tokens are too permissive. We're moving to scoped access tokens.
+          </TooltipContent>
+        </Tooltip>
+      )}
     </div>
     <p
       className="font-mono text-foreground-lighter truncate text-xs mt-1 max-w-32 sm:max-w-48 lg:max-w-full"

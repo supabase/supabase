@@ -30,12 +30,12 @@ import { useTrack } from '@/lib/telemetry/track'
 
 export interface AccessTokenListProps {
   searchString?: string
-  scopedEnabled?: boolean
+  scopedTokensEnabled?: boolean
 }
 
 export const AccessTokenList = ({
   searchString = '',
-  scopedEnabled = true,
+  scopedTokensEnabled,
 }: AccessTokenListProps) => {
   const track = useTrack()
   const [tokenToShow, setTokenToShow] = useState<MergedAccessToken | undefined>(undefined)
@@ -45,7 +45,9 @@ export const AccessTokenList = ({
     parseAsStringLiteral<AccessTokenSort>(ACCESS_TOKEN_SORT_VALUES).withDefault('created_at:desc')
   )
 
-  const { tokens, error, isLoading, isError } = useMergedAccessTokens({ scopedEnabled })
+  const { tokens, error, isLoading, isError } = useMergedAccessTokens({
+    scopedEnabled: scopedTokensEnabled,
+  })
 
   const { mutate: deleteClassicToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
@@ -135,6 +137,7 @@ export const AccessTokenList = ({
               name={x.name}
               tokenAlias={x.token_alias}
               isClassic={x.kind === 'classic'}
+              scopedTokensEnabled={scopedTokensEnabled}
             />
             <LastUsedCell lastUsedAt={x.last_used_at} />
             <ExpiresCell expiresAt={x.expires_at} />
@@ -144,7 +147,7 @@ export const AccessTokenList = ({
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="default"
-                      aria-label="More options"
+                      aria-label="More actions"
                       className="w-7"
                       icon={<MoreVertical />}
                     />
