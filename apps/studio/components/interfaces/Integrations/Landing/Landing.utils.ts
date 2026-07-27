@@ -67,10 +67,11 @@ export const useProjectOAuthIntegrationData = (
   isSuccess: boolean
 } => {
   const { data: org } = useSelectedOrganizationQuery({ enabled })
-  // A 403 here is deterministic — the role cannot read the resource — so the error has to be
-  // terminal. An errored query holds no data, so it never counts as fresh and refetches on every
-  // consumer mount; consumers that gate rendering on `isLoading` remount on each refetch, which
-  // loops without this.
+  // Any error here has to be terminal on mount. An errored query holds no data, so it never counts
+  // as fresh and refetches on every consumer mount — and consumers that gate rendering on
+  // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
+  // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
+  // are unaffected by this.
   const sharedOptions = { enabled, retryOnMount: false }
   const queries = {
     apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
