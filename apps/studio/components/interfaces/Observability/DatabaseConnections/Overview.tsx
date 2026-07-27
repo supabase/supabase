@@ -11,9 +11,11 @@ import {
 
 import {
   WARN_DURATION_ACTIVE_QUERY,
+  WARN_DURATION_BLOCKED,
   WARN_DURATION_IDLE_TXN,
   WARN_TOP_BLOCKER,
 } from './DatabaseConnections.constants'
+import { getActivityStart } from './DatabaseConnections.utils'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
@@ -42,7 +44,23 @@ export const Overview = ({ live }: OverviewProps) => {
     { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
   const activeQueries = (data ?? []).filter((x) => x.state === 'active')
+
   const blockedQueries = (data ?? []).filter((x) => x.blocked_by.length > 0)
+  const warnBlockedQueries = blockedQueries.some((activity) => {
+    const start = getActivityStart(activity)
+    if (!start) return false
+    return dayjs().utc().diff(dayjs(start).utc(), 'second') >= WARN_DURATION_BLOCKED
+  })
+  const longestBlockedQuery = blockedQueries.reduce<{
+    activity: DatabaseActivity
+    duration: number
+  } | null>((longest, activity) => {
+    const start = getActivityStart(activity)
+    if (!start) return longest
+    const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
+    return longest === null || duration > longest.duration ? { activity, duration } : longest
+  }, null)
+
   const idleInTransactionQueries = (data ?? []).filter((x) => {
     const isIdleInTransaction =
       x.state === 'idle in transaction' || x.state === 'idle in transaction (aborted)'
@@ -53,7 +71,7 @@ export const Overview = ({ live }: OverviewProps) => {
   const longestRunningQuery = (data ?? [])
     .filter((x) => LONG_RUNNING_STATES.includes(x.state))
     .reduce<{ activity: DatabaseActivity; duration: number } | null>((longest, activity) => {
-      const start = activity.state === 'active' ? activity.query_start : activity.transaction_start
+      const start = getActivityStart(activity)
       if (!start) return longest
       const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
       return longest === null || duration > longest.duration ? { activity, duration } : longest
@@ -182,11 +200,11 @@ export const Overview = ({ live }: OverviewProps) => {
 
           <MetricCard
             isLoading={isLoadingActivity}
-            className={cn(blockedQueries.length && 'bg-destructive-200 border-destructive-400')}
+            className={cn(warnBlockedQueries && 'bg-destructive-200 border-destructive-400')}
           >
             <MetricCardHeader>
               <MetricCardLabel
-                className={cn(blockedQueries.length && 'text-foreground')}
+                className={cn(warnBlockedQueries && 'text-foreground')}
                 tooltip={
                   <>
                     <p>
@@ -204,8 +222,32 @@ export const Overview = ({ live }: OverviewProps) => {
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
-              <MetricCardValue className={cn(blockedQueries.length && 'text-destructive')}>
-                {blockedQueries.length}
+              <MetricCardValue
+                className={cn('space-x-1', warnBlockedQueries && 'text-destructive')}
+              >
+                <span>{blockedQueries.length}</span>
+                {warnBlockedQueries && longestBlockedQuery && (
+                  <>
+                    <span className="text-foreground-light text-xs">·</span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="text-foreground-light text-xs cursor-pointer hover:text-foreground transition normal-nums"
+                      onClick={() => setSelectedPid(longestBlockedQuery.activity.pid)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelectedPid(longestBlockedQuery.activity.pid)
+                        }
+                      }}
+                    >
+                      PID {longestBlockedQuery.activity.pid} blocked for{' '}
+                      <span className="tabular-nums">
+                        {formatDuration(longestBlockedQuery.duration * 1000, 0)}
+                      </span>
+                    </span>
+                  </>
+                )}
               </MetricCardValue>
             </MetricCardContent>
           </MetricCard>
