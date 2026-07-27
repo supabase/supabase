@@ -102,6 +102,11 @@ export const useOrgSubscriptionUpdateMutation = ({
             }
           )
         }
+
+        // `null` means `remove tax id`
+        if (typeof variables.tax_id !== 'undefined') {
+          await queryClient.invalidateQueries({ queryKey: organizationKeys.taxId(slug) })
+        }
       }
 
       await onSuccess?.(data, variables, context)
