@@ -1,25 +1,29 @@
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+
 import { DiskManagementForm } from '@/components/interfaces/DiskManagement/DiskManagementForm'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from '@/components/layouts/Scaffold'
 import type { NextPageWithLayout } from '@/types'
 
 const AuthSettings: NextPageWithLayout = () => {
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Compute and Disk</ScaffoldTitle>
-          <ScaffoldDescription>
-            Configure the compute and disk settings for your project.
-          </ScaffoldDescription>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Compute and Disk</PageHeaderTitle>
+            <PageHeaderDescription>
+              Configure the compute and disk settings for your project.
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <DiskManagementForm />
     </>
   )

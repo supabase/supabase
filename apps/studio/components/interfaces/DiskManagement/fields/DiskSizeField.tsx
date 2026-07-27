@@ -15,31 +15,22 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { calculateDiskSizePrice } from '../DiskManagement.utils'
-import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { DiskType, PLAN_DETAILS } from '../ui/DiskManagement.constants'
 import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadReplicas'
-import { DiskSpaceBar } from '../ui/DiskSpaceBar'
 import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSection'
 import FormMessage from '../ui/FormMessage'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from '@/data/config/disk-utilization-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL, GB } from '@/lib/constants'
+import { GB } from '@/lib/constants'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
   disableInput: boolean
-  setAdvancedSettingsOpenState: (state: boolean) => void
 }
 
-export function DiskSizeField({
-  form,
-  disableInput,
-  setAdvancedSettingsOpenState,
-}: DiskSizeFieldProps) {
+export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
   const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues, resetField, watch } = form
   const { data: org } = useSelectedOrganizationQuery()
@@ -79,125 +70,111 @@ export function DiskSizeField({
     PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
   const includedDiskGB = includedDiskGBMeta[watchedStorageType]
 
-  const { defaultValues, dirtyFields, isDirty, errors } = formState
-  const diskSizePrice = calculateDiskSizePrice({
-    planId,
-    oldSize: defaultValues?.totalSize || 0,
-    oldStorageType: defaultValues?.storageType as DiskType,
-    newSize: getValues('totalSize'),
-    newStorageType: getValues('storageType') as DiskType,
-  })
+  const { defaultValues, dirtyFields } = formState
 
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
   return (
-    <div id="disk-size" className="grid @xl:grid-cols-12 gap-5">
-      <div className="col-span-4">
-        <FormField
-          name="totalSize"
-          control={control}
-          render={({ field, fieldState: { isDirty } }) => (
-            <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
-              <FormControl className="max-w-32">
-                <InputGroup>
-                  <FormInputGroupInput
-                    type="number"
-                    id={field.name}
-                    {...field}
-                    disabled={disableInput || isError}
-                    onWheel={(e) => e.currentTarget.blur()}
-                    onChange={(e) => {
-                      setValue('totalSize', e.target.valueAsNumber, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
+    <FormField
+      name="totalSize"
+      control={control}
+      render={({ field, fieldState: { isDirty } }) => (
+        <FormItemLayout
+          label="Disk size"
+          layout="flex-row-reverse"
+          id={field.name}
+          description={
+            <div className="flex flex-col gap-y-3">
+              {includedDiskGB > 0 && org?.plan.id && (
+                <p>
+                  Your plan includes up to {includedDiskGB} GB of {watchedStorageType} storage.
+                </p>
+              )}
+
+              <DiskTypeRecommendationSection
+                form={form}
+                actions={
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      setValue('storageType', 'io2', { shouldDirty: true })
                       trigger('provisionedIOPS')
-                      trigger('throughput')
+                      trigger('totalSize')
                     }}
-                    min={includedDiskGB}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>GB</InputGroupText>
-                    {isDirty ? (
-                      <InputGroupButton
-                        type="button"
-                        variant="default"
-                        size="tiny"
-                        className="px-2 text-foreground-light"
-                        onClick={() => {
-                          resetField('totalSize')
-                          trigger('provisionedIOPS')
-                        }}
-                        title="Reset"
-                      >
-                        <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                      </InputGroupButton>
-                    ) : null}
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-        <div className="flex flex-col gap-1">
-          <BillingChangeBadge
-            className="mt-1"
-            beforePrice={Number(diskSizePrice.oldPrice)}
-            afterPrice={Number(diskSizePrice.newPrice)}
-            show={isDirty && !errors.totalSize && diskSizePrice.oldPrice !== diskSizePrice.newPrice}
-          />
-          <span className="text-foreground-lighter text-sm">
-            {includedDiskGB > 0 &&
-              org?.plan.id &&
-              `Your plan includes up to ${includedDiskGB} GB of ${watchedStorageType} storage.`}
+                  >
+                    Change to High Performance SSD
+                  </Button>
+                }
+              />
 
-            <div className="mt-3">
-              <DocsButton abbrev={false} href={`${DOCS_URL}/guides/platform/database-size`} />
+              {isProjectNew ? (
+                <FormMessage
+                  message="Disk size data is not available for ~10 minutes after project creation"
+                  type="error"
+                />
+              ) : (
+                error && (
+                  <FormMessage message="Failed to load disk size data" type="error">
+                    {error?.message}
+                  </FormMessage>
+                )
+              )}
+
+              <DiskManagementDiskSizeReadReplicas
+                isDirty={
+                  dirtyFields.totalSize !== undefined ||
+                  watchedStorageType !== defaultValues?.storageType
+                }
+                totalSize={(defaultValues?.totalSize || 0) * 1.25}
+                usedSize={mainDiskUsed}
+                newTotalSize={watchedTotalSize * 1.25}
+                oldStorageType={defaultValues?.storageType as DiskType}
+                newStorageType={getValues('storageType') as DiskType}
+              />
             </div>
-          </span>
-          <DiskTypeRecommendationSection
-            form={form}
-            actions={
-              <Button
-                variant="default"
-                onClick={() => {
-                  setValue('storageType', 'io2')
+          }
+        >
+          <FormControl className="max-w-32">
+            <InputGroup>
+              <FormInputGroupInput
+                type="number"
+                id={field.name}
+                {...field}
+                disabled={disableInput || isError}
+                onWheel={(e) => e.currentTarget.blur()}
+                onChange={(e) => {
+                  setValue('totalSize', e.target.valueAsNumber, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  })
                   trigger('provisionedIOPS')
-                  trigger('totalSize')
-                  setAdvancedSettingsOpenState(true)
+                  trigger('throughput')
                 }}
-              >
-                Change to High Performance SSD
-              </Button>
-            }
-          />
-        </div>
-      </div>
-      <div className="col-span-8">
-        <DiskSpaceBar form={form} />
-
-        {isProjectNew ? (
-          <FormMessage
-            message="Disk size data is not available for ~10 minutes after project creation"
-            type="error"
-          />
-        ) : (
-          error && (
-            <FormMessage message="Failed to load disk size data" type="error">
-              {error?.message}
-            </FormMessage>
-          )
-        )}
-
-        <DiskManagementDiskSizeReadReplicas
-          isDirty={dirtyFields.totalSize !== undefined}
-          totalSize={(defaultValues?.totalSize || 0) * 1.25}
-          usedSize={mainDiskUsed}
-          newTotalSize={watchedTotalSize * 1.25}
-          oldStorageType={defaultValues?.storageType as DiskType}
-          newStorageType={getValues('storageType') as DiskType}
-        />
-      </div>
-    </div>
+                min={includedDiskGB}
+              />
+              <InputGroupAddon align="inline-end">
+                <InputGroupText>GB</InputGroupText>
+                {isDirty ? (
+                  <InputGroupButton
+                    type="button"
+                    variant="default"
+                    size="tiny"
+                    className="px-2 text-foreground-light"
+                    aria-label="Reset disk size"
+                    onClick={() => {
+                      resetField('totalSize')
+                      trigger('provisionedIOPS')
+                    }}
+                    title="Reset"
+                  >
+                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                  </InputGroupButton>
+                ) : null}
+              </InputGroupAddon>
+            </InputGroup>
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
   )
 }
