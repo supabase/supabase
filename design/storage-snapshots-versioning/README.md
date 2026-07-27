@@ -294,6 +294,26 @@ Reuse the list view of `FileExplorer` in a "trash mode":
 - Row actions: **Restore** (`ConfirmationModal`, reversible) and **Delete permanently** (`ConfirmationModal variant="warning"`; blocked with explanation if a snapshot pins it, per §3.4).
 - Header actions: **Restore all**, **Empty trash** (`TextConfirmModal` type-to-confirm).
 
+### 7.2b Batch selection and the "delete everything" action
+
+Recovering from a bad delete usually means recovering *many* files, so single-row actions aren't enough. The list mirrors the file explorer's selection chrome rather than inventing a second pattern:
+
+- **Checkbox on hover** per row (`opacity-0 group-hover:opacity-100`), staying visible once selected — same as `FileExplorerRow`.
+- **Shift-click range selection** from the last-touched row, and a **select-all** checkbox in the header.
+- **Bulk action bar** replacing the header when anything is selected — reuses the explorer's shared `bulkActionBarClassName`, shows "n items selected", and offers Restore / Delete permanently / clear.
+- Snapshot-pinned files are counted separately in the bar ("3 held by a snapshot") and excluded from the delete, because the backend will refuse them. The confirm dialog says how many will be kept rather than silently deleting fewer than requested.
+
+**On "Purge": don't use it.** Rejected for three reasons — it's jargon (the copy guide explicitly says to avoid it), it's vague about the outcome ("purge" doesn't say *permanently deleted*), and it introduces a third verb for an action already called "Delete permanently" on the row and in the confirm button. Options considered:
+
+| Candidate | Verdict |
+| --- | --- |
+| **"Delete all permanently"** ✅ | Chosen. Matches the row action and confirm label exactly, states the outcome, no jargon. |
+| "Empty" | Consistent with the existing "Empty bucket" action, but "Empty deleted files" doesn't parse, and it reads as reversible. |
+| "Purge" | Jargon, vague, and a third synonym for the same operation. |
+| "Delete forever" | Fine, but "permanently" is already the established word in this flow — one word, used consistently, beats two near-synonyms. |
+
+The action is type-to-confirm (`TextConfirmModal`, bucket name), matching "Delete bucket" — the most destructive action in the feature gets the highest-friction confirmation.
+
 ### 7.3 Empty state
 
 When versioning is enabled but nothing is deleted: "Nothing in the trash. Deleted objects will appear here and can be restored until a lifecycle policy removes them." When versioning is *off*: an empty state that explains deletes are permanent and offers to enable versioning.

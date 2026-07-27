@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
@@ -19,10 +19,11 @@ export const useBucketTrashQuery = ({ projectRef, bucketId }: BucketTrashVariabl
 type TrashRestoreVariables = {
   projectRef: string
   bucketId: string
-  objectId: string
+  /** One or more soft-deleted objects to promote back to current. */
+  objectIds: string[]
 }
 
-/** Prototype: restoring a soft-deleted object promotes it back to current. */
+/** Prototype: restoring soft-deleted objects promotes them back to current. */
 export const useBucketTrashRestoreMutation = ({
   onSuccess,
   onError,
@@ -38,7 +39,40 @@ export const useBucketTrashRestoreMutation = ({
       await onSuccess?.(data, variables, context)
     },
     onError(error, variables, context) {
-      if (onError === undefined) toast.error(`Failed to restore object: ${error.message}`)
+      if (onError === undefined) toast.error(`Failed to restore objects: ${error.message}`)
+      else onError(error, variables, context)
+    },
+    ...options,
+  })
+}
+
+type TrashDeleteVariables = {
+  projectRef: string
+  bucketId: string
+  /** Objects to hard-delete. Omit to delete every soft-deleted object. */
+  objectIds?: string[]
+}
+
+/**
+ * Prototype: permanently deletes soft-deleted objects. Objects pinned by a
+ * snapshot are skipped server-side, so the UI must not promise they're gone.
+ */
+export const useBucketTrashDeleteMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<void, Error, TrashDeleteVariables> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<void, Error, TrashDeleteVariables>({
+    mutationFn: () => mockDelay(undefined, 600),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.trash(variables.projectRef, variables.bucketId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    onError(error, variables, context) {
+      if (onError === undefined) toast.error(`Failed to delete objects: ${error.message}`)
       else onError(error, variables, context)
     },
     ...options,
