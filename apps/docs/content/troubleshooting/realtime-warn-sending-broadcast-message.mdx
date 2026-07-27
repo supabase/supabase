@@ -56,7 +56,7 @@ Because both mechanisms require a client to connect, a project whose clients can
 
 The usual cause is authentication. When every connection attempt is rejected, no partition is created, and old ones are never cleaned up. The newest partition stays at the last day a client connected.
 
-Check whether your clients are actually connecting before treating this as a partition problem:
+Check whether your clients are connecting before treating this as a partition problem:
 
 - Look for connection errors in your project's Realtime logs, such as failures to validate a JWT signature.
 - Try connecting with the [Realtime Inspector](https://realtime.supabase.com/inspector/new) using your project's current publishable or anon key. If the Inspector connects but your app does not, your app is sending a different key or a stale user session.
