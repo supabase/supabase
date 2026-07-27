@@ -132,29 +132,35 @@ pages linking into reference docs or server-side auth guides.
 
 ### In scope
 
-| Changed path                                 | Behavior                                              |
-| -------------------------------------------- | ----------------------------------------------------- |
-| `apps/docs/content/guides/**/*.mdx`          | Test `/docs/guides/<slug>` (skips federated sections) |
-| `apps/docs/content/troubleshooting/**/*.mdx` | Test `/docs/guides/troubleshooting/<slug>`            |
-| `apps/docs/content/_partials/**`             | Test owned pages that include that partial            |
+| Changed path                                 | Behavior                                                 |
+| -------------------------------------------- | -------------------------------------------------------- |
+| `apps/docs/content/guides/**/*.mdx`          | Test `/docs/guides/<slug>`, excluding federated sections |
+| `apps/docs/content/troubleshooting/**/*.mdx` | Test `/docs/guides/troubleshooting/<slug>`               |
+| `apps/docs/content/_partials/**`             | Test owned pages that include that partial               |
 
 ### Out of scope
 
 - Federated guide sections: `graphql`, `database/extensions/wrappers`,
   `ai/python`, `deployment/terraform`, `deployment/ci`
 - Reference docs under `/docs/reference`
-- Non-docs routes such as `/dashboard` and `/ui` (skipped by the link checker)
+- Non-docs routes such as `/dashboard` and `/ui`, which the link checker skips
 
 ### Limits
 
 Resolved scope is capped at 20 pages so a widely shared partial cannot explode
-runtime. To test beyond the cap, use `pnpm e2e:docs:all` (see
-[Run every in-scope page](#run-every-in-scope-page)) instead of raising it. To
-inspect the resolved list without running Playwright:
+runtime. To test beyond the cap, use `pnpm e2e:docs:all` instead of raising it.
+See [Run every in-scope page](#run-every-in-scope-page).
+
+To inspect the resolved list without running Playwright, replicate the same
+scope `pnpm e2e:docs` uses by default: commits since `origin/master`, plus
+staged and unstaged working-tree changes.
 
 ```bash
-git diff --name-only --diff-filter=ACMR origin/master...HEAD \
-  | pnpm -C e2e/docs resolve-docs-scope
+{
+  git diff --name-only --diff-filter=ACMR origin/master...HEAD
+  git diff --name-only --diff-filter=ACMR
+  git diff --name-only --diff-filter=ACMR --cached
+} | pnpm -C e2e/docs resolve-docs-scope
 ```
 
 ## Debug failures
@@ -180,4 +186,4 @@ owned docs content, partials, or `e2e/docs`.
 
 Draft pull requests stay skipped until you mark them ready for review. Manual
 `workflow_dispatch` runs require a `page_paths` input and accept an optional
-`base_url` (defaults to production).
+`base_url`, which defaults to production.

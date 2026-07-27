@@ -59,14 +59,14 @@ function repoRootFromCwd(): string {
 }
 
 function collectChangedFiles(repoRoot: string, baseRef: string): string[] {
-  const ranges = [
+  const ranges: string[][] = [
     // Commits on this branch since diverging from the base
     ['diff', '--name-only', '--diff-filter=ACMR', `${baseRef}...HEAD`],
     // Unstaged working tree
     ['diff', '--name-only', '--diff-filter=ACMR'],
     // Staged working tree
     ['diff', '--name-only', '--diff-filter=ACMR', '--cached'],
-  ] as const
+  ]
 
   const files = new Set<string>()
   for (const args of ranges) {

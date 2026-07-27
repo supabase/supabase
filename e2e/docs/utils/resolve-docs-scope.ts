@@ -3,7 +3,8 @@ import { basename, join, relative, sep } from 'node:path'
 
 /**
  * Federated guide section prefixes — mirrors
- * apps/docs/scripts/federated-content/sources/*.ts
+ * apps/docs/scripts/federated-content/sources/*.ts. Checked automatically
+ * against those files by assertFederatedSectionsInSync below.
  */
 export const FEDERATED_SECTIONS = [
   'graphql',
@@ -20,8 +21,45 @@ const TROUBLESHOOTING_PREFIX = 'apps/docs/content/troubleshooting/'
 const PARTIALS_PREFIX = 'apps/docs/content/_partials/'
 const DOCS_GUIDES_URL_PREFIX = '/docs/guides/'
 const DOCS_TROUBLESHOOTING_URL_PREFIX = '/docs/guides/troubleshooting/'
+const FEDERATED_CONTENT_SOURCES_DIR = 'apps/docs/scripts/federated-content/sources'
 
 const PARTIAL_PATH_RE = /<\$Partial\b[\s\S]*?\bpath\s*=\s*"([^"]+)"[\s\S]*?\/?>/g
+const SOURCE_SECTION_RE = /\bsection:\s*'([^']+)'/
+
+/**
+ * Compares FEDERATED_SECTIONS against the `section:` field declared in each
+ * apps/docs/scripts/federated-content/sources/*.ts file, so a section added
+ * or removed there can't silently drift from what this suite treats as
+ * out-of-scope.
+ */
+async function assertFederatedSectionsInSync(repoRoot: string): Promise<void> {
+  const sourcesDir = join(repoRoot, FEDERATED_CONTENT_SOURCES_DIR)
+  const sourceFiles = (await readdir(sourcesDir)).filter((file) => file.endsWith('.ts'))
+
+  const actualSections = new Set<string>()
+  for (const file of sourceFiles) {
+    const source = await readFile(join(sourcesDir, file), 'utf8')
+    const match = source.match(SOURCE_SECTION_RE)
+    if (match) actualSections.add(match[1])
+  }
+
+  const expectedSections = new Set<string>(FEDERATED_SECTIONS)
+  const missing = [...actualSections].filter((section) => !expectedSections.has(section))
+  const stale = [...expectedSections].filter((section) => !actualSections.has(section))
+
+  if (missing.length > 0 || stale.length > 0) {
+    const details = [
+      missing.length > 0 ? `missing from FEDERATED_SECTIONS: ${missing.join(', ')}` : null,
+      stale.length > 0 ? `no longer a federated-content source: ${stale.join(', ')}` : null,
+    ]
+      .filter(Boolean)
+      .join('; ')
+    throw new Error(
+      `FEDERATED_SECTIONS in e2e/docs/utils/resolve-docs-scope.ts is out of sync with ` +
+        `${FEDERATED_CONTENT_SOURCES_DIR}/*.ts (${details}). Update FEDERATED_SECTIONS to match.`
+    )
+  }
+}
 
 export type ResolveDocsScopeOptions = {
   /** Repo-root-relative changed file paths */
@@ -226,6 +264,8 @@ function pagesUsingPartials(
 export async function resolveDocsScope(
   options: ResolveDocsScopeOptions
 ): Promise<ResolveDocsScopeResult> {
+  await assertFederatedSectionsInSync(options.repoRoot)
+
   const maxPages = options.maxPages ?? MAX_SCOPED_PAGES
   const pages = new Set<string>()
   const changedPartials: string[] = []
@@ -273,6 +313,8 @@ export async function resolveDocsScope(
  * full-suite runs rather than the default changed-files scope.
  */
 export async function resolveAllDocsPages(repoRoot: string): Promise<string[]> {
+  await assertFederatedSectionsInSync(repoRoot)
+
   const guidesDir = join(repoRoot, 'apps/docs/content/guides')
   const troubleshootingDir = join(repoRoot, 'apps/docs/content/troubleshooting')
 
