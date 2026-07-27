@@ -24,7 +24,7 @@ const DOCS_TROUBLESHOOTING_URL_PREFIX = '/docs/guides/troubleshooting/'
 const FEDERATED_CONTENT_SOURCES_DIR = 'apps/docs/scripts/federated-content/sources'
 
 const PARTIAL_PATH_RE = /<\$Partial\b[\s\S]*?\bpath\s*=\s*"([^"]+)"[\s\S]*?\/?>/g
-const SOURCE_SECTION_RE = /\bsection:\s*'([^']+)'/
+const SOURCE_SECTION_RE = /\bsection:\s*'([^']+)'/g
 
 /**
  * Compares FEDERATED_SECTIONS against the `section:` field declared in each
@@ -39,8 +39,16 @@ async function assertFederatedSectionsInSync(repoRoot: string): Promise<void> {
   const actualSections = new Set<string>()
   for (const file of sourceFiles) {
     const source = await readFile(join(sourcesDir, file), 'utf8')
-    const match = source.match(SOURCE_SECTION_RE)
-    if (match) actualSections.add(match[1])
+    const matches = [...source.matchAll(SOURCE_SECTION_RE)].map((match) => match[1])
+    const distinctMatches = new Set(matches)
+
+    if (distinctMatches.size > 1) {
+      throw new Error(
+        `${FEDERATED_CONTENT_SOURCES_DIR}/${file} declares multiple distinct 'section:' ` +
+          `values (${[...distinctMatches].join(', ')}); expected exactly one per source file.`
+      )
+    }
+    if (distinctMatches.size === 1) actualSections.add(matches[0])
   }
 
   const expectedSections = new Set<string>(FEDERATED_SECTIONS)

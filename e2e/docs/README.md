@@ -114,13 +114,14 @@ To test every guide and troubleshooting entry instead of a changed-files scope
 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all
 ```
 
-This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described below, and
-tests every page listed by `pnpm -C e2e/docs resolve-docs-scope` across the
-whole `guides` and `troubleshooting` trees — several hundred pages as of this
-writing. `--all` runs also default to `--max-failures=0`, so a full run isn't
-cut short by `playwright.config.ts`'s global `maxFailures: 3`. Expect a long
-run: the suite runs one worker by default, so pass `--workers` to parallelize
-it, for example:
+This ignores `DOCS_E2E_PAGE_PATHS` and the 20-page cap described in
+[Limits](#limits), and tests every page listed by
+`pnpm -C e2e/docs resolve-docs-scope` across the whole `guides` and
+`troubleshooting` trees — several hundred pages as of this writing. `--all`
+runs also default to `--max-failures=0`, so a full run isn't cut short by
+`playwright.config.ts`'s global `maxFailures: 3`. Expect a long run: the suite
+runs one worker by default, so pass `--workers` to parallelize it, for
+example:
 
 ```bash
 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:all -- --workers=4

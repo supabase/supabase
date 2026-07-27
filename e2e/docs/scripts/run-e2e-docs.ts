@@ -134,7 +134,10 @@ async function main() {
 
   // playwright.config.ts sets a global maxFailures: 3, which would otherwise
   // abort an exhaustive --all run after just 3 failing pages out of hundreds.
-  const hasMaxFailuresArg = playwrightArgs.some((arg) => arg.startsWith('--max-failures'))
+  // -x is Playwright's shorthand for --max-failures=1.
+  const hasMaxFailuresArg = playwrightArgs.some(
+    (arg) => arg === '-x' || arg.startsWith('--max-failures')
+  )
   const finalPlaywrightArgs =
     runAll && !hasMaxFailuresArg ? [...playwrightArgs, '--max-failures=0'] : playwrightArgs
 
