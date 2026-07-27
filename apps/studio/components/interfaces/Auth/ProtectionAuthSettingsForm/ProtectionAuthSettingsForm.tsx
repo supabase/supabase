@@ -154,7 +154,8 @@ export const ProtectionAuthSettingsForm = () => {
   const { isDirty } = protectionForm.formState
 
   useEffect(() => {
-    if (authConfig && !isUpdatingConfig) {
+    // Background refetches (e.g. on window focus) must not overwrite edits in progress
+    if (authConfig && !isUpdatingConfig && !protectionForm.formState.isDirty) {
       const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
         'hcaptcha') as CaptchaProviders
 
@@ -204,7 +205,10 @@ export const ProtectionAuthSettingsForm = () => {
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
 
-    updateAuthConfig({ projectRef: projectRef!, config: payload })
+    updateAuthConfig(
+      { projectRef: projectRef!, config: payload },
+      { onSuccess: () => protectionForm.reset(values) }
+    )
   }
 
   const SECURITY_CAPTCHA_ENABLED = useWatch({
