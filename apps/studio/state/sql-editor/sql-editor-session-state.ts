@@ -1,12 +1,10 @@
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
-import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-
 /**
- * Ephemeral, per-session SQL editor state that is NOT persisted: query results,
- * EXPLAIN results, and the row limit. Kept separate from the snippet/folder
- * store (which deals with persistence) because none of this is saved — it lives
- * only for the current editing session.
+ * Ephemeral, per-session SQL editor state that is NOT persisted: query results
+ * and the row limit. Kept separate from the snippet/folder store (which deals
+ * with persistence) because none of this is saved — it lives only for the
+ * current editing session.
  */
 export const sqlEditorSessionState = proxy({
   /**
@@ -22,18 +20,10 @@ export const sqlEditorSessionState = proxy({
     }[]
   },
 
-  /** EXPLAIN results, if any, keyed by snippet id. */
-  explainResults: {} as {
-    [snippetId: string]: {
-      rows: QueryPlanRow[]
-      error?: { message: string; formattedError?: string }
-    }
-  },
-
   /**
    * UI-imposed limit for the number of rows a query can return (a safeguard
    * against accidentally taking down the database with a huge SELECT). Related
-   * to `autoLimit` in `results`; see `checkIfAppendLimitRequired`/`suffixWithLimit`.
+   * to `autoLimit` in `results`; see `applyAutoLimit`.
    */
   limit: 100,
 
@@ -56,28 +46,9 @@ export const sqlEditorSessionState = proxy({
     sqlEditorSessionState.results[id] = []
   },
 
-  addExplainResult: (id: string, results: QueryPlanRow[]) => {
-    // Use ref() to prevent Valtio from creating proxies for each row object
-    sqlEditorSessionState.explainResults[id] = { rows: ref(results) }
-  },
-
-  addExplainResultError: (id: string, error: { message: string; formattedError?: string }) => {
-    sqlEditorSessionState.explainResults[id] = { rows: ref([]), error }
-  },
-
-  resetExplainResult: (id: string) => {
-    sqlEditorSessionState.explainResults[id] = { rows: [] }
-  },
-
-  resetResults: (id: string) => {
-    sqlEditorSessionState.resetResult(id)
-    sqlEditorSessionState.resetExplainResult(id)
-  },
-
   /** Drop all session state for a snippet (called when the snippet is removed). */
   clearForSnippet: (id: string) => {
     delete sqlEditorSessionState.results[id]
-    delete sqlEditorSessionState.explainResults[id]
   },
 })
 

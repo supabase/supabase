@@ -3,7 +3,7 @@ import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
-import ObservabilityMenu from './ObservabilityMenu'
+import { ObservabilityMenu } from './ObservabilityMenu'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
 import { BannerMetricsAPI } from '@/components/ui/BannerStack/Banners/BannerMetricsAPI'

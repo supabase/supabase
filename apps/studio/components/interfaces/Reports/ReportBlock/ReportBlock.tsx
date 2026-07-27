@@ -1,11 +1,11 @@
-import { acceptUntrustedSql } from '@supabase/pg-meta'
+import { acceptUntrustedSql, safeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
+import { applyAutoLimit } from '../../SQLEditor/SQLEditor.utils'
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
@@ -81,7 +81,11 @@ export const ReportBlock = ({
 
   const autoLimit = 100
   const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
-  const { appendAutoLimit } = checkIfAppendLimitRequired(sql ?? '', autoLimit)
+  // acceptUntrustedSql is usually not allowed outside a user-action event
+  // handler, but it's explicitly fine here: adding this block to a report is
+  // itself the user action that approves running its SQL.
+  const acceptedSql = sql !== undefined ? acceptUntrustedSql(sql) : safeSql``
+  const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(acceptedSql, autoLimit)
 
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
@@ -97,6 +101,7 @@ export const ReportBlock = ({
     isPending: executeSqlLoading,
     refetch,
   } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- formattedSql/appendAutoLimit are fully derived from sql/autoLimit, both already in the key
     queryKey: sqlKeys.query(projectRef, [
       item.id,
       sql,
@@ -114,14 +119,9 @@ export const ReportBlock = ({
         return null
       }
 
-      const formattedSql = suffixWithLimit(acceptUntrustedSql(sql), autoLimit)
-
       return executeSql({
         projectRef,
         connectionString,
-        // acceptUntrustedSql is usually not allowed in an auto-run position,
-        // but in this case we are explicitly allowing it because adding a block
-        // to a report is an explicit user action.
         sql: formattedSql,
       })
     },

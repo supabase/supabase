@@ -50,6 +50,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
       onPointerMove={drag.handlePointerMove}
     >
       <div
+        id="mobile-nav-actions"
         className={cn(
           'flex pointer-events-auto cursor-grab active:cursor-grabbing flex-row items-center justify-between w-auto rounded-full',
           'bg-overlay/80 backdrop-blur-md px-2.5 py-2 gap-2',
@@ -106,7 +107,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
                 'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30',
                 !sheet.isMenuOpen && 'bg-surface-300!'
               )}
-              icon={<Menu />}
+              icon={<Menu className={cn(sheet.isMenuOpen && 'text-background')} />}
               onClick={sheet.handleMenuClick}
             />
           )}

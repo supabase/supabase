@@ -71,6 +71,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     useSelectedOrganizationQuery()
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit())
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT, () => snap.newChat())
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -177,7 +178,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
   const hasPendingApproval = hasPendingToolApproval(chatMessages)
-  const isChatInputDisabled = !isApiKeySet || disablePrompts || isLoadingOrganization
+  const supportMetadata = snap.activeChat?.supportMetadata
+  const isSupportChat = !!supportMetadata?.isSupportChat
+  const isSupportChatClosed = isSupportChat && supportMetadata.lifecycleStatus !== 'bot_active'
+  const activeChatId = snap.activeChatId
+  const supportConversationId = supportMetadata?.frontConversationId
+  const isChatInputDisabled =
+    !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -426,7 +433,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         />
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
               {renderedMessages}
               {error && (
                 <>
@@ -492,6 +499,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           </Conversation>
         ) : (
           <AIOnboarding
+            key={snap.activeChatId}
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
             suggestions={
               snap.suggestions as
@@ -547,7 +555,35 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative">
+        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
+          {isSupportChat && !isSupportChatClosed && (
+            <div>
+              <div className="mb-3 border-t" />
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="tiny"
+                  disabled={!activeChatId || !supportConversationId}
+                  onClick={() =>
+                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'escalated')
+                  }
+                >
+                  Escalate to human
+                </Button>
+                <Button
+                  variant="outline"
+                  size="tiny"
+                  disabled={!activeChatId || !supportConversationId}
+                  onClick={() =>
+                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'user_resolved')
+                  }
+                >
+                  Resolve
+                </Button>
+              </div>
+            </div>
+          )}
+
           {disablePrompts && (
             <Admonition
               showIcon={false}
@@ -574,17 +610,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
+              'z-20',
+              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
+              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
+              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
             disabled={isChatInputDisabled}
             placeholder={
               hasMessages
-                ? 'Ask a follow up question...'
+                ? isSupportChat
+                  ? 'Share details so the assistant can help with your support request...'
+                  : 'Ask a follow up question...'
                 : (snap.sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
-                  : 'Chat to Postgres...'
+                  : isSupportChat
+                    ? 'Describe your support issue...'
+                    : 'Chat to Postgres...'
             }
             value={value}
             onValueChange={(e) => setValue(e.target.value)}

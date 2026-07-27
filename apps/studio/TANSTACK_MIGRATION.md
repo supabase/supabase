@@ -78,7 +78,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/_app/account.tsx` — AccountLayout (reads `accountLayoutTitle` from leaf `staticData`)
 - [x] `routes/_app/org.tsx` — OrganizationLayout (reads `orgLayoutTitle` from leaf `staticData`). **Delta vs plan:** placed at `_app/org.tsx` (wraps both `/org/` index and `/org/$slug/*`) instead of `_app/org/$slug.tsx`. PageLayout stays inline on `/org/$slug/index.tsx` since only that one route uses it.
 - [x] `routes/_app/new.tsx` — skipped; only `_app/new/index.tsx` lives under \_app (inlines WizardLayout). `new/$slug` is top-level (no AppLayout) so a sub-shell would not actually share state.
-- [x] `routes/integrations/vercel.tsx` — VercelIntegrationWindowLayout. **Delta vs plan:** placed at top-level rather than under `_app/` — Next getLayout for all three leaves wraps only in VercelIntegrationWindowLayout, no AppLayout/DefaultLayout.
+- [x] `routes/integrations/vercel.tsx` — passthrough `Outlet` only (no shared window layout). **Delta vs plan:** placed at top-level rather than under `_app/`. All three Vercel leaves (install, marketplace choose-project, deploy-button new-project) render their own `InterstitialLayout` inline; the old `VercelIntegrationWindowLayout` was removed.
 
 ### Project shell
 
@@ -494,6 +494,80 @@ Keep this plugin even after migration — it's not a Next-related shim,
 it's general protection against this entire class of bug. Just clear
 the allowlist when the underlying cycle is gone.
 
+### `@sentry/nextjs` → `@sentry/react` alias
+
+`resolve.alias` in `vite.config.ts` rewrites the bare `@sentry/nextjs`
+import to `compat/sentry-nextjs.ts`, which re-exports `@sentry/react`
+(the same-version package `@sentry/nextjs` wraps on the client) plus
+explicit stand-ins for the Next-only APIs (`captureRouterTransitionStart`,
+`captureRequestError`, `withSentryConfig`).
+
+Why: `@sentry/nextjs`'s client entry imports
+`next/dist/shared/lib/constants`, whose module scope evaluates
+`...(process?.features?.typescript ? ['next.config.mts'] : [])`.
+Optional chaining does **not** guard an undeclared `process` identifier,
+so every built client chunk containing it (table editor was the canary)
+threw `ReferenceError: process is not defined` at module load. Dev was
+unaffected (dev pipeline shims `process`), so it only surfaced in the
+production/test build.
+
+The alias also made the previous `@sentry/nextjs` SSR workarounds
+(`ssr.noExternal` entry + `ssr.optimizeDeps.include`) obsolete — the id
+is rewritten before SSR resolution, and `@sentry/react` ships real ESM.
+App source keeps importing `@sentry/nextjs` so the Next build
+(`build:next`) is untouched; drop the alias + shim together with the
+Next build when the migration is done (switch imports to
+`@sentry/react` directly).
+
+### GraphiQL Monaco workers: `setup-workers/webpack` → `setup-workers/vite`
+
+App source (`GraphiQLTab.tsx`) imports `graphiql/setup-workers/webpack`,
+which registers `MonacoEnvironment.getWorker` using
+`new Worker(new URL('monaco-editor/...', import.meta.url))` — the URL form
+webpack/turbopack rewrites at build time. Vite doesn't rewrite bare module
+specifiers inside `new URL(..., import.meta.url)`, so under the TanStack
+build the worker URLs 404'd and Monaco fell back to running the `json`,
+`editorWorkerService` and `graphql` workers on the main thread ("Could not
+create web worker(s). Falling back to loading web worker code in main
+thread" in the console).
+
+The `graphiqlViteWorkers` plugin in `vite.config.ts` resolves that import
+to graphiql's own `setup-workers/vite` variant (same three workers via
+Vite `?worker` imports) in client builds; SSR resolution is untouched. The
+import specifier stays `.../webpack` in app source so the Next build keeps
+working. The whole setup-workers chain is also in `optimizeDeps.exclude` —
+the Rolldown dep optimizer can't load `?worker` ids
+(`UNLOADABLE_DEPENDENCY`), so the modules go through the normal transform
+pipeline where Vite's built-in worker plugin handles them. Drop the plugin
+and the exclude, and switch the import to `graphiql/setup-workers/vite`,
+when the Next build goes away.
+
+### Raw-text imports: `*.md` + `public/deno/*.d.ts` (`rawTextLoader`)
+
+Next's raw-loader rules (next.config.ts `turbopack.rules`) serve `*.md`
+files and the Deno typings `public/deno/edge-runtime.d.ts` /
+`public/deno/lib.deno.d.ts` as JS modules whose default export is the
+file's text. The `rawTextLoader` plugin in `vite.config.ts` mirrors that
+for the Vite pipeline:
+
+- `*.md` — plain `transform` (used by
+  `static-data/integrations/*/overview.md` via the literal-import registry
+  in `static-data/integrations/overviews.ts`).
+- The two Deno `.d.ts` files (used by `components/ui/AIEditor` as Monaco
+  extra libs for edge-function editors) — an exact-specifier allowlist
+  resolved to `\0`-virtual ids and served from a `load` hook. They can't go
+  through `transform`: Rolldown's native dep scanner skips JS plugin hooks
+  and hard-fails parsing TS _declaration_ syntax (`get stdin(): ...;`) as
+  runtime TS, which killed dependency pre-bundling wholesale. The previous
+  `/* @vite-ignore */` hack kept the scanner away but also meant the
+  imports failed at runtime, silently dropping Deno type hints in the
+  TanStack build. Do NOT widen the allowlist to `*.d.ts` — hijacking
+  declaration-file resolution globally would corrupt packages that ship
+  `.d.ts` next to their JS. The `as string` casts on the import specifiers
+  in `AIEditor/index.tsx` keep tsc from resolving the `.d.ts` files as
+  declaration files (TS2846) while erasing to plain literals both bundlers
+  statically analyze.
+
 ### Other build-side migration changes
 
 - `pnpm-workspace.yaml` catalog now includes `@tanstack/react-router`,
@@ -525,4 +599,5 @@ the allowlist when the underlying cycle is gone.
 - Delete `pages/_app.tsx`, `pages/_document.tsx`, `pages/_error.jsx`, `pages/500.tsx`, `pages/404.tsx` (Next-only catch-alls; TanStack equivalents on `__root.tsx`).
 - Drop the `dev:next` / `build:next` / `start:next` scripts from `apps/studio/package.json` once we're committed to TanStack.
 - Remove the `apps/studio/pages/**` `path_instructions` guardrail entry from `.coderabbit.yaml` (added in FE-3423; remove it as part of this FE-3106 cleanup) — it's only useful while both runtimes coexist.
+- Remove the "TanStack Start migration" section from `apps/studio/CLAUDE.md` — it only applies while both runtimes coexist.
 - Delete this file.

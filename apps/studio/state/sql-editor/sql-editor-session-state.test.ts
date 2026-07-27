@@ -7,7 +7,6 @@ import { sqlEditorSessionState } from './sql-editor-session-state'
 // each test to keep cases independent.
 beforeEach(() => {
   sqlEditorSessionState.results = {}
-  sqlEditorSessionState.explainResults = {}
   sqlEditorSessionState.limit = 100
 })
 
@@ -39,45 +38,14 @@ describe('sqlEditorSessionState', () => {
     })
   })
 
-  describe('explain results', () => {
-    it('addExplainResult stores rows keyed by snippet id', () => {
-      const rows = [{ 'QUERY PLAN': 'Seq Scan' }]
-      sqlEditorSessionState.addExplainResult('a', rows)
-
-      expect(sqlEditorSessionState.explainResults['a']?.rows).toEqual(rows)
-      expect(sqlEditorSessionState.explainResults['a']?.error).toBeUndefined()
-    })
-
-    it('addExplainResultError stores the error with empty rows', () => {
-      sqlEditorSessionState.addExplainResultError('a', { message: 'bad plan' })
-
-      expect(sqlEditorSessionState.explainResults['a']?.rows).toEqual([])
-      expect(sqlEditorSessionState.explainResults['a']?.error).toEqual({ message: 'bad plan' })
-    })
-  })
-
-  describe('resetResults', () => {
-    it('clears both the query result and the explain result for a snippet', () => {
-      sqlEditorSessionState.addResult('a', [{ x: 1 }])
-      sqlEditorSessionState.addExplainResult('a', [{ 'QUERY PLAN': 'Seq Scan' }])
-
-      sqlEditorSessionState.resetResults('a')
-
-      expect(sqlEditorSessionState.results['a']).toEqual([])
-      expect(sqlEditorSessionState.explainResults['a']).toEqual({ rows: [] })
-    })
-  })
-
   describe('clearForSnippet', () => {
-    it('deletes both results and explain results for a snippet, leaving others intact', () => {
+    it('deletes results for a snippet, leaving others intact', () => {
       sqlEditorSessionState.addResult('a', [{ x: 1 }])
-      sqlEditorSessionState.addExplainResult('a', [{ 'QUERY PLAN': 'Seq Scan' }])
       sqlEditorSessionState.addResult('b', [{ y: 2 }])
 
       sqlEditorSessionState.clearForSnippet('a')
 
       expect(sqlEditorSessionState.results['a']).toBeUndefined()
-      expect(sqlEditorSessionState.explainResults['a']).toBeUndefined()
       expect(sqlEditorSessionState.results['b']?.[0]?.rows).toEqual([{ y: 2 }])
     })
   })

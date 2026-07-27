@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
 import {
@@ -9,8 +9,6 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
@@ -19,25 +17,18 @@ import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 
 export const APIKeyRow = ({
   apiKey,
-  lastSeen,
   isDeleting,
   isDeleteModalOpen,
-  isLoadingLastSeen = false,
-  showLastSeen = true,
   onDelete,
   setKeyToDelete,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
-  lastSeen?: { timestamp: number; relative: string }
-  showLastSeen?: boolean
   isDeleting: boolean
   isDeleteModalOpen: boolean
-  isLoadingLastSeen?: boolean
   onDelete: () => void
   setKeyToDelete: (id: string | null) => void
 }) => {
   const MotionTableRow = motion.create(TableRow)
-  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   return (
     <>
@@ -67,24 +58,6 @@ export const APIKeyRow = ({
             <ApiKeyPill apiKey={apiKey} />
           </div>
         </TableCell>
-
-        {showLastSeen && showApiKeysLastUsed && (
-          <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
-            <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
-              {isLoadingLastSeen ? (
-                <ShimmeringLoader />
-              ) : lastSeen?.timestamp ? (
-                <TimestampInfo
-                  className="text-sm"
-                  utcTimestamp={lastSeen?.timestamp}
-                  label={lastSeen.relative}
-                />
-              ) : (
-                <span className="text-foreground-lighter">Never used</span>
-              )}
-            </div>
-          </TableCell>
-        )}
 
         {IS_PLATFORM && (
           <TableCell className="py-2">
@@ -123,9 +96,8 @@ export const APIKeyRow = ({
         variant="destructive"
         alert={{
           title: 'This cannot be undone',
-          description: lastSeen
-            ? `This API key was used ${lastSeen.timestamp}. Make sure all backend components using it have been updated. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.`
-            : `This API key has not been used in the past 24 hours. Make sure you've updated all backend components using it before deletion.`,
+          description:
+            'Make sure all applications and services using it have been updated before deletion. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.',
         }}
       />
     </>

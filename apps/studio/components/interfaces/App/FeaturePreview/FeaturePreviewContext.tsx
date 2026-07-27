@@ -94,10 +94,11 @@ export const useUnifiedLogsPreview = () => {
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn = isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn =
+    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -127,9 +128,10 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsRLSTesterEnabled = () => {
+export const useIsSqlEditorManualSaveEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
+  return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
 export const useIsMarketplaceEnabled = () => {

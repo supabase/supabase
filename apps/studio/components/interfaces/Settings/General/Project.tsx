@@ -9,8 +9,8 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import PauseProjectButton from './Infrastructure/PauseProjectButton'
-import RestartServerButton from './Infrastructure/RestartServerButton'
+import { PauseProjectButton } from './Infrastructure/PauseProjectButton'
+import { RestartServerButton } from './Infrastructure/RestartServerButton'
 import { ResumeProjectButton } from '@/components/interfaces/Project/ResumeProjectButton'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -19,7 +19,11 @@ import { PROJECT_STATUS } from '@/lib/constants'
 
 export const Project = () => {
   const { data: project } = useSelectedProjectQuery()
+  const isBranch = Boolean(project?.parent_project_ref)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
+  const entityLabel = isBranch ? 'branch' : 'project'
+  const entityLabelCapitalized = isBranch ? 'Branch' : 'Project'
+
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
   ])
@@ -34,30 +38,30 @@ export const Project = () => {
 
   const primaryActionLabel = isPaused
     ? shouldShowDashboardLink
-      ? 'View project dashboard'
-      : 'Resume project'
+      ? `View ${entityLabel} dashboard`
+      : `Resume ${entityLabel}`
     : projectSettingsRestartProject
-      ? 'Restart project'
+      ? `Restart ${entityLabel}`
       : 'Restart database'
 
   const primaryActionDescription = isPaused
     ? isPauseStatusSuccess && !pauseStatus.can_restore
-      ? 'This project can no longer be resumed here. Open the dashboard to download backups and view recovery options.'
+      ? `This ${entityLabel} can no longer be resumed here. Open the dashboard to download backups and view recovery options.`
       : isPauseStatusError
-        ? 'Open the dashboard to manage this paused project.'
-        : 'Bring your paused project back online.'
-    : 'Your project will not be available for a few minutes.'
+        ? `Open the dashboard to manage this paused ${entityLabel}.`
+        : `Bring your paused ${entityLabel} back online.`
+    : `Your ${entityLabel} will not be available for a few minutes.`
 
   return (
     <>
       <PageSection id="restart-project">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Project availability</PageSectionTitle>
+            <PageSectionTitle>{entityLabelCapitalized} availability</PageSectionTitle>
             <PageSectionDescription>
               {isPaused
-                ? 'Resume your paused project or review recovery options'
-                : 'Restart or pause your project when performing maintenance'}
+                ? `Resume your paused ${entityLabel} or review recovery options`
+                : `Restart or pause your ${entityLabel} when performing maintenance`}
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -84,6 +88,7 @@ export const Project = () => {
                 )}
               </div>
             </CardContent>
+
             {!isPaused && (
               <CardContent>
                 <div
@@ -91,10 +96,10 @@ export const Project = () => {
                   id="pause-project"
                 >
                   <div>
-                    <p className="text-sm">Pause project</p>
+                    <p className="text-sm">Pause {entityLabel}</p>
                     <div className="max-w-[420px]">
                       <p className="text-sm text-foreground-light">
-                        Your project will not be accessible while it is paused.
+                        Your {entityLabel} will not be accessible while it is paused.
                       </p>
                     </div>
                   </div>

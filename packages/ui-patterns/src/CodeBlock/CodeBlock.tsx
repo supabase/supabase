@@ -222,7 +222,7 @@ export const CodeBlock = ({
                       : 'var(--background-selection)',
                     borderLeft: highlightBorder
                       ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'var(--foreground-default)'}`
-                      : null,
+                      : undefined,
                   },
                   class: 'hljs-line-highlight',
                 }
@@ -268,7 +268,7 @@ export const CodeBlock = ({
             >
               <Button
                 variant="default"
-                className="px-1.5"
+                className="px-1.5 dark:bg-200! dark:hover:bg-button! hover:bg-alternative!"
                 icon={copied ? <Check /> : <Copy />}
                 onClick={() => onSelectCopy(value || children)}
               >
