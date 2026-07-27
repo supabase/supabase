@@ -132,6 +132,12 @@ async function main() {
     process.exit(0)
   }
 
+  // playwright.config.ts sets a global maxFailures: 3, which would otherwise
+  // abort an exhaustive --all run after just 3 failing pages out of hundreds.
+  const hasMaxFailuresArg = playwrightArgs.some((arg) => arg.startsWith('--max-failures'))
+  const finalPlaywrightArgs =
+    runAll && !hasMaxFailuresArg ? [...playwrightArgs, '--max-failures=0'] : playwrightArgs
+
   const baseUrl = process.env.PLAYWRIGHT_BASE_URL?.trim() || DEFAULT_BASE_URL
   if (!(await isBaseUrlReachable(baseUrl))) {
     console.error(`No docs server responding at ${baseUrl}.`)
@@ -149,7 +155,7 @@ async function main() {
     DOCS_E2E_PAGE_PATHS: pages.join(','),
   }
 
-  const child = spawn('pnpm', ['exec', 'playwright', 'test', ...playwrightArgs], {
+  const child = spawn('pnpm', ['exec', 'playwright', 'test', ...finalPlaywrightArgs], {
     cwd: E2E_DOCS_ROOT,
     env,
     stdio: 'inherit',
