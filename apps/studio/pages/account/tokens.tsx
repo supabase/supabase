@@ -5,23 +5,34 @@ import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { AccessTokenList } from '@/components/interfaces/Account/AccessTokens/AccessTokenList'
+import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
+import { NewTokenButton } from '@/components/interfaces/Account/AccessTokens/Classic/NewTokenButton'
 import { MigrationAdmonition } from '@/components/interfaces/Account/AccessTokens/MigrationAdmonition'
 import { NewScopedTokenSheet } from '@/components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenSheet'
 import { AccessTokensLayout } from '@/components/layouts/AccessTokens/AccessTokensLayout'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { NewAccessToken } from '@/data/access-tokens/access-tokens-create-mutation'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const scopedTokensEnabled = useFlag('scopedPAT')
+  const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
   const [searchString, setSearchString] = useState('')
 
   return (
     <AccessTokensLayout>
       <div className="space-y-4">
         {scopedTokensEnabled && <MigrationAdmonition />}
+        {newToken && (
+          <AccessTokenNewBanner
+            token={newToken}
+            onClose={() => setNewToken(undefined)}
+            getTokenValue={(token) => token.token}
+          />
+        )}
         <div className="flex items-center justify-between gap-x-2 mb-3">
           <Input
             size="tiny"
@@ -44,10 +55,14 @@ const UserAccessTokens: NextPageWithLayout = () => {
                 CLI docs
               </a>
             </Button>
-            <NewScopedTokenSheet />
+            {scopedTokensEnabled ? (
+              <NewScopedTokenSheet />
+            ) : (
+              <NewTokenButton onCreateToken={setNewToken} />
+            )}
           </div>
         </div>
-        <AccessTokenList searchString={searchString} />
+        <AccessTokenList searchString={searchString} scopedTokensEnabled={scopedTokensEnabled} />
       </div>
     </AccessTokensLayout>
   )
