@@ -67,12 +67,20 @@ export const useProjectOAuthIntegrationData = (
   isSuccess: boolean
 } => {
   const { data: org } = useSelectedOrganizationQuery({ enabled })
+  // A 403 here is deterministic — the role cannot read the resource — so the error has to be
+  // terminal. An errored query holds no data, so it never counts as fresh and refetches on every
+  // consumer mount; consumers that gate rendering on `isLoading` remount on each refetch, which
+  // loops without this.
+  const sharedOptions = { enabled, retryOnMount: false }
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, { enabled }),
-    edgeFunctionSecrets: useSecretsQuery({ projectRef }, { enabled }),
-    authConfig: useAuthConfigQuery({ projectRef }, { enabled }),
-    partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, { enabled }),
-    oauthApps: useAuthorizedAppsQuery({ slug: org?.slug }, { enabled: enabled && !!org }),
+    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
+    edgeFunctionSecrets: useSecretsQuery({ projectRef }, sharedOptions),
+    authConfig: useAuthConfigQuery({ projectRef }, sharedOptions),
+    partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, sharedOptions),
+    oauthApps: useAuthorizedAppsQuery(
+      { slug: org?.slug },
+      { ...sharedOptions, enabled: enabled && !!org }
+    ),
   }
 
   const data = useMemo(() => {
