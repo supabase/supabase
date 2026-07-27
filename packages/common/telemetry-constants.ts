@@ -235,9 +235,21 @@ export interface CronJobHistoryClickedEvent {
 }
 
 /**
- * Enable cleanup button clicked, either in the cron jobs page header (opens the
- * confirmation dialog) or within the dialog itself (schedules the daily cleanup
- * job that deletes old rows from cron.job_run_details).
+ * Fired when the user clicks the header 'Enable cleanup' button to open the
+ * confirmation dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCleanupDialogOpenedEvent {
+  action: 'cron_job_cleanup_dialog_opened'
+  groups: TelemetryGroups
+}
+
+/**
+ * Fired when the user confirms the cleanup dialog and the daily cleanup job is
+ * actually scheduled (deletes old rows from cron.job_run_details).
  *
  * @group Events
  * @source studio
@@ -246,9 +258,7 @@ export interface CronJobHistoryClickedEvent {
 export interface CronJobCleanupEnableButtonClickedEvent {
   action: 'cron_job_cleanup_enable_button_clicked'
   properties: {
-    /** Where the button was clicked from */
-    origin: 'header' | 'dialog'
-    /** Retention period chosen for the cleanup job, e.g. 7 days. Only sent on dialog confirm. */
+    /** Retention period chosen for the cleanup job, e.g. 7 days. */
     retentionInterval?: string
   }
   groups: TelemetryGroups
@@ -3573,6 +3583,7 @@ export type TelemetryEvent =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
+  | CronJobCleanupDialogOpenedEvent
   | CronJobCleanupEnableButtonClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
