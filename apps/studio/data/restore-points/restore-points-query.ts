@@ -1,13 +1,15 @@
-import { useMutation, UseMutationOptions, useQuery } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { restorePointKeys } from './keys'
 import {
   getMockPlatformProtectionSummary,
   getMockRestorePointCoverage,
+  getMockStorageBackupSyncSettings,
   mockDelay,
   type PlatformProtectionSummary,
   type RestorePointCoverage,
+  type StorageBackupSyncSettings,
 } from './restore-points-mocks'
 
 export type RestorePointCoverageVariables = {
@@ -16,7 +18,7 @@ export type RestorePointCoverageVariables = {
   backupTimestamps: string[]
 }
 
-/** Coverage across Database / Storage / Config for each backup timestamp. */
+/** Coverage across Database / Auth / Storage / Config for each backup timestamp. */
 export const useRestorePointCoverageQuery = ({
   projectRef,
   backupTimestamps,
@@ -41,6 +43,50 @@ export const usePlatformProtectionSummaryQuery = ({ projectRef }: { projectRef?:
     queryFn: () => mockDelay(getMockPlatformProtectionSummary()),
     enabled: !!projectRef,
   })
+
+export const useStorageBackupSyncQuery = ({ projectRef }: { projectRef?: string }) =>
+  useQuery<StorageBackupSyncSettings, Error>({
+    queryKey: restorePointKeys.storageBackupSync(projectRef),
+    queryFn: () => mockDelay(getMockStorageBackupSyncSettings()),
+    enabled: !!projectRef,
+  })
+
+type StorageBackupSyncUpdateVariables = {
+  projectRef: string
+  settings: StorageBackupSyncSettings
+}
+
+/**
+ * Prototype: persist the project-level sync settings. Writes optimistically into
+ * the query cache so the coverage banner reflects the change immediately.
+ */
+export const useStorageBackupSyncUpdateMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<StorageBackupSyncSettings, Error, StorageBackupSyncUpdateVariables> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<StorageBackupSyncSettings, Error, StorageBackupSyncUpdateVariables>({
+    mutationFn: ({ settings }) => mockDelay(settings, 500),
+    async onSuccess(data, variables, context) {
+      queryClient.setQueryData(restorePointKeys.storageBackupSync(variables.projectRef), data)
+      const bucketsProtected = data.buckets.filter((bucket) => bucket.isIncluded).length
+      queryClient.setQueryData<PlatformProtectionSummary>(
+        restorePointKeys.protectionSummary(variables.projectRef),
+        (previous) =>
+          previous === undefined
+            ? previous
+            : { ...previous, bucketsProtected, bucketsTotal: data.buckets.length }
+      )
+      await onSuccess?.(data, variables, context)
+    },
+    onError(error, variables, context) {
+      if (onError === undefined) toast.error(`Failed to update settings: ${error.message}`)
+      else onError(error, variables, context)
+    },
+    ...options,
+  })
+}
 
 export type RestoreMode = 'branch' | 'in-place'
 

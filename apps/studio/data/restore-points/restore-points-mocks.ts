@@ -15,7 +15,7 @@ export type PrimitiveCoverageStatus = 'covered' | 'uncovered' | 'not-applicable'
 
 export interface PrimitiveCoverage {
   /** Which platform primitive this describes. */
-  primitive: 'database' | 'storage' | 'config'
+  primitive: 'database' | 'auth' | 'storage' | 'config'
   status: PrimitiveCoverageStatus
   /** Short label for the chip, e.g. "Database", "Storage". */
   label: string
@@ -47,13 +47,50 @@ export interface PlatformProtectionSummary {
   canRestoreToBranch: boolean
 }
 
+export interface BucketSyncState {
+  name: string
+  /** Snapshotted immediately before each scheduled database backup. */
+  isIncluded: boolean
+  sizeBytes: number
+}
+
+/**
+ * Project-level storage/backup sync settings.
+ *
+ * Expressing this per bucket alone is a trap: a bucket added later defaults to
+ * unprotected, so a project that was fully recoverable silently degrades. A
+ * project-level default with `applyToNewBuckets` keeps the guarantee intact, and
+ * per-bucket entries remain the deliberate opt-out (e.g. a large cache bucket
+ * not worth snapshotting).
+ */
+export interface StorageBackupSyncSettings {
+  /** Master switch: snapshot storage before each scheduled database backup. */
+  isEnabled: boolean
+  /** New buckets inherit snapshotting so coverage can't silently regress. */
+  applyToNewBuckets: boolean
+  buckets: BucketSyncState[]
+}
+
 const GB = 1024 * 1024 * 1024
 
 const DATABASE_COVERAGE: PrimitiveCoverage = {
   primitive: 'database',
   status: 'covered',
   label: 'Database',
-  detail: 'Postgres schema and data. Auth users and Storage metadata restore with it.',
+  detail: 'Postgres schema and data, including Storage metadata.',
+}
+
+/**
+ * Auth is called out separately even though it comes along with Postgres: users
+ * and sessions coming back is a distinct thing people need to know, and stating
+ * it makes the Storage gap read as a deliberate exception rather than an
+ * oversight.
+ */
+const AUTH_COVERAGE: PrimitiveCoverage = {
+  primitive: 'auth',
+  status: 'covered',
+  label: 'Auth',
+  detail: 'Users, identities, and sessions — they live in Postgres, so they restore with it.',
 }
 
 const CONFIG_COVERAGE: PrimitiveCoverage = {
@@ -93,6 +130,7 @@ export const getMockRestorePointCoverage = (
     backupTimestamp,
     primitives: [
       DATABASE_COVERAGE,
+      AUTH_COVERAGE,
       hasStorageSnapshot ? storageCovered(2) : STORAGE_UNCOVERED,
       CONFIG_COVERAGE,
     ],
@@ -108,6 +146,16 @@ export const getMockPlatformProtectionSummary = (): PlatformProtectionSummary =>
   bucketsTotal: 3,
   isConfigTracked: true,
   canRestoreToBranch: true,
+})
+
+export const getMockStorageBackupSyncSettings = (): StorageBackupSyncSettings => ({
+  isEnabled: true,
+  applyToNewBuckets: false,
+  buckets: [
+    { name: 'match-media', isIncluded: true, sizeBytes: 4.1 * GB },
+    { name: 'avatars', isIncluded: true, sizeBytes: 1.4 * GB },
+    { name: 'exports', isIncluded: false, sizeBytes: 0.6 * GB },
+  ],
 })
 
 export const mockDelay = <T>(value: T, ms = 300): Promise<T> =>

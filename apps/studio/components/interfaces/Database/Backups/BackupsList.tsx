@@ -7,9 +7,8 @@ import { toast } from 'sonner'
 
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
-import { BackupsStorageAlert } from './BackupsStorageAlert'
-import { PlatformCoverageNotice } from './RestorePoints/PlatformCoverageNotice'
 import { RestoreBackupModal } from './RestorePoints/RestoreBackupModal'
+import { StorageCoverageNotice } from './RestorePoints/StorageCoverageNotice'
 import Panel from '@/components/ui/Panel'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from '@/data/database/backup-restore-mutation'
@@ -84,8 +83,7 @@ export const BackupsList = () => {
           <BackupsEmpty />
         ) : (
           <>
-            <BackupsStorageAlert />
-            <PlatformCoverageNotice />
+            <StorageCoverageNotice mode="scheduled" />
             <Panel>
               {sortedBackups?.map((x, i: number) => {
                 return (

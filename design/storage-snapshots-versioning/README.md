@@ -339,6 +339,41 @@ Design decisions:
 
 ---
 
+## 8b. Where should Backups live in the dashboard?
+
+Raised once restore points became environment-wide: if a backup now covers Database, Auth, Storage, and Config, is `Database → Backups` still the right home?
+
+**Recommendation: keep it under Database for now, but rename the page from "Database Backups" to "Backups."**
+
+Reasons to stay:
+- Restore risk still concentrates in the database, and the page is still ~90% database mechanics — PITR, physical vs logical, retention entitlements, read-replica constraints.
+- It's where users already look. Every existing doc, support macro, and muscle-memory path points here; moving it buys confusion without buying capability.
+- Auth and Storage metadata coverage is a *consequence* of Postgres being the source of truth. The page sitting next to the database reinforces that model rather than obscuring it.
+
+What would change our mind — two plausible end states, both post-Select:
+1. **A project-level "Recovery" section**, once Storage snapshots, config-from-git, and Compute state are all first-class inputs and the page is no longer database-dominated.
+2. **Absorbed into Branches.** If restoring is primarily "create a branch from a past point, verify, promote," then restore points are a *time axis on branches* and belong beside them. The vision's framing — branching as a CoW primitive that everything inherits — points here.
+
+Either way the trigger is the same: revisit when storage-level branching lands (2026–2027 per the engineering vision), because that's when "restore" stops being a database operation with attachments and becomes an environment operation.
+
+Interim: keep the route, retitle the page, and make coverage explicit (done). Renaming is cheap and reversible; relocating is neither.
+
+## 8c. Config pattern for Storage ↔ backup sync
+
+Per-bucket toggles alone are a trap: a bucket created later defaults to unprotected, so a project that was fully recoverable silently stops being so. Nobody gets an alert — they find out during a restore.
+
+The pattern is **project-level default + per-bucket opt-out**:
+
+| Level | Control | Purpose |
+| --- | --- | --- |
+| Project | "Snapshot Storage with each backup" | The actual intent: keep the environment consistently recoverable |
+| Project | "Include new buckets automatically" | Stops coverage regressing as the project grows — the fix for the trap above |
+| Bucket | Per-bucket switch | The deliberate exception (e.g. a large regenerable cache bucket) |
+
+Two placement rules that matter more than the toggles:
+- **Configure it where the problem is visible.** The control opens from the coverage banner on the Backups page, not only from Storage settings. Users discover the gap while looking at backups; sending them to another product to fix it loses them.
+- **One banner, state-aware.** The page previously had a permanent "Storage objects are not included" alert. Once snapshots exist that statement is sometimes false, so it becomes a single notice with four states: feature off, sync off, partial coverage (warning + which buckets), full coverage. Never two banners describing the same thing.
+
 ## 9. Open questions for the team
 
 1. **Version chip noise** — showing `v3` on every versioned object could clutter dense buckets. Alternative: only show it in the pane + on hover. (Prototype shows both; recommend hover-only for the row, always-on in the pane.)

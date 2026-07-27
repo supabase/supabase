@@ -51,7 +51,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
       <PageHeader>
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Database Backups</PageHeaderTitle>
+            <PageHeaderTitle>Backups</PageHeaderTitle>
           </PageHeaderSummary>
         </PageHeaderMeta>
         <PageHeaderNavigationTabs>

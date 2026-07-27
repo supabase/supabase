@@ -21,7 +21,7 @@ import {
 } from 'ui'
 
 import { BackupsEmpty } from '../BackupsEmpty'
-import { BackupsStorageAlert } from '../BackupsStorageAlert'
+import { StorageCoverageNotice } from '../RestorePoints/StorageCoverageNotice'
 import type { Timezone } from './PITR.types'
 import { getClientTimezone } from './PITR.utils'
 import { PITRForm } from './PITRForm'
@@ -84,7 +84,7 @@ export const PITRSelection = () => {
         title="Restore your database from a backup"
         description="Database changes are watched and recorded, so that you can restore your database to any point in time"
       />
-      <BackupsStorageAlert />
+      <StorageCoverageNotice mode="pitr" />
       {hasNoBackupsAvailable ? (
         <BackupsEmpty />
       ) : (

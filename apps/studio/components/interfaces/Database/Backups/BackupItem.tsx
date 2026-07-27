@@ -122,8 +122,13 @@ export const BackupItem = ({
             </InlineLink>
           </TooltipContent>
         </Tooltip>
+      </div>
+
+      {/* Coverage sits in its own column between the timestamp and the actions */}
+      <div className="flex flex-1 justify-center">
         {coverage && <CoverageChips primitives={coverage.primitives} />}
       </div>
+
       <div>{generateSideButtons(backup)}</div>
     </div>
   )
