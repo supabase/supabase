@@ -59,7 +59,7 @@ export async function GET() {
     }
 
     return NextResponse.json(
-      { error: 'Unable to scoped token permission scope map at this time' },
+      { error: 'Unable to fetch scoped token permission scope map at this time' },
       { status: errorCode, headers }
     )
   }
