@@ -102,7 +102,7 @@ export const NewScopedTokenForm = ({
         )}
       </ScrollArea>
       <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">
-        <StepIndicator step={1} total={2} label="Configure" />
+        <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
         <div className="flex gap-2">
           {step === 'review' && (
             <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
