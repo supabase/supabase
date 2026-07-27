@@ -28,6 +28,10 @@ export async function HEAD() {
   })
 }
 
+/*
+ * This route allows us to not add all permissions mappings to the client bundle.
+ * Ideally, this should be provided by the management API, including MCP tools.
+ */
 export async function GET() {
   if (!IS_PLATFORM) return new Response(null, { status: 404 })
 

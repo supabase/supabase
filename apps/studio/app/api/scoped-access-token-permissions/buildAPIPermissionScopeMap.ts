@@ -1,10 +1,9 @@
 import lodash from 'lodash'
-import { ensurePresent } from 'openai/core.mjs'
 import z from 'zod'
 
 // We don't have an OpenAPI that describes mcp tools security requirements so
 // we have this json file that must be updated when they change
-import mcp_tools_permissions_map from './mcp_tools_permissions_map.json'
+import { MCPToolScopeMappings } from './MCPToolScopeMappings'
 import {
   EndpointMap,
   McpMap,
@@ -23,12 +22,12 @@ export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> 
   // Get the permissions map for the API v1
   const apiV1SpecsJSON = await fetchAPIPermissionScope('v1')
   const apiV1Specs = API_SPECS_SCHEMA.parse(apiV1SpecsJSON)
-  const permissionScopeMapV1 = getEndpointsAndMCPToolsForAPI(apiV1Specs, mcp_tools_permissions_map)
+  const permissionScopeMapV1 = getEndpointsAndMCPToolsForAPI(apiV1Specs, MCPToolScopeMappings)
 
   // Get the permissions map for the API v2
   const apiV2SpecsJSON = await fetchAPIPermissionScope('v2')
   const apiV2Specs = API_SPECS_SCHEMA.parse(apiV2SpecsJSON)
-  const permissionScopeMapV2 = getEndpointsAndMCPToolsForAPI(apiV2Specs, mcp_tools_permissions_map)
+  const permissionScopeMapV2 = getEndpointsAndMCPToolsForAPI(apiV2Specs, MCPToolScopeMappings)
 
   const permissionScope = lodash.mergeWith(
     {},
