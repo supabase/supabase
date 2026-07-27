@@ -44,7 +44,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
       retryDelay: 1000,
     }
   )
-  console.log({ token })
 
   const groupedResourcesByAccess = useMemo(() => {
     const grouped: Record<string, string[]> = {}
