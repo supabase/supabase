@@ -114,7 +114,12 @@ function useGetProjectPermissions(
       ? projectData
       : { ref: projectRefOverride, parent_project_ref: undefined }
 
-  const projectRef = project?.parent_project_ref ? project.parent_project_ref : project?.ref
+  const projectRef =
+    projectRefOverride === null
+      ? null
+      : project?.parent_project_ref
+        ? project.parent_project_ref
+        : project?.ref
 
   const isLoading =
     isLoadingPermissions ||
