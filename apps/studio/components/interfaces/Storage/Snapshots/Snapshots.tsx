@@ -44,7 +44,7 @@ export const Snapshots = () => {
     <>
       <PageContainer>
         <PageSection>
-          <PageSectionContent className="gap-y-4">
+          <PageSectionContent className="flex flex-col gap-y-4">
             <div className="flex items-center justify-between gap-x-2">
               <div className="flex items-center gap-x-3">
                 <StorageBucketSelector

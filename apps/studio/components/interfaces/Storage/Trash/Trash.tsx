@@ -56,7 +56,7 @@ export const Trash = () => {
     <>
       <PageContainer>
         <PageSection>
-          <PageSectionContent className="gap-y-4">
+          <PageSectionContent className="flex flex-col gap-y-4">
             <div className="flex items-center gap-x-3">
               <StorageBucketSelector
                 projectRef={ref}
