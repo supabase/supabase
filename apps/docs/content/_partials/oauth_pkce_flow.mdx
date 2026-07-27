@@ -103,10 +103,13 @@ const supabase = createServerClient(
       getAll() {
         return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
       },
-      setAll(cookiesToSet, _headers) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value, options }) =>
           Astro.cookies.set(name, value, options)
         )
+        if (headers) {
+          headers.forEach((value, key) => Astro.response.headers.append(key, value))
+        }
       },
     },
   }
@@ -144,10 +147,13 @@ const supabase = createServerClient(
       getAll() {
         return parseCookieHeader(request.headers.get('Cookie') ?? '')
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headers) {
         cookiesToSet.forEach(({ name, value, options }) =>
           responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
         )
+        if (headers) {
+          headers.forEach((value, key) => responseHeaders.append(key, value))
+        }
       },
     },
   }
@@ -275,10 +281,13 @@ export const GET: APIRoute = async ({ request, cookies, redirect }) => {
           getAll() {
             return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
           },
-          setAll(cookiesToSet, _headers) {
+          setAll(cookiesToSet, headers) {
             cookiesToSet.forEach(({ name, value, options }) =>
               Astro.cookies.set(name, value, options)
             )
+            if (headers) {
+              headers.forEach((value, key) => Astro.response.headers.append(key, value))
+            }
           },
         },
       }
@@ -321,11 +330,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
           getAll() {
             return parseCookieHeader(request.headers.get('Cookie') ?? '')
           },
-          setAll(cookiesToSet, cacheHeaders) {
+          setAll(cookiesToSet, headers) {
             cookiesToSet.forEach(({ name, value, options }) =>
               responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
             )
-            Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+            if (headers) {
+              headers.forEach((value, key) => responseHeaders.append(key, value))
+            }
           },
         },
       }
