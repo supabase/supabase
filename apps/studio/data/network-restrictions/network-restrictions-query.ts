@@ -7,12 +7,12 @@ import { UseCustomQueryOptions } from '@/types'
 export type NetworkRestrictionsVariables = { projectRef?: string }
 
 export type NetworkRestrictionsResponse = {
-  entitlement: 'disallowed' | 'allowed'
-  status: '' | 'stored' | 'applied'
-  config: { dbAllowedCidrs: string[] }
-  old_config?: { dbAllowedCidrs: string[] }
-  error?: any
-}
+		entitlement: "disallowed" | "allowed";
+		status: "" | "stored" | "applied";
+		config: { dbAllowedCidrs: string[], dbAllowedCidrsV6: string[] };
+		old_config?: { dbAllowedCidrs: string[], dbAllowedCidrsV6: string[] };
+		error?: any;
+	};
 
 export async function getNetworkRestrictions(
   { projectRef }: NetworkRestrictionsVariables,
@@ -34,10 +34,10 @@ export async function getNetworkRestrictions(
 
     if (isNotAllowedError) {
       return {
-        entitlement: 'disallowed',
-        config: { dbAllowedCidrs: [] },
-        status: '',
-      } as NetworkRestrictionsResponse
+							entitlement: "disallowed",
+							config: { dbAllowedCidrs: [], dbAllowedCidrsV6: [] },
+							status: "",
+						} as NetworkRestrictionsResponse;
     } else {
       handleError(error)
     }
