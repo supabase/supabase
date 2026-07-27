@@ -135,12 +135,19 @@ export const Overview = ({ live }: OverviewProps) => {
               <MetricCardLabel
                 tooltip={
                   <div>
-                    <p className="text-foreground-light pr-2">Connections by roles:</p>
-                    {rolesWithActiveConnections.map((role) => (
-                      <div key={role.id} className="flex items-center">
-                        <p className="min-w-32">{role.name}:</p> {role.activeConnections}
-                      </div>
-                    ))}
+                    <p className="text-foreground-light">Connections by roles:</p>
+                    <table>
+                      <tbody>
+                        {rolesWithActiveConnections.map((role) => (
+                          <tr key={role.id}>
+                            <th scope="row" className="text-left font-normal">
+                              {role.name}:
+                            </th>
+                            <td className="pl-2">{role.activeConnections}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 }
               >
