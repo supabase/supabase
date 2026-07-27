@@ -37,7 +37,11 @@ The estimate can differ substantially from the actual volume because:
 - Published-column filtering is approximated from average column widths, while publication row-filter selectivity is not estimated.
 - Planner statistics can be stale or unavailable. Missing variable-width statistics use a fallback width.
 
+<Admonition type="note">
+
 This is a rough planning estimate, not the billable measurement. It is most directionally useful for recently analyzed, moderately wide tables with most columns published, little bloat, and no row filters. Treat it as especially rough for narrow, heavily filtered, TOAST-heavy, or bloated tables and for schemas whose text values differ substantially from their physical representation.
+
+</Admonition>
 
 Actual charges use the logical Postgres row data copied after publication column and row filters and accepted by the destination.
 
