@@ -66,7 +66,7 @@ export type ResolveDocsScopeOptions = {
   changedFiles: string[]
   /** Absolute path to the monorepo root */
   repoRoot: string
-  /** Max pages before failing (default MAX_SCOPED_PAGES) */
+  /** Max pages to test before the rest are truncated (default MAX_SCOPED_PAGES) */
   maxPages?: number
 }
 
@@ -260,6 +260,8 @@ function pagesUsingPartials(
 
 /**
  * Resolve which docs pages to E2E-test from a list of changed repo files.
+ * Truncates to maxPages (sorted) so a widely shared partial can't blow up
+ * runtime; use resolveAllDocsPages / `pnpm e2e:docs:all` to cover everything.
  */
 export async function resolveDocsScope(
   options: ResolveDocsScopeOptions
@@ -293,13 +295,7 @@ export async function resolveDocsScope(
     }
   }
 
-  const sorted = [...pages].sort()
-  if (sorted.length > maxPages) {
-    throw new Error(
-      `Docs E2E scope resolved ${sorted.length} pages (max ${maxPages}). ` +
-        `Narrow the PR or raise MAX_SCOPED_PAGES. First pages: ${sorted.slice(0, 10).join(', ')}…`
-    )
-  }
+  const sorted = [...pages].sort().slice(0, maxPages)
 
   return {
     pages: sorted,

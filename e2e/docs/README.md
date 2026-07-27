@@ -148,8 +148,10 @@ pages linking into reference docs or server-side auth guides.
 ### Limits
 
 Resolved scope is capped at 20 pages so a widely shared partial cannot explode
-runtime. To test beyond the cap, use `pnpm e2e:docs:all` instead of raising it.
-See [Run every in-scope page](#run-every-in-scope-page).
+runtime. If a change resolves to more pages than that, only the first 20 in
+sorted order are tested and the rest are silently dropped from that run. To
+test beyond the cap, use `pnpm e2e:docs:all` instead of raising it. See
+[Run every in-scope page](#run-every-in-scope-page).
 
 To inspect the resolved list without running Playwright, replicate the same
 scope `pnpm e2e:docs` uses by default: commits since `origin/master`, plus
