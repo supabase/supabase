@@ -16,31 +16,34 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 
 ### Beat 1 — Enable protection (1–2 min)
 **Storage → Files → a bucket → Edit bucket**
-- Show the new **Data protection** section: Object versioning + Bucket snapshots toggles.
-- Point out: per-bucket opt-in, lifecycle fields use the design system's "input with unit" pattern, and the cost admonition appears inline at enable-time — not buried in docs.
+- Show the **Data protection** section: object versioning switch, and "include in restore points" switch.
+- Point out: versioning retention shows the project default inline ("Keeping N versions for D days") with an explicit override switch to diverge per bucket; lifecycle fields use the design system's "input with unit" pattern; the cost admonition appears inline at enable-time — not buried in docs.
 
 ### Beat 2 — Versioning in the explorer (2 min)
 **Upload/overwrite a file → Preview pane → Versions tab**
 - Version history lives where the file already lives — no separate page, no new navigation.
+- Each version has three icon-only actions: download, restore, delete. The current version only gets download — it can't be restored onto itself or deleted while current, and visually it's no longer set apart, just a "Latest" badge on an otherwise plain row.
 - Restore an older version; call out that it's **non-destructive** (promotes to a new current version, old current becomes noncurrent).
-- Show a version **pinned by a snapshot** blocking hard-delete — this is the direct answer to "when do I actually stop paying for this."
+- Show a version **pinned by a snapshot** blocking delete — this is the direct answer to "when do I actually stop paying for this."
 
 ### Beat 3 — Deleted files (1–2 min)
 **Storage → Files → Deleted files tab**
 - Soft-deleted objects, an "auto-removes" column, one-click restore.
+- Hover a row for a selection checkbox, shift-click for a range — same pattern as the main Explorer — then batch-restore or batch-delete from the selection bar. "Delete all permanently" clears a whole bucket in one action (deliberately not called "purge").
 - Same "held by snapshot" state appears here too — one consistent mental model across both surfaces.
 
 ### Beat 4 — Snapshots (2 min)
 **Storage → Files → Snapshots tab**
-- Take a snapshot; show Pre-backup vs Manual trigger badges.
+- Take a snapshot; show **Backup sync** (green) vs **Manual** trigger badges.
 - Open Restore: the add / revert / remove diff shown **before** confirming — this is what makes a whole-bucket restore trustworthy instead of a leap of faith.
 
 ### Beat 5 — The platform reframe (3 min) — the part to slow down on
 **Database → Backups → Scheduled**
 - This is what changed after re-reading the vision docs.
-- Each backup row now shows coverage chips: **Database / Storage / Config**.
+- Each backup row now shows coverage chips: **Database / Auth / Storage / Config**.
 - Explain: Auth users and Storage *metadata* live in Postgres, so a database restore brings them back for free. Object *bytes* don't — that asymmetry is exactly the drift bug in the PRFAQ.
-- The coverage notice names which buckets aren't protected, with a link to fix it.
+- One state-aware coverage notice (not two overlapping banners anymore) names which buckets aren't covered, linking straight to the project's **Restore points** settings on the Storage Settings page — one place to fix it, not a separate dialog.
+- Storage → Files → Settings → **Restore points**: frequency (with every backup / daily / hourly) and retention are project-level, since per-bucket retention would let a restore point be complete for one bucket and expired for another on the same day. Bucket-level keeps only participation (opt-out) and versioning's own override.
 - Open Restore: it defaults to **"into a new preview branch,"** not in-place. Tie this explicitly to "branching is a platform primitive, not a database feature" — a CoW branch is cheap and reversible, so verify-then-promote should be the default; destructive in-place restore becomes the deliberate exception.
 
 ### Beat 6 — Usage/billing honesty (1–2 min)
@@ -60,29 +63,60 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 
 ## 2. Project update (for you to send/present)
 
-> **Subject: Storage recovery (Snapshots & Versioning) — prototype + a platform reframe, feedback wanted**
+> **First design pass and thoughts on Storage Snapshots and Object Versioning**
 >
-> Hey team,
+> I approached this design exploration by working backwards from an end state that maximizes value across the whole product experience — from a platform-wide point of view, not a Storage-only one — starting from these fundamentals:
 >
-> Sharing where I've landed on the Storage Snapshots & Versioning work. Scope moved a bit from the original PRFAQ — in a direction I think is more durable — and I want your read on it before going further.
+> 1. Users are asking to
+>    1. undo an accidental delete or overwrite on a single file
+>    2. recover a whole bucket to a known-good state without Storage falling out of sync with the database
+> 2. The 3-year Product Vision, particularly two principles that ended up shaping the design directly: "three primitives, not thirty products," and branching as a first-class primitive
 >
-> **Where it started.** The PRFAQ was scoped to Storage: object versioning for single-file recovery, bucket snapshots for whole-bucket recovery, and snapshots timed to database backups so both land on the same point in time. That's still the core of what's prototyped.
+> Full demo in the attached video. Here are some highlights:
 >
-> **Why I widened the frame.** Re-reading the 3-year product and engineering vision, two principles didn't sit well with a Storage-only design:
-> - *"Three primitives, not thirty products"* — designing this as a Storage feature risks it becoming a fourth thing bolted alongside Database / Storage / Compute, instead of a composition of what already exists.
-> - *"Branching is a first-class primitive"* — the vision is explicit that branching lives at the block/CoW layer, and everything that persists state in Postgres inherits it for free. A recovery feature that doesn't default to "restore into a branch" is fighting that architecture, not building toward it.
+> **1. Backups restore the entire project state, not just the database**
+> Each backup row shows per-primitive coverage — Database, Auth, Storage, Config — so it's clear at a glance what actually comes back when you restore, not just that a backup exists. Auth is called out explicitly because it's easy to assume it's separate, when in fact users and sessions live in Postgres and restore for free with the database — Storage is the one that doesn't come along automatically, which is exactly the gap in the original ask. The coverage notice on the Backups page now also collapses to a single state-aware banner (previously two overlapping ones) and links straight to one settings page to fix a gap, rather than opening its own one-off editor.
 >
-> So the prototype now treats a database backup as a restore point for the **environment** — Database, Storage, and Config — rather than a database artifact with a Storage bolt-on. Concretely: each backup shows coverage across all three; restoring defaults to a new preview branch (cheap, reversible, verify-then-promote), with in-place restore as an explicit, warned-against escape hatch; and the coverage gap — buckets without snapshots — is named instead of silently reproducing the drift the PRFAQ set out to fix.
+> One small consequence: I renamed the page from "Database Backups" to "Backups." Open question below on whether it eventually belongs somewhere else entirely.
 >
-> **What's built.** Real Studio components, not a static mockup, behind a prototype flag and wired to mock data since there's no backend yet: per-bucket enable with lifecycle policies, version history in the file preview pane with non-destructive restore, a Deleted files view, a Snapshots view with restore-with-diff, Database/Storage/Config coverage on backup rows with branch-first restore, and Storage Size in Org Usage broken into live/versions/snapshots inside the existing section.
+> **2. Restore a backup into a new preview branch, or over production**
+> Given branching is meant to be a first-class, cheap, copy-on-write primitive, defaulting to "restore into a preview branch" felt like the right call: verify the restored state is actually what you expect, then promote to production — instead of committing to a destructive restore blind. In-place restore over production stays available as the deliberate escape hatch, not the default.
 >
-> **What's deliberately unsolved.** The PRFAQ's own Internal FAQ was honest that the hard part is infra, not UI: event-driven lifecycle expiry, hard-delete coordination between Postgres and S3, and bucket-restore diffing at scale. None of that is in this prototype — it's all mocked. I don't think that's a gap in the demo; I think it's the right place to draw the line before a design review.
+> **3. Recover deleted files**
+> A dedicated view — mentally modeled on a Trash/Recycle Bin, though I landed on calling it "Deleted files" in the actual UI since it reads a bit less informal — lists every soft-deleted object, filtered by bucket. Selection now works the same way as the main file browser: hover a row for a checkbox, shift-click for a range, and a bulk action bar appears for the batch. From there you can:
 >
-> **What I'd like from you:**
-> - **Storage** — does branch-first restore hold up against how storage branching is actually sequenced? Per-bucket Deleted files, or project-wide?
-> - **Design** — does the platform reframe read as coherent, or is it trying to do too much in one screen?
+> - restore a file (or a batch of files)
+> - delete a file (or a batch) permanently
+> - delete every deleted file in a bucket permanently, in one action
 >
-> I'll walk through it live, ~15 minutes.
+> I considered "purge" for that last one and moved away from it: it's jargon, it doesn't actually say what happens, and it would've been a third word for an action already called "delete permanently" everywhere else in this flow. Landed on **"Delete all permanently"** instead, so the vocabulary stays consistent end to end.
+>
+> **4. Object versions, surfaced where the file already lives**
+> No new navigation for this one — the file preview panel gets a Versions tab listing every version of an object. Each version now has three explicit, single-icon actions — download, restore, delete — instead of one ambiguous button, so it's clear what's possible without guessing. The current version only ever gets download, since it can't be restored onto itself or deleted while it's current; visually it's no longer set apart in its own bordered card either — it sits in the same plain timeline as every other version, distinguished only by a "Latest" badge, since the extra styling wasn't earning its keep.
+>
+> Restoring is non-destructive: it promotes an older version to become the new current version, and the previous current version just becomes another entry in the list. Deleting a version respects the same lock as before — a version held by a bucket snapshot can't be permanently deleted until that snapshot is removed. This is meant to be the direct, in-context answer to the question that matters most for trust here: "when do I actually stop paying for this?"
+>
+> **5. Bucket snapshots, with a restore diff instead of a leap of faith**
+> A new Snapshots view per bucket — living as a tab under Files rather than a new item in the left nav, since it's a recovery lens on file buckets, not a new bucket type alongside Analytics/Vectors. Each snapshot shows whether it was taken automatically (right before a scheduled backup — now badged as "Backup sync" in green, rather than an unstyled "Pre-backup" label) or manually. Restoring one shows the exact diff before you confirm — objects added back, objects reverted, objects that will be removed — so restoring an entire bucket doesn't require blind trust.
+>
+> **6. Storage cost has to stay legible, or this becomes a support-ticket generator**
+> The existing Storage Size usage chart now splits into live objects / object versions / snapshots, folded into the section that's already there rather than bolted on as a new card, so it's consistent with how every other usage metric on that page is presented. A per-bucket table shows exactly which bucket's retention is driving the number. This was arguably the single highest-risk item in the original PRFAQ's own internal review: if a customer can't answer "when is my object truly gone, and when do I stop paying for it?" without reading docs, the feature generates billing-surprise tickets instead of trust.
+>
+> **7. Keeping Storage in sync with backups without silent drift**
+> This one changed the most since I first sketched it. A single per-bucket toggle has a trap: it quietly stops covering a bucket created after the fact, so a fully-recoverable project degrades without anyone noticing — and if retention were also set per bucket, a restore point could be complete for one bucket and already expired for another on the very same day, silently. So the two settings that determine *whether a restore point exists at all* — how often Storage is captured (with every database backup, daily, or hourly) and how long it's retained — now live in one place: a project-level "Restore points" settings section, plus an "include new buckets automatically" switch so newly created buckets aren't a silent gap.
+>
+> Bucket-level configuration keeps only what's genuinely bucket-specific: whether a bucket participates at all (the deliberate opt-out, e.g. for a large regenerable cache bucket), and object-versioning's own retention, which can inherit the project default or be overridden per bucket — since keeping more or fewer old versions of one noisy bucket doesn't put restore points elsewhere out of sync. The old idea of a separate "sync" dialog is gone too: the coverage notice on the Backups page now links straight to this one settings page, so there's exactly one place this is configured, not two that can drift apart from each other.
+>
+> ---
+>
+> **Open questions I'd love feedback on:**
+> - Does branch-first restore hold up against how storage-level branching actually gets sequenced, or is it getting ahead of the infrastructure?
+> - Per-bucket "Deleted files," or one project-wide view?
+> - Do the coverage chips (Database / Auth / Storage / Config) communicate the right amount on one row, or is it trying to say too much at a glance?
+> - Now that a restore point spans more than the database, does "Backups" still belong under Database, or does it eventually move — into a project-wide "Recovery" area, or even next to Branches once storage branching lands?
+> - Is project-level frequency + retention, plus a bucket-level participation/versioning-override split, the right amount of configuration surface — or does even two levels read as one too many for most people?
+>
+> *("Deleted files" vs "Trash" is no longer an open question — landed on "Deleted files" and it's shipped consistently across the UI.)*
 
 ---
 
