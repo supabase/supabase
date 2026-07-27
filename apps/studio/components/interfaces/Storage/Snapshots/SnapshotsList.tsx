@@ -56,9 +56,7 @@ export const SnapshotsList = ({ snapshots, onRestore }: SnapshotsListProps) => {
               </TableCell>
               <TableCell>
                 {snapshot.trigger === 'pre-backup' ? (
-                  <span className="inline-flex items-center rounded-full border border-blue-800 bg-blue-500/10 px-2 py-0.5 text-xs text-blue-1100">
-                    Pre-backup
-                  </span>
+                  <Badge variant="success">Backup sync</Badge>
                 ) : (
                   <Badge variant="default">Manual</Badge>
                 )}

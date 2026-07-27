@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
@@ -49,6 +49,44 @@ export const useObjectVersionRestoreMutation = ({
     },
     onError(error, variables, context) {
       if (onError === undefined) toast.error(`Failed to restore version: ${error.message}`)
+      else onError(error, variables, context)
+    },
+    ...options,
+  })
+}
+
+type ObjectVersionDeleteVariables = {
+  projectRef: string
+  bucketId: string
+  objectName: string
+  versionId: string
+}
+
+/**
+ * Prototype: permanently deletes a single noncurrent version. Versions pinned by
+ * a snapshot are rejected server-side, so the UI blocks them rather than
+ * promising a delete it can't deliver.
+ */
+export const useObjectVersionDeleteMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<void, Error, ObjectVersionDeleteVariables> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<void, Error, ObjectVersionDeleteVariables>({
+    mutationFn: () => mockDelay(undefined, 500),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.objectVersions(
+          variables.projectRef,
+          variables.bucketId,
+          variables.objectName
+        ),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    onError(error, variables, context) {
+      if (onError === undefined) toast.error(`Failed to delete version: ${error.message}`)
       else onError(error, variables, context)
     },
     ...options,

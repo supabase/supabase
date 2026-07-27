@@ -1,12 +1,16 @@
 import dayjs from 'dayjs'
-import { RotateCcw } from 'lucide-react'
+import { Download, RotateCcw, Trash2 } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { Badge, Button, cn } from 'ui'
+import { Badge, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import {
+  useObjectVersionDeleteMutation,
   useObjectVersionRestoreMutation,
   useObjectVersionsQuery,
 } from '@/data/storage/protection/object-versions-query'
@@ -36,8 +40,17 @@ export const VersionHistory = ({
     isSuccess,
   } = useObjectVersionsQuery({ projectRef, bucketId, objectName })
 
+  const [versionToDelete, setVersionToDelete] = useState<ObjectVersion>()
+
   const { mutate: restoreVersion, isPending: isRestoring } = useObjectVersionRestoreMutation({
     onSuccess: () => toast.success('Version restored as the current version'),
+  })
+
+  const { mutate: deleteVersion, isPending: isDeleting } = useObjectVersionDeleteMutation({
+    onSuccess: () => {
+      toast.success('Version permanently deleted')
+      setVersionToDelete(undefined)
+    },
   })
 
   const handleRestore = (version: ObjectVersion) => {
@@ -78,12 +91,7 @@ export const VersionHistory = ({
                   {!isLast && <span className="w-px flex-1 bg-border" />}
                 </div>
 
-                <div
-                  className={cn(
-                    'flex-1 pb-8',
-                    version.isCurrent && 'rounded-md border border-border bg-surface-100 p-3'
-                  )}
-                >
+                <div className="flex-1 pb-8">
                   <div className="flex items-center justify-between gap-x-2">
                     <div className="flex items-center gap-x-2">
                       <span className="text-sm text-foreground">
@@ -91,17 +99,54 @@ export const VersionHistory = ({
                       </span>
                       {version.isCurrent && <Badge variant="success">Latest</Badge>}
                     </div>
-                    {!version.isCurrent && (
-                      <Button
-                        variant="default"
+
+                    <div className="flex items-center gap-x-1">
+                      <ButtonTooltip
+                        variant="text"
                         size="tiny"
-                        icon={<RotateCcw />}
-                        loading={isRestoring}
-                        onClick={() => handleRestore(version)}
-                      >
-                        Restore
-                      </Button>
-                    )}
+                        className="px-1.5"
+                        icon={<Download size={14} />}
+                        aria-label={`Download version ${shortVersion(version.versionId)}`}
+                        onClick={() =>
+                          toast.success(`Downloading ${shortVersion(version.versionId)}`)
+                        }
+                        tooltip={{ content: { side: 'bottom', text: 'Download' } }}
+                      />
+
+                      {/* The current version can't be restored onto itself, nor deleted */}
+                      {!version.isCurrent && (
+                        <>
+                          <ButtonTooltip
+                            variant="text"
+                            size="tiny"
+                            className="px-1.5"
+                            icon={<RotateCcw size={14} />}
+                            loading={isRestoring}
+                            aria-label={`Restore version ${shortVersion(version.versionId)}`}
+                            onClick={() => handleRestore(version)}
+                            tooltip={{ content: { side: 'bottom', text: 'Restore as current' } }}
+                          />
+                          <ButtonTooltip
+                            variant="text"
+                            size="tiny"
+                            className="px-1.5 hover:text-destructive"
+                            icon={<Trash2 size={14} />}
+                            disabled={version.heldBySnapshot !== null}
+                            aria-label={`Delete version ${shortVersion(version.versionId)}`}
+                            onClick={() => setVersionToDelete(version)}
+                            tooltip={{
+                              content: {
+                                side: 'bottom',
+                                text:
+                                  version.heldBySnapshot !== null
+                                    ? 'Held by a snapshot — delete the snapshot first'
+                                    : 'Delete permanently',
+                              },
+                            }}
+                          />
+                        </>
+                      )}
+                    </div>
                   </div>
                   <p className="mt-0.5 text-xs text-foreground-lighter">
                     {formatBytes(version.size)} · {version.action}
@@ -123,6 +168,34 @@ export const VersionHistory = ({
         title="Restoring is non-destructive"
         description="Restoring makes an older version the new current version. The previous current version becomes a noncurrent version you can still recover."
       />
+
+      <ConfirmationModal
+        variant="destructive"
+        visible={versionToDelete !== undefined}
+        title="Permanently delete version"
+        confirmLabel="Delete permanently"
+        confirmLabelLoading="Deleting..."
+        loading={isDeleting}
+        onCancel={() => setVersionToDelete(undefined)}
+        onConfirm={() => {
+          if (!projectRef || !bucketId || !versionToDelete) return
+          deleteVersion({
+            projectRef,
+            bucketId,
+            objectName,
+            versionId: versionToDelete.versionId,
+          })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Version{' '}
+          <span className="font-mono text-foreground">
+            {versionToDelete ? shortVersion(versionToDelete.versionId) : ''}
+          </span>{' '}
+          of {objectName} will be permanently deleted. The current version is not affected. This
+          action cannot be undone.
+        </p>
+      </ConfirmationModal>
     </div>
   )
 }
