@@ -37,9 +37,9 @@ localized swap later):
 | **Snapshots (2a)** | Storage → Files → **Snapshots** tab (`/storage/files/snapshots`) | `Snapshots/Snapshots.tsx`, `SnapshotsList.tsx`, `TakeSnapshotModal.tsx`, `RestoreSnapshotModal.tsx`; page `pages/project/[ref]/storage/files/snapshots/index.tsx` (+ route) |
 | **Versions tab (3a)** | Storage explorer → select a file → preview pane | `StorageExplorer/VersionHistory.tsx`, tabs added to `StorageExplorer/PreviewPane.tsx` |
 | **Storage size breakdown (4a)** | Org → **Usage** page | `StorageRetentionUsage/StorageRetentionUsage.tsx`, mounted in `Organization/Usage/Usage.tsx` |
-| **Trash (6a)** | Storage → Files → **Trash** tab (`/storage/files/trash`) | `Trash/Trash.tsx`, `TrashList.tsx`; page `pages/project/[ref]/storage/files/trash/index.tsx` (+ route) |
-| Nav | Snapshots + Trash as **Files sub-tabs** (not sidebar items — they're views over file buckets, not a bucket type) | `StorageLayout/StorageBucketsLayout.tsx` |
-| Shared | Bucket picker for Snapshots/Trash | `StorageBucketSelector.tsx` |
+| **Deleted files (6a)** | Storage → Files → **Deleted files** tab (`/storage/files/trash`) | `Trash/Trash.tsx`, `TrashList.tsx`; page `pages/project/[ref]/storage/files/trash/index.tsx` (+ route) — internal naming ("Trash") kept for the component/route, only the displayed label changed |
+| Nav | Snapshots + Deleted files as **Files sub-tabs** (not sidebar items — they're views over file buckets, not a bucket type) | `StorageLayout/StorageBucketsLayout.tsx` |
+| Shared | Bucket picker for Snapshots/Deleted files | `StorageBucketSelector.tsx` |
 
 ## Verification status
 

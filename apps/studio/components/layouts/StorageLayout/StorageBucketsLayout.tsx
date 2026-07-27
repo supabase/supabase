@@ -44,7 +44,7 @@ export const StorageBucketsLayout = ({
                   href: `/project/${ref}/storage/files/snapshots`,
                 },
                 {
-                  label: 'Trash',
+                  label: 'Deleted files',
                   href: `/project/${ref}/storage/files/trash`,
                 },
               ]

@@ -9,6 +9,8 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { StorageBucketSelector } from '../StorageBucketSelector'
+import { TrashList } from './TrashList'
 import { AlertError } from '@/components/ui/AlertError'
 import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
 import {
@@ -16,8 +18,6 @@ import {
   useBucketTrashRestoreMutation,
 } from '@/data/storage/protection/bucket-trash-query'
 import { type TrashObject } from '@/data/storage/protection/protection-mocks'
-import { StorageBucketSelector } from '../StorageBucketSelector'
-import { TrashList } from './TrashList'
 
 export const Trash = () => {
   const { ref } = useParams()
@@ -72,11 +72,11 @@ export const Trash = () => {
             </div>
 
             {isPending && <GenericSkeletonLoader />}
-            {isError && <AlertError error={error} subject="Failed to retrieve trash" />}
+            {isError && <AlertError error={error} subject="Failed to retrieve deleted files" />}
             {isSuccess && objects.length === 0 && (
               <Admonition
                 type="default"
-                title="Nothing in the trash"
+                title="No deleted files"
                 description="Deleted objects appear here and can be restored until a lifecycle policy removes them."
               />
             )}
@@ -92,7 +92,7 @@ export const Trash = () => {
                 </Card>
                 <p className="text-sm text-foreground-lighter">
                   Items held by a snapshot stay recoverable — and billable — until every snapshot
-                  referencing them is deleted, even past their trash retention.
+                  referencing them is deleted, even past their retention period.
                 </p>
               </>
             )}

@@ -104,7 +104,7 @@ const BucketPage: NextPageWithLayout = () => {
                   <Link
                     href={`/project/${ref}/storage/files/trash?bucket=${encodeURIComponent(bucket?.name ?? '')}`}
                   >
-                    Trash
+                    Deleted files
                   </Link>
                 </Button>
               )}

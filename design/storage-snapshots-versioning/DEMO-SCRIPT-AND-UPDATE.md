@@ -25,8 +25,8 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 - Restore an older version; call out that it's **non-destructive** (promotes to a new current version, old current becomes noncurrent).
 - Show a version **pinned by a snapshot** blocking hard-delete — this is the direct answer to "when do I actually stop paying for this."
 
-### Beat 3 — Trash (1–2 min)
-**Storage → Files → Trash tab**
+### Beat 3 — Deleted files (1–2 min)
+**Storage → Files → Deleted files tab**
 - Soft-deleted objects, an "auto-removes" column, one-click restore.
 - Same "held by snapshot" state appears here too — one consistent mental model across both surfaces.
 
@@ -53,7 +53,7 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 - Vision tie-in: three primitives, Postgres as source of truth, branching as the default recovery path. Nothing here required a fourth primitive.
 - **Ask the room:**
   - Storage: does branch-first restore hold up against how storage branching is actually sequenced (2026–2027 per the vision)?
-  - Storage: per-bucket Trash, or project-wide?
+  - Storage: per-bucket Deleted files, or project-wide?
   - Design: does the platform reframe (coverage chips, "restore point" language) read as coherent, or is it doing too much in one screen?
 
 ---
@@ -74,12 +74,12 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 >
 > So the prototype now treats a database backup as a restore point for the **environment** — Database, Storage, and Config — rather than a database artifact with a Storage bolt-on. Concretely: each backup shows coverage across all three; restoring defaults to a new preview branch (cheap, reversible, verify-then-promote), with in-place restore as an explicit, warned-against escape hatch; and the coverage gap — buckets without snapshots — is named instead of silently reproducing the drift the PRFAQ set out to fix.
 >
-> **What's built.** Real Studio components, not a static mockup, behind a prototype flag and wired to mock data since there's no backend yet: per-bucket enable with lifecycle policies, version history in the file preview pane with non-destructive restore, a Trash view, a Snapshots view with restore-with-diff, Database/Storage/Config coverage on backup rows with branch-first restore, and Storage Size in Org Usage broken into live/versions/snapshots inside the existing section.
+> **What's built.** Real Studio components, not a static mockup, behind a prototype flag and wired to mock data since there's no backend yet: per-bucket enable with lifecycle policies, version history in the file preview pane with non-destructive restore, a Deleted files view, a Snapshots view with restore-with-diff, Database/Storage/Config coverage on backup rows with branch-first restore, and Storage Size in Org Usage broken into live/versions/snapshots inside the existing section.
 >
 > **What's deliberately unsolved.** The PRFAQ's own Internal FAQ was honest that the hard part is infra, not UI: event-driven lifecycle expiry, hard-delete coordination between Postgres and S3, and bucket-restore diffing at scale. None of that is in this prototype — it's all mocked. I don't think that's a gap in the demo; I think it's the right place to draw the line before a design review.
 >
 > **What I'd like from you:**
-> - **Storage** — does branch-first restore hold up against how storage branching is actually sequenced? Per-bucket Trash, or project-wide?
+> - **Storage** — does branch-first restore hold up against how storage branching is actually sequenced? Per-bucket Deleted files, or project-wide?
 > - **Design** — does the platform reframe read as coherent, or is it trying to do too much in one screen?
 >
 > I'll walk through it live, ~15 minutes.
