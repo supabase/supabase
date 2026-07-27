@@ -195,7 +195,7 @@ export const ComputeBadgeWrapper = ({
                     })
                   }}
                 >
-                  <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                  <Link href={`/project/${projectRef}/settings/infrastructure`}>
                     Upgrade compute
                   </Link>
                 </Button>

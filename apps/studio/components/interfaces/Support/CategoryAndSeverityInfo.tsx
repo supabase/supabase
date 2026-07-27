@@ -189,11 +189,8 @@ const IssueSuggestion = ({ category, projectRef }: { category: string; projectRe
         title="Have you checked your project's infrastructure activity?"
       >
         High memory or low disk IO bandwidth may be slowing down your database. Verify by checking
-        the infrastructure activity of your project{' '}
-        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
-          here
-        </InlineLink>
-        .
+        your project's database observability reports{' '}
+        <InlineLink href={`${baseUrl}/observability/database`}>here</InlineLink>.
       </Admonition>
     )
   }
@@ -205,12 +202,9 @@ const IssueSuggestion = ({ category, projectRef }: { category: string; projectRe
         className={className}
         title="Have you checked the Query Performance Advisor?"
       >
-        Identify slow running queries and get actionable insights on how to optimize them with the
-        Query Performance Advisor{' '}
-        <InlineLink href={`${baseUrl}/settings/infrastructure#infrastructure-activity`}>
-          here
-        </InlineLink>
-        .
+        Identify slow running queries and get actionable insights on how to optimize them with Query
+        Performance{' '}
+        <InlineLink href={`${baseUrl}/observability/query-performance`}>here</InlineLink>.
       </Admonition>
     )
   }

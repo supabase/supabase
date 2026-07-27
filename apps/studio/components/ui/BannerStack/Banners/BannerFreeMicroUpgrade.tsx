@@ -58,7 +58,7 @@ export const BannerFreeMicroUpgrade = () => {
               track('free_micro_upgrade_banner_cta_clicked')
             }}
           >
-            <Link href={`/project/${ref}/settings/compute-and-disk?upgrade=micro`}>
+            <Link href={`/project/${ref}/settings/infrastructure?upgrade=micro`}>
               Upgrade for free
             </Link>
           </Button>

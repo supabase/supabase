@@ -16,6 +16,7 @@ import { Badge, Button } from 'ui'
 
 import { asGraphqlExposureLint, GraphqlExposureLintCTA } from './GraphqlExposureLintCTA'
 import { LINTER_LEVELS, LintInfo } from '@/components/interfaces/Linter/Linter.constants'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { Lint, LINT_TYPES } from '@/data/lint/lint-query'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -305,7 +306,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'vulnerable_postgres_version',
     title: 'Postgres version has security patches available',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/settings/infrastructure`,
+    link: ({ projectRef }) => getServiceVersionsPath(projectRef),
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/upgrading`,
     category: 'security',

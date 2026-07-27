@@ -14,6 +14,7 @@ import { CreateNewProjectDialog } from '@/components/interfaces/Database/Backups
 import { projectSpecToMonthlyPrice } from '@/components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
 import { DiskType } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -158,7 +159,7 @@ export const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full"
           content={`Restore to new project is only available for Postgres 15 and above.
-            Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
+            Go to [Service versions](${getServiceVersionsPath(project?.ref)})
             to upgrade your database version.
           `}
         />

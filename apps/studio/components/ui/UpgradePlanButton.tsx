@@ -71,7 +71,7 @@ export const UpgradePlanButton = ({
     ? `/org/${slug ?? '_'}/billing?panel=costControl&source=${source}`
     : isOnPaidPlanAndRequestingToPurchaseAddon
       ? addon === 'computeSize'
-        ? `/project/${ref ?? '_'}/settings/compute-and-disk`
+        ? `/project/${ref ?? '_'}/settings/infrastructure`
         : `/project/${ref ?? '_'}/settings/addons?panel=${addon}&source=${source}`
       : `/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=${source}`
 

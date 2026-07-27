@@ -373,7 +373,7 @@ const DatabaseUsage = () => {
                   <div className="ml-auto">
                     {project?.cloud_provider === 'AWS' ? (
                       <Button asChild variant="default">
-                        <Link href={`/project/${ref}/settings/compute-and-disk`}>
+                        <Link href={`/project/${ref}/settings/infrastructure`}>
                           Increase disk size
                         </Link>
                       </Button>
