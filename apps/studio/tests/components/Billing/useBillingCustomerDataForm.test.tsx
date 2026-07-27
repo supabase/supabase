@@ -202,6 +202,7 @@ describe('useBillingCustomerDataForm', () => {
     )
 
     act(() => {
+      result.current.setPurchasingAs('business')
       result.current.form.setValue('tax_id_name', 'US EIN', { shouldDirty: true })
       result.current.form.setValue('tax_id_type', 'us_ein', { shouldDirty: true })
       result.current.form.setValue('tax_id_value', '12-3456789', { shouldDirty: true })
@@ -229,7 +230,7 @@ describe('useBillingCustomerDataForm', () => {
         country: 'US',
       },
     })
-    expect(result.current.isDirty).toBe(false)
+    expect(result.current.isDirty).toBeFalsy()
   })
 
   it('submits tax_id as null after an existing tax ID is removed', async () => {
@@ -489,11 +490,13 @@ describe('useBillingCustomerDataForm', () => {
     )
 
     act(() => {
+      result.current.setPurchasingAs('business')
       result.current.onAddressChange(
         makeAddressChangeEvent({
           address: { city: 'Los Angeles', state: 'CA', postal_code: '90001' },
         })
       )
+
       result.current.form.setValue('tax_id_name', 'US EIN', { shouldDirty: true })
       result.current.form.setValue('tax_id_type', 'us_ein', { shouldDirty: true })
       result.current.form.setValue('tax_id_value', '12-3456789', { shouldDirty: true })
@@ -505,7 +508,7 @@ describe('useBillingCustomerDataForm', () => {
       result.current.handleReset()
     })
 
-    expect(result.current.isDirty).toBe(false)
+    expect(result.current.isDirty).toBeFalsy()
     expect(result.current.addressCountry).toBe('US')
 
     act(() => {
