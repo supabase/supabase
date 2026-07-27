@@ -306,6 +306,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
               loading={isFetching}
               icon={<AlertCircle />}
               aria-label="Get exact row count"
+              disabled
             />
           </TooltipTrigger>
           <TooltipContent side="top">Failed to retrieve count: {error?.message}</TooltipContent>
