@@ -280,19 +280,22 @@ export const PreviewPane = () => {
       className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
       style={{ width }}
     >
-      {/* Preview Header */}
-      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
-      </div>
-
       {showVersions ? (
-        <Tabs defaultValue="details" className="mt-2">
-          <TabsList className="mb-2">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="versions">
-              Versions{versionCount !== undefined ? ` (${versionCount})` : ''}
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="details">
+          {/* Preview Header: tabs share the row with the close icon */}
+          <div className="flex w-full items-center justify-between">
+            <TabsList className="gap-x-4 border-none">
+              <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsTrigger value="versions">
+                Versions{versionCount !== undefined ? ` (${versionCount})` : ''}
+              </TabsTrigger>
+            </TabsList>
+            <X
+              className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
+              size={14}
+              onClick={() => setSelectedFilePreview(undefined)}
+            />
+          </div>
           <TabsContent value="details">{detailsContent}</TabsContent>
           <TabsContent value="versions" className="pt-2">
             <VersionHistory
@@ -304,7 +307,17 @@ export const PreviewPane = () => {
           </TabsContent>
         </Tabs>
       ) : (
-        detailsContent
+        <>
+          {/* Preview Header */}
+          <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
+            <X
+              className="cursor-pointer"
+              size={14}
+              onClick={() => setSelectedFilePreview(undefined)}
+            />
+          </div>
+          {detailsContent}
+        </>
       )}
     </div>
   )

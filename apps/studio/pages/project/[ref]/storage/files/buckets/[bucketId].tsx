@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
+import { ChevronDown, FolderOpen, Settings, Shield, Trash, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -33,6 +33,7 @@ import { PublicBucketWarning } from '@/components/interfaces/Storage/PublicBucke
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
+import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
@@ -59,6 +60,7 @@ const BucketPage: NextPageWithLayout = () => {
 
   const { getPolicyCount } = useBucketPolicyCount()
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
+  const showProtection = useIsStorageProtectionEnabled()
 
   useEffect(() => {
     if (isSuccess && !bucket) {
@@ -97,6 +99,15 @@ const BucketPage: NextPageWithLayout = () => {
                   Policies
                 </Link>
               </Button>
+              {showProtection && (
+                <Button asChild variant="outline" size="tiny" icon={<Trash size={14} />}>
+                  <Link
+                    href={`/project/${ref}/storage/files/trash?bucket=${encodeURIComponent(bucket?.name ?? '')}`}
+                  >
+                    Trash
+                  </Link>
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="tiny" iconRight={<ChevronDown size={14} />}>

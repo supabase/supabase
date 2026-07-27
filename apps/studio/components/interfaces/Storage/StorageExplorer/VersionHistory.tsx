@@ -80,7 +80,7 @@ export const VersionHistory = ({
 
                 <div
                   className={cn(
-                    'flex-1 pb-4',
+                    'flex-1 pb-8',
                     version.isCurrent && 'rounded-md border border-border bg-surface-100 p-3'
                   )}
                 >
