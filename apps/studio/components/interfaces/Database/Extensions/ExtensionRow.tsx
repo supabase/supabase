@@ -90,7 +90,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell className="truncate">{isOn ? extension.schema : '-'}</TableCell>
 
         <TableCell className="text-foreground-light max-w-xs">
-          <p className="truncate" title={extension.comment ?? undefined}>
+          <p className="truncate max-w-xs" title={extension.comment ?? undefined}>
             {extension.comment}
           </p>
         </TableCell>
