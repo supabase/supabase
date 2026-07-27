@@ -137,12 +137,16 @@ export const Overview = ({ live }: OverviewProps) => {
                   <div>
                     <p className="text-foreground-light">Connections by roles:</p>
                     <table>
-                      {rolesWithActiveConnections.map((role) => (
-                        <tr key={role.id}>
-                          <td>{role.name}:</td>
-                          <td className="pl-2">{role.activeConnections}</td>
-                        </tr>
-                      ))}
+                      <tbody>
+                        {rolesWithActiveConnections.map((role) => (
+                          <tr key={role.id}>
+                            <th scope="row" className="text-left font-normal">
+                              {role.name}:
+                            </th>
+                            <td className="pl-2">{role.activeConnections}</td>
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
                   </div>
                 }
