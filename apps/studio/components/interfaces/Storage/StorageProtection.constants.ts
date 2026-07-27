@@ -10,44 +10,55 @@ export const useIsStorageProtectionEnabled = () => STORAGE_PROTECTION_ENABLED
 
 export type BucketVersioningState = 'enabled' | 'suspended' | 'disabled'
 
+/**
+ * Project-wide defaults for object versioning. New buckets inherit these so
+ * enabling versioning doesn't require re-deciding retention every time; a bucket
+ * can still override them when its churn genuinely differs.
+ */
+export const PROJECT_VERSIONING_DEFAULTS = {
+  versionExpiryDays: 30,
+  maxNoncurrentVersions: 100,
+} as const
+
 export interface BucketProtection {
   versioning: BucketVersioningState
-  snapshots: boolean
-  snapshotOnDatabaseBackup: boolean
+  /**
+   * Whether this bucket is captured in the project's restore points. Frequency
+   * and retention are project-level — see RestorePointPolicy.
+   */
+  isIncludedInRestorePoints: boolean
   /** Expire noncurrent versions after N days (null = keep indefinitely). */
   versionExpiryDays: number | null
   /** Cap on retained newer noncurrent versions (max 100). */
   maxNoncurrentVersions: number | null
-  /** Expire snapshots after N days (null = keep indefinitely). */
-  snapshotExpiryDays: number | null
+  /** True when this bucket's version retention differs from the project default. */
+  hasVersioningOverride: boolean
 }
 
 const PROTECTED_BUCKETS: Record<string, BucketProtection> = {
   'match-media': {
     versioning: 'enabled',
-    snapshots: true,
-    snapshotOnDatabaseBackup: true,
-    versionExpiryDays: 30,
-    maxNoncurrentVersions: 100,
-    snapshotExpiryDays: 90,
+    isIncludedInRestorePoints: true,
+    versionExpiryDays: PROJECT_VERSIONING_DEFAULTS.versionExpiryDays,
+    maxNoncurrentVersions: PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions,
+    hasVersioningOverride: false,
   },
   avatars: {
     versioning: 'enabled',
-    snapshots: false,
-    snapshotOnDatabaseBackup: false,
+    isIncludedInRestorePoints: true,
+    // Higher-churn bucket that deliberately keeps fewer versions than the default
     versionExpiryDays: 30,
     maxNoncurrentVersions: 10,
-    snapshotExpiryDays: null,
+    hasVersioningOverride: true,
   },
 }
 
 const DEFAULT_PROTECTION: BucketProtection = {
   versioning: 'disabled',
-  snapshots: false,
-  snapshotOnDatabaseBackup: false,
+  isIncludedInRestorePoints: false,
   versionExpiryDays: null,
   maxNoncurrentVersions: null,
-  snapshotExpiryDays: null,
+  hasVersioningOverride: false,
 }
 
 /** Prototype: derive a bucket's protection config from its name. */
@@ -56,11 +67,3 @@ export const getMockBucketProtection = (bucketName: string | undefined): BucketP
 
 export const isBucketVersioned = (bucketName: string | undefined) =>
   getMockBucketProtection(bucketName).versioning === 'enabled'
-
-// Colours for the retention breakdown (Tailwind-independent so the chart + legend
-// stay in lockstep). Live = brand green, versions = amber, snapshots = blue.
-export const RETENTION_COLORS = {
-  live: 'hsl(var(--brand-default))',
-  versions: 'hsl(var(--warning-default))',
-  snapshots: 'hsl(217, 91%, 60%)',
-} as const

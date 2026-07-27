@@ -378,21 +378,59 @@ Either way the trigger is the same: revisit when storage-level branching lands (
 
 Interim: keep the route, retitle the page, and make coverage explicit (done). Renaming is cheap and reversible; relocating is neither.
 
-## 8c. Config pattern for Storage ↔ backup sync
+## 8c. Lifecycle policy: what belongs at which level
 
-Per-bucket toggles alone are a trap: a bucket created later defaults to unprotected, so a project that was fully recoverable silently stops being so. Nobody gets an alert — they find out during a restore.
+The PRFAQ describes two per-bucket opt-ins (versioning, snapshotting). The follow-up question was whether there's a third lever for **frequency and maximum life**, and whether that means three lifecycle policies per bucket: snapshots, current objects, prior versions.
 
-The pattern is **project-level default + per-bucket opt-out**:
+### Two axes, not three policies
 
-| Level | Control | Purpose |
+The three proposed policies aren't the same kind of thing:
+
+| | Created by | Has a frequency? | Purpose |
+| --- | --- | --- | --- |
+| Prior versions | User action (overwrite/delete) | No | Recovery depth |
+| Snapshots | A schedule | **Yes** | Recovery depth |
+| Current objects | User action (upload) | No | Cost hygiene — *deliberate destruction* |
+
+So the frequency instinct is right, but it applies to **only one** of the three: snapshots are the only scheduled artifact. Versions and current objects are created by user action and have retention only.
+
+And **current-object expiry is a different product** (S3 lifecycle expiration). Grouping it here puts "keep my data safe" and "delete my data" on one screen, and it has a nasty interaction with versioning: if expiry deletes an object while versioning is on, does it become a billable prior version? If yes, "expire after 90 days" doesn't reduce the bill — exactly the surprise-bill risk the PRFAQ flags as #1. Deferred out of this scope, to be shipped later with that interaction answered explicitly.
+
+### Why snapshot retention can't be per-bucket
+
+A restore point's entire value is being consistent *across* buckets, because the database references objects in all of them. If bucket A keeps snapshots 90 days and bucket B keeps 30, then on day 31 the older restore points silently degrade into **partial** ones — restorable for A, gone for B — and you find out mid-incident.
+
+So frequency and retention are project-level, single values. Per bucket you choose *participation*, which is the cost escape hatch. This makes the surface smaller, not bigger:
+
+| Knob | Level | Why |
 | --- | --- | --- |
-| Project | "Snapshot Storage with each backup" | The actual intent: keep the environment consistently recoverable |
-| Project | "Include new buckets automatically" | Stops coverage regressing as the project grows — the fix for the trap above |
-| Bucket | Per-bucket switch | The deliberate exception (e.g. a large regenerable cache bucket) |
+| Snapshot frequency | **Project** | Consistency requires coordination across buckets |
+| Snapshot retention | **Project** | Per-bucket retention makes older restore points partial |
+| Bucket participates | Bucket | Cost escape hatch; defaults to *in* |
+| Version retention (days / max count) | Bucket, with project default | No cross-bucket consistency requirement; churn varies per bucket |
+| ~~Current object expiry~~ | Deferred | Different product; see above |
 
-Two placement rules that matter more than the toggles:
-- **Configure it where the problem is visible.** The control opens from the coverage banner on the Backups page, not only from Storage settings. Users discover the gap while looking at backups; sending them to another product to fix it loses them.
-- **One banner, state-aware.** The page previously had a permanent "Storage objects are not included" alert. Once snapshots exist that statement is sometimes false, so it becomes a single notice with four states: feature off, sync off, partial coverage (warning + which buckets), full coverage. Never two banners describing the same thing.
+Versioning is the opposite case: undoing an overwrite in `avatars` has no relationship to `uploads`, and churn varies wildly, so per-bucket is right — with a project default so new buckets inherit rather than silently defaulting to unprotected.
+
+### Frequency defaults to inheritance, not configuration
+
+Default is **"with every database backup."** An independent cadence actively breaks the headline value: you'd get storage restore points with no matching database backup, so you could restore the files but not the database state that referenced them. Daily/hourly remain available as advanced options, but for most users frequency isn't a knob they touch.
+
+### Keeping two levels from being confusing
+
+1. **Always show the effective value and its origin** — "Keeping 100 versions per file for 30 days (project default)" vs "(overridden for this bucket)". Never make users resolve inheritance in their heads.
+2. **Lead with the promise, not the mechanism** — "You can roll Storage back to any of the last 90 days" instead of listing retention numbers. The policy is the implementation; the recovery window is what the customer is buying.
+3. **"Restore points", not "lifecycle policy"** — the latter is S3 vocabulary that makes users learn our mechanism.
+
+### Where it's configured
+
+| Surface | Role |
+| --- | --- |
+| Storage → Files → Settings | **Canonical editor** for the project-level restore point policy (frequency, retention, include-new-buckets, per-bucket participation) |
+| Bucket create/edit modal | Versioning (with override) + this bucket's participation; shows the inherited project policy read-only and links to Settings |
+| Database → Backups banner | States actual coverage and links to Settings — one editor, so the two can't drift |
+
+**One banner, state-aware.** The Backups page previously had a permanent "Storage objects are not included" alert. Once restore points exist that statement is sometimes false, so it's a single notice with four states: feature off, capture off, partial coverage (warning + which buckets), full coverage. Never two banners describing the same thing.
 
 ## 9. Open questions for the team
 

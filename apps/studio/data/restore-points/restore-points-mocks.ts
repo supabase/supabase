@@ -47,28 +47,49 @@ export interface PlatformProtectionSummary {
   canRestoreToBranch: boolean
 }
 
-export interface BucketSyncState {
+export interface BucketParticipation {
   name: string
-  /** Snapshotted immediately before each scheduled database backup. */
+  /** Whether this bucket is captured in the project's restore points. */
   isIncluded: boolean
   sizeBytes: number
 }
 
 /**
- * Project-level storage/backup sync settings.
+ * How often restore points are captured.
  *
- * Expressing this per bucket alone is a trap: a bucket added later defaults to
- * unprotected, so a project that was fully recoverable silently degrades. A
- * project-level default with `applyToNewBuckets` keeps the guarantee intact, and
- * per-bucket entries remain the deliberate opt-out (e.g. a large cache bucket
- * not worth snapshotting).
+ * `with-database-backup` is the default because the feature's whole value is
+ * database and storage landing on the same point in time. An independent cadence
+ * produces storage snapshots with no matching database backup — you could restore
+ * the files but not the database state that referenced them — so it's an advanced
+ * option, not the primary lever.
  */
-export interface StorageBackupSyncSettings {
-  /** Master switch: snapshot storage before each scheduled database backup. */
+export type SnapshotFrequency = 'with-database-backup' | 'daily' | 'hourly'
+
+export const SNAPSHOT_FREQUENCY_LABELS: Record<SnapshotFrequency, string> = {
+  'with-database-backup': 'With every database backup',
+  daily: 'Every day',
+  hourly: 'Every hour',
+}
+
+/**
+ * Project-level restore point policy.
+ *
+ * Frequency and retention are deliberately project-level, not per bucket. A
+ * restore point's value is being consistent *across* buckets — the database
+ * references objects in all of them. If one bucket kept snapshots for 30 days and
+ * another for 90, then on day 31 the older restore points silently degrade into
+ * partial ones: restorable for one bucket, gone for the other. Per bucket you
+ * choose participation only, which is the cost escape hatch.
+ */
+export interface RestorePointPolicy {
+  /** Master switch for capturing storage in restore points. */
   isEnabled: boolean
-  /** New buckets inherit snapshotting so coverage can't silently regress. */
+  frequency: SnapshotFrequency
+  /** Single project-wide retention so restore points can't become partial. */
+  retentionDays: number
+  /** New buckets inherit participation so coverage can't silently regress. */
   applyToNewBuckets: boolean
-  buckets: BucketSyncState[]
+  buckets: BucketParticipation[]
 }
 
 const GB = 1024 * 1024 * 1024
@@ -148,8 +169,10 @@ export const getMockPlatformProtectionSummary = (): PlatformProtectionSummary =>
   canRestoreToBranch: true,
 })
 
-export const getMockStorageBackupSyncSettings = (): StorageBackupSyncSettings => ({
+export const getMockRestorePointPolicy = (): RestorePointPolicy => ({
   isEnabled: true,
+  frequency: 'with-database-backup',
+  retentionDays: 90,
   applyToNewBuckets: false,
   buckets: [
     { name: 'match-media', isIncluded: true, sizeBytes: 4.1 * GB },

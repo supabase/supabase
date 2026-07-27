@@ -28,6 +28,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { RestorePointsSettings } from './RestorePointsSettings'
 import { StorageFileSizeLimitErrorMessage } from './StorageFileSizeLimitErrorMessage'
 import {
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
@@ -40,6 +41,7 @@ import {
   encodeBucketLimitErrorMessage,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
+import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -65,6 +67,7 @@ interface StorageSettingsState {
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const showProtection = useIsStorageProtectionEnabled()
 
   const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_READ,
@@ -470,6 +473,8 @@ export const StorageSettings = () => {
               </>
             )}
           </Form>
+
+          {IS_PLATFORM && showProtection && <RestorePointsSettings />}
         </PageSectionContent>
       </PageSection>
     </PageContainer>

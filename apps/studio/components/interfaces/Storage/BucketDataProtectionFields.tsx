@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { useState } from 'react'
 import {
   DialogSection,
@@ -12,7 +13,14 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { type BucketProtection, getMockBucketProtection } from './StorageProtection.constants'
+import {
+  getMockBucketProtection,
+  PROJECT_VERSIONING_DEFAULTS,
+  type BucketProtection,
+} from './StorageProtection.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { SNAPSHOT_FREQUENCY_LABELS } from '@/data/restore-points/restore-points-mocks'
+import { useRestorePointPolicyQuery } from '@/data/restore-points/restore-points-query'
 
 interface BucketDataProtectionFieldsProps {
   /** Existing bucket name (Edit) to pre-populate current protection config. */
@@ -20,24 +28,43 @@ interface BucketDataProtectionFieldsProps {
 }
 
 /**
- * "Data protection" section for the create/edit bucket modals — object
- * versioning + bucket snapshots with their lifecycle policies.
+ * "Data protection" section for the create/edit bucket modals.
  *
- * Prototype: this manages its own local state and is not yet persisted through
- * the bucket mutation, so the enable/lifecycle UX can be demoed end-to-end.
+ * Deliberately scoped to what is genuinely per-bucket: versioning (recovery depth
+ * for individual files, where churn varies bucket to bucket) and whether this
+ * bucket participates in the project's restore points. Restore point frequency
+ * and retention are project-level — a restore point only means anything if it
+ * covers every bucket the database references, so per-bucket retention would let
+ * older restore points quietly become partial.
+ *
+ * Prototype: manages local state and isn't persisted through the bucket mutation.
  */
 export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionFieldsProps) => {
+  const { ref: projectRef } = useParams()
+  const { data: policy } = useRestorePointPolicyQuery({ projectRef })
+
   const initial: BucketProtection = getMockBucketProtection(bucketName)
 
   const [versioning, setVersioning] = useState(initial.versioning === 'enabled')
-  const [versionExpiryDays, setVersionExpiryDays] = useState(initial.versionExpiryDays ?? 30)
+  const [hasVersioningOverride, setHasVersioningOverride] = useState(initial.hasVersioningOverride)
+  const [versionExpiryDays, setVersionExpiryDays] = useState(
+    initial.versionExpiryDays ?? PROJECT_VERSIONING_DEFAULTS.versionExpiryDays
+  )
   const [maxNoncurrentVersions, setMaxNoncurrentVersions] = useState(
-    initial.maxNoncurrentVersions ?? 100
+    initial.maxNoncurrentVersions ?? PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions
+  )
+  const [isIncludedInRestorePoints, setIsIncludedInRestorePoints] = useState(
+    initial.isIncludedInRestorePoints
   )
 
-  const [snapshots, setSnapshots] = useState(initial.snapshots)
-  const [snapshotOnBackup, setSnapshotOnBackup] = useState(initial.snapshotOnDatabaseBackup)
-  const [snapshotExpiryDays, setSnapshotExpiryDays] = useState(initial.snapshotExpiryDays ?? 90)
+  const effectiveExpiryDays = hasVersioningOverride
+    ? versionExpiryDays
+    : PROJECT_VERSIONING_DEFAULTS.versionExpiryDays
+  const effectiveMaxVersions = hasVersioningOverride
+    ? maxNoncurrentVersions
+    : PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions
+
+  const isRestorePointsEnabled = policy?.isEnabled ?? false
 
   return (
     <>
@@ -61,37 +88,59 @@ export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionF
 
         {versioning && (
           <div className="flex flex-col gap-y-3 border-l border-border pl-4 pt-1">
+            <p className="text-sm text-foreground-light">
+              Keeping {effectiveMaxVersions} versions per file for {effectiveExpiryDays} days{' '}
+              <span className="text-foreground-lighter">
+                {hasVersioningOverride ? '(overridden for this bucket)' : '(project default)'}
+              </span>
+            </p>
+
             <div className="flex items-center justify-between gap-x-4">
-              <Label htmlFor="version-expiry" className="font-normal text-foreground-light">
-                Expire noncurrent versions after
+              <Label htmlFor="versioning-override" className="font-normal text-foreground-light">
+                Use different retention for this bucket
               </Label>
-              <InputGroup className="w-40">
-                <InputGroupInput
-                  id="version-expiry"
-                  type="number"
-                  min={1}
-                  value={versionExpiryDays}
-                  onChange={(e) => setVersionExpiryDays(e.target.valueAsNumber)}
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupText>days</InputGroupText>
-                </InputGroupAddon>
-              </InputGroup>
-            </div>
-            <div className="flex items-center justify-between gap-x-4">
-              <Label htmlFor="max-versions" className="font-normal text-foreground-light">
-                Max noncurrent versions
-              </Label>
-              <Input
-                id="max-versions"
-                type="number"
-                min={1}
-                max={100}
-                className="w-40"
-                value={maxNoncurrentVersions}
-                onChange={(e) => setMaxNoncurrentVersions(e.target.valueAsNumber)}
+              <Switch
+                id="versioning-override"
+                checked={hasVersioningOverride}
+                onCheckedChange={setHasVersioningOverride}
               />
             </div>
+
+            {hasVersioningOverride && (
+              <>
+                <div className="flex items-center justify-between gap-x-4">
+                  <Label htmlFor="version-expiry" className="font-normal text-foreground-light">
+                    Expire noncurrent versions after
+                  </Label>
+                  <InputGroup className="w-40">
+                    <InputGroupInput
+                      id="version-expiry"
+                      type="number"
+                      min={1}
+                      value={versionExpiryDays}
+                      onChange={(e) => setVersionExpiryDays(e.target.valueAsNumber)}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>days</InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </div>
+                <div className="flex items-center justify-between gap-x-4">
+                  <Label htmlFor="max-versions" className="font-normal text-foreground-light">
+                    Max noncurrent versions
+                  </Label>
+                  <Input
+                    id="max-versions"
+                    type="number"
+                    min={1}
+                    max={100}
+                    className="w-40"
+                    value={maxNoncurrentVersions}
+                    onChange={(e) => setMaxNoncurrentVersions(e.target.valueAsNumber)}
+                  />
+                </div>
+              </>
+            )}
           </div>
         )}
       </DialogSection>
@@ -101,57 +150,42 @@ export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionF
       <DialogSection className="space-y-3">
         <div className="flex items-center justify-between gap-x-6">
           <div className="flex flex-col">
-            <Label htmlFor="bucket-snapshots">Bucket snapshots</Label>
+            <Label htmlFor="include-in-restore-points">Include in restore points</Label>
             <p className="text-sm text-foreground-lighter">
-              Capture point-in-time restore points for the whole bucket
+              Capture this bucket so it can be restored alongside a database backup
             </p>
           </div>
           <Switch
-            id="bucket-snapshots"
+            id="include-in-restore-points"
             size="large"
-            checked={snapshots}
-            onCheckedChange={setSnapshots}
+            checked={isIncludedInRestorePoints}
+            onCheckedChange={setIsIncludedInRestorePoints}
           />
         </div>
 
-        {snapshots && (
-          <div className="flex flex-col gap-y-3 border-l border-border pl-4 pt-1">
-            <div className="flex items-center justify-between gap-x-4">
-              <Label htmlFor="snapshot-on-backup" className="font-normal text-foreground-light">
-                Snapshot before each database backup
-              </Label>
-              <Switch
-                id="snapshot-on-backup"
-                size="large"
-                checked={snapshotOnBackup}
-                onCheckedChange={setSnapshotOnBackup}
-              />
-            </div>
-            <div className="flex items-center justify-between gap-x-4">
-              <Label htmlFor="snapshot-expiry" className="font-normal text-foreground-light">
-                Keep snapshots for
-              </Label>
-              <InputGroup className="w-40">
-                <InputGroupInput
-                  id="snapshot-expiry"
-                  type="number"
-                  min={1}
-                  value={snapshotExpiryDays}
-                  onChange={(e) => setSnapshotExpiryDays(e.target.valueAsNumber)}
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupText>days</InputGroupText>
-                </InputGroupAddon>
-              </InputGroup>
-            </div>
-          </div>
+        {isIncludedInRestorePoints && (
+          <p className="text-sm text-foreground-lighter border-l border-border pl-4">
+            {isRestorePointsEnabled && policy ? (
+              <>
+                Captured {SNAPSHOT_FREQUENCY_LABELS[policy.frequency].toLowerCase()}, kept for{' '}
+                {policy.retentionDays} days.{' '}
+              </>
+            ) : (
+              <>Restore points are turned off for this project. </>
+            )}
+            Frequency and retention are set for the whole project in{' '}
+            <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
+              Storage settings
+            </InlineLink>
+            .
+          </p>
         )}
 
-        {(versioning || snapshots) && (
+        {versioning && (
           <Admonition
             type="warning"
-            title="Retained versions and snapshots add to your storage bill"
-            description="Objects held by a snapshot can't be deleted until the snapshot expires."
+            title="Retained versions and restore points add to your storage bill"
+            description="Objects held by a restore point can't be deleted until it expires."
           />
         )}
       </DialogSection>

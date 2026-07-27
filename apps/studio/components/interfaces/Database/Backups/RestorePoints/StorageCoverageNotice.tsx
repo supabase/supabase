@@ -1,16 +1,15 @@
 import { useParams } from 'common'
-import { useState } from 'react'
+import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { StorageBackupSyncDialog } from './StorageBackupSyncDialog'
 import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
-import { useStorageBackupSyncQuery } from '@/data/restore-points/restore-points-query'
+import { useRestorePointPolicyQuery } from '@/data/restore-points/restore-points-query'
 
 interface StorageCoverageNoticeProps {
   /**
    * Scheduled backups restore to a discrete point; PITR restores to any second,
-   * which storage snapshots can't match — that caveat only applies to PITR.
+   * which storage restore points can't match — that caveat only applies to PITR.
    */
   mode: 'scheduled' | 'pitr'
 }
@@ -20,16 +19,14 @@ interface StorageCoverageNoticeProps {
  * pages.
  *
  * Replaces the old always-on "Storage objects are not included" alert, which is
- * wrong once a bucket has snapshots enabled. This states the project's actual
- * coverage and offers the fix inline, so users don't have to leave for Storage
- * to work out why a restore would leave them inconsistent.
+ * wrong once a bucket is included in restore points. States the project's actual
+ * coverage and links to the one place it's configured.
  */
 export const StorageCoverageNotice = ({ mode }: StorageCoverageNoticeProps) => {
   const { ref: projectRef } = useParams()
   const isProtectionEnabled = useIsStorageProtectionEnabled()
-  const [showSyncDialog, setShowSyncDialog] = useState(false)
 
-  const { data: sync, isSuccess } = useStorageBackupSyncQuery({ projectRef })
+  const { data: policy, isSuccess } = useRestorePointPolicyQuery({ projectRef })
 
   // Without the feature, the original message is still the correct one.
   if (!isProtectionEnabled) {
@@ -47,67 +44,59 @@ export const StorageCoverageNotice = ({ mode }: StorageCoverageNoticeProps) => {
 
   if (!isSuccess) return null
 
-  const included = sync.buckets.filter((bucket) => bucket.isIncluded)
-  const excluded = sync.buckets.filter((bucket) => !bucket.isIncluded)
-  const isSyncOff = !sync.isEnabled || included.length === 0
+  const included = policy.buckets.filter((bucket) => bucket.isIncluded)
+  const excluded = policy.buckets.filter((bucket) => !bucket.isIncluded)
+  const isCaptureOff = !policy.isEnabled || included.length === 0
   const hasGap = excluded.length > 0
-  const willDriftOnNewBuckets = sync.isEnabled && !sync.applyToNewBuckets
+  const willDriftOnNewBuckets = policy.isEnabled && !policy.applyToNewBuckets
 
   const configureAction = (
-    <Button type="default" onClick={() => setShowSyncDialog(true)}>
-      Configure
+    <Button asChild variant="default">
+      <Link href={`/project/${projectRef}/storage/files/settings`}>Configure restore points</Link>
     </Button>
   )
 
   const pitrCaveat =
     mode === 'pitr'
-      ? ' Storage restores to the nearest snapshot before your chosen time, not the exact second.'
+      ? ' Storage restores to the nearest restore point before your chosen time, not the exact second.'
       : ''
 
+  if (isCaptureOff) {
+    return (
+      <Admonition
+        type="default"
+        layout="horizontal"
+        title="Storage objects are not included"
+        description={`Restoring will bring back your database — including Auth users and Storage metadata, which live in Postgres — but not the objects themselves. Rows may end up referencing files that no longer exist.${pitrCaveat}`}
+      >
+        <div className="mt-3">{configureAction}</div>
+      </Admonition>
+    )
+  }
+
+  if (hasGap) {
+    return (
+      <Admonition
+        type="warning"
+        layout="horizontal"
+        title={`${excluded.length} of ${policy.buckets.length} buckets are not included in restore points`}
+        description={`${included.map((b) => b.name).join(', ')} restore alongside the database. ${excluded.map((b) => b.name).join(', ')} will keep ${excluded.length === 1 ? 'its' : 'their'} current files, so restored rows may reference objects that no longer exist.${pitrCaveat}`}
+      >
+        <div className="mt-3">{configureAction}</div>
+      </Admonition>
+    )
+  }
+
   return (
-    <>
-      {isSyncOff && (
-        <Admonition
-          type="default"
-          layout="horizontal"
-          title="Storage objects are not included"
-          description={`Restoring will bring back your database — including Auth users and Storage metadata, which live in Postgres — but not the objects themselves. Rows may end up referencing files that no longer exist.${pitrCaveat}`}
-        >
-          <div className="mt-3">{configureAction}</div>
-        </Admonition>
-      )}
-
-      {!isSyncOff && hasGap && (
-        <Admonition
-          type="warning"
-          layout="horizontal"
-          title={`${excluded.length} of ${sync.buckets.length} buckets are not included in backups`}
-          description={`${included.map((b) => b.name).join(', ')} restore alongside the database. ${excluded.map((b) => b.name).join(', ')} will keep ${excluded.length === 1 ? 'its' : 'their'} current files, so restored rows may reference objects that no longer exist.${pitrCaveat}`}
-        >
-          <div className="mt-3">{configureAction}</div>
-        </Admonition>
-      )}
-
-      {!isSyncOff && !hasGap && (
-        <Admonition
-          type="default"
-          layout="horizontal"
-          title="Database and Storage restore together"
-          description={`All ${sync.buckets.length} buckets are snapshotted before each scheduled backup, so your database and files restore to the same point in time.${pitrCaveat}${
-            willDriftOnNewBuckets
-              ? ' Buckets created from now on are not included automatically.'
-              : ''
-          }`}
-        >
-          {willDriftOnNewBuckets && <div className="mt-3">{configureAction}</div>}
-        </Admonition>
-      )}
-
-      <StorageBackupSyncDialog
-        visible={showSyncDialog}
-        projectRef={projectRef}
-        onClose={() => setShowSyncDialog(false)}
-      />
-    </>
+    <Admonition
+      type="default"
+      layout="horizontal"
+      title="Database and Storage restore together"
+      description={`All ${policy.buckets.length} buckets are captured before each backup and kept for ${policy.retentionDays} days, so your database and files restore to the same point in time.${pitrCaveat}${
+        willDriftOnNewBuckets ? ' Buckets created from now on are not included automatically.' : ''
+      }`}
+    >
+      {willDriftOnNewBuckets && <div className="mt-3">{configureAction}</div>}
+    </Admonition>
   )
 }

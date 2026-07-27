@@ -5,11 +5,11 @@ import { restorePointKeys } from './keys'
 import {
   getMockPlatformProtectionSummary,
   getMockRestorePointCoverage,
-  getMockStorageBackupSyncSettings,
+  getMockRestorePointPolicy,
   mockDelay,
   type PlatformProtectionSummary,
   type RestorePointCoverage,
-  type StorageBackupSyncSettings,
+  type RestorePointPolicy,
 } from './restore-points-mocks'
 
 export type RestorePointCoverageVariables = {
@@ -44,32 +44,32 @@ export const usePlatformProtectionSummaryQuery = ({ projectRef }: { projectRef?:
     enabled: !!projectRef,
   })
 
-export const useStorageBackupSyncQuery = ({ projectRef }: { projectRef?: string }) =>
-  useQuery<StorageBackupSyncSettings, Error>({
-    queryKey: restorePointKeys.storageBackupSync(projectRef),
-    queryFn: () => mockDelay(getMockStorageBackupSyncSettings()),
+export const useRestorePointPolicyQuery = ({ projectRef }: { projectRef?: string }) =>
+  useQuery<RestorePointPolicy, Error>({
+    queryKey: restorePointKeys.policy(projectRef),
+    queryFn: () => mockDelay(getMockRestorePointPolicy()),
     enabled: !!projectRef,
   })
 
-type StorageBackupSyncUpdateVariables = {
+type RestorePointPolicyUpdateVariables = {
   projectRef: string
-  settings: StorageBackupSyncSettings
+  policy: RestorePointPolicy
 }
 
 /**
- * Prototype: persist the project-level sync settings. Writes optimistically into
- * the query cache so the coverage banner reflects the change immediately.
+ * Prototype: persist the project-level restore point policy. Writes into the
+ * query cache so the backups coverage banner reflects the change immediately.
  */
-export const useStorageBackupSyncUpdateMutation = ({
+export const useRestorePointPolicyUpdateMutation = ({
   onSuccess,
   onError,
   ...options
-}: UseMutationOptions<StorageBackupSyncSettings, Error, StorageBackupSyncUpdateVariables> = {}) => {
+}: UseMutationOptions<RestorePointPolicy, Error, RestorePointPolicyUpdateVariables> = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<StorageBackupSyncSettings, Error, StorageBackupSyncUpdateVariables>({
-    mutationFn: ({ settings }) => mockDelay(settings, 500),
+  return useMutation<RestorePointPolicy, Error, RestorePointPolicyUpdateVariables>({
+    mutationFn: ({ policy }) => mockDelay(policy, 500),
     async onSuccess(data, variables, context) {
-      queryClient.setQueryData(restorePointKeys.storageBackupSync(variables.projectRef), data)
+      queryClient.setQueryData(restorePointKeys.policy(variables.projectRef), data)
       const bucketsProtected = data.buckets.filter((bucket) => bucket.isIncluded).length
       queryClient.setQueryData<PlatformProtectionSummary>(
         restorePointKeys.protectionSummary(variables.projectRef),
@@ -81,7 +81,7 @@ export const useStorageBackupSyncUpdateMutation = ({
       await onSuccess?.(data, variables, context)
     },
     onError(error, variables, context) {
-      if (onError === undefined) toast.error(`Failed to update settings: ${error.message}`)
+      if (onError === undefined) toast.error(`Failed to update restore points: ${error.message}`)
       else onError(error, variables, context)
     },
     ...options,
