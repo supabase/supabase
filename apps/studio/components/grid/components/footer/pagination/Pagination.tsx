@@ -295,12 +295,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       </div>
 
       {isLoading ? (
-        <Button
-          variant="text"
-          className="w-7"
-          loading
-          aria-label="Get exact row count"
-        />
+        <Button variant="text" className="w-7" loading aria-label="Get exact row count" />
       ) : isError ? (
         <Tooltip>
           <TooltipTrigger asChild>
