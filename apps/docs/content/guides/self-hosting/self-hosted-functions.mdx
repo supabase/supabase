@@ -47,7 +47,7 @@ Deno.serve(async (req: Request) => {
 ### Step 2: Restart the functions service to pick up the new function
 
 ```sh
-docker compose restart functions --no-deps
+sh run.sh restart functions
 ```
 
 ### Step 3: Invoke your function
@@ -94,7 +94,7 @@ Don't commit `.env.functions` to version control if it contains secrets. Add it 
 Restart the functions service:
 
 ```sh
-docker compose up -d --force-recreate --no-deps functions
+sh run.sh recreate functions
 ```
 
 ### Using inline environment variables
@@ -178,7 +178,7 @@ scp -r ./my-function user@<your-domain>:/path/to/self-hosted/volumes/functions/
 Then restart the functions service on the remote host:
 
 ```sh
-ssh user@<your-domain> 'cd /path/to/self-hosted && docker compose restart functions --no-deps'
+ssh user@<your-domain> 'cd /path/to/self-hosted && sh run.sh restart functions'
 ```
 
 ## Copying functions from Supabase platform
@@ -199,7 +199,7 @@ For more details, see:
 
 ### 400 "missing function name in request"
 
-The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello` — not just `/functions/v1/`.
+The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello`.
 
 ### 500 error on invocation
 
@@ -221,7 +221,7 @@ Common causes: syntax errors in your function code, invalid imports, or missing 
 Restart the functions service:
 
 ```sh
-docker compose restart functions --no-deps
+sh run.sh restart functions
 ```
 
 ### Custom env vars not available in functions
@@ -230,10 +230,10 @@ docker compose restart functions --no-deps
 - Recreate the functions container after changing configuration
 - Check that the variable name matches exactly (case-sensitive)
 
-Use the following command to recreate the container, not just `restart`:
+Use the following command to recreate the container:
 
 ```sh
-docker compose up -d --force-recreate --no-deps functions
+sh run.sh recreate functions
 ```
 
 ### Memory or timeout errors

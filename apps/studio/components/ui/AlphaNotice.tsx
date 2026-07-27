@@ -2,7 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { BASE_PATH } from '@/lib/constants'
 

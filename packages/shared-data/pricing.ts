@@ -197,18 +197,18 @@ export const pricing: Pricing = {
       },
       {
         key: 'database.replication',
-        title: 'External Replication (ETL)',
+        title: 'Pipelines',
         plans: {
           free: false,
           pro: [
-            '$39 per pipeline per month',
-            '$3.00 per GB replicated data',
-            '$0.60 per GB backfill data',
+            '$0.053 per pipeline per hour',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
           ],
           team: [
-            '$39 per pipeline per month',
-            '$3.00 per GB replicated data',
-            '$0.60 per GB backfill data',
+            '$0.053 per pipeline per hour',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
           ],
           enterprise: 'Custom',
         },

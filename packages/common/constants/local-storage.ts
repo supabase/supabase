@@ -25,10 +25,11 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_PG_DELTA_DIFF: 'supabase-ui-pg-delta-diff',
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
   UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
-  UI_PREVIEW_RLS_TESTER: 'supabase-ui-rls-tester',
+  UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
+  SIGN_IN_CHATGPT_ENABLED: 'siwc-enabled',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   STORAGE_PREFERENCE: (ref: string) => `storage-explorer-${ref}`,
@@ -58,8 +59,6 @@ export const LOCAL_STORAGE_KEYS = {
   LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
-  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
-  SENTRY_USER_ID: 'supabase-sentry-user-id',
   // Used for storing the last sign in method used by the user
   LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
   // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
@@ -103,8 +102,6 @@ export const LOCAL_STORAGE_KEYS = {
 
   PROJECT_SECURITY_DISMISSED_AT: (ref: string) => `project-security-dismissed-at-${ref}`,
 
-  RLS_TESTER_BANNER_DISMISSED: (ref: string) => `rls-tester-banner-dismissed-${ref}`,
-
   // Observability banner dismissed
   OBSERVABILITY_BANNER_DISMISSED: (ref: string) => `observability-banner-dismissed-${ref}`,
   ORGANIZATION_MARKETPLACE_BANNER_DISMISSED: (orgSlug: string, managedBy: string) =>
@@ -116,7 +113,10 @@ export const LOCAL_STORAGE_KEYS = {
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
+  PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
+    `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
+  UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
 
@@ -156,11 +156,13 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
   LOCAL_STORAGE_KEYS.BLOG_VIEW,
   LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
+  LOCAL_STORAGE_KEYS.SIGN_IN_CHATGPT_ENABLED,
   LOCAL_STORAGE_KEYS.LINTER_SHOW_FOOTER,
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
   LOCAL_STORAGE_KEYS.UI_TIMEZONE,

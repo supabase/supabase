@@ -9,7 +9,7 @@ export const AdditionalMonthlySpend = ({
     <div className="text-sm text-foreground-lighter border-t p-5">
       <p>
         The new project will start with the same compute size as your current project, but the disk
-        size will be slightly larger (1.25×) to ensure the restore completes successfully. You will
+        size will be slightly larger (1.5×) to ensure the restore completes successfully. You will
         be able to update the compute size and increase the disk size after the new project is
         created in{' '}
         <span className="font-mono text-xs tracking-tighter text-foreground-light">

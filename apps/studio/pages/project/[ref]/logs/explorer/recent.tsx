@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import RecentQueriesItem from '@/components/interfaces/Settings/Logs/RecentQueriesItem'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import Table from '@/components/to-be-cleaned/Table'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'

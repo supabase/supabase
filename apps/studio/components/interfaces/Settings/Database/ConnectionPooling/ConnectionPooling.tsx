@@ -21,7 +21,7 @@ import {
   InputGroupText,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -35,7 +35,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { InlineLink } from '@/components/ui/InlineLink'

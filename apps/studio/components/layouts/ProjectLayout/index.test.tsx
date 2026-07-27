@@ -156,7 +156,11 @@ vi.mock('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarni
   ResourceExhaustionWarningBanner: () => null,
 }))
 vi.mock('@/components/ui/ButtonTooltip', () => ({
-  ButtonTooltip: ({ children, ...props }: any) => <button {...props}>{children}</button>,
+  ButtonTooltip: ({ children, ...props }: any) => (
+    <button tabIndex={0} {...props}>
+      {children}
+    </button>
+  ),
 }))
 vi.mock('@/components/ui/PartnerIcon', () => ({
   default: () => <div data-testid="partner-icon" />,
@@ -193,7 +197,6 @@ vi.mock('@/components/ui/BannerStack/Banners/BannerUnifiedLogs', () => ({
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   useUnifiedLogsPreview: () => ({
     isEnabled: false,
-    isEligible: false,
     isLoading: false,
     enable: () => {},
     disable: () => {},
@@ -392,7 +395,9 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 
   it('calls dismissBanner when compute warnings are cleared', async () => {
@@ -410,7 +415,9 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 
   it('calls dismissBanner when project is not nano compute', async () => {
@@ -421,6 +428,8 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 })

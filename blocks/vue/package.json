@@ -6,7 +6,7 @@
   "exports": "./index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -26,6 +26,8 @@
   "devDependencies": {
     "shadcn": "^3.3.1",
     "tsconfig": "workspace:*",
+    "@typescript/native": "catalog:",
+    "typescript": "catalog:",
     "vite": "^7.3.2"
   }
 }

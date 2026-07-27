@@ -8,6 +8,7 @@ Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
+Akilesh Sethu
 Alaister Young
 Aleksi Immonen
 Alex Hall
@@ -23,6 +24,7 @@ Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
+Anna Baker
 Ant Evans
 Ant Wilson
 Ariuna K
@@ -31,6 +33,7 @@ Artur Zakirov
 Artyom Borissov
 Aziz Quadri
 Barco Fourie
+Barry Roodt
 Beng Eu
 Benjamin Coenen
 Bo Lu
@@ -41,6 +44,7 @@ Brent Newson
 Brian Cullen
 Brent Schroeter
 Bruno Kilian
+Burhan A
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -143,6 +147,7 @@ Joanna Michniewicz
 Joaquim Moreno
 Joel Low
 Joey Freeland
+Joey Lei
 John Fitzgerald
 Joel Martin
 Johan Bergström
@@ -158,6 +163,7 @@ Julian Domke
 Julien Goux
 Kai M
 Kalleby Santos
+Kanad Gupta
 Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
@@ -183,6 +189,7 @@ Liam Cloud Hogan
 Lindsay Moss
 Lukas Bernert
 Lukas Klingsbo
+Łukasz Korbasiewicz
 Łukasz Niemier
 Maksym Ionutsa
 Manuel Mendez
@@ -218,6 +225,7 @@ Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Paul Bauer
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
@@ -258,9 +266,12 @@ Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shaii O
+Shane Adams
 Shane E
+Shaun Newman
 Shreekar Shetty
 Sreyas Udayavarman
+Stephanie Jackson (stejacks)
 Stephen Morgan
 Steve Chavez
 Steven Eubank
@@ -274,6 +285,7 @@ Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
 Terry Wilcox
+Thanya Nitithatsanakul
 Thomas E
 Tim Frietas
 Tim Palmer
@@ -290,6 +302,7 @@ Utkarash Singh
 Victor Farazdagi
 Warwick Mitchell
 Wen Bo Xie
+Wendie Cheung
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov

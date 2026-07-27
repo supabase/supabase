@@ -50,7 +50,7 @@ export default function Home() {
                         <Link href="/docs/getting-started/quickstart">Get Started</Link>
                       </Button_Shadcn_>
                       <Button_Shadcn_ variant="outline" size="lg">
-                        <Link href="/docs/ai-editors-rules/skills">Install Skills</Link>
+                        <a href="/docs/guides/ai-tools/ai-skills">Install Skills</a>
                       </Button_Shadcn_>
                     </div>
                   </div>

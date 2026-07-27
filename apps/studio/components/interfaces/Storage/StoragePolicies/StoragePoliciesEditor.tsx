@@ -3,9 +3,9 @@ import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
-import { PolicyName } from '@/components/interfaces/Auth/Policies/PolicyEditor/PolicyName'
-import { PolicyRoles } from '@/components/interfaces/Auth/Policies/PolicyEditor/PolicyRoles'
-import SqlEditor from '@/components/ui/SqlEditor'
+import { PolicyName } from './PolicyEditor/PolicyName'
+import { PolicyRoles } from './PolicyEditor/PolicyRoles'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DOCS_URL } from '@/lib/constants'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
@@ -20,7 +20,11 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
         </p>
       </div>
       <div className="h-56 md:w-2/3">
-        <SqlEditor defaultValue={definition} onInputChange={onUpdatePolicyDefinition} />
+        <CodeEditor
+          language="pgsql"
+          defaultValue={definition}
+          onInputChange={onUpdatePolicyDefinition}
+        />
       </div>
     </div>
   )
@@ -145,7 +149,7 @@ const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () =>
 
 // [Refactor] All these update methods could be summarised into one single function probably
 
-const StoragePoliciesEditor = ({
+export const StoragePoliciesEditor = ({
   policyFormFields = {},
   onViewTemplates = noop,
   onUpdatePolicyName = noop,
@@ -190,5 +194,3 @@ const StoragePoliciesEditor = ({
     </>
   )
 }
-
-export default StoragePoliciesEditor

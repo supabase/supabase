@@ -151,7 +151,7 @@ This guarantee provides your application with close alignment with security comp
 
 If you wish to make your own JWTs or have access to the private key or shared secret used by Supabase, you can create a new JWT signing key by importing a private key or setting a shared secret yourself.
 
-Use the [Supabase CLI](/docs/reference/cli/introduction) to quickly and securely generate a private key ready for import:
+Use the [Supabase CLI](/docs/reference/cli/introduction) to securely generate a private key ready for import:
 
 ```sh
 supabase gen signing-key --algorithm ES256
@@ -228,7 +228,7 @@ This is to ensure you have the ability, should you need it, to go back to the le
 
 ### Why does revoking the legacy JWT secret require disabling of `anon` and `service_role` API keys?
 
-Unfortunately `anon` and `service_role` are not just API keys, but are also valid JSON Web Tokens, signed by the legacy JWT secret. Revoking the legacy JWT secret means that your application no longer trusts any JWT signed with it. Therefore before you revoke the legacy JWT secret, you must disable the `anon` and `service_role` to ensure a consistent security setup.
+Unfortunately `anon` and `service_role` are not only API keys, but are also valid JSON Web Tokens, signed by the legacy JWT secret. Revoking the legacy JWT secret means that your application no longer trusts any JWT signed with it. Therefore before you revoke the legacy JWT secret, you must disable the `anon` and `service_role` to ensure a consistent security setup.
 
 ### Using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate a `service_role` JWT secret?
 

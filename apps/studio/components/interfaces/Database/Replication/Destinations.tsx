@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { ChartArea, MoreVertical, Plus, Search, X } from 'lucide-react'
+import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -19,17 +20,19 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
@@ -45,6 +48,7 @@ import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -52,11 +56,13 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const newDestinationDefaultType = infrastructureReadReplicas
@@ -69,14 +75,15 @@ export const Destinations = () => {
           ? 'DuckLake'
           : etlEnableSnowflake
             ? 'Snowflake'
-            : null
+            : etlEnableClickHouse
+              ? 'ClickHouse'
+              : null
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
-  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
-    useState(false)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
   const [_, setDestinationType] = useQueryState(
     'destinationType',
@@ -86,6 +93,7 @@ export const Destinations = () => {
       'Analytics Bucket',
       'DuckLake',
       'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -146,7 +154,7 @@ export const Destinations = () => {
     () => sourcesData?.sources.find((source) => source.name === projectRef),
     [projectRef, sourcesData?.sources]
   )
-  const canDisableExternalReplication =
+  const canDisablePipelines =
     isSourcesSuccess &&
     isDestinationsSuccess &&
     isPipelinesSuccess &&
@@ -232,6 +240,7 @@ export const Destinations = () => {
               actions={
                 filterString.length > 0 && (
                   <Button
+                    aria-label="Clear filter"
                     variant="text"
                     icon={<X />}
                     className="p-0 h-5 w-5"
@@ -258,15 +267,27 @@ export const Destinations = () => {
                 Add destination
               </Button>
             </Shortcut>
+            {organization?.slug && (
+              <Button asChild variant="default" icon={<ChartArea />}>
+                <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>
+                  Usage
+                </Link>
+              </Button>
+            )}
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-            {canDisableExternalReplication && (
+            {canDisablePipelines && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" icon={<MoreVertical />} className="w-7" />
+                  <Button
+                    aria-label="More actions"
+                    variant="default"
+                    icon={<MoreVertical />}
+                    className="w-7"
+                  />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
-                    Disable external replication
+                  <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>
+                    Disable Pipelines
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -356,8 +377,8 @@ export const Destinations = () => {
             >
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external destinations for real-time data pipelines.
+                Deploy Read Replicas for lower latency and workload isolation, or add a Pipelines
+                destination for analytics workloads.
               </p>
               <Button
                 icon={<Plus />}
@@ -374,9 +395,9 @@ export const Destinations = () => {
 
       <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
 
-      <DisableExternalReplicationDialog
-        open={showDisableExternalReplicationDialog}
-        setOpen={setShowDisableExternalReplicationDialog}
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
       />
     </>
   )

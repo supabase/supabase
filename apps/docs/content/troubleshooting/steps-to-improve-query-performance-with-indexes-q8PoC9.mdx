@@ -43,7 +43,7 @@ select
 from pg_statio_user_tables;
 ```
 
-If the cache hit rate is relatively low, it often means that you need to increase your memory capacity. The second metric that is often inspected is index usage. Indexes are data structures that allow Postgres to search for information quickly - think of them like you would think of an index at the back of a book. Instead of scanning every page (or row), you can use an index to find the contents you need quickly. For a better understanding of how Postgres decides on whether to use an index or not, check out this [explainer](https://github.com/orgs/supabase/discussions/26959).
+If the cache hit rate is relatively low, it often means that you need to increase your memory capacity. The second metric that is often inspected is index usage. Indexes are data structures that allow Postgres to search for information efficiently - think of them like you would think of an index at the back of a book. Instead of scanning every page (or row), you can use an index to find the contents you need efficiently. For a better understanding of how Postgres decides on whether to use an index or not, check out this [explainer](https://github.com/orgs/supabase/discussions/26959).
 
 The index hit rate (how often an index is used) can usually be improved moderately.
 
@@ -59,7 +59,7 @@ where seq_scan + idx_scan > 0
 order by n_live_tup desc;
 ```
 
-A lot of the [queries for inspecting performance](/docs/reference/cli/supabase-inspect-db) are actually pre-bundled as part of the [Supabase CLI](/docs/guides/cli/getting-started). For instance, there is a command for testing which indexes of yours are unnecessary and are needlessly taking up space:
+A lot of the [queries for inspecting performance](/docs/reference/cli/supabase-inspect-db) are pre-bundled as part of the [Supabase CLI](/docs/guides/cli/getting-started). For instance, there is a command for testing which indexes of yours are unnecessary and are needlessly taking up space:
 
 ```bash
 npx supabase login

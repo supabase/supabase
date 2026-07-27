@@ -34,6 +34,7 @@ import {
 } from './Logs.utils'
 import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
+import { MissingLimitErrorRenderer } from './LogsErrorRenderers/MissingLimitErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
 import { MultiSelectActionBar, type LogCopyFormat } from './MultiSelectActionBar'
@@ -512,7 +513,7 @@ export const LogTable = ({
         )}
         <Button
           title="run-logs-query"
-          variant={hasEditorValue ? 'primary' : 'alternative'}
+          variant="primary"
           disabled={!hasEditorValue}
           onClick={onRun}
           iconRight={<Play size={12} />}
@@ -529,6 +530,12 @@ export const LogTable = ({
     const childProps = {
       isCustomQuery: queryType ? false : true,
       error: error!,
+    }
+    if (
+      typeof error === 'object' &&
+      error.error?.errors.find((err) => err.reason === 'missingLimit')
+    ) {
+      return <MissingLimitErrorRenderer />
     }
     if (
       typeof error === 'object' &&

@@ -15,7 +15,7 @@ import {
   SheetTitle,
 } from 'ui'
 
-import { EnableReplicationCallout } from '../EnableReplicationCallout'
+import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
@@ -43,6 +43,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
       'Analytics Bucket',
       'DuckLake',
       'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -87,6 +88,11 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
     setEdit(null)
   }
 
+  const docsUrl =
+    urlDestinationType === 'BigQuery'
+      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
+      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
+
   useEffect(() => {
     if (edit !== null && invalidExistingDestination) {
       toast(`Unable to find destination ID ${edit}`)
@@ -99,13 +105,16 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
       <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent size="lg" showClose={false}>
           <div className="flex flex-col h-full" tabIndex={-1}>
-            <SheetHeader>
-              <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
-              <SheetDescription>
-                {editMode
-                  ? 'Update the configuration for this destination'
-                  : 'A destination can be a read replica or an external destination that receives your database changes in real time.'}
-              </SheetDescription>
+            <SheetHeader className="flex items-center justify-between">
+              <div>
+                <SheetTitle>{editMode ? 'Edit destination' : 'Add new destination'}</SheetTitle>
+                <SheetDescription>
+                  {editMode
+                    ? 'Update the configuration for this destination.'
+                    : 'Set up a read replica or Supabase Pipelines destination for near real-time replication'}
+                </SheetDescription>
+              </div>
+              <DocsButton href={docsUrl} topic={`${urlDestinationType} pipeline settings`} />
             </SheetHeader>
 
             <DestinationTypeSelection />
@@ -118,11 +127,11 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
                   <div className="flex flex-col gap-y-1">
-                    <h4>Replicate data to external destinations in real time</h4>
+                    <h4>Request Pipelines access</h4>
                     <p className="text-sm text-foreground-light">
-                      External destinations are in <span className="text-foreground">alpha</span>{' '}
-                      and are being rolled out gradually. Request access below to join the waitlist.
-                      Read replicas are available now.
+                      Pipelines is in <span className="text-foreground">public alpha</span> and
+                      being rolled out gradually. Request access below to join the waitlist. Read
+                      replicas are available now.
                     </p>
                   </div>
                   <div className="flex gap-x-2">
@@ -132,20 +141,20 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                       iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
                     >
                       <Link
-                        href="https://forms.supabase.com/pg_replicate"
                         target="_blank"
                         rel="noreferrer"
+                        href="https://forms.supabase.com/pg_replicate"
                       >
-                        Request alpha access
+                        Request Pipelines access
                       </Link>
                     </Button>
-                    <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
+                    <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
                   </div>
                 </div>
               </SheetSection>
             ) : replicationNotEnabled ? (
               <SheetSection>
-                <EnableReplicationCallout
+                <EnablePipelinesCallout
                   className="p-6!"
                   type={destinationType}
                   hasAccess={hasETLReplicationAccess}

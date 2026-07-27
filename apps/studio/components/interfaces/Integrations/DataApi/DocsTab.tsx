@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useMemo, useState } from 'react'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ShowApiKey } from '../../Docs/Docs.types'
 import { LangSelector } from '../../Docs/LangSelector'

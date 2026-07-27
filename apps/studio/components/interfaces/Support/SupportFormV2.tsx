@@ -24,10 +24,11 @@ import { OrganizationSelector } from './OrganizationSelector'
 import { ProjectAndPlanInfo } from './ProjectAndPlanInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
-import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
+import { SupportAccessToggle } from './SupportAccessToggle'
 import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
+  canAllowSupportAccess,
   formatMessage,
   formatStudioVersion,
   getOrgSubscriptionPlan,
@@ -160,10 +161,9 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       ...values,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess:
-        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-          ? values.allowSupportAccess
-          : false,
+      allowSupportAccess: canAllowSupportAccess(values.category, values.projectRef)
+        ? values.allowSupportAccess
+        : false,
       library:
         values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
           ? selectedLibrary.key
@@ -254,7 +254,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
           </>
         )}
 
-        {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+        {canAllowSupportAccess(category, projectRef) && (
           <>
             <SupportAccessToggle form={form} className="px-6" />
             <DialogSectionSeparator />

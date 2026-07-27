@@ -14,11 +14,12 @@ import {
   DialogTrigger,
   StatusIcon,
 } from 'ui'
-import { GenericSkeletonLoader, TimestampInfo } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ActionStatusBadge, ActionStatusBadgeCondensed, STATUS_TO_LABEL } from './ActionStatusBadge'
 import BranchStatusBadge from './BranchStatusBadge'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ActionRunData } from '@/data/actions/action-detail-query'
 import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
 import {
@@ -114,6 +115,7 @@ export const WorkflowLogs = ({ branch }: WorkflowLogsProps) => {
                       <li key={workflowRun.id} className="flex justify-between px-4 py-3 gap-2">
                         <button
                           type="button"
+                          tabIndex={workflowRun.id === projectRef ? -1 : 0}
                           disabled={workflowRun.id === projectRef}
                           onClick={() => setSelectedWorkflowRun(workflowRun)}
                           className="flex items-center gap-2 w-full justify-between"

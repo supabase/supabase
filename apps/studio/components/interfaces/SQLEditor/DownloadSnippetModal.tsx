@@ -27,7 +27,7 @@ import {
 } from './SQLEditor.utils'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { DOCS_URL } from '@/lib/constants'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 const CLI_DOCS_URL = `${DOCS_URL}/guides/cli/local-development`
 

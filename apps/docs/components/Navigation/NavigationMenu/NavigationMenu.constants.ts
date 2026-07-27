@@ -281,6 +281,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
         ],
         [
           {
+            label: 'Server SDK',
+            icon: 'reference-javascript',
+            href: '/reference/server' as `/${string}`,
+            level: 'reference_server',
+            new: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
@@ -734,6 +741,10 @@ export const auth: NavMenuConstant = {
       enabled: authFlowsEnabled,
       items: [
         {
+          name: 'Which package to use',
+          url: '/guides/auth/choosing-a-server-package',
+        },
+        {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
@@ -1179,24 +1190,22 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'External replication',
-          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+          name: 'Pipelines',
+          url: '/guides/database/replication/pipelines' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
-              items: [
-                {
-                  name: 'BigQuery',
-                  url: '/guides/database/replication/bigquery' as `/${string}`,
-                },
-              ],
+              url: '/guides/database/replication/pipelines' as `/${string}`,
+            },
+            {
+              name: 'BigQuery',
+              url: '/guides/database/replication/bigquery' as `/${string}`,
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/pipelines-faq' },
           ],
         },
         {
@@ -1419,6 +1428,10 @@ export const database: NavMenuConstant = {
             {
               name: 'Logflare',
               url: '/guides/database/extensions/wrappers/logflare' as `/${string}`,
+            },
+            {
+              name: 'MongoDB',
+              url: '/guides/database/extensions/wrappers/mongodb' as `/${string}`,
             },
             {
               name: 'MSSQL',
@@ -2096,6 +2109,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
             { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+            { name: 'Purging Cache', url: '/guides/storage/cdn/purge-cdn-cache' },
             { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
           ],
         },
@@ -2440,25 +2454,14 @@ export const local_development: NavMenuConstant = {
   title: 'Local Dev / CLI',
   url: '/guides/local-development',
   items: [
-    { name: 'Overview', url: '/guides/local-development' },
+    { name: 'Overview & quickstart', url: '/guides/local-development' },
+    { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
+    { name: 'Local development workflow', url: '/guides/local-development/cli-workflows' },
     {
-      name: 'CLI',
+      name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Getting started', url: '/guides/local-development/cli/getting-started' },
-        {
-          name: 'Configuration',
-          url: '/guides/local-development/cli/config',
-          enabled: localDevelopmentEnabled,
-        },
-        { name: 'CLI commands', url: '/reference/cli' },
-      ],
-    },
-    {
-      name: 'Local development',
-      url: undefined,
-      items: [
-        { name: 'Getting started', url: '/guides/local-development/overview' },
+        { name: 'Database migrations', url: '/guides/local-development/database-migrations' },
         {
           name: 'Declarative database schemas',
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
@@ -2481,6 +2484,18 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/customizing-email-templates' as `/${string}`,
           enabled: localDevelopmentEnabled,
         },
+      ],
+    },
+    {
+      name: 'Reference',
+      url: undefined,
+      items: [
+        {
+          name: 'CLI configuration',
+          url: '/guides/local-development/cli/config',
+          enabled: localDevelopmentEnabled,
+        },
+        { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
     {
@@ -2716,6 +2731,14 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/clone-project',
         },
         {
+          name: 'Project Pausing',
+          url: '/guides/platform/free-project-pausing' as `/${string}`,
+        },
+        {
+          name: 'Delete Project',
+          url: '/guides/platform/delete-project',
+        },
+        {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
           enabled: fullPlatformEnabled,
@@ -2901,6 +2924,10 @@ export const platform: NavMenuConstant = {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
+            {
+              name: 'Pipelines',
+              url: '/guides/platform/manage-your-usage/pipelines' as `/${string}`,
+            },
           ],
         },
         {
@@ -2967,6 +2994,10 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Logging',
           url: '/guides/telemetry/logs' as `/${string}`,
+        },
+        {
+          name: 'Debugging',
+          url: '/guides/telemetry/debugging' as `/${string}`,
         },
         {
           name: 'Advanced log filtering',
@@ -3205,12 +3236,16 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations',
     },
     {
-      name: 'Vercel Marketplace',
-      url: '/guides/integrations/vercel-marketplace',
+      name: 'Dashboard Integrations',
+      url: '/guides/integrations#dashboard-integrations',
     },
     {
-      name: 'Supabase Marketplace',
-      url: '/guides/integrations/supabase-marketplace',
+      name: 'Partner Catalog',
+      url: '/guides/integrations/partner-catalog',
+    },
+    {
+      name: 'Vercel Marketplace',
+      url: '/guides/integrations/vercel-marketplace',
     },
     {
       name: 'Build Your Own',
@@ -3332,6 +3367,17 @@ export const reference_javascript_v2 = {
   pkg: {
     name: '@supabase/supabase-js',
     repo: 'https://github.com/supabase/supabase-js',
+  },
+}
+
+export const reference_server_v1 = {
+  icon: 'reference-javascript',
+  title: 'Server',
+  url: '/reference/server',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/server',
+    repo: 'https://github.com/supabase/server',
   },
 }
 

@@ -20,33 +20,24 @@ export type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
+
+  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
 
   return useMemo(
     () =>
       [
         {
-          key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
-          name: 'RLS Tester',
-          discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
-          enabled: true,
-          isNew: true,
-          isPlatformOnly: false,
-          isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/auth/policies`,
-        },
-        {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
           name: 'Updated Logs interface',
           discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-          enabled: isUnifiedLogsPreviewAvailable,
+          enabled: true,
           isNew: true,
           isPlatformOnly: true,
-          isDefaultOptIn: false,
+          isDefaultOptIn: unifiedLogsDefaultOptIn,
           getRoute: (ref?: string) => `/project/${ref}/logs`,
         },
         {
@@ -67,7 +58,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: false,
           isPlatformOnly: true,
           isDefaultOptIn: true,
-          enabled: pgDeltaDiffEnabled,
+          enabled: true,
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
@@ -101,21 +92,30 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
-          name: 'Integrations layout',
+          name: 'One-Click Integrations',
           discussionsUrl: undefined,
           enabled: isMarketplaceEnabled,
           isNew: true,
+          isPlatformOnly: false,
+          isDefaultOptIn: true,
+          getRoute: (ref?: string) => `/project/${ref}/integrations`,
+        },
+        {
+          key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
+          name: 'Disable snippet auto-saving',
+          discussionsUrl: undefined,
+          isNew: true,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/integrations`,
+          enabled: sqlEditorManualSaveEnabled,
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
     [
-      isUnifiedLogsPreviewAvailable,
-      pgDeltaDiffEnabled,
+      unifiedLogsDefaultOptIn,
       platformWebhooksEnabled,
       jitDbAccessEnabled,
       isMarketplaceEnabled,
+      sqlEditorManualSaveEnabled,
     ]
   )
 }

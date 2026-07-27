@@ -9,10 +9,11 @@ import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-fu
 import { useKeywordsQuery } from '@/data/database/keywords-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useTableColumnsQuery } from '@/data/database/table-columns-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
   const { data: project } = useSelectedProjectQuery()
@@ -54,6 +55,8 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
 
   const pgInfoRef = useRef<any>(null)
 
+  const filteredSchemas = useSchemasFilteredForHighAvailability(schemas)
+
   const isPgInfoReady =
     intellisenseEnabled &&
     isTableColumnsSuccess &&
@@ -66,7 +69,7 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
       pgInfoRef.current = {}
     }
     pgInfoRef.current.tableColumns = tableColumns
-    pgInfoRef.current.schemas = schemas
+    pgInfoRef.current.schemas = filteredSchemas
     pgInfoRef.current.keywords = keywords
     pgInfoRef.current.functions = functions
   }

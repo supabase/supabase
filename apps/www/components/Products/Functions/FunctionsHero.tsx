@@ -193,6 +193,7 @@ const FunctionsHero = () => {
       >
         <CopyToClipboard text="supabase functions new <function-name> && supabase functions deploy <function-name>">
           <button
+            tabIndex={0}
             onClick={handleCopy}
             className="w-full px-3 py-2 group hover:border-strong flex gap-1 sm:gap-2 items-center bg-alternative rounded-xl border"
           >
@@ -241,9 +242,9 @@ const FunctionsHero = () => {
               y2={s?.y2}
               gradientUnits="userSpaceOnUse"
             >
-              <stop offset="0" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-              <stop offset="0.5" stopColor="hsl(var(--foreground-default))" stopOpacity="0.6" />
-              <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+              <stop offset="0" stopColor="var(--foreground-default)" stopOpacity="0" />
+              <stop offset="0.5" stopColor="var(--foreground-default)" stopOpacity="0.6" />
+              <stop offset="1" stopColor="var(--foreground-default)" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>

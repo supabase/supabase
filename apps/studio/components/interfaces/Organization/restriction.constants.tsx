@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { type ReactNode } from 'react'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 
@@ -11,12 +11,11 @@ export const RESTRICTION_MESSAGES = {
       const label = dayjs(date).format('DD MMM, YYYY')
       return (
         <>
-          You have a grace period until{' '}
-          <TimestampInfo className="text-sm" utcTimestamp={date} label={label} />. After that, your
-          projects will be restricted while your organization is over quota.{' '}
+          Projects will be restricted from{' '}
+          <TimestampInfo className="text-sm" utcTimestamp={date} label={label} /> if your
+          organization remains over quota.{' '}
           <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink> or{' '}
-          <InlineLink href={`/org/${slug}/billing`}>manage your plan</InlineLink> to avoid
-          restrictions.
+          <InlineLink href={`/org/${slug}/billing`}>billing</InlineLink>.
         </>
       )
     },

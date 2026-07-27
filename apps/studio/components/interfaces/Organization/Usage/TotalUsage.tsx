@@ -7,7 +7,7 @@ import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/B
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
 import { SectionContent } from './SectionContent'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import {
   ComputeUsageMetric,
   computeUsageMetricLabel,
@@ -38,6 +38,9 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.LOG_STORAGE,
   PricingMetric.LOG_QUERYING,
   PricingMetric.ACTIVE_COMPUTE_HOURS,
+  PricingMetric.ETL_PIPELINE,
+  PricingMetric.ETL_REPLICATED_DATA,
+  PricingMetric.ETL_COPY_BACKFILL_DATA,
 ]
 
 export const TotalUsage = ({

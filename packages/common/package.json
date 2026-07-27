@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
     "typecheck": "tsc --noEmit"
   },
@@ -21,11 +21,12 @@
     "flags": "^4.0.0",
     "lodash": "catalog:",
     "next-themes": "catalog:",
-    "posthog-js": "^1.333.0",
+    "posthog-js": "^1.391.2",
     "react-use": "^17.4.0",
     "valtio": "catalog:"
   },
   "devDependencies": {
+    "lucide-react": "*",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -34,12 +35,14 @@
     "@vitest/ui": "catalog:",
     "tsconfig": "workspace:*",
     "type-fest": "5.6.0",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
+    "lucide-react": "*",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

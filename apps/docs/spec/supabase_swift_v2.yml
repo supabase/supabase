@@ -4384,6 +4384,8 @@ functions:
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
       Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    notes: |
+      The `format` parameter accepts an `ExplainFormat` value — either `.text` (default, human-readable) or `.json` (machine-readable JSON).
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -4462,6 +4464,21 @@ functions:
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
+        isSpotlight: false
+
+      - id: get-execution-plan-json-format
+        name: Get the execution plan as JSON
+        code: |
+          ```swift
+          try await supabase
+            .from("instruments")
+            .select()
+            .explain(format: .json)
+            .execute()
+            .value
+          ```
+        description: |
+          Use `format: .json` to get a machine-readable JSON execution plan. The `ExplainFormat` type accepts `.text` (default) or `.json`.
         isSpotlight: false
   - id: invoke
     title: invoke()
@@ -5176,7 +5193,7 @@ functions:
             .createBucket(
               "avatars",
               options: BucketOptions(
-                public: false,
+                isPublic: false,
                 allowedMimeTypes: ["image/png"],
                 fileSizeLimit: 1024
               )
@@ -5216,7 +5233,7 @@ functions:
             .updateBucket(
               "avatars",
               options: BucketOptions(
-                public: false,
+                isPublic: false,
                 fileSizeLimit: 1024,
                 allowedMimeTypes: ["image/png"]
               )
@@ -5375,12 +5392,13 @@ functions:
           let signedURL = try await supabase.storage
             .from("avatars")
             .createSignedURL(
-              path: "folder/avatar1.png", expiresIn: 60,
-              download: true
+              path: "folder/avatar1.png",
+              expiresIn: 60,
+              download: .withOriginalName
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          Use `.withOriginalName` to download with the original file name, or `.named("custom.png")` to specify a custom file name. The `download: Bool` overload still compiles but is disfavored.
 
   - id: from-create-signed-urls
     title: from.createSignedUrls()
@@ -5519,11 +5537,11 @@ functions:
             .from("public-bucket")
             .getPublicURL(
               path: "folder/avatar1.png",
-              download: true
+              download: .withOriginalName
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          Use `.withOriginalName` to download with the original file name, or `.named("custom.png")` to specify a custom file name. The `download: Bool` overload still compiles but is disfavored.
 
   - id: from-download
     title: from.download()

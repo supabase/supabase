@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useOAuthAppDeleteMutation } from '@/data/oauth/oauth-app-delete-mutation'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'

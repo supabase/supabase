@@ -328,3 +328,5 @@ flowchart TD
   H --> J[Use Dedicated Pooler PgBouncer Pro]
   I --> K[Use Supavisor Transaction Mode]
 ```
+
+The decision depends on where you connect from. For a **persistent backend**, use a direct connection if you can reach the database over IPv6 (or have the IPv4 add-on); otherwise use Supavisor in session mode. For **serverless or edge** environments, use the dedicated pooler (PgBouncer, Pro plan) when IPv6 or the IPv4 add-on is available, or Supavisor in transaction mode when you need IPv4.

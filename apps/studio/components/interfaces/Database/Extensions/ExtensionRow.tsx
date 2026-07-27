@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { extensions } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableExtensionModal } from './EnableExtensionModal'
@@ -158,14 +158,17 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               <Loader2 className="animate-spin" size={16} />
             ) : (
               <Tooltip>
-                <TooltipTrigger>
-                  <Switch
-                    disabled={disabled}
-                    checked={isOn}
-                    onCheckedChange={() =>
-                      isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
-                    }
-                  />
+                <TooltipTrigger asChild>
+                  <div>
+                    <Switch
+                      aria-label="Toggle extension"
+                      disabled={disabled}
+                      checked={isOn}
+                      onCheckedChange={() =>
+                        isOn ? setIsDisableModalOpen(true) : setShowConfirmEnableModal(true)
+                      }
+                    />
+                  </div>
                 </TooltipTrigger>
                 {disabled && (
                   <TooltipContent side="bottom">

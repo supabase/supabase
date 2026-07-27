@@ -1,4 +1,4 @@
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
 import { Snowflake } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -8,6 +8,7 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectSeparator,
   SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -15,6 +16,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
@@ -28,7 +30,7 @@ interface DestinationTypeOption {
   label: string
   description: string
   icon: typeof Database
-  isAlpha: boolean
+  stage: 'Public Alpha' | 'Early Access' | 'Deprecated' | null
   enabled: boolean
 }
 
@@ -42,6 +44,7 @@ export const DestinationTypeSelection = () => {
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const [urlDestinationType, setDestinationType] = useQueryState(
@@ -52,6 +55,7 @@ export const DestinationTypeSelection = () => {
       'Analytics Bucket',
       'DuckLake',
       'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -74,7 +78,7 @@ export const DestinationTypeSelection = () => {
 
   const groups: DestinationTypeGroup[] = [
     {
-      label: 'Within Supabase',
+      label: 'Other',
       options: [
         {
           value: 'Read Replica',
@@ -82,46 +86,54 @@ export const DestinationTypeSelection = () => {
           description:
             'Deploy a read-only database in another region for lower latency and workload isolation',
           icon: Database,
-          isAlpha: false,
+          stage: null,
           enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
         },
+      ],
+    },
+    {
+      label: 'Pipelines',
+      options: [
         {
           value: 'Analytics Bucket',
           label: 'Analytics Bucket',
           description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
           icon: AnalyticsBucket,
-          isAlpha: true,
+          stage: 'Deprecated',
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
-      ],
-    },
-    {
-      label: 'Outside Supabase',
-      options: [
         {
           value: 'BigQuery',
           label: 'BigQuery',
-          description: "Stream changes to Google Cloud's data warehouse for analytics and BI",
+          description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
           icon: BigQuery,
-          isAlpha: true,
+          stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
         },
         {
           value: 'DuckLake',
           label: 'DuckLake',
-          description: 'Stream changes to a DuckLake catalog backed by S3-compatible storage',
+          description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
           icon: Database,
-          isAlpha: true,
+          stage: 'Early Access',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
           description:
-            'Stream changes to Snowflake for warehouse analytics and downstream data workflows',
+            'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
           icon: Snowflake,
-          isAlpha: true,
+          stage: 'Early Access',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+        },
+        {
+          value: 'ClickHouse',
+          label: 'ClickHouse',
+          description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
+          icon: ClickHouse,
+          stage: 'Early Access',
+          enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
       ],
     },
@@ -139,16 +151,22 @@ export const DestinationTypeSelection = () => {
     <FormItemLayout
       isReactForm={false}
       layout="horizontal"
-      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+      className="p-5 [&>div]:gap-y-1"
       label="Type"
       labelOptional="Destination type cannot be changed after creation"
       description={
-        selectedOption?.isAlpha && (
-          <span className="block text-sm text-foreground-light mb-1">
-            This destination type is in alpha and may change while we iterate.{' '}
-            <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-              Leave feedback
-            </InlineLink>
+        selectedOption?.stage && (
+          <span className="block text-sm text-foreground-lighter mb-1">
+            {selectedOption.stage === 'Public Alpha'
+              ? 'This destination type is in public alpha and may change as we iterate based on customer feedback. '
+              : selectedOption.stage === 'Deprecated'
+                ? 'This destination type is deprecated.'
+                : 'This destination type is available through early access and may change as we iterate based on customer feedback. '}
+            {selectedOption.stage !== 'Deprecated' && (
+              <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+                Leave feedback
+              </InlineLink>
+            )}
           </span>
         )
       }
@@ -164,7 +182,19 @@ export const DestinationTypeSelection = () => {
               <selectedOption.icon size={20} className="shrink-0 text-foreground-light" />
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
-                {selectedOption.isAlpha && <Badge variant="warning">Alpha</Badge>}
+                {selectedOption.stage && (
+                  <Badge
+                    variant={
+                      selectedOption.stage === 'Early Access'
+                        ? 'warning'
+                        : selectedOption.stage === 'Deprecated'
+                          ? 'destructive'
+                          : 'default'
+                    }
+                  >
+                    {selectedOption.stage}
+                  </Badge>
+                )}
               </div>
             </div>
           ) : (
@@ -172,8 +202,9 @@ export const DestinationTypeSelection = () => {
           )}
         </SelectTrigger>
         <SelectContent align="end">
-          {visibleGroups.map((group) => (
+          {visibleGroups.map((group, index) => (
             <SelectGroup key={group.label}>
+              {index > 0 && <SelectSeparator />}
               <SelectLabel>{group.label}</SelectLabel>
               {group.options.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="py-2">
@@ -182,7 +213,19 @@ export const DestinationTypeSelection = () => {
                     <div className="flex flex-col gap-y-0.5">
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>
-                        {option.isAlpha && <Badge variant="warning">Alpha</Badge>}
+                        {option.stage && (
+                          <Badge
+                            variant={
+                              option.stage === 'Early Access'
+                                ? 'warning'
+                                : option.stage === 'Deprecated'
+                                  ? 'destructive'
+                                  : 'default'
+                            }
+                          >
+                            {option.stage}
+                          </Badge>
+                        )}
                       </div>
                       <span className="text-xs text-foreground-lighter">{option.description}</span>
                     </div>

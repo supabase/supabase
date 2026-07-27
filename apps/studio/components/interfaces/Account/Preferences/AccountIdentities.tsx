@@ -29,6 +29,7 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { parseRedirectMessage } from './AccountIdentities.utils'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
@@ -68,7 +69,7 @@ export const AccountIdentities = () => {
   const [selectedProviderUpdateEmail, setSelectedProviderUpdateEmail] = useState<string>()
   const [linkingProviderId, setLinkingProviderId] = useState<string>()
 
-  const [, message] = router.asPath.split('#message=')
+  const message = parseRedirectMessage(router.asPath)
   const unlinkedExternalProviders = connectableExternalProviders.filter((provider) => {
     return !identities.some(
       (identity) => identity.provider === provider.authProvider || identity.provider === provider.id
@@ -119,7 +120,7 @@ export const AccountIdentities = () => {
   }
 
   useEffect(() => {
-    if (message) toast.success(message.replaceAll('+', ' '))
+    if (message) toast.success(message)
   }, [message])
 
   return (

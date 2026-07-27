@@ -2,230 +2,170 @@
 title: 'Use Supabase with RedwoodJS'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="redwoodjs" />
 
-  <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Setup your new Supabase Project">
-      [Create a new project](/dashboard) in the Supabase Dashboard.
+## 1. Setup your new Supabase project
 
-      <Admonition type="tip">
+[Create a new project](/dashboard) in the Supabase Dashboard.
 
-      Be sure to make note of the Database Password you used as you will need this later to connect to your database.
+<Admonition type="tip">
 
-      </Admonition>
-    </StepHikeCompact.Details>
+Be sure to make note of the Database Password you used as you will need this later to connect to your database.
 
-    <StepHikeCompact.Code>
-      ![New project for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/new-project.png)
-    </StepHikeCompact.Code>
+</Admonition>
 
-  </StepHikeCompact.Step>
+![New project for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/new-project.png)
 
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Gather Database Connection Strings">
+## 2. Gather database connection strings
 
-    Open the project [**Connect** panel](/dashboard/project/_?showConnect=true). This quickstart connects using the [**Transaction pooler**](/dashboard/project/_?showConnect=true&method=transaction) and [**Session pooler**](/dashboard/project/_?showConnect=true&method=session) mode. Transaction mode is used for application queries and Session mode is used for running migrations with Prisma.
+Open the project [**Connect** panel](/dashboard/project/_?showConnect=true). This quickstart connects using the [**Transaction pooler**](/dashboard/project/_?showConnect=true&method=transaction) and [**Session pooler**](/dashboard/project/_?showConnect=true&method=session) mode. Transaction mode is used for application queries and Session mode is used for running migrations with Prisma.
 
-    To do this, set the connection mode to `Transaction` in the [Database Settings page](/dashboard/project/_/database/settings) and copy the connection string and append `?pgbouncer=true&&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
+To do this, set the connection mode to `Transaction` in the [Database Settings page](/dashboard/project/_/database/settings) and copy the connection string and append `?pgbouncer=true&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
 
-    To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
+To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
 
-    You will need the Transaction mode connection string and the Session mode connection string to setup environment variables in Step 5.
+You will need the Transaction mode connection string and the Session mode connection string to set up environment variables in Step 6.
 
-    <Admonition type="tip">
+<Admonition type="tip">
 
-    You can copy and paste these connection strings from the Supabase Dashboard when needed in later steps.
+You can copy and paste these connection strings from the Supabase Dashboard when needed in later steps.
 
-    </Admonition>
-    </StepHikeCompact.Details>
+</Admonition>
 
-    <StepHikeCompact.Code>
-      ![pooled connection for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/pooled-connection-strings.png)
-    </StepHikeCompact.Code>
+![pooled connection for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/pooled-connection-strings.png)
 
-  </StepHikeCompact.Step>
+## 3. Create a RedwoodJS app
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Create a RedwoodJS app">
-      Create a RedwoodJS app with TypeScript.
+Create a RedwoodJS app with TypeScript.
 
-      <Admonition type="note">
+<Admonition type="note">
 
-        The [`yarn` package manager](https://yarnpkg.com) is required to create a RedwoodJS app. You will use it to run RedwoodJS commands later.
+The [`yarn` package manager](https://yarnpkg.com) is required to create a RedwoodJS app. You will use it to run RedwoodJS commands later.
 
-        While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` flag.
+While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` flag.
 
-      </Admonition>
-    </StepHikeCompact.Details>
+</Admonition>
 
-    <StepHikeCompact.Code>
-      ```bash name=Terminal
-      yarn create redwood-app my-app --ts
-      ```
-    </StepHikeCompact.Code>
+```bash
+yarn create redwood-app my-app --ts
+```
 
-  </StepHikeCompact.Step>
+## 4. Install Agent Skills (optional)
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Open your RedwoodJS app in VS Code">
-      You'll develop your app, manage database migrations, and run your app in VS Code.
-    </StepHikeCompact.Details>
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-    <StepHikeCompact.Code>
-      ```bash name=Terminal
-      cd my-app
-      code .
-      ```
-    </StepHikeCompact.Code>
+To install, run the following command in the root of your project:
 
-  </StepHikeCompact.Step>
+```bash
+npx skills add supabase/agent-skills
+```
 
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Configure Environment Variables">
+## 5. Install MCP server (optional)
 
-      In your `.env` file, add the following environment variables for your database connection:
+The Supabase MCP server connects AI assistants to Supabase, allowing you to interact with your projects on your behalf. Find out more on how to add it to your client in [the MCP docs](/docs/guides/ai-tools/mcp).
 
-      * The `DATABASE_URL` should use the Transaction mode connection string you copied in Step 1.
+## 6. Configure environment variables
 
-      * The `DIRECT_URL` should use the Session mode connection string you copied in Step 1.
+In your `.env` file, add the following environment variables for your database connection:
 
-    </StepHikeCompact.Details>
+- The `DATABASE_URL` should use the Transaction mode connection string you copied in Step 2.
 
-    <StepHikeCompact.Code>
-      ```bash name=.env
-      # Transaction mode connection string used for migrations
-      DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+- The `DIRECT_URL` should use the Session mode connection string you copied in Step 2.
 
-      # Session mode connection string — used by Prisma Client
-      DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
-      ```
-    </StepHikeCompact.Code>
+```bash name=.env
+# Transaction mode connection string used for migrations
+DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
 
-  </StepHikeCompact.Step>
+# Session mode connection string — used by Prisma Client
+DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
+```
 
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Update your Prisma Schema">
-      By default, RedwoodJS ships with a SQLite database, but we want to use Postgres.
+## 7. Update your Prisma schema
 
-      Update your Prisma schema file `api/db/schema.prisma` to use your Supabase Postgres database connection environment variables you setup in Step 5.
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-      ```prisma name=api/db/schema.prisma
-      datasource db {
-        provider  = "postgresql"
-        url       = env("DATABASE_URL")
-        directUrl = env("DIRECT_URL")
-      }
-      ```
-    </StepHikeCompact.Code>
+By default, RedwoodJS ships with a SQLite database, but we want to use Postgres.
 
-  </StepHikeCompact.Step>
+Update your Prisma schema file `api/db/schema.prisma` to use your Supabase Postgres database connection environment variables you set up in Step 6.
 
-  <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Create the Instrument model and apply a schema migration">
-      Create the Instrument model in `api/db/schema.prisma` and then run `yarn rw prisma migrate dev` from your terminal to apply the migration.
-    </StepHikeCompact.Details>
+```prisma name=api/db/schema.prisma
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+```
 
-    <StepHikeCompact.Code>
-      ```prisma name=api/db/schema.prisma
-      model Instrument {
-        id   Int    @id @default(autoincrement())
-        name String @unique
-      }
-      ```
-    </StepHikeCompact.Code>
+## 8. Create the instrument model and apply a schema migration
 
-  </StepHikeCompact.Step>
+Create the Instrument model in `api/db/schema.prisma` and then run `yarn rw prisma migrate dev` from your terminal to apply the migration.
 
-  <StepHikeCompact.Step step={8}>
-    <StepHikeCompact.Details title="Update seed script">
-      Seed the database with a few instruments.
+```prisma name=api/db/schema.prisma
+model Instrument {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+}
+```
 
-      Update the file `scripts/seed.ts` to contain the following code:
-    </StepHikeCompact.Details>
+## 9. Update seed script
 
-    <StepHikeCompact.Code>
+Seed the database with a few instruments.
 
-      ```ts name=scripts/seed.ts
-      import type { Prisma } from '@prisma/client'
-      import { db } from 'api/src/lib/db'
+Update the file `scripts/seed.ts` to contain the following code:
 
-      export default async () => {
-        try {
-          const data: Prisma.InstrumentCreateArgs['data'][] = [
-            { name: 'dulcimer' },
-            { name: 'harp' },
-            { name: 'guitar' },
-          ]
+```ts name=scripts/seed.ts
+import type { Prisma } from '@prisma/client'
+import { db } from 'api/src/lib/db'
 
-          console.log('Seeding instruments ...')
+export default async () => {
+  try {
+    const data: Prisma.InstrumentCreateArgs['data'][] = [
+      { name: 'dulcimer' },
+      { name: 'harp' },
+      { name: 'guitar' },
+    ]
 
-          const instruments = await db.instrument.createMany({ data })
+    console.log('Seeding instruments ...')
 
-          console.log('Done.', instruments)
-        } catch (error) {
-          console.error(error)
-        }
-      }
-      ```
-    </StepHikeCompact.Code>
+    const instruments = await db.instrument.createMany({ data })
 
-  </StepHikeCompact.Step>
+    console.log('Done.', instruments)
+  } catch (error) {
+    console.error(error)
+  }
+}
+```
 
-  <StepHikeCompact.Step step={9}>
-    <StepHikeCompact.Details title="Seed your database">
-      Run the seed database command to populate the `Instrument` table with the instruments you just created.
+## 10. Seed your database
 
-      <Admonition type="tip">
+Run the seed database command to populate the `Instrument` table with the instruments you created.
 
-        The reset database command `yarn rw prisma db reset` will recreate the tables and will also run the seed script.
+<Admonition type="tip">
 
-      </Admonition>
-    </StepHikeCompact.Details>
+The reset database command `yarn rw prisma db reset` recreates the tables and also runs the seed script.
 
-    <StepHikeCompact.Code>
-      ```bash name=Terminal
-      yarn rw prisma db seed
-      ```
-    </StepHikeCompact.Code>
+</Admonition>
 
-  </StepHikeCompact.Step>
+```bash
+yarn rw prisma db seed
+```
 
-  <StepHikeCompact.Step step={10}>
-    <StepHikeCompact.Details title="Scaffold the Instrument UI">
-      Now, we'll use RedwoodJS generators to scaffold a CRUD UI for the `Instrument` model.
-    </StepHikeCompact.Details>
+## 11. Scaffold the instrument UI
 
-    <StepHikeCompact.Code>
-      ```bash name=Terminal
-      yarn rw g scaffold instrument
-      ```
-    </StepHikeCompact.Code>
+Use RedwoodJS generators to scaffold a CRUD UI for the `Instrument` model.
 
-  </StepHikeCompact.Step>
+```bash
+yarn rw g scaffold instrument
+```
 
-  <StepHikeCompact.Step step={11}>
-    <StepHikeCompact.Details title="Start the app">
-      Start the app via `yarn rw dev`. A browser will open to the RedwoodJS Splash page.
-    </StepHikeCompact.Details>
+## 12. Start the app
 
-    <StepHikeCompact.Code>
-      ![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-splash.png)
+Start the app via `yarn rw dev`. A browser will open to the RedwoodJS Splash page.
 
-    </StepHikeCompact.Code>
+![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-splash.png)
 
-  </StepHikeCompact.Step>
+## 13. View instruments UI
 
-  <StepHikeCompact.Step step={12}>
-    <StepHikeCompact.Details title="View Books UI">
-      Click on `/instruments` to visit http://localhost:8910/instruments where should see the list of instruments.
+Click on `/instruments` to visit http://localhost:8910/instruments where should see the list of instruments.
 
-      You may now edit, delete, and add new books using the scaffolded UI.
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+You may now edit, delete, and add new instruments using the scaffolded UI.

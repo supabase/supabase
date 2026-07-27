@@ -5,6 +5,7 @@ import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const DropdownMenu = ({
   modal = false,
@@ -13,7 +14,22 @@ const DropdownMenu = ({
   <DropdownMenuPrimitive.Root modal={modal} {...props} />
 )
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <DropdownMenuPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
@@ -32,14 +48,14 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      'flex cursor-default select-none items-center rounded-xs px-2 py-1.5 text-xs outline-hidden focus:bg-overlay-hover data-[state=open]:bg-overlay-hover',
+      'flex cursor-default select-none items-center rounded-xs pl-2 pr-1 py-1.5 text-xs outline-hidden focus:bg-overlay-hover data-[state=open]:bg-overlay-hover',
       inset && 'pl-8',
       className
     )}
     {...props}
   >
     {children}
-    <ChevronRight className="h-4 w-4 ml-auto!" />
+    <ChevronRight className="ml-auto! shrink-0 text-foreground-lighter" size={12} />
   </DropdownMenuPrimitive.SubTrigger>
 ))
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName

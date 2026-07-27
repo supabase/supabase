@@ -2,116 +2,82 @@
 title: 'Use Supabase with Ruby on Rails'
 subtitle: 'Learn how to create a Rails project and connect it to your Supabase Postgres database.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="ruby-on-rails" />
 
-  <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Create a Rails Project">
+## 1. Create a Rails project
 
-    Make sure your Ruby and Rails versions are up to date, then use `rails new` to scaffold a new Rails project. Use the `-d=postgresql` flag to set it up for Postgres.
+With your Ruby and Rails versions up to date, run `rails new` on your terminal to scaffold a new project.
 
-    Go to the [Rails docs](https://guides.rubyonrails.org/getting_started.html) for more details.
+Use the `-d=postgresql` flag to set it up for Postgres.
 
-    </StepHikeCompact.Details>
+Check the [Rails docs](https://guides.rubyonrails.org/getting_started.html) for more details.
 
-    <StepHikeCompact.Code>
+```bash
+rails new blog -d=postgresql
+```
 
-     ```bash name=Terminal
-     rails new blog -d=postgresql
-     ```
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-    </StepHikeCompact.Code>
+To install, run the following command in the root of your project:
 
-  </StepHikeCompact.Step>
+```bash
+npx skills add supabase/agent-skills
+```
 
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Set up the Postgres connection details">
+## 3. Install MCP server (optional)
 
-    Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
+The Supabase MCP server connects AI assistants to Supabase, allowing you to interact with your projects on your behalf. Find out more on how to add it to your client in [the MCP docs](/docs/guides/ai-tools/mcp).
 
-    When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
+## 4. Set up the Postgres connection details
 
-    Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
+Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
-      <Admonition type="note">
+When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
 
-        If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
 
-      </Admonition>
+<Admonition type="note">
 
-    </StepHikeCompact.Details>
+If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
 
-    <StepHikeCompact.Code>
+</Admonition>
 
-    ```bash name=Terminal
-    export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
-    ```
+```bash name=.env
+export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
+```
 
-    </StepHikeCompact.Code>
+## 5. Create and run a database migration
 
-  </StepHikeCompact.Step>
+Rails includes Active Record as the ORM as well as database migration tooling which generates the SQL migration files for you.
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Create and run a database migration">
+Create an example `Article` model and generate the migration files.
 
-    Rails includes Active Record as the ORM as well as database migration tooling which generates the SQL migration files for you.
+```bash
+bin/rails generate model Article title:string body:text
+bin/rails db:migrate
+```
 
-    Create an example `Article` model and generate the migration files.
+## 6. Use the model to interact with the database
 
-    </StepHikeCompact.Details>
+You can use the included Rails console to interact with the database. For example, you can create new entries or list all entries in a Model's table.
 
-    <StepHikeCompact.Code>
+```bash
+bin/rails console
+```
 
-    ```bash name=Terminal
-    bin/rails generate model Article title:string body:text
-    bin/rails db:migrate
-    ```
+```rb name=irb
+article = Article.new(title: "Hello Rails", body: "I am on Rails!")
+article.save # Saves the entry to the database
 
-    </StepHikeCompact.Code>
+Article.all
+```
 
-  </StepHikeCompact.Step>
+## 7. Start the app
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Use the Model to interact with the database">
+Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
 
-    You can use the included Rails console to interact with the database. For example, you can create new entries or list all entries in a Model's table.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      bin/rails console
-      ```
-
-      ```rb name=irb
-      article = Article.new(title: "Hello Rails", body: "I am on Rails!")
-      article.save # Saves the entry to the database
-
-      Article.all
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      bin/rails server
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
+```bash
+bin/rails server
+```

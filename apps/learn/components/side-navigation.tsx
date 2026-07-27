@@ -4,7 +4,7 @@ import { logOut, useIsLoggedIn, useUser } from 'common'
 import { LogOut, Settings, UserIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { AuthenticatedDropdownMenu, type menuItem } from 'ui-patterns'
+import { AuthenticatedDropdownMenu, type menuItem } from 'ui-patterns/AuthenticatedDropdownMenu'
 
 import { CommandMenu } from './command-menu'
 import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'

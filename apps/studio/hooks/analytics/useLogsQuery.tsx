@@ -32,12 +32,17 @@ export interface LogsQueryHook {
   enabled?: boolean
 }
 
-export const useLogsQuery = (
-  projectRef: string,
-  initialParams: Partial<LogsEndpointParams> = {},
+export const useLogsQuery = ({
+  projectRef,
+  initialParams = {},
   enabled = true,
-  options: { useOtel?: boolean } = {}
-): LogsQueryHook => {
+  options = {},
+}: {
+  projectRef?: string
+  initialParams?: Partial<LogsEndpointParams>
+  enabled?: boolean
+  options?: { useOtel?: boolean }
+}): LogsQueryHook => {
   const { useOtel = false } = options
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
@@ -78,7 +83,7 @@ export const useLogsQuery = (
     queryFn: async ({ signal }) => {
       const { data, error } = await get(logsAllEndpointUrl(useOtel), {
         params: {
-          path: { ref: projectRef },
+          path: { ref: projectRef! },
           query: params,
         },
         signal,
@@ -138,4 +143,3 @@ export const useLogsQuery = (
     setParams,
   }
 }
-export default useLogsQuery

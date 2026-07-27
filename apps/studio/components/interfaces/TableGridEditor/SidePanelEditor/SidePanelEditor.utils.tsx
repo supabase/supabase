@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import type { PGTablePrimaryKey } from '@supabase/pg-meta'
 import pgMeta, {
   getAddForeignKeySQL,
   getAddPrimaryKeySQL,
@@ -11,7 +12,6 @@ import pgMeta, {
   getUpdateIdentitySequenceSQL,
   type ForeignKey,
 } from '@supabase/pg-meta'
-import type { PGTablePrimaryKey } from '@supabase/pg-meta'
 import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { Query } from '@supabase/pg-meta/src/query'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
@@ -26,12 +26,10 @@ import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './Si
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
-import { type AcceptedGeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
-import SparkBar from '@/components/ui/SparkBar'
+import { SparkBar } from '@/components/ui/SparkBar'
 import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
-import { createDatabasePolicy } from '@/data/database-policies/database-policy-create-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 import { databaseKeys } from '@/data/database/keys'
@@ -443,9 +441,8 @@ export const createTable = async ({
   foreignKeyRelations,
   isRLSEnabled,
   importContent,
-  generatedPolicies = [],
-  onCreatePoliciesSuccess,
   track,
+  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -459,9 +456,8 @@ export const createTable = async ({
   foreignKeyRelations: ForeignKey[]
   isRLSEnabled: boolean
   importContent?: ImportContent
-  generatedPolicies?: AcceptedGeneratedPolicy[]
-  onCreatePoliciesSuccess?: () => void
   track: Track
+  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -545,51 +541,10 @@ export const createTable = async ({
     }
   )
 
-  // 6. Create generated RLS policies if any
-  // [Joshen] Possible area for optimization to create all policies in a single query call
-  // Can be subsequently added to the table creation SQL as well for a single transaction
-
-  const failedPolicies: AcceptedGeneratedPolicy[] = []
-  if (generatedPolicies.length > 0 && isRLSEnabled) {
-    await Sentry.startSpan(
-      { name: 'create_table.create_policies', op: 'db.policies.create' },
-      async (span) => {
-        span.setAttribute('policies.count', generatedPolicies.length)
-        toast.loading(`Creating ${generatedPolicies.length} policies for table...`, { id: toastId })
-        await Promise.all(
-          generatedPolicies.map(async (policy) => {
-            try {
-              return await createDatabasePolicy({
-                projectRef,
-                connectionString,
-                payload: {
-                  name: policy.name,
-                  table: policy.table,
-                  schema: policy.schema,
-                  definition: policy.definition,
-                  check: policy.check,
-                  action: policy.action,
-                  command: policy.command,
-                  roles: policy.roles,
-                },
-              })
-            } catch (error: any) {
-              console.error('Failed to generate policy', error.message)
-              failedPolicies.push(policy)
-            }
-          })
-        )
-        span.setAttribute('policies.failed_count', failedPolicies.length)
-        onCreatePoliciesSuccess?.()
-      }
-    )
-  }
-
   track('table_created', {
     method: 'table_editor',
     schema_name: payload.schema,
     table_name: payload.name,
-    has_generated_policies: generatedPolicies.length > 0 && isRLSEnabled,
   })
 
   if (isRLSEnabled) {
@@ -721,12 +676,13 @@ export const createTable = async ({
         projectRef,
         connectionString,
         id: table.id,
+        scoped,
       })
     }
   )
 
   // Finally, return the created table
-  return { table, failedPolicies }
+  return { table }
 }
 
 /** TODO: Refactor to do in a single transaction */
@@ -741,6 +697,7 @@ export const updateTable = async ({
   existingForeignKeyRelations,
   primaryKey,
   track,
+  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -752,6 +709,7 @@ export const updateTable = async ({
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
   track: Track
+  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -912,6 +870,19 @@ export const updateTable = async ({
       queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
     }),
     queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
+    // useTableQuery (FK selectors/formatters) has a 5min staleTime, and the columns/FKs
+    // above were only just applied after `updatedTable` was fetched -- refresh its identity,
+    // plus the pre-rename one too, so nothing serves stale/deleted columns until then.
+    queryClient.invalidateQueries({
+      queryKey: tableKeys.retrieve(projectRef, updatedTable.name, updatedTable.schema),
+    }),
+    ...(updatedTable.name !== table.name || updatedTable.schema !== table.schema
+      ? [
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.retrieve(projectRef, table.name, table.schema),
+          }),
+        ]
+      : []),
   ])
 
   // We need to invalidate tableRowsAndCount after tableEditor
@@ -925,6 +896,7 @@ export const updateTable = async ({
       projectRef,
       connectionString,
       id: table.id,
+      scoped,
     }),
     hasError,
   }

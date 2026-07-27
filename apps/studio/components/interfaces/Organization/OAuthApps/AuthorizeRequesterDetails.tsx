@@ -1,5 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
   Badge,
@@ -13,16 +14,21 @@ import {
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
-import { LogoBox } from '@/components/layouts/InterstitialLayout'
+import { getRequesterLogo } from './OAuthApps.utils'
+import {
+  CONNECT_LOGO_LIGHT_TILE_CLASSNAME,
+  LogoBox,
+  LogoPair,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 const OAUTH_SCOPES_DOCS_URL = `${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`
 const PERMISSION_DETAILS_TRIGGER_CLASSNAME =
   'mx-auto flex h-7 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 text-xs text-foreground-lighter transition-colors hover:bg-surface-200 hover:text-foreground'
 
 export interface AuthorizeRequesterDetailsProps {
-  icon: string | null
   name: string
   domain: string
   scopes: OAuthScope[]
@@ -165,47 +171,59 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-// Hardcode custom logs for known apps that have broken icons (e.g. due to CORS issues), to ensure they display properly
-//  in the UI. This should be deleted once we support CIMD MCP
-const CUSTOM_LOGO_URLS = {
-  perplexity: `${BASE_PATH}/img/icons/perplexity-icon.svg`,
-  cursor: `${BASE_PATH}/img/icons/cursor-icon.svg`,
-  claude: `${BASE_PATH}/img/icons/claude-icon.svg`,
-  chatgpt: `${BASE_PATH}/img/icons/openai-icon.svg`,
-  openai: `${BASE_PATH}/img/icons/openai-icon.svg`,
-}
-
-export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
+/**
+ * Connect interstitial header mark for `/authorize`.
+ * Curated logos resolve from allowlisted redirect_uri hosts; otherwise pair only
+ * when a usable remote icon is present, else show Supabase alone.
+ *
+ * Uploaded / unknown bitmaps have no light/dark metadata, so both tiles use
+ * fixed light chrome (`forceLight`) across Studio themes. Curated partners keep
+ * theme-reactive tiles and may swap dark assets when available.
+ */
+export const AuthorizeConnectLogo = ({
+  icon,
+  name,
+  redirectUri,
+}: {
+  icon: string | null
+  name: string
+  redirectUri?: string | null
+}) => {
   const [failedIcon, setFailedIcon] = useState<string | null>(null)
+  const { resolvedTheme } = useTheme()
 
-  const customLogoUrl = useMemo(() => {
-    for (const key of Object.keys(CUSTOM_LOGO_URLS)) {
-      if (icon?.toLocaleLowerCase().includes(key)) {
-        return CUSTOM_LOGO_URLS[key as keyof typeof CUSTOM_LOGO_URLS]
-      }
+  const logo = useMemo(
+    () =>
+      getRequesterLogo({
+        icon,
+        redirectUri,
+        useDarkVariant: resolvedTheme === 'dark',
+      }),
+    [icon, redirectUri, resolvedTheme]
+  )
 
-      if (name.toLocaleLowerCase().includes(key)) {
-        return CUSTOM_LOGO_URLS[key as keyof typeof CUSTOM_LOGO_URLS]
-      }
-    }
-    return icon || ''
-  }, [icon, name])
+  const hasUsableLogo = Boolean(logo.src) && failedIcon !== logo.src
 
-  const showLetter = !customLogoUrl || failedIcon === customLogoUrl
+  if (!hasUsableLogo) {
+    return <SupabaseLogo />
+  }
+
+  const forceLightPair = !logo.isKnownClient
 
   return (
-    <LogoBox>
-      {showLetter ? (
-        <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
-      ) : (
-        <img
-          alt={name}
-          src={customLogoUrl}
-          className="size-full object-cover"
-          onError={() => setFailedIcon(customLogoUrl)}
-        />
-      )}
-    </LogoBox>
+    <LogoPair
+      left={
+        <LogoBox className={forceLightPair ? CONNECT_LOGO_LIGHT_TILE_CLASSNAME : 'bg-surface-75'}>
+          <img
+            alt={name}
+            src={logo.src}
+            className={cn(logo.isKnownClient ? 'size-7 object-contain' : 'size-full object-cover')}
+            onError={() => setFailedIcon(logo.src)}
+          />
+        </LogoBox>
+      }
+      right={<SupabaseLogo forceLight={forceLightPair} />}
+    />
   )
 }
 

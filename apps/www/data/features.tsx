@@ -642,38 +642,41 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
     },
   },
   {
-    title: 'Supabase ETL',
-    subtitle: 'Real-time data replication to analytical destinations.',
-    description: `Supabase ETL is a change-data-capture pipeline built in Rust that replicates your Postgres tables to analytical destinations in near real-time. Reading directly from the Postgres Write Ahead Log, ETL ensures your analytics data stays synchronized with your production database.
+    title: 'Supabase Pipelines',
+    subtitle: 'Replicate Postgres data to analytical destinations.',
+    description: `Supabase Pipelines is a managed change data capture (CDC) product that uses Postgres logical replication to deliver published data to analytical destinations in near real time.
 
 ## Key benefits
-1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
-2. Analytics Buckets support: Replicate to Iceberg format for large-scale analytics.
-3. BigQuery integration: Direct replication to Google's data warehouse.
-4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Optimized for analytics: Faster queries and lower storage costs through compression.
-6. Production isolation: Complete separation of analytics and production workloads.
+1. Initial sync: Copy existing rows from published tables.
+2. Ongoing replication: Apply subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
+3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
+4. Workload isolation: Keep analytical queries away from the primary database.
 
-## How it works
-ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. For Analytics Buckets, data is stored in append-only changelog format using Parquet files. For BigQuery, a view is created for each table backed by versioned tables.
+## Destinations
+BigQuery is currently available. [Request early access](/go/supabase-pipelines-new-destinations) to ClickHouse, Snowflake, and DuckLake while destination support expands.
 
-## Supabase ETL is valuable for:
-- Data warehousing and business intelligence
-- Historical analysis and audit trails
-- Large-scale analytics requiring separation from production
-- Compliance scenarios requiring complete data history
+## Setup
+Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+
+## Requirements
+Requirements depend on the destination. BigQuery requires source tables to have primary keys and requires the publication to include those columns.
+
+## Pipelines is valuable for:
+- Near real-time analytics data movement
+- Analytics separation from production
+- Managed replication to supported destination systems
 
 ## Limitations
-Tables require primary keys. DDL support (schema changes) is currently in development.
+Schema change support is currently in beta and limited to supported BigQuery changes. Destination-specific constraints apply.
 
-Supabase ETL provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+Pipelines keeps the current destination table state synchronized. It does not automatically create a queryable history of every row version.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.github.io/etl/',
-    slug: 'supabase-etl',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
+    slug: 'supabase-pipelines',
     status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: false,
     },
   },
@@ -1609,7 +1612,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
 2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
 3. Built-in time travel: Query historical data using snapshots.
 4. Schema evolution: Evolve schema over time without breaking queries.
-5. Integrated with ETL: Real-time replication from Postgres via Supabase ETL.
+5. Open ingestion: Populate buckets with your own Iceberg-compatible ingestion pipeline.
 6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
 
 ## Query tools supported
@@ -2830,48 +2833,6 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
-    },
-  },
-  {
-    title: 'Replication',
-    subtitle: 'Replicate database changes to external destinations.',
-    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
-
-## Key benefits
-1. Near real-time sync: Changes replicated as they occur using WAL reading.
-2. Analytics Buckets support: Append-only changelog format in Iceberg.
-3. BigQuery integration: Direct replication to Google's data warehouse.
-4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Managed pipeline: Monitor status, lag, and errors in dashboard.
-
-## Destinations
-Analytics Buckets create append-only changelog with \`cdc_operation\` column, preserving complete change history in Iceberg format. BigQuery creates views backed by versioned tables for efficient querying.
-
-## Setup
-Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
-
-## Requirements
-Tables must have primary keys. Logical replication must be enabled.
-
-## Replication is valuable for:
-- Real-time data warehousing
-- Analytics separation from production
-- Historical data archival
-- Multi-destination data sync
-- Compliance and audit trails
-
-## Limitations
-No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
-
-Replication provides the real-time data pipeline required for modern analytics architectures.`,
-    icon: DatabaseZap,
-    products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/external-replication-setup',
-    slug: 'replication',
-    status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
-      availableOnSelfHosted: false,
     },
   },
   {
