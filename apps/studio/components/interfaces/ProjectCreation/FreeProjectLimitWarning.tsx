@@ -6,9 +6,13 @@ import type { MemberWithFreeProjectLimit } from '@/data/organizations/free-proje
 
 interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
+  showVercelReturnHint?: boolean
 }
 
-export const FreeProjectLimitWarning = ({ membersExceededLimit }: FreeProjectLimitWarningProps) => {
+export const FreeProjectLimitWarning = ({
+  membersExceededLimit,
+  showVercelReturnHint = false,
+}: FreeProjectLimitWarningProps) => {
   return (
     <Panel.Content>
       <Admonition
@@ -32,6 +36,11 @@ export const FreeProjectLimitWarning = ({ membersExceededLimit }: FreeProjectLim
               These members will need to either delete, pause, or upgrade one or more of these
               projects before you're able to create a free project within this organization.
             </p>
+            {showVercelReturnHint && (
+              <p className="text-sm leading-normal">
+                Or return to Vercel and restart with a different organization.
+              </p>
+            )}
 
             <UpgradePlanButton
               source="freeProjectLimitWarning"
