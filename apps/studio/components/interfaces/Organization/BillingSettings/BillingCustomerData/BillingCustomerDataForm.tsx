@@ -252,6 +252,8 @@ export const PurchasingAsRadioButtons = (props: {
   onSetPurchasingAs: (v: PurchasingAs) => void
   purchasingAs: PurchasingAs
 }) => {
+  const id = useId()
+
   return (
     <RadioGroup
       defaultValue={'individual'}
@@ -262,10 +264,10 @@ export const PurchasingAsRadioButtons = (props: {
       <div className="flex items-center gap-3">
         <RadioGroupItem
           value="individual"
-          id="purchasing-as-individual"
+          id={'purchasing-as-individual-' + id}
           className="cursor-pointer"
         />
-        <label htmlFor="purchasing-as-individual">I'm purchasing as an individual</label>
+        <label htmlFor={'purchasing-as-individual-' + id}>I'm purchasing as an individual</label>
         <Tooltip>
           <TooltipTrigger asChild>
             <HelpCircle
@@ -280,8 +282,12 @@ export const PurchasingAsRadioButtons = (props: {
         </Tooltip>
       </div>
       <div className="flex items-center gap-3">
-        <RadioGroupItem value="business" id="purchasing-as-business" className="cursor-pointer" />
-        <label htmlFor="purchasing-as-business">I'm purchasing as a business</label>
+        <RadioGroupItem
+          value="business"
+          id={'purchasing-as-business' + id}
+          className="cursor-pointer"
+        />
+        <label htmlFor={'purchasing-as-business' + id}>I'm purchasing as a business</label>
         <Tooltip>
           <TooltipTrigger asChild>
             <HelpCircle
