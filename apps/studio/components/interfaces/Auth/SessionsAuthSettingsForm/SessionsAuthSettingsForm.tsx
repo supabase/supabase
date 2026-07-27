@@ -48,6 +48,14 @@ function HoursOrNeverText({ value }: { value: number }) {
   }
 }
 
+function secondsToHours(seconds: number): number {
+  return seconds / 3600
+}
+
+function hoursToSeconds(hours: number): number {
+  return Math.round(hours * 3600)
+}
+
 const RefreshTokenSchema = z.object({
   REFRESH_TOKEN_ROTATION_ENABLED: z.boolean(),
   SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: z.coerce.number().min(0, 'Must be a value more than 0'),
@@ -118,8 +126,10 @@ export const SessionsAuthSettingsForm = () => {
 
       if (!isUpdatingUserSessions) {
         userSessionsForm.reset({
-          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
-          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
+          SESSIONS_TIMEBOX: secondsToHours(authConfig.SESSIONS_TIMEBOX || 0),
+          SESSIONS_INACTIVITY_TIMEOUT: secondsToHours(
+            authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0
+          ),
           SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
         })
       }
@@ -146,7 +156,11 @@ export const SessionsAuthSettingsForm = () => {
   }
 
   const onSubmitUserSessions = (values: any) => {
-    const payload = { ...values }
+    const payload = {
+      ...values,
+      SESSIONS_TIMEBOX: hoursToSeconds(values.SESSIONS_TIMEBOX),
+      SESSIONS_INACTIVITY_TIMEOUT: hoursToSeconds(values.SESSIONS_INACTIVITY_TIMEOUT),
+    }
     setIsUpdatingUserSessions(true)
 
     updateAuthConfig(
