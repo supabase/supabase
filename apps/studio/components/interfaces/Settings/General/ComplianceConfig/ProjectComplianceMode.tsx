@@ -13,6 +13,8 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { getComplianceRequirements } from './ComplianceConfig.utils'
+import { ComplianceRequirementRow } from './ComplianceRequirementRow'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -24,8 +26,6 @@ import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-q
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { getComplianceRequirements } from './ComplianceConfig.utils'
-import { ComplianceRequirementRow } from './ComplianceRequirementRow'
 
 export const ComplianceConfig = () => {
   const { ref } = useParams()
@@ -70,14 +70,12 @@ export const ComplianceConfig = () => {
     if (!isLoading) setIsSensitive(initialIsSensitive)
   }, [isLoading])
 
-  const {
-    data: sslEnforcement,
-    isLoading: isLoadingSslEnforcement,
-  } = useSSLEnforcementQuery({ projectRef: ref }, { enabled: isSensitive })
-  const {
-    data: networkRestrictions,
-    isLoading: isLoadingNetworkRestrictions,
-  } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: isSensitive })
+  const { data: sslEnforcement, isLoading: isLoadingSslEnforcement } = useSSLEnforcementQuery(
+    { projectRef: ref },
+    { enabled: isSensitive }
+  )
+  const { data: networkRestrictions, isLoading: isLoadingNetworkRestrictions } =
+    useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: isSensitive })
   const { data: backups, isLoading: isLoadingBackups } = useBackupsQuery(
     { projectRef: ref },
     { enabled: isSensitive }
