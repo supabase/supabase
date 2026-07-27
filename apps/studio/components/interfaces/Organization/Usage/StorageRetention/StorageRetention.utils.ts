@@ -1,4 +1,7 @@
+import dayjs from 'dayjs'
+
 import type { DataPoint } from '@/data/analytics/constants'
+import type { StorageRetentionUsage } from '@/data/storage/protection/protection-mocks'
 
 export const STORAGE_RETENTION_KEYS = {
   live: 'storage_size_live',
@@ -6,46 +9,23 @@ export const STORAGE_RETENTION_KEYS = {
   snapshots: 'storage_size_snapshots',
 } as const
 
-export type StorageRetentionTotals = { live: number; versions: number; snapshots: number }
-
 /**
- * Splits each Storage Size data point into live / prior-version / snapshot
- * segments so the usage chart can stack what is driving the total.
+ * Maps the mock daily retention series into the `DataPoint[]` shape the shared
+ * `UsageBarChart` expects.
  *
- * The platform API reports Storage Size as a single number today, so the split
- * is derived from the retention totals' ratio. The per-day total is preserved
- * exactly — only its attribution is inferred.
+ * The platform's real daily-stats endpoint is what the rest of the usage page
+ * charts read from, but Storage Size here needs a live/versions/snapshots
+ * breakdown that endpoint doesn't report — and in this prototype environment the
+ * real endpoint is also sparse, which is what produced the earlier single
+ * "Invalid Date" bar (`dayjs` formatting a missing/malformed real date). Reading
+ * the chart entirely off the mock daily series (already anchored to the
+ * viewer's current date in `protection-mocks.ts`) sidesteps both problems.
  */
-export const splitStorageSizeByRetention = (
-  dataPoints: DataPoint[],
-  totalKey: string,
-  totals: StorageRetentionTotals | undefined
-): DataPoint[] => {
-  const sum = (totals?.live ?? 0) + (totals?.versions ?? 0) + (totals?.snapshots ?? 0)
-
-  return dataPoints.map((point) => {
-    const total = Number(point[totalKey] ?? 0)
-
-    // Without retention data (or an empty day) attribute everything to live objects
-    // so the chart still renders the real total.
-    if (!totals || sum <= 0 || total <= 0) {
-      return {
-        ...point,
-        [STORAGE_RETENTION_KEYS.live]: total,
-        [STORAGE_RETENTION_KEYS.versions]: 0,
-        [STORAGE_RETENTION_KEYS.snapshots]: 0,
-      }
-    }
-
-    const versions = (total * totals.versions) / sum
-    const snapshots = (total * totals.snapshots) / sum
-
-    return {
-      ...point,
-      // Give live the remainder so the three segments always add back to `total`
-      [STORAGE_RETENTION_KEYS.live]: total - versions - snapshots,
-      [STORAGE_RETENTION_KEYS.versions]: versions,
-      [STORAGE_RETENTION_KEYS.snapshots]: snapshots,
-    }
-  })
-}
+export const toStorageSizeChartData = (daily: StorageRetentionUsage['daily']): DataPoint[] =>
+  daily.map((day) => ({
+    period_start: day.date,
+    periodStartFormatted: dayjs(day.date).format('DD MMM'),
+    [STORAGE_RETENTION_KEYS.live]: day.live,
+    [STORAGE_RETENTION_KEYS.versions]: day.versions,
+    [STORAGE_RETENTION_KEYS.snapshots]: day.snapshots,
+  }))

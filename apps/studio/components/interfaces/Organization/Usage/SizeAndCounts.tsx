@@ -1,4 +1,4 @@
-import { splitStorageSizeByRetention } from './StorageRetention/StorageRetention.utils'
+import { toStorageSizeChartData } from './StorageRetention/StorageRetention.utils'
 import { dailyUsageToDataPoints } from './Usage.utils'
 import UsageSection from './UsageSection/UsageSection'
 import { DataPoint } from '@/data/analytics/constants'
@@ -33,15 +33,11 @@ const SizeAndCounts = ({
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
     [PricingMetric.STORAGE_SIZE]: {
-      isLoading: isLoadingOrgDailyStats || isLoadingRetention,
+      isLoading: isLoadingRetention,
       margin: 14,
-      // Split the reported total into live / versions / snapshots so the chart
-      // stacks what is driving Storage Size (the API reports one number today).
-      data: splitStorageSizeByRetention(
-        dailyUsageToDataPoints(orgDailyStats, (metric) => metric === PricingMetric.STORAGE_SIZE),
-        PricingMetric.STORAGE_SIZE.toLowerCase(),
-        retention?.totals
-      ),
+      // Reads entirely off the mock retention series (live / versions / snapshots)
+      // rather than the real daily-stats endpoint — see StorageRetention.utils.ts.
+      data: retention ? toStorageSizeChartData(retention.daily) : [],
     },
     [PricingMetric.DATABASE_SIZE]: {
       isLoading: isLoadingOrgDailyStats,
