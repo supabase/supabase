@@ -1,14 +1,15 @@
 'use client'
 
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 import { useEffect, useReducer, useRef } from 'react'
-import { PhoneLoginsItems } from '../Navigation/NavigationMenu/NavigationMenu.constants'
-import { IconPanel } from 'ui-patterns/IconPanel'
 import { Dialog, DialogContent, DialogHeader, DialogSection, Heading } from 'ui'
+import { IconPanel } from 'ui-patterns/IconPanel'
+
+import { PhoneLoginsItems } from '../Navigation/NavigationMenu/NavigationMenu.constants'
 import MessageBird from './MessageBirdConfig.mdx'
+import TextLocal from './TextLocalConfig.mdx'
 import Twilio from './TwilioConfig.mdx'
 import Vonage from './VonageConfig.mdx'
-import TextLocal from './TextLocalConfig.mdx'
-import { safeHistoryReplaceState } from '~/lib/historyUtils'
 
 const reducer = (_, action: (typeof PhoneLoginsItems)[number] | undefined) => {
   const url = new URL(document.location.href)
@@ -43,6 +44,7 @@ const AuthSmsProviderConfig = () => {
         <div className="grid grid-cols-6 gap-10 not-prose py-8">
           {PhoneLoginsItems.map((provider) => (
             <button
+              tabIndex={0}
               key={provider.name}
               className="col-span-6 xl:col-span-3"
               onClick={() => setSelectedProvider(provider)}

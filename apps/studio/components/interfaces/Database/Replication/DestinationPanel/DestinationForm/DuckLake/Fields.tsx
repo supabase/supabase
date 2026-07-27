@@ -26,7 +26,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
+import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
   DUCKLAKE_MODE_CUSTOM,
@@ -76,6 +76,7 @@ const DuckLakeModeSelector = ({
           <button
             key={option.value}
             type="button"
+            tabIndex={0}
             role="radio"
             aria-checked={selected}
             onClick={() => onChange(option.value)}
@@ -227,7 +228,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
                 min={1}
                 max={6}
                 value={field.value ?? ''}
-                placeholder="Default: 4"
+                placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
                 onChange={(event) =>
                   field.onChange(event.target.value === '' ? undefined : Number(event.target.value))
                 }
@@ -449,7 +450,7 @@ const DuckLakeCustomFields = ({
                   min={1}
                   max={6}
                   value={field.value ?? ''}
-                  placeholder="Default: 4"
+                  placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
                   onChange={(event) =>
                     field.onChange(
                       event.target.value === '' ? undefined : Number(event.target.value)
@@ -476,7 +477,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Access Key ID"
+              label="S3 access key ID"
               description={
                 editMode
                   ? 'Stored access key ID is hidden. Enter a new key ID to replace it.'
@@ -500,7 +501,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Secret Access Key"
+              label="S3 secret access key"
               description={
                 editMode
                   ? 'Stored secret access key is hidden. Enter a new secret to replace it.'
@@ -532,7 +533,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Region"
+              label="S3 region"
               description="Required region for the object storage provider"
             >
               <FormControl>
@@ -548,7 +549,7 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Endpoint"
+              label="S3 endpoint"
               description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`"
             >
               <FormControl>

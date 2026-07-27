@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
@@ -19,10 +20,10 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
+  AuthorizeConnectLogo,
   AuthorizeRequesterDetails,
-  RequesterLogo,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import { InterstitialLayout, LogoPair, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization, ResponseError } from '@/types'
 
@@ -91,9 +92,10 @@ export function ApiAuthorizationMainView({
   return (
     <InterstitialLayout
       logo={
-        <LogoPair
-          left={<RequesterLogo icon={requester.icon} name={requester.name} />}
-          right={<SupabaseLogo />}
+        <AuthorizeConnectLogo
+          icon={requester.icon}
+          name={requester.name}
+          redirectUri={requester.redirect_uri}
         />
       }
       title={`Authorize ${requester.name}`}
@@ -124,7 +126,6 @@ export function ApiAuthorizationMainView({
               {showReadyContent && (
                 <>
                   <AuthorizeRequesterDetails
-                    icon={requester.icon}
                     name={requester.name}
                     domain={requester.domain}
                     scopes={requester.scopes}
@@ -194,6 +195,12 @@ function OrganizationsEmptyState(): ReactNode {
       type="warning"
       title="No organizations found"
       description="Create an organization before authorizing this request."
+      actions={[
+        // [Joshen] JFYI this is a short term solution to guide users with creating an org from here
+        <Button asChild key="new-org" variant="default">
+          <Link href="/new">Create an organization</Link>
+        </Button>,
+      ]}
     />
   )
 }

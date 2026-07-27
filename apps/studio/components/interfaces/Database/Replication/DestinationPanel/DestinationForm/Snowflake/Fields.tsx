@@ -11,9 +11,11 @@ import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 export const SnowflakeFields = ({
   form,
   editMode,
+  hasStoredPrivateKeyPassphrase,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  hasStoredPrivateKeyPassphrase: boolean
 }) => {
   const [showPrivateKeyPassphrase, setShowPrivateKeyPassphrase] = useState(false)
 
@@ -157,7 +159,7 @@ export const SnowflakeFields = ({
               layout="horizontal"
               label="Private key passphrase"
               description={
-                editMode
+                hasStoredPrivateKeyPassphrase
                   ? 'Stored passphrase setting is hidden. Enter a new passphrase to replace it.'
                   : 'Optional passphrase for encrypted private keys'
               }
@@ -166,13 +168,19 @@ export const SnowflakeFields = ({
                 <PasswordInput
                   value={field.value ?? ''}
                   type={showPrivateKeyPassphrase ? 'text' : 'password'}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Optional'}
+                  placeholder={
+                    hasStoredPrivateKeyPassphrase ? STORED_SECRET_PLACEHOLDER : 'Optional'
+                  }
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
                     <div className="flex items-center justify-center">
                       <Button
                         variant="default"
                         className="w-7"
+                        title={showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+                        aria-label={
+                          showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'
+                        }
                         icon={showPrivateKeyPassphrase ? <Eye /> : <EyeOff />}
                         onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
                       />

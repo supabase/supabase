@@ -36,9 +36,9 @@ export const data: CustomerStoryType[] = [
     description:
       'Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.',
     organization: 'Hyper',
-    imgUrl: 'images/customers/logos/hyper.svg',
-    logo: '/images/customers/logos/hyper.svg',
-    logo_inverse: '/images/customers/logos/light/hyper.svg',
+    imgUrl: 'images/customers/logos/hyper.png',
+    logo: '/images/customers/logos/hyper.png',
+    logo_inverse: '/images/customers/logos/light/hyper.png',
     url: '/customers/hyper',
     ctaText: 'View story',
   },

@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import Link from 'next/link'
+import { parseAsString, useQueryState } from 'nuqs'
 import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
@@ -9,6 +10,7 @@ import { DataTableFilterControls } from './DataTableFilters/DataTableFilterContr
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { UserLogFilterControl } from '@/components/interfaces/UnifiedLogs/components/UserLogFilterControl'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 
 interface FilterSideBarProps {
@@ -24,6 +26,7 @@ export function FilterSideBar({
 }: FilterSideBarProps) {
   const { ref } = useParams()
   const { table } = useDataTable()
+  const [user, setUser] = useQueryState('user', parseAsString)
 
   const panelRef = usePanelRef()
 
@@ -58,14 +61,19 @@ export function FilterSideBar({
             <p className="text-foreground text-lg">Logs</p>
             <Badge variant="default">Beta</Badge>
           </div>
-          {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
+          {table.getState().columnFilters.length || user ? (
+            <DataTableResetButton onReset={() => setUser(null)} />
+          ) : null}
         </div>
       </div>
 
       <UnifiedLogsBanner />
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
+        <DataTableFilterControls
+          dateRangeDisabled={dateRangeDisabled}
+          itemsAfter={{ level: <UserLogFilterControl /> }}
+        />
         <FeaturePreviewSidebarPanel
           className="mx-2 my-4"
           title="Capture your logs"

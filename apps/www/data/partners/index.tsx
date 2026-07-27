@@ -42,6 +42,10 @@ export default {
       label: 'Become a Partner',
       link: 'https://forms.supabase.com/partner',
     },
+    secondaryCta: {
+      label: 'Partner Catalog',
+      link: '/partners/catalog',
+    },
   },
   oAuthApp: {
     steps: [
