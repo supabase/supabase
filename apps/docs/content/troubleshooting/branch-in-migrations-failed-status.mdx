@@ -7,16 +7,16 @@ database_id = ""
 
 When a Preview Branch is created via the Dashboard, it's built by replaying the migration history from your `main` branch against a fresh database. If that replay fails partway through, the branch is left either empty or partly complete and its status shows `MIGRATIONS_FAILED`. This almost always means the migration history on `main` is out of sync with its actual live schema — commonly because a change was made directly via the SQL Editor or another manual edit that was never captured as a migration file.
 
-The steps to resolve this differ slightly depending on whether you branch via the **Dashboard** or the **GitHub integration**. Follow the section that matches your setup.
+Follow the steps below to diagnose and repair your migration history so branching can complete successfully.
 
 ---
-
-## Part 1: Branching via the Dashboard
 
 #### 1. Confirm the branch failure and view its workflow
 
 - Go to [Branches](/dashboard/project/_/branches) and find the affected branch.
 - Click **View logs**. A popup shows the branch's creation workflow, including the failed step.
+
+![image](/docs/img/troubleshooting/migrations-failed-status.png)
 
 ---
 
@@ -24,7 +24,9 @@ The steps to resolve this differ slightly depending on whether you branch via th
 
 - Go to [Postgres Logs](/dashboard/project/_/logs?filter=log_type:eq:postgres).
 - Look for entries beginning with `execute <unnamed>:` — these are the individual migration statements being replayed.
-- Find the entry **highlighted in red**. This is the statement that failed, and its message explains why (e.g. relation already exists, column not found, permission denied).
+- Find the entry **highlighted in red**. This is the statement that failed, and its message explains why (e.g. relation already exists, column not found, permission denied, relation does not exist).
+
+![image](/docs/img/troubleshooting/postgres-logs-migration-failed.png)
 
 ---
 
@@ -63,8 +65,18 @@ supabase migration repair <timestamp> --status applied
 
 #### 6. Re-test branch creation
 
-Once repaired, either create a new branch or **rebase** the existing affected branch. Check the branch's workflow logs again (step 1) to confirm migrations now complete successfully.
+Once repaired, either create a new branch or **rebase** the existing affected branch. 
+
+![image](/docs/img/troubleshooting/rebase-branch-button.png)
+
+Check the branch's workflow logs again (step 1) to confirm migrations now complete successfully.
 
 > If it fails again, repeat steps 2–6 — there may be more than one out-of-sync migration to work through, one at a time.
 
 ---
+
+#### Additional tips
+
+If issues persist after repairing migration history (schema drift, repeated mismatches), review the [branching troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues) and consider further manual repair with [`supabase migration repair`](/docs/reference/cli/supabase-migration-repair).
+
+If your migration history has drifted too far out of sync for repairing individual migrations to be practical, consider creating a single baseline migration that encapsulates your production project's current schema instead. The [new branch doesn't copy database troubleshooting guide](/docs/guides/troubleshooting/new-branch-doesnt-copy-database) walks through the commands for setting this up.
