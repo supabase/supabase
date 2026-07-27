@@ -106,24 +106,24 @@ catalogs:
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
   monaco-editor: 0.52.2
-  '@mapbox/node-pre-gyp>tar': ^7.5.19
+  '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
   braintrust>uuid: ^11.1.1
-  cacache>tar: ^7.5.19
+  cacache>tar: ^7.5.21
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
   h3@1: 1.15.11
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   mdx-bundler>uuid: ^11.1.1
-  node-gyp>tar: ^7.5.19
+  node-gyp>tar: ^7.5.21
   nodemailer: ^7.0.11
   postcss: ^8.5.18
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
-  supabase>tar: ^7.5.19
+  supabase>tar: ^7.5.21
   tmp: ^0.2.7
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1
@@ -704,8 +704,8 @@ importers:
         specifier: 'catalog:'
         version: 4.2.4
       tar:
-        specifier: ^7.5.19
-        version: 7.5.20
+        specifier: ^7.5.21
+        version: 7.5.21
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -16399,8 +16399,8 @@ packages:
   tar-stream@3.1.7:
     resolution: {integrity: sha512-qJj60CXt7IU1Ffyc3NJMjh6EkuCFej46zUqJ4J7pqYlThyd9bO0XBTmcOIhSzZJVWfsLks0+nle/j538YAW9RQ==}
 
-  tar@7.5.20:
-    resolution: {integrity: sha512-9FcyK4PA6+WbzlTM9WhQm6vB5W7cP7dUiPsv1g7YDwEQnQ1CGpK3MGlKk/ITVWMk05kHZuBhmVhiv8LZoy/PFQ==}
+  tar@7.5.21:
+    resolution: {integrity: sha512-XdhtCvlMywwxpCW8YEq3lOXBJpUPTR2OHHcwLPO3HwsJqOHa2Ok/oJ7ruGzp+JrKoRPVCzJwAdEjqLW/vNRPHA==}
     engines: {node: '>=18'}
 
   termi-link@1.1.0:
@@ -20322,7 +20322,7 @@ snapshots:
       npmlog: 5.0.1
       rimraf: 3.0.2
       semver: 7.8.1
-      tar: 7.5.20
+      tar: 7.5.21
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -20335,7 +20335,7 @@ snapshots:
       node-fetch: 2.7.0(encoding@0.1.13)
       nopt: 8.1.0
       semver: 7.8.1
-      tar: 7.5.20
+      tar: 7.5.21
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -25833,7 +25833,7 @@ snapshots:
       minipass-pipeline: 1.2.4
       p-map: 4.0.0
       ssri: 10.0.6
-      tar: 7.5.20
+      tar: 7.5.21
       unique-filename: 3.0.0
 
   call-bind-apply-helpers@1.0.2:
@@ -31236,7 +31236,7 @@ snapshots:
       nopt: 7.2.1
       proc-log: 3.0.0
       semver: 7.8.1
-      tar: 7.5.20
+      tar: 7.5.21
       which: 4.0.0
     transitivePeerDependencies:
       - supports-color
@@ -34094,7 +34094,7 @@ snapshots:
       bin-links: 6.0.0
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       node-fetch: 3.3.2
-      tar: 7.5.20
+      tar: 7.5.21
     transitivePeerDependencies:
       - supports-color
 
@@ -34167,7 +34167,7 @@ snapshots:
       fast-fifo: 1.3.2
       streamx: 2.22.0
 
-  tar@7.5.20:
+  tar@7.5.21:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
