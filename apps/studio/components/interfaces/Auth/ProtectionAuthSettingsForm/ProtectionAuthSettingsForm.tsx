@@ -155,7 +155,7 @@ export const ProtectionAuthSettingsForm = () => {
 
   useEffect(() => {
     // Background refetches (e.g. on window focus) must not overwrite edits in progress
-    if (authConfig && !isUpdatingConfig && !protectionForm.formState.isDirty) {
+    if (authConfig && !isUpdatingConfig && !isDirty) {
       const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
         'hcaptcha') as CaptchaProviders
 
@@ -195,7 +195,7 @@ export const ProtectionAuthSettingsForm = () => {
         })
       }
     }
-  }, [authConfig, isUpdatingConfig])
+  }, [authConfig, isUpdatingConfig, isDirty])
 
   const onSubmitProtection = (values: any) => {
     const payload = { ...values }

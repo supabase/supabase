@@ -114,6 +114,22 @@ describe('ProtectionAuthSettingsForm — captcha secret', () => {
     expect(await screen.findByDisplayValue('changed-in-another-tab')).toBeInTheDocument()
   })
 
+  test('syncs a config that arrived during an edit once the edit is cancelled', async () => {
+    mockAuthConfig([{}, { SECURITY_CAPTCHA_SECRET: 'changed-in-another-tab' }])
+    const queryClient = renderForm()
+
+    const secretInput = await screen.findByDisplayValue('stored-secret')
+    fireEvent.change(secretInput, { target: { value: 'my-new-turnstile-secret' } })
+
+    await triggerWindowFocusRefetch(queryClient)
+    expect(secretInput).toHaveValue('my-new-turnstile-secret')
+
+    const form = secretInput.closest('form') as HTMLFormElement
+    fireEvent.click(within(form).getByRole('button', { name: 'Cancel' }))
+
+    await waitFor(() => expect(secretInput).toHaveValue('changed-in-another-tab'))
+  })
+
   test('sends the edited secret on save and settles clean afterwards', async () => {
     mockAuthConfig([{}])
     let patchBody: any
