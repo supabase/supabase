@@ -266,6 +266,18 @@ export const PurchasingAsRadioButtons = (props: {
           className="cursor-pointer"
         />
         <label htmlFor="purchasing-as-individual">I'm purchasing as an individual</label>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle
+              size={14}
+              className="text-foreground-lighter hover:text-foreground transition"
+            />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="w-72">
+            Use this if you are not a business or if you are a business without a tax ID (e.g. US
+            EIN, VAT, GST).
+          </TooltipContent>
+        </Tooltip>
       </div>
       <div className="flex items-center gap-3">
         <RadioGroupItem value="business" id="purchasing-as-business" className="cursor-pointer" />
@@ -278,8 +290,8 @@ export const PurchasingAsRadioButtons = (props: {
             />
           </TooltipTrigger>
           <TooltipContent side="top" className="w-72">
-            Purchasing as a business allows you to add a tax ID (e.g. US EIN, VAT, GST) to your
-            account, which will then show up on your invoice.
+            Use this if you are a business and if you want to add a tax ID (e.g. US EIN, VAT, GST)
+            to your account, which will then show up on your invoice.
           </TooltipContent>
         </Tooltip>
       </div>
