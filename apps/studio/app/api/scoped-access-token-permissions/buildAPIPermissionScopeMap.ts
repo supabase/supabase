@@ -30,7 +30,7 @@ export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> 
   const permissionScopeMapV2 = getEndpointsAndMCPToolsForAPI(apiV2Specs, MCPToolScopeMappings)
 
   const permissionScope = lodash.mergeWith(
-    {},
+    { mcp_tools: MCPToolScopeMappings },
     permissionScopeMapV1,
     permissionScopeMapV2,
     mergeArrays
@@ -56,7 +56,7 @@ export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> 
 export const getEndpointsAndMCPToolsForAPI = (
   apiSpecs: z.output<typeof API_SPECS_SCHEMA>,
   mcp_tools: McpMap
-): PermissionScopeMap => {
+): Omit<PermissionScopeMap, 'mcp_tools'> => {
   const scopes: ScopeMap = {}
   const endpoints: EndpointMap = {}
 
@@ -96,7 +96,7 @@ export const getEndpointsAndMCPToolsForAPI = (
     })
   })
 
-  return { scopes, endpoints, mcp_tools }
+  return { scopes, endpoints }
 }
 
 const NEXT_PUBLIC_API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN || 'https://api.supabase.com'
