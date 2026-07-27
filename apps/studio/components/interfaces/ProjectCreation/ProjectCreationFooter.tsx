@@ -73,11 +73,6 @@ export const ProjectCreationFooter = ({
     // compute credits
     10
 
-  const navigateToStudio = () => {
-    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-    else router.push('/organizations')
-  }
-
   const onCancel = () => {
     if (canReturnToVercel && vercelReturnUrl) {
       window.location.href = vercelReturnUrl
@@ -85,7 +80,8 @@ export const ProjectCreationFooter = ({
     }
 
     // Fall back to Studio when cancelAction is studio, or when vercel next is missing/invalid
-    navigateToStudio()
+    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+    else router.push('/organizations')
   }
 
   return (
