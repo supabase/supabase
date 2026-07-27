@@ -103,7 +103,12 @@ export const SignUpForm = () => {
     let redirectTo: string
 
     if (isInsideOAuthFlow) {
-      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}${searchParams.organization_slug && `&organization_slug=${searchParams.organization_slug}`}`
+      const authorizeParams = new URLSearchParams({ auth_id: searchParams.auth_id })
+      if (searchParams.token) authorizeParams.set('token', searchParams.token)
+      if (searchParams.organization_slug) {
+        authorizeParams.set('organization_slug', searchParams.organization_slug)
+      }
+      redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
       // Use getRedirectToPath to handle redirect_to parameter and other query params
       const { returnTo } = router.query
