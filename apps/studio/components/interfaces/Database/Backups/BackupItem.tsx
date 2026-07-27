@@ -4,20 +4,30 @@ import { Download } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { CoverageChips } from './RestorePoints/CoverageChips'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
 import type { DatabaseBackup } from '@/data/database/backups-query'
+import type { RestorePointCoverage } from '@/data/restore-points/restore-points-mocks'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface BackupItemProps {
   index: number
   isHealthy: boolean
   backup: DatabaseBackup
+  /** Platform coverage for this restore point (Database / Storage / Config). */
+  coverage?: RestorePointCoverage
   onSelectBackup: () => void
 }
 
-export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupItemProps) => {
+export const BackupItem = ({
+  index,
+  isHealthy,
+  backup,
+  coverage,
+  onSelectBackup,
+}: BackupItemProps) => {
   const { ref: projectRef } = useParams()
   const { can: canTriggerScheduledBackups } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
@@ -88,11 +98,11 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
 
   return (
     <div
-      className={`flex h-12 items-center justify-between px-6 ${
+      className={`flex min-h-12 items-center justify-between gap-x-4 px-6 py-2 ${
         index ? 'border-t border-default' : ''
       }`}
     >
-      <div className="flex items-center gap-x-2">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <TimestampInfo
           displayAs="utc"
           utcTimestamp={backup.inserted_at}
@@ -112,6 +122,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
             </InlineLink>
           </TooltipContent>
         </Tooltip>
+        {coverage && <CoverageChips primitives={coverage.primitives} />}
       </div>
       <div>{generateSideButtons(backup)}</div>
     </div>

@@ -1,6 +1,8 @@
 import { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { STORAGE_RETENTION_KEYS } from './StorageRetention/StorageRetention.utils'
+import { StorageRetentionBreakdown } from './StorageRetention/StorageRetentionBreakdown'
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -215,13 +217,18 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
   databaseAndStorageSizeAttributes.push({
     anchor: 'storageSize',
     key: PricingMetric.STORAGE_SIZE,
-    attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
+    attributes: [
+      { key: STORAGE_RETENTION_KEYS.live, name: 'Live objects', color: 'white' },
+      { key: STORAGE_RETENTION_KEYS.versions, name: 'Object versions', color: 'yellow' },
+      { key: STORAGE_RETENTION_KEYS.snapshots, name: 'Snapshots', color: 'blue' },
+    ],
     name: 'Storage Size',
     chartPrefix: 'Average',
     unit: 'bytes',
     description:
-      'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+      'Sum of all objects in your storage buckets, including versions and snapshots retained for recovery.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
     chartDescription: 'The data refreshes every hour.',
+    additionalInfo: () => <StorageRetentionBreakdown />,
     links: [
       {
         name: 'Storage',

@@ -4,18 +4,18 @@ import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Admonition } from 'ui-patterns/admonition'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { BackupItem } from './BackupItem'
 import { BackupsEmpty } from './BackupsEmpty'
 import { BackupsStorageAlert } from './BackupsStorageAlert'
+import { PlatformCoverageNotice } from './RestorePoints/PlatformCoverageNotice'
+import { RestoreBackupModal } from './RestorePoints/RestoreBackupModal'
 import Panel from '@/components/ui/Panel'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from '@/data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from '@/data/database/backups-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
+import { useRestorePointCoverageQuery } from '@/data/restore-points/restore-points-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -56,6 +56,11 @@ export const BackupsList = () => {
   )
   const isPitrEnabled = backups?.pitr_enabled
 
+  const { data: coverageByTimestamp } = useRestorePointCoverageQuery({
+    projectRef,
+    backupTimestamps: sortedBackups.map((backup) => backup.inserted_at),
+  })
+
   if (!hasAccessToBackups) {
     return (
       <UpgradeToPro
@@ -80,6 +85,7 @@ export const BackupsList = () => {
         ) : (
           <>
             <BackupsStorageAlert />
+            <PlatformCoverageNotice />
             <Panel>
               {sortedBackups?.map((x, i: number) => {
                 return (
@@ -88,6 +94,7 @@ export const BackupsList = () => {
                     backup={x}
                     index={i}
                     isHealthy={isHealthy}
+                    coverage={coverageByTimestamp?.[x.inserted_at]}
                     onSelectBackup={() => setSelectedBackup(x)}
                   />
                 )
@@ -96,47 +103,18 @@ export const BackupsList = () => {
           </>
         )}
       </div>
-      <ConfirmationModal
-        size="small"
-        confirmLabel="Restore"
-        confirmLabelLoading="Restoring..."
-        variant="warning"
-        visible={selectedBackup !== undefined}
-        title="Restore from backup"
-        loading={isRestoring || isSuccessBackup}
-        onCancel={() => setSelectedBackup(undefined)}
-        onConfirm={() => {
+      <RestoreBackupModal
+        projectRef={projectRef}
+        backup={selectedBackup}
+        coverage={selectedBackup ? coverageByTimestamp?.[selectedBackup.inserted_at] : undefined}
+        isRestoringInPlace={isRestoring || isSuccessBackup}
+        onRestoreInPlace={() => {
           if (projectRef === undefined) return console.error('Project ref required')
           if (selectedBackup === undefined) return console.error('Backup required')
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
-      >
-        <div className="space-y-3">
-          {!!selectedBackup && (
-            <p className="text-sm">
-              This will restore your database to the backup made on{' '}
-              <TimestampInfo
-                displayAs="utc"
-                utcTimestamp={selectedBackup.inserted_at}
-                labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-                className="text-sm!"
-              />
-            </p>
-          )}
-
-          <Admonition
-            showIcon={false}
-            type="warning"
-            title="This action cannot be undone"
-            description={
-              <ul className="list-disc list-inside">
-                <li>Your project will be offline during restoration</li>
-                <li>Any new data since this backup will be lost</li>
-              </ul>
-            }
-          />
-        </div>
-      </ConfirmationModal>
+        onCancel={() => setSelectedBackup(undefined)}
+      />
     </>
   )
 }
