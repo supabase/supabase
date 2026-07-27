@@ -12,7 +12,7 @@ import {
   type SetupIntent,
 } from '@stripe/stripe-js'
 import { Form } from '@ui/components/shadcn/ui/form'
-import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -33,15 +33,11 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  RadioGroup,
-  RadioGroupItem,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { PurchasingAsRadioButtons } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/BillingCustomerDataForm'
 import { TAX_IDS } from '@/components/interfaces/Organization/BillingSettings/BillingCustomerData/TaxID.constants'
 import {
   getEffectiveTaxCountry,
@@ -348,41 +344,10 @@ export const NewPaymentMethodElement = forwardRef(
 
         {fullyLoaded && (
           <div className="flex items-center space-x-2 py-4">
-            <RadioGroup
-              defaultValue={'individual'}
-              value={purchasingAs}
-              onValueChange={(v) => setPurchasingAs(v === 'business' ? 'business' : 'individual')}
-              className="text-sm"
-            >
-              <div className="flex items-center gap-3">
-                <RadioGroupItem
-                  value="individual"
-                  id="purchasing-as-individual"
-                  className="cursor-pointer"
-                />
-                <label htmlFor="purchasing-as-individual">I'm purchasing as an individual</label>
-              </div>
-              <div className="flex items-center gap-3">
-                <RadioGroupItem
-                  value="business"
-                  id="purchasing-as-business"
-                  className="cursor-pointer"
-                />
-                <label htmlFor="purchasing-as-business">I'm purchasing as a business</label>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle
-                      size={14}
-                      className="text-foreground-lighter hover:text-foreground transition"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="w-72">
-                    Purchasing as a business allows you to add a tax ID (e.g. US EIN, VAT, GST) to
-                    your account, which will then show up on your invoice.
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            </RadioGroup>
+            <PurchasingAsRadioButtons
+              onSetPurchasingAs={setPurchasingAs}
+              purchasingAs={purchasingAs}
+            />
           </div>
         )}
 

@@ -113,37 +113,7 @@ export const BillingCustomerDataForm = ({
 
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
-      <RadioGroup
-        defaultValue={'individual'}
-        value={purchasingAs}
-        onValueChange={(v) => setPurchasingAs(v === 'business' ? 'business' : 'individual')}
-        className="text-sm"
-      >
-        <div className="flex items-center gap-3">
-          <RadioGroupItem
-            value="individual"
-            id="purchasing-as-individual"
-            className="cursor-pointer"
-          />
-          <label htmlFor="purchasing-as-individual">I'm purchasing as an individual</label>
-        </div>
-        <div className="flex items-center gap-3">
-          <RadioGroupItem value="business" id="purchasing-as-business" className="cursor-pointer" />
-          <label htmlFor="purchasing-as-business">I'm purchasing as a business</label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircle
-                size={14}
-                className="text-foreground-lighter hover:text-foreground transition"
-              />
-            </TooltipTrigger>
-            <TooltipContent side="top" className="w-72">
-              Purchasing as a business allows you to add a tax ID (e.g. US EIN, VAT, GST) to your
-              account, which will then show up on your invoice.
-            </TooltipContent>
-          </Tooltip>
-        </div>
-      </RadioGroup>
+      <PurchasingAsRadioButtons onSetPurchasingAs={setPurchasingAs} purchasingAs={purchasingAs} />
 
       <div className={cn('relative', disabled && 'opacity-50')}>
         <AddressElement
@@ -275,5 +245,44 @@ export const BillingCustomerDataForm = ({
         </div>
       )}
     </div>
+  )
+}
+
+export const PurchasingAsRadioButtons = (props: {
+  onSetPurchasingAs: (v: PurchasingAs) => void
+  purchasingAs: PurchasingAs
+}) => {
+  return (
+    <RadioGroup
+      defaultValue={'individual'}
+      value={props.purchasingAs}
+      onValueChange={(v) => props.onSetPurchasingAs(v === 'business' ? 'business' : 'individual')} // satisfying typescript
+      className="text-sm"
+    >
+      <div className="flex items-center gap-3">
+        <RadioGroupItem
+          value="individual"
+          id="purchasing-as-individual"
+          className="cursor-pointer"
+        />
+        <label htmlFor="purchasing-as-individual">I'm purchasing as an individual</label>
+      </div>
+      <div className="flex items-center gap-3">
+        <RadioGroupItem value="business" id="purchasing-as-business" className="cursor-pointer" />
+        <label htmlFor="purchasing-as-business">I'm purchasing as a business</label>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle
+              size={14}
+              className="text-foreground-lighter hover:text-foreground transition"
+            />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="w-72">
+            Purchasing as a business allows you to add a tax ID (e.g. US EIN, VAT, GST) to your
+            account, which will then show up on your invoice.
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </RadioGroup>
   )
 }
