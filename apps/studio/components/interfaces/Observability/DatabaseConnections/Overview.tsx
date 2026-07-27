@@ -239,7 +239,11 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="text-foreground-light text-xs cursor-pointer hover:text-foreground transition normal-nums"
+                      className={cn(
+                        'text-foreground-light text-xs cursor-pointer transition-all normal-nums',
+                        'hover:text-foreground hover:underline',
+                        'focus:text-foreground focus:underline'
+                      )}
                       onClick={() => setSelectedPid(longestBlockedQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -289,7 +293,7 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="normal-nums cursor-pointer hover:underline"
+                      className="normal-nums cursor-pointer hover:underline focus:underline"
                       onClick={() => setSelectedPid(queryBlockingTheMostQueries.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -346,7 +350,7 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="normal-nums hover:underline cursor-pointer"
+                      className="normal-nums hover:underline focus:underline cursor-pointer"
                       onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
