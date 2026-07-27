@@ -8,7 +8,11 @@ on:
       - 'apps/docs/content/guides/getting-started/quickstarts/nextjs.mdx'
       - 'apps/docs/content/_partials/quickstart_db_setup.mdx'
       - 'apps/docs/content/_partials/api_settings.mdx'
-      - 'e2e/docs/**'
+      - 'e2e/docs/features/**'
+      - 'e2e/docs/utils/**'
+      - 'e2e/docs/playwright.config.ts'
+      - 'e2e/docs/package.json'
+      - 'e2e/docs/tsconfig.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/docs-e2e.yml'
   workflow_dispatch:
