@@ -67,6 +67,7 @@ export const SignUpForm = () => {
   const [searchParams] = useQueryStates({
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
+    organization_slug: parseAsString.withDefault(''),
   })
 
   const trackFunnelError = useTrackFunnelError()
@@ -102,7 +103,7 @@ export const SignUpForm = () => {
     let redirectTo: string
 
     if (isInsideOAuthFlow) {
-      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}${searchParams.organization_slug && `&organization_slug=${searchParams.organization_slug}`}`
     } else {
       // Use getRedirectToPath to handle redirect_to parameter and other query params
       const { returnTo } = router.query
