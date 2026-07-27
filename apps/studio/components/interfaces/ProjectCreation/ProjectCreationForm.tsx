@@ -19,6 +19,7 @@ import { DatabasePasswordInput } from './DatabasePasswordInput'
 import { DataSeeding } from './DataSeeding'
 import { DisabledWarningDueToIncident } from './DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
+import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
@@ -657,6 +658,8 @@ export const ProjectCreationForm = ({
                     <ProjectNameInput form={form} />
 
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
+
+                    <HighAvailabilityInput form={form} />
 
                     <DatabasePasswordInput form={form} />
 

@@ -118,9 +118,9 @@ export const AdvancedSettings = ({
               name="maxCopyConnectionsPerTable"
               render={({ field }) => (
                 <FormItemLayout
-                  label="Copy connections per table"
+                  label="Initial sync connections per table"
                   layout="horizontal"
-                  description="Maximum number of connections used to sync each table."
+                  description="Maximum number of source connections used to sync existing rows for each table."
                 >
                   <FormControl>
                     <InputGroup>

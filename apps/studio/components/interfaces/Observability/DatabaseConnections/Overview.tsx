@@ -135,12 +135,19 @@ export const Overview = ({ live }: OverviewProps) => {
               <MetricCardLabel
                 tooltip={
                   <div>
-                    <p className="text-foreground-light pr-2">Connections by roles:</p>
-                    {rolesWithActiveConnections.map((role) => (
-                      <div key={role.id} className="flex items-center">
-                        <p className="min-w-32">{role.name}:</p> {role.activeConnections}
-                      </div>
-                    ))}
+                    <p className="text-foreground-light">Connections by roles:</p>
+                    <table>
+                      <tbody>
+                        {rolesWithActiveConnections.map((role) => (
+                          <tr key={role.id}>
+                            <th scope="row" className="text-left font-normal">
+                              {role.name}:
+                            </th>
+                            <td className="pl-2">{role.activeConnections}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 }
               >
@@ -232,7 +239,11 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="text-foreground-light text-xs cursor-pointer hover:text-foreground transition normal-nums"
+                      className={cn(
+                        'text-foreground-light text-xs cursor-pointer transition-all normal-nums',
+                        'hover:text-foreground hover:underline',
+                        'focus:text-foreground focus:underline'
+                      )}
                       onClick={() => setSelectedPid(longestBlockedQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -282,7 +293,7 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="normal-nums cursor-pointer hover:underline"
+                      className="normal-nums cursor-pointer hover:underline focus:underline"
                       onClick={() => setSelectedPid(queryBlockingTheMostQueries.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -339,7 +350,7 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="normal-nums hover:underline cursor-pointer"
+                      className="normal-nums hover:underline focus:underline cursor-pointer"
                       onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
