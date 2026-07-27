@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 import {
   articleSelectorForPagePath,
+  browserLikeUserAgent,
   collectDocsOwnedLinks,
   parseDocsE2EPagePaths,
 } from '../utils/docs-links.js'
@@ -38,10 +39,11 @@ test.describe('Docs owned pages', () => {
       ).toBeVisible()
 
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
+      const userAgent = await browserLikeUserAgent(page)
 
       for (const url of links) {
         try {
-          const linkResponse = await page.request.get(url)
+          const linkResponse = await page.request.get(url, { headers: { 'user-agent': userAgent } })
           expect
             .soft(linkResponse.ok(), `${url} should resolve (status ${linkResponse.status()})`)
             .toBeTruthy()

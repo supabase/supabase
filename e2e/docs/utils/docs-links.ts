@@ -65,6 +65,18 @@ export async function collectDocsOwnedLinks(
 }
 
 /**
+ * Playwright's headless Chromium reports a `HeadlessChrome` UA string, which
+ * Vercel's bot protection blocks on some routes (notably /docs/reference/*)
+ * even though the same page loads fine for a real browser. Stripping
+ * `Headless` avoids that false positive when checking links out-of-band via
+ * page.request rather than an actual navigation.
+ */
+export async function browserLikeUserAgent(page: Page): Promise<string> {
+  const userAgent = await page.evaluate(() => navigator.userAgent)
+  return userAgent.replace('HeadlessChrome', 'Chrome')
+}
+
+/**
  * Parse DOCS_E2E_PAGE_PATHS (comma- or newline-separated /docs/... paths).
  */
 export function parseDocsE2EPagePaths(raw: string | undefined): string[] {
