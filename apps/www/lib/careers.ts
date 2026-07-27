@@ -14,10 +14,11 @@ export const filterGenericJob = (job: JobItemProps) => job.id === PLACEHOLDER_JO
 export const groupJobsByDepartment = (jobs: JobItemProps[]) => {
   return jobs.reduce(
     (acc, job) => {
-      if (!acc[job.department]) {
-        acc[job.department] = []
+      const department = job.department || 'Other'
+      if (!acc[department]) {
+        acc[department] = []
       }
-      acc[job.department].push(job)
+      acc[department].push(job)
       return acc
     },
     {} as Record<string, JobItemProps[]>
