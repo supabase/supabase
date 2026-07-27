@@ -248,8 +248,10 @@ export interface CronJobCleanupDialogOpenedEvent {
 }
 
 /**
- * Fired when the user confirms the cleanup dialog and the daily cleanup job is
- * actually scheduled (deletes old rows from cron.job_run_details).
+ * Fired when the user confirms the cleanup dialog, initiating the request to
+ * schedule the daily cleanup job (deletes old rows from cron.job_run_details).
+ * Emitted on confirm, before the scheduling request resolves, so it does not
+ * indicate the job was scheduled successfully.
  *
  * @group Events
  * @source studio
