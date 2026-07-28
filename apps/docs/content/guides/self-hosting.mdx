@@ -5,9 +5,75 @@ subtitle: 'Install and run your own Supabase on your computer, server, or cloud 
 hideToc: true
 ---
 
-Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent you from using managed services, or want to run Supabase in an isolated environment.
+Self-hosting runs Supabase on your own infrastructure instead of the managed platform. Get full control over your data, meet compliance requirements, or run in a fully isolated environment.
 
-### How self-hosted Supabase differs
+<div className="flex flex-wrap gap-3 not-prose">
+  <Button variant="primary" asChild>
+    <Link href="/guides/self-hosting/docker">Get started with Docker</Link>
+  </Button>
+  <Button variant="outline" asChild>
+    <Link href="#support-and-community">Join the community</Link>
+  </Button>
+</div>
+
+## Everything you get, self-hosted
+
+<div className="grid grid-cols-12 gap-6 not-prose">
+  <Link href="/reference/self-hosting-auth/introduction" className="col-span-6 md:col-span-3" passHref>
+    <IconPanel
+      title="Auth"
+      icon="/docs/img/icons/menu/auth"
+      hasLightIcon={true}
+      background={true}
+      showIconBg={true}
+    >
+      Email/password, OAuth, and phone authentication.
+    </IconPanel>
+  </Link>
+  <Link href="/guides/database/overview" className="col-span-6 md:col-span-3" passHref>
+    <IconPanel
+      title="Database"
+      icon="/docs/img/icons/menu/database"
+      hasLightIcon={true}
+      background={true}
+      showIconBg={true}
+    >
+      A full Postgres database with realtime subscriptions.
+    </IconPanel>
+  </Link>
+  <Link href="/reference/self-hosting-storage/introduction" className="col-span-6 md:col-span-3" passHref>
+    <IconPanel
+      title="Storage"
+      icon="/docs/img/icons/menu/storage"
+      hasLightIcon={true}
+      background={true}
+      showIconBg={true}
+    >
+      Store and serve files, from images to videos.
+    </IconPanel>
+  </Link>
+  <Link href="/reference/self-hosting-realtime/introduction" className="col-span-6 md:col-span-3" passHref>
+    <IconPanel
+      title="Realtime"
+      icon="/docs/img/icons/menu/realtime"
+      hasLightIcon={true}
+      background={true}
+      showIconBg={true}
+    >
+      Listen to database changes and broadcast messages.
+    </IconPanel>
+  </Link>
+</div>
+
+<ContentListings id="self-hosting-get-started" />
+
+<ContentListings id="self-hosting-community" />
+
+## More about self-hosting
+
+<Accordion type="default" chevronAlign="right" justified>
+
+<AccordionItem header="How self-hosted Supabase differs" id="differs">
 
 Self-hosted Supabase is different from:
 
@@ -16,7 +82,9 @@ Self-hosted Supabase is different from:
 
 Self-hosted Supabase mimics a single project. Studio doesn't support multiple organizations or projects. Platform-only [features](/features) such as branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable** in self-hosted configuration. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
-### Your responsibilities when self-hosting
+</AccordionItem>
+
+<AccordionItem header="Your responsibilities when self-hosting" id="responsibilities">
 
 When you self-host, **you are responsible for**:
 
@@ -28,15 +96,17 @@ When you self-host, **you are responsible for**:
 - Backups and disaster recovery
 - Monitoring and uptime
 
-### Telemetry
+</AccordionItem>
+
+<AccordionItem header="Telemetry" id="telemetry">
 
 Self-hosted Supabase (run via Docker Compose) **does not phone home or collect any telemetry**.
 
 The **Supabase CLI** is a [separate tool](/docs/guides/local-development/cli/getting-started) and collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
 
-<ContentListings id="self-hosting-get-started" />
+</AccordionItem>
 
-<ContentListings id="self-hosting-community" />
+</Accordion>
 
 ## Support and community
 
