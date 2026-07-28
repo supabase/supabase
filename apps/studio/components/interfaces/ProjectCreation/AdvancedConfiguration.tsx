@@ -23,10 +23,15 @@ import { DOCS_URL } from '@/lib/constants'
 
 interface AdvancedConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
+  isOrioleDbAvailable: boolean
 }
 
-export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
+export const AdvancedConfiguration = ({
+  form,
+  isOrioleDbAvailable,
+}: AdvancedConfigurationProps) => {
   const disableOrioleProjectCreation = useFlag('disableOrioleProjectCreation')
+  const isOrioleDbDisabled = disableOrioleProjectCreation || !isOrioleDbAvailable
 
   return (
     <Panel.Content>
@@ -85,13 +90,14 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                                 '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
                                 form.getValues('useOrioleDb') ? 'rounded-b-none!' : ''
                               )}
-                              disabled={disableOrioleProjectCreation}
+                              disabled={isOrioleDbDisabled}
                             />
                           </TooltipTrigger>
-                          {disableOrioleProjectCreation && (
+                          {isOrioleDbDisabled && (
                             <TooltipContent side="right" className="w-60 text-center">
-                              OrioleDB is temporarily disabled for new projects. Please try again
-                              later.
+                              {disableOrioleProjectCreation
+                                ? 'OrioleDB is temporarily disabled for new projects. Please try again later.'
+                                : 'OrioleDB is not available in the selected region.'}
                             </TooltipContent>
                           )}
                         </Tooltip>

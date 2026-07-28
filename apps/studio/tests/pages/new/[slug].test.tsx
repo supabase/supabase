@@ -496,6 +496,20 @@ describe('project creation wizard', () => {
   })
 
   describe('postgres version and orioledb', () => {
+    test('shows advanced configuration on initial load when orioledb is unavailable', async () => {
+      mockWizardEndpoints({
+        availableVersions: {
+          available_versions: DEFAULT_AVAILABLE_VERSIONS.available_versions.slice(0, 1),
+        },
+      })
+
+      await renderWizard()
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Advanced Configuration' }))
+
+      expect(screen.getByRole('radio', { name: /Postgres with OrioleDB/ })).toBeDisabled()
+    })
+
     test('selecting orioledb shows the alpha warning and submits the oriole engine/channel', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()

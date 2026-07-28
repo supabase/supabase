@@ -739,9 +739,12 @@ export const ProjectCreationForm = ({
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
-                    {showAdvancedConfig &&
-                      !!availableOrioleVersion &&
-                      highAvailability !== true && <AdvancedConfiguration form={form} />}
+                    {showAdvancedConfig && highAvailability !== true && (
+                      <AdvancedConfiguration
+                        form={form}
+                        isOrioleDbAvailable={availableOrioleVersion !== undefined}
+                      />
+                    )}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
