@@ -44,10 +44,16 @@ Spring Data JPA uses Hibernate, which relies on server-side prepared statements,
 
 </Admonition>
 
-Add the connection string and driver to `src/main/resources/application.properties`.
+The connection string contains your database password, and `application.properties` is committed with your project. Set the string as an environment variable instead, and set it the same way on whatever platform you deploy to.
+
+```bash
+export SUPABASE_DB_URL='jdbc:postgresql://xxxx.pooler.supabase.com:5432/postgres?user=postgres.xxxx&password=[YOUR-PASSWORD]'
+```
+
+Then reference the variable, along with the driver, in `src/main/resources/application.properties`.
 
 ```text name=src/main/resources/application.properties
-spring.datasource.url=jdbc:postgresql://xxxx.pooler.supabase.com:5432/postgres?user=postgres.xxxx&password=[YOUR-PASSWORD]
+spring.datasource.url=${SUPABASE_DB_URL}
 spring.datasource.driver-class-name=org.postgresql.Driver
 spring.jpa.hibernate.ddl-auto=update
 ```

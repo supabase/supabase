@@ -207,9 +207,10 @@ database.new. Then:
    -d type=maven-project -d language=java -d groupId=com.example -d artifactId=instruments
    -d name=instruments -o instruments.zip\` and unzip it to scaffold the project.
 2. Copy the JDBC connection string for the Session pooler (port 5432) from the Supabase
-   Connect panel and set \`spring.datasource.url\` and \`spring.datasource.driver-class-name\`
-   in \`application.properties\`. Avoid the Transaction pooler (port 6543) since Hibernate
-   relies on prepared statements.
+   Connect panel and export it as a \`SUPABASE_DB_URL\` environment variable, so the
+   password stays out of source control. Set \`spring.datasource.url=\${SUPABASE_DB_URL}\`
+   and \`spring.datasource.driver-class-name\` in \`application.properties\`. Avoid the
+   Transaction pooler (port 6543) since Hibernate relies on prepared statements.
 3. Set \`spring.jpa.hibernate.ddl-auto=update\` and
    \`spring.jpa.properties.hibernate.default_schema\` in \`application.properties\`, so
    Hibernate creates tables outside the \`public\` schema that Supabase exposes as a data API.
