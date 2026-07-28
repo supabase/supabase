@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useCallback } from 'react'
 
 import { DEFAULT_LOG_DATE_RANGE, resolveLogRunRange } from './querySource'
@@ -20,6 +20,7 @@ type UseLogsSqlExecutionArgs = { id: string }
  */
 export function useLogsSqlExecution({ id }: UseLogsSqlExecutionArgs) {
   const { ref: projectRef } = useParams()
+  const isOtelLogsEnabled = useFlag('otelLegacyLogs')
   const track = useTrack()
   const sessionSnap = useSqlEditorSessionSnapshot()
 
@@ -36,6 +37,13 @@ export function useLogsSqlExecution({ id }: UseLogsSqlExecutionArgs) {
     (sql: SafeLogSqlFragment) => {
       if (isExecuting || projectRef === undefined) return
 
+      if (!isOtelLogsEnabled) {
+        getSqlEditorSessionSnapshot().addResultError(id, {
+          message: "Querying logs from the SQL editor isn't available for this project yet.",
+        })
+        return
+      }
+
       // Re-read imperatively so a range picked immediately before the run is
       // honored; relative ranges re-resolve against `now` here.
       const range = resolveLogRunRange(
@@ -46,7 +54,7 @@ export function useLogsSqlExecution({ id }: UseLogsSqlExecutionArgs) {
 
       track('sql_editor_query_run_button_clicked', { source: 'logs' })
     },
-    [id, isExecuting, mutate, projectRef, track]
+    [id, isExecuting, isOtelLogsEnabled, mutate, projectRef, track]
   )
 
   return { executeLogsQuery, isExecuting }

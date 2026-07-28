@@ -39,6 +39,12 @@ function mockLogsAllOtel(rows: unknown[] = []) {
   return captured
 }
 
+/** Renders the hook with ClickHouse logs enabled by default; pass
+ *  `{ otelLegacyLogs: false }` to exercise the not-available-yet guard. */
+function renderLogsExecution(flags: Record<string, boolean> = { otelLegacyLogs: true }) {
+  return renderSqlEditorHook(() => useLogsSqlExecution({ id: SNIPPET_ID }), { flags })
+}
+
 beforeEach(() => {
   resetSqlEditorStores()
   setupSqlEditorMocks()
@@ -50,7 +56,7 @@ describe('useLogsSqlExecution', () => {
     const rows = [{ event_message: 'hello' }]
     const captured = mockLogsAllOtel(rows)
 
-    const { result } = renderSqlEditorHook(() => useLogsSqlExecution({ id: SNIPPET_ID }))
+    const { result } = renderLogsExecution()
 
     act(() => {
       result.current.executeLogsQuery(logsSql('select event_message from edge_logs'))
@@ -80,7 +86,7 @@ describe('useLogsSqlExecution', () => {
         }),
     })
 
-    const { result } = renderSqlEditorHook(() => useLogsSqlExecution({ id: SNIPPET_ID }))
+    const { result } = renderLogsExecution()
 
     act(() => {
       result.current.executeLogsQuery(logsSql('select does_not_exist from edge_logs'))
@@ -97,7 +103,7 @@ describe('useLogsSqlExecution', () => {
       last: { amount: 2, unit: 'hour' },
     })
 
-    const { result } = renderSqlEditorHook(() => useLogsSqlExecution({ id: SNIPPET_ID }))
+    const { result } = renderLogsExecution()
 
     act(() => {
       result.current.executeLogsQuery(logsSql('select 1'))
@@ -109,5 +115,22 @@ describe('useLogsSqlExecution', () => {
     expect(Number.isNaN(from)).toBe(false)
     expect(Number.isNaN(to)).toBe(false)
     expect(from).toBeLessThan(to)
+  })
+
+  it('records an unavailable message and fires no request when ClickHouse logs are off', async () => {
+    const captured = mockLogsAllOtel([])
+
+    const { result } = renderLogsExecution({ otelLegacyLogs: false })
+
+    act(() => {
+      result.current.executeLogsQuery(logsSql('select 1'))
+    })
+
+    await waitFor(() => expect(sqlEditorSessionState.results[SNIPPET_ID]?.[0]?.error).toBeDefined())
+    expect(sqlEditorSessionState.results[SNIPPET_ID][0].error.message).toBe(
+      "Querying logs with SQL isn't available for this project yet."
+    )
+    // The doomed request never left the client.
+    expect(captured).toHaveLength(0)
   })
 })
