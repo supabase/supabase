@@ -17,10 +17,15 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  useWatch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import {
+  filterHighAvailabilityRegions,
+  getHighAvailabilityRegionCode,
+} from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { getAvailableRegions } from './ProjectCreation.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -69,6 +74,8 @@ export const RegionSelector = ({
 }: RegionSelectorProps) => {
   const { slug } = useParams()
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
+  const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
@@ -91,8 +98,11 @@ export const RegionSelector = ({
     { enabled: smartRegionEnabled, staleTime: 1000 * 60 * 5 } // 5 minutes
   )
 
-  const smartRegions = availableRegionsData?.all.smartGroup ?? []
+  const allSmartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
+  const restrictHighAvailabilityRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+  const smartRegions = restrictHighAvailabilityRegion ? [] : allSmartRegions
 
   const recommendedSmartRegions = new Set(
     [availableRegionsData?.recommendations.smartGroup.code].filter(Boolean)
@@ -111,7 +121,11 @@ export const RegionSelector = ({
     }
   })
 
-  const regionOptions = smartRegionEnabled ? allRegions : regionsArray
+  const unfilteredRegionOptions = smartRegionEnabled ? allRegions : regionsArray
+  const regionOptions = filterHighAvailabilityRegions(
+    [...unfilteredRegionOptions],
+    highAvailability
+  )
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
   const showNonProdFields =
@@ -156,15 +170,22 @@ export const RegionSelector = ({
                 description={
                   <>
                     <p>Select the region closest to your users for the best performance.</p>
-                    {showNonProdFields && (
+                    {restrictHighAvailabilityRegion ? (
                       <div className="mt-2 text-warning">
-                        <p>Only these regions are supported for local/staging projects:</p>
-                        <ul className="list-disc list-inside mt-1">
-                          <li>East US (North Virginia)</li>
-                          <li>Central EU (Frankfurt)</li>
-                          <li>Southeast Asia (Singapore)</li>
-                        </ul>
+                        High Availability projects are currently limited to{' '}
+                        {regionOptions[0]?.name ?? highAvailabilityRegionCode}.
                       </div>
+                    ) : (
+                      showNonProdFields && (
+                        <div className="mt-2 text-warning">
+                          <p>Only these regions are supported for local/staging projects:</p>
+                          <ul className="list-disc list-inside mt-1">
+                            <li>East US (North Virginia)</li>
+                            <li>Central EU (Frankfurt)</li>
+                            <li>Southeast Asia (Singapore)</li>
+                          </ul>
+                        </div>
+                      )
                     )}
                   </>
                 }

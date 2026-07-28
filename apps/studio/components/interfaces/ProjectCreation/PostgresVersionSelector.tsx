@@ -26,6 +26,7 @@ interface PostgresVersionDetails {
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
+  disabled?: boolean
   organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
@@ -56,6 +57,7 @@ export const extractPostgresVersionDetails = (value: string): PostgresVersionDet
 export const PostgresVersionSelector = ({
   cloudProvider,
   dbRegion,
+  disabled = false,
   organizationSlug,
   field,
   form,
@@ -107,6 +109,7 @@ export const PostgresVersionSelector = ({
         value={postgresVersionSelection}
         onValueChange={field.onChange}
         disabled={
+          disabled ||
           availableVersions.length === 0 ||
           (type === 'create' && isLoadingProjectCreateVersions) ||
           (type === 'unpause' && isLoadingProjectUnpauseVersions)

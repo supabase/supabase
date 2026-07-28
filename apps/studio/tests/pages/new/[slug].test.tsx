@@ -249,6 +249,7 @@ const DEFAULT_FLAGS = {
   newProjectInternalOnlyConfiguration: false,
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
+  highAvailabilityProjectCreation: false,
 }
 
 async function renderWizard(options: { flags?: Partial<typeof DEFAULT_FLAGS> } = {}) {
@@ -520,24 +521,30 @@ describe('project creation wizard', () => {
       expect(body.release_channel).toBe('alpha')
     })
 
-    test('rejects high availability combined with orioledb', async () => {
+    test('resets OrioleDB and hides advanced configuration when high availability is enabled', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
 
       await fillProjectName('HA Oriole Project')
+      await generateAndWaitForStrongPassword()
       await selectRegion(/Americas/)
-
-      // The high availability toggle is now a top-level field, gated only by the entitlement.
-      await user.click(await screen.findByRole('switch'))
 
       fireEvent.click(await screen.findByRole('button', { name: 'Advanced Configuration' }))
       await user.click(await screen.findByRole('radio', { name: /Postgres with OrioleDB/ }))
 
-      await screen.findByText('High availability is not supported with OrioleDB images')
-      expect(onRequest).not.toHaveBeenCalled()
+      await user.click(await screen.findByRole('switch'))
+
+      expect(
+        screen.queryByRole('button', { name: 'Advanced Configuration' })
+      ).not.toBeInTheDocument()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].postgres_engine).toBe('17')
+      expect(onRequest.mock.calls[0][0].release_channel).toBe('ga')
     })
 
     test('blocks submission with a toast when orioledb becomes unavailable after selection', async () => {
@@ -593,16 +600,26 @@ describe('project creation wizard', () => {
   })
 
   describe('high availability', () => {
-    test('shows the high availability toggle from the entitlement, without the internal-only flag', async () => {
+    test('shows the high availability toggle when the feature flag and entitlement are enabled', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
+
+      expect(await screen.findByText('High availability')).toBeInTheDocument()
+      expect(screen.getByText('Alpha')).toBeInTheDocument()
+      expect(screen.getByText(/Free during Alpha for up to 2 projects/)).toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', { name: 'Internal-only Configuration' })
+      ).not.toBeInTheDocument()
+    })
+
+    test('hides the high availability toggle when the feature flag is disabled', async () => {
       mockWizardEndpoints()
 
       await renderWizard()
 
-      expect(await screen.findByText('High availability')).toBeInTheDocument()
-      // The toggle must not depend on the internal-only configuration section.
-      expect(
-        screen.queryByRole('button', { name: 'Internal-only Configuration' })
-      ).not.toBeInTheDocument()
+      await screen.findByPlaceholderText('Project name')
+      expect(screen.queryByText('High availability')).not.toBeInTheDocument()
     })
 
     test('hides the high availability toggle when the org lacks the entitlement', async () => {
@@ -617,18 +634,36 @@ describe('project creation wizard', () => {
         ],
       })
 
-      await renderWizard()
+      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
 
       await screen.findByPlaceholderText('Project name')
       expect(screen.queryByText('High availability')).not.toBeInTheDocument()
     })
 
-    test('enabling high availability submits the flag and forces the AWS_K8S cloud provider', async () => {
+    test('makes the fixed Postgres version non-editable', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard({
+        flags: {
+          highAvailabilityProjectCreation: true,
+          newProjectInternalOnlyConfiguration: true,
+        },
+      })
+
+      await user.click(await screen.findByRole('switch'))
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      expect(screen.getByLabelText('Postgres version')).toBeDisabled()
+      expect(screen.getByPlaceholderText('e.g 17.6.1.104')).toBeDisabled()
+      expect(screen.getByPlaceholderText('e.g 17.6.1.104')).toHaveValue('17.6.1.147')
+    })
+
+    test('enabling high availability submits the fixed Postgres version and AWS_K8S provider', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard()
+      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
 
       await fillProjectName('HA Project')
       await generateAndWaitForStrongPassword()
@@ -641,6 +676,37 @@ describe('project creation wizard', () => {
       const body = onRequest.mock.calls[0][0]
       expect(body.high_availability).toBe(true)
       expect(body.cloud_provider).toBe('AWS_K8S')
+      expect(body.postgres_engine).toBe('17')
+      expect(body.release_channel).toBe('ga')
+      expect(body.custom_supabase_internal_requests).toMatchObject({
+        ami: {
+          search_tags: {
+            'tag:postgresVersion': '17.6.1.147',
+          },
+        },
+      })
+    })
+
+    test('restores the standard Postgres configuration when high availability is disabled', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
+
+      await fillProjectName('Standard Project')
+      await generateAndWaitForStrongPassword()
+      const highAvailabilitySwitch = await screen.findByRole('switch')
+      await user.click(highAvailabilitySwitch)
+      await user.click(highAvailabilitySwitch)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      const body = onRequest.mock.calls[0][0]
+      expect(body.high_availability).toBe(false)
+      expect(body.postgres_engine).toBeUndefined()
+      expect(body.custom_supabase_internal_requests).toBeUndefined()
     })
   })
 

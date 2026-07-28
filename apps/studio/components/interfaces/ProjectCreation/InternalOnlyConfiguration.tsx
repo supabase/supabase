@@ -1,12 +1,13 @@
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
-import { FormControl, FormField, Input } from 'ui'
+import { FormControl, FormField, Input, useWatch } from 'ui'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CloudProviderSelector } from './CloudProviderSelector'
 import { PostgresVersionSelector } from './PostgresVersionSelector'
+import { HIGH_AVAILABILITY_POSTGRES_VERSION } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 
@@ -17,6 +18,7 @@ interface InternalOnlyConfigurationProps {
 export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationProps) => {
   const { slug } = useParams()
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
+  const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
 
   return (
     <Panel.Content>
@@ -36,6 +38,7 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                   cloudProvider={form.getValues('cloudProvider') as CloudProvider}
                   organizationSlug={slug}
                   dbRegion={form.getValues('dbRegion')}
+                  disabled={highAvailability}
                 />
               )}
             />
@@ -56,10 +59,22 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                     <FormItemLayout
                       label="Custom Postgres version"
                       layout="horizontal"
-                      description="Specify a custom version of Postgres (defaults to the latest)."
+                      description={
+                        highAvailability
+                          ? 'High Availability projects use a fixed Postgres version during Alpha.'
+                          : 'Specify a custom version of Postgres (defaults to the latest).'
+                      }
                     >
                       <FormControl>
-                        <Input placeholder="e.g 17.6.1.104" {...field} autoComplete="off" />
+                        <Input
+                          placeholder="e.g 17.6.1.104"
+                          {...field}
+                          value={
+                            highAvailability ? HIGH_AVAILABILITY_POSTGRES_VERSION : field.value
+                          }
+                          disabled={highAvailability}
+                          autoComplete="off"
+                        />
                       </FormControl>
                     </FormItemLayout>
                   )}

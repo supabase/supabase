@@ -1,5 +1,26 @@
 import { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 
+export const HIGH_AVAILABILITY_POSTGRES_VERSION = '17.6.1.147'
+
+export const getHighAvailabilityRegionCode = (
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  if (environment === 'local') return 'eu-central-1'
+  if (environment === 'staging') return 'us-east-1'
+  return undefined
+}
+
+export const filterHighAvailabilityRegions = <T extends { code: string }>(
+  regions: T[],
+  highAvailability: boolean,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  const regionCode = getHighAvailabilityRegionCode(environment)
+  return highAvailability && regionCode !== undefined
+    ? regions.filter((region) => region.code === regionCode)
+    : regions
+}
+
 // [Joshen] Obtained from https://gist.github.com/tadast/8827699
 export const COUNTRY_LAT_LON = {
   AF: { lat: 33, lon: 65 },

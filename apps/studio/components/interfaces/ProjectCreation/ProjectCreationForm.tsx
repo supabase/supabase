@@ -23,7 +23,11 @@ import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
-import { sizes } from './ProjectCreation.constants'
+import {
+  getHighAvailabilityRegionCode,
+  HIGH_AVAILABILITY_POSTGRES_VERSION,
+  sizes,
+} from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
   instanceLabel,
@@ -147,6 +151,7 @@ export const ProjectCreationForm = ({
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const postgresVersionBeforeHighAvailability = useRef('')
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -174,7 +179,7 @@ export const ProjectCreationForm = ({
       shouldRunMigrations: true,
     },
   })
-  const { getFieldState, resetField, setValue } = form
+  const { getFieldState, getValues, resetField, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -187,6 +192,7 @@ export const ProjectCreationForm = ({
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -267,15 +273,27 @@ export const ProjectCreationForm = ({
       }
     )
 
-  const recommendedSmartRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
-    : ''
+  const highAvailabilityRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? availableRegionsData?.all.specific.find(
+          (region) => region.code === highAvailabilityRegionCode
+        )
+      : undefined
+  const recommendedSmartRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? highAvailabilityRegion?.name
+      : smartRegionEnabled
+        ? availableRegionsData?.recommendations.smartGroup.name
+        : ''
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
-    : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? highAvailabilityRegion?.name
+      : smartRegionEnabled
+        ? availableRegionsData?.recommendations.smartGroup.name
+        : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -383,7 +401,11 @@ export const ProjectCreationForm = ({
       shouldRunMigrations,
     } = values
 
-    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
+    const resolvedPostgresVersion = highAvailability
+      ? HIGH_AVAILABILITY_POSTGRES_VERSION
+      : postgresVersion
+
+    if (resolvedPostgresVersion && !resolvedPostgresVersion.match(/1[2-9]\..*/)) {
       return toast.error(
         `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
       )
@@ -404,9 +426,19 @@ export const ProjectCreationForm = ({
       extractPostgresVersionDetails(postgresVersionSelection)
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion = smartRegionEnabled
-      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
-      : undefined
+    const selectedRegion =
+      highAvailability && highAvailabilityRegionCode !== undefined
+        ? specific.find((region) => region.code === highAvailabilityRegionCode)
+        : smartRegionEnabled
+          ? (smartGroup.find((x) => x.name === dbRegion) ??
+            specific.find((x) => x.name === dbRegion))
+          : undefined
+
+    if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
+      return toast.error(
+        `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
+      )
+    }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
     const shouldIncludeGitHubFields =
@@ -451,8 +483,16 @@ export const ProjectCreationForm = ({
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
-      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
-      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      postgresEngine: highAvailability
+        ? '17'
+        : useOrioleDb
+          ? availableOrioleVersion?.postgres_engine
+          : postgresEngine,
+      releaseChannel: highAvailability
+        ? 'ga'
+        : useOrioleDb
+          ? availableOrioleVersion?.release_channel
+          : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
       ...(shouldIncludeGitHubFields
         ? {
@@ -462,11 +502,11 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (postgresVersion || instanceType) {
+    if (resolvedPostgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
         ami: {
-          ...(postgresVersion && {
-            search_tags: { 'tag:postgresVersion': postgresVersion },
+          ...(resolvedPostgresVersion && {
+            search_tags: { 'tag:postgresVersion': resolvedPostgresVersion },
           }),
           ...(instanceType && { instance_type: instanceType }),
         },
@@ -529,6 +569,20 @@ export const ProjectCreationForm = ({
       setValue('cloudProvider', 'AWS_K8S')
     }
   }, [highAvailability, cloudProvider, setValue])
+
+  useEffect(() => {
+    const currentPostgresVersion = getValues('postgresVersion')
+
+    if (highAvailability) {
+      if (currentPostgresVersion !== HIGH_AVAILABILITY_POSTGRES_VERSION) {
+        postgresVersionBeforeHighAvailability.current = currentPostgresVersion
+      }
+      setValue('postgresVersion', HIGH_AVAILABILITY_POSTGRES_VERSION)
+      setValue('useOrioleDb', false)
+    } else if (currentPostgresVersion === HIGH_AVAILABILITY_POSTGRES_VERSION) {
+      setValue('postgresVersion', postgresVersionBeforeHighAvailability.current)
+    }
+  }, [getValues, highAvailability, setValue])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
@@ -676,7 +730,7 @@ export const ProjectCreationForm = ({
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
-                    {showAdvancedConfig && !!availableOrioleVersion && (
+                    {showAdvancedConfig && !!availableOrioleVersion && !highAvailability && (
                       <AdvancedConfiguration form={form} />
                     )}
 
