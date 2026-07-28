@@ -140,6 +140,7 @@ After the affected table finishes copying and catches up, the temporary slot is 
 - Avoid leaving pipelines stopped for long periods while the source database is still receiving writes.
 - Schedule bulk updates, imports, and migrations during lower-traffic windows when possible.
 - For BigQuery, verify that service account permissions, table requirements, and replica identity settings match the [BigQuery destination guide](/docs/guides/database/replication/bigquery).
+- For Snowflake, verify that the service user's default role, schema privileges, key pair, row limits, and replica identity settings match the [Snowflake destination guide](/docs/guides/database/replication/snowflake).
 - If the initial sync is the bottleneck, review **Table sync workers** and **Copy connections per table** in the pipeline's advanced settings. Increasing either can use more source database connections; increasing table sync workers can also use more temporary replication slots.
 
 ## Handling errors
@@ -158,7 +159,7 @@ Table errors occur during the initial sync and affect individual tables. These e
 
 **Recovering from table errors:**
 
-When a table encounters an error during the initial sync, you can reset the table state. This restarts that table's initial sync from the beginning.
+When a table encounters an error during the initial sync, you can reset the table state. This deletes the table's existing destination data and restarts its initial sync from the beginning. For Snowflake, the reset drops and recreates the append-only history table and its managed streaming channel.
 
 ### Pipeline errors
 
