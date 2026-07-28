@@ -45,7 +45,7 @@ const LogoComponent = ({
   className?: string
   wrapperClassName?: string
 }) => (
-  <div className={cn('relative box-content p-8 pb-0', wrapperClassName)}>
+  <div className={cn('relative box-content p-4 pb-0 md:p-6 md:pb-0', wrapperClassName)}>
     <div className="relative h-[33px] w-auto max-w-[145px]">
       <Image
         src={logoImage}
@@ -112,10 +112,10 @@ export const GlassPanel = ({
       )}
       <div
         className={cn(
-          'px-8 pb-8 relative',
+          'relative p-4 md:p-6',
           'flex flex-col h-full',
           icon ? 'gap-3' : 'gap-2',
-          !header ? 'pt-8' : ''
+          header && 'pt-0'
         )}
       >
         <div className="flex items-center gap-3">
