@@ -304,7 +304,7 @@ async function renderDocsIndex(): Promise<void> {
   const content = [
     '# Supabase Docs',
     '',
-    'Documentation for [Supabase](https://supabase.com). Guide pages are also available as markdown: append `.md` to the page URL, or request with `Accept: text/markdown`.',
+    'Documentation for [Supabase](https://supabase.com). Guide pages are also available as markdown: append `.md` to the page URL (content negotiation via the Accept header is also supported).',
     '',
     '## Guides',
     '',
