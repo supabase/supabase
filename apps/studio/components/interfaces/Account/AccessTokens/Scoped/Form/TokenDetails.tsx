@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import dayjs from 'dayjs'
 import type { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
@@ -98,14 +98,18 @@ export const TokenDetails = ({ form }: TokenDetailsProps) => {
                         <DatePicker>
                           <DatePickerTrigger asChild>
                             <DatePickerButton ref={field.ref} block isInvalid={fieldState.invalid}>
-                              {value ? format(value, 'dd MMM, yyyy') : 'Pick a date'}
+                              {value ? dayjs(value).format('DD MMM, YYYY') : 'Pick a date'}
                             </DatePickerButton>
                           </DatePickerTrigger>
                           <DatePickerContent>
                             <Calendar
                               mode="single"
                               selected={value}
-                              onSelect={(date) => field.onChange(date?.toISOString())}
+                              onSelect={(date) =>
+                                field.onChange(
+                                  date ? dayjs(date).endOf('day').toISOString() : undefined
+                                )
+                              }
                               initialFocus
                             />
                           </DatePickerContent>
