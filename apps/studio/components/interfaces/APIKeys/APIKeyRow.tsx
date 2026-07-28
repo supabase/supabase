@@ -65,6 +65,7 @@ export const APIKeyRow = ({
               <DropdownMenu>
                 <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
                   <Button
+                    aria-label={`More actions for API key ${apiKey.name}`}
                     variant="text"
                     size="tiny"
                     icon={
@@ -72,6 +73,7 @@ export const APIKeyRow = ({
                         size="14"
                         className="text-foreground-light hover:text-foreground"
                       />
+                    
                     }
                   />
                 </DropdownMenuTrigger>
