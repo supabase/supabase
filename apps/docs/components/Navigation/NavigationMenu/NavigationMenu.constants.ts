@@ -1205,6 +1205,10 @@ export const database: NavMenuConstant = {
               url: '/guides/database/replication/bigquery' as `/${string}`,
             },
             {
+              name: 'Snowflake',
+              url: '/guides/database/replication/snowflake' as `/${string}`,
+            },
+            {
               name: 'Monitoring',
               url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },
