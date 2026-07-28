@@ -2502,6 +2502,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "skip-to-content-demo": {
+      name: "skip-to-content-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/skip-to-content-demo")),
+      source: "",
+      files: ["registry/default/example/skip-to-content-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "page-container-demo": {
       name: "page-container-demo",
       type: "components:example",
