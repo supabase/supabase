@@ -673,6 +673,19 @@ describe('project creation wizard', () => {
       expect(screen.getByPlaceholderText('e.g 17.6.1.104')).toHaveValue('17.6.1.147')
     })
 
+    test('shows high availability regions in a dedicated group', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard()
+
+      await user.click(await screen.findByRole('switch', { name: 'Enable high availability' }))
+      await user.click(getSelectTriggerByLabel('Region'))
+
+      expect(await screen.findByText('High Availability Regions')).toBeInTheDocument()
+      expect(screen.queryByText('General regions')).not.toBeInTheDocument()
+      expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+    })
+
     test('enabling high availability submits the fixed Postgres version and AWS_K8S provider', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
@@ -683,7 +696,7 @@ describe('project creation wizard', () => {
       await fillProjectName('HA Project')
       await generateAndWaitForStrongPassword()
       await user.click(await screen.findByRole('switch'))
-      await selectRegion(/Americas/)
+      await selectRegion(/East US/)
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 

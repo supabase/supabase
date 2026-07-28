@@ -102,7 +102,7 @@ export const RegionSelector = ({
   const allRegions = availableRegionsData?.all.specific ?? []
   const restrictHighAvailabilityRegion =
     highAvailability && highAvailabilityRegionCode !== undefined
-  const smartRegions = restrictHighAvailabilityRegion ? [] : allSmartRegions
+  const smartRegions = highAvailability ? [] : allSmartRegions
 
   const recommendedSmartRegions = new Set(
     [availableRegionsData?.recommendations.smartGroup.code].filter(Boolean)
@@ -225,7 +225,7 @@ export const RegionSelector = ({
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
-                      {smartRegionEnabled && (
+                      {smartRegionEnabled && !highAvailability && (
                         <>
                           <SelectGroup>
                             <SelectLabel>General regions</SelectLabel>
@@ -265,7 +265,9 @@ export const RegionSelector = ({
                       )}
 
                       <SelectGroup>
-                        <SelectLabel>Specific regions</SelectLabel>
+                        <SelectLabel>
+                          {highAvailability ? 'High Availability Regions' : 'Specific regions'}
+                        </SelectLabel>
                         {regionOptions.map((value) => {
                           return (
                             <SelectItem
