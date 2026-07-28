@@ -128,7 +128,7 @@ describe('useLogsSqlExecution', () => {
 
     await waitFor(() => expect(sqlEditorSessionState.results[SNIPPET_ID]?.[0]?.error).toBeDefined())
     expect(sqlEditorSessionState.results[SNIPPET_ID][0].error.message).toBe(
-      "Querying logs with SQL isn't available for this project yet."
+      "Querying logs from the SQL editor isn't available for this project yet."
     )
     // The doomed request never left the client.
     expect(captured).toHaveLength(0)
