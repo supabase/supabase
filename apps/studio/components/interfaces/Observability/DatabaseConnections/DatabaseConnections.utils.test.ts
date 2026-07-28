@@ -210,6 +210,20 @@ describe('getConnectionMetrics', () => {
       expect(queryBlockingTheMostQueries?.count).toBe(2)
     })
 
+    it('counts a diamond-shaped block pattern once, not per incoming path', () => {
+      // root blocks both p1 and p2 directly, and both p1 and p2 block w - w must only count once
+      const activities = [
+        activity({ pid: 0, blocked_by: [] }),
+        activity({ pid: 1, blocked_by: [0] }),
+        activity({ pid: 2, blocked_by: [0] }),
+        activity({ pid: 3, blocked_by: [1, 2] }),
+      ]
+
+      const { queryBlockingTheMostQueries } = getConnectionMetrics(activities)
+      expect(queryBlockingTheMostQueries?.activity.pid).toBe(0)
+      expect(queryBlockingTheMostQueries?.count).toBe(3)
+    })
+
     it('does not warn when the top blocker is under the threshold (3)', () => {
       const activities = [
         activity({ pid: 1, blocked_by: [] }),

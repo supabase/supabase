@@ -79,20 +79,25 @@ const findLongestRunning = (
   }, null)
 
 // Counts every activity transitively blocked by pid - not just direct waiters, but their waiters
-// in turn - so a long chain outweighs several short ones.
-const countTransitivelyBlocked = (
-  pid: number,
-  activities: DatabaseActivity[],
-  visited: Set<number> = new Set()
-): number => {
-  if (visited.has(pid)) return 0
-  visited.add(pid)
+// in turn - so a long chain outweighs several short ones. Traverses breadth-first over a single
+// counted set so a waiter reachable through more than one blocker (a "diamond") is still only
+// counted once.
+const countTransitivelyBlocked = (pid: number, activities: DatabaseActivity[]): number => {
+  const counted = new Set<number>()
+  const queue = [pid]
 
-  const directWaiters = activities.filter((x) => x.blocked_by.includes(pid))
-  return directWaiters.reduce(
-    (count, waiter) => count + 1 + countTransitivelyBlocked(waiter.pid, activities, visited),
-    0
-  )
+  while (queue.length > 0) {
+    const currentPid = queue.shift()!
+    const directWaiters = activities.filter((x) => x.blocked_by.includes(currentPid))
+
+    for (const waiter of directWaiters) {
+      if (counted.has(waiter.pid)) continue
+      counted.add(waiter.pid)
+      queue.push(waiter.pid)
+    }
+  }
+
+  return counted.size
 }
 
 // Derives the Overview page's connection/activity metrics (and their warning thresholds) from the
