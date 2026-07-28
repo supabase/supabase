@@ -1,9 +1,9 @@
 ---
 name: studio-e2e-tests
-description: Write and run Playwright E2E tests for Supabase Studio. Use when asked
-  to run e2e tests, write new E2E tests, or debug flaky tests. Covers running commands,
-  avoiding race conditions, waiting strategies, selectors, helper functions, and CI
-  vs local differences.
+description: Write and run Playwright E2E tests for Supabase Studio (e2e/studio).
+  Use when asked to run e2e tests, write new E2E tests, or debug flaky or failing
+  Playwright tests. Covers running commands, avoiding race conditions, waiting
+  strategies, selectors, helper functions, and CI vs local differences.
 ---
 
 # E2E Studio Tests

@@ -1,6 +1,4 @@
-import { Check, Copy } from 'lucide-react'
-import { useState } from 'react'
-import { cn, copyToClipboard } from 'ui'
+import CopyButton from '@/components/ui/CopyButton'
 
 interface Parameter {
   key: string
@@ -13,45 +11,42 @@ interface ConnectionParametersProps {
 }
 
 export const ConnectionParameters = ({ parameters, onCopy }: ConnectionParametersProps) => {
-  const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
+  const copyAllText = parameters.map((param) => `${param.key}=${param.value}`).join('\n')
 
   return (
-    <div className="bg-surface-75 rounded-lg border font-mono text-sm p-4">
-      {parameters.map((param) => (
-        <div key={param.key} className="py-0.5 group/param">
-          <div className="text-xs flex items-center">
-            <span className="text-foreground-lighter">{param.key}:</span>
-            <span className="ml-1 text-foreground">{param.value}</span>
-            <button
-              type="button"
-              tabIndex={0}
+    <div className="overflow-hidden rounded-lg border bg-surface-75">
+      <div className="flex items-center justify-between border-b bg-surface-100 py-2 pl-4 pr-2">
+        <span className="text-xs text-foreground-light">Connection parameters</span>
+        <CopyButton
+          variant="default"
+          size="tiny"
+          copyLabel="Copy all"
+          text={copyAllText}
+          aria-label="Copy all connection parameters"
+          onClick={() => onCopy?.('all')}
+        />
+      </div>
+      <div className="divide-y">
+        {parameters.map((param) => (
+          <div
+            key={param.key}
+            className="flex items-center gap-x-2 py-2.5 pl-4 pr-2 font-mono text-sm"
+          >
+            <span className="shrink-0 text-foreground-lighter">{param.key}:</span>
+            <span className="flex-1 truncate text-foreground" title={param.value}>
+              {param.value}
+            </span>
+            <CopyButton
+              variant="default"
+              size="tiny"
+              iconOnly
+              text={param.value}
               aria-label={`Copy ${param.key}`}
-              onClick={() => {
-                copyToClipboard(param.value, () => {
-                  setCopiedMap((prev) => ({ ...prev, [param.key]: true }))
-                  onCopy?.(param.key)
-                  setTimeout(() => {
-                    setCopiedMap((prev) => ({ ...prev, [param.key]: false }))
-                  }, 1000)
-                })
-              }}
-              className={cn(
-                'text-foreground-lighter',
-                'ml-2 opacity-0 group-hover/param:opacity-100 focus-visible:opacity-100',
-                'hover:text-foreground rounded-xs p-1',
-                copiedMap[param.key] && 'opacity-100',
-                'transition-all'
-              )}
-            >
-              {copiedMap[param.key] ? (
-                <Check size={12} strokeWidth={1.5} />
-              ) : (
-                <Copy size={12} strokeWidth={1.5} />
-              )}
-            </button>
+              onClick={() => onCopy?.(param.key)}
+            />
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }

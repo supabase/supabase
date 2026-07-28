@@ -1,19 +1,20 @@
 ---
 id: 'ai-tools'
 title: 'AI Tools'
-subtitle: 'Plugins, MCP, and skills for AI-first Supabase development.'
+subtitle: 'Connect your AI coding agent to Supabase.'
 ---
 
-Supabase provides integrations and resources that your AI coding agents can use to build on Supabase:
+Supabase provides everything you need to connect an AI coding agent to your project: a live connection to your database and platform (MCP), portable instructions your agent can reuse (Agent Skills), a one-step bundle of both (Plugin), and copy-paste prompts for tools that don't support any of the above.
 
-- [Agent Plugin](/docs/guides/ai-tools/plugins): One-click setup that bundles the MCP server and agent skills into a single install for your AI coding agent.
-- [MCP Server](/docs/guides/ai-tools/mcp): Connect your AI agent to your Supabase project using the Model Context Protocol (MCP). Gives your agent tools to read your schema, run queries, manage migrations, and more - directly from your IDE.
-- [Agent Skills](/docs/guides/ai-tools/ai-skills): Curated instruction sets that give your AI agent procedural knowledge about working with Supabase.
-- [Prompts](/docs/guides/ai-tools/ai-prompts): Ready-to-use prompts for common Supabase tasks. Copy them into your project and reference them from your AI tool for consistent, accurate output.
+## Pick your agent
 
-## Building AI into your app?
+<ContentListings id="ai-tools-supported-agents" />
 
-The tools above are for your development workflow. If you're building AI capabilities into your own product:
+## Key concepts
 
-- [Deploy MCP servers](/docs/guides/ai-tools/byo-mcp) - Host your own MCP server on Supabase Edge Functions so your users can connect their AI agents to your product
-- [Vectors / Embeddings](/docs/guides/ai) - Build semantic search, RAG pipelines, and other AI-powered features using pgvector
+- **MCP (Model Context Protocol)**: a live connection between your agent and your actual Supabase project. Once connected, your agent can call tools to query data, run migrations, deploy Edge Functions, and more.
+- **Agent Skills**: portable, on-demand instructions your agent loads when it needs Supabase- or Postgres-specific procedural knowledge. Skills don't require a live connection, and work across different agents.
+- **Plugin**: a single install that bundles the MCP server and Agent Skills together for a specific agent.
+- **Prompts**: static prompt files you copy into your project for agents that don't support MCP, plugins, or skills natively.
+
+<ContentListings id="ai-tools-building-into-app" />
