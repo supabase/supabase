@@ -94,7 +94,7 @@ RUN set -eux; \
     rm -rf /tmp/pg_uuidv7.* /tmp/ext-sql
 ```
 
-The same Dockerfile structure works for your own extensions - `COPY` your PGXS source into the builder instead of `git clone`. However, when authoring a new extension from scratch, it's best to use the Nix build instead (see [Build the extension into the Nix image](#build-the-extension-into-the-nix-image) below).
+The same Dockerfile structure generally works for your own extensions. However, when authoring a new extension from scratch, it's best to use the Nix build instead (see [Build the extension into the Nix image](#build-the-extension-into-the-nix-image) below).
 
 ### Handle dependencies beyond the standard library
 
