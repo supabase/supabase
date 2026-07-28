@@ -202,7 +202,11 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
                   >
                     <MultiSelectorTrigger
                       mode="combobox"
-                      label={organizationSlugs ? 'Select projects' : 'Select an organization first'}
+                      label={
+                        organizationSlugs.length > 0
+                          ? 'Select projects'
+                          : 'Select an organization first'
+                      }
                       badgeLimit="wrap"
                       showIcon={false}
                       deletableBadge
