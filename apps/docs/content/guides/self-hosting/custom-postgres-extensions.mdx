@@ -94,7 +94,7 @@ RUN set -eux; \
     rm -rf /tmp/pg_uuidv7.* /tmp/ext-sql
 ```
 
-The same Dockerfile structure generally works for your own extensions. However, when authoring a new extension from scratch, it's best to use the Nix build instead (see [Build the extension into the Nix image](#build-the-extension-into-the-nix-image) below).
+The same Dockerfile structure generally works for your own extensions. However, when authoring a new extension from scratch, it's best to use the Nix build instead (refer to [Build the extension into the Nix image](#build-the-extension-into-the-nix-image) below).
 
 ### Handle dependencies beyond the standard library
 
@@ -174,7 +174,7 @@ docker compose exec db psql -U postgres -c "CREATE EXTENSION pg_uuidv7;"
 
 <Admonition type="note">
 
-`/etc/postgresql-custom/` is on the `db-config` named volume, so this change persists across restarts. See [Custom Postgres configuration](/docs/guides/self-hosting/postgres-upgrade-17#custom-postgres-configuration) for more on the `conf.d/` mechanism.
+`/etc/postgresql-custom/` is on the `db-config` named volume, so this change persists across restarts. Read [Custom Postgres configuration](/docs/guides/self-hosting/postgres-upgrade-17#custom-postgres-configuration) for more on the `conf.d/` mechanism.
 
 </Admonition>
 
