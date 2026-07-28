@@ -20,7 +20,7 @@ import {
   selfHostingShareExperience,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
-import { telemetryAI, telemetryDebugging, telemetryMonitoring } from './telemetry.data'
+import { telemetryDebugging, telemetryMonitoring } from './telemetry.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   authGetStarted,
@@ -48,7 +48,6 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   storageResources,
   telemetryDebugging,
   telemetryMonitoring,
-  telemetryAI,
 ]
 
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(
