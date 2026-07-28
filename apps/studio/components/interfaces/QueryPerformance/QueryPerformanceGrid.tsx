@@ -114,7 +114,7 @@ export const QueryPerformanceGrid = ({
       resizable: true,
       minWidth:
         col.id === 'prop_total_time'
-          ? calculateTimeConsumedWidth((aggregatedData) ?? [])
+          ? calculateTimeConsumedWidth(aggregatedData ?? [])
           : (col.minWidth ?? 120),
       sortable: !nonSortableColumns.includes(col.id),
       headerCellClass: 'first:pl-6 cursor-pointer',
@@ -611,7 +611,7 @@ export const QueryPerformanceGrid = ({
           </SheetHeader>
 
           <div className="overflow-auto grow px-0">
-            <SheetSection className='pt-0'>
+            <SheetSection className="pt-0">
               <Tabs
                 value={view}
                 className="flex flex-col h-full"
