@@ -46,7 +46,7 @@ export const UserActivityTab = ({ user }: UserActivityTabProps) => {
   const search = useMemo(
     () =>
       buildUserActivitySearch({
-        user: user.id,
+        user: user.id!,
         date: [
           new Date(selectedDateRange.period_start.date),
           new Date(selectedDateRange.period_end.date),

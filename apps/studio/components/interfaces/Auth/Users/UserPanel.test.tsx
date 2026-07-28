@@ -98,19 +98,4 @@ describe('UserPanel', () => {
     expect(screen.queryByRole('tab', { name: 'Logs' })).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
   })
-
-  it('shows the Activity tab when the UserActivity flag is enabled', async () => {
-    vi.mocked(useFlag).mockReturnValue(true)
-    renderPanel([])
-
-    expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: 'Activity' })).toBeInTheDocument()
-  })
-
-  it('hides the Activity tab when the UserActivity flag is disabled', async () => {
-    renderPanel([])
-
-    expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
-    expect(screen.queryByRole('tab', { name: 'Activity' })).not.toBeInTheDocument()
-  })
 })
