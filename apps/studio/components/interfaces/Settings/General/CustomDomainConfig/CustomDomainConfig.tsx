@@ -32,7 +32,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 export const CustomDomainConfig = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
   const { data: organization } = useSelectedOrganizationQuery()
   const isBranch = Boolean(project?.parent_project_ref)
   const entityLabel = isBranch ? 'branch' : 'project'
@@ -40,10 +40,11 @@ export const CustomDomainConfig = () => {
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const plan = organization?.plan?.id
+  const canLoadCustomDomains = !isHighAvailability && !isHighAvailabilityPending
 
   const { data: addons, isPending: isLoadingAddons } = useProjectAddonsQuery(
     { projectRef: ref },
-    { enabled: !isHighAvailability }
+    { enabled: canLoadCustomDomains }
   )
   const hasCustomDomainAddon = !!addons?.selected_addons.find((x) => x.type === 'custom_domain')
 
@@ -56,7 +57,7 @@ export const CustomDomainConfig = () => {
   } = useCustomDomainsQuery(
     { projectRef: ref },
     {
-      enabled: !isHighAvailability,
+      enabled: canLoadCustomDomains,
       refetchInterval: (query) => {
         const data = query.state.data
         // while setting up the ssl certificate, we want to poll every 5 seconds
@@ -71,6 +72,28 @@ export const CustomDomainConfig = () => {
 
   const { status } = customDomainData || {}
 
+  if (isHighAvailability) {
+    return (
+      <PageSection id="custom-domains">
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Custom domains</PageSectionTitle>
+            <PageSectionDescription>
+              Present a branded experience to your users
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <HighAvailabilityDisabledEmptyState
+            title="Custom domains unavailable on High Availability projects"
+            description="We're working to bring custom domains to High Availability projects. Contact support if this is blocking your work."
+            className="max-w-none mx-0 py-6"
+          />
+        </PageSectionContent>
+      </PageSection>
+    )
+  }
+
   return (
     <PageSection id="custom-domains">
       <PageSectionMeta>
@@ -82,13 +105,7 @@ export const CustomDomainConfig = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        {isHighAvailability ? (
-          <HighAvailabilityDisabledEmptyState
-            title="Custom domains unavailable on High Availability projects"
-            description="We're working to bring custom domains to High Availability projects. Contact support if this is blocking your work."
-            className="max-w-none mx-0 py-6"
-          />
-        ) : isLoadingAddons ? (
+        {isHighAvailabilityPending || isLoadingAddons ? (
           <Card>
             <CardContent className="space-y-6">
               <CustomDomainsShimmerLoader />

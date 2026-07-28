@@ -21,6 +21,59 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 
+interface BranchStatValueProps {
+  currentBranch?: { created_at?: string }
+  isDefaultProject: boolean
+  isError: boolean
+  isHighAvailability: boolean
+  isLoading: boolean
+  latestNonDefaultBranch?: { name?: string }
+}
+
+export const BranchStatValue = ({
+  currentBranch,
+  isDefaultProject,
+  isError,
+  isHighAvailability,
+  isLoading,
+  latestNonDefaultBranch,
+}: BranchStatValueProps) => {
+  if (isHighAvailability) {
+    return <p className="text-foreground-lighter">Unavailable</p>
+  }
+
+  if (isLoading) {
+    return <Skeleton className="h-6 w-24" />
+  }
+
+  if (isError) {
+    return <p className="text-foreground-lighter">Unable to load</p>
+  }
+
+  if (isDefaultProject) {
+    return (
+      <p
+        className={cn('truncate min-w-0', !latestNonDefaultBranch && 'text-foreground-lighter')}
+        title={latestNonDefaultBranch?.name ?? 'No branches'}
+      >
+        {latestNonDefaultBranch?.name ?? 'No branches'}
+      </p>
+    )
+  }
+
+  if (currentBranch?.created_at) {
+    return (
+      <TimestampInfo
+        className="text-base"
+        label={dayjs(currentBranch.created_at).fromNow()}
+        utcTimestamp={currentBranch.created_at}
+      />
+    )
+  }
+
+  return <p className="text-foreground-lighter">Unknown</p>
+}
+
 export const ActivityStats = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -30,7 +83,11 @@ export const ActivityStats = () => {
   const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
   const parentProjectRef = project?.parent_project_ref ?? project?.ref
 
-  const { data: branchesData, isPending: isLoadingBranches } = useBranchesQuery(
+  const {
+    data: branchesData,
+    isPending: isLoadingBranches,
+    isError: isBranchesError,
+  } = useBranchesQuery(
     {
       projectRef: parentProjectRef,
     },
@@ -148,27 +205,14 @@ export const ActivityStats = () => {
               stat_value: branchesData?.length ?? 0,
             }}
             value={
-              isLoadingBranches ? (
-                <Skeleton className="h-6 w-24" />
-              ) : isDefaultProject ? (
-                <p
-                  className={cn(
-                    'truncate min-w-0',
-                    !latestNonDefaultBranch && 'text-foreground-lighter'
-                  )}
-                  title={latestNonDefaultBranch?.name ?? 'No branches'}
-                >
-                  {latestNonDefaultBranch?.name ?? 'No branches'}
-                </p>
-              ) : currentBranch?.created_at ? (
-                <TimestampInfo
-                  className="text-base"
-                  label={dayjs(currentBranch.created_at).fromNow()}
-                  utcTimestamp={currentBranch.created_at}
-                />
-              ) : (
-                <p className="text-foreground-lighter">Unknown</p>
-              )
+              <BranchStatValue
+                currentBranch={currentBranch}
+                isDefaultProject={isDefaultProject}
+                isError={isBranchesError}
+                isHighAvailability={isHighAvailability}
+                isLoading={isLoadingBranches}
+                latestNonDefaultBranch={latestNonDefaultBranch}
+              />
             }
           />
         </DisableInteraction>
