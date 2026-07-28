@@ -7,6 +7,8 @@ import { cn } from 'ui'
 
 interface Props {
   title: string
+  /** Brand/company name for logo alt text when the logo is the only place that name appears. */
+  name?: string
   icon?: string | React.ReactNode
   children?: React.ReactNode
   header?: string
@@ -40,16 +42,18 @@ const LogoComponent = ({
   logoImage,
   className,
   wrapperClassName,
+  alt,
 }: {
   logoImage: string
   className?: string
   wrapperClassName?: string
+  alt: string
 }) => (
   <div className={cn('relative box-content p-4 pb-0 md:p-6 md:pb-0', wrapperClassName)}>
     <div className="relative h-[33px] w-auto max-w-[145px]">
       <Image
         src={logoImage}
-        alt=""
+        alt={alt}
         fill
         sizes="100%"
         className={cn('object-contain object-left', className)}
@@ -60,6 +64,7 @@ const LogoComponent = ({
 
 export const GlassPanel = ({
   title,
+  name,
   icon,
   children,
   header,
@@ -72,6 +77,7 @@ export const GlassPanel = ({
   className,
 }: Props) => {
   const { resolvedTheme } = useTheme()
+  const logoAlt = name ?? ''
 
   return (
     <div
@@ -90,6 +96,7 @@ export const GlassPanel = ({
       {logoInverse && (
         <LogoComponent
           logoImage={logoInverse}
+          alt={logoAlt}
           className="opacity-50"
           wrapperClassName="hidden dark:block"
         />
@@ -97,6 +104,7 @@ export const GlassPanel = ({
       {logo && (
         <LogoComponent
           logoImage={logo}
+          alt={logoAlt}
           className="opacity-75"
           wrapperClassName={logoInverse ? 'block dark:hidden' : undefined}
         />
@@ -112,7 +120,7 @@ export const GlassPanel = ({
       )}
       <div
         className={cn(
-          'relative p-4 md:p-6',
+          'relative px-4.5 py-4 md:px-5.5 md:py-5.5',
           'flex flex-col h-full',
           icon ? 'gap-3' : 'gap-2',
           header && 'pt-0'
