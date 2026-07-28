@@ -70,7 +70,8 @@ const CERTIFICATIONS = [
     planNote: 'BAA available to Team and Enterprise customers',
     planHref: '/dashboard/org/_/documents',
     imgSrc: '/images/security/HIPAA.svg',
-    docsHref: '/docs/guides/platform/shared-responsibility-model#managing-healthcare-data',
+    docsHref:
+      'https://supabase.com/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data',
   },
 ]
 
@@ -420,7 +421,7 @@ const SecurityPage: NextPage = () => {
                 {
                   title: 'Sub-processor list',
                   desc: 'Supabase maintains a list of third-party sub-processors involved in processing customer data. This is required disclosure under GDPR Article 28.',
-                  href: '/legal/privacy',
+                  href: '/legal/privacy#subprocessors',
                   linkLabel: 'View sub-processors',
                 },
                 {
@@ -489,7 +490,7 @@ const SecurityPage: NextPage = () => {
                 <p className="text-xs text-foreground-muted mt-0.5">
                   US East, EU West, AP Southeast, and more.{' '}
                   <Link
-                    href="/docs/guides/platform/regions"
+                    href="https://supabase.com/docs/guides/platform/regions"
                     className="text-brand hover:text-brand-600"
                   >
                     See all regions →
@@ -540,7 +541,7 @@ const SecurityPage: NextPage = () => {
               customers are responsible for the security of their applications and data.
             </p>
             <Link
-              href="/docs/guides/platform/shared-responsibility-model"
+              href="https://supabase.com/docs/guides/deployment/shared-responsibility-model"
               className="text-sm text-brand hover:text-brand-600 inline-flex items-center gap-1"
             >
               Full shared responsibility documentation <ChevronRight className="w-3 h-3" />
