@@ -150,7 +150,11 @@ export const ActivityRow = ({
 
   return (
     <>
-      <TableRow id={activity.pid.toString()} key={activity.pid} className={cn('[&>td]:py-3')}>
+      <TableRow
+        id={activity.pid.toString()}
+        key={activity.pid}
+        className={cn('[&>td]:py-3', nested && 'bg-alternative')}
+      >
         <TableCell className="relative w-[70px]">
           {selectedPid === activity.pid && (
             <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter" />

@@ -1,7 +1,6 @@
 import { isEqual } from 'lodash'
 import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs'
-import { useEffect } from 'react'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -21,8 +20,6 @@ interface ActivityProps {
 
 export const Activity = ({ live }: ActivityProps) => {
   const { data: project } = useSelectedProjectQuery()
-
-  const [selectedPid] = useQueryState('pid', parseAsInteger)
 
   const [
     {
@@ -48,7 +45,7 @@ export const Activity = ({ live }: ActivityProps) => {
     isEqual(rolesFilter, DEFAULT_ROLES_FILTER) &&
     viewFilter === ''
 
-  const { data, isPending, isSuccess } = useDatabaseActivityQuery(
+  const { data, isPending } = useDatabaseActivityQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -165,7 +162,7 @@ export const Activity = ({ live }: ActivityProps) => {
   return (
     <div className="flex flex-col gap-y-4">
       <h2>Sessions</h2>
-      <div className="flex gap-x-2">
+      <div className="flex gap-2 flex-wrap">
         <Input
           size="tiny"
           icon={<Search />}
