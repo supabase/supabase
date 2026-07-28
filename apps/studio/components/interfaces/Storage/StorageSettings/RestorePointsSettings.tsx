@@ -11,11 +11,6 @@ import {
   InputGroupInput,
   InputGroupText,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -25,15 +20,12 @@ import { AlertError } from '@/components/ui/AlertError'
 import {
   SNAPSHOT_FREQUENCY_LABELS,
   type RestorePointPolicy,
-  type SnapshotFrequency,
 } from '@/data/restore-points/restore-points-mocks'
 import {
   useRestorePointPolicyQuery,
   useRestorePointPolicyUpdateMutation,
 } from '@/data/restore-points/restore-points-query'
 import { formatBytes } from '@/lib/helpers'
-
-const FREQUENCIES: SnapshotFrequency[] = ['with-database-backup', 'daily', 'hourly']
 
 /**
  * Project-level snapshot lifecycle policy — the canonical editor.
@@ -110,25 +102,13 @@ export const RestorePointsSettings = () => {
                   <Label htmlFor="restore-points-frequency">Frequency</Label>
                   <p className="text-sm text-foreground-lighter">
                     Matching your database backups keeps both restorable to the same point in time.
+                    Not configurable — any other cadence risks a snapshot that predates the backup
+                    you're restoring.
                   </p>
                 </div>
-                <Select
-                  value={policy.frequency}
-                  onValueChange={(value) =>
-                    setDraft({ ...policy, frequency: value as SnapshotFrequency })
-                  }
-                >
-                  <SelectTrigger id="restore-points-frequency" className="w-64">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {FREQUENCIES.map((frequency) => (
-                      <SelectItem key={frequency} value={frequency}>
-                        {SNAPSHOT_FREQUENCY_LABELS[frequency]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <p id="restore-points-frequency" className="text-sm text-foreground">
+                  {SNAPSHOT_FREQUENCY_LABELS[policy.frequency]}
+                </p>
               </CardContent>
 
               <CardContent className="flex items-center justify-between gap-x-6">

@@ -16,12 +16,13 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 
 ### Beat 1 — Enable protection (1–2 min)
 **Storage → Files → a bucket → Edit bucket**
-- Show the **Data protection** section: object versioning switch, and "include in snapshots" switch.
-- Point out: versioning retention shows the project default inline ("Keeping N versions for D days") with an explicit override switch to diverge per bucket; lifecycle fields use the design system's "input with unit" pattern; the cost admonition appears inline at enable-time — not buried in docs.
+- Show the **Data protection** section: a single "Include in snapshots" switch, on by default.
+- Point out what's *not* here anymore: no versioning on/off, no retention override, no expiry-day inputs. A colleague's review flagged those as a footgun at bucket-creation time — asking someone to set retention before they've seen how the bucket is used. Versioning still applies, at the project default; this modal just doesn't ask.
 
 ### Beat 2 — Versioning in the explorer (2 min)
 **Upload/overwrite a file → Preview pane → Versions tab**
-- Version history lives where the file already lives — no separate page, no new navigation.
+- Version history lives where the file already lives — no separate page, no new navigation. Tabs sit just below the preview thumbnail now, not at the very top.
+- Click any version row: the thumbnail above updates with a "Previewing version…" banner and a "Back to latest" link, so browsing versions and looking at the file happen in the same glance.
 - Each version has three icon-only actions: download, restore, delete. The current version only gets download — it can't be restored onto itself or deleted while current, and visually it's no longer set apart, just a "Latest" badge on an otherwise plain row.
 - Restore an older version; call out that it's **non-destructive** (promotes to a new current version, old current becomes noncurrent).
 - Show a version **pinned by a snapshot** blocking delete — this is the direct answer to "when do I actually stop paying for this."
@@ -43,7 +44,7 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 - Each backup row now shows coverage chips: **Database / Auth / Storage / Config**.
 - Explain: Auth users and Storage *metadata* live in Postgres, so a database restore brings them back for free. Object *bytes* don't — that asymmetry is exactly the drift bug in the PRFAQ.
 - One state-aware coverage notice (not two overlapping banners anymore) names which buckets aren't covered, linking straight to the project's **Snapshot lifecycle** settings on the Storage Settings page — one place to fix it, not a separate dialog.
-- Storage → Files → Settings → **Snapshot lifecycle**: frequency (with every backup / daily / hourly) and retention are project-level, since per-bucket retention would let a snapshot generation be complete for one bucket and expired for another on the same day. Bucket-level keeps only participation (opt-out) and versioning's own override.
+- Storage → Files → Settings → **Snapshot lifecycle**: retention is project-level, since per-bucket retention would let a snapshot generation be complete for one bucket and expired for another on the same day. Frequency is shown as a fixed value, "With every database backup" — not a dropdown. Any other cadence would mean the nearest snapshot to a given backup could be up to a full cadence interval older than it, silently reintroducing the exact drift problem this feature exists to prevent.
 - Open Restore: it defaults to **"into a new preview branch,"** not in-place. Tie this explicitly to "branching is a platform primitive, not a database feature" — a CoW branch is cheap and reversible, so verify-then-promote should be the default; destructive in-place restore becomes the deliberate exception.
 
 ### Beat 6 — Usage/billing honesty (1–2 min)
@@ -92,7 +93,7 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 > I considered "purge" for that last one and moved away from it: it's jargon, it doesn't actually say what happens, and it would've been a third word for an action already called "delete permanently" everywhere else in this flow. Landed on **"Delete all permanently"** instead, so the vocabulary stays consistent end to end.
 >
 > **4. Object versions, surfaced where the file already lives**
-> No new navigation for this one — the file preview panel gets a Versions tab listing every version of an object. Each version now has three explicit, single-icon actions — download, restore, delete — instead of one ambiguous button, so it's clear what's possible without guessing. The current version only ever gets download, since it can't be restored onto itself or deleted while it's current; visually it's no longer set apart in its own bordered card either — it sits in the same plain timeline as every other version, distinguished only by a "Latest" badge, since the extra styling wasn't earning its keep.
+> No new navigation for this one — the file preview panel gets a Versions tab listing every version of an object. The tabs (Details/Versions) now sit just below the preview thumbnail instead of at the very top, and clicking a version previews it in that thumbnail with a "Previewing version…／Back to latest" banner — so browsing history and looking at the file are the same motion, not two separate steps. Each version has three explicit, single-icon actions — download, restore, delete — instead of one ambiguous button, so it's clear what's possible without guessing. The current version only ever gets download, since it can't be restored onto itself or deleted while it's current; visually it's no longer set apart in its own bordered card either — it sits in the same plain timeline as every other version, distinguished only by a "Latest" badge, since the extra styling wasn't earning its keep.
 >
 > Restoring is non-destructive: it promotes an older version to become the new current version, and the previous current version just becomes another entry in the list. Deleting a version respects the same lock as before — a version held by a bucket snapshot can't be permanently deleted until that snapshot is removed. This is meant to be the direct, in-context answer to the question that matters most for trust here: "when do I actually stop paying for this?"
 >
@@ -103,11 +104,13 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 > The existing Storage Size usage chart now splits into live objects / object versions / snapshots, folded into the section that's already there rather than bolted on as a new card, so it's consistent with how every other usage metric on that page is presented. A per-bucket table shows exactly which bucket's retention is driving the number. This was arguably the single highest-risk item in the original PRFAQ's own internal review: if a customer can't answer "when is my object truly gone, and when do I stop paying for it?" without reading docs, the feature generates billing-surprise tickets instead of trust.
 >
 > **7. Keeping Storage in sync with backups without silent drift**
-> This one changed the most since I first sketched it. A single per-bucket toggle has a trap: it quietly stops covering a bucket created after the fact, so a fully-recoverable project degrades without anyone noticing — and if retention were also set per bucket, a snapshot generation could be complete for one bucket and already expired for another on the very same day, silently. So the two settings that determine *whether a usable snapshot exists at all* — how often Storage is captured (with every database backup, daily, or hourly) and how long it's retained — now live in one place: a project-level "Snapshot lifecycle" settings section, plus an "include new buckets automatically" switch so newly created buckets aren't a silent gap.
+> This one changed the most since I first sketched it, and changed again after a colleague's review. A single per-bucket toggle has a trap: it quietly stops covering a bucket created after the fact, so a fully-recoverable project degrades without anyone noticing — and if retention were also set per bucket, a snapshot generation could be complete for one bucket and already expired for another on the very same day, silently. So the settings that determine *whether a usable snapshot exists at all* — frequency and retention — live in one place: a project-level "Snapshot lifecycle" settings section, plus an "include new buckets automatically" switch so newly created buckets aren't a silent gap.
+>
+> The follow-up question was whether daily/hourly frequency should even be offered as "advanced options." The answer turned out to be no: with any cadence other than "with every database backup," the nearest snapshot to a given backup can be up to a full interval older than it, so you'd restore the database to time T but Storage to some earlier time — the exact drift bug this feature exists to prevent, reintroduced through a settings screen. Frequency is now a fixed, non-editable value. The same review flagged the bucket create/edit modal's versioning controls (on/off, retention override, expiry days, max versions) as the same footgun at the worst possible moment — before anyone's seen how a brand-new bucket is actually used. That modal is now down to one switch, "Include in snapshots," defaulting to *in*; versioning still applies, at the project default, just not as a decision this dialog asks for.
 >
 > (Renamed from my earlier "restore points" language, which read as an invented umbrella term competing with "backup," "snapshot," and "PITR recovery point." Settling on "snapshots" ties it back to the Snapshots tab and the bucket-level "include in snapshots" toggle users already see.)
 >
-> Bucket-level configuration keeps only what's genuinely bucket-specific: whether a bucket participates at all (the deliberate opt-out, e.g. for a large regenerable cache bucket), and object-versioning's own retention, which can inherit the project default or be overridden per bucket — since keeping more or fewer old versions of one noisy bucket doesn't put other buckets' snapshots out of sync. The old idea of a separate "sync" dialog is gone too: the coverage notice on the Backups page now links straight to this one settings page, so there's exactly one place this is configured, not two that can drift apart from each other.
+> The old idea of a separate "sync" dialog is gone too: the coverage notice on the Backups page now links straight to the Settings page, so there's exactly one place any of this is configured.
 >
 > ---
 >
@@ -116,9 +119,9 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 > - Per-bucket "Deleted files," or one project-wide view?
 > - Do the coverage chips (Database / Auth / Storage / Config) communicate the right amount on one row, or is it trying to say too much at a glance?
 > - Now that a backup's coverage spans more than the database, does "Backups" still belong under Database, or does it eventually move — into a project-wide "Recovery" area, or even next to Branches once storage branching lands?
-> - Is project-level frequency + retention, plus a bucket-level participation/versioning-override split, the right amount of configuration surface — or does even two levels read as one too many for most people?
+> - With bucket-level versioning overrides no longer exposed anywhere in the UI, is that a real gap for anyone, or was it genuinely unused complexity?
 >
-> *("Deleted files" vs "Trash" is no longer an open question — landed on "Deleted files" and it's shipped consistently across the UI.)*
+> *("Deleted files" vs "Trash" is no longer an open question — landed on "Deleted files" and it's shipped consistently across the UI. Same for frequency and bucket-creation switches — both simplified to fixed defaults per review feedback, rather than staying open questions.)*
 
 ---
 

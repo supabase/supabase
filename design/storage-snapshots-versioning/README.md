@@ -404,17 +404,23 @@ So frequency and retention are project-level, single values. Per bucket you choo
 
 | Knob | Level | Why |
 | --- | --- | --- |
-| Snapshot frequency | **Project** | Consistency requires coordination across buckets |
+| Snapshot frequency | **Project, fixed** | Only one correct value; see below |
 | Snapshot retention | **Project** | Per-bucket retention makes older snapshots partial |
 | Bucket participates | Bucket | Cost escape hatch; defaults to *in* |
-| Version retention (days / max count) | Bucket, with project default | No cross-bucket consistency requirement; churn varies per bucket |
+| Version retention (days / max count) | Project default only (currently no override surface) | See "Versioning at bucket creation" below |
 | ~~Current object expiry~~ | Deferred | Different product; see above |
 
-Versioning is the opposite case: undoing an overwrite in `avatars` has no relationship to `uploads`, and churn varies wildly, so per-bucket is right — with a project default so new buckets inherit rather than silently defaulting to unprotected.
+### Frequency isn't a knob at all — it's fixed to "with every database backup"
 
-### Frequency defaults to inheritance, not configuration
+Earlier drafts offered daily/hourly as "advanced options" for users who wanted more granularity. Design review (prompted by a colleague's question: *"should we just force Frequency to be per database backup?"*) concluded those options are a footgun, not a feature: with any cadence other than "with every database backup," the nearest snapshot to a given backup can be up to a full cadence interval older than it — you restore the database to time T, but Storage rolls back to some earlier time T-minus-up-to-a-day. That's the exact "rows referencing files that no longer exist" problem this feature exists to prevent, just reintroduced through a different door. There's no rounding logic that fixes this after the fact — the fix is to not offer the cadence that causes it. The Settings page now shows "With every database backup" as a static value, not a dropdown.
 
-Default is **"with every database backup."** An independent cadence actively breaks the headline value: you'd get storage snapshots with no matching database backup, so you could restore the files but not the database state that referenced them. Daily/hourly remain available as advanced options, but for most users frequency isn't a knob they touch.
+Versioning is the opposite case in one respect — undoing an overwrite in `avatars` has no relationship to `uploads`, and churn varies wildly, so per-bucket configuration is conceptually right — but see below for why the *editor* for it was cut back too.
+
+### Versioning at bucket creation: default number, not a decision
+
+The create/edit bucket modal originally exposed four versioning controls: enable/disable, an override switch, expiry days, and max noncurrent versions — on top of the one snapshot-participation switch. A colleague's review flagged this as the same footgun pattern as frequency: "could we just ship only the default versioning number + include in restore points? Or, if they must have the ability to change both, only allow after bucket creation?" A brand-new bucket is the worst possible moment to ask someone to reason about retention tradeoffs — they haven't seen how the bucket is actually used yet.
+
+The modal now has exactly one control: **"Include in snapshots"**, defaulting to *in* (the participation default flipped from opt-in to opt-out to match the stated design intent above). Object versioning still exists and still applies — every bucket gets the project default (`PROJECT_VERSIONING_DEFAULTS`) — it's just not a decision the create/edit modal asks for. `avatars` in the mock data still has a versioning override, representing config set some other way (API, or a future dedicated surface), which the modal doesn't need to expose to stay honest about what's possible.
 
 ### Keeping two levels from being confusing
 
@@ -426,8 +432,8 @@ Default is **"with every database backup."** An independent cadence actively bre
 
 | Surface | Role |
 | --- | --- |
-| Storage → Files → Settings | **Canonical editor** for the project-level snapshot lifecycle policy (frequency, retention, include-new-buckets, per-bucket participation) |
-| Bucket create/edit modal | Versioning (with override) + this bucket's participation; shows the inherited project policy read-only and links to Settings |
+| Storage → Files → Settings | **Canonical editor** for the project-level snapshot lifecycle policy (fixed frequency, retention, include-new-buckets, per-bucket participation) |
+| Bucket create/edit modal | This bucket's snapshot participation only; shows the inherited project policy read-only and links to Settings. Versioning applies at the project default and isn't edited here |
 | Database → Backups banner | States actual coverage and links to Settings — one editor, so the two can't drift |
 
 **One banner, state-aware.** The Backups page previously had a permanent "Storage objects are not included" alert. Once snapshots exist that statement is sometimes false, so it's a single notice with four states: feature off, capture off, partial coverage (warning + which buckets), full coverage. Never two banners describing the same thing.

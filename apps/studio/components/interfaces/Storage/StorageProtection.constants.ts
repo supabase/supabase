@@ -55,7 +55,9 @@ const PROTECTED_BUCKETS: Record<string, BucketProtection> = {
 
 const DEFAULT_PROTECTION: BucketProtection = {
   versioning: 'disabled',
-  isIncludedInRestorePoints: false,
+  // Snapshot participation defaults to in — it's a cost opt-out, not an opt-in,
+  // so a new bucket isn't a silent gap in coverage.
+  isIncludedInRestorePoints: true,
   versionExpiryDays: null,
   maxNoncurrentVersions: null,
   hasVersioningOverride: false,

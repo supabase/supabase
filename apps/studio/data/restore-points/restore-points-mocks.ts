@@ -55,20 +55,19 @@ export interface BucketParticipation {
 }
 
 /**
- * How often restore points are captured.
+ * How often snapshots are captured.
  *
- * `with-database-backup` is the default because the feature's whole value is
- * database and storage landing on the same point in time. An independent cadence
- * produces storage snapshots with no matching database backup — you could restore
- * the files but not the database state that referenced them — so it's an advanced
- * option, not the primary lever.
+ * Fixed to `with-database-backup`, not user-configurable. An independent cadence
+ * (e.g. daily or hourly) would produce storage snapshots with no matching
+ * database backup — you could restore the files but not the database state that
+ * referenced them, or restore a backup that predates the nearest snapshot by up
+ * to a full cadence interval. That gap is a footgun, not a useful knob, so there
+ * is only one option.
  */
-export type SnapshotFrequency = 'with-database-backup' | 'daily' | 'hourly'
+export type SnapshotFrequency = 'with-database-backup'
 
 export const SNAPSHOT_FREQUENCY_LABELS: Record<SnapshotFrequency, string> = {
   'with-database-backup': 'With every database backup',
-  daily: 'Every day',
-  hourly: 'Every hour',
 }
 
 /**

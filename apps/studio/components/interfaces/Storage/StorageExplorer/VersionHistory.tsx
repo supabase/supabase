@@ -22,6 +22,10 @@ interface VersionHistoryProps {
   bucketId?: string
   objectName: string
   mimeType?: string
+  /** versionId of the version currently shown in the preview above. */
+  previewedVersionId?: string
+  /** Called when a version row is clicked, to show it in the preview above. */
+  onPreview?: (version: ObjectVersion) => void
 }
 
 const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
@@ -31,6 +35,8 @@ export const VersionHistory = ({
   bucketId,
   objectName,
   mimeType,
+  previewedVersionId,
+  onPreview,
 }: VersionHistoryProps) => {
   const {
     data: versions,
@@ -91,7 +97,19 @@ export const VersionHistory = ({
                   {!isLast && <span className="w-px flex-1 bg-border" />}
                 </div>
 
-                <div className="flex-1 pb-8">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className={cn(
+                    'flex-1 pb-8 -mx-2 px-2 rounded-md transition-colors cursor-pointer',
+                    onPreview && 'hover:bg-surface-200',
+                    previewedVersionId === version.versionId && 'bg-surface-200'
+                  )}
+                  onClick={() => onPreview?.(version)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') onPreview?.(version)
+                  }}
+                >
                   <div className="flex items-center justify-between gap-x-2">
                     <div className="flex items-center gap-x-2">
                       <span className="text-sm text-foreground">
@@ -100,7 +118,7 @@ export const VersionHistory = ({
                       {version.isCurrent && <Badge variant="success">Latest</Badge>}
                     </div>
 
-                    <div className="flex items-center gap-x-1">
+                    <div className="flex items-center gap-x-1" onClick={(e) => e.stopPropagation()}>
                       <ButtonTooltip
                         variant="text"
                         size="tiny"

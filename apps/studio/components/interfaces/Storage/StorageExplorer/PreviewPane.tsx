@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import dayjs from 'dayjs'
 import { AlertCircle, ChevronDown, Copy, Download, LoaderCircle, Trash2, X } from 'lucide-react'
+import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
   Button,
@@ -22,6 +24,7 @@ import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { VersionHistory } from './VersionHistory'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useObjectVersionsQuery } from '@/data/storage/protection/object-versions-query'
+import type { ObjectVersion } from '@/data/storage/protection/protection-mocks'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { BASE_PATH } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
@@ -145,6 +148,8 @@ export const PreviewPane = () => {
   })
   const versionCount = versionsData?.length
 
+  const [previewedVersion, setPreviewedVersion] = useState<ObjectVersion>()
+
   if (!file) return null
 
   const width = 450
@@ -153,149 +158,170 @@ export const PreviewPane = () => {
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
-  const detailsContent = (
-    <>
-      {/* Preview Thumbnail*/}
-      <div className="my-4 border border-overlay">
-        <div className="flex h-56 w-full items-center 2xl:h-72">
-          <PreviewFile item={file} />
-        </div>
+  // Prototype: there's no real per-version storage backing this yet, so an
+  // older version reuses the current file's bytes — the banner below is what
+  // actually communicates which version is being looked at.
+  const isPreviewingOlderVersion = previewedVersion !== undefined && !previewedVersion.isCurrent
+
+  const previewThumbnail = (
+    <div className="relative my-4 border border-overlay">
+      <div className="flex h-56 w-full items-center 2xl:h-72">
+        <PreviewFile item={file} />
       </div>
-
-      <div className="w-full space-y-6">
-        {/* Preview Information */}
-        <div className="space-y-1">
-          <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
-          {file.isCorrupted && (
-            <div className="flex items-center space-x-2">
-              <AlertCircle size={14} className="text-foreground-light" />
-              <p className="text-sm text-foreground-light">
-                File is corrupted, please delete and reupload this file again
-              </p>
-            </div>
-          )}
-          {mimeType && (
-            <p className="text-sm text-foreground-light">
-              {mimeType}
-              {size && <span> - {size}</span>}
-            </p>
-          )}
-        </div>
-
-        {/* Preview Metadata */}
-        <div className="space-y-2">
-          <div>
-            <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
-            <p className="text-sm text-foreground-light">{createdAt}</p>
-          </div>
-          <div>
-            <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
-            <p className="text-sm text-foreground-light">{updatedAt}</p>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex space-x-2 border-b border-overlay pb-4">
-          <Button
-            variant="default"
-            icon={<Download />}
-            disabled={file.isCorrupted}
-            onClick={() => downloadFile(file)}
+      {isPreviewingOlderVersion && (
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-x-2 border-t border-overlay bg-surface-100/95 px-3 py-1.5">
+          <p className="text-xs text-foreground-light">
+            Previewing version{' '}
+            <span className="font-mono text-foreground">
+              {previewedVersion.versionId.slice(0, 6)}…
+            </span>{' '}
+            · {dayjs(previewedVersion.createdAt).format('MMM D, HH:mm')}
+          </p>
+          <button
+            className="text-xs text-brand hover:underline"
+            onClick={() => setPreviewedVersion(undefined)}
           >
-            Download
-          </Button>
-          {selectedBucket.public ? (
-            <Button
-              variant="outline"
-              icon={<Copy />}
-              onClick={() => onCopyUrl(file.path!)}
-              disabled={file.isCorrupted}
-            >
-              Get URL
-            </Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  icon={<Copy />}
-                  iconRight={<ChevronDown />}
-                  disabled={file.isCorrupted}
-                >
-                  Get URL
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" align="center">
-                <DropdownMenuItem
-                  key="expires-one-week"
-                  onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}
-                >
-                  Expire in 1 week
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="expires-one-month"
-                  onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.MONTH)}
-                >
-                  Expire in 1 month
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="expires-one-year"
-                  onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.YEAR)}
-                >
-                  Expire in 1 year
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  key="custom-expiry"
-                  onClick={() => setSelectedFileCustomExpiry(file)}
-                >
-                  Custom expiry
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+            Back to latest
+          </button>
         </div>
-        <ButtonTooltip
-          variant="outline"
-          disabled={!canUpdateFiles}
-          size="tiny"
-          icon={<Trash2 />}
-          onClick={() => setSelectedItemsToDelete([file])}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canUpdateFiles
-                ? 'You need additional permissions to delete this file'
-                : undefined,
-            },
-          }}
-        >
-          Delete file
-        </ButtonTooltip>
+      )}
+    </div>
+  )
+
+  const detailsContent = (
+    <div className="w-full space-y-6">
+      {/* Preview Information */}
+      <div className="space-y-1">
+        <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
+        {file.isCorrupted && (
+          <div className="flex items-center space-x-2">
+            <AlertCircle size={14} className="text-foreground-light" />
+            <p className="text-sm text-foreground-light">
+              File is corrupted, please delete and reupload this file again
+            </p>
+          </div>
+        )}
+        {mimeType && (
+          <p className="text-sm text-foreground-light">
+            {mimeType}
+            {size && <span> - {size}</span>}
+          </p>
+        )}
       </div>
-    </>
+
+      {/* Preview Metadata */}
+      <div className="space-y-2">
+        <div>
+          <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
+          <p className="text-sm text-foreground-light">{createdAt}</p>
+        </div>
+        <div>
+          <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
+          <p className="text-sm text-foreground-light">{updatedAt}</p>
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex space-x-2 border-b border-overlay pb-4">
+        <Button
+          variant="default"
+          icon={<Download />}
+          disabled={file.isCorrupted}
+          onClick={() => downloadFile(file)}
+        >
+          Download
+        </Button>
+        {selectedBucket.public ? (
+          <Button
+            variant="outline"
+            icon={<Copy />}
+            onClick={() => onCopyUrl(file.path!)}
+            disabled={file.isCorrupted}
+          >
+            Get URL
+          </Button>
+        ) : (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                icon={<Copy />}
+                iconRight={<ChevronDown />}
+                disabled={file.isCorrupted}
+              >
+                Get URL
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="center">
+              <DropdownMenuItem
+                key="expires-one-week"
+                onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}
+              >
+                Expire in 1 week
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                key="expires-one-month"
+                onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.MONTH)}
+              >
+                Expire in 1 month
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                key="expires-one-year"
+                onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.YEAR)}
+              >
+                Expire in 1 year
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                key="custom-expiry"
+                onClick={() => setSelectedFileCustomExpiry(file)}
+              >
+                Custom expiry
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
+      <ButtonTooltip
+        variant="outline"
+        disabled={!canUpdateFiles}
+        size="tiny"
+        icon={<Trash2 />}
+        onClick={() => setSelectedItemsToDelete([file])}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canUpdateFiles
+              ? 'You need additional permissions to delete this file'
+              : undefined,
+          },
+        }}
+      >
+        Delete file
+      </ButtonTooltip>
+    </div>
   )
 
   return (
     <div
+      key={file.id ?? file.name}
       className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
       style={{ width }}
     >
+      {/* Preview Header */}
+      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
+        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
+      </div>
+
+      {previewThumbnail}
+
       {showVersions ? (
         <Tabs defaultValue="details">
-          {/* Preview Header: tabs share the row with the close icon */}
-          <div className="flex w-full items-center justify-between">
-            <TabsList className="gap-x-4 border-none">
-              <TabsTrigger value="details">Details</TabsTrigger>
-              <TabsTrigger value="versions">
-                Versions{versionCount !== undefined ? ` (${versionCount})` : ''}
-              </TabsTrigger>
-            </TabsList>
-            <X
-              className="cursor-pointer text-foreground-lighter transition-colors hover:text-foreground"
-              size={14}
-              onClick={() => setSelectedFilePreview(undefined)}
-            />
-          </div>
+          <TabsList className="gap-x-4">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="versions">
+              Versions{versionCount !== undefined ? ` (${versionCount})` : ''}
+            </TabsTrigger>
+          </TabsList>
           <TabsContent value="details">{detailsContent}</TabsContent>
           <TabsContent value="versions" className="pt-2">
             <VersionHistory
@@ -303,21 +329,13 @@ export const PreviewPane = () => {
               bucketId={selectedBucket?.id}
               objectName={file.name}
               mimeType={file.metadata?.mimetype}
+              previewedVersionId={previewedVersion?.versionId}
+              onPreview={setPreviewedVersion}
             />
           </TabsContent>
         </Tabs>
       ) : (
-        <>
-          {/* Preview Header */}
-          <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-            <X
-              className="cursor-pointer"
-              size={14}
-              onClick={() => setSelectedFilePreview(undefined)}
-            />
-          </div>
-          {detailsContent}
-        </>
+        detailsContent
       )}
     </div>
   )
