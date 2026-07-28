@@ -95,6 +95,7 @@ export const ProjectCreationFooter = ({
       </p>
     ) : (
       <Button
+        type="button"
         variant="default"
         disabled={isCreatingNewProject || isSuccessNewProject}
         onClick={onCancel}
