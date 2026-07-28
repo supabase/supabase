@@ -3,13 +3,13 @@
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
 import { useEffect, useReducer, useRef } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogSection, Heading } from 'ui'
-import { IconPanel } from 'ui-patterns/IconPanel'
 
 import { PhoneLoginsItems } from '../Navigation/NavigationMenu/NavigationMenu.constants'
 import MessageBird from './MessageBirdConfig.mdx'
 import TextLocal from './TextLocalConfig.mdx'
 import Twilio from './TwilioConfig.mdx'
 import Vonage from './VonageConfig.mdx'
+import { IconLinkButton, IconLinkImage } from '@/features/ui/IconLink'
 
 const reducer = (_, action: (typeof PhoneLoginsItems)[number] | undefined) => {
   const url = new URL(document.location.href)
@@ -41,22 +41,17 @@ const AuthSmsProviderConfig = () => {
         <h3 className="sr-only" id="sms-provider-configuration">
           Configuring SMS Providers
         </h3>
-        <div className="grid grid-cols-6 gap-10 not-prose py-8">
+        <ul className="grid grid-cols-12 gap-6 not-prose py-8">
           {PhoneLoginsItems.map((provider) => (
-            <button
-              tabIndex={0}
-              key={provider.name}
-              className="col-span-6 xl:col-span-3"
-              onClick={() => setSelectedProvider(provider)}
-            >
-              <IconPanel
+            <li key={provider.name} className="col-span-12 sm:col-span-6">
+              <IconLinkButton
                 title={provider.name}
-                icon={provider.icon}
-                hasLightIcon={provider.hasLightIcon}
+                icon={<IconLinkImage path={provider.icon} hasLightIcon={provider.hasLightIcon} />}
+                onClick={() => setSelectedProvider(provider)}
               />
-            </button>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
       <Dialog
         open={!!selectedProvider}

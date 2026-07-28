@@ -1,6 +1,6 @@
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import Link from 'next/link'
-import { type ReactNode } from 'react'
+import { type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { cn } from 'ui'
 
 const sizeStyles = {
@@ -23,6 +23,33 @@ export type IconLinkItem = {
   className?: string
 }
 
+const iconLinkClassName =
+  'group relative -m-3 flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent'
+
+function IconLinkContent({
+  title,
+  icon,
+  size = 'sm',
+}: {
+  title: string
+  icon: ReactNode
+  size?: IconLinkSize
+}) {
+  return (
+    <>
+      <div
+        className={cn(
+          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong',
+          sizeStyles[size].tile
+        )}
+      >
+        {icon}
+      </div>
+      <span className="text-base text-foreground">{title}</span>
+    </>
+  )
+}
+
 export function IconLink({
   href,
   title,
@@ -37,23 +64,32 @@ export function IconLink({
   className?: string
 }) {
   return (
-    <Link
-      href={href}
-      className={cn(
-        'group relative -m-3 flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent',
-        className
-      )}
-    >
-      <div
-        className={cn(
-          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong',
-          sizeStyles[size].tile
-        )}
-      >
-        {icon}
-      </div>
-      <span className="text-base text-foreground">{title}</span>
+    <Link href={href} className={cn(iconLinkClassName, className)}>
+      <IconLinkContent title={title} icon={icon} size={size} />
     </Link>
+  )
+}
+
+export function IconLinkButton({
+  title,
+  icon,
+  size = 'sm',
+  className,
+  ...props
+}: {
+  title: string
+  icon: ReactNode
+  size?: IconLinkSize
+  className?: string
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      type="button"
+      className={cn(iconLinkClassName, 'w-full text-left', className)}
+      {...props}
+    >
+      <IconLinkContent title={title} icon={icon} size={size} />
+    </button>
   )
 }
 
