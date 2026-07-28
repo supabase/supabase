@@ -15,10 +15,8 @@ import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
 import {
   selfHostingCommunity,
-  selfHostingGetHelp,
   selfHostingGetStarted,
-  selfHostingResolveIssues,
-  selfHostingShareExperience,
+  selfHostingSupport,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 
@@ -42,9 +40,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   realtimeResources,
   selfHostingGetStarted,
   selfHostingCommunity,
-  selfHostingResolveIssues,
-  selfHostingGetHelp,
-  selfHostingShareExperience,
+  selfHostingSupport,
   storageGetStarted,
   storageExamples,
   storageResources,
