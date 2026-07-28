@@ -69,6 +69,7 @@ Older Studio code predates some of these conventions. For new or modified code, 
 - **Memoization is not the default**: `useMemo`/`useCallback` only for measured expense or referential stability a memoized child depends on.
 - **TypeScript**: avoid `as` casts — where external data enters, parse it with zod (`schema.parse`/`safeParse`) instead. Model multi-state values as discriminated unions (`{ status: 'success'; data: T } | { status: 'error'; error: Error }`) rather than independent boolean flags.
 - **Naming**: prop callbacks are `onX`, internal handlers are `handleX`. Custom hooks return objects, not tuples.
+- **Refactoring**: when you move or extract code into a new module, update every importer to point at the new location directly — do **not** leave a re-export shim in the old file "for backward compatibility." It's a one-line import change per consumer, and keeping shims around makes the codebase messy and the true source of a symbol ambiguous.
 
 ## Defaults that differ here
 

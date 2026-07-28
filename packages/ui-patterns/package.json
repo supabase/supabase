@@ -686,10 +686,6 @@
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
     },
-    "./admonition": {
-      "import": "./src/admonition.tsx",
-      "types": "./src/admonition.tsx"
-    },
     "./collapsible-alert": {
       "import": "./src/collapsible-alert.tsx",
       "types": "./src/collapsible-alert.tsx"

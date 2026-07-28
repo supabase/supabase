@@ -11,9 +11,9 @@ import {
   generateDynamicHelper,
   generateDynamicHelpers,
   generateHelpersFromInput,
-  LogsDatePicker,
   parseCustomInput,
-} from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+} from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
 
 dayjs.extend(timezone)

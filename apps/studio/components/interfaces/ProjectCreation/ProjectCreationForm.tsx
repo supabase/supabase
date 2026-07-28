@@ -9,7 +9,7 @@ import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, cn, Form, useWatch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
@@ -35,7 +35,6 @@ import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
 import { SecurityOptions } from './SecurityOptions'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
-import { getValidVercelReturnUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import {
   GitHubRepositoryField,
   useGitHubRepositoryOptions,
@@ -91,7 +90,7 @@ interface ProjectCreationFormProps {
  *  - "Internal configuration" section
  *  - "GitHub repository" field
  *  - "Free project info" at the bottom
- * - Shows Cancel as "Return to Vercel" (via `next`) instead of navigating into Studio
+ * - Cancel closes the popup window instead of navigating into Studio
  * - Shows the following:
  *  - "Data seeding" section
  * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
@@ -106,8 +105,7 @@ export const ProjectCreationForm = ({
   const track = useTrack()
   const router = useRouter()
   const { profile } = useProfile()
-  const { slug, projectName, externalId, next } = useParams()
-  const canReturnToVercel = getValidVercelReturnUrl(next) !== undefined
+  const { slug, projectName, externalId } = useParams()
   const trackFunnelError = useTrackFunnelError()
   const defaultProvider = useDefaultProvider()
 
@@ -609,7 +607,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
-              cancelAction={isVercelIntegrationFlow ? 'vercel' : 'studio'}
+              cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
         >
@@ -702,10 +700,7 @@ export const ProjectCreationForm = ({
                 {freePlanWithExceedingLimits ? (
                   isAdmin &&
                   slug && (
-                    <FreeProjectLimitWarning
-                      membersExceededLimit={membersExceededLimit || []}
-                      showVercelReturnHint={isVercelIntegrationFlow && canReturnToVercel}
-                    />
+                    <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                   )
                 ) : hasOutstandingInvoices ? (
                   <Panel.Content>

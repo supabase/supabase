@@ -3,9 +3,9 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { Content } from './content-query'
 import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
-import { SNIPPET_PAGE_LIMIT, withSavedStatus, type Snippet } from './sql-folders-query'
+import { SNIPPET_PAGE_LIMIT, withSavedStatus, type SnippetWithContent } from './sql-folders-query'
 import { get } from '@/data/fetchers'
-import type { SqlSnippets, UseCustomInfiniteQueryOptions } from '@/types'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type SqlSnippet = Extract<Content, { type: 'sql' }>
 
@@ -49,9 +49,7 @@ export async function getSqlSnippets(
     throw error
   }
 
-  const snippets = remapSqlContentFields(
-    data.data as unknown as Array<Snippet & { content?: SqlSnippets.Content }>
-  )
+  const snippets = remapSqlContentFields(data.data as unknown as SnippetWithContent[])
   return {
     cursor: data.cursor,
     contents: snippets.map(withSavedStatus),
