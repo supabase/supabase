@@ -341,7 +341,7 @@ const HomePage = () => (
                 return (
                   <li key={guide.name} className="col-span-6 md:col-span-4">
                     <Link href={guide.url || '#'} passHref>
-                      <IconPanel {...guide} title={guide.name} background={true} showLink={false} />
+                      <IconPanel {...guide} title={guide.name} />
                     </Link>
                   </li>
                 )
@@ -405,7 +405,7 @@ const HomePage = () => (
                 return (
                   <li key={option.title} className="col-span-6">
                     <Link href={option.href} passHref>
-                      <IconPanelWithIconPicker {...option} background={true} showLink={false} />
+                      <IconPanelWithIconPicker {...option} />
                     </Link>
                   </li>
                 )

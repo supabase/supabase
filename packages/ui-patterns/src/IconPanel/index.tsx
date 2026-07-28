@@ -1,6 +1,5 @@
 'use client'
 
-import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -11,13 +10,10 @@ interface Props {
 
   icon?: string | React.ReactNode
   iconSize?: 'sm' | 'lg'
-  children?: React.ReactNode
 
   background?: boolean
 
   hasLightIcon?: boolean
-
-  showLink?: boolean
 }
 
 export const IconPanel = ({
@@ -25,10 +21,8 @@ export const IconPanel = ({
   tooltip,
   icon,
   iconSize = 'sm',
-  children,
   background = true,
   hasLightIcon,
-  showLink = false,
 }: Props) => {
   const { theme } = useTheme()
 
@@ -59,13 +53,7 @@ export const IconPanel = ({
       <TooltipTrigger asChild>
         <div className={['relative', 'group'].join(' ')} data-tip={tooltip}>
           <div className={['peer relative', 'flex flex-col', icon ? 'gap-6' : 'gap-2'].join(' ')}>
-            <div
-              className={[
-                'flex',
-                children ? 'items-start' : 'items-center',
-                (title || showLink) && 'gap-3',
-              ].join(' ')}
-            >
+            <div className={['flex items-center', title && 'gap-3'].join(' ')}>
               {typeof icon === 'string' ? (
                 <IconContainer>
                   <img
@@ -83,17 +71,7 @@ export const IconPanel = ({
               ) : (
                 <IconContainer>{icon}</IconContainer>
               )}
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-3">
-                  {title && <h5 className="text-base text-foreground m-0">{title}</h5>}
-                </div>
-                {children && (
-                  <span className="text-sm text-foreground-light not-prose">{children}</span>
-                )}
-                {showLink && (
-                  <span className="text-brand-link justify-end text-sm">Learn more</span>
-                )}
-              </div>
+              {title && <h5 className="text-base text-foreground m-0">{title}</h5>}
             </div>
           </div>
           <div

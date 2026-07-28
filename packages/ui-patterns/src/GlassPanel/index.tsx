@@ -10,7 +10,6 @@ interface Props {
   icon?: string | React.ReactNode
   children?: React.ReactNode
   header?: string
-  background?: boolean
   className?: string
   logo?: string
   logoInverse?: string
@@ -66,7 +65,6 @@ export const GlassPanel = ({
   icon,
   children,
   header,
-  background = true,
   logo,
   logoInverse,
   hasLightIcon,
@@ -87,9 +85,7 @@ export const GlassPanel = ({
         'overflow-hidden',
         'border rounded-lg',
         'text-left',
-        background
-          ? 'hover:border-strong bg-surface-75'
-          : 'border-muted hover:border-default bg-transparent',
+        'bg-surface-75 hover:border-strong',
         'transition',
         className
       )}
@@ -119,10 +115,6 @@ export const GlassPanel = ({
             "
         />
       )}
-      {/* <div
-        className="absolute left-0 top-0 w-[250px] h-[150px] transform scale-100 opacity-50 group-hover:scale-150 group-hover:opacity-100 transition-all duration-700 ease-out"
-        style={{ background: `radial-gradient(100% 100% at 0% 0%, #3EACCF18, transparent)` }}
-      /> */}
       <div
         className={cn(
           'px-8 pb-8 relative',

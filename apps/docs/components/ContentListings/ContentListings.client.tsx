@@ -16,9 +16,10 @@ import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { resolveContentListingIcon } from './iconChip'
 
 const GRID_ITEM_CLASS = {
+  // Stay 2-up until xl (~1280px) so cards aren't cramped beside the docs sidebar.
   2: 'col-span-12 md:col-span-6',
-  3: 'col-span-12 md:col-span-4',
-  4: 'col-span-12 md:col-span-3',
+  3: 'col-span-12 md:col-span-6 xl:col-span-4',
+  4: 'col-span-12 md:col-span-6 xl:col-span-3',
 } as const
 
 function useContentListingClickHandler(group: ContentListingGroup) {
