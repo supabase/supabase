@@ -8,6 +8,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 import { ServiceStatus } from './ServiceStatus'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { SingleStat } from '@/components/ui/SingleStat'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useBackupsQuery } from '@/data/database/backups-query'
@@ -137,9 +138,9 @@ export const ActivityStats = () => {
           }
         />
 
-        {!isHighAvailability && (
+        <DisableInteraction disabled={isHighAvailability} aria-disabled={isHighAvailability}>
           <SingleStat
-            href={`/project/${ref}/branches`}
+            href={isHighAvailability ? undefined : `/project/${ref}/branches`}
             icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
             label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
             trackingProperties={{
@@ -170,7 +171,7 @@ export const ActivityStats = () => {
               )
             }
           />
-        )}
+        </DisableInteraction>
 
         <SingleStat
           href={`/project/${ref}/database/migrations`}
