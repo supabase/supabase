@@ -130,6 +130,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
         )}
       </div>
       <button
+        tabIndex={0}
         type="button"
         onClick={() => setIsExpanded((expanded) => !expanded)}
         className="mt-2 cursor-pointer text-sm text-brand-link transition-colors hover:text-foreground focus-ring"
@@ -184,6 +185,7 @@ function CopyButton({ label, value }: { label: string; value: string }) {
 
   return (
     <button
+      tabIndex={0}
       type="button"
       onClick={() => {
         copyToClipboard(value, () => {
