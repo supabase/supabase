@@ -3,9 +3,10 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import {
-  BatchConfig,
   buildDucklakeApiConfig,
+  buildPipelineApiConfig,
   DestinationConfig,
+  PipelineConfig,
 } from './create-destination-pipeline-mutation'
 import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
@@ -19,13 +20,7 @@ export type UpdateDestinationPipelineParams = {
   destinationName: string
   destinationConfig: DestinationConfig
   sourceId: number
-  pipelineConfig: {
-    publicationName: string
-    batch?: BatchConfig
-    maxTableSyncWorkers?: number
-    maxCopyConnectionsPerTable?: number
-    invalidatedSlotBehavior?: 'error' | 'recreate'
-  }
+  pipelineConfig: PipelineConfig
 }
 
 type UpdateDestinationPipelineBody =
@@ -40,13 +35,7 @@ async function updateDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: {
-      publicationName,
-      batch,
-      maxTableSyncWorkers,
-      maxCopyConnectionsPerTable,
-      invalidatedSlotBehavior,
-    },
+    pipelineConfig,
     sourceId,
   }: UpdateDestinationPipelineParams,
   signal?: AbortSignal
@@ -126,13 +115,7 @@ async function updateDestinationPipeline(
     )
   }
 
-  const pipeline_config = {
-    publication_name: publicationName,
-    max_table_sync_workers: maxTableSyncWorkers,
-    max_copy_connections_per_table: maxCopyConnectionsPerTable,
-    invalidated_slot_behavior: invalidatedSlotBehavior,
-    batch: batch ? { max_fill_ms: batch.maxFillMs } : undefined,
-  }
+  const pipeline_config = buildPipelineApiConfig(pipelineConfig)
 
   const { data, error } = await post(
     '/platform/replication/{ref}/destinations-pipelines/{destination_id}/{pipeline_id}',

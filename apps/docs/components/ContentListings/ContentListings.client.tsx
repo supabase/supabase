@@ -81,8 +81,19 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                       title={item.title}
                       icon={resolveContentListingIcon(item.icon)}
                       hasLightIcon={item.hasLightIcon ?? typeof item.icon === 'string'}
-                      badge={item.badge ? <Badge variant="success">{item.badge}</Badge> : undefined}
+                      badge={
+                        item.badge && item.badgePosition !== 'below' ? (
+                          <Badge variant="success">{item.badge}</Badge>
+                        ) : undefined
+                      }
                     >
+                      {item.badge && item.badgePosition === 'below' && (
+                        // Pull the badge up close to the title (GlassPanel's icon-row gap is
+                        // large by default), then push extra space before the description below.
+                        <Badge variant="success" className="-mt-4 mb-6 block w-fit">
+                          {item.badge}
+                        </Badge>
+                      )}
                       {item.description}
                     </GlassPanel>
                   </Link>

@@ -14,11 +14,11 @@ catalog:
   '@monaco-editor/react': ^4.7.0
   '@sentry/nextjs': ^10.59.0
   '@sentry/tanstackstart-react': ^10.59.0
-  '@supabase/auth-js': 2.110.8
-  '@supabase/postgrest-js': 2.110.8
-  '@supabase/realtime-js': 2.110.8
+  '@supabase/auth-js': 2.110.9
+  '@supabase/postgrest-js': 2.110.9
+  '@supabase/realtime-js': 2.110.9
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.110.8
+  '@supabase/supabase-js': 2.110.9
   '@tanstack/react-router': ^1.169.2
   '@tanstack/react-start': ^1.167.65
   '@tanstack/react-table': ^8.21.3
@@ -56,16 +56,27 @@ catalog:
 allowBuilds:
   '@parcel/watcher': false
   '@sentry/cli': false
+  '@supabase/build-icons@file:packages/build-icons': set this to true or false
+  '@supabase/pg-meta@file:packages/pg-meta': set this to true or false
+  ai-commands@file:packages/ai-commands: set this to true or false
+  api-types@file:packages/api-types: set this to true or false
+  common@file:packages/common: set this to true or false
+  config@file:packages/config: set this to true or false
   contentlayer2: false
   core-js: false
+  dev-tools@file:packages/dev-tools: set this to true or false
   es5-ext: false
   esbuild: false
+  icons@file:packages/icons: set this to true or false
   libpg-query: false
   msw: false
   node-pty: true
   protobufjs: false
+  shared-data@file:packages/shared-data: set this to true or false
   sharp: false
   supabase: true
+  ui-patterns@file:packages/ui-patterns: set this to true or false
+  ui@file:packages/ui: set this to true or false
 
 minimumReleaseAge: 4320
 

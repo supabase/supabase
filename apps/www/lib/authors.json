@@ -1,5 +1,13 @@
 [
   {
+    "author_id": "alex_hall",
+    "author": "Alex Hall",
+    "username": "alexhall",
+    "position": "Engineering",
+    "author_url": "https://github.com/alexhall",
+    "author_image_url": "https://github.com/alexhall.png"
+  },
+  {
     "author_id": "angelico_de_los_reyes",
     "author": "Angelico de los Reyes",
     "position": "Engineering",

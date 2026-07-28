@@ -28,7 +28,12 @@ const tables = [
 
 describe('calculateRestartCostEstimate', () => {
   it('sums only the tables being restarted', () => {
-    expect(calculateRestartCostEstimate(tables, ['public.orders', 'public.customers'])).toEqual({
+    expect(
+      calculateRestartCostEstimate(tables, [
+        { schema: 'public', name: 'orders' },
+        { schema: 'public', name: 'customers' },
+      ])
+    ).toMatchObject({
       isComplete: true,
       estimatedBytes: 3_000_000_000,
       estimatedCost: 2,
@@ -38,7 +43,10 @@ describe('calculateRestartCostEstimate', () => {
 
   it('marks the estimate incomplete when a restarted table is missing', () => {
     expect(
-      calculateRestartCostEstimate(tables, ['public.orders', 'public.missing']).isComplete
+      calculateRestartCostEstimate(tables, [
+        { schema: 'public', name: 'orders' },
+        { schema: 'public', name: 'missing' },
+      ]).isComplete
     ).toBe(false)
   })
 })
