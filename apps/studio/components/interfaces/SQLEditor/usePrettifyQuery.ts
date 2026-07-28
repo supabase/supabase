@@ -25,7 +25,9 @@ export function usePrettifyQuery({ id, isDiffOpen }: { id: string; isDiffOpen: b
     const snippet = state.snippets[id]
 
     if (editor.isReady() && project) {
-      const sql = editor.getSql(snippet?.snippet.content?.unchecked_sql)
+      const fallback =
+        snippet?.snippet.type === 'log_sql' ? undefined : snippet?.snippet.content?.unchecked_sql
+      const sql = editor.getSql(fallback)
       if (sql === undefined) return
 
       const formattedSql = formatSql(sql)

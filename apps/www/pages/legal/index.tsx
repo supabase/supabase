@@ -16,6 +16,11 @@ const sections = [
         type: 'document' as const,
       },
       {
+        label: 'Data Processing Addendum',
+        href: '/legal/customer-resources/data-processing-addendum',
+        type: 'document' as const,
+      },
+      {
         label: 'Support Policy',
         href: '/support-policy',
         type: 'document' as const,
