@@ -8,7 +8,7 @@ import { AccessTokenList } from '@/components/interfaces/Account/AccessTokens/Ac
 import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
 import { NewTokenButton } from '@/components/interfaces/Account/AccessTokens/Classic/NewTokenButton'
 import { MigrationAdmonition } from '@/components/interfaces/Account/AccessTokens/MigrationAdmonition'
-import { NewScopedTokenButton } from '@/components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenButton'
+import { NewScopedTokenSheet } from '@/components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenSheet'
 import { AccessTokensLayout } from '@/components/layouts/AccessTokens/AccessTokensLayout'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
@@ -57,7 +57,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
               </a>
             </Button>
             {scopedTokensEnabled ? (
-              <NewScopedTokenButton onCreateToken={(token) => setNewToken(token)} />
+              <NewScopedTokenSheet />
             ) : (
               <NewTokenButton onCreateToken={setNewToken} />
             )}

@@ -1,0 +1,1318 @@
+{
+  "_meta": {
+    "description": "Cross-reference between OpenFGA permission scopes, Management API endpoints, and MCP tools. scopes: scope -> what it authorizes. endpoints: endpoint -> ALL scopes it requires. mcp_tools: tool -> ALL scopes it requires.",
+    "generated_from": {
+      "scopes": "openfga/model/supabase.fga (type scope relations)",
+      "endpoints": "api/apps/mgmt-api/specs/v1.spec.json and v2.spec.json — fga_permissions security entries emitted by the @AuthWithFgaPermissions decorator (platform/system endpoints intentionally excluded)",
+      "mcp_tools": "@supabase/mcp-server-supabase@0.8.1 tools (served at POST /mcp), mapped to the FGA permission of the equivalent management API operation each tool performs"
+    },
+    "notes": [
+      "Scope lists on endpoints and mcp_tools are conjunctive: the caller needs ALL listed scopes (FgaPermissionsGuard checks every declared permission).",
+      "MCP tool authorization is enforced via legacy OAuth scopes (assertMcpOAuthScope) plus ABAC/RLS checks; the FGA permissions shown are the equivalent fine-grained scopes per legacyOauthScopeToFgaPermissionMap and matching v1 endpoints.",
+      "MCP tools with no permission scope requirement (search_docs, confirm_cost) and endpoints not guarded by @AuthWithFgaPermissions are not listed.",
+      "execute_sql requires only database_read when called with read_only=true; writes require database_read and database_write."
+    ]
+  },
+  "scopes": {
+    "organizations_read": {
+      "endpoints": [
+        "GET /v1/organizations"
+      ],
+      "mcp_tools": [
+        "list_organizations"
+      ]
+    },
+    "organizations_create": {
+      "endpoints": [
+        "POST /v1/organizations"
+      ],
+      "mcp_tools": []
+    },
+    "projects_read": {
+      "endpoints": [
+        "GET /v1/projects"
+      ],
+      "mcp_tools": [
+        "list_projects"
+      ]
+    },
+    "snippets_read": {
+      "endpoints": [
+        "GET /v1/snippets",
+        "GET /v1/snippets/{id}"
+      ],
+      "mcp_tools": []
+    },
+    "organization_admin_read": {
+      "endpoints": [
+        "GET /v1/organizations/{slug}",
+        "GET /v1/organizations/{slug}/entitlements"
+      ],
+      "mcp_tools": [
+        "get_cost",
+        "get_organization"
+      ]
+    },
+    "organization_admin_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/claim-token",
+        "GET /v1/oauth/authorize/project-claim",
+        "GET /v1/organizations/{slug}/project-claim/{token}",
+        "PATCH /v2/organizations/{slug}/members/{user_id}/roles",
+        "POST /v1/organizations/{slug}/project-claim/{token}",
+        "POST /v1/projects/{ref}/claim-token",
+        "POST /v2/projects/{ref}/transfers"
+      ],
+      "mcp_tools": []
+    },
+    "organization_projects_read": {
+      "endpoints": [
+        "GET /v1/organizations/{slug}/projects"
+      ],
+      "mcp_tools": []
+    },
+    "organization_projects_create": {
+      "endpoints": [
+        "POST /v1/projects"
+      ],
+      "mcp_tools": [
+        "create_project"
+      ]
+    },
+    "members_read": {
+      "endpoints": [
+        "GET /v1/organizations/{slug}/members",
+        "GET /v2/organizations/{slug}/members",
+        "GET /v2/organizations/{slug}/roles"
+      ],
+      "mcp_tools": []
+    },
+    "members_write": {
+      "endpoints": [
+        "POST /v2/organizations/{slug}/members/invitations"
+      ],
+      "mcp_tools": []
+    },
+    "project_admin_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}",
+        "GET /v1/projects/{ref}/claim-token",
+        "GET /v1/projects/{ref}/health",
+        "GET /v1/projects/{ref}/jit-access",
+        "GET /v1/projects/{ref}/restore",
+        "GET /v1/projects/{ref}/upgrade/eligibility",
+        "GET /v1/projects/{ref}/upgrade/status",
+        "GET /v2/projects/{ref}/private-link/associations",
+        "POST /v2/projects/{ref}/transfers/previews"
+      ],
+      "mcp_tools": [
+        "get_project",
+        "get_project_url"
+      ]
+    },
+    "project_admin_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}",
+        "DELETE /v1/projects/{ref}/claim-token",
+        "DELETE /v2/projects/{ref}/private-link/associations/aws-account/{aws_account_id}",
+        "GET /v1/oauth/authorize/project-claim",
+        "GET /v1/projects/{ref}/pgsodium",
+        "PATCH /v1/projects/{ref}",
+        "PATCH /v1/projects/{ref}/config/auth",
+        "POST /v1/projects/{ref}/claim-token",
+        "POST /v1/projects/{ref}/pause",
+        "POST /v1/projects/{ref}/restart",
+        "POST /v1/projects/{ref}/restore",
+        "POST /v1/projects/{ref}/restore/cancel",
+        "POST /v1/projects/{ref}/upgrade",
+        "POST /v2/projects/{ref}/private-link/associations",
+        "PUT /v1/projects/{ref}/jit-access",
+        "PUT /v1/projects/{ref}/pgsodium"
+      ],
+      "mcp_tools": [
+        "pause_project",
+        "restore_project"
+      ]
+    },
+    "action_runs_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/actions",
+        "GET /v1/projects/{ref}/actions/{run_id}",
+        "GET /v1/projects/{ref}/actions/{run_id}/logs",
+        "HEAD /v1/projects/{ref}/actions"
+      ],
+      "mcp_tools": []
+    },
+    "action_runs_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/actions/{run_id}/status"
+      ],
+      "mcp_tools": []
+    },
+    "advisors_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/advisors/performance",
+        "GET /v1/projects/{ref}/advisors/security"
+      ],
+      "mcp_tools": [
+        "get_advisors"
+      ]
+    },
+    "analytics_config_read": {
+      "endpoints": [
+        "GET /v2/projects/{ref}/analytics/log-drains"
+      ],
+      "mcp_tools": []
+    },
+    "analytics_config_write": {
+      "endpoints": [
+        "DELETE /v2/projects/{ref}/analytics/log-drains/{id}",
+        "POST /v2/projects/{ref}/analytics/log-drains",
+        "PUT /v2/projects/{ref}/analytics/log-drains/{id}"
+      ],
+      "mcp_tools": []
+    },
+    "analytics_logs_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/analytics/endpoints/logs",
+        "GET /v1/projects/{ref}/analytics/endpoints/logs.all"
+      ],
+      "mcp_tools": [
+        "get_logs"
+      ]
+    },
+    "analytics_usage_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/analytics/endpoints/functions.combined-stats",
+        "GET /v1/projects/{ref}/analytics/endpoints/usage.api-counts",
+        "GET /v1/projects/{ref}/analytics/endpoints/usage.api-requests-count"
+      ],
+      "mcp_tools": []
+    },
+    "api_gateway_keys_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/api-keys",
+        "GET /v1/projects/{ref}/api-keys/legacy",
+        "GET /v1/projects/{ref}/api-keys/{id}"
+      ],
+      "mcp_tools": [
+        "get_publishable_keys"
+      ]
+    },
+    "api_gateway_keys_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/api-keys/{id}",
+        "PATCH /v1/projects/{ref}/api-keys/{id}",
+        "POST /v1/projects/{ref}/api-keys",
+        "PUT /v1/projects/{ref}/api-keys/legacy"
+      ],
+      "mcp_tools": []
+    },
+    "auth_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/auth",
+        "GET /v1/projects/{ref}/config/auth/sso/providers",
+        "GET /v1/projects/{ref}/config/auth/sso/providers/{provider_id}",
+        "GET /v1/projects/{ref}/config/auth/third-party-auth",
+        "GET /v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}"
+      ],
+      "mcp_tools": []
+    },
+    "auth_config_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/config/auth/sso/providers/{provider_id}",
+        "DELETE /v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}",
+        "PATCH /v1/projects/{ref}/config/auth",
+        "POST /v1/projects/{ref}/config/auth/sso/providers",
+        "POST /v1/projects/{ref}/config/auth/third-party-auth",
+        "PUT /v1/projects/{ref}/config/auth/sso/providers/{provider_id}"
+      ],
+      "mcp_tools": []
+    },
+    "auth_signing_keys_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/auth/signing-keys",
+        "GET /v1/projects/{ref}/config/auth/signing-keys/legacy",
+        "GET /v1/projects/{ref}/config/auth/signing-keys/{id}"
+      ],
+      "mcp_tools": []
+    },
+    "auth_signing_keys_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/config/auth/signing-keys/{id}",
+        "PATCH /v1/projects/{ref}/config/auth/signing-keys/{id}",
+        "POST /v1/projects/{ref}/config/auth/signing-keys",
+        "POST /v1/projects/{ref}/config/auth/signing-keys/legacy"
+      ],
+      "mcp_tools": []
+    },
+    "backups_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/database/backups",
+        "GET /v1/projects/{ref}/database/backups/restore-point",
+        "GET /v1/projects/{ref}/database/backups/schedule"
+      ],
+      "mcp_tools": []
+    },
+    "backups_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/database/backups/schedule",
+        "POST /v1/projects/{ref}/database/backups/restore",
+        "POST /v1/projects/{ref}/database/backups/restore-pitr",
+        "POST /v1/projects/{ref}/database/backups/restore-point",
+        "POST /v1/projects/{ref}/database/backups/undo"
+      ],
+      "mcp_tools": []
+    },
+    "branching_development_create": {
+      "endpoints": [
+        "POST /v1/projects/{ref}/branches"
+      ],
+      "mcp_tools": [
+        "create_branch"
+      ]
+    },
+    "branching_development_delete": {
+      "endpoints": [
+        "DELETE /v1/branches/{branch_id_or_ref}"
+      ],
+      "mcp_tools": [
+        "delete_branch"
+      ]
+    },
+    "branching_development_read": {
+      "endpoints": [
+        "GET /v1/branches/{branch_id_or_ref}",
+        "GET /v1/projects/{ref}/branches",
+        "GET /v1/projects/{ref}/branches/{name}"
+      ],
+      "mcp_tools": [
+        "list_branches"
+      ]
+    },
+    "branching_development_write": {
+      "endpoints": [
+        "GET /v1/branches/{branch_id_or_ref}/diff",
+        "PATCH /v1/branches/{branch_id_or_ref}",
+        "POST /v1/branches/{branch_id_or_ref}/merge",
+        "POST /v1/branches/{branch_id_or_ref}/push",
+        "POST /v1/branches/{branch_id_or_ref}/reset",
+        "POST /v1/branches/{branch_id_or_ref}/restore"
+      ],
+      "mcp_tools": [
+        "merge_branch",
+        "rebase_branch",
+        "reset_branch"
+      ]
+    },
+    "branching_production_create": {
+      "endpoints": [
+        "POST /v1/projects/{ref}/branches"
+      ],
+      "mcp_tools": [
+        "create_branch"
+      ]
+    },
+    "branching_production_delete": {
+      "endpoints": [
+        "DELETE /v1/branches/{branch_id_or_ref}",
+        "DELETE /v1/projects/{ref}/branches"
+      ],
+      "mcp_tools": [
+        "delete_branch"
+      ]
+    },
+    "branching_production_read": {
+      "endpoints": [
+        "GET /v1/branches/{branch_id_or_ref}",
+        "GET /v1/projects/{ref}/branches",
+        "GET /v1/projects/{ref}/branches/{name}"
+      ],
+      "mcp_tools": [
+        "list_branches"
+      ]
+    },
+    "branching_production_write": {
+      "endpoints": [
+        "GET /v1/branches/{branch_id_or_ref}/diff",
+        "PATCH /v1/branches/{branch_id_or_ref}",
+        "POST /v1/branches/{branch_id_or_ref}/merge",
+        "POST /v1/branches/{branch_id_or_ref}/push",
+        "POST /v1/branches/{branch_id_or_ref}/reset",
+        "POST /v1/branches/{branch_id_or_ref}/restore"
+      ],
+      "mcp_tools": [
+        "merge_branch",
+        "rebase_branch",
+        "reset_branch"
+      ]
+    },
+    "custom_domain_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/custom-hostname"
+      ],
+      "mcp_tools": []
+    },
+    "custom_domain_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/custom-hostname",
+        "POST /v1/projects/{ref}/custom-hostname/activate",
+        "POST /v1/projects/{ref}/custom-hostname/initialize",
+        "POST /v1/projects/{ref}/custom-hostname/reverify"
+      ],
+      "mcp_tools": []
+    },
+    "data_api_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/postgrest"
+      ],
+      "mcp_tools": []
+    },
+    "data_api_config_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/postgrest"
+      ],
+      "mcp_tools": []
+    },
+    "database_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/database/pgbouncer",
+        "GET /v1/projects/{ref}/database/context",
+        "GET /v1/projects/{ref}/database/openapi",
+        "GET /v1/projects/{ref}/types/typescript",
+        "GET /v1/projects/{ref}/upgrade/eligibility",
+        "GET /v1/projects/{ref}/upgrade/status",
+        "POST /v1/projects/{ref}/database/query",
+        "POST /v1/projects/{ref}/database/query/read-only"
+      ],
+      "mcp_tools": [
+        "execute_sql",
+        "generate_typescript_types",
+        "get_advisors",
+        "list_extensions",
+        "list_tables"
+      ]
+    },
+    "database_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/cli/login-role",
+        "POST /v1/projects/{ref}/cli/login-role",
+        "POST /v1/projects/{ref}/database/query",
+        "POST /v1/projects/{ref}/upgrade"
+      ],
+      "mcp_tools": [
+        "apply_migration",
+        "execute_sql"
+      ]
+    },
+    "database_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/database/postgres"
+      ],
+      "mcp_tools": []
+    },
+    "database_config_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/database/password",
+        "PUT /v1/projects/{ref}/config/database/postgres"
+      ],
+      "mcp_tools": []
+    },
+    "database_jit_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/database/jit",
+        "GET /v1/projects/{ref}/database/jit/list",
+        "POST /v1/projects/{ref}/database/jit"
+      ],
+      "mcp_tools": []
+    },
+    "database_jit_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/database/jit/invite/{invite_id}",
+        "DELETE /v1/projects/{ref}/database/jit/{user_id}",
+        "POST /v1/projects/{ref}/database/jit/invite",
+        "PUT /v1/projects/{ref}/database/jit"
+      ],
+      "mcp_tools": []
+    },
+    "database_network_bans_read": {
+      "endpoints": [
+        "POST /v1/projects/{ref}/network-bans/retrieve",
+        "POST /v1/projects/{ref}/network-bans/retrieve/enriched"
+      ],
+      "mcp_tools": []
+    },
+    "database_network_bans_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/network-bans"
+      ],
+      "mcp_tools": []
+    },
+    "database_network_restrictions_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/network-restrictions"
+      ],
+      "mcp_tools": []
+    },
+    "database_network_restrictions_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/network-restrictions",
+        "POST /v1/projects/{ref}/network-restrictions/apply"
+      ],
+      "mcp_tools": []
+    },
+    "database_migrations_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/database/migrations",
+        "GET /v1/projects/{ref}/database/migrations/{version}"
+      ],
+      "mcp_tools": [
+        "list_migrations"
+      ]
+    },
+    "database_migrations_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/database/migrations",
+        "PATCH /v1/projects/{ref}/database/migrations/{version}",
+        "POST /v1/projects/{ref}/database/migrations",
+        "PUT /v1/projects/{ref}/database/migrations"
+      ],
+      "mcp_tools": [
+        "apply_migration"
+      ]
+    },
+    "database_pooling_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/database/pooler"
+      ],
+      "mcp_tools": []
+    },
+    "database_pooling_config_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/config/database/pooler"
+      ],
+      "mcp_tools": []
+    },
+    "database_readonly_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/readonly"
+      ],
+      "mcp_tools": []
+    },
+    "database_readonly_config_write": {
+      "endpoints": [
+        "POST /v1/projects/{ref}/readonly/temporary-disable"
+      ],
+      "mcp_tools": []
+    },
+    "database_ssl_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/ssl-enforcement"
+      ],
+      "mcp_tools": []
+    },
+    "database_ssl_config_write": {
+      "endpoints": [
+        "PUT /v1/projects/{ref}/ssl-enforcement"
+      ],
+      "mcp_tools": []
+    },
+    "database_webhooks_config_read": {
+      "endpoints": [],
+      "mcp_tools": []
+    },
+    "database_webhooks_config_write": {
+      "endpoints": [
+        "POST /v1/projects/{ref}/database/webhooks/enable"
+      ],
+      "mcp_tools": []
+    },
+    "edge_functions_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/functions",
+        "GET /v1/projects/{ref}/functions/{function_slug}",
+        "GET /v1/projects/{ref}/functions/{function_slug}/body"
+      ],
+      "mcp_tools": [
+        "get_edge_function",
+        "list_edge_functions"
+      ]
+    },
+    "edge_functions_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/functions/{function_slug}",
+        "PATCH /v1/projects/{ref}/functions/{function_slug}",
+        "POST /v1/projects/{ref}/functions",
+        "POST /v1/projects/{ref}/functions/deploy",
+        "PUT /v1/projects/{ref}/functions"
+      ],
+      "mcp_tools": [
+        "deploy_edge_function"
+      ]
+    },
+    "edge_functions_secrets_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/secrets"
+      ],
+      "mcp_tools": []
+    },
+    "edge_functions_secrets_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/secrets",
+        "POST /v1/projects/{ref}/secrets"
+      ],
+      "mcp_tools": []
+    },
+    "infra_add_ons_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/billing/addons"
+      ],
+      "mcp_tools": []
+    },
+    "infra_add_ons_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/billing/addons/{addon_variant}",
+        "PATCH /v1/projects/{ref}/billing/addons"
+      ],
+      "mcp_tools": []
+    },
+    "infra_disk_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/disk",
+        "GET /v1/projects/{ref}/config/disk/autoscale",
+        "GET /v1/projects/{ref}/config/disk/util"
+      ],
+      "mcp_tools": []
+    },
+    "infra_disk_config_write": {
+      "endpoints": [
+        "POST /v1/projects/{ref}/config/disk"
+      ],
+      "mcp_tools": []
+    },
+    "infra_read_replicas_read": {
+      "endpoints": [],
+      "mcp_tools": []
+    },
+    "infra_read_replicas_write": {
+      "endpoints": [
+        "POST /v1/projects/{ref}/read-replicas/remove",
+        "POST /v1/projects/{ref}/read-replicas/setup"
+      ],
+      "mcp_tools": []
+    },
+    "project_snippets_read": {
+      "endpoints": [],
+      "mcp_tools": []
+    },
+    "project_snippets_write": {
+      "endpoints": [],
+      "mcp_tools": []
+    },
+    "realtime_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/realtime"
+      ],
+      "mcp_tools": []
+    },
+    "realtime_config_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/config/realtime",
+        "POST /v1/projects/{ref}/config/realtime/shutdown"
+      ],
+      "mcp_tools": []
+    },
+    "storage_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/storage/buckets"
+      ],
+      "mcp_tools": [
+        "list_storage_buckets"
+      ]
+    },
+    "storage_write": {
+      "endpoints": [],
+      "mcp_tools": []
+    },
+    "storage_config_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/config/storage"
+      ],
+      "mcp_tools": [
+        "get_storage_config"
+      ]
+    },
+    "storage_config_write": {
+      "endpoints": [
+        "PATCH /v1/projects/{ref}/config/storage"
+      ],
+      "mcp_tools": [
+        "update_storage_config"
+      ]
+    },
+    "vanity_subdomain_read": {
+      "endpoints": [
+        "GET /v1/projects/{ref}/vanity-subdomain"
+      ],
+      "mcp_tools": []
+    },
+    "vanity_subdomain_write": {
+      "endpoints": [
+        "DELETE /v1/projects/{ref}/vanity-subdomain",
+        "POST /v1/projects/{ref}/vanity-subdomain/activate",
+        "POST /v1/projects/{ref}/vanity-subdomain/check-availability"
+      ],
+      "mcp_tools": []
+    }
+  },
+  "endpoints": {
+    "DELETE /v1/branches/{branch_id_or_ref}": [
+      "branching_development_delete",
+      "branching_production_delete"
+    ],
+    "DELETE /v1/projects/{ref}": [
+      "project_admin_write"
+    ],
+    "DELETE /v1/projects/{ref}/api-keys/{id}": [
+      "api_gateway_keys_write"
+    ],
+    "DELETE /v1/projects/{ref}/billing/addons/{addon_variant}": [
+      "infra_add_ons_write"
+    ],
+    "DELETE /v1/projects/{ref}/branches": [
+      "branching_production_delete"
+    ],
+    "DELETE /v1/projects/{ref}/claim-token": [
+      "organization_admin_write",
+      "project_admin_write"
+    ],
+    "DELETE /v1/projects/{ref}/cli/login-role": [
+      "database_write"
+    ],
+    "DELETE /v1/projects/{ref}/config/auth/signing-keys/{id}": [
+      "auth_signing_keys_write"
+    ],
+    "DELETE /v1/projects/{ref}/config/auth/sso/providers/{provider_id}": [
+      "auth_config_write"
+    ],
+    "DELETE /v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": [
+      "auth_config_write"
+    ],
+    "DELETE /v1/projects/{ref}/custom-hostname": [
+      "custom_domain_write"
+    ],
+    "DELETE /v1/projects/{ref}/database/jit/invite/{invite_id}": [
+      "database_jit_write"
+    ],
+    "DELETE /v1/projects/{ref}/database/jit/{user_id}": [
+      "database_jit_write"
+    ],
+    "DELETE /v1/projects/{ref}/database/migrations": [
+      "database_migrations_write"
+    ],
+    "DELETE /v1/projects/{ref}/functions/{function_slug}": [
+      "edge_functions_write"
+    ],
+    "DELETE /v1/projects/{ref}/network-bans": [
+      "database_network_bans_write"
+    ],
+    "DELETE /v1/projects/{ref}/secrets": [
+      "edge_functions_secrets_write"
+    ],
+    "DELETE /v1/projects/{ref}/vanity-subdomain": [
+      "vanity_subdomain_write"
+    ],
+    "DELETE /v2/projects/{ref}/analytics/log-drains/{id}": [
+      "analytics_config_write"
+    ],
+    "DELETE /v2/projects/{ref}/private-link/associations/aws-account/{aws_account_id}": [
+      "project_admin_write"
+    ],
+    "GET /v1/branches/{branch_id_or_ref}": [
+      "branching_development_read",
+      "branching_production_read"
+    ],
+    "GET /v1/branches/{branch_id_or_ref}/diff": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "GET /v1/oauth/authorize/project-claim": [
+      "organization_admin_write",
+      "project_admin_write"
+    ],
+    "GET /v1/organizations": [
+      "organizations_read"
+    ],
+    "GET /v1/organizations/{slug}": [
+      "organization_admin_read"
+    ],
+    "GET /v1/organizations/{slug}/entitlements": [
+      "organization_admin_read"
+    ],
+    "GET /v1/organizations/{slug}/members": [
+      "members_read"
+    ],
+    "GET /v1/organizations/{slug}/project-claim/{token}": [
+      "organization_admin_write"
+    ],
+    "GET /v1/organizations/{slug}/projects": [
+      "organization_projects_read"
+    ],
+    "GET /v1/projects": [
+      "projects_read"
+    ],
+    "GET /v1/projects/{ref}": [
+      "project_admin_read"
+    ],
+    "GET /v1/projects/{ref}/actions": [
+      "action_runs_read"
+    ],
+    "GET /v1/projects/{ref}/actions/{run_id}": [
+      "action_runs_read"
+    ],
+    "GET /v1/projects/{ref}/actions/{run_id}/logs": [
+      "action_runs_read"
+    ],
+    "GET /v1/projects/{ref}/advisors/performance": [
+      "advisors_read"
+    ],
+    "GET /v1/projects/{ref}/advisors/security": [
+      "advisors_read"
+    ],
+    "GET /v1/projects/{ref}/analytics/endpoints/functions.combined-stats": [
+      "analytics_usage_read"
+    ],
+    "GET /v1/projects/{ref}/analytics/endpoints/logs": [
+      "analytics_logs_read"
+    ],
+    "GET /v1/projects/{ref}/analytics/endpoints/logs.all": [
+      "analytics_logs_read"
+    ],
+    "GET /v1/projects/{ref}/analytics/endpoints/usage.api-counts": [
+      "analytics_usage_read"
+    ],
+    "GET /v1/projects/{ref}/analytics/endpoints/usage.api-requests-count": [
+      "analytics_usage_read"
+    ],
+    "GET /v1/projects/{ref}/api-keys": [
+      "api_gateway_keys_read"
+    ],
+    "GET /v1/projects/{ref}/api-keys/legacy": [
+      "api_gateway_keys_read"
+    ],
+    "GET /v1/projects/{ref}/api-keys/{id}": [
+      "api_gateway_keys_read"
+    ],
+    "GET /v1/projects/{ref}/billing/addons": [
+      "infra_add_ons_read"
+    ],
+    "GET /v1/projects/{ref}/branches": [
+      "branching_development_read",
+      "branching_production_read"
+    ],
+    "GET /v1/projects/{ref}/branches/{name}": [
+      "branching_development_read",
+      "branching_production_read"
+    ],
+    "GET /v1/projects/{ref}/claim-token": [
+      "project_admin_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth": [
+      "auth_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth/signing-keys": [
+      "auth_signing_keys_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth/signing-keys/legacy": [
+      "auth_signing_keys_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth/signing-keys/{id}": [
+      "auth_signing_keys_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth/sso/providers": [
+      "auth_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth/sso/providers/{provider_id}": [
+      "auth_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth/third-party-auth": [
+      "auth_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}": [
+      "auth_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/database/pgbouncer": [
+      "database_read"
+    ],
+    "GET /v1/projects/{ref}/config/database/pooler": [
+      "database_pooling_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/database/postgres": [
+      "database_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/disk": [
+      "infra_disk_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/disk/autoscale": [
+      "infra_disk_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/disk/util": [
+      "infra_disk_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/realtime": [
+      "realtime_config_read"
+    ],
+    "GET /v1/projects/{ref}/config/storage": [
+      "storage_config_read"
+    ],
+    "GET /v1/projects/{ref}/custom-hostname": [
+      "custom_domain_read"
+    ],
+    "GET /v1/projects/{ref}/database/backups": [
+      "backups_read"
+    ],
+    "GET /v1/projects/{ref}/database/backups/restore-point": [
+      "backups_read"
+    ],
+    "GET /v1/projects/{ref}/database/backups/schedule": [
+      "backups_read"
+    ],
+    "GET /v1/projects/{ref}/database/context": [
+      "database_read"
+    ],
+    "GET /v1/projects/{ref}/database/jit": [
+      "database_jit_read"
+    ],
+    "GET /v1/projects/{ref}/database/jit/list": [
+      "database_jit_read"
+    ],
+    "GET /v1/projects/{ref}/database/migrations": [
+      "database_migrations_read"
+    ],
+    "GET /v1/projects/{ref}/database/migrations/{version}": [
+      "database_migrations_read"
+    ],
+    "GET /v1/projects/{ref}/database/openapi": [
+      "database_read"
+    ],
+    "GET /v1/projects/{ref}/functions": [
+      "edge_functions_read"
+    ],
+    "GET /v1/projects/{ref}/functions/{function_slug}": [
+      "edge_functions_read"
+    ],
+    "GET /v1/projects/{ref}/functions/{function_slug}/body": [
+      "edge_functions_read"
+    ],
+    "GET /v1/projects/{ref}/health": [
+      "project_admin_read"
+    ],
+    "GET /v1/projects/{ref}/jit-access": [
+      "project_admin_read"
+    ],
+    "GET /v1/projects/{ref}/network-restrictions": [
+      "database_network_restrictions_read"
+    ],
+    "GET /v1/projects/{ref}/pgsodium": [
+      "project_admin_write"
+    ],
+    "GET /v1/projects/{ref}/postgrest": [
+      "data_api_config_read"
+    ],
+    "GET /v1/projects/{ref}/readonly": [
+      "database_readonly_config_read"
+    ],
+    "GET /v1/projects/{ref}/restore": [
+      "project_admin_read"
+    ],
+    "GET /v1/projects/{ref}/secrets": [
+      "edge_functions_secrets_read"
+    ],
+    "GET /v1/projects/{ref}/ssl-enforcement": [
+      "database_ssl_config_read"
+    ],
+    "GET /v1/projects/{ref}/storage/buckets": [
+      "storage_read"
+    ],
+    "GET /v1/projects/{ref}/types/typescript": [
+      "database_read"
+    ],
+    "GET /v1/projects/{ref}/upgrade/eligibility": [
+      "database_read",
+      "project_admin_read"
+    ],
+    "GET /v1/projects/{ref}/upgrade/status": [
+      "database_read",
+      "project_admin_read"
+    ],
+    "GET /v1/projects/{ref}/vanity-subdomain": [
+      "vanity_subdomain_read"
+    ],
+    "GET /v1/snippets": [
+      "snippets_read"
+    ],
+    "GET /v1/snippets/{id}": [
+      "snippets_read"
+    ],
+    "GET /v2/organizations/{slug}/members": [
+      "members_read"
+    ],
+    "GET /v2/organizations/{slug}/roles": [
+      "members_read"
+    ],
+    "GET /v2/projects/{ref}/analytics/log-drains": [
+      "analytics_config_read"
+    ],
+    "GET /v2/projects/{ref}/private-link/associations": [
+      "project_admin_read"
+    ],
+    "HEAD /v1/projects/{ref}/actions": [
+      "action_runs_read"
+    ],
+    "PATCH /v1/branches/{branch_id_or_ref}": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "PATCH /v1/projects/{ref}": [
+      "project_admin_write"
+    ],
+    "PATCH /v1/projects/{ref}/actions/{run_id}/status": [
+      "action_runs_write"
+    ],
+    "PATCH /v1/projects/{ref}/api-keys/{id}": [
+      "api_gateway_keys_write"
+    ],
+    "PATCH /v1/projects/{ref}/billing/addons": [
+      "infra_add_ons_write"
+    ],
+    "PATCH /v1/projects/{ref}/config/auth": [
+      "auth_config_write",
+      "project_admin_write"
+    ],
+    "PATCH /v1/projects/{ref}/config/auth/signing-keys/{id}": [
+      "auth_signing_keys_write"
+    ],
+    "PATCH /v1/projects/{ref}/config/database/pooler": [
+      "database_pooling_config_write"
+    ],
+    "PATCH /v1/projects/{ref}/config/realtime": [
+      "realtime_config_write"
+    ],
+    "PATCH /v1/projects/{ref}/config/storage": [
+      "storage_config_write"
+    ],
+    "PATCH /v1/projects/{ref}/database/backups/schedule": [
+      "backups_write"
+    ],
+    "PATCH /v1/projects/{ref}/database/migrations/{version}": [
+      "database_migrations_write"
+    ],
+    "PATCH /v1/projects/{ref}/database/password": [
+      "database_config_write"
+    ],
+    "PATCH /v1/projects/{ref}/functions/{function_slug}": [
+      "edge_functions_write"
+    ],
+    "PATCH /v1/projects/{ref}/network-restrictions": [
+      "database_network_restrictions_write"
+    ],
+    "PATCH /v1/projects/{ref}/postgrest": [
+      "data_api_config_write"
+    ],
+    "PATCH /v2/organizations/{slug}/members/{user_id}/roles": [
+      "organization_admin_write"
+    ],
+    "POST /v1/branches/{branch_id_or_ref}/merge": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "POST /v1/branches/{branch_id_or_ref}/push": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "POST /v1/branches/{branch_id_or_ref}/reset": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "POST /v1/branches/{branch_id_or_ref}/restore": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "POST /v1/organizations": [
+      "organizations_create"
+    ],
+    "POST /v1/organizations/{slug}/project-claim/{token}": [
+      "organization_admin_write"
+    ],
+    "POST /v1/projects": [
+      "organization_projects_create"
+    ],
+    "POST /v1/projects/{ref}/api-keys": [
+      "api_gateway_keys_write"
+    ],
+    "POST /v1/projects/{ref}/branches": [
+      "branching_development_create",
+      "branching_production_create"
+    ],
+    "POST /v1/projects/{ref}/claim-token": [
+      "organization_admin_write",
+      "project_admin_write"
+    ],
+    "POST /v1/projects/{ref}/cli/login-role": [
+      "database_write"
+    ],
+    "POST /v1/projects/{ref}/config/auth/signing-keys": [
+      "auth_signing_keys_write"
+    ],
+    "POST /v1/projects/{ref}/config/auth/signing-keys/legacy": [
+      "auth_signing_keys_write"
+    ],
+    "POST /v1/projects/{ref}/config/auth/sso/providers": [
+      "auth_config_write"
+    ],
+    "POST /v1/projects/{ref}/config/auth/third-party-auth": [
+      "auth_config_write"
+    ],
+    "POST /v1/projects/{ref}/config/disk": [
+      "infra_disk_config_write"
+    ],
+    "POST /v1/projects/{ref}/config/realtime/shutdown": [
+      "realtime_config_write"
+    ],
+    "POST /v1/projects/{ref}/custom-hostname/activate": [
+      "custom_domain_write"
+    ],
+    "POST /v1/projects/{ref}/custom-hostname/initialize": [
+      "custom_domain_write"
+    ],
+    "POST /v1/projects/{ref}/custom-hostname/reverify": [
+      "custom_domain_write"
+    ],
+    "POST /v1/projects/{ref}/database/backups/restore": [
+      "backups_write"
+    ],
+    "POST /v1/projects/{ref}/database/backups/restore-pitr": [
+      "backups_write"
+    ],
+    "POST /v1/projects/{ref}/database/backups/restore-point": [
+      "backups_write"
+    ],
+    "POST /v1/projects/{ref}/database/backups/undo": [
+      "backups_write"
+    ],
+    "POST /v1/projects/{ref}/database/jit": [
+      "database_jit_read"
+    ],
+    "POST /v1/projects/{ref}/database/jit/invite": [
+      "database_jit_write"
+    ],
+    "POST /v1/projects/{ref}/database/migrations": [
+      "database_migrations_write"
+    ],
+    "POST /v1/projects/{ref}/database/query": [
+      "database_read",
+      "database_write"
+    ],
+    "POST /v1/projects/{ref}/database/query/read-only": [
+      "database_read"
+    ],
+    "POST /v1/projects/{ref}/database/webhooks/enable": [
+      "database_webhooks_config_write"
+    ],
+    "POST /v1/projects/{ref}/functions": [
+      "edge_functions_write"
+    ],
+    "POST /v1/projects/{ref}/functions/deploy": [
+      "edge_functions_write"
+    ],
+    "POST /v1/projects/{ref}/network-bans/retrieve": [
+      "database_network_bans_read"
+    ],
+    "POST /v1/projects/{ref}/network-bans/retrieve/enriched": [
+      "database_network_bans_read"
+    ],
+    "POST /v1/projects/{ref}/network-restrictions/apply": [
+      "database_network_restrictions_write"
+    ],
+    "POST /v1/projects/{ref}/pause": [
+      "project_admin_write"
+    ],
+    "POST /v1/projects/{ref}/read-replicas/remove": [
+      "infra_read_replicas_write"
+    ],
+    "POST /v1/projects/{ref}/read-replicas/setup": [
+      "infra_read_replicas_write"
+    ],
+    "POST /v1/projects/{ref}/readonly/temporary-disable": [
+      "database_readonly_config_write"
+    ],
+    "POST /v1/projects/{ref}/restart": [
+      "project_admin_write"
+    ],
+    "POST /v1/projects/{ref}/restore": [
+      "project_admin_write"
+    ],
+    "POST /v1/projects/{ref}/restore/cancel": [
+      "project_admin_write"
+    ],
+    "POST /v1/projects/{ref}/secrets": [
+      "edge_functions_secrets_write"
+    ],
+    "POST /v1/projects/{ref}/upgrade": [
+      "database_write",
+      "project_admin_write"
+    ],
+    "POST /v1/projects/{ref}/vanity-subdomain/activate": [
+      "vanity_subdomain_write"
+    ],
+    "POST /v1/projects/{ref}/vanity-subdomain/check-availability": [
+      "vanity_subdomain_write"
+    ],
+    "POST /v2/organizations/{slug}/members/invitations": [
+      "members_write"
+    ],
+    "POST /v2/projects/{ref}/analytics/log-drains": [
+      "analytics_config_write"
+    ],
+    "POST /v2/projects/{ref}/private-link/associations": [
+      "project_admin_write"
+    ],
+    "POST /v2/projects/{ref}/transfers": [
+      "organization_admin_write"
+    ],
+    "POST /v2/projects/{ref}/transfers/previews": [
+      "project_admin_read"
+    ],
+    "PUT /v1/projects/{ref}/api-keys/legacy": [
+      "api_gateway_keys_write"
+    ],
+    "PUT /v1/projects/{ref}/config/auth/sso/providers/{provider_id}": [
+      "auth_config_write"
+    ],
+    "PUT /v1/projects/{ref}/config/database/postgres": [
+      "database_config_write"
+    ],
+    "PUT /v1/projects/{ref}/database/jit": [
+      "database_jit_write"
+    ],
+    "PUT /v1/projects/{ref}/database/migrations": [
+      "database_migrations_write"
+    ],
+    "PUT /v1/projects/{ref}/functions": [
+      "edge_functions_write"
+    ],
+    "PUT /v1/projects/{ref}/jit-access": [
+      "project_admin_write"
+    ],
+    "PUT /v1/projects/{ref}/pgsodium": [
+      "project_admin_write"
+    ],
+    "PUT /v1/projects/{ref}/ssl-enforcement": [
+      "database_ssl_config_write"
+    ],
+    "PUT /v2/projects/{ref}/analytics/log-drains/{id}": [
+      "analytics_config_write"
+    ]
+  },
+  "mcp_tools": {
+    "apply_migration": [
+      "database_migrations_write",
+      "database_write"
+    ],
+    "create_branch": [
+      "branching_development_create",
+      "branching_production_create"
+    ],
+    "create_project": [
+      "organization_projects_create"
+    ],
+    "delete_branch": [
+      "branching_development_delete",
+      "branching_production_delete"
+    ],
+    "deploy_edge_function": [
+      "edge_functions_write"
+    ],
+    "execute_sql": [
+      "database_read",
+      "database_write"
+    ],
+    "generate_typescript_types": [
+      "database_read"
+    ],
+    "get_advisors": [
+      "advisors_read",
+      "database_read"
+    ],
+    "get_cost": [
+      "organization_admin_read"
+    ],
+    "get_edge_function": [
+      "edge_functions_read"
+    ],
+    "get_logs": [
+      "analytics_logs_read"
+    ],
+    "get_organization": [
+      "organization_admin_read"
+    ],
+    "get_project": [
+      "project_admin_read"
+    ],
+    "get_project_url": [
+      "project_admin_read"
+    ],
+    "get_publishable_keys": [
+      "api_gateway_keys_read"
+    ],
+    "get_storage_config": [
+      "storage_config_read"
+    ],
+    "list_branches": [
+      "branching_development_read",
+      "branching_production_read"
+    ],
+    "list_edge_functions": [
+      "edge_functions_read"
+    ],
+    "list_extensions": [
+      "database_read"
+    ],
+    "list_migrations": [
+      "database_migrations_read"
+    ],
+    "list_organizations": [
+      "organizations_read"
+    ],
+    "list_projects": [
+      "projects_read"
+    ],
+    "list_storage_buckets": [
+      "storage_read"
+    ],
+    "list_tables": [
+      "database_read"
+    ],
+    "merge_branch": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "pause_project": [
+      "project_admin_write"
+    ],
+    "rebase_branch": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "reset_branch": [
+      "branching_development_write",
+      "branching_production_write"
+    ],
+    "restore_project": [
+      "project_admin_write"
+    ],
+    "update_storage_config": [
+      "storage_config_write"
+    ]
+  }
+}

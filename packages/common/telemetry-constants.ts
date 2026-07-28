@@ -3303,7 +3303,7 @@ export interface AccessTokenCreatedEvent {
   properties: {
     tokenType: 'classic' | 'scoped'
     expiryPreset: string
-    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    resourceAccess?: 'project' | 'organization' | 'account'
     permissionCount?: number
   }
   groups: Omit<TelemetryGroups, 'project'>
