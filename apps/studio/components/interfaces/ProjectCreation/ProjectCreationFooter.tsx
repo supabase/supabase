@@ -1,5 +1,6 @@
-import { useFlag, useParams } from 'common'
+import { useFlag } from 'common'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
@@ -16,14 +17,14 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
-import { getValidVercelReturnUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 
-export type ProjectCreationCancelAction = 'studio' | 'vercel' | 'hidden'
+/** `close` = close the popup (Vercel interstitial); `studio` = navigate into Studio. */
+export type ProjectCreationCancelAction = 'studio' | 'close' | 'hidden'
 
 interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>
@@ -45,10 +46,10 @@ export const ProjectCreationFooter = ({
   cancelAction = 'studio',
 }: ProjectCreationFooterProps) => {
   const router = useRouter()
-  const { next } = useParams()
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const [showCloseWindowHint, setShowCloseWindowHint] = useState(false)
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
 
@@ -57,8 +58,8 @@ export const ProjectCreationFooter = ({
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
-  const vercelReturnUrl = getValidVercelReturnUrl(next)
-  const canReturnToVercel = cancelAction === 'vercel' && vercelReturnUrl !== undefined
+  const showAdditionalCosts =
+    !isFreePlan && !projectCreationDisabled && canCreateProject && additionalMonthlySpend > 0
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -74,135 +75,159 @@ export const ProjectCreationFooter = ({
     10
 
   const onCancel = () => {
-    if (canReturnToVercel && vercelReturnUrl) {
-      window.location.href = vercelReturnUrl
+    if (cancelAction === 'close') {
+      window.close()
+      // Browsers only allow closing script-opened windows. If we're still open, ask the user.
+      window.setTimeout(() => {
+        if (!window.closed) setShowCloseWindowHint(true)
+      }, 100)
       return
     }
 
-    // Fall back to Studio when cancelAction is studio, or when vercel next is missing/invalid
     if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
     else router.push('/organizations')
+  }
+
+  const cancelButton =
+    cancelAction !== 'hidden' ? (
+      <div className="flex flex-col items-start gap-1">
+        <Button
+          variant="default"
+          disabled={isCreatingNewProject || isSuccessNewProject}
+          onClick={onCancel}
+        >
+          Cancel
+        </Button>
+        {showCloseWindowHint && (
+          <p className="text-sm text-foreground-light">Close this window to cancel.</p>
+        )}
+      </div>
+    ) : null
+
+  const createButton = (
+    <Button
+      type="submit"
+      loading={isCreatingNewProject || isSuccessNewProject}
+      disabled={!canCreateProject}
+    >
+      Create new project
+    </Button>
+  )
+
+  // When there are no additional costs and Cancel is visible, put Cancel on the left
+  // and Create on the right. When costs are shown, keep both actions together on the right.
+  if (!showAdditionalCosts) {
+    return (
+      <div
+        key="panel-footer"
+        className={
+          cancelButton
+            ? 'flex w-full items-center justify-between gap-4'
+            : 'flex w-full items-center justify-end gap-4'
+        }
+      >
+        {cancelButton}
+        {createButton}
+      </div>
+    )
   }
 
   return (
     <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
       <div className="col-span-4">
-        {!isFreePlan &&
-          !projectCreationDisabled &&
-          canCreateProject &&
-          additionalMonthlySpend > 0 && (
-            <div className="flex justify-between text-sm">
-              <span>Additional costs</span>
-              <div className="text-brand flex gap-1 items-center font-mono font-medium">
-                <span>${additionalMonthlySpend}/m</span>
-                <InfoTooltip side="top" className="max-w-[450px] p-0">
-                  <div className="p-4 text-sm text-foreground-light space-y-1">
-                    <p>
-                      Each project includes a dedicated Postgres instance running on its own server.
-                      You are charged for the{' '}
-                      <InlineLink href={`${DOCS_URL}/guides/platform/billing-on-supabase`}>
-                        Compute resource
-                      </InlineLink>{' '}
-                      of that server, independent of your database usage.
-                    </p>
-                    {monthlyComputeCosts > 0 && (
-                      <p>Compute costs are applied on top of your subscription plan costs.</p>
-                    )}
-                  </div>
-
-                  <Table className="mt-2">
-                    <TableHeader className="[&_th]:h-7">
-                      <TableRow className="py-2">
-                        <TableHead className="w-[170px]">Project</TableHead>
-                        <TableHead>Compute Size</TableHead>
-                        <TableHead className="text-right">Monthly Costs</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody className="[&_td]:py-2">
-                      {organizationProjects.map((project) => {
-                        const primaryDb = project.databases.find(
-                          (db) => db.identifier === project.ref
-                        )
-                        return (
-                          <TableRow key={project.ref} className="text-foreground-light">
-                            <TableCell className="w-[170px] truncate">{project.name}</TableCell>
-                            <TableCell className="text-center">
-                              {instanceLabel(primaryDb?.infra_compute_size)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              ${monthlyInstancePrice(primaryDb?.infra_compute_size)}
-                            </TableCell>
-                          </TableRow>
-                        )
-                      })}
-
-                      <TableRow>
-                        <TableCell className="w-[170px] flex gap-2">
-                          <span className="truncate">
-                            {form.getValues('projectName') || 'New project'}
-                          </span>
-                          <Badge variant="success">New</Badge>
-                        </TableCell>
-                        <TableCell className="text-center">{instanceLabel(instanceSize)}</TableCell>
-                        <TableCell className="text-right">
-                          ${monthlyInstancePrice(instanceSize)}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                  <PopoverSeparator />
-                  <Table>
-                    <TableHeader className="[&_th]:h-7">
-                      <TableRow>
-                        <TableHead colSpan={2}>Compute Credits</TableHead>
-                        <TableHead colSpan={1} className="text-right">
-                          -$10
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody className="[&_td]:py-2">
-                      <TableRow className="text-foreground">
-                        <TableCell colSpan={2}>
-                          Total Monthly Compute Costs
-                          {/**
-                           * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                           * Will be adjusted in the future [kevin]
-                           */}
-                          {organizationProjects.length > 0 && (
-                            <p className="text-xs text-foreground-lighter">
-                              Excluding Read replicas
-                            </p>
-                          )}
-                        </TableCell>
-                        <TableCell colSpan={1} className="text-right">
-                          ${monthlyComputeCosts}
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </InfoTooltip>
+        <div className="flex justify-between text-sm">
+          <span>Additional costs</span>
+          <div className="text-brand flex gap-1 items-center font-mono font-medium">
+            <span>${additionalMonthlySpend}/m</span>
+            <InfoTooltip side="top" className="max-w-[450px] p-0">
+              <div className="p-4 text-sm text-foreground-light space-y-1">
+                <p>
+                  Each project includes a dedicated Postgres instance running on its own server. You
+                  are charged for the{' '}
+                  <InlineLink href={`${DOCS_URL}/guides/platform/billing-on-supabase`}>
+                    Compute resource
+                  </InlineLink>{' '}
+                  of that server, independent of your database usage.
+                </p>
+                {monthlyComputeCosts > 0 && (
+                  <p>Compute costs are applied on top of your subscription plan costs.</p>
+                )}
               </div>
-            </div>
-          )}
+
+              <Table className="mt-2">
+                <TableHeader className="[&_th]:h-7">
+                  <TableRow className="py-2">
+                    <TableHead className="w-[170px]">Project</TableHead>
+                    <TableHead>Compute Size</TableHead>
+                    <TableHead className="text-right">Monthly Costs</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="[&_td]:py-2">
+                  {organizationProjects.map((project) => {
+                    const primaryDb = project.databases.find((db) => db.identifier === project.ref)
+                    return (
+                      <TableRow key={project.ref} className="text-foreground-light">
+                        <TableCell className="w-[170px] truncate">{project.name}</TableCell>
+                        <TableCell className="text-center">
+                          {instanceLabel(primaryDb?.infra_compute_size)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          ${monthlyInstancePrice(primaryDb?.infra_compute_size)}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+
+                  <TableRow>
+                    <TableCell className="w-[170px] flex gap-2">
+                      <span className="truncate">
+                        {form.getValues('projectName') || 'New project'}
+                      </span>
+                      <Badge variant="success">New</Badge>
+                    </TableCell>
+                    <TableCell className="text-center">{instanceLabel(instanceSize)}</TableCell>
+                    <TableCell className="text-right">
+                      ${monthlyInstancePrice(instanceSize)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+              <PopoverSeparator />
+              <Table>
+                <TableHeader className="[&_th]:h-7">
+                  <TableRow>
+                    <TableHead colSpan={2}>Compute Credits</TableHead>
+                    <TableHead colSpan={1} className="text-right">
+                      -$10
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="[&_td]:py-2">
+                  <TableRow className="text-foreground">
+                    <TableCell colSpan={2}>
+                      Total Monthly Compute Costs
+                      {/**
+                       * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                       * Will be adjusted in the future [kevin]
+                       */}
+                      {organizationProjects.length > 0 && (
+                        <p className="text-xs text-foreground-lighter">Excluding Read replicas</p>
+                      )}
+                    </TableCell>
+                    <TableCell colSpan={1} className="text-right">
+                      ${monthlyComputeCosts}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </InfoTooltip>
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-end col-span-8 space-x-2 ml-auto">
-        {cancelAction !== 'hidden' && (
-          <Button
-            variant="default"
-            disabled={isCreatingNewProject || isSuccessNewProject}
-            onClick={onCancel}
-          >
-            {canReturnToVercel ? 'Return to Vercel' : 'Cancel'}
-          </Button>
-        )}
-        <Button
-          type="submit"
-          loading={isCreatingNewProject || isSuccessNewProject}
-          disabled={!canCreateProject}
-        >
-          Create new project
-        </Button>
+      <div className="flex items-center col-span-8 space-x-2 ml-auto">
+        {cancelButton}
+        {createButton}
       </div>
     </div>
   )
