@@ -113,7 +113,7 @@ export function CodeCopyButton({ className, content }: { className?: string; con
             onClick={handleCopy}
             onBlur={resetStatus}
             className={cn(
-              'border rounded-md p-1',
+              'cursor-pointer border rounded-md p-1',
               copied && 'bg-selection',
               'hover:bg-selection transition',
               className
