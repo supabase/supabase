@@ -24,7 +24,7 @@ export type IconLinkItem = {
 }
 
 const iconLinkClassName =
-  'group relative -m-3 flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent'
+  'group relative -m-3 flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent focus-ring focus-visible:bg-accent'
 
 function IconLinkContent({
   title,
@@ -39,7 +39,7 @@ function IconLinkContent({
     <>
       <div
         className={cn(
-          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong',
+          'flex shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-surface-100 transition-colors group-hover:border-strong group-focus-visible:border-strong',
           sizeStyles[size].tile
         )}
       >

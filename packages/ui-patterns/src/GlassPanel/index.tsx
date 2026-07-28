@@ -40,9 +40,7 @@ const LogoComponent = ({
   logoImage,
   className,
   wrapperClassName,
-  title,
 }: {
-  title: string
   logoImage: string
   className?: string
   wrapperClassName?: string
@@ -51,7 +49,7 @@ const LogoComponent = ({
     <div className="relative h-[33px] w-auto max-w-[145px]">
       <Image
         src={logoImage}
-        alt={title}
+        alt=""
         fill
         sizes="100%"
         className={cn('object-contain object-left', className)}
@@ -80,7 +78,6 @@ export const GlassPanel = ({
       className={cn(
         'relative',
         'h-full',
-        'group',
         'cursor-pointer',
         'overflow-hidden',
         'border rounded-lg',
@@ -92,7 +89,6 @@ export const GlassPanel = ({
     >
       {logoInverse && (
         <LogoComponent
-          title={title}
           logoImage={logoInverse}
           className="opacity-50"
           wrapperClassName="hidden dark:block"
@@ -100,7 +96,6 @@ export const GlassPanel = ({
       )}
       {logo && (
         <LogoComponent
-          title={title}
           logoImage={logo}
           className="opacity-75"
           wrapperClassName={logoInverse ? 'block dark:hidden' : undefined}
@@ -128,7 +123,7 @@ export const GlassPanel = ({
             <IconBackground showIconBg={showIconBg}>
               <img
                 className="w-5"
-                alt={title}
+                alt=""
                 src={`${icon}${
                   hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''
                 }.svg`}

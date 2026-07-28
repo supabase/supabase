@@ -1,7 +1,7 @@
 'use client'
 
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
-import { useEffect, useReducer, useRef } from 'react'
+import { useEffect, useId, useReducer, useRef } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogSection, Heading } from 'ui'
 
 import { PhoneLoginsItems } from '../Navigation/NavigationMenu/NavigationMenu.constants'
@@ -24,6 +24,8 @@ const reducer = (_, action: (typeof PhoneLoginsItems)[number] | undefined) => {
 
 const AuthSmsProviderConfig = () => {
   const [selectedProvider, setSelectedProvider] = useReducer(reducer, undefined)
+  const dialogId = useId()
+  const dialogTitleId = useId()
 
   useEffect(() => {
     const providerName = new URLSearchParams(document.location.search ?? '').get('showSmsProvider')
@@ -43,10 +45,13 @@ const AuthSmsProviderConfig = () => {
         </h3>
         <ul className="grid grid-cols-12 gap-6 not-prose py-8">
           {PhoneLoginsItems.map((provider) => (
-            <li key={provider.name} className="col-span-12 sm:col-span-6">
+            <li key={provider.name} className="col-span-12 sm:col-span-6 xl:col-span-3">
               <IconLinkButton
                 title={provider.name}
                 icon={<IconLinkImage path={provider.icon} hasLightIcon={provider.hasLightIcon} />}
+                aria-haspopup="dialog"
+                aria-expanded={selectedProvider?.name === provider.name}
+                aria-controls={selectedProvider?.name === provider.name ? dialogId : undefined}
                 onClick={() => setSelectedProvider(provider)}
               />
             </li>
@@ -59,14 +64,16 @@ const AuthSmsProviderConfig = () => {
       >
         {selectedProvider && (
           <DialogContent
+            id={dialogId}
             className="w-[min(90vw,80ch)]! max-w-[min(90vw,80ch)]! max-h-[90dvh]! prose overflow-auto"
+            aria-labelledby={dialogTitleId}
             onOpenAutoFocus={(evt) => {
               evt.preventDefault()
               headingRef.current?.focus()
             }}
           >
             <DialogHeader className="pb-0 [&>h3]:m-0! [&>h3>a]:hidden! [&>h3:focus-visible]:outline-hidden">
-              <Heading tag="h3" ref={headingRef} tabIndex={-1}>
+              <Heading tag="h3" id={dialogTitleId} ref={headingRef} tabIndex={-1}>
                 {selectedProvider.name}
               </Heading>
             </DialogHeader>

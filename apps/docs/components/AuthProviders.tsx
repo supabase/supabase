@@ -1,7 +1,7 @@
 import providers from '../data/authProviders'
 import { IconLinkImage, IconLinkList } from '@/features/ui/IconLink'
 
-export default function AuthProviders({ type }: { type: string }) {
+export default function AuthProviders({ type, labelledBy }: { type: string; labelledBy?: string }) {
   const items = providers
     .filter((item) => item.authType === type)
     .map((provider) => ({
@@ -12,6 +12,7 @@ export default function AuthProviders({ type }: { type: string }) {
 
   return (
     <IconLinkList
+      labelledBy={labelledBy}
       className="not-prose py-8"
       itemClassName="col-span-12 xs:col-span-6 lg:col-span-4 xl:col-span-3"
       items={items}
