@@ -29,13 +29,13 @@ import { useTrack } from '@/lib/telemetry/track'
 
 export interface AccessTokenListProps {
   searchString?: string
-  scopedEnabled?: boolean
+  scopedTokensEnabled?: boolean
   onDeleteSuccess: (id: number | string) => void
 }
 
 export const AccessTokenList = ({
   searchString = '',
-  scopedEnabled = true,
+  scopedTokensEnabled,
   onDeleteSuccess,
 }: AccessTokenListProps) => {
   const track = useTrack()
@@ -46,7 +46,9 @@ export const AccessTokenList = ({
     parseAsStringLiteral<AccessTokenSort>(ACCESS_TOKEN_SORT_VALUES).withDefault('created_at:desc')
   )
 
-  const { tokens, error, isLoading, isError } = useMergedAccessTokens({ scopedEnabled })
+  const { tokens, error, isLoading, isError } = useMergedAccessTokens({
+    scopedTokensEnabled,
+  })
 
   const { mutate: deleteClassicToken } = useAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
@@ -62,7 +64,7 @@ export const AccessTokenList = ({
 
   const { mutate: deleteScopedToken } = useScopedAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
-      track('access_token_removed', { tokenType: 'classic' })
+      track('access_token_removed', { tokenType: 'scoped' })
       onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsDeleteOpen(false)
@@ -138,6 +140,7 @@ export const AccessTokenList = ({
               name={x.name}
               tokenAlias={x.token_alias}
               isClassic={x.kind === 'classic'}
+              scopedTokensEnabled={scopedTokensEnabled}
             />
             <LastUsedCell lastUsedAt={x.last_used_at} />
             <ExpiresCell expiresAt={x.expires_at} />

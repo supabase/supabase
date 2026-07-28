@@ -62,6 +62,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
           onDeleteSuccess={(id) => {
             if (id === newToken?.id) setNewToken(undefined)
           }}
+          scopedTokensEnabled={scopedTokensEnabled}
         />
       </div>
     </AccessTokensLayout>

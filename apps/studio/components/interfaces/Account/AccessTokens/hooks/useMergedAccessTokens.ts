@@ -12,7 +12,7 @@ export interface MergedAccessToken extends BaseToken {
 
 interface UseMergedAccessTokensOptions {
   /** Whether scoped tokens should be fetched + merged (gated on the scopedPAT flag). */
-  scopedEnabled?: boolean
+  scopedTokensEnabled?: boolean
 }
 
 /**
@@ -22,7 +22,7 @@ interface UseMergedAccessTokensOptions {
  * the consuming list (via filterAndSortTokens), so this only merges + tags.
  */
 export const useMergedAccessTokens = ({
-  scopedEnabled = true,
+  scopedTokensEnabled: scopedEnabled,
 }: UseMergedAccessTokensOptions = {}) => {
   const classic = useAccessTokensQuery()
   const scoped = useScopedAccessTokensQuery({ enabled: scopedEnabled })
