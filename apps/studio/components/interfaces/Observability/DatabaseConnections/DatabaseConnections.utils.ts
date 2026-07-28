@@ -99,7 +99,7 @@ export const getConnectionMetrics = (activities: DatabaseActivity[]): Connection
     const isIdleInTransaction =
       x.state === 'idle in transaction' || x.state === 'idle in transaction (aborted)'
     if (!isIdleInTransaction || !x.transaction_start) return false
-    return now.diff(dayjs(x.transaction_start).utc(), 'second') > WARN_DURATION_IDLE_TXN
+    return now.diff(dayjs(x.transaction_start).utc(), 'second') >= WARN_DURATION_IDLE_TXN
   })
 
   const longestRunningQuery = findLongestRunning(
