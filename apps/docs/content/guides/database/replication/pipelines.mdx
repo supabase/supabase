@@ -173,7 +173,7 @@ Once Pipelines is enabled and you have a Postgres publication, configure a desti
 #### Choose and configure your destination
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-Follow these steps to configure your destination. Each destination has its own setup requirements and data model. **BigQuery** is currently available. **Snowflake** is available through Early Access; [request access](/go/supabase-pipelines-new-destinations) to enable it. You can use the same form to request early access to ClickHouse and DuckLake.
+Follow these steps to configure your destination. Each destination has its own setup requirements and data model. **BigQuery** is currently available. **Snowflake** is in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to Snowflake, ClickHouse, or DuckLake.
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** if the destination side panel isn't already open
@@ -324,13 +324,13 @@ For more troubleshooting help, see the [Pipelines FAQ](/docs/guides/database/rep
 
 Pipelines has the following limitations:
 
-- **Row identity**: Requirements are destination-specific. BigQuery always requires a source primary key and its published columns. Snowflake insert-only tables don't require a key, deletes require a published primary-key or replica-identity index unless full identity is used, and updates require `REPLICA IDENTITY FULL`.
+- **Row identity**: Requirements are destination-specific. BigQuery always requires a source primary key and its published columns. Snowflake insert-only tables don't require a key. Snowflake deletes require a published primary-key or replica-identity index unless full identity is used. Snowflake updates require `REPLICA IDENTITY FULL`.
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
 - **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
 - **Replica identity**: Updates and deletes need the mode required by the destination. See the [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements) and [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements) requirements.
 - **Schema changes**: Support is destination-specific and limited.
 - **No user-defined transformations**: Pipelines performs destination-compatible type and name mapping, but doesn't run custom transformations
-- **At-least-once processing**: In rare recovery cases, an acknowledged batch can be processed and counted again. BigQuery uses primary-key-based CDC to converge on current state. Snowflake uses committed channel offsets to suppress ordinary replay, but its append-only consumers must still tolerate repeated events. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
+- **At-least-once processing**: In rare recovery cases, an acknowledged batch can be processed and counted again. BigQuery uses primary-key-based CDC to converge on current state. Snowflake uses committed channel offsets to suppress ordinary replay. Because its tables are append-only, consumers must still tolerate repeated events. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
 
 Destination-specific limitations, such as row size and type mappings, are documented in each destination guide.
 
