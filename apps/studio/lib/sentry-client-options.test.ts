@@ -6,6 +6,7 @@ import {
   isBrowserWalletExtensionError,
   isCancellationRejection,
   isChallengeExpiredError,
+  isThirdPartyOnlyPageCrash,
   isUserAbortedOperation,
 } from './sentry-client-options'
 
@@ -277,6 +278,81 @@ describe('Sentry beforeSend filtering functions', () => {
     })
   })
 
+  describe('isThirdPartyOnlyPageCrash', () => {
+    const thirdPartyFrame = {
+      filename:
+        'node_modules/.pnpm/react-dom@19.2.6_react@19.2.6/node_modules/react-dom/cjs/react-dom-client.production.js',
+      function: 'beginWork',
+      in_app: false,
+    } as StackFrame
+
+    const studioFrame = {
+      filename: 'app:///components/interfaces/Home/Landing.utils.ts',
+      function: 'getResources',
+      in_app: true,
+    } as StackFrame
+
+    it('returns true for a page crash whose frames are all third-party', () => {
+      const event: SentryEvent = {
+        tags: { globalErrorBoundary: true, third_party_code: true },
+        exception: { values: [{ type: 'SyntaxError', stacktrace: { frames: [thirdPartyFrame] } }] },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(true)
+    })
+
+    it('returns true when the tags arrive stringified', () => {
+      const event: SentryEvent = {
+        tags: { globalErrorBoundary: 'True', third_party_code: 'true' },
+        exception: { values: [{ type: 'SyntaxError', stacktrace: { frames: [thirdPartyFrame] } }] },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(true)
+    })
+
+    it('returns false when a single in_app frame is present', () => {
+      const event: SentryEvent = {
+        tags: { globalErrorBoundary: true, third_party_code: true },
+        exception: {
+          values: [{ type: 'TypeError', stacktrace: { frames: [thirdPartyFrame, studioFrame] } }],
+        },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(false)
+    })
+
+    it('returns false when the event carries no frames at all', () => {
+      const event: SentryEvent = {
+        tags: { globalErrorBoundary: true, third_party_code: true },
+        exception: { values: [{ type: 'Error', value: 'Error without stacktrace' }] },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(false)
+    })
+
+    it('returns false when the crash is not third-party-only', () => {
+      const event: SentryEvent = {
+        tags: { globalErrorBoundary: true },
+        exception: { values: [{ type: 'SyntaxError', stacktrace: { frames: [thirdPartyFrame] } }] },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(false)
+    })
+
+    it('returns false when the error did not crash the page via the error boundary', () => {
+      const event: SentryEvent = {
+        tags: { third_party_code: true },
+        exception: { values: [{ type: 'SyntaxError', stacktrace: { frames: [thirdPartyFrame] } }] },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(false)
+    })
+
+    it('returns false for an untagged event', () => {
+      expect(isThirdPartyOnlyPageCrash({})).toBe(false)
+    })
+  })
+
   describe('integration scenarios', () => {
     it('correctly identifies SUPABASE-APP-353 pattern (cancellation rejection)', () => {
       // Based on actual Sentry issue SUPABASE-APP-353
@@ -393,6 +469,73 @@ describe('Sentry beforeSend filtering functions', () => {
       }
 
       expect(isChallengeExpiredError(error, event)).toBe(true)
+    })
+
+    it('correctly identifies SUPABASE-APP-K5H pattern (extension tampering page crash)', () => {
+      // Based on actual Sentry issue SUPABASE-APP-K5H: an extension rewrites a chunk, React
+      // throws while rendering and the global error boundary catches it — no frame of ours left.
+      const event: SentryEvent = {
+        tags: { globalErrorBoundary: true, third_party_code: true },
+        exception: {
+          values: [
+            {
+              type: 'SyntaxError',
+              value: 'Invalid or unexpected token',
+              stacktrace: {
+                frames: [
+                  {
+                    filename:
+                      'node_modules/.pnpm/scheduler@0.27.0/node_modules/scheduler/cjs/scheduler.production.js',
+                    function: 'performWorkUntilDeadline',
+                    in_app: false,
+                  } as StackFrame,
+                  {
+                    filename:
+                      'node_modules/.pnpm/react-dom@19.2.6_react@19.2.6/node_modules/react-dom/cjs/react-dom-client.production.js',
+                    function: 'renderWithHooks',
+                    in_app: false,
+                  } as StackFrame,
+                ],
+              },
+            },
+          ],
+        },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(true)
+    })
+
+    it('keeps SUPABASE-APP-K4R pattern (data-gated bug with source-mapped studio frames)', () => {
+      // Based on actual Sentry issue SUPABASE-APP-K4R: also tagged third_party_code +
+      // globalErrorBoundary, but the trace still contains our own in_app frame.
+      const event: SentryEvent = {
+        tags: { globalErrorBoundary: true, third_party_code: true },
+        exception: {
+          values: [
+            {
+              type: 'TypeError',
+              value: 'apiKeys.some is not a function',
+              stacktrace: {
+                frames: [
+                  {
+                    filename:
+                      'node_modules/.pnpm/react-dom@19.2.6_react@19.2.6/node_modules/react-dom/cjs/react-dom-client.production.js',
+                    function: 'renderWithHooks',
+                    in_app: false,
+                  } as StackFrame,
+                  {
+                    filename: 'app:///components/interfaces/Home/Landing.utils.ts',
+                    function: 'getKeyResources',
+                    in_app: true,
+                  } as StackFrame,
+                ],
+              },
+            },
+          ],
+        },
+      }
+
+      expect(isThirdPartyOnlyPageCrash(event)).toBe(false)
     })
 
     it('does not filter legitimate errors', () => {

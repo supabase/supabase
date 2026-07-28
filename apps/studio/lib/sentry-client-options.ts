@@ -55,6 +55,24 @@ export function isBrowserWalletExtensionError(event: Sentry.Event): boolean {
   })
 }
 
+// Boolean tags read back as `true` in-process, but can arrive stringified.
+function isTagEnabled(value: unknown): boolean {
+  return value === true || value === 'true' || value === 'True'
+}
+
+// Full-page crashes that are pure extension tampering (e.g. SUPABASE-APP-K5H): error boundary +
+// third-party-only + frames but zero in_app. Genuine bugs keep in_app frames, so they still report.
+export function isThirdPartyOnlyPageCrash(event: Sentry.Event): boolean {
+  const isErrorBoundaryCrash = isTagEnabled(event.tags?.globalErrorBoundary)
+  const isThirdPartyOnly = isTagEnabled(event.tags?.third_party_code)
+  if (!isErrorBoundaryCrash || !isThirdPartyOnly) {
+    return false
+  }
+
+  const frames = event.exception?.values?.flatMap((e) => e.stacktrace?.frames || []) || []
+  return frames.length > 0 && !frames.some((frame) => frame.in_app === true)
+}
+
 // Filter user-aborted operations (intentional cancellations)
 // These are expected when users cancel requests or navigate away
 // Examples: SUPABASE-APP-BG6, SUPABASE-APP-BG7
@@ -215,6 +233,12 @@ export function buildSentryClientOptions({
       // while ensuring page-crashing errors from third-party libs (caused by first-party bugs)
       // are always reported.
       if (isThirdPartyOnly && !isErrorBoundaryCrash) {
+        return null
+      }
+
+      // Narrow that exemption: a page crash with no frame of ours left in the trace is tampering,
+      // not a first-party bug, so there is nothing actionable to report.
+      if (isThirdPartyOnlyPageCrash(event)) {
         return null
       }
 
