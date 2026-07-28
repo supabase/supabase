@@ -75,6 +75,8 @@ export function IconLinkButton({
   icon,
   size = 'sm',
   className,
+  disabled,
+  tabIndex,
   ...props
 }: {
   title: string
@@ -85,6 +87,8 @@ export function IconLinkButton({
   return (
     <button
       type="button"
+      disabled={disabled}
+      tabIndex={tabIndex ?? (disabled ? -1 : 0)}
       className={cn(iconLinkClassName, 'w-full text-left', className)}
       {...props}
     >
