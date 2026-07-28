@@ -17,7 +17,7 @@ import {
   Switch,
 } from 'ui'
 
-import { Admonition } from '../Admonition'
+import { Admonition } from '../admonition'
 
 interface PrivacySettingsProps {
   className?: string
