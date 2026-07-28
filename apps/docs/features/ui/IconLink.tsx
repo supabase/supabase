@@ -73,7 +73,7 @@ export function IconLinkList({
   return (
     <ul className={cn('grid grid-cols-12 gap-6', className)} aria-labelledby={labelledBy}>
       {items.map((item) => (
-        <li key={item.title} className={cn(itemClassName, item.className)}>
+        <li key={item.href} className={cn(itemClassName, item.className)}>
           <IconLink href={item.href} title={item.title} icon={item.icon} size={size} />
         </li>
       ))}
