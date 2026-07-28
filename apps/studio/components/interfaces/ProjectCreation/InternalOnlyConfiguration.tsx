@@ -6,7 +6,6 @@ import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CloudProviderSelector } from './CloudProviderSelector'
-import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { PostgresVersionSelector } from './PostgresVersionSelector'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
@@ -40,8 +39,6 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                 />
               )}
             />
-
-            <HighAvailabilityInput form={form} />
           </div>
 
           {showNonProdFields && (

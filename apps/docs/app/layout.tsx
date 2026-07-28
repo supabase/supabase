@@ -1,5 +1,3 @@
-import '@code-hike/mdx/styles.css'
-import 'config/code-hike.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 import '../styles/globals.css'
 import '../styles/prism-okaidia.css'
