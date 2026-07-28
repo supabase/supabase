@@ -609,6 +609,11 @@ describe('project creation wizard', () => {
       expect(screen.getByText('Alpha')).toBeInTheDocument()
       expect(screen.getByText(/Free during Alpha for up to 2 projects/)).toBeInTheDocument()
       expect(
+        screen
+          .getByText('High availability')
+          .compareDocumentPosition(screen.getByText('Compute size'))
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+      expect(
         screen.queryByRole('button', { name: 'Internal-only Configuration' })
       ).not.toBeInTheDocument()
     })

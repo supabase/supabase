@@ -713,9 +713,9 @@ export const ProjectCreationForm = ({
                     )}
                     <ProjectNameInput form={form} />
 
-                    {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
-
                     <HighAvailabilityInput form={form} />
+
+                    {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
                     <DatabasePasswordInput form={form} />
 
