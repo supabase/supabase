@@ -12,7 +12,6 @@ import {
   Globe,
   Key,
   Lock,
-  Minus,
   RefreshCw,
   Shield,
   ShieldCheck,
@@ -89,37 +88,6 @@ const SECURITY_PLAN_ROWS = [
   { feature: 'SSO (SAML)', values: [false, false, false, true] },
   { feature: 'Audit logs', values: [false, false, false, true] },
   { feature: 'Custom Data Processing Agreement', values: [false, false, false, true] },
-]
-
-const RESPONSIBILITY_ROWS = [
-  {
-    supabase: 'Physical infrastructure security (AWS data centers)',
-    customer: 'Row-level security (RLS) policy design and correctness',
-  },
-  {
-    supabase: 'Platform-level encryption at rest and in transit',
-    customer: 'Application-level secrets management',
-  },
-  {
-    supabase: 'Operating system patching and hardening',
-    customer: 'API key rotation and least-privilege access grants',
-  },
-  {
-    supabase: 'Network perimeter protection (Cloudflare, DDoS mitigation)',
-    customer: 'Authentication flow implementation (MFA enforcement for end-users)',
-  },
-  {
-    supabase: 'Database engine security updates',
-    customer: 'Data classification and application-level access controls',
-  },
-  {
-    supabase: 'Backup integrity and storage',
-    customer: 'Compliance obligations specific to your application and jurisdiction',
-  },
-  {
-    supabase: 'Vulnerability scanning and penetration testing of platform',
-    customer: 'Penetration testing of your application layer',
-  },
 ]
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
@@ -490,7 +458,7 @@ const SecurityPage: NextPage = () => {
                 <p className="text-xs text-foreground-muted mt-0.5">
                   US East, EU West, AP Southeast, and more.{' '}
                   <Link
-                    href="https://supabase.com/docs/guides/platform/regions"
+                    href="/docs/guides/platform/regions"
                     className="text-brand hover:text-brand-600"
                   >
                     See all regions →
@@ -531,63 +499,21 @@ const SecurityPage: NextPage = () => {
         </div>
 
         {/* Shared responsibility */}
-        <SectionContainer id="shared-responsibility" className="py-16 md:py-24 flex flex-col gap-8">
-          <div className="flex flex-col gap-2 max-w-xl">
+        <SectionContainer id="shared-responsibility" className="py-16 md:py-24 flex flex-col gap-4">
+          <div className="flex flex-col gap-3 max-w-xl">
             <h2 className="text-2xl md:text-3xl font-medium text-foreground">
               Shared responsibility model
             </h2>
             <p className="text-foreground-light">
-              Supabase operates a shared responsibility model. We secure the infrastructure;
-              customers are responsible for the security of their applications and data.
+              Supabase secures the infrastructure. You secure your application — RLS policies, API
+              keys, and access controls.
             </p>
             <Link
-              href="https://supabase.com/docs/guides/deployment/shared-responsibility-model"
+              href="/docs/guides/deployment/shared-responsibility-model"
               className="text-sm text-brand hover:text-brand-600 inline-flex items-center gap-1"
             >
-              Full shared responsibility documentation <ChevronRight className="w-3 h-3" />
+              Read the full shared responsibility model <ChevronRight className="w-3 h-3" />
             </Link>
-          </div>
-
-          <div className="w-full overflow-x-auto rounded-lg border border-default bg-surface-75">
-            <table className="w-full min-w-[560px] border-collapse text-left">
-              <thead>
-                <tr className="border-b border-default">
-                  <th className="py-4 px-4 md:px-6 text-sm font-medium text-foreground w-1/2">
-                    Supabase handles
-                  </th>
-                  <th className="py-4 px-4 md:px-6 text-sm font-medium text-foreground w-1/2">
-                    You handle
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {RESPONSIBILITY_ROWS.map((row, i) => (
-                  <tr
-                    key={i}
-                    className="border-b border-default last:border-b-0 hover:bg-surface-100/50 transition-colors"
-                  >
-                    <td className="py-3 px-4 md:px-6 text-sm text-foreground-light">
-                      <span className="flex items-start gap-2">
-                        <Check
-                          className="w-3.5 h-3.5 text-brand mt-0.5 shrink-0"
-                          strokeWidth={2.5}
-                        />
-                        {row.supabase}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 md:px-6 text-sm text-foreground-light">
-                      <span className="flex items-start gap-2">
-                        <Minus
-                          className="w-3.5 h-3.5 text-foreground-muted mt-0.5 shrink-0"
-                          strokeWidth={2}
-                        />
-                        {row.customer}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </SectionContainer>
 
@@ -640,77 +566,26 @@ const SecurityPage: NextPage = () => {
         </div>
 
         {/* DPA & Legal */}
-        <SectionContainer id="dpa" className="py-16 md:py-24 flex flex-col gap-8">
-          <div className="flex flex-col gap-2 max-w-xl">
+        <SectionContainer id="dpa" className="py-16 md:py-24 flex flex-col gap-4">
+          <div className="flex flex-col gap-3 max-w-xl">
             <h2 className="text-2xl md:text-3xl font-medium text-foreground">
               Data Processing Agreement
             </h2>
             <p className="text-foreground-light">
-              A Data Processing Agreement (DPA) is a legally binding contract that governs how
-              Supabase processes personal data on your behalf under GDPR. It is required for
-              EU/EEA-based customers and their clients.
+              A Data Processing Agreement (DPA) is available for customers who need a formal GDPR
+              data processing contract.{' '}
+              <Link href="/legal/dpa" className="text-brand hover:text-brand-600">
+                View the DPA
+              </Link>
+              .
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-4 p-6 rounded-lg border border-default bg-surface-75">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-default bg-surface-100 text-foreground-light">
-                <FileText className="w-5 h-5" strokeWidth={1.5} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <h3 className="text-base font-medium text-foreground">
-                  Team & Enterprise customers
-                </h3>
-                <p className="text-sm text-foreground-light leading-relaxed">
-                  Access and sign the DPA directly from your organization dashboard under the
-                  Documents tab.
-                </p>
-              </div>
-              <Link
-                href="/dashboard/org/_/documents"
-                className="inline-flex items-center justify-center gap-2 rounded-md border border-default bg-surface-100 px-4 py-2 text-sm text-foreground hover:bg-surface-200 transition-colors self-start"
-              >
-                Go to Documents
-                <ChevronRight className="w-4 h-4" />
+            <p className="text-foreground-light">
+              For sub-processor lists, security questionnaires, or custom legal agreements,{' '}
+              <Link href="/contact/enterprise" className="text-brand hover:text-brand-600">
+                contact Sales
               </Link>
-            </div>
-
-            <div className="flex flex-col gap-4 p-6 rounded-lg border border-default bg-surface-75">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-default bg-surface-100 text-foreground-light">
-                <Globe className="w-5 h-5" strokeWidth={1.5} />
-              </div>
-              <div className="flex flex-col gap-1">
-                <h3 className="text-base font-medium text-foreground">Free & Pro customers</h3>
-                <p className="text-sm text-foreground-light leading-relaxed">
-                  Request a DPA by contacting us. We&apos;ll review your request and follow up with
-                  the appropriate agreement. Upgrading to Team or Enterprise gives you instant
-                  self-serve access.
-                </p>
-              </div>
-              <Link
-                href="/legal/dpa"
-                className="inline-flex items-center justify-center gap-2 rounded-md border border-default bg-surface-100 px-4 py-2 text-sm text-foreground hover:bg-surface-200 transition-colors self-start"
-              >
-                View DPA
-                <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 items-start p-5 rounded-lg border border-default bg-surface-75">
-            <Shield className="w-5 h-5 text-foreground-light shrink-0 mt-0.5" />
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-medium text-foreground">
-                Need additional legal documents?
-              </p>
-              <p className="text-sm text-foreground-light">
-                Sub-processor lists, security questionnaire responses, and custom legal agreements
-                are available for Enterprise customers.{' '}
-                <Link href="/contact/enterprise" className="text-brand hover:text-brand-600">
-                  Contact Sales →
-                </Link>
-              </p>
-            </div>
+              .
+            </p>
           </div>
         </SectionContainer>
 
