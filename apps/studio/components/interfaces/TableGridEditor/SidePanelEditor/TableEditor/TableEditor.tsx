@@ -32,6 +32,7 @@ import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-const
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useChanged } from '@/hooks/misc/useChanged'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -77,6 +78,7 @@ export const TableEditor = ({
   const snap = useTableEditorStateSnapshot()
   const tableEditorApi = useContext(TableEditorStateContext)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
+  const { isHighAvailability } = useHighAvailability()
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
@@ -504,6 +506,7 @@ export const TableEditor = ({
             <Checkbox
               id="enable-realtime"
               checked={tableFields.isRealtimeEnabled}
+              disabled={isHighAvailability}
               onCheckedChange={() => {
                 track('realtime_toggle_table_clicked', {
                   newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
@@ -522,7 +525,9 @@ export const TableEditor = ({
                 Enable Realtime
               </label>
               <p className="text-sm text-foreground-muted">
-                Broadcast changes on this table to authorized subscribers.
+                {isHighAvailability
+                  ? 'Realtime is unavailable on High Availability projects.'
+                  : 'Broadcast changes on this table to authorized subscribers.'}
               </p>
             </div>
           </div>
