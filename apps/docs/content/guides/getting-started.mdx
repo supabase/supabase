@@ -15,12 +15,20 @@ hideToc: true
       Develop with Supabase AI-first using plugins, MCP, and skills.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/api-keys" className="col-span-12 md:col-span-6 xl:col-span-4" passHref>
+  <Link
+    href="/guides/getting-started/api-keys"
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+    passHref
+  >
     <GlassPanel title="API Keys" hasLightIcon={true} showIconBg={true}>
       Learn about the different API keys in Supabase and how to use them.
     </GlassPanel>
   </Link>
-  <Link href="/guides/local-development" className="col-span-12 md:col-span-6 xl:col-span-4" passHref>
+  <Link
+    href="/guides/local-development"
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+    passHref
+  >
     <GlassPanel title="Local Development" hasLightIcon={true} showIconBg={true}>
       Use the Supabase CLI to develop locally and collaborate between teams.
     </GlassPanel>
@@ -48,10 +56,7 @@ hideToc: true
     passHref
     className="col-span-12 md:col-span-6 xl:col-span-4"
   >
-    <GlassPanel
-      title="Subscription Payments (SaaS)"
-      icon="/docs/img/icons/nextjs-icon"
-    >
+    <GlassPanel title="Subscription Payments (SaaS)" icon="/docs/img/icons/nextjs-icon">
       Clone, deploy, and fully customize a SaaS subscription application with Next.js.
     </GlassPanel>
   </Link>
@@ -71,42 +76,62 @@ hideToc: true
 <$Show if="docs:framework_quickstarts">
 
 <div className="grid lg:grid-cols-12 gap-6 not-prose">
-  <Link href="/guides/getting-started/quickstarts/reactjs" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/reactjs"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="React" icon="/docs/img/icons/react-icon">
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a React app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/nextjs" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
-    <GlassPanel
-      title="Next.js"
-      icon="/docs/img/icons/nextjs-icon"
-      hasLightIcon={true}
-    >
+  <Link
+    href="/guides/getting-started/quickstarts/nextjs"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
+    <GlassPanel title="Next.js" icon="/docs/img/icons/nextjs-icon" hasLightIcon={true}>
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a Next.js app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/nuxtjs" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/nuxtjs"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="Nuxt" icon="/docs/img/icons/nuxt-icon">
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a Nuxt app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/hono" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/hono"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="Hono" icon="/docs/img/icons/hono-icon">
       Learn how to create a Supabase project, add some sample data to your database, secure it with
       auth, and query the data from a Hono app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/redwoodjs" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/redwoodjs"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="RedwoodJS" icon="/docs/img/icons/redwood-icon">
       Learn how to create a Supabase project, add some sample data to your database using Prisma
       migration and seeds, and query the data from a RedwoodJS app.
     </GlassPanel>
   </Link>
   <$Show if="sdk:dart">
-    <Link href="/guides/getting-started/quickstarts/flutter" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+    <Link
+      href="/guides/getting-started/quickstarts/flutter"
+      passHref
+      className="col-span-12 md:col-span-6 xl:col-span-4"
+    >
       <GlassPanel title="Flutter" icon="/docs/img/icons/flutter-icon">
         Learn how to create a Supabase project, add some sample data to your database, and query the
         data from a Flutter app.
@@ -114,7 +139,11 @@ hideToc: true
     </Link>
   </$Show>
   <$Show if="sdk:swift">
-    <Link href="/guides/getting-started/quickstarts/ios-swiftui" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+    <Link
+      href="/guides/getting-started/quickstarts/ios-swiftui"
+      passHref
+      className="col-span-12 md:col-span-6 xl:col-span-4"
+    >
       <GlassPanel title="iOS SwiftUI" icon="/docs/img/icons/swift-icon">
         Learn how to create a Supabase project, add some sample data to your database, and query the
         data from an iOS app.
@@ -122,42 +151,62 @@ hideToc: true
     </Link>
   </$Show>
   <$Show if="sdk:kotlin">
-    <Link href="/guides/getting-started/quickstarts/kotlin" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+    <Link
+      href="/guides/getting-started/quickstarts/kotlin"
+      passHref
+      className="col-span-12 md:col-span-6 xl:col-span-4"
+    >
       <GlassPanel title="Android Kotlin" icon="/docs/img/icons/kotlin-icon">
         Learn how to create a Supabase project, add some sample data to your database, and query the
         data from an Android Kotlin app.
       </GlassPanel>
     </Link>
   </$Show>
-  <Link href="/guides/getting-started/quickstarts/sveltekit" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/sveltekit"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="SvelteKit" icon="/docs/img/icons/svelte-icon">
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a SvelteKit app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/solidjs" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/solidjs"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="SolidJS" icon="/docs/img/icons/solidjs-icon">
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a SolidJS app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/vue" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/vue"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="Vue" icon="/docs/img/icons/vuejs-icon">
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a Vue app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/tanstack" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
-    <GlassPanel
-      title="TanStack Start"
-      icon="/docs/img/icons/tanstack-icon"
-      hasLightIcon={true}
-    >
+  <Link
+    href="/guides/getting-started/quickstarts/tanstack"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
+    <GlassPanel title="TanStack Start" icon="/docs/img/icons/tanstack-icon" hasLightIcon={true}>
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a TanStack Start app.
     </GlassPanel>
   </Link>
-  <Link href="/guides/getting-started/quickstarts/refine" passHref className="col-span-12 md:col-span-6 xl:col-span-4">
+  <Link
+    href="/guides/getting-started/quickstarts/refine"
+    passHref
+    className="col-span-12 md:col-span-6 xl:col-span-4"
+  >
     <GlassPanel title="Refine" icon="/docs/img/icons/refine-icon">
       Learn how to create a Supabase project, add some sample data to your database, and query the
       data from a Refine app.
