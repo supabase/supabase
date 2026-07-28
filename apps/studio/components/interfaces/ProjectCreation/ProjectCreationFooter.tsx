@@ -1,4 +1,4 @@
-import { useFlag } from 'common'
+import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -16,11 +16,14 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
+import { getValidVercelReturnUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+
+export type ProjectCreationCancelAction = 'studio' | 'vercel' | 'hidden'
 
 interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>
@@ -29,7 +32,7 @@ interface ProjectCreationFooterProps {
   organizationProjects: OrgProject[]
   isCreatingNewProject: boolean
   isSuccessNewProject: boolean
-  hideCancelButton: boolean
+  cancelAction?: ProjectCreationCancelAction
 }
 
 export const ProjectCreationFooter = ({
@@ -39,9 +42,10 @@ export const ProjectCreationFooter = ({
   organizationProjects,
   isCreatingNewProject,
   isSuccessNewProject,
-  hideCancelButton,
+  cancelAction = 'studio',
 }: ProjectCreationFooterProps) => {
   const router = useRouter()
+  const { next } = useParams()
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const { lastVisitedOrganization } = useLastVisitedOrganization()
@@ -52,6 +56,9 @@ export const ProjectCreationFooter = ({
   const additionalMonthlySpend = isFreePlan
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
+
+  const vercelReturnUrl = getValidVercelReturnUrl(next)
+  const canReturnToVercel = cancelAction === 'vercel' && vercelReturnUrl !== undefined
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -65,6 +72,17 @@ export const ProjectCreationFooter = ({
     monthlyInstancePrice(instanceSize) -
     // compute credits
     10
+
+  const onCancel = () => {
+    if (canReturnToVercel && vercelReturnUrl) {
+      window.location.href = vercelReturnUrl
+      return
+    }
+
+    // Fall back to Studio when cancelAction is studio, or when vercel next is missing/invalid
+    if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+    else router.push('/organizations')
+  }
 
   return (
     <div key="panel-footer" className="grid grid-cols-12 w-full gap-4 items-center">
@@ -169,16 +187,13 @@ export const ProjectCreationFooter = ({
       </div>
 
       <div className="flex items-end col-span-8 space-x-2 ml-auto">
-        {!hideCancelButton && (
+        {cancelAction !== 'hidden' && (
           <Button
             variant="default"
             disabled={isCreatingNewProject || isSuccessNewProject}
-            onClick={() => {
-              if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-              else router.push('/organizations')
-            }}
+            onClick={onCancel}
           >
-            Cancel
+            {canReturnToVercel ? 'Return to Vercel' : 'Cancel'}
           </Button>
         )}
         <Button

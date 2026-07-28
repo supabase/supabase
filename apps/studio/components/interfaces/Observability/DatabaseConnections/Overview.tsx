@@ -9,7 +9,13 @@ import {
   MetricCardValue,
 } from 'ui-patterns/MetricCard'
 
-import { WARN_DURATION_ACTIVE_QUERY, WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
+import {
+  WARN_DURATION_ACTIVE_QUERY,
+  WARN_DURATION_BLOCKED,
+  WARN_DURATION_IDLE_TXN,
+  WARN_TOP_BLOCKER,
+} from './DatabaseConnections.constants'
+import { getActivityStart } from './DatabaseConnections.utils'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
@@ -26,14 +32,6 @@ interface OverviewProps {
   live?: boolean
 }
 
-/**
- * [Joshen] Couple of nuances worth calling out to provide better signals for the user
- * - Idle in transaction:
- *   - Only considers queries in that state, but running for longer than 10 seconds
- *   - Could otherwise be a query in mid-flight
- * - Longest running:
- *  - Only considers queries that are active or idle in transaction
- */
 export const Overview = ({ live }: OverviewProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [, setSelectedPid] = useQueryState('pid', parseAsInteger)
@@ -46,7 +44,23 @@ export const Overview = ({ live }: OverviewProps) => {
     { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
   const activeQueries = (data ?? []).filter((x) => x.state === 'active')
+
   const blockedQueries = (data ?? []).filter((x) => x.blocked_by.length > 0)
+  const warnBlockedQueries = blockedQueries.some((activity) => {
+    const start = getActivityStart(activity)
+    if (!start) return false
+    return dayjs().utc().diff(dayjs(start).utc(), 'second') >= WARN_DURATION_BLOCKED
+  })
+  const longestBlockedQuery = blockedQueries.reduce<{
+    activity: DatabaseActivity
+    duration: number
+  } | null>((longest, activity) => {
+    const start = getActivityStart(activity)
+    if (!start) return longest
+    const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
+    return longest === null || duration > longest.duration ? { activity, duration } : longest
+  }, null)
+
   const idleInTransactionQueries = (data ?? []).filter((x) => {
     const isIdleInTransaction =
       x.state === 'idle in transaction' || x.state === 'idle in transaction (aborted)'
@@ -57,7 +71,7 @@ export const Overview = ({ live }: OverviewProps) => {
   const longestRunningQuery = (data ?? [])
     .filter((x) => LONG_RUNNING_STATES.includes(x.state))
     .reduce<{ activity: DatabaseActivity; duration: number } | null>((longest, activity) => {
-      const start = activity.state === 'active' ? activity.query_start : activity.transaction_start
+      const start = getActivityStart(activity)
       if (!start) return longest
       const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
       return longest === null || duration > longest.duration ? { activity, duration } : longest
@@ -68,6 +82,22 @@ export const Overview = ({ live }: OverviewProps) => {
     ((longestRunningQuery?.activity.state === 'idle in transaction' ||
       longestRunningQuery?.activity.state === 'idle in transaction (aborted)') &&
       longestRunningQuery.duration >= WARN_DURATION_IDLE_TXN)
+
+  const blockingCounts = (data ?? []).reduce<Map<number, number>>((counts, activity) => {
+    activity.blocked_by.forEach((pid) => counts.set(pid, (counts.get(pid) ?? 0) + 1))
+    return counts
+  }, new Map())
+
+  const queryBlockingTheMostQueries = [...blockingCounts].reduce<{
+    activity: DatabaseActivity
+    count: number
+  } | null>((mostBlocking, [pid, count]) => {
+    if (mostBlocking && count <= mostBlocking.count) return mostBlocking
+    const activity = (data ?? []).find((x) => x.pid === pid)
+    return activity ? { activity, count } : mostBlocking
+  }, null)
+
+  const warnTopBlocker = (queryBlockingTheMostQueries?.count ?? 0) >= WARN_TOP_BLOCKER
 
   const { data: roles, isPending: isLoadingRoles } = useDatabaseRolesQuery(
     {
@@ -99,18 +129,25 @@ export const Overview = ({ live }: OverviewProps) => {
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           <MetricCard isLoading={isLoadingRoles || isLoadingMaxConnections}>
             <MetricCardHeader>
               <MetricCardLabel
                 tooltip={
                   <div>
-                    <p className="text-foreground-light pr-2">Connections by roles:</p>
-                    {rolesWithActiveConnections.map((role) => (
-                      <div key={role.id} className="flex items-center">
-                        <p className="min-w-32">{role.name}:</p> {role.activeConnections}
-                      </div>
-                    ))}
+                    <p className="text-foreground-light">Connections by roles:</p>
+                    <table>
+                      <tbody>
+                        {rolesWithActiveConnections.map((role) => (
+                          <tr key={role.id}>
+                            <th scope="row" className="text-left font-normal">
+                              {role.name}:
+                            </th>
+                            <td className="pl-2">{role.activeConnections}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 }
               >
@@ -126,57 +163,6 @@ export const Overview = ({ live }: OverviewProps) => {
             </MetricCardContent>
           </MetricCard>
 
-          <MetricCard
-            isLoading={isLoadingActivity}
-            className={cn(warnLongestRunningQuery && 'bg-warning-200 border-warning-400')}
-          >
-            <MetricCardHeader>
-              <MetricCardLabel
-                className={cn(warnLongestRunningQuery && 'text-foreground')}
-                tooltip="Only considers active or idle-in-transaction queries"
-              >
-                Longest running
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              <MetricCardValue
-                className={cn(
-                  'space-x-2',
-                  longestRunningQuery === null
-                    ? 'text-foreground-lighter'
-                    : warnLongestRunningQuery
-                      ? 'text-warning'
-                      : 'text-foreground'
-                )}
-              >
-                {longestRunningQuery === null ? (
-                  '-'
-                ) : (
-                  <>
-                    <span>{formatDuration(longestRunningQuery.duration * 1000, 0)}</span>
-                    <span className="text-foreground-lighter text-sm">·</span>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      className="text-foreground-lighter text-sm hover:text-foreground transition cursor-pointer"
-                      onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          setSelectedPid(longestRunningQuery.activity.pid)
-                        }
-                      }}
-                    >
-                      PID: {longestRunningQuery.activity.pid}
-                    </span>
-                  </>
-                )}
-              </MetricCardValue>
-            </MetricCardContent>
-          </MetricCard>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 lg:grid-cols-3">
           <MetricCard isLoading={isLoadingActivity}>
             <MetricCardHeader>
               <MetricCardLabel tooltip="Queries currently executing on the database.">
@@ -185,36 +171,6 @@ export const Overview = ({ live }: OverviewProps) => {
             </MetricCardHeader>
             <MetricCardContent>
               <MetricCardValue>{activeQueries?.length}</MetricCardValue>
-            </MetricCardContent>
-          </MetricCard>
-
-          <MetricCard
-            isLoading={isLoadingActivity}
-            className={cn(blockedQueries.length && 'bg-destructive-200 border-destructive-400')}
-          >
-            <MetricCardHeader>
-              <MetricCardLabel
-                className={cn(blockedQueries.length && 'text-foreground')}
-                tooltip={
-                  <>
-                    <p>
-                      Queries waiting on a lock held by another session - stalls everything queued
-                      behind it.
-                    </p>
-                    <p className="mt-2">
-                      Typically caused by an uncommitted transaction, a long-running migration, or a
-                      stuck idle-in-transaction session.
-                    </p>
-                  </>
-                }
-              >
-                Blocked queries
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              <MetricCardValue className={cn(blockedQueries.length && 'text-destructive')}>
-                {blockedQueries.length}
-              </MetricCardValue>
             </MetricCardContent>
           </MetricCard>
 
@@ -245,6 +201,179 @@ export const Overview = ({ live }: OverviewProps) => {
                 className={cn(idleInTransactionQueries.length > 0 && 'text-warning')}
               >
                 {idleInTransactionQueries.length}
+              </MetricCardValue>
+            </MetricCardContent>
+          </MetricCard>
+
+          <MetricCard
+            isLoading={isLoadingActivity}
+            className={cn(warnBlockedQueries && 'bg-destructive-200 border-destructive-400')}
+          >
+            <MetricCardHeader>
+              <MetricCardLabel
+                className={cn(warnBlockedQueries && 'text-foreground')}
+                tooltip={
+                  <>
+                    <p>
+                      Queries waiting on a lock held by another session - stalls everything queued
+                      behind it.
+                    </p>
+                    <p className="mt-2">
+                      Typically caused by a slow transaction, a long-running migration, or a stuck
+                      idle-in-transaction session.
+                    </p>
+                  </>
+                }
+              >
+                Blocked queries
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              <MetricCardValue
+                className={cn('space-x-1', warnBlockedQueries && 'text-destructive')}
+              >
+                <span>{blockedQueries.length}</span>
+                {warnBlockedQueries && longestBlockedQuery && (
+                  <>
+                    <span className="text-foreground-light text-xs">·</span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className={cn(
+                        'text-foreground-light text-xs cursor-pointer transition-all normal-nums',
+                        'hover:text-foreground hover:underline',
+                        'focus:text-foreground focus:underline'
+                      )}
+                      onClick={() => setSelectedPid(longestBlockedQuery.activity.pid)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelectedPid(longestBlockedQuery.activity.pid)
+                        }
+                      }}
+                    >
+                      PID {longestBlockedQuery.activity.pid} blocked for{' '}
+                      <span className="tabular-nums">
+                        {formatDuration(longestBlockedQuery.duration * 1000, 0)}
+                      </span>
+                    </span>
+                  </>
+                )}
+              </MetricCardValue>
+            </MetricCardContent>
+          </MetricCard>
+
+          <MetricCard
+            isLoading={isLoadingActivity}
+            className={cn(warnTopBlocker && 'bg-destructive-200 border-destructive-400')}
+          >
+            <MetricCardHeader>
+              <MetricCardLabel
+                className={cn(warnTopBlocker && 'text-foreground')}
+                tooltip="The query blocking the most other queries"
+              >
+                Top blocker
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              <MetricCardValue
+                className={cn(
+                  'space-x-1',
+                  queryBlockingTheMostQueries === null
+                    ? 'text-foreground-lighter'
+                    : warnTopBlocker
+                      ? 'text-destructive'
+                      : 'text-foreground'
+                )}
+              >
+                {queryBlockingTheMostQueries === null ? (
+                  '-'
+                ) : (
+                  <>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="normal-nums cursor-pointer hover:underline focus:underline"
+                      onClick={() => setSelectedPid(queryBlockingTheMostQueries.activity.pid)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelectedPid(queryBlockingTheMostQueries.activity.pid)
+                        }
+                      }}
+                    >
+                      PID: {queryBlockingTheMostQueries?.activity.pid}
+                    </span>
+                    <span className="text-foreground-light text-xs">·</span>
+                    <span
+                      className={cn(
+                        'text-xs',
+                        warnTopBlocker ? 'text-foreground-light' : 'text-foreground-lighter'
+                      )}
+                    >
+                      Blocking {queryBlockingTheMostQueries?.count} other{' '}
+                      {queryBlockingTheMostQueries?.count > 1 ? 'queries' : 'query'}
+                    </span>
+                  </>
+                )}
+              </MetricCardValue>
+            </MetricCardContent>
+          </MetricCard>
+
+          <MetricCard
+            isLoading={isLoadingActivity}
+            className={cn(warnLongestRunningQuery && 'bg-warning-200 border-warning-400')}
+          >
+            <MetricCardHeader>
+              <MetricCardLabel
+                className={cn(warnLongestRunningQuery && 'text-foreground')}
+                tooltip="Only considers active or idle-in-transaction queries"
+              >
+                Longest running
+              </MetricCardLabel>
+            </MetricCardHeader>
+            <MetricCardContent>
+              <MetricCardValue
+                className={cn(
+                  'space-x-1',
+                  longestRunningQuery === null
+                    ? 'text-foreground-lighter'
+                    : warnLongestRunningQuery
+                      ? 'text-warning'
+                      : 'text-foreground'
+                )}
+              >
+                {longestRunningQuery === null ? (
+                  '-'
+                ) : (
+                  <>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      className="normal-nums hover:underline focus:underline cursor-pointer"
+                      onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelectedPid(longestRunningQuery.activity.pid)
+                        }
+                      }}
+                    >
+                      PID: {longestRunningQuery.activity.pid}
+                    </span>
+                    <span className="text-foreground-lighter text-sm">·</span>
+                    <span
+                      className={cn(
+                        'text-sm',
+                        warnLongestRunningQuery
+                          ? 'text-foreground-light'
+                          : 'text-foreground-lighter'
+                      )}
+                    >
+                      {formatDuration(longestRunningQuery.duration * 1000, 0)}
+                    </span>
+                  </>
+                )}
               </MetricCardValue>
             </MetricCardContent>
           </MetricCard>
