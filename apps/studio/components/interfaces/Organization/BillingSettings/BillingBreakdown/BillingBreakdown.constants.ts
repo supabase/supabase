@@ -180,7 +180,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.ETL_COPY_BACKFILL_DATA,
-    name: 'Pipeline Initial Sync Data',
+    name: 'Initial Sync Data Processed',
     units: 'bytes',
     unitName: 'GB',
     category: 'Pipelines',
@@ -188,7 +188,7 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   },
   {
     key: PricingMetric.ETL_REPLICATED_DATA,
-    name: 'Pipeline Ongoing Replication Data',
+    name: 'Ongoing Replication Data Processed',
     units: 'bytes',
     unitName: 'GB',
     category: 'Pipelines',
