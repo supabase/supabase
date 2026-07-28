@@ -89,20 +89,19 @@ export const ProjectCreationFooter = ({
   }
 
   const cancelButton =
-    cancelAction !== 'hidden' ? (
-      <div className="flex flex-col items-start gap-1">
-        <Button
-          variant="default"
-          disabled={isCreatingNewProject || isSuccessNewProject}
-          onClick={onCancel}
-        >
-          Cancel
-        </Button>
-        {showCloseWindowHint && (
-          <p className="text-sm text-foreground-light">Close this window to cancel.</p>
-        )}
-      </div>
-    ) : null
+    cancelAction === 'hidden' ? null : showCloseWindowHint ? (
+      <p role="status" aria-live="polite" className="text-xs text-foreground-muted mr-3">
+        Close window to cancel
+      </p>
+    ) : (
+      <Button
+        variant="default"
+        disabled={isCreatingNewProject || isSuccessNewProject}
+        onClick={onCancel}
+      >
+        Cancel
+      </Button>
+    )
 
   const createButton = (
     <Button
