@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "entries": {
+    "gotrue-go": {
+      "inputHash": "sha256:396117cdd4f35031398337709f9f102cb475938d0748f803364b4ec8f17c9ac2",
+      "syncedAt": "2026-07-02T21:55:42.397Z",
+      "defaultBranchSha": "5d67daa76ea7c743103e297cfb8f4791d16580f6",
+      "llmModel": "keyword"
+    },
+    "storage-py": {
+      "inputHash": "sha256:96d60c0dc2b9451bd06b201d0e7dcb5536d9b54ef2ca252d4812aa20b933eb3e",
+      "syncedAt": "2026-07-02T21:55:51.131Z",
+      "defaultBranchSha": "b1b1c87b5caa5dc3a50b93688d637759c61c6354",
+      "llmModel": "keyword"
+    },
+    "supabase-js": {
+      "inputHash": "sha256:d591899753823bb21bd1c290f90cb3328065d5e5a0e49c57f8c92ffe501ff773",
+      "syncedAt": "2026-07-02T21:55:49.316Z",
+      "defaultBranchSha": "7f9d2b35a5c45737e97f7dd6568fb88874c5e636",
+      "llmModel": "keyword"
+    }
+  }
+}

@@ -32,9 +32,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Restore fetch-content LLM cache
+        uses: actions/cache@v4
+        with:
+          path: apps/community-docs/.cache
+          key: community-docs-cache-${{ hashFiles('apps/community-docs/content/.state.json') }}
+          restore-keys: |
+            community-docs-cache-
+
       - name: Fetch community docs content
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: pnpm --filter community-docs fetch-content
 
       - name: Create pull request

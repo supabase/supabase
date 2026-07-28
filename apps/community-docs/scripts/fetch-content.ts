@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import { dirname, extname, join, posix, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
@@ -10,13 +10,43 @@ import {
   getGitHubResourceUrl,
   type GitHubResourceSource,
 } from '../lib/community-resources'
+import { getEnricher, postProcessTags, type Enricher, type EnrichResult } from './lib/llm-enrich'
+import {
+  computeInputHash,
+  readSyncState,
+  shouldSkip,
+  writeSyncState,
+  type SyncState,
+} from './lib/sync-state'
 
 const execFileAsync = promisify(execFile)
 
 const COMMUNITY_ORG = 'supabase-community'
 const appDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const contentDirectory = join(appDirectory, 'content')
+const stateFilePath = join(contentDirectory, '.state.json')
 const maxBuffer = 1024 * 1024 * 50
+
+const MANIFEST_CANDIDATES = [
+  'package.json',
+  'pubspec.yaml',
+  'Cargo.toml',
+  'go.mod',
+  'pyproject.toml',
+] as const
+const ENTRY_CANDIDATES = [
+  'src/main.rs',
+  'lib.rs',
+  'src/lib.rs',
+  'main.go',
+  'main.py',
+  'main.dart',
+  'lib/main.dart',
+  'index.ts',
+  'src/index.ts',
+  'index.js',
+  'src/index.js',
+] as const
 
 type RepoListItem = {
   name: string
@@ -38,6 +68,7 @@ type RepoDetails = {
 
 type TreeResponse = {
   tree?: TreeItem[]
+  sha?: string
 }
 
 type TreeItem = {
@@ -69,8 +100,16 @@ type GeneratedDoc = {
   content: string
 }
 
+type Flags = {
+  refresh: boolean
+  dryRun: boolean
+  only?: Set<string>
+  llmMode: 'default' | 'aggressive'
+}
+
 const headingPattern = /^(#{1,3})\s+(Getting Started|Quickstart|Installation|Usage)\b.*$/gim
 
+// Fallback keyword-based inference used only when the OpenAI enricher is unavailable.
 const categoryKeywords = [
   { category: 'Auth', keywords: ['auth', 'oauth', 'jwt', 'session', 'login', 'identity'] },
   { category: 'Storage', keywords: ['storage', 'bucket', 'file', 'upload', 's3'] },
@@ -101,6 +140,7 @@ const tagKeywords = [
   'expo',
   'stripe',
 ]
+
 const docsEntryFilenames = [
   'README.md',
   'README.mdx',
@@ -110,6 +150,53 @@ const docsEntryFilenames = [
   'index.mdx',
 ] as const
 const maxLinkedDocumentDepth = 2
+
+function parseFlags(argv: string[]): Flags {
+  const flags: Flags = { refresh: false, dryRun: false, llmMode: 'default' }
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i]
+    if (arg === '--') {
+      // pnpm forwards `--` as a positional separator; ignore.
+      continue
+    } else if (arg === '--refresh') {
+      flags.refresh = true
+    } else if (arg === '--dry-run') {
+      flags.dryRun = true
+    } else if (arg === '--only' || arg.startsWith('--only=')) {
+      const value = arg === '--only' ? argv[++i] : arg.slice('--only='.length)
+      if (value) {
+        flags.only = new Set(
+          value
+            .split(',')
+            .map((s) => slugify(s.trim()))
+            .filter(Boolean)
+        )
+      }
+    } else if (arg === '--llm-mode' || arg.startsWith('--llm-mode=')) {
+      const value = arg === '--llm-mode' ? argv[++i] : arg.slice('--llm-mode='.length)
+      if (value === 'aggressive') flags.llmMode = 'aggressive'
+      else if (value && value !== 'default') {
+        throw new Error(`Unknown --llm-mode: ${value} (expected: default | aggressive)`)
+      }
+    } else if (arg === '--help' || arg === '-h') {
+      console.log(
+        [
+          'Usage: pnpm --filter community-docs fetch-content [-- <flags>]',
+          '',
+          'Flags:',
+          '  --only <slug,slug>       Only sync these slugs (kebab-case).',
+          '  --refresh                Ignore the state cache and re-sync everything in scope.',
+          '  --dry-run                Print the plan without touching filesystem or calling the LLM.',
+          '  --llm-mode aggressive    Let the LLM overwrite regex-extracted bodies and existing GitHub descriptions.',
+        ].join('\n')
+      )
+      process.exit(0)
+    } else {
+      throw new Error(`Unknown argument: ${arg}`)
+    }
+  }
+  return flags
+}
 
 async function gh<T>(args: string[]): Promise<T> {
   const token = process.env.GH_TOKEN ?? process.env.GITHUB_TOKEN
@@ -157,6 +244,17 @@ async function listRepos(): Promise<RepoListItem[]> {
 
 async function getRepoDetails(source: GitHubResourceSource): Promise<RepoDetails | undefined> {
   return maybeGh<RepoDetails>(['api', `repos/${source.owner}/${source.repo}`])
+}
+
+async function getBranchSha(
+  source: GitHubResourceSource,
+  branch: string
+): Promise<string | undefined> {
+  const response = await maybeGh<{ commit?: { sha?: string } }>([
+    'api',
+    `repos/${source.owner}/${source.repo}/branches/${encodeURIComponent(branch)}`,
+  ])
+  return response?.commit?.sha
 }
 
 function encodeGitHubPath(path: string): string {
@@ -231,7 +329,12 @@ function decodeMarkdownLinkTarget(target: string) {
 }
 
 function isRelativeLinkTarget(target: string) {
-  return Boolean(target) && !target.startsWith('#') && !target.startsWith('/') && !/^[a-z][a-z0-9+.-]*:/i.test(target)
+  return (
+    Boolean(target) &&
+    !target.startsWith('#') &&
+    !target.startsWith('/') &&
+    !/^[a-z][a-z0-9+.-]*:/i.test(target)
+  )
 }
 
 function extractRelativeMarkdownLinks(source: string): string[] {
@@ -265,7 +368,7 @@ function resolveLinkedDocumentPaths(
     .filter((path) => isBlobPath(tree, path))
 }
 
-async function getMarkdownContent(
+async function getFileContent(
   source: GitHubResourceSource,
   branch: string,
   path: string
@@ -293,7 +396,7 @@ async function discoverSourceDocuments(
     if (visited.has(path)) continue
     visited.add(path)
 
-    const content = await getMarkdownContent(source, branch, path)
+    const content = await getFileContent(source, branch, path)
 
     if (!content) continue
 
@@ -328,6 +431,18 @@ function extractGettingStartedSections(source: string): string[] {
   }
 
   return sections
+}
+
+function extractGettingStartedFromDocuments(documents: SourceDocument[]): {
+  label: string
+  section: string
+}[] {
+  return documents.flatMap((document) =>
+    extractGettingStartedSections(document.content).map((section) => ({
+      label: document.label,
+      section,
+    }))
+  )
 }
 
 function extractFirstParagraph(source: string): string | undefined {
@@ -436,22 +551,55 @@ function toFrontmatter(doc: GeneratedDoc): string {
   ].join('\n')
 }
 
-function buildGeneratedDoc(
-  repo: RepoDetails,
-  documents: SourceDocument[],
+function findManifestFile(
+  tree: TreeItem[],
   source: GitHubResourceSource
-): GeneratedDoc {
-  const combinedContent = documents.map((document) => document.content).join('\n\n')
-  const sections = documents.flatMap((document) =>
-    extractGettingStartedSections(document.content).map((section) => ({
-      label: document.label,
-      section,
-    }))
-  )
-  const description =
-    repo.description?.trim() ||
-    extractFirstParagraph(combinedContent) ||
-    `Getting started with ${repo.name}.`
+): { path: string } | undefined {
+  const sourceRoot = getSourceRoot(source)
+  for (const candidate of MANIFEST_CANDIDATES) {
+    const path = joinGitHubPath(sourceRoot, candidate)
+    if (isBlobPath(tree, path)) return { path }
+  }
+  return undefined
+}
+
+function findEntryFile(
+  tree: TreeItem[],
+  source: GitHubResourceSource
+): { path: string } | undefined {
+  const sourceRoot = getSourceRoot(source)
+  for (const candidate of ENTRY_CANDIDATES) {
+    const path = joinGitHubPath(sourceRoot, candidate)
+    if (isBlobPath(tree, path)) return { path }
+  }
+  return undefined
+}
+
+function buildBodyMarkdown(
+  source: GitHubResourceSource,
+  sections: { label: string; section: string }[],
+  llmBody: string | undefined,
+  llmSource: EnrichResult['gettingStarted']['source'] | undefined,
+  aggressive: boolean
+): string {
+  const useLlm =
+    llmBody !== undefined &&
+    llmSource !== undefined &&
+    llmSource !== 'none' &&
+    (aggressive || sections.length === 0)
+
+  if (useLlm) {
+    return [
+      `> This page is generated from [${source.name}](${getGitHubResourceUrl(source.name)}).`,
+      '',
+      `{/* Source: LLM ${llmSource} */}`,
+      '',
+      '## Getting started',
+      '',
+      sanitizeMdxContent(llmBody),
+    ].join('\n')
+  }
+
   const body =
     sections.length > 0
       ? sections
@@ -461,6 +609,64 @@ function buildGeneratedDoc(
           )
           .join('\n\n')
       : 'No getting-started sections were found in the README, linked docs, or docs directory for this repository.'
+
+  return [
+    `> This page is generated from [${source.name}](${getGitHubResourceUrl(source.name)}).`,
+    '',
+    '## Getting started',
+    '',
+    body,
+  ].join('\n')
+}
+
+function buildEnrichedDoc(
+  repo: RepoDetails,
+  source: GitHubResourceSource,
+  sections: { label: string; section: string }[],
+  enriched: EnrichResult,
+  combinedContent: string,
+  flags: Flags
+): GeneratedDoc {
+  const aggressive = flags.llmMode === 'aggressive'
+  const description = aggressive
+    ? enriched.description
+    : repo.description?.trim() || enriched.description
+  const tags = postProcessTags([...(repo.topics ?? []), ...enriched.tags])
+  const body = buildBodyMarkdown(
+    source,
+    sections,
+    enriched.gettingStarted.markdown,
+    enriched.gettingStarted.source,
+    aggressive
+  )
+
+  return {
+    title: humanizeRepoName(source.name),
+    description:
+      description || extractFirstParagraph(combinedContent) || `Getting started with ${repo.name}.`,
+    repo: source.name,
+    repoUrl: getGitHubResourceUrl(source.name),
+    stars: repo.stargazers_count ?? 0,
+    forks: repo.forks_count ?? 0,
+    language: repo.language ?? undefined,
+    isTemplate: repo.is_template ?? false,
+    tags,
+    category: enriched.category,
+    content: body,
+  }
+}
+
+function buildKeywordDoc(
+  repo: RepoDetails,
+  source: GitHubResourceSource,
+  sections: { label: string; section: string }[],
+  combinedContent: string
+): GeneratedDoc {
+  const description =
+    repo.description?.trim() ||
+    extractFirstParagraph(combinedContent) ||
+    `Getting started with ${repo.name}.`
+  const body = buildBodyMarkdown(source, sections, undefined, undefined, false)
 
   return {
     title: humanizeRepoName(source.name),
@@ -473,30 +679,43 @@ function buildGeneratedDoc(
     isTemplate: repo.is_template ?? false,
     tags: inferTags(repo, combinedContent, source.name),
     category: inferCategory(repo, combinedContent, source.name),
-    content: [
-      `> This page is generated from [${source.name}](${getGitHubResourceUrl(source.name)}).`,
-      '',
-      '## Getting started',
-      '',
-      body,
-    ].join('\n'),
+    content: body,
   }
 }
 
-async function removeGeneratedContent() {
-  await mkdir(contentDirectory, { recursive: true })
-  const entries = await readdir(contentDirectory, { withFileTypes: true })
-
-  await Promise.all(
-    entries
-      .filter((entry) => entry.isDirectory() || extname(entry.name) === '.mdx')
-      .map((entry) => rm(resolveContentPath(entry.name), { force: true, recursive: true }))
-  )
+async function cleanupOrphans(
+  sourcesBySlug: Map<string, GitHubResourceSource>,
+  state: SyncState
+): Promise<void> {
+  let entries
+  try {
+    entries = await readdir(contentDirectory, { withFileTypes: true })
+  } catch {
+    return
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue
+    const slug = slugify(entry.name)
+    if (sourcesBySlug.has(slug)) continue
+    await rm(resolveContentPath(entry.name), { force: true, recursive: true })
+    delete state.entries[slug]
+    console.log(`Removed orphan content/${entry.name}/`)
+  }
 }
 
 async function main() {
+  const flags = parseFlags(process.argv.slice(2))
   await ghText(['--version'])
-  await removeGeneratedContent()
+
+  const enricher: Enricher | null = getEnricher()
+  if (!enricher) {
+    console.warn(
+      'ANTHROPIC_API_KEY is not set. Falling back to keyword-based inference for all repos.'
+    )
+  }
+
+  await mkdir(contentDirectory, { recursive: true })
+  const state = await readSyncState(stateFilePath)
 
   const repos = await listRepos()
   const sourcesBySlug = new Map<string, GitHubResourceSource>()
@@ -513,25 +732,133 @@ async function main() {
     sourcesBySlug.set(slugify(name), getGitHubResourceSource(name))
   }
 
-  for (const source of sourcesBySlug.values()) {
-    const details = await getRepoDetails(source)
+  const seenSlugs = new Set<string>()
+  let synced = 0
+  let skipped = 0
+  let failed = 0
 
-    if (!details) continue
+  for (const [slug, source] of sourcesBySlug) {
+    if (flags.only && !flags.only.has(slug)) continue
+    seenSlugs.add(slug)
 
-    const branch = source.branch ?? details.default_branch
-    const tree = await getRepositoryTree(source, branch)
-    const documents = await discoverSourceDocuments(source, branch, tree)
+    try {
+      const details = await getRepoDetails(source)
+      if (!details) {
+        failed++
+        console.log(`  ✗ ${slug} — no repo details`)
+        continue
+      }
 
-    const generated = buildGeneratedDoc(details, documents, source)
-    const repoDirectory = resolveContentPath(source.repo)
-    const filename = `${slugify(source.name)}.mdx`
-    const outputPath = join(repoDirectory, filename)
-    const output = `${toFrontmatter(generated)}\n\n${generated.content}\n`
+      const branch = source.branch ?? details.default_branch
+      const [tree, branchSha] = await Promise.all([
+        getRepositoryTree(source, branch),
+        getBranchSha(source, branch),
+      ])
+      const documents = await discoverSourceDocuments(source, branch, tree)
+      const combinedContent = documents.map((doc) => doc.content).join('\n\n')
+      const sections = extractGettingStartedFromDocuments(documents)
+      const manifestPath = findManifestFile(tree, source)
+      const wantsEntry = enricher !== null && sections.length === 0
+      const entryPath = wantsEntry ? findEntryFile(tree, source) : undefined
 
-    await mkdir(repoDirectory, { recursive: true })
-    await writeFile(outputPath, output)
-    console.log(`Generated content/${source.repo}/${filename}`)
+      const [manifestContent, entryContent] = await Promise.all([
+        manifestPath
+          ? getFileContent(source, branch, manifestPath.path)
+          : Promise.resolve(undefined),
+        entryPath ? getFileContent(source, branch, entryPath.path) : Promise.resolve(undefined),
+      ])
+
+      const inputHash = computeInputHash([
+        branchSha ?? branch,
+        details.description ?? '',
+        (details.topics ?? []).slice().sort().join(','),
+        String(details.stargazers_count ?? 0),
+        combinedContent,
+        manifestContent ?? '',
+        entryContent ?? '',
+        `llm:${enricher ? 'claude-haiku-4-5' : 'keyword'}`,
+        `mode:${flags.llmMode}`,
+      ])
+
+      if (shouldSkip(state, slug, inputHash, flags)) {
+        skipped++
+        continue
+      }
+
+      if (flags.dryRun) {
+        console.log(
+          `  → ${slug} — would ${enricher ? 'call LLM' : 'run keyword fallback'} (regex sections: ${sections.length})`
+        )
+        continue
+      }
+
+      let doc: GeneratedDoc
+      if (enricher) {
+        try {
+          const enriched = await enricher({
+            repo: {
+              name: details.name,
+              description: details.description,
+              topics: details.topics,
+            },
+            regexSections: sections.map((s) => s.section),
+            readmeAndDocs: combinedContent,
+            manifestFile:
+              manifestContent && manifestPath
+                ? { path: manifestPath.path, content: manifestContent }
+                : undefined,
+            entryFile:
+              entryContent && entryPath
+                ? { path: entryPath.path, content: entryContent }
+                : undefined,
+          })
+          doc = buildEnrichedDoc(details, source, sections, enriched, combinedContent, flags)
+        } catch (error) {
+          console.warn(
+            `  ! LLM enrichment failed for ${slug}, falling back to keyword inference: ${
+              (error as Error).message
+            }`
+          )
+          doc = buildKeywordDoc(details, source, sections, combinedContent)
+        }
+      } else {
+        doc = buildKeywordDoc(details, source, sections, combinedContent)
+      }
+
+      const repoDirectory = resolveContentPath(source.repo)
+      const filename = `${slugify(source.name)}.mdx`
+      const outputPath = join(repoDirectory, filename)
+      const output = `${toFrontmatter(doc)}\n\n${doc.content}\n`
+
+      await mkdir(repoDirectory, { recursive: true })
+      await writeFile(outputPath, output)
+
+      state.entries[slug] = {
+        inputHash,
+        syncedAt: new Date().toISOString(),
+        defaultBranchSha: branchSha,
+        llmModel: enricher ? 'claude-haiku-4-5' : 'keyword',
+      }
+      synced++
+      console.log(`  ✓ ${slug} — category=${doc.category} tags=${doc.tags.length}`)
+    } catch (error) {
+      failed++
+      console.warn(`  ✗ ${slug} — ${(error as Error).message}`)
+    }
   }
+
+  // Orphan cleanup: only when running a full sync (no --only filter) and not a dry run.
+  if (!flags.only && !flags.dryRun) {
+    await cleanupOrphans(sourcesBySlug, state)
+  }
+
+  if (!flags.dryRun) {
+    await writeSyncState(stateFilePath, state)
+  }
+
+  console.log(
+    `\nDone. synced=${synced} skipped=${skipped} failed=${failed}${flags.dryRun ? ' (dry run)' : ''}`
+  )
 }
 
 main().catch((error) => {
