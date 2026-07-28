@@ -313,6 +313,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
               key={prompt.value}
               value={prompt.value}
               forceMount
+              inert={!isActive}
               aria-hidden={!isActive}
               className="col-start-1 row-start-1 m-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
             >
