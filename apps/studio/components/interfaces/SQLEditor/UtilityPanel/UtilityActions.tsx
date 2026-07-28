@@ -1,5 +1,5 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AlignLeft, Check, ChevronDown, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -18,8 +18,11 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { type QuerySource } from '../querySource'
 import { ROWS_PER_PAGE_OPTIONS } from '../SQLEditor.constants'
 import { AutosaveStatus } from './AutosaveStatus'
+import { LogsRangePicker } from './LogsRangePicker'
+import { QuerySourceIndicator } from './QuerySourceIndicator'
 import { SqlRunButton } from './RunButton'
 import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
@@ -35,6 +38,7 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state
 
 export type UtilityActionsProps = {
   id: string
+  runSource: QuerySource
   isExecuting?: boolean
   isDisabled?: boolean
   hasSelection?: boolean
@@ -45,6 +49,7 @@ export type UtilityActionsProps = {
 
 export const UtilityActions = ({
   id,
+  runSource,
   isExecuting = false,
   isDisabled = false,
   hasSelection = false,
@@ -56,6 +61,14 @@ export const UtilityActions = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const isManualSaveEnabled = useIsSqlEditorManualSaveEnabled()
+
+  const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
+  const isOtelLogsEnabled = useFlag('otelLegacyLogs')
+
+  const isLogs = runSource.type === 'logs'
+  const canCreateLogsSnippet = isLogsSourceEnabled && isOtelLogsEnabled
+  const canShowSourceIndicator = isLogs || canCreateLogsSnippet
+  const isLogsRunBlocked = isLogs && !isOtelLogsEnabled
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -141,7 +154,7 @@ export const UtilityActions = ({
               </DropdownMenuItem>
             </>
           )}
-          <DropdownMenuItem className="justify-between" onClick={prettifyQuery}>
+          <DropdownMenuItem className="justify-between" onClick={prettifyQuery} disabled={isLogs}>
             <span className="flex items-center gap-x-2">
               <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
               Prettify SQL
@@ -208,6 +221,7 @@ export const UtilityActions = ({
             <Button
               variant="text"
               onClick={prettifyQuery}
+              disabled={isLogs}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
               aria-label="Prettify SQL"
@@ -223,51 +237,64 @@ export const UtilityActions = ({
       </div>
 
       <div className="flex items-center gap-x-2">
-        <div className="flex items-center">
-          {IS_PLATFORM && (
-            <DatabaseSelector
-              selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
-              variant="connected-on-right"
-              onSelectId={onSelectDatabase}
-            />
-          )}
-          <RoleImpersonationPopover
-            serviceRoleLabel="postgres"
-            header="Run SQL query as a role"
-            variant={IS_PLATFORM ? 'connected-on-left' : 'regular'}
-          />
-        </div>
+        {canShowSourceIndicator && <QuerySourceIndicator source={runSource.type} />}
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="default"
-              iconRight={<ChevronDown size={14} className="text-foreground-light" />}
-            >
-              <span className="text-foreground-light">Limit</span>{' '}
-              {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40" align="end">
-            <DropdownMenuRadioGroup
-              value={sessionSnap.limit.toString()}
-              onValueChange={(val) => sessionSnap.setLimit(Number(val))}
-            >
-              {ROWS_PER_PAGE_OPTIONS.map((option) => (
-                <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
-                  {option.label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {runSource.type === 'logs' ? (
+          <LogsRangePicker id={id} range={runSource.dateRange} />
+        ) : (
+          <>
+            <div className="flex items-center">
+              {IS_PLATFORM && (
+                <DatabaseSelector
+                  selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
+                  variant="connected-on-right"
+                  onSelectId={onSelectDatabase}
+                />
+              )}
+              <RoleImpersonationPopover
+                serviceRoleLabel="postgres"
+                header="Run SQL query as a role"
+                variant={IS_PLATFORM ? 'connected-on-left' : 'regular'}
+              />
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="default"
+                  iconRight={<ChevronDown size={14} className="text-foreground-light" />}
+                >
+                  <span className="text-foreground-light">Limit</span>{' '}
+                  {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-40" align="end">
+                <DropdownMenuRadioGroup
+                  value={sessionSnap.limit.toString()}
+                  onValueChange={(val) => sessionSnap.setLimit(Number(val))}
+                >
+                  {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                    <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
+                      {option.label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        )}
 
         <div className="flex items-center">
           {isManualSaveEnabled && <SqlSaveButton id={id} className="rounded-r-none" />}
           <SqlRunButton
             hasSelection={hasSelection}
-            isDisabled={isDisabled || isExecuting}
+            isDisabled={isDisabled || isExecuting || isLogsRunBlocked}
             isExecuting={isExecuting}
+            disabledReason={
+              isLogsRunBlocked
+                ? "Querying logs from the SQL editor isn't available for this project yet"
+                : undefined
+            }
             className={isManualSaveEnabled ? 'rounded-l-none' : undefined}
             onClick={executeQuery}
           />

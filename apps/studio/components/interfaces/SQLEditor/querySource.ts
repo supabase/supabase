@@ -26,6 +26,16 @@ export function getSnippetSource(snippet: Pick<Snippet, 'type'>): SqlSnippetSour
 }
 
 /**
+ * Parse a raw `source` value (e.g. the `?source=` query param a creation entry
+ * threads through `/sql/new`) into a `SqlSnippetSource`. Only the explicit
+ * `'logs'` opts a new snippet into the logs backend; anything else — including an
+ * absent param — is a database snippet, keeping database the safe default.
+ */
+export function parseSqlSnippetSource(raw: string | undefined): SqlSnippetSource {
+  return raw === 'logs' ? 'logs' : 'database'
+}
+
+/**
  * An ISO-8601 datetime proven valid at construction via a dayjs parse. Absolute
  * log ranges carry these instead of raw strings so an unvalidated datetime can
  * never reach execution.
