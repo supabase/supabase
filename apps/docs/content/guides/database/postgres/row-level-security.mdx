@@ -17,16 +17,23 @@ RLS _must_ always be enabled on any tables stored in an exposed schema. By defau
 
 RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself and grant only the permissions each Postgres role needs.
 
+Tables created in the `public` schema have default privileges granted to the `anon` and `authenticated` roles. To apply a least-privilege approach, revoke existing privileges first and then grant only the permissions required for your application.
+
 ```sql
-GRANT SELECT ON <schema_name>.<table_name> TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO service_role;
+REVOKE ALL ON TABLE <schema_name>.<table_name>
+FROM anon, authenticated;
+
+GRANT SELECT ON TABLE <schema_name>.<table_name>
+TO anon;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE <schema_name>.<table_name>
+TO authenticated;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE <schema_name>.<table_name>
+TO service_role;
 
 alter table <schema_name>.<table_name>
 enable row level security;
-```
-
-</Admonition>
 
 RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be combined with [Supabase Auth](/docs/guides/auth) for end-to-end user security from the browser to the database.
 
