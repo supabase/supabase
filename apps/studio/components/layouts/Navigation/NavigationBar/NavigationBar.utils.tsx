@@ -1,10 +1,14 @@
+import { useParams } from 'common'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
 import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
 import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
 import type { Project } from '@/data/projects/project-detail-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -159,6 +163,7 @@ export const generateOtherRoutes = (
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
+
   return [
     {
       key: 'advisors',
@@ -204,6 +209,22 @@ export const generateOtherRoutes = (
       shortcutId: SHORTCUT_IDS.NAV_INTEGRATIONS,
     },
   ]
+}
+
+// [Joshen] Main hook to consume as it standardizes the generation of the menu items
+export const useGenerateOtherRoutes = (): Route[] => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
+  const reportsEnabled = useIsFeatureEnabled('reports:all')
+  const logsEnabled = useIsFeatureEnabled('logs:all')
+
+  return generateOtherRoutes(ref, project, {
+    isPlatform: IS_PLATFORM,
+    unifiedLogs: unifiedLogsEnabled,
+    showReports: reportsEnabled,
+    showLogs: logsEnabled,
+  })
 }
 
 export const generateSettingsRoutes = (ref?: string): Route[] => {
