@@ -7,6 +7,8 @@
 // and logs SQL can never cross execution paths. Branding is per-type and never mixed.
 import { untrustedSql } from '@supabase/pg-meta'
 
+import type { SnippetStatus } from './snippet-status'
+import type { SnippetWithContent } from './sql-folders-query'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
 function isSqlContentType(type: string): type is 'sql' | 'log_sql' {
@@ -26,6 +28,17 @@ export function remapSqlContentField<T extends { type: string }>(item: T): T {
 
 export function remapSqlContentFields<T extends { type: string }>(items: Array<T>): Array<T> {
   return items.map(remapSqlContentField)
+}
+
+// Wire→domain boundary for a single SQL-editor snippet. The platform API types a
+// content row's `content` as an opaque `{ [key: string]: unknown }` map (and its
+// `type` as the full `'sql' | 'report' | 'log_sql'`), so turning a fetched row
+// into a branded, discriminated `SnippetWithContent` needs exactly one assertion.
+// Concentrating it here — the single place that already owns the sql↔unchecked_sql
+// rename — keeps the query/mutation call sites free of `as unknown as` casts.
+export function remapWireSnippet(row: unknown, status: SnippetStatus): SnippetWithContent {
+  const snippet = remapSqlContentField(row as SnippetWithContent)
+  return { ...snippet, status }
 }
 
 // Reverse remap: `unchecked_sql` → `sql` before sending to the API.
