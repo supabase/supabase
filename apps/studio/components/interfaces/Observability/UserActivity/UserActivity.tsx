@@ -56,8 +56,16 @@ export const UserActivity = () => {
     [selectedUserId, selectedDateRange]
   )
 
-  const { data, isLoading, isError, error, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useUnifiedLogsInfiniteQuery({ projectRef, search }, { enabled: !!selectedUserId })
+  const {
+    data,
+    isLoading,
+    isPlaceholderData,
+    isError,
+    error,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useUnifiedLogsInfiniteQuery({ projectRef, search }, { enabled: !!selectedUserId })
 
   const events = useMemo(() => {
     const rows = data?.pages?.flatMap((page) => page.data ?? []) ?? []
@@ -134,7 +142,7 @@ export const UserActivity = () => {
           title="Select a user"
           description="Choose a user from the dropdown above to view their activity."
         />
-      ) : isLoading ? (
+      ) : isLoading || isPlaceholderData ? (
         <GenericSkeletonLoader />
       ) : isError ? (
         <AlertError error={error} subject="Failed to load user activity" />
@@ -144,6 +152,8 @@ export const UserActivity = () => {
             events={events}
             projectRef={projectRef}
             onViewPayload={setPayloadEvent}
+            dateRangeStart={selectedDateRange.period_start.date}
+            dateRangeEnd={selectedDateRange.period_end.date}
           />
           {hasNextPage && (
             <Button
