@@ -8,6 +8,7 @@ import { ReactNode, useMemo } from 'react'
 import { Badge, cn } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
+import { AdminStudioButton } from './AdminStudioButton'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HomeIcon } from './HomeIcon'
@@ -216,6 +217,7 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && <MergeRequestButton />}
+                  <AdminStudioButton />
                   <ConnectButton buttonVariant={connectButtonVariant} />
                 </motion.div>
               )}

@@ -105,7 +105,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/auth/settings',
-    destination: '/project/:ref/auth/users',
+    destination: '/project/:ref/auth/providers',
     permanent: true,
   },
   {

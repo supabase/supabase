@@ -131,6 +131,7 @@ export * from './src/components/shadcn/ui/sidebar'
 
 // ICONS
 export * from './src/components/StatusIcon'
+export * from './src/components/SuccessCheck'
 
 // export icons
 export * from './src/components/Icon/icons/IconBriefcase2'

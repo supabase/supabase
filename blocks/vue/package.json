@@ -6,7 +6,7 @@
   "exports": "./index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

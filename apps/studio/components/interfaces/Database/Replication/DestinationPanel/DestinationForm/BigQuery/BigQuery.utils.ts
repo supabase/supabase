@@ -10,7 +10,7 @@ export type BigQueryValidationIssue = {
 const BIGQUERY_REQUIRED_FIELDS: { path: BigQueryFieldPath; message: string }[] = [
   { path: 'projectId', message: 'Project ID is required' },
   { path: 'datasetId', message: 'Dataset ID is required' },
-  { path: 'serviceAccountKey', message: 'Service Account Key is required' },
+  { path: 'serviceAccountKey', message: 'Service account key is required' },
 ]
 
 export const getBigQueryValidationIssues = (

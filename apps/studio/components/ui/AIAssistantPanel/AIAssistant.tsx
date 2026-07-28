@@ -71,6 +71,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     useSelectedOrganizationQuery()
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit())
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT, () => snap.newChat())
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -432,7 +433,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         />
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
               {renderedMessages}
               {error && (
                 <>
@@ -498,6 +499,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           </Conversation>
         ) : (
           <AIOnboarding
+            key={snap.activeChatId}
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
             suggestions={
               snap.suggestions as
@@ -553,9 +555,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative">
+        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
           {isSupportChat && !isSupportChatClosed && (
-            <div className="mb-3">
+            <div>
               <div className="mb-3 border-t" />
               <div className="flex items-center gap-2">
                 <Button
@@ -581,6 +583,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               </div>
             </div>
           )}
+
           {disablePrompts && (
             <Admonition
               showIcon={false}
@@ -607,7 +610,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
+              'z-20',
+              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
+              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
+              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
