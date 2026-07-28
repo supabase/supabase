@@ -81,8 +81,9 @@ export const ReplicationPipelineStatus = () => {
   } | null>(null)
   const [showRestartDialog, setShowRestartDialog] = useState(false)
   const [selectedTableForRestart, setSelectedTableForRestart] = useState<{
-    tableId: number
-    tableName: string
+    id: number
+    schema: string
+    name: string
   } | null>(null)
   const [showBatchRestartDialog, setShowBatchRestartDialog] = useState(false)
   const [batchRestartMode, setBatchRestartMode] = useState<'all' | 'errored' | null>(null)
@@ -143,11 +144,11 @@ export const ReplicationPipelineStatus = () => {
   const displayState = getPipelineDisplayState(requestStatus, statusName)
   const config = getDisabledStateConfig({ requestStatus, statusName })
 
-  // Sort tables by name for consistent ordering (memoized)
+  // Sort tables by schema and name for consistent ordering (memoized)
   const tableStatuses = useMemo(
     () =>
-      (replicationStatusData?.table_statuses || []).sort((a, b) =>
-        a.table_name.localeCompare(b.table_name)
+      (replicationStatusData?.table_statuses || []).sort(
+        (a, b) => a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
       ),
     [replicationStatusData?.table_statuses]
   )
@@ -160,7 +161,7 @@ export const ReplicationPipelineStatus = () => {
       searchString.length === 0
         ? tableStatuses
         : tableStatuses.filter((table) =>
-            table.table_name.toLowerCase().includes(searchString.toLowerCase())
+            `${table.schema}.${table.name}`.toLowerCase().includes(searchString.toLowerCase())
           ),
     [tableStatuses, searchString]
   )
@@ -171,13 +172,7 @@ export const ReplicationPipelineStatus = () => {
   )
 
   const erroredTables = useMemo(
-    () =>
-      tableStatuses.filter(
-        (table) =>
-          table.state.name === 'error' &&
-          'retry_policy' in table.state &&
-          table.state.retry_policy?.policy === 'manual_retry'
-      ),
+    () => tableStatuses.filter((table) => table.state.name === 'error'),
     [tableStatuses]
   )
 
@@ -382,9 +377,9 @@ export const ReplicationPipelineStatus = () => {
                   <div className="rounded-sm border border-default/50 bg-surface-200/40">
                     <ul className="divide-y divide-default/40">
                       {tablesWithLag.map((table) => (
-                        <li key={`${table.table_id}-${table.table_name}`} className="px-3 py-2">
+                        <li key={table.id} className="px-3 py-2">
                           <SlotLagMetricsInline
-                            tableName={table.table_name}
+                            tableName={`${table.schema}.${table.name}`}
                             metrics={table.table_sync_lag as SlotLagMetrics}
                           />
                         </li>
@@ -454,7 +449,7 @@ export const ReplicationPipelineStatus = () => {
                       tooltip={{
                         content: {
                           side: 'left',
-                          text: !hasErroredTables ? 'No tables require manual retry' : undefined,
+                          text: !hasErroredTables ? 'No failed tables' : undefined,
                         },
                       }}
                     >
@@ -485,7 +480,7 @@ export const ReplicationPipelineStatus = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredTableStatuses.map((table) => {
-                      const isRestarting = restartingTableIds.has(table.table_id)
+                      const isRestarting = restartingTableIds.has(table.id)
                       const isErrorState = table.state.name === 'error'
                       const errorReason =
                         isErrorState && 'reason' in table.state ? table.state.reason : undefined
@@ -493,7 +488,7 @@ export const ReplicationPipelineStatus = () => {
                         isErrorState && 'solution' in table.state ? table.state.solution : undefined
                       return (
                         <TableReplicationRow
-                          key={table.table_id}
+                          key={table.id}
                           table={table}
                           isRestarting={isRestarting}
                           showDisabledState={showDisabledState}
@@ -502,8 +497,9 @@ export const ReplicationPipelineStatus = () => {
                           isPipelineStopped={statusName === PipelineStatusName.STOPPED}
                           onSelectRestart={() => {
                             setSelectedTableForRestart({
-                              tableId: table.table_id,
-                              tableName: table.table_name,
+                              id: table.id,
+                              schema: table.schema,
+                              name: table.name,
                             })
                             setShowRestartDialog(true)
                           }}
@@ -511,7 +507,7 @@ export const ReplicationPipelineStatus = () => {
                             isErrorState && errorReason
                               ? () => {
                                   setSelectedTableError({
-                                    tableName: table.table_name,
+                                    tableName: `${table.schema}.${table.name}`,
                                     reason: errorReason,
                                     solution: errorSolution,
                                   })
@@ -581,18 +577,18 @@ export const ReplicationPipelineStatus = () => {
         <RestartTableDialog
           open={showRestartDialog}
           onOpenChange={setShowRestartDialog}
-          tableId={selectedTableForRestart.tableId}
-          tableName={selectedTableForRestart.tableName}
+          table={selectedTableForRestart}
+          tableSyncCopy={pipeline?.config.table_sync_copy}
           sourceId={pipeline?.source_id}
           publicationName={pipeline?.config.publication_name}
           pipelineStatusName={statusName}
           onRestartStart={() => {
-            setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.tableId))
+            setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.id))
           }}
           onRestartComplete={() => {
             setRestartingTableIds((prev) => {
               const next = new Set(prev)
-              next.delete(selectedTableForRestart.tableId)
+              next.delete(selectedTableForRestart.id)
               return next
             })
           }}
@@ -619,6 +615,7 @@ export const ReplicationPipelineStatus = () => {
           tables={tableStatuses}
           sourceId={pipeline?.source_id}
           publicationName={pipeline?.config.publication_name}
+          tableSyncCopy={pipeline?.config.table_sync_copy}
           pipelineStatusName={statusName}
           onRestartStart={(tableIds) => {
             setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))

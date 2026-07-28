@@ -1926,7 +1926,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo-social-auth',
-    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
   },
   {
     permanent: true,
@@ -1936,7 +1936,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/tutorials/with-expo-social-auth',
-    destination: '/docs/guides/getting-started/tutorials/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
   },
   {
     permanent: true,
@@ -3314,6 +3314,7 @@ module.exports = [
   { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
   { permanent: true, source: '/llms/realtime.txt', destination: '/realtime.md' },
   { permanent: true, source: '/llms/storage.txt', destination: '/storage.md' },
-  { permanent: true, source: '/llms/vector.txt', destination: '/vector.md' },
+  { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
   { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
+  { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
 ]

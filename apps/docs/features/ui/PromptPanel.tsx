@@ -130,9 +130,10 @@ function ExpandableContent({ children }: { children: ReactNode }) {
         )}
       </div>
       <button
+        tabIndex={0}
         type="button"
         onClick={() => setIsExpanded((expanded) => !expanded)}
-        className="mt-2 text-sm text-brand-link transition-colors hover:text-brand focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-foreground-muted"
+        className="mt-2 text-sm text-brand-link transition-colors hover:text-brand focus-ring"
         aria-expanded={isExpanded}
       >
         {isExpanded ? 'Show less' : 'Show more'}
@@ -184,13 +185,14 @@ function CopyButton({ label, value }: { label: string; value: string }) {
 
   return (
     <button
+      tabIndex={0}
       type="button"
       onClick={() => {
         copyToClipboard(value, () => {
           setCopied(true)
         })
       }}
-      className="rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-foreground-muted"
+      className="rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
       aria-label={copied ? `${label} copied` : `Copy ${label}`}
       title={copied ? 'Copied' : 'Copy to clipboard'}
     >
@@ -202,7 +204,11 @@ function CopyButton({ label, value }: { label: string; value: string }) {
 function TabLabel({ icon, children }: { icon?: ReactNode; children: ReactNode }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      {icon && <span className="text-tertiary-foreground [&_svg]:size-3.5">{icon}</span>}
+      {icon && (
+        <span aria-hidden="true" className="text-tertiary-foreground [&_svg]:size-3.5">
+          {icon}
+        </span>
+      )}
       {children}
     </span>
   )
@@ -228,6 +234,7 @@ const tabTriggerClassName = 'h-full px-0 py-0 text-xs shadow-none data-[state=ac
  */
 function PromptPanel({ children, className }: PromptPanelProps) {
   const fallbackId = useId()
+  const titleId = useId()
   const prompts = collectPrompts(children)
   const [activeTab, setActiveTab] = useState(prompts[0]?.value ?? fallbackId)
   const [shimmerEnabled, setShimmerEnabled] = useState(true)
@@ -250,6 +257,7 @@ function PromptPanel({ children, className }: PromptPanelProps) {
         </TabsList>
       ) : (
         <span
+          id={titleId}
           className={cn(
             'inline-flex items-center justify-center whitespace-nowrap border-b-2 border-transparent text-foreground-lighter',
             tabTriggerClassName
@@ -269,6 +277,8 @@ function PromptPanel({ children, className }: PromptPanelProps) {
   if (!hasTabs) {
     return (
       <div
+        role="region"
+        aria-labelledby={titleId}
         onFocusCapture={dismissShimmer}
         onPointerEnter={dismissShimmer}
         className={cn(

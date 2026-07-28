@@ -3,6 +3,7 @@ import { FormControl, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
+import Panel from '@/components/ui/Panel'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 interface HighAvailabilityInputProps {
@@ -15,20 +16,22 @@ export const HighAvailabilityInput = ({ form }: HighAvailabilityInputProps) => {
   if (!hasAccess) return null
 
   return (
-    <FormField
-      control={form.control}
-      name="highAvailability"
-      render={({ field }) => (
-        <FormItemLayout
-          label="High Availability"
-          description="Horizontally scalable Postgres for highly available, globally distributed deployments while staying true to standard Postgres."
-          layout="horizontal"
-        >
-          <FormControl>
-            <Switch checked={field.value} onCheckedChange={field.onChange} />
-          </FormControl>
-        </FormItemLayout>
-      )}
-    />
+    <Panel.Content>
+      <FormField
+        control={form.control}
+        name="highAvailability"
+        render={({ field }) => (
+          <FormItemLayout
+            label="High availability"
+            description="Horizontally scalable Postgres for highly available, globally distributed deployments while staying true to standard Postgres."
+            layout="horizontal"
+          >
+            <FormControl>
+              <Switch checked={field.value} onCheckedChange={field.onChange} />
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
+    </Panel.Content>
   )
 }
