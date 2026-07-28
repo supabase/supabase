@@ -327,8 +327,8 @@ export const LogsDatePicker = ({
     Math.abs(dayjs(startDate).diff(dayjs(endDate), 'days')) >
     LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD - 1
 
-  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
-  const entitledToAuditLogDays = getEntitlementNumericValue()
+  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementMax()
 
   const showHelperBadge = (helper?: DatetimeHelper) => {
     if (!helper) return false

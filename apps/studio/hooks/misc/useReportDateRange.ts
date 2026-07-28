@@ -62,8 +62,8 @@ export const useReportDateRange = (
     | ReportsDatetimeHelper = REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES
 ) => {
   const { plan: orgPlan, isLoading: isOrgPlanLoading } = useCurrentOrgPlan()
-  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
-  const entitledToAuditLogDays = getEntitlementNumericValue()
+  const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
+  const entitledToAuditLogDays = getEntitlementMax()
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
 
   // Get filtered date picker helpers based on organization plan
