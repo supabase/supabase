@@ -94,11 +94,11 @@ When upgrading, the Supabase platform will "right-size" your disk based on the c
 
 ### Time limits
 
-Starting from 2024-06-24, when a project is paused, users then have a 90-day window to restore the project on the platform from within Supabase Studio.
+When a project is paused, users have a 1-year window to restore the project on the platform from within Supabase Studio.
 
-The 90-day window allows Supabase to introduce platform changes that may not be backwards compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
+The restore window exists because backups are only retained for a limited period, and platform changes may not be backwards compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
 
-During the 90-day restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](/dashboard/projects).
+During the restore window a paused project can be restored to the platform with a single button click from [Studio's dashboard page](/dashboard/projects).
 
 <Image
   alt="Project Paused: 90 Days Remaining"
@@ -107,7 +107,7 @@ During the 90-day restore window a paused project can be restored to the platfor
   src="/docs/img/guides/platform/paused-90-day.png"
 />
 
-After the 90-day restore window, you can download your project's backup file, and Storage objects from the project dashboard. You can restore the data in the following ways:
+After the restore window, you can download your project's backup file, and Storage objects from the project dashboard. You can restore the data in the following ways:
 
 - [Restore a backup to a new Supabase project](/docs/guides/platform/migrating-within-supabase/dashboard-restore)
 - [Restore a backup locally](/docs/guides/local-development/restoring-downloaded-backup)
@@ -119,7 +119,7 @@ After the 90-day restore window, you can download your project's backup file, an
   height={306}
 />
 
-If you upgrade to a paid plan while your project is paused within the 90-day restore window, any expired one-click restore options are reenabled. Since the backup was taken outside the backwards compatibility window, it may fail to restore. If you have a problem restoring your backup after upgrading, contact [Support](/support).
+If you upgrade to a paid plan while your project is paused, any expired one-click restore options are reenabled. Since the backup was taken outside the backwards compatibility window, it may fail to restore. If you have a problem restoring your backup after upgrading, contact [Support](/support).
 
 <Image
   alt="Project Paused: Paid Tier Restore"

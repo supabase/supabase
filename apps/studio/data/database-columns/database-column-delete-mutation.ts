@@ -8,6 +8,7 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import { tableRowKeys } from '@/data/table-rows/keys'
+import { tableKeys } from '@/data/tables/keys'
 import { viewKeys } from '@/data/views/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -67,6 +68,11 @@ export const useDatabaseColumnDeleteMutation = ({
         // which has a view dependent on it
         queryClient.invalidateQueries({
           queryKey: viewKeys.listBySchema(projectRef, [column.schema]),
+        }),
+        // useTableQuery (FK selectors/formatters) has a 5min staleTime -- without this,
+        // it can keep serving the deleted column to any FK target cell pointing at this table.
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.retrieve(projectRef, column.table, column.schema),
         }),
       ])
 
