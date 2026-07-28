@@ -12,7 +12,6 @@ import { resolveSectionDisplay } from './MobileMenuContent.utils'
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
 import { TopLevelRouteItem } from './TopLevelRouteItem'
 import { routeHasSubmenu, useMobileMenuNavigation } from './useMobileMenuNavigation'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import {
   generateProductRoutes,

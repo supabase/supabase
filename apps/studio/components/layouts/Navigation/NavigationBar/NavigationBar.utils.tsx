@@ -159,7 +159,6 @@ export const generateOtherRoutes = (
 ): Route[] => {
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
-  const isPlatform = features?.isPlatform ?? IS_PLATFORM
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
@@ -174,14 +173,20 @@ export const generateOtherRoutes = (
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     // Observability is only available on the platform, not for self-hosted/CLI
-    ...(isPlatform && reportsEnabled
+    ...(reportsEnabled
       ? [
           {
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
             icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/observability`),
+            link:
+              ref &&
+              (isProjectBuilding
+                ? buildingUrl
+                : IS_PLATFORM
+                  ? `/project/${ref}/observability`
+                  : `/project/${ref}/query-performance`),
             shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY,
           },
         ]
@@ -220,7 +225,6 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const logsEnabled = useIsFeatureEnabled('logs:all')
 
   return generateOtherRoutes(ref, project, {
-    isPlatform: IS_PLATFORM,
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,
