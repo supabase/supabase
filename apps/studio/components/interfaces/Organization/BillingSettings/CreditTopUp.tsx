@@ -301,8 +301,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           <DialogDescription className="space-y-2">
             <p className="prose text-sm">
               On successful payment, an invoice will be issued and you'll be granted credits equal
-              to the pre-tax amount. Credits will be applied to future invoices only and are not
-              refundable. The topped up credits do not expire.
+              to the pre-tax amount. Credits will be applied to future invoices only. They cannot be
+              used to pay or adjust outstanding invoices. Credits are non-refundable and do not
+              expire.
             </p>
             <p className="prose text-sm">
               For larger discounted credit packages, please reach out to us via{' '}

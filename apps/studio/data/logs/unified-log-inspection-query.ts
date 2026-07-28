@@ -20,6 +20,7 @@ import {
   getPostgrestServiceFlowQuery,
   getStorageServiceFlowQuery,
 } from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
+import { LOG_TYPE_TO_SOURCE } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -34,12 +35,50 @@ export const SERVICE_FLOW_TYPES = [
 
 export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
 
+// The logs table's primary key is (project, source, timestamp) — filtering on
+// source narrows the sorted range ClickHouse has to scan before the timestamp
+// bound even applies, so it matters for performance, not just correctness.
+// Values are drawn from LOG_TYPE_TO_SOURCE (shared with LOG_TYPE_CONDITION in
+// UnifiedLogs.queries.ts) so there's one source of truth for the type -> source
+// mapping; only the key spelling differs ('edge-function' vs 'edge function').
+const SERVICE_FLOW_TYPE_SOURCE: Record<ServiceFlowType, SafeLogSqlFragment> = {
+  postgrest: lit(LOG_TYPE_TO_SOURCE.postgrest),
+  auth: lit(LOG_TYPE_TO_SOURCE.auth),
+  'edge-function': lit(LOG_TYPE_TO_SOURCE['edge function']),
+  storage: lit(LOG_TYPE_TO_SOURCE.storage),
+  postgres: lit(LOG_TYPE_TO_SOURCE.postgres),
+}
+
 export type UnifiedLogInspectionVariables = {
   projectRef?: string
   logId?: string
   type?: ServiceFlowType
   search: QuerySearchParamsType
   useOtel?: boolean
+  /**
+   * The selected row's own timestamp (ms since epoch), when known. A single log
+   * is always looked up by `id`, so we can bound the query tightly around this
+   * timestamp instead of the (potentially much wider) selected search range.
+   */
+  logTimestampMs?: number | null
+}
+
+// The row's timestamp is the exact stored value (parsed from the same
+// `timestamp` column), not an approximate clock reading, so this only needs to
+// absorb millisecond-vs-microsecond rounding — not real clock skew.
+const INSPECTION_WINDOW_MS = 60 * 1000
+
+function getInspectionISOStartEnd(
+  search: QuerySearchParamsType,
+  logTimestampMs: number | null | undefined
+) {
+  if (typeof logTimestampMs === 'number' && Number.isFinite(logTimestampMs)) {
+    return {
+      isoTimestampStart: new Date(logTimestampMs - INSPECTION_WINDOW_MS).toISOString(),
+      isoTimestampEnd: new Date(logTimestampMs + INSPECTION_WINDOW_MS).toISOString(),
+    }
+  }
+  return getUnifiedLogsISOStartEnd(search)
 }
 
 export type UnifiedLogInspectionResponse = {
@@ -124,7 +163,14 @@ export interface UnifiedLogInspectionEntry {
 }
 
 export async function getUnifiedLogInspection(
-  { projectRef, logId, type, search, useOtel = false }: UnifiedLogInspectionVariables,
+  {
+    projectRef,
+    logId,
+    type,
+    search,
+    useOtel = false,
+    logTimestampMs,
+  }: UnifiedLogInspectionVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -137,7 +183,7 @@ export async function getUnifiedLogInspection(
     throw new Error('type is required')
   }
 
-  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const { isoTimestampStart, isoTimestampEnd } = getInspectionISOStartEnd(search, logTimestampMs)
 
   if (!useOtel) {
     let sql: SafeLogSqlFragment
@@ -186,10 +232,10 @@ export async function getUnifiedLogInspection(
   if (!/^[0-9a-fA-F-]{1,64}$/.test(logId)) {
     throw new Error('Invalid logId')
   }
-  const sql = safeSql`
+  const sql = safeSql`-- unified logs: inspect single log by id
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
-WHERE id = ${lit(logId)}
+WHERE id = ${lit(logId)} AND source = ${SERVICE_FLOW_TYPE_SOURCE[type]}
 LIMIT 1
 `
 
@@ -216,7 +262,7 @@ LIMIT 1
   if (row.source === 'function_edge_logs') {
     const executionId = row.log_attributes?.['execution_id'] ?? row.log_attributes?.['request_id']
     if (typeof executionId === 'string' && /^[0-9a-fA-F-]{1,64}$/.test(executionId)) {
-      const fnSql = safeSql`
+      const fnSql = safeSql`-- unified logs: edge function console logs for execution
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
 WHERE source = 'function_logs' AND log_attributes['execution_id'] = ${lit(executionId)}
@@ -249,7 +295,7 @@ export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogIn
 export type UnifiedLogInspectionError = ResponseError
 
 export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
-  { projectRef, logId, type, search }: UnifiedLogInspectionVariables,
+  { projectRef, logId, type, search, logTimestampMs }: UnifiedLogInspectionVariables,
   {
     enabled = true,
     ...options
@@ -259,7 +305,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
   return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
     queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
     queryFn: ({ signal }) =>
-      getUnifiedLogInspection({ projectRef, logId, type, search, useOtel }, signal),
+      getUnifiedLogInspection({ projectRef, logId, type, search, useOtel, logTimestampMs }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,

@@ -6,13 +6,21 @@ import { useScopedAccessTokensQuery } from '@/data/scoped-access-tokens/scoped-a
 
 export type TokenKind = 'classic' | 'scoped'
 
-export interface MergedAccessToken extends BaseToken {
-  kind: TokenKind
+export type MergedAccessToken = ClassicAccessToken | ScopedAccessToken
+
+export interface ClassicAccessToken extends BaseToken {
+  id: number
+  kind: 'classic'
+}
+
+export interface ScopedAccessToken extends BaseToken {
+  id: string
+  kind: 'scoped'
 }
 
 interface UseMergedAccessTokensOptions {
   /** Whether scoped tokens should be fetched + merged (gated on the scopedPAT flag). */
-  scopedEnabled?: boolean
+  scopedTokensEnabled?: boolean
 }
 
 /**
@@ -22,7 +30,7 @@ interface UseMergedAccessTokensOptions {
  * the consuming list (via filterAndSortTokens), so this only merges + tags.
  */
 export const useMergedAccessTokens = ({
-  scopedEnabled = true,
+  scopedTokensEnabled: scopedEnabled,
 }: UseMergedAccessTokensOptions = {}) => {
   const classic = useAccessTokensQuery()
   const scoped = useScopedAccessTokensQuery({ enabled: scopedEnabled })

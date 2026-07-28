@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -37,6 +37,8 @@ export const SQLEditorMenu = () => {
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+
+  const topForPostgres = useFlag('topForPostgres')
 
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
@@ -165,11 +167,13 @@ export const SQLEditorMenu = () => {
         {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
       </div>
 
-      <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
-          View running queries
-        </Button>
-      </div>
+      {!topForPostgres && (
+        <div className="p-4 border-t sticky bottom-0 bg-studio">
+          <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
+            View running queries
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

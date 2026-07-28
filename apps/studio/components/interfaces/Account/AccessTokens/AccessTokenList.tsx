@@ -30,12 +30,14 @@ import { useTrack } from '@/lib/telemetry/track'
 
 export interface AccessTokenListProps {
   searchString?: string
-  scopedEnabled?: boolean
+  scopedTokensEnabled?: boolean
+  onDeleteSuccess: (id: number | string) => void
 }
 
 export const AccessTokenList = ({
   searchString = '',
-  scopedEnabled = true,
+  scopedTokensEnabled = true,
+  onDeleteSuccess,
 }: AccessTokenListProps) => {
   const track = useTrack()
   const [tokenToShow, setTokenToShow] = useState<MergedAccessToken | undefined>(undefined)
@@ -45,29 +47,33 @@ export const AccessTokenList = ({
     parseAsStringLiteral<AccessTokenSort>(ACCESS_TOKEN_SORT_VALUES).withDefault('created_at:desc')
   )
 
-  const { tokens, error, isLoading, isError } = useMergedAccessTokens({ scopedEnabled })
+  const { tokens, error, isLoading, isError } = useMergedAccessTokens({ scopedTokensEnabled })
 
-  const { mutate: deleteClassicToken } = useAccessTokenDeleteMutation({
-    onSuccess: () => {
-      track('access_token_removed', { tokenType: 'classic' })
-      toast.success('Successfully deleted access token')
-      setTokenToDelete(undefined)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete access token: ${error.message}`)
-    },
-  })
+  const { mutate: deleteClassicToken, isPending: isPendingClassicToken } =
+    useAccessTokenDeleteMutation({
+      onSuccess: (_, vars) => {
+        track('access_token_removed', { tokenType: 'classic' })
+        onDeleteSuccess(vars.id)
+        toast.success('Successfully deleted access token')
+        setTokenToDelete(undefined)
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete access token: ${error.message}`)
+      },
+    })
 
-  const { mutate: deleteScopedToken } = useScopedAccessTokenDeleteMutation({
-    onSuccess: () => {
-      track('access_token_removed', { tokenType: 'classic' })
-      toast.success('Successfully deleted access token')
-      setTokenToDelete(undefined)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete access token: ${error.message}`)
-    },
-  })
+  const { mutate: deleteScopedToken, isPending: isPendingScopedToken } =
+    useScopedAccessTokenDeleteMutation({
+      onSuccess: (_, vars) => {
+        track('access_token_removed', { tokenType: 'scoped' })
+        onDeleteSuccess(vars.id)
+        toast.success('Successfully deleted access token')
+        setTokenToDelete(undefined)
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete access token: ${error.message}`)
+      },
+    })
 
   const onSortChange = (column: AccessTokenSortColumn) => {
     handleSortChange(sort, column, setSort)
@@ -135,6 +141,7 @@ export const AccessTokenList = ({
               name={x.name}
               tokenAlias={x.token_alias}
               isClassic={x.kind === 'classic'}
+              scopedTokensEnabled={scopedTokensEnabled}
             />
             <LastUsedCell lastUsedAt={x.last_used_at} />
             <ExpiresCell expiresAt={x.expires_at} />
@@ -176,6 +183,7 @@ export const AccessTokenList = ({
         confirmLabelLoading="Deleting"
         onCancel={() => setTokenToDelete(undefined)}
         onConfirm={handleConfirmDelete}
+        loading={isPendingClassicToken || isPendingScopedToken}
       >
         <p className="py-4 text-sm text-foreground-light">
           This action cannot be undone. Are you sure you want to delete "{tokenToDelete?.name}"

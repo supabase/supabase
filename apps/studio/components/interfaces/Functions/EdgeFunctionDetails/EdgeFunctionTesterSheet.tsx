@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Loader2, Plus, Send, X } from 'lucide-react'
+import { BookOpen, Loader2, Plus, Send, X } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import {
@@ -37,6 +37,7 @@ import * as z from 'zod'
 
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
+import { getEdgeFunctionErrorDocs } from './EdgeFunctionDetails.utils'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
@@ -100,6 +101,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
 
   const [response, setResponse] = useState<ResponseData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const errorDocs = response ? getEdgeFunctionErrorDocs(response.headers) : undefined
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
@@ -423,12 +425,28 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
                                 Headers
                               </TabsTrigger>
                             </div>
-                            <Badge
-                              variant={response.status >= 400 ? 'destructive' : 'success'}
-                              className="-translate-y-1"
-                            >
-                              {response.status}
-                            </Badge>
+                            <div className="-translate-y-1 flex items-center gap-2">
+                              {errorDocs !== undefined && (
+                                <Button
+                                  asChild
+                                  variant="text"
+                                  size="tiny"
+                                  icon={<BookOpen size={14} />}
+                                >
+                                  <a
+                                    href={errorDocs.href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label={`View documentation for ${errorDocs.code} (opens in new tab)`}
+                                  >
+                                    Error docs
+                                  </a>
+                                </Button>
+                              )}
+                              <Badge variant={response.status >= 400 ? 'destructive' : 'success'}>
+                                {response.status}
+                              </Badge>
+                            </div>
                           </TabsList>
                           <TabsContent value="body" className="mt-0 flex-1 overflow-auto p-0">
                             <CodeBlock

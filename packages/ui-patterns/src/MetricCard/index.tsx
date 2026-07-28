@@ -142,7 +142,7 @@ const MetricCardIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
 MetricCardIcon.displayName = 'MetricCardIcon'
 
 interface MetricCardLabelProps extends React.HTMLAttributes<HTMLDivElement> {
-  tooltip?: string
+  tooltip?: React.ReactNode
   children: React.ReactNode
 }
 
@@ -157,7 +157,7 @@ const MetricCardLabel = React.forwardRef<HTMLDivElement, MetricCardLabelProps>(
         <span>{children}</span>
         {tooltip && (
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger aria-label="More information">
               <HelpCircle size={14} strokeWidth={1.5} />
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">{tooltip}</TooltipContent>

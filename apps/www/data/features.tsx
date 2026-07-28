@@ -643,30 +643,33 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
   },
   {
     title: 'Supabase Pipelines',
-    subtitle: 'Real-time data replication to analytical destinations.',
-    description: `Supabase Pipelines creates managed change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time. Reading directly from the Postgres Write Ahead Log, each pipeline keeps your analytics data synchronized with your production database.
+    subtitle: 'Replicate Postgres data to analytical destinations.',
+    description: `Supabase Pipelines is a managed change data capture (CDC) product that uses Postgres logical replication to deliver published data to analytical destinations in near real time.
 
 ## Key benefits
-1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
-2. BigQuery integration: Direct replication to Google's data warehouse.
-3. Managed destinations: Start with BigQuery while more destinations are evaluated.
-4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Optimized for analytics: Faster queries and lower storage costs through compression.
-6. Production isolation: Complete separation of analytics and production workloads.
+1. Initial sync: Copy existing rows from published tables.
+2. Ongoing replication: Apply subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
+3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
+4. Workload isolation: Keep analytical queries away from the primary database.
 
-## How it works
-Pipelines uses Postgres logical replication to capture changes. For BigQuery, a view is created for each table backed by versioned tables.
+## Destinations
+BigQuery is currently available. [Request early access](/go/supabase-pipelines-new-destinations) to ClickHouse, Snowflake, and DuckLake while destination support expands.
+
+## Setup
+Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+
+## Requirements
+Requirements depend on the destination. BigQuery requires source tables to have primary keys and requires the publication to include those columns.
 
 ## Pipelines is valuable for:
-- Data warehousing and business intelligence
-- Historical analysis and audit trails
-- Large-scale analytics requiring separation from production
-- Compliance scenarios requiring complete data history
+- Near real-time analytics data movement
+- Analytics separation from production
+- Managed replication to supported destination systems
 
 ## Limitations
-Tables require primary keys. DDL support (schema changes) is currently in development.
+Schema change support is currently in beta and limited to supported BigQuery changes. Destination-specific constraints apply.
 
-Pipelines provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+Pipelines keeps the current destination table state synchronized. It does not automatically create a queryable history of every row version.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
@@ -2830,48 +2833,6 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
-    },
-  },
-  {
-    title: 'Replication',
-    subtitle: 'Replicate database changes to external destinations.',
-    description: `Supabase Pipelines uses Postgres logical replication to replicate database changes to external destinations like BigQuery. Changes are captured from the Write Ahead Log and delivered in near real time to analytical systems.
-
-## Key benefits
-1. Near real-time sync: Changes replicated as they occur using WAL reading.
-2. BigQuery integration: Direct replication to Google's data warehouse.
-3. Managed pipeline: Monitor status, lag, and errors in dashboard.
-4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Production isolation: Keep analytical workloads away from your primary database.
-
-## Destinations
-BigQuery creates views backed by versioned tables for efficient querying. Additional managed destinations are being evaluated as Pipelines develops.
-
-## Setup
-Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
-
-## Requirements
-Tables must have primary keys. Logical replication must be enabled.
-
-## Replication is valuable for:
-- Real-time data warehousing
-- Analytics separation from production
-- Historical data archival
-- Multi-destination data sync
-- Compliance and audit trails
-
-## Limitations
-No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
-
-Pipelines provides the real-time data pipeline required for modern analytics architectures.`,
-    icon: DatabaseZap,
-    products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
-    slug: 'replication',
-    status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
-      availableOnSelfHosted: false,
     },
   },
   {

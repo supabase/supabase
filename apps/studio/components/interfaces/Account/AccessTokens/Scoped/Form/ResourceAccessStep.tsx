@@ -202,7 +202,11 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
                   >
                     <MultiSelectorTrigger
                       mode="combobox"
-                      label={organizationSlugs ? 'Select projects' : 'Select an organization first'}
+                      label={
+                        organizationSlugs.length > 0
+                          ? 'Select projects'
+                          : 'Select an organization first'
+                      }
                       badgeLimit="wrap"
                       showIcon={false}
                       deletableBadge
@@ -236,6 +240,7 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
             type="button"
             className="text-foreground-light underline hover:text-foreground transition-colors"
             onClick={enableAccountLevel}
+            tabIndex={0}
           >
             Advanced options
           </button>
@@ -266,6 +271,7 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
                 type="button"
                 className="text-xs text-foreground-light underline hover:text-foreground transition-colors"
                 onClick={switchBackToSingleProject}
+                tabIndex={0}
               >
                 Switch back
               </button>
