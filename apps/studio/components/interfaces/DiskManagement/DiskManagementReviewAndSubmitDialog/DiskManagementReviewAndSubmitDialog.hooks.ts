@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { useFormState, useWatch, type UseFormReturn } from 'react-hook-form'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
@@ -44,7 +44,8 @@ export function useDiskManagementReviewChanges(
   form: UseFormReturn<DiskStorageSchemaType>,
   numReplicas: number
 ) {
-  form.watch(['computeSize', 'totalSize', 'storageType', 'provisionedIOPS', 'throughput'])
+  useWatch({ control: form.control })
+  const { isDirty, errors } = useFormState({ control: form.control })
 
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -104,8 +105,6 @@ export function useDiskManagementReviewChanges(
 
   const advancedBeforePrice = Number(iopsPrice.oldPrice) + Number(throughputPrice.oldPrice)
   const advancedAfterPrice = Number(iopsPrice.newPrice) + Number(throughputPrice.newPrice)
-
-  const { isDirty, errors } = form.formState
 
   const showComputeBillingBadge = shouldShowComputeBillingBadge({
     isDirty,
