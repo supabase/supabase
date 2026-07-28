@@ -425,6 +425,11 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
         {
+          name: 'Spring Boot',
+          url: '/guides/getting-started/quickstarts/spring-boot' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
           name: 'SolidJS',
           url: '/guides/getting-started/quickstarts/solidjs',
         },

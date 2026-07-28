@@ -269,6 +269,7 @@ allow_list = [
     "Inbucket",
     "Inferencer",
     "Infisical",
+    "Initializr",
     "IntelliJ",
     "IntelliSense",
     "[Ii]nviter's",
