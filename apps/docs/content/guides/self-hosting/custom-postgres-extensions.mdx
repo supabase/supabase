@@ -6,35 +6,31 @@ subtitle: 'Build a custom Docker image with additional Postgres extensions.'
 
 ## Overview
 
-The `supabase/postgres` image includes a curated set of extensions that are compiled in at build time. There is **no runtime mechanism to install a compiled (native `.so`) extension** into a running container: you cannot `apk add` or `apt-get install` an extension package, because the image is built with [Nix](https://nixos.org) and its extension set is fixed when the image is produced.
+The `supabase/postgres` image includes a curated set of extensions that are compiled in at build time. There is no runtime mechanism to install a compiled native `.so` extension into a running container: you cannot `apk add` or `apt-get install` an extension package, because the image is built with [Nix](https://nixos.org) and its extension set is fixed when the image is produced.
 
 To add a native extension that Supabase Postgres doesn't provide, you have to build your own image. This guide walks through that end to end for the current Alpine-based images, using [`pg_uuidv7`](https://github.com/fboulnois/pg_uuidv7) as the running example.
 
 <Admonition type="note">
 
-If your extension is written in **pure SQL or a trusted procedural language** (no native code), you don't need a custom image at all. Use [`pg_tle`](https://github.com/aws/pg_tle), which is already bundled and preloaded - run `CREATE EXTENSION pg_tle;` and install your extension through it. This guide is for extensions that ship a compiled `.so`.
+If your extension is written in pure SQL or a trusted procedural language, you don't need a custom image at all. Use [`pg_tle`](https://github.com/aws/pg_tle), which is already bundled and preloaded - run `CREATE EXTENSION pg_tle;` and install your extension through it.
 
 </Admonition>
 
-The _proper_ way to add an extension is to compile it into the image's [Nix build](#alternative-build-the-extension-into-the-nix-image). That's the most robust route, but it requires Nix, building the image from source, and maintaining a fork. The rest of this guide describes a simpler alternative: build your extension in an ordinary Docker builder and layer it onto the published image. The approach can work for many standard [PGXS](https://www.postgresql.org/docs/current/extend-pgxs.html) extensions - but your mileage may vary, and the constraints in the next section are the trade-off.
+The proper way to add an extension is to compile it into the image's [Nix build](#build-the-extension-into-the-nix-image). That's the most robust route, but it requires Nix, building the image from source, and maintaining a fork. The rest of this guide describes a simpler alternative: build your extension in an ordinary Docker builder and layer it onto the published image. The approach can work for many standard [PGXS](https://www.postgresql.org/docs/current/extend-pgxs.html) extensions - but your mileage may vary, and the constraints in the next section are the trade-off.
 
 <Admonition type="caution">
 
-Supabase builds, tests, and maintains the official `supabase/postgres` images and their bundled extensions. A custom image built by following this guide is **unofficial and unsupported** - it's not guaranteed to work, and may break with future changes to the base image. Testing, quality assurance, and ongoing maintenance (rebuilding and re-verifying after every upgrade) are your responsibility.
+Supabase builds, tests, and maintains the official `supabase/postgres` images and their bundled extensions. A custom image built by following this guide is unofficial and unsupported - it's not guaranteed to work, and may break with future changes to the base image. Testing, quality assurance, and ongoing maintenance are your responsibility.
 
 </Admonition>
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Why Postgres images need special handling
 
 The base image is Alpine Linux, but the Postgres binaries and every bundled extension live in a `/nix` store:
 
-1. **The runtime is `glibc`, not `musl`.** The Nix-built `postgres` and its extensions are linked against `glibc`. If you compile an extension with Alpine's native toolchain (`apk add build-base`), it links `musl` and **fails to load** at `CREATE EXTENSION` with an error like `libc.musl-aarch64.so.1: cannot open shared object file`. You must build in a `glibc` environment.
-2. **Match the major version, and keep the builder's `glibc` no newer than the image's.** Extensions are ABI-stable across an entire Postgres major version. However, an extension built against a **newer** `glibc` than the runtime provides will fail to load (`version 'GLIBC_2.xx' not found`). The Supabase image currently ships `glibc 2.40`, so this guide builds on Debian 12 (`postgres:17-bookworm`, `glibc 2.36`), which stays safely below it. Avoid the default `postgres:17` tag (it's currently Debian 13 and `glibc 2.41`).
-3. **The module directory is redirected.** The running `postgres` is a wrapper script that overrides its library directory via a `NIX_PGLIBDIR` environment variable. Your compiled `.so` must be installed into that directory - _not_ the path `pg_config --pkglibdir` reports. This is why you can't follow an extension's upstream install instructions (which typically use `make install` or copy to `pg_config --pkglibdir`): on these images `$libdir` resolves to `NIX_PGLIBDIR`, so a `.so` placed in `pkglibdir` loads with `could not access file "$libdir/<name>"`.
-
-The cleanest way to satisfy 1 and 2 is to compile inside a `postgres:<major>-bookworm` image and then copy the artifacts into the Supabase runtime image.
+1. The runtime is `glibc`, not `musl`. The Nix-built `postgres` and its extensions are linked against `glibc`. If you compile an extension with Alpine's native toolchain (`apk add build-base`), it links `musl` and fails to load at `CREATE EXTENSION` with an error like `libc.musl-aarch64.so.1: cannot open shared object file`. You must build in a `glibc` environment.
+2. Match the major version, and keep the builder's `glibc` no later than the image's. Extensions are ABI-stable across an entire Postgres major version. However, an extension built against a newer `glibc` than the runtime provides will fail to load (`version 'GLIBC_2.xx' not found`). The Supabase image currently ships `glibc 2.40`, so this guide builds on Debian 12 (`postgres:17-bookworm`, `glibc 2.36`), which stays safely below it. Avoid the default `postgres:17` - it's currently Debian 13 and `glibc 2.41`.
+3. The module directory is redirected. The running `postgres` is a wrapper script that overrides its library directory via a `NIX_PGLIBDIR` environment variable. Your compiled `.so` must be installed into that directory - not the path `pg_config --pkglibdir` reports. This is why you can't follow an extension's upstream install instructions which typically use `make install` or copy to `pg_config --pkglibdir`.
 
 <Admonition type="note" title="How the image is versioned">
 
@@ -50,20 +46,18 @@ docker run --rm --entrypoint sh supabase/postgres:17.6.1.136 -c \
 ## Prerequisites
 
 - Docker installed and running
-- The exact `supabase/postgres` tag your deployment uses (see `db.image` in your `docker-compose.yml`, e.g. `supabase/postgres:17.6.1.136`)
+- The exact `supabase/postgres` tag your deployment uses. For example, `supabase/postgres:17.6.1.136`
 - Extension source that builds with standard [PGXS](https://www.postgresql.org/docs/current/extend-pgxs.html)
 
 <Admonition type="caution">
 
-Always build against the **same major version** you run, and rebuild your custom image whenever you upgrade the base image.
+Always build against the same major version you run, and rebuild your custom image whenever you upgrade the base image.
 
 </Admonition>
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ## Step 1: Write the Dockerfile
 
-Use a multi-stage build: a `glibc` builder stage (`postgres:<major>-bookworm`) to compile, and the **Supabase image** as the runtime stage that installs the artifacts into the correct Nix locations.
+Use a multi-stage build: a `glibc` builder stage (`postgres:<major>-bookworm`) to compile, and the Supabase image as the runtime stage that installs the artifacts into the correct Nix locations.
 
 The example below builds [`pg_uuidv7`](https://github.com/fboulnois/pg_uuidv7) cloned from its Git repository.
 
@@ -100,33 +94,32 @@ RUN set -eux; \
     rm -rf /tmp/pg_uuidv7.* /tmp/ext-sql
 ```
 
-The same Dockerfile structure works for your own extensions - `COPY` your PGXS source into the builder instead of `git clone`. However, when authoring a _new_ extension from scratch, it's best to use the Nix build instead (see [Alternative: build the extension into the Nix image](#alternative-build-the-extension-into-the-nix-image) below).
+The same Dockerfile structure works for your own extensions - `COPY` your PGXS source into the builder instead of `git clone`. However, when authoring a new extension from scratch, it's best to use the Nix build instead (see [Build the extension into the Nix image](#build-the-extension-into-the-nix-image) below).
 
 ### Handle dependencies beyond the standard library
 
-Copying a `.so` onto the image works cleanly only when its **sole** runtime dependency is the C library (`libc.so.6`) - that's the image's `glibc`, already loaded in the `postgres` process, so it resolves automatically. Any _other_ shared library the extension links (`libcurl`, `OpenSSL`, etc.) must also be present and loadable at runtime.
+Copying a `.so` onto the image works cleanly only when its sole runtime dependency is the C library (`libc.so.6`) - that's the image's `glibc`, already loaded in the `postgres` process, so it resolves automatically. Any other shared library the extension links (`libcurl`, `OpenSSL`, etc.) must also be present and loadable at runtime.
 
 The build happens inside Docker - check the compiled `.so` in the builder stage rather than on your host:
 
 ```sh
-# build only the builder stage, then inspect the .so it produced
 docker build --target builder -t ext-builder .
 docker run --rm --entrypoint sh ext-builder -c 'readelf -d /src/*.so | grep NEEDED'
 ```
 
-- **Only `libc.so.6` and `ld-linux-*`** - the Dockerfile above is sufficient (`pg_uuidv7` is this case).
-- **Anything else listed** - handle those dependencies with one of the options below.
+- Only `libc.so.6` and `ld-linux-*` - the Dockerfile above is sufficient (`pg_uuidv7` is this case).
+- Anything else listed - handle those dependencies with one of the options below.
 
-**Recommended: statically link the extra dependencies** into the `.so`, so its only remaining `NEEDED` is `libc.so.6`. After building, re-run the check above and confirm only `libc.so.6` and `ld-linux-*` remain.
+Recommended: statically link the extra dependencies into the `.so`, so its only remaining `NEEDED` is `libc.so.6`. After building, re-run the check above and confirm only `libc.so.6` and `ld-linux-*` remain.
 
 A few things make this more involved than it sounds:
 
-- **The distribution's own static archive is often not enough.** A feature-rich `libcurl.a`, for example, includes many dependencies whose static archives aren't all installable - so you typically build a _minimal_ static version of the dependency from source and link that.
-- **PGXS may ignore the extension's `CFLAGS`.** Pass extra include paths via `PG_CPPFLAGS` on the `make` command line rather than editing the Makefile.
-- **Static linking has limits.** It won't help a dependency that `dlopen`s plugins at runtime, and linking a library that's _also_ loaded by another extension (two copies of OpenSSL in one process, say) can clash.
-- **Some extensions hard-code their own name**, so you can't rename one to sidestep a collision with a bundled extension.
+- The distribution's own static archive is often not enough. A feature-rich `libcurl.a`, for example, includes many dependencies whose static archives aren't all installable - so you typically build a minimal static version of the dependency from source and link that.
+- PGXS may ignore the extension's `CFLAGS`. Pass extra include paths via `PG_CPPFLAGS` on the `make` command line rather than editing the Makefile.
+- Static linking has limits. It won't help a dependency that `dlopen`s plugins at runtime, and linking a library that's also loaded by another extension (two copies of OpenSSL in one process, say) can clash.
+- Some extensions hard-code their own name, so you can't rename one to sidestep a collision with a bundled extension.
 
-When static linking isn't practical, use the [Nix path](#alternative-build-the-extension-into-the-nix-image), which resolves every dependency against the image's own libraries automatically.
+When static linking isn't practical, use the [Nix path](#build-the-extension-into-the-nix-image), which resolves every dependency against the image's own libraries automatically.
 
 ## Step 2: Build the image
 
@@ -158,11 +151,11 @@ sh run.sh recreate db
 
 ## Step 4: Enable the extension
 
-The Supabase `postgres` role is intentionally **not a superuser**, and extension creation is gated by [`supautils`](https://github.com/supabase/supautils). A native extension that isn't on the `supautils.privileged_extensions` allow-list can only be created by the `supabase_admin` superuser. You have two options.
+The Supabase `postgres` role is intentionally not a superuser, and extension creation is gated by [`supautils`](https://github.com/supabase/supautils). A native extension that isn't on the `supautils.privileged_extensions` allow-list can only be created by the `supabase_admin` superuser. You have two options.
 
 ### Option A: Allow the `postgres` role to create it (no rebuild)
 
-The Postgres 17 image loads any `.conf` file from `/etc/postgresql-custom/conf.d/`, and that directory is included **after** the baked-in `supautils.conf`, so a `conf.d` file wins. Append your extension to the allow-list there. Because the list has no "append" syntax, restate the current value plus your extension:
+Append your extension to the allow-list in a custom `supautils` configuration. The Postgres 17 image loads any `.conf` file from `/etc/postgresql-custom/conf.d/`.
 
 ```sh
 docker exec supabase-db bash -c '
@@ -187,7 +180,7 @@ docker compose exec db psql -U postgres -c "CREATE EXTENSION pg_uuidv7;"
 
 ### Option B: Enable it as a superuser
 
-The image's init scripts run as `supabase_admin` (a superuser) on first boot. Drop a SQL file into the init directory to create the extension automatically for **new** databases:
+The image's init scripts run as `supabase_admin` (a superuser) on first boot. Drop a SQL file into the init directory to create the extension automatically for new databases:
 
 ```yaml name=docker-compose.yml
 db:
@@ -202,11 +195,11 @@ CREATE EXTENSION IF NOT EXISTS pg_uuidv7;
 
 <Admonition type="caution">
 
-Init scripts only run when the data directory (`./volumes/db/data`) is **empty**, that is on first initialization. For an already-initialized database, connect as `supabase_admin` once and run `CREATE EXTENSION` manually.
+Init scripts only run when the data directory (`./volumes/db/data`) is empty, that is on first initialization. For an already-initialized database, connect as `supabase_admin` once and run `CREATE EXTENSION` manually.
 
 </Admonition>
 
-## Verify
+## Verify the extension
 
 ```sh
 docker compose exec db psql -U postgres \
@@ -223,7 +216,7 @@ docker compose exec db psql -U postgres \
 
 ## Extensions that have to be preloaded
 
-If your extension must be listed in `shared_preload_libraries` (for example, one that runs a background worker), add it with the same `conf.d/` mechanism. The `conf.d/` include runs after the baked-in setting, so restate the current value plus your library:
+If your extension must be listed in `shared_preload_libraries`, add it with the same `conf.d/` mechanism. The `conf.d/` include runs after the baked-in setting, so restate the current value plus your library:
 
 ```sh
 docker exec supabase-db bash -c '
@@ -236,20 +229,18 @@ sh run.sh restart db
 
 <Admonition type="caution">
 
-`shared_preload_libraries` has no append syntax - you must restate the **full** existing list plus your library, or you'll disable the extensions Supabase relies on.
+`shared_preload_libraries` has no append syntax. Include the full existing list plus your library, or you'll disable the extensions Supabase relies on.
 
 </Admonition>
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-## Alternative: build the extension into the Nix image
+## Build the extension into the Nix image
 
 The Docker approach above layers a separately-compiled `.so` onto the published image. The most reliable way is to add the extension to Supabase's own [Nix](https://nixos.org) build, so it's compiled with the exact same toolchain as everything else in the image. This option sidesteps the `libc`/ABI concerns entirely and is how the bundled extensions are built. It requires Nix, building the image from source, and maintaining a fork of `supabase/postgres`.
 
 Rough guide to choosing:
 
-- **One-off extension on the stock image, minimal tooling** - the Docker approach in this guide.
-- **Bulletproof ABI match, want it merged upstream, or it needs preload / `supautils` wiring done "the Supabase way"** - the Nix build below.
+- One-off extension on the stock image, minimal tooling - the Docker approach in this guide.
+- Bulletproof ABI match, want it merged upstream, or it needs preload / `supautils` wiring done "the Supabase way" - the Nix build below.
 
 This guide intentionally doesn't teach Nix. The authoritative, maintained instructions live in the `supabase/postgres` repository:
 
