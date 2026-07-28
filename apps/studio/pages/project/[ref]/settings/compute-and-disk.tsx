@@ -11,7 +11,7 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from '@/types'
 
-const AuthSettings: NextPageWithLayout = () => {
+const ComputeAndDiskSettings: NextPageWithLayout = () => {
   return (
     <>
       <PageHeader size="default">
@@ -29,9 +29,9 @@ const AuthSettings: NextPageWithLayout = () => {
   )
 }
 
-AuthSettings.getLayout = (page) => (
+ComputeAndDiskSettings.getLayout = (page) => (
   <DefaultLayout>
     <SettingsLayout title="Compute and Disk">{page}</SettingsLayout>
   </DefaultLayout>
 )
-export default AuthSettings
+export default ComputeAndDiskSettings

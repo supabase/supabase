@@ -23,15 +23,14 @@ import { ComputeInstanceAddonVariantId, InfraInstanceSize } from '../DiskManagem
 import { ComputeAddonVariant, getAvailableComputeOptions } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
+import { useShowMicroUpgradeBadge } from './useShowMicroUpgradeBadge'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-const INITIALLY_VISIBLE_COUNT = 6
+const SKELETON_PLACEHOLDER_COUNT = 6
 
 /**
  * to do: this could be a type from api-types
@@ -58,21 +57,15 @@ export function ComputeSectionBillingBadge({
   beforePrice,
   afterPrice,
 }: ComputeSectionBillingBadgeProps) {
-  const { data: project } = useSelectedProjectQuery()
-  const { hasAccess: entitledUpdateCompute } = useCheckEntitlements(
-    'instances.compute_update_available_sizes'
-  )
-
   const computeSize = form.watch('computeSize')
-  const projectComputeSize = project?.infra_compute_size ?? 'nano'
-  const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
+  const { showMicroUpgradeBadge } = useShowMicroUpgradeBadge()
 
   return (
     <BillingChangeBadge
       show={show}
       beforePrice={beforePrice}
       afterPrice={afterPrice}
-      free={showUpgradeBadge && computeSize === 'ci_micro'}
+      free={showMicroUpgradeBadge && computeSize === 'ci_micro'}
     />
   )
 }
@@ -80,10 +73,8 @@ export function ComputeSectionBillingBadge({
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
-  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
-
-  const { hasAccess: entitledUpdateCompute, isLoading: isEntitlementLoading } =
-    useCheckEntitlements('instances.compute_update_available_sizes')
+  const { project, isProjectLoading, isEntitlementLoading, showMicroUpgradeBadge } =
+    useShowMicroUpgradeBadge()
 
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
@@ -111,9 +102,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
 
-  const projectComputeSize = project?.infra_compute_size ?? 'nano'
-  const showUpgradeBadge = entitledUpdateCompute && projectComputeSize === 'nano'
-
   return (
     <FormField
       name="computeSize"
@@ -139,7 +127,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             }
           >
             {isLoading ? (
-              Array(INITIALLY_VISIBLE_COUNT)
+              Array(SKELETON_PLACEHOLDER_COUNT)
                 .fill(0)
                 .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
             ) : addonsError ? (
@@ -193,7 +181,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <div>
-                              {showUpgradeBadge && compute.identifier === 'ci_micro' && (
+                              {showMicroUpgradeBadge && compute.identifier === 'ci_micro' && (
                                 <HoverCard openDelay={200}>
                                   <HoverCardTrigger asChild>
                                     <div

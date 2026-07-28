@@ -6,14 +6,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, cn, Form } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Button, cn, Form } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageSection,
-  PageSectionAside,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -25,33 +22,19 @@ import {
   calculateDiskSizeRequiredForIopsWithGp3,
   mapComputeSizeNameToAddonVariantId,
 } from './DiskManagement.utils'
+import { AdvancedSection, ComputeSection, DiskSection } from './DiskManagementForm.sections'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog'
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog.hooks'
-import { AutoScaleFields } from './fields/AutoScaleFields'
-import {
-  ComputeSectionBillingBadge,
-  ComputeSizeField,
-  ComputeSizeFieldMeta,
-} from './fields/ComputeSizeField'
-import { DiskSizeField } from './fields/DiskSizeField'
-import { IOPSField } from './fields/IOPSField'
-import { StorageTypeField } from './fields/StorageTypeField'
-import { ThroughputField } from './fields/ThroughputField'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
-import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
   DISK_LIMITS,
   DiskType,
   PLAN_DETAILS,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
-import { DiskSpaceBar } from './ui/DiskSpaceBar'
 import { NoticeBar } from './ui/NoticeBar'
-import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { RequestUpgradeToBillingOwners } from '@/components/ui/RequestUpgradeToBillingOwners'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
   useDiskAttributesQuery,
@@ -76,7 +59,7 @@ import {
   useIsAwsNimbusCloudProvider,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL, GB, PROJECT_STATUS } from '@/lib/constants'
+import { GB, PROJECT_STATUS } from '@/lib/constants'
 
 export function DiskManagementForm() {
   const { ref: projectRef } = useParams()
@@ -377,18 +360,22 @@ export function DiskManagementForm() {
     const fieldErrors = Object.keys(errors)
     if (fieldErrors.length === 0) return
 
-    const scrollTarget =
-      fieldErrors.includes('maxSizeGb') ||
-      fieldErrors.includes('growthPercent') ||
-      fieldErrors.includes('minIncrementGb')
-        ? autoscaleSettingsRef
-        : fieldErrors.includes('throughput') || fieldErrors.includes('provisionedIOPS')
-          ? storageSettingsRef
-          : fieldErrors.includes('totalSize')
-            ? diskSizeSettingsRef
-            : fieldErrors.includes('computeSize')
-              ? computeSettingsRef
-              : null
+    const scrollTargets = [
+      {
+        hasError:
+          fieldErrors.includes('maxSizeGb') ||
+          fieldErrors.includes('growthPercent') ||
+          fieldErrors.includes('minIncrementGb'),
+        ref: autoscaleSettingsRef,
+      },
+      {
+        hasError: fieldErrors.includes('throughput') || fieldErrors.includes('provisionedIOPS'),
+        ref: storageSettingsRef,
+      },
+      { hasError: fieldErrors.includes('totalSize'), ref: diskSizeSettingsRef },
+      { hasError: fieldErrors.includes('computeSize'), ref: computeSettingsRef },
+    ]
+    const scrollTarget = scrollTargets.find(({ hasError }) => hasError)?.ref ?? null
 
     if (!scrollTarget) return
 
@@ -441,216 +428,47 @@ export function DiskManagementForm() {
               />
             )}
             <PageSectionContent>
-              <PageSection className="pt-0">
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle className="heading-default text-base">
-                      Compute size
-                    </PageSectionTitle>
-                    <PageSectionDescription>
-                      <ComputeSizeFieldMeta />
-                    </PageSectionDescription>
-                  </PageSectionSummary>
-                  <PageSectionAside>
-                    <ComputeSectionBillingBadge
-                      form={form}
-                      show={showComputeBillingBadge}
-                      beforePrice={Number(computeSizePrice.oldPrice)}
-                      afterPrice={Number(computeSizePrice.newPrice)}
-                    />
-                    <DocsButton href={`${DOCS_URL}/guides/platform/compute-and-disk`} />
-                  </PageSectionAside>
-                </PageSectionMeta>
-                <PageSectionContent ref={computeSettingsRef} className="scroll-mt-24">
-                  <ComputeSizeField form={form} disabled={disableComputeInputs} />
-                </PageSectionContent>
-              </PageSection>
+              <ComputeSection
+                form={form}
+                settingsRef={computeSettingsRef}
+                showBillingBadge={showComputeBillingBadge}
+                beforePrice={Number(computeSizePrice.oldPrice)}
+                afterPrice={Number(computeSizePrice.newPrice)}
+                disabled={disableComputeInputs}
+              />
 
-              <PageSection id="disk-size">
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle className="heading-default text-base">Disk</PageSectionTitle>
-                    <PageSectionDescription>
-                      Configure provisioned storage for your primary database.
-                    </PageSectionDescription>
-                  </PageSectionSummary>
-                  <PageSectionAside>
-                    <BillingChangeBadge
-                      show={showDiskBillingBadge}
-                      beforePrice={Number(diskSizePrice.oldPrice)}
-                      afterPrice={Number(diskSizePrice.newPrice)}
-                    />
-                    <DocsButton href={`${DOCS_URL}/guides/platform/database-size`} />
-                  </PageSectionAside>
-                </PageSectionMeta>
-                <PageSectionContent
-                  ref={diskSizeSettingsRef}
-                  className="flex flex-col gap-4 scroll-mt-24"
-                >
-                  {isAws && <DiskSpaceBar form={form} />}
-
-                  <SpendCapDisabledSection currentDiskSizeGb={defaultValues.totalSize} />
-
-                  <NoticeBar
-                    type="default"
-                    visible={isDiskNoticeVisible}
-                    title="Disk configuration is only available for projects in the AWS cloud provider"
-                    description={
-                      isAwsK8s
-                        ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
-                        : isBranch
-                          ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
-                          : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
-                    }
-                  />
-
-                  {isAws && (
-                    <>
-                      <div className="flex flex-col gap-y-3">
-                        <DiskCountdownRadial />
-                        {!isReadOnlyMode && usedPercentage >= 90 && isWithinCooldownWindow && (
-                          <Admonition
-                            type="destructive"
-                            title="Database size is currently over 90% of disk size"
-                            description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
-                          >
-                            <DocsButton
-                              abbrev={false}
-                              className="mt-2"
-                              href={`${DOCS_URL}/guides/platform/database-size#read-only-mode`}
-                            />
-                          </Admonition>
-                        )}
-                        {isReadOnlyMode && (
-                          <Admonition
-                            type="destructive"
-                            title="Project is currently in read-only mode"
-                            description="You will need to manually override read-only mode and reduce the database size to below 95% of the disk size"
-                          >
-                            <DocsButton
-                              abbrev={false}
-                              className="mt-2"
-                              href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
-                            />
-                          </Admonition>
-                        )}
-                      </div>
-
-                      <Card>
-                        <CardContent>
-                          <DiskSizeField form={form} disableInput={disableDiskSizeInput} />
-                        </CardContent>
-                      </Card>
-                    </>
-                  )}
-                </PageSectionContent>
-              </PageSection>
+              <DiskSection
+                form={form}
+                settingsRef={diskSizeSettingsRef}
+                showBillingBadge={showDiskBillingBadge}
+                beforePrice={Number(diskSizePrice.oldPrice)}
+                afterPrice={Number(diskSizePrice.newPrice)}
+                isAws={isAws}
+                isAwsK8s={isAwsK8s}
+                isBranch={isBranch}
+                isNoticeVisible={isDiskNoticeVisible}
+                isReadOnlyMode={!!isReadOnlyMode}
+                usedPercentage={usedPercentage}
+                isWithinCooldownWindow={isWithinCooldownWindow}
+                currentDiskSizeGb={defaultValues.totalSize}
+                disableDiskSizeInput={disableDiskSizeInput}
+              />
 
               {isAws && (
-                <PageSection>
-                  <PageSectionMeta>
-                    <PageSectionSummary>
-                      <PageSectionTitle className="heading-default text-base">
-                        Advanced
-                      </PageSectionTitle>
-                      <PageSectionDescription>
-                        Configure autoscaling, storage type, IOPS, and throughput.
-                      </PageSectionDescription>
-                    </PageSectionSummary>
-                    <PageSectionAside>
-                      <BillingChangeBadge
-                        show={showAdvancedBillingBadge}
-                        beforePrice={advancedBeforePrice}
-                        afterPrice={advancedAfterPrice}
-                      />
-                    </PageSectionAside>
-                  </PageSectionMeta>
-                  <PageSectionContent className="flex flex-col gap-4">
-                    <Card ref={autoscaleSettingsRef} className="scroll-mt-24">
-                      <CardContent className="flex flex-col gap-y-8">
-                        <AutoScaleFields form={form} />
-                      </CardContent>
-                    </Card>
-
-                    <Card ref={storageSettingsRef} className="scroll-mt-24">
-                      <CardContent className="flex flex-col gap-y-8">
-                        <NoticeBar
-                          type="default"
-                          visible={!!disableIopsThroughputConfig}
-                          title="Adjusting disk configuration requires LARGE Compute size or above"
-                          description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
-                          actions={
-                            canUpdateDiskConfiguration ? (
-                              <Button
-                                variant="default"
-                                onClick={() => {
-                                  form.setValue('computeSize', 'ci_large', {
-                                    shouldDirty: true,
-                                    shouldValidate: true,
-                                  })
-                                  form.trigger('provisionedIOPS')
-                                  form.trigger('throughput')
-                                }}
-                              >
-                                Change to LARGE Compute
-                              </Button>
-                            ) : (
-                              <RequestUpgradeToBillingOwners
-                                addon="computeSize"
-                                featureProposition="adjust disk configuration"
-                              />
-                            )
-                          }
-                        />
-                        <NoticeBar
-                          type="default"
-                          visible={
-                            isDiskTooSmallForCustomIops &&
-                            !disableIopsThroughputConfig &&
-                            !disableDiskInputs
-                          }
-                          title={`Increase disk size to adjust IOPS or throughput`}
-                          description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are limited to 4 within a rolling 24-hour window).`}
-                          actions={
-                            !disableDiskSizeInput ? (
-                              <Button
-                                variant="default"
-                                onClick={() => {
-                                  form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
-                                    shouldDirty: true,
-                                    shouldValidate: true,
-                                  })
-                                }}
-                              >
-                                Increase to {suggestedDiskSizeForCustomIops} GB
-                              </Button>
-                            ) : undefined
-                          }
-                        />
-                        <StorageTypeField
-                          form={form}
-                          disableInput={disableIopsThroughputConfig || disableDiskInputs}
-                        />
-                        <IOPSField
-                          form={form}
-                          disableInput={
-                            disableIopsThroughputConfig ||
-                            disableDiskInputs ||
-                            isDiskTooSmallForCustomIops
-                          }
-                        />
-                        <ThroughputField
-                          form={form}
-                          disableInput={
-                            disableIopsThroughputConfig ||
-                            disableDiskInputs ||
-                            isDiskTooSmallForCustomIops
-                          }
-                        />
-                      </CardContent>
-                    </Card>
-                  </PageSectionContent>
-                </PageSection>
+                <AdvancedSection
+                  form={form}
+                  autoscaleSettingsRef={autoscaleSettingsRef}
+                  storageSettingsRef={storageSettingsRef}
+                  showBillingBadge={showAdvancedBillingBadge}
+                  beforePrice={advancedBeforePrice}
+                  afterPrice={advancedAfterPrice}
+                  disableIopsThroughputConfig={disableIopsThroughputConfig}
+                  canUpdateDiskConfiguration={canUpdateDiskConfiguration}
+                  isDiskTooSmallForCustomIops={isDiskTooSmallForCustomIops}
+                  disableDiskInputs={disableDiskInputs}
+                  disableDiskSizeInput={disableDiskSizeInput}
+                  suggestedDiskSizeForCustomIops={suggestedDiskSizeForCustomIops}
+                />
               )}
             </PageSectionContent>
           </PageSection>

@@ -164,6 +164,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                     onClick={() => {
                       resetField('totalSize')
                       trigger('provisionedIOPS')
+                      trigger('throughput')
                     }}
                     title="Reset"
                   >

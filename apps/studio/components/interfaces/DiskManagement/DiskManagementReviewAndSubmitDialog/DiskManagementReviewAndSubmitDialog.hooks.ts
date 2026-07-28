@@ -26,6 +26,20 @@ const COMPUTE_SIZES_BELOW_LARGE: Array<ComputeInstanceAddonVariantId> = [
   'ci_medium',
 ]
 
+export function shouldShowComputeBillingBadge({
+  isDirty,
+  hasComputeSizeError,
+  oldPrice,
+  newPrice,
+}: {
+  isDirty: boolean
+  hasComputeSizeError: boolean
+  oldPrice: string | number
+  newPrice: string | number
+}) {
+  return isDirty && !hasComputeSizeError && Number(oldPrice) !== Number(newPrice)
+}
+
 export function useDiskManagementReviewChanges(
   form: UseFormReturn<DiskStorageSchemaType>,
   numReplicas: number
@@ -91,9 +105,14 @@ export function useDiskManagementReviewChanges(
   const advancedBeforePrice = Number(iopsPrice.oldPrice) + Number(throughputPrice.oldPrice)
   const advancedAfterPrice = Number(iopsPrice.newPrice) + Number(throughputPrice.newPrice)
 
-  const { isDirty, dirtyFields, errors } = form.formState
+  const { isDirty, errors } = form.formState
 
-  const showComputeBillingBadge = isDirty && !!dirtyFields.computeSize && !errors.computeSize
+  const showComputeBillingBadge = shouldShowComputeBillingBadge({
+    isDirty,
+    hasComputeSizeError: !!errors.computeSize,
+    oldPrice: computeSizePrice.oldPrice,
+    newPrice: computeSizePrice.newPrice,
+  })
 
   const showDiskBillingBadge =
     isDirty &&
