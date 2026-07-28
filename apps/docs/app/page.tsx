@@ -370,7 +370,7 @@ const HomePage = () => (
                   passHref
                   target={resource.external ? '_blank' : undefined}
                 >
-                  <GlassPanelWithIconPicker {...resource} background={false}>
+                  <GlassPanelWithIconPicker {...resource}>
                     {resource.description}
                   </GlassPanelWithIconPicker>
                 </Link>

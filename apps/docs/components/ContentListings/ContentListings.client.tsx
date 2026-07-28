@@ -88,9 +88,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                       }
                     >
                       {item.badge && item.badgePosition === 'below' && (
-                        // Pull the badge up close to the title (GlassPanel's icon-row gap is
-                        // large by default), then push extra space before the description below.
-                        <Badge variant="success" className="-mt-4 mb-6 block w-fit">
+                        <Badge variant="success" className="mb-3 block w-fit">
                           {item.badge}
                         </Badge>
                       )}

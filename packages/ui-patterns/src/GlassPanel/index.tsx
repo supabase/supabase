@@ -127,7 +127,7 @@ export const GlassPanel = ({
         className={cn(
           'px-8 pb-8 relative',
           'flex flex-col h-full',
-          icon ? 'gap-6' : 'gap-2',
+          icon ? 'gap-3' : 'gap-2',
           !header ? 'pt-8' : ''
         )}
       >

@@ -113,7 +113,7 @@ export default function Extensions() {
                   target={getLinkTarget(extension.link)}
                   className="no-underline"
                 >
-                  <GlassPanel title={extension.name} background={false} key={extension.name}>
+                  <GlassPanel title={extension.name} key={extension.name}>
                     <p className="mt-4">
                       {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
                     </p>
