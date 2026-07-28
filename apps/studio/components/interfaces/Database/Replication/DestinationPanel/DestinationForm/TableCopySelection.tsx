@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useMemo } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField, Select, SelectContent, SelectItem, SelectTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
