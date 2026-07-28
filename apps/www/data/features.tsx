@@ -648,18 +648,18 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 
 ## Key benefits
 1. Initial sync: Copy existing rows from published tables.
-2. Ongoing replication: Apply subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
+2. Ongoing replication: Capture and deliver subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
 3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
 4. Workload isolation: Keep analytical queries away from the primary database.
 
 ## Destinations
-BigQuery is currently available. [Request early access](/go/supabase-pipelines-new-destinations) to ClickHouse, Snowflake, and DuckLake while destination support expands.
+BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
 
 ## Setup
 Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
-Requirements depend on the destination. BigQuery requires source tables to have primary keys and requires the publication to include those columns.
+Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a published primary-key identity, replica-identity index, or full identity. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
 
 ## Pipelines is valuable for:
 - Near real-time analytics data movement
@@ -667,9 +667,9 @@ Requirements depend on the destination. BigQuery requires source tables to have 
 - Managed replication to supported destination systems
 
 ## Limitations
-Schema change support is currently in beta and limited to supported BigQuery changes. Destination-specific constraints apply.
+Schema change support is destination-specific and limited. Destination-specific constraints apply.
 
-Pipelines keeps the current destination table state synchronized. It does not automatically create a queryable history of every row version.`,
+BigQuery and DuckLake keep current-state tables synchronized. ClickHouse supports current-state ReplacingMergeTree tables or append-only MergeTree CDC history. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase accumulated destination data. Schema changes can alter retained history in append-only ClickHouse and Snowflake tables.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
