@@ -1,6 +1,14 @@
-import { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import type {
+  DesiredInstanceSize,
+  PostgresEngine,
+  ReleaseChannel,
+} from '@/data/projects/new-project.constants'
 
 export const HIGH_AVAILABILITY_POSTGRES_VERSION = '17.6.1.147'
+export const HIGH_AVAILABILITY_POSTGRES_ENGINE = HIGH_AVAILABILITY_POSTGRES_VERSION.split(
+  '.'
+)[0] as PostgresEngine
+export const HIGH_AVAILABILITY_RELEASE_CHANNEL = 'ga' satisfies ReleaseChannel
 
 export const getHighAvailabilityRegionCode = (
   environment = process.env.NEXT_PUBLIC_ENVIRONMENT

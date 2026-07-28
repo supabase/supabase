@@ -25,7 +25,9 @@ import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
 import {
   getHighAvailabilityRegionCode,
+  HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_POSTGRES_VERSION,
+  HIGH_AVAILABILITY_RELEASE_CHANNEL,
   sizes,
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
@@ -280,12 +282,9 @@ export const ProjectCreationForm = ({
           (region) => region.code === highAvailabilityRegionCode
         )
       : undefined
-  const recommendedSmartRegion =
-    highAvailability && highAvailabilityRegionCode !== undefined
-      ? highAvailabilityRegion?.name
-      : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
-        : ''
+  const recommendedSmartRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : ''
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
@@ -293,7 +292,7 @@ export const ProjectCreationForm = ({
     highAvailability && highAvailabilityRegionCode !== undefined
       ? highAvailabilityRegion?.name
       : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
+        ? recommendedSmartRegion
         : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
@@ -485,12 +484,12 @@ export const ProjectCreationForm = ({
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
       postgresEngine: highAvailability
-        ? '17'
+        ? HIGH_AVAILABILITY_POSTGRES_ENGINE
         : useOrioleDb
           ? availableOrioleVersion?.postgres_engine
           : postgresEngine,
       releaseChannel: highAvailability
-        ? 'ga'
+        ? HIGH_AVAILABILITY_RELEASE_CHANNEL
         : useOrioleDb
           ? availableOrioleVersion?.release_channel
           : releaseChannel,
@@ -554,12 +553,6 @@ export const ProjectCreationForm = ({
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (!isDbRegionDirty && recommendedSmartRegion) {
-      setValue('dbRegion', recommendedSmartRegion)
-    }
-  }, [recommendedSmartRegion, isDbRegionDirty, setValue])
-
-  useEffect(() => {
     if (regionError && fixedDefaultRegion) {
       resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
@@ -567,7 +560,9 @@ export const ProjectCreationForm = ({
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      cloudProviderBeforeHighAvailability.current = cloudProvider as CloudProvider
+      if (cloudProviderBeforeHighAvailability.current === undefined) {
+        cloudProviderBeforeHighAvailability.current = cloudProvider as CloudProvider
+      }
       setValue('cloudProvider', 'AWS_K8S')
     } else if (
       !highAvailability &&
