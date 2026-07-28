@@ -16,9 +16,9 @@ It does **not** include internal traffic between the Realtime server and your Po
 
 Only data the server sends to the WebSocket, and any HTTP Broadcast request. DB → Realtime logical replication traffic (the connection Realtime uses internally to read changes for Broadcast from Database or Postgres Changes) is not counted — it never leaves the Realtime service to reach a client, so it isn't part of Egress.
 
-## Does it include replication slot initialization/reinitialization or Broadcast from database cold-start traffic?
+## Does it include replication slot initialization/recreation or Broadcast from database cold-start traffic?
 
-No. Replication slot creation, checks, and reconnection attempts to your database are internal to the Realtime service and Postgres. Even if your tenant is frequently idling out and reinitializing (for example, logs showing `Stop tenant ... because of no connected users` followed by slot recreation), that activity is not what's reflected in your billed Realtime Egress.
+No. Replication slot creation, checks, and reconnection attempts to your database are internal to the Realtime service and Postgres. Even if your tenant is frequently idling out and starting back up (for example, logs showing `Stop tenant ... because of no connected users` followed by slot recreation), that activity is not what's reflected in your billed Realtime Egress.
 
 ## Does it include Phoenix/WebSocket protocol overhead (handshake, heartbeat, phx_join, phx_leave, rejoin frames)?
 
@@ -26,7 +26,7 @@ Yes — any message the server sends over an open socket counts, including heart
 
 ## Can repeated tenant stop/start or cold-start cycles cause large billed egress even when payload is small?
 
-No. Tenant idling out (`no connected users`) and reinitializing on the next connection is a normal part of the multi-tenant architecture and is not a mechanism that inflates Realtime Egress. If you're seeing a large gap between your application-measured payload and your billed egress, look at message volume and fan-out first (see below) rather than tenant lifecycle events.
+No. Tenant idling out (`no connected users`) and starting back up on the next connection is a normal part of the multi-tenant architecture and is not a mechanism that inflates Realtime Egress. If you're seeing a large gap between your application-measured payload and your billed egress, look at message volume and fan-out first (see below) rather than tenant lifecycle events.
 
 ## Is the dashboard graph batched or attributed in a way that could make one day look much higher than actual usage?
 
