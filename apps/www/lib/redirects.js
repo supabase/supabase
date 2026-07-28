@@ -3314,6 +3314,7 @@ module.exports = [
   { permanent: true, source: '/llms/edge-functions.txt', destination: '/edge-functions.md' },
   { permanent: true, source: '/llms/realtime.txt', destination: '/realtime.md' },
   { permanent: true, source: '/llms/storage.txt', destination: '/storage.md' },
-  { permanent: true, source: '/llms/vector.txt', destination: '/vector.md' },
+  { permanent: true, source: '/llms/vector.txt', destination: '/modules/vector.md' },
   { permanent: true, source: '/llms/pricing.txt', destination: '/pricing.md' },
+  { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
 ]

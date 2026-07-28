@@ -41,9 +41,9 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
-import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from '../ui/PromptPanel'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
@@ -71,6 +71,7 @@ const components = {
   AccordionItem,
   Admonition: AdmonitionWithMargin,
   AgentPluginsPanel,
+  AiPrompt,
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
@@ -101,11 +102,6 @@ const components = {
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
-  Prompt,
-  PromptContent,
-  PromptCopy,
-  PromptPanel,
-  PromptTitle,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,
