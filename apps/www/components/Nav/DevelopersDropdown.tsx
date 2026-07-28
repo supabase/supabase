@@ -47,7 +47,7 @@ export const DevelopersDropdown = () => {
           </div>
         ))}
       </div>
-      <div className="bg-surface-75 xl:bg-transparent flex flex-col w-[550px] xl:w-[460px] border-t xl:border-t-0 xl:border-l xl:border-l-0">
+      <div className="bg-surface-75 xl:bg-transparent flex flex-col w-[550px] xl:w-[460px] border-t xl:border-t-0">
         <div className="flex-col gap-2 py-8 px-10">
           <Link
             href="/blog"

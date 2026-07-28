@@ -22,7 +22,7 @@
   animation-timing-function: ease !important;
 }
 
-.desktopMenuViewport[data-state='open'] .desktopMenuContent:not([data-motion]) {
+.desktopMenuViewport .desktopMenuContent:not([data-motion]) {
   animation: desktop-menu-content-in 180ms ease both;
   will-change: opacity, transform;
 }
@@ -39,6 +39,13 @@
   }
 }
 
+/*
+ * The 580px/1040px stops must stay in sync with the dropdown column widths:
+ * every dropdown (Product/Developers/Solutions) is xl:w-[1040px] with a
+ * 580px left column and 460px right column, and the viewport is forced to
+ * xl:w-[1040px] in Nav/index.tsx. The 1px stripe replaces the columns'
+ * left border at xl.
+ */
 @media (min-width: 80rem) {
   .desktopMenuViewport {
     background-image: linear-gradient(
@@ -55,7 +62,7 @@
     transition: none !important;
   }
 
-  .desktopMenuViewport[data-state='open'] .desktopMenuContent:not([data-motion]) {
-    animation: none;
+  .desktopMenuViewport .desktopMenuContent:not([data-motion]) {
+    animation: none !important;
   }
 }

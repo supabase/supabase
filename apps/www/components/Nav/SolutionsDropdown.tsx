@@ -22,7 +22,7 @@ export const SolutionsDropdown = () => (
       ))}
     </div>
 
-    <div className="bg-surface-75 xl:bg-transparent flex flex-col w-[550px] xl:w-[460px] border-t xl:border-t-0 xl:border-l xl:border-l-0">
+    <div className="bg-surface-75 xl:bg-transparent flex flex-col w-[550px] xl:w-[460px] border-t xl:border-t-0">
       <div className="flex flex-col gap-6 py-8 px-10">
         <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
           {DevelopersData['navigation'][3].label}

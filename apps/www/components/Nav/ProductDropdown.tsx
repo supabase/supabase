@@ -122,7 +122,7 @@ export const ProductDropdown = () => {
           </div>
         </div>
       </div>
-      <div className="bg-surface-75 border-t xl:border-t-0 xl:border-l xl:border-l-0 xl:bg-transparent py-8 px-10 gap-8 flex flex-col w-full xl:w-[460px]">
+      <div className="bg-surface-75 border-t xl:border-t-0 xl:bg-transparent py-8 px-10 gap-8 flex flex-col w-full xl:w-[460px]">
         <div className="col-span-3 flex flex-row gap-8 xl:w-auto">
           <div>
             <Link
