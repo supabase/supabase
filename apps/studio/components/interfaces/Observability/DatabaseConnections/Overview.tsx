@@ -66,6 +66,11 @@ export const Overview = ({ live }: OverviewProps) => {
     }
   )
 
+  const onSelectPid = (pid: number) => {
+    setSelectedPid(pid)
+    document.getElementById(pid.toString())?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex gap-x-4">
@@ -188,11 +193,11 @@ export const Overview = ({ live }: OverviewProps) => {
                         'hover:text-foreground hover:underline',
                         'focus:text-foreground focus:underline'
                       )}
-                      onClick={() => setSelectedPid(longestBlockedQuery.activity.pid)}
+                      onClick={() => onSelectPid(longestBlockedQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(longestBlockedQuery.activity.pid)
+                          onSelectPid(longestBlockedQuery.activity.pid)
                         }
                       }}
                     >
@@ -238,11 +243,11 @@ export const Overview = ({ live }: OverviewProps) => {
                       role="button"
                       tabIndex={0}
                       className="normal-nums cursor-pointer hover:underline focus:underline"
-                      onClick={() => setSelectedPid(queryBlockingTheMostQueries.activity.pid)}
+                      onClick={() => onSelectPid(queryBlockingTheMostQueries.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(queryBlockingTheMostQueries.activity.pid)
+                          onSelectPid(queryBlockingTheMostQueries.activity.pid)
                         }
                       }}
                     >
@@ -295,11 +300,11 @@ export const Overview = ({ live }: OverviewProps) => {
                       role="button"
                       tabIndex={0}
                       className="normal-nums hover:underline focus:underline cursor-pointer"
-                      onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
+                      onClick={() => onSelectPid(longestRunningQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(longestRunningQuery.activity.pid)
+                          onSelectPid(longestRunningQuery.activity.pid)
                         }
                       }}
                     >

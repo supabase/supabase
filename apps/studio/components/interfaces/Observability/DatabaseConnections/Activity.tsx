@@ -7,7 +7,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportsSelectFilter } from '../../Reports/v2/ReportsSelectFilter'
-import { ActivityRow } from './ActivityRow'
+import { GroupedActivityRow } from './ActivityRow'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
@@ -64,6 +64,9 @@ export const Activity = ({ live }: ActivityProps) => {
   const matchesSearch = (activity: { query: string | null }) =>
     !searchFilter || (activity.query?.toLowerCase().includes(searchFilter.toLowerCase()) ?? false)
 
+  // Pids referenced in some other activity's blocked_by - i.e. they are blocking something
+  const blockingPids = new Set((data ?? []).flatMap((x) => x.blocked_by))
+
   const activities = data?.filter((activity) => {
     const matchesState =
       !statesFilter ||
@@ -72,10 +75,18 @@ export const Activity = ({ live }: ActivityProps) => {
     const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
     const matchesApplication =
       applicationsFilter.length === 0 || applicationsFilter.includes(activity.application_name)
-    const matchesView = viewFilter !== 'blocked' || activity.blocked_by.length > 0
-    return matchesState && matchesRole && matchesApplication && matchesView && matchesSearch(activity)
+    // In the blocked view, only show root blockers - activities blocking others while not
+    // themselves blocked. Everything they block is shown nested under them instead.
+    const matchesView =
+      viewFilter !== 'blockers' ||
+      (activity.blocked_by.length === 0 && blockingPids.has(activity.pid))
+    return (
+      matchesState && matchesRole && matchesApplication && matchesView && matchesSearch(activity)
+    )
   })
-  const blockedQueries = (data ?? []).filter((x) => x.blocked_by.length > 0)
+  const rootBlockers = (data ?? []).filter(
+    (x) => x.blocked_by.length === 0 && blockingPids.has(x.pid)
+  )
 
   const stateOptions = [
     'Idle',
@@ -92,7 +103,7 @@ export const Activity = ({ live }: ActivityProps) => {
         y.state === x.toLowerCase() &&
         (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
         (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
-        (viewFilter !== 'blocked' || y.blocked_by.length > 0) &&
+        (viewFilter !== 'blockers' || y.blocked_by.length > 0) &&
         matchesSearch(y)
     ).length,
   }))
@@ -109,7 +120,7 @@ export const Activity = ({ live }: ActivityProps) => {
           (!statesFilter ||
             statesFilter.length === 0 ||
             (y.state !== null && statesFilter.includes(y.state))) &&
-          (viewFilter !== 'blocked' || y.blocked_by.length > 0) &&
+          (viewFilter !== 'blockers' || y.blocked_by.length > 0) &&
           matchesSearch(y)
       ).length,
     }))
@@ -128,7 +139,7 @@ export const Activity = ({ live }: ActivityProps) => {
             statesFilter.length === 0 ||
             (y.state !== null && statesFilter.includes(y.state))) &&
           (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
-          (viewFilter !== 'blocked' || y.blocked_by.length > 0) &&
+          (viewFilter !== 'blockers' || y.blocked_by.length > 0) &&
           matchesSearch(y)
       ).length,
     }))
@@ -150,14 +161,6 @@ export const Activity = ({ live }: ActivityProps) => {
       view: '',
     })
   }
-
-  useEffect(() => {
-    if (selectedPid && isSuccess) {
-      document
-        .getElementById(selectedPid.toString())
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-  }, [selectedPid, isSuccess])
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -198,11 +201,11 @@ export const Activity = ({ live }: ActivityProps) => {
           popoverClassName="w-60"
         />
         <Button
-          variant={viewFilter === 'blocked' ? 'default' : 'dashed'}
-          iconRight={<span>{blockedQueries.length}</span>}
-          onClick={() => setQueryStates({ view: viewFilter === 'blocked' ? '' : 'blocked' })}
+          variant={viewFilter === 'blockers' ? 'default' : 'dashed'}
+          iconRight={<span>{rootBlockers.length}</span>}
+          onClick={() => setQueryStates({ view: viewFilter === 'blockers' ? '' : 'blockers' })}
         >
-          Blocked queries
+          Root blockers
         </Button>
         {!hasNoFiltersApplied && (
           <ButtonTooltip
@@ -272,7 +275,7 @@ export const Activity = ({ live }: ActivityProps) => {
             ) : null}
 
             {activities?.map((activity) => (
-              <ActivityRow key={activity.pid} activity={activity} />
+              <GroupedActivityRow key={activity.pid} activity={activity} />
             ))}
           </TableBody>
         </Table>
