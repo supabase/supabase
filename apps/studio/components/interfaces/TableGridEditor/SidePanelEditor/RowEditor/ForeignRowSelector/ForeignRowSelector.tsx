@@ -175,7 +175,7 @@ export const ForeignRowSelector = ({
                 <p className="text-xs text-foreground-light">Saving</p>
               </div>
             )}
-            <Button variant="text" icon={<X />} className="w-7" onClick={closePanel} />
+            <Button variant="text" icon={<X />} className="w-7" onClick={closePanel} aria-label="Close panel"/>
           </div>
         </div>
       }
