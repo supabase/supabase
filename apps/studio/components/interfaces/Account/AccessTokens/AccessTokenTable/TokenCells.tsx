@@ -20,7 +20,7 @@ export const TokenNameCell = ({
       <p className="truncate" title={name}>
         {name}
       </p>
-      {isClassic && scopedTokensEnabled && <Badge variant="default">Classic</Badge>}
+      {isClassic && scopedTokensEnabled && <Badge variant="default">Legacy</Badge>}
     </div>
     <p
       className="font-mono text-foreground-lighter truncate text-xs mt-1 max-w-32 sm:max-w-48 lg:max-w-full"
