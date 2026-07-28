@@ -273,24 +273,28 @@ async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Pr
   await fs.writeFile(TROUBLESHOOTING_INDEX_PATH, content)
 }
 
-async function renderDocsIndex(): Promise<void> {
+async function renderDocsIndex(guides: MarkdownSource[]): Promise<void> {
   const guidesContentDir = path.join(process.cwd(), 'content', 'guides')
   const dirents = await fs.readdir(guidesContentDir, { withFileTypes: true })
-  const sections = dirents
-    .filter((dirent) => dirent.isDirectory())
-    .map((dirent) => dirent.name)
-    .sort()
+  const sectionDirs = dirents.filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name)
+  const topLevelSlugs = guides.map(({ slug }) => slug).filter((slug) => !slug.includes('/'))
+  const sections = Array.from(new Set([...sectionDirs, ...topLevelSlugs])).sort()
+
+  const docsUrl = (pagePath: string) => `${getInternalLinkBaseUrl()}${withDocsBasePath(pagePath)}`
 
   const entries = await Promise.all(
     sections.map(async (section) => {
-      const url = `${getInternalLinkBaseUrl()}${withDocsBasePath(`/guides/${section}`)}`
+      const url = docsUrl(`/guides/${section}`)
       const landingPath = path.join(guidesContentDir, `${section}.mdx`)
+      let raw: string
       try {
-        await fs.access(landingPath)
-      } catch {
-        return `- [${section}](${url})`
+        raw = await fs.readFile(landingPath, 'utf8')
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+          return `- [${section}](${url})`
+        }
+        throw err
       }
-      const raw = await fs.readFile(landingPath, 'utf8')
       const { data } = parseFrontmatter(raw, 'yaml')
       const title = typeof data.title === 'string' && data.title.length > 0 ? data.title : section
       const description =
@@ -312,8 +316,8 @@ async function renderDocsIndex(): Promise<void> {
     '',
     '## More',
     '',
-    `- [Troubleshooting](${getInternalLinkBaseUrl()}${withDocsBasePath('/guides/troubleshooting')})`,
-    `- [API and SDK reference](${getInternalLinkBaseUrl()}${withDocsBasePath('/reference')})`,
+    `- [Troubleshooting](${docsUrl('/guides/troubleshooting')})`,
+    `- [API and SDK reference](${docsUrl('/reference')})`,
     '- [llms.txt](https://supabase.com/llms.txt)',
     '- [Full documentation in a single file](https://supabase.com/llms-full.txt)',
     '',
@@ -344,9 +348,11 @@ async function generate() {
     })
   )
 
-  await renderManifest(sources, ['troubleshooting', 'index'])
-  await renderTroubleshootingIndex(troubleshooting)
-  await renderDocsIndex()
+  await Promise.all([
+    renderManifest(sources, ['troubleshooting', 'index']),
+    renderTroubleshootingIndex(troubleshooting),
+    renderDocsIndex(guides),
+  ])
 
   console.log(
     `Generated ${sources.length} markdown files under public/markdown/guides/, troubleshooting guides index at public/markdown/guides/troubleshooting.md, docs index at public/markdown/guides/index.md and updated public/markdown/manifest.json`

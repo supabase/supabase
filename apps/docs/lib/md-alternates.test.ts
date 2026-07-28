@@ -67,7 +67,7 @@ describe('markdown alternate wiring', () => {
       'utf-8'
     )
     expect(source.includes("renderManifest(sources, ['troubleshooting', 'index'])")).toBe(true)
-    expect(source.includes('await renderDocsIndex()')).toBe(true)
+    expect(source.includes('renderDocsIndex(guides)')).toBe(true)
   })
 
   it('next.config rewrites /index.md to the generated file', async () => {
@@ -117,15 +117,16 @@ describe('no hardcoded text/markdown outside the helper', () => {
       )
     ).flat()
 
-    const offenders: string[] = []
-    for (const file of [...rootFiles, ...nestedFiles]) {
-      const rel = path.relative(process.cwd(), file)
-      if (ALLOWED_MD_LITERAL_FILES.has(rel)) continue
-      const source = await fs.readFile(file, 'utf-8')
-      if (source.includes('text/markdown')) {
-        offenders.push(rel)
-      }
-    }
+    const offenders = (
+      await Promise.all(
+        [...rootFiles, ...nestedFiles].map(async (file) => {
+          const rel = path.relative(process.cwd(), file)
+          if (ALLOWED_MD_LITERAL_FILES.has(rel)) return null
+          const source = await fs.readFile(file, 'utf-8')
+          return source.includes('text/markdown') ? rel : null
+        })
+      )
+    ).filter((rel): rel is string => rel !== null)
     expect(offenders, `hardcoded text/markdown in: ${offenders.join(', ')}`).toEqual([])
   })
 })
