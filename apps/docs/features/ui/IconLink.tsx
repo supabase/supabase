@@ -16,6 +16,13 @@ const sizeStyles = {
 
 export type IconLinkSize = keyof typeof sizeStyles
 
+export type IconLinkItem = {
+  title: string
+  href: string
+  icon: ReactNode
+  className?: string
+}
+
 export function IconLink({
   href,
   title,
@@ -33,7 +40,7 @@ export function IconLink({
     <Link
       href={href}
       className={cn(
-        'group flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent',
+        'group relative -m-3 flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-accent',
         className
       )}
     >
@@ -47,6 +54,30 @@ export function IconLink({
       </div>
       <span className="text-base text-foreground">{title}</span>
     </Link>
+  )
+}
+
+export function IconLinkList({
+  items,
+  labelledBy,
+  className,
+  itemClassName = 'col-span-6 md:col-span-4',
+  size = 'sm',
+}: {
+  items: IconLinkItem[]
+  labelledBy?: string
+  className?: string
+  itemClassName?: string
+  size?: IconLinkSize
+}) {
+  return (
+    <ul className={cn('grid grid-cols-12 gap-6', className)} aria-labelledby={labelledBy}>
+      {items.map((item) => (
+        <li key={item.title} className={cn(itemClassName, item.className)}>
+          <IconLink href={item.href} title={item.title} icon={item.icon} size={size} />
+        </li>
+      ))}
+    </ul>
   )
 }
 

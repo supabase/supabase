@@ -1,6 +1,6 @@
 import { isFeatureEnabled } from 'common'
 
-import { IconLink, IconLinkImage } from '@/features/ui/IconLink'
+import { IconLinkImage, IconLinkList } from '@/features/ui/IconLink'
 
 const {
   sdkDart: sdkDartEnabled,
@@ -73,27 +73,20 @@ const frameworks = [
   },
 ]
 
-export function FrameworkQuickstarts() {
+export function FrameworkQuickstarts({ labelledBy }: { labelledBy?: string }) {
   return (
-    <ul className="grid grid-cols-12 gap-3">
-      {frameworks
+    <IconLinkList
+      labelledBy={labelledBy}
+      size="lg"
+      items={frameworks
         .filter((framework) => framework.enabled !== false)
-        .map((framework) => (
-          <li key={framework.name} className="col-span-6 md:col-span-4">
-            <IconLink
-              href={framework.href}
-              title={framework.name}
-              size="lg"
-              icon={
-                <IconLinkImage
-                  path={framework.icon}
-                  hasLightIcon={framework.hasLightIcon}
-                  size="lg"
-                />
-              }
-            />
-          </li>
-        ))}
-    </ul>
+        .map((framework) => ({
+          title: framework.name,
+          href: framework.href,
+          icon: (
+            <IconLinkImage path={framework.icon} hasLightIcon={framework.hasLightIcon} size="lg" />
+          ),
+        }))}
+    />
   )
 }

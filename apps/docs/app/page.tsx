@@ -7,7 +7,7 @@ import { TextLink } from 'ui-patterns/TextLink'
 import { FrameworkQuickstarts } from '@/components/FrameworkQuickstarts'
 import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
-import { IconLink, IconLinkImage, IconLinkMenuIcon } from '@/features/ui/IconLink'
+import { IconLinkImage, IconLinkList, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
 import { BASE_PATH } from '@/lib/constants'
 
@@ -87,31 +87,26 @@ const postgresIntegrations = [
     title: 'AI & Vectors',
     icon: 'ai',
     href: '/guides/ai',
-    description: 'AI toolkit to manage embeddings',
   },
   {
     title: 'Cron',
     icon: 'cron',
     href: '/guides/cron',
-    description: 'Schedule and monitor recurring Jobs',
   },
   {
     title: 'Queues',
     icon: 'queues',
     href: '/guides/queues',
-    description: 'Durable Message Queues with guaranteed delivery',
   },
   {
     title: 'Data REST API',
     icon: 'rest',
     href: '/guides/api',
-    description: 'Access your database through a RESTful API.',
   },
   {
     title: 'GraphQL API',
     icon: 'graphql',
     href: '/guides/graphql',
-    description: 'Access your database through a GraphQL API.',
   },
 ]
 
@@ -223,6 +218,20 @@ const additionalResources = [
   },
 ]
 
+const migrationGuides = [...MIGRATION_PAGES]
+  .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+  .flatMap((guide) => {
+    if (!guide.name || !guide.url || typeof guide.icon !== 'string') return []
+
+    return [
+      {
+        title: guide.name,
+        href: guide.url,
+        icon: <IconLinkImage path={guide.icon} hasLightIcon={guide.hasLightIcon} />,
+      },
+    ]
+  })
+
 const HomePage = () => (
   <HomeLayout>
     <div className="flex flex-col">
@@ -238,7 +247,7 @@ const HomePage = () => (
           </div>
 
           <div className="col-span-8 not-prose">
-            <FrameworkQuickstarts />
+            <FrameworkQuickstarts labelledBy="connect-a-framework" />
           </div>
         </div>
       )}
@@ -252,7 +261,10 @@ const HomePage = () => (
           </p>
         </div>
 
-        <ul className="col-span-8 grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
+        <ul
+          aria-labelledby="products"
+          className="col-span-8 grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600"
+        >
           {products.map((product) => {
             return (
               <li key={product.title} className={cn(product.span ?? 'col-span-12 md:col-span-6')}>
@@ -276,17 +288,15 @@ const HomePage = () => (
             Extend your database with built-in tools for AI, APIs, scheduled jobs, and queues.
           </p>
         </div>
-        <ul className="col-span-8 grid grid-cols-12 gap-3 not-prose">
-          {postgresIntegrations.map((integration) => (
-            <li key={integration.title} className="col-span-6 md:col-span-4">
-              <IconLink
-                href={integration.href}
-                title={integration.title}
-                icon={<IconLinkMenuIcon icon={integration.icon} />}
-              />
-            </li>
-          ))}
-        </ul>
+        <IconLinkList
+          labelledBy="postgres-integrations"
+          className="col-span-8 not-prose"
+          items={postgresIntegrations.map((integration) => ({
+            title: integration.title,
+            href: integration.href,
+            icon: <IconLinkMenuIcon icon={integration.icon} />,
+          }))}
+        />
       </div>
 
       <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
@@ -299,19 +309,17 @@ const HomePage = () => (
           </p>
         </div>
 
-        <ul className="col-span-8 grid grid-cols-12 gap-3 not-prose">
-          {clientLibraries
+        <IconLinkList
+          labelledBy="client-libraries"
+          className="col-span-8 not-prose"
+          items={clientLibraries
             .filter((library) => library.enabled)
-            .map((library) => (
-              <li key={library.title} className="col-span-6 md:col-span-4">
-                <IconLink
-                  href={library.href}
-                  title={library.title}
-                  icon={<IconLinkMenuIcon icon={library.icon} />}
-                />
-              </li>
-            ))}
-        </ul>
+            .map((library) => ({
+              title: library.title,
+              href: library.href,
+              icon: <IconLinkMenuIcon icon={library.icon} />,
+            }))}
+        />
       </div>
       {isFeatureEnabled('docs:full_getting_started') && (
         <div className="flex flex-col gap-6 border-b py-12 lg:grid lg:grid-cols-12 lg:gap-x-16">
@@ -329,23 +337,11 @@ const HomePage = () => (
             />
           </div>
 
-          <ul className="col-span-8 grid grid-cols-12 gap-3 not-prose">
-            {[...MIGRATION_PAGES]
-              .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-              .map((guide) => {
-                if (!guide.name || !guide.url || typeof guide.icon !== 'string') return null
-
-                return (
-                  <li key={guide.name} className="col-span-6 md:col-span-4">
-                    <IconLink
-                      href={guide.url}
-                      title={guide.name}
-                      icon={<IconLinkImage path={guide.icon} hasLightIcon={guide.hasLightIcon} />}
-                    />
-                  </li>
-                )
-              })}
-          </ul>
+          <IconLinkList
+            labelledBy="migrate-to-supabase"
+            className="col-span-8 not-prose"
+            items={migrationGuides}
+          />
         </div>
       )}
 
@@ -359,7 +355,10 @@ const HomePage = () => (
           </p>
         </div>
 
-        <ul className="col-span-8 grid grid-cols-12 gap-6 not-prose">
+        <ul
+          aria-labelledby="additional-resources"
+          className="col-span-8 grid grid-cols-12 gap-6 not-prose"
+        >
           {additionalResources.map((resource) => {
             return (
               <li key={resource.title} className="col-span-12 md:col-span-6">
@@ -398,17 +397,16 @@ const HomePage = () => (
           </div>
 
           <div className="col-span-8 grid grid-cols-12 not-prose">
-            <ul className="col-span-full grid grid-cols-12 gap-3 lg:col-span-8">
-              {selfHostingOptions.map((option) => (
-                <li key={option.title} className="col-span-6">
-                  <IconLink
-                    href={option.href}
-                    title={option.title}
-                    icon={<IconLinkMenuIcon icon={option.icon} />}
-                  />
-                </li>
-              ))}
-            </ul>
+            <IconLinkList
+              labelledBy="self-hosting"
+              className="col-span-full lg:col-span-8"
+              itemClassName="col-span-6"
+              items={selfHostingOptions.map((option) => ({
+                title: option.title,
+                href: option.href,
+                icon: <IconLinkMenuIcon icon={option.icon} />,
+              }))}
+            />
           </div>
         </div>
       )}
