@@ -1,4 +1,4 @@
-import { format } from 'date-fns'
+import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -59,7 +59,7 @@ export const NewScopedTokenFormReview = ({ values }: ReviewStepProps) => {
   const expiresSummary = useMemo(() => {
     if (values.expiresAt === 'custom') {
       return values.customExpiryDate
-        ? format(new Date(values.customExpiryDate), 'dd MMM, yyyy')
+        ? dayjs(values.customExpiryDate).format('DD MMM, YYYY')
         : 'Custom — no date set'
     }
     return EXPIRY_OPTIONS.find((o) => o.value === values.expiresAt)?.label ?? values.expiresAt
