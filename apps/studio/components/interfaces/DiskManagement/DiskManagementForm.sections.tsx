@@ -1,7 +1,7 @@
 import { type RefObject } from 'react'
 import { type UseFormReturn } from 'react-hook-form'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionAside,

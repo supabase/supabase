@@ -1,7 +1,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'

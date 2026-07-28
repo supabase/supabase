@@ -147,8 +147,9 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   // Reads the SQL to run from the editor as an UntrustedSqlFragment. Promotion
   // to safety (acceptUntrustedSql) happens at each user-action site, never here.
   const readEditorSql = useCallback((): UntrustedSqlFragment | undefined => {
-    const snippet = getSqlEditorV2StateSnapshot().snippets[id]
-    return editor.getSql(snippet?.snippet.content?.unchecked_sql)
+    const snippet = getSqlEditorV2StateSnapshot().snippets[id]?.snippet
+    const fallback = snippet?.type === 'log_sql' ? undefined : snippet?.content?.unchecked_sql
+    return editor.getSql(fallback)
   }, [editor, id])
 
   const { executeQuery, isExecuting, potentialIssues, resetPotentialIssues } =

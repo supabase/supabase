@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { type AdmonitionProps } from 'ui-patterns/Admonition/Admonition.types'
 
 // Temporary animation shim while callers migrate to Admonition from ui-patterns.
