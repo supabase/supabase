@@ -15,9 +15,10 @@ Supabase allows convenient and secure data access from the browser, as long as y
 
 RLS _must_ always be enabled on any tables stored in an exposed schema. By default, this is the `public` schema.
 
-RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself and grant only the permissions each Postgres role needs.
+RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself and explicitly revoke default permissions before granting only the permissions each Postgres role needs.
 
 ```sql
+REVOKE ALL ON TABLE <schema_name>.<table_name> FROM anon, authenticated;
 GRANT SELECT ON <schema_name>.<table_name> TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO service_role;
@@ -209,7 +210,7 @@ Say you have a table called `profiles` in the public schema and you only want us
 ```sql
 -- 1. Create table
 create table profiles (
-  id uuid primary key,
+  id uuid uuid primary key,
   user_id uuid references auth.users,
   avatar_url text
 );
