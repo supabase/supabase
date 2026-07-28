@@ -7,7 +7,7 @@ import {
   UserGroupIcon,
 } from '@heroicons/react/outline'
 import SecurityNewsletterForm from '~/components/SecurityNewsletterForm'
-import { Activity, Lock } from 'lucide-react'
+import { Activity, FileText, Globe, Lock, Scale } from 'lucide-react'
 
 import Layout from '../layouts/Layout'
 
@@ -150,6 +150,44 @@ In addition to internal security reviews, we use various tools to scan our code 
 Supabase combats Distributed Denial of Service attacks in several ways to mitigate resource abuse and prevent runaway bills.
 
 In addition to protection at the CDN level via Cloudflare, we employ [fail2ban](https://github.com/fail2ban/fail2ban) to prevent brute force logins. Users can [customize rate limits](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention) for critical API routes and set [spend caps](/docs/guides/platform/cost-control#spend-cap) to prevent surprise bills.
+
+</Section>
+
+<Section icon={<Globe strokeWidth={1}/>}>
+
+### GDPR & European Compliance
+
+Supabase supports GDPR-compliant deployments. Projects hosted in EU regions keep your primary database data in-region, and a Data Processing Agreement (DPA) is available for customers who need a formal data processing contract under GDPR.
+
+Read more about [GDPR compliance at Supabase](/docs/guides/security/gdpr) or view our [sub-processor list](/legal/privacy).
+
+</Section>
+
+<Section icon={<Globe strokeWidth={1}/>}>
+
+### Data Residency
+
+When you create a project in an AWS region, your Postgres database, Auth service, and Storage objects are hosted in that region. Supabase offers regions across the US, EU, and Asia Pacific.
+
+See the full list of [available regions](/docs/guides/platform/regions).
+
+</Section>
+
+<Section icon={<FileText strokeWidth={1}/>}>
+
+### Data Processing Agreement
+
+A Data Processing Agreement (DPA) is available for customers who require a formal GDPR data processing contract. Team and Enterprise customers can access and sign the DPA directly from the [organization dashboard](/dashboard/org/_/documents). Other customers can request one via [/legal/dpa](/legal/dpa).
+
+</Section>
+
+<Section icon={<Scale strokeWidth={1}/>}>
+
+### Shared Responsibility
+
+Supabase secures the underlying infrastructure — physical data centers, operating systems, database engines, encryption, and network perimeter protection. Customers are responsible for Row Level Security policies, API key management, application-layer access controls, and the security of their own code.
+
+Read our full [shared responsibility model](/docs/guides/platform/shared-responsibility-model).
 
 </Section>
 
