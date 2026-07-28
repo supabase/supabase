@@ -13,6 +13,8 @@ import { Badge } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
+import { resolveContentListingIcon } from './iconChip'
+
 const GRID_ITEM_CLASS = {
   2: 'col-span-12 md:col-span-6',
   3: 'col-span-12 md:col-span-4',
@@ -77,10 +79,21 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                   >
                     <GlassPanel
                       title={item.title}
-                      icon={item.icon}
-                      hasLightIcon={item.hasLightIcon ?? true}
-                      badge={item.badge ? <Badge variant="success">{item.badge}</Badge> : undefined}
+                      icon={resolveContentListingIcon(item.icon)}
+                      hasLightIcon={item.hasLightIcon ?? typeof item.icon === 'string'}
+                      badge={
+                        item.badge && item.badgePosition !== 'below' ? (
+                          <Badge variant="success">{item.badge}</Badge>
+                        ) : undefined
+                      }
                     >
+                      {item.badge && item.badgePosition === 'below' && (
+                        // Pull the badge up close to the title (GlassPanel's icon-row gap is
+                        // large by default), then push extra space before the description below.
+                        <Badge variant="success" className="-mt-4 mb-6 block w-fit">
+                          {item.badge}
+                        </Badge>
+                      )}
                       {item.description}
                     </GlassPanel>
                   </Link>

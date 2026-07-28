@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -18,9 +17,6 @@ import {
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 
-const DOTNET_CONFIG_COMMAND =
-  'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION'
-
 type DirectFilesConfig = {
   files: {
     name: string
@@ -30,7 +26,6 @@ type DirectFilesConfig = {
   connectionStringFile?: string
   /** The password ends up inside a connection URL, so special characters must be percent-encoded */
   passwordInUrl?: boolean
-  postCommands?: { label: string; command: string }[]
 }
 
 function DirectFilesContent({ state, connectionStringPooler }: StepContentProps) {
@@ -136,12 +131,6 @@ func main() {
             },
           ],
           connectionStringFile: 'appsettings.json',
-          postCommands: [
-            {
-              label: 'Add the configuration package to read the settings.',
-              command: DOTNET_CONFIG_COMMAND,
-            },
-          ],
         }
 
       case 'python':
@@ -251,20 +240,6 @@ except Exception as e:
       <MultipleCodeBlock files={config.files} value={activeFile} onValueChange={setActiveFile} />
       {config.passwordInUrl && <PasswordEncodingNote />}
       <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
-      {(config.postCommands ?? []).map((command) => (
-        <div key={command.command} className="flex flex-col gap-2">
-          <p className="text-sm text-foreground-light">{command.label}</p>
-          <CodeBlock
-            className="[&_code]:text-foreground"
-            wrapperClassName="lg:col-span-2"
-            value={command.command}
-            hideLineNumbers
-            language="bash"
-          >
-            {command.command}
-          </CodeBlock>
-        </div>
-      ))}
     </div>
   )
 }

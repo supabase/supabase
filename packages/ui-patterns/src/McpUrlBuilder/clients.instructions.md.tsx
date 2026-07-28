@@ -88,6 +88,25 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  kimi: {
+    alternate: () => (
+      <>
+        <paragraph>
+          Kimi Code reads <inlineCode value=".kimi-code/mcp.json" /> from your current working
+          directory. To make the server available in every project, place the file under{' '}
+          <inlineCode value="$KIMI_CODE_HOME" /> instead, which defaults to{' '}
+          <inlineCode value="~/.kimi-code" />.
+        </paragraph>
+        <paragraph>
+          Restart Kimi Code or start a new session to load the server, then check its status by
+          running:
+        </paragraph>
+        <code lang="bash" value="/mcp" />
+        <paragraph>To configure MCP servers and complete the Supabase OAuth login, run:</paragraph>
+        <code lang="bash" value="/mcp-config" />
+      </>
+    ),
+  },
   'gemini-cli': {
     primary: ({ isPlatform, url }) => (
       <>

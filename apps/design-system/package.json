@@ -13,7 +13,7 @@
     "start": "next start",
     "lint": "eslint .",
     "content:build": "contentlayer2 build",
-    "clean": "rimraf node_modules .next .turbo",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
     "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {

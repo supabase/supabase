@@ -1,5 +1,6 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
+import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
 import { databaseGetStarted, databaseNextSteps } from './database.data'
 import {
@@ -10,7 +11,7 @@ import {
   functionsExamplesWebhooksPayments,
   functionsGetStarted,
 } from './functions.data'
-import { gettingStartedGetStarted } from './getting-started.data'
+import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
 import {
   selfHostingCommunity,
@@ -22,6 +23,8 @@ import {
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
+  aiToolsSupportedAgents,
+  aiToolsBuildingIntoApp,
   authGetStarted,
   authPricing,
   authNextSteps,
@@ -33,7 +36,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   functionsExamplesAiMedia,
   functionsExamplesMessaging,
   functionsExamplesOperations,
-  gettingStartedGetStarted,
+  logDrainsDestinations,
   realtimeGetStarted,
   realtimeExamples,
   realtimeResources,

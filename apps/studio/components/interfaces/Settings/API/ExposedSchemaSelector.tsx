@@ -18,6 +18,11 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getExposedSchemaCounts } from './ExposedSchemaSelector.utils'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import {
+  MULTIGRES_SCHEMA_NAME,
+  useHighAvailability,
+  useSchemasFilteredForHighAvailability,
+} from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { pluralize } from '@/lib/helpers'
@@ -48,6 +53,7 @@ export const ExposedSchemaSelector = ({
   const [open, setOpen] = useState(false)
 
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
 
   const {
     data: allSchemas,
@@ -59,23 +65,34 @@ export const ExposedSchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
+  const visibleSchemas = useSchemasFilteredForHighAvailability(allSchemas)
   const schemas = useMemo(
     () =>
-      (allSchemas ?? [])
+      visibleSchemas
         .filter((s) => !internalSchemasCannotExpose.has(s.name))
         .sort((a, b) => a.name.localeCompare(b.name)),
-    [allSchemas]
+    [visibleSchemas]
+  )
+
+  // Persisted selections go through the same HA filtering as the schema list, so a
+  // multigres schema exposed in the config doesn't render as a "missing" schema row.
+  const visibleSelectedSchemas = useMemo(
+    () =>
+      isHighAvailability
+        ? selectedSchemas.filter((schema) => schema !== MULTIGRES_SCHEMA_NAME)
+        : selectedSchemas,
+    [selectedSchemas, isHighAvailability]
   )
 
   const missingExposedSchema = useMemo(
-    () => selectedSchemas.filter((schema) => !schemas.some((s) => s.name === schema)),
-    [schemas, selectedSchemas]
+    () => visibleSelectedSchemas.filter((schema) => !schemas.some((s) => s.name === schema)),
+    [schemas, visibleSelectedSchemas]
   )
 
-  const selectedSet = useMemo(() => new Set(selectedSchemas), [selectedSchemas])
+  const selectedSet = useMemo(() => new Set(visibleSelectedSchemas), [visibleSelectedSchemas])
   const { selectedCount, totalCount } = getExposedSchemaCounts({
     visibleSchemas: schemas.map((s) => s.name),
-    selectedSchemas,
+    selectedSchemas: visibleSelectedSchemas,
     protectedSchemas: internalSchemasCannotExpose,
   })
 
