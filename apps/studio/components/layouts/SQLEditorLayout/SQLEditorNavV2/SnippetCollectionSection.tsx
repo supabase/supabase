@@ -65,11 +65,9 @@ export const SnippetCollectionSection = ({
     <InnerSideMenuCollapsible className="px-0" open={open} onOpenChange={onOpenChange}>
       <InnerSideMenuCollapsibleTrigger title={`${title}${count > 0 ? ` (${count})` : ''}`} />
       <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
-        {isLoading ? (
-          <SQLEditorLoadingSnippets />
-        ) : snippets.length === 0 ? (
-          emptyState
-        ) : (
+        {isLoading && <SQLEditorLoadingSnippets />}
+        {!isLoading && snippets.length === 0 && emptyState}
+        {!isLoading && snippets.length > 0 && (
           <TreeView
             data={treeData}
             aria-label={ariaLabel}
