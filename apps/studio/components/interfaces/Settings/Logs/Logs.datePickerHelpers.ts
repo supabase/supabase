@@ -27,9 +27,11 @@ export const parseCustomInput = (input: string): ParsedCustomInput => {
   if (!match) return { type: 'invalid' }
 
   const [, numStr, unitStr] = match
-  const value = parseInt(numStr, 10)
+  const value = Number.parseInt(numStr, 10)
 
-  if (isNaN(value) || value <= 0) return { type: 'invalid' }
+  // Only finite positive values may reach generateDynamicHelper(): Number.isFinite
+  // rejects NaN and Infinity outright, and the <= 0 guard keeps out non-positive.
+  if (!Number.isFinite(value) || value <= 0) return { type: 'invalid' }
 
   if (!unitStr) {
     return { type: 'number', value }
