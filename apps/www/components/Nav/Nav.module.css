@@ -1,0 +1,40 @@
+.desktopMenuViewport {
+  --menu-viewport-width-duration: 220ms;
+  --menu-viewport-height-duration: 180ms;
+  --menu-viewport-width-easing: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --menu-viewport-height-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  transform-origin: top center;
+  transition-property: width, height !important;
+  transition-duration:
+    var(--menu-viewport-width-duration), var(--menu-viewport-height-duration) !important;
+  transition-timing-function:
+    var(--menu-viewport-width-easing), var(--menu-viewport-height-easing) !important;
+}
+
+.desktopMenuViewport[data-state='open'] {
+  animation-duration: 180ms !important;
+  animation-timing-function: ease !important;
+}
+
+.desktopMenuViewport[data-state='closed'] {
+  animation-duration: 180ms !important;
+  animation-timing-function: ease !important;
+}
+
+@media (min-width: 80rem) {
+  .desktopMenuViewport {
+    background-image: linear-gradient(
+      to right,
+      var(--background) 0 580px,
+      var(--border) 580px 581px,
+      var(--background-surface-75) 581px 100%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktopMenuViewport {
+    transition: none !important;
+  }
+}

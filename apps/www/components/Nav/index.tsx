@@ -24,6 +24,7 @@ import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
 import MenuItem from './MenuItem'
 import { MobileMenu } from './MobileMenu'
+import styles from './Nav.module.css'
 import RightClickBrandLogo from './RightClickBrandLogo'
 import useDropdownMenu from './useDropdownMenu'
 
@@ -31,6 +32,12 @@ interface Props {
   hideNavbar: boolean
   stickyNavbar?: boolean
 }
+
+const desktopMenuContentMotion =
+  'data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-[48px]! data-[motion=from-start]:slide-in-from-left-[48px]! data-[motion=to-end]:slide-out-to-right-[48px]! data-[motion=to-start]:slide-out-to-left-[48px]! data-[motion^=from-]:duration-[180ms] data-[motion^=to-]:duration-[180ms] data-[motion^=from-]:ease-[cubic-bezier(0.455,0.03,0.515,0.955)] data-[motion^=to-]:ease-[cubic-bezier(0.455,0.03,0.515,0.955)] data-[motion^=from-]:will-change-[transform,opacity] data-[motion^=to-]:will-change-[transform,opacity] motion-reduce:data-[motion^=from-]:animate-none motion-reduce:data-[motion^=to-]:animate-none'
+
+const desktopMenuViewportMotion =
+  'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:fade-in data-[state=closed]:fade-out data-[state=open]:zoom-in-[98%]! data-[state=closed]:zoom-out-[98%]! data-[state=open]:slide-in-from-right-0! xl:w-[1040px]! motion-reduce:data-[state=open]:animate-none motion-reduce:data-[state=closed]:animate-none'
 
 const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const pathname = usePathname()
@@ -121,7 +128,11 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                 <NavigationMenu
                   delayDuration={0}
                   className="hidden pl-8 sm:space-x-4 lg:flex h-16"
-                  viewportClassName="rounded-xl bg-background"
+                  viewportClassName={cn(
+                    'rounded-xl bg-background',
+                    styles.desktopMenuViewport,
+                    desktopMenuViewportMotion
+                  )}
                 >
                   <NavigationMenuList>
                     {menu.primaryNav.map((menuItem) =>
@@ -130,12 +141,14 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ variant: 'text', size: 'small' }),
-                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2 h-auto'
+                              'h-auto rounded-md bg-transparent! px-2 duration-100 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] hover:bg-transparent! hover:text-brand-link data-[state=open]:bg-transparent! data-[state=open]:text-brand-link! focus-ring focus-visible:text-foreground'
                             )}
                           >
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent>{menuItem.dropdown}</NavigationMenuContent>
+                          <NavigationMenuContent className={desktopMenuContentMotion}>
+                            {menuItem.dropdown}
+                          </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
