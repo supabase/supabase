@@ -3057,16 +3057,6 @@ export const telemetry: NavMenuConstant = {
         },
       ],
     },
-    {
-      name: 'AI & automation',
-      url: undefined,
-      items: [
-        {
-          name: 'AI agents and MCP',
-          url: '/guides/telemetry/ai-agents' as `/${string}`,
-        },
-      ],
-    },
   ],
 }
 

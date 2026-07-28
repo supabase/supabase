@@ -63,23 +63,3 @@ export const telemetryMonitoring: ContentListingGroup = {
     },
   ],
 }
-
-export const telemetryAI: ContentListingGroup = {
-  id: 'telemetry-ai',
-  heading: 'AI & automation',
-  type: 'grid',
-  columns: 2,
-  items: [
-    {
-      title: 'AI agents and MCP',
-      href: '/guides/telemetry/ai-agents',
-      description:
-        'Use the Supabase MCP server and debugging skill to let agents monitor and debug your project.',
-    },
-    {
-      title: 'MCP server setup',
-      href: '/guides/getting-started/mcp',
-      description: 'Connect Claude, Cursor, or any MCP-compatible agent to your Supabase project.',
-    },
-  ],
-}
