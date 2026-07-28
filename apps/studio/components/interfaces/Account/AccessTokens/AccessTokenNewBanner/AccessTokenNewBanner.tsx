@@ -34,6 +34,7 @@ export const AccessTokenNewBanner = <T,>({
       className="mb-6 relative"
       actions={
         <Button
+          aria-label="Close token banner"
           variant="text"
           icon={<X />}
           className="w-7 h-7 absolute top-2.5 right-2.5"
