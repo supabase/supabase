@@ -9,7 +9,7 @@ import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, cn, Form, useWatch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
