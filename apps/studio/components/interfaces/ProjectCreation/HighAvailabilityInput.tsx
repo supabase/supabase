@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import { Badge, FormControl, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -13,9 +12,8 @@ interface HighAvailabilityInputProps {
 
 export const HighAvailabilityInput = ({ form }: HighAvailabilityInputProps) => {
   const { hasAccess } = useCheckEntitlements('instances.high_availability')
-  const highAvailabilityProjectCreation = useFlag('highAvailabilityProjectCreation')
 
-  if (!highAvailabilityProjectCreation || !hasAccess) return null
+  if (!hasAccess) return null
 
   return (
     <Panel.Content>

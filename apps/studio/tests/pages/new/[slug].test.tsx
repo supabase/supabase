@@ -249,7 +249,6 @@ const DEFAULT_FLAGS = {
   newProjectInternalOnlyConfiguration: false,
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
-  highAvailabilityProjectCreation: false,
 }
 
 async function renderWizard(options: { flags?: Partial<typeof DEFAULT_FLAGS> } = {}) {
@@ -521,12 +520,12 @@ describe('project creation wizard', () => {
       expect(body.release_channel).toBe('alpha')
     })
 
-    test('resets OrioleDB and hides advanced configuration when high availability is enabled', async () => {
+    test('hides advanced configuration only while high availability is enabled', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
+      await renderWizard()
 
       await fillProjectName('HA Oriole Project')
       await generateAndWaitForStrongPassword()
@@ -535,12 +534,19 @@ describe('project creation wizard', () => {
       fireEvent.click(await screen.findByRole('button', { name: 'Advanced Configuration' }))
       await user.click(await screen.findByRole('radio', { name: /Postgres with OrioleDB/ }))
 
-      await user.click(await screen.findByRole('switch'))
+      const highAvailabilitySwitch = await screen.findByRole('switch')
+      await user.click(highAvailabilitySwitch)
 
       expect(
         screen.queryByRole('button', { name: 'Advanced Configuration' })
       ).not.toBeInTheDocument()
 
+      await user.click(highAvailabilitySwitch)
+      expect(
+        await screen.findByRole('button', { name: 'Advanced Configuration' })
+      ).toBeInTheDocument()
+
+      await user.click(highAvailabilitySwitch)
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       expect(onRequest.mock.calls[0][0].postgres_engine).toBe('17')
@@ -600,10 +606,10 @@ describe('project creation wizard', () => {
   })
 
   describe('high availability', () => {
-    test('shows the high availability toggle when the feature flag and entitlement are enabled', async () => {
+    test('shows the high availability toggle when the entitlement is enabled', async () => {
       mockWizardEndpoints()
 
-      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
+      await renderWizard()
 
       expect(await screen.findByText('High availability')).toBeInTheDocument()
       expect(screen.getByText('Alpha')).toBeInTheDocument()
@@ -618,15 +624,6 @@ describe('project creation wizard', () => {
       ).not.toBeInTheDocument()
     })
 
-    test('hides the high availability toggle when the feature flag is disabled', async () => {
-      mockWizardEndpoints()
-
-      await renderWizard()
-
-      await screen.findByPlaceholderText('Project name')
-      expect(screen.queryByText('High availability')).not.toBeInTheDocument()
-    })
-
     test('hides the high availability toggle when the org lacks the entitlement', async () => {
       mockWizardEndpoints({
         entitlements: [
@@ -639,7 +636,7 @@ describe('project creation wizard', () => {
         ],
       })
 
-      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
+      await renderWizard()
 
       await screen.findByPlaceholderText('Project name')
       expect(screen.queryByText('High availability')).not.toBeInTheDocument()
@@ -650,7 +647,6 @@ describe('project creation wizard', () => {
 
       await renderWizard({
         flags: {
-          highAvailabilityProjectCreation: true,
           newProjectInternalOnlyConfiguration: true,
         },
       })
@@ -668,7 +664,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
+      await renderWizard()
 
       await fillProjectName('HA Project')
       await generateAndWaitForStrongPassword()
@@ -697,7 +693,7 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { highAvailabilityProjectCreation: true } })
+      await renderWizard()
 
       await fillProjectName('Standard Project')
       await generateAndWaitForStrongPassword()
@@ -710,6 +706,7 @@ describe('project creation wizard', () => {
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       const body = onRequest.mock.calls[0][0]
       expect(body.high_availability).toBe(false)
+      expect(body.cloud_provider).toBe('AWS')
       expect(body.postgres_engine).toBeUndefined()
       expect(body.custom_supabase_internal_requests).toBeUndefined()
     })

@@ -151,6 +151,7 @@ export const ProjectCreationForm = ({
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const cloudProviderBeforeHighAvailability = useRef<CloudProvider | undefined>(undefined)
   const postgresVersionBeforeHighAvailability = useRef('')
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -566,7 +567,15 @@ export const ProjectCreationForm = ({
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
+      cloudProviderBeforeHighAvailability.current = cloudProvider as CloudProvider
       setValue('cloudProvider', 'AWS_K8S')
+    } else if (
+      !highAvailability &&
+      cloudProvider === 'AWS_K8S' &&
+      cloudProviderBeforeHighAvailability.current !== undefined
+    ) {
+      setValue('cloudProvider', cloudProviderBeforeHighAvailability.current)
+      cloudProviderBeforeHighAvailability.current = undefined
     }
   }, [highAvailability, cloudProvider, setValue])
 
@@ -730,9 +739,9 @@ export const ProjectCreationForm = ({
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
-                    {showAdvancedConfig && !!availableOrioleVersion && !highAvailability && (
-                      <AdvancedConfiguration form={form} />
-                    )}
+                    {showAdvancedConfig &&
+                      !!availableOrioleVersion &&
+                      highAvailability !== true && <AdvancedConfiguration form={form} />}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
