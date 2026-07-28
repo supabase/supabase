@@ -118,6 +118,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
+                      aria-label={`More options for token ${x.name}`}
                       variant="default"
                       title="More options"
                       className="w-7"
