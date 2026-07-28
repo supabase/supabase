@@ -65,8 +65,8 @@ const EnablePipelinesModal = () => {
               feedback.
             </p>
             <p className="text-sm leading-normal!">
-              Pipelines is billed for configured pipeline hours, initial sync data, and ongoing
-              replication data. Review the{' '}
+              Pipelines is billed for configured pipeline hours and Postgres row data processed
+              during initial sync and ongoing replication. Review the{' '}
               <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
                 Pipelines pricing
               </InlineLink>{' '}

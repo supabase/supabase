@@ -14,6 +14,26 @@
   },
   "exports": {
     "./package.json": "./package.json",
+    "./Admonition/Admonition.constants": {
+      "import": "./src/Admonition/Admonition.constants.ts",
+      "types": "./src/Admonition/Admonition.constants.ts"
+    },
+    "./Admonition/Admonition": {
+      "import": "./src/Admonition/Admonition.tsx",
+      "types": "./src/Admonition/Admonition.tsx"
+    },
+    "./Admonition/Admonition.types": {
+      "import": "./src/Admonition/Admonition.types.ts",
+      "types": "./src/Admonition/Admonition.types.ts"
+    },
+    "./Admonition/AdmonitionIcons": {
+      "import": "./src/Admonition/AdmonitionIcons.tsx",
+      "types": "./src/Admonition/AdmonitionIcons.tsx"
+    },
+    "./Admonition": {
+      "import": "./src/Admonition/index.tsx",
+      "types": "./src/Admonition/index.tsx"
+    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"

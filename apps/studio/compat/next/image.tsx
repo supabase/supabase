@@ -135,6 +135,8 @@ const Image = forwardRef(function Image(
     : style
 
   return (
+    // alt is spread with rest
+    // eslint-disable-next-line jsx-a11y/alt-text
     <img
       {...rest}
       ref={(node) => {
