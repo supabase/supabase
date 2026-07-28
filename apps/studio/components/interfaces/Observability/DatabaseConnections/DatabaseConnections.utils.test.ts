@@ -8,7 +8,24 @@ const NOW = '2024-01-15T12:00:00Z'
 const secondsAgo = (seconds: number) =>
   new Date(new Date(NOW).getTime() - seconds * 1000).toISOString()
 
-const activity = (overrides: Partial<DatabaseActivity> = {}): DatabaseActivity => ({
+// `DatabaseActivity` intersects a discriminated `WaitEvent` union, so `Partial<DatabaseActivity>`
+// doesn't distribute cleanly over it - scope overrides to the plain fields tests actually vary.
+type ActivityOverrides = Partial<
+  Pick<
+    DatabaseActivity,
+    | 'pid'
+    | 'role_name'
+    | 'application_name'
+    | 'blocked_by'
+    | 'query'
+    | 'query_start'
+    | 'transaction_start'
+    | 'state_change'
+    | 'state'
+  >
+>
+
+const activity = (overrides: ActivityOverrides = {}): DatabaseActivity => ({
   pid: 1,
   role_name: 'postgres',
   application_name: 'test',
@@ -18,6 +35,8 @@ const activity = (overrides: Partial<DatabaseActivity> = {}): DatabaseActivity =
   transaction_start: null,
   state_change: null,
   state: 'active',
+  wait_event_type: null,
+  wait_event: null,
   ...overrides,
 })
 
