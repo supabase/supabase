@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import { useFlag } from 'common'
 import { http, HttpResponse } from 'msw'
 import { ResizablePanelGroup } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -27,6 +28,12 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
     .mockReturnValue({ data: { ref: 'project-ref', connectionString: 'postgres://' } }),
 }))
 
+// Defaults the `UserActivity` ConfigCat flag to off; individual tests override this.
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useFlag: vi.fn().mockReturnValue(false),
+}))
+
 // Heavy tab bodies — the sanctioned use of vi.mock. This spec only asserts tab
 // visibility, not what the tabs render.
 vi.mock('./UserOverview', () => ({
@@ -34,6 +41,9 @@ vi.mock('./UserOverview', () => ({
 }))
 vi.mock('./UserLogs', () => ({
   UserLogs: () => <div data-testid="user-logs" />,
+}))
+vi.mock('./UserActivityTab', () => ({
+  UserActivityTab: () => <div data-testid="user-activity" />,
 }))
 
 const renderPanel = (disabledFeatures: string[] = []) => {
@@ -87,5 +97,20 @@ describe('UserPanel', () => {
     expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
     expect(screen.queryByRole('tab', { name: 'Logs' })).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
+  })
+
+  it('shows the Activity tab when the UserActivity flag is enabled', async () => {
+    vi.mocked(useFlag).mockReturnValue(true)
+    renderPanel([])
+
+    expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: 'Activity' })).toBeInTheDocument()
+  })
+
+  it('hides the Activity tab when the UserActivity flag is disabled', async () => {
+    renderPanel([])
+
+    expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
+    expect(screen.queryByRole('tab', { name: 'Activity' })).not.toBeInTheDocument()
   })
 })

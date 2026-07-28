@@ -111,7 +111,6 @@ import { Route as ProjectRefSettingsAddonsRouteImport } from './routes/project/$
 import { Route as ProjectRefRealtimeSettingsRouteImport } from './routes/project/$ref/realtime/settings'
 import { Route as ProjectRefRealtimePoliciesRouteImport } from './routes/project/$ref/realtime/policies'
 import { Route as ProjectRefRealtimeInspectorRouteImport } from './routes/project/$ref/realtime/inspector'
-import { Route as ProjectRefObservabilityUserActivityRouteImport } from './routes/project/$ref/observability/user-activity'
 import { Route as ProjectRefObservabilityStorageRouteImport } from './routes/project/$ref/observability/storage'
 import { Route as ProjectRefObservabilityRealtimeRouteImport } from './routes/project/$ref/observability/realtime'
 import { Route as ProjectRefObservabilityQueryPerformanceRouteImport } from './routes/project/$ref/observability/query-performance'
@@ -849,12 +848,6 @@ const ProjectRefRealtimeInspectorRoute =
     id: '/inspector',
     path: '/inspector',
     getParentRoute: () => ProjectRefRealtimeRoute,
-  } as any)
-const ProjectRefObservabilityUserActivityRoute =
-  ProjectRefObservabilityUserActivityRouteImport.update({
-    id: '/user-activity',
-    path: '/user-activity',
-    getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
 const ProjectRefObservabilityStorageRoute =
   ProjectRefObservabilityStorageRouteImport.update({
@@ -2200,7 +2193,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
-  '/project/$ref/observability/user-activity': typeof ProjectRefObservabilityUserActivityRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2497,7 +2489,6 @@ export interface FileRoutesByTo {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
-  '/project/$ref/observability/user-activity': typeof ProjectRefObservabilityUserActivityRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2807,7 +2798,6 @@ export interface FileRoutesById {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
-  '/project/$ref/observability/user-activity': typeof ProjectRefObservabilityUserActivityRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -3117,7 +3107,6 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
-    | '/project/$ref/observability/user-activity'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -3414,7 +3403,6 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
-    | '/project/$ref/observability/user-activity'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -3723,7 +3711,6 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
-    | '/project/$ref/observability/user-activity'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -4711,13 +4698,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/realtime/inspector'
       preLoaderRoute: typeof ProjectRefRealtimeInspectorRouteImport
       parentRoute: typeof ProjectRefRealtimeRoute
-    }
-    '/project/$ref/observability/user-activity': {
-      id: '/project/$ref/observability/user-activity'
-      path: '/user-activity'
-      fullPath: '/project/$ref/observability/user-activity'
-      preLoaderRoute: typeof ProjectRefObservabilityUserActivityRouteImport
-      parentRoute: typeof ProjectRefObservabilityRoute
     }
     '/project/$ref/observability/storage': {
       id: '/project/$ref/observability/storage'
@@ -6605,7 +6585,6 @@ interface ProjectRefObservabilityRouteChildren {
   ProjectRefObservabilityQueryPerformanceRoute: typeof ProjectRefObservabilityQueryPerformanceRoute
   ProjectRefObservabilityRealtimeRoute: typeof ProjectRefObservabilityRealtimeRoute
   ProjectRefObservabilityStorageRoute: typeof ProjectRefObservabilityStorageRoute
-  ProjectRefObservabilityUserActivityRoute: typeof ProjectRefObservabilityUserActivityRoute
   ProjectRefObservabilityIndexRoute: typeof ProjectRefObservabilityIndexRoute
 }
 
@@ -6628,8 +6607,6 @@ const ProjectRefObservabilityRouteChildren: ProjectRefObservabilityRouteChildren
       ProjectRefObservabilityQueryPerformanceRoute,
     ProjectRefObservabilityRealtimeRoute: ProjectRefObservabilityRealtimeRoute,
     ProjectRefObservabilityStorageRoute: ProjectRefObservabilityStorageRoute,
-    ProjectRefObservabilityUserActivityRoute:
-      ProjectRefObservabilityUserActivityRoute,
     ProjectRefObservabilityIndexRoute: ProjectRefObservabilityIndexRoute,
   }
 
