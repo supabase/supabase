@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery, type Content, type ContentBase } from '@/data/content/content-query'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
@@ -50,6 +51,7 @@ export const useGenerateObservabilityMenu = () => {
   const topForPostgres = useFlag('topForPostgres')
   const { isSupamonitorEnabled } = useSupamonitorStatus()
   const storageSupported = useIsFeatureEnabled('project_storage:all')
+  const { isHighAvailability } = useHighAvailability()
 
   const baseUrl = `/project/${ref}/observability`
 
@@ -144,6 +146,17 @@ export const useGenerateObservabilityMenu = () => {
       url: `${baseUrl}/realtime${preservedQueryParams}`,
       shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_REALTIME,
     },
+    // Throwaway demo: HA cluster topology via the mgmt-api `/ha-admin` passthrough.
+    // Only shown for High Availability (Multigres) projects.
+    ...(isHighAvailability
+      ? [
+          {
+            name: 'HA cluster',
+            key: 'ha-cluster',
+            url: `${baseUrl}/ha-cluster${preservedQueryParams}`,
+          },
+        ]
+      : []),
   ]
 
   const sections: ObservabilityMenuSection[] = [
