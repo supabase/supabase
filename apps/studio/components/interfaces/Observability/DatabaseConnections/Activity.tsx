@@ -30,6 +30,7 @@ export const Activity = ({ live }: ActivityProps) => {
       states: statesFilter,
       applications: applicationsFilter,
       roles: rolesFilter,
+      view: viewFilter,
     },
     setQueryStates,
   ] = useQueryStates({
@@ -37,13 +38,15 @@ export const Activity = ({ live }: ActivityProps) => {
     states: parseAsArrayOf(parseAsString, ',').withDefault([]),
     applications: parseAsArrayOf(parseAsString, ',').withDefault([]),
     roles: parseAsArrayOf(parseAsString, ',').withDefault(DEFAULT_ROLES_FILTER),
+    view: parseAsString.withDefault(''),
   })
 
   const hasNoFiltersApplied =
     searchFilter.length === 0 &&
     statesFilter.length === 0 &&
     applicationsFilter.length === 0 &&
-    isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
+    isEqual(rolesFilter, DEFAULT_ROLES_FILTER) &&
+    viewFilter === ''
 
   const { data, isPending, isSuccess } = useDatabaseActivityQuery(
     {
@@ -69,8 +72,10 @@ export const Activity = ({ live }: ActivityProps) => {
     const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
     const matchesApplication =
       applicationsFilter.length === 0 || applicationsFilter.includes(activity.application_name)
-    return matchesState && matchesRole && matchesApplication && matchesSearch(activity)
+    const matchesView = viewFilter !== 'blocked' || activity.blocked_by.length > 0
+    return matchesState && matchesRole && matchesApplication && matchesView && matchesSearch(activity)
   })
+  const blockedQueries = (data ?? []).filter((x) => x.blocked_by.length > 0)
 
   const stateOptions = [
     'Idle',
@@ -87,6 +92,7 @@ export const Activity = ({ live }: ActivityProps) => {
         y.state === x.toLowerCase() &&
         (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
         (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
+        (viewFilter !== 'blocked' || y.blocked_by.length > 0) &&
         matchesSearch(y)
     ).length,
   }))
@@ -103,6 +109,7 @@ export const Activity = ({ live }: ActivityProps) => {
           (!statesFilter ||
             statesFilter.length === 0 ||
             (y.state !== null && statesFilter.includes(y.state))) &&
+          (viewFilter !== 'blocked' || y.blocked_by.length > 0) &&
           matchesSearch(y)
       ).length,
     }))
@@ -121,6 +128,7 @@ export const Activity = ({ live }: ActivityProps) => {
             statesFilter.length === 0 ||
             (y.state !== null && statesFilter.includes(y.state))) &&
           (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
+          (viewFilter !== 'blocked' || y.blocked_by.length > 0) &&
           matchesSearch(y)
       ).length,
     }))
@@ -139,6 +147,7 @@ export const Activity = ({ live }: ActivityProps) => {
       states: [],
       roles: DEFAULT_ROLES_FILTER,
       applications: [],
+      view: '',
     })
   }
 
@@ -158,7 +167,7 @@ export const Activity = ({ live }: ActivityProps) => {
           size="tiny"
           icon={<Search />}
           placeholder="Search query"
-          className="w-64"
+          className="w-56"
           value={searchFilter}
           onChange={(e) => setQueryStates({ search: e.target.value })}
         />
@@ -188,6 +197,13 @@ export const Activity = ({ live }: ActivityProps) => {
           isLoading={isPending}
           popoverClassName="w-60"
         />
+        <Button
+          variant={viewFilter === 'blocked' ? 'default' : 'dashed'}
+          iconRight={<span>{blockedQueries.length}</span>}
+          onClick={() => setQueryStates({ view: viewFilter === 'blocked' ? '' : 'blocked' })}
+        >
+          Blocked queries
+        </Button>
         {!hasNoFiltersApplied && (
           <ButtonTooltip
             variant="text"
