@@ -4,11 +4,14 @@ import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import type { UserActivityEvent } from './UserActivity.constants'
 import { UserActivityEventItem } from './UserActivityEventItem'
+import { useFormatDateTime } from '@/lib/datetime'
 
 interface UserActivityTimelineProps {
   events: UserActivityEvent[]
   projectRef: string | undefined
   onViewPayload: (event: UserActivityEvent) => void
+  dateRangeStart: string
+  dateRangeEnd: string
 }
 
 /** Group events by calendar day, preserving chronological order. */
@@ -27,15 +30,19 @@ export const UserActivityTimeline = ({
   events,
   projectRef,
   onViewPayload,
+  dateRangeStart,
+  dateRangeEnd,
 }: UserActivityTimelineProps) => {
+  const formatDateTime = useFormatDateTime()
   const dayGroups = groupEventsByDay(events)
 
   if (events.length === 0) {
+    const dateRangeFormat = 'MMM D, YYYY h:mm A'
     return (
       <EmptyStatePresentational
         icon={SearchX}
         title="No activity found"
-        description="No activity found in this date range."
+        description={`No activity found between ${formatDateTime(dateRangeStart, dateRangeFormat)} and ${formatDateTime(dateRangeEnd, dateRangeFormat)}.`}
       />
     )
   }
