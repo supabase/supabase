@@ -1,10 +1,10 @@
 import {
+  literal,
   safeSql,
   untrustedSql,
   type SafeSqlFragment,
   type UntrustedSqlFragment,
 } from '@supabase/pg-meta'
-import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import {
@@ -12,17 +12,26 @@ import {
   destructiveSqlRegex,
   NEW_SQL_SNIPPET_SKELETON,
   sqlAiDisclaimerComment,
+  untitledSnippetTitle,
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
-import { ContentDiff, type IStandaloneCodeEditor } from './SQLEditor.types'
-import { isExplainSql } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+import {
+  ContentDiff,
+  DiffType,
+  type IStandaloneCodeEditor,
+  type PotentialIssues,
+} from './SQLEditor.types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
+import type { Database } from '@/data/read-replicas/replicas-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { sqlEventParser } from '@/lib/sql-event-parser'
-import type { RoleImpersonationState } from '@/state/role-impersonation-state'
+import {
+  isRoleImpersonationEnabled,
+  type RoleImpersonationState,
+} from '@/state/role-impersonation-state'
 
 export type CreateTableWithoutRLS = {
   schema?: string
@@ -186,6 +195,126 @@ export function checkAlterDatabaseConnection(sql: string): boolean {
   )
 }
 
+/**
+ * Runs every pre-execution safety check on a query and packages the results as
+ * `PotentialIssues`, used both to decide whether to show the warning modal and
+ * to render its content.
+ */
+export function analyzeQueryIssues(
+  sql: string,
+  eventTriggers: DatabaseEventTrigger[] | undefined
+): PotentialIssues {
+  return {
+    hasDestructiveOperations: checkDestructiveQuery(sql),
+    hasUpdateWithoutWhere: isUpdateWithoutWhere(sql),
+    hasAlterDatabasePreventConnection: checkAlterDatabaseConnection(sql),
+    createTablesMissingRLS: filterTablesCoveredByEnsureRLSTrigger(
+      getCreateTablesMissingRLS(sql),
+      hasActiveEnsureRLSTrigger(eventTriggers)
+    ),
+  }
+}
+
+/**
+ * Whether `issues` should block an unforced run behind the warning modal.
+ */
+export function hasBlockingIssues(issues: PotentialIssues, force: boolean): boolean {
+  return (
+    !force &&
+    (!!issues.hasDestructiveOperations ||
+      !!issues.hasUpdateWithoutWhere ||
+      !!issues.hasAlterDatabasePreventConnection ||
+      (issues.createTablesMissingRLS?.length ?? 0) > 0)
+  )
+}
+
+/**
+ * Resolves the connection string for the currently selected database (primary
+ * or read replica) from the read-replicas list. Shared by the run and explain
+ * flows so the lookup isn't duplicated.
+ */
+export function resolveConnectionString(
+  databases: Database[] | undefined,
+  selectedDatabaseId: string | undefined
+): string | undefined {
+  return (
+    databases?.find((db) => db.identifier === selectedDatabaseId)?.connectionString ?? undefined
+  )
+}
+
+/**
+ * Whether a query run should lazily kick off AI title generation for the
+ * snippet: only when the org has AI enabled (not disabled/HIPAA — which would
+ * silently forward the query to the AI provider without consent), the
+ * snippet still has its placeholder name, and we're running on the hosted
+ * platform.
+ */
+export function shouldAutoGenerateTitle({
+  aiOptInLevel,
+  snippetName,
+  isPlatform,
+}: {
+  aiOptInLevel: string
+  snippetName: string | undefined
+  isPlatform: boolean
+}): boolean {
+  return (
+    aiOptInLevel !== 'disabled' && !!snippetName?.startsWith(untitledSnippetTitle) && isPlatform
+  )
+}
+
+/**
+ * Builds the params passed to `useExecuteSqlMutation`'s `execute`: applies the
+ * auto-limit suffix and role impersonation to the SQL, and derives the
+ * `autoLimit`/`isRoleImpersonationEnabled` flags. Callers still attach their
+ * own `handleError`.
+ */
+export function buildExecuteParams({
+  sql,
+  limit,
+  connectionString,
+  projectRef,
+  impersonatedRoleState,
+}: {
+  sql: SafeSqlFragment
+  limit: number
+  connectionString: string | undefined
+  projectRef: string
+  impersonatedRoleState: RoleImpersonationState
+}) {
+  const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, limit)
+
+  return {
+    projectRef,
+    connectionString,
+    sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
+    autoLimit: appendAutoLimit ? limit : undefined,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+    isStatementTimeoutDisabled: true as const,
+    contextualInvalidation: true as const,
+  }
+}
+
+/**
+ * Derives the stable snippet id + loading state for the editor from the URL.
+ */
+export function deriveSnippetIdentity({
+  urlId,
+  generatedId,
+  snippets,
+}: {
+  urlId: string | undefined
+  generatedId: string
+  snippets: Record<string, { snippet: { content?: unknown } }>
+}): { id: string; isLoading: boolean } {
+  const id = !urlId || urlId === 'new' ? generatedId : urlId
+
+  const snippetIsLoading = !(id in snippets && snippets[id].snippet.content !== undefined)
+  const isLoading = urlId === 'new' ? false : snippetIsLoading
+
+  return { id, isLoading }
+}
+
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
   `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
@@ -231,13 +360,35 @@ export const compareAsNewSnippet = (sqlDiff: ContentDiff) => {
   }
 }
 
+/**
+ * Removes trailing `;` characters from a safe SQL fragment. Only ever removes
+ * existing terminators — never adds text — so the result is exactly as safe
+ * as the input; the brand carries over intentionally. This is the one place
+ * in the file allowed to reassert `SafeSqlFragment` on a derived string —
+ * every other function composes new fragments through `safeSql`/`literal`.
+ */
+export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
+  return sql.replace(/;+\s*$/, '') as SafeSqlFragment
+}
+
 // [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
 // This is to prevent dashboard from accidentally appending limit to the end of a query
 // thats not supposed to have any, since there's too many cases to cover.
 // We can however look into making this logic better in the future
 // i.e It's harder to append the limit param, than just leaving the query as it is
 // Otherwise we'd need a full on parser to do this properly
-export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
+//
+// Only accepts `SafeSqlFragment`: this decides whether to build (and builds)
+// a new SQL fragment that gets executed, so every caller — including ones
+// that only want the `appendAutoLimit` flag for a display hint — must already
+// hold safe SQL. Composes the ` limit N;` suffix through `safeSql`/`literal`
+// rather than gluing raw template-literal text onto the fragment and casting
+// the result, so the only new content this function ever stamps safe is an
+// internally-generated integer literal, never arbitrary concatenated text.
+export function applyAutoLimit(
+  sql: SafeSqlFragment,
+  limit: number = 0
+): { sql: SafeSqlFragment; appendAutoLimit: boolean } {
   // Remove lines and whitespaces to use for checking
   const cleanedSql = sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
 
@@ -260,15 +411,13 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
     !cleanedSql.match(/limit;$/i) &&
     !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
     !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
-  return { cleanedSql, appendAutoLimit }
-}
 
-export const suffixWithLimit = (sql: SafeSqlFragment, limit: number = 0): SafeSqlFragment => {
-  const { cleanedSql, appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-  if (!appendAutoLimit) return sql
-  return (
-    cleanedSql.endsWith(';') ? sql.replace(/[;]+$/, ` limit ${limit};`) : `${sql} limit ${limit};`
-  ) as SafeSqlFragment
+  if (!appendAutoLimit) return { sql, appendAutoLimit: false }
+
+  const core = cleanedSql.endsWith(';') ? trimTrailingSemicolons(sql) : sql
+  const suffixed = safeSql`${core} limit ${literal(limit)};`
+
+  return { sql: suffixed, appendAutoLimit: true }
 }
 
 /**
@@ -324,19 +473,34 @@ export function assembleCompletionDiff(
 }
 
 /**
- * Builds the SQL sent for an EXPLAIN run: wraps the query in `EXPLAIN ANALYZE`
- * (unless it is already an EXPLAIN), applies role impersonation, and wraps the
- * whole thing in a rollback transaction so EXPLAIN ANALYZE never mutates data.
- *
- * Takes an already-safe fragment — the untrusted→safe promotion happens at the
- * caller's user-action boundary (see `acceptUntrustedSql`), not in here.
+ * Builds the request body sent to the AI completion endpoint. `options` is
+ * the caller-provided extra fields (e.g. `completionMetadata`), merged in
+ * last so it can override the defaults if it ever needs to.
  */
-export function buildExplainSql(
-  sql: SafeSqlFragment,
-  impersonatedRoleState?: RoleImpersonationState
-): SafeSqlFragment {
-  const explainSql = isExplainSql(sql) ? sql : safeSql`EXPLAIN ANALYZE ${sql}`
-  return wrapWithRollback(wrapWithRoleImpersonation(explainSql, impersonatedRoleState))
+export function buildCompletionRequestBody({
+  projectRef,
+  connectionString,
+  orgSlug,
+  options,
+}: {
+  projectRef: string | undefined
+  connectionString: string | undefined | null
+  orgSlug: string | undefined
+  options?: { completionMetadata?: unknown }
+}): {
+  projectRef: string | undefined
+  connectionString: string | undefined | null
+  language: 'sql'
+  orgSlug: string | undefined
+  completionMetadata?: unknown
+} {
+  return {
+    projectRef,
+    connectionString,
+    language: 'sql',
+    orgSlug,
+    ...(options ?? {}),
+  }
 }
 
 /**
@@ -345,4 +509,99 @@ export function buildExplainSql(
 export function buildDebugPromptText(sql: string, errorMessage: string): string {
   const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
   return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+}
+
+type DebugSnippet = { snippet: { content?: { unchecked_sql?: UntrustedSqlFragment } } } | undefined
+type DebugResult = { error?: { message?: string } } | undefined
+
+/**
+ * Extracts the SQL (disclaimer stripped) and error message used to debug a
+ * failing snippet, shared by `buildDebugPrompt` and `onDebug`. Falls back to
+ * an empty query / `'Unknown error'` rather than throwing when the snippet or
+ * its last result aren't available yet.
+ */
+export function extractDebugContext(
+  snippet: DebugSnippet,
+  result: DebugResult
+): { sql: string; errorMessage: string } {
+  const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
+    .replace(sqlAiDisclaimerComment, '')
+    .trim()
+  const errorMessage = result?.error?.message ?? 'Unknown error'
+  return { sql, errorMessage }
+}
+
+/**
+ * Builds the `aiSnap.newChat(...)` payload for the debug-this-snippet flow.
+ */
+export function buildDebugChatArgs(
+  snippet: DebugSnippet,
+  result: DebugResult
+): { name: string; sqlSnippets: string[]; initialInput: string } {
+  const { sql, errorMessage } = extractDebugContext(snippet, result)
+  return {
+    name: 'Debug SQL snippet',
+    sqlSnippets: [sql],
+    initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`,
+  }
+}
+
+/** What `drainDiffRequest` should do with a pending diff request, given the editor's current value. */
+export type DiffRequestPlan =
+  | { kind: 'replace'; text: string }
+  | { kind: 'diff'; diff: ContentDiff; diffType: DiffType }
+
+/**
+ * Decides how to apply a pending diff request to the editor: if the editor is
+ * empty, just copy the request's SQL straight in; otherwise open a diff
+ * between what's there and the requested SQL. Pure decision only — the
+ * effect (`drainDiffRequest`) is left to actually touch the editor/diff state.
+ */
+export function planDiffRequestApplication({
+  existingValue,
+  request,
+}: {
+  existingValue: string
+  request: { diffType: DiffType; sql: string }
+}): DiffRequestPlan {
+  if (existingValue.length === 0) {
+    return { kind: 'replace', text: request.sql }
+  }
+  return {
+    kind: 'diff',
+    diff: { original: existingValue, modified: request.sql },
+    diffType: request.diffType,
+  }
+}
+
+/** What the window keydown handler should do for a key event, given the diff/prompt state. */
+export type DiffKeyAction =
+  | { type: 'accept' }
+  | { type: 'escape'; shouldDiscard: boolean }
+  | { type: 'none' }
+
+/**
+ * Decides how the SQL editor's window-level keydown handler should react:
+ * accept an open diff on Cmd/Ctrl+Enter, or discard-and-dismiss on Escape.
+ * No-ops when neither a diff nor the AI prompt is open, or for any other key.
+ */
+export function resolveDiffKeyAction(
+  e: Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey'>,
+  {
+    isDiffOpen,
+    isPromptOpen,
+    os,
+  }: { isDiffOpen: boolean; isPromptOpen: boolean; os: 'macos' | 'windows' | undefined }
+): DiffKeyAction {
+  if (!isDiffOpen && !isPromptOpen) return { type: 'none' }
+
+  switch (e.key) {
+    case 'Enter':
+      if ((os === 'macos' ? e.metaKey : e.ctrlKey) && isDiffOpen) return { type: 'accept' }
+      return { type: 'none' }
+    case 'Escape':
+      return { type: 'escape', shouldDiscard: isDiffOpen }
+    default:
+      return { type: 'none' }
+  }
 }

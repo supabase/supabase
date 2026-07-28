@@ -91,9 +91,7 @@ const Team = () => {
           </div>
           <div className=" col-span-4 pt-8 md:mt-0 md:text-right">
             <a href="https://supabase.com/careers">
-              <Button size="medium" className="text-white">
-                Join the team
-              </Button>
+              <Button size="medium">Join the team</Button>
             </a>
           </div>
         </div>
@@ -222,7 +220,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover
@@ -249,7 +247,7 @@ const Press = () => {
             href={x.href}
             key={x.href}
             target="_blank"
-            className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+            className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
           >
             <Panel
               hasActiveOnHover

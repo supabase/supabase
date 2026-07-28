@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useState, type PropsWithChildren } from 'react'
-
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -42,7 +41,10 @@ function MultipleSources({ children, sources }: PropsWithChildren<{ sources: (st
       {children}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="block -mt-4 mb-4 ml-auto text-foreground-lighter text-sm focus-visible:outline-hidden focus-visible:underline">
+          <button
+            tabIndex={0}
+            className="block -mt-4 mb-4 ml-auto text-foreground-lighter text-sm focus-visible:outline-hidden focus-visible:underline"
+          >
             View sources
           </button>
         </DropdownMenuTrigger>

@@ -173,11 +173,11 @@ updated_at       | 2022-12-14 02:51:13.938396+00
   ></iframe>
 </div>
 
-As we mentioned, Vault uses Transparent Column Encryption (TCE) to store secrets in an authenticated encrypted form. There are some details around that you may be curious about. What does authenticated mean? Where is the encryption key stored? This section explains those details.
+As we mentioned, Vault stores secrets in an authenticated encrypted form. There are some details around that you may be curious about. What does authenticated mean? Where is the encryption key stored? This section explains those details.
 
 ### Authenticated encryption with associated data
 
-The first important feature of TCE is that it uses an [Authenticated Encryption with Associated Data](<https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)>) encryption algorithm (based on `libsodium`).
+The first important feature is that it uses an [Authenticated Encryption with Associated Data](<https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)>) encryption algorithm (based on `libsodium`).
 
 ### Encryption key location
 
@@ -189,12 +189,31 @@ Another important feature is that the encryption key is never stored in the data
 
 This is an important safety precaution - there is little value in storing the encryption key in the database itself as this would be like locking your front door but leaving the key in the lock! Storing the key outside the database fixes this issue.
 
-Where is the key stored? Supabase creates and manages the encryption key in our secured backend systems. We keep this key safe and separate from your data. You remain in control of your key - a separate API endpoint is available that you can use to access the key if you want to decrypt your data outside of Supabase.
+Where is the key stored? Supabase creates and manages a unique encryption key for each project in our secured backend systems. We keep this key safe and separate from your data. You remain in control of your key - the [Management API endpoint](/docs/reference/api/v1-get-pgsodium-config) returns your project's 64-character hex root key so you can decrypt your data outside of Supabase or copy it to another project.
 
-Which roles should have access to the `vault.secrets` table should be carefully considered. There are two ways to grant access, the first is that the `postgres` user can explicitly grant access to the vault table itself.
+Which roles should have access to the `vault.secrets` table should be carefully considered. One example would be the `postgres` user explicitly granting access to the vault table.
+
+### Key portability and migration
+
+Each Supabase project has its own root encryption key. Same-project operations - pausing and restoring, and Point-in-Time or in-place restores - keep the same key, so your secrets stay readable automatically. The [Restore to a new project](/docs/guides/platform/clone-project) and [Branching](/docs/guides/deployment/branching) flows also copy the key to the new project.
+
+However, if you migrate to a **new** project with a manual `pg_dump` / `pg_restore`, that project is created with its own fresh key and **cannot decrypt** secrets copied from the old project. Before relying on the migrated data, copy the old project's root key to the new project. The `pgsodium` Management API endpoint returns and accepts the 64-character hex root key, and is only available for active (not paused or removed) projects:
+
+```bash
+export OLD_PROJECT_REF="<old_project_ref>"
+export NEW_PROJECT_REF="<new_project_ref>"
+export SUPABASE_ACCESS_TOKEN="<personal_access_token>"
+
+curl "https://api.supabase.com/v1/projects/$OLD_PROJECT_REF/pgsodium" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" |
+curl "https://api.supabase.com/v1/projects/$NEW_PROJECT_REF/pgsodium" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -X PUT --json @-
+```
+
+See [Backup and restore using the CLI](/docs/guides/platform/migrating-within-supabase/backup-restore) for the full restore procedure.
 
 ### Resources
 
 - Read more about Supabase Vault in the [blog post](/blog/vault-now-in-beta)
 - [Supabase Vault on GitHub](https://github.com/supabase/vault)
-- [Column Encryption](/docs/guides/database/column-encryption)
