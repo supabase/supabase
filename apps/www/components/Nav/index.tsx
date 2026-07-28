@@ -146,7 +146,9 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           >
                             {menuItem.title}
                           </NavigationMenuTrigger>
-                          <NavigationMenuContent className={desktopMenuContentMotion}>
+                          <NavigationMenuContent
+                            className={cn(desktopMenuContentMotion, styles.desktopMenuContent)}
+                          >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
                         </NavigationMenuItem>
