@@ -61,10 +61,13 @@ export const telemetryMonitoring: ContentListingGroup = {
       href: '/guides/monitoring-and-debugging/sentry-monitoring',
       description: 'Send errors to Sentry for alerting and grouping.',
     },
+<<<<<<< HEAD
     {
       title: 'MCP server setup',
       href: '/guides/getting-started/mcp',
       description: 'Connect Claude, Cursor, or any MCP-compatible agent to your Supabase project.',
     },
+=======
+>>>>>>> cca431639e (Debugging Skill and MCP dependent changes)
   ],
 }
