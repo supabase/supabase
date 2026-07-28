@@ -81,7 +81,8 @@ export const useRestorePointPolicyUpdateMutation = ({
       await onSuccess?.(data, variables, context)
     },
     onError(error, variables, context) {
-      if (onError === undefined) toast.error(`Failed to update restore points: ${error.message}`)
+      if (onError === undefined)
+        toast.error(`Failed to update snapshot lifecycle settings: ${error.message}`)
       else onError(error, variables, context)
     },
     ...options,

@@ -150,7 +150,7 @@ This directly implements the External FAQ ("If an object belongs to a snapshot, 
 
 ## 4. Deliverable 3 — Visualize / navigate / interact with snapshots
 
-**Principle:** a snapshot is a bucket-wide, immutable restore point. It gets its own nav section (`/storage/snapshots`) built on the existing list-page pattern (`PageContainer` + search + sort + `Card`-wrapped `@tanstack/react-table`, as in `FilesBuckets/index.tsx`).
+**Principle:** a snapshot is a bucket-wide, immutable point-in-time capture. It gets its own nav section (`/storage/snapshots`) built on the existing list-page pattern (`PageContainer` + search + sort + `Card`-wrapped `@tanstack/react-table`, as in `FilesBuckets/index.tsx`).
 
 ### 4.1 Snapshots list
 
@@ -361,7 +361,7 @@ Design decisions:
 
 ## 8b. Where should Backups live in the dashboard?
 
-Raised once restore points became environment-wide: if a backup now covers Database, Auth, Storage, and Config, is `Database → Backups` still the right home?
+Raised once a backup's coverage became environment-wide: if a backup now covers Database, Auth, Storage, and Config, is `Database → Backups` still the right home?
 
 **Recommendation: keep it under Database for now, but rename the page from "Database Backups" to "Backups."**
 
@@ -372,7 +372,7 @@ Reasons to stay:
 
 What would change our mind — two plausible end states, both post-Select:
 1. **A project-level "Recovery" section**, once Storage snapshots, config-from-git, and Compute state are all first-class inputs and the page is no longer database-dominated.
-2. **Absorbed into Branches.** If restoring is primarily "create a branch from a past point, verify, promote," then restore points are a *time axis on branches* and belong beside them. The vision's framing — branching as a CoW primitive that everything inherits — points here.
+2. **Absorbed into Branches.** If restoring is primarily "create a branch from a past point, verify, promote," then backups and snapshots are a *time axis on branches* and belong beside them. The vision's framing — branching as a CoW primitive that everything inherits — points here.
 
 Either way the trigger is the same: revisit when storage-level branching lands (2026–2027 per the engineering vision), because that's when "restore" stops being a database operation with attachments and becomes an environment operation.
 
@@ -398,14 +398,14 @@ And **current-object expiry is a different product** (S3 lifecycle expiration). 
 
 ### Why snapshot retention can't be per-bucket
 
-A restore point's entire value is being consistent *across* buckets, because the database references objects in all of them. If bucket A keeps snapshots 90 days and bucket B keeps 30, then on day 31 the older restore points silently degrade into **partial** ones — restorable for A, gone for B — and you find out mid-incident.
+A snapshot generation's entire value is being consistent *across* buckets, because the database references objects in all of them. If bucket A keeps snapshots 90 days and bucket B keeps 30, then on day 31 the older snapshots silently degrade into **partial** ones — restorable for A, gone for B — and you find out mid-incident.
 
 So frequency and retention are project-level, single values. Per bucket you choose *participation*, which is the cost escape hatch. This makes the surface smaller, not bigger:
 
 | Knob | Level | Why |
 | --- | --- | --- |
 | Snapshot frequency | **Project** | Consistency requires coordination across buckets |
-| Snapshot retention | **Project** | Per-bucket retention makes older restore points partial |
+| Snapshot retention | **Project** | Per-bucket retention makes older snapshots partial |
 | Bucket participates | Bucket | Cost escape hatch; defaults to *in* |
 | Version retention (days / max count) | Bucket, with project default | No cross-bucket consistency requirement; churn varies per bucket |
 | ~~Current object expiry~~ | Deferred | Different product; see above |
@@ -414,23 +414,23 @@ Versioning is the opposite case: undoing an overwrite in `avatars` has no relati
 
 ### Frequency defaults to inheritance, not configuration
 
-Default is **"with every database backup."** An independent cadence actively breaks the headline value: you'd get storage restore points with no matching database backup, so you could restore the files but not the database state that referenced them. Daily/hourly remain available as advanced options, but for most users frequency isn't a knob they touch.
+Default is **"with every database backup."** An independent cadence actively breaks the headline value: you'd get storage snapshots with no matching database backup, so you could restore the files but not the database state that referenced them. Daily/hourly remain available as advanced options, but for most users frequency isn't a knob they touch.
 
 ### Keeping two levels from being confusing
 
 1. **Always show the effective value and its origin** — "Keeping 100 versions per file for 30 days (project default)" vs "(overridden for this bucket)". Never make users resolve inheritance in their heads.
 2. **Lead with the promise, not the mechanism** — "You can roll Storage back to any of the last 90 days" instead of listing retention numbers. The policy is the implementation; the recovery window is what the customer is buying.
-3. **"Restore points", not "lifecycle policy"** — the latter is S3 vocabulary that makes users learn our mechanism.
+3. **"Snapshots" and "snapshot lifecycle", not "restore points".** Earlier drafts of this feature used "restore point" as an umbrella term — a single word for "the moment your whole environment can be rolled back to." In review that read as unclear: it's a made-up term competing with "backup," "snapshot," and "PITR recovery point," all of which already mean something specific to users. The prototype now says what it means: "snapshots" for the Storage-side artifact (matching the existing Snapshots tab and bucket-level "include in snapshots" toggle), and "snapshot lifecycle" for the project-level frequency/retention settings that govern them. The one place this term still earns its keep is the per-backup **coverage** concept (Database/Auth/Storage/Config) — that's about a backup's coverage, so it's described as such rather than reusing "restore point" as a noun.
 
 ### Where it's configured
 
 | Surface | Role |
 | --- | --- |
-| Storage → Files → Settings | **Canonical editor** for the project-level restore point policy (frequency, retention, include-new-buckets, per-bucket participation) |
+| Storage → Files → Settings | **Canonical editor** for the project-level snapshot lifecycle policy (frequency, retention, include-new-buckets, per-bucket participation) |
 | Bucket create/edit modal | Versioning (with override) + this bucket's participation; shows the inherited project policy read-only and links to Settings |
 | Database → Backups banner | States actual coverage and links to Settings — one editor, so the two can't drift |
 
-**One banner, state-aware.** The Backups page previously had a permanent "Storage objects are not included" alert. Once restore points exist that statement is sometimes false, so it's a single notice with four states: feature off, capture off, partial coverage (warning + which buckets), full coverage. Never two banners describing the same thing.
+**One banner, state-aware.** The Backups page previously had a permanent "Storage objects are not included" alert. Once snapshots exist that statement is sometimes false, so it's a single notice with four states: feature off, capture off, partial coverage (warning + which buckets), full coverage. Never two banners describing the same thing.
 
 ## 9. Open questions for the team
 

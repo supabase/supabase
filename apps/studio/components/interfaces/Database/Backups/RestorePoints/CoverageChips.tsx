@@ -4,8 +4,8 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type { PrimitiveCoverage } from '@/data/restore-points/restore-points-mocks'
 
 /**
- * Per-primitive coverage chips for a restore point. Makes it obvious at a glance
- * that a database backup does not necessarily protect Storage objects.
+ * Per-primitive coverage chips for a backup. Makes it obvious at a glance that a
+ * database backup does not necessarily protect Storage objects.
  */
 export const CoverageChips = ({ primitives }: { primitives: PrimitiveCoverage[] }) => {
   return (

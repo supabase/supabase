@@ -16,7 +16,7 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 
 ### Beat 1 — Enable protection (1–2 min)
 **Storage → Files → a bucket → Edit bucket**
-- Show the **Data protection** section: object versioning switch, and "include in restore points" switch.
+- Show the **Data protection** section: object versioning switch, and "include in snapshots" switch.
 - Point out: versioning retention shows the project default inline ("Keeping N versions for D days") with an explicit override switch to diverge per bucket; lifecycle fields use the design system's "input with unit" pattern; the cost admonition appears inline at enable-time — not buried in docs.
 
 ### Beat 2 — Versioning in the explorer (2 min)
@@ -42,8 +42,8 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 - This is what changed after re-reading the vision docs.
 - Each backup row now shows coverage chips: **Database / Auth / Storage / Config**.
 - Explain: Auth users and Storage *metadata* live in Postgres, so a database restore brings them back for free. Object *bytes* don't — that asymmetry is exactly the drift bug in the PRFAQ.
-- One state-aware coverage notice (not two overlapping banners anymore) names which buckets aren't covered, linking straight to the project's **Restore points** settings on the Storage Settings page — one place to fix it, not a separate dialog.
-- Storage → Files → Settings → **Restore points**: frequency (with every backup / daily / hourly) and retention are project-level, since per-bucket retention would let a restore point be complete for one bucket and expired for another on the same day. Bucket-level keeps only participation (opt-out) and versioning's own override.
+- One state-aware coverage notice (not two overlapping banners anymore) names which buckets aren't covered, linking straight to the project's **Snapshot lifecycle** settings on the Storage Settings page — one place to fix it, not a separate dialog.
+- Storage → Files → Settings → **Snapshot lifecycle**: frequency (with every backup / daily / hourly) and retention are project-level, since per-bucket retention would let a snapshot generation be complete for one bucket and expired for another on the same day. Bucket-level keeps only participation (opt-out) and versioning's own override.
 - Open Restore: it defaults to **"into a new preview branch,"** not in-place. Tie this explicitly to "branching is a platform primitive, not a database feature" — a CoW branch is cheap and reversible, so verify-then-promote should be the default; destructive in-place restore becomes the deliberate exception.
 
 ### Beat 6 — Usage/billing honesty (1–2 min)
@@ -57,7 +57,7 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 - **Ask the room:**
   - Storage: does branch-first restore hold up against how storage branching is actually sequenced (2026–2027 per the vision)?
   - Storage: per-bucket Deleted files, or project-wide?
-  - Design: does the platform reframe (coverage chips, "restore point" language) read as coherent, or is it doing too much in one screen?
+  - Design: does the platform reframe (coverage chips, "snapshot lifecycle" language) read as coherent, or is it doing too much in one screen?
 
 ---
 
@@ -103,9 +103,11 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 > The existing Storage Size usage chart now splits into live objects / object versions / snapshots, folded into the section that's already there rather than bolted on as a new card, so it's consistent with how every other usage metric on that page is presented. A per-bucket table shows exactly which bucket's retention is driving the number. This was arguably the single highest-risk item in the original PRFAQ's own internal review: if a customer can't answer "when is my object truly gone, and when do I stop paying for it?" without reading docs, the feature generates billing-surprise tickets instead of trust.
 >
 > **7. Keeping Storage in sync with backups without silent drift**
-> This one changed the most since I first sketched it. A single per-bucket toggle has a trap: it quietly stops covering a bucket created after the fact, so a fully-recoverable project degrades without anyone noticing — and if retention were also set per bucket, a restore point could be complete for one bucket and already expired for another on the very same day, silently. So the two settings that determine *whether a restore point exists at all* — how often Storage is captured (with every database backup, daily, or hourly) and how long it's retained — now live in one place: a project-level "Restore points" settings section, plus an "include new buckets automatically" switch so newly created buckets aren't a silent gap.
+> This one changed the most since I first sketched it. A single per-bucket toggle has a trap: it quietly stops covering a bucket created after the fact, so a fully-recoverable project degrades without anyone noticing — and if retention were also set per bucket, a snapshot generation could be complete for one bucket and already expired for another on the very same day, silently. So the two settings that determine *whether a usable snapshot exists at all* — how often Storage is captured (with every database backup, daily, or hourly) and how long it's retained — now live in one place: a project-level "Snapshot lifecycle" settings section, plus an "include new buckets automatically" switch so newly created buckets aren't a silent gap.
 >
-> Bucket-level configuration keeps only what's genuinely bucket-specific: whether a bucket participates at all (the deliberate opt-out, e.g. for a large regenerable cache bucket), and object-versioning's own retention, which can inherit the project default or be overridden per bucket — since keeping more or fewer old versions of one noisy bucket doesn't put restore points elsewhere out of sync. The old idea of a separate "sync" dialog is gone too: the coverage notice on the Backups page now links straight to this one settings page, so there's exactly one place this is configured, not two that can drift apart from each other.
+> (Renamed from my earlier "restore points" language, which read as an invented umbrella term competing with "backup," "snapshot," and "PITR recovery point." Settling on "snapshots" ties it back to the Snapshots tab and the bucket-level "include in snapshots" toggle users already see.)
+>
+> Bucket-level configuration keeps only what's genuinely bucket-specific: whether a bucket participates at all (the deliberate opt-out, e.g. for a large regenerable cache bucket), and object-versioning's own retention, which can inherit the project default or be overridden per bucket — since keeping more or fewer old versions of one noisy bucket doesn't put other buckets' snapshots out of sync. The old idea of a separate "sync" dialog is gone too: the coverage notice on the Backups page now links straight to this one settings page, so there's exactly one place this is configured, not two that can drift apart from each other.
 >
 > ---
 >
@@ -113,7 +115,7 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 > - Does branch-first restore hold up against how storage-level branching actually gets sequenced, or is it getting ahead of the infrastructure?
 > - Per-bucket "Deleted files," or one project-wide view?
 > - Do the coverage chips (Database / Auth / Storage / Config) communicate the right amount on one row, or is it trying to say too much at a glance?
-> - Now that a restore point spans more than the database, does "Backups" still belong under Database, or does it eventually move — into a project-wide "Recovery" area, or even next to Branches once storage branching lands?
+> - Now that a backup's coverage spans more than the database, does "Backups" still belong under Database, or does it eventually move — into a project-wide "Recovery" area, or even next to Branches once storage branching lands?
 > - Is project-level frequency + retention, plus a bucket-level participation/versioning-override split, the right amount of configuration surface — or does even two levels read as one too many for most people?
 >
 > *("Deleted files" vs "Trash" is no longer an open question — landed on "Deleted files" and it's shipped consistently across the UI.)*

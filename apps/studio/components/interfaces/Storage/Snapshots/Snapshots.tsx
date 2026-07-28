@@ -8,14 +8,16 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AlertError } from '@/components/ui/AlertError'
-import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
-import { useBucketSnapshotsQuery } from '@/data/storage/protection/bucket-snapshots-query'
-import { type BucketSnapshot } from '@/data/storage/protection/protection-mocks'
 import { StorageBucketSelector } from '../StorageBucketSelector'
 import { RestoreSnapshotModal } from './RestoreSnapshotModal'
 import { SnapshotsList } from './SnapshotsList'
 import { TakeSnapshotModal } from './TakeSnapshotModal'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useRestorePointPolicyQuery } from '@/data/restore-points/restore-points-query'
+import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
+import { useBucketSnapshotsQuery } from '@/data/storage/protection/bucket-snapshots-query'
+import { type BucketSnapshot } from '@/data/storage/protection/protection-mocks'
 
 export const Snapshots = () => {
   const { ref } = useParams()
@@ -28,6 +30,8 @@ export const Snapshots = () => {
   }, [bucketsData])
 
   const selectedBucket = bucketParam ?? firstBucket ?? undefined
+
+  const { data: policy } = useRestorePointPolicyQuery({ projectRef: ref })
 
   const [showTakeSnapshot, setShowTakeSnapshot] = useState(false)
   const [snapshotToRestore, setSnapshotToRestore] = useState<BucketSnapshot>()
@@ -73,7 +77,7 @@ export const Snapshots = () => {
               <Admonition
                 type="default"
                 title="No snapshots yet"
-                description="Take a snapshot to create a restore point, or enable snapshots on this bucket to capture one before each database backup."
+                description="Take a snapshot manually, or include this bucket in the project's snapshot lifecycle to capture one automatically before each database backup."
               />
             )}
             {isSuccess && snapshots.length > 0 && (
@@ -81,9 +85,15 @@ export const Snapshots = () => {
                 <Card className="overflow-hidden">
                   <SnapshotsList snapshots={snapshots} onRestore={setSnapshotToRestore} />
                 </Card>
-                <p className="text-sm text-foreground-lighter">
-                  Snapshots expire after 90 days per this bucket&apos;s lifecycle policy.
-                </p>
+                {policy && (
+                  <p className="text-sm text-foreground-lighter">
+                    Snapshots are kept for {policy.retentionDays} days, per the project&apos;s{' '}
+                    <InlineLink href={`/project/${ref}/storage/files/settings`}>
+                      snapshot lifecycle policy
+                    </InlineLink>
+                    .
+                  </p>
+                )}
               </>
             )}
           </PageSectionContent>

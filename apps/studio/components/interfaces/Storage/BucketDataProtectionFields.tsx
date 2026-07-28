@@ -32,10 +32,10 @@ interface BucketDataProtectionFieldsProps {
  *
  * Deliberately scoped to what is genuinely per-bucket: versioning (recovery depth
  * for individual files, where churn varies bucket to bucket) and whether this
- * bucket participates in the project's restore points. Restore point frequency
- * and retention are project-level — a restore point only means anything if it
+ * bucket participates in the project's snapshots. Snapshot frequency and
+ * retention are project-level — a snapshot generation only means anything if it
  * covers every bucket the database references, so per-bucket retention would let
- * older restore points quietly become partial.
+ * older snapshots quietly become partial.
  *
  * Prototype: manages local state and isn't persisted through the bucket mutation.
  */
@@ -150,7 +150,7 @@ export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionF
       <DialogSection className="space-y-3">
         <div className="flex items-center justify-between gap-x-6">
           <div className="flex flex-col">
-            <Label htmlFor="include-in-restore-points">Include in restore points</Label>
+            <Label htmlFor="include-in-restore-points">Include in snapshots</Label>
             <p className="text-sm text-foreground-lighter">
               Capture this bucket so it can be restored alongside a database backup
             </p>
@@ -171,7 +171,7 @@ export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionF
                 {policy.retentionDays} days.{' '}
               </>
             ) : (
-              <>Restore points are turned off for this project. </>
+              <>Snapshot capture is turned off for this project. </>
             )}
             Frequency and retention are set for the whole project in{' '}
             <InlineLink href={`/project/${projectRef}/storage/files/settings`}>
@@ -184,8 +184,8 @@ export const BucketDataProtectionFields = ({ bucketName }: BucketDataProtectionF
         {versioning && (
           <Admonition
             type="warning"
-            title="Retained versions and restore points add to your storage bill"
-            description="Objects held by a restore point can't be deleted until it expires."
+            title="Retained versions and snapshots add to your storage bill"
+            description="Objects held by a snapshot can't be deleted until it expires."
           />
         )}
       </DialogSection>

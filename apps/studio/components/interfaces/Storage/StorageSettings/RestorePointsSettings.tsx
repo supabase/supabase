@@ -36,11 +36,12 @@ import { formatBytes } from '@/lib/helpers'
 const FREQUENCIES: SnapshotFrequency[] = ['with-database-backup', 'daily', 'hourly']
 
 /**
- * Project-level restore point policy — the canonical editor.
+ * Project-level snapshot lifecycle policy — the canonical editor.
  *
- * Frequency and retention live here rather than per bucket because a restore
- * point only means anything if it's consistent across every bucket the database
- * references. Per bucket you choose participation, which is the cost lever.
+ * Frequency and retention live here rather than per bucket because a snapshot
+ * generation only means anything if it's consistent across every bucket the
+ * database references. Per bucket you choose participation, which is the cost
+ * lever.
  *
  * Prototype: backed by mock data, so nothing is persisted beyond the session.
  */
@@ -51,7 +52,7 @@ export const RestorePointsSettings = () => {
 
   const { mutate: updatePolicy, isPending: isUpdating } = useRestorePointPolicyUpdateMutation({
     onSuccess: () => {
-      toast.success('Restore points updated')
+      toast.success('Snapshot lifecycle settings updated')
       setDraft(undefined)
     },
   })
@@ -66,7 +67,7 @@ export const RestorePointsSettings = () => {
     <Card>
       <CardContent>
         <div className="flex flex-col gap-y-1">
-          <h3 className="text-base text-foreground">Restore points</h3>
+          <h3 className="text-base text-foreground">Snapshot lifecycle</h3>
           <p className="text-sm text-foreground-light">
             Captures your buckets at a point in time so Storage can be restored alongside a database
             backup. Applies to every bucket you include below.
@@ -81,7 +82,7 @@ export const RestorePointsSettings = () => {
       )}
       {isError && (
         <CardContent>
-          <AlertError error={error} subject="Failed to retrieve restore point policy" />
+          <AlertError error={error} subject="Failed to retrieve snapshot lifecycle policy" />
         </CardContent>
       )}
 
@@ -89,7 +90,7 @@ export const RestorePointsSettings = () => {
         <>
           <CardContent className="flex items-center justify-between gap-x-6">
             <div className="flex flex-col">
-              <Label htmlFor="restore-points-enabled">Capture restore points</Label>
+              <Label htmlFor="restore-points-enabled">Capture snapshots</Label>
               <p className="text-sm text-foreground-lighter">
                 Snapshots the included buckets so a restore brings back files as well as data.
               </p>
@@ -132,10 +133,10 @@ export const RestorePointsSettings = () => {
 
               <CardContent className="flex items-center justify-between gap-x-6">
                 <div className="flex flex-col">
-                  <Label htmlFor="restore-points-retention">Keep restore points for</Label>
+                  <Label htmlFor="restore-points-retention">Keep snapshots for</Label>
                   <p className="text-sm text-foreground-lighter">
-                    One retention for the whole project, so older restore points stay complete
-                    rather than covering only some buckets.
+                    One retention for the whole project, so older snapshots stay complete rather
+                    than covering only some buckets.
                   </p>
                 </div>
                 <InputGroup className="w-40">
@@ -214,7 +215,7 @@ export const RestorePointsSettings = () => {
                   description={
                     includedBuckets.length === 0
                       ? 'Restoring a database backup will leave your files untouched, so rows may reference objects that no longer exist.'
-                      : `${includedBuckets.length} of ${policy.buckets.length} buckets included, adding roughly ${formatBytes(includedBytes)} of retained storage per restore point.`
+                      : `${includedBuckets.length} of ${policy.buckets.length} buckets included, adding roughly ${formatBytes(includedBytes)} of retained storage per snapshot.`
                   }
                 />
               </CardContent>

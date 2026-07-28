@@ -9,7 +9,7 @@ import { useRestorePointPolicyQuery } from '@/data/restore-points/restore-points
 interface StorageCoverageNoticeProps {
   /**
    * Scheduled backups restore to a discrete point; PITR restores to any second,
-   * which storage restore points can't match — that caveat only applies to PITR.
+   * which storage snapshots can't match — that caveat only applies to PITR.
    */
   mode: 'scheduled' | 'pitr'
 }
@@ -19,7 +19,7 @@ interface StorageCoverageNoticeProps {
  * pages.
  *
  * Replaces the old always-on "Storage objects are not included" alert, which is
- * wrong once a bucket is included in restore points. States the project's actual
+ * wrong once a bucket is included in snapshots. States the project's actual
  * coverage and links to the one place it's configured.
  */
 export const StorageCoverageNotice = ({ mode }: StorageCoverageNoticeProps) => {
@@ -52,13 +52,13 @@ export const StorageCoverageNotice = ({ mode }: StorageCoverageNoticeProps) => {
 
   const configureAction = (
     <Button asChild variant="default">
-      <Link href={`/project/${projectRef}/storage/files/settings`}>Configure restore points</Link>
+      <Link href={`/project/${projectRef}/storage/files/settings`}>Configure snapshots</Link>
     </Button>
   )
 
   const pitrCaveat =
     mode === 'pitr'
-      ? ' Storage restores to the nearest restore point before your chosen time, not the exact second.'
+      ? ' Storage restores to the nearest snapshot before your chosen time, not the exact second.'
       : ''
 
   if (isCaptureOff) {
@@ -79,7 +79,7 @@ export const StorageCoverageNotice = ({ mode }: StorageCoverageNoticeProps) => {
       <Admonition
         type="warning"
         layout="horizontal"
-        title={`${excluded.length} of ${policy.buckets.length} buckets are not included in restore points`}
+        title={`${excluded.length} of ${policy.buckets.length} buckets are not included in snapshots`}
         description={`${included.map((b) => b.name).join(', ')} restore alongside the database. ${excluded.map((b) => b.name).join(', ')} will keep ${excluded.length === 1 ? 'its' : 'their'} current files, so restored rows may reference objects that no longer exist.${pitrCaveat}`}
       >
         <div className="mt-3">{configureAction}</div>

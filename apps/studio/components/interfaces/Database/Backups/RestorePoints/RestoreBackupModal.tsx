@@ -25,7 +25,7 @@ interface RestoreBackupModalProps {
 }
 
 /**
- * Restore a platform restore point.
+ * Restore a platform backup.
  *
  * Two modes, because branching is a platform primitive: restoring into a preview
  * branch is a copy-on-write clone — cheap, non-destructive, and verifiable
@@ -80,7 +80,7 @@ export const RestoreBackupModal = ({
     >
       <div className="space-y-5">
         <div>
-          <p className="text-sm mb-2">What this restore point includes</p>
+          <p className="text-sm mb-2">What this backup includes</p>
           <div className="flex flex-col">
             {coverage?.primitives.map((primitive) => {
               const isCovered = primitive.status === 'covered'

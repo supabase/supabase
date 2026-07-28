@@ -33,8 +33,8 @@ localized swap later):
 
 | Design | Where | Key files |
 | --- | --- | --- |
-| **Data protection modal** | Create/Edit bucket → new "Data protection" section | `BucketDataProtectionFields.tsx`, wired into `CreateBucketModal.tsx` + `EditBucketModal.tsx`. Bucket-level only: versioning (with override) + restore point participation |
-| **Restore point policy** | Storage → Files → **Settings** | `StorageSettings/RestorePointsSettings.tsx` — canonical project-level editor (frequency, retention, include-new-buckets, per-bucket participation) |
+| **Data protection modal** | Create/Edit bucket → new "Data protection" section | `BucketDataProtectionFields.tsx`, wired into `CreateBucketModal.tsx` + `EditBucketModal.tsx`. Bucket-level only: versioning (with override) + snapshot participation ("Include in snapshots") |
+| **Snapshot lifecycle policy** | Storage → Files → **Settings** | `StorageSettings/RestorePointsSettings.tsx` — canonical project-level editor (frequency, retention, include-new-buckets, per-bucket participation). Displayed as "Snapshot lifecycle"; the component/file/hook names still say "RestorePoint*" internally — only the visible copy moved away from that term |
 | **Snapshots (2a)** | Storage → Files → **Snapshots** tab (`/storage/files/snapshots`) | `Snapshots/Snapshots.tsx`, `SnapshotsList.tsx`, `TakeSnapshotModal.tsx`, `RestoreSnapshotModal.tsx`; page `pages/project/[ref]/storage/files/snapshots/index.tsx` (+ route) |
 | **Versions tab (3a)** | Storage explorer → select a file → preview pane | `StorageExplorer/VersionHistory.tsx`, tabs added to `StorageExplorer/PreviewPane.tsx` |
 | **Storage size breakdown (4a)** | Org → **Usage** page | `StorageRetentionUsage/StorageRetentionUsage.tsx`, mounted in `Organization/Usage/Usage.tsx` |
