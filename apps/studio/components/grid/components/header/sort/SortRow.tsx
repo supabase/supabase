@@ -53,10 +53,11 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
         </span>
       </div>
       <div className="flex items-center gap-x-1.5">
-        <label className="text-xs text-foreground-lighter">ascending:</label>
+        <span className="text-xs text-foreground-lighter">ascending:</span>
         <Switch
           defaultChecked={sort.ascending}
           onCheckedChange={(e: boolean) => onToggle(columnName, e)}
+          aria-label={`Sort ${column.name} in ascending order`}
         />
       </div>
       <Button
@@ -65,6 +66,7 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
         variant="text"
         className="w-7"
         onClick={() => onDelete(columnName)}
+        aria-label={`Remove sort for ${column.name}`}
       />
     </div>
   )
