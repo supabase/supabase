@@ -58,6 +58,7 @@ const TROUBLESHOOTING_INDEX_PATH = path.join(
   'guides',
   'troubleshooting.md'
 )
+const DOCS_INDEX_PATH = path.join(process.cwd(), 'public', 'markdown', 'guides', 'index.md')
 
 type JsxNode = MdxJsxFlowElement | MdxJsxTextElement
 type Props = Record<string, unknown>
@@ -272,6 +273,56 @@ async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Pr
   await fs.writeFile(TROUBLESHOOTING_INDEX_PATH, content)
 }
 
+async function renderDocsIndex(): Promise<void> {
+  const guidesContentDir = path.join(process.cwd(), 'content', 'guides')
+  const dirents = await fs.readdir(guidesContentDir, { withFileTypes: true })
+  const sections = dirents
+    .filter((dirent) => dirent.isDirectory())
+    .map((dirent) => dirent.name)
+    .sort()
+
+  const entries = await Promise.all(
+    sections.map(async (section) => {
+      const url = `${getInternalLinkBaseUrl()}${withDocsBasePath(`/guides/${section}`)}`
+      const landingPath = path.join(guidesContentDir, `${section}.mdx`)
+      try {
+        await fs.access(landingPath)
+      } catch {
+        return `- [${section}](${url})`
+      }
+      const raw = await fs.readFile(landingPath, 'utf8')
+      const { data } = parseFrontmatter(raw, 'yaml')
+      const title = typeof data.title === 'string' && data.title.length > 0 ? data.title : section
+      const description =
+        typeof data.description === 'string' && data.description.length > 0
+          ? `: ${data.description}`
+          : ''
+      return `- [${title}](${url})${description}`
+    })
+  )
+
+  const content = [
+    '# Supabase Docs',
+    '',
+    'Documentation for [Supabase](https://supabase.com). Guide pages are also available as markdown: append `.md` to the page URL, or request with `Accept: text/markdown`.',
+    '',
+    '## Guides',
+    '',
+    ...entries,
+    '',
+    '## More',
+    '',
+    `- [Troubleshooting](${getInternalLinkBaseUrl()}${withDocsBasePath('/guides/troubleshooting')})`,
+    `- [API and SDK reference](${getInternalLinkBaseUrl()}${withDocsBasePath('/reference')})`,
+    '- [llms.txt](https://supabase.com/llms.txt)',
+    '- [Full documentation in a single file](https://supabase.com/llms-full.txt)',
+    '',
+  ].join('\n')
+
+  await fs.mkdir(path.dirname(DOCS_INDEX_PATH), { recursive: true })
+  await fs.writeFile(DOCS_INDEX_PATH, content)
+}
+
 async function generate() {
   const { guides, troubleshooting } = await collectMarkdownSources()
   const sources = [...guides, ...troubleshooting]
@@ -293,11 +344,12 @@ async function generate() {
     })
   )
 
-  await renderManifest(sources, ['troubleshooting'])
+  await renderManifest(sources, ['troubleshooting', 'index'])
   await renderTroubleshootingIndex(troubleshooting)
+  await renderDocsIndex()
 
   console.log(
-    `Generated ${sources.length} markdown files under public/markdown/guides/, troubleshooting guides index at public/markdown/guides/troubleshooting.md and updated public/markdown/manifest.json`
+    `Generated ${sources.length} markdown files under public/markdown/guides/, troubleshooting guides index at public/markdown/guides/troubleshooting.md, docs index at public/markdown/guides/index.md and updated public/markdown/manifest.json`
   )
 }
 
