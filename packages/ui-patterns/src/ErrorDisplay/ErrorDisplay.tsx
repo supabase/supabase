@@ -4,7 +4,7 @@ import { HelpCircle } from 'lucide-react'
 import { forwardRef, useEffect, useRef } from 'react'
 import { Card, CardHeader, cn } from 'ui'
 
-import { WarningIcon } from '../Admonition'
+import { WarningIcon } from '../admonition'
 import type { ErrorDisplayProps, SupportFormParams } from './ErrorDisplay.types'
 
 export type { SupportFormParams } from './ErrorDisplay.types'
