@@ -111,6 +111,7 @@ export const TokenDetails = ({ form }: TokenDetailsProps) => {
                                 )
                               }
                               initialFocus
+                              disabled={{ before: dayjs().startOf('day').toDate() }}
                             />
                           </DatePickerContent>
                         </DatePicker>
