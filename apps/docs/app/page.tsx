@@ -10,6 +10,7 @@ import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker
 import { IconLinkImage, IconLinkList, IconLinkMenuIcon } from '@/features/ui/IconLink'
 import HomeLayout from '@/layouts/HomeLayout'
 import { BASE_PATH } from '@/lib/constants'
+import { mdAlternate } from '@/lib/md-alternates'
 
 const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
   'sdk:csharp',
@@ -28,11 +29,11 @@ const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata>
       ...(parentAlternates && {
         languages: parentAlternates.languages || undefined,
         media: parentAlternates.media || undefined,
-        types: {
-          ...(parentAlternates.types ?? {}),
-          'text/markdown': 'https://supabase.com/llms-full.txt',
-        },
       }),
+      types: {
+        ...(parentAlternates?.types ?? {}),
+        ...mdAlternate('index'),
+      },
     },
   }
 }
