@@ -98,6 +98,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
         className="px-1"
         icon={<X strokeWidth={1.5} />}
         onClick={() => onDelete(filterIdx)}
+        aria-label="Remove filter"
       />
     </div>
   )
