@@ -6,8 +6,16 @@ import { useScopedAccessTokensQuery } from '@/data/scoped-access-tokens/scoped-a
 
 export type TokenKind = 'classic' | 'scoped'
 
-export interface MergedAccessToken extends BaseToken {
-  kind: TokenKind
+export type MergedAccessToken = ClassicAccessToken | ScopedAccessToken
+
+export interface ClassicAccessToken extends BaseToken {
+  id: number
+  kind: 'classic'
+}
+
+export interface ScopedAccessToken extends BaseToken {
+  id: string
+  kind: 'scoped'
 }
 
 interface UseMergedAccessTokensOptions {

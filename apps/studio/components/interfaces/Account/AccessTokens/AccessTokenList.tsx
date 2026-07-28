@@ -50,29 +50,31 @@ export const AccessTokenList = ({
     scopedTokensEnabled,
   })
 
-  const { mutate: deleteClassicToken } = useAccessTokenDeleteMutation({
-    onSuccess: (_, vars) => {
-      track('access_token_removed', { tokenType: 'classic' })
-      onDeleteSuccess(vars.id)
-      toast.success('Successfully deleted access token')
-      setIsDeleteOpen(false)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete access token: ${error.message}`)
-    },
-  })
+  const { mutate: deleteClassicToken, isPending: isPendingClassicToken } =
+    useAccessTokenDeleteMutation({
+      onSuccess: (_, vars) => {
+        track('access_token_removed', { tokenType: 'classic' })
+        onDeleteSuccess(vars.id)
+        toast.success('Successfully deleted access token')
+        setIsDeleteOpen(false)
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete access token: ${error.message}`)
+      },
+    })
 
-  const { mutate: deleteScopedToken } = useScopedAccessTokenDeleteMutation({
-    onSuccess: (_, vars) => {
-      track('access_token_removed', { tokenType: 'scoped' })
-      onDeleteSuccess(vars.id)
-      toast.success('Successfully deleted access token')
-      setIsDeleteOpen(false)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete access token: ${error.message}`)
-    },
-  })
+  const { mutate: deleteScopedToken, isPending: isPendingScopedToken } =
+    useScopedAccessTokenDeleteMutation({
+      onSuccess: (_, vars) => {
+        track('access_token_removed', { tokenType: 'scoped' })
+        onDeleteSuccess(vars.id)
+        toast.success('Successfully deleted access token')
+        setIsDeleteOpen(false)
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete access token: ${error.message}`)
+      },
+    })
 
   const onSortChange = (column: AccessTokenSortColumn) => {
     handleSortChange(sort, column, setSort)
@@ -87,8 +89,8 @@ export const AccessTokenList = ({
 
   const handleConfirmDelete = () => {
     if (!token) return
-    if (token.kind === 'classic') deleteClassicToken({ id: token.id as number })
-    else deleteScopedToken({ id: token.id as string })
+    if (token.kind === 'classic') deleteClassicToken({ id: token.id })
+    else deleteScopedToken({ id: token.id })
   }
 
   if (isError) {
@@ -182,6 +184,7 @@ export const AccessTokenList = ({
         confirmLabelLoading="Deleting"
         onCancel={() => setIsDeleteOpen(false)}
         onConfirm={handleConfirmDelete}
+        loading={isPendingClassicToken || isPendingScopedToken}
       >
         <p className="py-4 text-sm text-foreground-light">
           This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
