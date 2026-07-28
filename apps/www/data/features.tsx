@@ -653,13 +653,13 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 4. Workload isolation: Keep analytical queries away from the primary database.
 
 ## Destinations
-BigQuery is currently available. Snowflake is available through Early Access; [request access](/go/supabase-pipelines-new-destinations) to enable it. You can use the same form to request early access to ClickHouse and DuckLake.
+BigQuery is currently available. Snowflake is in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to Snowflake, ClickHouse, or DuckLake.
 
 ## Setup
 Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
-Requirements depend on the destination. BigQuery requires source tables to have primary keys and requires the publication to include those columns. Snowflake updates require REPLICA IDENTITY FULL; deletes require a published row identity.
+Requirements depend on the destination. BigQuery requires source tables to have primary keys and requires the publication to include those columns. Snowflake updates require REPLICA IDENTITY FULL. Deletes require a published row identity.
 
 ## Pipelines is valuable for:
 - Near real-time analytics data movement
@@ -669,7 +669,7 @@ Requirements depend on the destination. BigQuery requires source tables to have 
 ## Limitations
 Schema change support is destination-specific and limited. Destination-specific constraints apply.
 
-BigQuery keeps current-state tables synchronized. Snowflake stores append-only CDC history, although source truncates, table resets, and schema changes can modify or erase that history.`,
+BigQuery keeps current-state tables synchronized. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase that history. Schema changes can alter it.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
