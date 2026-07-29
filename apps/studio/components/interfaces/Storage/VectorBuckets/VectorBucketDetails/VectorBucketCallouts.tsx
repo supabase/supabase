@@ -4,6 +4,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldSection } from '@/components/layouts/Scaffold'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
@@ -40,7 +41,7 @@ export const ExtensionNotInstalled = ({
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
+                ? getServiceVersionsPath(projectRef)
                 : `/project/${projectRef}/database/extensions?filter=wrappers`
             }
           >
@@ -84,7 +85,7 @@ export const ExtensionNeedsUpgrade = ({
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${projectRef}/settings/infrastructure`
+                ? getServiceVersionsPath(projectRef)
                 : `/project/${projectRef}/database/extensions?filter=wrappers`
             }
           >

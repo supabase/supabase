@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -93,7 +93,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         <h3 className="text-foreground text-xl prose">{REPORT_TITLE}</h3>
         <div className="flex items-center gap-2 flex-wrap">
           <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryPerformance} topic={REPORT_TITLE} />
-          <DatabaseSelector />
+          {IS_PLATFORM && <DatabaseSelector />}
         </div>
       </div>
       <QueryPerformance

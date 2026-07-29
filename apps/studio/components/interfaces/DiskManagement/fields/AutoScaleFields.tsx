@@ -55,7 +55,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
         render={({ field }) => {
           return (
             <FormItemLayout
-              layout="horizontal"
+              layout="flex-row-reverse"
               label="Autoscale growth percent"
               id={field.name}
               labelOptional="Percentage of current disk size to grow"
@@ -70,6 +70,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}
@@ -101,7 +102,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
         render={({ field }) => {
           return (
             <FormItemLayout
-              layout="horizontal"
+              layout="flex-row-reverse"
               label="Minimum increment"
               id={field.name}
               labelOptional="Minimum value to autoscale disk size by"
@@ -116,6 +117,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}
@@ -147,7 +149,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
         render={({ field }) => {
           return (
             <FormItemLayout
-              layout="horizontal"
+              layout="flex-row-reverse"
               label="Maximum disk size"
               id={field.name}
               labelOptional="Maximum size that the disk can grow to"
@@ -157,6 +159,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}

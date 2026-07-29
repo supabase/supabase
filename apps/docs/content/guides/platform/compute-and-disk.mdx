@@ -33,11 +33,11 @@ In paid organizations, Nano Compute are billed at the same price as Micro Comput
 
 [^1]: Database max connections are recommended values and can be [customized via `max_connections`](/docs/guides/database/custom-postgres-config) depending on your use case. Be aware of [these considerations](/docs/guides/troubleshooting/how-to-change-max-database-connections-_BQ8P5) before modifying.
 
-[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/platform/shared-responsibility-model) for more information.
+[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/deployment/shared-responsibility-model) for more information.
 
 [^3]: Compute resources on the Free plan are subject to change.
 
-Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
+Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/infrastructure) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
 
 <Image
   alt="Compute Size Selection"
@@ -102,7 +102,7 @@ If you need consistent disk performance, choose the 4XL or larger compute instan
 
 ### Provisioned disk throughput and IOPS
 
-The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/compute-and-disk) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
+The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Infrastructure settings](/dashboard/project/_/settings/infrastructure) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
 
 <Admonition type="caution">
 
