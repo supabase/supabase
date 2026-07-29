@@ -5,7 +5,7 @@
  *
  * ## Naming conventions
  * Event names and actions should use standardized past-tense verbs for data quality and consistency.
- * Only use verbs already established in this file or in https://github.com/supabase/infrastructure/blob/develop/packages/api-core/src/shared/telemetry.ts
+ * Only use verbs already established in this file or in https://github.com/supabase/platform/blob/develop/packages/api-core/src/shared/telemetry.ts
  * Adding new verbs requires @growth-eng review to prevent data pollution.
  *
  * @module telemetry-frontend
@@ -1510,16 +1510,31 @@ export interface DatabaseConnectionsOverviewMetricCardClickedEvent {
 }
 
 /**
- * User applied a filter on the Sessions table of the Database Connections observability page.
+ * User updated a filter on the Sessions table of the Database Connections observability page.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/observability/connections
  */
-export interface DatabaseConnectionsFilterAppliedEvent {
-  action: 'database_connections_filter_applied'
+export interface DatabaseConnectionsFilterUpdatedEvent {
+  action: 'database_connections_filter_updated'
   properties: {
-    type: 'state' | 'roles' | 'application' | 'blockers' | 'reset'
+    type: 'state' | 'roles' | 'application' | 'reset'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Root blockers filter button on the Database Connections activity table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBlockerViewClickedEvent {
+  action: 'database_connections_blocker_view_clicked'
+  properties: {
+    newState: 'enabled' | 'disabled'
   }
   groups: TelemetryGroups
 }
@@ -1559,8 +1574,8 @@ export interface SessionTerminateButtonClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/observability/connections
  */
-export interface SessionTerminationSubmittedEvent {
-  action: 'session_termination_submitted'
+export interface SessionTerminateSubmittedEvent {
+  action: 'session_terminate_submitted'
   properties: {
     activityState: DatabaseActivityState
     /**
@@ -3760,9 +3775,10 @@ export type TelemetryEvent =
   | IndexAdvisorTabClickedEvent
   | DatabaseConnectionsLiveModeClickedEvent
   | DatabaseConnectionsOverviewMetricCardClickedEvent
-  | DatabaseConnectionsFilterAppliedEvent
+  | DatabaseConnectionsFilterUpdatedEvent
+  | DatabaseConnectionsBlockerViewClickedEvent
   | SessionTerminateButtonClickedEvent
-  | SessionTerminationSubmittedEvent
+  | SessionTerminateSubmittedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent

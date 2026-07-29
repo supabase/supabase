@@ -152,7 +152,7 @@ export const Activity = ({ live }: ActivityProps) => {
     })
 
   const onResetFilters = () => {
-    track('database_connections_filter_applied', { type: 'reset' })
+    track('database_connections_filter_updated', { type: 'reset' })
     setQueryStates({
       search: '',
       states: [],
@@ -179,7 +179,8 @@ export const Activity = ({ live }: ActivityProps) => {
           options={stateOptions}
           value={statesFilter ?? []}
           onChange={(states) => {
-            track('database_connections_filter_applied', { type: 'state' })
+            if (isEqual(states, statesFilter)) return
+            track('database_connections_filter_updated', { type: 'state' })
             setQueryStates({ states })
           }}
           isLoading={isPending}
@@ -191,7 +192,8 @@ export const Activity = ({ live }: ActivityProps) => {
           options={roleOptions}
           value={rolesFilter ?? []}
           onChange={(roles) => {
-            track('database_connections_filter_applied', { type: 'roles' })
+            if (isEqual(roles, rolesFilter)) return
+            track('database_connections_filter_updated', { type: 'roles' })
             setQueryStates({ roles })
           }}
           isLoading={isPending}
@@ -203,7 +205,8 @@ export const Activity = ({ live }: ActivityProps) => {
           options={applicationOptions}
           value={applicationsFilter ?? []}
           onChange={(applications) => {
-            track('database_connections_filter_applied', { type: 'application' })
+            if (isEqual(applications, applicationsFilter)) return
+            track('database_connections_filter_updated', { type: 'application' })
             setQueryStates({ applications })
           }}
           isLoading={isPending}
@@ -213,7 +216,9 @@ export const Activity = ({ live }: ActivityProps) => {
           variant={viewFilter === 'blockers' ? 'default' : 'dashed'}
           iconRight={rootBlockers.length > 0 ? <span>{rootBlockers.length}</span> : null}
           onClick={() => {
-            track('database_connections_filter_applied', { type: 'blockers' })
+            track('database_connections_blocker_view_clicked', {
+              newState: viewFilter === 'blockers' ? 'disabled' : 'enabled',
+            })
             setQueryStates({ view: viewFilter === 'blockers' ? '' : 'blockers' })
           }}
           tooltip={{

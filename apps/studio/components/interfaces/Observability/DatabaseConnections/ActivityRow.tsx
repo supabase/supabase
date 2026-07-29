@@ -128,7 +128,6 @@ export const ActivityRow = ({
 
   const durationSeconds = getDuration(activity)
   const badgeVariant = getBadgeVariant(activity)
-  const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
 
   /**
    * Queries in "active state": 30s threshold is long enough (most CRUD queries should be quick)
@@ -142,7 +141,8 @@ export const ActivityRow = ({
         durationSeconds >= WARN_DURATION_IDLE_TXN))
 
   const onConfirmTerminate = async () => {
-    track('session_termination_submitted', { activityState: activity.state, isBlocking })
+    const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
+    track('session_terminate_submitted', { activityState: activity.state, isBlocking })
     try {
       await abortQuery({
         pid: activity.pid,
@@ -396,6 +396,9 @@ export const ActivityRow = ({
                 className="gap-x-2"
                 disabled={superuserRoles?.includes(activity.role_name)}
                 onClick={() => {
+                  const isBlocking = (data ?? []).some((x) =>
+                    x.blocked_by.includes(activity.pid)
+                  )
                   track('session_terminate_button_clicked', {
                     activityState: activity.state,
                     isBlocking,
