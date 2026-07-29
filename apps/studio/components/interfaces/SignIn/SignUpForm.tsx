@@ -67,6 +67,7 @@ export const SignUpForm = () => {
   const [searchParams] = useQueryStates({
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
+    organization_slug: parseAsString.withDefault(''),
   })
 
   const trackFunnelError = useTrackFunnelError()
@@ -79,8 +80,8 @@ export const SignUpForm = () => {
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(`Failed to sign up: ${error.message}`)
-      trackFunnelError('signup', classifyApiError('signup', error), 'toast')
+      const toastId = toast.error(`Failed to sign up: ${error.message}`)
+      trackFunnelError('signup', classifyApiError('signup', error), 'toast', toastId)
     },
   })
 
@@ -102,7 +103,12 @@ export const SignUpForm = () => {
     let redirectTo: string
 
     if (isInsideOAuthFlow) {
-      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+      const authorizeParams = new URLSearchParams({ auth_id: searchParams.auth_id })
+      if (searchParams.token) authorizeParams.set('token', searchParams.token)
+      if (searchParams.organization_slug) {
+        authorizeParams.set('organization_slug', searchParams.organization_slug)
+      }
+      redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
       // Use getRedirectToPath to handle redirect_to parameter and other query params
       const { returnTo } = router.query

@@ -5,7 +5,7 @@ import { BarChart2, ChartLine, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
@@ -438,7 +438,12 @@ export const InfrastructureActivity = () => {
                       title="Looking for actual disk activity?"
                       description="The chart above shows your remaining burst budget, not real disk throughput. For detailed read/write IOPS and throughput charts, head to the Database Observability page."
                     >
-                      <Button asChild variant="default" icon={<ChartLine size={14} />}>
+                      <Button
+                        asChild
+                        variant="default"
+                        className="mt-2"
+                        icon={<ChartLine size={14} />}
+                      >
                         <Link href={`/project/${projectRef}/observability/database`}>
                           View detailed IOPS and throughput
                         </Link>

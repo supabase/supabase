@@ -9,7 +9,7 @@ import {
   NavMenu,
   NavMenuItem,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -40,6 +40,8 @@ const LegacyIntegrationPage = () => {
     integration,
     isAvailableLoading,
     isInstalledLoading,
+    isIntegrationStatusLoading,
+    oauthIntegrationData,
     tabs,
     Component,
   } = useIntegrationDetail()
@@ -116,7 +118,11 @@ const LegacyIntegrationPage = () => {
             </PageHeaderSummary>
 
             {integration?.type === 'oauth' && (
-              <InstallOAuthIntegrationButton integration={integration} />
+              <InstallOAuthIntegrationButton
+                integration={integration}
+                data={oauthIntegrationData}
+                isLoading={isIntegrationStatusLoading}
+              />
             )}
           </PageHeaderMeta>
         )}

@@ -235,6 +235,38 @@ export interface CronJobHistoryClickedEvent {
 }
 
 /**
+ * Fired when the user clicks the header 'Enable cleanup' button to open the
+ * confirmation dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCleanupDialogOpenedEvent {
+  action: 'cron_job_cleanup_dialog_opened'
+  groups: TelemetryGroups
+}
+
+/**
+ * Fired when the user confirms the cleanup dialog, initiating the request to
+ * schedule the daily cleanup job (deletes old rows from cron.job_run_details).
+ * Emitted on confirm, before the scheduling request resolves, so it does not
+ * indicate the job was scheduled successfully.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCleanupEnableButtonClickedEvent {
+  action: 'cron_job_cleanup_enable_button_clicked'
+  properties: {
+    /** Retention period chosen for the cleanup job, e.g. 7 days. */
+    retentionInterval?: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * A feature preview was enabled by the user through the FeaturePreviewModal.
  *
  * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
@@ -695,6 +727,19 @@ export interface SqlEditorTemplateClickedEvent {
 }
 
 /**
+ * User clicked the "Disable" button next to the autosave status text in the
+ * SQL Editor, to open the feature preview modal for manual snippet saving.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorAutosaveDisableClickedEvent {
+  action: 'sql_editor_autosave_disable_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the "Result download CSV" button in the SQL editor.
  *
  * @group Events
@@ -883,6 +928,16 @@ export interface DocsFeedbackClickedEvent {
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
+}
+
+/**
+ * User clicked the sidebar link to set up an AI coding agent with Supabase.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AgentSetupClickedEvent {
+  action: 'agent_setup_clicked'
 }
 
 /**
@@ -1763,7 +1818,7 @@ export interface BranchCreateButtonClickedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/branches
+ * @page /dashboard/project/{ref}/branches, /dashboard/project/{ref}/merge or /dashboard/project/{ref}/settings/general
  */
 export interface BranchDeleteButtonClickedEvent {
   action: 'branch_delete_button_clicked'
@@ -1775,7 +1830,7 @@ export interface BranchDeleteButtonClickedEvent {
     /**
      * Where the delete action was initiated from
      */
-    origin: 'branches_page' | 'merge_page'
+    origin: 'branches_page' | 'merge_page' | 'settings_page'
   }
   groups: TelemetryGroups
 }
@@ -2804,7 +2859,6 @@ export type AiAssistantSource =
   | 'log_explorer'
   | 'error_code'
   | 'advisor_signal_detail'
-  | 'rls_tester'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3271,8 +3325,8 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
- * User clicked the "Upgrade to Pro" CTA in one of the experiment placement surfaces.
- * GROWTH experiment: `upgradeCtaPlacement` (user_dropdown / org_projects_list).
+ * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
+ * `placement` identifying which one (the user dropdown or the org project-list usage card).
  *
  * @group Events
  * @source studio
@@ -3281,25 +3335,6 @@ export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
     placement: 'user_dropdown' | 'org_projects_list'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
- * User was exposed to the upgrade CTA placement experiment.
- * Fires once per session per free-plan user enrolled in any variant (including control),
- * so the conversion analysis has a baseline cohort.
- *
- * @group Events
- * @source studio
- */
-export interface UpgradeCtaPlacementExperimentExposedEvent {
-  action: 'upgrade_cta_placement_experiment_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: 'control' | 'user_dropdown' | 'org_projects_list'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3357,6 +3392,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
+      | 'multigres'
   }
   groups: TelemetryGroups
 }
@@ -3533,18 +3569,6 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
- * User ran a query in the RLS tester feature preview.
- *
- * @group Events
- * @source studio
- */
-export interface RlsTesterRunQueryClickedEvent {
-  action: 'rls_tester_run_query_clicked'
-  properties: { type: 'raw' | 'inferred' }
-  groups: Partial<TelemetryGroups>
-}
-
-/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3561,6 +3585,8 @@ export type TelemetryEvent =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
+  | CronJobCleanupDialogOpenedEvent
+  | CronJobCleanupEnableButtonClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | TimezonePickerClickedEvent
@@ -3583,6 +3609,7 @@ export type TelemetryEvent =
   | TableRealtimeDisabledEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
+  | SqlEditorAutosaveDisableClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
@@ -3595,6 +3622,7 @@ export type TelemetryEvent =
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
+  | AgentSetupClickedEvent
   | AskAiClickedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
@@ -3723,7 +3751,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
@@ -3744,4 +3771,3 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
-  | RlsTesterRunQueryClickedEvent

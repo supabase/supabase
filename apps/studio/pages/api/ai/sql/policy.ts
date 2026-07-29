@@ -10,7 +10,7 @@ import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { RLS_PROMPT } from '@/lib/ai/prompts'
 import { getTools } from '@/lib/ai/tools'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 const policySchema = z.object({
   sql: z.string().describe('The generated Postgres CREATE POLICY statement.'),
@@ -100,53 +100,67 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const tools = await getTools({
-      projectRef,
-      connectionString,
-      authorization,
-      aiOptInLevel,
-      accessToken,
-    })
+    // Closes the remote MCP connection opened in getTools when generation is done,
+    // if anything below throws, or if the client disconnects mid-generation so the
+    // connection isn't held until generateText resolves on its own (mirrors the
+    // request-scoped cleanup in generate-v4.ts).
+    const toolsAbortController = new AbortController()
+    req.on('close', () => toolsAbortController.abort())
+    req.on('aborted', () => toolsAbortController.abort())
+    // Fires when the response finishes or the connection drops.
+    res.on('close', () => toolsAbortController.abort())
+    try {
+      const tools = await getTools({
+        projectRef,
+        connectionString,
+        authorization,
+        aiOptInLevel,
+        accessToken,
+        signal: toolsAbortController.signal,
+      })
 
-    const { experimental_output } = await generateText({
-      ...modelParams,
-      stopWhen: stepCountIs(5),
-      prompt: source`
-        You are a Postgres RLS (Row Level Security) expert.
-        Determine the most appropriate policies for the "${schema}"."${tableName}" table within a Supabase project.
+      const { experimental_output } = await generateText({
+        ...modelParams,
+        stopWhen: stepCountIs(5),
+        prompt: source`
+          You are a Postgres RLS (Row Level Security) expert.
+          Determine the most appropriate policies for the "${schema}"."${tableName}" table within a Supabase project.
 
-        ${columns.length > 0 ? `Table columns: ${columns.join(', ')}` : 'No column metadata provided.'}
+          ${columns.length > 0 ? `Table columns: ${columns.join(', ')}` : 'No column metadata provided.'}
 
-        ${message ? `User request: ${message}` : ''}
+          ${message ? `User request: ${message}` : ''}
 
-        RLS Guide: ${RLS_PROMPT}
+          RLS Guide: ${RLS_PROMPT}
 
-        Requirements:
-        - Use the available planning and schema tools (like "list_policies" or "list_tables") to inspect the "${schema}" schema and existing policies before generating new ones.
-        - Ensure policies strictly adhere to the existing schema
-        - Return a curated list of recommended CREATE POLICY statements as JSON.
-        - Each policy must include: name, sql, command (SELECT/INSERT/UPDATE/DELETE/ALL), action (PERMISSIVE/RESTRICTIVE), roles (array of role names).
-        - Include "definition" (USING clause expression without the USING keyword) for SELECT, UPDATE, DELETE policies.
-        - Include "check" (WITH CHECK clause expression without the WITH CHECK keywords) for INSERT, UPDATE policies.
-        - Avoid duplicating existing policies and reference the public schema and typical Supabase best practices when deciding the coverage.
-        - Prefer PERMISSIVE policies unless a RESTRICTIVE policy is explicitly required
-      `,
-      tools,
-      experimental_output: Output.object({
-        schema: z.object({
-          policies: z.array(policySchema),
+          Requirements:
+          - Use the available planning and schema tools (like "list_policies" or "list_tables") to inspect the "${schema}" schema and existing policies before generating new ones.
+          - Ensure policies strictly adhere to the existing schema
+          - Return a curated list of recommended CREATE POLICY statements as JSON.
+          - Each policy must include: name, sql, command (SELECT/INSERT/UPDATE/DELETE/ALL), action (PERMISSIVE/RESTRICTIVE), roles (array of role names).
+          - Include "definition" (USING clause expression without the USING keyword) for SELECT, UPDATE, DELETE policies.
+          - Include "check" (WITH CHECK clause expression without the WITH CHECK keywords) for INSERT, UPDATE policies.
+          - Avoid duplicating existing policies and reference the public schema and typical Supabase best practices when deciding the coverage.
+          - Prefer PERMISSIVE policies unless a RESTRICTIVE policy is explicitly required
+        `,
+        tools,
+        experimental_output: Output.object({
+          schema: z.object({
+            policies: z.array(policySchema),
+          }),
         }),
-      }),
-    })
+      })
 
-    // Add table and schema to each policy from the request
-    const policies = (experimental_output?.policies ?? []).map((policy) => ({
-      ...policy,
-      table: tableName,
-      schema,
-    }))
+      // Add table and schema to each policy from the request
+      const policies = (experimental_output?.policies ?? []).map((policy) => ({
+        ...policy,
+        table: tableName,
+        schema,
+      }))
 
-    return res.json(policies)
+      return res.json(policies)
+    } finally {
+      toolsAbortController.abort()
+    }
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI policy generation failed: ${error.message}`)

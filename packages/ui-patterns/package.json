@@ -8,12 +8,32 @@
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
     "test:coverage": "vitest --run --coverage",
-    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "gen:exports": "tsx ./scripts/update-exports.ts"
   },
   "exports": {
     "./package.json": "./package.json",
+    "./Admonition/Admonition.constants": {
+      "import": "./src/Admonition/Admonition.constants.ts",
+      "types": "./src/Admonition/Admonition.constants.ts"
+    },
+    "./Admonition/Admonition": {
+      "import": "./src/Admonition/Admonition.tsx",
+      "types": "./src/Admonition/Admonition.tsx"
+    },
+    "./Admonition/Admonition.types": {
+      "import": "./src/Admonition/Admonition.types.ts",
+      "types": "./src/Admonition/Admonition.types.ts"
+    },
+    "./Admonition/AdmonitionIcons": {
+      "import": "./src/Admonition/AdmonitionIcons.tsx",
+      "types": "./src/Admonition/AdmonitionIcons.tsx"
+    },
+    "./Admonition": {
+      "import": "./src/Admonition/index.tsx",
+      "types": "./src/Admonition/index.tsx"
+    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -249,22 +269,6 @@
     "./CommandMenu/prepackaged/shared/constants": {
       "import": "./src/CommandMenu/prepackaged/shared/constants.ts",
       "types": "./src/CommandMenu/prepackaged/shared/constants.ts"
-    },
-    "./ComplexTabs": {
-      "import": "./src/ComplexTabs/index.tsx",
-      "types": "./src/ComplexTabs/index.tsx"
-    },
-    "./ComplexTabs/withQueryParams": {
-      "import": "./src/ComplexTabs/withQueryParams.tsx",
-      "types": "./src/ComplexTabs/withQueryParams.tsx"
-    },
-    "./ComplexTabs/withSticky": {
-      "import": "./src/ComplexTabs/withSticky.tsx",
-      "types": "./src/ComplexTabs/withSticky.tsx"
-    },
-    "./ComplexTabs/withSticky.utils": {
-      "import": "./src/ComplexTabs/withSticky.utils.ts",
-      "types": "./src/ComplexTabs/withSticky.utils.ts"
     },
     "./ComputeBadge": {
       "import": "./src/ComputeBadge/index.tsx",
@@ -590,6 +594,14 @@
       "import": "./src/SimpleCodeBlock/prism.ts",
       "types": "./src/SimpleCodeBlock/prism.ts"
     },
+    "./SkipToContent/SkipToContent": {
+      "import": "./src/SkipToContent/SkipToContent.tsx",
+      "types": "./src/SkipToContent/SkipToContent.tsx"
+    },
+    "./SkipToContent": {
+      "import": "./src/SkipToContent/index.tsx",
+      "types": "./src/SkipToContent/index.tsx"
+    },
     "./SqlToRest/assumptions": {
       "import": "./src/SqlToRest/assumptions.ts",
       "types": "./src/SqlToRest/assumptions.ts"
@@ -685,10 +697,6 @@
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
-    },
-    "./admonition": {
-      "import": "./src/admonition.tsx",
-      "types": "./src/admonition.tsx"
     },
     "./collapsible-alert": {
       "import": "./src/collapsible-alert.tsx",
@@ -813,6 +821,7 @@
     "next-router-mock": "^0.9.13",
     "tailwindcss": "^4.2.4",
     "tsx": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",

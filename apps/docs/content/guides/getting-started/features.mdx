@@ -199,61 +199,61 @@ Features in Beta are tested by an external penetration tester for security issue
 
 In addition to the Beta requirements, features in GA are covered by the [uptime SLA](/sla).
 
-| Product        | Feature                    | Stage           | Available on self-hosted                    |
-| -------------- | -------------------------- | --------------- | ------------------------------------------- |
-| Database       | Postgres                   | `GA`            | ✅                                          |
-| Database       | Vector Database            | `GA`            | ✅                                          |
-| Database       | Auto-generated Rest API    | `GA`            | ✅                                          |
-| Database       | Auto-generated GraphQL API | `GA`            | ✅                                          |
-| Database       | Webhooks                   | `beta`          | ✅                                          |
-| Database       | Vault                      | `public alpha`  | ✅                                          |
-| Database       | Replication                | `private alpha` | N/A                                         |
-| Platform       |                            | `GA`            | ✅                                          |
-| Platform       | Point-in-Time Recovery     | `GA`            | 🚧 [wal-g](https://github.com/wal-g/wal-g)  |
-| Platform       | Custom Domains             | `GA`            | N/A                                         |
-| Platform       | Network Restrictions       | `GA`            | N/A                                         |
-| Platform       | SSL enforcement            | `GA`            | N/A                                         |
-| Platform       | Branching                  | `beta`          | N/A                                         |
-| Platform       | Terraform Provider         | `public alpha`  | N/A                                         |
-| Platform       | Read Replicas              | `GA`            | N/A                                         |
-| Platform       | Log Drains                 | `public alpha`  | ✅                                          |
-| Platform       | MCP                        | `public alpha`  | ✅                                          |
-| Platform       | PrivateLink                | `beta`          | N/A                                         |
-| Studio         |                            | `GA`            | ✅                                          |
-| Studio         | SSO                        | `GA`            | ✅                                          |
-| Studio         | Column Privileges          | `public alpha`  | ✅                                          |
-| Realtime       | Postgres Changes           | `GA`            | ✅                                          |
-| Realtime       | Broadcast                  | `GA`            | ✅                                          |
-| Realtime       | Presence                   | `GA`            | ✅                                          |
-| Realtime       | Broadcast Authorization    | `public beta`   | ✅                                          |
-| Realtime       | Presence Authorization     | `public beta`   | ✅                                          |
-| Realtime       | Broadcast from Database    | `public beta`   | ✅                                          |
-| Storage        |                            | `GA`            | ✅                                          |
-| Storage        | CDN                        | `GA`            | 🚧 [Cloudflare](https://www.cloudflare.com) |
-| Storage        | Smart CDN                  | `GA`            | 🚧 [Cloudflare](https://www.cloudflare.com) |
-| Storage        | Image Transformations      | `GA`            | ✅                                          |
-| Storage        | Resumable Uploads          | `GA`            | ✅                                          |
-| Storage        | S3 compatibility           | `GA`            | ✅                                          |
-| Edge Functions |                            | `GA`            | ✅                                          |
-| Edge Functions | Regional Invocations       | `GA`            | ✅                                          |
-| Edge Functions | NPM compatibility          | `GA`            | ✅                                          |
-| Auth           |                            | `GA`            | ✅                                          |
-| Auth           | Email login                | `GA`            | ✅                                          |
-| Auth           | Social login               | `GA`            | ✅                                          |
-| Auth           | Phone login                | `GA`            | ✅                                          |
-| Auth           | Passwordless login         | `GA`            | ✅                                          |
-| Auth           | SSO with SAML              | `GA`            | ✅                                          |
-| Auth           | Authorization via RLS      | `GA`            | ✅                                          |
-| Auth           | CAPTCHA protection         | `GA`            | ✅                                          |
-| Auth           | Server-side Auth           | `beta`          | ✅                                          |
-| Auth           | Third-Party Auth           | `GA`            | ✅                                          |
-| Auth           | Hooks                      | `beta`          | ✅                                          |
-| CLI            |                            | `GA`            | ✅ Works with self-hosted                   |
-| Management API |                            | `GA`            | N/A                                         |
-| Client Library | JavaScript                 | `GA`            | N/A                                         |
-| Client Library | Flutter                    | `GA`            | N/A                                         |
-| Client Library | Swift                      | `GA`            | N/A                                         |
-| Client Library | Python                     | `beta`          | N/A                                         |
+| Product        | Feature                    | Stage          | Available on self-hosted                    |
+| -------------- | -------------------------- | -------------- | ------------------------------------------- |
+| Database       | Postgres                   | `GA`           | ✅                                          |
+| Database       | Vector Database            | `GA`           | ✅                                          |
+| Database       | Auto-generated Rest API    | `GA`           | ✅                                          |
+| Database       | Auto-generated GraphQL API | `GA`           | ✅                                          |
+| Database       | Webhooks                   | `beta`         | ✅                                          |
+| Database       | Vault                      | `public alpha` | ✅                                          |
+| Database       | Supabase Pipelines         | `public alpha` | N/A                                         |
+| Platform       |                            | `GA`           | ✅                                          |
+| Platform       | Point-in-Time Recovery     | `GA`           | 🚧 [wal-g](https://github.com/wal-g/wal-g)  |
+| Platform       | Custom Domains             | `GA`           | N/A                                         |
+| Platform       | Network Restrictions       | `GA`           | N/A                                         |
+| Platform       | SSL enforcement            | `GA`           | N/A                                         |
+| Platform       | Branching                  | `beta`         | N/A                                         |
+| Platform       | Terraform Provider         | `public alpha` | N/A                                         |
+| Platform       | Read Replicas              | `GA`           | N/A                                         |
+| Platform       | Log Drains                 | `public alpha` | ✅                                          |
+| Platform       | MCP                        | `public alpha` | ✅                                          |
+| Platform       | PrivateLink                | `beta`         | N/A                                         |
+| Studio         |                            | `GA`           | ✅                                          |
+| Studio         | SSO                        | `GA`           | ✅                                          |
+| Studio         | Column Privileges          | `public alpha` | ✅                                          |
+| Realtime       | Postgres Changes           | `GA`           | ✅                                          |
+| Realtime       | Broadcast                  | `GA`           | ✅                                          |
+| Realtime       | Presence                   | `GA`           | ✅                                          |
+| Realtime       | Broadcast Authorization    | `public beta`  | ✅                                          |
+| Realtime       | Presence Authorization     | `public beta`  | ✅                                          |
+| Realtime       | Broadcast from Database    | `public beta`  | ✅                                          |
+| Storage        |                            | `GA`           | ✅                                          |
+| Storage        | CDN                        | `GA`           | 🚧 [Cloudflare](https://www.cloudflare.com) |
+| Storage        | Smart CDN                  | `GA`           | 🚧 [Cloudflare](https://www.cloudflare.com) |
+| Storage        | Image Transformations      | `GA`           | ✅                                          |
+| Storage        | Resumable Uploads          | `GA`           | ✅                                          |
+| Storage        | S3 compatibility           | `GA`           | ✅                                          |
+| Edge Functions |                            | `GA`           | ✅                                          |
+| Edge Functions | Regional Invocations       | `GA`           | ✅                                          |
+| Edge Functions | NPM compatibility          | `GA`           | ✅                                          |
+| Auth           |                            | `GA`           | ✅                                          |
+| Auth           | Email login                | `GA`           | ✅                                          |
+| Auth           | Social login               | `GA`           | ✅                                          |
+| Auth           | Phone login                | `GA`           | ✅                                          |
+| Auth           | Passwordless login         | `GA`           | ✅                                          |
+| Auth           | SSO with SAML              | `GA`           | ✅                                          |
+| Auth           | Authorization via RLS      | `GA`           | ✅                                          |
+| Auth           | CAPTCHA protection         | `GA`           | ✅                                          |
+| Auth           | Server-side Auth           | `beta`         | ✅                                          |
+| Auth           | Third-Party Auth           | `GA`           | ✅                                          |
+| Auth           | Hooks                      | `beta`         | ✅                                          |
+| CLI            |                            | `GA`           | ✅ Works with self-hosted                   |
+| Management API |                            | `GA`           | N/A                                         |
+| Client Library | JavaScript                 | `GA`           | N/A                                         |
+| Client Library | Flutter                    | `GA`           | N/A                                         |
+| Client Library | Swift                      | `GA`           | N/A                                         |
+| Client Library | Python                     | `beta`         | N/A                                         |
 
 - ✅ = Fully Available
 - 🚧 = Available, but requires external tools or configuration

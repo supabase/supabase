@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../BillingSettings/Restriction'
@@ -15,6 +15,7 @@ import Activity from './Activity'
 import Compute from './Compute'
 import Egress from './Egress'
 import OrgLogUsage from './OrgLogUsage'
+import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 import {
@@ -348,6 +349,17 @@ export const Usage = () => {
           isLoadingOrgDailyStats={isLoadingOrgDailyStats}
         />
       )}
+
+      <Pipelines
+        orgSlug={slug as string}
+        projectRef={selectedProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+      />
     </>
   )
 }

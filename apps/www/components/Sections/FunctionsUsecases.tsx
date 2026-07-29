@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { ArrowUpRight } from 'lucide-react'
 // Import Swiper React components
 import Link from 'next/link'
+import { useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button } from 'ui'
+
 import CodeBlock from '../CodeBlock/CodeBlock'
-import { ArrowUpRight } from 'lucide-react'
 
 interface Example {
   lang: 'js' | 'py' | 'sql'
@@ -44,6 +45,7 @@ function FunctionsUsecases(props: Props) {
             const active = i == apiSwiperActiveIndex
             return (
               <button
+                tabIndex={0}
                 key={`featureHighlighted-${i}`}
                 className={
                   'bg-background hover:bg-surface-100 hover:border group rounded-md border px-6 py-4 text-left transition-all' +

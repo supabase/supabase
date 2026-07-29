@@ -91,7 +91,8 @@ Depending on your setup, you may need to adjust these values - for example, to u
 An override `docker-compose.rustfs.yml` can be added to enable RustFS container and provide an S3-compatible API for Storage backend:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up -d
+sh run.sh config add rustfs
+sh run.sh start
 ```
 
 Make sure to review the Storage section in your `.env` file for related configuration options.
@@ -112,7 +113,8 @@ MinIO no longer publishes open source Docker images or maintains their open sour
 An override `docker-compose.s3.yml` can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.s3.yml up -d
+sh run.sh config add s3
+sh run.sh start
 ```
 
 Make sure to review the Storage section in your `.env` file for related configuration options.
@@ -137,7 +139,7 @@ For AWS S3, you do not need `GLOBAL_S3_ENDPOINT` or `GLOBAL_S3_FORCE_PATH_STYLE`
 ### S3-compatible providers
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-Use the same configuration as MinIO, but point to your provider's endpoint, e.g.:
+Use the same configuration as MinIO, replacing the endpoint, bucket name, region, and AWS credentials with the values provided by your S3-compatible provider, for example:
 
 ```yaml name=docker-compose.yml
 storage:
@@ -146,6 +148,10 @@ storage:
     STORAGE_BACKEND: s3
     GLOBAL_S3_BUCKET: your-bucket-name
     GLOBAL_S3_ENDPOINT: https://your-account-id.r2.cloudflarestorage.com
+    GLOBAL_S3_FORCE_PATH_STYLE: 'true'
+    AWS_ACCESS_KEY_ID: your-access-key-id
+    AWS_SECRET_ACCESS_KEY: your-secret-access-key
+    REGION: your-region
 ```
 
 ## Verify
@@ -207,7 +213,7 @@ Setting a bucket to "Public" only allows unauthenticated **downloads**. Uploads 
 
 ### Upload URLs point to localhost
 
-If uploads from a browser fail (CORS or mixed content errors), check that `API_EXTERNAL_URL` and `SUPABASE_PUBLIC_URL` in your `.env` file match your actual domain and protocol - not `http://localhost:8000`.
+If uploads from a browser fail (CORS or mixed content errors), check that `SUPABASE_PUBLIC_URL` in your `.env` file matches your actual domain and protocol - not `http://localhost:8000`.
 
 ### Additional resources
 

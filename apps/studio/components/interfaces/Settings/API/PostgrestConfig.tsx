@@ -23,7 +23,7 @@ import {
   Switch,
   useWatch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -310,7 +310,7 @@ export const PostgrestConfig = () => {
                     >
                       <ExposedSchemaSelector
                         selectedSchemas={watchedDbSchema}
-                        disabled={!canUpdatePostgrestConfig}
+                        readOnly={!canUpdatePostgrestConfig}
                         onToggleSchema={(schema) => {
                           const current = form.getValues('dbSchema')
                           if (current.includes(schema)) {

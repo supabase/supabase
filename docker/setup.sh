@@ -290,7 +290,7 @@ else
 fi
 
 public_url=$(ask "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
-api_url=$(ask   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url")
+api_url=$(ask   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url/auth/v1")
 site_url=$(ask  "SITE_URL (default Auth redirect)"    "$current_site_url")
 
 # Suggest PROXY_DOMAIN from the public_url host (unless it's localhost-ish)

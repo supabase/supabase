@@ -40,11 +40,18 @@ interface ItemProps {
   doNotCloseOverlay?: boolean
   showActiveBar?: boolean
   style?: React.CSSProperties
+  className?: string
 }
 
 export const menuItemVariants = cva(
   cn(
-    'cursor-pointer flex space-x-3 items-center outline-hidden focus-visible:ring-1 ring-foreground-muted focus-visible:z-10 group'
+    // focus-ring: when the item itself is focused.
+    // group-focus-visible: when a wrapping Link/button (e.g. ProductMenu) is the
+    // focus target — cannot use focus-ring here (utility targets :focus-visible
+    // on the same element).
+    'cursor-pointer flex space-x-3 items-center focus-visible:z-10 group',
+    'focus-ring',
+    'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background'
   ),
   {
     variants: {
@@ -91,13 +98,13 @@ export const menuItemVariants = cva(
   }
 )
 
-export function Item({ children, icon, active, onClick, style }: ItemProps) {
+export function Item({ children, icon, active, onClick, style, className }: ItemProps) {
   const { type } = useMenuContext()
 
   return (
     <li
       role="menuitem"
-      className={cn('outline-hidden', menuItemVariants({ type, active }))}
+      className={cn('outline-hidden', menuItemVariants({ type, active }), className)}
       style={style}
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
@@ -112,14 +119,14 @@ export function Item({ children, icon, active, onClick, style }: ItemProps) {
           {icon}
         </div>
       )}
-      <span
-        className={cn('transition truncate text-sm', {
+      <div
+        className={cn('transition truncate text-sm w-full', {
           'text-foreground-light group-hover:text-foreground': !active,
           'text-foreground font-semibold': active,
         })}
       >
         {children}
-      </span>
+      </div>
     </li>
   )
 }
