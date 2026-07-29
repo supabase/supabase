@@ -4,8 +4,9 @@ import { toast } from 'sonner'
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
 import { lintKeys } from '@/data/lint/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { ResponseError, type UseCustomMutationOptions } from '@/types'
 
 export type AuthConfigUpdateVariables = {
   projectRef: string
@@ -14,6 +15,13 @@ export type AuthConfigUpdateVariables = {
 }
 
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
+  if (!IS_PLATFORM) {
+    throw new ResponseError(
+      'Auth settings can only be viewed in self-hosted mode. ' +
+        'Configure them using environment variables in your docker-compose.yml or .env file.'
+    )
+  }
+
   const { data, error } = await patch('/platform/auth/{ref}/config', {
     params: {
       path: { ref: projectRef },
