@@ -41,7 +41,7 @@ const { data, error } = await supabase
 
 ## Detailed breakdown of explain output components
 
-## 1. Plan type
+### 1. Plan type
 
 **- Seq Scan:** A sequential scan that reads all rows from a table. This is often seen in the absence of indexes that can be used for the query.
 
@@ -49,26 +49,26 @@ const { data, error } = await supabase
 
 **- Bitmap Heap Scan:** Uses a bitmap index to find rows efficiently and then retrieves the actual rows from the table. This type of scan is efficient when retrieving a moderate number of rows.
 
-## 2. Cost
+### 2. Cost
 
 **cost=0.00..19.00:** This represents the estimated cost of executing the plan. The first number (0.00) is the cost of returning the first row, and the second number (19.00) is the total cost of executing the query and retrieving all rows. These values are arbitrary units determined by the database's cost model, not actual time or resources.
 
 **Start-up Cost:** The cost incurred before returning the first row.
 **Total Cost:** The estimated total cost of the operation.
 
-## 3. Rows
+### 3. Rows
 
 **rows=1:** An estimate of the number of rows the query will return. Accurate row estimates depend on updated statistics; if the estimates are off, it might indicate that the database statistics need to be updated.
 
-## 4. Width
+### 4. Width
 
 **width=240:** The average number of bytes expected for the output rows. This indicates the expected data volume that needs to be processed or transferred, which can impact performance.
 
-## 5. Filters
+### 5. Filters
 
 **Filter: (user_id = 1):** This shows any filters applied post-scan. Filters are conditions that are checked after retrieving the rows. A high number of rows being filtered out could indicate a need for better indexing.
 
-## 6. Execution time
+### 6. Execution time
 
 **Execution Time: 0.069 ms:** measures how long it took to execute the query, including retrieving the data, performing any sorts, joins, or other operations defined in the execution plan, and returning the final results. This time is measured in milliseconds.
 

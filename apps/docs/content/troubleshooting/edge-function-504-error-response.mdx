@@ -108,19 +108,19 @@ You can initiate functions in a background task to be handled independently of t
 
 Instead of managing all operations within the function itself, there may be an external API that can execute jobs faster and then send back results. Alternatively, you may be able to offload some processing to the requester rather than doing everything within the function itself.
 
-## Using alternative libraries
+### Using alternative libraries
 
 Some libraries, may be more optimal than others. It's worth exploring alternative libraries that may execute faster or are lighter weight.
 
-## Optimizing database operations
+### Optimizing database operations
 
 If you are connecting to Supabase Postgres from your function, you can inspect the speed of your queries in the [performance dashboard](/dashboard/project/_/observability/query-performance). If the operations are slow, you can review [performance](/dashboard/project/_/advisors/performance) and [index advisor](/docs/guides/database/postgres/indexes#index-advisor) for improvement suggestions.
 
-## Implement caching
+### Implement caching
 
 If you are making requests to the same resource and the return values change irregularly, you may be able to implement an external cache layer, such as [Upstash Redis](/docs/guides/functions/examples/upstash-redis) to reduce wait times.
 
-## Restrict request load
+### Restrict request load
 
 If the function is used to evaluate user submissions, you can restrict load size to reduce computational time. You can use the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=select%0A++req.pathname+as+function_name%2C%0A++res.status_code%2C%0A++AVG%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+avg_content_size_in_bytes%2C%0A++MIN%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+min_content_size_in_bytes%2C%0A++MAX%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+max_content_size_in_bytes%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST%28metadata%29+as+metadata%0A++cross+join+UNNEST%28metadata.request%29+as+req%0A++cross+join+UNNEST%28sb%29+as+sb%0A++cross+join+UNNEST%28req.headers%29+as+headers%0A++cross+join+UNNEST%28metadata.response%29+as+res%0Awhere+%0A++++req.pathname+%3D+%27%2Ffunctions%2Fv1%2Finduce-504%27%0AGROUP+BY+req.pathname%2C+res.status_code+++++%0Alimit+10) to filter by the content size in bytes provided by the initial requester:
 
