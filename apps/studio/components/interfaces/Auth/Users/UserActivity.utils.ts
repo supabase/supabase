@@ -133,7 +133,7 @@ export const groupNoisyEvents = (events: UserActivityEvent[]): UserActivityTimel
   }
 
   for (const event of events) {
-    if (true) {
+    if (isNoisyEvent(event)) {
       currentRun.push(event)
     } else {
       flushRun()
