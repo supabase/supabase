@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { COMPUTE_BASELINE_IOPS, COMPUTE_MAX_IOPS } from 'shared-data'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {

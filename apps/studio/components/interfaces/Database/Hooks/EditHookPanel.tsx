@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -15,24 +15,16 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
+import {
+  PG_META_SCOPED_INTROSPECTION_FLAG,
+  tableEditorQueryOptions,
+} from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
-
-export const isEdgeFunction = ({
-  ref,
-  restUrlTld,
-  url,
-}: {
-  ref?: string
-  restUrlTld?: string
-  url: string
-}) =>
-  url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
-  url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
 
 const FORM_ID = 'edit-hook-panel-form'
 
@@ -80,6 +72,7 @@ export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isLoadingTable, setIsLoadingTable] = useState(false)
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
     projectRef: project?.ref,
@@ -139,7 +132,6 @@ export const EditHookPanel = () => {
   const isSubmitting = isCreating || isUpdating || isLoadingTable
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const form = useForm<WebhookFormValues>({
     resolver: zodResolver(FormSchema),
@@ -148,11 +140,7 @@ export const EditHookPanel = () => {
       table_id: selectedHook?.table_id?.toString() ?? '',
       http_url: selectedHook?.function_args?.[0] ?? '',
       http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-      function_type: isEdgeFunction({
-        ref,
-        restUrlTld,
-        url: selectedHook?.function_args?.[0] ?? '',
-      })
+      function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
         ? 'supabase_function'
         : 'http_request',
       timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -184,11 +172,7 @@ export const EditHookPanel = () => {
         table_id: selectedHook?.table_id?.toString() ?? '',
         http_url: selectedHook?.function_args?.[0] ?? '',
         http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-        function_type: isEdgeFunction({
-          ref,
-          restUrlTld,
-          url: selectedHook?.function_args?.[0] ?? '',
-        })
+        function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
           ? 'supabase_function'
           : 'http_request',
         timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -197,7 +181,7 @@ export const EditHookPanel = () => {
         httpParameters: parseParameters(selectedHook),
       })
     }
-  }, [visible, selectedHook, ref, restUrlTld, form])
+  }, [visible, selectedHook, ref, restUrl, form])
 
   const queryClient = useQueryClient()
   const onSubmit: SubmitHandler<WebhookFormValues> = async (values) => {
@@ -212,6 +196,7 @@ export const EditHookPanel = () => {
           id: Number(values.table_id),
           projectRef: project?.ref,
           connectionString: project?.connectionString,
+          scoped,
         })
       )
       if (!selectedTable) {

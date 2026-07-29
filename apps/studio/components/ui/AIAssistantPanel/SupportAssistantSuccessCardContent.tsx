@@ -135,7 +135,7 @@ export function SupportAssistantSuccessCardContent({
         }
       }}
       className={cn(
-        'group cursor-pointer bg-muted/50 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+        'group cursor-pointer bg-muted/50 transition-colors hover:bg-muted/50 focus-ring',
         className
       )}
     >

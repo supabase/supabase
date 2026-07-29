@@ -1,7 +1,7 @@
-import { format } from 'date-fns'
+import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import {
   computeOverallRisk,
@@ -17,12 +17,10 @@ import { RiskMarker } from './RiskMarker'
 import {
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
-  PermissionScopeMap,
-} from '@/data/scoped-access-tokens/permission-scope-map-query'
+} from '@/data/access-tokens/permission-scope-map'
 
 interface ReviewStepProps {
   values: TokenFormValues
-  permissionScopeMap: PermissionScopeMap | undefined
 }
 
 const RISK_TEXT_CLASS: Record<OverallRisk['tone'], string> = {
@@ -35,10 +33,10 @@ const RISK_TEXT_CLASS: Record<OverallRisk['tone'], string> = {
 const modeLabel = (mode: PermissionMode) =>
   mode === 'readwrite' ? 'Read-write' : mode === 'read' ? 'Read' : 'None'
 
-export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewStepProps) => {
+export const NewScopedTokenFormReview = ({ values }: ReviewStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
   const selection = values.permissions
-  const allGrantedScopes = useMemo(() => selectionToScopes(selection), [selection])
+  const grantedScopes = useMemo(() => selectionToScopes(selection), [selection])
   const risk = useMemo(
     () => computeOverallRisk(selection, values.resourceAccess),
     [selection, values.resourceAccess]
@@ -61,7 +59,7 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
   const expiresSummary = useMemo(() => {
     if (values.expiresAt === 'custom') {
       return values.customExpiryDate
-        ? format(new Date(values.customExpiryDate), 'dd MMM, yyyy')
+        ? dayjs(values.customExpiryDate).format('DD MMM, YYYY')
         : 'Custom — no date set'
     }
     return EXPIRY_OPTIONS.find((o) => o.value === values.expiresAt)?.label ?? values.expiresAt
@@ -78,12 +76,9 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
     [selection]
   )
 
-  const hasCapabilities = allGrantedScopes.length > 0
+  const hasCapabilities = grantedScopes.length > 0
 
-  const mcpTools = useMemo(
-    () => getEnabledMcpTools({ grantedScopes: allGrantedScopes, permissionScopeMap }),
-    [allGrantedScopes, permissionScopeMap]
-  )
+  const mcpTools = useMemo(() => getEnabledMcpTools(grantedScopes), [grantedScopes])
 
   const capabilityGroups = useMemo(() => {
     const groups: { entry: PermissionCatalogEntry; mode: PermissionMode; endpoints: string[][] }[] =
@@ -92,18 +87,14 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
       for (const { entry, mode } of category.entries) {
         const capabilityScopes =
           mode === 'readwrite' ? [...entry.readScopes, ...entry.writeScopes] : entry.readScopes
-        const endpoints = getEnabledEndpointsForCapability({
-          capabilityScopes,
-          allGrantedScopes,
-          permissionScopeMap,
-        })
+        const endpoints = getEnabledEndpointsForCapability(capabilityScopes, grantedScopes)
         if (endpoints.length > 0) {
           groups.push({ entry, mode, endpoints: endpoints.map((e) => [e.method, e.path]) })
         }
       }
     }
     return groups
-  }, [activeByCategory, allGrantedScopes, permissionScopeMap])
+  }, [activeByCategory, grantedScopes])
 
   const rows: [string, React.ReactNode][] = [
     ['Name', values.tokenName || <span className="text-foreground-lighter">Untitled token</span>],
@@ -121,11 +112,7 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
                 <div key={entry.key} className="flex items-center gap-2 text-sm">
                   <span className="text-foreground">{entry.name}</span>
                   <span className="text-foreground-light">· {modeLabel(mode)}</span>
-                  <RiskMarker
-                    entry={entry}
-                    withTooltip={false}
-                    permissionScopeMap={permissionScopeMap}
-                  />
+                  <RiskMarker entry={entry} withTooltip={false} />
                 </div>
               ))}
             </div>

@@ -119,6 +119,7 @@ import { Route as ProjectRefObservabilityQueryInsightsRouteImport } from './rout
 import { Route as ProjectRefObservabilityPostgrestRouteImport } from './routes/project/$ref/observability/postgrest'
 import { Route as ProjectRefObservabilityEdgeFunctionsRouteImport } from './routes/project/$ref/observability/edge-functions'
 import { Route as ProjectRefObservabilityDatabaseRouteImport } from './routes/project/$ref/observability/database'
+import { Route as ProjectRefObservabilityConnectionsRouteImport } from './routes/project/$ref/observability/connections'
 import { Route as ProjectRefObservabilityAuthRouteImport } from './routes/project/$ref/observability/auth'
 import { Route as ProjectRefObservabilityApiOverviewRouteImport } from './routes/project/$ref/observability/api-overview'
 import { Route as ProjectRefObservabilityIdRouteImport } from './routes/project/$ref/observability/$id'
@@ -895,6 +896,12 @@ const ProjectRefObservabilityDatabaseRoute =
   ProjectRefObservabilityDatabaseRouteImport.update({
     id: '/database',
     path: '/database',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityConnectionsRoute =
+  ProjectRefObservabilityConnectionsRouteImport.update({
+    id: '/connections',
+    path: '/connections',
     getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
 const ProjectRefObservabilityAuthRoute =
@@ -2186,6 +2193,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
@@ -2482,6 +2490,7 @@ export interface FileRoutesByTo {
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
@@ -2791,6 +2800,7 @@ export interface FileRoutesById {
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
@@ -3100,6 +3110,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
     | '/project/$ref/observability/postgrest'
@@ -3396,6 +3407,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
     | '/project/$ref/observability/postgrest'
@@ -3704,6 +3716,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
     | '/project/$ref/observability/postgrest'
@@ -4754,6 +4767,13 @@ declare module '@tanstack/react-router' {
       path: '/database'
       fullPath: '/project/$ref/observability/database'
       preLoaderRoute: typeof ProjectRefObservabilityDatabaseRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/connections': {
+      id: '/project/$ref/observability/connections'
+      path: '/connections'
+      fullPath: '/project/$ref/observability/connections'
+      preLoaderRoute: typeof ProjectRefObservabilityConnectionsRouteImport
       parentRoute: typeof ProjectRefObservabilityRoute
     }
     '/project/$ref/observability/auth': {
@@ -6578,6 +6598,7 @@ interface ProjectRefObservabilityRouteChildren {
   ProjectRefObservabilityIdRoute: typeof ProjectRefObservabilityIdRoute
   ProjectRefObservabilityApiOverviewRoute: typeof ProjectRefObservabilityApiOverviewRoute
   ProjectRefObservabilityAuthRoute: typeof ProjectRefObservabilityAuthRoute
+  ProjectRefObservabilityConnectionsRoute: typeof ProjectRefObservabilityConnectionsRoute
   ProjectRefObservabilityDatabaseRoute: typeof ProjectRefObservabilityDatabaseRoute
   ProjectRefObservabilityEdgeFunctionsRoute: typeof ProjectRefObservabilityEdgeFunctionsRoute
   ProjectRefObservabilityPostgrestRoute: typeof ProjectRefObservabilityPostgrestRoute
@@ -6594,6 +6615,8 @@ const ProjectRefObservabilityRouteChildren: ProjectRefObservabilityRouteChildren
     ProjectRefObservabilityApiOverviewRoute:
       ProjectRefObservabilityApiOverviewRoute,
     ProjectRefObservabilityAuthRoute: ProjectRefObservabilityAuthRoute,
+    ProjectRefObservabilityConnectionsRoute:
+      ProjectRefObservabilityConnectionsRoute,
     ProjectRefObservabilityDatabaseRoute: ProjectRefObservabilityDatabaseRoute,
     ProjectRefObservabilityEdgeFunctionsRoute:
       ProjectRefObservabilityEdgeFunctionsRoute,

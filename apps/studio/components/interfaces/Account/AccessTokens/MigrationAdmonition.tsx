@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { X } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'

@@ -48,14 +48,14 @@ const RadioGroupStackedItem = React.forwardRef<
         // Enabled/hover states
         'enabled:cursor-pointer enabled:hover:bg-surface-300 enabled:hover:border-foreground-muted',
         // Focus state
-        'focus:ring-background-control focus:border-control focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-background-control focus-visible:ring-offset-2 focus-visible:ring-offset-foreground-muted',
+        'focus-ring enabled:focus-visible:border-control',
         // Z-index for interactions
         'hover:z-1 focus-visible:z-1 data-[state=checked]:z-1',
         // Checked state
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
         'data-[state=checked]:bg-surface-300 data-[state=checked]:border-foreground-muted',
-        // Transitions and group
-        'transition group',
+        // Colors only — avoid bare `transition` so the focus ring does not animate
+        'transition-colors group',
         props.className
       )}
     >
@@ -66,12 +66,11 @@ const RadioGroupStackedItem = React.forwardRef<
               // Base styles
               'aspect-square h-4 w-4 min-w-4 min-h-4 rounded-full border relative',
               'flex items-center justify-center',
-              'ring-offset-background transition',
               // States
               'group-data-[state=checked]:border-foreground-muted',
-              'group-focus:border-foreground-muted group-focus:outline-hidden',
-              'group-focus-visible:ring-2 group-focus-visible:ring-background-control group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-foreground-muted',
-              'group-hover:border-foreground-muted'
+              'group-focus-visible:border-foreground-muted',
+              'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background',
+              'group-hover:border-foreground-muted transition-colors'
             )}
           >
             <RadioGroupPrimitive.Indicator className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">

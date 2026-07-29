@@ -321,7 +321,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 paginatedDeliveries.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="cursor-pointer inset-focus"
+                    className="cursor-pointer focus-inset"
                     onClick={() => onOpenDelivery(row.original.id)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {

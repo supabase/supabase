@@ -3,7 +3,7 @@ import { ChevronRight } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, Form, ScrollArea, Separator, SheetClose, SheetFooter } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
 import { DEFAULT_EXPIRY, TokenFormSchema, TokenFormValues } from './NewScopedTokenForm.utils'

@@ -404,7 +404,7 @@ begin
   -- Step 1: Check for explicit allow
   select count(*) into allow_count
   from public.signup_networks
-  where type = 'allow' and ip::inet << cidr;
+  where type = 'allow' and ip <<= cidr;
 
   if allow_count > 0 then
     -- If explicitly allowed, allow signup
@@ -414,7 +414,7 @@ begin
   -- Step 2: Check for explicit deny
   select count(*) into deny_count
   from public.signup_networks
-  where type = 'deny' and ip::inet << cidr;
+  where type = 'deny' and ip <<= cidr;
 
   if deny_count > 0 then
     return jsonb_build_object(
