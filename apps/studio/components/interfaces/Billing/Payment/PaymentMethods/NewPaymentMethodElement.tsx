@@ -140,7 +140,10 @@ export const NewPaymentMethodElement = forwardRef(
       form.setValue('tax_id_name', name)
     }
 
-    const { tax_id_name, tax_id_value: rawTaxIdValue } = useWatch({ control: form.control })
+    const [tax_id_name, rawTaxIdValue] = useWatch({
+      control: form.control,
+      name: ['tax_id_name', 'tax_id_value'],
+    })
     const taxIdValue = rawTaxIdValue?.trim() ?? ''
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 

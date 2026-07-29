@@ -78,7 +78,7 @@ export const BillingCustomerDataForm = ({
     form.setValue('tax_id_value', '', { shouldDirty: true })
   }
 
-  const { tax_id_name } = useWatch({ control: form.control })
+  const tax_id_name = useWatch({ control: form.control, name: 'tax_id_name' })
   const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
   const availableTaxIds = useMemo(() => {

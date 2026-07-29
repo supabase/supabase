@@ -61,7 +61,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
     defaultValues,
   })
 
-  const { value, unit } = useWatch({ control: form.control })
+  const [value, unit] = useWatch({ control: form.control, name: ['value', 'unit'] })
   const bannedUntil = dayjs().add(Number(value), unit).format('DD MMM YYYY HH:mm (ZZ)')
 
   const onSubmit = (data: FormType) => {

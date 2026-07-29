@@ -108,7 +108,10 @@ const DuckLakeModeSelector = ({
 }
 
 const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
-  const { ducklakeStorageProjectRef } = useWatch({ control: form.control })
+  const ducklakeStorageProjectRef = useWatch({
+    control: form.control,
+    name: 'ducklakeStorageProjectRef',
+  })
 
   const [showNewBucketDialog, setShowNewBucketDialog] = useState(false)
   const [newBucketName, setNewBucketName] = useState('')
@@ -777,7 +780,10 @@ const BucketSelection = ({
   value: string | undefined
   onChange: (value: string) => void
 }) => {
-  const { ducklakeStorageProjectRef } = useWatch({ control: form.control })
+  const ducklakeStorageProjectRef = useWatch({
+    control: form.control,
+    name: 'ducklakeStorageProjectRef',
+  })
 
   const {
     data: bucketsData,

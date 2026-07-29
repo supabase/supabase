@@ -20,7 +20,7 @@ export const PublicationSelection = ({
   onSelectNewPublication,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
-  const { publicationName } = useWatch({ control: form.control })
+  const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const sourceId = useReplicationSourceId({ projectRef })
 

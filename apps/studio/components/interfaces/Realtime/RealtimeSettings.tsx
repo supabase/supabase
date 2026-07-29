@@ -135,7 +135,10 @@ export const RealtimeSettings = () => {
     } as any,
   })
 
-  const { allow_public, suspend } = useWatch({ control: form.control })
+  const [allow_public, suspend] = useWatch({
+    control: form.control,
+    name: ['allow_public', 'suspend'],
+  })
   const isSettingToPrivate = !data?.private_only && !allow_public
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend

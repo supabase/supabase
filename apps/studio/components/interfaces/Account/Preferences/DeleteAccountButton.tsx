@@ -63,7 +63,7 @@ export const DeleteAccountButton = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: { account: '' },
   })
-  const { account } = useWatch({ control: form.control })
+  const account = useWatch({ control: form.control, name: 'account' })
 
   const { mutate: submitSupportTicket, isPending } = useSendSupportTicketMutation({
     onSuccess: () => {

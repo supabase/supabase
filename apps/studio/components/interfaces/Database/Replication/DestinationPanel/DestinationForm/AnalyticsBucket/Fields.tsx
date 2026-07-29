@@ -61,7 +61,10 @@ export const AnalyticsBucketFields = ({
   editMode: boolean
   onSelectNewBucket: () => void
 }) => {
-  const { warehouseName, s3AccessKeyId, namespace } = useWatch({ control: form.control })
+  const [warehouseName, s3AccessKeyId, namespace] = useWatch({
+    control: form.control,
+    name: ['warehouseName', 's3AccessKeyId', 'namespace'],
+  })
   const [showCatalogToken, setShowCatalogToken] = useState(false)
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 

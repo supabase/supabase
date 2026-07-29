@@ -66,7 +66,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
     defaultValues,
     mode: 'onChange',
   })
-  const { namespace } = useWatch({ control: form.control })
+  const namespace = useWatch({ control: form.control, name: 'namespace' })
   const {
     fields: columns,
     append: appendColumn,

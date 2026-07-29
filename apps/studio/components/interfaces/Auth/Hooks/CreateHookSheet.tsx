@@ -167,12 +167,10 @@ export const CreateHookSheet = ({
   })
 
   const isDirty = form.formState.isDirty
-  const {
-    postgresValues = { schema: 'public', functionName: '' },
-    hookType,
-    selectedType,
-    enabled,
-  } = useWatch({ control: form.control })
+  const [postgresValues, hookType, selectedType, enabled] = useWatch({
+    control: form.control,
+    name: ['postgresValues', 'hookType', 'selectedType', 'enabled'],
+  })
   const {
     confirmOnClose,
     handleOpenChange,

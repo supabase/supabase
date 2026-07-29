@@ -106,7 +106,7 @@ export const EnableExtensionModal = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const { schema } = useWatch({ control: form.control })
+  const schema = useWatch({ control: form.control, name: 'schema' })
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (project === undefined) return console.error('Project is required')

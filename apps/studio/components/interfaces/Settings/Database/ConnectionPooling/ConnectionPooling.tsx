@@ -113,7 +113,7 @@ export const ConnectionPooling = () => {
       max_client_conn: undefined,
     },
   })
-  const { default_pool_size } = useWatch({ control: form.control })
+  const default_pool_size = useWatch({ control: form.control, name: 'default_pool_size' })
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
   const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
 

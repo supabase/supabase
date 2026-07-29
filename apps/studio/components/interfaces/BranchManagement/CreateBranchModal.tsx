@@ -111,7 +111,10 @@ export const CreateBranchModal = () => {
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
-  const { withData, gitBranchName } = useWatch({ control: form.control })
+  const [withData, gitBranchName] = useWatch({
+    control: form.control,
+    name: ['withData', 'gitBranchName'],
+  })
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const {

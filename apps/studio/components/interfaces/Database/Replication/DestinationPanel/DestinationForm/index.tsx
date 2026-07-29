@@ -259,7 +259,7 @@ export const DestinationForm = ({
     defaultValues,
   })
 
-  const { publicationName } = useWatch({ control: form.control })
+  const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =

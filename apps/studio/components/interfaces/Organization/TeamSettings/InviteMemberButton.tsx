@@ -151,7 +151,10 @@ export const InviteMemberButton = () => {
     defaultValues,
   })
 
-  const { applyToOrg, projectRef, email } = useWatch({ control: form.control })
+  const [applyToOrg, projectRef, email] = useWatch({
+    control: form.control,
+    name: ['applyToOrg', 'projectRef', 'email'],
+  })
 
   const emailCount = parseEmails(email ?? '').length
 

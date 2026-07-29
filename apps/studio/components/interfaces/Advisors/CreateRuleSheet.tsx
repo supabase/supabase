@@ -99,7 +99,10 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
     defaultValues,
   })
 
-  const { lint_name, assigned_to, is_disabled } = useWatch({ control: form.control })
+  const [lint_name, assigned_to, is_disabled] = useWatch({
+    control: form.control,
+    name: ['lint_name', 'assigned_to', 'is_disabled'],
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')

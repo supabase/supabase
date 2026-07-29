@@ -157,7 +157,7 @@ export function DiskManagementForm() {
     reValidateMode: 'onChange',
   })
 
-  const { computeSize: modifiedComputeSize } = useWatch({ control: form.control })
+  const modifiedComputeSize = useWatch({ control: form.control, name: 'computeSize' })
 
   const isSuccess =
     isAddonsSuccess &&
