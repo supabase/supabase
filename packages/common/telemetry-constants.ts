@@ -1494,6 +1494,36 @@ export interface DatabaseConnectionsLiveModeClickedEvent {
   groups: TelemetryGroups
 }
 
+/**
+ * User clicked a metric card PID in the Overview panel of the Database Connections observability page, selecting it in the activity table below.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsOverviewMetricCardClickedEvent {
+  action: 'database_connections_overview_metric_card_clicked'
+  properties: {
+    type: 'longest_blocked' | 'top_blocker' | 'longest_running'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User applied a filter on the Sessions table of the Database Connections observability page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsFilterAppliedEvent {
+  action: 'database_connections_filter_applied'
+  properties: {
+    type: 'state' | 'roles' | 'application' | 'blockers' | 'reset'
+  }
+  groups: TelemetryGroups
+}
+
 type DatabaseActivityState =
   | 'idle'
   | 'active'
@@ -3729,6 +3759,8 @@ export type TelemetryEvent =
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
   | DatabaseConnectionsLiveModeClickedEvent
+  | DatabaseConnectionsOverviewMetricCardClickedEvent
+  | DatabaseConnectionsFilterAppliedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminationSubmittedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
