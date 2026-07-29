@@ -36,7 +36,7 @@ export interface AccessTokenListProps {
 
 export const AccessTokenList = ({
   searchString = '',
-  scopedTokensEnabled = true,
+  scopedTokensEnabled,
   onDeleteSuccess,
 }: AccessTokenListProps) => {
   const track = useTrack()
