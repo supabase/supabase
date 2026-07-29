@@ -55,7 +55,7 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
   const [isCreating, setIsCreating] = useState(false)
 
   const FormSchema = createFormSchema()
-  const defaultValues = {
+  const defaultValues: CreateTableFormValues = {
     namespace: '',
     newNamespace: undefined,
     name: '',
@@ -240,9 +240,9 @@ export const CreateTableSheet = ({ open, onOpenChange }: CreateTableSheetProps) 
                           <p className="text-xs text-foreground-lighter">Name</p>
                           <p className="text-xs text-foreground-lighter">Type</p>
                         </div>
-                        {columns.map((_, idx) => (
+                        {columns.map((column, idx) => (
                           <ColumnRow
-                            key={`column-${idx}`}
+                            key={column.id}
                             control={form.control}
                             idx={idx}
                             isCreating={isCreating}
@@ -287,7 +287,7 @@ interface ColumnRowProps {
 
 const ColumnRow = ({ control, idx, isCreating, onRemove }: ColumnRowProps) => {
   const columnType = useWatch({ control, name: `columns.${idx}.type` })
-  const additionalFields = COLUMN_TYPE_FIELDS[columnType as keyof typeof COLUMN_TYPE_FIELDS] ?? []
+  const additionalFields = COLUMN_TYPE_FIELDS[columnType] ?? []
 
   return (
     <div className="grid grid-cols-[1fr_1fr_32px] gap-x-1">
@@ -345,7 +345,7 @@ const ColumnRow = ({ control, idx, isCreating, onRemove }: ColumnRowProps) => {
               <FormField
                 control={control}
                 key={`columns.${idx}.${x.name}`}
-                name={`columns.${idx}.${x.name}` as any}
+                name={`columns.${idx}.${x.name}`}
                 render={({ field }) => (
                   <FormItemLayout>
                     <FormControl>
