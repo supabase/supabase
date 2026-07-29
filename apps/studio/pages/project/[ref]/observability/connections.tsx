@@ -14,6 +14,7 @@ import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -21,6 +22,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import type { NextPageWithLayout } from '@/types'
 
 export const DatabaseConnections: NextPageWithLayout = () => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
@@ -46,6 +48,11 @@ export const DatabaseConnections: NextPageWithLayout = () => {
 
   function handleToggleLive() {
     const nextLive = !live
+
+    track('database_connections_live_mode_clicked', {
+      newState: nextLive ? 'enabled' : 'disabled',
+    })
+
     setLive(nextLive)
     if (nextLive) {
       setNow(dayjs.utc())

@@ -1479,6 +1479,21 @@ export interface IndexAdvisorTabClickedEvent {
   groups: TelemetryGroups
 }
 
+/**
+ * User toggled live mode on the Database Connections observability page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsLiveModeClickedEvent {
+  action: 'database_connections_live_mode_clicked'
+  properties: {
+    newState: 'enabled' | 'disabled'
+  }
+  groups: TelemetryGroups
+}
+
 type DatabaseActivityState =
   | 'idle'
   | 'active'
@@ -3713,6 +3728,7 @@ export type TelemetryEvent =
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
+  | DatabaseConnectionsLiveModeClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminationSubmittedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
