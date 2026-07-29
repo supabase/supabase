@@ -77,12 +77,14 @@ describe('describeUserActivityEvent', () => {
 
     it('describes a successful login', () => {
       const eventMessage = JSON.stringify({ path: '/token', status: 200 })
-      expect(describeUserActivityEvent('auth', eventMessage)).toBe('The user logged in')
+      expect(describeUserActivityEvent('auth', eventMessage)).toBe('The user renewed their session')
     })
 
     it('describes a failed login without an error code', () => {
       const eventMessage = JSON.stringify({ path: '/token', status: 400 })
-      expect(describeUserActivityEvent('auth', eventMessage)).toBe('User failed to log in')
+      expect(describeUserActivityEvent('auth', eventMessage)).toBe(
+        'User failed to renew their session'
+      )
     })
 
     it('returns null for an unrecognized auth path', () => {

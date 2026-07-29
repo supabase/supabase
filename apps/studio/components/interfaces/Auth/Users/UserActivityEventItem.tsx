@@ -34,7 +34,9 @@ export const UserActivityEventItem = ({
   indented = false,
 }: UserActivityEventItemProps) => {
   const hasError = isErrorLevel(event.level)
-  const logsHref = `/project/${projectRef}/logs?date=${event.timestampMs - LOGS_JUMP_WINDOW_MS}-${event.timestampMs + LOGS_JUMP_WINDOW_MS}&id=${event.id}`
+  const logsHref = projectRef
+    ? `/project/${projectRef}/logs?date=${event.timestampMs - LOGS_JUMP_WINDOW_MS}-${event.timestampMs + LOGS_JUMP_WINDOW_MS}&id=${event.id}`
+    : undefined
   const description = describeUserActivityEvent(event.logType, event.eventMessage)
   const requestLine = `${event.method ?? ''} ${event.pathname ?? ''}`.trim()
 
@@ -92,16 +94,27 @@ export const UserActivityEventItem = ({
             <span className="font-mono text-xs text-foreground-lighter tabular-nums">
               {dayjs(event.timestampMs).format('HH:mm:ss')}
             </span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button asChild variant="text" size="tiny" className="px-1">
-                  <Link href={logsHref}>
-                    <ExternalLink size={14} strokeWidth={1.5} />
-                  </Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">View in Logs Explorer</TooltipContent>
-            </Tooltip>
+            {logsHref ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button asChild variant="text" size="tiny" className="px-1">
+                    <Link href={logsHref}>
+                      <ExternalLink size={14} strokeWidth={1.5} />
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">View in Logs Explorer</TooltipContent>
+              </Tooltip>
+            ) : (
+              <ButtonTooltip
+                variant="text"
+                size="tiny"
+                className="px-1"
+                disabled
+                icon={<ExternalLink size={14} strokeWidth={1.5} />}
+                tooltip={{ content: { side: 'top', text: 'View in Logs Explorer' } }}
+              />
+            )}
             <ButtonTooltip
               variant="text"
               size="tiny"

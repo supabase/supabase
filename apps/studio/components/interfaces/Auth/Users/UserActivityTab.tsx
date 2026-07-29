@@ -75,9 +75,14 @@ export const UserActivityTab = ({ user }: UserActivityTabProps) => {
   return (
     <div className={cn('flex flex-col gap-y-6', PANEL_PADDING)}>
       <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-2">
-        <div className="flex items-center border border-strong rounded-full w-min h-7">
+        <div
+          role="group"
+          aria-label="Activity event filter"
+          className="flex items-center border border-strong rounded-full w-min h-7"
+        >
           <button
             tabIndex={0}
+            aria-pressed={filter === 'all'}
             className={cn(
               'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
               filter === 'all'
@@ -91,6 +96,7 @@ export const UserActivityTab = ({ user }: UserActivityTabProps) => {
           <div className="h-full w-px border-r border-strong" />
           <button
             tabIndex={0}
+            aria-pressed={filter === 'errors'}
             className={cn(
               'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
               filter === 'errors'

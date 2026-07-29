@@ -1,5 +1,4 @@
 import { screen } from '@testing-library/react'
-import { useFlag } from 'common'
 import { http, HttpResponse } from 'msw'
 import { ResizablePanelGroup } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
