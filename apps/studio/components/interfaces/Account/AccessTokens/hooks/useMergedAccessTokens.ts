@@ -30,10 +30,10 @@ interface UseMergedAccessTokensOptions {
  * the consuming list (via filterAndSortTokens), so this only merges + tags.
  */
 export const useMergedAccessTokens = ({
-  scopedTokensEnabled: scopedEnabled,
+  scopedTokensEnabled,
 }: UseMergedAccessTokensOptions = {}) => {
   const classic = useAccessTokensQuery()
-  const scoped = useScopedAccessTokensQuery({ enabled: scopedEnabled })
+  const scoped = useScopedAccessTokensQuery({ enabled: scopedTokensEnabled })
 
   return useMemo(() => {
     const classicTokens: MergedAccessToken[] = (classic.data ?? []).map((token) => ({
@@ -47,7 +47,7 @@ export const useMergedAccessTokens = ({
     return {
       tokens: [...classicTokens, ...scopedTokens],
       // Classic drives the primary states; a scoped fetch that is still loading shouldn't block the list.
-      isLoading: classic.isPending || (scopedEnabled && scoped.isPending),
+      isLoading: classic.isPending || (scopedTokensEnabled && scoped.isPending),
       isError: classic.isError,
       error: classic.error,
       isSuccess: classic.isSuccess,
@@ -60,6 +60,6 @@ export const useMergedAccessTokens = ({
     classic.isSuccess,
     scoped.data,
     scoped.isPending,
-    scopedEnabled,
+    scopedTokensEnabled,
   ])
 }
