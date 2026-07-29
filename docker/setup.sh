@@ -222,27 +222,29 @@ RESOLVED_REF=""
 REPO_URL="${SUPABASE_REPO_URL:-https://github.com/supabase/supabase}"
 STAMP_FILE=".supabase-version"
 
-# Highest self-hosted/v* tag on the remote, or empty. Same resolver as update.sh.
+# Highest self-hosted/v* tag on the remote, or empty when the remote has none.
+# Returns non-zero (printing nothing) when the remote can't be reached.
 latest_release_tag() {
-    git ls-remote --tags --refs "$REPO_URL" 2>/dev/null \
+    _refs=$(git ls-remote --tags --refs "$REPO_URL" 2>/dev/null) || return 1
+    printf '%s\n' "$_refs" \
         | sed 's#^.*refs/tags/##' \
         | grep -E '^self-hosted/v[0-9]' \
         | sort -V | tail -n1
 }
 
-# Sparse-clone docker/ from the latest self-hosted tag, falling back to HEAD.
+# Clone only docker/ from <ref> (empty = default branch) into <dest>.
 sparse_clone() {
-    # sparse_clone <dest> [ref]  -> clone docker/ only; ref empty means default branch
-    dest="$1"
-    ref="$2"
-    if [ -n "$ref" ]; then
+    # sparse_clone <dest> [ref]
+    _dest="$1"
+    _ref="$2"
+    if [ -n "$_ref" ]; then
         git clone --filter=blob:none --no-checkout --depth=1 --quiet \
-            --branch "$ref" "$REPO_URL" "$dest" 2>/dev/null || return 1
+            --branch "$_ref" "$REPO_URL" "$_dest" 2>/dev/null || return 1
     else
         git clone --filter=blob:none --no-checkout --depth=1 --quiet \
-            "$REPO_URL" "$dest" 2>/dev/null || return 1
+            "$REPO_URL" "$_dest" 2>/dev/null || return 1
     fi
-    ( cd "$dest" &&
+    ( cd "$_dest" &&
       git sparse-checkout init --cone &&
       git sparse-checkout set docker &&
       git checkout --quiet ) 2>/dev/null || return 1
@@ -254,47 +256,32 @@ resolved_sha() {
 }
 
 prepare_source() {
-    SRC_TMP=$(mktemp -d) || return 1
+    SRC_TMP=$(mktemp -d) || die "Could not create a temporary directory"
     dest="$SRC_TMP/supabase"
 
-    # Explicit ref (--ref): clone it directly, no fallback.
+    # Pick the ref to clone; empty means the default branch (HEAD), used only
+    # when no release tag exists yet (or --head). A resolved tag that fails to
+    # clone is an error, not a reason to silently install HEAD instead.
     if [ -n "$SOURCE_REF" ]; then
-        log "Sparse-cloning supabase repo at requested ref: $SOURCE_REF"
-        sparse_clone "$dest" "$SOURCE_REF" || die "Could not clone ref '$SOURCE_REF' from $REPO_URL"
-        RESOLVED_REF="$SOURCE_REF"
-        SRC_DIR="$dest/docker"
-        return 0
-    fi
-
-    # Forced HEAD (--head): skip tag detection entirely.
-    if [ "$FORCE_HEAD" = "1" ]; then
-        log "Sparse-cloning supabase repo at HEAD (--head)"
-        sparse_clone "$dest" "" || { rm -rf "$SRC_TMP"; return 1; }
-        RESOLVED_REF=$(resolved_sha "$dest")
-        SRC_DIR="$dest/docker"
-        return 0
-    fi
-
-    tag=$(latest_release_tag)
-    if [ -n "$tag" ]; then
-        log "Sparse-cloning supabase repo at latest self-hosted tag: $tag"
-        if ! sparse_clone "$dest" "$tag"; then
-            warn "Clone of $tag failed; falling back to the default branch (HEAD)"
-            rm -rf "$dest"
-            tag=""
+        ref="$SOURCE_REF"
+    elif [ "$FORCE_HEAD" = "1" ]; then
+        ref=""
+    else
+        if ref=$(latest_release_tag); then
+            [ -n "$ref" ] || log "No self-hosted release tag found; using the default branch (HEAD)"
+        else
+            die "Could not reach $REPO_URL to look up release tags. Check your network and retry, or pass --head (default branch) or --ref <tag>."
         fi
-    else
-        log "No self-hosted release tag found; using the default branch (HEAD)"
     fi
 
-    if [ -z "$tag" ]; then
-        log "Sparse-cloning supabase repo at HEAD"
-        sparse_clone "$dest" "" || { rm -rf "$SRC_TMP"; return 1; }
-        # No release tag yet: stamp the commit SHA so update.sh has an exact base.
-        RESOLVED_REF=$(resolved_sha "$dest")
-    else
-        RESOLVED_REF="$tag"
-    fi
+    log "Sparse-cloning supabase repo at ${ref:-HEAD}"
+    sparse_clone "$dest" "$ref" || die "Could not clone '${ref:-HEAD}' from $REPO_URL"
+
+    # Stamp the tag name for a release tag, else the exact commit SHA.
+    case "$ref" in
+        self-hosted/v*) RESOLVED_REF="$ref" ;;
+        *)              RESOLVED_REF=$(resolved_sha "$dest") ;;
+    esac
 
     SRC_DIR="$dest/docker"
 }
@@ -311,9 +298,9 @@ read_env() {
 }
 
 # Record the base version this deployment was set up from, so update.sh can
-# 3-way merge future upgrades against it. Just the ref - update.sh derives the
-# changelog date from the base snapshot it fetches at that ref. Per-deployment
-# state, not vendor content: gitignored, never committed.
+# 3-way merge future upgrades against it: it fetches the snapshot at this ref
+# as the merge base, and derives the base version from the ref itself. Just the
+# ref - per-deployment state, not vendor content: gitignored.
 write_version_stamp() {
     [ -n "$1" ] || { warn "Could not resolve a base ref; skipping $STAMP_FILE"; return 0; }
     {
