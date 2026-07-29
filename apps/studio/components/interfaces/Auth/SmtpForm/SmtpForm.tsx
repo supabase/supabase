@@ -100,7 +100,12 @@ type SmtpFormValues = z.infer<typeof smtpSchema>
 
 export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
-  const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    error: authConfigError,
+    isError,
+    isSuccess,
+  } = useAuthConfigQuery({ projectRef })
   const { data: selectedProject } = useSelectedProjectQuery()
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
@@ -236,16 +241,16 @@ export const SmtpForm = () => {
     })
   }
 
-  // Update form values when auth config is loaded
   useEffect(() => {
-    if (authConfig) {
+    if (isSuccess) {
       const formValues = generateFormValues(authConfig)
       form.reset({
         ...formValues,
         ENABLE_SMTP: isSmtpEnabled(authConfig),
       } as SmtpFormValues)
     }
-  }, [authConfig, form])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccess, form])
 
   if (isError) {
     return (
@@ -295,6 +300,7 @@ export const SmtpForm = () => {
                     >
                       <FormControl>
                         <Switch
+                          aria-label="Toggle SMTP"
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           disabled={!canUpdateConfig}
