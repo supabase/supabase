@@ -37,7 +37,7 @@ vi.mock('ui', () => ({
   TooltipTrigger: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
 
-vi.mock('ui-patterns/admonition', () => ({
+vi.mock('ui-patterns/Admonition', () => ({
   Admonition: ({
     title,
     description,
