@@ -80,7 +80,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
     <ReportPadding className="gap-y-12">
       <div className="flex items-center justify-between gap-x-4">
         <div className="flex items-center gap-x-2">
-          <h1 className="w-min">Database Connections</h1>
+          <h1 className="w-max">Database Connections</h1>
           {live && (
             <Tooltip>
               <TooltipTrigger>
