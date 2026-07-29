@@ -9,7 +9,7 @@ import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, cn, Form, useWatch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
@@ -19,6 +19,7 @@ import { DatabasePasswordInput } from './DatabasePasswordInput'
 import { DataSeeding } from './DataSeeding'
 import { DisabledWarningDueToIncident } from './DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
+import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
@@ -89,7 +90,7 @@ interface ProjectCreationFormProps {
  *  - "Internal configuration" section
  *  - "GitHub repository" field
  *  - "Free project info" at the bottom
- *  - "Cancel" button
+ * - Cancel closes the popup window instead of navigating into Studio
  * - Shows the following:
  *  - "Data seeding" section
  * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
@@ -606,7 +607,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
-              hideCancelButton={isVercelIntegrationFlow}
+              cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
         >
@@ -657,6 +658,8 @@ export const ProjectCreationForm = ({
                     <ProjectNameInput form={form} />
 
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
+
+                    <HighAvailabilityInput form={form} />
 
                     <DatabasePasswordInput form={form} />
 

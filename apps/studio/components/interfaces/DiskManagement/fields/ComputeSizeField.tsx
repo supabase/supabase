@@ -102,6 +102,10 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
 
+  const showSkeletons = isLoading
+  const showLoadError = !isLoading && !!addonsError
+  const showComputeOptions = !isLoading && !addonsError
+
   return (
     <FormField
       name="computeSize"
@@ -120,21 +124,20 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             }}
             defaultValue={field.value}
             disabled={disabled}
-            className={
-              !addonsError
-                ? 'grid grid-cols-2 gap-4 @[680px]:grid-cols-3 @[900px]:grid-cols-4'
-                : undefined
-            }
+            className={cn(
+              !addonsError && 'grid grid-cols-2 gap-4 @[680px]:grid-cols-3 @[900px]:grid-cols-4'
+            )}
           >
-            {isLoading ? (
+            {showSkeletons &&
               Array(SKELETON_PLACEHOLDER_COUNT)
                 .fill(0)
-                .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
-            ) : addonsError ? (
+                .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)}
+            {showLoadError && (
               <FormMessage message={'Failed to load Compute size options'} type="error">
                 <p>{addonsError?.message}</p>
               </FormMessage>
-            ) : (
+            )}
+            {showComputeOptions && (
               <>
                 {availableOptions.map((compute) => {
                   const lockedMicroDueToPITR =
@@ -146,14 +149,17 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
                   const lockedOption = lockedNanoDueToPlan || lockedMicroDueToPITR
 
-                  const price =
+                  // Nano on a paid plan is billed at the Micro rate
+                  const isNanoBilledAsMicro =
                     org?.plan.id !== 'free' &&
                     project?.infra_compute_size === 'nano' &&
                     compute.identifier === 'ci_nano'
-                      ? availableOptions.find(
-                          (option: ComputeAddonVariant) => option.identifier === 'ci_micro'
-                        )?.price
-                      : compute.price
+
+                  const price = isNanoBilledAsMicro
+                    ? availableOptions.find(
+                        (option: ComputeAddonVariant) => option.identifier === 'ci_micro'
+                      )?.price
+                    : compute.price
 
                   const cpuLabel = (() => {
                     const cpuCores = compute.meta?.cpu_cores
@@ -215,28 +221,25 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                     infraComputeSize={compute.name as InfraInstanceSize}
                                   />
                                   <div className="flex items-center space-x-1">
-                                    {lockedOption ? (
+                                    {lockedOption && (
                                       <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
                                         <Lock size={14} />
                                       </div>
-                                    ) : (
-                                      showComputePrice && (
-                                        <>
-                                          <span
-                                            className="text-foreground text-sm font-semibold"
-                                            translate="no"
-                                          >
-                                            ${price}
-                                          </span>
-                                          <span className="text-foreground-light translate-y-px">
-                                            {' '}
-                                            /{' '}
-                                            {compute.price_interval === 'monthly'
-                                              ? 'month'
-                                              : 'hour'}
-                                          </span>
-                                        </>
-                                      )
+                                    )}
+                                    {!lockedOption && showComputePrice && (
+                                      <>
+                                        <span
+                                          className="text-foreground text-sm font-semibold"
+                                          translate="no"
+                                        >
+                                          ${price}
+                                        </span>
+                                        <span className="text-foreground-light translate-y-px">
+                                          {' '}
+                                          /{' '}
+                                          {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                                        </span>
+                                      </>
                                     )}
                                   </div>
                                 </div>

@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { cn } from 'ui'
 import {
@@ -9,24 +8,12 @@ import {
   MetricCardValue,
 } from 'ui-patterns/MetricCard'
 
-import {
-  WARN_DURATION_ACTIVE_QUERY,
-  WARN_DURATION_BLOCKED,
-  WARN_DURATION_IDLE_TXN,
-  WARN_TOP_BLOCKER,
-} from './DatabaseConnections.constants'
-import { getActivityStart } from './DatabaseConnections.utils'
+import { getConnectionMetrics } from './DatabaseConnections.utils'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
-import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
+import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-const LONG_RUNNING_STATES: (DatabaseActivity['state'] | undefined)[] = [
-  'active',
-  'idle in transaction',
-  'idle in transaction (aborted)',
-]
 
 interface OverviewProps {
   live?: boolean
@@ -43,61 +30,18 @@ export const Overview = ({ live }: OverviewProps) => {
     },
     { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
-  const activeQueries = (data ?? []).filter((x) => x.state === 'active')
 
-  const blockedQueries = (data ?? []).filter((x) => x.blocked_by.length > 0)
-  const warnBlockedQueries = blockedQueries.some((activity) => {
-    const start = getActivityStart(activity)
-    if (!start) return false
-    return dayjs().utc().diff(dayjs(start).utc(), 'second') >= WARN_DURATION_BLOCKED
-  })
-  const longestBlockedQuery = blockedQueries.reduce<{
-    activity: DatabaseActivity
-    duration: number
-  } | null>((longest, activity) => {
-    const start = getActivityStart(activity)
-    if (!start) return longest
-    const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
-    return longest === null || duration > longest.duration ? { activity, duration } : longest
-  }, null)
-
-  const idleInTransactionQueries = (data ?? []).filter((x) => {
-    const isIdleInTransaction =
-      x.state === 'idle in transaction' || x.state === 'idle in transaction (aborted)'
-    if (!isIdleInTransaction || !x.transaction_start) return false
-    return dayjs().utc().diff(dayjs(x.transaction_start).utc(), 'second') > WARN_DURATION_IDLE_TXN
-  })
-
-  const longestRunningQuery = (data ?? [])
-    .filter((x) => LONG_RUNNING_STATES.includes(x.state))
-    .reduce<{ activity: DatabaseActivity; duration: number } | null>((longest, activity) => {
-      const start = getActivityStart(activity)
-      if (!start) return longest
-      const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
-      return longest === null || duration > longest.duration ? { activity, duration } : longest
-    }, null)
-  const warnLongestRunningQuery =
-    (longestRunningQuery?.activity.state === 'active' &&
-      longestRunningQuery.duration >= WARN_DURATION_ACTIVE_QUERY) ||
-    ((longestRunningQuery?.activity.state === 'idle in transaction' ||
-      longestRunningQuery?.activity.state === 'idle in transaction (aborted)') &&
-      longestRunningQuery.duration >= WARN_DURATION_IDLE_TXN)
-
-  const blockingCounts = (data ?? []).reduce<Map<number, number>>((counts, activity) => {
-    activity.blocked_by.forEach((pid) => counts.set(pid, (counts.get(pid) ?? 0) + 1))
-    return counts
-  }, new Map())
-
-  const queryBlockingTheMostQueries = [...blockingCounts].reduce<{
-    activity: DatabaseActivity
-    count: number
-  } | null>((mostBlocking, [pid, count]) => {
-    if (mostBlocking && count <= mostBlocking.count) return mostBlocking
-    const activity = (data ?? []).find((x) => x.pid === pid)
-    return activity ? { activity, count } : mostBlocking
-  }, null)
-
-  const warnTopBlocker = (queryBlockingTheMostQueries?.count ?? 0) >= WARN_TOP_BLOCKER
+  const {
+    activeQueries,
+    blockedQueries,
+    warnBlockedQueries,
+    longestBlockedQuery,
+    idleInTransactionQueries,
+    longestRunningQuery,
+    warnLongestRunningQuery,
+    queryBlockingTheMostQueries,
+    warnTopBlocker,
+  } = getConnectionMetrics(data ?? [])
 
   const { data: roles, isPending: isLoadingRoles } = useDatabaseRolesQuery(
     {
@@ -122,6 +66,11 @@ export const Overview = ({ live }: OverviewProps) => {
     }
   )
 
+  const onSelectPid = (pid: number) => {
+    setSelectedPid(pid)
+    document.getElementById(pid.toString())?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex gap-x-4">
@@ -135,12 +84,19 @@ export const Overview = ({ live }: OverviewProps) => {
               <MetricCardLabel
                 tooltip={
                   <div>
-                    <p className="text-foreground-light pr-2">Connections by roles:</p>
-                    {rolesWithActiveConnections.map((role) => (
-                      <div key={role.id} className="flex items-center">
-                        <p className="min-w-32">{role.name}:</p> {role.activeConnections}
-                      </div>
-                    ))}
+                    <p className="text-foreground-light">Connections by roles:</p>
+                    <table>
+                      <tbody>
+                        {rolesWithActiveConnections.map((role) => (
+                          <tr key={role.id}>
+                            <th scope="row" className="text-left font-normal">
+                              {role.name}:
+                            </th>
+                            <td className="pl-2">{role.activeConnections}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 }
               >
@@ -232,12 +188,16 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="text-foreground-light text-xs cursor-pointer hover:text-foreground transition normal-nums"
-                      onClick={() => setSelectedPid(longestBlockedQuery.activity.pid)}
+                      className={cn(
+                        'text-foreground-light text-xs cursor-pointer transition-all normal-nums',
+                        'hover:text-foreground hover:underline',
+                        'focus:text-foreground focus:underline'
+                      )}
+                      onClick={() => onSelectPid(longestBlockedQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(longestBlockedQuery.activity.pid)
+                          onSelectPid(longestBlockedQuery.activity.pid)
                         }
                       }}
                     >
@@ -282,12 +242,12 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="normal-nums cursor-pointer hover:underline"
-                      onClick={() => setSelectedPid(queryBlockingTheMostQueries.activity.pid)}
+                      className="normal-nums cursor-pointer hover:underline focus:underline"
+                      onClick={() => onSelectPid(queryBlockingTheMostQueries.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(queryBlockingTheMostQueries.activity.pid)
+                          onSelectPid(queryBlockingTheMostQueries.activity.pid)
                         }
                       }}
                     >
@@ -339,12 +299,12 @@ export const Overview = ({ live }: OverviewProps) => {
                     <span
                       role="button"
                       tabIndex={0}
-                      className="normal-nums hover:underline cursor-pointer"
-                      onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
+                      className="normal-nums hover:underline focus:underline cursor-pointer"
+                      onClick={() => onSelectPid(longestRunningQuery.activity.pid)}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(longestRunningQuery.activity.pid)
+                          onSelectPid(longestRunningQuery.activity.pid)
                         }
                       }}
                     >

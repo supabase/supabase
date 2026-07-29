@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { RotateCcw } from 'lucide-react'
-import { UseFormReturn } from 'react-hook-form'
+import { useFormState, useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
   FormControl,
@@ -32,7 +32,7 @@ type DiskSizeFieldProps = {
 
 export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
   const { ref: projectRef } = useParams()
-  const { control, formState, setValue, trigger, getValues, resetField, watch } = form
+  const { control, setValue, trigger, resetField } = form
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
 
@@ -61,8 +61,8 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
     dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < 10 ||
     project?.status === 'COMING_UP'
 
-  const watchedStorageType = watch('storageType')
-  const watchedTotalSize = watch('totalSize')
+  const watchedStorageType = useWatch({ control, name: 'storageType' })
+  const watchedTotalSize = useWatch({ control, name: 'totalSize' })
 
   const planId = org?.plan.id ?? 'free'
 
@@ -70,7 +70,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
     PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
   const includedDiskGB = includedDiskGBMeta[watchedStorageType]
 
-  const { defaultValues, dirtyFields } = formState
+  const { defaultValues, dirtyFields } = useFormState({ control })
 
   const mainDiskUsed = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
 
@@ -129,7 +129,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                 usedSize={mainDiskUsed}
                 newTotalSize={watchedTotalSize * 1.25}
                 oldStorageType={defaultValues?.storageType as DiskType}
-                newStorageType={getValues('storageType') as DiskType}
+                newStorageType={watchedStorageType as DiskType}
               />
             </div>
           }
@@ -143,7 +143,10 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                 disabled={disableInput || isError}
                 onWheel={(e) => e.currentTarget.blur()}
                 onChange={(e) => {
-                  setValue('totalSize', e.target.valueAsNumber, {
+                  // valueAsNumber is NaN while the input is empty, which would otherwise
+                  // propagate into the price calculations and the read replica sizing
+                  const value = e.target.valueAsNumber
+                  setValue('totalSize', Number.isNaN(value) ? 0 : value, {
                     shouldDirty: true,
                     shouldValidate: true,
                   })

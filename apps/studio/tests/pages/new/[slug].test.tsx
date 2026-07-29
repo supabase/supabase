@@ -525,12 +525,12 @@ describe('project creation wizard', () => {
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+      await renderWizard()
 
       await fillProjectName('HA Oriole Project')
       await selectRegion(/Americas/)
 
-      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+      // The high availability toggle is now a top-level field, gated only by the entitlement.
       await user.click(await screen.findByRole('switch'))
 
       fireEvent.click(await screen.findByRole('button', { name: 'Advanced Configuration' }))
@@ -589,6 +589,58 @@ describe('project creation wizard', () => {
         )
       )
       expect(onRequest).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('high availability', () => {
+    test('shows the high availability toggle from the entitlement, without the internal-only flag', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard()
+
+      expect(await screen.findByText('High availability')).toBeInTheDocument()
+      // The toggle must not depend on the internal-only configuration section.
+      expect(
+        screen.queryByRole('button', { name: 'Internal-only Configuration' })
+      ).not.toBeInTheDocument()
+    })
+
+    test('hides the high availability toggle when the org lacks the entitlement', async () => {
+      mockWizardEndpoints({
+        entitlements: [
+          {
+            feature: { key: 'instances.high_availability', type: 'boolean' },
+            hasAccess: false,
+            type: 'boolean',
+            config: { enabled: false },
+          } as Entitlement,
+        ],
+      })
+
+      await renderWizard()
+
+      await screen.findByPlaceholderText('Project name')
+      expect(screen.queryByText('High availability')).not.toBeInTheDocument()
+    })
+
+    test('enabling high availability submits the flag and forces the AWS_K8S cloud provider', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('HA Project')
+      await generateAndWaitForStrongPassword()
+      await user.click(await screen.findByRole('switch'))
+      await selectRegion(/Americas/)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      const body = onRequest.mock.calls[0][0]
+      expect(body.high_availability).toBe(true)
+      expect(body.cloud_provider).toBe('AWS_K8S')
     })
   })
 

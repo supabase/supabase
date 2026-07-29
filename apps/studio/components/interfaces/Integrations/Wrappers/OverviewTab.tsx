@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Sheet, SheetContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
