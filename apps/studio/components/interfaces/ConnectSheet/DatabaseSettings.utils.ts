@@ -1,4 +1,5 @@
 import type { ConnectionStringPooler, DeploymentMode } from './Connect.types'
+import { appendConnectionStringParams } from './ConnectionString.utils'
 
 /**
  * Multigres (high-availability) projects only accept TLS connections with
@@ -7,8 +8,14 @@ import type { ConnectionStringPooler, DeploymentMode } from './Connect.types'
  */
 export const HIGH_AVAILABILITY_SSL_PARAMS = 'sslmode=require&sslnegotiation=direct'
 
+/**
+ * No-op when the URI already carries `sslnegotiation` — API-provided pooler
+ * connection strings may already include the SSL params.
+ */
 export const appendHighAvailabilitySslParams = (uri: string) =>
-  !uri ? uri : `${uri}${uri.includes('?') ? '&' : '?'}${HIGH_AVAILABILITY_SSL_PARAMS}`
+  uri.includes('sslnegotiation=')
+    ? uri
+    : appendConnectionStringParams(uri, HIGH_AVAILABILITY_SSL_PARAMS)
 
 type ConnectionStrings = {
   psql: string
@@ -280,14 +287,18 @@ export const buildConnectionStringPooler = ({
   // Port-swap 6543→5432 derives session from transaction. For shared this is a
   // real Supavisor session connection; for dedicated it lands on direct Postgres
   // (PgBouncer has no session mode).
+  const withSslParams = (uri: string) =>
+    isHighAvailability ? appendHighAvailabilitySslParams(uri) : uri
+  const transactionDedicated = connectionStringsDedicated?.pooler.uri
+  const sessionDedicated = connectionStringsDedicated?.pooler.uri.replace('6543', '5432')
+
   return {
-    transactionShared: connectionStringsShared.pooler.uri,
-    sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
-    transactionDedicated: connectionStringsDedicated?.pooler.uri,
-    sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
+    transactionShared: withSslParams(connectionStringsShared.pooler.uri),
+    sessionShared: withSslParams(connectionStringsShared.pooler.uri.replace('6543', '5432')),
+    transactionDedicated:
+      transactionDedicated === undefined ? undefined : withSslParams(transactionDedicated),
+    sessionDedicated: sessionDedicated === undefined ? undefined : withSslParams(sessionDedicated),
     ipv4SupportedForDedicatedPooler: ipv4Addon,
-    direct: isHighAvailability
-      ? appendHighAvailabilitySslParams(connectionStringsShared.direct.uri)
-      : connectionStringsShared.direct.uri,
+    direct: withSslParams(connectionStringsShared.direct.uri),
   }
 }

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  appendConnectionStringParams,
   buildConnectionParameters,
   buildConnectionStringWithPassword,
   buildJdbcString,
@@ -167,6 +168,27 @@ describe('resolveConnectionString', () => {
         connectionStringPooler: { ...pooler, transactionDedicated: undefined },
       })
     ).toBe('tx-shared')
+  })
+})
+
+describe('appendConnectionStringParams', () => {
+  test('joins with ? when the URI has no query string', () => {
+    expect(appendConnectionStringParams('postgresql://u@h:5432/db', 'pgbouncer=true')).toBe(
+      'postgresql://u@h:5432/db?pgbouncer=true'
+    )
+  })
+
+  test('joins with & when the URI already has a query string', () => {
+    expect(
+      appendConnectionStringParams('postgresql://u@h:5432/db?sslmode=require', 'pgbouncer=true')
+    ).toBe('postgresql://u@h:5432/db?sslmode=require&pgbouncer=true')
+  })
+
+  test('returns the URI unchanged for empty inputs', () => {
+    expect(appendConnectionStringParams('', 'pgbouncer=true')).toBe('')
+    expect(appendConnectionStringParams('postgresql://u@h:5432/db', '')).toBe(
+      'postgresql://u@h:5432/db'
+    )
   })
 })
 
