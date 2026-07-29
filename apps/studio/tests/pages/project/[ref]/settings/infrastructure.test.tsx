@@ -318,7 +318,8 @@ describe('/project/[ref]/settings/infrastructure', () => {
     expect(screen.getByText('Scaling')).toBeInTheDocument()
     expect(screen.getByText('Compute size')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Disk', level: 2 })).toBeInTheDocument()
-    expect(screen.getByText('Advanced')).toBeInTheDocument()
+    // The Advanced section renders only once the project query resolves (isAws)
+    expect(await screen.findByText('Advanced')).toBeInTheDocument()
 
     const diskSize = await screen.findByRole('spinbutton', { name: 'Disk size' })
     await waitFor(() => expect(diskSize).toHaveValue(100))
