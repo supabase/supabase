@@ -5,7 +5,6 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   buildUserActivitySearch,
-  isErrorLevel,
   mapLogRowToActivityEvent,
   type UserActivityEvent,
 } from './UserActivity.constants'
@@ -21,8 +20,6 @@ import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-q
 import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-type UserActivityFilter = 'all' | 'errors'
-
 interface UserActivityTabProps {
   user: User
 }
@@ -30,7 +27,6 @@ interface UserActivityTabProps {
 export const UserActivityTab = ({ user }: UserActivityTabProps) => {
   const { ref: projectRef } = useParams()
 
-  const [filter, setFilter] = useState<UserActivityFilter>('all')
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [payloadEvent, setPayloadEvent] = useState<UserActivityEvent | null>(null)
 
@@ -68,47 +64,12 @@ export const UserActivityTab = ({ user }: UserActivityTabProps) => {
 
   const events = useMemo(() => {
     const rows = data?.pages?.flatMap((page) => page.data ?? []) ?? []
-    const mapped = rows.map(mapLogRowToActivityEvent)
-    return filter === 'errors' ? mapped.filter((event) => isErrorLevel(event.level)) : mapped
-  }, [data?.pages, filter])
+    return rows.map(mapLogRowToActivityEvent)
+  }, [data?.pages])
 
   return (
     <div className={cn('flex flex-col gap-y-6', PANEL_PADDING)}>
       <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-2">
-        <div
-          role="group"
-          aria-label="Activity event filter"
-          className="flex items-center border border-strong rounded-full w-min h-7"
-        >
-          <button
-            tabIndex={0}
-            aria-pressed={filter === 'all'}
-            className={cn(
-              'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
-              filter === 'all'
-                ? 'bg-overlay-hover text-foreground'
-                : 'hover:bg-surface-200 text-foreground-light'
-            )}
-            onClick={() => setFilter('all')}
-          >
-            All events
-          </button>
-          <div className="h-full w-px border-r border-strong" />
-          <button
-            tabIndex={0}
-            aria-pressed={filter === 'errors'}
-            className={cn(
-              'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
-              filter === 'errors'
-                ? 'bg-overlay-hover text-foreground'
-                : 'hover:bg-surface-200 text-foreground-light'
-            )}
-            onClick={() => setFilter('errors')}
-          >
-            Errors only
-          </button>
-        </div>
-
         <LogsDatePicker
           onSubmit={handleDatePickerChange}
           value={datePickerValue}
