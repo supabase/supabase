@@ -186,7 +186,7 @@ const IssueSuggestion = ({ category, projectRef }: { category: string; projectRe
       <Admonition
         type="default"
         className={className}
-        title="Have you checked your project's infrastructure activity?"
+        title="Have you checked your project's database observability reports?"
       >
         High memory or low disk IO bandwidth may be slowing down your database. Verify by checking
         your project's database observability reports{' '}

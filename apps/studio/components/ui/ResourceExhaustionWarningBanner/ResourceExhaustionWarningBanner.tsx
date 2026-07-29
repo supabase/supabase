@@ -158,7 +158,7 @@ export const ResourceExhaustionWarningBanner = () => {
     !isComputeUpgradeMetric
   // Suppress when already on the target page (no-op CTA). Paid-plan compute warnings link to
   // infrastructure; free-plan links to billing instead, so we keep the banner visible for them.
-  const onDatabaseSettingsAndInReadOnlyMode =
+  const shouldSuppressOnInfrastructurePage =
     router.pathname.endsWith('settings/infrastructure') &&
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
@@ -186,7 +186,7 @@ export const ResourceExhaustionWarningBanner = () => {
     hasNoWarnings ||
     hasNoWarningContent ||
     onUsageOrInfraAndNotInReadOnlyMode ||
-    onDatabaseSettingsAndInReadOnlyMode ||
+    shouldSuppressOnInfrastructurePage ||
     !isVisible
   ) {
     return null
