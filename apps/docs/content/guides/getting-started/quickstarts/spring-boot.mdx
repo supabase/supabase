@@ -6,9 +6,16 @@ breadcrumb: 'Framework Quickstarts'
 
 <AiPrompt id="spring-boot" />
 
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- Java 17 or later, which you can check with `java -version`
+- `curl` and `unzip`, to download and extract the generated project
+
 ## 1. Create a Spring Boot project
 
-Make sure you have Java 17 or later installed (`java -version`), then use [Spring Initializr](https://start.spring.io) to scaffold a new project with the Web, Spring Data JPA, and Postgres Driver dependencies.
+Use [Spring Initializr](https://start.spring.io) to scaffold a new project with the Web, Spring Data JPA, and Postgres Driver dependencies. Run the following from the directory where you keep your projects.
 
 ```bash
 curl https://start.spring.io/starter.zip \
@@ -24,7 +31,9 @@ unzip instruments.zip -d instruments && cd instruments
 
 ## 2. Install Supabase's Agent Skills (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase. 
+
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
 
 To install, run the following command in the root of your project:
 
@@ -38,7 +47,13 @@ Go to [database.new](https://database.new) and create a new Supabase project. Sa
 
 When your project is up and running, navigate to its dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
 
-Under the **Session pooler** (port `5432`), select the **JDBC** tab and copy the connection string. Replace the password placeholder with your saved database password.
+<Admonition type="caution">
+
+The Transaction pooler (port `6543`) doesn't work as your app's main data source, because Spring Data JPA uses Hibernate, which relies on server-side prepared statements. Use the Session pooler, or the direct connection string if you're in an [IPv6 environment](/docs/guides/troubleshooting/supabase--your-network-ipv4-and-ipv6-compatibility-cHe3BP) or have the [IPv4 Add-On](/docs/guides/platform/ipv4-address).
+
+</Admonition>
+
+Under the **Session pooler** (port `5432`), select the **JDBC** tab and copy the connection string. Replace the password placeholder with your saved database password, and [percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
 
 <Admonition type="note">
 
@@ -46,17 +61,13 @@ You can reset your database password in your [Database Settings](/dashboard/proj
 
 </Admonition>
 
-<Admonition type="note">
-
-Spring Data JPA uses Hibernate, which relies on server-side prepared statements, so the Transaction pooler (port `6543`) doesn't work as your app's main data source. Stick to the Session pooler, or use the direct connection string if you're in an [IPv6 environment](/docs/guides/troubleshooting/supabase--your-network-ipv4-and-ipv6-compatibility-cHe3BP) or have the IPv4 Add-On.
-
-</Admonition>
-
 The connection string contains your database password, and `application.properties` is committed with your project. Set the string as an environment variable instead, and set it the same way on whatever platform you deploy to.
 
 ```bash
-export SUPABASE_DB_URL='jdbc:postgresql://xxxx.pooler.supabase.com:5432/postgres?user=postgres.xxxx&password=[YOUR-PASSWORD]'
+export SUPABASE_DB_URL='jdbc:postgresql://xxxx.pooler.supabase.com:5432/postgres?user=postgres.xxxx&password=[YOUR-PASSWORD]&sslmode=require'
 ```
+
+The string you copied doesn't set `sslmode`, so add it. The driver defaults to `prefer`, which falls back to sending your data in plaintext if the encrypted attempt fails. You can also [enforce SSL](/docs/guides/platform/ssl-enforcement) on the database side.
 
 Then reference the variable, along with the driver, in `src/main/resources/application.properties`.
 
