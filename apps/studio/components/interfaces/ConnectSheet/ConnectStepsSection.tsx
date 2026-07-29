@@ -35,6 +35,7 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -50,6 +51,7 @@ interface ConnectStepsSectionProps {
 function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionStringPooler {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
@@ -113,8 +115,16 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
         connectionStringsShared,
         connectionStringsDedicated,
         ipv4Addon: !!ipv4Addon,
+        isHighAvailability,
       }),
-    [deploymentMode, connectionInfo, connectionStringsShared, connectionStringsDedicated, ipv4Addon]
+    [
+      deploymentMode,
+      connectionInfo,
+      connectionStringsShared,
+      connectionStringsDedicated,
+      ipv4Addon,
+      isHighAvailability,
+    ]
   )
 }
 

@@ -1,9 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  appendHighAvailabilitySslParams,
   buildConnectionStringPooler,
   getSelfHostedDirectStrings,
   getSelfHostedPoolerStrings,
+  HIGH_AVAILABILITY_SSL_PARAMS,
 } from '../DatabaseSettings.utils'
 import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
 
@@ -99,6 +101,7 @@ describe('buildConnectionStringPooler', () => {
       connectionStringsShared: sharedPlatform,
       connectionStringsDedicated: dedicatedPlatform,
       ipv4Addon: true,
+      isHighAvailability: false,
     })
 
     expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
@@ -115,6 +118,7 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo,
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
+      isHighAvailability: false,
     })
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
     expect(result.transactionDedicated).toBeUndefined()
@@ -128,6 +132,7 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo,
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
+      isHighAvailability: false,
     })
 
     expect(result.direct).toBe(directUri)
@@ -144,6 +149,7 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo: { db_host: 'supabase.example.com', db_port: 5432 },
       connectionStringsShared: sharedPlatform,
       ipv4Addon: true,
+      isHighAvailability: false,
     })
 
     expect(result.transactionShared).toBe(
@@ -167,8 +173,43 @@ describe('buildConnectionStringPooler', () => {
       connectionInfo: { db_host: 'supabase.example.com', db_port: 0 },
       connectionStringsShared: sharedPlatform,
       ipv4Addon: false,
+      isHighAvailability: false,
     })
     expect(result.sessionShared).toContain(':5432/postgres')
     expect(result.direct).toContain(':5432/postgres')
+  })
+
+  test('platform high availability: appends SSL params to the direct URI only', () => {
+    const result = buildConnectionStringPooler({
+      deploymentMode: platform,
+      connectionInfo,
+      connectionStringsShared: sharedPlatform,
+      connectionStringsDedicated: dedicatedPlatform,
+      ipv4Addon: true,
+      isHighAvailability: true,
+    })
+
+    expect(result.direct).toBe(`${sharedPlatform.direct.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`)
+    expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
+    expect(result.sessionShared).toBe(sharedPlatform.pooler.uri.replace('6543', '5432'))
+    expect(result.transactionDedicated).toBe(dedicatedPlatform.pooler.uri)
+  })
+})
+
+describe('appendHighAvailabilitySslParams', () => {
+  test('appends with ? when the URI has no query string', () => {
+    expect(appendHighAvailabilitySslParams('postgresql://u:p@host:5432/db')).toBe(
+      `postgresql://u:p@host:5432/db?${HIGH_AVAILABILITY_SSL_PARAMS}`
+    )
+  })
+
+  test('appends with & when the URI already has a query string', () => {
+    expect(appendHighAvailabilitySslParams('postgresql://u:p@host:5432/db?options=x')).toBe(
+      `postgresql://u:p@host:5432/db?options=x&${HIGH_AVAILABILITY_SSL_PARAMS}`
+    )
+  })
+
+  test('leaves an empty string untouched', () => {
+    expect(appendHighAvailabilitySslParams('')).toBe('')
   })
 })

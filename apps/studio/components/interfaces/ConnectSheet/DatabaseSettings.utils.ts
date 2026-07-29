@@ -1,5 +1,15 @@
 import type { ConnectionStringPooler, DeploymentMode } from './Connect.types'
 
+/**
+ * Multigres (high-availability) projects only accept TLS connections with
+ * direct SSL negotiation — without these params clients fail with
+ * "server closed the connection unexpectedly".
+ */
+export const HIGH_AVAILABILITY_SSL_PARAMS = 'sslmode=require&sslnegotiation=direct'
+
+export const appendHighAvailabilitySslParams = (uri: string) =>
+  !uri ? uri : `${uri}${uri.includes('?') ? '&' : '?'}${HIGH_AVAILABILITY_SSL_PARAMS}`
+
 type ConnectionStrings = {
   psql: string
   uri: string
@@ -228,12 +238,14 @@ export const buildConnectionStringPooler = ({
   connectionStringsShared,
   connectionStringsDedicated,
   ipv4Addon,
+  isHighAvailability,
 }: {
   deploymentMode: DeploymentMode
   connectionInfo: { db_host: string; db_port: number | string }
   connectionStringsShared: { direct: ConnectionStrings; pooler: ConnectionStrings }
   connectionStringsDedicated?: { direct: ConnectionStrings; pooler: ConnectionStrings }
   ipv4Addon: boolean
+  isHighAvailability: boolean
 }): ConnectionStringPooler => {
   if (deploymentMode.isSelfHosted) {
     const dbHost = connectionInfo.db_host
@@ -274,6 +286,8 @@ export const buildConnectionStringPooler = ({
     transactionDedicated: connectionStringsDedicated?.pooler.uri,
     sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
     ipv4SupportedForDedicatedPooler: ipv4Addon,
-    direct: connectionStringsShared.direct.uri,
+    direct: isHighAvailability
+      ? appendHighAvailabilitySslParams(connectionStringsShared.direct.uri)
+      : connectionStringsShared.direct.uri,
   }
 }
