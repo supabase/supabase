@@ -298,7 +298,9 @@ function mockInfrastructureEndpoints() {
 }
 
 function renderInfrastructurePage() {
-  return customRender(<InfrastructurePage />, { profileContext: PROFILE_CONTEXT })
+  return customRender(<InfrastructurePage dehydratedState={{}} />, {
+    profileContext: PROFILE_CONTEXT,
+  })
 }
 
 describe('/project/[ref]/settings/infrastructure', () => {
