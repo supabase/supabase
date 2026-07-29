@@ -247,6 +247,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/single-value-field-array',
           items: [],
         },
+        {
+          title: 'Skip to Content',
+          href: '/docs/fragments/skip-to-content',
+          items: [],
+        },
       ],
     },
     {

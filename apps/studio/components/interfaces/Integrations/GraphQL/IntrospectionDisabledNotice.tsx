@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { PG_GRAPHQL_CONFIG_DOCS_URL } from './constants'
 import { IntrospectionConfirmModal } from './IntrospectionConfirmModal'

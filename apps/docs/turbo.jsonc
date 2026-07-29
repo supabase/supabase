@@ -16,6 +16,10 @@
     "build:markdown": {
       "outputs": ["public/markdown/**", "public/markdown/manifest.json"],
     },
+    "test": {
+      // Lets the smoke tests target a preview deploy or localhost instead of production.
+      "env": ["DOCS_SMOKE_URL"],
+    },
     "build": {
       "dependsOn": ["^build", "codegen:examples", "codegen:references", "build:markdown"],
       "env": [
