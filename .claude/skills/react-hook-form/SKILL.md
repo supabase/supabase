@@ -182,11 +182,20 @@ controlled, and lets zod coerce on validation (see `maxConnections` above):
 with a plain `<Input {...field} type="number" />`.
 
 If you instead wire `onChange` through `e.target.valueAsNumber` (or
-`valueAsNumber: true`), an emptied input produces `NaN`, which lands in form
-state and propagates into every calculation, price preview, and
-`value` attribute downstream. Guard it:
-`field.onChange(e.target.value === '' ? null : e.target.valueAsNumber)` — and
-then handle the `null` per the rules above. Never let `NaN` into form state.
+`valueAsNumber: true`), an empty or partially-typed input produces `NaN`, which
+lands in form state and propagates into every calculation, price preview, and
+`value` attribute downstream. Guard it with the **same empty sentinel the
+field's schema declares** — with the `''`-union schema above:
+`field.onChange(Number.isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber)`.
+Never let `NaN` into form state.
+
+Reach for `null` as the empty value only when the field's schema is explicitly
+nullable (an API field where empty means "unset"). Then keep `null` out of both
+the input and the coercion: render via `value={field.value ?? ''}`, and don't
+pass the value through `z.coerce.number()` — `Number(null)` is `0`, so a
+nullable field fed into the coercing union silently validates empty as `0`.
+Whatever you pick, it's one sentinel per field, used consistently across
+schema, `onChange`, rendering, and the submit mapping.
 
 ## Dirty state and change detection
 
