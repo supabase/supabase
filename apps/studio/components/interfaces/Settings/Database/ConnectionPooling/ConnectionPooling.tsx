@@ -73,7 +73,8 @@ const PoolingConfigurationFormSchema = z.object({
 export const ConnectionPooling = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
+  const canLoadPoolingConfig = !isHighAvailability && !isHighAvailabilityPending
   const { can: canUpdateConnectionPoolingConfiguration } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'projects',
@@ -86,7 +87,7 @@ export const ConnectionPooling = () => {
     isPending: isLoadingPgbouncerConfig,
     isError: isErrorPgbouncerConfig,
     isSuccess: isSuccessPgbouncerConfig,
-  } = usePgbouncerConfigQuery({ projectRef }, { enabled: !isHighAvailability })
+  } = usePgbouncerConfigQuery({ projectRef }, { enabled: canLoadPoolingConfig })
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const disablePoolModeSelection = !hasDedicatedPooler
@@ -96,7 +97,7 @@ export const ConnectionPooling = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: !isHighAvailability }
+    { enabled: canLoadPoolingConfig }
   )
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
 

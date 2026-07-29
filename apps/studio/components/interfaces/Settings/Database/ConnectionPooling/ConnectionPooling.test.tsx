@@ -75,7 +75,7 @@ describe('ConnectionPooling', () => {
         connectionString: 'postgresql://example',
       },
     })
-    mockUseHighAvailability.mockReturnValue({ isHighAvailability: true })
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: true, isPending: false })
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true })
     mockUseCheckEntitlements.mockReturnValue({ hasAccess: true })
     mockUsePgbouncerConfigQuery.mockReturnValue({
@@ -122,5 +122,38 @@ describe('ConnectionPooling', () => {
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
     expect(mockUpdatePoolerConfig).not.toHaveBeenCalled()
+
+    expect(mockUsePgbouncerConfigQuery).toHaveBeenCalledWith(expect.anything(), {
+      enabled: false,
+    })
+    expect(mockUseMaxConnectionsQuery).toHaveBeenCalledWith(expect.anything(), {
+      enabled: false,
+    })
+  })
+
+  it('does not fetch pooling config while the high availability state is pending', () => {
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: true })
+
+    customRender(<ConnectionPooling />)
+
+    expect(mockUsePgbouncerConfigQuery).toHaveBeenCalledWith(expect.anything(), {
+      enabled: false,
+    })
+    expect(mockUseMaxConnectionsQuery).toHaveBeenCalledWith(expect.anything(), {
+      enabled: false,
+    })
+  })
+
+  it('fetches pooling config for non high availability projects', () => {
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: false })
+
+    customRender(<ConnectionPooling />)
+
+    expect(mockUsePgbouncerConfigQuery).toHaveBeenCalledWith(expect.anything(), {
+      enabled: true,
+    })
+    expect(mockUseMaxConnectionsQuery).toHaveBeenCalledWith(expect.anything(), {
+      enabled: true,
+    })
   })
 })

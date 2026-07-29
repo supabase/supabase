@@ -28,11 +28,11 @@ export const PoolingModesModal = () => {
   const { ref: projectRef } = useParams()
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const { isHighAvailability } = useHighAvailability()
+  const { isHighAvailability, isPending: isHighAvailabilityPending } = useHighAvailability()
 
   const { data } = useSupavisorConfigurationQuery(
     { projectRef: projectRef },
-    { enabled: !isHighAvailability }
+    { enabled: !isHighAvailability && !isHighAvailabilityPending }
   )
   const primaryConfig = data?.find((x) => x.identifier === state.selectedDatabaseId)
 
