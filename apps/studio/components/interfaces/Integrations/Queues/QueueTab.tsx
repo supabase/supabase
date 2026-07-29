@@ -79,7 +79,7 @@ export const QueueTab = () => {
   const messages = useMemo(() => data?.pages.flatMap((p) => p), [data?.pages])
 
   const { mutate: updateTable, isPending: isUpdatingTable } = useTableUpdateMutation({
-    onSettled: () => {
+    onSuccess: () => {
       toast.success(`Successfully enabled RLS for ${queueName}`)
       setRlsConfirmModalOpen(false)
     },
