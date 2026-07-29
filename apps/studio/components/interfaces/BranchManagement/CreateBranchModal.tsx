@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -25,7 +25,6 @@ import {
   FormControl,
   FormField,
   Input,
-  Label,
   Switch,
   Tooltip,
   TooltipContent,
@@ -49,6 +48,7 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { DiskAttributesData, useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { projectKeys } from '@/data/projects/keys'
@@ -59,6 +59,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { openInstallGitHubIntegrationWindow } from '@/lib/github'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -111,8 +112,17 @@ export const CreateBranchModal = () => {
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
-  const { withData, gitBranchName } = form.watch()
+  const withData = useWatch({ control: form.control, name: 'withData' })
+  const gitBranchName = useWatch({ control: form.control, name: 'gitBranchName' })
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
+
+  const {
+    data: gitHubAuthorization,
+    error: authorizationError,
+    isPending: isLoadingAuthorization,
+    isSuccess: isSuccessAuthorization,
+    isError: isErrorAuthorization,
+  } = useGitHubAuthorizationQuery()
 
   const {
     data: connections,
@@ -124,6 +134,11 @@ export const CreateBranchModal = () => {
     { organizationId: selectedOrg?.id },
     { enabled: showCreateBranchModal }
   )
+
+  const isLoading = isLoadingAuthorization || isLoadingConnections
+  const isSuccess = isSuccessAuthorization && isSuccessConnections
+  const isError = isErrorAuthorization || isErrorConnections
+  const error = authorizationError || connectionsError
 
   const { data: branches } = useBranchesQuery({ projectRef })
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery(
@@ -319,22 +334,50 @@ export const CreateBranchModal = () => {
                 )}
               />
 
-              {isLoadingConnections && (
+              {isLoading && (
                 <div className="flex flex-col gap-y-2">
                   <ShimmeringLoader />
                   <ShimmeringLoader className="w-1/2" />
                 </div>
               )}
 
-              {isErrorConnections && (
+              {isError && (
                 <AlertError
-                  error={connectionsError}
+                  error={error}
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
 
-              {isSuccessConnections &&
-                (githubConnection ? (
+              {isSuccess &&
+                (!gitHubAuthorization ? (
+                  <div className="flex items-center gap-2 justify-between">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-sm text leading-none">Sync with a GitHub branch</span>
+                      <p className="text-sm text-foreground-lighter">
+                        Keep this preview branch in sync with a chosen GitHub branch
+                      </p>
+                    </div>
+                    <Button
+                      variant="default"
+                      icon={<Github />}
+                      onClick={() => openInstallGitHubIntegrationWindow('authorize')}
+                    >
+                      Connect
+                    </Button>
+                  </div>
+                ) : !githubConnection ? (
+                  <div className="flex items-center gap-2 justify-between">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-sm text leading-none">Sync with a GitHub branch</span>
+                      <p className="text-sm text-foreground-lighter">
+                        Keep this preview branch in sync with a chosen GitHub branch
+                      </p>
+                    </div>
+                    <Button variant="default" icon={<Github />} onClick={handleGitHubClick}>
+                      Configure
+                    </Button>
+                  </div>
+                ) : (
                   <FormField
                     control={form.control}
                     name="gitBranchName"
@@ -363,7 +406,11 @@ export const CreateBranchModal = () => {
                           </div>
                         }
                         labelOptional="Optional"
-                        description="Automatically deploy changes on every commit"
+                        description={
+                          gitHubAuthorization
+                            ? 'Automatically deploy changes on every commit'
+                            : undefined
+                        }
                       >
                         <div className="relative w-full">
                           <FormControl>
@@ -390,18 +437,6 @@ export const CreateBranchModal = () => {
                       </FormItemLayout>
                     )}
                   />
-                ) : (
-                  <div className="flex items-center gap-2 justify-between">
-                    <div className="flex flex-col gap-1">
-                      <Label>Sync with a GitHub branch</Label>
-                      <p className="text-sm text-foreground-lighter">
-                        Keep this preview branch in sync with a chosen GitHub branch
-                      </p>
-                    </div>
-                    <Button variant="default" icon={<Github />} onClick={handleGitHubClick}>
-                      Configure
-                    </Button>
-                  </div>
                 ))}
 
               {allowDataBranching && (
@@ -412,7 +447,7 @@ export const CreateBranchModal = () => {
                     <FormItemLayout
                       label={
                         <>
-                          <Label className="mr-2">Include data</Label>
+                          <span className="mr-2">Include data</span>
                           {!hasPitrEnabled && <Badge variant="warning">Requires PITR</Badge>}
                         </>
                       }
@@ -422,6 +457,7 @@ export const CreateBranchModal = () => {
                     >
                       <FormControl>
                         <Switch
+                          aria-label="Include data"
                           disabled={!hasPitrEnabled}
                           checked={field.value}
                           onCheckedChange={field.onChange}
