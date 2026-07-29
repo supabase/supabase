@@ -27,7 +27,6 @@ with check (true);
 
 -- Default privileges in this project do not give API roles access to new
 -- tables, so submissions need an explicit insert grant. Clients submit with
--- the publishable key (anon role) only. Reads are reserved for service_role,
--- which the feedback pipeline uses.
+-- the publishable key (anon role) only. No API role can read this table;
+-- like the other feedback tables, it is read via direct database access.
 grant insert on table interfaces_feedback to anon;
-grant select on table interfaces_feedback to service_role;
