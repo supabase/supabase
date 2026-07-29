@@ -92,7 +92,11 @@ export const NewScopedTokenSheet = () => {
             onClose={() => handleOpenChange(false, true)}
           />
         ) : (
-          <NewScopedTokenForm isPending={isPending} onCreateToken={handleCreate} />
+          <NewScopedTokenForm
+            isPending={isPending}
+            onCreateToken={handleCreate}
+            onCancel={() => handleOpenChange(false, true)}
+          />
         )}
       </SheetContent>
     </Sheet>

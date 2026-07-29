@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Button, Form, ScrollArea, Separator, SheetClose, SheetFooter } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -30,9 +31,11 @@ const DEFAULT_VALUES: TokenFormValues = {
 export const NewScopedTokenForm = ({
   isPending,
   onCreateToken,
+  onCancel,
 }: {
   isPending: boolean
   onCreateToken: (values: TokenFormValues) => void
+  onCancel: () => void
 }) => {
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenFormSchema),
@@ -51,7 +54,14 @@ export const NewScopedTokenForm = ({
   const values = form.watch()
   const selection = values.permissions
   const configuredCount = countConfigured(selection)
-  const { data: permissionScopeMap } = useGetEnabledEndpointsForCapability()
+  const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
+
+  useEffect(() => {
+    if (isError) {
+      toast.error('Something went wrong, try again')
+      onCancel()
+    }
+  }, [onCancel, isError])
 
   const handleReviewAccess = async () => {
     if (configuredCount === 0) {
