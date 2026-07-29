@@ -538,7 +538,7 @@ const SecurityPage: NextPage = () => {
                 {
                   title: 'Rate limiting',
                   desc: 'Brute-force login attempts are blocked via fail2ban. Customers can customize rate limits for API routes and set spend caps to prevent runaway usage.',
-                  href: '/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention',
+                  href: '/docs/guides/deployment/going-into-prod#rate-limiting-resource-allocation--abuse-prevention',
                 },
                 {
                   title: 'Vulnerability management',
