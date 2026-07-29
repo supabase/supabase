@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { ControllerRenderProps, UseFormReturn, useWatch } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -30,6 +30,12 @@ interface PostgresVersionSelectorProps {
   organizationSlug?: string
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
+  /**
+   * Owned by the form owner (not this component) so the last valid selection
+   * survives this selector unmounting, e.g. when its collapsible section
+   * closes. Create it with useRef('') alongside the form.
+   */
+  lastValidSelectionRef: { current: string }
   type?: 'create' | 'unpause'
   layout?: 'vertical' | 'horizontal'
   label?: string
@@ -61,6 +67,7 @@ export const PostgresVersionSelector = ({
   organizationSlug,
   field,
   form,
+  lastValidSelectionRef,
   type = 'create',
   layout = 'horizontal',
   label = 'Postgres version',
@@ -101,30 +108,29 @@ export const PostgresVersionSelector = ({
   // react-hook-form intermittently drops this field's value when its Controller
   // remounts, so a one-shot "set the default once versions load" effect leaves
   // the select stuck empty. Instead this effect re-asserts off the watched value:
-  // a selection present in the current list is kept (and remembered), and when
-  // the value is missing or cleared out from under us it restores the last valid
-  // selection, falling back to the GA default.
-  const lastValidSelection = useRef('')
-
+  // a selection present in the current list is kept (and remembered in the
+  // owner-held lastValidSelectionRef), and when the value is missing or cleared
+  // out from under us it restores the last valid selection, falling back to the
+  // GA default.
   useEffect(() => {
     if (availableVersions.length === 0) return
     const isSelectionAvailable = (selection: string) =>
       availableVersions.some((version) => formatValue(version) === selection)
 
     if (postgresVersionSelection && isSelectionAvailable(postgresVersionSelection)) {
-      lastValidSelection.current = postgresVersionSelection
+      lastValidSelectionRef.current = postgresVersionSelection
       return
     }
 
-    if (isSelectionAvailable(lastValidSelection.current)) {
-      form.setValue('postgresVersionSelection', lastValidSelection.current)
+    if (isSelectionAvailable(lastValidSelectionRef.current)) {
+      form.setValue('postgresVersionSelection', lastValidSelectionRef.current)
       return
     }
 
     const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
     const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
     form.setValue('postgresVersionSelection', defaultValue)
-  }, [isSuccess, availableVersions, postgresVersionSelection, form])
+  }, [isSuccess, availableVersions, postgresVersionSelection, lastValidSelectionRef, form])
 
   return (
     <FormItemLayout id={field.name} label={label} layout={layout}>

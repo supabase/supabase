@@ -5,9 +5,7 @@ import type {
 } from '@/data/projects/new-project.constants'
 
 export const HIGH_AVAILABILITY_POSTGRES_VERSION = '17.6.1.147'
-export const HIGH_AVAILABILITY_POSTGRES_ENGINE = HIGH_AVAILABILITY_POSTGRES_VERSION.split(
-  '.'
-)[0] as PostgresEngine
+export const HIGH_AVAILABILITY_POSTGRES_ENGINE = '17' satisfies PostgresEngine
 export const HIGH_AVAILABILITY_RELEASE_CHANNEL = 'ga' satisfies ReleaseChannel
 
 export const getHighAvailabilityRegionCode = (

@@ -13,6 +13,9 @@ describe('High Availability project creation constraints', () => {
     expect(HIGH_AVAILABILITY_POSTGRES_VERSION).toBe('17.6.1.147')
     expect(HIGH_AVAILABILITY_POSTGRES_ENGINE).toBe('17')
     expect(HIGH_AVAILABILITY_RELEASE_CHANNEL).toBe('ga')
+    expect(HIGH_AVAILABILITY_POSTGRES_VERSION).toMatch(
+      new RegExp(`^${HIGH_AVAILABILITY_POSTGRES_ENGINE}\\.`)
+    )
   })
 
   it.each([

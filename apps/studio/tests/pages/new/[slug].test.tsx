@@ -102,6 +102,19 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
   },
 }
 
+const FRANKFURT = 'Central EU (Frankfurt)'
+
+const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    specific: [
+      ...DEFAULT_AVAILABLE_REGIONS.all.specific,
+      { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
+    ],
+  },
+}
+
 const DEFAULT_AVAILABLE_VERSIONS: { available_versions: AvailableVersion[] } = {
   available_versions: [
     { postgres_engine: '15', release_channel: 'ga', version: 'supabase-postgres-15.6.1.139' },
@@ -576,19 +589,7 @@ describe('project creation wizard', () => {
     })
 
     test('keeps a manually selected Postgres version when available versions refetch', async () => {
-      const FRANKFURT = 'Central EU (Frankfurt)'
-      mockWizardEndpoints({
-        availableRegions: {
-          ...DEFAULT_AVAILABLE_REGIONS,
-          all: {
-            ...DEFAULT_AVAILABLE_REGIONS.all,
-            specific: [
-              ...DEFAULT_AVAILABLE_REGIONS.all.specific,
-              { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
-            ],
-          },
-        },
-      })
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_FRANKFURT })
       const onAvailableVersionsRequest = vi.fn()
       addAPIMock({
         method: 'post',
@@ -627,20 +628,36 @@ describe('project creation wizard', () => {
       expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
     })
 
-    test('blocks submission with a toast when orioledb becomes unavailable after selection', async () => {
-      const FRANKFURT = 'Central EU (Frankfurt)'
-      mockWizardEndpoints({
-        availableRegions: {
-          ...DEFAULT_AVAILABLE_REGIONS,
-          all: {
-            ...DEFAULT_AVAILABLE_REGIONS.all,
-            specific: [
-              ...DEFAULT_AVAILABLE_REGIONS.all.specific,
-              { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
-            ],
-          },
-        },
+    test('keeps a non-default Postgres version when the internal panel is collapsed and reopened', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await screen.findByPlaceholderText('Project name')
+      await selectRegion(/Americas/)
+      const panelToggle = await screen.findByRole('button', {
+        name: 'Internal-only Configuration',
       })
+      fireEvent.click(panelToggle)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+      await user.click(screen.getByLabelText('Postgres version'))
+      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+
+      fireEvent.click(panelToggle)
+      await waitFor(() => expect(screen.queryByLabelText('Postgres version')).toBeNull())
+      fireEvent.click(panelToggle)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+      )
+    })
+
+    test('blocks submission with a toast when orioledb becomes unavailable after selection', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_FRANKFURT })
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
@@ -778,19 +795,7 @@ describe('project creation wizard', () => {
     test('forces the high availability region over a manually selected region and restores it', async () => {
       vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'staging')
       try {
-        const FRANKFURT = 'Central EU (Frankfurt)'
-        mockWizardEndpoints({
-          availableRegions: {
-            ...DEFAULT_AVAILABLE_REGIONS,
-            all: {
-              ...DEFAULT_AVAILABLE_REGIONS.all,
-              specific: [
-                ...DEFAULT_AVAILABLE_REGIONS.all.specific,
-                { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
-              ],
-            },
-          },
-        })
+        mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_FRANKFURT })
 
         await renderWizard()
 

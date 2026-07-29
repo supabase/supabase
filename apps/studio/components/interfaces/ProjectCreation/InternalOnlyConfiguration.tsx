@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { FormControl, FormField, Input, useWatch } from 'ui'
@@ -19,6 +20,9 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
   const { slug } = useParams()
   const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  // Held here (outside the collapsible content) so the selector's last valid
+  // selection survives the section being collapsed and reopened.
+  const lastValidPostgresVersionSelection = useRef('')
 
   return (
     <Panel.Content>
@@ -39,6 +43,7 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
                   organizationSlug={slug}
                   dbRegion={form.getValues('dbRegion')}
                   disabled={highAvailability}
+                  lastValidSelectionRef={lastValidPostgresVersionSelection}
                 />
               )}
             />
