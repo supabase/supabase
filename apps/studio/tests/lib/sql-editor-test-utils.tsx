@@ -5,6 +5,7 @@ import { http, HttpResponse } from 'msw'
 import { NuqsTestingAdapter } from 'nuqs/adapters/testing'
 import type { ReactNode } from 'react'
 
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type {
   ContentDiff,
   DiffController,
@@ -147,6 +148,7 @@ export function seedSnippet({
   sql = '',
   ownerId = 1,
   projectId = 1,
+  source = 'database',
 }: {
   id: string
   projectRef?: string
@@ -154,6 +156,7 @@ export function seedSnippet({
   sql?: string
   ownerId?: number
   projectId?: number
+  source?: SqlSnippetSource
 }) {
   const snippet = createSqlSnippetSkeletonV2({
     name,
@@ -161,6 +164,7 @@ export function seedSnippet({
     owner_id: ownerId,
     project_id: projectId,
     idOverride: id,
+    source,
   })
   sqlEditorState.addSnippet({ projectRef, snippet })
   return snippet

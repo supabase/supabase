@@ -16,7 +16,7 @@ import { useQueryState } from 'nuqs'
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
