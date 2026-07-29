@@ -21,6 +21,9 @@ interface UserActivityEventItemProps {
   onViewPayload: (event: UserActivityEvent) => void
   /** Hide the connector line below the last item */
   isLast?: boolean
+  /** Indent the content card so it reads as nested under an omitted-events group, while
+   * keeping the connector dot aligned with the group's line above it */
+  indented?: boolean
 }
 
 export const UserActivityEventItem = ({
@@ -28,6 +31,7 @@ export const UserActivityEventItem = ({
   projectRef,
   onViewPayload,
   isLast = false,
+  indented = false,
 }: UserActivityEventItemProps) => {
   const hasError = isErrorLevel(event.level)
   const logsHref = `/project/${projectRef}/logs?date=${event.timestampMs - LOGS_JUMP_WINDOW_MS}-${event.timestampMs + LOGS_JUMP_WINDOW_MS}&id=${event.id}`
@@ -56,6 +60,7 @@ export const UserActivityEventItem = ({
       <div
         className={cn(
           'mb-3 flex-1 rounded-md px-4 py-3',
+          indented && 'ml-6',
           hasError ? 'border border-destructive-300 bg-destructive-200/30' : 'bg-surface-100/50'
         )}
       >

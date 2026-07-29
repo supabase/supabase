@@ -101,6 +101,7 @@ export const UserActivityTimeline = ({
                           projectRef={projectRef}
                           onViewPayload={onViewPayload}
                           isLast={isLastItem && eventIndex === item.events.length - 1}
+                          indented
                         />
                       ))}
                   </Fragment>

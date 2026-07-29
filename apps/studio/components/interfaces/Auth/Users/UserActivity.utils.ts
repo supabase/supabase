@@ -27,8 +27,8 @@ const describeAuthEventMessage = (eventMessage: string): string | null => {
     success = 'The user signed up'
     failure = 'User failed to sign up'
   } else if (path === '/token') {
-    success = 'The user logged in'
-    failure = 'User failed to log in'
+    success = 'The user renewed their session'
+    failure = 'User failed to renew their session'
   } else if (path === '/logout') {
     success = 'The user logged out'
     failure = 'User failed to log out'
@@ -133,7 +133,7 @@ export const groupNoisyEvents = (events: UserActivityEvent[]): UserActivityTimel
   }
 
   for (const event of events) {
-    if (isNoisyEvent(event)) {
+    if (true) {
       currentRun.push(event)
     } else {
       flushRun()
