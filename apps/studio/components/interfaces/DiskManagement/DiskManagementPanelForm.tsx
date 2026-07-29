@@ -11,6 +11,7 @@ import {
 } from 'ui-patterns/PageSection'
 
 import { DocsButton } from '../../ui/DocsButton'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { DOCS_URL } from '@/lib/constants'
 
 // [Joshen] Only used for non AWS projects
@@ -33,9 +34,7 @@ export function DiskManagementPanelForm() {
           description="Disk configuration is now managed alongside Project Compute on the Infrastructure page."
           actions={
             <Button variant="default" asChild>
-              <Link href={`/project/${projectRef}/settings/infrastructure`}>
-                Go to Infrastructure
-              </Link>
+              <Link href={getInfrastructurePath(projectRef)}>Go to Infrastructure</Link>
             </Button>
           }
         />

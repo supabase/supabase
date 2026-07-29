@@ -1,4 +1,5 @@
 import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 
 const COMPUTE_UPGRADE_METRICS = ['disk_io', 'cpu', 'ram']
@@ -52,26 +53,24 @@ export const getResourceWarningCorrectionUrl = ({
     return `/org/${organizationSlug ?? '_'}/billing?panel=subscriptionPlan&source=resource_exhaustion_banner`
   }
 
+  const ref = projectRef ?? 'default'
+  const infrastructurePath = getInfrastructurePath(ref)
+
   if (isComputeUpgradeMetric && activeWarnings.length > 1) {
-    return `/project/${projectRef ?? 'default'}/settings/infrastructure`
+    return infrastructurePath
   }
 
   const correctionUrlVariants: Record<string, string | undefined> = {
-    disk_space: '/project/[ref]/settings/infrastructure',
-    read_only: '/project/[ref]/settings/infrastructure',
-    disk_io: '/project/[ref]/settings/infrastructure',
-    cpu: '/project/[ref]/settings/infrastructure',
-    ram: '/project/[ref]/settings/infrastructure',
-    auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
-    auth_restricted_email_sending: '/project/[ref]/auth/smtp',
+    disk_space: infrastructurePath,
+    read_only: infrastructurePath,
+    disk_io: infrastructurePath,
+    cpu: infrastructurePath,
+    ram: infrastructurePath,
+    auth_email_rate_limit: `/project/${ref}/auth/rate-limits`,
+    auth_restricted_email_sending: `/project/${ref}/auth/smtp`,
   }
 
-  const correctionUrl =
-    metric === undefined
-      ? undefined
-      : metric === null
-        ? '/project/[ref]/settings/infrastructure'
-        : (correctionUrlVariants[metric] ?? `/project/[ref]/settings/infrastructure#${metric}`)
-
-  return correctionUrl?.replace('[ref]', projectRef ?? 'default')
+  if (metric === undefined) return undefined
+  if (metric === null) return infrastructurePath
+  return correctionUrlVariants[metric] ?? `${infrastructurePath}#${metric}`
 }

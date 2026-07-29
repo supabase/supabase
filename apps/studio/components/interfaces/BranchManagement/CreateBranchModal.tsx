@@ -41,6 +41,7 @@ import {
   estimateRestoreTime,
 } from './BranchManagement.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -522,7 +523,7 @@ export const CreateBranchModal = () => {
                                     <InlineLink
                                       onClick={() => setShowCreateBranchModal(false)}
                                       className="pointer-events-auto"
-                                      href={`/project/${projectRef}/settings/infrastructure`}
+                                      href={getInfrastructurePath(projectRef)}
                                     >
                                       Infrastructure
                                     </InlineLink>

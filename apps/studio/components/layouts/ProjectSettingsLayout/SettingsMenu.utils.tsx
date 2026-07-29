@@ -2,6 +2,7 @@ import { useFlag, useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -109,7 +110,7 @@ export const useGenerateSettingsMenu = () => {
         {
           name: 'Infrastructure',
           key: 'infrastructure',
-          url: `/project/${ref}/settings/infrastructure`,
+          url: getInfrastructurePath(ref),
           items: [],
           disabled: !isProjectActive,
           isLoading: isPending,
