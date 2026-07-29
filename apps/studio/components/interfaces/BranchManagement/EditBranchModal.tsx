@@ -27,10 +27,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { ConnectToGitHub } from './ConnectToGitHub'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -56,6 +58,14 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
     projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
 
   const {
+    data: githubAuthorization,
+    error: authorizationError,
+    isPending: isLoadingAuthorization,
+    isSuccess: isSuccessAuthorization,
+    isError: isErrorAuthorization,
+  } = useGitHubAuthorizationQuery()
+
+  const {
     data: connections,
     error: connectionsError,
     isPending: isLoadingConnections,
@@ -64,6 +74,11 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   } = useGitHubConnectionsQuery({
     organizationId: selectedOrg?.id,
   })
+
+  const isLoading = isLoadingAuthorization || isLoadingConnections
+  const isSuccess = isSuccessAuthorization && isSuccessConnections
+  const isError = isErrorAuthorization || isErrorConnections
+  const error = authorizationError || connectionsError
 
   const { data: branches } = useBranchesQuery({ projectRef })
   const { mutate: checkGithubBranchValidity, isPending: isChecking } = useCheckGithubBranchValidity(
@@ -234,22 +249,24 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                 )}
               />
 
-              {isLoadingConnections && (
+              {isLoading && (
                 <div className="flex flex-col gap-y-2">
                   <ShimmeringLoader />
                   <ShimmeringLoader className="w-1/2" />
                 </div>
               )}
 
-              {isErrorConnections && (
+              {isError && (
                 <AlertError
-                  error={connectionsError}
+                  error={error}
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
 
-              {isSuccessConnections &&
-                (githubConnection ? (
+              {isSuccess &&
+                (!githubAuthorization || !githubConnection ? (
+                  <ConnectToGitHub />
+                ) : (
                   <FormField
                     control={form.control}
                     name="gitBranchName"
@@ -300,21 +317,6 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                       </FormItemLayout>
                     )}
                   />
-                ) : (
-                  <div className="flex items-center gap-2 justify-between">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <Label>Sync with a GitHub branch</Label>
-                      </div>
-                      <p className="text-sm text-foreground-light">
-                        Optionally connect to a GitHub repository to manage migrations automatically
-                        for this branch.
-                      </p>
-                    </div>
-                    <Button variant="default" icon={<Github />} onClick={openLinkerPanel}>
-                      Connect to GitHub
-                    </Button>
-                  </div>
                 ))}
             </DialogSection>
 

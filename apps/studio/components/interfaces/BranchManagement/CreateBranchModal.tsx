@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
-import { Check, DatabaseZap, DollarSign, Github, GitMerge, Loader2 } from 'lucide-react'
+import { Check, DatabaseZap, DollarSign, GitMerge, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -39,6 +39,7 @@ import {
   estimateDiskCost,
   estimateRestoreTime,
 } from './BranchManagement.utils'
+import { ConnectToGitHub } from './ConnectToGitHub'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import { AlertError } from '@/components/ui/AlertError'
@@ -59,7 +60,6 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import { openInstallGitHubIntegrationWindow } from '@/lib/github'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -117,7 +117,7 @@ export const CreateBranchModal = () => {
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const {
-    data: gitHubAuthorization,
+    data: githubAuthorization,
     error: authorizationError,
     isPending: isLoadingAuthorization,
     isSuccess: isSuccessAuthorization,
@@ -271,11 +271,6 @@ export const CreateBranchModal = () => {
     })
   }
 
-  const handleGitHubClick = () => {
-    setShowCreateBranchModal(false)
-    router.push(`/project/${projectRef}/settings/integrations`)
-  }
-
   useEffect(() => {
     if (showCreateBranchModal) form.reset()
   }, [form, showCreateBranchModal])
@@ -349,34 +344,8 @@ export const CreateBranchModal = () => {
               )}
 
               {isSuccess &&
-                (!gitHubAuthorization ? (
-                  <div className="flex items-center gap-2 justify-between">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-sm text leading-none">Sync with a GitHub branch</span>
-                      <p className="text-sm text-foreground-lighter">
-                        Keep this preview branch in sync with a chosen GitHub branch
-                      </p>
-                    </div>
-                    <Button
-                      variant="default"
-                      icon={<Github />}
-                      onClick={() => openInstallGitHubIntegrationWindow('authorize')}
-                    >
-                      Connect
-                    </Button>
-                  </div>
-                ) : !githubConnection ? (
-                  <div className="flex items-center gap-2 justify-between">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-sm text leading-none">Sync with a GitHub branch</span>
-                      <p className="text-sm text-foreground-lighter">
-                        Keep this preview branch in sync with a chosen GitHub branch
-                      </p>
-                    </div>
-                    <Button variant="default" icon={<Github />} onClick={handleGitHubClick}>
-                      Configure
-                    </Button>
-                  </div>
+                (!githubAuthorization || !githubConnection ? (
+                  <ConnectToGitHub />
                 ) : (
                   <FormField
                     control={form.control}
@@ -407,7 +376,7 @@ export const CreateBranchModal = () => {
                         }
                         labelOptional="Optional"
                         description={
-                          gitHubAuthorization
+                          githubAuthorization
                             ? 'Automatically deploy changes on every commit'
                             : undefined
                         }
