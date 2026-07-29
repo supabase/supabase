@@ -85,7 +85,7 @@ vi.mock('ui', () => ({
   TooltipTrigger: ({ children }: PropsWithChildren) => <span>{children}</span>,
 }))
 
-vi.mock('ui-patterns/admonition', () => ({
+vi.mock('ui-patterns/Admonition', () => ({
   Admonition: ({ children }: PropsWithChildren) => <div>{children}</div>,
 }))
 

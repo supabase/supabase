@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import {
   computeOverallRisk,

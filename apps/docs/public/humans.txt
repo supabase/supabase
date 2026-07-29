@@ -59,8 +59,8 @@ Chris Chapman (Chappie)
 Chris Copplestone
 Chris Gwilliams
 Chris Martin
+Chris Opland
 Chris Stockton
-Chris Ward
 Christian Funkhouser
 Claudiu Dragalina-Paraipan
 Clayton Kast
@@ -70,6 +70,7 @@ Colum Ferry
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
