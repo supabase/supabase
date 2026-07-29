@@ -146,6 +146,22 @@ export function logDateRangeToDatePickerValue(range: LogDateRange): DatePickerVa
 }
 
 /**
+ * Structural equality for two log date ranges. Relative ranges match on amount +
+ * unit, NOT display text — "Last hour" and "Last 1 hour" render differently but
+ * are the same range, so comparing labels is unreliable. Absolute ranges match on
+ * their (validated) ISO endpoints.
+ */
+export function logDateRangesEqual(a: LogDateRange, b: LogDateRange): boolean {
+  if (a.kind === 'relative' && b.kind === 'relative') {
+    return a.last.amount === b.last.amount && a.last.unit === b.last.unit
+  }
+  if (a.kind === 'absolute' && b.kind === 'absolute') {
+    return a.from === b.from && a.to === b.to
+  }
+  return false
+}
+
+/**
  * Resolve a `LogDateRange` to concrete ISO endpoints for a run. Relative ranges
  * re-resolve against `now` (so "last hour" is always the hour before the run);
  * absolute ranges pass through. Reuses the Logs `ResolvedLogDateRange` shape.

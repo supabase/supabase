@@ -21,8 +21,7 @@ import {
 import { type QuerySource } from '../querySource'
 import { ROWS_PER_PAGE_OPTIONS } from '../SQLEditor.constants'
 import { AutosaveStatus } from './AutosaveStatus'
-import { LogsRangePicker } from './LogsRangePicker'
-import { QuerySourceIndicator } from './QuerySourceIndicator'
+import { QuerySourceMenu } from './QuerySourceMenu/QuerySourceMenu'
 import { SqlRunButton } from './RunButton'
 import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
@@ -237,10 +236,12 @@ export const UtilityActions = ({
       </div>
 
       <div className="flex items-center gap-x-2">
-        {canShowSourceIndicator && <QuerySourceIndicator source={runSource.type} />}
-
-        {runSource.type === 'logs' ? (
-          <LogsRangePicker id={id} range={runSource.dateRange} />
+        {canShowSourceIndicator ? (
+          <QuerySourceMenu
+            id={id}
+            runSource={runSource}
+            canCreateLogsSnippet={canCreateLogsSnippet}
+          />
         ) : (
           <>
             <div className="flex items-center">

@@ -40,7 +40,9 @@ export const SQLEditorMenu = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const topForPostgres = useFlag('topForPostgres')
-  const canCreateLogsSnippet = useFlag('sqlEditorLogsSource') && useFlag('otelLegacyLogs')
+  const sqlEditorLogsSource = useFlag('sqlEditorLogsSource')
+  const otelLegacyLogs = useFlag('otelLegacyLogs')
+  const canCreateLogsSnippet = sqlEditorLogsSource && otelLegacyLogs
 
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
