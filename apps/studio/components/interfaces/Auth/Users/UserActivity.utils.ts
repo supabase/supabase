@@ -1,3 +1,5 @@
+import { NOISY_EVENT_PATHNAMES, type UserActivityEvent } from './UserActivity.constants'
+
 /** Matches the `<method> | <status> | <url> | <caller>` shape of edge/PostgREST log messages. */
 const REST_LOG_PATTERN = /^(\w+)\s*\|\s*(\d{3})\s*\|\s*(\S+)/
 const REST_TABLE_PATTERN = /\/rest\/v1\/([^/?]+)/i
@@ -106,4 +108,39 @@ export const describeUserActivityEvent = (
   return logType === 'auth'
     ? describeAuthEventMessage(eventMessage)
     : describeRestLogMessage(eventMessage)
+}
+
+export type UserActivityTimelineItem =
+  | { kind: 'event'; event: UserActivityEvent }
+  | { kind: 'omitted'; id: string; events: UserActivityEvent[] }
+
+const isNoisyEvent = (event: UserActivityEvent) =>
+  event.pathname !== null && NOISY_EVENT_PATHNAMES.includes(event.pathname)
+
+/**
+ * Splits a day's events into a sequence of individual events and runs of "noisy" events (see
+ * NOISY_EVENT_PATHNAMES) collapsed into a single group — even a lone occurrence is grouped, so
+ * it renders as a dismissible "omitted" summary rather than as a full event card.
+ */
+export const groupNoisyEvents = (events: UserActivityEvent[]): UserActivityTimelineItem[] => {
+  const items: UserActivityTimelineItem[] = []
+  let currentRun: UserActivityEvent[] = []
+
+  const flushRun = () => {
+    if (currentRun.length === 0) return
+    items.push({ kind: 'omitted', id: `omitted-${currentRun[0].id}`, events: currentRun })
+    currentRun = []
+  }
+
+  for (const event of events) {
+    if (isNoisyEvent(event)) {
+      currentRun.push(event)
+    } else {
+      flushRun()
+      items.push({ kind: 'event', event })
+    }
+  }
+  flushRun()
+
+  return items
 }

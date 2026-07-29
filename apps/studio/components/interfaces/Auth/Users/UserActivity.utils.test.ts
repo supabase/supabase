@@ -1,6 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
-import { describeUserActivityEvent } from './UserActivity.utils'
+import type { UserActivityEvent } from './UserActivity.constants'
+import { describeUserActivityEvent, groupNoisyEvents } from './UserActivity.utils'
+
+const buildEvent = (overrides: Partial<UserActivityEvent> = {}): UserActivityEvent => ({
+  id: 'event-id',
+  timestampMs: 0,
+  logType: 'auth',
+  eventMessage: '',
+  method: null,
+  pathname: null,
+  status: null,
+  level: 'success',
+  headers: {},
+  logs: [],
+  ...overrides,
+})
 
 describe('describeUserActivityEvent', () => {
   describe('auth events', () => {
@@ -134,5 +149,54 @@ describe('describeUserActivityEvent', () => {
       expect(describeUserActivityEvent('auth', '')).toBeNull()
       expect(describeUserActivityEvent('postgrest', undefined)).toBeNull()
     })
+  })
+})
+
+describe('groupNoisyEvents', () => {
+  it('leaves non-noisy events ungrouped', () => {
+    const signup = buildEvent({ id: 'signup', pathname: '/signup' })
+    const login = buildEvent({ id: 'user', pathname: '/user' })
+
+    expect(groupNoisyEvents([signup, login])).toEqual([
+      { kind: 'event', event: signup },
+      { kind: 'event', event: login },
+    ])
+  })
+
+  it('collapses a single noisy event into its own group', () => {
+    const tokenRefresh = buildEvent({ id: 'token-1', pathname: '/token' })
+
+    expect(groupNoisyEvents([tokenRefresh])).toEqual([
+      { kind: 'omitted', id: 'omitted-token-1', events: [tokenRefresh] },
+    ])
+  })
+
+  it('collapses a consecutive run of noisy events into one group', () => {
+    const signup = buildEvent({ id: 'signup', pathname: '/signup' })
+    const tokenA = buildEvent({ id: 'token-1', pathname: '/token' })
+    const tokenB = buildEvent({ id: 'token-2', pathname: '/token' })
+    const logout = buildEvent({ id: 'logout', pathname: '/logout' })
+
+    expect(groupNoisyEvents([signup, tokenA, tokenB, logout])).toEqual([
+      { kind: 'event', event: signup },
+      { kind: 'omitted', id: 'omitted-token-1', events: [tokenA, tokenB] },
+      { kind: 'event', event: logout },
+    ])
+  })
+
+  it('starts a new group when noisy events are interrupted by another event', () => {
+    const tokenA = buildEvent({ id: 'token-1', pathname: '/token' })
+    const logout = buildEvent({ id: 'logout', pathname: '/logout' })
+    const tokenB = buildEvent({ id: 'token-2', pathname: '/token' })
+
+    expect(groupNoisyEvents([tokenA, logout, tokenB])).toEqual([
+      { kind: 'omitted', id: 'omitted-token-1', events: [tokenA] },
+      { kind: 'event', event: logout },
+      { kind: 'omitted', id: 'omitted-token-2', events: [tokenB] },
+    ])
+  })
+
+  it('returns an empty array for no events', () => {
+    expect(groupNoisyEvents([])).toEqual([])
   })
 })

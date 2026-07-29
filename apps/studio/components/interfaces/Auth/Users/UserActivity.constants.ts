@@ -96,6 +96,13 @@ export const LEVEL_DOT_COLOR: Record<UserActivityLevel, string> = {
 
 export const isErrorLevel = (level: UserActivityLevel) => level === 'error'
 
+/**
+ * Pathnames collapsed into an "N omitted events" summary in the activity timeline. These fire
+ * often enough on their own (e.g. silent token refreshes hitting `/token`) that showing every
+ * occurrence would drown out the rest of a user's activity.
+ */
+export const NOISY_EVENT_PATHNAMES: readonly string[] = ['/token']
+
 /** Map an event's derived severity level to a Badge variant. */
 export const levelBadgeVariant = (level: UserActivityLevel): BadgeProps['variant'] => {
   if (level === 'error') return 'destructive'
