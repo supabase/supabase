@@ -396,9 +396,7 @@ export const ActivityRow = ({
                 className="gap-x-2"
                 disabled={superuserRoles?.includes(activity.role_name)}
                 onClick={() => {
-                  const isBlocking = (data ?? []).some((x) =>
-                    x.blocked_by.includes(activity.pid)
-                  )
+                  const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
                   track('session_terminate_button_clicked', {
                     activityState: activity.state,
                     isBlocking,
