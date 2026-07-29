@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Check, Github, Loader2 } from 'lucide-react'
+import { Check, Loader2 } from 'lucide-react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,7 +20,6 @@ import {
   FormControl,
   FormField,
   Input,
-  Label,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -47,7 +45,6 @@ interface EditBranchModalProps {
 
 export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalProps) => {
   const { ref } = useParams()
-  const router = useRouter()
   const { data: projectDetails } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
 
