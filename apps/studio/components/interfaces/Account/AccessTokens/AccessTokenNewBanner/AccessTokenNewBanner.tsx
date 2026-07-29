@@ -1,6 +1,6 @@
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -33,13 +33,18 @@ export const AccessTokenNewBanner = <T,>({
       title={title}
       className="mb-6 relative"
       actions={
-        <Button
-          aria-label="Close token banner"
-          variant="text"
-          icon={<X />}
-          className="w-7 h-7 absolute top-2.5 right-2.5"
-          onClick={onClose}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              aria-label="Close token banner"
+              variant="text"
+              icon={<X />}
+              className="w-7 h-7 absolute top-2.5 right-2.5"
+              onClick={onClose}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Close token banner</TooltipContent>
+        </Tooltip>
       }
     >
       <div className="space-y-4">
