@@ -2,7 +2,7 @@ import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { CpuIcon, Lock, Microchip } from 'lucide-react'
 import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   cn,
   FormField,
@@ -57,7 +57,7 @@ export function ComputeSectionBillingBadge({
   beforePrice,
   afterPrice,
 }: ComputeSectionBillingBadgeProps) {
-  const computeSize = form.watch('computeSize')
+  const computeSize = useWatch({ control: form.control, name: 'computeSize' })
   const { showMicroUpgradeBadge } = useShowMicroUpgradeBadge()
 
   return (

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -106,7 +106,6 @@ export const SmtpForm = () => {
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
   const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
 
-  const [enableSmtp, setEnableSmtp] = useState(false)
   const [showDisableConfirmation, setShowDisableConfirmation] = useState(false)
   const [pendingValues, setPendingValues] = useState<SmtpFormValues | null>(null)
 
@@ -150,6 +149,8 @@ export const SmtpForm = () => {
   })
 
   const { isDirty } = form.formState
+  const smtpHost = useWatch({ control: form.control, name: 'SMTP_HOST' })
+  const enableSmtp = useWatch({ control: form.control, name: 'ENABLE_SMTP' })
 
   const doUpdate = ({
     values,
@@ -243,19 +244,8 @@ export const SmtpForm = () => {
         ...formValues,
         ENABLE_SMTP: isSmtpEnabled(authConfig),
       } as SmtpFormValues)
-      setEnableSmtp(isSmtpEnabled(authConfig))
     }
   }, [authConfig, form])
-
-  // Update enableSmtp state when the form field changes
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'ENABLE_SMTP') {
-        setEnableSmtp(value.ENABLE_SMTP as boolean)
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [form])
 
   if (isError) {
     return (
@@ -395,7 +385,7 @@ export const SmtpForm = () => {
                           )}
                         />
 
-                        {form.watch('SMTP_HOST')?.endsWith('.gmail.com') && (
+                        {smtpHost?.endsWith('.gmail.com') && (
                           <Admonition
                             type="warning"
                             title="Check your SMTP provider"
@@ -523,7 +513,6 @@ export const SmtpForm = () => {
                       variant="default"
                       onClick={() => {
                         form.reset()
-                        setEnableSmtp(isSmtpEnabled(authConfig))
                       }}
                     >
                       Cancel

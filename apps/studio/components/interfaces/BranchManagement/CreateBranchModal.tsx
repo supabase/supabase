@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -111,7 +111,7 @@ export const CreateBranchModal = () => {
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
-  const { withData, gitBranchName } = form.watch()
+  const { withData, gitBranchName } = useWatch({ control: form.control })
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const {

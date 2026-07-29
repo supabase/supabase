@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMemo } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -106,7 +106,7 @@ export const EnableExtensionModal = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const { schema } = form.watch()
+  const { schema } = useWatch({ control: form.control })
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (project === undefined) return console.error('Project is required')

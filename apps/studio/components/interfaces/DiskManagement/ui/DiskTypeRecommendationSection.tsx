@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ReactNode } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -13,10 +13,10 @@ export function DiskTypeRecommendationSection({
   actions?: ReactNode
   form: UseFormReturn<DiskStorageSchemaType>
 }) {
-  const { watch } = form
-
-  const totalSize = watch('totalSize')
-  const storageType = watch('storageType')
+  const [totalSize, storageType] = useWatch({
+    control: form.control,
+    name: ['totalSize', 'storageType'],
+  })
   const isVisible = storageType === DiskType.GP3 && totalSize > DISK_LIMITS[DiskType.GP3].maxStorage
   const io2Option = DISK_TYPE_OPTIONS.find((option) => option.type === DiskType.IO2)
 
