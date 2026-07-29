@@ -10,6 +10,7 @@ import {
   PermissionScopeMap,
   ScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
+import { InternalServerError } from '@/lib/api/apiHelpers'
 
 // Default lodash merge does not correctly merge arrays so this custom merger fixes it
 function mergeArrays(objValue: unknown, srcValue: unknown) {
@@ -111,7 +112,14 @@ const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
   if (response.ok) {
     return response.json()
   }
-  throw new Error(`Unable to fetch scoped token permission scope: ${response.statusText}`)
+  const responseText = await response.text()
+
+  const retryAfter = response.headers.get('Retry-After') ?? undefined
+  throw new InternalServerError(`API v${version} responded with ${response.status}`, {
+    status: response.status,
+    body: responseText,
+    ...(retryAfter !== undefined && { retryAfter }),
+  })
 }
 
 // Simplified OPEN API specs schemas that only defines what we care about for scoped tokens
