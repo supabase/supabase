@@ -19,7 +19,7 @@ Projects must meet these requirements to use Read Replicas:
    - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
 
 3. Running on Postgres 15+.
-   - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+   - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/upgrading).
 
 4. Not using [legacy logical backups](/docs/guides/platform/backups#point-in-time-recovery)
    - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
@@ -110,7 +110,7 @@ Once the Primary database has completed restarting (or resizing, in case of a co
 
 The following procedures require all Read Replicas for a project to be brought down before performing them:
 
-1. [Project upgrades](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
+1. [Project upgrades](/docs/guides/platform/upgrading)
 2. [Data restorations](/docs/guides/platform/backups#pitr-restoration-process)
 
 These operations need to complete before you can re-deploy Read Replicas.
