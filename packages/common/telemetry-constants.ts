@@ -1311,6 +1311,10 @@ export interface ImportDataAddedEvent {
  */
 export interface SqlEditorQueryRunButtonClickedEvent {
   action: 'sql_editor_query_run_button_clicked'
+  properties: {
+    /** Which backend the query ran against. */
+    source: 'database' | 'logs'
+  }
   groups: TelemetryGroups
 }
 
