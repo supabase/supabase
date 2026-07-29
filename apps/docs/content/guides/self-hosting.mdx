@@ -5,29 +5,33 @@ subtitle: 'Install and run your own Supabase on your computer, server, or cloud 
 hideToc: true
 ---
 
-Self-hosting runs Supabase on your own infrastructure instead of the managed platform. Get full control over your data, meet compliance requirements, or run in a fully isolated environment.
-
-<div className="flex flex-wrap gap-3 not-prose">
-  <Button variant="primary" asChild>
-    <Link href="/guides/self-hosting/docker">Get started with Docker</Link>
-  </Button>
-  <Button variant="outline" asChild>
-    <Link href="#support-and-community">Join the community</Link>
-  </Button>
+<div className="grid grid-cols-12 gap-6 lg:gap-4 items-center not-prose">
+  <div className="col-span-12 lg:col-span-5">
+    <p className="text-foreground-light m-0">
+      Self-hosting runs Supabase on your own infrastructure instead of the managed platform. Get
+      full control over your data, meet compliance requirements, or run in a fully isolated
+      environment.
+    </p>
+  </div>
+  <div className="col-span-12 lg:col-span-7 xl:col-span-6 xl:col-start-7">
+    <Image
+      alt="Diagram of the Supabase stack running on your own infrastructure, with Database, Auth, Storage, and Realtime services."
+      src={{
+        dark: '/docs/img/self-hosting/self-hosting-hero-dark.svg',
+        light: '/docs/img/self-hosting/self-hosting-hero-light.svg',
+      }}
+      width={669}
+      height={360}
+      className="w-full h-auto"
+    />
+  </div>
 </div>
 
-<div className="w-full aspect-[16/6] rounded-lg border border-dashed border-strong flex items-center justify-center text-foreground-lighter text-sm not-prose">
-  Hero illustration — placeholder for Design
-</div>
-
-<div className="my-16 flex flex-col gap-2 max-w-xl">
+<div className="mt-8 mb-6 flex flex-col gap-1 max-w-xl">
   <span className="text-brand font-mono uppercase text-xs tracking-wider">Full platform</span>
-  <h2 className="text-foreground-lighter">
+  <h2 className="text-foreground-lighter !mt-0 !mb-0">
     Everything you get, <span className="text-foreground">self-hosted</span>
   </h2>
-  <p className="text-foreground-lighter">
-    Self-hosting isn't a stripped-down version — you get the full Supabase platform.
-  </p>
 </div>
 
 <ul className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 not-prose">
@@ -62,7 +66,9 @@ Self-hosting runs Supabase on your own infrastructure instead of the managed pla
         <span className="h-7 bg-foreground-lighter" />
       </div>
       <h4 className="text-foreground text-lg mt-1">Storage</h4>
-      <p className="text-foreground-lighter text-sm">Store and serve files, from images to videos.</p>
+      <p className="text-foreground-lighter text-sm">
+        Store and serve files, from images to videos.
+      </p>
     </Link>
   </li>
   <li>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="669" height="360" fill="none" viewBox="0 0 669 360">
+  <defs>
+    <linearGradient id="gGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3ECF8E"/>
+      <stop offset="100%" stop-color="#249361"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <radialGradient id="glow" cx="72%" cy="42%" r="48%">
+      <stop offset="0%" stop-color="#3ECF8E" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#3ECF8E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="669" height="360" fill="url(#glow)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="88" width="160" height="184" rx="28" fill="#1C1C1C" stroke="#343434" stroke-width="1.1"/>
+  </g>
+  <line x1="92" y1="96" x2="92" y2="264" stroke="#282828" stroke-width="0.75"/><line x1="112" y1="96" x2="112" y2="264" stroke="#282828" stroke-width="0.75"/><line x1="132" y1="96" x2="132" y2="264" stroke="#282828" stroke-width="0.75"/><line x1="152" y1="96" x2="152" y2="264" stroke="#282828" stroke-width="0.75"/><line x1="172" y1="96" x2="172" y2="264" stroke="#282828" stroke-width="0.75"/><line x1="192" y1="96" x2="192" y2="264" stroke="#282828" stroke-width="0.75"/><line x1="212" y1="96" x2="212" y2="264" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="116" x2="226" y2="116" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="136" x2="226" y2="136" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="156" x2="226" y2="156" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="176" x2="226" y2="176" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="196" x2="226" y2="196" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="216" x2="226" y2="216" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="236" x2="226" y2="236" stroke="#282828" stroke-width="0.75"/><line x1="78" y1="256" x2="226" y2="256" stroke="#282828" stroke-width="0.75"/>
+  <rect x="108" y="140" width="88" height="88" rx="14" fill="none" stroke="#707070" stroke-width="1.2" stroke-dasharray="4 4"/>
+  <rect x="124" y="156" width="56" height="14" rx="3" fill="#454545" fill-opacity="0.35"/>
+  <rect x="124" y="178" width="56" height="14" rx="3" fill="#454545" fill-opacity="0.35"/>
+  <rect x="124" y="200" width="56" height="14" rx="3" fill="#3ECF8E" fill-opacity="0.55"/>
+  <text x="152" y="254" text-anchor="middle" fill="#707070" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10">YOUR INFRA</text>
+
+  <path d="M232 120 H256 V52 H424 V72" stroke="#454545" stroke-width="1.25" fill="none"/>
+  <circle cx="232" cy="120" r="3" fill="#454545"/>
+  <circle cx="424" cy="72" r="4.5" fill="#EDEDED"/>
+
+  <g filter="url(#shadow)">
+    <rect x="280" y="72" width="288" height="232" rx="36" fill="#1C1C1C" stroke="#343434" stroke-width="1.25"/>
+  </g>
+  <rect x="300" y="92" width="132" height="24" rx="12" fill="#202020" stroke="#2E2E2E"/>
+  <circle cx="314" cy="104" r="4" fill="url(#gGreen)"/>
+  <text x="326" y="108" fill="#EDEDED" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11">SELF-HOSTED</text>
+  <rect x="300" y="128" width="248" height="32" rx="8" fill="#202020" stroke="#2E2E2E"/>
+  <circle cx="318" cy="144" r="4" fill="#3ECF8E"/>
+  <text x="334" y="148" fill="#EDEDED" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">Database</text>
+  <rect x="470" y="140" width="60" height="8" rx="4" fill="#282828"/>
+  <rect x="470" y="140" width="52" height="8" rx="4" fill="#3ECF8E"/>
+  <rect x="300" y="168" width="248" height="32" rx="8" fill="#202020" stroke="#2E2E2E"/>
+  <circle cx="318" cy="184" r="4" fill="#3ECF8E"/>
+  <text x="334" y="188" fill="#EDEDED" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">Auth</text>
+  <rect x="470" y="180" width="60" height="8" rx="4" fill="#282828"/>
+  <rect x="470" y="180" width="46" height="8" rx="4" fill="#3ECF8E"/>
+  <rect x="300" y="208" width="248" height="32" rx="8" fill="#202020" stroke="#2E2E2E"/>
+  <circle cx="318" cy="224" r="4" fill="#3ECF8E"/>
+  <text x="334" y="228" fill="#EDEDED" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">Storage</text>
+  <rect x="470" y="220" width="60" height="8" rx="4" fill="#282828"/>
+  <rect x="470" y="220" width="40" height="8" rx="4" fill="#3ECF8E"/>
+  <rect x="300" y="248" width="248" height="32" rx="8" fill="#202020" stroke="#2E2E2E"/>
+  <circle cx="318" cy="264" r="4" fill="#3ECF8E"/>
+  <text x="334" y="268" fill="#EDEDED" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12">Realtime</text>
+  <rect x="470" y="260" width="60" height="8" rx="4" fill="#282828"/>
+  <rect x="470" y="260" width="48" height="8" rx="4" fill="#3ECF8E"/>
+</svg>
