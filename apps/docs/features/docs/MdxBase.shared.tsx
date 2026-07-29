@@ -66,6 +66,17 @@ const Pre = (props: any) => {
   return <CodeBlock {...props} />
 }
 
+/**
+ * Give a wide table its own scroll container, the way `pre` gets one from `CodeBlock`.
+ * Without it the overflow propagates up and scrolls the whole page. `tabIndex` keeps the
+ * scroll region reachable without a pointer (WCAG 2.1.1).
+ */
+const Table = (props: ComponentPropsWithoutRef<'table'>) => (
+  <div tabIndex={0} className="table-scroll w-full overflow-x-auto">
+    <table {...props} />
+  </div>
+)
+
 const components = {
   Accordion,
   AccordionItem,
@@ -138,6 +149,7 @@ const components = {
    * plus having a more resilient highlighting strategy.
    */
   code: (props: any) => <code {...props}>{props.children}</code>,
+  table: Table,
   Price,
 }
 
