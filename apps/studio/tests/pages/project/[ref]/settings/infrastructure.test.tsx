@@ -6,8 +6,8 @@ import { HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
 import type { ProfileContextType } from '@/lib/profile'
+import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -109,7 +109,7 @@ vi.mock('@/lib/constants', async (importOriginal) => {
   }
 })
 
-vi.mock('ui-patterns/admonition', () => ({
+vi.mock('ui-patterns/Admonition', () => ({
   Admonition: ({
     children,
     description,
@@ -312,9 +312,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
     const user = userEvent.setup()
     renderInfrastructurePage()
 
-    expect(
-      screen.getByRole('heading', { name: 'Infrastructure', level: 1 })
-    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Infrastructure', level: 1 })).toBeInTheDocument()
     expect(screen.getByText('Scaling')).toBeInTheDocument()
     expect(screen.getByText('Compute size')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Disk', level: 2 })).toBeInTheDocument()

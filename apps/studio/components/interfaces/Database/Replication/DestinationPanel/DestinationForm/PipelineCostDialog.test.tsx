@@ -88,7 +88,7 @@ describe('PipelineCostDialog', () => {
     costEstimateTables = tables
   })
 
-  it('shows only the initial-copy tables selected by the policy', async () => {
+  it('shows only the tables selected for initial sync', async () => {
     renderDialog({ type: 'include_tables', table_ids: [101] })
 
     expect(await screen.findByText('public.orders')).toBeInTheDocument()
@@ -97,10 +97,10 @@ describe('PipelineCostDialog', () => {
     expect(screen.queryByText('$10.00')).not.toBeInTheDocument()
   })
 
-  it('shows a zero initial-copy charge while retaining ongoing rates', async () => {
+  it('shows a zero initial sync charge while retaining ongoing replication rates', async () => {
     renderDialog({ type: 'skip_all_tables' })
 
-    expect(await screen.findByText(/No tables will be initially copied/)).toBeInTheDocument()
+    expect(await screen.findByText(/No tables will run an initial sync/)).toBeInTheDocument()
     expect(screen.getByText('$0.00')).toBeInTheDocument()
     expect(screen.getByText('$0.05/hour')).toBeInTheDocument()
     expect(screen.getByText('$3.00/GB')).toBeInTheDocument()
@@ -117,5 +117,14 @@ describe('PipelineCostDialog', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Unavailable')).toBeInTheDocument()
     expect(screen.queryByText('$0.60')).not.toBeInTheDocument()
+  })
+
+  it('explains that row filters can reduce processed data compared with the estimate', async () => {
+    costEstimateTables = [{ ...tables[0], is_row_filtered: true }]
+
+    renderDialog({ type: 'include_tables', table_ids: [101] })
+
+    expect(await screen.findByText(/Row filters can reduce the data processed/)).toBeInTheDocument()
+    expect(screen.getByText(/Quick planning estimate/)).toBeInTheDocument()
   })
 })
