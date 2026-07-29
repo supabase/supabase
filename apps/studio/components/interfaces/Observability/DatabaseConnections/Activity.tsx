@@ -11,6 +11,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 const DEFAULT_ROLES_FILTER = ['anon', 'authenticated', 'postgres']
 
@@ -19,6 +20,7 @@ interface ActivityProps {
 }
 
 export const Activity = ({ live }: ActivityProps) => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
 
   const [
@@ -150,6 +152,7 @@ export const Activity = ({ live }: ActivityProps) => {
     })
 
   const onResetFilters = () => {
+    track('database_connections_filter_updated', { type: 'reset' })
     setQueryStates({
       search: '',
       states: [],
@@ -175,7 +178,11 @@ export const Activity = ({ live }: ActivityProps) => {
           label="State"
           options={stateOptions}
           value={statesFilter ?? []}
-          onChange={(states) => setQueryStates({ states })}
+          onChange={(states) => {
+            if (isEqual(states, statesFilter)) return
+            track('database_connections_filter_updated', { type: 'state' })
+            setQueryStates({ states })
+          }}
           isLoading={isPending}
           popoverClassName="w-60"
         />
@@ -184,7 +191,11 @@ export const Activity = ({ live }: ActivityProps) => {
           label="Roles"
           options={roleOptions}
           value={rolesFilter ?? []}
-          onChange={(roles) => setQueryStates({ roles })}
+          onChange={(roles) => {
+            if (isEqual(roles, rolesFilter)) return
+            track('database_connections_filter_updated', { type: 'roles' })
+            setQueryStates({ roles })
+          }}
           isLoading={isPending}
           popoverClassName="w-72"
         />
@@ -193,14 +204,23 @@ export const Activity = ({ live }: ActivityProps) => {
           label="Application"
           options={applicationOptions}
           value={applicationsFilter ?? []}
-          onChange={(applications) => setQueryStates({ applications })}
+          onChange={(applications) => {
+            if (isEqual(applications, applicationsFilter)) return
+            track('database_connections_filter_updated', { type: 'application' })
+            setQueryStates({ applications })
+          }}
           isLoading={isPending}
           popoverClassName="w-60"
         />
         <ButtonTooltip
           variant={viewFilter === 'blockers' ? 'default' : 'dashed'}
           iconRight={rootBlockers.length > 0 ? <span>{rootBlockers.length}</span> : null}
-          onClick={() => setQueryStates({ view: viewFilter === 'blockers' ? '' : 'blockers' })}
+          onClick={() => {
+            track('database_connections_blocker_view_clicked', {
+              newState: viewFilter === 'blockers' ? 'disabled' : 'enabled',
+            })
+            setQueryStates({ view: viewFilter === 'blockers' ? '' : 'blockers' })
+          }}
           tooltip={{
             content: {
               side: 'bottom',
