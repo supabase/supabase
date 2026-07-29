@@ -1,29 +1,26 @@
-.desktopMenuViewport {
+/*
+ * Single source of truth for the dropdown motion timings. The Tailwind
+ * motion constants in Nav/index.tsx consume these variables via
+ * duration-(--…)/ease-(--…) utilities, so tune them here only.
+ * --menu-motion-duration paces the viewport open/close, the content
+ * entrance/switch, and the viewport height transition so they stay in sync.
+ */
+.desktopMenu {
+  --menu-motion-duration: 180ms;
   --menu-viewport-width-duration: 220ms;
-  --menu-viewport-height-duration: 180ms;
-  --menu-viewport-width-easing: cubic-bezier(0.455, 0.03, 0.515, 0.955);
-  --menu-viewport-height-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --menu-ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+  --menu-ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
 
+.desktopMenuViewport {
   transform-origin: top center;
   transition-property: width, height !important;
-  transition-duration:
-    var(--menu-viewport-width-duration), var(--menu-viewport-height-duration) !important;
-  transition-timing-function:
-    var(--menu-viewport-width-easing), var(--menu-viewport-height-easing) !important;
-}
-
-.desktopMenuViewport[data-state='open'] {
-  animation-duration: 180ms !important;
-  animation-timing-function: ease !important;
-}
-
-.desktopMenuViewport[data-state='closed'] {
-  animation-duration: 180ms !important;
-  animation-timing-function: ease !important;
+  transition-duration: var(--menu-viewport-width-duration), var(--menu-motion-duration) !important;
+  transition-timing-function: var(--menu-ease-in-out-quad), var(--menu-ease-out-quad) !important;
 }
 
 .desktopMenuViewport .desktopMenuContent:not([data-motion]) {
-  animation: desktop-menu-content-in 180ms ease both;
+  animation: desktop-menu-content-in var(--menu-motion-duration) ease both;
   will-change: opacity, transform;
 }
 
