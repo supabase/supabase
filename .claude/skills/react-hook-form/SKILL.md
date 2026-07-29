@@ -147,11 +147,15 @@ Submit buttons living outside the `<form>` (sheet/dialog footers) use a stable
   clobber the user's in-progress edits. (Good examples:
   `components/interfaces/Settings/Database/ConnectionLogging.tsx`,
   `components/interfaces/Storage/EditBucketModal.tsx`.)
-- **After a successful mutation, `reset(submittedValues)`** in `onSuccess` so the
+- **After a successful mutation, re-baseline the form** in `onSuccess` so the
   saved state becomes the new baseline (`isDirty` returns to false, Cancel now
-  reverts to the saved values). A bare `reset()` reverts to the _previous_
-  defaults — wrong after a save. If the form uses `values` and the mutation
-  invalidates the query, the refetch handles this for you.
+  reverts to the saved values). Prefer what the server actually persisted: if the
+  form uses `values` and the mutation invalidates the query, the refetch handles
+  this for you; if the mutation returns the updated resource, `reset(response)`.
+  `reset(submittedValues)` is the fallback for APIs that store exactly what was
+  sent — if the server normalizes or fills values, it baselines the form to data
+  that was never saved. A bare `reset()` reverts to the _previous_ defaults —
+  wrong after a save.
 - Cancel buttons call `form.reset()`. This only visually restores fields whose
   values round-trip through defined, controlled values — which is why the null
   rules below matter.
@@ -189,12 +193,24 @@ field's schema declares** — with the `''`-union schema above:
 `field.onChange(Number.isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber)`.
 Never let `NaN` into form state.
 
-Reach for `null` as the empty value only when the field's schema is explicitly
-nullable (an API field where empty means "unset"). Then keep `null` out of both
-the input and the coercion: render via `value={field.value ?? ''}`, and don't
-pass the value through `z.coerce.number()` — `Number(null)` is `0`, so a
+A nullable API field (`null` = "unset", e.g. a platform default applies)
+doesn't change the in-form sentinel — keep `''` inside the form and convert at
+the boundaries:
+
+```tsx
+// inbound: null → '' when building defaults/values
+values: { growthPercent: data.growth_percent ?? '' },
+// schema: '' stays the in-form sentinel, zod coerces real input
+growthPercent: z.union([z.literal(''), z.coerce.number().gte(10).lte(100)]),
+// outbound: '' → null in onSubmit
+mutate({ growth_percent: values.growthPercent === '' ? null : values.growthPercent })
+```
+
+If `null` does end up in form state (some existing forms hold it), keep it out
+of both the input and the coercion: render via `value={field.value ?? ''}`, and
+don't pass the value through `z.coerce.number()` — `Number(null)` is `0`, so a
 nullable field fed into the coercing union silently validates empty as `0`.
-Whatever you pick, it's one sentinel per field, used consistently across
+Either way it's one sentinel per field, used consistently across defaults,
 schema, `onChange`, rendering, and the submit mapping.
 
 ## Dirty state and change detection
