@@ -12,6 +12,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
+import { UserActivityGraph } from './UserActivityGraph'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
@@ -287,6 +288,12 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
               </div>
             )
           })}
+        </div>
+
+        <Separator />
+        <div className={cn('flex flex-col', PANEL_PADDING)}>
+          <p>User activity over the last 90 days</p>
+          <UserActivityGraph userId={user.id as string} />
         </div>
 
         <Separator />
