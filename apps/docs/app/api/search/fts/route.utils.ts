@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { supabase } from '~/lib/supabase'
 import { isFeatureEnabled } from 'common/enabled-features'
 import { type NextRequest } from 'next/server'
@@ -16,6 +17,10 @@ export async function _handleFtsSearchRequest(request: NextRequest) {
 
   if (error) {
     console.error('Error running docs full-text search:', error)
+    Sentry.captureException(new Error(error.message), {
+      tags: { route: 'search-fts' },
+      extra: { query, searchFunction, error },
+    })
     return Response.json({ error: error.message }, { status: 500 })
   }
 

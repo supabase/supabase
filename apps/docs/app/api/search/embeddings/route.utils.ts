@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { isFeatureEnabled } from 'common/enabled-features'
 import { type NextRequest } from 'next/server'
 
@@ -22,6 +23,10 @@ export async function _handleEmbeddingsSearchRequest(request: NextRequest) {
 
   if (!response.ok) {
     console.error('Error running docs embeddings search:', data)
+    Sentry.captureException(new Error(data?.error ?? 'search-embeddings request failed'), {
+      tags: { route: 'search-embeddings' },
+      extra: { query, status: response.status, data },
+    })
   }
 
   return Response.json(data, { status: response.status })

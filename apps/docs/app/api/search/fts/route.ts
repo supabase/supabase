@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { type NextRequest } from 'next/server'
 
 import { corsHeaders } from '../cors'
@@ -16,6 +17,7 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error('Error handling docs full-text search request:', error)
+    Sentry.captureException(error, { tags: { route: 'search-fts' } })
     return Response.json(
       { error: 'There was an error processing your request' },
       { status: 500, headers: corsHeaders }
