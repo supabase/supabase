@@ -153,6 +153,8 @@ export const ProjectCreationForm = ({
     useState(false)
   const cloudProviderBeforeHighAvailability = useRef<CloudProvider | undefined>(undefined)
   const postgresVersionBeforeHighAvailability = useRef('')
+  const postgresVersionSelectionBeforeHighAvailability = useRef<string | undefined>(undefined)
+  const dbRegionBeforeHighAvailability = useRef<string | null>(null)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -556,6 +558,25 @@ export const ProjectCreationForm = ({
     }
   }, [regionError, resetField, fixedDefaultRegion])
 
+  // The region auto-fill effect above skips dirty fields, so a manually chosen
+  // region would keep showing in the trigger while HA only offers its fixed
+  // region — force it over (and restore it afterwards) explicitly.
+  useEffect(() => {
+    const highAvailabilityRegionName = highAvailabilityRegion?.name
+    if (highAvailability && highAvailabilityRegionName !== undefined) {
+      const currentRegion = getValues('dbRegion')
+      if (currentRegion !== highAvailabilityRegionName) {
+        if (dbRegionBeforeHighAvailability.current === null) {
+          dbRegionBeforeHighAvailability.current = currentRegion ?? null
+        }
+        setValue('dbRegion', highAvailabilityRegionName)
+      }
+    } else if (!highAvailability && dbRegionBeforeHighAvailability.current !== null) {
+      setValue('dbRegion', dbRegionBeforeHighAvailability.current)
+      dbRegionBeforeHighAvailability.current = null
+    }
+  }, [highAvailability, highAvailabilityRegion?.name, getValues, setValue])
+
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
       if (cloudProviderBeforeHighAvailability.current === undefined) {
@@ -579,10 +600,21 @@ export const ProjectCreationForm = ({
       if (currentPostgresVersion !== HIGH_AVAILABILITY_POSTGRES_VERSION) {
         postgresVersionBeforeHighAvailability.current = currentPostgresVersion
       }
+      if (postgresVersionSelectionBeforeHighAvailability.current === undefined) {
+        postgresVersionSelectionBeforeHighAvailability.current = getValues(
+          'postgresVersionSelection'
+        )
+      }
       setValue('postgresVersion', HIGH_AVAILABILITY_POSTGRES_VERSION)
       setValue('useOrioleDb', false)
-    } else if (currentPostgresVersion === HIGH_AVAILABILITY_POSTGRES_VERSION) {
-      setValue('postgresVersion', postgresVersionBeforeHighAvailability.current)
+    } else {
+      if (currentPostgresVersion === HIGH_AVAILABILITY_POSTGRES_VERSION) {
+        setValue('postgresVersion', postgresVersionBeforeHighAvailability.current)
+      }
+      if (postgresVersionSelectionBeforeHighAvailability.current !== undefined) {
+        setValue('postgresVersionSelection', postgresVersionSelectionBeforeHighAvailability.current)
+        postgresVersionSelectionBeforeHighAvailability.current = undefined
+      }
     }
   }, [getValues, highAvailability, setValue])
 

@@ -575,6 +575,58 @@ describe('project creation wizard', () => {
       expect(onRequest.mock.calls[0][0].release_channel).toBe('ga')
     })
 
+    test('keeps a manually selected Postgres version when available versions refetch', async () => {
+      const FRANKFURT = 'Central EU (Frankfurt)'
+      mockWizardEndpoints({
+        availableRegions: {
+          ...DEFAULT_AVAILABLE_REGIONS,
+          all: {
+            ...DEFAULT_AVAILABLE_REGIONS.all,
+            specific: [
+              ...DEFAULT_AVAILABLE_REGIONS.all.specific,
+              { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
+            ],
+          },
+        },
+      })
+      const onAvailableVersionsRequest = vi.fn()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/organizations/:slug/available-versions',
+        response: () => {
+          onAvailableVersionsRequest()
+          return HttpResponse.json<{ available_versions: AvailableVersion[] }>(
+            DEFAULT_AVAILABLE_VERSIONS
+          )
+        },
+      })
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await fillProjectName('Sticky Version Project')
+      await selectRegion(/Americas/)
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      // Auto-selects the GA default once versions load
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+
+      await user.click(screen.getByLabelText('Postgres version'))
+      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+
+      const requestsBeforeRegionChange = onAvailableVersionsRequest.mock.calls.length
+      await selectRegion(/Frankfurt/)
+      await waitFor(() =>
+        expect(onAvailableVersionsRequest.mock.calls.length).toBeGreaterThan(
+          requestsBeforeRegionChange
+        )
+      )
+
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+    })
+
     test('blocks submission with a toast when orioledb becomes unavailable after selection', async () => {
       const FRANKFURT = 'Central EU (Frankfurt)'
       mockWizardEndpoints({
@@ -721,6 +773,98 @@ describe('project creation wizard', () => {
           },
         },
       })
+    })
+
+    test('forces the high availability region over a manually selected region and restores it', async () => {
+      vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'staging')
+      try {
+        const FRANKFURT = 'Central EU (Frankfurt)'
+        mockWizardEndpoints({
+          availableRegions: {
+            ...DEFAULT_AVAILABLE_REGIONS,
+            all: {
+              ...DEFAULT_AVAILABLE_REGIONS.all,
+              specific: [
+                ...DEFAULT_AVAILABLE_REGIONS.all.specific,
+                { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
+              ],
+            },
+          },
+        })
+
+        await renderWizard()
+
+        await screen.findByPlaceholderText('Project name')
+        await selectRegion(/Frankfurt/)
+        expect(getSelectTriggerByLabel('Region')).toHaveTextContent(FRANKFURT)
+
+        const highAvailabilitySwitch = await screen.findByRole('switch', {
+          name: 'Enable high availability',
+        })
+        await user.click(highAvailabilitySwitch)
+
+        await waitFor(() =>
+          expect(getSelectTriggerByLabel('Region')).toHaveTextContent('East US (North Virginia)')
+        )
+
+        await user.click(highAvailabilitySwitch)
+
+        await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent(FRANKFURT))
+      } finally {
+        vi.unstubAllEnvs()
+      }
+    })
+
+    test('restores the Postgres version selection when high availability is toggled off', async () => {
+      mockWizardEndpoints()
+      // Mirror staging: no versions offered for the standard provider, so the
+      // selection only ever gets populated by the AWS_K8S list while HA is on.
+      addAPIMock({
+        method: 'post',
+        path: '/platform/organizations/:slug/available-versions',
+        response: async ({ request }) => {
+          const { provider } = (await request.json()) as { provider: string }
+          return HttpResponse.json<{ available_versions: AvailableVersion[] }>(
+            provider === 'AWS_K8S' ? DEFAULT_AVAILABLE_VERSIONS : { available_versions: [] }
+          )
+        },
+      })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await fillProjectName('HA Selection Restore Project')
+      await generateAndWaitForStrongPassword()
+      await selectRegion(/Americas/)
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      const highAvailabilitySwitch = await screen.findByRole('switch', {
+        name: 'Enable high availability',
+      })
+      await user.click(highAvailabilitySwitch)
+
+      // The AWS_K8S versions load and auto-select a default while HA is on
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+
+      await user.click(highAvailabilitySwitch)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent(
+          'Select a Postgres version for your project'
+        )
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      const body = onRequest.mock.calls[0][0]
+      expect(body.high_availability).toBe(false)
+      expect(body.postgres_engine).toBeUndefined()
+      expect(body.release_channel).toBeUndefined()
+      expect(body.custom_supabase_internal_requests).toBeUndefined()
     })
 
     test('restores the standard Postgres configuration when high availability is disabled', async () => {
