@@ -145,7 +145,11 @@ feed server-driven defaults through the `values` option (next section) instead
 of hoisting.
 
 Submit buttons living outside the `<form>` (sheet/dialog footers) use the same
-module-level `FORM_ID` via `form={FORM_ID}` on the button.
+module-level `FORM_ID` via `form={FORM_ID}` on the button. A module-level id is
+only safe for singleton forms — if the component can mount more than once at a
+time, duplicate ids make external buttons submit the first matching form, so
+mint a per-instance id with `useId()` and share it between the `<form>` and its
+buttons.
 
 ## defaultValues, server data, and reset
 
