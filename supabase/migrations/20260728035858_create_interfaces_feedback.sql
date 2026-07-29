@@ -13,7 +13,7 @@ comment on table interfaces_feedback is
 comment on column interfaces_feedback.feedback is
 'The free-form feedback text as submitted by the user.';
 comment on column interfaces_feedback.user_agent is
-'User agent of the submitting interface, e.g. supabase-cli/2.30.4 (darwin/arm64). Also identifies which interface the feedback came from.';
+'User agent of the submitting interface, e.g. SupabaseCLI/2.3.4. Also identifies which interface the feedback came from.';
 comment on column interfaces_feedback.project_ref is
 'Optional reference of the Supabase project the feedback relates to.';
 
