@@ -55,9 +55,11 @@ Always build against the same major version you run, and rebuild your custom ima
 
 </Admonition>
 
-## Step 1: Write the Dockerfile
+## Build the extension
 
 Use a multi-stage build: a `glibc` builder stage (`postgres:<major>-bookworm`) to compile, and the Supabase image as the runtime stage that installs the artifacts into the correct Nix locations.
+
+### Step 1: Write the Dockerfile
 
 The example below builds [`pg_uuidv7`](https://github.com/fboulnois/pg_uuidv7) cloned from its Git repository.
 
@@ -96,7 +98,7 @@ RUN set -eux; \
 
 The same Dockerfile structure generally works for your own extensions. However, when authoring a new extension from scratch, it's best to use the Nix build instead (refer to [Build the extension into the Nix image](#build-the-extension-into-the-nix-image) below).
 
-### Handle dependencies beyond the standard library
+#### Handle dependencies beyond the standard library
 
 Copying a `.so` onto the image works cleanly only when its sole runtime dependency is the C library (`libc.so.6`) - that's the image's `glibc`, already loaded in the `postgres` process, so it resolves automatically. Any other shared library the extension links (`libcurl`, `OpenSSL`, etc.) must also be present and loadable at runtime.
 
@@ -121,7 +123,7 @@ A few things make this more involved than it sounds:
 
 When static linking isn't practical, use the [Nix path](#build-the-extension-into-the-nix-image), which resolves every dependency against the image's own libraries automatically.
 
-## Step 2: Build the image
+### Step 2: Build the image
 
 Build against the tag you run in production so the runtime and major version match:
 
@@ -133,7 +135,7 @@ docker build \
   .
 ```
 
-## Step 3: Use the image in your stack
+### Step 3: Use the image in your stack
 
 Point the `db` service at your custom image in `docker-compose.yml`:
 
@@ -149,11 +151,11 @@ Then recreate the database service so it picks up the new image:
 sh run.sh recreate db
 ```
 
-## Step 4: Enable the extension
+### Step 4: Enable the extension
 
 The Supabase `postgres` role is intentionally not a superuser, and extension creation is gated by [`supautils`](https://github.com/supabase/supautils). A native extension that isn't on the `supautils.privileged_extensions` allow-list can only be created by the `supabase_admin` superuser. You have two options.
 
-### Option A: Allow the `postgres` role to create it (no rebuild)
+#### Option A: Allow the `postgres` role to create it (no rebuild)
 
 Append your extension to the allow-list in a custom `supautils` configuration. The Postgres 17 image loads any `.conf` file from `/etc/postgresql-custom/conf.d/`.
 
@@ -178,7 +180,7 @@ docker compose exec db psql -U postgres -c "CREATE EXTENSION pg_uuidv7;"
 
 </Admonition>
 
-### Option B: Enable it as a superuser
+#### Option B: Enable it as a superuser
 
 The image's init scripts run as `supabase_admin` (a superuser) on first boot. Drop a SQL file into the init directory to create the extension automatically for new databases:
 
