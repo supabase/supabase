@@ -137,6 +137,8 @@ module.exports = {
               textUnderlineOffset: '2px',
             },
             'a:hover': {
+              // Match Studio InlineLink: text + decoration both move to foreground
+              color: 'var(--foreground-default)',
               textDecorationColor: 'var(--foreground-default)',
             },
             figcaption: {

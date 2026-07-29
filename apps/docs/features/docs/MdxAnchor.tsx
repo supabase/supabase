@@ -23,17 +23,31 @@ const flattenChildrenToText = (node: unknown): string => {
   return ''
 }
 
-export function MdxAnchor({ href, children, ...rest }: ComponentPropsWithoutRef<'a'>) {
+/**
+ * Docs MDX `<a>` mapper. Underline / hover decoration aligned with Studio InlineLink.
+ */
+export function MdxAnchor({ href, children, className, ...rest }: ComponentPropsWithoutRef<'a'>) {
+  const linkClassName = cn(
+    'underline underline-offset-2 decoration-foreground-muted transition-colors',
+    'hover:text-foreground hover:decoration-foreground',
+    className
+  )
+
   if (!isExternalHref(href)) {
     return (
-      <a href={href} {...rest}>
+      <a href={href} className={linkClassName} {...rest}>
         {children}
       </a>
     )
   }
   const label = flattenChildrenToText(children).trim()
   return (
-    <a href={href} aria-label={label ? `External Source: ${label}` : undefined} {...rest}>
+    <a
+      href={href}
+      aria-label={label ? `External Source: ${label}` : undefined}
+      className={linkClassName}
+      {...rest}
+    >
       {children}
       <ExternalLinkIcon
         size={14}
