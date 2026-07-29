@@ -70,6 +70,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}
@@ -116,6 +117,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}
@@ -157,6 +159,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}
