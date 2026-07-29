@@ -37,7 +37,7 @@ export const TOTPFactors = () => {
                       </p>
                       <div className="flex items-center gap-4">
                         <p className="text-sm text-foreground-light">
-                          Added on {dayjs(factor.updated_at).format(DATETIME_FORMAT)}
+                          Added on {dayjs(factor.created_at).format(DATETIME_FORMAT)}
                         </p>
                         <Button
                           size="tiny"

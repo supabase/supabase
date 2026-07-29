@@ -89,6 +89,7 @@ export default function Extensions() {
             </ul>
             <p className="mt-2">
               <button
+                tabIndex={0}
                 type="reset"
                 className="text-xs hover:underline"
                 onClick={() => setFilters([])}

@@ -1,5 +1,4 @@
 import { format } from 'date-fns'
-import { Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
@@ -235,10 +234,6 @@ export const TimeSplitInput = ({
         hover:border-stronger transition-colors
     `}
     >
-      <div className="mr-1 text-foreground-lighter">
-        <Clock size={14} strokeWidth={1.5} />
-      </div>
-
       <input
         type="text"
         onBlur={() => handleOnBlur()}

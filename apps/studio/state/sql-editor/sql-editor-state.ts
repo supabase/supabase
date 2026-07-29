@@ -257,7 +257,7 @@ export const sqlEditorState = proxy({
 
   removeFavorite: (id: string) => {
     const storeSnippet = sqlEditorState.snippets[id]
-    if (storeSnippet.snippet) {
+    if (storeSnippet) {
       storeSnippet.snippet.favorite = false
       sqlEditorState.needsSaving.set(id, true)
     }

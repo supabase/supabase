@@ -11,20 +11,19 @@ import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const { data: org } = useSelectedOrganizationQuery()
-  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
+  const { showUpgradeCta: showOrgProjectsListUsageCard } = useShowUpgradeCta()
 
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
-  const showOrgProjectsListUsageCard = upgradeCtaVariant === 'org_projects_list'
 
   return (
     <ScaffoldContainer className="grow flex">
-      <ScaffoldSection isFullWidth className="pb-0">
+      <ScaffoldSection isFullWidth className="pb-12">
         {disableAccessMfa ? (
           <Admonition
             type="note"

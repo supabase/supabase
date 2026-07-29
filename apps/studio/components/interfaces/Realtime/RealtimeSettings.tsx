@@ -94,9 +94,9 @@ export const RealtimeSettings = () => {
         .max(maxConn?.maxConnections ?? 100)
         .optional(),
       max_concurrent_users: z.coerce.number().min(1).max(50000).optional(),
-      max_events_per_second: z.coerce.number().min(1).max(10000).optional(),
-      max_presence_events_per_second: z.coerce.number().min(1).max(10000).optional(),
-      max_payload_size_in_kb: z.coerce.number().min(1).max(3000).optional(),
+      max_events_per_second: z.coerce.number().min(1).max(50000).optional(),
+      max_presence_events_per_second: z.coerce.number().min(1).max(5000).optional(),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(10000).optional(),
       // [Joshen] These fields are temporarily hidden from the UI
       // max_bytes_per_second: z.coerce.number().min(1).max(10000000).optional(),
       // max_channels_per_client: z.coerce.number().min(1).max(10000).optional(),
@@ -111,9 +111,9 @@ export const RealtimeSettings = () => {
         .min(1)
         .max(maxConn?.maxConnections ?? 100),
       max_concurrent_users: z.coerce.number().min(1).max(50000),
-      max_events_per_second: z.coerce.number().min(1).max(10000),
-      max_presence_events_per_second: z.coerce.number().min(1).max(10000),
-      max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
+      max_events_per_second: z.coerce.number().min(1).max(50000),
+      max_presence_events_per_second: z.coerce.number().min(1).max(5000),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(10000),
       // [Joshen] These fields are temporarily hidden from the UI
       // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
       // max_channels_per_client: z.coerce.number().min(1).max(10000),

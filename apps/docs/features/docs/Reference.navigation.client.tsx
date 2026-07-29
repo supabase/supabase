@@ -331,6 +331,7 @@ function CompoundRefLink({
     <Collapsible.Root open={open} onOpenChange={setOpen}>
       <Collapsible.Trigger asChild disabled={isActive}>
         <button
+          tabIndex={0}
           className={cn(
             'group',
             'cursor-pointer',

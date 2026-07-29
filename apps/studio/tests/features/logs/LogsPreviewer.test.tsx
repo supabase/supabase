@@ -140,6 +140,20 @@ test('can click load older', async () => {
   expect(handleClick).toHaveBeenCalled()
 })
 
+test('loads its/ite from the URL into the date picker and opens without crashing', async () => {
+  const its = dayjs('2024-01-15T12:00:00.000Z')
+  const ite = dayjs('2024-01-15T12:02:00.000Z')
+
+  customRender(
+    <LogsPreviewer queryType="api" projectRef="default" tableName={LogsTableName.EDGE} />,
+    { nuqs: { searchParams: { its: its.toISOString(), ite: ite.toISOString() } } }
+  )
+
+  const label = `${its.format('DD MMM, HH:mm')} - ${ite.format('DD MMM, HH:mm')}`
+  await userEvent.click(await screen.findByText(label))
+  expect(await screen.findByText('Apply')).toBeInTheDocument()
+})
+
 describe('calculateBarClickTimeRange', () => {
   const clickedTime = '2024-01-15T12:30:00.000Z'
 
