@@ -100,6 +100,9 @@ and the demos in `apps/design-system/registry/default/example/`
 before inventing structure.
 
 ```tsx
+// Module level — static references, not recreated on every render
+const FORM_ID = 'pool-config-form'
+
 const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   maxConnections: z
@@ -108,13 +111,16 @@ const FormSchema = z.object({
 })
 type FormValues = z.infer<typeof FormSchema>
 
+const defaultValues: FormValues = { name: '', maxConnections: '' }
+
+// Inside the component
 const form = useForm<FormValues>({
   resolver: zodResolver(FormSchema),
-  defaultValues: { name: '', maxConnections: '' },
+  defaultValues,
 })
 
 <Form {...form}>
-  <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+  <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
     <FormField
       control={form.control}
       name="name"
@@ -130,8 +136,20 @@ const form = useForm<FormValues>({
 </Form>
 ```
 
-Submit buttons living outside the `<form>` (sheet/dialog footers) use a stable
-`formId` and `form={formId}` on the button.
+Define the schema, `type`, static `defaultValues`, and the form's id at module
+level, outside the component. Rebuilding them per render is wasted work and
+unstable references — RHF reads `defaultValues` only on the first render, but
+anything else comparing against these objects sees a fresh identity each time.
+When they genuinely depend on runtime data, build the schema with `useMemo` and
+feed server-driven defaults through the `values` option (next section) instead
+of hoisting.
+
+Submit buttons living outside the `<form>` (sheet/dialog footers) use the same
+module-level `FORM_ID` via `form={FORM_ID}` on the button. A module-level id is
+only safe for singleton forms — if the component can mount more than once at a
+time, duplicate ids make external buttons submit the first matching form, so
+mint a per-instance id with `useId()` and share it between the `<form>` and its
+buttons.
 
 ## defaultValues, server data, and reset
 
