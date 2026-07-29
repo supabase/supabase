@@ -63,6 +63,13 @@ vi.mock('@/data/subscriptions/project-addons-query', () => ({
   useProjectAddonsQuery: mockUseProjectAddonsQuery,
 }))
 
+const expectEveryQueryCall = (queryMock: ReturnType<typeof vi.fn>, enabled: boolean) => {
+  expect(queryMock).toHaveBeenCalled()
+  for (const [, options] of queryMock.mock.calls) {
+    expect(options).toEqual({ enabled })
+  }
+}
+
 describe('ConnectionPooling', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -123,12 +130,8 @@ describe('ConnectionPooling', () => {
     expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
     expect(mockUpdatePoolerConfig).not.toHaveBeenCalled()
 
-    expect(mockUsePgbouncerConfigQuery).toHaveBeenCalledWith(expect.anything(), {
-      enabled: false,
-    })
-    expect(mockUseMaxConnectionsQuery).toHaveBeenCalledWith(expect.anything(), {
-      enabled: false,
-    })
+    expectEveryQueryCall(mockUsePgbouncerConfigQuery, false)
+    expectEveryQueryCall(mockUseMaxConnectionsQuery, false)
   })
 
   it('does not fetch pooling config while the high availability state is pending', () => {
@@ -136,12 +139,8 @@ describe('ConnectionPooling', () => {
 
     customRender(<ConnectionPooling />)
 
-    expect(mockUsePgbouncerConfigQuery).toHaveBeenCalledWith(expect.anything(), {
-      enabled: false,
-    })
-    expect(mockUseMaxConnectionsQuery).toHaveBeenCalledWith(expect.anything(), {
-      enabled: false,
-    })
+    expectEveryQueryCall(mockUsePgbouncerConfigQuery, false)
+    expectEveryQueryCall(mockUseMaxConnectionsQuery, false)
   })
 
   it('fetches pooling config for non high availability projects', () => {
@@ -149,11 +148,7 @@ describe('ConnectionPooling', () => {
 
     customRender(<ConnectionPooling />)
 
-    expect(mockUsePgbouncerConfigQuery).toHaveBeenCalledWith(expect.anything(), {
-      enabled: true,
-    })
-    expect(mockUseMaxConnectionsQuery).toHaveBeenCalledWith(expect.anything(), {
-      enabled: true,
-    })
+    expectEveryQueryCall(mockUsePgbouncerConfigQuery, true)
+    expectEveryQueryCall(mockUseMaxConnectionsQuery, true)
   })
 })
