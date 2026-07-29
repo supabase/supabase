@@ -112,8 +112,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             buildPrompt={buildPrompt}
             onOpenAssistant={handleSummarizeActivity}
             disabled={isLoadingActivity}
-            isLoading={isLoadingActivity}
-            // @ts-ignore [Joshen] To add proper telemetry source in subsequent PR
+            loading={isLoadingActivity}
             telemetrySource="database_connections"
             size="tiny"
             variant="default"
