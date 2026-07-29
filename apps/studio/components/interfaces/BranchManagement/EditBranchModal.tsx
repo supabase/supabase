@@ -128,14 +128,6 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const isFormValid = form.formState.isValid && (!gitBranchName || isGitBranchValid)
   const canSubmit = isFormValid && !isUpdating && !isChecking
 
-  const openLinkerPanel = () => {
-    onClose()
-
-    if (projectRef) {
-      router.push(`/project/${projectRef}/settings/integrations`)
-    }
-  }
-
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!branch?.project_ref) return console.error('Branch ref is required')
@@ -194,8 +186,9 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             if (form.getValues('gitBranchName') !== requested) return
             setIsGitBranchValid(false)
             form.setError('gitBranchName', {
-              ...error,
-              message: `Unable to find branch "${branchName}" in ${repoOwner}/${repoName}`,
+              message:
+                error?.message ??
+                `Unable to find branch "${branchName}" in ${repoOwner}/${repoName}`,
             })
           },
         }
