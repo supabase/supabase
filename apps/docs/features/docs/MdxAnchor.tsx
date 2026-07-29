@@ -23,19 +23,36 @@ const flattenChildrenToText = (node: unknown): string => {
   return ''
 }
 
+/** Same resting/hover contract as Studio InlineLink (no brand/green link colour). */
+const mdxAnchorClassName =
+  'underline transition underline-offset-2 decoration-inherit hover:decoration-foreground text-inherit hover:text-foreground'
+
+const relForTarget = (target?: string, rel?: string) => {
+  if (target !== '_blank') return rel
+  const tokens = new Set((rel ?? '').split(/\s+/).filter(Boolean))
+  tokens.add('noopener')
+  tokens.add('noreferrer')
+  return [...tokens].join(' ')
+}
+
 /**
- * Docs MDX `<a>` mapper. Underline / hover decoration aligned with Studio InlineLink.
+ * Docs MDX `<a>` mapper. Same resting/hover contract as Studio InlineLink:
+ * inherit text + decoration, then foreground on hover.
  */
-export function MdxAnchor({ href, children, className, ...rest }: ComponentPropsWithoutRef<'a'>) {
-  const linkClassName = cn(
-    'underline underline-offset-2 decoration-foreground-muted transition-colors',
-    'hover:text-foreground hover:decoration-foreground',
-    className
-  )
+export function MdxAnchor({
+  href,
+  children,
+  className,
+  target,
+  rel,
+  ...rest
+}: ComponentPropsWithoutRef<'a'>) {
+  const linkClassName = cn(mdxAnchorClassName, className)
+  const resolvedRel = relForTarget(target, rel)
 
   if (!isExternalHref(href)) {
     return (
-      <a href={href} className={linkClassName} {...rest}>
+      <a href={href} target={target} rel={resolvedRel} className={linkClassName} {...rest}>
         {children}
       </a>
     )
@@ -44,6 +61,8 @@ export function MdxAnchor({ href, children, className, ...rest }: ComponentProps
   return (
     <a
       href={href}
+      target={target}
+      rel={resolvedRel}
       aria-label={label ? `External Source: ${label}` : undefined}
       className={linkClassName}
       {...rest}
