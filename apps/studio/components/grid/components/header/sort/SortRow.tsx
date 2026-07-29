@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, X } from 'lucide-react'
 import { memo } from 'react'
-import { Button, Switch } from 'ui'
+import { Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Sort } from '@/components/grid/types'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -60,14 +60,19 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
           aria-label={`Sort ${column.name} in ascending order`}
         />
       </div>
-      <Button
-        icon={<X strokeWidth={1.5} />}
-        size="tiny"
-        variant="text"
-        className="w-7"
-        onClick={() => onDelete(columnName)}
-        aria-label={`Remove sort for ${column.name}`}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            icon={<X strokeWidth={1.5} />}
+            size="tiny"
+            variant="text"
+            className="w-7"
+            onClick={() => onDelete(columnName)}
+            aria-label={`Remove sort for ${column.name}`}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Remove sort</TooltipContent>
+      </Tooltip>
     </div>
   )
 }
