@@ -13,7 +13,6 @@ import {
   ChartLine,
   ChartLoadingState,
   ChartMetric,
-  type ChartLineTick,
 } from 'ui-patterns/Chart'
 
 import {
@@ -41,7 +40,18 @@ const USAGE_ATTRIBUTES = [
   'disk_fs_used_wal',
   'pg_database_size',
   'disk_fs_size',
-] as InfraMonitoringAttribute[]
+] satisfies InfraMonitoringAttribute[]
+
+const ROLLING_WINDOW_DAYS = 7
+
+const getRollingWindow = () => {
+  const now = dayjs()
+
+  return {
+    startDate: now.subtract(ROLLING_WINDOW_DAYS, 'day').toISOString(),
+    endDate: now.toISOString(),
+  }
+}
 
 const COMPUTE_CHART_CONFIG = {
   maxCpuUsage: {
@@ -94,14 +104,7 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
   const supportsBurstableIO = hasBurstableIO(project?.infra_compute_size)
 
   // Anchor query key dates to mount time; fetch uses a rolling 7-day window on each refetch.
-  const { startDate, endDate } = useMemo(() => {
-    const now = dayjs()
-
-    return {
-      startDate: now.subtract(7, 'day').toISOString(),
-      endDate: now.toISOString(),
-    }
-  }, [])
+  const { startDate, endDate } = useMemo(getRollingWindow, [])
 
   const {
     data: usageData,
@@ -116,20 +119,16 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
       interval: '1d',
     },
     {
-      queryFn: ({ signal }) => {
-        const now = dayjs()
-
-        return getInfraMonitoringAttributes(
+      queryFn: ({ signal }) =>
+        getInfraMonitoringAttributes(
           {
             projectRef,
             attributes: USAGE_ATTRIBUTES,
-            startDate: now.subtract(7, 'day').toISOString(),
-            endDate: now.toISOString(),
+            ...getRollingWindow(),
             interval: '1d',
           },
           signal
-        )
-      },
+        ),
     }
   )
 
@@ -226,7 +225,7 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
             >
               <div className="h-48 px-card pb-4 pt-2">
                 <ChartLine
-                  data={computeChartData as ChartLineTick[]}
+                  data={computeChartData}
                   dataKey="maxCpuUsage"
                   dataKeys={
                     supportsBurstableIO
@@ -308,7 +307,7 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
             >
               <div className="h-48 px-card pb-4 pt-2">
                 <ChartLine
-                  data={diskChartData as ChartLineTick[]}
+                  data={diskChartData}
                   dataKey="databaseUsagePercent"
                   dataKeys={['databaseUsagePercent', 'walUsagePercent', 'systemUsagePercent']}
                   DateTimeFormat="MMM D"
