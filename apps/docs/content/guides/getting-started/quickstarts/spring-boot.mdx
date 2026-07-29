@@ -22,7 +22,7 @@ curl https://start.spring.io/starter.zip \
 unzip instruments.zip -d instruments && cd instruments
 ```
 
-## 2. Install Agent Skills (optional)
+## 2. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
@@ -36,7 +36,13 @@ npx skills add supabase/agent-skills
 
 Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
-When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session). Under the **Session pooler** (port `5432`), select the **JDBC** tab and copy the connection string. Replace the password placeholder with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
+When your project is up and running, navigate to its dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
+
+Under the **Session pooler** (port `5432`), select the **JDBC** tab and copy the connection string. Replace the password placeholder with your saved database password.
+
+<Admonition type="note">
+You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
+</Admonition>
 
 <Admonition type="note">
 
@@ -62,9 +68,9 @@ If the app fails to start with `Unable to determine Dialect without JDBC metadat
 
 ## 4. Change the default schema
 
-By default Hibernate creates tables in the `public` schema. We recommend changing this because Supabase exposes the `public` schema as a [data API](/docs/guides/api).
+By default Hibernate creates tables in the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
 
-The schema has to exist on Supabase before your app starts, so create it from the [Table Editor](/dashboard/project/_/editor) first. Then point Hibernate at it in `application.properties`.
+Create the schema from the [Table Editor](/dashboard/project/_/editor) as your app will need it before start. Then point **Hibernate** at it in `application.properties`.
 
 ```text name=src/main/resources/application.properties
 spring.jpa.properties.hibernate.default_schema=app
