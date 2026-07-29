@@ -29,33 +29,35 @@ export const UserActivityOmittedEventsItem = ({
       </div>
 
       {/* Summary row */}
-      <div className={cn('mb-3 flex-1 rounded-md bg-surface-100/50')}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="button"
-              variant="text"
-              size="tiny"
-              block
-              iconLeft={
-                expanded ? (
-                  <ChevronDown size={14} strokeWidth={1.5} />
-                ) : (
-                  <ChevronRight size={14} strokeWidth={1.5} />
-                )
-              }
-              className="justify-start h-auto px-4 py-3 text-foreground-light"
-              onClick={onToggle}
-            >
-              {label}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="top">
-            {expanded
-              ? 'Click to collapse'
-              : 'These events were omitted for brevity. Click to expand.'}
-          </TooltipContent>
-        </Tooltip>
+      <div className={cn('mb-3 flex-1 py-4')}>
+        <div className="border-top border h-px w-full items-center">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant="text"
+                size="tiny"
+                block
+                iconLeft={
+                  expanded ? (
+                    <ChevronDown size={14} strokeWidth={1.5} />
+                  ) : (
+                    <ChevronRight size={14} strokeWidth={1.5} />
+                  )
+                }
+                className="hover:bg-inherit -top-4"
+                onClick={onToggle}
+              >
+                {label}
+              </Button>
+            </TooltipTrigger>
+            {!expanded && (
+              <TooltipContent>
+                <p>These events were omitted for brevity. Click to expand.</p>
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </div>
       </div>
     </div>
   )
