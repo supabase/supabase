@@ -179,11 +179,9 @@ export const ConnectionPooling = () => {
             title={HA_DISABLED_TITLE}
             description={
               <>
-                These settings are read-only because High Availability projects run one pooler per
-                Postgres pod. Each pooler can support up to{' '}
-                {HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toLocaleString()} active or passive client
-                connections. Multigres chooses the appropriate pooling behavior automatically, so
-                you do not need to select a pooling mode.{' '}
+                High Availability projects run one pooler per Postgres pod, each supporting up to{' '}
+                {HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toLocaleString()} active or passive
+                connections, with pooling behavior selected automatically.{' '}
                 <InlineLink href="https://multigres.com/blog/pooling-without-choosing-a-mode">
                   Learn more
                 </InlineLink>
@@ -193,32 +191,18 @@ export const ConnectionPooling = () => {
           />
         )}
 
-        {isSuccessAddons && (isHighAvailability || !disablePoolModeSelection) && !hasIpv4Addon && (
+        {isSuccessAddons && !isHighAvailability && !disablePoolModeSelection && !hasIpv4Addon && (
           <Admonition
             type="default"
             layout="responsive"
-            title={
-              isHighAvailability
-                ? 'IPv4 add-on unavailable on High Availability projects'
-                : 'Dedicated pooler uses IPv6 by default'
-            }
-            description={
-              isHighAvailability
-                ? 'The IPv4 add-on cannot be enabled for High Availability projects.'
-                : 'Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance.'
-            }
+            title="Dedicated pooler uses IPv6 by default"
+            description="Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance."
             actions={
-              isHighAvailability ? (
-                <Button variant="default" disabled>
+              <Button variant="default" asChild>
+                <Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
                   Enable IPv4 add-on
-                </Button>
-              ) : (
-                <Button variant="default" asChild>
-                  <Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
-                    Enable IPv4 add-on
-                  </Link>
-                </Button>
-              )
+                </Link>
+              </Button>
             }
           />
         )}
@@ -226,20 +210,19 @@ export const ConnectionPooling = () => {
         <Panel
           noMargin
           footer={
-            <FormActions
-              form={formId}
-              isSubmitting={isUpdatingPoolerConfig}
-              hasChanges={form.formState.isDirty}
-              handleReset={() => resetForm()}
-              disabled={isHighAvailability}
-              helper={
-                isHighAvailability
-                  ? HA_DISABLED_TITLE
-                  : !canUpdateConnectionPoolingConfiguration
+            isHighAvailability ? undefined : (
+              <FormActions
+                form={formId}
+                isSubmitting={isUpdatingPoolerConfig}
+                hasChanges={form.formState.isDirty}
+                handleReset={() => resetForm()}
+                helper={
+                  !canUpdateConnectionPoolingConfiguration
                     ? 'You need additional permissions to update connection pooling settings'
                     : undefined
-              }
-            />
+                }
+              />
+            )
           }
         >
           <Panel.Content>

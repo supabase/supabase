@@ -110,17 +110,17 @@ describe('ConnectionPooling', () => {
       screen.getAllByText(
         'Connection pooling settings are managed automatically on High Availability projects'
       )
-    ).toHaveLength(2)
+    ).toHaveLength(1)
     expect(screen.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
       'href',
       'https://multigres.com/blog/pooling-without-choosing-a-mode'
     )
 
-    expect(screen.getByRole('button', { name: 'Enable IPv4 add-on' })).toBeDisabled()
+    expect(screen.queryByText('Enable IPv4 add-on')).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText('Managed automatically')).toBeDisabled()
     expect(screen.getByDisplayValue('100000')).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument()
     expect(mockUpdatePoolerConfig).not.toHaveBeenCalled()
   })
 })
