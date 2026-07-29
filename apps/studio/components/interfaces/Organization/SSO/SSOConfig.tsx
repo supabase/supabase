@@ -226,7 +226,6 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     syncFormFromConfig()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [ssoConfig, organization?.slug])
 
   // Automatically add an empty domain field when SP-initiated is enabled
@@ -239,7 +238,6 @@ export const SSOConfig = () => {
 
   useEffect(() => {
     ensureDomainField()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [enableSpInitiated])
 
   return (
