@@ -158,7 +158,7 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
 
   if (!response.ok) {
     const errorText = await response.text()
-    console.error('[getIncidentStatus] Failed:', response.status, errorText)
+    console.error('[getScopedAccessTokenPermissions] Failed:', response.status, errorText)
 
     let retryAfter: number | undefined
     const retryAfterHeader = response.headers.get('Retry-After')
@@ -168,7 +168,7 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
     }
 
     throw new ResponseError(
-      `Failed to fetch incident status: ${response.statusText}`,
+      `Failed to fetch scoped access token permissions: ${response.statusText}`,
       response.status,
       undefined,
       retryAfter
