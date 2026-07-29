@@ -23,7 +23,7 @@ const flattenChildrenToText = (node: unknown): string => {
   return ''
 }
 
-/** Same resting/hover contract as Studio InlineLink (no brand/green link colour). */
+/** Same resting/hover contract as Studio InlineLink (no brand/green link color). */
 const mdxAnchorClassName =
   'underline transition underline-offset-2 decoration-inherit hover:decoration-foreground text-inherit hover:text-foreground'
 

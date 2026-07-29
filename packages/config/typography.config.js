@@ -130,7 +130,7 @@ module.exports = {
               paddingBottom: '2px',
               fontWeight: '400',
               opacity: 1,
-              // Match Studio InlineLink: inherit body colour, foreground on hover
+              // Match Studio InlineLink: inherit body color, foreground on hover
               color: 'inherit',
               textDecorationLine: 'underline',
               textDecorationColor: 'inherit',
