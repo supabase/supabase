@@ -86,6 +86,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                 <FormInputGroupInput
                   type="number"
                   {...field}
+                  id={field.name}
                   value={field.value}
                   disabled={disableInput || disableIopsInput || isError}
                   onChange={(e) => {

@@ -62,6 +62,7 @@ The skills in `.claude/skills/` are the source of truth for conventions — load
 - `telemetry-standards` — PostHog events, `packages/common/telemetry-constants.ts`
 - `dev-toolbar-review` — `packages/dev-tools`, `packages/common/posthog-client.ts`, `packages/common/feature-flags.tsx`
 - `safe-sql-execution` — any code that builds or executes SQL against user databases
+- `react-hook-form` — writing or modifying any form code, anywhere in the monorepo
 - `vitest` / `vercel-composition-patterns` — generic unit-testing and React composition references
 
 ## Studio
