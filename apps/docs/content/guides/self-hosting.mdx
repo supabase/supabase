@@ -13,9 +13,7 @@ Self-hosting runs Supabase on your own infrastructure instead of the managed pla
 
 ## More about self-hosting
 
-<Accordion type="default" chevronAlign="right" justified>
-
-<AccordionItem header="How self-hosted Supabase differs" id="differs">
+### How self-hosted Supabase differs
 
 Self-hosted Supabase is different from:
 
@@ -24,9 +22,7 @@ Self-hosted Supabase is different from:
 
 Self-hosted Supabase mimics a single project. Studio doesn't support multiple organizations or projects. Platform-only [features](/features) such as branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable** in self-hosted configuration. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
-</AccordionItem>
-
-<AccordionItem header="Your responsibilities when self-hosting" id="responsibilities">
+### Your responsibilities when self-hosting
 
 When you self-host, **you are responsible for**:
 
@@ -38,17 +34,11 @@ When you self-host, **you are responsible for**:
 - Backups and disaster recovery
 - Monitoring and uptime
 
-</AccordionItem>
-
-<AccordionItem header="Telemetry" id="telemetry">
+### Telemetry
 
 Self-hosted Supabase (run via Docker Compose) **does not phone home or collect any telemetry**.
 
 The **Supabase CLI** is a [separate tool](/docs/guides/local-development/cli/getting-started) and collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
-
-</AccordionItem>
-
-</Accordion>
 
 ## Support and community
 
