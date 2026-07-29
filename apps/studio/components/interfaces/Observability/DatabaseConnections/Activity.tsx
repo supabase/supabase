@@ -197,13 +197,19 @@ export const Activity = ({ live }: ActivityProps) => {
           isLoading={isPending}
           popoverClassName="w-60"
         />
-        <Button
+        <ButtonTooltip
           variant={viewFilter === 'blockers' ? 'default' : 'dashed'}
-          iconRight={<span>{rootBlockers.length}</span>}
+          iconRight={rootBlockers.length > 0 ? <span>{rootBlockers.length}</span> : null}
           onClick={() => setQueryStates({ view: viewFilter === 'blockers' ? '' : 'blockers' })}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'Shows queries currently blocking others',
+            },
+          }}
         >
           Root blockers
-        </Button>
+        </ButtonTooltip>
         {!hasNoFiltersApplied && (
           <ButtonTooltip
             variant="text"
