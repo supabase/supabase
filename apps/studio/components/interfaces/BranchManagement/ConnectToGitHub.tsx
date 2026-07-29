@@ -6,14 +6,20 @@ import { Button } from 'ui'
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { openInstallGitHubIntegrationWindow } from '@/lib/github'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const ConnectToGitHub = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const { showCreateBranchModal, setShowCreateBranchModal } = useAppStateSnapshot()
+
+  const isBranch = project?.parent_project_ref !== undefined
+  const projectRef =
+    project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery()
 
