@@ -69,10 +69,17 @@ const Pre = (props: any) => {
 /**
  * Give a wide table its own scroll container, the way `pre` gets one from `CodeBlock`.
  * Without it the overflow propagates up and scrolls the whole page. `tabIndex` keeps the
- * scroll region reachable without a pointer (WCAG 2.1.1).
+ * scroll region reachable without a pointer (WCAG 2.1.1), and the role names that stop.
+ * `group` rather than `region` so a page of tables doesn't fill the landmark menu, matching
+ * how `CodeBlock` labels its own scroll container.
  */
 const Table = (props: ComponentPropsWithoutRef<'table'>) => (
-  <div tabIndex={0} className="table-scroll w-full overflow-x-auto">
+  <div
+    tabIndex={0}
+    role="group"
+    aria-roledescription="scrollable table"
+    className="table-scroll w-full overflow-x-auto"
+  >
     <table {...props} />
   </div>
 )
