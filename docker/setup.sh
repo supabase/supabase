@@ -8,8 +8,9 @@
 #   3. Optionally installs the AWS CLI v2 (--with-aws)
 #   4. Sparse-clones the repo to extract the contents of ./docker
 #   5. Creates a project directory in CWD and copies docker/* into it
-#   6. Prompts for the main URLs and writes them to .env
-#   7. Generates secrets and asymmetric API keys via utils/*.sh
+#   6. Records the base version the deployment was set up from (.supabase-version)
+#   7. Prompts for the main URLs and writes them to .env
+#   8. Generates secrets and asymmetric API keys via utils/*.sh
 #
 # Usage:
 #   sh setup.sh                            # interactive
@@ -406,7 +407,7 @@ sh utils/add-new-auth-keys.sh --update-env
 write_version_stamp "$RESOLVED_REF"
 
 log "Pulling Docker images"
-docker compose pull || warn "docker compose pull failed; you can retry later."
+docker compose --progress quiet pull || warn "docker compose pull failed; you can retry later."
 
 echo ""
 echo "Setup complete. Project ready at: $(pwd)"
@@ -417,6 +418,6 @@ echo "  sh run.sh config"
 echo "  sh run.sh secrets"
 echo "  sh run.sh start"
 echo ""
-echo "To enable docker-compose overrides (pg17, envoy, caddy, nginx, rustfs, s3, logs):"
+echo "To enable docker-compose overrides (envoy, caddy, nginx, rustfs, s3, logs):"
 echo "  sh run.sh config add pg17"
 echo ""
