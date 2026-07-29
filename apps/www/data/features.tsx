@@ -771,7 +771,7 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 5. Row-level security integration: Respect database permissions when broadcasting changes.
 6. Column selection: Opt in to receive only the columns you choose in the event payload, with the primary key always included.
 
-## Benefits
+## Benefits:
 - Real-time updates: Receive instant notifications when data changes, enabling live-updating UIs.
 - Efficient data syncing: Keep client-side data in sync with the database without constant API calls.
 - Flexible subscriptions: Tailor your subscriptions to specific events, schemas, tables, or conditions.
