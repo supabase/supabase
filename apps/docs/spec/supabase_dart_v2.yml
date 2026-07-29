@@ -277,7 +277,7 @@ functions:
         name: Sign up with redirect URL
         isSpotlight: true
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```dart
           final AuthResponse res = await supabase.auth.signUp(
