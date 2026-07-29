@@ -134,8 +134,8 @@ mkdir supabase-project
 # Copy the configuration over to your project
 cp -rf supabase/docker/. supabase-project
 
-# Switch to your project directory
-cd supabase-project
+# Switch to the project directory with a new .env
+cd supabase-project && cp .env.example .env
 
 # Pull the latest images
 docker compose pull
@@ -167,8 +167,8 @@ mkdir supabase-project
 # Copy the configuration over to your project
 cp -rf supabase/docker/. supabase-project
 
-# Switch to your project directory
-cd supabase-project
+# Switch to the project directory with a new .env
+cd supabase-project && cp .env.example .env
 
 # Pull the latest images
 docker compose pull
