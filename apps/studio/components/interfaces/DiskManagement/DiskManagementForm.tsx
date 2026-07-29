@@ -16,6 +16,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { ComputeAndDiskUsageCharts } from './ComputeAndDiskUsageCharts'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import { DiskManagementMessage } from './DiskManagement.types'
 import {
@@ -61,7 +62,7 @@ import {
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
 
-export function DiskManagementForm() {
+export function DiskManagementForm({ chartsClassName }: { chartsClassName?: string } = {}) {
   const { ref: projectRef } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -390,6 +391,12 @@ export function DiskManagementForm() {
     <Form {...form}>
       <form id="disk-compute-form" onSubmit={form.handleSubmit(onSubmit)}>
         <PageContainer size="default" className="pb-16">
+          <PageSection>
+            <PageSectionContent>
+              <ComputeAndDiskUsageCharts className={chartsClassName} />
+            </PageSectionContent>
+          </PageSection>
+
           {(isProjectResizing ||
             isProjectRequestingDiskChanges ||
             (isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions)) && (
