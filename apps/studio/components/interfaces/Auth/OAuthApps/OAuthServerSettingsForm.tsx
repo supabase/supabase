@@ -16,7 +16,7 @@ import {
   Input,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -25,7 +25,7 @@ import * as z from 'zod'
 
 import { OAuthEndpointsTable } from './OAuthEndpointsTable'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
@@ -285,7 +285,7 @@ export const OAuthServerSettingsForm = () => {
 
                         return (
                           <Admonition
-                            type="tip"
+                            type="note"
                             title="Make sure this path is implemented in your application."
                             description={
                               <>

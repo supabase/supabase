@@ -5,7 +5,8 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { Button } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   InterstitialAccountRow,
@@ -139,7 +140,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
           {showAuthorizationState && emailMatches && linkedOrg && (
             <div className="flex flex-col gap-3">
               <Admonition
-                type="tip"
+                type="note"
                 description={
                   <>
                     <span className="font-medium text-foreground">{linkedOrg.name}</span> is already

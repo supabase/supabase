@@ -5,14 +5,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { TreeView } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuSeparator,
-} from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+} from 'ui-patterns/InnerSideMenu'
 
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
 import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
@@ -35,11 +35,12 @@ import { useContentDeleteMutation } from '@/data/content/content-delete-mutation
 import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { isNewFolder } from '@/state/sql-editor/sql-editor-lifecycle'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {
@@ -54,6 +55,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const { data: project } = useSelectedProjectQuery()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const { clearSnippetsFromHistory } = useDashboardHistory()
 
   const [sectionVisibility, setSectionVisibility] = useLocalStorage<SectionState>(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_SECTION_STATE(projectRef ?? ''),
@@ -324,6 +326,10 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   // ===============
 
   const postDeleteCleanup = (ids: string[]) => {
+    // Purge the deleted snippets from dashboard history first, so that navigating
+    // to the SQL editor doesn't redirect back to a deleted snippet
+    clearSnippetsFromHistory(ids)
+
     // [Refactor] To investigate - deleting a snippet while it's open, will have it in the side nav
     // for a bit, before it gets removed (assumingly invalidated)
     setShowDeleteModal(false)

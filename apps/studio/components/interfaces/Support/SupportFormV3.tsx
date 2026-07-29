@@ -5,6 +5,7 @@ import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
 import { Form, Separator } from 'ui'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   AffectedServicesSelector,
@@ -24,10 +25,11 @@ import { OrganizationSelector } from './OrganizationSelector'
 import { PlanExpectationInfoContent, ProjectAndPlanInfo } from './ProjectAndPlanInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
-import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
+import { SupportAccessToggle } from './SupportAccessToggle'
 import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
+  canAllowSupportAccess,
   formatMessage,
   formatStudioVersion,
   getOrgSubscriptionPlan,
@@ -98,7 +100,7 @@ export const SupportFormV3 = ({
   })
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       dispatch({
         type: 'SUCCESS',
         sentProjectRef: variables.projectRef,
@@ -115,6 +117,10 @@ export const SupportFormV3 = ({
           library: variables.library,
           allowSupportAccess: variables.allowSupportAccess,
           dashboardLogs: variables.dashboardLogs,
+          // Front conversation created by this submission + the thread_ref used to
+          // create it, so the AI support chat can append to the same conversation.
+          threadRef: variables.threadRef,
+          frontConversationId: data?.conversationId,
         },
       })
     },
@@ -166,10 +172,9 @@ export const SupportFormV3 = ({
       ...values,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess:
-        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-          ? values.allowSupportAccess
-          : false,
+      allowSupportAccess: canAllowSupportAccess(values.category, values.projectRef)
+        ? values.allowSupportAccess
+        : false,
       library:
         values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
           ? selectedLibrary.key
@@ -192,6 +197,11 @@ export const SupportFormV3 = ({
       browserInformation: detectBrowser(),
       dashboardLogs: dashboardLogUrl?.[0],
       dashboardStudioVersion: commit ? formatStudioVersion(commit) : undefined,
+      // Stable Front thread_ref so the AI support chat (if the user engages it) can
+      // be appended to the same Front conversation this submission creates. Use the
+      // uuid package rather than crypto.randomUUID(), which is undefined in insecure
+      // contexts (non-localhost HTTP) and would throw, silently aborting the submit.
+      threadRef: uuidv4(),
     }
 
     if (values.projectRef !== NO_PROJECT_MARKER) {
@@ -255,7 +265,7 @@ export const SupportFormV3 = ({
         </div>
 
         {(DASHBOARD_LOG_CATEGORIES.includes(category) ||
-          (!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category)) ||
+          canAllowSupportAccess(category, projectRef) ||
           showPlanExpectationInfo ||
           showDirectEmailInfo) && (
           <div className="flex flex-col gap-y-6">
@@ -265,7 +275,7 @@ export const SupportFormV3 = ({
               <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} align="right" />
             )}
 
-            {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+            {canAllowSupportAccess(category, projectRef) && (
               <SupportAccessToggle form={form} align="right" />
             )}
 

@@ -1,10 +1,11 @@
-import { Admonition } from 'ui-patterns'
 import {
   getAllProductAreas,
   getAllStacks,
   getChannelCounts,
   getUnansweredThreads,
 } from '~/data/contribute'
+import { Admonition } from 'ui-patterns/Admonition'
+
 import { UnansweredThreadsTable } from './UnansweredThreadsTable'
 
 export async function UnansweredThreads({

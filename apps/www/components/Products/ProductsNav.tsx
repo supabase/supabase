@@ -21,7 +21,7 @@ function ProductsNav({ activePage }: Props) {
               key={product.name}
               className={cn(
                 'flex items-center gap-1.5 px-2 first:-ml-2 py-4 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
-                'focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground focus-visible:outline-brand-600',
+                'focus-ring focus-visible:text-foreground',
                 product.name === activePage && 'border-foreground-light text-foreground'
               )}
               href={`/${isAuth ? 'auth' : product.name.toLowerCase().replace(' ', '-')}`}

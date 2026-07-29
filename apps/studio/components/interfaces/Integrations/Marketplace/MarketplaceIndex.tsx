@@ -1,15 +1,15 @@
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo, useRef } from 'react'
 import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  EmptyStatePresentational,
-  PageContainer,
   PageHeader,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageHeader'
 
 import {
   EXCLUDED_CATEGORY_SLUGS,
@@ -229,7 +229,7 @@ export const MarketplaceIndex = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <div className="flex shrink-0 items-center gap-2">
-            <DocsButton href={`${DOCS_URL}/guides/integrations/supabase-marketplace`} />
+            <DocsButton href={`${DOCS_URL}/guides/integrations`} />
           </div>
         </PageHeaderMeta>
       </PageHeader>

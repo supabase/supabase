@@ -24,6 +24,7 @@
 
 .root :global(.graphiql-horizontal-drag-bar) {
   @apply border-l border-default;
+  background-color: var(--graphiql-response-bg);
 }
 
 .root :global(.graphiql-horizontal-drag-bar:hover::after) {
@@ -63,15 +64,8 @@
 .root :global(.graphiql-response .monaco-editor),
 .root :global(.graphiql-response .monaco-editor .margin),
 .root :global(.graphiql-response .monaco-editor .monaco-editor-background) {
+  @apply pt-0;
   background-color: var(--graphiql-response-bg) !important;
-}
-
-/* Editor-to-response drag bar: blend it into the response side so it doesn't read as
- * a third color sandwiched between the two panes. The plugin-to-main drag bar is left
- * alone — it sits next to the editor surface and our default border there is fine. */
-.root :global(.graphiql-editors + .graphiql-horizontal-drag-bar) {
-  background-color: var(--graphiql-response-bg);
-  border-left: 0;
 }
 
 .root :global(.graphiql-button),
@@ -105,21 +99,20 @@
   --border-radius-8: 0;
   --border-radius-12: 0;
   --popover-box-shadow: none;
+  /* Theme-independent: the Supabase green, and a response surface whose own token
+   * (--background-surface-300) already resolves per theme — so only --color-base below
+   * needs to branch on light/dark. */
+  --color-primary: 153, 50%, 50%;
+  --graphiql-response-bg: var(--background-surface-300);
 }
 
 :global(body.graphiql-dark) .root {
   /* HSL form of #1f1f1f, matches the editor.background returned by getTheme('dark') */
   --color-base: 0, 0%, 12%;
-  --color-primary: 153, 50%, 50%;
-  --graphiql-response-bg: hsl(var(--background-surface-300));
 }
 
 :global(body.graphiql-light) .root {
-  /* HSL form of #fcfcfc, matches the dashboard bg-default and the editor.background
-   * we override to in GraphiQLTab.tsx so the editor reads as part of the surrounding UI. */
+  /* HSL form of #fcfcfc, matches the dashboard bg-default so the editor reads as part
+   * of the surrounding UI. */
   --color-base: 0, 0%, 98.8%;
-  --color-primary: 153, 50%, 50%;
-  /* Drop the response below the editor in light mode (inverse of dark) so it reads as
-   * the lower / "data" surface rather than the lifted one. */
-  --graphiql-response-bg: hsl(var(--background-surface-300));
 }

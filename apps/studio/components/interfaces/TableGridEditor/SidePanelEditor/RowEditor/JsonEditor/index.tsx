@@ -1,3 +1,4 @@
+import type { OnMount } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
 import { AlignLeft } from 'lucide-react'
@@ -16,6 +17,8 @@ import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { minifyJSON, prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface JsonEditProps {
   row?: { [key: string]: any }
@@ -59,17 +62,35 @@ export const JsonEditor = ({
   const isTruncated = isValueTruncated(jsonString, columnFormat)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
-  const validateJSON = async (resolve: () => void) => {
-    try {
-      const newJsonStr = removeJSONTrailingComma(jsonStr)
-      const minifiedJSON = minifyJSON(newJsonStr)
-      if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
-    } catch (error: any) {
-      resolve()
-      toast.error('JSON seems to have an invalid structure.')
-    }
-  }
+  const validateJSON = useCallback(
+    async (nextValue: string, resolve: () => void) => {
+      try {
+        const newJsonStr = removeJSONTrailingComma(nextValue)
+        const minifiedJSON = minifyJSON(newJsonStr)
+        if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
+      } catch (error: any) {
+        resolve()
+        toast.error('JSON seems to have an invalid structure.')
+      }
+    },
+    [onSaveJSON]
+  )
+
+  const handleEditorMount: OnMount = useCallback(
+    (editor, monaco) => {
+      if (readOnly) return
+
+      editor.addAction({
+        id: 'save-value',
+        label: 'Save value',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+        run: () => validateJSON(editor.getValue(), () => undefined),
+      })
+    },
+    [readOnly, validateJSON]
+  )
 
   const prettify = () => {
     const res = prettifyJSON(jsonStr)
@@ -99,6 +120,7 @@ export const JsonEditor = ({
         pkMatch,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       },
       {
         onSuccess: (data: unknown | undefined) => {
@@ -166,7 +188,7 @@ export const JsonEditor = ({
           closePanel={onClose}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
-          applyFunction={readOnly ? undefined : validateJSON}
+          applyFunction={readOnly ? undefined : (resolve) => validateJSON(jsonStr, resolve)}
         />
       }
     >
@@ -179,6 +201,7 @@ export const JsonEditor = ({
               language="json"
               value={(jsonStr ?? '').toString()}
               onInputChange={(val) => setJsonStr(val ?? '')}
+              onMount={handleEditorMount}
             />
           </div>
         ) : (

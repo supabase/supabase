@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { FilterBar, isGroup, type FilterCondition, type FilterGroup } from 'ui-patterns'
+import { FilterBar, isGroup, type FilterCondition, type FilterGroup } from 'ui-patterns/FilterBar'
 
 const logs = [
   ['10:42:01.129', 'POST /hello-world', '200', '132ms', 'iad1'],

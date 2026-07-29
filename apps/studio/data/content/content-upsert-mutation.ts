@@ -2,9 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { Content } from './content-query'
-import { unmapSqlContentField } from './content-remap'
+import { remapWireSnippet, unmapSqlContentField } from './content-remap'
 import { contentKeys } from './keys'
-import type { Snippet, SnippetWithContent } from './sql-folders-query'
+import type { SnippetWithContent } from './sql-folders-query'
 import type { components } from '@/data/api'
 import { handleError, put } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -31,11 +31,9 @@ export async function upsertContent(
     signal,
   })
   if (error) handleError(error)
+  if (!data) return null
 
-  const snippet = data as Snippet | null
-  // The upsert response is a snippet freshly persisted to the database, so it
-  // carries status 'saved' as it crosses into the app — same as the queries.
-  return snippet === null ? null : { ...snippet, status: 'saved' }
+  return remapWireSnippet(data, 'saved')
 }
 
 export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>

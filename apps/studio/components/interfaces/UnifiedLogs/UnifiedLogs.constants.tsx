@@ -17,6 +17,7 @@ import {
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
 export const LOG_TYPES_LABELS = {
+  edge: 'API Gateway',
   postgres: 'Postgres',
   postgrest: 'PostgREST',
   auth: 'Auth',
@@ -25,11 +26,29 @@ export const LOG_TYPES_LABELS = {
   realtime: 'Realtime',
   supavisor: 'Supavisor',
   pgbouncer: 'PgBouncer',
+  multigres: 'Multigres',
 }
 
 type LogType = keyof typeof LOG_TYPES_LABELS
 export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
-export const DEFAULT_LOG_TYPES = ['postgres', 'postgrest'] as const
+export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
+
+// ClickHouse `source` value for each unified log type. Single source of truth
+// consumed by both the unified logs list query (LOG_TYPE_CONDITION in
+// UnifiedLogs.queries.ts) and the single-log inspection point lookup
+// (unified-log-inspection-query.ts).
+export const LOG_TYPE_TO_SOURCE: Record<LogType, string> = {
+  edge: 'edge_logs',
+  postgrest: 'postgrest_logs',
+  storage: 'storage_logs',
+  postgres: 'postgres_logs',
+  'edge function': 'function_edge_logs',
+  auth: 'auth_logs',
+  realtime: 'realtime_logs',
+  supavisor: 'supavisor_logs',
+  pgbouncer: 'pgbouncer_logs',
+  multigres: 'multigres_logs',
+}
 
 const parseAsSort = createParser({
   parse(queryValue: string) {
@@ -72,6 +91,13 @@ export const SEARCH_PARAMS_PARSER = {
 
   // View options
   show_connection_logs: parseAsBoolean.withDefault(true),
+  edge_auth: parseAsBoolean.withDefault(true),
+  edge_storage: parseAsBoolean.withDefault(true),
+  edge_postgrest: parseAsBoolean.withDefault(true),
+
+  // Support searching for user against user ID
+  // See userAttributionCondition in UnifiedLogs.queries.ts.
+  user: parseAsString,
 }
 
 const POSTGRES_STATUS_CODE_LABELS = {

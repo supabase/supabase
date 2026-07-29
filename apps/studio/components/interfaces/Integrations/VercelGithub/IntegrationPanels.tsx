@@ -18,7 +18,7 @@ import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
 
-export interface IntegrationInstallationProps extends RefAttributes<HTMLLIElement> {
+interface IntegrationInstallationProps extends RefAttributes<HTMLLIElement> {
   title: string
   integration: Integration
   disabled?: boolean
@@ -72,16 +72,16 @@ const Avatar = ({ src }: { src: string | undefined }) => {
   )
 }
 
+const IntegrationIconBlock = ({ integration }: { integration: Integration }) => {
+  return (
+    <div className="bg-black text-white w-8 h-8 rounded-sm flex items-center justify-center">
+      <HandleIcon type={integration.integration.name} />
+    </div>
+  )
+}
+
 export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
   ({ integration, disabled, ...props }, ref) => {
-    const IntegrationIconBlock = () => {
-      return (
-        <div className="bg-black text-white w-8 h-8 rounded-sm flex items-center justify-center">
-          <HandleIcon type={integration.integration.name} />
-        </div>
-      )
-    }
-
     return (
       <li
         ref={ref}
@@ -92,7 +92,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
         <div className="flex gap-6 items-center">
           <div className="flex gap-3 items-center">
             <div className="flex -space-x-1">
-              <IntegrationIconBlock />
+              <IntegrationIconBlock integration={integration} />
               <Avatar src={integration?.metadata?.account.avatar} />
             </div>
           </div>
@@ -299,7 +299,7 @@ export const EmptyIntegrationConnection = forwardRef<
         {...props}
         className={cn(
           showNode && 'ml-6 pl-8 mt-4 border-l',
-          'relative pb-2',
+          'relative',
           'last:border-l-transparent',
           className
         )}
@@ -361,7 +361,7 @@ export const IntegrationConnectionHeader = forwardRef<HTMLDivElement, Integratio
         )}
       >
         {props.title && <h5 className="text-foreground">{props.title}</h5>}
-        <Markdown content={markdown} />
+        <Markdown content={markdown} className="[&>p]:my-0" />
       </div>
     )
   }

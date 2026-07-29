@@ -16,6 +16,7 @@ export const CONTENT_DIRECTORY = join(DOCS_DIRECTORY, 'content')
 export const EXAMPLES_DIRECTORY = join(DOCS_DIRECTORY, 'examples')
 export const GUIDES_DIRECTORY = join(CONTENT_DIRECTORY, 'guides')
 export const PARTIALS_DIRECTORY = join(CONTENT_DIRECTORY, '_partials')
+export const GENERATED_DIRECTORY = join(DOCS_DIRECTORY, 'features/docs/generated')
 export const REF_DOCS_DIRECTORY = join(DOCS_DIRECTORY, 'docs/ref')
 export const SPEC_DIRECTORY = join(DOCS_DIRECTORY, 'spec')
 
@@ -28,6 +29,12 @@ export type GuideFrontmatter = {
   /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
+  /**
+   * Overrides the "Edit this page on GitHub" link. Used for federated
+   * content, whose source of truth lives in an external repo rather than
+   * this generated file.
+   */
+  editLink?: string
 }
 
 /**
@@ -63,6 +70,9 @@ export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
   }
   if ('tocVideo' in obj && typeof obj.tocVideo !== 'string') {
     throw Error(`Invalid guide frontmatter: tocVideo must be a string. Received ${obj.tocVideo}`)
+  }
+  if ('editLink' in obj && typeof obj.editLink !== 'string') {
+    throw Error(`Invalid guide frontmatter: editLink must be a string. Received: ${obj.editLink}`)
   }
   return true
 }

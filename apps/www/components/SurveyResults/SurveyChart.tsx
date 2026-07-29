@@ -314,7 +314,7 @@ export function SurveyChart({
       ref={chartRef}
       className="w-full bg-200 border-t border-muted"
       style={{
-        background: `radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+        background: `radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, var(--background-surface-200), transparent 75%)`,
       }}
     >
       <header className="px-8 py-8">

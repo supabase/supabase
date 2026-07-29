@@ -1,8 +1,8 @@
 import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -190,6 +190,17 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError, snap.enforceExactCount, error?.code])
 
+  // Reset back to the first page whenever the filters change
+  const hasMountedRef = useRef(false)
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
+    snap.setPage(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters])
+
   // [Joshen] One to revisit if we can consolidate this and the main return statement
   if (isForeignTableSelected) {
     return (
@@ -284,11 +295,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       </div>
 
       {isLoading ? (
-        <Button
-          variant="text"
-          className="w-7"
-          icon={<Loader2 size={12} className="animate-spin" />}
-        />
+        <Button variant="text" className="w-7" loading aria-label="Get exact row count" />
       ) : isError ? (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -298,6 +305,8 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
               className="w-7"
               loading={isFetching}
               icon={<AlertCircle />}
+              aria-label="Get exact row count"
+              disabled
             />
           </TooltipTrigger>
           <TooltipContent side="top">Failed to retrieve count: {error?.message}</TooltipContent>
@@ -320,6 +329,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
                   className="w-7"
                   loading={isFetching}
                   icon={<HelpCircle />}
+                  aria-label="Get exact row count"
                   onClick={() => {
                     // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
                     if (rowsCountEstimate === null || count === -1 || count > THRESHOLD_COUNT) {

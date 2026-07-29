@@ -23,8 +23,7 @@ import {
   Switch,
   useWatch,
 } from 'ui'
-import { GenericSkeletonLoader, PageSection, PageSectionContent } from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -33,6 +32,8 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import { ExposedSchemaSelector, internalSchemasCannotExpose } from './ExposedSchemaSelector'
@@ -48,7 +49,7 @@ import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
 import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { noop } from '@/lib/void'
@@ -309,7 +310,7 @@ export const PostgrestConfig = () => {
                     >
                       <ExposedSchemaSelector
                         selectedSchemas={watchedDbSchema}
-                        disabled={!canUpdatePostgrestConfig}
+                        readOnly={!canUpdatePostgrestConfig}
                         onToggleSchema={(schema) => {
                           const current = form.getValues('dbSchema')
                           if (current.includes(schema)) {

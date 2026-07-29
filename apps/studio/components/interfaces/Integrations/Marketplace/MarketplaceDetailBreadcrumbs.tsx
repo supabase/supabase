@@ -9,8 +9,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 interface MarketplaceDetailBreadrumbsProps {
   isLoading?: boolean

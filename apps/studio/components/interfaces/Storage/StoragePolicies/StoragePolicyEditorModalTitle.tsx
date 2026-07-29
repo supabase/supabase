@@ -3,7 +3,7 @@ import { ChevronLeft, X } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cn } from 'ui'
 
-import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Auth/Policies/Policies.constants'
+import { POLICY_MODAL_VIEWS } from './PolicyEditorModal/PolicyEditorModal.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -29,9 +29,10 @@ export const StoragePolicyEditorModalTitle = ({
       <div>
         <div className="flex items-center space-x-3">
           <button
+            tabIndex={0}
             onClick={onSelectBackFromTemplates}
             className={cn(
-              'cursor-pointer rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+              'cursor-pointer rounded-xs opacity-20 hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
               'hit-area-6'
             )}
           >
@@ -50,7 +51,7 @@ export const StoragePolicyEditorModalTitle = ({
       <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
       <DialogPrimitive.Close
         className={cn(
-          'absolute p-0.5 right-3.5 top-4.5 rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+          'absolute p-0.5 right-3.5 top-4.5 rounded-xs opacity-20 hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
           'hit-area-6'
         )}
       >

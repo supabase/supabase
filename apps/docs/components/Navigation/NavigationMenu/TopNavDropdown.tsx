@@ -17,8 +17,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Theme,
-  themes,
+  singleThemes,
 } from 'ui'
 
 import MenuIconPicker from './MenuIconPicker'
@@ -68,6 +67,7 @@ const TopNavDropdown = () => {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild className="flex">
         <button
+          tabIndex={0}
           title="Menu dropdown button"
           className={cn(
             buttonVariants({ variant: 'default' }),
@@ -106,9 +106,9 @@ const TopNavDropdown = () => {
               setTheme(value)
             }}
           >
-            {themes
+            {singleThemes
               .filter((x) => x.value === 'light' || x.value === 'dark' || x.value === 'system')
-              .map((theme: Theme) => (
+              .map((theme) => (
                 <DropdownMenuRadioItem key={`topnav-theme-${theme.value}`} value={theme.value}>
                   {theme.name}
                 </DropdownMenuRadioItem>

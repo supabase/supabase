@@ -6,11 +6,11 @@ description: 'Deploy Prometheus and Grafana yourself to monitor Supabase metrics
 
 Self-hosting [Prometheus](https://prometheus.io/docs/prometheus/latest/installation/) and Grafana gives you full control over retention, alert routing, and dashboards. The Supabase Metrics API slots into any standard Prometheus scrape job, so you can run everything locally, on a VM, or inside Kubernetes.
 
-<$Partial path="metrics_access.mdx" />
+<Admonition type="caution">
 
-<Admonition type="note">
+Use this guide only if you need full manual control (custom scrape topology, self-hosted Prometheus or non-standard auth).
 
-Grafana also documents a [Supabase integration reference](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-supabase/). While it targets Grafana Cloud, the scrape and agent settings apply equally to self-hosted clusters and offer a community-maintained companion to this guide.
+Otherwise, use the [Grafana Cloud integration](/docs/guides/telemetry/metrics/grafana-cloud#installation) available in the Supabase Dashboard.
 
 </Admonition>
 
@@ -18,7 +18,7 @@ Grafana also documents a [Supabase integration reference](https://grafana.com/do
 
 1. **Prometheus** scrapes `https://<project-ref>.supabase.co/customer/v1/privileged/metrics` every minute using HTTP Basic Auth.
 2. **Grafana** reads from Prometheus and renders dashboards/alerts.
-3. (Optional) **Alertmanager** or your preferred system sends notifications when Prometheus rules fire.
+3. **Prometheus Alertmanager** or your preferred system sends notifications when Prometheus rules fire (optional) .
 
 ## 1. Deploy Prometheus
 
@@ -40,7 +40,7 @@ scrape_configs:
           project: '<project-ref>'
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 - Keep the scrape interval at 60 seconds to match Supabase’s refresh cadence.
 - If you run Prometheus behind a proxy, make sure it can establish outbound HTTPS connections to `*.supabase.co`.
@@ -63,10 +63,11 @@ Install Grafana (Docker image, Helm chart, or packages) and connect it to Promet
 
 You now have over 200 production-ready panels covering CPU, IO, WAL, replication, index bloat, and query throughput.
 
-<img
+<Image
   src="/docs/img/guides/platform/supabase-grafana-prometheus.png"
   alt="Supabase Grafana dashboard showcasing database metrics"
-  className="mt-6 rounded-lg border border-foreground/10 shadow-xs"
+  width="3000"
+  height="1509"
 />
 
 ## 4. Configure alerting

@@ -1,21 +1,39 @@
 import { ChevronDown, RotateCcw, X } from 'lucide-react'
-import { Path, PathValue } from 'react-hook-form'
-import { Button, Checkbox, Popover, PopoverContent, PopoverTrigger, WarningIcon } from 'ui'
+import { useFieldArray, useFormState } from 'react-hook-form'
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormField,
+  FormMessage,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  WarningIcon,
+} from 'ui'
 
+import { TokenFormValues } from '../../../AccessToken.schemas'
 import { PermissionResourceSelector } from './PermissionResourceSelector'
-import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
+import { PermissionsProps } from './Permissions.types'
 import { sortActions } from './Permissions.utils'
 import { ACCESS_TOKEN_RESOURCES } from '@/components/interfaces/Account/AccessTokens/AccessToken.constants'
 import { formatAccessText } from '@/components/interfaces/Account/AccessTokens/AccessToken.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
-export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
-  setValue,
-  watch,
+export const Permissions = ({
+  control,
   resourceSearchOpen,
   setResourceSearchOpen,
-}: PermissionsProps<TFormValues>) => {
-  const permissionRows = (watch('permissionRows' as Path<TFormValues>) || []) as PermissionRow[]
+}: PermissionsProps) => {
+  const {
+    fields: permissionRows,
+    append,
+    remove,
+  } = useFieldArray<TokenFormValues>({
+    name: 'permissionRows',
+    control,
+  })
+  const { errors } = useFormState({ control, name: 'permissionRows' })
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
@@ -28,12 +46,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                 variant="default"
                 size="tiny"
                 className="p-1"
-                onClick={() => {
-                  setValue(
-                    'permissionRows' as Path<TFormValues>,
-                    [] as PathValue<TFormValues, Path<TFormValues>>
-                  )
-                }}
+                onClick={() => remove()}
                 icon={<RotateCcw size={16} />}
                 tooltip={{
                   content: {
@@ -49,7 +62,13 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
               open={resourceSearchOpen}
               onOpenChange={setResourceSearchOpen}
               permissionRows={permissionRows}
-              setValue={setValue}
+              onResourceToggled={(resource) => {
+                const index = permissionRows.findIndex((p) => p.resource === resource.resource)
+                if (index > -1) {
+                  return remove(index)
+                }
+                append(resource)
+              }}
               align="end"
             />
           </div>
@@ -66,88 +85,101 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                 (r) => r.resource === row.resource
               )
               return (
-                <div key={row.resource ?? `resource-${index}`}>
-                  <div className="flex items-center gap-3 p-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium truncate max-w-[36ch] capitalize">
-                            {selectedResource?.title}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {selectedResource && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="default"
-                              size="tiny"
-                              className="w-[150px] flex text-sm justify-between h-7 "
-                              iconRight={
-                                <ChevronDown size={14} className="text-foreground-muted" />
-                              }
-                            >
-                              {row.actions.length === 0 ? (
-                                <span className="text-foreground-lighter">Select access</span>
-                              ) : row.actions.length === 1 ? (
-                                formatAccessText(row.actions[0])
-                              ) : (
-                                `${row.actions.length} selected`
-                              )}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[180px] p-2" align="end">
-                            <div className="space-y-2">
-                              {sortActions(selectedResource.actions).map((action) => (
-                                <label
-                                  key={action}
-                                  className="flex items-center gap-2 cursor-pointer"
-                                >
-                                  <Checkbox
-                                    checked={row.actions.includes(action)}
-                                    onCheckedChange={(checked) => {
-                                      const newActions = checked
-                                        ? [...row.actions, action]
-                                        : row.actions.filter((a) => a !== action)
-                                      const newRows: PermissionRow[] = permissionRows.map((r, i) =>
-                                        i === index
-                                          ? { resource: r.resource, actions: newActions }
-                                          : r
-                                      )
-                                      setValue(
-                                        'permissionRows' as Path<TFormValues>,
-                                        newRows as PathValue<TFormValues, Path<TFormValues>>,
-                                        { shouldValidate: true, shouldDirty: true }
-                                      )
-                                    }}
-                                  />
-                                  <span className="text-sm">{formatAccessText(action)}</span>
-                                </label>
-                              ))}
+                <FormField
+                  key={row.id}
+                  name={`permissionRows.${index}.actions`}
+                  render={({ field, fieldState }) => {
+                    const fieldValue = field.value || []
+
+                    return (
+                      <div>
+                        <div className="flex items-center gap-3 p-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium truncate max-w-[36ch] capitalize">
+                                  {selectedResource?.title}
+                                </span>
+                              </div>
                             </div>
-                          </PopoverContent>
-                        </Popover>
-                      )}
-                      <Button
-                        variant="text"
-                        size="tiny"
-                        className="p-1"
-                        onClick={() => {
-                          const newRows = permissionRows.filter((_, i) => i !== index)
-                          setValue(
-                            'permissionRows' as Path<TFormValues>,
-                            newRows as PathValue<TFormValues, Path<TFormValues>>,
-                            { shouldValidate: true, shouldDirty: true }
-                          )
-                        }}
-                        icon={<X size={16} />}
-                      />
-                    </div>
-                  </div>
-                  {index < permissionRows.length - 1 && <div className="border-t border-border" />}
-                </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {selectedResource && (
+                              <Popover>
+                                <FormControl>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      id={`permissionRows.${index}.actions`}
+                                      aria-describedby={
+                                        fieldState.invalid
+                                          ? `permissionRows.${index}.actions.error`
+                                          : undefined
+                                      }
+                                      variant="default"
+                                      size="tiny"
+                                      className="w-[150px] flex text-sm justify-between h-7 "
+                                      iconRight={
+                                        <ChevronDown size={14} className="text-foreground-muted" />
+                                      }
+                                      ref={field.ref}
+                                    >
+                                      {fieldValue.length === 0 ? (
+                                        <span className="text-foreground-lighter">
+                                          Select access
+                                        </span>
+                                      ) : fieldValue.length === 1 ? (
+                                        formatAccessText(fieldValue[0])
+                                      ) : (
+                                        `${fieldValue.length} selected`
+                                      )}
+                                    </Button>
+                                  </PopoverTrigger>
+                                </FormControl>
+                                <PopoverContent className="w-[180px] p-2" align="end">
+                                  <div className="space-y-2">
+                                    {sortActions(selectedResource.actions).map((action) => (
+                                      <label
+                                        key={action}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                      >
+                                        <Checkbox
+                                          checked={fieldValue.includes(action)}
+                                          onCheckedChange={(checked) => {
+                                            const newActions = checked
+                                              ? [...fieldValue, action]
+                                              : fieldValue.filter((a: string) => a !== action)
+                                            field.onChange(newActions)
+                                          }}
+                                        />
+                                        <span className="text-sm">{formatAccessText(action)}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            )}
+                            <Button
+                              variant="text"
+                              size="tiny"
+                              className="p-1"
+                              onClick={() => {
+                                remove(index)
+                              }}
+                              icon={<X size={16} />}
+                              aria-label="Remove"
+                            />
+                          </div>
+                        </div>
+                        <div className="p-3 pt-0">
+                          <FormMessage id={`permissionRows.${index}.actions.error`} />
+                        </div>
+                        {index < permissionRows.length - 1 && (
+                          <div className="border-t border-border" />
+                        )}
+                      </div>
+                    )
+                  }}
+                />
               )
             })}
           </div>
@@ -160,6 +192,11 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
           Once you've set these permissions, you cannot edit them.
         </span>
       </div>
+      {errors.permissionRows?.message || errors.permissionRows?.root?.message ? (
+        <p role="alert" className="mt-2 text-sm text-destructive">
+          {errors.permissionRows?.message || errors.permissionRows?.root?.message}
+        </p>
+      ) : null}
     </div>
   )
 }

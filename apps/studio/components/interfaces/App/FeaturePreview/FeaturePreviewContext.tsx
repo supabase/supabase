@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -43,6 +44,11 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
   const initializeFlags = useEffectEvent(() => {
     setFlags(
       featurePreviews.reduce((a, b) => {
+        // Platform-only previews can never be enabled outside the hosted platform
+        if (!IS_PLATFORM && b.isPlatformOnly) {
+          return { ...a, [b.key]: false }
+        }
+
         const defaultOptIn = b.isDefaultOptIn
         const localStorageValue = safeLocalStorage.getItem(b.key)
         return {
@@ -88,10 +94,11 @@ export const useUnifiedLogsPreview = () => {
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn = isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn =
+    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -101,8 +108,7 @@ export const useUnifiedLogsPreview = () => {
 
 export const useIsPgDeltaDiffEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
-  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
 export const useIsAdvisorRulesEnabled = () => {
@@ -122,9 +128,10 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsRLSTesterEnabled = () => {
+export const useIsSqlEditorManualSaveEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
+  return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
 export const useIsMarketplaceEnabled = () => {

@@ -23,15 +23,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+} from 'ui-patterns/PageSection'
 
 import type { JitUserRule, SheetMode } from './JitDbAccess.types'
 import {
@@ -42,8 +42,9 @@ import {
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
 import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -302,13 +303,17 @@ export const JitDbAccessConfiguration = () => {
       ? 'Postgres upgrade required'
       : unavailableReason === 'manual_migration_required'
         ? 'Migration required'
-        : 'Temporary access unavailable'
+        : unavailableReason === 'ssl_enforcement_required'
+          ? 'SSL enforcement required'
+          : 'Temporary access unavailable'
   const unavailableDescription =
     unavailableReason === 'postgres_upgrade_required'
       ? 'must be upgraded to Postgres 17 or later before temporary access can be enabled.'
       : unavailableReason === 'manual_migration_required'
         ? 'must be migrated before temporary access can be enabled. Contact support to migrate this project.'
-        : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
+        : unavailableReason === 'ssl_enforcement_required'
+          ? 'must have SSL enforcement enabled before temporary access can be enabled.'
+          : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
 
   useEffect(() => {
     if (!isLoadingConfiguration && jitDbAccessConfiguration) {
@@ -375,7 +380,13 @@ export const JitDbAccessConfiguration = () => {
               actions={
                 unavailableReason === 'postgres_upgrade_required' && ref ? (
                   <Button variant="default" asChild>
-                    <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres</Link>
+                    <Link href={getServiceVersionsPath(ref)}>Upgrade Postgres</Link>
+                  </Button>
+                ) : unavailableReason === 'ssl_enforcement_required' && ref ? (
+                  <Button variant="default" asChild>
+                    <Link href={`/project/${ref}/settings/database#ssl-configuration`}>
+                      Enable SSL enforcement
+                    </Link>
                   </Button>
                 ) : (
                   <Button variant="default" asChild>

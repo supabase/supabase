@@ -23,9 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
@@ -321,7 +321,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 paginatedDeliveries.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="cursor-pointer inset-focus"
+                    className="cursor-pointer focus-inset"
                     onClick={() => onOpenDelivery(row.original.id)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter' || event.key === ' ') {

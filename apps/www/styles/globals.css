@@ -12,6 +12,13 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/marketing/src/**/*.{tsx,ts,js}';
 
+@theme inline {
+  --font-sans:
+    var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope, var(--font-sans));
+  --font-mono: var(--font-source-code-pro), 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
 @utility section-container {
   @apply w-full mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
 }
@@ -37,6 +44,20 @@
 
   --delay-1200: 1200ms;
   --delay-1500: 1500ms;
+
+  /* font sizing and weights optimized for Inter */
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.875rem;
+  --text-6xl: 3.625rem;
+  --text-7xl: 4.375rem;
+  --text-8xl: 5.875rem;
+  --text-9xl: 7.875rem;
+  --font-weight-normal: 450;
 }
 
 @keyframes flash-code {
@@ -113,7 +134,25 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: hsl(var(--border-default, currentColor));
+    border-color: var(--border-default, currentColor);
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .h2,
+  .h3,
+  .h4,
+  .h5,
+  .h6 {
+    @apply font-heading font-semibold;
+  }
+
+  h1,
+  .h1 {
+    @apply font-heading font-medium tracking-normal;
   }
 }
 
@@ -132,28 +171,9 @@
   }
 }
 
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
 html {
   scroll-behavior: smooth !important;
+  font-weight: 450;
 }
 
 body {
@@ -265,11 +285,6 @@ h6:not(.overwrite) {
   @apply text-foreground-lighter text-xs;
 }
 
-.sbui-border-fix select {
-  @apply border-solid;
-  border-width: 1px;
-}
-
 .section--masked {
   /* overflow: hidden; */
 }
@@ -300,7 +315,7 @@ h6:not(.overwrite) {
 .stroke-text {
   -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
   -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: hsl(var(--background-selection));
+  -webkit-text-stroke-color: var(--background-selection);
 }
 
 .stroke-text.fill {
@@ -313,20 +328,6 @@ h6:not(.overwrite) {
   @apply border border-strong;
 }
 
-.sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply bg-border-stronger text-white;
-  text-shadow: none;
-  font-weight: 400;
-}
-.sbui-tabs--alt div[role='tablist'] .sbui-btn-text {
-  @apply text-border-muted;
-  font-weight: 400;
-  shadow: none;
-}
-
-.sbui-tabs--underline-alt div[role='tablist'] .sbui-tab-button-underline--active {
-  @apply border-foreground-muted;
-}
 /* override position of tabs  */
 .dashboard-tabs > div > div {
   justify-content: center;
@@ -351,14 +352,6 @@ table {
   border-collapse: collapse;
 }
 
-.sbui-typography-container thead {
-  @apply text-border;
-}
-
-.sbui-typography a {
-  @apply wrap-break-word;
-}
-
 /*
  * sets the image in @Next/Image components to respect the height of the content
  */
@@ -371,28 +364,7 @@ table {
 }
 .next-image--dynamic-fill.wide,
 video.wide {
-  @apply sm:my-0 sm:max-w-none sm:-mx-8 sm:w-[calc(100%+4rem)];
-}
-@media (min-width: 560px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 6rem) !important;
-    margin: 0 -3rem;
-  }
-}
-@media (min-width: 1280px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 10rem) !important;
-    margin: 0 -5rem;
-  }
-}
-@media (min-width: 1535px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 14rem) !important;
-    margin: 0 -7rem;
-  }
+  @apply sm:max-w-none -mx-2 w-[calc(100%+1rem)] md:-mx-4 md:w-[calc(100%+2rem)] lg:-mx-8 lg:w-[calc(100%+4rem)];
 }
 
 .next-image--dynamic-fill > span {
@@ -632,8 +604,8 @@ launch week
     rgba(57, 97, 125, 0.32) 0%,
     rgba(57, 97, 125, 0.32) 5%,
     rgba(0, 222, 209, 0.75) 8%,
-    hsl(var(--background-default)) 65%,
-    hsl(var(--background-default)) 100%
+    var(--background-default) 65%,
+    var(--background-default) 100%
   );
 }
 
@@ -655,7 +627,7 @@ launch week
   background: radial-gradient(
     circle at 50% -60%,
     rgba(255, 255, 255, 0) 0%,
-    hsl(var(--background-default)) 65%
+    var(--background-default) 65%
   );
 }
 
@@ -664,7 +636,7 @@ launch week
     background: radial-gradient(
       circle at 50% -40%,
       rgba(255, 255, 255, 0) 0%,
-      hsl(var(--background-default)) 65%
+      var(--background-default) 65%
     );
   }
 }
@@ -684,7 +656,7 @@ launch week
 /* The inside of the circle */
 .flair-mask-b {
   position: absolute;
-  background-color: hsl(var(--background-default));
+  background-color: var(--background-default);
   top: 0px;
   width: 182%;
   left: -41%;
@@ -766,8 +738,8 @@ launch week
   .gradient-text-500 {
     background-image: -webkit-linear-gradient(
       45deg,
-      hsl(var(--foreground-lighter)) 0%,
-      hsl(var(--foreground-default)) 100%
+      var(--foreground-lighter) 0%,
+      var(--foreground-default) 100%
     );
   }
 

@@ -25,7 +25,6 @@ import {
   PopoverTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageHeader,
@@ -37,6 +36,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
@@ -44,7 +44,7 @@ import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeF
 import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import CopyButton from '@/components/ui/CopyButton'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
@@ -313,7 +313,7 @@ const EdgeFunctionDetailsLayout = ({
                   onOpenChange={setIsTimestampHoverCardOpen}
                 >
                   <HoverCardTrigger asChild>
-                    <button type="button" className="flex items-center gap-2 group">
+                    <button type="button" tabIndex={0} className="flex items-center gap-2 group">
                       <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
                       <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
                         {updatedRelative ?? 'Deploy status unavailable'}

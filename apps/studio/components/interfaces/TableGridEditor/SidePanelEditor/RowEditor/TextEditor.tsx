@@ -1,3 +1,4 @@
+import type { OnMount } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
 import { useCallback, useEffect, useState } from 'react'
@@ -14,6 +15,8 @@ import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 interface TextEditorProps {
   visible: boolean
@@ -48,6 +51,7 @@ export const TextEditor = ({
   const isTruncated = isValueTruncated(value)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const loadFullValue = () => {
     if (
@@ -72,14 +76,32 @@ export const TextEditor = ({
         pkMatch,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       },
       { onSuccess: (data) => setStrValue(data) }
     )
   }
 
-  const saveValue = (resolve: () => void) => {
-    if (onSaveField) onSaveField(strValue, resolve)
-  }
+  const saveValue = useCallback(
+    (nextValue: string, resolve: () => void) => {
+      if (onSaveField) onSaveField(nextValue, resolve)
+    },
+    [onSaveField]
+  )
+
+  const handleEditorMount: OnMount = useCallback(
+    (editor, monaco) => {
+      if (readOnly) return
+
+      editor.addAction({
+        id: 'save-value',
+        label: 'Save value',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+        run: () => saveValue(editor.getValue(), () => undefined),
+      })
+    },
+    [readOnly, saveValue]
+  )
 
   useEffect(() => {
     if (visible) {
@@ -121,7 +143,7 @@ export const TextEditor = ({
           closePanel={onClose}
           backButtonLabel="Cancel"
           applyButtonLabel="Save value"
-          applyFunction={readOnly ? undefined : saveValue}
+          applyFunction={readOnly ? undefined : (resolve) => saveValue(strValue, resolve)}
         />
       }
     >
@@ -134,6 +156,7 @@ export const TextEditor = ({
               language="markdown"
               value={strValue ?? ''}
               onInputChange={(val) => setStrValue(val ?? '')}
+              onMount={handleEditorMount}
             />
           </div>
         ) : (

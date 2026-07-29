@@ -70,7 +70,7 @@ export default function TableRowLinkActions() {
           {policies.map((policy) => (
             <TableRow
               key={policy.id}
-              className="relative cursor-pointer inset-focus"
+              className="relative cursor-pointer focus-inset"
               onClick={(event) => {
                 if (event.currentTarget !== event.target) return
                 handlePolicyNavigation(policy.id, event)

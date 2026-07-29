@@ -100,7 +100,7 @@ const nextConfig = {
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'no-sniff',
+            value: 'nosniff',
           },
           {
             key: 'Strict-Transport-Security',
