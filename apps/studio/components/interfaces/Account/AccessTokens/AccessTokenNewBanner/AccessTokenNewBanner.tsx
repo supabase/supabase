@@ -29,7 +29,7 @@ export const AccessTokenNewBanner = <T,>({
 
   return (
     <Admonition
-      type="tip"
+      type="note"
       title={title}
       className="mb-6 relative"
       actions={
