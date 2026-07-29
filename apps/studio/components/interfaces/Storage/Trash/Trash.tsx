@@ -25,17 +25,29 @@ import {
 } from '@/data/storage/protection/bucket-trash-query'
 import { type TrashObject } from '@/data/storage/protection/protection-mocks'
 
-export const Trash = () => {
+interface TrashProps {
+  /**
+   * When set, the bucket is fixed to this value (embedded in a bucket view) —
+   * the bucket selector is hidden and the `?bucket=` query param is ignored.
+   */
+  bucketId?: string
+}
+
+export const Trash = ({ bucketId }: TrashProps = {}) => {
   const { ref } = useParams()
+  const isBucketFixed = bucketId !== undefined
 
   const [bucketParam, setBucketParam] = useQueryState('bucket', parseAsString)
-  const { data: bucketsData } = usePaginatedBucketsQuery({ projectRef: ref })
+  const { data: bucketsData } = usePaginatedBucketsQuery(
+    { projectRef: ref },
+    { enabled: !isBucketFixed }
+  )
   const firstBucket = useMemo(() => {
     const buckets = bucketsData?.pages.flatMap((page) => page) ?? []
     return buckets.find((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')?.name
   }, [bucketsData])
 
-  const selectedBucket = bucketParam ?? firstBucket ?? undefined
+  const selectedBucket = bucketId ?? bucketParam ?? firstBucket ?? undefined
 
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [lastToggledId, setLastToggledId] = useState<string | null>(null)
@@ -94,18 +106,21 @@ export const Trash = () => {
           <PageSectionContent className="flex flex-col gap-y-4">
             <div className="flex items-center justify-between gap-x-3">
               <div className="flex items-center gap-x-3">
-                <StorageBucketSelector
-                  projectRef={ref}
-                  value={selectedBucket}
-                  onChange={(bucket) => {
-                    setBucketParam(bucket)
-                    setSelectedIds([])
-                  }}
-                />
+                {!isBucketFixed && (
+                  <StorageBucketSelector
+                    projectRef={ref}
+                    value={selectedBucket}
+                    onChange={(bucket) => {
+                      setBucketParam(bucket)
+                      setSelectedIds([])
+                    }}
+                  />
+                )}
                 {selectedBucket && (
                   <p className="text-sm text-foreground-lighter">
-                    Soft-deleted objects in {selectedBucket}, restorable until their retention
-                    policy expires them
+                    {isBucketFixed
+                      ? 'Soft-deleted objects in this bucket, restorable until their retention policy expires them'
+                      : `Soft-deleted objects in ${selectedBucket}, restorable until their retention policy expires them`}
                   </p>
                 )}
               </div>

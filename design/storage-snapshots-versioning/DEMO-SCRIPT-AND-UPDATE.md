@@ -34,9 +34,12 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 - Same "held by snapshot" state appears here too — one consistent mental model across both surfaces.
 
 ### Beat 4 — Snapshots (2 min)
-**Storage → Files → Snapshots tab**
-- Take a snapshot; show **Backup sync** (green) vs **Manual** trigger badges.
+**Two placements to compare — both are live in the prototype:**
+- **Top-level, cross-bucket**: Storage → Files → Snapshots tab. Bucket selector at the top. Good for "Snapshot mental mode" across many buckets.
+- **In-bucket**: any bucket detail page → Snapshots sub-tab (`?view=snapshots`). No selector, the bucket is already the context — matches how someone actually says the task ("I want to restore *this* bucket to last week"). Same for **Deleted files** (`?view=trash`).
+- Take a snapshot from either surface; show **Backup sync** (green) vs **Manual** trigger badges.
 - Open Restore: the add / revert / remove diff shown **before** confirming — this is what makes a whole-bucket restore trustworthy instead of a leap of faith.
+- Talking point: the two views run the same underlying component with a `bucketId` prop, so we can compare feel without maintaining two implementations.
 
 ### Beat 5 — The platform reframe (3 min) — the part to slow down on
 **Database → Backups → Scheduled**
@@ -98,7 +101,9 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 > Restoring is non-destructive: it promotes an older version to become the new current version, and the previous current version just becomes another entry in the list. Deleting a version respects the same lock as before — a version held by a bucket snapshot can't be permanently deleted until that snapshot is removed. This is meant to be the direct, in-context answer to the question that matters most for trust here: "when do I actually stop paying for this?"
 >
 > **5. Bucket snapshots, with a restore diff instead of a leap of faith**
-> A new Snapshots view per bucket — living as a tab under Files rather than a new item in the left nav, since it's a recovery lens on file buckets, not a new bucket type alongside Analytics/Vectors. Each snapshot shows whether it was taken automatically (right before a scheduled backup — now badged as "Backup sync" in green, rather than an unstyled "Pre-backup" label) or manually. Restoring one shows the exact diff before you confirm — objects added back, objects reverted, objects that will be removed — so restoring an entire bucket doesn't require blind trust.
+> A new Snapshots view — living as a tab under Files rather than a new item in the left nav, since it's a recovery lens on file buckets, not a new bucket type alongside Analytics/Vectors. Each snapshot shows whether it was taken automatically (right before a scheduled backup — now badged as "Backup sync" in green, rather than an unstyled "Pre-backup" label) or manually. Restoring one shows the exact diff before you confirm — objects added back, objects reverted, objects that will be removed — so restoring an entire bucket doesn't require blind trust.
+>
+> Reviewer feedback on placement — *"I'd expect this inside the bucket, that's where users go when they say 'I want to restore *this* bucket to last week'"* — turned out to be one of those "we need to feel both" questions, so the prototype has both surfaces live in parallel: a top-level cross-bucket **Snapshots** tab (with a bucket selector, for "Snapshot mental mode") and a per-bucket view (`?view=snapshots` on the bucket page, no selector, locked to context). Same story for **Deleted files**. Both are literally the same underlying component with an optional `bucketId` prop, so there's no drift risk while we compare. Open question below on which one to keep.
 >
 > **6. Storage cost has to stay legible, or this becomes a support-ticket generator**
 > The existing Storage Size usage chart now splits into live objects / object versions / snapshots, folded into the section that's already there rather than bolted on as a new card, so it's consistent with how every other usage metric on that page is presented. A per-bucket table shows exactly which bucket's retention is driving the number. This was arguably the single highest-risk item in the original PRFAQ's own internal review: if a customer can't answer "when is my object truly gone, and when do I stop paying for it?" without reading docs, the feature generates billing-surprise tickets instead of trust.
@@ -116,7 +121,7 @@ Setup: `pnpm dev:studio`, prototype flag on (`STORAGE_PROTECTION_ENABLED`), a pr
 >
 > **Open questions I'd love feedback on:**
 > - Does branch-first restore hold up against how storage-level branching actually gets sequenced, or is it getting ahead of the infrastructure?
-> - Per-bucket "Deleted files," or one project-wide view?
+> - Snapshots and Deleted files — top-level cross-bucket surface, per-bucket in-context surface, or (as shipped now) both? Which one to cut, or keep both as complementary?
 > - Do the coverage chips (Database / Auth / Storage / Config) communicate the right amount on one row, or is it trying to say too much at a glance?
 > - Now that a backup's coverage spans more than the database, does "Backups" still belong under Database, or does it eventually move — into a project-wide "Recovery" area, or even next to Branches once storage branching lands?
 > - With bucket-level versioning overrides no longer exposed anywhere in the UI, is that a real gap for anyone, or was it genuinely unused complexity?

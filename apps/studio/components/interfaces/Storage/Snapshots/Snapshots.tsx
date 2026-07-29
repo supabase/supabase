@@ -19,17 +19,29 @@ import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
 import { useBucketSnapshotsQuery } from '@/data/storage/protection/bucket-snapshots-query'
 import { type BucketSnapshot } from '@/data/storage/protection/protection-mocks'
 
-export const Snapshots = () => {
+interface SnapshotsProps {
+  /**
+   * When set, the bucket is fixed to this value (embedded in a bucket view) —
+   * the bucket selector is hidden and the `?bucket=` query param is ignored.
+   */
+  bucketId?: string
+}
+
+export const Snapshots = ({ bucketId }: SnapshotsProps = {}) => {
   const { ref } = useParams()
+  const isBucketFixed = bucketId !== undefined
 
   const [bucketParam, setBucketParam] = useQueryState('bucket', parseAsString)
-  const { data: bucketsData } = usePaginatedBucketsQuery({ projectRef: ref })
+  const { data: bucketsData } = usePaginatedBucketsQuery(
+    { projectRef: ref },
+    { enabled: !isBucketFixed }
+  )
   const firstBucket = useMemo(() => {
     const buckets = bucketsData?.pages.flatMap((page) => page) ?? []
     return buckets.find((bucket) => !('type' in bucket) || bucket.type === 'STANDARD')?.name
   }, [bucketsData])
 
-  const selectedBucket = bucketParam ?? firstBucket ?? undefined
+  const selectedBucket = bucketId ?? bucketParam ?? firstBucket ?? undefined
 
   const { data: policy } = useRestorePointPolicyQuery({ projectRef: ref })
 
@@ -51,14 +63,18 @@ export const Snapshots = () => {
           <PageSectionContent className="flex flex-col gap-y-4">
             <div className="flex items-center justify-between gap-x-2">
               <div className="flex items-center gap-x-3">
-                <StorageBucketSelector
-                  projectRef={ref}
-                  value={selectedBucket}
-                  onChange={setBucketParam}
-                />
+                {!isBucketFixed && (
+                  <StorageBucketSelector
+                    projectRef={ref}
+                    value={selectedBucket}
+                    onChange={setBucketParam}
+                  />
+                )}
                 {selectedBucket && (
                   <p className="text-sm text-foreground-lighter">
-                    Restore {selectedBucket} to a previous point in time
+                    {isBucketFixed
+                      ? 'Restore this bucket to a previous point in time'
+                      : `Restore ${selectedBucket} to a previous point in time`}
                   </p>
                 )}
               </div>

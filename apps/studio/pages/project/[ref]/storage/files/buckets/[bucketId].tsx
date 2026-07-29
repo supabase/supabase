@@ -1,8 +1,8 @@
 import { useParams } from 'common'
-import { ChevronDown, FolderOpen, Settings, Shield, Trash, Trash2 } from 'lucide-react'
+import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
+import { parseAsBoolean, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import {
@@ -18,6 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  NavMenu,
+  NavMenuItem,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -30,15 +32,20 @@ import { EditBucketModal } from '@/components/interfaces/Storage/EditBucketModal
 import { EmptyBucketModal } from '@/components/interfaces/Storage/EmptyBucketModal'
 import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import { PublicBucketWarning } from '@/components/interfaces/Storage/PublicBucketWarning'
+import { Snapshots } from '@/components/interfaces/Storage/Snapshots/Snapshots'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
+import { Trash } from '@/components/interfaces/Storage/Trash/Trash'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
+
+type BucketView = 'files' | 'snapshots' | 'trash'
+const BUCKET_VIEWS: BucketView[] = ['files', 'snapshots', 'trash']
 
 const BucketPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -56,6 +63,13 @@ const BucketPage: NextPageWithLayout = () => {
   const [showDeleteModal, setShowDeleteModal] = useQueryState(
     'delete',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const [view, setView] = useQueryState(
+    'view',
+    parseAsStringEnum<BucketView>(BUCKET_VIEWS)
+      .withDefault('files')
+      .withOptions({ history: 'push', clearOnDefault: true })
   )
 
   const { getPolicyCount } = useBucketPolicyCount()
@@ -99,15 +113,6 @@ const BucketPage: NextPageWithLayout = () => {
                   Policies
                 </Link>
               </Button>
-              {showProtection && (
-                <Button asChild variant="outline" size="tiny" icon={<Trash size={14} />}>
-                  <Link
-                    href={`/project/${ref}/storage/files/trash?bucket=${encodeURIComponent(bucket?.name ?? '')}`}
-                  >
-                    Deleted files
-                  </Link>
-                </Button>
-              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
@@ -173,16 +178,40 @@ const BucketPage: NextPageWithLayout = () => {
           </BreadcrumbList>
         </PageBreadcrumbs>
 
-        <PageContainer size="full" className="flex flex-1 min-h-0 flex-col px-0 xl:px-0">
-          {ref && bucketId && (
-            <div className="px-4 py-4 empty:hidden">
-              <PublicBucketWarning projectRef={ref} bucketId={bucketId} />
+        {showProtection && (
+          <NavMenu aria-label="Bucket views" className="px-4">
+            <NavMenuItem active={view === 'files'}>
+              <button type="button" onClick={() => setView('files')}>
+                Files
+              </button>
+            </NavMenuItem>
+            <NavMenuItem active={view === 'snapshots'}>
+              <button type="button" onClick={() => setView('snapshots')}>
+                Snapshots
+              </button>
+            </NavMenuItem>
+            <NavMenuItem active={view === 'trash'}>
+              <button type="button" onClick={() => setView('trash')}>
+                Deleted files
+              </button>
+            </NavMenuItem>
+          </NavMenu>
+        )}
+
+        {view === 'files' && (
+          <PageContainer size="full" className="flex flex-1 min-h-0 flex-col px-0 xl:px-0">
+            {ref && bucketId && (
+              <div className="px-4 py-4 empty:hidden">
+                <PublicBucketWarning projectRef={ref} bucketId={bucketId} />
+              </div>
+            )}
+            <div className="flex-1 min-h-0">
+              <StorageExplorer />
             </div>
-          )}
-          <div className="flex-1 min-h-0">
-            <StorageExplorer />
-          </div>
-        </PageContainer>
+          </PageContainer>
+        )}
+        {view === 'snapshots' && bucket && <Snapshots bucketId={bucket.name} />}
+        {view === 'trash' && bucket && <Trash bucketId={bucket.name} />}
       </div>
 
       {bucket && (

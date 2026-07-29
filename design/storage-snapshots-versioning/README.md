@@ -438,6 +438,21 @@ The modal now has exactly one control: **"Include in snapshots"**, defaulting to
 
 **One banner, state-aware.** The Backups page previously had a permanent "Storage objects are not included" alert. Once snapshots exist that statement is sometimes false, so it's a single notice with four states: feature off, capture off, partial coverage (warning + which buckets), full coverage. Never two banners describing the same thing.
 
+## 8d. Where do Snapshots and Deleted files live?
+
+Follow-up from review: *"I wonder if this UI should live within each bucket instead of at the file buckets root. I think that's where I'd expect to see it as a user ('I want to restore bucket static back to last week's version'), and it would remove the need for things like the bucket selector."*
+
+The prototype now runs both placements side by side so we can compare, since there's no obvious right answer without touching it:
+
+| Placement | URL | Bucket selector? | Best for |
+| --- | --- | --- | --- |
+| **Top-level, cross-bucket** | `/storage/files/snapshots`, `/storage/files/trash` | Yes — pick a bucket | "Snapshot / Deleted-files mental mode": handle recovery across buckets in one place, drop-down to switch |
+| **In-bucket** | `/storage/files/buckets/<name>?view=snapshots`, `?view=trash` | No — locked to this bucket | "I want to restore *this* bucket to last week": recovery in the same context you already opened the bucket in |
+
+**Implementation:** `Snapshots` and `Trash` both accept an optional `bucketId` prop. When passed, they hide their own bucket selector and skip the `?bucket=` query param. The in-bucket view is a `NavMenu` inside `pages/project/[ref]/storage/files/buckets/[bucketId].tsx` — Files / Snapshots / Deleted files — driven by a `?view=` `nuqs` state. The two surfaces are literally the same components, so there's no divergence risk while we compare them.
+
+**Open question:** which placement to keep. The in-bucket view removes a selector click and matches how users describe the task ("restore this bucket to…"). The top-level view is better when the actual task is "clean up soft-deleted stuff across the project," which is genuinely a different mode. We may end up keeping both; if we cut one, the in-bucket view is likely the primary and the top-level tab becomes redundant navigation.
+
 ## 9. Open questions for the team
 
 1. **Version chip noise** — showing `v3` on every versioned object could clutter dense buckets. Alternative: only show it in the pane + on hover. (Prototype shows both; recommend hover-only for the row, always-on in the pane.)
