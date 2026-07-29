@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { Button, cn, CriticalIcon, Separator } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
