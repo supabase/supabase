@@ -16,53 +16,74 @@ Self-hosting runs Supabase on your own infrastructure instead of the managed pla
   </Button>
 </div>
 
-## Everything you get, self-hosted
+<div className="w-full aspect-[16/6] rounded-lg border border-dashed border-strong flex items-center justify-center text-foreground-lighter text-sm not-prose">
+  Hero illustration — placeholder for Design
+</div>
 
-<div className="grid grid-cols-12 gap-6 not-prose">
-  <Link href="/reference/self-hosting-auth/introduction" className="col-span-6 md:col-span-3" passHref>
-    <IconPanel
-      title="Auth"
-      icon="/docs/img/icons/menu/auth"
-      hasLightIcon={true}
-      background={true}
-      showIconBg={true}
-    >
-      Email/password, OAuth, and phone authentication.
-    </IconPanel>
-  </Link>
-  <Link href="/guides/database/overview" className="col-span-6 md:col-span-3" passHref>
-    <IconPanel
-      title="Database"
-      icon="/docs/img/icons/menu/database"
-      hasLightIcon={true}
-      background={true}
-      showIconBg={true}
-    >
-      A full Postgres database with realtime subscriptions.
-    </IconPanel>
-  </Link>
-  <Link href="/reference/self-hosting-storage/introduction" className="col-span-6 md:col-span-3" passHref>
-    <IconPanel
-      title="Storage"
-      icon="/docs/img/icons/menu/storage"
-      hasLightIcon={true}
-      background={true}
-      showIconBg={true}
-    >
-      Store and serve files, from images to videos.
-    </IconPanel>
-  </Link>
-  <Link href="/reference/self-hosting-realtime/introduction" className="col-span-6 md:col-span-3" passHref>
-    <IconPanel
-      title="Realtime"
-      icon="/docs/img/icons/menu/realtime"
-      hasLightIcon={true}
-      background={true}
-      showIconBg={true}
-    >
-      Listen to database changes and broadcast messages.
-    </IconPanel>
-  </Link>
+<div className="my-16 flex flex-col gap-2 max-w-xl">
+  <span className="text-brand font-mono uppercase text-xs tracking-wider">Full platform</span>
+  <h2 className="text-foreground-lighter">
+    Everything you get, <span className="text-foreground">self-hosted</span>
+  </h2>
+  <p className="text-foreground-lighter">
+    Self-hosting isn't a stripped-down version — you get the full Supabase platform.
+  </p>
+</div>
+
+<ul className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 not-prose">
+  <li>
+    <Link href="/reference/self-hosting-auth/introduction">
+      <img src="/docs/img/icons/menu/auth.svg" alt="" className="w-7 h-7 mb-2" />
+      <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
+        <span className="h-7 bg-foreground-lighter" />
+      </div>
+      <h4 className="text-foreground text-lg mt-1">Auth</h4>
+      <p className="text-foreground-lighter text-sm">
+        Email/password, OAuth, and phone authentication.
+      </p>
+    </Link>
+  </li>
+  <li>
+    <Link href="/guides/database/overview">
+      <img src="/docs/img/icons/menu/database.svg" alt="" className="w-7 h-7 mb-2" />
+      <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
+        <span className="h-7 bg-foreground-lighter" />
+      </div>
+      <h4 className="text-foreground text-lg mt-1">Database</h4>
+      <p className="text-foreground-lighter text-sm">
+        A full Postgres database with realtime subscriptions.
+      </p>
+    </Link>
+  </li>
+  <li>
+    <Link href="/reference/self-hosting-storage/introduction">
+      <img src="/docs/img/icons/menu/storage.svg" alt="" className="w-7 h-7 mb-2" />
+      <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
+        <span className="h-7 bg-foreground-lighter" />
+      </div>
+      <h4 className="text-foreground text-lg mt-1">Storage</h4>
+      <p className="text-foreground-lighter text-sm">Store and serve files, from images to videos.</p>
+    </Link>
+  </li>
+  <li>
+    <Link href="/reference/self-hosting-realtime/introduction">
+      <img src="/docs/img/icons/menu/realtime.svg" alt="" className="w-7 h-7 mb-2" />
+      <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
+        <span className="h-7 bg-foreground-lighter" />
+      </div>
+      <h4 className="text-foreground text-lg mt-1">Realtime</h4>
+      <p className="text-foreground-lighter text-sm">
+        Listen to database changes and broadcast messages.
+      </p>
+    </Link>
+  </li>
+</ul>
+
+<div className="my-16 flex flex-col items-center text-center gap-4 not-prose">
+  <h2>Ready to self-host Supabase?</h2>
+  <Button variant="primary" asChild>
+    <Link href="/guides/self-hosting/docker">Get started with Docker</Link>
+  </Button>
 </div>
 
 <ContentListings id="self-hosting-get-started" />
@@ -112,11 +133,7 @@ The **Supabase CLI** is a [separate tool](/docs/guides/local-development/cli/get
 
 Self-hosted Supabase is community-supported.
 
-<ContentListings id="self-hosting-resolve-issues" />
-
-<ContentListings id="self-hosting-get-help" />
-
-<ContentListings id="self-hosting-share-experience" />
+<ContentListings id="self-hosting-support" />
 
 ### Enterprise self-hosting
 
