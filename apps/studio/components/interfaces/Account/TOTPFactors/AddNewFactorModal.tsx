@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Form, FormControl, FormField, Input } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
@@ -75,9 +75,6 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
     mode: 'onChange',
   })
 
-  const name = useWatch({ control: form.control, name: 'name' })
-  const isNameProvided = name.trim().length > 0
-
   const onSubmit: SubmitHandler<EnrollFormValues> = async (values) => {
     enroll({ factorType: 'totp', friendlyName: values.name })
   }
@@ -94,7 +91,6 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
       confirmLabel="Generate QR"
       confirmLabelLoading="Generating QR"
       loading={isEnrolling}
-      disabled={!isNameProvided}
       onCancel={onClose}
       onConfirm={form.handleSubmit(onSubmit)}
     >
