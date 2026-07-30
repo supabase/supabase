@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import type { Control, UseFormSetValue } from 'react-hook-form'
 import {
   Badge,
   Checkbox,
@@ -14,6 +14,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  useWatch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -31,7 +32,9 @@ import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
 
 interface ResourceAccessStepProps {
-  form: UseFormReturn<TokenFormValues>
+  control: Control<TokenFormValues>
+  setValue: UseFormSetValue<TokenFormValues>
+
   /** Inline error surfaced only after an attempt to advance. */
   error?: string
 }
@@ -55,12 +58,12 @@ const CARD_OPTIONS: {
   },
 ]
 
-export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => {
+export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
 
-  const resourceAccess = form.watch('resourceAccess')
-  const organizationSlugs = form.watch('organizationSlugs', [])
-  const accountConfirmed = form.watch('accountConfirmed')
+  const resourceAccess = useWatch({ control, name: 'resourceAccess' })
+  const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
+  const accountConfirmed = useWatch({ control, name: 'accountConfirmed' })
 
   const isAccount = resourceAccess === 'account'
 
@@ -70,14 +73,14 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
   )
 
   const enableAccountLevel = () => {
-    form.setValue('resourceAccess', 'account', { shouldValidate: true })
-    form.setValue('organizationSlugs', [])
-    form.setValue('projectRefs', [])
+    setValue('resourceAccess', 'account', { shouldValidate: true })
+    setValue('organizationSlugs', [])
+    setValue('projectRefs', [])
   }
 
   const switchBackToSingleProject = () => {
-    form.setValue('resourceAccess', 'project', { shouldValidate: true })
-    form.setValue('accountConfirmed', false)
+    setValue('resourceAccess', 'project', { shouldValidate: true })
+    setValue('accountConfirmed', false)
   }
 
   return (
@@ -88,7 +91,7 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
       </div>
 
       <FormField
-        control={form.control}
+        control={control}
         name="resourceAccess"
         render={({ field }) => (
           <RadioGroupCard
@@ -97,8 +100,8 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
             onValueChange={(value) => {
               field.onChange(value)
               // Reset dependent selections when switching modes.
-              form.setValue('projectRefs', [])
-              if (value !== 'account') form.setValue('accountConfirmed', false)
+              setValue('projectRefs', [])
+              if (value !== 'account') setValue('accountConfirmed', false)
             }}
             disabled={isAccount}
           >
@@ -129,7 +132,7 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
           <div className="space-y-1">
             {resourceAccess === 'project' ? (
               <FormField
-                control={form.control}
+                control={control}
                 name="organizationSlugs"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Organization" id="organizationSlugs">
@@ -138,7 +141,7 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
                         value={field.value.length > 0 ? field.value[0] : ''}
                         onValueChange={(value) => {
                           field.onChange([value])
-                          form.setValue('projectRefs', [])
+                          setValue('projectRefs', [])
                         }}
                       >
                         <SelectTrigger id="organizationSlugs" ref={field.ref}>
@@ -158,7 +161,7 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
               />
             ) : (
               <FormField
-                control={form.control}
+                control={control}
                 name="organizationSlugs"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Organizations" id="organizationSlugs">
@@ -191,7 +194,7 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
 
           {resourceAccess === 'project' && (
             <FormField
-              control={form.control}
+              control={control}
               name="projectRefs"
               render={({ field }) => (
                 <FormItemLayout layout="vertical" label="Projects" id="projectRefs">
@@ -256,16 +259,22 @@ export const ResourceAccessStep = ({ form, error }: ResourceAccessStepProps) => 
                 single project or organization unless you specifically need account-wide access.
               </p>
               <div className="flex items-start gap-2">
-                <Checkbox
-                  id="accountConfirmed"
-                  checked={accountConfirmed ?? false}
-                  onCheckedChange={(checked) =>
-                    form.setValue('accountConfirmed', checked === true, { shouldValidate: true })
-                  }
+                <FormField
+                  control={control}
+                  name="accountConfirmed"
+                  render={({ field }) => (
+                    <>
+                      <Checkbox
+                        id="accountConfirmed"
+                        checked={accountConfirmed ?? false}
+                        onCheckedChange={(checked) => field.onChange(checked)}
+                      />
+                      <Label htmlFor="accountConfirmed" className="text-xs text-foreground-light">
+                        I understand this token is not limited to one project or organization.
+                      </Label>
+                    </>
+                  )}
                 />
-                <Label htmlFor="accountConfirmed" className="text-xs text-foreground-light">
-                  I understand this token is not limited to one project or organization.
-                </Label>
               </div>
               <button
                 type="button"
