@@ -74,6 +74,7 @@ const mockProjects = () =>
 const mockPermissionsMap = () =>
   addAPIMock({
     method: 'get',
+    // @ts-expect-error Studio API is missing from types
     path: '/scoped-access-token-permissions',
     response: () =>
       HttpResponse.json({
