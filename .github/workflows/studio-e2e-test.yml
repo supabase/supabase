@@ -45,7 +45,7 @@ jobs:
             studio:
               - 'packages/pg-meta/**'
               - 'apps/studio/**'
-              - 'apps/ui-library/**'
+              - 'apps/library/**'
               - 'apps/design-system/**'
               - 'e2e/studio/**'
               - 'pnpm-lock.yaml'

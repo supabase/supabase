@@ -1,0 +1,131 @@
+---
+title: 'MCP Tools: PostgREST'
+description: Database tools generated from your PostgREST schema, with no code per table
+---
+
+A toolset for the [MCP server](/docs/headless/mcp-server) that reads the API
+description PostgREST already serves and turns it into MCP tools. Every table,
+view, and function the calling user can reach becomes a tool, so a new
+table is a new set of tools without a redeploy.
+
+For a schema with a `todos` table, a `todo_counts` view, and a
+`complete_all_todos` function, an MCP client sees:
+
+```text
+list_todos  create_todos  update_todos  delete_todos
+list_todo_counts
+call_complete_all_todos
+```
+
+## Installation
+
+<BlockItem
+  name="mcp-tools-postgrest"
+  description="Generates MCP tools from your PostgREST schema"
+/>
+
+Add `--overwrite`:
+
+```bash
+npx shadcn@latest add --overwrite https://supabase.com/library/r/mcp-tools-postgrest.json
+```
+
+This block declares the MCP server as a dependency, so the framework installs
+first. Both ship `tools/index.ts` — the toolset manifest — and this block's
+version is the one that registers the PostgREST toolset. Without `--overwrite`,
+the CLI keeps the framework's copy and the toolset silently never registers.
+
+<Callout type="note">
+
+If you have already added your own toolsets to `tools/index.ts`, re-add their
+`registerToolset` lines after installing. The manifest is the only file the two
+blocks share.
+
+</Callout>
+
+## Folder structure
+
+<RegistryBlock itemName="mcp-tools-postgrest" />
+
+## What the tools look like
+
+Filters are structured rather than raw PostgREST syntax. A model picks a column
+from an enum of real columns and an operator from a fixed list, and the toolset
+builds the query:
+
+```json
+{
+  "name": "list_todos",
+  "arguments": {
+    "filters": [
+      { "column": "done", "operator": "is", "value": "false" },
+      { "column": "priority", "operator": "lte", "value": "2" }
+    ],
+    "select": "id,title,priority",
+    "order": "priority.asc",
+    "limit": 20
+  }
+}
+```
+
+Operators cover `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in`,
+`is`, `cs`, and `cd`. Insert and update tools take real column types read from the
+schema, including `null` to clear a column.
+
+## Guardrails
+
+- **Update and delete require at least one filter.** PostgREST would otherwise
+  apply them to every row the caller can reach, which is one malformed tool call
+  away from an emptied table.
+- **Reads are capped.** `limit` defaults to 50 and tops out at 1000, so a table
+  scan cannot flood a model's context.
+- **Read-only views get only a list tool**, because PostgREST exposes only `GET`
+  for them.
+- **Volatile functions are marked destructive** in their annotations; functions
+  PostgREST exposes on `GET` are marked read-only.
+
+## What the tools expose
+
+The generated tools mirror what PostgREST exposes, and the calling user's token
+is used to read the schema — so the tool list already reflects their privileges.
+That makes grants and RLS the control surface:
+
+- A table with no grant to `authenticated` produces no tools.
+- RLS decides which rows each tool call returns or changes.
+- To hide a table from agents entirely, revoke its grant or move it out of the
+  exposed schema.
+
+The MCP server still owns authentication and creates the RLS-scoped client used
+for every tool call. It passes the already-verified access token to this toolset
+for schema discovery, so the PostgREST block never reads the raw MCP request or
+parses credentials itself. The shared `supabase.ts` helper resolves the project
+URL and publishable key, including named `SUPABASE_PUBLISHABLE_KEYS`.
+
+<Callout type="caution">
+
+A view over an RLS-protected table needs `security_invoker = on`. Without it the
+view runs as its owner and bypasses the base table's policies, so the generated
+tool would return other users' rows.
+
+```sql
+create view public.todo_counts with (security_invoker = on) as
+  select user_id, count(*) as total_count from public.todos group by user_id;
+```
+
+</Callout>
+
+## Schema caching
+
+The schema is fetched once per worker and reused for 300 seconds. Set
+`MCP_POSTGREST_SCHEMA_TTL` to change that, or `0` to read it on every request.
+The cache holds table shapes, never rows, and every tool call still goes through
+RLS.
+
+A new table appears as new tools when the cache expires. To pick one up
+immediately, redeploy the function.
+
+## Further reading
+
+- [MCP Server](/docs/headless/mcp-server)
+- [Row Level Security](/docs/guides/database/postgres/row-level-security)
+- [PostgREST API](/docs/guides/api)

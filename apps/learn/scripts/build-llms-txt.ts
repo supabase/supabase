@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const BASE_URL = 'https://supabase.com/ui/docs'
+const BASE_URL = 'https://supabase.com/library/docs'
 
 interface DocMeta {
   title: string

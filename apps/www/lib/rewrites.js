@@ -1,3 +1,5 @@
+const LIBRARY_URL = process.env.NEXT_PUBLIC_LIBRARY_URL ?? process.env.NEXT_PUBLIC_UI_LIBRARY_URL
+
 const rewrites = [
   {
     source: '/:path*',
@@ -22,12 +24,12 @@ const rewrites = [
       ]
     : []),
   {
-    source: '/ui',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}`,
+    source: '/library',
+    destination: `${LIBRARY_URL}`,
   },
   {
-    source: '/ui/:path*',
-    destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
+    source: '/library/:path*',
+    destination: `${LIBRARY_URL}/:path*`,
   },
   {
     source: '/design-system',

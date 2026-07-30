@@ -12,7 +12,7 @@ ESLINT_PACKAGES=(
   "apps/docs:docs"
   "apps/learn:learn"
   "apps/studio:studio"
-  "apps/ui-library:ui-library"
+  "apps/library:library"
   "apps/www:www"
 )
 
