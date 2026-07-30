@@ -172,6 +172,20 @@ describe('OrganizationInvite', () => {
     })
   })
 
+  test('renders an inline error when joining the organization fails', () => {
+    mocks.useAcceptInvitationMutation.mockReturnValue({
+      mutate: mocks.acceptInvitation,
+      isPending: false,
+      error: responseError('You are already a member of this organization'),
+    })
+
+    render(<OrganizationInvite />)
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Failed to join organization: You are already a member of this organization'
+    )
+  })
+
   test('renders a wrong-account warning and signs out', async () => {
     const user = userEvent.setup()
     mocks.useInvitationQuery.mockReturnValue({
