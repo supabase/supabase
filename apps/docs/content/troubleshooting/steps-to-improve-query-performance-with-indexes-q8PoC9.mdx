@@ -59,7 +59,7 @@ where seq_scan + idx_scan > 0
 order by n_live_tup desc;
 ```
 
-A lot of the [queries for inspecting performance](/docs/reference/cli/supabase-inspect-db) are pre-bundled as part of the [Supabase CLI](/docs/guides/cli/getting-started). For instance, there is a command for testing which indexes of yours are unnecessary and are needlessly taking up space:
+A lot of the [queries for inspecting performance](/docs/reference/cli/supabase-inspect-db) are pre-bundled as part of the [Supabase CLI](/docs/guides/local-development/cli/getting-started). For instance, there is a command for testing which indexes of yours are unnecessary and are needlessly taking up space:
 
 ```bash
 npx supabase login

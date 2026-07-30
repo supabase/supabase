@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
@@ -199,7 +199,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   }
 
   // Check if form values have changed
-  const formValues = form.watch()
+  const formValues = useWatch({ control: form.control })
   const baselineValues = INITIAL_VALUES
   const baselineBodyValue = (authConfig && authConfig[messageSlug]) ?? ''
   const hasCustomTemplate =
