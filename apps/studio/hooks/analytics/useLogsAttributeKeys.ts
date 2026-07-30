@@ -1,35 +1,43 @@
-import { useDebounce } from '@uidotdev/usehooks'
-import { useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 import { detectLogSource } from '@/data/logs/logs-sql-rewrite'
-import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
+import { otelLogKeysQueryOptions } from '@/data/logs/otel-log-keys-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-/** Long enough that typing a source name doesn't fire a request per keystroke. */
-export const SOURCE_DETECTION_DEBOUNCE_MS = 500
-
 /**
- * The real `log_attributes` keys for whichever source a logs query targets. The AI
- * flows pass these along so the model uses exact dotted paths instead of inventing
- * them.
+ * Looks up the real `log_attributes` keys for whichever source a logs query
+ * targets. The AI flows pass these along so the model uses exact dotted paths
+ * instead of inventing them.
  *
- * Takes the live query text and debounces internally, deliberately: the detected
- * source is part of the React Query key, so an undebounced caller fires a fresh
- * analytics request for every intermediate source name while the user types one
- * (`edge_l`, `edge_lo`, `edge_log`, …). Owning the debounce here means a new caller
- * can't reintroduce that by forgetting to pre-debounce.
+ * Deliberately imperative: discovery aggregates a week of logs, and the source is
+ * derived from query text the user is editing, so anything reactive fires requests
+ * for half-typed source names. Fetching at submit time means one request per
+ * action the user actually took. It still goes through the query client, so a
+ * result already cached for that source (by an earlier submit, or by a component
+ * subscribed via `useOtelLogKeysQuery`) is reused rather than refetched.
+ *
+ * Keys are an enhancement, never a requirement — a failed or impossible lookup
+ * resolves to `undefined` and the caller proceeds without them.
  */
-export function useLogsAttributeKeys({ sql, enabled }: { sql: string; enabled: boolean }) {
+export function useLogsAttributeKeys() {
+  const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
+  const projectRef = project?.ref
 
-  const settledSql = useDebounce(sql, SOURCE_DETECTION_DEBOUNCE_MS)
-  // Memoized so the query key stays referentially stable between renders — the
-  // callers re-render on every keystroke even though `settledSql` doesn't change.
-  const source = useMemo(
-    () => (enabled ? detectLogSource(settledSql) : undefined),
-    [enabled, settledSql]
+  const fetchAttributeKeys = useCallback(
+    async (sql: string): Promise<string[] | undefined> => {
+      const source = detectLogSource(sql)
+      if (!projectRef || source === undefined) return undefined
+
+      try {
+        return await queryClient.fetchQuery(otelLogKeysQueryOptions({ projectRef, source }))
+      } catch {
+        return undefined
+      }
+    },
+    [projectRef, queryClient]
   )
 
-  const { data } = useOtelLogKeysQuery({ projectRef: project?.ref, source }, { enabled })
-  return data
+  return { fetchAttributeKeys }
 }

@@ -188,8 +188,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     requestRewrite,
     dismiss: dismissRewriteBanner,
   } = useLegacyLogsRewrite({
-    sql: editorValue,
-    isOffered: showRewriteCTA && !rewriteBannerDismissed,
     // Read straight from the editor instance — `editorValue` state can lag the
     // most recent keystroke.
     readSql: () => editorRef.current?.getValue() ?? editorValue,

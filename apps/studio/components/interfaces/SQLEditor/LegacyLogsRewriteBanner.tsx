@@ -55,10 +55,6 @@ export const LegacyLogsRewriteBanner = () => {
   )
 
   const { state, requestRewrite, dismiss } = useLegacyLogsRewrite({
-    // Live, not `settledSql` — the hook debounces this itself for key discovery,
-    // and debouncing twice would just delay the keys further.
-    sql: liveSql,
-    isOffered: isLogsSnippetNeedingRewrite && !isDiffOpen,
     // Rewrite exactly what's in the editor now, not the debounced value the
     // visibility check used — they differ if the user clicked mid-edit.
     readSql: () => getSqlEditorV2StateSnapshot().snippets[id]?.snippet.content?.unchecked_sql ?? '',

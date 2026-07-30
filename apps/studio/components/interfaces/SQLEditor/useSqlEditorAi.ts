@@ -95,14 +95,10 @@ export function useSqlEditorAi({
   const dialect = sqlSourceToDialect(sqlSource)
   const isClickhouse = dialect === 'clickhouse'
 
-  // Ground ClickHouse edits in the source's real log_attributes keys, the same way
-  // the whole-query rewrite does — otherwise inline edits invent dotted paths. The
-  // lookup debounces the snippet text itself (the store is written on every
-  // keystroke); React Query dedupes it against the rewrite banner's identical one.
-  const availableKeys = useLogsAttributeKeys({
-    sql: snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? '',
-    enabled: isClickhouse,
-  })
+  // Grounds ClickHouse edits in the source's real log_attributes keys, the same way
+  // the whole-query rewrite does — otherwise inline edits invent dotted paths.
+  // Looked up when the user submits, not while they type.
+  const { fetchAttributeKeys } = useLogsAttributeKeys()
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -286,7 +282,17 @@ export function useSqlEditorAi({
           beforeSelection: context.beforeSelection,
           afterSelection: context.afterSelection,
         }))
-        const headerData = await constructHeaders()
+        // ClickHouse only: there's no server-side schema to fetch for the logs
+        // table, so the real log_attributes keys travel with the request. Detected
+        // from the whole document, which is what the three context fields spell.
+        const [headerData, availableKeys] = await Promise.all([
+          constructHeaders(),
+          isClickhouse
+            ? fetchAttributeKeys(
+                context.beforeSelection + context.selection + context.afterSelection
+              )
+            : undefined,
+        ])
 
         const authorizationHeader = headerData.get('Authorization')
 
@@ -304,9 +310,7 @@ export function useSqlEditorAi({
               language: 'pgsql',
               prompt,
               selection: context.selection,
-              // ClickHouse only: there's no server-side schema to fetch for the
-              // logs table, so the real log_attributes keys travel with the request.
-              ...(isClickhouse && availableKeys ? { availableKeys } : {}),
+              ...(availableKeys ? { availableKeys } : {}),
             },
           },
         })
@@ -314,7 +318,7 @@ export function useSqlEditorAi({
         setPromptState((prev) => ({ ...prev, isLoading: false }))
       }
     },
-    [availableKeys, complete, isClickhouse, setPromptState]
+    [complete, fetchAttributeKeys, isClickhouse, setPromptState]
   )
 
   const handleDiffEditorMount = useCallback(

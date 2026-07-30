@@ -73,17 +73,9 @@ export type LegacyLogsRewriteProposal = { original: string; modified: string }
 
 type UseLegacyLogsRewriteArgs = {
   /**
-   * The query the offer is about, as currently displayed. Used to discover the
-   * source's real `log_attributes` keys; pass the live value — the key lookup
-   * debounces it.
-   */
-  sql: string
-  /** Whether an offer is on screen — gates the key-discovery query. */
-  isOffered: boolean
-  /**
-   * Reads the query to rewrite at the moment the user asks. Separate from `sql`
-   * because a surface may hold a fresher value than the one driving visibility,
-   * and the rewrite must operate on exactly what the user sees.
+   * Reads the query to rewrite at the moment the user asks. A callback rather than
+   * a value so the rewrite operates on exactly what the user sees, not on whatever
+   * a surface last rendered.
    */
   readSql: () => string
   /** Receives a rewrite worth reviewing. Each surface routes this to its own diff. */
@@ -102,8 +94,6 @@ type UseLegacyLogsRewriteArgs = {
  * completion call, the stale-edit guard, no-op detection, and the resulting state.
  */
 export function useLegacyLogsRewrite({
-  sql,
-  isOffered,
   readSql,
   onProposal,
   onDismissed,
@@ -114,8 +104,7 @@ export function useLegacyLogsRewrite({
 
   const [state, dispatch] = useReducer(legacyLogsRewriteReducer, INITIAL_LEGACY_LOGS_REWRITE_STATE)
 
-  // Fetched reactively so the keys are ready when the user asks for the rewrite.
-  const availableKeys = useLogsAttributeKeys({ sql, enabled: isOffered })
+  const { fetchAttributeKeys } = useLogsAttributeKeys()
 
   const requestRewrite = async () => {
     if (!projectRef) return console.error('[useLegacyLogsRewrite] Project ref is required')
@@ -125,7 +114,10 @@ export function useLegacyLogsRewrite({
 
     dispatch({ type: 'rewriteRequested' })
     try {
-      const headerData = await constructHeaders()
+      const [headerData, availableKeys] = await Promise.all([
+        constructHeaders(),
+        fetchAttributeKeys(currentSql),
+      ])
       const rewritten = await rewriteLogsSqlWithAI({
         sql: currentSql,
         projectRef,
