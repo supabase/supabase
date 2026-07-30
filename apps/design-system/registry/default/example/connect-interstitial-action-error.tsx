@@ -18,15 +18,17 @@ export default function ConnectInterstitialActionError() {
       <div className="flex flex-col gap-4">
         <AccountRow displayName="alex@example.com" />
         <div className="flex flex-col gap-2">
-          <p role="alert" className="text-sm text-destructive">
-            Failed to authorize Stripe Projects. Please try again.
-          </p>
           <Button variant="primary" block>
             Authorize Stripe Projects
           </Button>
           <Button variant="text" block>
             Cancel
           </Button>
+          <div className="mt-3 border-t border-muted pt-5">
+            <p role="alert" className="text-center text-xs text-destructive text-balance">
+              Failed to authorize Stripe Projects. Please try again.
+            </p>
+          </div>
         </div>
       </div>
     </InterstitialShell>

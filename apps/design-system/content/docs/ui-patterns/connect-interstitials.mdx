@@ -206,9 +206,9 @@ Match feedback to its scope:
 
 - Use `FormMessage` or `FieldError` beside a field when that field needs to
   change.
-- Show a submission or action failure as simple destructive text immediately
-  above the actions. Keep the current account, selections, and actions visible
-  so the user can retry.
+- Show a submission or action failure as simple destructive text below the
+  actions. Separate it with a subtle divider when needed for composition. Keep
+  the current account, selections, and actions visible so the user can retry.
 - Use `Admonition` when the whole interstitial is blocked or has materially
   changed state, such as an invalid link, wrong account, or partially completed
   setup.
@@ -219,9 +219,11 @@ Match feedback to its scope:
 ```tsx
 {
   actionError && (
-    <p role="alert" className="text-sm text-destructive">
-      {actionError}
-    </p>
+    <div className="mt-3 border-t border-muted pt-5">
+      <p role="alert" className="text-center text-xs text-destructive text-balance">
+        {actionError}
+      </p>
+    </div>
   )
 }
 ```
