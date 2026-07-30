@@ -414,7 +414,7 @@ The `config add` / `config remove` commands manage the `COMPOSE_FILE` [variable]
 
 ## Updating
 
-The `update.sh` script updates an existing deployment in place. It pulls a newer version of the Docker configuration and merges it over your files with a three-way merge, so your secrets, overrides, and local edits are preserved and any genuine conflicts are surfaced rather than silently overwritten.
+The `update.sh` script updates an existing deployment in place. It pulls a newer version of the Docker configuration and merges it over your files with a three-way merge.
 
 ```sh
 sh update.sh --dry-run   # preview the changes
@@ -423,7 +423,7 @@ sh run.sh pull           # pull new images
 sh run.sh recreate       # restart to pick up the changes
 ```
 
-See [Update your self-hosted deployment](/docs/guides/self-hosting/updating) for the full walkthrough - breaking changes, conflict resolution, pinning a release, and older installs without a recorded version. We publish stable releases approximately once a month; the versions in each release are tested together, so they may lag behind the latest images on Docker Hub.
+See [Update your self-hosted deployment](/docs/guides/self-hosting/updating) for the full walkthrough - breaking changes, conflict resolution, pinning a release, and older installs without a recorded version.
 
 To follow the changes between releases, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
 

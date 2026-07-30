@@ -29,9 +29,7 @@
 # Env:
 #   SUPABASE_REPO_URL   Override the upstream repo (default: github supabase/supabase)
 #
-# Documentation:
-#   - UPGRADING.md
-#   - https://supabase.com/docs/guides/self-hosting/updating
+# Documentation: https://supabase.com/docs/guides/self-hosting/updating
 #
 
 set -e
@@ -272,8 +270,10 @@ version your deployment was based on and record it, then re-run:
 
 Or supply it inline for this run:  sh update.sh --from <commit-sha-or-tag>
 
-Continuing in REPORT-ONLY mode: showing files and .env keys that are new in
-'$TARGET_REF' versus your current deployment. Nothing will be written.
+Continuing in REPORT-ONLY mode. NOTE: this is NOT the full set of changes -
+without a base version it can only list files and .env keys that are entirely
+NEW to you; it CANNOT show which existing files would change or conflict. Record
+a base and re-run for the real preview. Nothing will be written.
 EOF
 }
 
@@ -294,15 +294,15 @@ fetch_snapshots() {
 }
 
 run_report_only() {
-    log "Files present in '$TARGET_REF' but missing locally:"
+    log "Files in '$TARGET_REF' you do NOT have yet (brand-new only; existing files that changed are NOT shown here):"
     while IFS= read -r f; do
         is_excluded "$f" && continue
-        [ -f "$f" ] || echo "  new: $f"
+        [ -f "$f" ] || echo "  + $f"
     done <<EOF
 $(list_files "$TARGET_DIR")
 EOF
     echo ""
-    log ".env keys present in target .env.example but missing from your .env:"
+    log ".env keys in the new .env.example that your .env is missing (add these):"
     if [ -f "$TARGET_DIR/.env.example" ]; then
         while IFS= read -r k; do
             env_has_key "$k" .env || echo "  + $k"
@@ -311,7 +311,9 @@ $(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$TARGET_DIR/.env.example" | cut -d= -f1)
 EOF
     fi
     echo ""
-    log "Report-only complete. Record a base version (see above) to perform a real update."
+    warn "This is NOT the full update. To see what would actually change (updated files,"
+    warn "conflicts, breaking-change gate), record a base version - see the guidance above -"
+    warn "then re-run. Nothing was written."
 }
 
 # --- breaking-change gate (manifest-driven, before any writes) ---------------

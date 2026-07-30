@@ -45,7 +45,7 @@ This Docker Compose configuration includes the following services:
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 - **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
 - **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
-- **[UPGRADING.md](./UPGRADING.md)** - Upgrade an existing deployment with `update.sh`
+- **[Update your deployment](https://supabase.com/docs/guides/self-hosting/updating)** - Update an existing deployment with `update.sh`
 
 ## Updates
 
@@ -57,8 +57,8 @@ sh update.sh
 sh run.sh pull && sh run.sh recreate
 ```
 
-See **[UPGRADING.md](./UPGRADING.md)** for conflicts, breaking changes, pinning a
-release, and older installs without `.supabase-version`.
+See the **[update guide](https://supabase.com/docs/guides/self-hosting/updating)** for conflicts,
+breaking changes, pinning a release, and older installs without `.supabase-version`.
 
 ## Community & Support
 
