@@ -82,7 +82,7 @@ s3() {
 }
 
 # Wrapper for jq that yields empty output instead of aborting the suite when
-# the payload is not JSON — an S3 error document, say — and jq exits non-zero.
+# the payload is not JSON (e.g. an S3 error document) and jq exits non-zero.
 jq_r() {
     jq -r "$@" 2>/dev/null || true
 }
