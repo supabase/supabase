@@ -217,12 +217,17 @@ When the goal is to remove an account so it can no longer access your app, delet
 - **Existing sessions.** Deleting the user does not revoke access tokens that were already issued. Any valid access token keeps working until it expires.
 - **Incomplete deletion.** An application-level "deleted" flag leaves the `auth.users` row intact, so the account can still authenticate and refresh. A temporary [ban](/docs/reference/javascript/auth-admin-updateuserbyid) only blocks sign-in for its duration and does not revoke existing sessions. Neither is a substitute for deleting the auth user.
 
-To fully revoke access:
+To cut off access:
 
 1. Revoke the user's sessions so their refresh token can no longer mint new access tokens — sign them out with the [`global` scope](/docs/guides/auth/signout), or delete their rows from `auth.sessions` server-side.
 2. Delete the auth user with [`auth.admin.deleteUser()`](/docs/reference/javascript/auth-admin-deleteuser).
 
-Even after you revoke sessions, any access token already issued stays valid until the `exp` claim passes, and during that window the account can still call the API. To narrow or close that window, keep the [access token (JWT) expiry](/docs/guides/auth/sessions) short, or validate the `session_id` claim against the `auth.sessions` table on sensitive operations. See [User sessions](/docs/guides/auth/sessions) for details.
+These steps stop the account from obtaining any _new_ tokens, but they cannot retroactively invalidate an access token that was already issued. Supabase access tokens are stateless JWTs, so a token already in the user's hands stays valid until its `exp` claim passes, and during that window the account can still call the API. You have two ways to handle this window:
+
+- **Bound it:** keep the [access token (JWT) expiry](/docs/guides/auth/sessions) short, so any outstanding token expires soon after step 1.
+- **Close it immediately:** validate the `session_id` claim against the `auth.sessions` table on sensitive operations. Because step 1 removes the session row, an outstanding token fails this check right away.
+
+See [User sessions](/docs/guides/auth/sessions) for details.
 
 ## Exporting users
 
