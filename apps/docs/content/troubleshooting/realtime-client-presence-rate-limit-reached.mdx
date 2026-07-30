@@ -33,11 +33,11 @@ The fix is to stop sending frequent Presence updates. Choose the option that mat
 
 ### Use Broadcast for high-frequency updates
 
-Presence is meant for slow-changing state such as online/offline status, the document a user is viewing, or which page they're on. For high-frequency or fire-and-forget data—live cursors, typing indicators, pointer positions—use [Broadcast](/docs/guides/realtime/broadcast) instead. Broadcast sends messages directly between clients without maintaining synced state, so it handles rapid updates without triggering this limit.
+Presence is meant for slow-changing state such as online/offline status, the document a user is viewing, or which page they're on. For high-frequency or fire-and-forget data—live cursors, typing indicators, pointer positions—use [Broadcast](/docs/guides/realtime/broadcast) instead. Broadcast relays messages through Realtime to connected clients without maintaining synced Presence state, so it handles rapid updates without triggering this limit.
 
 ### Throttle your Presence updates
 
-If you do need Presence for state that changes often, throttle the `track()` calls so the client sends at most a few updates per window. Only call `track()` when the value you're sharing changes, and coalesce bursts into a single update rather than tracking on every event.
+If you do need Presence for state that changes often, throttle your `track()` and `untrack()` calls so the client sends at most a few Presence updates per window. Only update Presence when the shared state changes, and coalesce bursts into a single update rather than sending one on every event.
 
 ## How to prevent it
 
