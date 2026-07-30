@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { useGroupedPermissions } from '../hooks/useGroupedPermissions'
@@ -29,7 +29,7 @@ export const AccessTokenNewBanner = <T,>({
 
   return (
     <Admonition
-      type="tip"
+      type="note"
       title={title}
       className="mb-6 relative"
       actions={

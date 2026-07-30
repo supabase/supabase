@@ -16,6 +16,7 @@ import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   computeErrorHighlightLine,
+  createSqlSnippetSkeletonV2,
   deriveSnippetIdentity,
   extractDebugContext,
   filterTablesCoveredByEnsureRLSTrigger,
@@ -430,6 +431,35 @@ describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
       orgSlug: 'acme',
       completionMetadata: { prompt: 'add a where clause' },
     })
+  })
+})
+
+describe('SQLEditor.utils.ts:createSqlSnippetSkeletonV2', () => {
+  const baseArgs = { name: 'Untitled', sql: 'select 1', owner_id: 1, project_id: 1 }
+
+  test('defaults to a database (sql) snippet', () => {
+    const snippet = createSqlSnippetSkeletonV2(baseArgs)
+    expect(snippet.type).toBe('sql')
+    expect(snippet.content?.unchecked_sql).toBe('select 1')
+    expect(snippet.status).toBe('new')
+  })
+
+  test('builds a database snippet when source is explicitly "database"', () => {
+    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'database' })
+    expect(snippet.type).toBe('sql')
+  })
+
+  test('builds a logs (log_sql) snippet when source is "logs"', () => {
+    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'logs' })
+    expect(snippet.type).toBe('log_sql')
+    expect(snippet.content?.unchecked_sql).toBe('select 1')
+  })
+
+  test('sets content_id to the snippet id for both sources', () => {
+    const db = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'db-id' })
+    const logs = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'logs-id', source: 'logs' })
+    expect(db.content?.content_id).toBe('db-id')
+    expect(logs.content?.content_id).toBe('logs-id')
   })
 })
 

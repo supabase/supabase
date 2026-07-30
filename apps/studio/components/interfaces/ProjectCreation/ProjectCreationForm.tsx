@@ -9,7 +9,7 @@ import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, cn, Form, useWatch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
@@ -23,9 +23,14 @@ import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
-import { sizes } from './ProjectCreation.constants'
+import {
+  HIGH_AVAILABILITY_POSTGRES_ENGINE,
+  HIGH_AVAILABILITY_RELEASE_CHANNEL,
+  sizes,
+} from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
   smartRegionToExactRegion,
@@ -35,7 +40,6 @@ import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
 import { SecurityOptions } from './SecurityOptions'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
-import { getValidVercelReturnUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import {
   GitHubRepositoryField,
   useGitHubRepositoryOptions,
@@ -91,7 +95,7 @@ interface ProjectCreationFormProps {
  *  - "Internal configuration" section
  *  - "GitHub repository" field
  *  - "Free project info" at the bottom
- * - Shows Cancel as "Return to Vercel" (via `next`) instead of navigating into Studio
+ * - Cancel closes the popup window instead of navigating into Studio
  * - Shows the following:
  *  - "Data seeding" section
  * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
@@ -106,8 +110,7 @@ export const ProjectCreationForm = ({
   const track = useTrack()
   const router = useRouter()
   const { profile } = useProfile()
-  const { slug, projectName, externalId, next } = useParams()
-  const canReturnToVercel = getValidVercelReturnUrl(next) !== undefined
+  const { slug, projectName, externalId } = useParams()
   const trackFunnelError = useTrackFunnelError()
   const defaultProvider = useDefaultProvider()
 
@@ -187,6 +190,7 @@ export const ProjectCreationForm = ({
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -267,15 +271,24 @@ export const ProjectCreationForm = ({
       }
     )
 
+  const highAvailabilityRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? availableRegionsData?.all.specific.find(
+          (region) => region.code === highAvailabilityRegionCode
+        )
+      : undefined
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
-    : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion =
+    highAvailability && highAvailabilityRegionCode !== undefined
+      ? highAvailabilityRegion?.name
+      : smartRegionEnabled
+        ? recommendedSmartRegion
+        : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -383,7 +396,11 @@ export const ProjectCreationForm = ({
       shouldRunMigrations,
     } = values
 
-    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
+    // HA projects never take a custom version — the API resolves the image from
+    // postgresEngine + releaseChannel.
+    const customPostgresVersion = highAvailability ? undefined : postgresVersion
+
+    if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
       return toast.error(
         `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
       )
@@ -404,9 +421,19 @@ export const ProjectCreationForm = ({
       extractPostgresVersionDetails(postgresVersionSelection)
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion = smartRegionEnabled
-      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
-      : undefined
+    const selectedRegion =
+      highAvailability && highAvailabilityRegionCode !== undefined
+        ? specific.find((region) => region.code === highAvailabilityRegionCode)
+        : smartRegionEnabled
+          ? (smartGroup.find((x) => x.name === dbRegion) ??
+            specific.find((x) => x.name === dbRegion))
+          : undefined
+
+    if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
+      return toast.error(
+        `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
+      )
+    }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
     const shouldIncludeGitHubFields =
@@ -451,8 +478,16 @@ export const ProjectCreationForm = ({
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
-      postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
-      releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      postgresEngine: highAvailability
+        ? HIGH_AVAILABILITY_POSTGRES_ENGINE
+        : useOrioleDb
+          ? availableOrioleVersion?.postgres_engine
+          : postgresEngine,
+      releaseChannel: highAvailability
+        ? HIGH_AVAILABILITY_RELEASE_CHANNEL
+        : useOrioleDb
+          ? availableOrioleVersion?.release_channel
+          : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
       ...(shouldIncludeGitHubFields
         ? {
@@ -462,11 +497,11 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (postgresVersion || instanceType) {
+    if (customPostgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
         ami: {
-          ...(postgresVersion && {
-            search_tags: { 'tag:postgresVersion': postgresVersion },
+          ...(customPostgresVersion && {
+            search_tags: { 'tag:postgresVersion': customPostgresVersion },
           }),
           ...(instanceType && { instance_type: instanceType }),
         },
@@ -513,22 +548,10 @@ export const ProjectCreationForm = ({
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (!isDbRegionDirty && recommendedSmartRegion) {
-      setValue('dbRegion', recommendedSmartRegion)
-    }
-  }, [recommendedSmartRegion, isDbRegionDirty, setValue])
-
-  useEffect(() => {
     if (regionError && fixedDefaultRegion) {
       resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
   }, [regionError, resetField, fixedDefaultRegion])
-
-  useEffect(() => {
-    if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      setValue('cloudProvider', 'AWS_K8S')
-    }
-  }, [highAvailability, cloudProvider, setValue])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
@@ -609,7 +632,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
-              cancelAction={isVercelIntegrationFlow ? 'vercel' : 'studio'}
+              cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
         >
@@ -659,9 +682,12 @@ export const ProjectCreationForm = ({
                     )}
                     <ProjectNameInput form={form} />
 
-                    {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
+                    <HighAvailabilityInput
+                      form={form}
+                      highAvailabilityRegionName={highAvailabilityRegion?.name}
+                    />
 
-                    <HighAvailabilityInput form={form} />
+                    {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
                     <DatabasePasswordInput form={form} />
 
@@ -676,9 +702,9 @@ export const ProjectCreationForm = ({
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
-                    {showAdvancedConfig && !!availableOrioleVersion && (
-                      <AdvancedConfiguration form={form} />
-                    )}
+                    {showAdvancedConfig &&
+                      !!availableOrioleVersion &&
+                      highAvailability !== true && <AdvancedConfiguration form={form} />}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
@@ -702,10 +728,7 @@ export const ProjectCreationForm = ({
                 {freePlanWithExceedingLimits ? (
                   isAdmin &&
                   slug && (
-                    <FreeProjectLimitWarning
-                      membersExceededLimit={membersExceededLimit || []}
-                      showVercelReturnHint={isVercelIntegrationFlow && canReturnToVercel}
-                    />
+                    <FreeProjectLimitWarning membersExceededLimit={membersExceededLimit || []} />
                   )
                 ) : hasOutstandingInvoices ? (
                   <Panel.Content>

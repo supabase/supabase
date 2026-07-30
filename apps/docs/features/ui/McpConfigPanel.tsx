@@ -23,7 +23,7 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   createMcpCopyHandler,
   McpConfigPanel as McpConfigPanelBase,

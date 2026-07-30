@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { cn } from 'ui'
 import {
@@ -9,30 +8,20 @@ import {
   MetricCardValue,
 } from 'ui-patterns/MetricCard'
 
-import {
-  WARN_DURATION_ACTIVE_QUERY,
-  WARN_DURATION_BLOCKED,
-  WARN_DURATION_IDLE_TXN,
-  WARN_TOP_BLOCKER,
-} from './DatabaseConnections.constants'
-import { getActivityStart } from './DatabaseConnections.utils'
+import { getConnectionMetrics } from './DatabaseConnections.utils'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
-import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
+import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-const LONG_RUNNING_STATES: (DatabaseActivity['state'] | undefined)[] = [
-  'active',
-  'idle in transaction',
-  'idle in transaction (aborted)',
-]
+import { useTrack } from '@/lib/telemetry/track'
 
 interface OverviewProps {
   live?: boolean
 }
 
 export const Overview = ({ live }: OverviewProps) => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const [, setSelectedPid] = useQueryState('pid', parseAsInteger)
 
@@ -43,61 +32,18 @@ export const Overview = ({ live }: OverviewProps) => {
     },
     { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
-  const activeQueries = (data ?? []).filter((x) => x.state === 'active')
 
-  const blockedQueries = (data ?? []).filter((x) => x.blocked_by.length > 0)
-  const warnBlockedQueries = blockedQueries.some((activity) => {
-    const start = getActivityStart(activity)
-    if (!start) return false
-    return dayjs().utc().diff(dayjs(start).utc(), 'second') >= WARN_DURATION_BLOCKED
-  })
-  const longestBlockedQuery = blockedQueries.reduce<{
-    activity: DatabaseActivity
-    duration: number
-  } | null>((longest, activity) => {
-    const start = getActivityStart(activity)
-    if (!start) return longest
-    const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
-    return longest === null || duration > longest.duration ? { activity, duration } : longest
-  }, null)
-
-  const idleInTransactionQueries = (data ?? []).filter((x) => {
-    const isIdleInTransaction =
-      x.state === 'idle in transaction' || x.state === 'idle in transaction (aborted)'
-    if (!isIdleInTransaction || !x.transaction_start) return false
-    return dayjs().utc().diff(dayjs(x.transaction_start).utc(), 'second') > WARN_DURATION_IDLE_TXN
-  })
-
-  const longestRunningQuery = (data ?? [])
-    .filter((x) => LONG_RUNNING_STATES.includes(x.state))
-    .reduce<{ activity: DatabaseActivity; duration: number } | null>((longest, activity) => {
-      const start = getActivityStart(activity)
-      if (!start) return longest
-      const duration = Math.max(dayjs().utc().diff(dayjs(start).utc(), 'second'), 0)
-      return longest === null || duration > longest.duration ? { activity, duration } : longest
-    }, null)
-  const warnLongestRunningQuery =
-    (longestRunningQuery?.activity.state === 'active' &&
-      longestRunningQuery.duration >= WARN_DURATION_ACTIVE_QUERY) ||
-    ((longestRunningQuery?.activity.state === 'idle in transaction' ||
-      longestRunningQuery?.activity.state === 'idle in transaction (aborted)') &&
-      longestRunningQuery.duration >= WARN_DURATION_IDLE_TXN)
-
-  const blockingCounts = (data ?? []).reduce<Map<number, number>>((counts, activity) => {
-    activity.blocked_by.forEach((pid) => counts.set(pid, (counts.get(pid) ?? 0) + 1))
-    return counts
-  }, new Map())
-
-  const queryBlockingTheMostQueries = [...blockingCounts].reduce<{
-    activity: DatabaseActivity
-    count: number
-  } | null>((mostBlocking, [pid, count]) => {
-    if (mostBlocking && count <= mostBlocking.count) return mostBlocking
-    const activity = (data ?? []).find((x) => x.pid === pid)
-    return activity ? { activity, count } : mostBlocking
-  }, null)
-
-  const warnTopBlocker = (queryBlockingTheMostQueries?.count ?? 0) >= WARN_TOP_BLOCKER
+  const {
+    activeQueries,
+    blockedQueries,
+    warnBlockedQueries,
+    longestBlockedQuery,
+    idleInTransactionQueries,
+    longestRunningQuery,
+    warnLongestRunningQuery,
+    queryBlockingTheMostQueries,
+    warnTopBlocker,
+  } = getConnectionMetrics(data ?? [])
 
   const { data: roles, isPending: isLoadingRoles } = useDatabaseRolesQuery(
     {
@@ -121,6 +67,29 @@ export const Overview = ({ live }: OverviewProps) => {
       refetchInterval: live ? 3000 : false,
     }
   )
+
+  const onSelectPid = (pid: number) => {
+    setSelectedPid(pid)
+    document.getElementById(pid.toString())?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  const onSelectLongestBlocked = () => {
+    if (!longestBlockedQuery) return
+    track('database_connections_overview_metric_card_clicked', { type: 'longest_blocked' })
+    onSelectPid(longestBlockedQuery.activity.pid)
+  }
+
+  const onSelectTopBlocker = () => {
+    if (!queryBlockingTheMostQueries) return
+    track('database_connections_overview_metric_card_clicked', { type: 'top_blocker' })
+    onSelectPid(queryBlockingTheMostQueries.activity.pid)
+  }
+
+  const onSelectLongestRunning = () => {
+    if (!longestRunningQuery) return
+    track('database_connections_overview_metric_card_clicked', { type: 'longest_running' })
+    onSelectPid(longestRunningQuery.activity.pid)
+  }
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -244,11 +213,11 @@ export const Overview = ({ live }: OverviewProps) => {
                         'hover:text-foreground hover:underline',
                         'focus:text-foreground focus:underline'
                       )}
-                      onClick={() => setSelectedPid(longestBlockedQuery.activity.pid)}
+                      onClick={() => onSelectLongestBlocked()}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(longestBlockedQuery.activity.pid)
+                          onSelectLongestBlocked()
                         }
                       }}
                     >
@@ -294,11 +263,11 @@ export const Overview = ({ live }: OverviewProps) => {
                       role="button"
                       tabIndex={0}
                       className="normal-nums cursor-pointer hover:underline focus:underline"
-                      onClick={() => setSelectedPid(queryBlockingTheMostQueries.activity.pid)}
+                      onClick={() => onSelectTopBlocker()}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(queryBlockingTheMostQueries.activity.pid)
+                          onSelectTopBlocker()
                         }
                       }}
                     >
@@ -351,11 +320,11 @@ export const Overview = ({ live }: OverviewProps) => {
                       role="button"
                       tabIndex={0}
                       className="normal-nums hover:underline focus:underline cursor-pointer"
-                      onClick={() => setSelectedPid(longestRunningQuery.activity.pid)}
+                      onClick={() => onSelectLongestRunning()}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedPid(longestRunningQuery.activity.pid)
+                          onSelectLongestRunning()
                         }
                       }}
                     >
