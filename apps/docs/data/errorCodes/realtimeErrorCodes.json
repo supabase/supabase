@@ -139,6 +139,9 @@
   "SubscriptionManagerConnectionFailed": {
     "description": "Error when the subscription manager process fails to connect to the database on startup."
   },
+  "UnableToCheckProcessesOnRemoteNode": {
+    "description": "Error when trying to check the processes on a remote node."
+  },
   "UnhandledProcessMessage": {
     "description": "Unhandled message received by a Realtime process."
   },
@@ -261,5 +264,32 @@
   },
   "HttpClientError": {
     "description": "Phoenix converted an exception into a 4xx HTTP response (for example a request to an unknown route). The log includes the underlying error and status."
-  }
+  },
+  "JoinsRateLimitReached": {
+    "description": "The rate of joins per second from your clients has reached the limit and the connection was refused."
+  },
+  "InvalidJWTToken": {
+    "description": "The JWT provided on connect is expired or is missing required claims (`role` and `exp`)."
+  },
+  "PrivateOnly": {
+    "description": "The connection was rejected because this project only allows private channels."
+  },
+  "UnableToHandleBroadcast": {
+    "description": "Error when handling a broadcast message."
+  },
+  "UnableToHandlePresence": {
+    "description": "Error when handling a presence message on a channel."
+  },
+  "ChannelShutdown": {
+    "description": "The channel was shut down and an error system message was pushed to the client."
+  },
+  "ReplicationRecoveryWindowExceeded": {
+    "description": "The replication connection recovery window was exceeded and the connection was terminated."
+  },
+  "MigrationCountMismatch": {
+    "description": "The cached `migrations_ran` count did not match the tenant database and is being reconciled."
+  },
+  "MigrationCountMismatchReconcileFailed": {
+    "description": "Failed to reconcile the `migrations_ran` count mismatch between the cache and the tenant database."
+  },
 }
