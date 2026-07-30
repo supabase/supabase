@@ -19,7 +19,10 @@ import {
   type CloudMarketplaceOnboardingInfo,
 } from '@/components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import { NewAwsMarketplaceOrgModal } from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgModal'
-import { InterstitialAccountRow } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialAccountRow,
+  InterstitialActionError,
+} from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useOrganizationLinkAwsMarketplaceMutation } from '@/data/organizations/organization-link-aws-marketplace-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
@@ -297,20 +300,18 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
           )}
 
           <div className="flex flex-col gap-5">
-            {linkError && (
-              <p role="alert" className="text-sm text-destructive">
-                {linkError}
-              </p>
-            )}
-            <Button
-              variant="primary"
-              block
-              loading={isLinking}
-              disabled={hasLinkableOrganizations && (!selectedOrgSlug || isLinking)}
-              onClick={primaryAction}
-            >
-              {primaryLabel}
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="primary"
+                block
+                loading={isLinking}
+                disabled={hasLinkableOrganizations && (!selectedOrgSlug || isLinking)}
+                onClick={primaryAction}
+              >
+                {primaryLabel}
+              </Button>
+              <InterstitialActionError error={linkError} />
+            </div>
             <p className="text-center text-xs text-foreground-lighter text-balance">
               <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
                 Learn more

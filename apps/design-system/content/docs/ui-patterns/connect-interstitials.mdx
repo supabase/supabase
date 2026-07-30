@@ -217,15 +217,7 @@ Match feedback to its scope:
   feedback for a failure the user needs to resolve on the current card.
 
 ```tsx
-{
-  actionError && (
-    <div className="mt-3 border-t border-muted pt-5">
-      <p role="alert" className="text-center text-xs text-destructive text-balance">
-        {actionError}
-      </p>
-    </div>
-  )
-}
+<InterstitialActionError error={actionError} />
 ```
 
 Clear stale action feedback when the user retries or changes a relevant

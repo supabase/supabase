@@ -23,7 +23,10 @@ import {
   AuthorizeConnectLogo,
   AuthorizeRequesterDetails,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialActionError,
+  InterstitialLayout,
+} from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization, ResponseError } from '@/types'
 
@@ -135,15 +138,11 @@ export function ApiAuthorizationMainView({
                     domain={requester.domain}
                     scopes={requester.scopes}
                   />
-                  {actionError && (
-                    <p role="alert" className="text-sm text-destructive">
-                      {actionError}
-                    </p>
-                  )}
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
                     redirectUrl={externalRedirectUrl}
+                    actionError={actionError}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -300,6 +299,7 @@ interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
   redirectUrl?: string
+  actionError?: string
   onDecline: () => void
   onApprove: () => void
 }
@@ -308,6 +308,7 @@ function FormFooter({
   approvalState,
   requester,
   redirectUrl,
+  actionError,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
@@ -328,7 +329,8 @@ function FormFooter({
       >
         Cancel
       </Button>
-      {redirectUrl && (
+      <InterstitialActionError error={actionError} />
+      {!actionError && redirectUrl && (
         <div className="mt-3 border-t border-muted pt-5">
           <p className="text-center text-xs text-foreground-lighter text-balance">
             Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
