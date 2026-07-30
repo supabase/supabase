@@ -1,17 +1,23 @@
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-interface LogsExplorerOtelBannerProps {
+interface LegacyLogsRewriteAdmonitionProps {
   isRewriting: boolean
   onRewrite: () => void
   onDismiss: () => void
 }
 
-export const LogsExplorerOtelBanner = ({
+/**
+ * Presentation-only banner offering to rewrite a BigQuery-dialect logs query to
+ * ClickHouse. Shared by the Logs Explorer and the SQL editor (whose
+ * `LegacyLogsRewriteBanner` owns the detection and rewrite flow) so the copy
+ * lives in one place.
+ */
+export const LegacyLogsRewriteAdmonition = ({
   isRewriting,
   onRewrite,
   onDismiss,
-}: LogsExplorerOtelBannerProps) => {
+}: LegacyLogsRewriteAdmonitionProps) => {
   return (
     <Admonition
       type="default"
@@ -24,7 +30,7 @@ export const LogsExplorerOtelBanner = ({
           <Button variant="default" size="tiny" loading={isRewriting} onClick={onRewrite}>
             Rewrite with Assistant
           </Button>
-          <Button variant="text" size="tiny" onClick={onDismiss}>
+          <Button variant="text" size="tiny" disabled={isRewriting} onClick={onDismiss}>
             Dismiss
           </Button>
         </div>

@@ -8,10 +8,11 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
+import { LegacyLogsRewriteAdmonition } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteAdmonition'
 import {
   detectLogSource,
-  looksLikeLegacyLogsQuery,
   rewriteLogsSqlWithAI,
+  shouldOfferLegacyLogsRewrite,
 } from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
 import {
   EXPLORER_DATEPICKER_HELPERS,
@@ -36,7 +37,6 @@ import {
   buildLogQueryParams,
   resolveLogDateRange,
 } from '@/components/interfaces/Settings/Logs/logsDateRange'
-import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/LogsExplorerOtelBanner'
 import { LogsQueryPanel } from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
@@ -189,7 +189,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const results = logData
   const isLoading = logsLoading
 
-  const showRewriteCTA = useOtelEndpoint && looksLikeLegacyLogsQuery(editorValue)
+  const showRewriteCTA = shouldOfferLegacyLogsRewrite({
+    sql: editorValue,
+    isClickhouseLogsEnabled: useOtelEndpoint,
+  })
 
   const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
@@ -509,7 +512,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onRewrite={handleRewrite}
           />
           {showRewriteCTA && !rewriteBannerDismissed && (
-            <LogsExplorerOtelBanner
+            <LegacyLogsRewriteAdmonition
               isRewriting={isRewriting}
               onRewrite={handleRewrite}
               onDismiss={() => setRewriteBannerDismissed(true)}

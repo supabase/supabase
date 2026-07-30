@@ -232,8 +232,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const system = isClickhouse
       ? source`
-          You rewrite SQL queries to ClickHouse SQL for the Supabase logs table.
-          Output only the rewritten SQL query: no explanation, no markdown, and no code fences.
+          You write and edit ClickHouse SQL for the Supabase logs table.
+          Output only SQL: no explanation, no markdown, and no code fences.
           ${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
           ${SECURITY_PROMPT}
         `

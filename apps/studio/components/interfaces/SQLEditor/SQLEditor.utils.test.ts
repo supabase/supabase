@@ -29,6 +29,7 @@ import {
   resolveConnectionString,
   resolveDiffKeyAction,
   shouldAutoGenerateTitle,
+  sqlSourceToDialect,
   trimTrailingSemicolons,
 } from './SQLEditor.utils'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
@@ -431,6 +432,31 @@ describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
       orgSlug: 'acme',
       completionMetadata: { prompt: 'add a where clause' },
     })
+  })
+  test('omits dialect when not provided, so the route keeps its Postgres default', () => {
+    const body = buildCompletionRequestBody({
+      projectRef: 'default',
+      connectionString: null,
+      orgSlug: 'acme',
+    })
+    expect(body).not.toHaveProperty('dialect')
+  })
+  test('includes the dialect when provided', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: null,
+        orgSlug: 'acme',
+        dialect: 'clickhouse',
+      }).dialect
+    ).toBe('clickhouse')
+  })
+})
+
+describe('SQLEditor.utils.ts:sqlSourceToDialect', () => {
+  test('logs snippets get ClickHouse, database snippets get Postgres', () => {
+    expect(sqlSourceToDialect('logs')).toBe('clickhouse')
+    expect(sqlSourceToDialect('database')).toBe('postgres')
   })
 })
 

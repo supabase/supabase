@@ -29,6 +29,8 @@ ${list}\n`
 export function buildClickhouseRewritePrompt(sql: string, availableKeys?: string[]): string {
   return `${LOGS_SCHEMA_REFERENCE}
 ${renderAvailableKeys(availableKeys)}
+Your task is to REWRITE the query below. It is BigQuery SQL and will not run on ClickHouse, so returning it unchanged is likely wrong — every rule below that applies must be applied.
+
 Convert the BigQuery logs query below to ClickHouse SQL for the logs table. There are no per-service tables and no unnest joins in ClickHouse. Follow these rules exactly:
 
 1. Replace the FROM table with the single logs table and filter by source. The old table name is the source value: "from postgres_logs as t" becomes "from logs where source = 'postgres_logs'". This is required, never select from a table like postgres_logs or edge_logs.
@@ -60,7 +62,45 @@ limit 100
 
 Reply with ONLY the rewritten SQL query: no explanation, no comments, and no markdown code fences.
 
+BigQuery query to rewrite:
 ${sql}`
+}
+
+/**
+ * Builds the prompt for an inline AI edit on a logs (ClickHouse) snippet in the
+ * SQL editor. The completion route sends this prompt through verbatim for the
+ * clickhouse dialect — there's no schema section wrapped around it — so the
+ * prompt has to carry the logs schema, the surrounding query, and the
+ * reply-with-only-SQL contract itself.
+ *
+ * The reply replaces the `<selection>` block (see `assembleCompletionDiff`), so
+ * the instruction is explicit that only that span should come back. Sibling of
+ * `buildClickhouseRewritePrompt`, which handles whole-query BigQuery rewrites.
+ */
+export function buildLogsCompletionPrompt({
+  instruction,
+  textBeforeCursor,
+  selection,
+  textAfterCursor,
+  availableKeys,
+}: {
+  instruction: string
+  textBeforeCursor: string
+  selection: string
+  textAfterCursor: string
+  availableKeys?: string[]
+}): string {
+  return `${LOGS_SCHEMA_REFERENCE}
+${renderAvailableKeys(availableKeys)}
+You are editing a ClickHouse logs query in the Supabase SQL editor. The full query is below, with the part to replace wrapped in <selection> tags. An empty selection means the user's cursor sits there and you should write new SQL for that spot.
+
+\`\`\`sql
+${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
+\`\`\`
+
+Instruction: ${instruction}
+
+Reply with ONLY the SQL that replaces the <selection> block, keeping the surrounding query valid: no explanation, no comments, and no markdown code fences.`
 }
 
 export function stripSqlCodeFences(text: string): string {
@@ -94,6 +134,22 @@ export function looksLikeLegacyLogsQuery(sql: string): boolean {
   if (/cast\s*\(\s*timestamp\s+as\s+datetime\s*\)/.test(lower)) return true
   const byFrom = lower.match(/\bfrom\s+([a-z_][a-z0-9_]*)/)
   return byFrom ? byFrom[1] !== 'logs' : false
+}
+
+/**
+ * Whether to offer the ClickHouse rewrite for a query. Both the flag and the
+ * dialect check matter: on an org whose logs haven't moved to ClickHouse the
+ * BigQuery text is still *correct*, so offering to rewrite it would break a
+ * working query. Callers layer their own dismissal state on top.
+ */
+export function shouldOfferLegacyLogsRewrite({
+  sql,
+  isClickhouseLogsEnabled,
+}: {
+  sql: string
+  isClickhouseLogsEnabled: boolean
+}): boolean {
+  return isClickhouseLogsEnabled && looksLikeLegacyLogsQuery(sql)
 }
 
 export interface RewriteLogsSqlArgs {

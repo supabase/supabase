@@ -497,25 +497,46 @@ export function assembleCompletionDiff(
 }
 
 /**
- * Builds the request body sent to the AI completion endpoint. `options` is
- * the caller-provided extra fields (e.g. `completionMetadata`), merged in
- * last so it can override the defaults if it ever needs to.
+ * The SQL dialect the AI writes. Mirrors the `dialect` enum the completion API
+ * route accepts — a snippet's dialect follows its source and never flips, so a
+ * logs snippet always gets ClickHouse SQL and a database snippet Postgres.
+ */
+export type SqlDialect = 'postgres' | 'clickhouse'
+
+/**
+ * Maps a snippet's query source to the dialect the AI should write in. Logs
+ * snippets run against the ClickHouse-backed analytics endpoint; everything
+ * else runs against the user's Postgres database.
+ */
+export function sqlSourceToDialect(source: SqlSnippetSource): SqlDialect {
+  return source === 'logs' ? 'clickhouse' : 'postgres'
+}
+
+/**
+ * Builds the request body sent to the AI completion endpoint. `dialect` is
+ * omitted when undefined so callers that don't care keep the route's Postgres
+ * default. `options` is the caller-provided extra fields (e.g.
+ * `completionMetadata`), merged in last so it can override the defaults if it
+ * ever needs to.
  */
 export function buildCompletionRequestBody({
   projectRef,
   connectionString,
   orgSlug,
+  dialect,
   options,
 }: {
   projectRef: string | undefined
   connectionString: string | undefined | null
   orgSlug: string | undefined
+  dialect?: SqlDialect
   options?: { completionMetadata?: unknown }
 }): {
   projectRef: string | undefined
   connectionString: string | undefined | null
   language: 'sql'
   orgSlug: string | undefined
+  dialect?: SqlDialect
   completionMetadata?: unknown
 } {
   return {
@@ -523,6 +544,7 @@ export function buildCompletionRequestBody({
     connectionString,
     language: 'sql',
     orgSlug,
+    ...(dialect !== undefined && { dialect }),
     ...(options ?? {}),
   }
 }

@@ -1,13 +1,17 @@
 import { act, waitFor } from '@testing-library/react'
+import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
+import type { SqlSnippetSource } from './querySource'
 import { DiffType } from './SQLEditor.types'
 import { useSqlEditorAi } from './useSqlEditorAi'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { API_URL } from '@/lib/constants'
 import { sidebarManagerState } from '@/state/sidebar-manager-state'
 import { sqlEditorDiffRequestState } from '@/state/sql-editor/sql-editor-diff-request'
 import { sqlEditorSessionState } from '@/state/sql-editor/sql-editor-session-state'
+import { mswServer } from '@/tests/lib/msw'
 import {
   createInMemoryEditor,
   renderSqlEditorHook,
@@ -18,15 +22,17 @@ import {
 
 const SNIPPET_ID = 'ai-snippet'
 
+type HarnessProps = { editorMountCount?: number; sqlSource?: SqlSnippetSource }
+
 /**
  * Composes the diff + prompt state hooks the AI hook depends on (production
  * wires these together in `SQLEditorControllers`), so tests drive the real
  * accept/discard/drain flows end to end.
  */
-function useAiHarness({ editorMountCount = 1 }: { editorMountCount?: number } = {}) {
+function useAiHarness({ editorMountCount = 1, sqlSource = 'database' }: HarnessProps = {}) {
   const diff = useSqlEditorDiff()
   const prompt = useSqlEditorPrompt()
-  const ai = useSqlEditorAi({ id: SNIPPET_ID, editorMountCount, diff, prompt })
+  const ai = useSqlEditorAi({ id: SNIPPET_ID, editorMountCount, diff, prompt, sqlSource })
   return { ai, diff, prompt }
 }
 
@@ -116,6 +122,101 @@ describe('useSqlEditorAi — accept / discard diff', () => {
 
     await waitFor(() => expect(result.current.diff.isDiffOpen).toBe(false))
     expect(inMemoryEditor.editor.getValue()).toBe('select 1;')
+  })
+})
+
+describe('useSqlEditorAi — completion dialect', () => {
+  type CompletionRequestBody = {
+    dialect?: string
+    completionMetadata: { prompt: string; selection: string }
+  }
+
+  /** Replaces the default completion mock so we can read what was posted. */
+  function captureCompletionRequests(response: string) {
+    const bodies: CompletionRequestBody[] = []
+    mswServer.use(
+      http.post(`${API_URL}/ai/code/complete`, async ({ request }) => {
+        bodies.push((await request.json()) as CompletionRequestBody)
+        return HttpResponse.json(response)
+      })
+    )
+    return bodies
+  }
+
+  const context = {
+    beforeSelection: "select timestamp from logs where source = 'edge_logs'\n",
+    selection: 'limit 5',
+    afterSelection: '',
+  }
+
+  it('posts the clickhouse dialect with a logs-shaped prompt for a logs snippet', async () => {
+    const bodies = captureCompletionRequests('limit 10')
+    const { result } = renderSqlEditorHook(useAiHarness, {
+      initialProps: { sqlSource: 'logs' },
+    })
+
+    await act(async () => {
+      await result.current.ai.handlePrompt('only keep 5xx responses', context)
+    })
+
+    expect(bodies).toHaveLength(1)
+    expect(bodies[0].dialect).toBe('clickhouse')
+    // The clickhouse route sends the prompt through verbatim, so the logs schema
+    // and query context have to be inside it.
+    expect(bodies[0].completionMetadata.prompt).toContain('log_attributes')
+    expect(bodies[0].completionMetadata.prompt).toContain('<selection>limit 5</selection>')
+    expect(bodies[0].completionMetadata.prompt).toContain('only keep 5xx responses')
+    expect(bodies[0].completionMetadata.selection).toBe('limit 5')
+  })
+
+  it('posts the postgres dialect with the raw instruction for a database snippet', async () => {
+    const bodies = captureCompletionRequests('limit 10')
+    const { result } = renderSqlEditorHook(useAiHarness, {
+      initialProps: { sqlSource: 'database' },
+    })
+
+    await act(async () => {
+      await result.current.ai.handlePrompt('bump the limit', context)
+    })
+
+    expect(bodies).toHaveLength(1)
+    expect(bodies[0].dialect).toBe('postgres')
+    expect(bodies[0].completionMetadata.prompt).toBe('bump the limit')
+  })
+
+  it('strips code fences and leaves clickhouse output unformatted', async () => {
+    captureCompletionRequests('```sql\nlimit 10\n```')
+    const { result } = renderSqlEditorHook(useAiHarness, {
+      initialProps: { sqlSource: 'logs' },
+    })
+
+    await act(async () => {
+      await result.current.ai.handlePrompt('bump the limit', context)
+    })
+
+    await waitFor(() => expect(result.current.diff.isDiffOpen).toBe(true))
+    // sql-formatter is Postgres-only, so the ClickHouse diff is the reassembled
+    // query verbatim — fences stripped, nothing else touched.
+    expect(result.current.diff.sourceSqlDiff).toEqual({
+      original: `${context.beforeSelection}limit 5`,
+      modified: `${context.beforeSelection}limit 10`,
+    })
+  })
+
+  it('still formats database output through sql-formatter', async () => {
+    captureCompletionRequests('limit 10')
+    const { result } = renderSqlEditorHook(useAiHarness, {
+      initialProps: { sqlSource: 'database' },
+    })
+
+    await act(async () => {
+      await result.current.ai.handlePrompt('bump the limit', context)
+    })
+
+    await waitFor(() => expect(result.current.diff.isDiffOpen).toBe(true))
+    expect(result.current.diff.sourceSqlDiff?.modified).not.toBe(
+      `${context.beforeSelection}limit 10`
+    )
   })
 })
 
