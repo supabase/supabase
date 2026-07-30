@@ -1,7 +1,7 @@
 import { useIsLoggedIn, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
