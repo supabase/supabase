@@ -36,6 +36,35 @@ export const platformBlocks: SidebarNavGroup = {
   ],
 }
 
+// Blocks for apps with no front-end of their own. These ship plain HTML rather
+// than components, so they take no framework and are not framework-switchable.
+export const headlessBlocks: SidebarNavGroup = {
+  title: 'Headless',
+  items: [
+    {
+      title: 'MCP Auth',
+      href: '/docs/headless/mcp-auth',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Auth',
+    },
+    {
+      title: 'MCP Server',
+      href: '/docs/headless/mcp-server',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Server',
+    },
+    {
+      title: 'MCP Tools: PostgREST',
+      href: '/docs/headless/mcp-tools-postgrest',
+      items: [],
+      new: true,
+      commandItemLabel: 'MCP Tools: PostgREST',
+    },
+  ],
+}
+
 // Component definitions with supported frameworks
 export const componentPages: SidebarNavGroup = {
   title: 'Components',
@@ -130,6 +159,10 @@ export const COMMAND_ITEMS = [
     href: item.href,
   })),
   ...componentPages.items.map((item) => ({
+    label: item.commandItemLabel,
+    href: item.href,
+  })),
+  ...headlessBlocks.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),

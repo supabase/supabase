@@ -1724,6 +1724,163 @@
       ]
     },
     {
+      "name": "mcp-auth-html",
+      "type": "registry:item",
+      "title": "MCP Auth (HTML)",
+      "description": "Sign-in, OAuth consent, and client management screens for an MCP server. Static HTML with a pinned local supabase-js bundle and no build step.",
+      "files": [
+        {
+          "path": "registry/default/blocks/mcp-auth-html/index.html",
+          "type": "registry:file",
+          "target": "index.html"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/auth/index.html",
+          "type": "registry:file",
+          "target": "auth/index.html"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/oauth/consent/index.html",
+          "type": "registry:file",
+          "target": "oauth/consent/index.html"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/config.js",
+          "type": "registry:file",
+          "target": "config.js"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/assets/app.js",
+          "type": "registry:file",
+          "target": "assets/app.js"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/assets/supabase.js",
+          "type": "registry:file",
+          "target": "assets/supabase.js"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/assets/vendor/supabase-js-2.110.9.js",
+          "type": "registry:file",
+          "target": "assets/vendor/supabase-js-2.110.9.js"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/assets/vendor/supabase-js-LICENSE",
+          "type": "registry:file",
+          "target": "assets/vendor/supabase-js-LICENSE"
+        },
+        {
+          "path": "registry/default/blocks/mcp-auth-html/assets/styles.css",
+          "type": "registry:file",
+          "target": "assets/styles.css"
+        }
+      ]
+    },
+    {
+      "name": "mcp-server",
+      "type": "registry:item",
+      "title": "MCP Server",
+      "description": "An MCP server as a Supabase Edge Function: Streamable HTTP transport, @supabase/server-powered OAuth 2.1 plus first-party JWT auth, and verified per-request tool context.",
+      "files": [
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/index.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/auth.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/auth.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/supabase.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/supabase.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.json",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/deno.json"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/deno.lock",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/deno.lock"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/.env.example",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/.env.example"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/registry.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/registry.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/types.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/types.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/result.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/result.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/echo.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/echo.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/whoami.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/whoami.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/index.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/index.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-server/supabase/migrations/20260730000000_mcp_access_token_hook.sql",
+          "type": "registry:file",
+          "target": "supabase/migrations/20260730000000_mcp_access_token_hook.sql"
+        }
+      ]
+    },
+    {
+      "name": "mcp-tools-postgrest",
+      "type": "registry:item",
+      "title": "MCP Tools: PostgREST",
+      "description": "A toolset for the MCP server that generates database tools from your PostgREST schema: read and write tools per table, view, and function.",
+      "registryDependencies": [
+        "https://supabase.com/ui/r/mcp-server.json"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/index.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/postgrest/index.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/schema.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/postgrest/schema.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/tools.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/postgrest/tools.ts"
+        },
+        {
+          "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/index.ts",
+          "type": "registry:file",
+          "target": "supabase/functions/mcp-server/tools/index.ts"
+        }
+      ]
+    },
+    {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "tanstack-db-nextjs",
       "type": "registry:block",

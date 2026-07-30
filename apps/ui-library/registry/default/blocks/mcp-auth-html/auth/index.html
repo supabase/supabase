@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in</title>
+    <link rel="stylesheet" href="../assets/styles.css" />
+  </head>
+  <body class="centered">
+    <main>
+      <div class="panel">
+        <div id="sign-in-view">
+          <div class="panel-header">
+            <h1>Sign in</h1>
+          </div>
+
+          <div id="providers" class="stack-tight" hidden></div>
+          <p id="providers-divider" class="divider" hidden>or</p>
+
+          <form id="sign-in-form">
+            <label>
+              Email
+              <input name="email" type="email" autocomplete="email" required />
+            </label>
+            <label>
+              Password
+              <input name="password" type="password" autocomplete="current-password" required />
+            </label>
+            <button type="submit">Sign in</button>
+          </form>
+
+          <p class="form-footer">
+            No account?
+            <button id="show-sign-up" class="link" type="button">Create one</button>
+          </p>
+        </div>
+
+        <div id="sign-up-view" hidden>
+          <div class="panel-header">
+            <h1>Create account</h1>
+          </div>
+
+          <form id="sign-up-form">
+            <label>
+              Email
+              <input name="email" type="email" autocomplete="email" required />
+            </label>
+            <label>
+              Password
+              <input
+                name="password"
+                type="password"
+                autocomplete="new-password"
+                minlength="6"
+                required
+              />
+            </label>
+            <button type="submit">Create account</button>
+          </form>
+
+          <p class="form-footer">
+            Already have an account?
+            <button id="show-sign-in" class="link" type="button">Sign in</button>
+          </p>
+        </div>
+
+        <p id="status" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </main>
+
+    <script src="../assets/vendor/supabase-js-2.110.9.js"></script>
+    <script type="module">
+      import { messageFor, returnToParam, setStatus } from '../assets/app.js'
+      import {
+        completeSignInRedirect,
+        configError,
+        getUser,
+        signInWithPassword,
+        signInWithProvider,
+        signUp,
+      } from '../assets/supabase.js'
+      import { SOCIAL_PROVIDERS } from '../config.js'
+
+      const status = document.querySelector('#status')
+      const signInView = document.querySelector('#sign-in-view')
+      const signUpView = document.querySelector('#sign-up-view')
+      const signInForm = document.querySelector('#sign-in-form')
+      const signUpForm = document.querySelector('#sign-up-form')
+
+      // Providers whose names look wrong when naively capitalized.
+      const PROVIDER_LABELS = {
+        github: 'GitHub',
+        gitlab: 'GitLab',
+        bitbucket: 'Bitbucket',
+        google: 'Google',
+        apple: 'Apple',
+        azure: 'Azure',
+        discord: 'Discord',
+        slack: 'Slack',
+        workos: 'WorkOS',
+        linkedin_oidc: 'LinkedIn',
+      }
+
+      const providerLabel = (provider) =>
+        PROVIDER_LABELS[provider] ?? provider.charAt(0).toUpperCase() + provider.slice(1)
+
+      /** Where to land once signed in: back where the user came from, or home. */
+      const destination = () => returnToParam() ?? '/'
+
+      function showView(view) {
+        signInView.hidden = view !== 'sign-in'
+        signUpView.hidden = view !== 'sign-up'
+        setStatus(status, '')
+      }
+
+      function withPending(form, pendingLabel, handler) {
+        const button = form.querySelector('[type="submit"]')
+        const idleLabel = button.textContent
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault()
+          setStatus(status, '')
+          button.disabled = true
+          button.textContent = pendingLabel
+
+          try {
+            await handler(Object.fromEntries(new FormData(form)))
+          } catch (error) {
+            setStatus(status, messageFor(error), { error: true })
+          } finally {
+            button.disabled = false
+            button.textContent = idleLabel
+          }
+        })
+      }
+
+      function mountProviders() {
+        if (!SOCIAL_PROVIDERS.length) return
+
+        const container = document.querySelector('#providers')
+        for (const provider of SOCIAL_PROVIDERS) {
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.className = 'provider'
+          button.textContent = `Continue with ${providerLabel(provider)}`
+          button.addEventListener('click', async () => {
+            setStatus(status, '')
+            button.disabled = true
+            try {
+              // Come back to this page so the redirect can be exchanged here,
+              // then continue to wherever the user was headed.
+              const redirectTo = new URL(location.pathname, location.origin)
+              const returnTo = returnToParam()
+              if (returnTo) redirectTo.searchParams.set('returnTo', returnTo)
+              await signInWithProvider(provider, { redirectTo: redirectTo.toString() })
+            } catch (error) {
+              setStatus(status, messageFor(error), { error: true })
+              button.disabled = false
+            }
+          })
+          container.append(button)
+        }
+
+        container.hidden = false
+        document.querySelector('#providers-divider').hidden = false
+      }
+
+      async function main() {
+        if (configError) {
+          setStatus(status, configError, { error: true })
+          for (const field of document.querySelectorAll('input, button')) field.disabled = true
+          return
+        }
+
+        mountProviders()
+
+        document.querySelector('#show-sign-up').addEventListener('click', () => showView('sign-up'))
+        document.querySelector('#show-sign-in').addEventListener('click', () => showView('sign-in'))
+
+        withPending(signInForm, 'Signing in…', async ({ email, password }) => {
+          await signInWithPassword({ email, password })
+          location.assign(destination())
+        })
+
+        withPending(signUpForm, 'Creating account…', async ({ email, password }) => {
+          // Confirmation links come back here, so preserve returnTo across the
+          // round trip through email.
+          const emailRedirectTo = new URL(location.pathname, location.origin)
+          const returnTo = returnToParam()
+          if (returnTo) emailRedirectTo.searchParams.set('returnTo', returnTo)
+
+          const session = await signUp({
+            email,
+            password,
+            emailRedirectTo: emailRedirectTo.toString(),
+          })
+
+          if (session) location.assign(destination())
+          else setStatus(status, 'Check your email for a confirmation link, then sign in.')
+        })
+
+        // A provider redirect or a confirmation link lands here with credentials
+        // in the URL. Finish that before deciding whether to show the form.
+        try {
+          if (await completeSignInRedirect()) {
+            location.replace(destination())
+            return
+          }
+        } catch (error) {
+          setStatus(status, messageFor(error), { error: true })
+          return
+        }
+
+        if (await getUser()) location.replace(destination())
+      }
+
+      main()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Connect an MCP client</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body class="wide">
+    <div id="account-bar" class="account-bar" hidden>
+      <span id="account-email"></span>
+      <button id="sign-out" class="link" type="button">Sign out</button>
+    </div>
+
+    <main id="content" hidden>
+      <div class="page-header">
+        <h1>Connect an MCP client</h1>
+        <p class="muted">
+          Add this server to a client, then approve the authorization request it opens.
+        </p>
+      </div>
+
+      <span class="field-label">Server URL</span>
+      <div class="code">
+        <pre><code id="server-url"></code></pre>
+        <button class="copy" type="button" data-copy="server-url">Copy</button>
+      </div>
+
+      <div class="section">
+        <h2>Clients</h2>
+        <div class="clients">
+          <article class="client">
+            <h3>Claude Code</h3>
+            <div class="code">
+              <pre><code id="claude-command"></code></pre>
+              <button class="copy" type="button" data-copy="claude-command">Copy</button>
+            </div>
+            <ol>
+              <li>Run the command.</li>
+              <li>Run <code>/mcp</code>, select the server, and sign in.</li>
+            </ol>
+          </article>
+
+          <article class="client">
+            <h3>Codex</h3>
+            <div class="code">
+              <pre><code id="codex-command"></code></pre>
+              <button class="copy" type="button" data-copy="codex-command">Copy</button>
+            </div>
+            <ol>
+              <li>Run both commands and sign in.</li>
+              <li>Start a session and run <code>/mcp</code> to confirm.</li>
+            </ol>
+          </article>
+
+          <article class="client">
+            <h3>Cursor</h3>
+            <div class="code">
+              <pre><code id="cursor-config"></code></pre>
+              <button class="copy" type="button" data-copy="cursor-config">Copy</button>
+            </div>
+            <ol>
+              <li>Add this to <code>~/.cursor/mcp.json</code> or <code>.cursor/mcp.json</code>.</li>
+              <li>Enable the server in MCP settings and sign in.</li>
+            </ol>
+          </article>
+
+          <article class="client">
+            <h3>ChatGPT</h3>
+            <div class="code">
+              <pre><code id="chatgpt-details"></code></pre>
+              <button class="copy" type="button" data-copy="chatgpt-details">Copy</button>
+            </div>
+            <ol>
+              <li>Go to <strong>Settings → Connectors</strong> and add a connector.</li>
+              <li>Paste these details, then sign in from a new chat.</li>
+            </ol>
+          </article>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>Authorized clients</h2>
+        <div id="grants" class="grants"></div>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </main>
+
+    <script src="./assets/vendor/supabase-js-2.110.9.js"></script>
+    <script type="module">
+      import {
+        messageFor,
+        mountAccountBar,
+        mountCopyButtons,
+        requireUser,
+        setStatus,
+      } from './assets/app.js'
+      import { configError, listGrants, revokeGrant } from './assets/supabase.js'
+      import { MCP_SERVER_URL, SUPABASE_URL } from './config.js'
+
+      const content = document.querySelector('#content')
+      const status = document.querySelector('#status')
+      const grantList = document.querySelector('#grants')
+      // This is a local alias in each MCP client, not the protocol-level server
+      // name. Clients learn the latter during initialization.
+      const clientAlias = 'supabase-mcp'
+
+      async function loadServerMetadata() {
+        const response = await fetch(
+          `${MCP_SERVER_URL.replace(/\/+$/, '')}/.well-known/oauth-protected-resource`
+        )
+        if (!response.ok) {
+          throw new Error(`The MCP server metadata request failed (${response.status}).`)
+        }
+
+        const metadata = await response.json()
+        const expectedIssuer = `${SUPABASE_URL.replace(/\/+$/, '')}/auth/v1`
+        if (metadata.resource !== MCP_SERVER_URL) {
+          throw new Error('The MCP server advertises a different resource URL than config.js.')
+        }
+        if (!metadata.authorization_servers?.includes(expectedIssuer)) {
+          throw new Error('The MCP server and this site use different Supabase Auth issuers.')
+        }
+        return metadata
+      }
+
+      /** Quote a value for a shell only when it needs it. */
+      function shellArg(value) {
+        return /^[A-Za-z0-9._/:-]+$/.test(value) ? value : `'${value.replaceAll("'", "'\\''")}'`
+      }
+
+      function renderCommands(metadata) {
+        document.querySelector('#server-url').textContent = MCP_SERVER_URL
+
+        document.querySelector('#claude-command').textContent =
+          `claude mcp add --transport http --scope user ${shellArg(clientAlias)} ${shellArg(MCP_SERVER_URL)}`
+
+        document.querySelector('#codex-command').textContent =
+          `codex mcp add ${shellArg(clientAlias)} --url ${shellArg(MCP_SERVER_URL)}\n` +
+          `codex mcp login ${shellArg(clientAlias)}`
+
+        document.querySelector('#cursor-config').textContent = JSON.stringify(
+          { mcpServers: { [clientAlias]: { url: MCP_SERVER_URL } } },
+          null,
+          2
+        )
+
+        document.querySelector('#chatgpt-details').textContent =
+          `Name: ${metadata.resource_name ?? clientAlias}\n` +
+          `Description: MCP access to this project for the signed-in user.\n` +
+          `URL: ${MCP_SERVER_URL}`
+      }
+
+      function grantName(grant) {
+        return grant.client?.name ?? grant.client_name ?? grant.client?.id ?? grant.client_id
+      }
+
+      async function renderGrants() {
+        let grants
+        try {
+          grants = await listGrants()
+        } catch (error) {
+          setStatus(status, messageFor(error), { error: true })
+          return
+        }
+
+        grantList.replaceChildren()
+
+        if (!grants.length) {
+          const empty = document.createElement('p')
+          empty.className = 'muted'
+          empty.textContent = 'No clients authorized yet. Connect one using the steps above.'
+          grantList.append(empty)
+          return
+        }
+
+        for (const grant of grants) {
+          const name = grantName(grant)
+          const scopes = grant.scopes ?? grant.scope?.split(' ') ?? []
+
+          const details = document.createElement('div')
+          const nameElement = document.createElement('strong')
+          nameElement.textContent = name
+          const scopeElement = document.createElement('small')
+          scopeElement.textContent = scopes.length ? scopes.join(', ') : 'No scopes requested'
+          details.append(nameElement, scopeElement)
+
+          const revoke = document.createElement('button')
+          revoke.type = 'button'
+          revoke.className = 'danger'
+          revoke.textContent = 'Revoke access'
+          revoke.addEventListener('click', async () => {
+            const confirmed = confirm(
+              `Revoke access for ${name}?\n\nIt stops reaching your data until you authorize it again.`
+            )
+            if (!confirmed) return
+
+            revoke.disabled = true
+            revoke.textContent = 'Revoking…'
+            try {
+              await revokeGrant(grant.client?.id ?? grant.client_id)
+              setStatus(status, `Access revoked for ${name}`)
+              await renderGrants()
+            } catch (error) {
+              setStatus(status, messageFor(error), { error: true })
+              revoke.disabled = false
+              revoke.textContent = 'Revoke access'
+            }
+          })
+
+          const item = document.createElement('div')
+          item.className = 'grant'
+          item.append(details, revoke)
+          grantList.append(item)
+        }
+      }
+
+      async function main() {
+        if (configError) {
+          content.hidden = false
+          setStatus(status, configError, { error: true })
+          return
+        }
+
+        const user = await requireUser()
+        if (!user) return // Signing in; a navigation is already in flight.
+
+        let metadata
+        try {
+          metadata = await loadServerMetadata()
+        } catch (error) {
+          content.hidden = false
+          setStatus(status, messageFor(error), { error: true })
+          return
+        }
+
+        mountAccountBar(user)
+        renderCommands(metadata)
+        mountCopyButtons()
+        content.hidden = false
+        await renderGrants()
+      }
+
+      main()
+    </script>
+  </body>
+</html>

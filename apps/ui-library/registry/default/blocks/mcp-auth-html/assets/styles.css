@@ -1,0 +1,495 @@
+/* Styles for the MCP authorization pages. One stylesheet, no build step, no
+   framework. Colors follow the viewer's light or dark preference. */
+
+:root {
+  color-scheme: light dark;
+
+  --background: #ffffff;
+  --surface: #fafafa;
+  --border: #e4e4e4;
+  --border-strong: #d4d4d4;
+  --foreground: #171717;
+  --foreground-light: #4b4b4b;
+  --foreground-muted: #737373;
+  --brand: #3ecf8e;
+  --brand-hover: #34b27b;
+  --brand-foreground: #052e1c;
+  --destructive: #b42318;
+  --radius: 6px;
+
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* Styles for the MCP authorization pages: one plain CSS file, no framework. The
+   tokens above set the light theme; this block overrides them for dark, which
+   follows the viewer's system setting. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #121212;
+    --surface: #1a1a1a;
+    --border: #2e2e2e;
+    --border-strong: #3d3d3d;
+    --foreground: #ededed;
+    --foreground-light: #b4b4b4;
+    --foreground-muted: #8f8f8f;
+    --destructive: #ff8b7d;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 2rem 1.25rem 4rem;
+  background: var(--background);
+  color: var(--foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Sign-in and consent are single decisions, so they sit centered and narrow.
+   The connect page is a reference you scroll, so it starts at the top. */
+.centered {
+  display: grid;
+  place-items: center;
+}
+
+main {
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+}
+
+.wide main {
+  max-width: 44rem;
+}
+
+h1,
+h2,
+p,
+ul,
+ol,
+pre {
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.25rem;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1rem;
+  font-weight: 550;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+.muted {
+  color: var(--foreground-muted);
+}
+
+.stack {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.stack-tight {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Panels ------------------------------------------------------------------ */
+
+.panel {
+  padding: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 2);
+  background: var(--surface);
+}
+
+.panel-header {
+  display: grid;
+  gap: 0.375rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Forms ------------------------------------------------------------------- */
+
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+label {
+  display: grid;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--foreground-light);
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font: inherit;
+}
+
+input::placeholder {
+  color: var(--foreground-muted);
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid var(--brand);
+  border-radius: var(--radius);
+  background: var(--brand);
+  color: var(--brand-foreground);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--brand-hover);
+  background: var(--brand-hover);
+}
+
+button.secondary,
+button.provider {
+  border-color: var(--border-strong);
+  background: var(--background);
+  color: var(--foreground);
+  font-weight: 450;
+}
+
+button.secondary:hover:not(:disabled),
+button.provider:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+
+button.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--foreground);
+  font-weight: 450;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+button.link:hover:not(:disabled) {
+  background: none;
+  color: var(--foreground);
+}
+
+button.danger {
+  border-color: var(--border-strong);
+  background: var(--background);
+  color: var(--destructive);
+  font-weight: 450;
+}
+
+button.danger:hover:not(:disabled) {
+  background: var(--surface);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.actions button {
+  flex: 1 1 auto;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+  gap: 0.75rem;
+  color: var(--foreground-muted);
+  font-size: 0.8125rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+
+.form-footer {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--foreground-muted);
+  text-align: center;
+}
+
+/* Status ------------------------------------------------------------------ */
+
+.status {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: var(--foreground-muted);
+}
+
+.status:empty {
+  display: none;
+}
+
+.status.error {
+  color: var(--destructive);
+}
+
+/* Consent ----------------------------------------------------------------- */
+
+.details {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  font-size: 0.875rem;
+}
+
+.detail {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.detail dt {
+  color: var(--foreground-muted);
+}
+
+.detail dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 500;
+}
+
+/* Values a user should compare character by character, such as the redirect the
+   client will be sent back to. */
+.detail dd.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.scopes {
+  margin: 0;
+  padding-left: 1.125rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+}
+
+.note {
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--foreground-light);
+}
+
+/* Account bar ------------------------------------------------------------- */
+
+.account-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  max-width: 44rem;
+  margin: 0 auto 2.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.account-bar span {
+  overflow-wrap: anywhere;
+  color: var(--foreground-muted);
+}
+
+/* Connect page ------------------------------------------------------------ */
+
+.page-header {
+  display: grid;
+  gap: 0.375rem;
+  margin-bottom: 2rem;
+}
+
+.section {
+  margin-top: 2.5rem;
+}
+
+.section > h2 {
+  margin-bottom: 1rem;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--foreground-light);
+}
+
+.code {
+  position: relative;
+  /* Without this, a long command widens the whole page instead of scrolling
+     inside its own block. */
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.code pre {
+  padding: 0.75rem 5rem 0.75rem 0.875rem;
+  overflow-x: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.copy {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-color: var(--border-strong);
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 450;
+}
+
+.copy:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--surface);
+}
+
+.clients {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Grid items size to their content by default, which a long command would win. */
+.client {
+  min-width: 0;
+}
+
+.client h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 550;
+}
+
+.client ol {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--foreground-light);
+}
+
+.client li + li {
+  margin-top: 0.25rem;
+}
+
+.grants {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.grant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.grant div {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.grant strong {
+  overflow-wrap: anywhere;
+  font-weight: 500;
+}
+
+.grant small {
+  color: var(--foreground-muted);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 34rem) {
+  body {
+    padding: 1.5rem 1rem 3rem;
+  }
+
+  .panel {
+    padding: 1.25rem;
+  }
+
+  .grant {
+    display: grid;
+  }
+
+  .grant button {
+    justify-self: start;
+  }
+
+  .code pre {
+    padding: 2.75rem 0.875rem 0.75rem;
+  }
+
+  .copy {
+    top: 0.5rem;
+    left: 0.5rem;
+    right: auto;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}

@@ -1,0 +1,264 @@
+import { createContextClient, verifyAuth } from 'npm:@supabase/server@1.4.1/core'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.108.2'
+
+import { getSupabaseEnvironment } from './supabase.ts'
+
+// Dual-mode authentication.
+//
+// This function is an OAuth 2.1 protected resource; Supabase Auth is the
+// authorization server. It accepts bearer tokens two ways:
+//
+//   1. OAuth client (Claude Code, Codex, ChatGPT, …) — the token carries a
+//      client_id and must be audience-bound to THIS resource. The audience comes
+//      from the custom access-token hook in the migration; without that binding,
+//      a token minted for another purpose could be replayed here.
+//
+//   2. First-party Supabase user JWT — for in-project callers such as your own
+//      front-end forwarding the user's session token. No client_id, no resource
+//      binding. It grants no more than PostgREST already would with the same
+//      token. Set MCP_ALLOW_FIRST_PARTY_JWT=false to require OAuth.
+//
+// Both modes then confirm the session against Auth, so a revoked grant or
+// deleted session takes effect immediately instead of at token expiry.
+
+const FUNCTION_PATH = '/functions/v1/mcp-server'
+const METADATA_PATH = '/.well-known/oauth-protected-resource'
+
+const CORS_HEADERS: Record<string, string> = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers':
+    'Authorization, Content-Type, Accept, Mcp-Protocol-Version, Mcp-Session-Id',
+  'Access-Control-Expose-Headers': 'WWW-Authenticate, Mcp-Session-Id',
+}
+
+export type AuthConfig = {
+  resourceUrl: string
+  metadataUrl: string
+  resourceName: string
+  authorizationServer: string
+  /** When false, only audience-bound OAuth tokens are accepted. */
+  allowFirstPartyJwt: boolean
+}
+
+export type AuthenticatedContext = {
+  /** User-scoped Supabase client, with the bearer token attached. */
+  supabase: SupabaseClient
+  /** Verified bearer token for toolsets that need to call another project API. */
+  accessToken: string
+  claims: Record<string, unknown>
+}
+
+type AuthenticationResult =
+  | { ok: true; context: AuthenticatedContext }
+  | { ok: false; response: Response }
+
+// -----------------------------------------------------------------------------
+// Canonical URLs
+// -----------------------------------------------------------------------------
+//
+// The Supabase project URL is the single source of truth shared with the browser
+// block and access-token hook. Keeping the starter on the standard function URL
+// makes the token audience deterministic and removes hosted-only URL secrets.
+
+function trimTrailingSlash(value: string): string {
+  return value.replace(/\/+$/, '')
+}
+
+function readTextEnv(name: string, fallback: string): string {
+  return Deno.env.get(name)?.trim() || fallback
+}
+
+export function getAuthConfig(): AuthConfig {
+  const projectUrl = trimTrailingSlash(getSupabaseEnvironment().url)
+  const resourceUrl = `${projectUrl}${FUNCTION_PATH}`
+  const allowFirstPartyJwt =
+    (Deno.env.get('MCP_ALLOW_FIRST_PARTY_JWT')?.trim().toLowerCase() ?? 'true') !== 'false'
+
+  return {
+    resourceUrl,
+    metadataUrl: `${resourceUrl}${METADATA_PATH}`,
+    resourceName: readTextEnv('MCP_SERVER_NAME', 'supabase-mcp'),
+    authorizationServer: `${projectUrl}/auth/v1`,
+    allowFirstPartyJwt,
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Protected-resource metadata and challenges
+// -----------------------------------------------------------------------------
+
+export function isProtectedResourceMetadataRequest(request: Request): boolean {
+  if (request.method !== 'GET') return false
+
+  const pathname = new URL(request.url).pathname
+  return pathname.endsWith(METADATA_PATH) || pathname === `${METADATA_PATH}${FUNCTION_PATH}`
+}
+
+export function protectedResourceMetadataResponse(config: AuthConfig): Response {
+  return applyCors(
+    Response.json({
+      resource: config.resourceUrl,
+      resource_name: config.resourceName,
+      authorization_servers: [config.authorizationServer],
+      bearer_methods_supported: ['header'],
+    })
+  )
+}
+
+/** The WWW-Authenticate value that points a client at the metadata document. */
+function challenge(config: AuthConfig): string {
+  return `Bearer resource_metadata="${config.metadataUrl}"`
+}
+
+function unauthorized(config: AuthConfig, description: string): Response {
+  return Response.json(
+    { error: 'unauthorized', error_description: description },
+    { status: 401, headers: { 'WWW-Authenticate': challenge(config) } }
+  )
+}
+
+// -----------------------------------------------------------------------------
+// Authentication
+// -----------------------------------------------------------------------------
+
+/** Normalise the `aud` claim, which may be a string or an array. */
+function audienceValues(audience: unknown): string[] {
+  if (typeof audience === 'string') return [audience]
+  if (Array.isArray(audience)) {
+    return audience.filter((value): value is string => typeof value === 'string')
+  }
+  return []
+}
+
+export async function authenticateRequest(
+  request: Request,
+  config: AuthConfig
+): Promise<AuthenticationResult> {
+  // Step 1: let @supabase/server extract the bearer token, verify its
+  // signature against the project's JWKS, and return its normalized auth
+  // context. MCP-specific issuer and resource checks stay below.
+  const environment = getSupabaseEnvironment()
+  const { data: auth, error } = await verifyAuth(request, {
+    auth: 'user',
+    env: environment,
+  })
+
+  if (error) {
+    if (error.status >= 500) {
+      console.error('Supabase authentication configuration failed', error)
+      return {
+        ok: false,
+        response: Response.json(
+          { error: 'server_error', error_description: 'Authentication is unavailable' },
+          { status: 500 }
+        ),
+      }
+    }
+
+    return { ok: false, response: unauthorized(config, 'A valid access token is required') }
+  }
+
+  const claims = auth.jwtClaims
+  const audiences = audienceValues(claims?.aud)
+  const clientId =
+    typeof claims?.client_id === 'string' && claims.client_id ? claims.client_id : null
+
+  // Step 2: checks shared by both modes.
+  if (claims?.role !== 'authenticated') {
+    return { ok: false, response: unauthorized(config, 'An authenticated user token is required') }
+  }
+  if (!audiences.includes('authenticated')) {
+    return { ok: false, response: unauthorized(config, 'The token audience is invalid') }
+  }
+  if (typeof claims?.sub !== 'string' || !claims.sub) {
+    return { ok: false, response: unauthorized(config, 'The token subject is invalid') }
+  }
+
+  // Step 3: mode-specific binding.
+  if (clientId) {
+    if (claims?.iss !== config.authorizationServer) {
+      return { ok: false, response: unauthorized(config, 'The token issuer is invalid') }
+    }
+    if (!audiences.includes(config.resourceUrl)) {
+      // The usual cause is the access-token hook not being enabled, which is easy
+      // to miss because everything up to this point succeeds: the client
+      // registers, the user consents, and a token comes back — it just is not
+      // bound to this resource.
+      console.warn(
+        `Token audience ${JSON.stringify(claims?.aud)} does not include ${config.resourceUrl}. ` +
+          'Enable [auth.hook.custom_access_token] in config.toml and run supabase config push.'
+      )
+      return {
+        ok: false,
+        response: unauthorized(
+          config,
+          'This token is not bound to this MCP server. The access-token hook may not be enabled.'
+        ),
+      }
+    }
+  } else if (!config.allowFirstPartyJwt) {
+    return { ok: false, response: unauthorized(config, 'An OAuth access token is required') }
+  }
+
+  const token = auth.token
+  if (!token) {
+    return { ok: false, response: unauthorized(config, 'A bearer token is required') }
+  }
+
+  // Step 4: a user-scoped client, so every tool inherits RLS.
+  let supabase: SupabaseClient
+  try {
+    supabase = createContextClient({
+      auth: { token, keyName: auth.keyName },
+      env: environment,
+    })
+  } catch (contextError) {
+    console.error('Unable to create a user-scoped Supabase client', contextError)
+    return {
+      ok: false,
+      response: Response.json(
+        { error: 'server_error', error_description: 'Database access is unavailable' },
+        { status: 500 }
+      ),
+    }
+  }
+
+  // Step 5: online validation, so revoked grants and deleted sessions take
+  // effect now rather than when the JWT expires.
+  const { data: userData, error: userError } = await supabase.auth.getUser(token)
+  if (userError || !userData.user || userData.user.id !== claims.sub) {
+    return { ok: false, response: unauthorized(config, 'The user session is no longer valid') }
+  }
+
+  return {
+    ok: true,
+    context: {
+      supabase,
+      accessToken: token,
+      claims: claims as Record<string, unknown>,
+    },
+  }
+}
+
+// -----------------------------------------------------------------------------
+// CORS
+// -----------------------------------------------------------------------------
+
+export function optionsResponse(): Response {
+  return new Response(null, { status: 204, headers: CORS_HEADERS })
+}
+
+/** A copy of `response` with the CORS headers applied. */
+export function applyCors(response: Response): Response {
+  const headers = new Headers(response.headers)
+  for (const [name, value] of Object.entries(CORS_HEADERS)) {
+    headers.set(name, value)
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}

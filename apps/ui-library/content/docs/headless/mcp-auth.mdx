@@ -1,0 +1,175 @@
+---
+title: MCP Auth
+description: Sign-in, consent, and client management screens for an MCP server, with no build step
+---
+
+<BlockPreview name="mcp-auth/oauth/consent?authorization_id=preview" />
+
+An MCP server that authenticates users needs a browser front-end: somewhere to
+sign in, and a consent screen for Supabase Auth to send OAuth clients to. This
+block is that front-end as static HTML — no framework, no build step, no
+`package.json`. Install it into an empty directory and drop the directory on any
+static host.
+
+## Installation
+
+<BlockItem
+  name="mcp-auth-html"
+  description="Static sign-in, consent, and client management pages for an MCP server"
+/>
+
+Every file in this block carries an explicit target, so `shadcn add` runs in a
+directory with no `components.json` and no framework:
+
+```bash
+mkdir my-mcp-frontend && cd my-mcp-frontend
+npx shadcn@latest add https://supabase.com/ui/r/mcp-auth-html.json
+```
+
+You can also run it inside an existing project and move the files into whichever
+directory that project serves statically.
+
+## Folder structure
+
+<RegistryBlock itemName="mcp-auth-html" />
+
+## Pages
+
+| Path              | Purpose                                                                     |
+| ----------------- | --------------------------------------------------------------------------- |
+| `/`               | Server URL, per-client connection steps, and the list of authorized clients |
+| `/auth/`          | Sign in and create an account                                               |
+| `/oauth/consent/` | The consent screen Supabase Auth redirects OAuth clients to                 |
+
+Keep `/oauth/consent/` at that path. Supabase Auth builds the consent URL by
+appending `authorization_url_path` to your Site URL, so the directory name is
+part of your Auth configuration.
+
+## Configuration
+
+Two values in `config.js` are required:
+
+```js
+export const SUPABASE_URL = 'https://your-project.supabase.co'
+export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_...'
+```
+
+Find both in your project's [API settings](/dashboard/project/_/settings/api).
+Both are safe to expose in a browser: the publishable key grants only what your
+RLS policies allow. The defaults that ship in the file match a local
+`supabase start` stack, so local development needs no edit.
+
+The MCP endpoint is derived from the same project URL:
+
+```js
+export const MCP_SERVER_URL = `${SUPABASE_URL}/functions/v1/mcp-server`
+```
+
+The connect page fetches the server's protected-resource metadata before showing
+client commands. It reports a configuration error if the resource URL or Auth
+issuer does not match this site. The `supabase-mcp` name in those commands is
+only a local client alias; it does not have to match the protocol-level server
+name.
+
+To offer social sign-in, list providers you have enabled under
+[Authentication → Providers](/dashboard/project/_/auth/providers):
+
+```js
+export const SOCIAL_PROVIDERS = ['github', 'google']
+```
+
+## Configure Supabase Auth
+
+The consent screen only works once the OAuth 2.1 server is enabled and pointed
+at it. In `supabase/config.toml`:
+
+```toml
+[auth]
+site_url = "https://your-frontend.example.com"
+additional_redirect_urls = ["https://your-frontend.example.com/auth/"]
+
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent/"
+allow_dynamic_registration = true
+
+# The MCP Server block installs this database hook. It audience-binds OAuth
+# access tokens to ${SUPABASE_URL}/functions/v1/mcp-server.
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/private/mcp_custom_access_token_hook"
+
+[functions.mcp-server]
+verify_jwt = false
+```
+
+Then run `supabase config push` to apply it to a linked project.
+
+`allow_dynamic_registration` lets MCP clients register themselves on first
+connect, which is how CLIs such as Claude Code and Codex expect to work. The
+`additional_redirect_urls` entry lets social sign-in and email confirmations
+return the user to `/auth/`.
+
+The trailing slash on `authorization_url_path` matches the directory this block
+serves the page from. Hosts that resolve directory indexes without it also work
+with `/oauth/consent`, but the trailing slash is the safer setting.
+
+<Callout type="note">
+
+This block covers the browser side only. The MCP server has to advertise Supabase
+Auth as its authorization server and verify the tokens it receives — the
+[MCP Server](/docs/headless/mcp-server) block does both, and installs the
+access-token hook the `[auth.hook.custom_access_token]` entry above enables.
+
+</Callout>
+
+## Deploy
+
+The block is a directory of static files, so any static host works: drop the
+directory on [Vercel](https://vercel.com/drop) or Netlify Drop, push it to
+Cloudflare Pages, or upload it to a public Storage bucket.
+
+Whatever you choose, set the deployed origin as your Site URL. That origin is
+what Supabase Auth appends `authorization_url_path` to, so a mismatch sends
+clients to a consent page that does not exist.
+
+Serve the files from the root of an origin. The pages navigate between
+themselves with absolute paths (`/auth/`, `/oauth/consent/`), which a deployment
+under a subdirectory would break.
+
+## How the flow works
+
+1. An MCP client registers itself and opens the authorization URL.
+2. Supabase Auth redirects the browser to `/oauth/consent/?authorization_id=...`.
+3. The consent page loads the request. Without a session it redirects to
+   `/auth/` first, then returns.
+4. The page shows the client name, the redirect URI, and the requested scopes.
+5. Approving returns a redirect back to the client with an authorization code.
+   Denying returns `access_denied`.
+
+A client the user has already approved skips the prompt: the authorization
+request comes back with only a redirect URL, and the page follows it.
+
+## Customizing
+
+`assets/styles.css` is one plain CSS file with no framework. The color tokens at
+the top drive both light and dark, which follow the viewer's system setting.
+
+`assets/supabase.js` is a thin adapter over a pinned, locally served
+`@supabase/supabase-js` 2.110.9 browser bundle. There is no runtime CDN in the
+path of the sign-in form, while Supabase JS owns PKCE, refresh-token rotation,
+session persistence, consent, and grant revocation. When updating it, replace
+`assets/vendor/supabase-js-2.110.9.js`, update the three script tags and registry
+manifest, and keep the version pinned.
+
+If you rewrite the consent page, load the authorization request before posting a
+decision. The consent endpoint rejects a decision for a request this user has
+not fetched.
+
+## Further reading
+
+- [MCP Server](/docs/headless/mcp-server) — the Edge Function these screens sign users in to
+- [MCP authentication](/docs/guides/auth/oauth-server/mcp-authentication)
+- [OAuth 2.1 server](/docs/guides/auth/oauth-server/getting-started)
+- [OAuth flows](/docs/guides/auth/oauth-server/oauth-flows)
+- [API keys](/docs/guides/getting-started/api-keys)

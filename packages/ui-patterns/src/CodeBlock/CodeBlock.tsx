@@ -9,6 +9,7 @@ import { Children, ReactNode, useState } from 'react'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
+import css from 'react-syntax-highlighter/dist/cjs/languages/hljs/css'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
 import go from 'react-syntax-highlighter/dist/cjs/languages/hljs/go'
 import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
@@ -52,6 +53,7 @@ const codeBlockLangs = [
   'yaml',
   'toml',
   'html',
+  'css',
 ] as const
 
 export type CodeBlockLang = (typeof codeBlockLangs)[number]
@@ -173,6 +175,7 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('pgsql', pgsql)
   SyntaxHighlighter.registerLanguage('swift', swift)
   SyntaxHighlighter.registerLanguage('html', xml)
+  SyntaxHighlighter.registerLanguage('css', css)
   SyntaxHighlighter.registerLanguage('toml', ini)
   SyntaxHighlighter.registerLanguage('yaml', yaml)
 

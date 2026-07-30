@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Authorize MCP client</title>
+    <link rel="stylesheet" href="../../assets/styles.css" />
+  </head>
+  <body class="centered">
+    <main>
+      <div class="panel">
+        <div class="panel-header">
+          <h1 id="title">Authorize MCP client</h1>
+          <p class="muted">Review what this client gets access to.</p>
+        </div>
+
+        <div id="consent" hidden>
+          <dl class="details">
+            <div class="detail">
+              <dt>Client</dt>
+              <dd id="client-name"></dd>
+            </div>
+            <div class="detail">
+              <dt>Redirects to</dt>
+              <dd id="redirect-uri" class="mono"></dd>
+            </div>
+            <div class="detail">
+              <dt>Signed in as</dt>
+              <dd id="user-email"></dd>
+            </div>
+            <div class="detail" id="scopes-detail" hidden>
+              <dt>Scopes</dt>
+              <dd>
+                <ul id="scopes" class="scopes"></ul>
+              </dd>
+            </div>
+          </dl>
+
+          <p class="note">
+            Approving lets this client read and change data through the MCP server as you. Your
+            existing database and function permissions still apply. Continue only if you started
+            this authorization yourself.
+          </p>
+
+          <div class="actions">
+            <button id="approve" type="button">Allow access</button>
+            <button id="deny" class="secondary" type="button">Deny</button>
+          </div>
+        </div>
+
+        <p id="status" class="status" role="status" aria-live="polite">Loading request…</p>
+      </div>
+    </main>
+
+    <script src="../../assets/vendor/supabase-js-2.110.9.js"></script>
+    <script type="module">
+      import { messageFor, requireUser, setStatus } from '../../assets/app.js'
+      import { configError, decideAuthorization, getAuthorization } from '../../assets/supabase.js'
+
+      const status = document.querySelector('#status')
+      const consent = document.querySelector('#consent')
+      const approveButton = document.querySelector('#approve')
+      const denyButton = document.querySelector('#deny')
+
+      function render(details, user) {
+        const clientName = details.client?.name ?? details.client?.id ?? 'Unknown client'
+
+        document.querySelector('#title').textContent = `Authorize ${clientName}`
+        document.querySelector('#client-name').textContent = clientName
+        document.querySelector('#redirect-uri').textContent = details.redirect_uri ?? 'Not provided'
+        document.querySelector('#user-email').textContent = user.email ?? user.id
+
+        const scopes = String(details.scope ?? '')
+          .split(' ')
+          .map((scope) => scope.trim())
+          .filter(Boolean)
+
+        if (scopes.length) {
+          const list = document.querySelector('#scopes')
+          for (const scope of scopes) {
+            const item = document.createElement('li')
+            item.textContent = scope
+            list.append(item)
+          }
+          document.querySelector('#scopes-detail').hidden = false
+        }
+
+        consent.hidden = false
+        setStatus(status, '')
+      }
+
+      async function decide(authorizationId, action) {
+        approveButton.disabled = true
+        denyButton.disabled = true
+        setStatus(status, action === 'approve' ? 'Approving…' : 'Denying…')
+
+        try {
+          const result = await decideAuthorization(authorizationId, action)
+          if (!result?.redirect_url) {
+            throw new Error('The server did not return a redirect. Start again from your client.')
+          }
+          location.assign(result.redirect_url)
+        } catch (error) {
+          setStatus(status, messageFor(error), { error: true })
+          approveButton.disabled = false
+          denyButton.disabled = false
+        }
+      }
+
+      async function main() {
+        if (configError) {
+          setStatus(status, configError, { error: true })
+          return
+        }
+
+        const authorizationId = new URLSearchParams(location.search).get('authorization_id')
+        if (!authorizationId) {
+          setStatus(
+            status,
+            'This page needs an authorization_id. Start again from your MCP client.',
+            {
+              error: true,
+            }
+          )
+          return
+        }
+
+        const user = await requireUser()
+        if (!user) return // Signing in; a navigation is already in flight.
+
+        let details
+        try {
+          details = await getAuthorization(authorizationId)
+        } catch (error) {
+          setStatus(status, messageFor(error), { error: true })
+          return
+        }
+
+        // A response with only a redirect_url means this user already approved
+        // this client, so finish the flow without asking again.
+        if (!details?.authorization_id && details?.redirect_url) {
+          location.replace(details.redirect_url)
+          return
+        }
+
+        render(details, user)
+        approveButton.addEventListener('click', () => decide(authorizationId, 'approve'))
+        denyButton.addEventListener('click', () => decide(authorizationId, 'deny'))
+      }
+
+      main()
+    </script>
+  </body>
+</html>

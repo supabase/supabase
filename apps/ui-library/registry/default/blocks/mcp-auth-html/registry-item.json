@@ -1,0 +1,53 @@
+{
+  "name": "mcp-auth-html",
+  "type": "registry:item",
+  "title": "MCP Auth (HTML)",
+  "description": "Sign-in, OAuth consent, and client management screens for an MCP server. Static HTML with a pinned local supabase-js bundle and no build step.",
+  "files": [
+    {
+      "path": "registry/default/blocks/mcp-auth-html/index.html",
+      "type": "registry:file",
+      "target": "index.html"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/auth/index.html",
+      "type": "registry:file",
+      "target": "auth/index.html"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/oauth/consent/index.html",
+      "type": "registry:file",
+      "target": "oauth/consent/index.html"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/config.js",
+      "type": "registry:file",
+      "target": "config.js"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/assets/app.js",
+      "type": "registry:file",
+      "target": "assets/app.js"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/assets/supabase.js",
+      "type": "registry:file",
+      "target": "assets/supabase.js"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/assets/vendor/supabase-js-2.110.9.js",
+      "type": "registry:file",
+      "target": "assets/vendor/supabase-js-2.110.9.js"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/assets/vendor/supabase-js-LICENSE",
+      "type": "registry:file",
+      "target": "assets/vendor/supabase-js-LICENSE"
+    },
+    {
+      "path": "registry/default/blocks/mcp-auth-html/assets/styles.css",
+      "type": "registry:file",
+      "target": "assets/styles.css"
+    }
+  ]
+}

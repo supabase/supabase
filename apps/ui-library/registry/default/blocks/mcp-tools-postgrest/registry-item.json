@@ -1,0 +1,29 @@
+{
+  "name": "mcp-tools-postgrest",
+  "type": "registry:item",
+  "title": "MCP Tools: PostgREST",
+  "description": "A toolset for the MCP server that generates database tools from your PostgREST schema: read and write tools per table, view, and function.",
+  "registryDependencies": ["https://supabase.com/ui/r/mcp-server.json"],
+  "files": [
+    {
+      "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/index.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/postgrest/index.ts"
+    },
+    {
+      "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/schema.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/postgrest/schema.ts"
+    },
+    {
+      "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/tools.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/postgrest/tools.ts"
+    },
+    {
+      "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/index.ts",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/index.ts"
+    }
+  ]
+}

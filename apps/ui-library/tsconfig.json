@@ -17,5 +17,13 @@
     ".next/types/**/*.ts",
     ".contentlayer/generated"
   ],
-  "exclude": ["node_modules", "./scripts/build-registry.mts"]
+  "exclude": [
+    "node_modules",
+    "./scripts/build-registry.mts",
+    // Blocks that ship Supabase Edge Function code are Deno sources: they use
+    // npm:/jsr: specifiers and the Deno global, which this tsconfig cannot
+    // resolve. They are typechecked by `deno check` instead — each such block
+    // ships a deno.json with a check task.
+    "registry/default/blocks/*/supabase/**"
+  ]
 }

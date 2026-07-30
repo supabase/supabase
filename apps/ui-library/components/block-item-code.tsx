@@ -3,7 +3,7 @@
 import { File } from 'lucide-react'
 import { useState } from 'react'
 import { flattenTree, TreeView, TreeViewItem } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import { RegistryNode } from '@/lib/process-registry'
 
@@ -26,6 +26,20 @@ const flattenChildren = (files: RegistryNode[]): TreeNode[] => {
     })
   )
 }
+
+// Most blocks are TypeScript, but some ship plain HTML, CSS, or JSON.
+const LANGUAGES: Record<string, CodeBlockLang> = {
+  css: 'css',
+  html: 'html',
+  js: 'js',
+  json: 'json',
+  jsx: 'jsx',
+  sql: 'sql',
+  toml: 'toml',
+}
+
+const languageFor = (fileName: string | undefined): CodeBlockLang =>
+  LANGUAGES[fileName?.split('.').pop() ?? ''] ?? 'ts'
 
 const findFirstFile = (nodes: RegistryNode[]): RegistryNode | null => {
   for (const node of nodes) {
@@ -105,7 +119,7 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
         <CodeBlock
           wrapperClassName="w-full"
           className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
-          language="ts"
+          language={languageFor(selectedFile.name)}
         >
           {selectedFile?.content}
         </CodeBlock>
