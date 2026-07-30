@@ -14,7 +14,7 @@ export function PgPartmanCallout() {
   return (
     <div className="mx-5 my-2">
       <Admonition
-        type="tip"
+        type="note"
         title="pg_partman is now available"
         description="Unlock partitioned queues for automatic data retention, lower storage costs, and faster performance at scale."
       >

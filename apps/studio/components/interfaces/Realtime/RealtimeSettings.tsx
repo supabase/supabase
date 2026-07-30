@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -135,7 +135,10 @@ export const RealtimeSettings = () => {
     } as any,
   })
 
-  const { allow_public, suspend } = form.watch()
+  const [allow_public, suspend] = useWatch({
+    control: form.control,
+    name: ['allow_public', 'suspend'],
+  })
   const isSettingToPrivate = !data?.private_only && !allow_public
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend
