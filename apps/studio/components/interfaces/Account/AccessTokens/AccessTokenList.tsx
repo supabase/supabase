@@ -130,8 +130,8 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                           icon={<MoreVertical />}
                         />
                       </DropdownMenuTrigger>
-                      <TooltipContent side="bottom">{`More options for token ${x.name}`}</TooltipContent>
                     </TooltipTrigger>
+                    <TooltipContent side="bottom">{`More options for token ${x.name}`}</TooltipContent>
                   </Tooltip>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
                     <DropdownMenuItem
