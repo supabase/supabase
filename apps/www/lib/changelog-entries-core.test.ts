@@ -104,6 +104,55 @@ describe('parseChangelogEntryFile', () => {
     expect(nullDate.sortDate).toBe('2026-07-22')
   })
 
+  it('includes the ## Migration steps section in the rendered body', () => {
+    const entry = parseChangelogEntryFile(
+      '20260714-breaking.md',
+      `---
+title: Breaking change
+change_type: breaking-change
+public: true
+publish_date: 2026-07-14
+---
+
+## Summary
+
+Short summary.
+
+## Body
+
+## What changed
+
+The thing changed.
+
+## Migration steps
+
+1. Do the thing.
+2. Do the other thing.
+
+## Rollout timeline
+
+| Date | Milestone |
+| ---- | --------- |
+| 2026 | done      |
+
+<!-- internal -->
+
+## Internal notes
+
+secret
+
+<!-- /internal -->
+`
+    )
+
+    expect(entry.bodySection).toContain('## What changed')
+    expect(entry.bodySection).toContain('## Migration steps')
+    expect(entry.bodySection).toContain('Do the thing.')
+    expect(entry.bodySection).not.toContain('Rollout timeline')
+    expect(entry.bodySection).not.toContain('Internal notes')
+    expect(entry.bodySection).not.toContain('secret')
+  })
+
   it('normalizes date frontmatter reaching detail-page props, even when unquoted', () => {
     // `[slug].tsx` ships `entry.frontmatter` into props; a Date would break serialization.
     const entry = parseChangelogEntryFile(

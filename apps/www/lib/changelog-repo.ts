@@ -43,10 +43,12 @@ export type ChangelogEntry = {
   sortDate: string
   /** Contents of `## Summary` only. */
   summary: string
-  /** Contents of `## Body` only. Never includes the internal block. */
+  /**
+   * Contents of `## Body` through the end of the public sections (including
+   * `## Migration steps`), excluding internal-only planning tables
+   * (`## Rollout timeline`, `## Comms timeline`). Never includes the internal block.
+   */
   bodySection: string
-  /** Contents of `## Migration steps`, if present. */
-  migrationSteps: string
 }
 
 function createChangelogRepoOctokit() {

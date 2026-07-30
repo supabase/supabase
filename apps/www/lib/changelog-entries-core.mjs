@@ -175,8 +175,7 @@ export function parseChangelogEntryFile(filename, raw) {
     frontmatter: toPublicFrontmatter(frontmatter),
     sortDate: toDateString(frontmatter.publish_date) ?? resolveDateFromFilename(filename) ?? '',
     summary: extractSection(publicBody, 'Summary'),
-    bodySection: extractSection(publicBody, 'Body', ['Migration steps']),
-    migrationSteps: extractSection(publicBody, 'Migration steps'),
+    bodySection: extractSection(publicBody, 'Body', ['Rollout timeline', 'Comms timeline']),
   }
 }
 
