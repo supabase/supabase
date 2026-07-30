@@ -210,6 +210,20 @@ You will encounter an error when you try to delete an Auth user that owns any St
 
 </Admonition>
 
+### Removing account access
+
+When the goal is to remove an account so it can no longer access your app, deleting the row is not enough on its own. Two things keep a "deleted" account working:
+
+- **Existing sessions.** Deleting the user does not revoke access tokens that were already issued. Any valid access token keeps working until it expires.
+- **Incomplete deletion.** An application-level "deleted" flag leaves the `auth.users` row intact, so the account can still authenticate and refresh. A temporary [ban](/docs/reference/javascript/auth-admin-updateuserbyid) only blocks sign-in for its duration and does not revoke existing sessions. Neither is a substitute for deleting the auth user.
+
+To fully revoke access:
+
+1. Revoke the user's sessions so their refresh token can no longer mint new access tokens — sign them out with the [`global` scope](/docs/guides/auth/signout), or delete their rows from `auth.sessions` server-side.
+2. Delete the auth user with [`auth.admin.deleteUser()`](/docs/reference/javascript/auth-admin-deleteuser).
+
+Even after you revoke sessions, any access token already issued stays valid until the `exp` claim passes, and during that window the account can still call the API. To narrow or close that window, keep the [access token (JWT) expiry](/docs/guides/auth/sessions) short, or validate the `session_id` claim against the `auth.sessions` table on sensitive operations. See [User sessions](/docs/guides/auth/sessions) for details.
+
 ## Exporting users
 
 As Supabase is built on top of Postgres, you can query the `auth.users` and `auth.identities` table via the `SQL Editor` tab to extract all users:
