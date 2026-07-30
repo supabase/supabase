@@ -185,11 +185,6 @@ export const OrganizationInvite = () => {
       <InterstitialAccountRow avatarUrl={avatarUrl} displayName={primaryEmail ?? username ?? ''} />
 
       <div className="flex flex-col gap-2">
-        {joinError && (
-          <p role="alert" className="text-sm text-destructive">
-            Failed to join organization: {joinError}
-          </p>
-        )}
         <Button
           variant="primary"
           block
@@ -202,6 +197,13 @@ export const OrganizationInvite = () => {
         <Button asChild variant="text" block>
           <Link href="/projects">Decline</Link>
         </Button>
+        {joinError && (
+          <div className="mt-3 border-t border-muted pt-5">
+            <p role="alert" className="text-center text-xs text-destructive text-balance">
+              Failed to join organization: {joinError}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )
