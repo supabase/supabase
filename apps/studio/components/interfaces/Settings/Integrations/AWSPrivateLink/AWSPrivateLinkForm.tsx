@@ -9,6 +9,11 @@ import {
   FormControl,
   FormField,
   Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -23,6 +28,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAWSAccountCreateMutation } from '@/data/aws-accounts/aws-account-create-mutation'
 import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
+import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -35,17 +42,25 @@ interface AWSPrivateLinkFormProps {
 interface FormValues {
   awsAccountId: string
   accountName: string
+  databaseIdentifier: string
 }
 
 export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
   const isNew = !account
   const { data: project } = useSelectedProjectQuery()
+  const { data: databases = [] } = useReadReplicasQuery(
+    { projectRef: project?.ref },
+    { enabled: isNew && !!project?.ref }
+  )
   const { mutate: createAccount, isPending } = useAWSAccountCreateMutation()
+
+  const readReplicas = databases.filter((database) => database.identifier !== project?.ref)
 
   const form = useForm<FormValues>({
     defaultValues: {
       awsAccountId: account?.aws_account_id ?? '',
       accountName: account?.account_name ?? '',
+      databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
     },
   })
 
@@ -53,7 +68,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
     account?.status === 'ASSOCIATION_ACCEPTED'
       ? 'This connection is active'
       : account?.status === 'READY'
-        ? 'Connection is ready'
+        ? 'Connection is ready to accept'
         : account?.status === 'CREATING'
           ? 'This account connection is being created'
           : account?.status === 'DELETING'
@@ -83,6 +98,10 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
           projectRef: project.ref,
           awsAccountId: values.awsAccountId,
           accountName: values.accountName,
+          databaseIdentifier:
+            values.databaseIdentifier && values.databaseIdentifier !== project.ref
+              ? values.databaseIdentifier
+              : undefined,
         },
         {
           onSuccess: () => {
@@ -99,8 +118,9 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
     form.reset({
       awsAccountId: account?.aws_account_id ?? '',
       accountName: account?.account_name ?? '',
+      databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
     })
-  }, [account, form])
+  }, [account, form, project?.ref])
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -172,6 +192,43 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   />
                 </>
               )}
+              <FormField
+                control={form.control}
+                name="databaseIdentifier"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Database target"
+                    description="Associations are created per database target. The same AWS account can be associated with both primary and replica databases."
+                  >
+                    <FormControl>
+                      <Select
+                        value={field.value}
+                        disabled={!isNew || !project?.ref}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a database" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {project?.ref && (
+                            <SelectItem value={project.ref}>Primary database</SelectItem>
+                          )}
+                          {readReplicas.map((database) => {
+                            const region = formatDatabaseRegion(database.region) ?? database.region
+                            const id = formatDatabaseID(database.identifier)
+
+                            return (
+                              <SelectItem key={database.identifier} value={database.identifier}>
+                                {`Read replica (${region} - ${id})`}
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="awsAccountId"

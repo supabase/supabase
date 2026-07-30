@@ -13,6 +13,8 @@ type AWSAccountsVariables = {
 export interface AWSAccount {
   aws_account_id: string
   account_name?: string
+  database_type?: 'PRIMARY' | 'READ_REPLICA'
+  database_identifier?: string
   status:
     | 'CREATING'
     | 'READY'

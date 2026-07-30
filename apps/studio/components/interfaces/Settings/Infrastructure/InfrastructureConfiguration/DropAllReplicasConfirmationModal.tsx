@@ -23,6 +23,17 @@ const DropAllReplicasConfirmationModal = ({
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { mutateAsync: removeReadReplica, isPending: isRemoving } = useReadReplicaRemoveMutation()
 
+  const getRemoveReplicaErrorMessage = (message: string) => {
+    const isPrivateLinkAssociationError =
+      /private\s*link/i.test(message) && /association/i.test(message)
+
+    if (isPrivateLinkAssociationError) {
+      return 'Remove replica PrivateLink associations before dropping replicas'
+    }
+
+    return 'Failed to drop all replicas'
+  }
+
   const onConfirmRemove = async () => {
     if (!projectRef) return console.error('Project is required')
     if (databases === undefined) return console.error('Unable to retrieve replicas')
@@ -49,7 +60,11 @@ const DropAllReplicasConfirmationModal = ({
       onSuccess()
       onCancel()
     } catch (error) {
-      toast.error('Failed to drop all replicas')
+      const message =
+        error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+          ? error.message
+          : ''
+      toast.error(getRemoveReplicaErrorMessage(message))
     }
   }
 
