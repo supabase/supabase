@@ -15,7 +15,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
