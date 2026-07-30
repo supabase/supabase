@@ -154,7 +154,7 @@ export const AnalyticsBuckets = () => {
                               return (
                                 <TableRow
                                   key={bucket.name}
-                                  className="relative cursor-pointer h-16 inset-focus"
+                                  className="relative cursor-pointer h-16 focus-inset"
                                   onClick={handleBucketNavigation}
                                   onAuxClick={handleBucketNavigation}
                                   onKeyDown={handleBucketNavigation}

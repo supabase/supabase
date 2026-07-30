@@ -1,9 +1,9 @@
 'use client'
 
 import { domAnimation, LazyMotion, m } from 'framer-motion'
-import React, { type PropsWithChildren } from 'react'
+import React, { type ComponentPropsWithoutRef } from 'react'
 
-const DocsCoverLogo = (props: PropsWithChildren) => {
+const DocsCoverLogo = ({ className, ...props }: ComponentPropsWithoutRef<'div'>) => {
   const pathMotionConfig = {
     initial: { pathLength: 0 },
     animate: { pathLength: 1 },
@@ -24,7 +24,7 @@ const DocsCoverLogo = (props: PropsWithChildren) => {
   }
 
   return (
-    <div className="w-[60px] md:w-[150px] [&_svg]" {...props}>
+    <div className={className} {...props}>
       <LazyMotion features={domAnimation}>
         <m.svg
           width="100%"

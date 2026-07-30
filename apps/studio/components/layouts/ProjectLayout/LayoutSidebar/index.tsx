@@ -24,8 +24,8 @@ export const LayoutSidebar = ({
   maxSize = '50',
   defaultSize = '30',
 }: LayoutSidebarProps) => {
-  const { activeSidebar } = useSidebarManagerSnapshot()
   const isMobile = useBreakpoint('md')
+  const { activeSidebar } = useSidebarManagerSnapshot()
   const { content: sheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
   useEffect(() => {

@@ -694,5 +694,46 @@ describe('useConnectState', () => {
         expect(result.current.state.connectionMethod).toBe('session')
       })
     })
+
+    describe('mcp features for deployment mode', () => {
+      test('self-hosted defaults and options stay within the non-platform subset', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'framework' }))
+        act(() => {
+          result.current.setMode('mcp')
+        })
+
+        const features = result.current.state.mcpFeatures
+        expect(Array.isArray(features)).toBe(true)
+        expect(features).toEqual(
+          expect.arrayContaining(['docs', 'database', 'development', 'debugging'])
+        )
+        expect(features).not.toContain('storage')
+        expect(features).not.toContain('account')
+        expect(features).not.toContain('auth')
+
+        const options = result.current.getFieldOptions('mcpFeatures').map((o) => o.value)
+        expect(options).toEqual(['docs', 'database', 'debugging', 'development'])
+      })
+
+      test('self-hosted strips unsupported features when re-entering mcp mode', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() =>
+          useConnectState({ mode: 'mcp', mcpFeatures: ['docs', 'account', 'database'] })
+        )
+        act(() => {
+          result.current.setMode('mcp')
+        })
+        expect(result.current.state.mcpFeatures).toEqual(['docs', 'database'])
+      })
+    })
   })
 })

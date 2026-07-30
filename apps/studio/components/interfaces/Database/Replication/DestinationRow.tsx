@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
 import { Minus, Snowflake } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -158,6 +158,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <Database size={18} className="text-foreground-light" />
             ) : type === 'Snowflake' ? (
               <Snowflake size={18} className="text-foreground-light" />
+            ) : type === 'ClickHouse' ? (
+              <ClickHouse size={18} className="text-foreground-light" />
             ) : (
               <Database size={18} className="text-foreground-light" />
             )}
@@ -167,11 +169,15 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             {isPipelineLoading ? (
               <ShimmeringLoader />
             ) : (
-              <div>
-                <p>
-                  {type} (Pipeline ID: {pipeline?.id})
+              <div className="flex flex-col gap-y-0.5">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {destinationName || type}
                 </p>
-                <p className="text-foreground-lighter">{destinationName}</p>
+                <div className="flex items-center gap-x-1.5 text-xs text-foreground-lighter">
+                  <span className="font-mono">#{pipeline?.id}</span>
+                  <span aria-hidden>&middot;</span>
+                  <span>{type}</span>
+                </div>
               </div>
             )}
           </TableCell>

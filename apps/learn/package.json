@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "lint:mdx": "supa-mdx-lint content --config ../../supa-mdx-lint.config.toml",
     "content:build": "contentlayer2 build",
-    "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
     "typecheck": "contentlayer2 build && tsc --noEmit"
   },
   "dependencies": {

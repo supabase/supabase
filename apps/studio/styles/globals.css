@@ -147,7 +147,7 @@
   --chart-warning: hsl(var(--warning-500));
   --chart-warning-muted: hsl(var(--warning-400));
   --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 65%, white);
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 50%, white);
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
@@ -170,7 +170,7 @@
   --chart-warning: hsl(var(--warning-default));
   --chart-warning-muted: hsl(var(--warning-500));
   --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 65%, white);
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 55%, var(--background));
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
@@ -208,13 +208,24 @@ body,
   box-sizing: border-box;
 }
 
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  @apply font-heading font-semibold;
+  @apply font-semibold;
 }
 
 .form-group .form-text,
@@ -473,4 +484,10 @@ div[data-radix-portal]:not(.portal--toast) {
 
 .prose.text-sm ul > li::before {
   top: 0.65rem;
+}
+
+.prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+strong,
+b {
+  @apply font-bold;
 }

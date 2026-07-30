@@ -115,6 +115,7 @@ export const FileExplorerRowEditing = ({
             onBlur={(event) => onSaveItemName(itemName.trim() || item.name, event)}
           />
           <button
+            tabIndex={-1}
             className="hidden"
             type="submit"
             onClick={(event) => onSaveItemName(itemName.trim() || item.name, event)}

@@ -1,5 +1,6 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
+import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
 import { databaseGetStarted, databaseNextSteps } from './database.data'
 import {
@@ -10,11 +11,21 @@ import {
   functionsExamplesWebhooksPayments,
   functionsGetStarted,
 } from './functions.data'
-import { gettingStartedGetStarted } from './getting-started.data'
+import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
+import {
+  selfHostingCommunity,
+  selfHostingGetHelp,
+  selfHostingGetStarted,
+  selfHostingResolveIssues,
+  selfHostingShareExperience,
+} from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
+import { telemetryDebugging, telemetryMonitoring } from './telemetry.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
+  aiToolsSupportedAgents,
+  aiToolsBuildingIntoApp,
   authGetStarted,
   authPricing,
   authNextSteps,
@@ -26,13 +37,20 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   functionsExamplesAiMedia,
   functionsExamplesMessaging,
   functionsExamplesOperations,
-  gettingStartedGetStarted,
+  logDrainsDestinations,
   realtimeGetStarted,
   realtimeExamples,
   realtimeResources,
+  selfHostingGetStarted,
+  selfHostingCommunity,
+  selfHostingResolveIssues,
+  selfHostingGetHelp,
+  selfHostingShareExperience,
   storageGetStarted,
   storageExamples,
   storageResources,
+  telemetryDebugging,
+  telemetryMonitoring,
 ]
 
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(

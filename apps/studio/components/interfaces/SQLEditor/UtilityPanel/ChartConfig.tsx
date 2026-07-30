@@ -20,7 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import BarChart from '@/components/ui/Charts/BarChart'
@@ -189,7 +189,7 @@ export const ChartConfig = ({
         </div>
 
         {!acknowledged && (
-          <Admonition showIcon={false} type="tip" className="p-2 relative group">
+          <Admonition showIcon={false} type="note" className="p-2 relative group">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}

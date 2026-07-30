@@ -11,6 +11,7 @@ import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { NewScopedAccessToken } from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
+import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const ScopedTokens: NextPageWithLayout = () => {
@@ -42,19 +43,15 @@ const ScopedTokens: NextPageWithLayout = () => {
           <div className="flex items-center gap-x-2">
             <Button asChild variant="default" icon={<ExternalLink />}>
               <a
-                href="https://supabase.com/docs/reference/api/introduction"
+                href={`${DOCS_URL}/reference/api/introduction`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
               >
                 API Docs
               </a>
             </Button>
             <Button asChild variant="default" icon={<ExternalLink />}>
-              <a
-                href="https://supabase.com/docs/reference/cli/start"
-                target="_blank"
-                rel="noreferrer"
-              >
+              <a href={`${DOCS_URL}/reference/cli/start`} target="_blank" rel="noopener noreferrer">
                 CLI docs
               </a>
             </Button>

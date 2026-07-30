@@ -14,11 +14,14 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSiwcQueryParamOptIn } from '@/hooks/misc/useSiwcQueryParamOptIn'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ExternalIdentityProviderConfig } from '@/lib/external-identity-providers'
 import type { NextPageWithLayout } from '@/types'
 
 const SignInPage: NextPageWithLayout = () => {
+  useSiwcQueryParamOptIn()
+
   const router = useRouter()
   const [showOtherOptions, setShowOtherOptions] = useState(false)
 
@@ -32,9 +35,14 @@ const SignInPage: NextPageWithLayout = () => {
     'dashboard_auth:sign_up',
   ])
 
-  const { dashboardAuthCustomProvider: customProvider } = useCustomContent([
-    'dashboard_auth:custom_provider',
-  ])
+  const {
+    dashboardAuthCustomProvider: customProvider,
+    dashboardAuthCustomProviders: customProvidersNew,
+  } = useCustomContent(['dashboard_auth:custom_provider', 'dashboard_auth:custom_providers'])
+
+  // [Joshen] This is just for backward compatibility - singular customProvider needs to be deprecated subsequently
+  // Just need to remove customProvider and rename customProvidersNew to customProviders
+  const customProviders = customProvidersNew ?? (customProvider ? [customProvider] : [])
 
   const { focusProvider } = useInboundBranding('sign-in')
   const signInProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignIn)
@@ -44,11 +52,15 @@ const SignInPage: NextPageWithLayout = () => {
     dividerBgClass = 'bg-studio'
   ) => {
     const showOrDivider =
-      (providers.length > 0 || signInWithSsoEnabled || !!customProvider) && signInWithEmailEnabled
+      (providers.length > 0 || signInWithSsoEnabled || customProviders.length > 0) &&
+      signInWithEmailEnabled
 
     return (
       <>
-        {customProvider && <SignInWithCustom providerName={customProvider} />}
+        {Array.isArray(customProviders) &&
+          customProviders.map((providerName: string) => (
+            <SignInWithCustom key={providerName} providerName={providerName} />
+          ))}
         {providers.map((provider) => (
           <SignInWithExternalProvider key={provider.id} provider={provider} />
         ))}
@@ -90,7 +102,7 @@ const SignInPage: NextPageWithLayout = () => {
     const hasOtherOptions =
       otherProviders.length > 0 ||
       signInWithSsoEnabled ||
-      !!customProvider ||
+      customProviders.length > 0 ||
       signInWithEmailEnabled
 
     return (
