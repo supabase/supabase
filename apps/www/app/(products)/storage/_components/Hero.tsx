@@ -1,4 +1,5 @@
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
+import { MarkdownActions } from '~/components/MarkdownActions'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -24,6 +25,12 @@ export function Hero() {
             <Link href="/docs/guides/storage">Documentation</Link>
           </Button>
         </div>
+        <MarkdownActions
+          orientation="horizontal"
+          pagePath="/storage"
+          mdPath="/storage.md"
+          pageType="product"
+        />
       </div>
     </SectionContainerWithCn>
   )
