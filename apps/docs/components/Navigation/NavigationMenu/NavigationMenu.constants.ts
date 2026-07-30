@@ -212,9 +212,9 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'security',
           },
           {
-            label: 'Monitoring and Debugging',
+            label: 'Telemetry',
             icon: 'telemetry',
-            href: '/guides/monitoring-and-debugging' as `/${string}`,
+            href: '/guides/telemetry' as `/${string}`,
             level: 'telemetry',
           },
           {
@@ -741,10 +741,6 @@ export const auth: NavMenuConstant = {
       enabled: authFlowsEnabled,
       items: [
         {
-          name: 'Which package to use',
-          url: '/guides/auth/choosing-a-server-package',
-        },
-        {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
@@ -1196,10 +1192,12 @@ export const database: NavMenuConstant = {
             {
               name: 'Setting up',
               url: '/guides/database/replication/pipelines' as `/${string}`,
-            },
-            {
-              name: 'BigQuery',
-              url: '/guides/database/replication/bigquery' as `/${string}`,
+              items: [
+                {
+                  name: 'BigQuery',
+                  url: '/guides/database/replication/bigquery' as `/${string}`,
+                },
+              ],
             },
             {
               name: 'Monitoring',
@@ -2454,14 +2452,25 @@ export const local_development: NavMenuConstant = {
   title: 'Local Dev / CLI',
   url: '/guides/local-development',
   items: [
-    { name: 'Overview & quickstart', url: '/guides/local-development' },
-    { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
-    { name: 'Local development workflow', url: '/guides/local-development/cli-workflows' },
+    { name: 'Overview', url: '/guides/local-development' },
     {
-      name: 'Guides',
+      name: 'CLI',
       url: undefined,
       items: [
-        { name: 'Database migrations', url: '/guides/local-development/database-migrations' },
+        { name: 'Getting started', url: '/guides/local-development/cli/getting-started' },
+        {
+          name: 'Configuration',
+          url: '/guides/local-development/cli/config',
+          enabled: localDevelopmentEnabled,
+        },
+        { name: 'CLI commands', url: '/reference/cli' },
+      ],
+    },
+    {
+      name: 'Local development',
+      url: undefined,
+      items: [
+        { name: 'Getting started', url: '/guides/local-development/overview' },
         {
           name: 'Declarative database schemas',
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
@@ -2484,18 +2493,6 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/customizing-email-templates' as `/${string}`,
           enabled: localDevelopmentEnabled,
         },
-      ],
-    },
-    {
-      name: 'Reference',
-      url: undefined,
-      items: [
-        {
-          name: 'CLI configuration',
-          url: '/guides/local-development/cli/config',
-          enabled: localDevelopmentEnabled,
-        },
-        { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
     {
@@ -2924,10 +2921,6 @@ export const platform: NavMenuConstant = {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
-            {
-              name: 'Pipelines',
-              url: '/guides/platform/manage-your-usage/pipelines' as `/${string}`,
-            },
           ],
         },
         {
@@ -2983,59 +2976,57 @@ export const platform: NavMenuConstant = {
 
 export const telemetry: NavMenuConstant = {
   icon: 'telemetry',
-  title: 'Monitoring and Debugging',
-  url: '/guides/monitoring-and-debugging',
+  title: 'Telemetry',
+  url: '/guides/telemetry',
   items: [
-    { name: 'Overview', url: '/guides/monitoring-and-debugging' },
+    { name: 'Overview', url: '/guides/telemetry' },
     {
-      name: 'Debugging',
+      name: 'Logging & observability',
       url: undefined,
       items: [
         {
-          name: 'Debugging guide',
-          url: '/guides/monitoring-and-debugging/debugging' as `/${string}`,
+          name: 'Logging',
+          url: '/guides/telemetry/logs' as `/${string}`,
         },
         {
-          name: 'Logging',
-          url: '/guides/monitoring-and-debugging/logs' as `/${string}`,
+          name: 'Debugging',
+          url: '/guides/telemetry/debugging' as `/${string}`,
         },
         {
           name: 'Advanced log filtering',
-          url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
+          url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
         },
         {
           name: 'Logs field reference',
-          url: '/guides/monitoring-and-debugging/log-field-reference' as `/${string}`,
+          url: '/guides/telemetry/log-field-reference' as `/${string}`,
         },
-      ],
-    },
-    {
-      name: 'Monitoring',
-      url: undefined,
-      items: [
         {
           name: 'Log drains',
-          url: '/guides/monitoring-and-debugging/log-drains' as `/${string}`,
+          url: '/guides/telemetry/log-drains' as `/${string}`,
+        },
+        {
+          name: 'Tracing with the JS SDK',
+          url: '/guides/telemetry/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Reports',
-          url: '/guides/monitoring-and-debugging/reports' as `/${string}`,
+          url: '/guides/telemetry/reports' as `/${string}`,
         },
         {
           name: 'Metrics',
-          url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
+          url: '/guides/telemetry/metrics' as `/${string}`,
           items: [
             {
               name: 'Overview',
-              url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
+              url: '/guides/telemetry/metrics' as `/${string}`,
             },
             {
               name: 'Grafana Cloud',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-cloud' as `/${string}`,
+              url: '/guides/telemetry/metrics/grafana-cloud' as `/${string}`,
             },
             {
               name: 'Grafana self-hosted',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-self-hosted' as `/${string}`,
+              url: '/guides/telemetry/metrics/grafana-self-hosted' as `/${string}`,
             },
             {
               name: 'Datadog',
@@ -3043,17 +3034,13 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Vendor-agnostic setup',
-              url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
+              url: '/guides/telemetry/metrics/vendor-agnostic' as `/${string}`,
             },
           ],
         },
         {
           name: 'Sentry integration',
-          url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
-        },
-        {
-          name: 'Tracing with the JS SDK',
-          url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
+          url: '/guides/telemetry/sentry-monitoring' as `/${string}`,
         },
       ],
     },
@@ -3073,34 +3060,30 @@ export const self_hosting: NavMenuConstant = {
   url: '/guides/self-hosting',
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
-    { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
+    { name: 'Enable Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
+    {
+      name: 'Add Reverse Proxy with HTTPS',
+      url: '/guides/self-hosting/self-hosted-proxy-https',
+    },
     {
       name: 'How-to Guides',
       items: [
-        { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
-        { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
-        {
-          name: 'Add Reverse Proxy with HTTPS',
-          url: '/guides/self-hosting/self-hosted-proxy-https',
-        },
-        { name: 'Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
         { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
-        {
-          name: 'Restore Project from Platform',
-          url: '/guides/self-hosting/restore-from-platform',
-        },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
+        { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
-        { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
-        { name: 'Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
+        { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
-        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
         {
-          name: 'Custom Postgres Extensions',
-          url: '/guides/self-hosting/custom-postgres-extensions',
+          name: 'Restore Project from Platform',
+          url: '/guides/self-hosting/restore-from-platform',
         },
+        { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
       ],
     },
     {
@@ -3246,16 +3229,12 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations',
     },
     {
-      name: 'Dashboard Integrations',
-      url: '/guides/integrations#dashboard-integrations',
-    },
-    {
-      name: 'Partner Catalog',
-      url: '/guides/integrations/partner-catalog',
-    },
-    {
       name: 'Vercel Marketplace',
       url: '/guides/integrations/vercel-marketplace',
+    },
+    {
+      name: 'Supabase Marketplace',
+      url: '/guides/integrations/supabase-marketplace',
     },
     {
       name: 'Build Your Own',
