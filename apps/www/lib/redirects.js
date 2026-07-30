@@ -1734,6 +1734,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/privacy-260316',
+    destination: '/privacy?version=v2',
+  },
+  {
+    permanent: true,
+    source: '/privacy-250528',
+    destination: '/privacy?version=v1',
+  },
+  {
+    permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
   },
