@@ -1,6 +1,7 @@
 'use client'
 
-import { useCopyMarkdownFromUrl } from 'common'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { askAiUrls, useCopyMarkdownFromUrl } from 'common'
 import { Chatgpt, Claude } from 'icons'
 import { Check, ChevronDown, Copy } from 'lucide-react'
 import {
@@ -21,8 +22,19 @@ type Props = {
 
 export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changelog.md' }: Props) {
   const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
-  const mdAbs = `${SITE_ORIGIN}${markdownPath}`
-  const aiPrompt = `Read from ${mdAbs} so I can ask questions about its contents`
+  const sendTelemetryEvent = useSendTelemetryEvent()
+  const pagePath = markdownPath.replace(/\.md$/, '')
+  const urls = askAiUrls(`${SITE_ORIGIN}${pagePath}`)
+
+  async function handleCopy() {
+    const ok = await copyMarkdown(markdownPath)
+    if (ok) {
+      sendTelemetryEvent({
+        action: 'copy_as_markdown_clicked',
+        properties: { pageType: 'changelog' },
+      })
+    }
+  }
 
   return (
     <div className={cn('flex items-center', className)}>
@@ -36,9 +48,9 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
             <Copy className="h-4 w-4" strokeWidth={2} aria-hidden />
           )
         }
-        onClick={() => void copyMarkdown(markdownPath)}
+        onClick={handleCopy}
       >
-        {copied ? 'Copied as Markdown' : 'Copy as Markdown'}
+        {copied ? 'Copied!' : 'Copy as Markdown'}
       </Button>
 
       <DropdownMenu>
@@ -53,9 +65,15 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
         <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem asChild className="gap-2">
             <a
-              href={`https://chatgpt.com/?hint=search&q=${encodeURIComponent(aiPrompt)}`}
+              href={urls.chatgpt}
               target="_blank"
               rel="noreferrer noopener"
+              onClick={() =>
+                sendTelemetryEvent({
+                  action: 'ask_ai_clicked',
+                  properties: { agent: 'chatgpt', pageType: 'changelog' },
+                })
+              }
             >
               <Chatgpt className="h-4 w-4 shrink-0" />
               Ask ChatGPT
@@ -63,9 +81,15 @@ export function ChangelogLlmMarkdownButton({ className, markdownPath = '/changel
           </DropdownMenuItem>
           <DropdownMenuItem asChild className="gap-2">
             <a
-              href={`https://claude.ai/new?q=${encodeURIComponent(aiPrompt)}`}
+              href={urls.claude}
               target="_blank"
               rel="noreferrer noopener"
+              onClick={() =>
+                sendTelemetryEvent({
+                  action: 'ask_ai_clicked',
+                  properties: { agent: 'claude', pageType: 'changelog' },
+                })
+              }
             >
               <Claude className="h-4 w-4 shrink-0" />
               Ask Claude
