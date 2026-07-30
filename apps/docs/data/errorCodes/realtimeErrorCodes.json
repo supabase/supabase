@@ -291,5 +291,5 @@
   },
   "MigrationCountMismatchReconcileFailed": {
     "description": "Failed to reconcile the `migrations_ran` count mismatch between the cache and the tenant database."
-  },
+  }
 }
