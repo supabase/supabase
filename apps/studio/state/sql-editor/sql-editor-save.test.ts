@@ -4,8 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createSaveMechanism, type SaveMechanismStore } from './sql-editor-save'
 import type { StateSnippet } from './types'
 import type { SnippetFolder } from '@/data/content/sql-folders-query'
+import type { SqlSnippets } from '@/types'
 
-function makeStateSnippet(overrides: Partial<StateSnippet['snippet']> = {}): StateSnippet {
+function makeStateSnippet(
+  overrides: Omit<Partial<StateSnippet['snippet']>, 'type' | 'content'> & {
+    content?: SqlSnippets.Content
+  } = {}
+): StateSnippet {
   return {
     projectRef: 'ref',
     splitSizes: [50, 50],

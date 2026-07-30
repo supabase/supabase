@@ -12,7 +12,7 @@ subtitle: 'This documentation covers frequently asked questions around subscript
 #### What are organizations and projects?
 
 The Supabase Platform has "organizations" and "projects". An organization may contain multiple projects. Each project is a dedicated Supabase instance with all of its sub-services including Storage, Auth, Functions and Realtime.
-Each organization only has a single subscription with a single plan (Free, Pro, Team or Enterprise). Project add-ons such as [Compute](/docs/guides/platform/compute-add-ons), [IPv4](/docs/guides/platform/ipv4-address), [Log Drains](/docs/guides/platform/log-drains), [Advanced MFA](/docs/guides/auth/auth-mfa/phone), [Custom Domains](/docs/guides/platform/custom-domains) and [PITR](/docs/guides/platform/backups#point-in-time-recovery) are configured per project and are added to your organization subscription.
+Each organization only has a single subscription with a single plan (Free, Pro, Team or Enterprise). Project add-ons such as [Compute](/docs/guides/platform/compute-and-disk), [IPv4](/docs/guides/platform/ipv4-address), [Log Drains](/docs/guides/telemetry/log-drains), [Advanced MFA](/docs/guides/auth/auth-mfa/phone), [Custom Domains](/docs/guides/platform/custom-domains) and [PITR](/docs/guides/platform/backups#point-in-time-recovery) are configured per project and are added to your organization subscription.
 
 Read more on [About billing on Supabase](/docs/guides/platform/billing-on-supabase#organization-based-billing).
 
@@ -54,7 +54,7 @@ Refer to our [Compute](/docs/guides/platform/manage-your-usage/compute#billing-e
 
 #### How does compute billing work?
 
-Each Supabase project is a dedicated VM and Postgres database. By default, your instance runs on the Micro compute instance. You have the option to upgrade your compute size in your [Project settings](/dashboard/project/_/settings/addons). See [Compute Add-ons](/docs/guides/platform/compute-add-ons) for available options.
+Each Supabase project is a dedicated VM and Postgres database. By default, your instance runs on the Micro compute instance. You have the option to upgrade your compute size in your [Project settings](/dashboard/project/_/settings/addons). See [Compute Add-ons](/docs/guides/platform/compute-and-disk) for available options.
 
 When you change your compute size, there are no immediate upfront charges. Instead, you will be billed based on the compute hours during your billing cycle reset.
 
@@ -132,7 +132,7 @@ The Fair Use Policy is applied through service restrictions. This could mean:
 - Pausing projects
 - Switching databases to read-only mode
 - Disabling new project launches/transfers
-- Responding with a [402 status code](/docs/guides/platform/http-status-codes#402-service-restriction) for all API requests
+- Responding with a [402 status code](/docs/guides/troubleshooting/http-status-codes#402-service-restriction) for all API requests
 
 The Fair Use Policy is generally applied to all projects of the restricted organization.
 
@@ -207,6 +207,10 @@ Note that any changes made to your billing details will only be reflected in you
 #### What happens if I am unable to make the payment?
 
 When an invoice becomes overdue, we will pause your projects and downgrade your organization to the Free Plan. You will be able to restore your projects once you have paid all outstanding invoices.
+
+#### Can I use a credit top-up to pay an outstanding invoice?
+
+Credit top-ups apply only to future invoices. They cannot be used to pay or adjust outstanding invoices.
 
 #### Why am I overdue?
 

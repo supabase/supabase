@@ -39,7 +39,9 @@ export const TableReplicationRow = ({
     <TableRow>
       <TableCell className="align-top">
         <div className="flex items-center gap-x-2">
-          <p>{table.table_name}</p>
+          <p>
+            {table.schema}.{table.name}
+          </p>
 
           <ButtonTooltip
             asChild
@@ -53,7 +55,7 @@ export const TableReplicationRow = ({
             <Link
               target="_blank"
               rel="noopener noreferrer"
-              href={`/project/${ref}/editor/${table.table_id}`}
+              href={`/project/${ref}/editor/${table.id}`}
             />
           </ButtonTooltip>
         </div>
@@ -81,7 +83,11 @@ export const TableReplicationRow = ({
             <div className="text-sm text-foreground">
               {statusConfig.description}{' '}
               {isErrorState && 'reason' in table.state && (
-                <button className={InlineLinkClassName} onClick={() => onSelectShowError()}>
+                <button
+                  tabIndex={0}
+                  className={InlineLinkClassName}
+                  onClick={() => onSelectShowError()}
+                >
                   View error.
                 </button>
               )}
@@ -100,7 +106,7 @@ export const TableReplicationRow = ({
                 className="w-7"
                 icon={<RotateCcw />}
                 disabled={showDisabledState || isRestarting || isAnyRestartInProgress}
-                aria-label={`Restart replication for ${table.table_name}`}
+                aria-label={`Restart replication for ${table.schema}.${table.name}`}
                 onClick={onSelectRestart}
               />
             </TooltipTrigger>

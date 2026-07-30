@@ -1,7 +1,13 @@
 import { NextRequest } from 'next/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { middleware } from './middleware'
+
+// The real manifest is generated at build time by a content script; mocking
+// it here decouples this test from that build step.
+vi.mock('~/public/markdown/manifest.json', () => ({
+  default: ['auth'],
+}))
 
 // BASE_PATH defaults to '/docs' when NEXT_PUBLIC_BASE_PATH is unset, so test
 // paths include the /docs prefix to match the middleware's GUIDES_PATH check.

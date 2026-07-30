@@ -123,6 +123,15 @@ describe('connect.schema:fields', () => {
     const field = connectSchema.fields.mcpFeatures
     expect(field.type).toBe('multi-select')
     expect(field.options).toEqual({ source: 'mcpFeatures' })
+    expect(field.defaultValue).toEqual([
+      'docs',
+      'account',
+      'database',
+      'debugging',
+      'development',
+      'functions',
+      'branching',
+    ])
   })
 })
 
@@ -229,7 +238,7 @@ describe('connect.schema:steps resolution', () => {
 
       expect(steps.find((s) => s.id === 'shadcn-add')).toBeDefined()
       expect(steps.find((s) => s.id === 'shadcn-env')).toBeDefined()
-      expect(steps.find((s) => s.id === 'shadcn-explore')).toBeDefined()
+      expect(steps.find((s) => s.id === 'shadcn-explore')).toBeUndefined()
     })
 
     test('should resolve steps for react without shadcn', () => {
@@ -386,14 +395,6 @@ describe('connect.schema:step content paths', () => {
     const shadcnStep = steps.find((s) => s.id === 'shadcn-add')
 
     expect(shadcnStep?.content).toBe('steps/shadcn/command')
-  })
-
-  test('shadcn explore step should have valid content path', () => {
-    const state: ConnectState = { mode: 'framework', framework: 'nextjs', frameworkUi: true }
-    const steps = resolveSteps(connectSchema, state)
-    const exploreStep = steps.find((s) => s.id === 'shadcn-explore')
-
-    expect(exploreStep?.content).toBe('steps/shadcn/explore')
   })
 
   test('shadcn env step should have valid content path', () => {

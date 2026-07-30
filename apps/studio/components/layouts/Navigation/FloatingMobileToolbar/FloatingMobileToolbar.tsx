@@ -50,6 +50,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
       onPointerMove={drag.handlePointerMove}
     >
       <div
+        id="mobile-nav-actions"
         className={cn(
           'flex pointer-events-auto cursor-grab active:cursor-grabbing flex-row items-center justify-between w-auto rounded-full',
           'bg-overlay/80 backdrop-blur-md px-2.5 py-2 gap-2',

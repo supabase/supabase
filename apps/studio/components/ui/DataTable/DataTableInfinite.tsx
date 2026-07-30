@@ -3,7 +3,7 @@ import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack
 import { flexRender } from '@tanstack/react-table'
 import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
-import { Fragment, UIEvent, useCallback, useRef } from 'react'
+import { Fragment, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -14,7 +14,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const TableRowClassName = 'border-b group data-[state=selected]:bg-muted hover:bg-surface-200'
-const TableCellClassName = 'text-xs py-1! p-2 *:[[role=checkbox]]:translate-y-[2px] truncate'
+const TableCellClassName = 'text-xs py-1! p-2 truncate'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
@@ -27,6 +27,8 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<unknown>
   setColumnOrder: (columnOrder: string[]) => void
   setColumnVisibility: (columnVisibility: VisibilityState) => void
+  /** Overrides the "No results found" copy shown when the current filters can't match any row. */
+  emptyStateMessage?: string | ReactNode
 
   // [Joshen] See if we can type this properly
   searchParamsParser: any
@@ -43,6 +45,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   totalRowsFetched = 0,
   setColumnOrder,
   setColumnVisibility,
+  emptyStateMessage = 'No results found',
   searchParamsParser,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
@@ -105,7 +108,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                     'w-full text-xs! font-normal! text-foreground-lighter font-mono',
                     'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
                     'text-muted-foreground h-9 px-2 text-left align-middle',
-                    '[&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
                     headerClassName
                   )}
                   aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}
@@ -194,7 +196,11 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                   className={cn(TableCellClassName, 'text-center')}
                 >
                   <div className="flex flex-col items-center justify-center h-full gap-3">
-                    <p className="text-foreground-light text-sm">No results found</p>
+                    {typeof emptyStateMessage === 'string' ? (
+                      <p className="text-foreground-light text-sm">{emptyStateMessage}</p>
+                    ) : (
+                      emptyStateMessage
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

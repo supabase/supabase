@@ -4,12 +4,56 @@ import {
   convertResultsToCSV,
   convertResultsToJSON,
   convertResultsToMarkdown,
+  formatCellValue,
+  formatClipboardValue,
   formatResults,
   getResultsHeaders,
   isLargeValue,
 } from './Results.utils'
 
 describe('Results.utils', () => {
+  describe('formatClipboardValue', () => {
+    it('returns empty string for null', () => {
+      expect(formatClipboardValue(null)).toBe('')
+    })
+
+    it('stringifies objects', () => {
+      expect(formatClipboardValue({ a: 1 })).toBe('{"a":1}')
+    })
+
+    it('stringifies arrays', () => {
+      expect(formatClipboardValue([1, 2])).toBe('[1,2]')
+    })
+
+    it('converts primitives to string', () => {
+      expect(formatClipboardValue('hello')).toBe('hello')
+      expect(formatClipboardValue(42)).toBe('42')
+      expect(formatClipboardValue(false)).toBe('false')
+    })
+  })
+
+  describe('formatCellValue', () => {
+    it('returns NULL for null', () => {
+      expect(formatCellValue(null)).toBe('NULL')
+    })
+
+    it('returns strings as-is', () => {
+      expect(formatCellValue('hello')).toBe('hello')
+    })
+
+    it('stringifies objects', () => {
+      expect(formatCellValue({ a: 1 })).toBe('{"a":1}')
+    })
+
+    it('stringifies numbers', () => {
+      expect(formatCellValue(42)).toBe('42')
+    })
+
+    it('stringifies booleans', () => {
+      expect(formatCellValue(true)).toBe('true')
+    })
+  })
+
   describe('formatResults', () => {
     it('should stringify object values', () => {
       const results = [{ id: 1, data: { nested: true } }]

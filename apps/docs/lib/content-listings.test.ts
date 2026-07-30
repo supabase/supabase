@@ -1,10 +1,27 @@
+import { CONTENT_LISTINGS } from '~/data/content-listings'
 import { storageGetStarted } from '~/data/content-listings/storage.data'
 import {
   ContentListings as ContentListingsMarkdownHandler,
   serializeContentListingGroupToMarkdown,
 } from '~/internals/markdown-schema/ContentListings'
+import { contentListingItemSchema } from '~/lib/content-listings.schema'
 import { isExternalContentListingHref } from '~/lib/content-listings.utils'
 import { describe, expect, it } from 'vitest'
+
+const SUPABASE_DASHBOARD_ORIGIN = 'https://supabase.com/dashboard'
+
+function isDashboardHref(href: string): boolean {
+  try {
+    const url = new URL(href, 'https://supabase.com')
+    return url.pathname === '/dashboard' || url.pathname.startsWith('/dashboard/')
+  } catch {
+    return href === '/dashboard' || href.startsWith('/dashboard/')
+  }
+}
+
+function isAbsoluteSupabaseDashboardHref(href: string): boolean {
+  return href === SUPABASE_DASHBOARD_ORIGIN || href.startsWith(`${SUPABASE_DASHBOARD_ORIGIN}/`)
+}
 
 describe('isExternalContentListingHref', () => {
   it('treats protocol-relative URLs as external', () => {
@@ -147,6 +164,65 @@ describe('ContentListings markdown handler', () => {
     const handler = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
     const direct = serializeContentListingGroupToMarkdown(storageGetStarted, '')
     expect(handler).toBe(direct)
+  })
+})
+
+describe('dashboard content listing hrefs', () => {
+  // Root-relative /dashboard hrefs get the docs basePath and 404; use absolute URLs.
+  it('uses absolute https://supabase.com dashboard URLs', () => {
+    const dashboardLinks = Object.values(CONTENT_LISTINGS).flatMap((group) =>
+      group.items
+        .filter((item) => isDashboardHref(item.href))
+        .map((item) => ({ listingId: group.id, title: item.title, href: item.href }))
+    )
+
+    expect(dashboardLinks.length).toBeGreaterThan(0)
+
+    const relativeOrNonCanonical = dashboardLinks.filter(
+      (link) => !isAbsoluteSupabaseDashboardHref(link.href)
+    )
+
+    expect(relativeOrNonCanonical).toEqual([])
+  })
+})
+
+describe('contentListingItemSchema icon', () => {
+  const baseItem = {
+    title: 'Datadog',
+    href: '/guides/monitoring-and-debugging/log-drains#datadog',
+    description: 'Stream logs directly into Datadog for monitoring and analysis.',
+  }
+
+  it('accepts a plain string icon path', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: '/docs/img/icons/github-icon',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts a well-formed icon chip object', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'datadog', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an icon chip object missing bg', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'datadog', color: '#632CA6' },
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects an icon chip object with an unknown kind', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'not-a-real-kind', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
+    })
+    expect(result.success).toBe(false)
   })
 })
 

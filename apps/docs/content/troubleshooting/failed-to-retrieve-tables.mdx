@@ -41,6 +41,6 @@ Once you are confident there will not be a crash loop, you can review the follow
 - If it was unintentional, double check for any recursive calls in your application code, edge functions or database functions.
 - Consider your table and your query structure - if your tables are very "wide" (lots of columns) or have complicated data types within them, it may be worth revisiting your architecture.
 - Continue to monitor your project's [query performance tab](/dashboard/project/_/observability/query-performance) and [enable index advisor](/docs/guides/database/extensions/index_advisor) if you haven't already - especially if there are a lot of select queries.
-- If after monitoring your changes you still do not notice improvements, consider upgrading compute if you think this level of activity is going to be regular. It will give you more memory overhead to process tasks like this. You can view all compute offerings [here](/dashboard/project/_/settings/compute-and-disk).
+- If after monitoring your changes you still do not notice improvements, consider upgrading compute if you think this level of activity is going to be regular. It will give you more memory overhead to process tasks like this. You can view all compute offerings [here](/dashboard/project/_/settings/infrastructure).
 
-If you want to effectively monitor your project's performance minute by minute, you can use the [Metrics API](/docs/guides/telemetry/metrics).
+If you want to effectively monitor your project's performance minute by minute, you can use the [Metrics API](/docs/guides/monitoring-and-debugging/metrics).

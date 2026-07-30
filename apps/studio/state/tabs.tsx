@@ -116,27 +116,27 @@ function getSavedRecentItems(ref: string): RecentItem[] {
   }
 }
 
-const DEFAULT_TABS_STATE = {
+const createDefaultTabsState = () => ({
   activeTab: null as string | null,
   openTabs: [] as string[],
   tabsMap: {} as Record<string, Tab>,
   previewTabId: undefined as string | undefined,
   recentItems: [],
-}
+})
 const TABS_STORAGE_KEY = 'supabase_studio_tabs'
 const getTabsStorageKey = (ref: string) => `${TABS_STORAGE_KEY}_${ref}`
 
 function getSavedTabs(ref: string) {
-  if (!ref) return DEFAULT_TABS_STATE
+  if (!ref) return createDefaultTabsState()
 
   const stored = safeLocalStorage.getItem(getTabsStorageKey(ref))
 
-  if (!stored) return DEFAULT_TABS_STATE
+  if (!stored) return createDefaultTabsState()
 
   try {
-    const parsed = JSON.parse(
-      stored ?? JSON.stringify(DEFAULT_TABS_STATE)
-    ) as typeof DEFAULT_TABS_STATE
+    const parsed = JSON.parse(stored ?? JSON.stringify(createDefaultTabsState())) as ReturnType<
+      typeof createDefaultTabsState
+    >
 
     if (
       !parsed.openTabs ||
@@ -144,12 +144,12 @@ function getSavedTabs(ref: string) {
       !parsed.tabsMap ||
       typeof parsed.tabsMap !== 'object'
     ) {
-      return DEFAULT_TABS_STATE
+      return createDefaultTabsState()
     }
 
     return parsed
   } catch (error) {
-    return DEFAULT_TABS_STATE
+    return createDefaultTabsState()
   }
 }
 

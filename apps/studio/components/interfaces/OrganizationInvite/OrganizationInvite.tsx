@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -194,7 +194,7 @@ export const OrganizationInvite = () => {
           Accept invite
         </Button>
         <Button asChild variant="text" block>
-          <Link href="/projects">Decline</Link>
+          <Link href="/organizations">Decline</Link>
         </Button>
       </div>
     </div>
