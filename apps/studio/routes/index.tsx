@@ -16,7 +16,7 @@ export const Route = createFileRoute('/')({
     // keep `projectName`. Only the consumed `next` param is dropped (and only
     // when it matched); everything else passes through.
     const carried = (shouldConsumeNext: boolean) => {
-      const carriedSearch = { ...location.search } as Record<string, unknown>
+      const carriedSearch: Record<string, unknown> = { ...location.search }
       if (shouldConsumeNext) delete carriedSearch.next
       return carriedSearch
     }
