@@ -14,7 +14,7 @@ const meta = {
 }
 
 const versions: LegalDocVersion[] = [
-  { id: 'v1', label: 'Version 1', effectiveDate: 'June 1, 2026', Component: V1 },
+  { id: 'v1', label: 'Version 1', effectiveDate: 'August 1, 2026', Component: V1 },
 ]
 
 export default function DataProcessingAddendumPage() {

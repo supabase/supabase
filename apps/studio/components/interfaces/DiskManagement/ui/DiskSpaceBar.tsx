@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -22,7 +22,7 @@ interface DiskSpaceBarProps {
 export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
-  const { formState, watch } = form
+  const { formState } = form
   const isDarkMode = resolvedTheme?.includes('dark')
   const { data: project } = useSelectedProjectQuery()
 
@@ -55,7 +55,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   }, [diskUtil, diskBreakdown])
 
   const showNewSize = formState.dirtyFields.totalSize !== undefined && diskBreakdown
-  const newTotalSize = watch('totalSize')
+  const newTotalSize = useWatch({ control: form.control, name: 'totalSize' })
 
   const totalSize = formState.defaultValues?.totalSize || 0
   const usedSizeTotal = Math.round(((diskBreakdownBytes?.totalUsedBytes ?? 0) / GB) * 100) / 100
