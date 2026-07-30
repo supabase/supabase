@@ -252,12 +252,6 @@ export const Destinations = () => {
           />
         </div>
         <div className="flex items-center gap-x-2">
-          {hasDestinations && organization?.slug && (
-            <Button asChild variant="default" icon={<ChartArea />}>
-              <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>Usage</Link>
-            </Button>
-          )}
-          <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
           {canDisablePipelines && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -275,6 +269,12 @@ export const Destinations = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           )}
+          {hasDestinations && organization?.slug && (
+            <Button asChild variant="default" icon={<ChartArea />}>
+              <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>Usage</Link>
+            </Button>
+          )}
+          <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
           <Shortcut
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
             label="Add destination"
