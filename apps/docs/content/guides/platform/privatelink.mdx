@@ -6,7 +6,7 @@ description: 'Secure private network connectivity to your Supabase database usin
 
 <Admonition type="note">
 
-PrivateLink is currently in beta and available only to Team and Enterprise customers.
+PrivateLink is available only to Team and Enterprise customers.
 Contact support if you would like to create a PrivateLink connection for a read-only replica.
 
 </Admonition>
@@ -20,13 +20,12 @@ By enabling PrivateLink, database connections never traverse the public internet
 Supabase PrivateLink is an organisation level configuration. It works by sharing a [VPC Lattice Resource Configuration](https://docs.aws.amazon.com/vpc-lattice/latest/ug/resource-configuration.html) to any number of AWS Accounts for each of your Supabase projects. Connectivity can be achieved by either associating the Resource Configuration to a PrivateLink endpoint, or a [VPC Lattice Service Network](https://docs.aws.amazon.com/vpc-lattice/latest/ug/service-networks.html). This means:
 
 - Database traffic flows through private AWS infrastructure only
-- Connection latency is typically reduced compared to public internet routing
 - Network isolation provides enhanced security posture
 - Attack surface is minimized by eliminating public exposure
 
 The connection architecture changes from public internet routing to a dedicated private path through AWS's secure network backbone.
 
-Supabase PrivateLink currently supports direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
+Supabase PrivateLink supports direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
 
 ## Requirements
 
@@ -151,17 +150,15 @@ postgresql://user:pass@db.[project-ref].supabase.co:5432/postgres
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:5432/postgres
 ```
 
-#### Step 7: Disable public connectivity (optional)
+#### Step 7: Restrict public database access (optional)
 
-For maximum security, you can disable public internet access for your database:
+For maximum security, you can restrict public database access in your project settings:
 
-1. Contact Supabase support to disable public connectivity
-2. Ensure all applications are successfully using the private connection
-3. Update any monitoring or backup tools to use the private endpoint
+1. Go to [**Database** > **Settings**](/dashboard/project/_/database/settings)
+2. In **Network Restrictions**, enable **Restrict all access**
+3. Ensure all applications, monitoring, and backup tools are using the private endpoint before enabling this setting
 
-## Beta limitations
-
-During the beta phase:
+## Limitations
 
 - **Read Replicas**: To establish PrivateLink with a Read Replica, reach out to your account rep.
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
