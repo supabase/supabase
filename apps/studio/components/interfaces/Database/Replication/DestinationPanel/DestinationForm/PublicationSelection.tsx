@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -20,7 +20,7 @@ export const PublicationSelection = ({
   onSelectNewPublication,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
-  const { publicationName } = form.watch()
+  const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const sourceId = useReplicationSourceId({ projectRef })
 

@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -29,11 +29,11 @@ type ThroughputFieldProps = {
 export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
   const { ref: projectRef } = useParams()
 
-  const { control, formState, setValue, getValues, watch } = form
+  const { control, formState, setValue, getValues } = form
 
-  const watchedStorageType = watch('storageType')
-  const watchedTotalSize = watch('totalSize')
-  const watchedComputeSize = watch('computeSize')
+  const watchedStorageType = useWatch({ control, name: 'storageType' })
+  const watchedTotalSize = useWatch({ control, name: 'totalSize' })
+  const watchedComputeSize = useWatch({ control, name: 'computeSize' })
   const throughput_mbps = formState.defaultValues?.throughput
 
   useDiskAttributesQuery({ projectRef })

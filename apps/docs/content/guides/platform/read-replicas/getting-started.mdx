@@ -15,11 +15,11 @@ Read Replicas are available for all projects on the Pro, Team and Enterprise pla
 Projects must meet these requirements to use Read Replicas:
 
 1. Running on AWS.
-2. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
+2. Running on at least a [Small compute add-on](/docs/guides/platform/compute-and-disk).
    - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
 
 3. Running on Postgres 15+.
-   - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+   - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/upgrading).
 
 4. Not using [legacy logical backups](/docs/guides/platform/backups#point-in-time-recovery)
    - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
@@ -110,7 +110,7 @@ Once the Primary database has completed restarting (or resizing, in case of a co
 
 The following procedures require all Read Replicas for a project to be brought down before performing them:
 
-1. [Project upgrades](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
+1. [Project upgrades](/docs/guides/platform/upgrading)
 2. [Data restorations](/docs/guides/platform/backups#pitr-restoration-process)
 
 These operations need to complete before you can re-deploy Read Replicas.
@@ -129,7 +129,7 @@ There is no single threshold to indicate when you should address replication lag
 
 <Admonition type="note">
 
-If you are already ingesting your [project's metrics](/docs/guides/telemetry/metrics) into your own environment, you can also keep track of replication lag and set alarms with the `physical_replication_lag_physical_replica_lag_seconds` metric.
+If you are already ingesting your [project's metrics](/docs/guides/monitoring-and-debugging/metrics) into your own environment, you can also keep track of replication lag and set alarms with the `physical_replication_lag_physical_replica_lag_seconds` metric.
 
 </Admonition>
 

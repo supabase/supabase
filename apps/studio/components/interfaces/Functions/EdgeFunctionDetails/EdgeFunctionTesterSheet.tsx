@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { BookOpen, Loader2, Plus, Send, X } from 'lucide-react'
 import { useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch } from 'react-hook-form'
 import {
   Badge,
   Button,
@@ -139,7 +139,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       queryParams: [{ key: '', value: '' }],
     },
   })
-  const { method } = form.watch()
+  const method = useWatch({ control: form.control, name: 'method' })
 
   const {
     fields: headerFields,
