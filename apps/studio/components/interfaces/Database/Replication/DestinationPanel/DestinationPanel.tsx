@@ -137,7 +137,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
           if (!open) onClose()
         }}
       >
-        <SheetContent size="lg" showClose={false}>
+        <SheetContent size="lg" showClose={false} className="max-w-3xl">
           <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
               <div>
