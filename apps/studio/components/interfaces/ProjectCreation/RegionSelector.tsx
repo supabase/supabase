@@ -1,4 +1,5 @@
 import { useFeatureFlags, useParams } from 'common'
+import { useEffect, useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -75,6 +76,7 @@ export const RegionSelector = ({
   const { slug } = useParams()
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  const dbRegion = useWatch({ control: form.control, name: 'dbRegion' })
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
@@ -134,6 +136,32 @@ export const RegionSelector = ({
 
   const allSelectableRegions = [...smartRegions, ...regionOptions]
 
+  // react-hook-form intermittently drops this field's value when its Controller
+  // remounts (e.g. a sibling section mounting/unmounting in the same update, such as
+  // toggling high availability), so a one-shot effect isn't enough. Instead this effect
+  // re-asserts off the watched value: a region present in the current list is kept (and
+  // remembered in lastValidRegionRef), and when it's missing or cleared out from under us
+  // it restores the last valid region. allSelectableRegions is intentionally omitted from
+  // deps — it's a new array every render, and comparing it by reference would defeat the
+  // point of reacting to genuine content changes on every render where they occur.
+  const lastValidRegionRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (allSelectableRegions.length === 0) return
+    const isRegionAvailable = (name: string | undefined) =>
+      !!name && allSelectableRegions.some((region) => region.name === name)
+
+    if (isRegionAvailable(dbRegion)) {
+      lastValidRegionRef.current = dbRegion
+      return
+    }
+
+    const lastValidRegion = lastValidRegionRef.current
+    if (lastValidRegion !== undefined && isRegionAvailable(lastValidRegion)) {
+      form.setValue('dbRegion', lastValidRegion)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbRegion, form])
+
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
   }
@@ -145,7 +173,7 @@ export const RegionSelector = ({
         name="dbRegion"
         render={({ field }) => {
           const selectedRegion = allSelectableRegions.find((region) => {
-            return !!region.name && region.name === field.value
+            return !!region.name && region.name === dbRegion
           })
 
           const affectingIncidents = incidents.filter((incident) => {
@@ -191,7 +219,7 @@ export const RegionSelector = ({
                 }
               >
                 <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
+                  <Select value={dbRegion} onValueChange={field.onChange} disabled={isLoading}>
                     <SelectTrigger
                       id="region"
                       className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
@@ -203,7 +231,7 @@ export const RegionSelector = ({
                             : 'Select a region for your project..'
                         }
                       >
-                        {field.value !== undefined && (
+                        {dbRegion !== undefined && (
                           <div className="flex items-center gap-x-3">
                             {selectedRegion?.code && (
                               // For some reason, Safari considered the empty string alt text on this icon as misspelled (with VoiceOver)
@@ -218,7 +246,7 @@ export const RegionSelector = ({
                             <span className="text-foreground">
                               {selectedRegion?.name
                                 ? getDisplayNameForSmartRegion(selectedRegion.name)
-                                : field.value}
+                                : dbRegion}
                             </span>
                           </div>
                         )}

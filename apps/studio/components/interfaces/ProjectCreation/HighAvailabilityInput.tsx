@@ -25,11 +25,6 @@ export const HighAvailabilityInput = ({
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
 
   // Fields to revert to when toggling off HA, so previously selected values aren't lost.
-  // cloudProvider/postgresVersion are handled directly in the toggle's onChange below,
-  // since both fields are disabled elsewhere in the form whenever HA is on — nothing else
-  // can change them out from under this. dbRegion instead needs its own effect (below)
-  // because `highAvailabilityRegionName` depends on an async query that may not have
-  // resolved yet at the moment the toggle fires.
   const beforeHighAvailability = useRef<{
     cloudProvider: CloudProvider | undefined
     postgresVersion: string
@@ -59,6 +54,15 @@ export const HighAvailabilityInput = ({
       )
       setValue('postgresVersion', HIGH_AVAILABILITY_POSTGRES_VERSION)
       setValue('useOrioleDb', false)
+
+      const currentRegion = getValues('dbRegion')
+      if (
+        highAvailabilityRegionName !== undefined &&
+        currentRegion !== highAvailabilityRegionName
+      ) {
+        beforeHighAvailability.current.dbRegion = currentRegion ?? null
+        setValue('dbRegion', highAvailabilityRegionName)
+      }
     } else {
       if (beforeHighAvailability.current.cloudProvider !== undefined) {
         setValue('cloudProvider', beforeHighAvailability.current.cloudProvider)
@@ -75,25 +79,27 @@ export const HighAvailabilityInput = ({
         )
         beforeHighAvailability.current.postgresVersionSelection = undefined
       }
+
+      if (beforeHighAvailability.current.dbRegion !== null) {
+        setValue('dbRegion', beforeHighAvailability.current.dbRegion)
+        beforeHighAvailability.current.dbRegion = null
+      }
     }
   }
 
-  // The region auto-fill effect in the parent form skips dirty fields, so a manually
-  // chosen region would keep showing in the trigger while HA only offers its fixed
-  // region — force it over (and restore it afterwards) explicitly.
+  // Catches the case where highAvailabilityRegionName wasn't loaded yet at the moment the
+  // toggle fired above (the org's available-regions query for AWS_K8S may still be in
+  // flight). The region auto-fill effect in the parent form skips dirty fields, so a
+  // manually chosen region would otherwise keep showing in the trigger — force it over
+  // explicitly once the HA region becomes known.
   useEffect(() => {
-    if (highAvailability && highAvailabilityRegionName !== undefined) {
-      const currentRegion = getValues('dbRegion')
-      if (currentRegion !== highAvailabilityRegionName) {
-        if (beforeHighAvailability.current.dbRegion === null) {
-          beforeHighAvailability.current.dbRegion = currentRegion ?? null
-        }
-        setValue('dbRegion', highAvailabilityRegionName)
-      }
-    } else if (!highAvailability && beforeHighAvailability.current.dbRegion !== null) {
-      setValue('dbRegion', beforeHighAvailability.current.dbRegion)
-      beforeHighAvailability.current.dbRegion = null
+    if (!highAvailability || highAvailabilityRegionName === undefined) return
+    const currentRegion = getValues('dbRegion')
+    if (currentRegion === highAvailabilityRegionName) return
+    if (beforeHighAvailability.current.dbRegion === null) {
+      beforeHighAvailability.current.dbRegion = currentRegion ?? null
     }
+    setValue('dbRegion', highAvailabilityRegionName)
   }, [highAvailability, highAvailabilityRegionName, getValues, setValue])
 
   if (!hasAccess) return null
