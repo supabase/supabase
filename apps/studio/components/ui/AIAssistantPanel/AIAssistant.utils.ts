@@ -2,7 +2,10 @@ import { isToolUIPart, type UIMessage } from 'ai'
 import { toast } from 'sonner'
 
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
-import { isLogsSource } from '@/components/interfaces/SQLEditor/querySource'
+import {
+  isLogsSource,
+  sqlSourceToFenceLanguage,
+} from '@/components/interfaces/SQLEditor/querySource'
 import { authKeys } from '@/data/auth/keys'
 import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
 import { databaseIndexesKeys } from '@/data/database-indexes/keys'
@@ -184,7 +187,7 @@ export const getSnippetContent = (snippet: SqlSnippet): string =>
  * which a ClickHouse query must never be offered as.
  */
 function getSnippetFenceLanguage(snippet: SqlSnippet): 'sql' | 'clickhouse' {
-  return typeof snippet !== 'string' && isLogsSource(snippet.source) ? 'clickhouse' : 'sql'
+  return sqlSourceToFenceLanguage(typeof snippet === 'string' ? undefined : snippet.source)
 }
 
 /**

@@ -1486,14 +1486,12 @@ describe('SQLEditor.utils:buildDebugPromptText', () => {
   // This text is copyable and gets pasted into external models, so it has to name
   // the dialect itself rather than relying on the message metadata.
   it('names the dialect for a logs snippet', () => {
-    const result = buildDebugPromptText(
-      "select count() from logs where source = 'edge_logs'",
-      'Unknown expression identifier',
-      'logs'
-    )
+    const sql = "select count() from logs where source = 'edge_logs'"
+    const result = buildDebugPromptText(sql, 'Unknown expression identifier', 'logs')
     expect(result).toContain('Unknown expression identifier')
     expect(result).toContain('ClickHouse')
     expect(result).toContain('not Postgres')
+    expect(result).toContain('```clickhouse\n' + sql + '\n```')
   })
 })
 

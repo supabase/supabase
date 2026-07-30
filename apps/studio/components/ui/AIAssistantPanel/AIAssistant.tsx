@@ -110,6 +110,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  // Whether attached queries are sent at all. One definition, shared by the chat form
+  // (which folds them into the message text) and the message metadata (which states
+  // whether any of them was a logs query), so the two can't disagree.
+  const includeSnippetsInMessage = aiOptInLevel !== 'disabled'
   const showMetadataWarning =
     IS_PLATFORM &&
     !!selectedOrganization &&
@@ -362,10 +366,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     }
 
     // Read off the attachments this message actually carries, so detaching the
-    // "Current Query" chip also drops the claim. Rides on the message rather than the
-    // request: a Retry then reproduces the context the message was asked in.
+    // "Current Query" chip also drops the claim. Gated on the same condition that
+    // decides whether attachments make it into the text at all: with AI opt-in
+    // disabled the chip is shown but no query is sent, and claiming otherwise would
+    // have the server prepend ClickHouse context for a message holding no query.
+    // Rides on the message rather than the request, so a Retry reproduces the context
+    // the message was asked in.
     const metadata: AssistantMessageMetadata = {
-      containsLogsSnippets: containsLogsSnippets(snap.sqlSnippets),
+      containsLogsSnippets: includeSnippetsInMessage && containsLogsSnippets(snap.sqlSnippets),
     }
 
     const payload = {
@@ -689,7 +697,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               newSnippets.splice(index, 1)
               snap.setSqlSnippets(newSnippets)
             }}
-            includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+            includeSnippetsInMessage={includeSnippetsInMessage}
             selectedModel={selectedModel}
             onSelectModel={(model) => snap.setModel(model)}
           />

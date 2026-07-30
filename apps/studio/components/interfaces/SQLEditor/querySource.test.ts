@@ -11,6 +11,7 @@ import {
   logDateRangeToDatePickerValue,
   resolveLogRunRange,
   resolveSnippetSource,
+  sqlSourceToFenceLanguage,
   type LogDateRange,
 } from './querySource'
 import {
@@ -60,6 +61,18 @@ describe('querySource.ts:isLogsSource', () => {
 
   it('is false for an absent source', () => {
     expect(isLogsSource(undefined)).toBe(false)
+  })
+})
+
+describe('querySource.ts:sqlSourceToFenceLanguage', () => {
+  it('labels a logs query as clickhouse and everything else as sql', () => {
+    expect(sqlSourceToFenceLanguage('logs')).toBe('clickhouse')
+    expect(sqlSourceToFenceLanguage('database')).toBe('sql')
+  })
+
+  // Attachments can carry no source; those are Postgres SQL.
+  it('treats an absent source as sql', () => {
+    expect(sqlSourceToFenceLanguage(undefined)).toBe('sql')
   })
 })
 

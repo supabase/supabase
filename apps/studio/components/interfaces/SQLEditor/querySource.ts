@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 
-import { generateDynamicHelper } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import type { Unit } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import { generateDynamicHelper } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import type { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { ResolvedLogDateRange } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import type { Snippet } from '@/data/content/sql-folders-query'
@@ -27,6 +27,15 @@ export function getSnippetSource(snippet: Pick<Snippet, 'type'>): SqlSnippetSour
 
 export function isLogsSource(source: SqlSnippetSource | undefined): boolean {
   return source === 'logs'
+}
+
+/**
+ * The markdown fence language a source's SQL is written into a prompt with, so the model
+ * can tell a ClickHouse logs query from Postgres SQL.  */
+export function sqlSourceToFenceLanguage(
+  source: SqlSnippetSource | undefined
+): 'sql' | 'clickhouse' {
+  return isLogsSource(source) ? 'clickhouse' : 'sql'
 }
 
 /**

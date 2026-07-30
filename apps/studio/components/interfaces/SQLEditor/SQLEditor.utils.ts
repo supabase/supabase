@@ -7,7 +7,7 @@ import {
 } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
-import { isLogsSource, type SqlSnippetSource } from './querySource'
+import { isLogsSource, sqlSourceToFenceLanguage, type SqlSnippetSource } from './querySource'
 import {
   alterDatabasePreventConnectionStatements,
   destructiveSqlRegex,
@@ -573,7 +573,8 @@ export function buildDebugPromptText(
   errorMessage: string,
   source: SqlSnippetSource
 ): string {
-  return `${buildDebugRequestText(errorMessage, source)}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+  const fence = sqlSourceToFenceLanguage(source)
+  return `${buildDebugRequestText(errorMessage, source)}\n\nSQL Query:\n\`\`\`${fence}\n${sql}\n\`\`\``
 }
 
 // Accepts either brand: the debug flow only reads the SQL as text (it's stripped
