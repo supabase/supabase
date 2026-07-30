@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Form, FormControl, FormField, Input } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
@@ -59,25 +59,31 @@ interface FirstStepProps {
   onClose: () => void
 }
 
+const ENROLL_FORM_ID = 'add-totp-factor-form'
+
+const EnrollFormSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+})
+type EnrollFormValues = z.infer<typeof EnrollFormSchema>
+
+const enrollFormDefaultValues: EnrollFormValues = { name: '' }
+
 const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) => {
-  const FormSchema = z.object({
-    name: z.string().min(1, 'Please provide a name to identify this app'),
-  })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: { name: '' },
+  const form = useForm<EnrollFormValues>({
+    resolver: zodResolver(EnrollFormSchema),
+    defaultValues: enrollFormDefaultValues,
     mode: 'onChange',
   })
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+  const name = useWatch({ control: form.control, name: 'name' })
+  const isNameProvided = name.trim().length > 0
+
+  const onSubmit: SubmitHandler<EnrollFormValues> = async (values) => {
     enroll({ factorType: 'totp', friendlyName: values.name })
   }
 
   useEffect(() => {
-    if (!visible) {
-      // Generate a name with a number between 0 and 1000
-      form.reset({ name: `App ${Math.floor(Math.random() * 1000)}` })
-    }
+    if (visible) form.reset(enrollFormDefaultValues)
   }, [form, visible])
 
   return (
@@ -88,12 +94,13 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
       confirmLabel="Generate QR"
       confirmLabelLoading="Generating QR"
       loading={isEnrolling}
+      disabled={!isNameProvided}
       onCancel={onClose}
       onConfirm={form.handleSubmit(onSubmit)}
     >
       <Form {...form}>
         <form
-          id="verify-otp-form"
+          id={ENROLL_FORM_ID}
           className="flex flex-col gap-4"
           onSubmit={form.handleSubmit(onSubmit)}
         >
@@ -104,11 +111,11 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
             render={({ field }) => (
               <FormItemLayout
                 name="name"
-                label="Provide a name to identify this app"
-                description="A string will be randomly generated if a name is not provided"
+                label="Authenticator app name"
+                description="Shown at sign-in to identify which app to use"
               >
                 <FormControl>
-                  <Input id="name" {...field} />
+                  <Input id="name" placeholder="e.g.: Google Authenticator" autoFocus {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
