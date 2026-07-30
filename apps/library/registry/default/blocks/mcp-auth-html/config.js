@@ -1,10 +1,11 @@
-export const SUPABASE_URL = 'http://127.0.0.1:54321'
-export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
+export const SUPABASE_URL = ''
+export const SUPABASE_PUBLISHABLE_KEY = ''
 
-// The two values above are the only required edit. They default to a local
-// `supabase start` stack; for a hosted project, replace them with your project
-// URL and publishable key from Project Settings → API. Both are safe to expose
-// in a browser: the publishable key grants only what your RLS policies allow.
+// The two values above are the only required edits. For a local project, run
+// `supabase status` and copy the API URL and publishable key it reports; do not
+// assume the default port is available. For a hosted project, copy them from
+// Project Settings → API. Both are safe to expose in a browser: the publishable
+// key grants only what your RLS policies allow.
 
 // The MCP server block and its access-token hook use this canonical endpoint.
 export const MCP_SERVER_URL = `${SUPABASE_URL.replace(/\/+$/, '')}/functions/v1/mcp-server`

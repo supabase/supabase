@@ -60,16 +60,25 @@ what to enable when that happens.
 
 ```bash
 supabase start
+supabase status
 cp supabase/functions/mcp-server/.env.example supabase/functions/.env
 supabase functions serve mcp-server --env-file supabase/functions/.env
 ```
 
-The server is then at `http://127.0.0.1:54321/functions/v1/mcp-server`. With
+Before serving the function, set `MCP_PUBLIC_SUPABASE_URL` in
+`supabase/functions/.env` to the **API URL printed by `supabase status`**. Copy
+the URL exactly, including its hostname and port. If another local project is
+already running, the CLI may assign this project a different port.
+
+The server is then at
+`${MCP_PUBLIC_SUPABASE_URL}/functions/v1/mcp-server`. With
 `MCP_ALLOW_FIRST_PARTY_JWT=true` you can call it with an ordinary user token,
-which is the quickest way to see the tool list:
+which is the quickest way to see the tool list. Export the same URL in your
+shell before using this example:
 
 ```bash
-curl -s http://127.0.0.1:54321/functions/v1/mcp-server \
+export MCP_PUBLIC_SUPABASE_URL="YOUR_API_URL_FROM_SUPABASE_STATUS"
+curl -s "$MCP_PUBLIC_SUPABASE_URL/functions/v1/mcp-server" \
   -H "Authorization: Bearer $USER_ACCESS_TOKEN" \
   -H 'Content-Type: application/json' \
   -H 'Accept: application/json, text/event-stream' \
@@ -85,11 +94,14 @@ JWKS and create a user-scoped Supabase client. It keeps OAuth protected-resource
 discovery and audience checks in the block because those are specific to MCP.
 Every tool therefore runs under the caller's grants and RLS.
 
-`supabase.ts` resolves the project environment once per worker. The Auth issuer,
-MCP resource URL, user-scoped client, and toolsets therefore all use the same
-Supabase URL and publishable key. The block deliberately uses the standard
-`${SUPABASE_URL}/functions/v1/mcp-server` endpoint because the access-token hook
-must mint that exact URL into the token audience.
+`supabase.ts` resolves the project environment once per worker for internal API
+calls and separately resolves the public project URL used by OAuth metadata.
+Hosted Edge Functions normally receive the public URL automatically. Locally,
+the injected URL may be a Docker-only address such as `http://kong:8000`, so the
+server requires `MCP_PUBLIC_SUPABASE_URL` rather than advertising an address
+external clients cannot reach. The block uses the standard
+`${MCP_PUBLIC_SUPABASE_URL}/functions/v1/mcp-server` endpoint because the
+access-token hook mints that exact URL into the token audience.
 
 | Mode                     | Who uses it                                            | What is required                                                     |
 | ------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------- |
@@ -160,12 +172,13 @@ registered at startup.
 
 ## Environment
 
-| Variable                    | Default          | Purpose                                               |
-| --------------------------- | ---------------- | ----------------------------------------------------- |
-| `MCP_SERVER_NAME`           | `supabase-mcp`   | Protocol-level server name returned to MCP clients    |
-| `MCP_SERVER_DESCRIPTION`    | Generic sentence | Server instructions sent to clients                   |
-| `MCP_ALLOW_FIRST_PARTY_JWT` | `true`           | Accept Supabase user JWTs in addition to OAuth tokens |
-| `MCP_TOOLSETS`              | unset (all)      | Comma-separated toolsets to register                  |
+| Variable                     | Default                  | Purpose                                                       |
+| ---------------------------- | ------------------------ | ------------------------------------------------------------- |
+| `MCP_PUBLIC_SUPABASE_URL`    | Hosted project URL       | Public API origin used in OAuth metadata and token audiences   |
+| `MCP_SERVER_NAME`            | `supabase-mcp`           | Protocol-level server name returned to MCP clients             |
+| `MCP_SERVER_DESCRIPTION`     | Generic sentence         | Server instructions sent to clients                            |
+| `MCP_ALLOW_FIRST_PARTY_JWT`  | `true`                   | Accept Supabase user JWTs in addition to OAuth tokens          |
+| `MCP_TOOLSETS`               | unset (all)              | Comma-separated toolsets to register                           |
 
 ## Deploy
 
@@ -175,9 +188,10 @@ supabase config push
 supabase functions deploy mcp-server
 ```
 
-No URL secrets are required. `@supabase/server` resolves the public Supabase
-project URL from the Edge Function environment, and every block derives its
-Auth and MCP endpoints from that value.
+No URL secret is required for the standard hosted project URL.
+`MCP_PUBLIC_SUPABASE_URL` is only needed when the externally reachable origin
+differs from the URL injected into the function, such as local Docker or a
+custom proxy domain.
 
 ## Further reading
 

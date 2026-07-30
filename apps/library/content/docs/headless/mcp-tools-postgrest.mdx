@@ -71,6 +71,43 @@ Operators cover `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in`,
 `is`, `cs`, and `cd`. Insert and update tools take real column types read from the
 schema, including `null` to clear a column.
 
+Create tools always accept a `rows` array so the same tool supports one-row and
+batch inserts:
+
+```json
+{
+  "name": "create_todos",
+  "arguments": {
+    "rows": [{ "title": "Review the MCP block", "done": false, "priority": 2 }],
+    "select": "id,title,done,priority"
+  }
+}
+```
+
+Updates separate the rows to match from the values to change:
+
+```json
+{
+  "name": "update_todos",
+  "arguments": {
+    "filters": [{ "column": "id", "operator": "eq", "value": "TODO_ID" }],
+    "values": { "done": true },
+    "select": "id,title,done"
+  }
+}
+```
+
+Deletes use the same structured filters and require at least one:
+
+```json
+{
+  "name": "delete_todos",
+  "arguments": {
+    "filters": [{ "column": "id", "operator": "eq", "value": "TODO_ID" }]
+  }
+}
+```
+
 ## Guardrails
 
 - **Update and delete require at least one filter.** PostgREST would otherwise

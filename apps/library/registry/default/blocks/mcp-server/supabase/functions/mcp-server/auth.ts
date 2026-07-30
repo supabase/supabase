@@ -1,7 +1,7 @@
 import { createContextClient, verifyAuth } from 'npm:@supabase/server@1.4.1/core'
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.108.2'
 
-import { getSupabaseEnvironment } from './supabase.ts'
+import { getPublicSupabaseUrl, getSupabaseEnvironment } from './supabase.ts'
 
 // Dual-mode authentication.
 //
@@ -57,20 +57,16 @@ type AuthenticationResult =
 // Canonical URLs
 // -----------------------------------------------------------------------------
 //
-// The Supabase project URL is the single source of truth shared with the browser
-// block and access-token hook. Keeping the starter on the standard function URL
-// makes the token audience deterministic and removes hosted-only URL secrets.
-
-function trimTrailingSlash(value: string): string {
-  return value.replace(/\/+$/, '')
-}
+// The public Supabase project URL is the single source of truth shared with the
+// browser block and access-token hook. It may differ from the Docker-only URL
+// the function uses for internal project API calls during local development.
 
 function readTextEnv(name: string, fallback: string): string {
   return Deno.env.get(name)?.trim() || fallback
 }
 
 export function getAuthConfig(): AuthConfig {
-  const projectUrl = trimTrailingSlash(getSupabaseEnvironment().url)
+  const projectUrl = getPublicSupabaseUrl()
   const resourceUrl = `${projectUrl}${FUNCTION_PATH}`
   const allowFirstPartyJwt =
     (Deno.env.get('MCP_ALLOW_FIRST_PARTY_JWT')?.trim().toLowerCase() ?? 'true') !== 'false'

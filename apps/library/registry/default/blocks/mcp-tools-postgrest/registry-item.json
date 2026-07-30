@@ -4,6 +4,7 @@
   "title": "MCP Tools: PostgREST",
   "description": "A toolset for the MCP server that generates database tools from your PostgREST schema: read and write tools per table, view, and function.",
   "registryDependencies": ["https://supabase.com/library/r/mcp-server.json"],
+  "docs": "Required setup: register the installed PostgREST toolset in `supabase/functions/mcp-server/tools/index.ts`. Import `postgrestToolset` from `./postgrest/index.ts`, then call `registerToolset(postgrestToolset)` inside `registerToolsets()`. See the block documentation for the complete edit.",
   "files": [
     {
       "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/index.ts",

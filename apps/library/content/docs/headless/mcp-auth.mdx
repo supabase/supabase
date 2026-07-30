@@ -57,8 +57,13 @@ export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_...'
 Find both in your project's
 [API settings](https://supabase.com/dashboard/project/_/settings/api).
 Both are safe to expose in a browser: the publishable key grants only what your
-RLS policies allow. The defaults that ship in the file match a local
-`supabase start` stack, so local development needs no edit.
+RLS policies allow.
+
+For a local project, run `supabase status` and copy the API URL and publishable
+key it reports. Do not assume the API is on port `54321`: the CLI may remap ports
+when another local project is running. Copy the hostname exactly too. If you use
+`127.0.0.1` for the API and local front-end, keep using it in `site_url` and
+redirect URLs instead of switching some URLs to `localhost`.
 
 The MCP endpoint is derived from the same project URL:
 

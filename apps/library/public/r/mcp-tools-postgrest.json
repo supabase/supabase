@@ -26,5 +26,6 @@
       "type": "registry:file",
       "target": "supabase/functions/mcp-server/tools/postgrest/tools.ts"
     }
-  ]
+  ],
+  "docs": "Required setup: register the installed PostgREST toolset in `supabase/functions/mcp-server/tools/index.ts`. Import `postgrestToolset` from `./postgrest/index.ts`, then call `registerToolset(postgrestToolset)` inside `registerToolsets()`. See the block documentation for the complete edit."
 }
