@@ -212,20 +212,17 @@ You will encounter an error when you try to delete an Auth user that owns any St
 
 ### Removing account access
 
-When the goal is to remove an account so it can no longer access your app, deleting the row is not enough on its own. Two things keep a "deleted" account working:
+When the goal is to remove an account so it can no longer access your app, delete the auth user with [`auth.admin.deleteUser()`](/docs/reference/javascript/auth-admin-deleteuser). With the default `shouldSoftDelete: false`, this removes the row from `auth.users`, which cascades to `auth.sessions` and invalidates the user's refresh tokens — so the account can no longer mint new access tokens.
 
-- **Existing sessions.** Deleting the user does not revoke access tokens that were already issued. Any valid access token keeps working until it expires.
-- **Incomplete deletion.** An application-level "deleted" flag leaves the `auth.users` row intact, so the account can still authenticate and refresh. A temporary [ban](/docs/reference/javascript/auth-admin-updateuserbyid) only blocks sign-in for its duration and does not revoke existing sessions. Neither is a substitute for deleting the auth user.
+A few things are _not_ a substitute for deleting the user:
 
-To cut off access:
+- A temporary [ban](/docs/reference/javascript/auth-admin-updateuserbyid) only blocks sign-in for its duration and does not revoke existing sessions.
+- Marking the account as deleted only in your own application tables leaves the `auth.users` row intact, so it can still authenticate and refresh.
 
-1. Revoke the user's sessions so their refresh token can no longer mint new access tokens — sign them out with the [`global` scope](/docs/guides/auth/signout), or delete their rows from `auth.sessions` server-side.
-2. Delete the auth user with [`auth.admin.deleteUser()`](/docs/reference/javascript/auth-admin-deleteuser).
+Deleting the user still cannot retroactively invalidate an access token that was already issued. Supabase access tokens are stateless JWTs, so a token already in the user's hands stays valid until its `exp` claim passes, and during that window the account can still call the API. You have two ways to handle this window:
 
-These steps stop the account from obtaining any _new_ tokens, but they cannot retroactively invalidate an access token that was already issued. Supabase access tokens are stateless JWTs, so a token already in the user's hands stays valid until its `exp` claim passes, and during that window the account can still call the API. You have two ways to handle this window:
-
-- **Bound it:** keep the [access token (JWT) expiry](/docs/guides/auth/sessions) short, so any outstanding token expires soon after step 1.
-- **Close it immediately:** validate the `session_id` claim against the `auth.sessions` table on sensitive operations. Because step 1 removes the session row, an outstanding token fails this check right away.
+- **Bound it:** keep the [access token (JWT) expiry](/docs/guides/auth/sessions) short, so any outstanding token expires soon after you delete the user.
+- **Close it for sensitive operations:** validate the `session_id` claim against the `auth.sessions` table on those operations. Because deleting the user removes the session row, an outstanding token fails this check — but only on the requests where you perform it; other API calls still accept the token until `exp`.
 
 See [User sessions](/docs/guides/auth/sessions) for details.
 
