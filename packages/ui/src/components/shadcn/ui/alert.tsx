@@ -45,8 +45,6 @@ const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  // p (not h5/div): text content without breaking heading hierarchy. In MDX prose,
-  // a <p> also picks up the same font-size as admonition body copy.
   <p
     ref={ref}
     data-slot="alert-title"
