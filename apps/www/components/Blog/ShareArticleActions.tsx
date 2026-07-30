@@ -1,6 +1,5 @@
 'use client'
 
-import { useCopyMarkdownFromUrl } from 'common'
 import Link from 'next/link'
 import {
   cn,
@@ -12,8 +11,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from 'ui'
-
-import { SITE_ORIGIN } from '@/lib/constants'
 
 const ShareArticleActions = ({
   title,
@@ -28,13 +25,8 @@ const ShareArticleActions = ({
   basePath?: string
   className?: string
 }) => {
-  const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
-
   const permalink = encodeURIComponent(`${basePath}${slug}`)
   const encodedTitle = encodeURIComponent(title)
-  const mdPath = `/blog/${slug}.md`
-  const mdAbs = `${SITE_ORIGIN}${mdPath}`
-  const aiPrompt = `Read from ${mdAbs} so I can ask questions about its contents`
 
   return (
     <TooltipProvider>
