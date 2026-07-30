@@ -3,7 +3,7 @@
 # Test S3 protocol endpoint for self-hosted Supabase Storage.
 #
 # Verifies that the S3-compatible endpoint at /storage/v1/s3 works with
-# standard S3 clients — the same way end users interact with it via
+# standard S3 clients - the same way end users interact with it via
 # aws cli, rclone, or other S3-compatible tools.
 #
 # Usage:
@@ -80,7 +80,7 @@ s3() {
 }
 
 # Wrapper for jq that yields empty output instead of aborting the suite when
-# the payload is not JSON — an S3 error document, say — and jq exits non-zero.
+# the payload is not JSON (e.g. an S3 error document) and jq exits non-zero.
 jq_r() {
     jq -r "$@" 2>/dev/null || true
 }
