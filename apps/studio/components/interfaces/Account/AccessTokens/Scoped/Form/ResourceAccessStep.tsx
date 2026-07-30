@@ -167,6 +167,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
                   <FormItemLayout layout="vertical" label="Organizations" id="organizationSlugs">
                     <MultiSelector onValuesChange={field.onChange} values={field.value}>
                       <MultiSelectorTrigger
+                        id="organizationSlugs"
                         mode="combobox"
                         label="Select organizations"
                         badgeLimit="wrap"
@@ -204,6 +205,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
                     disabled={!organizationSlugs}
                   >
                     <MultiSelectorTrigger
+                      id="projectRefs"
                       mode="combobox"
                       label={
                         organizationSlugs.length > 0
