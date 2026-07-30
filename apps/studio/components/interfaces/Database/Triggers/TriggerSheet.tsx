@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { PGTrigger } from '@supabase/pg-meta'
 import { Terminal } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -136,7 +136,10 @@ export const TriggerSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const { function_name, function_schema } = form.watch()
+  const [function_name, function_schema] = useWatch({
+    control: form.control,
+    name: ['function_name', 'function_schema'],
+  })
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
