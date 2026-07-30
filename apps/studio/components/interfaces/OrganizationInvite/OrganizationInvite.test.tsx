@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { OrganizationInvite } from '@/components/interfaces/OrganizationInvite/OrganizationInvite'
+import { OrganizationInvite } from './OrganizationInvite'
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import type { ProfileContextType } from '@/lib/profile'
 import { render } from '@/tests/helpers'

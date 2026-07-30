@@ -4,7 +4,7 @@ import {
   getOrganizationInviteContent,
   getOrganizationInviteStatus,
   type OrganizationInviteStatus,
-} from '@/components/interfaces/OrganizationInvite/OrganizationInvite.utils'
+} from './OrganizationInvite.utils'
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import type { ResponseError } from '@/types'
 
