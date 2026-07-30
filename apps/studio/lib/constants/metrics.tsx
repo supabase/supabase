@@ -1,5 +1,5 @@
 import { Auth, Realtime, Storage } from 'icons'
-import { ActivityIcon, DatabaseIcon, HeartIcon, ServerIcon } from 'lucide-react'
+import { ActivityIcon, DatabaseIcon, HeartPulseIcon, ServerIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 
 export type Metric = {
@@ -22,7 +22,7 @@ export const InstanceHealthIcon = ({
 }: {
   className?: string
   size?: number
-}) => <HeartIcon size={size} strokeWidth={1.5} className={className} />
+}) => <HeartPulseIcon size={size} strokeWidth={1.5} className={className} />
 
 export const METRIC_CATEGORIES = {
   API: {
