@@ -5,10 +5,12 @@ import {
   datePickerValueToLogDateRange,
   DEFAULT_LOG_DATE_RANGE,
   getSnippetSource,
+  isLogsSource,
   isoDateTimeString,
   logDateRangesEqual,
   logDateRangeToDatePickerValue,
   resolveLogRunRange,
+  resolveSnippetSource,
   type LogDateRange,
 } from './querySource'
 import {
@@ -47,6 +49,33 @@ describe('querySource.ts:getSnippetSource', () => {
 
   it('maps report to the database source', () => {
     expect(getSnippetSource({ type: 'report' })).toBe('database')
+  })
+})
+
+describe('querySource.ts:isLogsSource', () => {
+  it('is true only for the logs source', () => {
+    expect(isLogsSource('logs')).toBe(true)
+    expect(isLogsSource('database')).toBe(false)
+  })
+
+  it('is false for an absent source', () => {
+    expect(isLogsSource(undefined)).toBe(false)
+  })
+})
+
+describe('querySource.ts:resolveSnippetSource', () => {
+  it('prefers the snippet type over the URL param', () => {
+    expect(resolveSnippetSource({ type: 'log_sql' }, undefined)).toBe('logs')
+    // A stale/mismatched param must not override a snippet that already exists.
+    expect(resolveSnippetSource({ type: 'sql' }, 'logs')).toBe('database')
+  })
+
+  // A fresh `/sql/new` tab has no snippet until the first keystroke, so the param is
+  // the only signal that it is a logs tab.
+  it('falls back to the URL param before the snippet exists', () => {
+    expect(resolveSnippetSource(undefined, 'logs')).toBe('logs')
+    expect(resolveSnippetSource(undefined, undefined)).toBe('database')
+    expect(resolveSnippetSource(undefined, 'nonsense')).toBe('database')
   })
 })
 

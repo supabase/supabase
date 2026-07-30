@@ -25,6 +25,10 @@ export function getSnippetSource(snippet: Pick<Snippet, 'type'>): SqlSnippetSour
   return snippet.type === 'log_sql' ? 'logs' : 'database'
 }
 
+export function isLogsSource(source: SqlSnippetSource | undefined): boolean {
+  return source === 'logs'
+}
+
 /**
  * Parse a raw `source` value (e.g. the `?source=` query param a creation entry
  * threads through `/sql/new`) into a `SqlSnippetSource`. Only the explicit
@@ -33,6 +37,18 @@ export function getSnippetSource(snippet: Pick<Snippet, 'type'>): SqlSnippetSour
  */
 export function parseSqlSnippetSource(raw: string | undefined): SqlSnippetSource {
   return raw === 'logs' ? 'logs' : 'database'
+}
+
+/**
+ * Resolve where an open snippet's query runs, falling back to the `?source=` URL param
+ * when the snippet isn't in the store yet — a fresh `/sql/new` tab is materialized
+ * lazily on the first keystroke, and until then the param is the only signal.
+ */
+export function resolveSnippetSource(
+  snippet: Pick<Snippet, 'type'> | undefined,
+  sourceParam: string | undefined
+): SqlSnippetSource {
+  return snippet !== undefined ? getSnippetSource(snippet) : parseSqlSnippetSource(sourceParam)
 }
 
 /**

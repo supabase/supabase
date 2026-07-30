@@ -393,12 +393,25 @@ describe('SQLEditor.utils.ts:buildDebugChatArgs', () => {
   test('builds the newChat payload from the snippet sql and error message', () => {
     const snippet = buildDebugSnippet('select 1;')
     const result = { error: { message: 'relation does not exist' } }
-    expect(buildDebugChatArgs(snippet, result)).toEqual({
+    expect(buildDebugChatArgs(snippet, result, 'database')).toEqual({
       name: 'Debug SQL snippet',
-      sqlSnippets: ['select 1;'],
+      sqlSnippets: [{ label: 'Current Query', content: 'select 1;', source: 'database' }],
       initialInput:
         'Help me to debug the attached sql snippet which gives the following error: \n\nrelation does not exist',
     })
+  })
+
+  // The attachment is what puts sqlSource on the message the user then submits, so
+  // the debug flow has to attach a sourced snippet, not a bare string.
+  test('attaches the query with its source and names the dialect', () => {
+    const snippet = buildDebugSnippet('select count(*) from logs;')
+    const result = { error: { message: 'Unknown expression identifier' } }
+    expect(buildDebugChatArgs(snippet, result, 'logs').sqlSnippets).toEqual([
+      { label: 'Current Query', content: 'select count(*) from logs;', source: 'logs' },
+    ])
+    expect(buildDebugChatArgs(snippet, result, 'logs').initialInput).toEqual(
+      'Help me to debug the attached sql snippet which gives the following error: \n\nUnknown expression identifier\n\nThis query runs against the Supabase logs table on a ClickHouse-backed engine, not Postgres.'
+    )
   })
 })
 
@@ -1464,9 +1477,23 @@ describe('SQLEditor.utils:assembleCompletionDiff', () => {
 
 describe('SQLEditor.utils:buildDebugPromptText', () => {
   it('builds the debug prompt with the error message and SQL block', () => {
-    const result = buildDebugPromptText('select 1;', 'relation does not exist')
+    const result = buildDebugPromptText('select 1;', 'relation does not exist', 'database')
     expect(result).toContain('relation does not exist')
     expect(result).toContain('```sql\nselect 1;\n```')
+    expect(result).not.toContain('ClickHouse')
+  })
+
+  // This text is copyable and gets pasted into external models, so it has to name
+  // the dialect itself rather than relying on the message metadata.
+  it('names the dialect for a logs snippet', () => {
+    const result = buildDebugPromptText(
+      "select count() from logs where source = 'edge_logs'",
+      'Unknown expression identifier',
+      'logs'
+    )
+    expect(result).toContain('Unknown expression identifier')
+    expect(result).toContain('ClickHouse')
+    expect(result).toContain('not Postgres')
   })
 })
 

@@ -245,7 +245,11 @@ describe('useSqlEditorAi — debug', () => {
 
     const activeChat = aiAssistantState.chats[aiAssistantState.activeChatId ?? '']
     expect(activeChat?.name).toBe('Debug SQL snippet')
-    expect(aiAssistantState.sqlSnippets).toEqual(['selct 1;'])
+    // Attached with its source, which is what carries sqlSource onto the message the
+    // user submits from the prefilled composer.
+    expect(aiAssistantState.sqlSnippets).toEqual([
+      { label: 'Current Query', content: 'selct 1;', source: 'database' },
+    ])
     expect(aiAssistantState.initialInput).toContain('syntax error at or near "selct"')
   })
 
