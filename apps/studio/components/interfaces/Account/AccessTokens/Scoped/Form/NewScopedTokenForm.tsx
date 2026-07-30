@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Form, ScrollArea, Separator, SheetClose, SheetFooter } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -49,11 +49,16 @@ export const NewScopedTokenForm = ({
     mode: 'onChange',
   })
   const [step, setStep] = useState<'form' | 'review'>('form')
+  const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
   const [showMissingPermissionsWarning, setShowMissingPermissionsWarning] = useState(false)
   const resourceSectionRef = useRef<HTMLDivElement>(null)
-  const values = form.watch()
-  const selection = values.permissions
-  const configuredCount = countConfigured(selection)
+  const selection = useWatch({ control: form.control, name: 'permissions' })
+  const configuredCount = useWatch({
+    control: form.control,
+    name: 'permissions',
+    compute: (selection) => countConfigured(selection),
+  })
+
   const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
 
   useEffect(() => {
@@ -63,11 +68,12 @@ export const NewScopedTokenForm = ({
     }
   }, [onCancel, isError])
 
-  const handleReviewAccess = async () => {
+  const handleReviewAccess = async (values: TokenFormValues) => {
     if (configuredCount === 0) {
       setShowMissingPermissionsWarning(true)
       return
     }
+    setFormValues(values)
     setStep('review')
   }
 
@@ -82,10 +88,10 @@ export const NewScopedTokenForm = ({
         {step === 'form' ? (
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(handleReviewAccess)}>
-              <TokenDetails form={form} />
+              <TokenDetails control={form.control} setValue={form.setValue} />
               <Separator />
               <div ref={resourceSectionRef}>
-                <ResourceAccessStep form={form} />
+                <ResourceAccessStep control={form.control} setValue={form.setValue} />
               </div>
               <Separator />
               <PermissionsAccordion
@@ -108,7 +114,7 @@ export const NewScopedTokenForm = ({
             </form>
           </Form>
         ) : (
-          <NewScopedTokenFormReview values={values} permissionScopeMap={permissionScopeMap} />
+          <NewScopedTokenFormReview values={formValues} permissionScopeMap={permissionScopeMap} />
         )}
       </ScrollArea>
       <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">
@@ -127,7 +133,7 @@ export const NewScopedTokenForm = ({
               Review access
             </Button>
           ) : (
-            <Button loading={isPending} onClick={() => onCreateToken(form.getValues())}>
+            <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
               Create token
             </Button>
           )}

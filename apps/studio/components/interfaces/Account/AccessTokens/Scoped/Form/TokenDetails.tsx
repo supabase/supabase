@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import type { UseFormReturn } from 'react-hook-form'
+import type { Control, UseFormSetValue } from 'react-hook-form'
 import {
   Badge,
   Calendar,
@@ -12,6 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  useWatch,
 } from 'ui'
 import {
   DatePicker,
@@ -28,19 +29,22 @@ import {
 } from './NewScopedTokenForm.utils'
 
 interface TokenDetailsProps {
-  form: UseFormReturn<TokenFormValues>
+  control: Control<TokenFormValues>
+  setValue: UseFormSetValue<TokenFormValues>
 }
 
-export const TokenDetails = ({ form }: TokenDetailsProps) => {
+export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
+  const customExpiryDate = useWatch({ control, name: 'customExpiryDate' })
+
   const handleExpiryChange = (value: string) => {
-    form.setValue('expiresAt', value as TokenFormValues['expiresAt'], { shouldValidate: true })
+    setValue('expiresAt', value as TokenFormValues['expiresAt'], { shouldValidate: true })
     if (value === 'custom') {
-      if (!form.getValues('customExpiryDate')) {
+      if (!customExpiryDate) {
         const iso = getDefaultCustomExpiryDate()
-        form.setValue('customExpiryDate', iso, { shouldValidate: true })
+        setValue('customExpiryDate', iso, { shouldValidate: true })
       }
     } else {
-      form.setValue('customExpiryDate', undefined, { shouldValidate: true })
+      setValue('customExpiryDate', undefined, { shouldValidate: true })
     }
   }
 
@@ -51,7 +55,7 @@ export const TokenDetails = ({ form }: TokenDetailsProps) => {
       <FormField
         key="tokenName"
         name="tokenName"
-        control={form.control}
+        control={control}
         render={({ field }) => (
           <FormItemLayout name="tokenName" label="Name">
             <FormControl>
@@ -64,7 +68,7 @@ export const TokenDetails = ({ form }: TokenDetailsProps) => {
       <FormField
         key="expiresAt"
         name="expiresAt"
-        control={form.control}
+        control={control}
         render={({ field }) => (
           <FormItemLayout name="expiresAt" label="Expires in">
             <div className="flex gap-2">
@@ -90,7 +94,7 @@ export const TokenDetails = ({ form }: TokenDetailsProps) => {
                 <FormField
                   key="customExpiryDate"
                   name="customExpiryDate"
-                  control={form.control}
+                  control={control}
                   render={({ field, fieldState }) => {
                     const value = field.value ? new Date(field.value) : undefined
                     return (
