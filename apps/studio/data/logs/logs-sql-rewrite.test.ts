@@ -57,6 +57,21 @@ describe('detectLogSource', () => {
   it('returns undefined when nothing matches', () => {
     expect(detectLogSource('select 1')).toBeUndefined()
   })
+
+  it('ignores a column that merely ends in "source"', () => {
+    expect(detectLogSource("select 1 from logs where resource = 'nope'")).toBeUndefined()
+    expect(detectLogSource("select 1 from logs where datasource = 'nope'")).toBeUndefined()
+  })
+
+  it('still reads a qualified source column', () => {
+    expect(detectLogSource("select 1 from logs t where t.source = 'auth_logs'")).toBe('auth_logs')
+  })
+
+  it('prefers the real source column over a lookalike earlier in the query', () => {
+    expect(detectLogSource("select resource = 'nope' from logs where source = 'edge_logs'")).toBe(
+      'edge_logs'
+    )
+  })
 })
 
 describe('looksLikeLegacyLogsQuery', () => {

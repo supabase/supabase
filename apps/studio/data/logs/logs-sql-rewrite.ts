@@ -11,7 +11,9 @@ const SOURCE_ALIASES: Record<string, string> = {
 }
 
 export function detectLogSource(sql: string): string | undefined {
-  const bySource = sql.match(/source\s*=\s*'([^']+)'/i)
+  // `\b` so only a standalone `source` column counts — an unanchored match reads
+  // the value out of `resource = '...'` or `datasource = '...'` too.
+  const bySource = sql.match(/\bsource\s*=\s*'([^']+)'/i)
   if (bySource) {
     const source = bySource[1].toLowerCase()
     return SOURCE_ALIASES[source] ?? source
@@ -32,6 +34,12 @@ export function looksLikeLegacyLogsQuery(sql: string): boolean {
   const byFrom = lower.match(/\bfrom\s+([a-z_][a-z0-9_]*)/)
   return byFrom ? byFrom[1] !== 'logs' : false
 }
+
+/**
+ * How long to let the query text settle before re-running the dialect check.
+ * Shared so every surface offering the rewrite reacts on the same cadence.
+ */
+export const LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS = 500
 
 /**
  * Whether to offer the ClickHouse rewrite for a query. Both the flag and the

@@ -1,6 +1,7 @@
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { LegacyLogsRewriteState } from '@/hooks/analytics/useLegacyLogsRewrite'
 
 interface LegacyLogsRewriteAdmonitionProps {
@@ -85,9 +86,20 @@ export const LegacyLogsRewriteAdmonition = ({
           </Button>
           {/* Disabled mid-rewrite so the offer can't be dismissed out from under
               an in-flight request — the two states stay mutually exclusive. */}
-          <Button variant="text" size="tiny" disabled={isRewriting} onClick={onDismiss}>
+          <ButtonTooltip
+            variant="text"
+            size="tiny"
+            disabled={isRewriting}
+            onClick={onDismiss}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: isRewriting ? 'Available once the rewrite finishes' : undefined,
+              },
+            }}
+          >
             Dismiss
-          </Button>
+          </ButtonTooltip>
         </div>
       }
     />

@@ -1,5 +1,5 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useLocalStorage } from '@uidotdev/usehooks'
+import { useDebounce, useLocalStorage } from '@uidotdev/usehooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import type { editor } from 'monaco-editor'
@@ -47,7 +47,10 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { shouldOfferLegacyLogsRewrite } from '@/data/logs/logs-sql-rewrite'
+import {
+  LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS,
+  shouldOfferLegacyLogsRewrite,
+} from '@/data/logs/logs-sql-rewrite'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import {
   useLegacyLogsRewrite,
@@ -178,10 +181,17 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const results = logData
   const isLoading = logsLoading
 
-  const showRewriteCTA = shouldOfferLegacyLogsRewrite({
-    sql: editorValue,
-    isClickhouseLogsEnabled: useOtelEndpoint,
-  })
+  // Debounced so the dialect heuristics don't run on every keystroke, matching the
+  // SQL editor's rewrite banner.
+  const settledEditorValue = useDebounce(editorValue, LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS)
+  const shouldShowRewriteCTA = useMemo(
+    () =>
+      shouldOfferLegacyLogsRewrite({
+        sql: settledEditorValue,
+        isClickhouseLogsEnabled: useOtelEndpoint,
+      }),
+    [settledEditorValue, useOtelEndpoint]
+  )
 
   const {
     state: rewriteState,
@@ -475,11 +485,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
-            showRewriteAction={showRewriteCTA && rewriteBannerDismissed}
+            showRewriteAction={shouldShowRewriteCTA && rewriteBannerDismissed}
             isRewriting={isRewriting}
             onRewrite={requestRewrite}
           />
-          {(hasUnacknowledgedRewriteOutcome || (showRewriteCTA && !rewriteBannerDismissed)) && (
+          {(hasUnacknowledgedRewriteOutcome ||
+            (shouldShowRewriteCTA && !rewriteBannerDismissed)) && (
             <LegacyLogsRewriteAdmonition
               state={rewriteState}
               onRewrite={requestRewrite}

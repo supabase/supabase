@@ -149,7 +149,12 @@ export function useLegacyLogsRewrite({
   }
 
   const dismiss = () => {
-    dispatch({ type: 'dismissed' })
+    const dismissed: LegacyLogsRewriteEvent = { type: 'dismissed' }
+    // The transition table is the contract, not the UI that happens to disable the
+    // control: never report a dismissal the machine rejected (mid-rewrite, say),
+    // or a surface that persists it would suppress an offer that's still live.
+    if (legacyLogsRewriteReducer(state, dismissed) === state) return
+    dispatch(dismissed)
     onDismissed?.()
   }
 

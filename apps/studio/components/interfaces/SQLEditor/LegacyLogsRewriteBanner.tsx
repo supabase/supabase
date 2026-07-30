@@ -5,15 +5,15 @@ import { useMemo } from 'react'
 import { DiffType } from './SQLEditor.types'
 import { useSqlEditorAssistant, useSqlEditorRun, useSqlEditorSnippet } from './SQLEditorControllers'
 import { LegacyLogsRewriteAdmonition } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteAdmonition'
-import { shouldOfferLegacyLogsRewrite } from '@/data/logs/logs-sql-rewrite'
+import {
+  LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS,
+  shouldOfferLegacyLogsRewrite,
+} from '@/data/logs/logs-sql-rewrite'
 import { useLegacyLogsRewrite } from '@/hooks/analytics/useLegacyLogsRewrite'
 import {
   getSqlEditorV2StateSnapshot,
   useSqlEditorV2StateSnapshot,
 } from '@/state/sql-editor/sql-editor-state'
-
-/** Long enough that the dialect check doesn't run mid-word while typing. */
-const DIALECT_CHECK_DEBOUNCE_MS = 500
 
 /**
  * Offers to rewrite a logs snippet still written in the old BigQuery dialect
@@ -45,7 +45,7 @@ export const LegacyLogsRewriteBanner = () => {
   // dialect heuristics — the banner's visibility doesn't need per-character
   // precision, and a settled value avoids flapping mid-edit.
   const liveSql = snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? ''
-  const settledSql = useDebounce(liveSql, DIALECT_CHECK_DEBOUNCE_MS)
+  const settledSql = useDebounce(liveSql, LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS)
 
   const isLogsSnippetNeedingRewrite = useMemo(
     () =>
