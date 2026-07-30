@@ -24,10 +24,9 @@ import { useProfile, useProfileNameAndPicture } from '@/lib/profile'
 export const OrganizationInvite = () => {
   const router = useRouter()
   const isLoggedIn = useIsLoggedIn()
+  const { slug, token } = useParams()
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { username, avatarUrl, primaryEmail } = useProfileNameAndPicture()
-  const { slug, token } = useParams()
-  const [joinError, setJoinError] = useState<string>()
 
   const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
 
@@ -70,20 +69,21 @@ export const OrganizationInvite = () => {
 
   const mfaRequiredError = error?.message.includes('MFA required')
 
-  const { mutate: joinOrganization, isPending: isJoining } =
-    useOrganizationAcceptInvitationMutation({
-      onSuccess: () => {
-        router.push('/organizations')
-      },
-      onError: (error) => {
-        setJoinError(error.message)
-      },
-    })
+  const {
+    mutate: joinOrganization,
+    isPending: isJoining,
+    error: joinError,
+  } = useOrganizationAcceptInvitationMutation({
+    onSuccess: () => {
+      router.push('/organizations')
+    },
+    // [Joshen] Silence the default toast handler
+    onError: () => {},
+  })
 
   async function handleJoinOrganization() {
     if (!slug) return console.error('Slug is required')
     if (!token) return console.error('Token is required')
-    setJoinError(undefined)
     joinOrganization({ slug, token })
   }
 
@@ -200,7 +200,7 @@ export const OrganizationInvite = () => {
         {joinError && (
           <div className="mt-3 border-t border-muted pt-5">
             <p role="alert" className="text-center text-xs text-destructive text-balance">
-              Failed to join organization: {joinError}
+              Failed to join organization: {joinError.message}
             </p>
           </div>
         )}
