@@ -212,7 +212,6 @@ function CaseStudyPage(props: any) {
 
                         <MarkdownActions
                           pagePath={`/customers/${slug}`}
-                          mdPath={`/customers/${slug}.md`}
                           pageType="customers"
                           className="not-prose"
                         />

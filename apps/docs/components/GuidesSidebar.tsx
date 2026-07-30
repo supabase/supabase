@@ -24,13 +24,13 @@ function AiTools({ className }: { className?: string }) {
   const path = usePathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
-  const askUrls = askAiUrls(`https://supabase.com/docs${path}`)
+  const urls = askAiUrls(`https://supabase.com/docs${path}`)
 
   function handleAgentSetupClick() {
     sendTelemetryEvent({ action: 'agent_setup_clicked' })
   }
 
-  async function handleCopyMarkdown() {
+  async function handleCopy() {
     const ok = await copyMarkdown(`/docs/${path}.md`, {
       fallbackHtml: () => document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? '',
     })
@@ -58,7 +58,7 @@ function AiTools({ className }: { className?: string }) {
         </Link>
         <button
           tabIndex={0}
-          onClick={handleCopyMarkdown}
+          onClick={handleCopy}
           className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
         >
           {copied ? (
@@ -69,7 +69,7 @@ function AiTools({ className }: { className?: string }) {
           {copied ? 'Copied!' : 'Copy as Markdown'}
         </button>
         <a
-          href={askUrls.chatgpt}
+          href={urls.chatgpt}
           target="_blank"
           onClick={() =>
             sendTelemetryEvent({
@@ -84,7 +84,7 @@ function AiTools({ className }: { className?: string }) {
           Ask ChatGPT
         </a>
         <a
-          href={askUrls.claude}
+          href={urls.claude}
           target="_blank"
           onClick={() =>
             sendTelemetryEvent({

@@ -227,11 +227,7 @@ const BlogPostRenderer = async ({
                   {isLaunchWeek15 && <LW15Summary />}
 
                   <div className="lg:hidden py-8 flex flex-col gap-6">
-                    <MarkdownActions
-                      pagePath={`/blog/${blogMetaData.slug}`}
-                      mdPath={`/blog/${blogMetaData.slug}.md`}
-                      pageType="blog"
-                    />
+                    <MarkdownActions pagePath={`/blog/${blogMetaData.slug}`} pageType="blog" />
                     <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                   </div>
 
@@ -298,11 +294,7 @@ const BlogPostRenderer = async ({
                     </p>
                     <div className="overflow-y-auto min-h-0 flex-1">{toc}</div>
                     <div className="shrink-0 flex flex-col gap-6">
-                      <MarkdownActions
-                        pagePath={`/blog/${blogMetaData.slug}`}
-                        mdPath={`/blog/${blogMetaData.slug}.md`}
-                        pageType="blog"
-                      />
+                      <MarkdownActions pagePath={`/blog/${blogMetaData.slug}`} pageType="blog" />
                       <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                     </div>
                   </div>

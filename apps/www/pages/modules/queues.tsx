@@ -53,7 +53,6 @@ function CronPage() {
               orientation="horizontal"
               className="justify-center"
               pagePath="/modules/queues"
-              mdPath="/modules/queues.md"
               pageType="modules"
             />
           }

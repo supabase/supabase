@@ -51,12 +51,7 @@ export function Hero() {
             </Link>
           </Button>
         </div>
-        <MarkdownActions
-          orientation="horizontal"
-          pagePath="/"
-          mdPath="/homepage.md"
-          pageType="homepage"
-        />
+        <MarkdownActions orientation="horizontal" pagePath="/" pageType="homepage" />
       </div>
     </SectionContainer>
   )

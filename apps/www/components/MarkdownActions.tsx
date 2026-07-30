@@ -11,7 +11,6 @@ import { SITE_ORIGIN } from '@/lib/constants'
 
 type Props = {
   pagePath: string
-  mdPath: string
   pageType: MarkdownAffordancePageType
   orientation?: 'vertical' | 'horizontal'
   className?: string
@@ -22,13 +21,13 @@ const itemClass =
 
 export function MarkdownActions({
   pagePath,
-  mdPath,
   pageType,
   orientation = 'vertical',
   className,
 }: Props) {
   const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const mdPath = pagePath === '/' ? '/homepage.md' : `${pagePath}.md`
   const urls = askAiUrls(`${SITE_ORIGIN}${pagePath === '/' ? '' : pagePath}`)
 
   async function handleCopy() {

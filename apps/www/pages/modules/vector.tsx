@@ -79,7 +79,6 @@ function VectorPage() {
               orientation="horizontal"
               className="justify-center"
               pagePath="/modules/vector"
-              mdPath="/modules/vector.md"
               pageType="modules"
             />
           }

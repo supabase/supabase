@@ -27,12 +27,7 @@ export function Hero() {
             <Link href="/docs/guides/functions">Documentation</Link>
           </Button>
         </div>
-        <MarkdownActions
-          orientation="horizontal"
-          pagePath="/edge-functions"
-          mdPath="/edge-functions.md"
-          pageType="product"
-        />
+        <MarkdownActions orientation="horizontal" pagePath="/edge-functions" pageType="product" />
       </div>
     </SectionContainerWithCn>
   )

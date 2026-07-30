@@ -52,7 +52,6 @@ function CronPage() {
               orientation="horizontal"
               className="justify-center"
               pagePath="/modules/cron"
-              mdPath="/modules/cron.md"
               pageType="modules"
             />
           }

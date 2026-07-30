@@ -25,12 +25,7 @@ export function Hero() {
             <Link href="/docs/guides/realtime">Documentation</Link>
           </Button>
         </div>
-        <MarkdownActions
-          orientation="horizontal"
-          pagePath="/realtime"
-          mdPath="/realtime.md"
-          pageType="product"
-        />
+        <MarkdownActions orientation="horizontal" pagePath="/realtime" pageType="product" />
       </div>
     </SectionContainerWithCn>
   )

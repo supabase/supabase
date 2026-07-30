@@ -327,7 +327,6 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 </div>
                 <MarkdownActions
                   pagePath={`/events/${event.slug}`}
-                  mdPath={`/events/${event.slug}.md`}
                   pageType="events"
                   className="mb-4"
                 />

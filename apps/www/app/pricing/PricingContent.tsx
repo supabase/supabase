@@ -32,7 +32,6 @@ export default function PricingContent() {
               orientation="horizontal"
               className="justify-center pt-4"
               pagePath="/pricing"
-              mdPath="/pricing.md"
               pageType="pricing"
             />
           </div>

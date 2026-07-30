@@ -25,12 +25,7 @@ export function Hero() {
             <Link href="/docs/guides/database/overview">Documentation</Link>
           </Button>
         </div>
-        <MarkdownActions
-          orientation="horizontal"
-          pagePath="/database"
-          mdPath="/database.md"
-          pageType="product"
-        />
+        <MarkdownActions orientation="horizontal" pagePath="/database" pageType="product" />
       </div>
     </SectionContainerWithCn>
   )

@@ -111,11 +111,7 @@ export function ChangelogDetailSidebar({ slug, frontmatter, className }: Props) 
               View discussion on GitHub
             </a>
           )}
-          <MarkdownActions
-            pagePath={`/changelog/${slug}`}
-            mdPath={`/changelog/${slug}.md`}
-            pageType="changelog"
-          />
+          <MarkdownActions pagePath={`/changelog/${slug}`} pageType="changelog" />
         </nav>
       </section>
     </div>
