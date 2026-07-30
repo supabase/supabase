@@ -25,7 +25,6 @@ import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
 import {
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
-  HIGH_AVAILABILITY_POSTGRES_VERSION,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
   sizes,
 } from './ProjectCreation.constants'
@@ -397,11 +396,11 @@ export const ProjectCreationForm = ({
       shouldRunMigrations,
     } = values
 
-    const resolvedPostgresVersion = highAvailability
-      ? HIGH_AVAILABILITY_POSTGRES_VERSION
-      : postgresVersion
+    // HA projects never take a custom version — the API resolves the image from
+    // postgresEngine + releaseChannel.
+    const customPostgresVersion = highAvailability ? undefined : postgresVersion
 
-    if (resolvedPostgresVersion && !resolvedPostgresVersion.match(/1[2-9]\..*/)) {
+    if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
       return toast.error(
         `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
       )
@@ -498,11 +497,11 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (resolvedPostgresVersion || instanceType) {
+    if (customPostgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
         ami: {
-          ...(resolvedPostgresVersion && {
-            search_tags: { 'tag:postgresVersion': resolvedPostgresVersion },
+          ...(customPostgresVersion && {
+            search_tags: { 'tag:postgresVersion': customPostgresVersion },
           }),
           ...(instanceType && { instance_type: instanceType }),
         },

@@ -733,7 +733,7 @@ describe('project creation wizard', () => {
       expect(screen.queryByText('High availability')).not.toBeInTheDocument()
     })
 
-    test('makes the fixed Postgres version non-editable', async () => {
+    test('removes the custom Postgres version field while high availability is enabled', async () => {
       mockWizardEndpoints()
 
       await renderWizard({
@@ -742,12 +742,18 @@ describe('project creation wizard', () => {
         },
       })
 
-      await user.click(await screen.findByRole('switch'))
+      const highAvailabilitySwitch = await screen.findByRole('switch', {
+        name: 'Enable high availability',
+      })
+      await user.click(highAvailabilitySwitch)
       fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
 
       expect(screen.getByLabelText('Postgres version')).toBeDisabled()
-      expect(screen.getByPlaceholderText('e.g 17.6.1.104')).toBeDisabled()
-      expect(screen.getByPlaceholderText('e.g 17.6.1.104')).toHaveValue('17.6.1.147')
+      expect(screen.queryByPlaceholderText('e.g 17.6.1.104')).not.toBeInTheDocument()
+
+      await user.click(highAvailabilitySwitch)
+
+      expect(await screen.findByPlaceholderText('e.g 17.6.1.104')).toBeInTheDocument()
     })
 
     test('shows high availability regions in a dedicated group', async () => {
@@ -763,7 +769,7 @@ describe('project creation wizard', () => {
       expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
     })
 
-    test('enabling high availability submits the fixed Postgres version and AWS_K8S provider', async () => {
+    test('enabling high availability submits the fixed engine and AWS_K8S provider without a custom version', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
@@ -783,13 +789,7 @@ describe('project creation wizard', () => {
       expect(body.cloud_provider).toBe('AWS_K8S')
       expect(body.postgres_engine).toBe('17')
       expect(body.release_channel).toBe('ga')
-      expect(body.custom_supabase_internal_requests).toMatchObject({
-        ami: {
-          search_tags: {
-            'tag:postgresVersion': '17.6.1.147',
-          },
-        },
-      })
+      expect(body.custom_supabase_internal_requests).toBeUndefined()
     })
 
     test('forces the high availability region over a manually selected region and restores it', async () => {

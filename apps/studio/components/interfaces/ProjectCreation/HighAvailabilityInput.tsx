@@ -4,7 +4,6 @@ import { type CloudProvider } from 'shared-data'
 import { Badge, FormControl, FormField, Switch, useWatch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { HIGH_AVAILABILITY_POSTGRES_VERSION } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -27,12 +26,10 @@ export const HighAvailabilityInput = ({
   // Fields to revert to when toggling off HA, so previously selected values aren't lost.
   const beforeHighAvailability = useRef<{
     cloudProvider: CloudProvider | undefined
-    postgresVersion: string
     postgresVersionSelection: string | undefined
     dbRegion: string | null
   }>({
     cloudProvider: undefined,
-    postgresVersion: '',
     postgresVersionSelection: undefined,
     dbRegion: null,
   })
@@ -45,14 +42,9 @@ export const HighAvailabilityInput = ({
         setValue('cloudProvider', 'AWS_K8S')
       }
 
-      const currentPostgresVersion = getValues('postgresVersion')
-      if (currentPostgresVersion !== HIGH_AVAILABILITY_POSTGRES_VERSION) {
-        beforeHighAvailability.current.postgresVersion = currentPostgresVersion
-      }
       beforeHighAvailability.current.postgresVersionSelection = getValues(
         'postgresVersionSelection'
       )
-      setValue('postgresVersion', HIGH_AVAILABILITY_POSTGRES_VERSION)
       setValue('useOrioleDb', false)
 
       const currentRegion = getValues('dbRegion')
@@ -69,9 +61,6 @@ export const HighAvailabilityInput = ({
         beforeHighAvailability.current.cloudProvider = undefined
       }
 
-      if (getValues('postgresVersion') === HIGH_AVAILABILITY_POSTGRES_VERSION) {
-        setValue('postgresVersion', beforeHighAvailability.current.postgresVersion)
-      }
       if (beforeHighAvailability.current.postgresVersionSelection !== undefined) {
         setValue(
           'postgresVersionSelection',

@@ -8,7 +8,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CloudProviderSelector } from './CloudProviderSelector'
 import { PostgresVersionSelector } from './PostgresVersionSelector'
-import { HIGH_AVAILABILITY_POSTGRES_VERSION } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 
@@ -57,33 +56,23 @@ export const InternalOnlyConfiguration = ({ form }: InternalOnlyConfigurationPro
               <div className="flex flex-col gap-y-4">
                 <CloudProviderSelector form={form} />
 
-                <FormField
-                  control={form.control}
-                  name="postgresVersion"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Custom Postgres version"
-                      layout="horizontal"
-                      description={
-                        highAvailability
-                          ? 'High Availability projects use a fixed Postgres version during Alpha.'
-                          : 'Specify a custom version of Postgres (defaults to the latest).'
-                      }
-                    >
-                      <FormControl>
-                        <Input
-                          placeholder="e.g 17.6.1.104"
-                          {...field}
-                          value={
-                            highAvailability ? HIGH_AVAILABILITY_POSTGRES_VERSION : field.value
-                          }
-                          disabled={highAvailability}
-                          autoComplete="off"
-                        />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                {!highAvailability && (
+                  <FormField
+                    control={form.control}
+                    name="postgresVersion"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Custom Postgres version"
+                        layout="horizontal"
+                        description="Specify a custom version of Postgres (defaults to the latest)."
+                      >
+                        <FormControl>
+                          <Input placeholder="e.g 17.6.1.104" {...field} autoComplete="off" />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
 
                 <FormField
                   control={form.control}

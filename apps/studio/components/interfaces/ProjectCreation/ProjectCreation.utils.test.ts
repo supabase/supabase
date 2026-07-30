@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 
 import {
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
-  HIGH_AVAILABILITY_POSTGRES_VERSION,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
 } from './ProjectCreation.constants'
 import {
@@ -11,13 +10,9 @@ import {
 } from './ProjectCreation.utils'
 
 describe('High Availability project creation constraints', () => {
-  it('pins the Alpha Postgres image version', () => {
-    expect(HIGH_AVAILABILITY_POSTGRES_VERSION).toBe('17.6.1.147')
+  it('pins the Alpha Postgres engine and release channel', () => {
     expect(HIGH_AVAILABILITY_POSTGRES_ENGINE).toBe('17')
     expect(HIGH_AVAILABILITY_RELEASE_CHANNEL).toBe('ga')
-    expect(HIGH_AVAILABILITY_POSTGRES_VERSION).toMatch(
-      new RegExp(`^${HIGH_AVAILABILITY_POSTGRES_ENGINE}\\.`)
-    )
   })
 
   it.each([
