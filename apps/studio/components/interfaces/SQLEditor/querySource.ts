@@ -69,6 +69,14 @@ export const DEFAULT_LOG_DATE_RANGE: LogDateRange = {
 }
 
 /**
+ * The runtime query source for a snippet, pairing the database/logs discriminant
+ * with the extra state each backend needs to run. A logs run carries the active
+ * time range (session state, re-resolved at every run); a database run needs
+ * nothing beyond the connection the execution pipeline already resolves.
+ */
+export type QuerySource = { type: 'database' } | { type: 'logs'; dateRange: LogDateRange }
+
+/**
  * Parse a date-picker helper's label (e.g. "Last hour", "Last 3 hours", "Last 30
  * minutes") into a relative amount/unit. Covers both the static presets in
  * `EXPLORER_DATEPICKER_HELPERS` and the dynamic helpers `generateHelpersFromInput`

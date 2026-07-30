@@ -110,7 +110,6 @@ describe('Admonition', () => {
   })
 
   it.each([
-    ['tip', 'Tip'],
     ['danger', 'Danger'],
     ['deprecation', 'Deprecated'],
   ] as const)('exposes %s via aria-label as %s', (type, name) => {

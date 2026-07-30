@@ -238,15 +238,6 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
           />
         </div>
       )}
-      <p className="text-xs text-foreground-lighter my-4">
-        <span className="font-semibold">Note:</span> Disk Size refers to the total space your
-        project occupies on disk, including the database itself (currently{' '}
-        <span>{formatBytes(diskBreakdownBytes?.dbSizeBytes, 2, 'GB')}</span>), additional files like
-        the write-ahead log (currently{' '}
-        <span>{formatBytes(diskBreakdownBytes?.walSizeBytes, 2, 'GB')}</span>), and other system
-        resources (currently <span>{formatBytes(diskBreakdownBytes?.systemBytes, 2, 'GB')}</span>).
-        Data can take 5 minutes to refresh.
-      </p>
     </div>
   )
 }

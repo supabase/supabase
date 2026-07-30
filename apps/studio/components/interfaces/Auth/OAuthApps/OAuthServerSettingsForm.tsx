@@ -285,7 +285,7 @@ export const OAuthServerSettingsForm = () => {
 
                         return (
                           <Admonition
-                            type="tip"
+                            type="note"
                             title="Make sure this path is implemented in your application."
                             description={
                               <>

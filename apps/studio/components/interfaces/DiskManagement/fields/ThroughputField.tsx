@@ -77,6 +77,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
               <FormItemLayout
                 label="Throughput"
                 layout="flex-row-reverse"
+                id={field.name}
                 description={
                   <span className="flex flex-col gap-y-2">
                     <p>Higher throughput suits applications with high data transfer needs.</p>
@@ -100,6 +101,7 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                     <FormInputGroupInput
                       type="number"
                       {...field}
+                      id={field.name}
                       value={field.value}
                       onChange={(e) => {
                         setValue('throughput', e.target.valueAsNumber, {
