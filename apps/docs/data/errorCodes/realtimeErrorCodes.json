@@ -55,7 +55,7 @@
     "resolution": "Your project may have been suspended for exceeding usage quotas. Contact support with your project reference ID and a description of your Realtime use case.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/troubleshooting/realtime-project-suspended-for-exceeding-quotas",
+        "href": "/docs/guides/troubleshooting/realtime-project-suspended-for-exceeding-quotas",
         "description": "Troubleshooting guide for suspended projects"
       }
     ]
@@ -68,7 +68,7 @@
     "resolution": "Verify your database connection limits.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/database/connection-management",
+        "href": "/docs/guides/database/connection-management",
         "description": "Connection management guide"
       }
     ]
@@ -95,7 +95,7 @@
     "description": "Maximum number of WAL senders reached in tenant database.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/database/custom-postgres-config#cli-configurable-settings",
+        "href": "/docs/guides/database/custom-postgres-config#cli-configurable-settings",
         "description": "Configuring max WAL senders"
       }
     ]
@@ -212,7 +212,7 @@
     "description": "Warning when `realtime.send` or `realtime.send_binary` cannot insert the message.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/realtime/troubleshooting",
+        "href": "/docs/guides/realtime/troubleshooting",
         "description": "Realtime troubleshooting guide"
       }
     ]
@@ -239,7 +239,14 @@
     "description": "Limit of presence events reached globally."
   },
   "ClientPresenceRateLimitReached": {
-    "description": "Limit of presence events reached on a single socket."
+    "description": "A single client sent Presence updates too frequently and had its channel closed. This usually means Presence is being used for high-frequency updates it is not designed for.",
+    "resolution": "Reserve Presence for slow-changing state and use Broadcast for high-frequency updates such as live cursors, or throttle your track() calls.",
+    "references": [
+      {
+        "href": "/docs/guides/troubleshooting/realtime-client-presence-rate-limit-reached",
+        "description": "Troubleshooting guide for the ClientPresenceRateLimitReached error"
+      }
+    ]
   },
   "UnableToReplayMessages": {
     "description": "An error while replaying messages."
