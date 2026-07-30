@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ChevronRight } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { Button, Form, ScrollArea, Separator, SheetClose, SheetFooter } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -12,6 +13,7 @@ import { PermissionsAccordion } from './PermissionsAccordion'
 import { ResourceAccessStep } from './ResourceAccessStep'
 import { StepIndicator } from './StepIndicator'
 import { TokenDetails } from './TokenDetails'
+import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 const FORM_ID = 'scoped-token-form'
 
@@ -29,9 +31,11 @@ const DEFAULT_VALUES: TokenFormValues = {
 export const NewScopedTokenForm = ({
   isPending,
   onCreateToken,
+  onCancel,
 }: {
   isPending: boolean
   onCreateToken: (values: TokenFormValues) => void
+  onCancel: () => void
 }) => {
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenFormSchema),
@@ -50,6 +54,14 @@ export const NewScopedTokenForm = ({
   const values = form.watch()
   const selection = values.permissions
   const configuredCount = countConfigured(selection)
+  const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
+
+  useEffect(() => {
+    if (isError) {
+      toast.error('Something went wrong, try again')
+      onCancel()
+    }
+  }, [onCancel, isError])
 
   const handleReviewAccess = async () => {
     if (configuredCount === 0) {
@@ -76,7 +88,11 @@ export const NewScopedTokenForm = ({
                 <ResourceAccessStep form={form} />
               </div>
               <Separator />
-              <PermissionsAccordion selection={selection} onChange={handlePermissionChange} />
+              <PermissionsAccordion
+                selection={selection}
+                onChange={handlePermissionChange}
+                permissionScopeMap={permissionScopeMap}
+              />
               {showMissingPermissionsWarning && (
                 <div className="space-y-3 px-5 sm:px-6 pb-6">
                   <Admonition
@@ -92,11 +108,11 @@ export const NewScopedTokenForm = ({
             </form>
           </Form>
         ) : (
-          <NewScopedTokenFormReview values={values} />
+          <NewScopedTokenFormReview values={values} permissionScopeMap={permissionScopeMap} />
         )}
       </ScrollArea>
       <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">
-        <StepIndicator step={1} total={2} label="Configure" />
+        <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
         <div className="flex gap-2">
           {step === 'review' && (
             <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>

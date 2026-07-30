@@ -2,14 +2,21 @@ import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } 
 
 import type { PermissionCatalogEntry, PermissionMode } from '../../AccessToken.permissions'
 import { RiskMarker } from './RiskMarker'
+import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface PermissionRowProps {
   entry: PermissionCatalogEntry
   mode: PermissionMode
   onChange: (mode: PermissionMode) => void
+  permissionScopeMap: PermissionScopeMap | undefined
 }
 
-export const PermissionRow = ({ entry, mode, onChange }: PermissionRowProps) => {
+export const PermissionRow = ({
+  entry,
+  mode,
+  onChange,
+  permissionScopeMap,
+}: PermissionRowProps) => {
   return (
     <div className="flex items-start justify-between gap-4 py-3">
       <div className="min-w-0 space-y-1">
@@ -17,7 +24,7 @@ export const PermissionRow = ({ entry, mode, onChange }: PermissionRowProps) => 
           <span className="text-sm text-foreground">
             {entry.name} <span className="sr-only">permissions</span>
           </span>
-          <RiskMarker entry={entry} />
+          <RiskMarker entry={entry} permissionScopeMap={permissionScopeMap} />
         </Label>
         <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-light">
           {entry.description}

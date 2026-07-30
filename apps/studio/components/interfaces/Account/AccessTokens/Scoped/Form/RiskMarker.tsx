@@ -5,7 +5,10 @@ import {
   type PermissionCatalogEntry,
   type RiskLevel,
 } from '../../AccessToken.permissions'
-import { getMcpToolsForScopes } from '@/data/access-tokens/permission-scope-map'
+import {
+  getMcpToolsForScopes,
+  PermissionScopeMap,
+} from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 const DOT_CLASS: Record<RiskLevel, string> = {
   low: 'bg-brand',
@@ -24,9 +27,15 @@ interface RiskMarkerProps {
   /** When false, renders the dot + label without the explanatory tooltip (used in the review list). */
   withTooltip?: boolean
   className?: string
+  permissionScopeMap: PermissionScopeMap | undefined
 }
 
-export const RiskMarker = ({ entry, withTooltip = true, className }: RiskMarkerProps) => {
+export const RiskMarker = ({
+  entry,
+  withTooltip = true,
+  className,
+  permissionScopeMap,
+}: RiskMarkerProps) => {
   const marker = (
     <span
       className={cn(
@@ -43,7 +52,10 @@ export const RiskMarker = ({ entry, withTooltip = true, className }: RiskMarkerP
 
   if (!withTooltip) return marker
 
-  const mcpTools = getMcpToolsForScopes([...entry.readScopes, ...entry.writeScopes])
+  const mcpTools = getMcpToolsForScopes({
+    scopeIds: [...entry.readScopes, ...entry.writeScopes],
+    permissionScopeMap,
+  })
 
   return (
     <Tooltip>

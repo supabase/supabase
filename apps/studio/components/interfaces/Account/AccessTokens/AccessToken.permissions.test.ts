@@ -7,7 +7,10 @@ import {
   selectionToScopes,
   type PermissionSelection,
 } from './AccessToken.permissions'
-import { getEnabledEndpoints, getEnabledMcpTools } from '@/data/access-tokens/permission-scope-map'
+import {
+  getEnabledEndpoints,
+  getEnabledMcpTools,
+} from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 describe('selectionToScopes', () => {
   it('ignores none and returns read scope for read mode', () => {
@@ -75,12 +78,53 @@ describe('countConfigured', () => {
 describe('permission scope map (dual-scope enforcement)', () => {
   it('enables a dual-scope MCP tool only when all required scopes are granted', () => {
     // execute_sql requires both database_read and database_write
-    expect(getEnabledMcpTools(['database_read'])).not.toContain('execute_sql')
-    expect(getEnabledMcpTools(['database_read', 'database_write'])).toContain('execute_sql')
+    expect(
+      getEnabledMcpTools({
+        // Only scope one is granted
+        grantedScopes: ['database_read'],
+        permissionScopeMap: {
+          scopes: {},
+          endpoints: {},
+          mcp_tools: {
+            execute_sql: ['database_read', 'database_write'],
+          },
+        },
+      })
+    ).not.toContain('execute_sql')
+    expect(
+      getEnabledMcpTools({
+        // Both scopes are granted
+        grantedScopes: ['database_read', 'database_write'],
+        permissionScopeMap: {
+          scopes: {},
+          endpoints: {},
+          mcp_tools: {
+            execute_sql: ['database_read', 'database_write'],
+          },
+        },
+      })
+    ).toContain('execute_sql')
   })
 
   it('only lists endpoints whose every required scope is granted', () => {
-    const endpoints = getEnabledEndpoints(['database_read', 'database_write'])
-    expect(endpoints.every((e) => e.method.length > 0 && e.path.startsWith('/'))).toBe(true)
+    const endpoints = getEnabledEndpoints({
+      grantedScopes: ['database_read', 'database_write'],
+      permissionScopeMap: {
+        scopes: {},
+        endpoints: {
+          'GET /api/valid_read': ['database_read'],
+          'POST /api/valid_write': ['database_write'],
+          'PUT /api/valid_both': ['database_read', 'database_write'],
+          'PUT /api/invalid': ['project_write'],
+          'PUT /api/incomplete': ['database_read', 'project_write'],
+        },
+        mcp_tools: {},
+      },
+    })
+    expect(endpoints).toEqual([
+      { raw: 'GET /api/valid_read', method: 'GET', path: '/api/valid_read' },
+      { raw: 'POST /api/valid_write', method: 'POST', path: '/api/valid_write' },
+      { raw: 'PUT /api/valid_both', method: 'PUT', path: '/api/valid_both' },
+    ])
   })
 })

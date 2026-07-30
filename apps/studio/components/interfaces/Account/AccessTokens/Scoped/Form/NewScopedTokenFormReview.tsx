@@ -17,10 +17,12 @@ import { RiskMarker } from './RiskMarker'
 import {
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
-} from '@/data/access-tokens/permission-scope-map'
+  PermissionScopeMap,
+} from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface ReviewStepProps {
   values: TokenFormValues
+  permissionScopeMap: PermissionScopeMap | undefined
 }
 
 const RISK_TEXT_CLASS: Record<OverallRisk['tone'], string> = {
@@ -33,7 +35,7 @@ const RISK_TEXT_CLASS: Record<OverallRisk['tone'], string> = {
 const modeLabel = (mode: PermissionMode) =>
   mode === 'readwrite' ? 'Read-write' : mode === 'read' ? 'Read' : 'None'
 
-export const NewScopedTokenFormReview = ({ values }: ReviewStepProps) => {
+export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
   const selection = values.permissions
   const grantedScopes = useMemo(() => selectionToScopes(selection), [selection])
@@ -78,7 +80,10 @@ export const NewScopedTokenFormReview = ({ values }: ReviewStepProps) => {
 
   const hasCapabilities = grantedScopes.length > 0
 
-  const mcpTools = useMemo(() => getEnabledMcpTools(grantedScopes), [grantedScopes])
+  const mcpTools = useMemo(
+    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }),
+    [grantedScopes, permissionScopeMap]
+  )
 
   const capabilityGroups = useMemo(() => {
     const groups: { entry: PermissionCatalogEntry; mode: PermissionMode; endpoints: string[][] }[] =
@@ -87,14 +92,18 @@ export const NewScopedTokenFormReview = ({ values }: ReviewStepProps) => {
       for (const { entry, mode } of category.entries) {
         const capabilityScopes =
           mode === 'readwrite' ? [...entry.readScopes, ...entry.writeScopes] : entry.readScopes
-        const endpoints = getEnabledEndpointsForCapability(capabilityScopes, grantedScopes)
+        const endpoints = getEnabledEndpointsForCapability({
+          capabilityScopes,
+          allGrantedScopes: grantedScopes,
+          permissionScopeMap,
+        })
         if (endpoints.length > 0) {
           groups.push({ entry, mode, endpoints: endpoints.map((e) => [e.method, e.path]) })
         }
       }
     }
     return groups
-  }, [activeByCategory, grantedScopes])
+  }, [activeByCategory, grantedScopes, permissionScopeMap])
 
   const rows: [string, React.ReactNode][] = [
     ['Name', values.tokenName || <span className="text-foreground-lighter">Untitled token</span>],
@@ -112,7 +121,11 @@ export const NewScopedTokenFormReview = ({ values }: ReviewStepProps) => {
                 <div key={entry.key} className="flex items-center gap-2 text-sm">
                   <span className="text-foreground">{entry.name}</span>
                   <span className="text-foreground-light">· {modeLabel(mode)}</span>
-                  <RiskMarker entry={entry} withTooltip={false} />
+                  <RiskMarker
+                    entry={entry}
+                    withTooltip={false}
+                    permissionScopeMap={permissionScopeMap}
+                  />
                 </div>
               ))}
             </div>

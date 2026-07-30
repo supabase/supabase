@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   Badge,
+  cn,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -18,13 +19,19 @@ import {
   type PermissionSelection,
 } from '../../AccessToken.permissions'
 import { PermissionRow } from './PermissionRow'
+import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface PermissionsAccordionProps {
   selection: PermissionSelection
   onChange: (key: string, mode: PermissionMode) => void
+  permissionScopeMap: PermissionScopeMap | undefined
 }
 
-export const PermissionsAccordion = ({ selection, onChange }: PermissionsAccordionProps) => {
+export const PermissionsAccordion = ({
+  selection,
+  onChange,
+  permissionScopeMap,
+}: PermissionsAccordionProps) => {
   const [openCategories, setOpenCategories] = useState<string[]>([
     PERMISSION_CATALOG_BY_CATEGORY[0]?.key,
   ])
@@ -38,24 +45,25 @@ export const PermissionsAccordion = ({ selection, onChange }: PermissionsAccordi
         </p>
       </div>
 
-      <Accordion
-        type="multiple"
-        value={openCategories}
-        onValueChange={setOpenCategories}
-        className="space-y-2"
-      >
-        {PERMISSION_CATALOG_BY_CATEGORY.map((category) => {
+      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
+        {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
           const configuredCount = countConfiguredInCategory(selection, category.key)
           return (
             <AccordionItem
               key={category.key}
               value={category.key}
-              className="rounded-md border bg-surface-100 overflow-hidden"
+              className={cn('border', {
+                'border-b-0': index < PERMISSION_CATALOG_BY_CATEGORY.length - 1,
+                'rounded-t-md': index === 0,
+                'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
+              })}
             >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-sm text-foreground">{category.name}</span>
+                    <span className="font-mono uppercase tracking-widest text-xs">
+                      {category.name}
+                    </span>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <span tabIndex={0} className="text-foreground-lighter">
@@ -72,15 +80,17 @@ export const PermissionsAccordion = ({ selection, onChange }: PermissionsAccordi
                   )}
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-background px-4">
+              <AccordionContent className="bg-surface-100 *:pb-0">
                 <div className="divide-y">
                   {category.entries.map((entry) => (
-                    <PermissionRow
-                      key={entry.key}
-                      entry={entry}
-                      mode={selection[entry.key] ?? 'none'}
-                      onChange={(mode) => onChange(entry.key, mode)}
-                    />
+                    <div className="px-4" key={entry.key}>
+                      <PermissionRow
+                        entry={entry}
+                        mode={selection[entry.key] ?? 'none'}
+                        onChange={(mode) => onChange(entry.key, mode)}
+                        permissionScopeMap={permissionScopeMap}
+                      />
+                    </div>
                   ))}
                 </div>
               </AccordionContent>
