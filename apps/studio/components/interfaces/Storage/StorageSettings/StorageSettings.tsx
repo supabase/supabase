@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -21,7 +21,7 @@ import {
   SelectValue,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -158,7 +158,7 @@ export const StorageSettings = () => {
     reValidateMode: 'onSubmit',
   })
 
-  const { unit: storageUnit } = form.watch()
+  const storageUnit = useWatch({ control: form.control, name: 'unit' })
   const fileSizeLimitError = form.formState.errors.fileSizeLimit
 
   const { mutate: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation({

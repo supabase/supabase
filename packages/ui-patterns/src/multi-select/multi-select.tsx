@@ -209,6 +209,7 @@ export interface MultiSelectorTriggerProps extends React.HTMLAttributes<HTMLButt
   deletableBadge?: boolean
   showIcon?: boolean
   mode?: MultiSelectorMode
+  renderValue?: (value: string) => React.ReactNode
 }
 
 const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTriggerProps>(
@@ -221,6 +222,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       badgeLimit = 9999,
       showIcon = true,
       mode = 'combobox',
+      renderValue,
       children,
       ...props
     },
@@ -312,7 +314,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           >
             {visibleBadges.map((value) => (
               <Badge key={value} className={badgeClasses}>
-                {value}
+                {renderValue?.(value) ?? value}
                 {deletableBadge && (
                   <div
                     onMouseEnter={() => setIsDeleteHovered(true)}

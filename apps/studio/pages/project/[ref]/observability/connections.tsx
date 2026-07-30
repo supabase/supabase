@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Pause, Play } from 'lucide-react'
+import { CirclePause, CirclePlay } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -11,19 +11,28 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import type { NextPageWithLayout } from '@/types'
 
 export const DatabaseConnections: NextPageWithLayout = () => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
 
   const [live, setLive] = useState(true)
   const [now, setNow] = useState(() => dayjs.utc())
+
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleToggleLive, {
+    registerInCommandMenu: false,
+  })
 
   const {
     data,
@@ -36,6 +45,20 @@ export const DatabaseConnections: NextPageWithLayout = () => {
     },
     { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
   )
+
+  function handleToggleLive() {
+    const nextLive = !live
+
+    track('database_connections_live_mode_clicked', {
+      newState: nextLive ? 'enabled' : 'disabled',
+    })
+
+    setLive(nextLive)
+    if (nextLive) {
+      setNow(dayjs.utc())
+      refetchActivity()
+    }
+  }
 
   const buildPrompt = () => {
     return buildDatabaseConnectionsSummaryPrompt({
@@ -62,9 +85,9 @@ export const DatabaseConnections: NextPageWithLayout = () => {
 
   return (
     <ReportPadding className="gap-y-12">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-x-4">
         <div className="flex items-center gap-x-2">
-          <h1>Database Connections</h1>
+          <h1 className="w-max">Database Connections</h1>
           {live && (
             <Tooltip>
               <TooltipTrigger>
@@ -73,34 +96,30 @@ export const DatabaseConnections: NextPageWithLayout = () => {
                   <span>Live</span>
                 </Badge>
               </TooltipTrigger>
-              <TooltipContent side="bottom">
-                Data on this page is refreshed every 3 seconds
-              </TooltipContent>
+              <TooltipContent side="bottom">Refreshes data every 3 seconds</TooltipContent>
             </Tooltip>
           )}
         </div>
         <div className="flex items-center gap-x-2">
-          <Button
-            variant={live ? 'default' : 'primary'}
-            onClick={() => {
-              const nextLive = !live
-              setLive(nextLive)
-              if (nextLive) {
-                setNow(dayjs.utc())
-                refetchActivity()
-              }
-            }}
-            icon={live ? <Pause /> : <Play />}
+          <ShortcutTooltip
+            shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE}
+            label={live ? 'Pause live mode' : 'Refresh data every 3 seconds'}
+            side="bottom"
           >
-            {live ? 'Pause' : 'Live'}
-          </Button>
+            <Button
+              variant={live ? 'default' : 'primary'}
+              onClick={handleToggleLive}
+              icon={live ? <CirclePause /> : <CirclePlay />}
+            >
+              {live ? 'Pause' : 'Live'}
+            </Button>
+          </ShortcutTooltip>
           <AiAssistantDropdown
             label="Summarize activity"
             buildPrompt={buildPrompt}
             onOpenAssistant={handleSummarizeActivity}
             disabled={isLoadingActivity}
-            isLoading={isLoadingActivity}
-            // @ts-ignore [Joshen] To add proper telemetry source in subsequent PR
+            loading={isLoadingActivity}
             telemetrySource="database_connections"
             size="tiny"
             variant="default"

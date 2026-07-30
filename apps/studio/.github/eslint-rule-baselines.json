@@ -357,7 +357,6 @@
       "components/interfaces/SQLEditor/useSqlEditorExecution.ts": 1,
       "components/interfaces/Settings/Database/NetworkRestrictions/AddRestrictionModal.tsx": 1,
       "components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions.utils.ts": 2,
-      "components/interfaces/Settings/Infrastructure/InfrastructureActivity.tsx": 1,
       "components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceNode.tsx": 1,
       "components/interfaces/Settings/Logs/LogSelectionRenderers/DefaultPreviewSelectionRenderer.tsx": 1,
       "components/interfaces/Settings/Logs/LogTable.tsx": 1,

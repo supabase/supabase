@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 
+import { parseSqlSnippetSource } from './querySource'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
@@ -25,7 +26,7 @@ import { useTabsStateSnapshot } from '@/state/tabs'
 export function useSnippetEditor({ id, snippetName }: { id: string; snippetName: string }) {
   const router = useRouter()
   const { profile } = useProfile()
-  const { ref, content } = useParams()
+  const { ref, content, source } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -45,6 +46,9 @@ export function useSnippetEditor({ id, snippetName }: { id: string; snippetName:
         sql: value,
         owner_id: profile?.id,
         project_id: project?.id,
+        // A creation entry (e.g. "New logs query") threads the target backend
+        // through `/sql/new?source=`; default to a database snippet otherwise.
+        source: parseSqlSnippetSource(source),
       })
       snapV2.addSnippet({ projectRef: ref, snippet: newSnippet })
       // When the editor was seeded from a `content` deep-link, replace rather

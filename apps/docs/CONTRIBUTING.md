@@ -191,8 +191,7 @@ Choose the appropriate `type` for your admonition:
 - `danger`: Warn about actions or conditions that could cause data loss, expose sensitive data, or create another severe and difficult-to-reverse outcome. State the consequence first, and then explain how to avoid it.
 - `deprecation`: Identify a deprecated feature or behavior. State how the change affects the reader, and then provide the supported alternative or migration path.
 - `caution`: Warn about behavior that could cause bugs, failed operations, unexpected results, or serious inconvenience but doesn't rise to the severity of `danger`.
-- `tip`: Share an optional shortcut, optimization, or best practice that helps the reader complete the task more effectively. The main procedure must still work without it.
-- `note`: Highlight an important prerequisite, constraint, or clarification that doesn't represent a risk. If the information is essential to completing a step, include it in the procedure instead.
+- `note`: Highlight an important prerequisite, constraint, clarification, or optional shortcut that doesn't represent a risk. If the information is essential to completing a step, include it in the procedure instead.
 
 ```
 <Admonition type="note" title="Optional title">
