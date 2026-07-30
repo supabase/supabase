@@ -4,7 +4,7 @@ import {
   getOrganizationInviteContent,
   getOrganizationInviteStatus,
   type OrganizationInviteStatus,
-} from '@/components/interfaces/OrganizationInvite/OrganizationInvite.utils'
+} from './OrganizationInvite.utils'
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import type { ResponseError } from '@/types'
 
@@ -101,7 +101,7 @@ describe('OrganizationInvite utils', () => {
     ['ready', 'Join Acme Corp', 'You have been invited to join this Supabase organization'],
     ['wrong-account', 'Wrong account', undefined],
     ['expired', 'Invite expired', undefined],
-    ['invalid', 'Invite invalid', undefined],
+    ['invalid', 'Invalid invitation', undefined],
     ['no-longer-valid', 'Invite no longer available', undefined],
     ['error', 'Unable to load invitation', undefined],
   ])('returns content for %s', (status, title, description) => {
