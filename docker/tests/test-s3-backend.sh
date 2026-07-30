@@ -4,7 +4,7 @@
 #
 # Validates that the S3-compatible backend (MinIO, RustFS, etc.) handles
 # all S3 operations that Storage relies on. Uses the aws cli so the test
-# is backend-agnostic — no vendor-specific tools required.
+# is backend-agnostic - no vendor-specific tools required.
 #
 # Usage:
 #   sh test-s3-backend.sh                   # Uses localhost:9100
@@ -82,7 +82,7 @@ s3() {
 }
 
 # Wrapper for jq that yields empty output instead of aborting the suite when
-# the payload is not JSON — an S3 error document, say — and jq exits non-zero.
+# the payload is not JSON (e.g. an S3 error document) and jq exits non-zero.
 jq_r() {
     jq -r "$@" 2>/dev/null || true
 }
