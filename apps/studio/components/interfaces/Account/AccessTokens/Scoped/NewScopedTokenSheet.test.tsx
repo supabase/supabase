@@ -71,6 +71,18 @@ const mockProjects = () =>
       }),
   })
 
+const mockPermissionsMap = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/scoped-access-token-permissions',
+    response: () =>
+      HttpResponse.json({
+        scopes: {},
+        endpoints: {},
+        mcp_tools: {},
+      }),
+  })
+
 const mockCreateToken = () =>
   addAPIMock({
     method: 'post',
@@ -90,6 +102,7 @@ const mockCreateToken = () =>
 
 describe('NewScopedTokenSheet', () => {
   beforeEach(() => {
+    mockPermissionsMap()
     mockOrganizations()
     mockProjects()
     mockCreateToken()
