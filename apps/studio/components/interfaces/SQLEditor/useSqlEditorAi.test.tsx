@@ -128,7 +128,14 @@ describe('useSqlEditorAi — accept / discard diff', () => {
 describe('useSqlEditorAi — completion dialect', () => {
   type CompletionRequestBody = {
     dialect?: string
-    completionMetadata: { prompt: string; selection: string }
+    intent?: string
+    completionMetadata: {
+      prompt: string
+      selection: string
+      textBeforeCursor: string
+      textAfterCursor: string
+      availableKeys?: string[]
+    }
   }
 
   /** Replaces the default completion mock so we can read what was posted. */
@@ -149,7 +156,7 @@ describe('useSqlEditorAi — completion dialect', () => {
     afterSelection: '',
   }
 
-  it('posts the clickhouse dialect with a logs-shaped prompt for a logs snippet', async () => {
+  it('posts the clickhouse dialect with the raw instruction and cursor context', async () => {
     const bodies = captureCompletionRequests('limit 10')
     const { result } = renderSqlEditorHook(useAiHarness, {
       initialProps: { sqlSource: 'logs' },
@@ -161,12 +168,14 @@ describe('useSqlEditorAi — completion dialect', () => {
 
     expect(bodies).toHaveLength(1)
     expect(bodies[0].dialect).toBe('clickhouse')
-    // The clickhouse route sends the prompt through verbatim, so the logs schema
-    // and query context have to be inside it.
-    expect(bodies[0].completionMetadata.prompt).toContain('log_attributes')
-    expect(bodies[0].completionMetadata.prompt).toContain('<selection>limit 5</selection>')
-    expect(bodies[0].completionMetadata.prompt).toContain('only keep 5xx responses')
+    // The route assembles the schema section and the selection-wrapped code around
+    // the instruction, so the client posts the instruction verbatim — the same
+    // shape as the Postgres path — and never hand-builds prompt text.
+    expect(bodies[0].completionMetadata.prompt).toBe('only keep 5xx responses')
     expect(bodies[0].completionMetadata.selection).toBe('limit 5')
+    expect(bodies[0].completionMetadata.textBeforeCursor).toBe(context.beforeSelection)
+    // An inline edit is not a rewrite.
+    expect(bodies[0].intent).toBeUndefined()
   })
 
   it('posts the postgres dialect with the raw instruction for a database snippet', async () => {

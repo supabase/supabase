@@ -10,11 +10,6 @@ import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui
 
 import { LegacyLogsRewriteAdmonition } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteAdmonition'
 import {
-  detectLogSource,
-  rewriteLogsSqlWithAI,
-  shouldOfferLegacyLogsRewrite,
-} from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
-import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
   getLogsTemplates,
@@ -52,16 +47,17 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { constructHeaders } from '@/data/fetchers'
-import { fetchOtelLogKeys } from '@/data/logs/otel-log-keys-query'
+import { shouldOfferLegacyLogsRewrite } from '@/data/logs/logs-sql-rewrite'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import {
+  useLegacyLogsRewrite,
+  type LegacyLogsRewriteProposal,
+} from '@/hooks/analytics/useLegacyLogsRewrite'
 import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -101,9 +97,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const useOtelEndpoint = useFlag('otelLegacyLogs')
   const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
 
-  const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-
   const allTemplates = useMemo(() => {
     const templates = getLogsTemplates(useOtelEndpoint)
     if (logsShowMetadataIpTemplate) return templates
@@ -142,11 +135,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const [showMissingLimitError, setShowMissingLimitError] = useState<boolean>(false)
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
-  const [rewriteProposal, setRewriteProposal] = useState<{
-    original: string
-    modified: string
-  } | null>(null)
-  const [isRewriting, setIsRewriting] = useState<boolean>(false)
+  const [rewriteProposal, setRewriteProposal] = useState<LegacyLogsRewriteProposal | null>(null)
   const [rewriteBannerDismissed, setRewriteBannerDismissed] = useLocalStorage<boolean>(
     `project-${projectRef}-logs-rewrite-banner-dismissed`,
     false
@@ -193,6 +182,26 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     sql: editorValue,
     isClickhouseLogsEnabled: useOtelEndpoint,
   })
+
+  const {
+    state: rewriteState,
+    requestRewrite,
+    dismiss: dismissRewriteBanner,
+  } = useLegacyLogsRewrite({
+    sql: editorValue,
+    isOffered: showRewriteCTA && !rewriteBannerDismissed,
+    // Read straight from the editor instance — `editorValue` state can lag the
+    // most recent keystroke.
+    readSql: () => editorRef.current?.getValue() ?? editorValue,
+    onProposal: setRewriteProposal,
+    onDismissed: () => setRewriteBannerDismissed(true),
+  })
+  const isRewriting = rewriteState.status === 'rewriting'
+  // The machine tracks this session; localStorage remembers "don't offer again"
+  // across them. It isn't used to seed the machine because it reads as `false`
+  // during SSR, which would resurrect the banner on hydration.
+  const hasUnacknowledgedRewriteOutcome =
+    rewriteState.status === 'failed' || rewriteState.status === 'noRewriteNeeded'
 
   const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
@@ -244,42 +253,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
 
     addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(template.searchString) })
-  }
-
-  const handleRewrite = async () => {
-    const currentSql = editorRef.current?.getValue() ?? editorValue
-    if (!currentSql.trim()) {
-      toast.info('Write a query to rewrite first')
-      return
-    }
-    setIsRewriting(true)
-    try {
-      const headerData = await constructHeaders()
-      const source = detectLogSource(currentSql)
-      const availableKeys = source
-        ? await fetchOtelLogKeys({ projectRef: projectRef!, source }).catch(() => undefined)
-        : undefined
-      const rewritten = await rewriteLogsSqlWithAI({
-        sql: currentSql,
-        projectRef: projectRef!,
-        connectionString: project?.connectionString,
-        orgSlug: organization?.slug,
-        authorizationHeader: headerData.get('Authorization'),
-        availableKeys,
-      })
-      // The editor may have changed while awaiting key discovery and the AI call;
-      // don't offer a proposal that would clobber intervening edits.
-      const latestSql = editorRef.current?.getValue() ?? editorValue
-      if (latestSql !== currentSql) {
-        toast.info('The query changed while rewriting. Please try again.')
-        return
-      }
-      setRewriteProposal({ original: currentSql, modified: rewritten })
-    } catch (error) {
-      toast.error(`Couldn't rewrite the query: ${(error as Error).message}`)
-    } finally {
-      setIsRewriting(false)
-    }
   }
 
   const acceptRewrite = () => {
@@ -509,13 +482,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             warnings={warnings}
             showRewriteAction={showRewriteCTA && rewriteBannerDismissed}
             isRewriting={isRewriting}
-            onRewrite={handleRewrite}
+            onRewrite={requestRewrite}
           />
-          {showRewriteCTA && !rewriteBannerDismissed && (
+          {/* A persisted dismissal suppresses the offer, but not an outcome the user
+              just triggered — a rewrite started from the toolbar action still has to
+              report a failure somewhere. */}
+          {(hasUnacknowledgedRewriteOutcome || (showRewriteCTA && !rewriteBannerDismissed)) && (
             <LegacyLogsRewriteAdmonition
-              isRewriting={isRewriting}
-              onRewrite={handleRewrite}
-              onDismiss={() => setRewriteBannerDismissed(true)}
+              state={rewriteState}
+              onRewrite={requestRewrite}
+              onDismiss={dismissRewriteBanner}
             />
           )}
           <ShimmerLine active={isLoading} />

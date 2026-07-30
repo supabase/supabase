@@ -18,12 +18,10 @@ import {
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
-import {
-  buildLogsCompletionPrompt,
-  stripSqlCodeFences,
-} from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
+import { detectLogSource, stripSqlCodeFences } from '@/data/logs/logs-sql-rewrite'
+import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import { isError } from '@/data/utils/error-check'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -95,6 +93,20 @@ export function useSqlEditorAi({
   const [showWidget, setShowWidget] = useState(false)
 
   const dialect = sqlSourceToDialect(sqlSource)
+  const isClickhouse = dialect === 'clickhouse'
+
+  // Ground ClickHouse edits in the source's real log_attributes keys, the same way
+  // the whole-query rewrite does — otherwise inline edits invent dotted paths.
+  // React Query dedupes this against the rewrite banner's identical lookup.
+  const { data: availableKeys } = useOtelLogKeysQuery(
+    {
+      projectRef: project?.ref,
+      source: isClickhouse
+        ? detectLogSource(snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? '')
+        : undefined,
+    },
+    { enabled: isClickhouse }
+  )
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -230,7 +242,6 @@ export function useSqlEditorAi({
         const text: string = await response.json()
 
         const meta = options?.body?.completionMetadata ?? {}
-        const isClickhouse = dialect === 'clickhouse'
         // The clickhouse system prompt forbids fences, but strip them defensively
         // so a chatty model can't leak backticks into the snippet.
         const { original, modified } = assembleCompletionDiff(
@@ -253,6 +264,7 @@ export function useSqlEditorAi({
     },
     [
       dialect,
+      isClickhouse,
       org?.slug,
       project?.connectionString,
       project?.ref,
@@ -282,16 +294,9 @@ export function useSqlEditorAi({
 
         const authorizationHeader = headerData.get('Authorization')
 
-        const promptText =
-          dialect === 'clickhouse'
-            ? buildLogsCompletionPrompt({
-                instruction: prompt,
-                textBeforeCursor: context.beforeSelection,
-                selection: context.selection,
-                textAfterCursor: context.afterSelection,
-              })
-            : prompt
-
+        // The instruction goes over as-is for both dialects — the route assembles
+        // the schema section and the cursor context around it, so there's exactly
+        // one place that knows how a completion prompt is built.
         await complete(prompt, {
           ...(authorizationHeader
             ? { headers: { Authorization: authorizationHeader } }
@@ -301,8 +306,11 @@ export function useSqlEditorAi({
               textBeforeCursor: context.beforeSelection,
               textAfterCursor: context.afterSelection,
               language: 'pgsql',
-              prompt: promptText,
+              prompt,
               selection: context.selection,
+              // ClickHouse only: there's no server-side schema to fetch for the
+              // logs table, so the real log_attributes keys travel with the request.
+              ...(isClickhouse && availableKeys ? { availableKeys } : {}),
             },
           },
         })
@@ -310,7 +318,7 @@ export function useSqlEditorAi({
         setPromptState((prev) => ({ ...prev, isLoading: false }))
       }
     },
-    [complete, dialect, setPromptState]
+    [availableKeys, complete, isClickhouse, setPromptState]
   )
 
   const handleDiffEditorMount = useCallback(

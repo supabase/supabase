@@ -5,7 +5,7 @@ import {
   legacyLogsRewriteReducer as reduce,
   type LegacyLogsRewriteEvent,
   type LegacyLogsRewriteState,
-} from './LegacyLogsRewriteBanner.utils'
+} from './useLegacyLogsRewrite'
 
 const run = (
   events: LegacyLogsRewriteEvent[],
