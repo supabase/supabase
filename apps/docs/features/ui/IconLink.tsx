@@ -100,18 +100,26 @@ export function IconLinkButton({
 export function IconLinkList({
   items,
   labelledBy,
+  label,
   className,
   itemClassName = 'col-span-6 md:col-span-4',
   size = 'sm',
 }: {
   items: IconLinkItem[]
+  /** Prefer when a visible heading is the list’s name. */
   labelledBy?: string
+  /** Prefer when the nearby heading is section/setup copy, not a list title. */
+  label?: string
   className?: string
   itemClassName?: string
   size?: IconLinkSize
 }) {
   return (
-    <ul className={cn('grid grid-cols-12 gap-6', className)} aria-labelledby={labelledBy}>
+    <ul
+      className={cn('grid grid-cols-12 gap-6', className)}
+      aria-labelledby={labelledBy}
+      aria-label={label}
+    >
       {items.map((item) => (
         <li key={item.href} className={cn(itemClassName, item.className)}>
           <IconLink href={item.href} title={item.title} icon={item.icon} size={size} />
