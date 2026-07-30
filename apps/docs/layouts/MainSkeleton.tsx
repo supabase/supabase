@@ -204,6 +204,7 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
       )}
     >
       <button
+        tabIndex={0}
         className={cn(
           'h-8 w-8 flex group items-center justify-center mr-1',
           mobileMenuOpen && 'mt-0.5'
@@ -289,7 +290,7 @@ const Container = memo(function Container({
       id={DOCS_CONTENT_CONTAINER_ID}
       tabIndex={-1}
       className={cn(
-        'w-full transition-all ease-out relative scroll-mt-(--header-height)',
+        'w-full transition-all ease-out relative scroll-mt-(--header-height) outline-hidden',
         // desktop override any margin styles
         'lg:ml-0',
         className

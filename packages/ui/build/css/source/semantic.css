@@ -143,6 +143,10 @@
     calc(var(--surface) + var(--tone-span) * var(--contrast-text)) calc(var(--chroma) * 0.55)
       var(--surface-hue)
   );
+  /* Inverse of --foreground: canvas-coloured text for use on inverted fills
+     (bg-foreground, bg-black / dark:bg-white, etc). Not the same as
+     --primary-foreground, which stays dark for the vivid primary fill. */
+  --foreground-contrast: oklch(var(--surface) calc(var(--chroma) * 0.55) var(--surface-hue));
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
   --card-foreground: var(--foreground);

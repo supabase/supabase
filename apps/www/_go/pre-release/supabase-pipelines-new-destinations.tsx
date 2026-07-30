@@ -39,13 +39,13 @@ const page: GoPageInput = {
       className: 'border-y border-muted bg-surface-75 py-16 sm:py-24',
       title: 'Bring Supabase Postgres into your analytics stack',
       description:
-        'Pipelines keeps your application workload on Postgres while streaming production changes into systems built for analytics, reporting, and lakehouse workflows.',
+        'Pipelines keeps your application workload on Postgres while ongoing replication sends production changes to systems built for analytics, reporting, and lakehouse workflows.',
       columns: 3,
       items: [
         {
           title: 'ClickHouse',
           description:
-            'Stream operational data into ClickHouse for high-volume analytical queries, dashboards, and event workloads.',
+            'Replicate operational data into ClickHouse for high-volume analytical queries, dashboards, and event workloads.',
         },
         {
           title: 'Snowflake',
@@ -77,7 +77,7 @@ const page: GoPageInput = {
         {
           type: 'text',
           name: 'org_slug',
-          label: 'Supabase Organization Slug',
+          label: 'Supabase organization slug',
           placeholder: 'acme-inc',
           description: 'Use the slug from your Supabase Dashboard URL, for example /org/acme-inc.',
           required: true,

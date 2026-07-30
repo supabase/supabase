@@ -24,6 +24,7 @@ Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
+Anna Baker
 Ant Evans
 Ant Wilson
 Ariuna K
@@ -58,8 +59,8 @@ Chris Chapman (Chappie)
 Chris Copplestone
 Chris Gwilliams
 Chris Martin
+Chris Opland
 Chris Stockton
-Chris Ward
 Christian Funkhouser
 Claudiu Dragalina-Paraipan
 Clayton Kast
@@ -69,6 +70,7 @@ Colum Ferry
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
@@ -146,6 +148,7 @@ Joanna Michniewicz
 Joaquim Moreno
 Joel Low
 Joey Freeland
+Joey Lei
 John Fitzgerald
 Joel Martin
 Johan Bergström
@@ -266,8 +269,10 @@ Sergio Cioban Filho
 Shaii O
 Shane Adams
 Shane E
+Shaun Newman
 Shreekar Shetty
 Sreyas Udayavarman
+Stephanie Jackson (stejacks)
 Stephen Morgan
 Steve Chavez
 Steven Eubank
@@ -278,6 +283,7 @@ Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taha Le Bras
 Tanun Chalermsinsuwan
+Tarun Khandelwal
 Taryn King
 Terry Sutton
 Terry Wilcox
@@ -298,6 +304,7 @@ Utkarash Singh
 Victor Farazdagi
 Warwick Mitchell
 Wen Bo Xie
+Wendie Cheung
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov

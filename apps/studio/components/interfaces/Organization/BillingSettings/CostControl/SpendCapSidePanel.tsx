@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { pricing } from 'shared-data/pricing'
 import { toast } from 'sonner'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import Table from '@/components/to-be-cleaned/Table'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'

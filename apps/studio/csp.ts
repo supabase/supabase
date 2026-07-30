@@ -58,6 +58,7 @@ const STRIPE_NETWORK_URL = 'https://*.stripe.network'
 const CLOUDFLARE_URL = 'https://www.cloudflare.com'
 const VERCEL_URL = 'https://vercel.com'
 const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
+const GITHUB_URL = 'https://github.com'
 const GITHUB_API_URL = 'https://api.github.com'
 const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
 const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
@@ -125,12 +126,20 @@ export function getCSP() {
     STAPE_URL,
     ...(isDevOrStaging ? [POSTHOG_URL] : []),
   ]
+  // The TanStack build renders remote images as plain <img> tags (no image
+  // optimizer proxy), so every remote image origin must be listed here
+  // explicitly — unlike the Next.js build, where the optimizer serves them
+  // from same-origin /_next/image URLs covered by 'self'.
   const IMG_SRC_URLS = [
     SUPABASE_URL,
     SUPABASE_COM_URL,
     SUPABASE_PROJECTS_URL,
+    // GitHub profile avatars, e.g. https://github.com/<username>.png
+    GITHUB_URL,
     GITHUB_USER_AVATAR_URL,
     GOOGLE_USER_AVATAR_URL,
+    // Vercel integration account avatars (https://vercel.com/api/www/avatar/...)
+    VERCEL_URL,
     SUPABASE_ASSETS_URL,
     USERCENTRICS_APP_URL,
     STAPE_URL,
@@ -164,9 +173,7 @@ export function getCSP() {
     `blob:`,
     `data:`,
     ...IMG_SRC_URLS,
-    ...(isDevOrStaging
-      ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL, VERCEL_URL]
-      : []),
+    ...(isDevOrStaging ? [SUPABASE_STAGING_PROJECTS_URL, NIMBUS_STAGING_PROJECTS_URL] : []),
   ].join(' ')
 
   const scriptSrcDirective = [

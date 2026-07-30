@@ -1,5 +1,4 @@
 import { Key, Plus } from 'lucide-react'
-import { Path, PathValue } from 'react-hook-form'
 import {
   Button,
   Checkbox,
@@ -14,30 +13,16 @@ import {
   PopoverTrigger,
 } from 'ui'
 
-import {
-  PermissionResource,
-  PermissionResourceSelectorProps,
-  PermissionRow,
-  PermissionsFormValues,
-} from './Permissions.types'
-import { togglePermissionResource } from './Permissions.utils'
+import { PermissionResourceSelectorProps, PermissionRow } from './Permissions.types'
 import { ACCESS_TOKEN_RESOURCES } from '@/components/interfaces/Account/AccessTokens/AccessToken.constants'
 
-export const PermissionResourceSelector = <TFormValues extends PermissionsFormValues>({
+export const PermissionResourceSelector = ({
   open,
   onOpenChange,
+  onResourceToggled,
   permissionRows,
-  setValue,
   align = 'center',
-}: PermissionResourceSelectorProps<TFormValues>) => {
-  const handleToggleResource = (resource: PermissionResource) => {
-    const newRows = togglePermissionResource(permissionRows, resource)
-    setValue(
-      'permissionRows' as Path<TFormValues>,
-      newRows as PathValue<TFormValues, Path<TFormValues>>
-    )
-  }
-
+}: PermissionResourceSelectorProps) => {
   return (
     <Popover open={open} onOpenChange={onOpenChange} modal={true}>
       <PopoverTrigger asChild>
@@ -61,13 +46,13 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
                     <CommandItem
                       key={resource.resource}
                       value={`${resource.resource} ${resource.title}`}
-                      onSelect={() => handleToggleResource(resource)}
+                      onSelect={() => onResourceToggled(resource)}
                       className="text-foreground"
                     >
                       <div className="flex items-center gap-3 w-full">
                         <Checkbox
                           checked={isChecked}
-                          onCheckedChange={() => handleToggleResource(resource)}
+                          onCheckedChange={() => onResourceToggled(resource)}
                           onClick={(e) => e.stopPropagation()}
                         />
                         <Key size={12} className="text-foreground-lighter" />

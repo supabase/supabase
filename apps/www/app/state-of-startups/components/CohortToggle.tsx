@@ -23,6 +23,7 @@ export function CohortToggle({ eyebrow, options, value, onValueChange }: CohortT
           const isActive = option.label === value
           return (
             <button
+              tabIndex={0}
               key={option.label}
               type="button"
               onClick={() => onValueChange(option.label)}

@@ -29,12 +29,11 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
-import { useUnifiedLogsPreview } from './App/FeaturePreview/FeaturePreviewContext'
 import {
-  generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
   generateToolRoutes,
+  useGenerateOtherRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
@@ -132,11 +131,11 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
       <AnimatePresence mode="wait">
         <SidebarContentPrimitive>
           {projectRef ? (
-            <motion.div key="project-links">
+            <motion.nav key="project-links">
               <ProjectLinks />
-            </motion.div>
+            </motion.nav>
           ) : (
-            <motion.div
+            <motion.nav
               key="org-links"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -144,7 +143,7 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <OrganizationLinks />
-            </motion.div>
+            </motion.nav>
           )}
         </SidebarContentPrimitive>
       </AnimatePresence>
@@ -226,10 +225,21 @@ export function SideBarNavLink({
 }
 
 const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
+  const [sidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
+
+  // The nav icon only shifts right (pl-1.5 -> pl-2) when the sidebar is
+  // persistently open — not on hover-expand. Tie the dot to the same
+  // condition so it stays put while skimming the nav.
+  const isPersistentlyOpen = sidebarBehaviour === 'open'
+
   return (
     <div
       className={cn(
-        'absolute pointer-events-none flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
+        'absolute pointer-events-none flex h-2 w-2 top-2 z-10 rounded-full',
+        isPersistentlyOpen ? 'left-[20px]' : 'left-[18px]',
         hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
       )}
     />
@@ -241,10 +251,6 @@ const ProjectLinks = () => {
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
-  const showReports = useIsFeatureEnabled('reports:all')
-  const showLogs = useIsFeatureEnabled('logs:all')
-
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -270,93 +276,98 @@ const ProjectLinks = () => {
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project, {
-    unifiedLogs: isUnifiedLogsEnabled,
-    showReports,
-    showLogs,
-  })
+  const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)
 
   return (
-    <SidebarMenu>
+    <>
       <SidebarGroup className="gap-0.5">
-        <SideBarNavLink
-          key="home"
-          active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
-          route={{
-            key: 'HOME',
-            label: 'Project Overview',
-            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: `/project/${ref}`,
-            linkElement: <ProjectIndexPageLink projectRef={ref} />,
-            shortcutId: SHORTCUT_IDS.NAV_HOME,
-          }}
-        />
-        {toolRoutes.map((route, i) => (
+        <SidebarMenu>
           <SideBarNavLink
-            key={`tools-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
-            isLoading={isProjectPending}
+            key="home"
+            active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+            route={{
+              key: 'HOME',
+              label: 'Project Overview',
+              icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+              link: `/project/${ref}`,
+              linkElement: <ProjectIndexPageLink projectRef={ref} />,
+              shortcutId: SHORTCUT_IDS.NAV_HOME,
+            }}
           />
-        ))}
+          {toolRoutes.map((route, i) => (
+            <SideBarNavLink
+              key={`tools-routes-${i}`}
+              route={route}
+              active={activeRoute === route.key}
+              isLoading={isProjectPending}
+            />
+          ))}
+        </SidebarMenu>
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        {productRoutes.map((route, i) => (
-          <SideBarNavLink
-            key={`product-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
-            isLoading={isProjectPending}
-          />
-        ))}
+        <SidebarMenu>
+          {productRoutes.map((route, i) => (
+            <SideBarNavLink
+              key={`product-routes-${i}`}
+              route={route}
+              active={activeRoute === route.key}
+              isLoading={isProjectPending}
+            />
+          ))}
+        </SidebarMenu>
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        {otherRoutes.map((route) => {
-          if (route.key === 'advisors') {
-            return (
-              <div className="relative" key={route.key}>
-                {!route.disabled && (
-                  <ActiveDot
-                    hasErrors={errorLints.length > 0}
-                    hasWarnings={securityLints.length > 0}
-                  />
-                )}
+        <SidebarMenu>
+          {otherRoutes.map((route) => {
+            if (route.key === 'advisors') {
+              return (
+                <SideBarNavLink
+                  key={route.key}
+                  route={route}
+                  active={activeRoute === route.key}
+                  isLoading={isProjectPending}
+                >
+                  {route.icon}
+                  <span>{route.label}</span>
+                  {!route.disabled && (
+                    <ActiveDot
+                      hasErrors={errorLints.length > 0}
+                      hasWarnings={securityLints.length > 0}
+                    />
+                  )}
+                </SideBarNavLink>
+              )
+            } else {
+              return (
                 <SideBarNavLink
                   key={route.key}
                   route={route}
                   active={activeRoute === route.key}
                   isLoading={isProjectPending}
                 />
-              </div>
-            )
-          } else {
-            return (
-              <SideBarNavLink
-                key={route.key}
-                route={route}
-                active={activeRoute === route.key}
-                isLoading={isProjectPending}
-              />
-            )
-          }
-        })}
+              )
+            }
+          })}
+        </SidebarMenu>
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       {/* Settings routes to be added in with project/org nav */}
       <SidebarGroup className="gap-0.5">
-        {settingsRoutes.map((route, i) => (
-          <SideBarNavLink
-            key={`settings-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
-            isLoading={isProjectPending}
-          />
-        ))}
+        <SidebarMenu>
+          {settingsRoutes.map((route, i) => (
+            <SideBarNavLink
+              key={`settings-routes-${i}`}
+              route={route}
+              active={activeRoute === route.key}
+              isLoading={isProjectPending}
+            />
+          ))}
+        </SidebarMenu>
       </SidebarGroup>
-    </SidebarMenu>
+    </>
   )
 }
 
@@ -434,8 +445,8 @@ const OrganizationLinks = () => {
   if (!organizationSlug) return null
 
   return (
-    <SidebarMenu className="flex flex-col gap-1 items-start">
-      <SidebarGroup className="gap-0.5">
+    <SidebarGroup className="gap-0.5">
+      <SidebarMenu className="flex flex-col gap-1">
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
             key={item.key}
@@ -456,7 +467,7 @@ const OrganizationLinks = () => {
             }}
           />
         ))}
-      </SidebarGroup>
-    </SidebarMenu>
+      </SidebarMenu>
+    </SidebarGroup>
   )
 }

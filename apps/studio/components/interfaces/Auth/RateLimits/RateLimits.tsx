@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -146,6 +146,13 @@ export const RateLimits = () => {
       RATE_LIMIT_WEB3: 0,
     },
   })
+
+  const rateLimitTokenRefresh = useWatch({
+    control: rateLimitForm.control,
+    name: 'RATE_LIMIT_TOKEN_REFRESH',
+  })
+  const rateLimitVerify = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_VERIFY' })
+  const rateLimitOtp = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_OTP' })
 
   const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -390,9 +397,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') > 0 && (
+                        {rateLimitTokenRefresh > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_TOKEN_REFRESH') * 12} requests per hour
+                            {rateLimitTokenRefresh * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -438,9 +445,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_VERIFY') > 0 && (
+                        {rateLimitVerify > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_VERIFY') * 12} requests per hour
+                            {rateLimitVerify * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>
@@ -533,9 +540,9 @@ export const RateLimits = () => {
                             </TooltipContent>
                           )}
                         </Tooltip>
-                        {rateLimitForm.watch('RATE_LIMIT_OTP') > 0 && (
+                        {rateLimitOtp > 0 && (
                           <p className="text-foreground-lighter text-sm mt-2">
-                            {rateLimitForm.watch('RATE_LIMIT_OTP') * 12} requests per hour
+                            {rateLimitOtp * 12} requests per hour
                           </p>
                         )}
                       </FormItemLayout>

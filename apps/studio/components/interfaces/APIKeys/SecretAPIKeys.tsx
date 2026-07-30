@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
-import dayjs from 'dayjs'
+import { IS_PLATFORM, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Card } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -22,50 +21,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-
-interface LastSeenData {
-  [hash: string]: { timestamp: number; relative: string }
-}
-
-function useLastSeen({ projectRef, enabled }: { projectRef: string; enabled?: boolean }): {
-  data?: LastSeenData
-  isLoading: boolean
-} {
-  const now = useRef(new Date()).current
-
-  const query = useLogsQuery({
-    enabled,
-    projectRef,
-    initialParams: {
-      iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-      iso_timestamp_end: now.toISOString(),
-      sql: "-- last-used-secret-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, apikey.`hash` FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.apikey) as sbapikey cross join unnest(sbapikey.apikey) as apikey WHERE apikey.error is null and apikey.`hash` is not null and apikey.prefix like 'sb_secret_%' GROUP BY apikey.`hash`",
-    },
-  })
-
-  return useMemo(() => {
-    if (query.isLoading || !query.logData) {
-      return { data: undefined, isLoading: query.isLoading }
-    }
-
-    const now = dayjs()
-
-    const lastSeen = (query.logData as unknown as { timestamp: number; hash: string }[]).reduce(
-      (a, i) => {
-        a[i.hash] = {
-          timestamp: i.timestamp,
-          relative: `${dayjs.duration(now.diff(dayjs(i.timestamp))).humanize(false)} ago`,
-        }
-        return a
-      },
-      {} as LastSeenData
-    )
-
-    return { data: lastSeen, isLoading: query.isLoading }
-  }, [query])
-}
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -81,12 +37,6 @@ export const SecretAPIKeys = () => {
     isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
   } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
-
-  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
-  const { data: lastSeen, isLoading: isLoadingLastSeen } = useLastSeen({
-    projectRef: projectRef ?? '',
-    enabled: showApiKeysLastUsed,
-  })
 
   const secretApiKeys = useMemo(
     () =>
@@ -156,9 +106,6 @@ export const SecretAPIKeys = () => {
               <TableRow className="bg-200">
                 <TableHead>Name</TableHead>
                 <TableHead>API Key</TableHead>
-                {showApiKeysLastUsed && (
-                  <TableHead className="hidden lg:table-cell">Last Used</TableHead>
-                )}
                 {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
@@ -167,8 +114,6 @@ export const SecretAPIKeys = () => {
                 <APIKeyRow
                   key={apiKey.id}
                   apiKey={apiKey}
-                  lastSeen={lastSeen?.[apiKey.hash]}
-                  isLoadingLastSeen={isLoadingLastSeen}
                   isDeleting={apiKeyToDelete?.id === apiKey.id && isDeletingAPIKey}
                   onDelete={() => onDeleteAPIKey(apiKey)}
                   setKeyToDelete={setDeleteId}
