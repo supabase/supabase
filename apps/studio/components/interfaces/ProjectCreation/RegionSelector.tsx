@@ -1,4 +1,5 @@
 import { useFeatureFlags, useParams } from 'common'
+import { Loader2 } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
@@ -233,6 +234,9 @@ export const RegionSelector = ({
                       >
                         {dbRegion !== undefined && (
                           <div className="flex items-center gap-x-3">
+                            {isLoadingAvailableRegions && (
+                              <Loader2 size={14} className="animate-spin" />
+                            )}
                             {selectedRegion?.code && (
                               // For some reason, Safari considered the empty string alt text on this icon as misspelled (with VoiceOver)
                               // Only way to fix it is to set the role. Not needed for the combobox options
@@ -244,9 +248,11 @@ export const RegionSelector = ({
                               />
                             )}
                             <span className="text-foreground">
-                              {selectedRegion?.name
-                                ? getDisplayNameForSmartRegion(selectedRegion.name)
-                                : dbRegion}
+                              {isLoadingAvailableRegions
+                                ? 'Loading available regions...'
+                                : selectedRegion?.name
+                                  ? getDisplayNameForSmartRegion(selectedRegion.name)
+                                  : dbRegion}
                             </span>
                           </div>
                         )}
