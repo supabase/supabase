@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import Link from 'next/link'
 import { Fragment, useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -113,7 +113,7 @@ export const ConnectionPooling = () => {
       max_client_conn: undefined,
     },
   })
-  const { default_pool_size } = form.watch()
+  const default_pool_size = useWatch({ control: form.control, name: 'default_pool_size' })
   const connectionPoolingUnavailable = pgbouncerConfig?.pool_mode === null
   const ignoreStartupParameters = pgbouncerConfig?.ignore_startup_parameters
 

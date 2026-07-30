@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -261,7 +261,7 @@ export const DestinationForm = ({
     defaultValues,
   })
 
-  const { publicationName } = form.watch()
+  const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =

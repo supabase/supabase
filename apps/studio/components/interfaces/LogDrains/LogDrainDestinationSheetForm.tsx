@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -393,8 +393,8 @@ export function LogDrainDestinationSheetForm({
     values: formValues,
   })
 
-  const type = form.watch('type')
-  const tls = form.watch('tls')
+  const type = useWatch({ control: form.control, name: 'type' })
+  const tls = useWatch({ control: form.control, name: 'tls' })
 
   useEffect(() => {
     if (mode === 'create' && !open) {

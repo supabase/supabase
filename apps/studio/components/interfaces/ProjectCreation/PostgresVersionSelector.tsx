@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
+import { ControllerRenderProps, UseFormReturn, useWatch } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -91,7 +91,10 @@ export const PostgresVersionSelector = ({
       ? (createVersions?.available_versions ?? [])
       : (unpauseVersions?.available_versions ?? [])
   const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
-  const { postgresVersionSelection } = form.watch()
+  const postgresVersionSelection = useWatch({
+    control: form.control,
+    name: 'postgresVersionSelection',
+  })
 
   useEffect(() => {
     if (availableVersions.length > 0) {
