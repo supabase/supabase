@@ -101,7 +101,7 @@ describe('OrganizationInvite utils', () => {
     ['ready', 'Join Acme Corp', 'You have been invited to join this Supabase organization'],
     ['wrong-account', 'Wrong account', undefined],
     ['expired', 'Invite expired', undefined],
-    ['invalid', 'Invalid invite', undefined],
+    ['invalid', 'Invalid invitation', undefined],
     ['no-longer-valid', 'Invite no longer available', undefined],
     ['error', 'Unable to load invitation', undefined],
   ])('returns content for %s', (status, title, description) => {

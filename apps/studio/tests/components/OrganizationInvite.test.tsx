@@ -242,7 +242,7 @@ describe('OrganizationInvite', () => {
 
     rerender(<OrganizationInvite />)
 
-    expect(screen.getByText('Invalid invite')).toBeInTheDocument()
+    expect(screen.getByText('Invalid invitation')).toBeInTheDocument()
     expect(
       screen.getByText(
         'Open the full invite link again, or ask the organization owner for a new invite.'
