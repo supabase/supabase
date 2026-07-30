@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -26,7 +26,10 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
     setValue,
     formState: { errors },
   } = form
-  const { totalSize, growthPercent, maxSizeGb, minIncrementGb } = form.watch()
+  const [totalSize, growthPercent, maxSizeGb, minIncrementGb] = useWatch({
+    control,
+    name: ['totalSize', 'growthPercent', 'maxSizeGb', 'minIncrementGb'],
+  })
 
   const { isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
 
@@ -70,6 +73,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}
@@ -116,6 +120,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}
@@ -157,6 +162,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
                     disabled={isError}

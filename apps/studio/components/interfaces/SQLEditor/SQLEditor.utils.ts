@@ -457,7 +457,7 @@ export function applyAutoLimit(
  */
 export function getEditorSql(
   editor: IStandaloneCodeEditor,
-  snippetContent?: UntrustedSqlFragment
+  snippetContent?: string
 ): UntrustedSqlFragment {
   const selection = editor.getSelection()
   const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined

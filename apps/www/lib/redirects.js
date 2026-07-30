@@ -120,6 +120,11 @@ module.exports = [
     destination: '/docs/guides/observability/:match*',
   },
   {
+    permanent: true,
+    source: '/docs/guides/telemetry/:match*',
+    destination: '/docs/guides/monitoring-and-debugging/:match*',
+  },
+  {
     permanent: false,
     source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
     destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
@@ -1731,6 +1736,16 @@ module.exports = [
     permanent: true,
     source: '/docs/company/privacy',
     destination: '/privacy',
+  },
+  {
+    permanent: true,
+    source: '/privacy-260316',
+    destination: '/privacy?version=v2',
+  },
+  {
+    permanent: true,
+    source: '/privacy-250528',
+    destination: '/privacy?version=v1',
   },
   {
     permanent: true,

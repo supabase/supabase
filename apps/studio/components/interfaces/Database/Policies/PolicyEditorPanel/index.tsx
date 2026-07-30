@@ -14,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -130,7 +130,10 @@ export const PolicyEditorPanel = memo(function ({
     defaultValues,
   })
 
-  const { name, table, behavior, command, roles } = form.watch()
+  const [name, table, behavior, command, roles] = useWatch({
+    control: form.control,
+    name: ['name', 'table', 'behavior', 'command', 'roles'],
+  })
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 

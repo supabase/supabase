@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, cn, Form, FormControl, FormField, Separator } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -54,6 +54,8 @@ export const ResetPasswordForm = () => {
     defaultValues: { password: '', currentPassword: '' },
     mode: 'onChange',
   })
+
+  const password = useWatch({ control: form.control, name: 'password' })
 
   const onResetPassword = async (data: FormData) => {
     const toastId = toast.loading('Saving password...')
@@ -146,7 +148,7 @@ export const ResetPasswordForm = () => {
             'transition-all duration-400 overflow-y-hidden'
           )}
         >
-          <PasswordConditionsHelper password={form.watch('password')} />
+          <PasswordConditionsHelper password={password} />
         </div>
 
         <Separator className="bg-border" />

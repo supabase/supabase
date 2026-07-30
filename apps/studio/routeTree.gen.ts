@@ -105,7 +105,6 @@ import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/pro
 import { Route as ProjectRefSettingsInfrastructureRouteImport } from './routes/project/$ref/settings/infrastructure'
 import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
 import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
-import { Route as ProjectRefSettingsComputeAndDiskRouteImport } from './routes/project/$ref/settings/compute-and-disk'
 import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
 import { Route as ProjectRefSettingsApiRouteImport } from './routes/project/$ref/settings/api'
 import { Route as ProjectRefSettingsAddonsRouteImport } from './routes/project/$ref/settings/addons'
@@ -813,12 +812,6 @@ const ProjectRefSettingsDashboardRoute =
   ProjectRefSettingsDashboardRouteImport.update({
     id: '/dashboard',
     path: '/dashboard',
-    getParentRoute: () => ProjectRefSettingsRoute,
-  } as any)
-const ProjectRefSettingsComputeAndDiskRoute =
-  ProjectRefSettingsComputeAndDiskRouteImport.update({
-    id: '/compute-and-disk',
-    path: '/compute-and-disk',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
 const ProjectRefSettingsApiKeysRoute =
@@ -2207,7 +2200,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
-  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -2503,7 +2495,6 @@ export interface FileRoutesByTo {
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
-  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -2814,7 +2805,6 @@ export interface FileRoutesById {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
-  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -3124,7 +3114,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
-    | '/project/$ref/settings/compute-and-disk'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -3420,7 +3409,6 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/settings'
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
-    | '/project/$ref/settings/compute-and-disk'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -3730,7 +3718,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
-    | '/project/$ref/settings/compute-and-disk'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -4669,13 +4656,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/project/$ref/settings/dashboard'
       preLoaderRoute: typeof ProjectRefSettingsDashboardRouteImport
-      parentRoute: typeof ProjectRefSettingsRoute
-    }
-    '/project/$ref/settings/compute-and-disk': {
-      id: '/project/$ref/settings/compute-and-disk'
-      path: '/compute-and-disk'
-      fullPath: '/project/$ref/settings/compute-and-disk'
-      preLoaderRoute: typeof ProjectRefSettingsComputeAndDiskRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
     '/project/$ref/settings/api-keys': {
@@ -6671,7 +6651,6 @@ interface ProjectRefSettingsRouteChildren {
   ProjectRefSettingsAddonsRoute: typeof ProjectRefSettingsAddonsRoute
   ProjectRefSettingsApiRoute: typeof ProjectRefSettingsApiRoute
   ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
-  ProjectRefSettingsComputeAndDiskRoute: typeof ProjectRefSettingsComputeAndDiskRoute
   ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
   ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
   ProjectRefSettingsInfrastructureRoute: typeof ProjectRefSettingsInfrastructureRoute
@@ -6688,7 +6667,6 @@ const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
   ProjectRefSettingsAddonsRoute: ProjectRefSettingsAddonsRoute,
   ProjectRefSettingsApiRoute: ProjectRefSettingsApiRoute,
   ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
-  ProjectRefSettingsComputeAndDiskRoute: ProjectRefSettingsComputeAndDiskRoute,
   ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
   ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
   ProjectRefSettingsInfrastructureRoute: ProjectRefSettingsInfrastructureRoute,

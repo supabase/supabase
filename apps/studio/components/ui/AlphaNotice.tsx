@@ -21,7 +21,7 @@ export const AlphaNotice = ({
   return (
     <Admonition
       showIcon={false}
-      type="tip"
+      type="note"
       layout="horizontal"
       actions={
         <Button
