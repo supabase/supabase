@@ -195,7 +195,7 @@ export const OrganizationInvite = () => {
           Accept invite
         </Button>
         <Button asChild variant="text" block>
-          <Link href="/projects">Decline</Link>
+          <Link href="/organizations">Decline</Link>
         </Button>
         {joinError && (
           <div className="mt-3 border-t border-muted pt-5">
