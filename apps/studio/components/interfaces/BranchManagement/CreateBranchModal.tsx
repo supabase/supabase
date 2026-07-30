@@ -41,6 +41,7 @@ import {
 } from './BranchManagement.utils'
 import { ConnectToGitHub } from './ConnectToGitHub'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -112,8 +113,10 @@ export const CreateBranchModal = () => {
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
-  const withData = useWatch({ control: form.control, name: 'withData' })
-  const gitBranchName = useWatch({ control: form.control, name: 'gitBranchName' })
+  const [withData, gitBranchName] = useWatch({
+    control: form.control,
+    name: ['withData', 'gitBranchName'],
+  })
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const {
@@ -527,9 +530,9 @@ export const CreateBranchModal = () => {
                                     <InlineLink
                                       onClick={() => setShowCreateBranchModal(false)}
                                       className="pointer-events-auto"
-                                      href={`/project/${ref}/settings/compute-and-disk`}
+                                      href={getInfrastructurePath(projectRef)}
                                     >
-                                      Compute and Disk
+                                      Infrastructure
                                     </InlineLink>
                                   </p>
                                 </TooltipContent>

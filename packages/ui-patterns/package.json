@@ -594,6 +594,14 @@
       "import": "./src/SimpleCodeBlock/prism.ts",
       "types": "./src/SimpleCodeBlock/prism.ts"
     },
+    "./SkipToContent/SkipToContent": {
+      "import": "./src/SkipToContent/SkipToContent.tsx",
+      "types": "./src/SkipToContent/SkipToContent.tsx"
+    },
+    "./SkipToContent": {
+      "import": "./src/SkipToContent/index.tsx",
+      "types": "./src/SkipToContent/index.tsx"
+    },
     "./SqlToRest/assumptions": {
       "import": "./src/SqlToRest/assumptions.ts",
       "types": "./src/SqlToRest/assumptions.ts"
@@ -689,10 +697,6 @@
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
-    },
-    "./admonition": {
-      "import": "./src/admonition.tsx",
-      "types": "./src/admonition.tsx"
     },
     "./collapsible-alert": {
       "import": "./src/collapsible-alert.tsx",
