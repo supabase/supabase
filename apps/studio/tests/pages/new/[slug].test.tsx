@@ -872,6 +872,45 @@ describe('project creation wizard', () => {
       expect(body.custom_supabase_internal_requests).toBeUndefined()
     })
 
+    test('restores a manually selected Postgres version selection after HA toggle', async () => {
+      mockWizardEndpoints()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/organizations/:slug/available-versions',
+        response: async ({ request }) => {
+          const { provider } = (await request.json()) as { provider: string }
+          return HttpResponse.json<{ available_versions: AvailableVersion[] }>(
+            provider === 'AWS_K8S'
+              ? { available_versions: DEFAULT_AVAILABLE_VERSIONS.available_versions.slice(0, 1) }
+              : DEFAULT_AVAILABLE_VERSIONS
+          )
+        },
+      })
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await fillProjectName('Manual Selection Restore Project')
+      await selectRegion(/Americas/)
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+      await user.click(screen.getByLabelText('Postgres version'))
+      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+
+      const highAvailabilitySwitch = await screen.findByRole('switch', {
+        name: 'Enable high availability',
+      })
+      await user.click(highAvailabilitySwitch)
+      await user.click(highAvailabilitySwitch)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+      )
+    })
+
     test('restores the standard Postgres configuration when high availability is disabled', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()

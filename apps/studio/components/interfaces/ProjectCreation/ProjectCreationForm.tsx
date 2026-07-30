@@ -24,7 +24,6 @@ import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
 import { extractPostgresVersionDetails } from './PostgresVersionSelector'
 import {
-  getHighAvailabilityRegionCode,
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_POSTGRES_VERSION,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
@@ -32,6 +31,7 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
   smartRegionToExactRegion,
@@ -151,10 +151,6 @@ export const ProjectCreationForm = ({
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
-  const cloudProviderBeforeHighAvailability = useRef<CloudProvider | undefined>(undefined)
-  const postgresVersionBeforeHighAvailability = useRef('')
-  const postgresVersionSelectionBeforeHighAvailability = useRef<string | undefined>(undefined)
-  const dbRegionBeforeHighAvailability = useRef<string | null>(null)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -182,7 +178,7 @@ export const ProjectCreationForm = ({
       shouldRunMigrations: true,
     },
   })
-  const { getFieldState, getValues, resetField, setValue } = form
+  const { getFieldState, resetField, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -558,66 +554,6 @@ export const ProjectCreationForm = ({
     }
   }, [regionError, resetField, fixedDefaultRegion])
 
-  // The region auto-fill effect above skips dirty fields, so a manually chosen
-  // region would keep showing in the trigger while HA only offers its fixed
-  // region — force it over (and restore it afterwards) explicitly.
-  useEffect(() => {
-    const highAvailabilityRegionName = highAvailabilityRegion?.name
-    if (highAvailability && highAvailabilityRegionName !== undefined) {
-      const currentRegion = getValues('dbRegion')
-      if (currentRegion !== highAvailabilityRegionName) {
-        if (dbRegionBeforeHighAvailability.current === null) {
-          dbRegionBeforeHighAvailability.current = currentRegion ?? null
-        }
-        setValue('dbRegion', highAvailabilityRegionName)
-      }
-    } else if (!highAvailability && dbRegionBeforeHighAvailability.current !== null) {
-      setValue('dbRegion', dbRegionBeforeHighAvailability.current)
-      dbRegionBeforeHighAvailability.current = null
-    }
-  }, [highAvailability, highAvailabilityRegion?.name, getValues, setValue])
-
-  useEffect(() => {
-    if (highAvailability && cloudProvider !== 'AWS_K8S') {
-      if (cloudProviderBeforeHighAvailability.current === undefined) {
-        cloudProviderBeforeHighAvailability.current = cloudProvider as CloudProvider
-      }
-      setValue('cloudProvider', 'AWS_K8S')
-    } else if (
-      !highAvailability &&
-      cloudProvider === 'AWS_K8S' &&
-      cloudProviderBeforeHighAvailability.current !== undefined
-    ) {
-      setValue('cloudProvider', cloudProviderBeforeHighAvailability.current)
-      cloudProviderBeforeHighAvailability.current = undefined
-    }
-  }, [highAvailability, cloudProvider, setValue])
-
-  useEffect(() => {
-    const currentPostgresVersion = getValues('postgresVersion')
-
-    if (highAvailability) {
-      if (currentPostgresVersion !== HIGH_AVAILABILITY_POSTGRES_VERSION) {
-        postgresVersionBeforeHighAvailability.current = currentPostgresVersion
-      }
-      if (postgresVersionSelectionBeforeHighAvailability.current === undefined) {
-        postgresVersionSelectionBeforeHighAvailability.current = getValues(
-          'postgresVersionSelection'
-        )
-      }
-      setValue('postgresVersion', HIGH_AVAILABILITY_POSTGRES_VERSION)
-      setValue('useOrioleDb', false)
-    } else {
-      if (currentPostgresVersion === HIGH_AVAILABILITY_POSTGRES_VERSION) {
-        setValue('postgresVersion', postgresVersionBeforeHighAvailability.current)
-      }
-      if (postgresVersionSelectionBeforeHighAvailability.current !== undefined) {
-        setValue('postgresVersionSelection', postgresVersionSelectionBeforeHighAvailability.current)
-        postgresVersionSelectionBeforeHighAvailability.current = undefined
-      }
-    }
-  }, [getValues, highAvailability, setValue])
-
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
       setValue('instanceSize', instanceSize, {
@@ -747,7 +683,10 @@ export const ProjectCreationForm = ({
                     )}
                     <ProjectNameInput form={form} />
 
-                    <HighAvailabilityInput form={form} />
+                    <HighAvailabilityInput
+                      form={form}
+                      highAvailabilityRegionName={highAvailabilityRegion?.name}
+                    />
 
                     {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 

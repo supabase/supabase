@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  filterHighAvailabilityRegions,
-  getHighAvailabilityRegionCode,
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_POSTGRES_VERSION,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
 } from './ProjectCreation.constants'
+import {
+  filterHighAvailabilityRegions,
+  getHighAvailabilityRegionCode,
+} from './ProjectCreation.utils'
 
 describe('High Availability project creation constraints', () => {
   it('pins the Alpha Postgres image version', () => {
