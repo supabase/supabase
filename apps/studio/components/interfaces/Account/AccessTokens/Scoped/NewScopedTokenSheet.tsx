@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -70,9 +70,9 @@ export const NewScopedTokenSheet = ({
   const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
-  const resourceAccess = form.watch('resourceAccess')
-  const expiresAt = form.watch('expiresAt')
-  const permissionRows = form.watch('permissionRows') || []
+  const resourceAccess = useWatch({ control: form.control, name: 'resourceAccess' })
+  const expiresAt = useWatch({ control: form.control, name: 'expiresAt' })
+  const permissionRows = useWatch({ control: form.control, name: 'permissionRows' }) || []
 
   const onSubmit: SubmitHandler<TokenFormValues> = async (values) => {
     if (!permissionRows || permissionRows.length === 0) {
