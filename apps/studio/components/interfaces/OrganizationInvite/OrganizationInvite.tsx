@@ -1,8 +1,7 @@
 import { useIsLoggedIn, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import type { ReactNode } from 'react'
-import { toast } from 'sonner'
+import { useState, type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -28,6 +27,7 @@ export const OrganizationInvite = () => {
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { username, avatarUrl, primaryEmail } = useProfileNameAndPicture()
   const { slug, token } = useParams()
+  const [joinError, setJoinError] = useState<string>()
 
   const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
 
@@ -76,13 +76,14 @@ export const OrganizationInvite = () => {
         router.push('/organizations')
       },
       onError: (error) => {
-        toast.error(`Failed to join organization: ${error.message}`)
+        setJoinError(error.message)
       },
     })
 
   async function handleJoinOrganization() {
     if (!slug) return console.error('Slug is required')
     if (!token) return console.error('Token is required')
+    setJoinError(undefined)
     joinOrganization({ slug, token })
   }
 
@@ -184,6 +185,11 @@ export const OrganizationInvite = () => {
       <InterstitialAccountRow avatarUrl={avatarUrl} displayName={primaryEmail ?? username ?? ''} />
 
       <div className="flex flex-col gap-2">
+        {joinError && (
+          <p role="alert" className="text-sm text-destructive">
+            Failed to join organization: {joinError}
+          </p>
+        )}
         <Button
           variant="primary"
           block

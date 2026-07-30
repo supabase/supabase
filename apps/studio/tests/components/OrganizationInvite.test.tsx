@@ -172,6 +172,23 @@ describe('OrganizationInvite', () => {
     })
   })
 
+  test('renders an accept failure inline and allows retry', async () => {
+    const user = userEvent.setup()
+    mocks.useAcceptInvitationMutation.mockImplementation(({ onError }) => ({
+      mutate: () => onError(responseError('Invite token can only be accepted via an SSO account')),
+      isPending: false,
+    }))
+
+    render(<OrganizationInvite />)
+
+    await user.click(screen.getByRole('button', { name: 'Accept invite' }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Failed to join organization: Invite token can only be accepted via an SSO account'
+    )
+    expect(screen.getByRole('button', { name: 'Accept invite' })).toBeEnabled()
+  })
+
   test('renders a wrong-account warning and signs out', async () => {
     const user = userEvent.setup()
     mocks.useInvitationQuery.mockReturnValue({
