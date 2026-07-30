@@ -71,6 +71,8 @@ export interface ApiAuthorizationMainViewProps {
   requester: ApiAuthorizationResponse
   organizations: OrganizationsState
   requestedOrganizationSlug: string | undefined
+  actionError?: string
+  onOrganizationChange: () => void
   onApprove: () => void
   onDecline: () => void
 }
@@ -81,6 +83,8 @@ export function ApiAuthorizationMainView({
   requester,
   organizations,
   requestedOrganizationSlug,
+  actionError,
+  onOrganizationChange,
   onApprove,
   onDecline,
 }: ApiAuthorizationMainViewProps): ReactNode {
@@ -121,6 +125,7 @@ export function ApiAuthorizationMainView({
                   requester={requester}
                   organizations={organizations.organizations}
                   requestedOrganizationSlug={requestedOrganizationSlug}
+                  onOrganizationChange={onOrganizationChange}
                 />
               )}
               {showReadyContent && (
@@ -130,6 +135,11 @@ export function ApiAuthorizationMainView({
                     domain={requester.domain}
                     scopes={requester.scopes}
                   />
+                  {actionError && (
+                    <p role="alert" className="text-sm text-destructive">
+                      {actionError}
+                    </p>
+                  )}
                   <FormFooter
                     approvalState={approvalState}
                     requester={requester}
@@ -221,6 +231,7 @@ interface OrganizationSelectorProps {
   requestedOrganizationSlug: string | undefined
   organizations: Array<Organization>
   disabled?: boolean
+  onOrganizationChange: () => void
 }
 
 function OrganizationSelector({
@@ -229,6 +240,7 @@ function OrganizationSelector({
   requestedOrganizationSlug,
   organizations,
   disabled = false,
+  onOrganizationChange,
 }: OrganizationSelectorProps): ReactNode {
   return (
     <Form {...form}>
@@ -251,6 +263,7 @@ function OrganizationSelector({
                 disabled={disabled}
                 onValueChange={(value) => {
                   field.onChange(value)
+                  onOrganizationChange()
                   form.trigger('selectedOrgSlug')
                 }}
               >

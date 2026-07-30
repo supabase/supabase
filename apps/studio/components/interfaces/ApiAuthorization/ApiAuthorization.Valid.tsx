@@ -123,6 +123,7 @@ export function ApiAuthorizationValidScreen({
   navigate,
 }: ApiAuthorizationValidScreenProps): ReactNode {
   const [approvalState, setApprovalState] = useState<ApprovalState>('indeterminate')
+  const [actionError, setActionError] = useState<string>()
 
   const form = useForm<IApprovalFormSchema>({
     resolver: zodResolver(approvalFormSchema),
@@ -146,11 +147,19 @@ export function ApiAuthorizationValidScreen({
     onSuccess: (res) => {
       window.location.href = res.url
     },
+    onError: (error) => {
+      setApprovalState('indeterminate')
+      setActionError(`Failed to authorize request: ${error.message}`)
+    },
   })
   const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
       navigate('/organizations')
+    },
+    onError: (error) => {
+      setApprovalState('indeterminate')
+      setActionError(`Failed to cancel authorization request: ${error.message}`)
     },
   })
 
@@ -158,22 +167,18 @@ export function ApiAuthorizationValidScreen({
     if (approvalState !== 'indeterminate') {
       return
     }
+    setActionError(undefined)
     setApprovalState('approving')
-    approveRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    approveRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   const onDeclineRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
+    setActionError(undefined)
     setApprovalState('declining')
-    declineRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    declineRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   if (isLoading) {
@@ -224,6 +229,8 @@ export function ApiAuthorizationValidScreen({
         requester={effectiveRequester}
         requestedOrganizationSlug={effectiveOrganizationSlug}
         organizations={effectiveOrganizationsState}
+        actionError={actionError}
+        onOrganizationChange={() => setActionError(undefined)}
         onApprove={onApproveRequest}
         onDecline={onDeclineRequest}
       />

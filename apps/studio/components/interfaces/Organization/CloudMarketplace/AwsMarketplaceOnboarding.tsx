@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -36,11 +35,13 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(null)
   const [linkedOrgSlug, setLinkedOrgSlug] = useState<string | null>(null)
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
+  const [linkError, setLinkError] = useState<string>()
 
   useEffect(() => {
     setSelectedOrgSlug(null)
     setLinkedOrgSlug(null)
     setShowOrgCreationDialog(false)
+    setLinkError(undefined)
   }, [buyerId])
 
   const {
@@ -78,7 +79,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
         setLinkedOrgSlug(variables.slug)
       },
       onError: (error) => {
-        toast.error(error.message, { duration: 7_000 })
+        setLinkError(`Failed to link organization: ${error.message}`)
       },
     })
 
@@ -249,6 +250,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const primaryAction = hasLinkableOrganizations
     ? () => {
         if (!selectedOrgSlug || !buyerId) return
+        setLinkError(undefined)
         linkOrganization({ slug: selectedOrgSlug, buyerId })
       }
     : () => setShowOrgCreationDialog(true)
@@ -278,7 +280,10 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               }
               selectedSlug={selectedOrgSlug}
               disabled={isLinking}
-              onSelect={setSelectedOrgSlug}
+              onSelect={(slug) => {
+                setSelectedOrgSlug(slug)
+                setLinkError(undefined)
+              }}
               createLabel={hasLinkableOrganizations ? 'Create new organization' : undefined}
               onCreate={hasLinkableOrganizations ? () => setShowOrgCreationDialog(true) : undefined}
             />
@@ -292,6 +297,11 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
           )}
 
           <div className="flex flex-col gap-5">
+            {linkError && (
+              <p role="alert" className="text-sm text-destructive">
+                {linkError}
+              </p>
+            )}
             <Button
               variant="primary"
               block

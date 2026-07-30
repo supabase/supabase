@@ -170,6 +170,26 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     await screen.findByText('Organization linked')
   })
 
+  test('renders a link failure inline and keeps the action available', async () => {
+    const user = userEvent.setup()
+    mockAwsEndpoints()
+    mswServer.use(
+      http.put(`${API_URL}/platform/organizations/:slug/cloud-marketplace/link`, () =>
+        HttpResponse.json({ message: 'Marketplace link failed' }, { status: 500 })
+      )
+    )
+
+    renderScreen()
+
+    await user.click(await screen.findByRole('button', { name: /Acme Production/ }))
+    await user.click(screen.getByRole('button', { name: 'Link organization' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Failed to link organization: Marketplace link failed'
+    )
+    expect(screen.getByRole('button', { name: 'Link organization' })).toBeEnabled()
+  })
+
   test('creates an AWS-managed organization with buyerId and returns to linked state', async () => {
     const user = userEvent.setup()
     let createRequest: unknown
