@@ -177,6 +177,13 @@ export const RegionSelector = ({
             return !!region.name && region.name === dbRegion
           })
 
+          const selectedRegionLabel = selectedRegion?.name
+            ? getDisplayNameForSmartRegion(selectedRegion.name)
+            : dbRegion
+          const triggerLabel = isLoadingAvailableRegions
+            ? 'Loading available regions...'
+            : selectedRegionLabel
+
           const affectingIncidents = incidents.filter((incident) => {
             const affectedRegions = incident.cache?.affected_regions ?? []
             if (affectedRegions.length === 0 || selectedRegion?.code === undefined) return false
@@ -247,13 +254,7 @@ export const RegionSelector = ({
                                 src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
                               />
                             )}
-                            <span className="text-foreground">
-                              {isLoadingAvailableRegions
-                                ? 'Loading available regions...'
-                                : selectedRegion?.name
-                                  ? getDisplayNameForSmartRegion(selectedRegion.name)
-                                  : dbRegion}
-                            </span>
+                            <span className="text-foreground">{triggerLabel}</span>
                           </div>
                         )}
                       </SelectValue>
