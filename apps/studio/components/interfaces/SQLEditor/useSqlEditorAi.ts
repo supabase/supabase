@@ -20,9 +20,9 @@ import { useSQLEditorContext } from './SQLEditorContext'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
-import { detectLogSource, stripSqlCodeFences } from '@/data/logs/logs-sql-rewrite'
-import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
+import { stripSqlCodeFences } from '@/data/logs/logs-sql-rewrite'
 import { isError } from '@/data/utils/error-check'
+import { useLogsAttributeKeys } from '@/hooks/analytics/useLogsAttributeKeys'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -96,17 +96,13 @@ export function useSqlEditorAi({
   const isClickhouse = dialect === 'clickhouse'
 
   // Ground ClickHouse edits in the source's real log_attributes keys, the same way
-  // the whole-query rewrite does — otherwise inline edits invent dotted paths.
-  // React Query dedupes this against the rewrite banner's identical lookup.
-  const { data: availableKeys } = useOtelLogKeysQuery(
-    {
-      projectRef: project?.ref,
-      source: isClickhouse
-        ? detectLogSource(snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? '')
-        : undefined,
-    },
-    { enabled: isClickhouse }
-  )
+  // the whole-query rewrite does — otherwise inline edits invent dotted paths. The
+  // lookup debounces the snippet text itself (the store is written on every
+  // keystroke); React Query dedupes it against the rewrite banner's identical one.
+  const availableKeys = useLogsAttributeKeys({
+    sql: snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? '',
+    enabled: isClickhouse,
+  })
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {

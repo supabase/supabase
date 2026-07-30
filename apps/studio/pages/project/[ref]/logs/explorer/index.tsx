@@ -197,9 +197,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     onDismissed: () => setRewriteBannerDismissed(true),
   })
   const isRewriting = rewriteState.status === 'rewriting'
-  // The machine tracks this session; localStorage remembers "don't offer again"
-  // across them. It isn't used to seed the machine because it reads as `false`
-  // during SSR, which would resurrect the banner on hydration.
   const hasUnacknowledgedRewriteOutcome =
     rewriteState.status === 'failed' || rewriteState.status === 'noRewriteNeeded'
 
@@ -484,9 +481,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             isRewriting={isRewriting}
             onRewrite={requestRewrite}
           />
-          {/* A persisted dismissal suppresses the offer, but not an outcome the user
-              just triggered — a rewrite started from the toolbar action still has to
-              report a failure somewhere. */}
           {(hasUnacknowledgedRewriteOutcome || (showRewriteCTA && !rewriteBannerDismissed)) && (
             <LegacyLogsRewriteAdmonition
               state={rewriteState}

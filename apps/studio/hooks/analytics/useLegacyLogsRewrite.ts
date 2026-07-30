@@ -1,23 +1,12 @@
 import { useReducer } from 'react'
 
 import { constructHeaders } from '@/data/fetchers'
-import { detectLogSource, rewriteLogsSqlWithAI } from '@/data/logs/logs-sql-rewrite'
-import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
+import { rewriteLogsSqlWithAI } from '@/data/logs/logs-sql-rewrite'
+import { useLogsAttributeKeys } from '@/hooks/analytics/useLogsAttributeKeys'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getErrorMessage } from '@/lib/get-error-message'
 
-/**
- * The legacy-logs rewrite offer for one query, as a state machine. The states are
- * mutually exclusive by construction — a rewrite can't be in flight on an offer
- * the user already dismissed, and a dismissed offer never comes back — so callers
- * read one value instead of reconciling independent booleans.
- *
- * `failed` and `noRewriteNeeded` are outcomes a surface renders, not toasts: a
- * failure keeps its message so the user can read it and retry, and a no-op tells
- * the user the Assistant found nothing to change and waits for acknowledgement
- * rather than silently retiring the offer.
- */
 export type LegacyLogsRewriteState =
   | { status: 'offered' }
   | { status: 'rewriting' }
@@ -37,8 +26,7 @@ export const INITIAL_LEGACY_LOGS_REWRITE_STATE: LegacyLogsRewriteState = { statu
 /**
  * The events each state accepts. Anything absent is an invalid transition and
  * leaves the state untouched — notably `dismissed` is terminal, and the offer
- * can't be dismissed mid-rewrite (surfaces disable that control while a rewrite is
- * in flight), so a settling request can never resurrect it.
+ * can't be dismissed mid-rewrite.
  */
 const VALID_EVENTS: {
   [S in LegacyLogsRewriteState['status']]: readonly LegacyLogsRewriteEvent['type'][]
@@ -51,12 +39,6 @@ const VALID_EVENTS: {
   dismissed: [],
 }
 
-/**
- * Where each event lands. Split from `VALID_EVENTS` because the target depends
- * only on the event, never on the state it came from — which keeps this total and
- * exhaustive (so a new event is a compile error) without any casts to thread the
- * failure message through a lookup table.
- */
 function targetState(event: LegacyLogsRewriteEvent): LegacyLogsRewriteState {
   switch (event.type) {
     case 'rewriteRequested':
@@ -92,8 +74,8 @@ export type LegacyLogsRewriteProposal = { original: string; modified: string }
 type UseLegacyLogsRewriteArgs = {
   /**
    * The query the offer is about, as currently displayed. Used to discover the
-   * source's real `log_attributes` keys, so pass a settled (e.g. debounced) value
-   * rather than one that changes on every keystroke.
+   * source's real `log_attributes` keys; pass the live value — the key lookup
+   * debounces it.
    */
   sql: string
   /** Whether an offer is on screen — gates the key-discovery query. */
@@ -118,9 +100,6 @@ type UseLegacyLogsRewriteArgs = {
 /**
  * Owns the BigQuery → ClickHouse rewrite request end to end: key discovery, the
  * completion call, the stale-edit guard, no-op detection, and the resulting state.
- * Shared by the SQL editor's rewrite banner and the Logs Explorer so both behave
- * identically — the two previously hand-rolled this sequence and had already
- * drifted on no-op handling, key sourcing, and error formatting.
  */
 export function useLegacyLogsRewrite({
   sql,
@@ -135,12 +114,8 @@ export function useLegacyLogsRewrite({
 
   const [state, dispatch] = useReducer(legacyLogsRewriteReducer, INITIAL_LEGACY_LOGS_REWRITE_STATE)
 
-  // Real keys for the query's source keep the model from inventing dotted paths.
-  // Fetched reactively so they're ready when the user asks for the rewrite.
-  const { data: availableKeys } = useOtelLogKeysQuery(
-    { projectRef, source: isOffered ? detectLogSource(sql) : undefined },
-    { enabled: isOffered }
-  )
+  // Fetched reactively so the keys are ready when the user asks for the rewrite.
+  const availableKeys = useLogsAttributeKeys({ sql, enabled: isOffered })
 
   const requestRewrite = async () => {
     if (!projectRef) return console.error('[useLegacyLogsRewrite] Project ref is required')

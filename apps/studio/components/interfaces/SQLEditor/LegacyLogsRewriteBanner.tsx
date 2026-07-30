@@ -1,5 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag } from 'common'
+import { useMemo } from 'react'
 
 import { DiffType } from './SQLEditor.types'
 import { useSqlEditorAssistant, useSqlEditorRun, useSqlEditorSnippet } from './SQLEditorControllers'
@@ -46,12 +47,17 @@ export const LegacyLogsRewriteBanner = () => {
   const liveSql = snapV2.snippets[id]?.snippet.content?.unchecked_sql ?? ''
   const settledSql = useDebounce(liveSql, DIALECT_CHECK_DEBOUNCE_MS)
 
-  const isLogsSnippetNeedingRewrite =
-    runSource.type === 'logs' &&
-    shouldOfferLegacyLogsRewrite({ sql: settledSql, isClickhouseLogsEnabled: isOtelLogsEnabled })
+  const isLogsSnippetNeedingRewrite = useMemo(
+    () =>
+      runSource.type === 'logs' &&
+      shouldOfferLegacyLogsRewrite({ sql: settledSql, isClickhouseLogsEnabled: isOtelLogsEnabled }),
+    [runSource.type, settledSql, isOtelLogsEnabled]
+  )
 
   const { state, requestRewrite, dismiss } = useLegacyLogsRewrite({
-    sql: settledSql,
+    // Live, not `settledSql` — the hook debounces this itself for key discovery,
+    // and debouncing twice would just delay the keys further.
+    sql: liveSql,
     isOffered: isLogsSnippetNeedingRewrite && !isDiffOpen,
     // Rewrite exactly what's in the editor now, not the debounced value the
     // visibility check used — they differ if the user clicked mid-edit.

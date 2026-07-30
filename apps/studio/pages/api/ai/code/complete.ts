@@ -262,9 +262,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           ${SECURITY_PROMPT}
         `
 
-    // One assembly for both dialects — only the schema section and (for a rewrite)
-    // the instruction differ. Keeping this symmetric is what stops the client from
-    // hand-building an equivalent string for ClickHouse and drifting from it.
     const schemaSection = isClickhouse
       ? { heading: 'Logs Schema', body: buildClickhouseLogsSchemaSection(availableKeys) }
       : {
