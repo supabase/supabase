@@ -52,7 +52,7 @@ Below are some areas we saw agents tripping up during benchmark development, and
 
 #### Skills vs no-skills isn't as big a delta as we expected, and that's a good sign
 
-Across our benchmark, agents already pass most scenarios with no skill loaded at all. In the Build stage, for example, Sonnet 5 and GPT-5.6 both score 100% with no skill loaded, and skills mainly lift the weaker setups: Opus 4.8 from 89% to 100%, GPT-5.4 mini from 78% to 89%. That means agents are already reasonably capable at broad Supabase tasks out of the box. The biggest impact we saw is that agents with our skills loaded checked Supabase docs more consistently and thoroughly, which helped skills earn their keep in the edge cases where models need to unlearn outdated pre-training knowledge. We still recommend using our skill to ensure your agents have the most up-to-date information on Supabase best practices and breaking changes, examples of which follow below.
+Across our benchmark, agents already pass most scenarios with no skill loaded at all. In the Build stage, for example, Opus 5 and Kimi K3 both scored 100% with no skill loaded. Skills closed the gap for the rest: Sonnet 5 went from 78% to 100%, GPT-5.6 Sol from 89% to 100%, and GPT-5.4 mini from 78% to 89%. That means agents are reasonably capable at broad Supabase tasks out of the box. The biggest impact we saw is that agents with our skills loaded checked Supabase docs more consistently and thoroughly, which helped skills earn their keep in the edge cases where models need to unlearn outdated pre-training knowledge. We still recommend using our skill to ensure your agents have the most up-to-date information on Supabase best practices and breaking changes, examples of which follow below.
 
 ### Where agents struggle
 
