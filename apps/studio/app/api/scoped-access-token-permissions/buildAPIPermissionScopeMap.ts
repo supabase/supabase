@@ -2,7 +2,7 @@ import lodash from 'lodash'
 import z from 'zod'
 
 // We don't have an OpenAPI that describes mcp tools security requirements so
-// we have this json file that must be updated when they change
+// we have this hard coded file that must be updated when they change
 import { MCPToolScopeMappings } from './MCPToolScopeMappings'
 import {
   EndpointMap,
@@ -19,6 +19,10 @@ function mergeArrays(objValue: unknown, srcValue: unknown) {
   }
 }
 
+/*
+ * Builds the permissions/endpoint mapping by fetching the OpenAPI specs for our v1 and v2 APIs.
+ * @throws InternalServerError when it can't fetch the OpenAPI specs
+ */
 export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> => {
   // Get the permissions map for the API v1
   const apiV1SpecsJSON = await fetchAPIPermissionScope('v1')
@@ -103,23 +107,33 @@ export const getEndpointsAndMCPToolsForAPI = (
 const NEXT_PUBLIC_API_DOMAIN = process.env.NEXT_PUBLIC_API_DOMAIN || 'https://api.supabase.com'
 
 const fetchAPIPermissionScope = async (version: 'v1' | 'v2') => {
-  const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/api/${version}-json`, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-  if (response.ok) {
-    return response.json()
-  }
-  const responseText = await response.text()
+  try {
+    const response = await fetch(`${NEXT_PUBLIC_API_DOMAIN}/api/${version}-json`, {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (response.ok) {
+      return response.json()
+    }
+    const responseText = await response.text()
 
-  const retryAfter = response.headers.get('Retry-After') ?? undefined
-  throw new InternalServerError(`API v${version} responded with ${response.status}`, {
-    status: response.status,
-    body: responseText,
-    ...(retryAfter !== undefined && { retryAfter }),
-  })
+    const retryAfter = response.headers.get('Retry-After') ?? undefined
+    throw new InternalServerError(`API v${version} responded with ${response.status}`, {
+      status: response.status,
+      body: responseText,
+      ...(retryAfter !== undefined && { retryAfter }),
+    })
+  } catch (error: unknown) {
+    if (error instanceof InternalServerError) {
+      throw error
+    }
+
+    if (error instanceof Error) {
+      throw new InternalServerError(error.message)
+    }
+  }
 }
 
 // Simplified OPEN API specs schemas that only defines what we care about for scoped tokens
