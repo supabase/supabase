@@ -530,6 +530,34 @@ describe('useConnectState', () => {
       expect(connectionTypeField?.label).toBe('Connection Type')
     })
 
+    test('should coerce pooler-flavored initial state to the direct method for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      // Simulates pooler selections restored from the URL or localStorage
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionMethod: 'transaction', useSharedPooler: true })
+      )
+
+      expect(result.current.state.connectionMethod).toBe('direct')
+      expect(result.current.state.useSharedPooler).toBe(false)
+    })
+
+    test('should coerce connectionMethod updates to the direct method for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      act(() => {
+        result.current.updateField('connectionMethod', 'session')
+        result.current.updateField('useSharedPooler', true)
+      })
+
+      expect(result.current.state.connectionMethod).toBe('direct')
+      expect(result.current.state.useSharedPooler).toBe(false)
+    })
+
     test('should not affect non-HA projects', async () => {
       const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
       vi.mocked(useIsHighAvailability).mockReturnValue(false)

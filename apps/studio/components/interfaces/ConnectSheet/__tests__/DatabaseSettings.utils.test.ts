@@ -179,7 +179,8 @@ describe('buildConnectionStringPooler', () => {
     expect(result.direct).toContain(':5432/postgres')
   })
 
-  test('platform high availability: appends SSL params to every URI in the bag', () => {
+  test('platform high availability: collapses every slot to the direct URI with SSL params', () => {
+    const directUri = `${sharedPlatform.direct.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`
     const result = buildConnectionStringPooler({
       deploymentMode: platform,
       connectionInfo,
@@ -189,49 +190,30 @@ describe('buildConnectionStringPooler', () => {
       isHighAvailability: true,
     })
 
-    expect(result.direct).toBe(`${sharedPlatform.direct.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`)
-    expect(result.transactionShared).toBe(
-      `${sharedPlatform.pooler.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`
-    )
-    expect(result.sessionShared).toBe(
-      `${sharedPlatform.pooler.uri.replace('6543', '5432')}?${HIGH_AVAILABILITY_SSL_PARAMS}`
-    )
-    expect(result.transactionDedicated).toBe(
-      `${dedicatedPlatform.pooler.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`
-    )
-    expect(result.sessionDedicated).toBe(
-      `${dedicatedPlatform.pooler.uri.replace('6543', '5432')}?${HIGH_AVAILABILITY_SSL_PARAMS}`
-    )
+    expect(result.direct).toBe(directUri)
+    expect(result.transactionShared).toBe(directUri)
+    expect(result.sessionShared).toBe(directUri)
+    // No pooler on Multigres: dedicated slots stay empty and the IPv4 flag is
+    // off even when a dedicated pooler config and the addon were passed in
+    expect(result.transactionDedicated).toBeUndefined()
+    expect(result.sessionDedicated).toBeUndefined()
+    expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
   })
 
-  test('platform high availability: leaves API-provided URIs that already carry the params untouched', () => {
-    const withParams = makeStrings(
-      `postgresql://postgres.proj:[YOUR-PASSWORD]@pooler.supabase.com:6543/postgres?${HIGH_AVAILABILITY_SSL_PARAMS}`,
-      'postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5432/postgres'
-    )
-    const result = buildConnectionStringPooler({
-      deploymentMode: platform,
-      connectionInfo,
-      connectionStringsShared: withParams,
-      ipv4Addon: false,
-      isHighAvailability: true,
-    })
-
-    expect(result.transactionShared).toBe(withParams.pooler.uri)
-    expect(result.direct).toBe(`${withParams.direct.uri}?${HIGH_AVAILABILITY_SSL_PARAMS}`)
-  })
-
-  test('platform high availability: dedicated slots stay undefined without a dedicated pooler', () => {
+  test('platform without high availability appends no SSL params', () => {
     const result = buildConnectionStringPooler({
       deploymentMode: platform,
       connectionInfo,
       connectionStringsShared: sharedPlatform,
-      ipv4Addon: false,
-      isHighAvailability: true,
+      connectionStringsDedicated: dedicatedPlatform,
+      ipv4Addon: true,
+      isHighAvailability: false,
     })
 
-    expect(result.transactionDedicated).toBeUndefined()
-    expect(result.sessionDedicated).toBeUndefined()
+    expect(result.direct).toBe(sharedPlatform.direct.uri)
+    expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
+    expect(result.direct).not.toContain('sslnegotiation')
+    expect(result.transactionShared).not.toContain('sslnegotiation')
   })
 })
 

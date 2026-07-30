@@ -9,8 +9,8 @@ import { appendConnectionStringParams } from './ConnectionString.utils'
 export const HIGH_AVAILABILITY_SSL_PARAMS = 'sslmode=require&sslnegotiation=direct'
 
 /**
- * No-op when the URI already carries `sslnegotiation` — API-provided pooler
- * connection strings may already include the SSL params.
+ * No-op when the URI already carries `sslnegotiation`, so the params are never
+ * double-appended.
  */
 export const appendHighAvailabilitySslParams = (uri: string) =>
   uri.includes('sslnegotiation=')
@@ -284,21 +284,29 @@ export const buildConnectionStringPooler = ({
     }
   }
 
+  if (isHighAvailability) {
+    // Multigres has no pooler (neither Supavisor nor PgBouncer), so every slot
+    // falls back to the direct connection.
+    const directUri = appendHighAvailabilitySslParams(connectionStringsShared.direct.uri)
+    return {
+      transactionShared: directUri,
+      sessionShared: directUri,
+      transactionDedicated: undefined,
+      sessionDedicated: undefined,
+      ipv4SupportedForDedicatedPooler: false,
+      direct: directUri,
+    }
+  }
+
   // Port-swap 6543→5432 derives session from transaction. For shared this is a
   // real Supavisor session connection; for dedicated it lands on direct Postgres
   // (PgBouncer has no session mode).
-  const withSslParams = (uri: string) =>
-    isHighAvailability ? appendHighAvailabilitySslParams(uri) : uri
-  const transactionDedicated = connectionStringsDedicated?.pooler.uri
-  const sessionDedicated = connectionStringsDedicated?.pooler.uri.replace('6543', '5432')
-
   return {
-    transactionShared: withSslParams(connectionStringsShared.pooler.uri),
-    sessionShared: withSslParams(connectionStringsShared.pooler.uri.replace('6543', '5432')),
-    transactionDedicated:
-      transactionDedicated === undefined ? undefined : withSslParams(transactionDedicated),
-    sessionDedicated: sessionDedicated === undefined ? undefined : withSslParams(sessionDedicated),
+    transactionShared: connectionStringsShared.pooler.uri,
+    sessionShared: connectionStringsShared.pooler.uri.replace('6543', '5432'),
+    transactionDedicated: connectionStringsDedicated?.pooler.uri,
+    sessionDedicated: connectionStringsDedicated?.pooler.uri.replace('6543', '5432'),
     ipv4SupportedForDedicatedPooler: ipv4Addon,
-    direct: withSslParams(connectionStringsShared.direct.uri),
+    direct: connectionStringsShared.direct.uri,
   }
 }
