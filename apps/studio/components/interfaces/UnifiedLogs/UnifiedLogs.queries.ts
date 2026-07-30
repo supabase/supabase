@@ -30,7 +30,7 @@ const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname'] as co
 
 // OTEL log_attributes keys for HTTP-style fields. Centralized so they can be
 // adjusted in one place if the backend conventions change.
-const ATTR = {
+export const ATTR = {
   method: safeSql`log_attributes['request.method']`,
   status: safeSql`log_attributes['response.status_code']`,
   path: safeSql`log_attributes['request.path']`,
@@ -64,7 +64,7 @@ const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = Object.fromEntrie
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
-const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
+export const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'postgrest_logs' THEN 'postgrest'
       WHEN source = 'storage_logs' THEN 'storage'
       WHEN source = 'edge_logs' THEN 'edge'
@@ -81,7 +81,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
 // Status code is sourced from the HTTP response for gateway-style rows, the
 // auth-service `status` attribute for auth rows, and the Postgres
 // `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
-const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
+export const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
@@ -94,7 +94,7 @@ const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
 // `severity_text` of `INFO` regardless of response code) bucket as
 // success/warning/error by status. Postgres-style severity is the
 // fallback for rows without a status code.
-const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
+export const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
@@ -105,7 +105,7 @@ const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
     END`
 
 // The `auth_user` column is derived from the source-specific fields that can be attributed to a user.
-const AUTH_USER_EXPR: SafeLogSqlFragment = safeSql`nullIf(CASE
+export const AUTH_USER_EXPR: SafeLogSqlFragment = safeSql`nullIf(CASE
       WHEN source = 'auth_logs' THEN log_attributes['auth_event.actor_id']
       WHEN source = 'edge_logs' THEN log_attributes['request.sb.jwt.authorization.payload.subject']
       ELSE null
@@ -198,7 +198,7 @@ const translateFilter = (
   }
 }
 
-const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
+export const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
   conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
 /**
@@ -270,7 +270,7 @@ const ROW_PROJECTION: SafeLogSqlFragment = safeSql`
     null AS logs
 `
 
-const buildBaseWhere = (
+export const buildBaseWhere = (
   search: QuerySearchParamsType,
   excludeField?: string
 ): SafeLogSqlFragment[] => {

@@ -20,6 +20,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
+  Checkbox,
   cn,
   ResizableHandle,
   ResizablePanel,
@@ -33,6 +34,7 @@ import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
+import { TracedLogsSheet } from './components/TracedLogsSheet'
 import { RowSelectionHeader } from './RowSelectionHeader'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -275,8 +277,14 @@ export const UnifiedLogs = () => {
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
     const gatedFields = gateMultigresLogType(defaultFilterFields, showMultigresLogs)
+    // Traced mode locks the source selection to edge/auth/storage — the Log
+    // Type filter no longer applies, so drop it rather than show a filter
+    // that can't be changed.
+    const tracedAwareFields = search.traced
+      ? gatedFields.filter((field) => field.value !== 'log_type')
+      : gatedFields
 
-    return gatedFields.map((field) => {
+    return tracedAwareFields.map((field) => {
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
@@ -302,7 +310,7 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs])
+  }, [facets, showMultigresLogs, search.traced])
 
   const applyFilterSearch = () => {
     setSearch(buildFilterSearchUpdate(columnFilters, filterFields))
@@ -416,6 +424,16 @@ export const UnifiedLogs = () => {
                 </div>
 
                 <div className="ml-auto flex items-center gap-x-2">
+                  <label className="flex items-center gap-2 text-xs text-foreground-light cursor-pointer select-none">
+                    <Checkbox
+                      checked={search.traced}
+                      onCheckedChange={(checked) => setSearch({ traced: checked === true })}
+                    />
+                    Traced logs only
+                  </label>
+
+                  <div className="h-full border-r" />
+
                   <RefreshButton
                     isLoading={isRefetchingData}
                     onRefresh={refetchAllData}
@@ -498,7 +516,7 @@ export const UnifiedLogs = () => {
                 </div>
               </ResizablePanel>
 
-              {!!openRowId && !!selectedRow && (
+              {!!openRowId && !!selectedRow && !search.traced && (
                 <>
                   <LogsListPanel selectedRow={selectedRow} />
                   <ServiceFlowPanel
@@ -514,6 +532,13 @@ export const UnifiedLogs = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </DataTableSideBarLayout>
+
+      {search.traced && (
+        <TracedLogsSheet
+          row={openRowId && selectedRow ? selectedRow.original : null}
+          onClose={() => setOpenRowId(undefined)}
+        />
+      )}
     </DataTableProvider>
   )
 }
