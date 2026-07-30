@@ -13,7 +13,7 @@ info:
   libraries:
     - name: 'C#'
       id: 'csharp'
-      version: '1.0.0'
+      version: '1.5.0'
 
 functions:
   - id: initializing
@@ -93,26 +93,23 @@ functions:
               }
           }
 
-          void Initialize()
-          {
-              // Get All Messages
-              var response = await client.Table<Message>().Get();
-              List<Message> models = response.Models;
+          // Get All Messages
+          var response = await supabase.From<Message>().Get();
+          List<Message> models = response.Models;
 
-              // Insert
-              var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
-              await client.Table<Message>().Insert();
+          // Insert
+          var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
+          await supabase.From<Message>().Insert(newMessage);
 
-              // Update
-              var model = response.Models.First();
-              model.UserName = "elrhomariyounes";
-              await model.Update();
+          // Update
+          var model = response.Models.First();
+          model.UserName = "elrhomariyounes";
+          await model.Update<Message>();
 
-              // Delete
-              await response.Models.Last().Delete();
+          // Delete
+          await response.Models.Last().Delete<Message>();
 
-              // etc.
-          }
+          // etc.
           ```
   - id: sign-up
     title: 'SignUp()'
@@ -337,7 +334,7 @@ functions:
 
     examples:
       - id: reset-password
-        name: Reset password for Flutter
+        name: Reset password for email
         isSpotlight: true
         code: |
           ```c#
@@ -848,7 +845,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var channel = await supabase.From<City>().On(ChannelEventType.All, (sender, change) => { });
+          var channel = await supabase.From<City>().On(ListenType.All, (sender, change) => { });
           channel.Unsubscribe();
 
           // OR
@@ -978,7 +975,7 @@ functions:
         name: Delete bucket
         isSpotlight: true
         code: |
-          ```dart
+          ```c#
           var result = await supabase.Storage.DeleteBucket("avatars");
           ```
 
