@@ -414,24 +414,17 @@ The `config add` / `config remove` commands manage the `COMPOSE_FILE` [variable]
 
 ## Updating
 
-The `update.sh` script updates an existing deployment in place. It pulls a newer version of the Docker configuration and merges it over your files with a three-way merge.
+We publish stable releases of the Docker Compose setup approximately once a month. The versions in each release are tested together, so they may lag behind the latest images on Docker Hub. To update, apply the latest changes from the repository, then stop and start the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is **not guaranteed**. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
 
-```sh
-sh update.sh --dry-run   # preview the changes
-sh update.sh             # apply the update
-sh run.sh pull           # pull new images
-sh run.sh recreate       # restart to pick up the changes
-```
+To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md). Make sure to also check the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
 
-See [Update your self-hosted deployment](/docs/guides/self-hosting/updating) for the full walkthrough - breaking changes, conflict resolution, pinning a release, and older installs without a recorded version.
+After updating the configuration, stop and start the stack or individual services to pick up the changes. This may result in downtime for your applications and users.
 
-To follow the changes between releases, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
-
-To change or roll back a **single** service's image instead of updating everything - for example, Studio:
+For example, you'd like to update or rollback the Studio image. Follow the steps below:
 
 1. Check the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) images on [Supabase Docker Hub](https://hub.docker.com/u/supabase)
-2. Find the version (tag) you want. It looks something like `2026.04.27-sha-5f60601`
-3. Update the Studio `image` in `docker-compose.yml`: `image: supabase/studio:2026.04.27-sha-5f60601`
+2. Find the latest version (tag) number. It looks something like `2026.04.27-sha-5f60601`
+3. Update the Studio `image` configuration in the `docker-compose.yml` file. It should look like this: `image: supabase/studio:2026.04.27-sha-5f60601`
 4. Run `sh run.sh pull` to pull the new image, then `sh run.sh recreate studio` to update Studio without taking down the rest of the stack.
 
 ## Uninstalling

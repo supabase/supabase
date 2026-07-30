@@ -3,19 +3,20 @@
 # Hermetic test for update.sh (the self-hosted in-place update script).
 #
 # Builds a tiny synthetic "upstream" git repo with two tagged releases
-# (self-hosted/v0.9.0 and self-hosted/v1.1.0; 1.0.0 exists only as a manifest
-# key), where the target ships a two-entry breaking-change manifest. It then
-# simulates a configured deployment
-# based on v0.9.0 and runs update.sh via a SUPABASE_REPO_URL override (no
-# network), asserting: the 3-way merge preserves secrets/data/overrides, adds
-# new .env keys (but not ones the user commented out), applies clean merges,
-# reports real conflicts, honors .gitignore for user-owned paths, surfaces the
-# multi-entry gate, and advances the stamp ONLY on a clean apply. Also covers
-# the clean-apply path, default-target resolution, --from, --dry-run, and the
-# missing-stamp report-only path.
+# (self-hosted/v0.9.0 -> self-hosted/v1.1.0; 1.0.0 exists only as a manifest key),
+# where the target ships a breaking-change manifest with entries at the base and
+# inside the window. It then simulates a configured deployment based on v0.9.0
+# and runs update.sh via a SUPABASE_REPO_URL override (no network), asserting:
+# the 3-way merge preserves secrets/data/overrides, adds new .env keys (but not
+# ones the user commented out), applies clean merges, reports real conflicts,
+# honors .gitignore for user-owned paths, surfaces only the in-window gate
+# entries (base-version entry excluded), and advances the stamp ONLY on a clean
+# apply. Also covers the clean-apply path, default-target resolution, --from,
+# --dry-run, the missing-stamp report-only path, and a malformed manifest being
+# refused.
 #
 # Usage:
-#   sh tests/test-upgrade.sh        # run from the docker/ directory
+#   sh tests/test-update.sh        # run from the docker/ directory
 #
 
 set -eu
@@ -114,11 +115,17 @@ printf 'target hello\n' > docker/volumes/functions/hello/index.ts
 # overwrite the user's file of the same name (exercises is_excluded directly).
 mkdir -p docker/volumes/snippets
 printf 'VENDOR SEED\n' > docker/volumes/snippets/seed.sql
-# Two-entry manifest. 1.0.0 carries requires+gate; 1.1.0 is breaking with NO
-# 'requires' and, sorting last with no _schema after it, guards the set -e
-# regression where a requires-less final entry aborted the script.
+# Manifest with entries at/below and inside the window:
+#   0.9.0 == the base -> must be EXCLUDED (window is half-open: (base, target]).
+#   1.0.0  inside -> surfaces (carries requires+gate).
+#   1.1.0 == target -> surfaces; requires-less and sorts LAST (no _schema after),
+#          guarding the set -e regression where a requires-less final entry
+#          aborted the script. Do NOT add a version key after 1.1.0.
 cat > docker/upgrades.json <<'EOF'
 {
+  "0.9.0": {
+    "breaking": true
+  },
   "1.0.0": {
     "breaking": true,
     "gate": "utils/demo-migrate.sh",
@@ -135,6 +142,12 @@ git add -A
 git add -f docker/volumes/functions/hello/index.ts docker/volumes/snippets/seed.sql
 # Release tag for the target / default-target (latest self-hosted/v*) path.
 git commit -qm target && git tag self-hosted/v1.1.0
+
+# A ref whose upgrades.json is valid JSON but NOT an object. update.sh must
+# refuse (die) rather than silently skip the gate. Named so latest_release_tag
+# ignores it (not self-hosted/v*), leaving the default-target path on v1.1.0.
+printf '["valid JSON, but not an object"]\n' > docker/upgrades.json
+git add -A && git commit -qm 'malformed manifest' && git tag malformed-manifest
 
 # --- helper: lay down a deployment based on v0.9.0 --------------------------
 # make_deploy <dir> [conflict]  - pass "conflict" to pin the studio image so the
@@ -211,6 +224,7 @@ assert_file_contains  ".supabase-version" "ref=self-hosted/v0.9.0" "stamp NOT ad
 assert_file_contains  "$WORK/apply.log" "Files with merge conflicts" "conflicts reported in summary"
 assert_file_contains  "$WORK/apply.log" "[1.0.0]"               "manifest entry 1.0.0 surfaced"
 assert_file_contains  "$WORK/apply.log" "[1.1.0] BREAKING"      "requires-less last entry surfaced (no set -e abort)"
+assert_file_missing_pattern "$WORK/apply.log" "[0.9.0]"         "base-version entry excluded (window lower bound is half-open)"
 assert_file_contains  "$WORK/apply.log" "Run the demo migration first." "manifest gate step surfaced"
 assert_file_contains  "$WORK/apply.log" "utils/demo-migrate.sh" "manifest gate script surfaced"
 assert_file_contains  "$WORK/apply.log" "example.test/guide"    "manifest migration guide surfaced"
@@ -309,6 +323,21 @@ assert_file_missing_pattern ".env" "NEW_KEY"             "report-only wrote noth
 assert_path_absent   "backups"                           "report-only took no backup"
 assert_file_contains "$WORK/miss.log" "Breaking changes / required manual steps" "report-only surfaces the gate"
 assert_file_contains "$WORK/miss.log" "[1.0.0]"          "report-only lists in-range breaking release"
+assert_file_contains "$WORK/miss.log" "[0.9.0]"          "report-only (open lower bound) includes the base-version entry"
+
+echo ""
+echo "=== update.sh: malformed manifest -> refuses (dies), writes nothing ==="
+
+BADM="$WORK/badmanifest"
+make_deploy "$BADM"
+cd "$BADM"
+rc=0
+SUPABASE_REPO_URL="$SRC" sh ./update.sh --to malformed-manifest --yes > "$WORK/bad.log" 2>&1 || rc=$?
+if [ "$rc" != "0" ] && [ "$rc" != "2" ]; then ok "malformed manifest aborts (die, not a normal exit)"; else bad "expected die (non-0, non-2), got $rc"; fi
+assert_file_contains "$WORK/bad.log" "not a valid JSON object" "malformed-manifest error surfaced"
+assert_file_missing_pattern ".env" "NEW_KEY"                   "malformed manifest: .env untouched"
+assert_path_absent   "backups"                                 "malformed manifest: no backup taken"
+assert_file_contains ".supabase-version" "ref=self-hosted/v0.9.0" "malformed manifest: stamp not advanced"
 
 # --- summary -----------------------------------------------------------------
 
