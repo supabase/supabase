@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, cn, Form } from 'ui'
@@ -158,7 +158,7 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
     reValidateMode: 'onChange',
   })
 
-  const { computeSize: modifiedComputeSize } = form.watch()
+  const modifiedComputeSize = useWatch({ control: form.control, name: 'computeSize' })
 
   const isSuccess =
     isAddonsSuccess &&
@@ -195,8 +195,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
     !isSpendCapEnabled &&
     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
 
-  const watchedTotalSize = form.watch('totalSize') ?? 0
-  const watchedStorageType = form.watch('storageType')
+  const watchedTotalSize = useWatch({ control: form.control, name: 'totalSize' }) ?? 0
+  const watchedStorageType = useWatch({ control: form.control, name: 'storageType' })
   // Minimum disk size where the platform API will accept an IOPS payload (500 IOPS/GB rule).
   const minDiskSizeForCustomIops = calculateDiskSizeRequiredForIopsWithGp3(
     DISK_LIMITS[DiskType.GP3].minIops

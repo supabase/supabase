@@ -95,6 +95,7 @@ const SQLEditorToolbar = () => {
   return (
     <UtilityActions
       id={id}
+      runSource={runSource}
       isExecuting={isExecuting}
       isDisabled={diff.isDiffOpen}
       hasSelection={hasSelection}
