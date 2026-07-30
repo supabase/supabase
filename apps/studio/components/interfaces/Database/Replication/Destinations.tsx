@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Database } from 'icons'
-import { ChartArea, MoreVertical, Plus, Search, X } from 'lucide-react'
+import { MoreVertical, Plus, Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -12,6 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -39,6 +40,7 @@ import {
 } from './useIsETLPrivateAlpha'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -252,29 +254,39 @@ export const Destinations = () => {
           />
         </div>
         <div className="flex items-center gap-x-2">
-          {canDisablePipelines && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  aria-label="More actions"
-                  variant="default"
-                  icon={<MoreVertical />}
-                  className="w-7"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>
-                  Disable Pipelines
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-          {hasDestinations && organization?.slug && (
-            <Button asChild variant="default" icon={<ChartArea />}>
-              <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>Usage</Link>
-            </Button>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label="More actions"
+                variant="default"
+                icon={<MoreVertical />}
+                className="px-1"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem asChild>
+                <Link href={`/org/${organization?.slug}/usage#pipeline-initial-sync-data`}>
+                  View Pipelines usage
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItemTooltip
+                disabled={canDisablePipelines}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: 'Remove all existing destinations before disabling Pipelines',
+                  },
+                }}
+                onClick={() => setShowDisablePipelinesDialog(true)}
+              >
+                Disable Pipelines
+              </DropdownMenuItemTooltip>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+
           <Shortcut
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
             label="Add destination"
