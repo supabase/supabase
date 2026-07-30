@@ -156,7 +156,7 @@ describe('OrganizationInvite', () => {
     expect(screen.getByText('Signed in as')).toBeInTheDocument()
     expect(screen.getByText('jane@acmecorp.io')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Accept invite' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Decline' })).toHaveAttribute('href', '/projects')
+    expect(screen.getByRole('link', { name: 'Decline' })).toHaveAttribute('href', '/organizations')
   })
 
   test('accepts an invite with the current slug and token', async () => {

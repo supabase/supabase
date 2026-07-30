@@ -1,4 +1,4 @@
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 const CONFIG_SNIPPET = `[storage.vector]

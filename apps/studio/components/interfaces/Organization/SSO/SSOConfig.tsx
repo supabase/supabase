@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useFlag } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
@@ -129,8 +129,8 @@ export const SSOConfig = () => {
     defaultValues,
   })
 
-  const isSSOEnabled = form.watch('enabled')
-  const enableSpInitiated = form.watch('enableSpInitiated')
+  const isSSOEnabled = useWatch({ control: form.control, name: 'enabled' })
+  const enableSpInitiated = useWatch({ control: form.control, name: 'enableSpInitiated' })
 
   const { mutate: createSSOConfig, isPending: isCreating } = useSSOConfigCreateMutation({
     onSuccess: () => {
@@ -314,7 +314,7 @@ export const SSOConfig = () => {
                           )}
                         />
 
-                        {form.watch('enableSpInitiated') && (
+                        {enableSpInitiated && (
                           <Admonition
                             type="note"
                             title="Understanding SSO login flows"
@@ -346,7 +346,7 @@ export const SSOConfig = () => {
                         )}
                       </CardContent>
 
-                      {form.watch('enableSpInitiated') && (
+                      {enableSpInitiated && (
                         <CardContent>
                           <SSODomains form={form} />
                         </CardContent>

@@ -17,7 +17,7 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
 import { getSemver, semverGte, semverLte } from './LocalVersionPopover.utils'

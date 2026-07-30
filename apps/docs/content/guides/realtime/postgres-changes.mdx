@@ -1064,7 +1064,7 @@ You can also [negate any operator](#negating-a-filter-not) with `not.` and [comb
 
 <$Show if="sdk:js">
 
-<Admonition type="tip">
+<Admonition type="note">
 
 In JavaScript you can pass a raw filter string, or build one with the type-safe `postgresChangesFilter()` helper, which handles operator names, negation, `AND` composition, and escaping for you:
 
@@ -3256,7 +3256,7 @@ Use the estimator below to gauge the maximum throughput for your instance, and r
 
 <RealtimeLimitsEstimator />
 
-<Admonition type="tip">
+<Admonition type="note">
 
 If you expect more than ~3,000 concurrent subscribers on the same changes, use [Broadcast to stream database changes](/docs/guides/realtime/subscribing-to-database-changes#using-broadcast) instead. Broadcast sends each change once and fans it out to all subscribers, so it scales to far higher connection counts than per-subscriber authorization allows.
 

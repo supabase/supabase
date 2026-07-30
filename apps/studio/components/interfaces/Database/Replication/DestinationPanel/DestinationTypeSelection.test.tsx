@@ -155,7 +155,7 @@ describe('DestinationTypeSelection', () => {
             big_query: {
               project_id: 'gcp-proj',
               dataset_id: 'analytics',
-              service_account_key: '{}',
+              connection_pool_size: 5,
             },
           },
         }),

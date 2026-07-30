@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
 
+import { resolveDiffKeyAction } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { detectOS } from '@/lib/helpers'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -32,7 +33,7 @@ export function useSqlEditorShortcuts({
   const os = detectOS()
   const router = useRouter()
   const { ref } = useParams()
-  const { editorRef, refocusEditor } = useSQLEditorContext()
+  const { editor, refocusEditor } = useSQLEditorContext()
 
   const openNewSnippet = useCallback(() => {
     if (!ref) return
@@ -56,23 +57,23 @@ export function useSqlEditorShortcuts({
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (!isDiffOpen && !isPromptOpen) return
+      const action = resolveDiffKeyAction(e, { isDiffOpen, isPromptOpen, os })
 
-      switch (e.key) {
-        case 'Enter':
-          if ((os === 'macos' ? e.metaKey : e.ctrlKey) && isDiffOpen) {
-            acceptAiHandler()
-            resetPrompt()
-          }
-          return
-        case 'Escape':
-          if (isDiffOpen) discardAiHandler()
+      switch (action.type) {
+        case 'accept':
+          acceptAiHandler()
           resetPrompt()
-          editorRef.current?.focus()
+          return
+        case 'escape':
+          if (action.shouldDiscard) discardAiHandler()
+          resetPrompt()
+          editor.focus()
+          return
+        case 'none':
           return
       }
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [editorRef, os, isDiffOpen, isPromptOpen, acceptAiHandler, discardAiHandler, resetPrompt])
+  }, [editor, os, isDiffOpen, isPromptOpen, acceptAiHandler, discardAiHandler, resetPrompt])
 }

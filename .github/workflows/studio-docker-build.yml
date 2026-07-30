@@ -36,3 +36,8 @@ jobs:
       - name: Build
         if: steps.filter.outputs.studio == 'true'
         run: docker build . -f apps/studio/Dockerfile --target production -t supabase-studio:local --build-arg NEXT_PUBLIC_STUDIO_AUTH_MODE=supabase --no-cache
+      # Reuses the shared stages (deps/dev) from the first build's layer
+      # cache; only the tanstack build/runtime stages run fresh.
+      - name: Build (tanstack)
+        if: steps.filter.outputs.studio == 'true'
+        run: docker build . -f apps/studio/Dockerfile --target production -t supabase-studio:local-tanstack --build-arg NEXT_PUBLIC_STUDIO_AUTH_MODE=supabase --build-arg STUDIO_FRAMEWORK=tanstack

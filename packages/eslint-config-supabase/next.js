@@ -43,13 +43,13 @@ const typescriptConfig = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
     'supabase/no-await-before-copy-to-clipboard': 'error',
-    'supabase/require-explicit-tabindex': 'warn',
+    'supabase/require-explicit-tabindex': 'error',
   },
 }
 
 module.exports = defineConfig([
-  // Global ignore for the .next folder
-  { ignores: ['.next', 'public', '.contentlayer'] },
+  // Global ignore for build output and static assets
+  { ignores: ['.next', 'dist', 'public', '.contentlayer'] },
   turboConfig,
   prettierConfig,
   tanstackQuery.configs['flat/recommended'],

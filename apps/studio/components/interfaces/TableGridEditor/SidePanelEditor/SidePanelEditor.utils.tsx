@@ -870,6 +870,19 @@ export const updateTable = async ({
       queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
     }),
     queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
+    // useTableQuery (FK selectors/formatters) has a 5min staleTime, and the columns/FKs
+    // above were only just applied after `updatedTable` was fetched -- refresh its identity,
+    // plus the pre-rename one too, so nothing serves stale/deleted columns until then.
+    queryClient.invalidateQueries({
+      queryKey: tableKeys.retrieve(projectRef, updatedTable.name, updatedTable.schema),
+    }),
+    ...(updatedTable.name !== table.name || updatedTable.schema !== table.schema
+      ? [
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.retrieve(projectRef, table.name, table.schema),
+          }),
+        ]
+      : []),
   ])
 
   // We need to invalidate tableRowsAndCount after tableEditor

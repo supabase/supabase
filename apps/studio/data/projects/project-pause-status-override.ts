@@ -52,7 +52,7 @@ export function buildPauseStatus(override: PauseStateOverride): PauseStatusRespo
     can_restore: isRestorable,
     last_paused_on: null,
     latest_downloadable_backup_id: null,
-    max_days_till_restore_disabled: 90,
-    remaining_days_till_restore_disabled: isRestorable ? 78 : 0,
+    max_days_till_restore_disabled: 400,
+    remaining_days_till_restore_disabled: isRestorable ? 350 : 0,
   }
 }
