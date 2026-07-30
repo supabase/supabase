@@ -115,7 +115,7 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
                 description="Used to identify the app in your account settings and during sign-in."
               >
                 <FormControl>
-                  <Input id="name" placeholder="e.g.: Google Authenticator" autoFocus {...field} />
+                  <Input placeholder="e.g.: Google Authenticator" autoFocus {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
