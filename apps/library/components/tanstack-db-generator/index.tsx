@@ -24,6 +24,16 @@ const getBaseUrl = () => {
   }
 }
 
+const getPageBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
+    return 'https://supabase.com'
+  } else if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'preview') {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL}`
+  } else {
+    return 'http://localhost:3004'
+  }
+}
+
 export function TanstackDBGenerator() {
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
@@ -59,7 +69,7 @@ export function TanstackDBGenerator() {
   }
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
   const currentPath = pathname?.startsWith(basePath) ? pathname : `${basePath}${pathname ?? ''}`
-  const pageUrl = `https://supabase.com${currentPath}`
+  const pageUrl = `${getPageBaseUrl()}${currentPath}`
   const prompt = [
     `Read the installation instructions at ${pageUrl} before making changes.`,
     '',

@@ -30,6 +30,12 @@ const nextConfig = {
         destination: '/api/registry/tanstack-db',
         permanent: true,
       },
+      // Resolve custom block dependencies against the same Library deployment.
+      {
+        source: '/r/mcp-tools-postgrest.json',
+        destination: '/api/registry/mcp-tools-postgrest',
+        permanent: false,
+      },
     ]
   },
 }

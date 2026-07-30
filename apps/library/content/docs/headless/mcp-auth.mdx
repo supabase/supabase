@@ -54,7 +54,8 @@ export const SUPABASE_URL = 'https://your-project.supabase.co'
 export const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_...'
 ```
 
-Find both in your project's [API settings](/dashboard/project/_/settings/api).
+Find both in your project's
+[API settings](https://supabase.com/dashboard/project/_/settings/api).
 Both are safe to expose in a browser: the publishable key grants only what your
 RLS policies allow. The defaults that ship in the file match a local
 `supabase start` stack, so local development needs no edit.
@@ -72,7 +73,7 @@ only a local client alias; it does not have to match the protocol-level server
 name.
 
 To offer social sign-in, list providers you have enabled under
-[Authentication → Providers](/dashboard/project/_/auth/providers):
+[Authentication → Providers](https://supabase.com/dashboard/project/_/auth/providers):
 
 ```js
 export const SOCIAL_PROVIDERS = ['github', 'google']
@@ -118,7 +119,7 @@ with `/oauth/consent`, but the trailing slash is the safer setting.
 
 This block covers the browser side only. The MCP server has to advertise Supabase
 Auth as its authorization server and verify the tokens it receives — the
-[MCP Server](/docs/headless/mcp-server) block does both, and installs the
+[MCP Server](./mcp-server) block does both, and installs the
 access-token hook the `[auth.hook.custom_access_token]` entry above enables.
 
 </Callout>
@@ -168,8 +169,8 @@ not fetched.
 
 ## Further reading
 
-- [MCP Server](/docs/headless/mcp-server) — the Edge Function these screens sign users in to
-- [MCP authentication](/docs/guides/auth/oauth-server/mcp-authentication)
-- [OAuth 2.1 server](/docs/guides/auth/oauth-server/getting-started)
-- [OAuth flows](/docs/guides/auth/oauth-server/oauth-flows)
-- [API keys](/docs/guides/getting-started/api-keys)
+- [MCP Server](./mcp-server) — the Edge Function these screens sign users in to
+- [MCP authentication](https://supabase.com/docs/guides/auth/oauth-server/mcp-authentication)
+- [OAuth 2.1 server](https://supabase.com/docs/guides/auth/oauth-server/getting-started)
+- [OAuth flows](https://supabase.com/docs/guides/auth/oauth-server/oauth-flows)
+- [API keys](https://supabase.com/docs/guides/getting-started/api-keys)

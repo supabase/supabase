@@ -30,6 +30,14 @@ const getBaseUrl = () => {
   }
 }
 
+const getPageBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
+    return 'https://supabase.com'
+  }
+
+  return getBaseUrl()
+}
+
 const getComponentPath = (name: string) => {
   if (process.env.NEXT_PUBLIC_VERCEL_TARGET_ENV === 'production') {
     return `/${name}`
@@ -62,7 +70,7 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
   const currentPath = pathname?.startsWith(basePath) ? pathname : `${basePath}${pathname ?? ''}`
-  const pageUrl = `https://supabase.com${currentPath}`
+  const pageUrl = `${getPageBaseUrl()}${currentPath}`
   const prompt = [
     `Read the installation instructions at ${pageUrl} before making changes.`,
     '',
