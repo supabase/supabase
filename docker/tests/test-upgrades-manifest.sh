@@ -5,7 +5,9 @@
 #   - json:    upgrades.json is valid JSON
 #   - keys:    top-level keys are bare-semver versions (e.g. "0.7.0"), plus the
 #              optional "_schema" documentation block
-#   - schema:  each version-keyed entry has valid field types
+#   - schema:  each version-keyed entry has only known fields, with valid types
+#              (an unknown/misspelled key like "breakng" would silently disarm
+#              its gate, so it is rejected here)
 #   - gate:    any non-null "gate" points at a script that exists in the repo
 #
 # The manifest is the source of truth for gating; the CHANGELOG is display only,
@@ -53,15 +55,17 @@ for k in $(jq -r 'keys[]' "$JSON"); do
 done
 
 echo ""
-echo "=== version-keyed entries have valid field types ==="
+echo "=== version-keyed entries have only known fields, with valid types ==="
 for k in $(jq -r 'keys[]' "$JSON"); do
     case "$k" in [0-9]*.[0-9]*) ;; *) continue ;; esac
-    errs=$(jq -r --arg k "$k" '.[$k] |
-        [ (if (.breaking != null) and ((.breaking|type) != "boolean") then "breaking must be bool" else empty end),
-          (if (.gate != null) and ((.gate|type) != "string") then "gate must be string|null" else empty end),
-          (if (.migration_guide_url != null) and ((.migration_guide_url|type) != "string") then "migration_guide_url must be string|null" else empty end),
-          (if (.requires != null) and ((.requires|type) != "array") then "requires must be array" else empty end)
-        ] | join("; ")' "$JSON")
+    errs=$(jq -r --arg k "$k" '.[$k] as $e
+        | (($e | keys) - ["breaking", "gate", "migration_guide_url", "requires"]) as $unknown
+        | [ (if ($e.breaking != null) and (($e.breaking|type) != "boolean") then "breaking must be bool" else empty end),
+            (if ($e.gate != null) and (($e.gate|type) != "string") then "gate must be string|null" else empty end),
+            (if ($e.migration_guide_url != null) and (($e.migration_guide_url|type) != "string") then "migration_guide_url must be string|null" else empty end),
+            (if ($e.requires != null) and (($e.requires|type) != "array") then "requires must be array" else empty end),
+            (if ($unknown | length) > 0 then "unknown field(s) (typo?): " + ($unknown | join(", ")) else empty end)
+          ] | join("; ")' "$JSON")
     if [ -z "$errs" ]; then ok "entry $k valid"; else bad "entry $k: $errs"; fi
 done
 
