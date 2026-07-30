@@ -194,7 +194,7 @@ export const OrganizationInvite = () => {
           Accept invite
         </Button>
         <Button asChild variant="text" block>
-          <Link href="/projects">Decline</Link>
+          <Link href="/organizations">Decline</Link>
         </Button>
       </div>
     </div>
