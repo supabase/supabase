@@ -9,7 +9,7 @@ code = "ClientPresenceRateLimitReached"
 message = "Client presence rate limit exceeded"
 ---
 
-If a client sends Presence updates too quickly, you may see this error code in your [Realtime logs](/dashboard/project/_/logs/realtime-logs):
+If a client sends Presence updates too frequently, you may see this error code in your [Realtime logs](/dashboard/project/_/logs/realtime-logs):
 
 ```
 ClientPresenceRateLimitReached
@@ -35,9 +35,9 @@ The fix is to stop sending frequent Presence updates. Choose the option that mat
 
 Presence is meant for slow-changing state such as online/offline status, the document a user is viewing, or which page they're on. For high-frequency or fire-and-forget data—live cursors, typing indicators, pointer positions—use [Broadcast](/docs/guides/realtime/broadcast) instead. Broadcast sends messages directly between clients without maintaining synced state, so it handles rapid updates without triggering this limit.
 
-### Throttle or debounce Presence updates
+### Throttle your Presence updates
 
-If you do need Presence for state that changes often, throttle or debounce the `track()` calls so the client sends at most a few updates per window. Only call `track()` when the value you're sharing actually changes, and coalesce bursts into a single update rather than tracking on every event.
+If you do need Presence for state that changes often, throttle the `track()` calls so the client sends at most a few updates per window. Only call `track()` when the value you're sharing changes, and coalesce bursts into a single update rather than tracking on every event.
 
 ## How to prevent it
 
