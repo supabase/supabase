@@ -121,7 +121,7 @@ const ReplicationDiagramContent = () => {
   }, [nodes, isSuccessDestinations, skipRenderingDestinations, isSuccessReplicas])
 
   return (
-    <div className="nowheel relative min-h-[350px]">
+    <div className="nowheel relative h-[350px] w-full border border-muted rounded-md overflow-hidden">
       <ReactFlow
         // FIXME: https://github.com/xyflow/xyflow/issues/4876
         colorMode={'' as unknown as ColorMode}
