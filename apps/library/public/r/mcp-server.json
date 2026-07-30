@@ -73,7 +73,7 @@
     },
     {
       "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/tools/index.ts",
-      "content": "import { echoToolset } from './echo.ts'\nimport { registerToolset } from './registry.ts'\nimport { whoamiToolset } from './whoami.ts'\n\nexport type { ToolContext } from './types.ts'\n\n// The toolset manifest — the one file toolset blocks replace.\n//\n// shadcn copies whole files, so a block that adds tools ships its own version of\n// this file listing the framework's toolsets plus its own. Everything else in\n// this directory (registry.ts, types.ts, result.ts) and the framework files\n// (index.ts, auth.ts, deno.json) stay untouched.\n//\n// Called once at module scope, not per request.\nexport function registerToolsets(): void {\n  registerToolset(echoToolset)\n  registerToolset(whoamiToolset)\n}\n",
+      "content": "import { echoToolset } from './echo.ts'\nimport { registerToolset } from './registry.ts'\nimport { whoamiToolset } from './whoami.ts'\n\nexport type { ToolContext } from './types.ts'\n\n// The toolset manifest. Add each installed or custom toolset here so it is\n// registered when the Edge Function starts.\n//\n// Called once at module scope, not per request.\nexport function registerToolsets(): void {\n  registerToolset(echoToolset)\n  registerToolset(whoamiToolset)\n}\n",
       "type": "registry:file",
       "target": "supabase/functions/mcp-server/tools/index.ts"
     },

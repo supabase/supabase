@@ -24,24 +24,23 @@ call_complete_all_todos
   description="Generates MCP tools from your PostgREST schema"
 />
 
-Add `--overwrite`:
-
-```bash
-npx shadcn@latest add --overwrite https://supabase.com/library/r/mcp-tools-postgrest.json
-```
-
 This block declares the MCP server as a dependency, so the framework installs
-first. Both ship `tools/index.ts` — the toolset manifest — and this block's
-version is the one that registers the PostgREST toolset. Without `--overwrite`,
-the CLI keeps the framework's copy and the toolset silently never registers.
+first. The PostgREST block only adds files under `tools/postgrest`, leaving the
+server's toolset manifest untouched.
 
-<Callout type="note">
+After installing, import and register the PostgREST toolset in
+`supabase/functions/mcp-server/tools/index.ts`:
 
-If you have already added your own toolsets to `tools/index.ts`, re-add their
-`registerToolset` lines after installing. The manifest is the only file the two
-blocks share.
+```ts
+import { postgrestToolset } from './postgrest/index.ts'
 
-</Callout>
+// Keep the existing imports and registrations.
+export function registerToolsets(): void {
+  registerToolset(echoToolset)
+  registerToolset(whoamiToolset)
+  registerToolset(postgrestToolset)
+}
+```
 
 ## Folder structure
 

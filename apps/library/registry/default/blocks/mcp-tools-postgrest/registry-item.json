@@ -19,11 +19,6 @@
       "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/postgrest/tools.ts",
       "type": "registry:file",
       "target": "supabase/functions/mcp-server/tools/postgrest/tools.ts"
-    },
-    {
-      "path": "registry/default/blocks/mcp-tools-postgrest/supabase/functions/mcp-server/tools/index.ts",
-      "type": "registry:file",
-      "target": "supabase/functions/mcp-server/tools/index.ts"
     }
   ]
 }
