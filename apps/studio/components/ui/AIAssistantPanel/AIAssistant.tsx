@@ -20,6 +20,7 @@ import {
   onErrorChat,
   resolvePendingToolApprovalsAsDenied,
 } from './AIAssistant.utils'
+import { AIAssistantChatMenu } from './AIAssistantChatSelector'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
@@ -62,6 +63,7 @@ interface AIAssistantProps {
 }
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
+  const track = useTrack()
   const router = useRouter()
   const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -77,7 +79,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const { snippets } = useSqlEditorV2StateSnapshot()
   const snap = useAiAssistantStateSnapshot()
   const state = useAiAssistantState()
-  const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
+  const { activeSidebar, closeSidebar, isMaximised } = useSidebarManagerSnapshot()
 
   const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('assistant.advance_model')
@@ -155,8 +157,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       connectionString: project?.connectionString ?? '',
     })
   }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
-
-  const track = useTrack()
 
   const {
     messages: chatMessages,
@@ -421,237 +421,244 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex bg-card flex-col h-full w-full md:h-full max-h-dvh', className)}>
-        <AIAssistantHeader
-          isChatLoading={isChatLoading}
-          onNewChat={snap.newChat}
-          onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
-          showMetadataWarning={showMetadataWarning}
-          updatedOptInSinceMCP={updatedOptInSinceMCP}
-          isHipaaProjectDisallowed={isHipaaProjectDisallowed}
-          aiOptInLevel={aiOptInLevel}
-        />
-        {hasMessages ? (
-          <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
-              {renderedMessages}
-              {error && (
-                <>
-                  <AlertError
-                    error={
-                      isContextExceededError
-                        ? ASSISTANT_ERRORS['context-exceeded']
-                        : IS_PLATFORM
-                          ? ASSISTANT_ERRORS['default']
-                          : error
-                    }
-                    showErrorPrefix={false}
-                    showInstructions={false}
-                    subject="Sorry, I'm having trouble responding right now."
-                    additionalActions={
-                      <div className="flex items-center gap-x-2 mr-auto">
-                        {isContextExceededError ? (
-                          <Button
-                            variant="default"
-                            size="tiny"
-                            onClick={() => snap.newChat()}
-                            className="text-xs"
-                          >
-                            New chat
-                          </Button>
-                        ) : (
-                          <>
+      <div className={cn('flex bg-card h-full w-full md:h-full max-h-dvh', className)}>
+        {isMaximised && <AIAssistantChatMenu />}
+
+        <div className="flex flex-col flex-grow">
+          <AIAssistantHeader
+            isChatLoading={isChatLoading}
+            onNewChat={snap.newChat}
+            onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
+            showMetadataWarning={showMetadataWarning}
+            updatedOptInSinceMCP={updatedOptInSinceMCP}
+            isHipaaProjectDisallowed={isHipaaProjectDisallowed}
+            aiOptInLevel={aiOptInLevel}
+          />
+          {hasMessages ? (
+            <Conversation className={cn('flex-1')}>
+              <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
+                {renderedMessages}
+                {error && (
+                  <>
+                    <AlertError
+                      error={
+                        isContextExceededError
+                          ? ASSISTANT_ERRORS['context-exceeded']
+                          : IS_PLATFORM
+                            ? ASSISTANT_ERRORS['default']
+                            : error
+                      }
+                      showErrorPrefix={false}
+                      showInstructions={false}
+                      subject="Sorry, I'm having trouble responding right now."
+                      additionalActions={
+                        <div className="flex items-center gap-x-2 mr-auto">
+                          {isContextExceededError ? (
                             <Button
                               variant="default"
                               size="tiny"
-                              onClick={() => regenerate()}
+                              onClick={() => snap.newChat()}
                               className="text-xs"
                             >
-                              Retry
+                              New chat
                             </Button>
-                            <ButtonTooltip
-                              variant="default"
-                              size="tiny"
-                              onClick={handleClearMessages}
-                              className="w-7 h-7"
-                              icon={<Eraser />}
-                              tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
-                            />
-                          </>
-                        )}
+                          ) : (
+                            <>
+                              <Button
+                                variant="default"
+                                size="tiny"
+                                onClick={() => regenerate()}
+                                className="text-xs"
+                              >
+                                Retry
+                              </Button>
+                              <ButtonTooltip
+                                variant="default"
+                                size="tiny"
+                                onClick={handleClearMessages}
+                                className="w-7 h-7"
+                                icon={<Eraser />}
+                                tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
+                              />
+                            </>
+                          )}
+                        </div>
+                      }
+                    />
+                  </>
+                )}
+                {isChatLoading && (
+                  <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                    className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
+                  />
+                )}
+                <p className="text-center text-xs text-foreground-muted mt-6">
+                  Supabase AI may not always produce correct answers. Double check responses.
+                </p>
+              </ConversationContent>
+              <ConversationScrollButton />
+            </Conversation>
+          ) : (
+            <AIOnboarding
+              key={snap.activeChatId}
+              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
+              suggestions={
+                snap.suggestions as
+                  | { title?: string; prompts?: { label: string; description: string }[] }
+                  | undefined
+              }
+              onValueChange={(val) => setValue(val)}
+              onFocusInput={() => inputRef.current?.focus()}
+            />
+          )}
+
+          <AnimatePresence>
+            {editingMessageId && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="pointer-events-none z-10 -mt-24"
+              >
+                <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
+                  <motion.div
+                    className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
+                    variants={{
+                      hidden: { y: 5, opacity: 0 },
+                      show: { y: 0, opacity: 1 },
+                    }}
+                    transition={{ duration: 0.1 }}
+                    initial="hidden"
+                    animate="show"
+                    exit="hidden"
+                  >
+                    <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
+                      <div className="flex items-center gap-x-2 text-sm text-foreground">
+                        <Pencil size={14} />
+                        <span>Editing message</span>
                       </div>
+                      <ButtonTooltip
+                        variant="outline"
+                        size="tiny"
+                        icon={<X size={14} />}
+                        onClick={cancelEdit}
+                        className="w-6 h-6 p-0"
+                        title="Cancel editing"
+                        aria-label="Cancel editing"
+                        tooltip={{
+                          content: {
+                            side: 'top',
+                            text: <KeyboardShortcut keys={['Meta', 'Esc']} />,
+                          },
+                        }}
+                      />
+                    </div>
+                  </motion.div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
+            {isSupportChat && !isSupportChatClosed && (
+              <div>
+                <div className="mb-3 border-t" />
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="tiny"
+                    disabled={!activeChatId || !supportConversationId}
+                    onClick={() =>
+                      activeChatId && state.setSupportLifecycleStatus(activeChatId, 'escalated')
+                    }
+                  >
+                    Escalate to human
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="tiny"
+                    disabled={!activeChatId || !supportConversationId}
+                    onClick={() =>
+                      activeChatId && state.setSupportLifecycleStatus(activeChatId, 'user_resolved')
+                    }
+                  >
+                    Resolve
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {disablePrompts && (
+              <Admonition
+                showIcon={false}
+                type="default"
+                title="Assistant has been temporarily disabled"
+                description="We're currently looking into getting it back online"
+              />
+            )}
+
+            {isSuccess && !isApiKeySet && (
+              <Admonition
+                type="default"
+                title="OpenAI API key not set"
+                description={
+                  <Markdown
+                    content={
+                      'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
                     }
                   />
-                </>
-              )}
-              {isChatLoading && (
-                <motion.span
-                  animate={{ opacity: [1, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                  className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
-                />
-              )}
-              <p className="text-center text-xs text-foreground-muted mt-6">
-                Supabase AI may not always produce correct answers. Double check responses.
-              </p>
-            </ConversationContent>
-            <ConversationScrollButton />
-          </Conversation>
-        ) : (
-          <AIOnboarding
-            key={snap.activeChatId}
-            sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
-            suggestions={
-              snap.suggestions as
-                | { title?: string; prompts?: { label: string; description: string }[] }
-                | undefined
-            }
-            onValueChange={(val) => setValue(val)}
-            onFocusInput={() => inputRef.current?.focus()}
-          />
-        )}
-
-        <AnimatePresence>
-          {editingMessageId && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="pointer-events-none z-10 -mt-24"
-            >
-              <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
-                <motion.div
-                  className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
-                  variants={{
-                    hidden: { y: 5, opacity: 0 },
-                    show: { y: 0, opacity: 1 },
-                  }}
-                  transition={{ duration: 0.1 }}
-                  initial="hidden"
-                  animate="show"
-                  exit="hidden"
-                >
-                  <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
-                    <div className="flex items-center gap-x-2 text-sm text-foreground">
-                      <Pencil size={14} />
-                      <span>Editing message</span>
-                    </div>
-                    <ButtonTooltip
-                      variant="outline"
-                      size="tiny"
-                      icon={<X size={14} />}
-                      onClick={cancelEdit}
-                      className="w-6 h-6 p-0"
-                      title="Cancel editing"
-                      aria-label="Cancel editing"
-                      tooltip={{
-                        content: { side: 'top', text: <KeyboardShortcut keys={['Meta', 'Esc']} /> },
-                      }}
-                    />
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
-          {isSupportChat && !isSupportChatClosed && (
-            <div>
-              <div className="mb-3 border-t" />
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  disabled={!activeChatId || !supportConversationId}
-                  onClick={() =>
-                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'escalated')
-                  }
-                >
-                  Escalate to human
-                </Button>
-                <Button
-                  variant="outline"
-                  size="tiny"
-                  disabled={!activeChatId || !supportConversationId}
-                  onClick={() =>
-                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'user_resolved')
-                  }
-                >
-                  Resolve
-                </Button>
-              </div>
-            </div>
-          )}
-
-          {disablePrompts && (
-            <Admonition
-              showIcon={false}
-              type="default"
-              title="Assistant has been temporarily disabled"
-              description="We're currently looking into getting it back online"
-            />
-          )}
-
-          {isSuccess && !isApiKeySet && (
-            <Admonition
-              type="default"
-              title="OpenAI API key not set"
-              description={
-                <Markdown
-                  content={
-                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
-                  }
-                />
-              }
-            />
-          )}
-
-          <AssistantChatForm
-            textAreaRef={inputRef}
-            className={cn(
-              'z-20',
-              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
-              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
-              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
+                }
+              />
             )}
-            loading={isChatLoading}
-            isEditing={!!editingMessageId}
-            disabled={isChatInputDisabled}
-            placeholder={
-              hasMessages
-                ? isSupportChat
-                  ? 'Share details so the assistant can help with your support request...'
-                  : 'Ask a follow up question...'
-                : (snap.sqlSnippets ?? [])?.length > 0
-                  ? 'Ask a question or make a change...'
-                  : isSupportChat
-                    ? 'Describe your support issue...'
-                    : 'Chat to Postgres...'
-            }
-            value={value}
-            onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(finalMessage) => {
-              sendMessageToAssistant(finalMessage)
-            }}
-            onStop={() => {
-              stop()
-              // to save partial responses from the AI
-              const lastMessage = chatMessages[chatMessages.length - 1]
-              if (lastMessage && lastMessage.role === 'assistant') {
-                state.updateMessage(lastMessage)
+
+            <AssistantChatForm
+              textAreaRef={inputRef}
+              className={cn(
+                'z-20',
+                '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
+                '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
+                '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
+              )}
+              loading={isChatLoading}
+              isEditing={!!editingMessageId}
+              disabled={isChatInputDisabled}
+              placeholder={
+                hasMessages
+                  ? isSupportChat
+                    ? 'Share details so the assistant can help with your support request...'
+                    : 'Ask a follow up question...'
+                  : (snap.sqlSnippets ?? [])?.length > 0
+                    ? 'Ask a question or make a change...'
+                    : isSupportChat
+                      ? 'Describe your support issue...'
+                      : 'Chat to Postgres...'
               }
-            }}
-            sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
-            onRemoveSnippet={(index) => {
-              const newSnippets = [...(snap.sqlSnippets ?? [])]
-              newSnippets.splice(index, 1)
-              snap.setSqlSnippets(newSnippets)
-            }}
-            includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
-            selectedModel={selectedModel}
-            onSelectModel={(model) => snap.setModel(model)}
-          />
+              value={value}
+              onValueChange={(e) => setValue(e.target.value)}
+              onSubmit={(finalMessage) => {
+                sendMessageToAssistant(finalMessage)
+              }}
+              onStop={() => {
+                stop()
+                // to save partial responses from the AI
+                const lastMessage = chatMessages[chatMessages.length - 1]
+                if (lastMessage && lastMessage.role === 'assistant') {
+                  state.updateMessage(lastMessage)
+                }
+              }}
+              sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
+              onRemoveSnippet={(index) => {
+                const newSnippets = [...(snap.sqlSnippets ?? [])]
+                newSnippets.splice(index, 1)
+                snap.setSqlSnippets(newSnippets)
+              }}
+              includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+              selectedModel={selectedModel}
+              onSelectModel={(model) => snap.setModel(model)}
+            />
+          </div>
         </div>
       </div>
     </ErrorBoundary>

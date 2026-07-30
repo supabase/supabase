@@ -1,5 +1,5 @@
-import { Check, Edit, History, Plus, Trash, X } from 'lucide-react'
-import { useState } from 'react'
+import { Check, Edit, History, MoreVertical, Plus, Trash, X } from 'lucide-react'
+import { KeyboardEvent, useState } from 'react'
 import {
   Button,
   cn,
@@ -10,7 +10,13 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Input,
+  Menu,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -18,9 +24,11 @@ import {
 } from 'ui'
 
 import { ShortcutTooltip } from '../ShortcutTooltip'
+import ProductMenuBar from '@/components/layouts/Navigation/ProductMenuBar'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean
@@ -28,6 +36,7 @@ interface AIAssistantChatSelectorProps {
 
 export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
+  const { isMaximised } = useSidebarManagerSnapshot()
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
@@ -35,7 +44,11 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
 
   const chats = Object.entries(snap.chats)
 
-  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY, () => setChatSelectorOpen((prev) => !prev))
+  useShortcut(
+    SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY,
+    () => setChatSelectorOpen((prev) => !prev),
+    { enabled: !isMaximised }
+  )
 
   const handleSelectChat = (id: string) => {
     snap.selectChat(id)
@@ -216,5 +229,116 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
         </Command>
       </PopoverContent>
     </Popover>
+  )
+}
+
+export const AIAssistantChatMenu = () => {
+  const snap = useAiAssistantStateSnapshot()
+  const chats = Object.entries(snap.chats)
+
+  const [value, setValue] = useState<string>()
+  const [editingId, setEditingId] = useState<string>()
+
+  const handleSaveName = (id: string) => {
+    if (value?.trim()) snap.renameChat(id, value.trim())
+    setEditingId(undefined)
+  }
+
+  const handleKeyDownInput = (e: KeyboardEvent<HTMLInputElement>, id: string) => {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      e.stopPropagation()
+      setEditingId(undefined)
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      e.stopPropagation()
+      handleSaveName(id)
+    }
+  }
+
+  return (
+    <div className="flex flex-col border-r w-64 [&>div]:bg-transparent">
+      <ProductMenuBar title="AI Assistant">
+        <Menu type="pills">
+          <Menu.Group
+            title={
+              <div className="flex w-full items-center justify-between relative mt-4 px-3">
+                <span className="uppercase font-mono">Chats</span>
+              </div>
+            }
+          />
+          <div className="px-3 pb-2">
+            {chats.map(([id, chat]) => (
+              <Menu.Item
+                key={id}
+                active={snap.activeChatId === id}
+                className={cn('group', editingId === id ? 'p-0' : 'pl-3 pr-1')}
+                onClick={() => snap.selectChat(id)}
+              >
+                {editingId === id ? (
+                  <Input
+                    autoFocus
+                    size="tiny"
+                    value={value}
+                    className="ring-0! focus-visible:ring-offset-0 text-sm"
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => setValue(e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                    onBlur={() => handleSaveName(id)}
+                    onKeyDown={(e) => handleKeyDownInput(e, id)}
+                  />
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <p className="truncate w-full">{chat.name}</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          aria-label="More actions"
+                          variant="text"
+                          className="px-0.5 h-[20px] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100"
+                          icon={<MoreVertical size={12} strokeWidth={2} />}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                          }}
+                        />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="w-44 *:gap-x-2">
+                        <DropdownMenuItem
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setEditingId(id)
+                            setValue(chat.name)
+                          }}
+                        >
+                          <Edit size={12} />
+                          <div>Rename</div>
+                        </DropdownMenuItem>
+                        {chats.length > 1 && (
+                          <>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                snap.deleteChat(id)
+                              }}
+                            >
+                              <Trash size={12} />
+                              <div>Delete</div>
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                )}
+              </Menu.Item>
+            ))}
+          </div>
+        </Menu>
+      </ProductMenuBar>
+    </div>
   )
 }

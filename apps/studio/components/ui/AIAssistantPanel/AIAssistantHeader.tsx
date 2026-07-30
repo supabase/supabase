@@ -109,6 +109,7 @@ export const AIAssistantHeader = ({
               size="tiny"
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={handleKeyDownInput}
+              onFocus={(e) => e.target.select()}
               onBlur={handleBlurInput}
             />
           ) : (
@@ -128,7 +129,7 @@ export const AIAssistantHeader = ({
 
         <div className="flex items-center gap-x-4 shrink-0">
           <div className="flex items-center">
-            <AIAssistantChatSelector />
+            {!isMaximised && <AIAssistantChatSelector />}
 
             <ShortcutTooltip
               side="bottom"
