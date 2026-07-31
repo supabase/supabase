@@ -47,6 +47,8 @@ export function buildSessionRecordingConfig(
 ): Partial<PostHogConfig> {
   return {
     disable_session_recording: !sessionReplay,
+    // Console output is not in the DOM, so text masking cannot reach it.
+    enable_recording_console_log: false,
     ...(sessionReplay && { session_recording: sessionReplay }),
   }
 }

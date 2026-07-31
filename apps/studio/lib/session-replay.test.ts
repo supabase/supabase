@@ -124,6 +124,13 @@ describe('buildSessionRecordingConfig', () => {
     expect(config.disable_session_recording).toBe(false)
     expect(config.session_recording).toBe(SESSION_REPLAY_CONFIG)
   })
+
+  it.each([undefined, SESSION_REPLAY_CONFIG])(
+    'never records console logs, which masking cannot reach (%#)',
+    (sessionReplay) => {
+      expect(buildSessionRecordingConfig(sessionReplay).enable_recording_console_log).toBe(false)
+    }
+  )
 })
 
 describe('IS_SESSION_REPLAY_ENABLED', () => {
