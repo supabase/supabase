@@ -1,7 +1,7 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { cn } from 'ui'
+import { cn, copyToClipboard } from 'ui'
 
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { MessageActions } from './Message.Actions'
@@ -17,6 +17,14 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
     onRate?.(id, newRating, reason)
   }
 
+  const handleCopy = () => {
+    const response = message.parts
+      .filter((x) => x.type === 'text')
+      .map((x) => x.text)
+      .join('\n')
+    copyToClipboard(response)
+  }
+
   return (
     <MessageDisplay.Container
       className={cn(
@@ -28,8 +36,9 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
       <MessageDisplay.MainArea>
         <MessageDisplay.Content message={message} />
       </MessageDisplay.MainArea>
-      {!readOnly && isLastMessage && onRate && !isLoading && (
-        <MessageActions alwaysShow>
+      {!readOnly && onRate && !isLoading && (
+        <MessageActions alwaysShow={isLastMessage}>
+          <MessageActions.Copy onClick={handleCopy} />
           <MessageActions.ThumbsUp
             onClick={() => handleRate('positive')}
             isActive={rating === 'positive'}
@@ -40,6 +49,7 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
             isActive={rating === 'negative'}
             disabled={!!rating}
           />
+          <MessageActions.Branch onClick={() => {}} />
         </MessageActions>
       )}
     </MessageDisplay.Container>
