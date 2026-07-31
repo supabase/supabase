@@ -268,11 +268,10 @@ export const FileExplorerRow = ({
   const mimeType = item.metadata ? item.metadata.mimetype : '-'
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
-  const isColumnsView = view === STORAGE_VIEWS.COLUMNS
   const isFile = item.type === STORAGE_ROW_TYPES.FILE
-  // Columns view keeps the file icon when selected so keyboard selection stays clear.
-  // List view may swap icon → checkbox on hover/select (existing, clearer layout).
-  const showRowIcon = isColumnsView || !isSelected
+  // Files: checkbox replaces icon on hover, keyboard focus, and when selected.
+  // Folders: icon only (no selection checkbox).
+  const showRowIcon = !isFile || !isSelected
 
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
@@ -301,7 +300,7 @@ export const FileExplorerRow = ({
           isSelected && 'bg-selection',
           isPreviewed && 'bg-selection hover:bg-selection',
           item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
-          // Keyboard focus on the checkbox: ring the whole row (esp. columns view)
+          // Keyboard focus on the checkbox: ring the whole row
           'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
         )}
         onClick={(event) => {
@@ -320,20 +319,15 @@ export const FileExplorerRow = ({
             view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
           )}
         >
-          <div
-            className={cn(
-              'relative flex shrink-0 items-center',
-              isColumnsView ? 'w-[42px] gap-1' : 'w-[30px]'
-            )}
-          >
+          <div className="relative flex h-4 w-[30px] shrink-0 items-center">
             {showRowIcon && (
               <div
                 className={cn(
-                  !isColumnsView && 'absolute',
-                  // List: reveal checkbox by hiding icon on hover/focus. Columns: keep icon.
-                  !isColumnsView && isFile && 'group-hover:hidden group-focus-within:hidden'
+                  'absolute',
+                  // Swap icon → checkbox on hover / keyboard focus (files only)
+                  isFile && 'group-hover:hidden group-focus-within:hidden'
                 )}
-                style={!isColumnsView ? { top: '2px' } : undefined}
+                style={{ top: '2px' }}
               >
                 <RowIcon
                   view={view}
@@ -346,12 +340,11 @@ export const FileExplorerRow = ({
             )}
             {isFile ? (
               <Checkbox
-                className={cn(
+                className={
                   isSelected
                     ? 'opacity-100'
-                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100',
-                  isColumnsView && 'order-first'
-                )}
+                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100'
+                }
                 checked={isSelected}
                 // use onClick instead of onCheckedChange to handle shift-key selection
                 onClick={(event) => {
@@ -361,11 +354,8 @@ export const FileExplorerRow = ({
                 aria-label="Check to select this item"
               />
             ) : (
-              // Keep list/columns alignment without a focusable control on folders
-              <span
-                aria-hidden
-                className={cn('h-4 w-4 shrink-0', isColumnsView && 'order-first')}
-              />
+              // Reserve the same slot as the file checkbox without a focusable control
+              <span aria-hidden className="h-4 w-4 shrink-0" />
             )}
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
