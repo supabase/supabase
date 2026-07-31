@@ -8,9 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
@@ -119,20 +116,14 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
             <TableCell>
               <div className="flex items-center justify-end gap-x-2">
                 <DropdownMenu>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-label={`More options for token ${x.name}`}
-                          variant="default"
-                          title="More options"
-                          className="w-7"
-                          icon={<MoreVertical />}
-                        />
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">{`More options for token ${x.name}`}</TooltipContent>
-                  </Tooltip>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="default"
+                      title="More options"
+                      className="w-7"
+                      icon={<MoreVertical />}
+                    />
+                  </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
                     <DropdownMenuItem
                       className="gap-x-2"

@@ -33,18 +33,12 @@ export const AccessTokenNewBanner = <T,>({
       title={title}
       className="mb-6 relative"
       actions={
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              aria-label="Close token banner"
-              variant="text"
-              icon={<X />}
-              className="w-7 h-7 absolute top-2.5 right-2.5"
-              onClick={onClose}
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Close token banner</TooltipContent>
-        </Tooltip>
+        <Button
+          variant="text"
+          icon={<X />}
+          className="w-7 h-7 absolute top-2.5 right-2.5"
+          onClick={onClose}
+        />
       }
     >
       <div className="space-y-4">
