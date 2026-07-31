@@ -58,7 +58,7 @@ export function LogosGrid() {
                       ? '1Password'
                       : name.charAt(0).toUpperCase() + name.slice(1)
                   }
-                  className="h-8 lg:h-12 w-auto"
+                  className={name === 'lovable' ? 'h-5 lg:h-8 w-auto' : 'h-8 lg:h-12 w-auto'}
                 />
               </li>
             ))}
