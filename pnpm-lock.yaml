@@ -777,7 +777,7 @@ importers:
         version: link:../../packages/common
       contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+        version: 0.4.6(markdown-wasm@1.2.0)(supports-color@8.1.1)
       framer-motion:
         specifier: ^11.18.2
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -792,7 +792,7 @@ importers:
         version: 16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       next-contentlayer2:
         specifier: 0.4.6
-        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.28.1)(markdown-wasm@1.2.0)(next@16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@8.1.1)
+        version: 0.4.6(contentlayer2@0.4.6(markdown-wasm@1.2.0)(supports-color@8.1.1))(markdown-wasm@1.2.0)(next@16.2.11(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@8.1.1)
       next-themes:
         specifier: 'catalog:'
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1504,9 +1504,6 @@ importers:
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
-      contentlayer2:
-        specifier: 0.4.6
-        version: 0.4.6(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
@@ -1528,9 +1525,6 @@ importers:
       next:
         specifier: 'catalog:'
         version: 16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
-      next-contentlayer2:
-        specifier: 0.4.6
-        version: 0.4.6(contentlayer2@0.4.6(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.28.1)(markdown-wasm@1.2.0)(next@16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@8.1.1)
       next-themes:
         specifier: 'catalog:'
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1594,6 +1588,9 @@ importers:
       vaul:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      velite:
+        specifier: ^0.4.0
+        version: 0.4.0(supports-color@8.1.1)
       y-monaco:
         specifier: ^0.1.6
         version: 0.1.6(monaco-editor@0.52.2)(yjs@13.6.29)
@@ -1679,6 +1676,9 @@ importers:
       micromark-extension-mdxjs:
         specifier: ^1.0.1
         version: 1.0.1
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
       postcss:
         specifier: ^8.5.18
         version: 8.5.22
@@ -20175,9 +20175,9 @@ snapshots:
 
   '@configcat/sdk@1.1.0': {}
 
-  '@contentlayer2/cli@0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
+  '@contentlayer2/cli@0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:
-      '@contentlayer2/core': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/core': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
       clipanion: 3.2.1(typanion@3.14.0)
       typanion: 3.14.0
@@ -20187,22 +20187,22 @@ snapshots:
       - markdown-wasm
       - supports-color
 
-  '@contentlayer2/client@0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
+  '@contentlayer2/client@0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:
-      '@contentlayer2/core': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/core': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - esbuild
       - markdown-wasm
       - supports-color
 
-  '@contentlayer2/core@0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
+  '@contentlayer2/core@0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:
       '@contentlayer2/utils': 0.4.3
       camel-case: 4.1.2
       comment-json: 4.2.3
       gray-matter: 4.0.3
-      mdx-bundler: 10.0.2(esbuild@0.28.1)(supports-color@8.1.1)
+      mdx-bundler: 10.0.2(supports-color@8.1.1)
       rehype-stringify: 10.0.0
       remark-frontmatter: 5.0.0(supports-color@8.1.1)
       remark-parse: 11.0.0(supports-color@8.1.1)
@@ -20211,15 +20211,14 @@ snapshots:
       type-fest: 4.30.0
       unified: 11.0.5
     optionalDependencies:
-      esbuild: 0.28.1
       markdown-wasm: 1.2.0
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
       - supports-color
 
-  '@contentlayer2/source-files@0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
+  '@contentlayer2/source-files@0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:
-      '@contentlayer2/core': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/core': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
       chokidar: 3.6.0
       fast-glob: 3.3.3
@@ -20236,10 +20235,10 @@ snapshots:
       - markdown-wasm
       - supports-color
 
-  '@contentlayer2/source-remote-files@0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
+  '@contentlayer2/source-remote-files@0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:
-      '@contentlayer2/core': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      '@contentlayer2/source-files': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/core': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/source-files': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
@@ -20466,11 +20465,10 @@ snapshots:
       '@whatwg-node/promise-helpers': 1.3.1
       tslib: 2.8.1
 
-  '@esbuild-plugins/node-resolve@0.2.2(esbuild@0.28.1)(supports-color@8.1.1)':
+  '@esbuild-plugins/node-resolve@0.2.2(supports-color@8.1.1)':
     dependencies:
       '@types/resolve': 1.20.6
       debug: 4.4.3(supports-color@8.1.1)
-      esbuild: 0.28.1
       escape-string-regexp: 4.0.0
       resolve: 1.22.10
     transitivePeerDependencies:
@@ -21891,11 +21889,10 @@ snapshots:
 
   '@marijn/find-cluster-break@1.0.2': {}
 
-  '@mdx-js/esbuild@3.0.1(esbuild@0.28.1)(supports-color@8.1.1)':
+  '@mdx-js/esbuild@3.0.1(supports-color@8.1.1)':
     dependencies:
       '@mdx-js/mdx': 3.1.1(supports-color@8.1.1)
       '@types/unist': 3.0.3
-      esbuild: 0.28.1
       vfile: 6.0.3
       vfile-message: 4.0.2
     transitivePeerDependencies:
@@ -28191,13 +28188,13 @@ snapshots:
 
   content-type@2.0.0: {}
 
-  contentlayer2@0.4.6(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1):
+  contentlayer2@0.4.6(markdown-wasm@1.2.0)(supports-color@8.1.1):
     dependencies:
-      '@contentlayer2/cli': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      '@contentlayer2/client': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      '@contentlayer2/core': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      '@contentlayer2/source-files': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
-      '@contentlayer2/source-remote-files': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/cli': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/client': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/core': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/source-files': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/source-remote-files': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
     transitivePeerDependencies:
       - '@effect-ts/otel-node'
@@ -32208,13 +32205,12 @@ snapshots:
 
   mdurl@2.0.0: {}
 
-  mdx-bundler@10.0.2(esbuild@0.28.1)(supports-color@8.1.1):
+  mdx-bundler@10.0.2(supports-color@8.1.1):
     dependencies:
       '@babel/runtime': 7.26.10
-      '@esbuild-plugins/node-resolve': 0.2.2(esbuild@0.28.1)(supports-color@8.1.1)
+      '@esbuild-plugins/node-resolve': 0.2.2(supports-color@8.1.1)
       '@fal-works/esbuild-plugin-global-externals': 2.1.2
-      '@mdx-js/esbuild': 3.0.1(esbuild@0.28.1)(supports-color@8.1.1)
-      esbuild: 0.28.1
+      '@mdx-js/esbuild': 3.0.1(supports-color@8.1.1)
       gray-matter: 4.0.3
       remark-frontmatter: 5.0.0(supports-color@8.1.1)
       remark-mdx-frontmatter: 4.0.0
@@ -33093,11 +33089,11 @@ snapshots:
 
   neotraverse@1.0.1: {}
 
-  next-contentlayer2@0.4.6(contentlayer2@0.4.6(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1))(esbuild@0.28.1)(markdown-wasm@1.2.0)(next@16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@8.1.1):
+  next-contentlayer2@0.4.6(contentlayer2@0.4.6(markdown-wasm@1.2.0)(supports-color@8.1.1))(markdown-wasm@1.2.0)(next@16.2.11(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(supports-color@8.1.1):
     dependencies:
-      '@contentlayer2/core': 0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      '@contentlayer2/core': 0.4.3(markdown-wasm@1.2.0)(supports-color@8.1.1)
       '@contentlayer2/utils': 0.4.3
-      contentlayer2: 0.4.6(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)
+      contentlayer2: 0.4.6(markdown-wasm@1.2.0)(supports-color@8.1.1)
       next: 16.2.11(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
