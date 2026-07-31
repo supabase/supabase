@@ -30,6 +30,8 @@ import {
 import type { ResourceAccessMode } from '../../AccessToken.permissions'
 import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
+import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import { Organization } from '@/types'
 
 interface ResourceAccessStepProps {
   control: Control<TokenFormValues>
@@ -60,6 +62,28 @@ const CARD_OPTIONS: {
 
 export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
+  const organizationsBySlug = useMemo(
+    () =>
+      organizations.reduce(
+        (acc, organization) => {
+          acc[organization.slug] = organization
+          return acc
+        },
+        {} as Record<string, Organization>
+      ),
+    [organizations]
+  )
+  const projectsByRef = useMemo(
+    () =>
+      projects.reduce(
+        (acc, project) => {
+          acc[project.ref] = project
+          return acc
+        },
+        {} as Record<string, ProjectInfoInfinite>
+      ),
+    [projects]
+  )
 
   const resourceAccess = useWatch({ control, name: 'resourceAccess' })
   const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
@@ -95,7 +119,9 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
         name="resourceAccess"
         render={({ field }) => (
           <RadioGroupCard
-            className="grid-cols-2"
+            className={cn('grid-cols-2', {
+              'pointer-events-none': isAccount,
+            })}
             value={isAccount ? undefined : resourceAccess}
             onValueChange={(value) => {
               field.onChange(value)
@@ -127,114 +153,112 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
         )}
       />
 
-      {!isAccount && (
+      {!isAccount && resourceAccess === 'project' ? (
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1">
-            {resourceAccess === 'project' ? (
-              <FormField
-                control={control}
-                name="organizationSlugs"
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="Organization" id="organizationSlugs">
-                    <FormControl>
-                      <Select
-                        value={field.value.length > 0 ? field.value[0] : ''}
-                        onValueChange={(value) => {
-                          field.onChange([value])
-                          setValue('projectRefs', [])
-                        }}
-                      >
-                        <SelectTrigger id="organizationSlugs" ref={field.ref}>
-                          <SelectValue placeholder="Select an organization" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {organizations.map((org) => (
-                            <SelectItem key={org.slug} value={org.slug}>
-                              {org.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            ) : (
-              <FormField
-                control={control}
-                name="organizationSlugs"
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="Organizations" id="organizationSlugs">
-                    <MultiSelector onValuesChange={field.onChange} values={field.value}>
-                      <MultiSelectorTrigger
-                        id="organizationSlugs"
-                        mode="combobox"
-                        label="Select organizations"
-                        badgeLimit="wrap"
-                        showIcon={false}
-                        deletableBadge
-                        className="w-full h-[34px] min-h-auto"
-                        ref={field.ref}
-                      />
-                      <MultiSelectorContent>
-                        <MultiSelectorInput placeholder="Search organizations" showResetIcon />
-                        <MultiSelectorList>
-                          {organizations.map((organization) => (
-                            <MultiSelectorItem key={organization.slug} value={organization.slug}>
-                              {organization.name}
-                            </MultiSelectorItem>
-                          ))}
-                        </MultiSelectorList>
-                      </MultiSelectorContent>
-                    </MultiSelector>
-                  </FormItemLayout>
-                )}
-              />
-            )}
-          </div>
-
-          {resourceAccess === 'project' && (
-            <FormField
-              control={control}
-              name="projectRefs"
-              render={({ field }) => (
-                <FormItemLayout layout="vertical" label="Projects" id="projectRefs">
-                  <MultiSelector
-                    onValuesChange={field.onChange}
-                    values={field.value}
-                    disabled={!organizationSlugs}
+          <FormField
+            control={control}
+            name="organizationSlugs"
+            render={({ field }) => (
+              <FormItemLayout layout="vertical" label="Organization" id="organizationSlugs">
+                <FormControl>
+                  <Select
+                    value={field.value.length > 0 ? field.value[0] : ''}
+                    onValueChange={(value) => {
+                      field.onChange([value])
+                      setValue('projectRefs', [])
+                    }}
                   >
-                    <MultiSelectorTrigger
-                      id="projectRefs"
-                      mode="combobox"
-                      label={
-                        organizationSlugs.length > 0
-                          ? 'Select projects'
-                          : 'Select an organization first'
-                      }
-                      badgeLimit="wrap"
-                      showIcon={false}
-                      deletableBadge
-                      className="w-full h-[34px] min-h-auto"
-                      ref={field.ref}
-                    />
-                    <MultiSelectorContent>
-                      <MultiSelectorInput placeholder="Search organizations" showResetIcon />
-                      <MultiSelectorList>
-                        {projectsForOrg.map((project) => (
-                          <MultiSelectorItem key={project.ref} value={project.ref}>
-                            {project.name}
-                          </MultiSelectorItem>
-                        ))}
-                      </MultiSelectorList>
-                    </MultiSelectorContent>
-                  </MultiSelector>
-                </FormItemLayout>
-              )}
-            />
-          )}
+                    <SelectTrigger id="organizationSlugs" ref={field.ref}>
+                      <SelectValue placeholder="Select an organization" asChild>
+                        <span>{organizationsBySlug[field.value[0]]?.name}</span>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {organizations.map((org) => (
+                        <SelectItem key={org.slug} value={org.slug}>
+                          {org.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItemLayout>
+            )}
+          />
+          <FormField
+            control={control}
+            name="projectRefs"
+            render={({ field }) => (
+              <FormItemLayout layout="vertical" label="Projects" id="projectRefs">
+                <MultiSelector
+                  onValuesChange={field.onChange}
+                  values={field.value}
+                  disabled={!organizationSlugs}
+                >
+                  <MultiSelectorTrigger
+                    id="projectRefs"
+                    mode="combobox"
+                    label={
+                      organizationSlugs.length > 0
+                        ? 'Select projects'
+                        : 'Select an organization first'
+                    }
+                    badgeLimit="wrap"
+                    showIcon={false}
+                    deletableBadge
+                    className="w-full"
+                    ref={field.ref}
+                    renderValue={(value) => projectsByRef[value]?.name}
+                  />
+                  <MultiSelectorContent>
+                    <MultiSelectorInput placeholder="Search organizations" showResetIcon />
+                    <MultiSelectorList>
+                      {projectsForOrg.map((project) => (
+                        <MultiSelectorItem key={project.ref} value={project.ref}>
+                          {project.name}
+                        </MultiSelectorItem>
+                      ))}
+                    </MultiSelectorList>
+                  </MultiSelectorContent>
+                </MultiSelector>
+              </FormItemLayout>
+            )}
+          />
         </div>
-      )}
+      ) : null}
+      {!isAccount && resourceAccess === 'organization' ? (
+        <FormField
+          control={control}
+          name="organizationSlugs"
+          render={({ field }) => (
+            <FormItemLayout layout="vertical" label="Organizations" id="organizationSlugs">
+              <MultiSelector onValuesChange={field.onChange} values={field.value}>
+                <MultiSelectorTrigger
+                  id="organizationSlugs"
+                  mode="combobox"
+                  label="Select organizations"
+                  badgeLimit="wrap"
+                  showIcon={false}
+                  deletableBadge
+                  className="w-full"
+                  ref={field.ref}
+                  renderValue={(value) => organizationsBySlug[value]?.name}
+                />
+                <MultiSelectorContent>
+                  <MultiSelectorInput placeholder="Search organizations" showResetIcon />
+                  <MultiSelectorList>
+                    {organizations.map((organization) => (
+                      <MultiSelectorItem key={organization.slug} value={organization.slug}>
+                        {organization.name}
+                      </MultiSelectorItem>
+                    ))}
+                  </MultiSelectorList>
+                </MultiSelectorContent>
+              </MultiSelector>
+            </FormItemLayout>
+          )}
+        />
+      ) : null}
 
       {error && <p className="text-xs text-destructive">{error}</p>}
 
