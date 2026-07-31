@@ -108,6 +108,19 @@ url = supabase.storage.from_('avatars').get_public_url(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var url = supabase.Storage.From("bucket").GetPublicUrl("image.jpg", new TransformOptions
+{
+    Width = 500,
+    Height = 600
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 An example URL could look like this:
@@ -183,6 +196,19 @@ let url = try await supabase.storage.from("bucket")
 val url = supabase.storage.from("bucket").createSignedUrl("image.jpg", 60.seconds) {
 	size(200, 200)
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var url = await supabase.Storage.From("bucket").CreateSignedUrl("image.jpg", 60000, new TransformOptions
+{
+    Width = 200,
+    Height = 200
+});
 ```
 
 </TabPanel>
@@ -281,6 +307,19 @@ response = supabase.storage.from_('bucket').download(
     'height': 300,
   },
 )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpg", new TransformOptions
+{
+    Width = 800,
+    Height = 300
+});
 ```
 
 </TabPanel>
@@ -397,6 +436,20 @@ response = supabase.storage.from_('bucket').download(
     },
   }
 )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpeg", new TransformOptions
+{
+    Width = 200,
+    Height = 200,
+    Format = "origin"
+});
 ```
 
 </TabPanel>
@@ -536,6 +589,18 @@ response = supabase.storage.from_('bucket').download(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpg", new TransformOptions
+{
+    Quality = 50
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Resizing
@@ -650,6 +715,20 @@ response = supabase.storage.from_('bucket').download(
     }
   }
 )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var data = await supabase.Storage.From("bucket").Download("image.jpg", new TransformOptions
+{
+    Width = 800,
+    Height = 300,
+    Resize = TransformOptions.ResizeType.Contain // Cover | Fill
+});
 ```
 
 </TabPanel>
