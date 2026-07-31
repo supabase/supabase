@@ -394,10 +394,6 @@
       "import": "./src/GlassPanel/index.tsx",
       "types": "./src/GlassPanel/index.tsx"
     },
-    "./IconPanel": {
-      "import": "./src/IconPanel/index.tsx",
-      "types": "./src/IconPanel/index.tsx"
-    },
     "./Image/Image": {
       "import": "./src/Image/Image.tsx",
       "types": "./src/Image/Image.tsx"

@@ -200,6 +200,48 @@ for new states instead of inventing a parallel card style.
 Prefer one full-width primary action. A full-width text button is fine for a
 secondary action that still belongs in the flow.
 
+### Action feedback
+
+Match feedback to its scope:
+
+- Use `FormMessage` or `FieldError` beside a field when that field needs to
+  change.
+- Show a submission or action failure as simple destructive text below the
+  actions. Separate it with a subtle divider when needed for composition. Keep
+  the current account, selections, and actions visible so the user can retry.
+- Use `Admonition` when the whole interstitial is blocked or has materially
+  changed state, such as an invalid link, wrong account, or partially completed
+  setup.
+- Use a toast only for non-blocking feedback or a completed action whose
+  originating surface is no longer visible. A toast must not be the only
+  feedback for a failure the user needs to resolve on the current card.
+
+```tsx
+{
+  actionError && (
+    <div className="mt-3 border-t border-muted pt-5">
+      <p role="alert" className="text-center text-xs text-destructive text-balance">
+        {actionError}
+      </p>
+    </div>
+  )
+}
+```
+
+Clear stale action feedback when the user retries or changes a relevant
+selection. Error copy should say what failed and, when it is not obvious, what
+the user can do next.
+
+<ComponentPreview
+  name="connect-interstitial-action-error"
+  description="Retryable action error shown beside the actions"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
+
 ## States
 
 Keep loading, invalid, error, and success states inside the same card when the

@@ -1749,6 +1749,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/legal/dpa',
+    destination: '/legal/customer-resources/data-processing-addendum',
+  },
+  {
+    permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
   },
