@@ -1754,6 +1754,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/downloads/docs/Supabase\\+DPA\\+:version(\\d{6}).pdf',
+    destination: '/legal/customer-resources/data-processing-addendum',
+  },
+  {
+    permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
   },
