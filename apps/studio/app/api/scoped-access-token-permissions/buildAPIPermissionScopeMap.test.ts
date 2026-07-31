@@ -48,7 +48,6 @@ describe('getEndpointsAndMCPToolsForAPI', () => {
         'POST /v1/projects/{ref}/database/migrations': ['database_migrations_write'],
         'PATCH /v1/projects/{ref}/database/migrations/{version}': ['database_migrations_write'],
       },
-      mcp_tools,
     })
   })
 })
