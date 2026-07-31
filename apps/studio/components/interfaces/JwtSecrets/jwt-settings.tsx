@@ -426,7 +426,7 @@ export const JWTSettings = () => {
         visible={isRegeneratingKey && !disableLegacyJwtSecretRotation}
         title="Confirm legacy JWT secret change"
         confirmAction="proceed"
-        confirmSubject="JWT secret change"
+        confirmSubject="this JWT secret change"
         confirmLabel={customToken ? 'Apply custom secret' : 'Generate random secret'}
         loading={isSubmittingJwtSecretUpdateRequest}
         onCancel={() => {

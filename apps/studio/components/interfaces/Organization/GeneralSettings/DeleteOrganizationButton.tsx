@@ -164,9 +164,9 @@ export const DeleteOrganizationButton = () => {
         variant="destructive"
         title="Delete organization"
         loading={isDeleting}
-        confirmAction="delete"
-        confirmSubject="organization"
-        confirmLabel="I understand, delete this organization"
+        confirmString={orgSlug ? `delete ${orgSlug}` : ''}
+        confirmPlaceholder={orgSlug ? `delete ${orgSlug}` : 'delete organization slug'}
+        confirmLabel="Delete organization and all projects"
         onConfirm={onConfirmDelete}
         onCancel={() => setIsOpen(false)}
       >

@@ -95,7 +95,7 @@ export const DeleteCronJob = () => {
       loading={isPending}
       confirmLabel={`Delete cron job ${cronJob.jobname}`}
       confirmAction="delete"
-      confirmSubject="cron job"
+      confirmSubject="this cron job"
       text={
         <>
           <span>This will delete the cron job</span>{' '}

@@ -395,8 +395,8 @@ export const FunctionsList = () => {
         title="Delete this function"
         loading={isDeletingFunction}
         confirmLabel={`Delete function ${functionToDelete?.name}`}
-      confirmAction="delete"
-      confirmSubject="function"
+        confirmAction="delete"
+        confirmSubject="this function"
         text={
           <>
             <span>This will delete the function</span>{' '}

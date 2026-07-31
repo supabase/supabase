@@ -23,7 +23,7 @@ export const DeleteDestination = ({
       title="Delete this destination"
       confirmLabel={isLoading ? 'Deleting...' : `Delete destination`}
       confirmAction="delete"
-      confirmSubject="destination"
+      confirmSubject="this destination"
       text={`This will delete the destination "${name}" and stop its replication pipeline. Already replicated data remains at the destination, and pipeline-hour billing ends when deletion completes.`}
       alert={{ title: 'You cannot recover this destination or pipeline after deletion.' }}
       onCancel={() => setVisible(!visible)}

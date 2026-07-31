@@ -203,7 +203,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
         loading={isRemoving}
         title={`Delete secret API key: ${apiKeyToDelete?.apiKey.name ?? ''}`}
         confirmAction="delete"
-        confirmSubject="secret API key"
+        confirmSubject="this secret API key"
         onCancel={() => setApiKeyToDelete(undefined)}
         onConfirm={onConfirmDeleteApiKey}
         alert={{
@@ -214,10 +214,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
       >
         <p className="text-sm">
           This will permanently delete the secret API key{' '}
-          <span className="font-medium text-foreground">
-            {apiKeyToDelete?.apiKey.name ?? ''}
-          </span>
-          .
+          <span className="font-medium text-foreground">{apiKeyToDelete?.apiKey.name ?? ''}</span>.
         </p>
       </TextConfirmModal>
     </>

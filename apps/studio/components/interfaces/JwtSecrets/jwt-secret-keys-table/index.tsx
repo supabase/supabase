@@ -461,8 +461,8 @@ export const JWTSecretKeysTable = () => {
             onConfirm={() => handleRevokeKey(selectedKey.id)}
             onCancel={resetDialog}
             title={`Revoke ${selectedKey.id}`}
-            confirmAction="delete"
-            confirmSubject="signing key"
+            confirmAction="revoke"
+            confirmSubject="this signing key"
             confirmLabel="Yes, revoke this signing key"
             variant="destructive"
             alert={{
@@ -507,7 +507,7 @@ export const JWTSecretKeysTable = () => {
           onCancel={resetDialog}
           title={`Permanently delete ${selectedKey.id}`}
           confirmAction="delete"
-          confirmSubject="signing key"
+          confirmSubject="this signing key"
           confirmLabel="Yes, permanently delete this key"
           variant="destructive"
           alert={{

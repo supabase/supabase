@@ -47,7 +47,7 @@ export const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) =
       loading={isPending}
       confirmLabel={`Delete queue ${queueName}`}
       confirmAction="delete"
-      confirmSubject="queue"
+      confirmSubject="this queue"
       text={
         <>
           <span>This will delete the queue</span>{' '}

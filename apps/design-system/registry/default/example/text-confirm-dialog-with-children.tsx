@@ -32,7 +32,7 @@ const TextConfirmModalWithChildren = () => {
       <TextConfirmModal
         key="withChildren"
         confirmAction="delete"
-        confirmSubject="project"
+        confirmSubject="this project"
         visible={visible}
         variant="destructive"
         title="Are you sure you want to delete?"

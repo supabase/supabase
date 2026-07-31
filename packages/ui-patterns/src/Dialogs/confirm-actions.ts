@@ -1,8 +1,16 @@
-export type ConfirmAction = 'delete' | 'purge' | 'disable' | 're-enable' | 'proceed' | 'custom'
+export type ConfirmAction =
+  | 'delete'
+  | 'purge'
+  | 'revoke'
+  | 'disable'
+  | 're-enable'
+  | 'proceed'
+  | 'custom'
 
 export const CONFIRM_ACTION_STRINGS: Record<Exclude<ConfirmAction, 'custom'>, string> = {
   delete: 'DELETE',
   purge: 'PURGE',
+  revoke: 'REVOKE',
   disable: 'DISABLE',
   're-enable': 'RE-ENABLE',
   proceed: 'PROCEED',
@@ -11,6 +19,7 @@ export const CONFIRM_ACTION_STRINGS: Record<Exclude<ConfirmAction, 'custom'>, st
 export const CONFIRM_ACTION_VERBS: Record<Exclude<ConfirmAction, 'custom'>, string> = {
   delete: 'delete',
   purge: 'purge',
+  revoke: 'revoke',
   disable: 'disable',
   're-enable': 're-enable',
   proceed: 'proceed with',

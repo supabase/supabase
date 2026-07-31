@@ -62,7 +62,7 @@ export const DeleteHookModal = () => {
       loading={isDeleting}
       confirmLabel={`Delete ${name}`}
       confirmAction="delete"
-      confirmSubject="webhook"
+      confirmSubject="this webhook"
       text={
         <>
           This will delete the webhook <span className="text-bold text-foreground">{name}</span>{' '}

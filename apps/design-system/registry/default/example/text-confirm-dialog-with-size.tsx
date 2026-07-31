@@ -30,7 +30,7 @@ const TextConfirmModalWithSize = () => {
       <TextConfirmModal
         key="withSize"
         confirmAction="delete"
-        confirmSubject="project"
+        confirmSubject="this project"
         visible={visible}
         size="xlarge"
         variant="destructive"

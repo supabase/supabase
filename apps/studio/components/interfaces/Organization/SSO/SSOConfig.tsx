@@ -422,7 +422,7 @@ export const SSOConfig = () => {
               title="Delete SSO Provider"
               loading={isDeleting}
               confirmAction="delete"
-              confirmSubject="SSO provider"
+              confirmSubject="this SSO provider"
               confirmLabel="I understand, delete SSO provider and members"
               onConfirm={onDeleteSSOConfig}
               onCancel={() => setIsDeleteModalVisible(false)}

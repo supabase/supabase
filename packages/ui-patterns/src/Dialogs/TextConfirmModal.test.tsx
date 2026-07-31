@@ -16,7 +16,7 @@ describe('TextConfirmModal', () => {
         title="Delete organization"
         variant="destructive"
         confirmAction="delete"
-        confirmSubject="organization"
+        confirmSubject="this organization"
         confirmLabel="Delete organization"
         onConfirm={onConfirm}
         onCancel={() => undefined}
@@ -62,6 +62,34 @@ describe('TextConfirmModal', () => {
 
     const submitButton = screen.getByRole('button', { name: 'Send request' })
     await user.type(screen.getByRole('textbox'), 'user@example.com')
+    await user.click(submitButton)
+
+    expect(onConfirm).toHaveBeenCalledTimes(1)
+  })
+
+  it('validates an action-and-target confirmation exactly', async () => {
+    const user = userEvent.setup()
+    const onConfirm = vi.fn()
+
+    render(
+      <TextConfirmModal
+        visible
+        loading={false}
+        title="Delete project"
+        confirmString="delete nextjs-todo-list"
+        confirmPlaceholder="delete nextjs-todo-list"
+        confirmLabel="Delete project and all data"
+        onConfirm={onConfirm}
+        onCancel={() => undefined}
+      />
+    )
+
+    const submitButton = screen.getByRole('button', { name: 'Delete project and all data' })
+    await user.type(screen.getByRole('textbox'), 'DELETE')
+    expect(submitButton).toBeDisabled()
+
+    await user.clear(screen.getByRole('textbox'))
+    await user.type(screen.getByRole('textbox'), 'delete nextjs-todo-list')
     await user.click(submitButton)
 
     expect(onConfirm).toHaveBeenCalledTimes(1)
