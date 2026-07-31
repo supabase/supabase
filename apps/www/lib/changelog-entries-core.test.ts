@@ -135,6 +135,12 @@ The thing changed.
 | ---- | --------- |
 | 2026 | done      |
 
+## Comms timeline
+
+| Date | Channel |
+| ---- | ------- |
+| 2026 | blog    |
+
 <!-- internal -->
 
 ## Internal notes
@@ -149,8 +155,57 @@ secret
     expect(entry.bodySection).toContain('## Migration steps')
     expect(entry.bodySection).toContain('Do the thing.')
     expect(entry.bodySection).not.toContain('Rollout timeline')
+    expect(entry.bodySection).not.toContain('Comms timeline')
+    expect(entry.bodySection).not.toContain('blog')
     expect(entry.bodySection).not.toContain('Internal notes')
     expect(entry.bodySection).not.toContain('secret')
+  })
+
+  it('excludes ## Comms timeline from bodySection when it precedes ## Rollout timeline', () => {
+    // Rollout timeline coming first would stop extraction on its own, so this
+    // fixture puts Comms timeline first to exercise the Comms boundary directly.
+    const entry = parseChangelogEntryFile(
+      '20260714-comms-first.md',
+      `---
+title: Breaking change
+change_type: breaking-change
+public: true
+publish_date: 2026-07-14
+---
+
+## Summary
+
+Short summary.
+
+## Body
+
+## What changed
+
+The thing changed.
+
+## Migration steps
+
+1. Do the thing.
+
+## Comms timeline
+
+| Date | Channel |
+| ---- | ------- |
+| 2026 | blog    |
+
+## Rollout timeline
+
+| Date | Milestone |
+| ---- | --------- |
+| 2026 | done      |
+`
+    )
+
+    expect(entry.bodySection).toContain('## Migration steps')
+    expect(entry.bodySection).toContain('Do the thing.')
+    expect(entry.bodySection).not.toContain('Comms timeline')
+    expect(entry.bodySection).not.toContain('blog')
+    expect(entry.bodySection).not.toContain('Rollout timeline')
   })
 
   it('normalizes date frontmatter reaching detail-page props, even when unquoted', () => {
