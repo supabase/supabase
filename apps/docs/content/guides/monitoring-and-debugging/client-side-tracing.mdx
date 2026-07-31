@@ -14,6 +14,7 @@ Because the headers follow the W3C standard, any compliant tracing SDK (OpenTele
 - `@opentelemetry/api` available at runtime — either installed directly or pulled in as a transitive dependency of your tracing SDK
 - A tracing SDK that registers a W3C-compliant propagator with the OpenTelemetry API
 
+<Admonition type="caution">
 As of `@supabase/supabase-js` version `2.112.0`, the OpenTelemetry integration lives in an opt-in subpath that you load once at your application entry point:
 
 ```ts
@@ -23,6 +24,8 @@ import '@supabase/supabase-js/tracing'
 The main bundle contains no OpenTelemetry code — this import is what wires it up. The subpath imports `@opentelemetry/api` directly, so your bundler includes it and module resolution fails loudly if it isn't installed. If `tracePropagation` is enabled without this import, the SDK logs a one-time warning and sends requests without trace headers.
 
 On versions `2.106.0`–`2.111.x`, the subpath doesn't exist — don't add the import there. Those versions load `@opentelemetry/api` dynamically and silently no-op when it's missing.
+
+</Admonition>
 
 Trace propagation isn't available through the CDN (UMD) build — there's no way to load the tracing runtime there.
 
@@ -38,6 +41,7 @@ Trace propagation is opt-in and takes two steps: load the tracing runtime at you
 
 ```ts
 import '@supabase/supabase-js/tracing'
+
 import { trace } from '@opentelemetry/api'
 import { createClient } from '@supabase/supabase-js'
 
