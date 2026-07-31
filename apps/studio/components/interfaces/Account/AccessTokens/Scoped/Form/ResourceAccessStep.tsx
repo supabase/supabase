@@ -266,6 +266,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
                   onValuesChange={field.onChange}
                   values={field.value}
                   disabled={!organizationSlugs}
+                  className="w-full"
                 >
                   <MultiSelectorTrigger
                     id="projectRefs"

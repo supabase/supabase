@@ -71,7 +71,7 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
         control={control}
         render={({ field }) => (
           <FormItemLayout name="expiresAt" label="Expires in" layout="flex-row-reverse">
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full">
               <FormControl className="grow">
                 <Select value={field.value} onValueChange={handleExpiryChange}>
                   <SelectTrigger>
@@ -98,7 +98,7 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
                   render={({ field, fieldState }) => {
                     const value = field.value ? new Date(field.value) : undefined
                     return (
-                      <div className="w-1/2">
+                      <div className="shrink">
                         <DatePicker>
                           <DatePickerTrigger asChild>
                             <DatePickerButton ref={field.ref} block isInvalid={fieldState.invalid}>

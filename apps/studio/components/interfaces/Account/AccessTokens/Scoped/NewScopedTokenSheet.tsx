@@ -74,11 +74,7 @@ export const NewScopedTokenSheet = () => {
       <SheetTrigger asChild>
         <Button variant="primary">Generate new token</Button>
       </SheetTrigger>
-      <SheetContent
-        showClose={false}
-        size="default"
-        className="flex h-full min-w-[720px]! flex-col gap-0"
-      >
+      <SheetContent showClose={false} size="default" className="flex h-full flex-col gap-0">
         <SheetHeader>
           <SheetTitle>{step === 'success' ? 'Token created' : 'Generate token'}</SheetTitle>
           <SheetDescription className="sr-only">
