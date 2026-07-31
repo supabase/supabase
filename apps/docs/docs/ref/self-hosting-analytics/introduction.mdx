@@ -214,6 +214,8 @@ When adding a custom Vector source, map your service logs to this shape before s
 
 ## Differences from the Supabase platform
 
+{/* TODO(DOCS-1262): revisit once COM-344 merges and self-hosted Docker Compose defaults to Envoy instead of Kong */}
+
 API logs rely on the locally running API gateway (Kong) instead of the Supabase Cloud API Gateway. Logs from Kong are not enriched with platform-only data.
 
 Within self-hosted Supabase (with the logs override enabled), container logs are routed to Logflare via Vector. As Kong routes API requests to PostgREST, self-hosted and [local development & CLI](/docs/guides/local-development) deployments produce Kong request logs rather than the platform API gateway logs.
