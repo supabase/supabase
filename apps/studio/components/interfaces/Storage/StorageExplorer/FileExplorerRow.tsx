@@ -325,7 +325,6 @@ export const FileExplorerRow = ({
               'relative flex shrink-0 items-center',
               isColumnsView ? 'w-[42px] gap-1' : 'w-[30px]'
             )}
-            onClick={(event) => event.stopPropagation()}
           >
             {showRowIcon && (
               <div
@@ -345,21 +344,29 @@ export const FileExplorerRow = ({
                 />
               </div>
             )}
-            <Checkbox
-              className={cn(
-                !isFile && 'invisible',
-                isSelected
-                  ? 'opacity-100'
-                  : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100',
-                isColumnsView && 'order-first'
-              )}
-              checked={isSelected}
-              // use onClick instead of onCheckedChange to handle shift-key selection
-              onClick={(event) => {
-                onCheckItem(event.nativeEvent.shiftKey)
-              }}
-              aria-label="Check to select this item"
-            />
+            {isFile ? (
+              <Checkbox
+                className={cn(
+                  isSelected
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100',
+                  isColumnsView && 'order-first'
+                )}
+                checked={isSelected}
+                // use onClick instead of onCheckedChange to handle shift-key selection
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onCheckItem(event.nativeEvent.shiftKey)
+                }}
+                aria-label="Check to select this item"
+              />
+            ) : (
+              // Keep list/columns alignment without a focusable control on folders
+              <span
+                aria-hidden
+                className={cn('h-4 w-4 shrink-0', isColumnsView && 'order-first')}
+              />
+            )}
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
             {item.name}
