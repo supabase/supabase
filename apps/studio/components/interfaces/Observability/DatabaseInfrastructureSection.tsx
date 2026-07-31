@@ -39,7 +39,6 @@ export const DatabaseInfrastructureSection = ({
   const { data: project } = useSelectedProjectQuery()
 
   // refreshKey forces date recalculation when user clicks refresh button
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate, infraInterval } = useMemo(() => {
     const now = dayjs()
     const end = now.toISOString()

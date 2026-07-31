@@ -290,8 +290,6 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   })
   useEffect(() => {
     resetDiff()
-    // Temporary until we update eslint to ignore useEffectEvent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const syncDiffEditor = useEffectEvent(() => {
@@ -301,8 +299,6 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   })
   useEffect(() => {
     syncDiffEditor()
-    // Temporary until we update eslint to ignore useEffectEvent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDiffType, sourceSqlDiff])
 
   const drainDiffRequest = useEffectEvent(() => {
@@ -328,8 +324,6 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   })
   useEffect(() => {
     drainDiffRequest()
-    // until we can upgrade eslint to ignore useEffectEvent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diffRequest.pending, editorMountCount])
 
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
