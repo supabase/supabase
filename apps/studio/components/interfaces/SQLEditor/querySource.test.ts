@@ -6,6 +6,7 @@ import {
   DEFAULT_LOG_DATE_RANGE,
   getSnippetSource,
   isoDateTimeString,
+  logDateRangesEqual,
   logDateRangeToDatePickerValue,
   resolveLogRunRange,
   type LogDateRange,
@@ -226,5 +227,59 @@ describe('querySource.ts:resolveLogRunRange', () => {
       from: '2025-01-01T00:00:00.000Z',
       to: '2025-01-02T00:00:00.000Z',
     })
+  })
+})
+
+describe('querySource.ts:logDateRangesEqual', () => {
+  it('matches relative ranges on amount + unit regardless of label formatting', () => {
+    const lastHourPreset = EXPLORER_DATEPICKER_HELPERS.find((h) => h.text === 'Last hour')!
+    const presetRange = datePickerValueToLogDateRange({
+      from: lastHourPreset.calcFrom(),
+      to: lastHourPreset.calcTo(),
+      isHelper: true,
+      text: lastHourPreset.text,
+    })
+
+    expect(
+      logDateRangesEqual(presetRange, { kind: 'relative', last: { amount: 1, unit: 'hour' } })
+    ).toBe(true)
+  })
+
+  it('does not match relative ranges with a different amount or unit', () => {
+    expect(
+      logDateRangesEqual(
+        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
+        { kind: 'relative', last: { amount: 3, unit: 'hour' } }
+      )
+    ).toBe(false)
+    expect(
+      logDateRangesEqual(
+        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
+        { kind: 'relative', last: { amount: 1, unit: 'day' } }
+      )
+    ).toBe(false)
+  })
+
+  it('matches absolute ranges on their ISO endpoints', () => {
+    const from = isoDateTimeString('2025-01-01T00:00:00.000Z')!
+    const to = isoDateTimeString('2025-01-02T00:00:00.000Z')!
+    expect(logDateRangesEqual({ kind: 'absolute', from, to }, { kind: 'absolute', from, to })).toBe(
+      true
+    )
+  })
+
+  it('never matches a relative range against an absolute one', () => {
+    const from = isoDateTimeString('2025-01-01T00:00:00.000Z')!
+    const to = isoDateTimeString('2025-01-02T00:00:00.000Z')!
+    expect(
+      logDateRangesEqual(
+        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
+        {
+          kind: 'absolute',
+          from,
+          to,
+        }
+      )
+    ).toBe(false)
   })
 })
