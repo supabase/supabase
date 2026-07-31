@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
+import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
@@ -83,7 +83,7 @@ interface DestinationFormProps {
   visible: boolean
   existingDestination?: ExistingDestination
   typeSelection?: ReactNode
-  checkIsDirtyRef?: MutableRefObject<() => boolean>
+  checkIsDirtyRef?: RefObject<() => boolean>
   onClose: () => void
   onCancel?: () => void
 }

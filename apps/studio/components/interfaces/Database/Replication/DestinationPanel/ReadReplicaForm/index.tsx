@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useEffect, useState, type MutableRefObject, type ReactNode } from 'react'
+import { RefObject, useEffect, useState, type ReactNode } from 'react'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -25,7 +25,7 @@ import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
   typeSelection?: ReactNode
-  checkIsDirtyRef?: MutableRefObject<() => boolean>
+  checkIsDirtyRef?: RefObject<() => boolean>
   onSuccess: () => void
   onClose: () => void
   onCancel?: () => void
