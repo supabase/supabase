@@ -18,6 +18,14 @@ type Props = {
   isReactForm?: boolean
   hideMessage?: boolean
   name?: string
+  /**
+   * For layout="horizontal", switches the label/content split to react to the nearest
+   * `@container` ancestor's width instead of the viewport width. Use when the layout sits
+   * inside a narrower column (e.g. next to a sidebar) so it stacks to a single column as
+   * soon as that column gets tight, rather than waiting for a viewport breakpoint that may
+   * never reflect the column's actual available space.
+   */
+  isContainerResponsive?: boolean
 }
 
 const ContainerVariants = cva('relative grid gap-10', {
@@ -35,7 +43,7 @@ const ContainerVariants = cva('relative grid gap-10', {
       false: '',
     },
     layout: {
-      horizontal: 'flex flex-col gap-2 md:grid md:grid-cols-12',
+      horizontal: 'flex flex-col gap-2',
       vertical: 'flex flex-col gap-2',
       flex: 'flex flex-row gap-3',
       'flex-row-reverse':
@@ -57,8 +65,20 @@ const ContainerVariants = cva('relative grid gap-10', {
       align: 'right',
       className: 'justify-between',
     },
+    {
+      layout: 'horizontal',
+      responsive: false,
+      className: 'md:grid md:grid-cols-12',
+    },
+    {
+      layout: 'horizontal',
+      responsive: true,
+      className: '@xl:grid @xl:grid-cols-12',
+    },
   ],
-  defaultVariants: {},
+  defaultVariants: {
+    responsive: false,
+  },
 })
 
 const LabelContainerVariants = cva('transition-all duration-500 ease-in-out', {
@@ -287,6 +307,7 @@ export const FormLayout = React.forwardRef<
       hideMessage = false,
       isReactForm,
       error,
+      isContainerResponsive = false,
       ...props
     },
     ref
@@ -356,7 +377,10 @@ export const FormLayout = React.forwardRef<
       <div
         ref={ref}
         {...props}
-        className={cn(ContainerVariants({ size, flex, align, layout }), className)}
+        className={cn(
+          ContainerVariants({ size, flex, align, layout, responsive: isContainerResponsive }),
+          className
+        )}
       >
         {flex && (
           <div className={cn(FlexContainer({ flex, align, layout }))}>

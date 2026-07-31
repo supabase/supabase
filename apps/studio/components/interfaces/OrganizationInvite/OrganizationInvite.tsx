@@ -1,10 +1,9 @@
 import { useIsLoggedIn, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import type { ReactNode } from 'react'
-import { toast } from 'sonner'
+import { type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -25,9 +24,9 @@ import { useProfile, useProfileNameAndPicture } from '@/lib/profile'
 export const OrganizationInvite = () => {
   const router = useRouter()
   const isLoggedIn = useIsLoggedIn()
+  const { slug, token } = useParams()
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { username, avatarUrl, primaryEmail } = useProfileNameAndPicture()
-  const { slug, token } = useParams()
 
   const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
 
@@ -70,15 +69,17 @@ export const OrganizationInvite = () => {
 
   const mfaRequiredError = error?.message.includes('MFA required')
 
-  const { mutate: joinOrganization, isPending: isJoining } =
-    useOrganizationAcceptInvitationMutation({
-      onSuccess: () => {
-        router.push('/organizations')
-      },
-      onError: (error) => {
-        toast.error(`Failed to join organization: ${error.message}`)
-      },
-    })
+  const {
+    mutate: joinOrganization,
+    isPending: isJoining,
+    error: joinError,
+  } = useOrganizationAcceptInvitationMutation({
+    onSuccess: () => {
+      router.push('/organizations')
+    },
+    // [Joshen] Silence the default toast handler
+    onError: () => {},
+  })
 
   async function handleJoinOrganization() {
     if (!slug) return console.error('Slug is required')
@@ -194,8 +195,15 @@ export const OrganizationInvite = () => {
           Accept invite
         </Button>
         <Button asChild variant="text" block>
-          <Link href="/projects">Decline</Link>
+          <Link href="/organizations">Decline</Link>
         </Button>
+        {joinError && (
+          <div className="mt-3 border-t border-muted pt-5">
+            <p role="alert" className="text-center text-xs text-destructive text-balance">
+              Failed to join organization: {joinError.message}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

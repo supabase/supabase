@@ -76,5 +76,29 @@ export async function buildStressCatalog(
     create table stress.p_root_east partition of stress.p_root for values in ('east');
   `)
 
+  // Enums and composite types so the user-defined-types introspection query has
+  // non-trivial results at scale: multi-label enums with a deliberately
+  // NON-alphabetical label order (to exercise the enumsortorder ordering), plus
+  // composite types -- one of which has a dropped attribute (to exercise the
+  // `not attisdropped` filter). A bulk loop grows pg_type/pg_attribute/pg_enum
+  // so the scoped correlated subqueries are exercised against a large catalog.
+  await db.executeQuery(`
+    create type stress.mood as enum ('ecstatic', 'sad', 'happy', 'ok');
+    create type stress.priority as enum ('critical', 'low', 'high', 'medium');
+    create type stress.addr as (street text, city text, zip int);
+    create type stress.pair as (a int, dropme text, b text);
+    alter type stress.pair drop attribute dropme;
+
+    create procedure stress.build_types(n int) language plpgsql as $$
+    begin
+      for i in 0..n-1 loop
+        execute format('create type stress.e_%s as enum (''c'', ''a'', ''b'')', i);
+        execute format('create type stress.ct_%s as (x int, y text)', i);
+        if i % 100 = 99 then commit; end if;
+      end loop;
+    end $$;
+  `)
+  await db.executeQuery(`call stress.build_types(200);`)
+
   await db.executeQuery(`analyze;`)
 }
