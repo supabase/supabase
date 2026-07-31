@@ -23,19 +23,20 @@ import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
+type EnablePipelinesModalProps =
+  | { open: boolean; onOpenChange: (open: boolean) => void }
+  | { open?: never; onOpenChange?: never }
+
 export const EnablePipelinesModal = ({
   open: extOpen,
-  setOpen: setExtOpen,
-}: {
-  open?: boolean
-  setOpen?: (val: boolean) => void
-}) => {
+  onOpenChange,
+}: EnablePipelinesModalProps) => {
   const { ref: projectRef } = useParams()
   const [_open, _setOpen] = useState(false)
 
   const open = extOpen ?? _open
-  const setOpen = setExtOpen ?? _setOpen
-  const hideTrigger = extOpen !== undefined && setExtOpen !== undefined
+  const setOpen = onOpenChange ?? _setOpen
+  const hideTrigger = extOpen !== undefined && onOpenChange !== undefined
 
   const { hasAccess } = useCheckEntitlements('replication.etl')
 

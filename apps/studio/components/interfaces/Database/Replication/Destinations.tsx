@@ -403,7 +403,7 @@ export const Destinations = () => {
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}
-        setOpen={setShowEnablePipelinesDialog}
+        onOpenChange={setShowEnablePipelinesDialog}
       />
 
       <DisablePipelinesDialog
