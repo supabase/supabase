@@ -36,6 +36,7 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
@@ -301,9 +302,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-52 *:space-x-2">
                         <DropdownMenuItem asChild>
-                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
-                            Resize databases
-                          </Link>
+                          <Link href={getInfrastructurePath(projectRef)}>Resize databases</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setShowDeleteAllModal(true)}>

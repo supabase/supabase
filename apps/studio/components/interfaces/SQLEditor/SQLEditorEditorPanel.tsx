@@ -12,6 +12,7 @@ import {
   useSqlEditorUi,
 } from './SQLEditorControllers'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
+import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { detectOS } from '@/lib/helpers'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -124,16 +125,28 @@ const SQLEditorMainView = () => {
   const { diff, prompt } = useSqlEditorAssistant()
   const { isDiffOpen } = diff
   const { promptState, openPrompt } = prompt
-  const { executeQuery, readEditorSql, prettifyQuery } = useSqlEditorRun()
+  const {
+    executeQuery,
+    readEditorSql,
+    prettifyQuery,
+    runSource,
+    executeLogsQuery,
+    readEditorLogsSql,
+  } = useSqlEditorRun()
   const { onMount, setHasSelection } = useSqlEditorUi()
 
   const os = detectOS()
 
   // Run gesture from the editor — promote here, at the user action.
   const runQuery = useCallback(() => {
-    const sql = readEditorSql()
-    if (sql !== undefined) void executeQuery(acceptUntrustedSql(sql))
-  }, [executeQuery, readEditorSql])
+    if (runSource.type === 'logs') {
+      const sql = readEditorLogsSql()
+      if (sql !== undefined) void executeLogsQuery(acceptUntrustedLogsSql(sql))
+    } else {
+      const sql = readEditorSql()
+      if (sql !== undefined) void executeQuery(acceptUntrustedSql(sql))
+    }
+  }, [executeLogsQuery, executeQuery, readEditorLogsSql, readEditorSql, runSource.type])
 
   return (
     <div key={id} className="w-full h-full relative">

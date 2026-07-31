@@ -3,8 +3,8 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -22,7 +22,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -82,6 +82,7 @@ interface DestinationFormProps {
   selectedType: DestinationType
   visible: boolean
   existingDestination?: ExistingDestination
+  typeSelection?: ReactNode
   onClose: () => void
 }
 
@@ -89,6 +90,7 @@ export const DestinationForm = ({
   selectedType,
   visible,
   existingDestination,
+  typeSelection,
   onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
@@ -259,7 +261,7 @@ export const DestinationForm = ({
     defaultValues,
   })
 
-  const { publicationName } = form.watch()
+  const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -422,6 +424,7 @@ export const DestinationForm = ({
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
+        {typeSelection}
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (

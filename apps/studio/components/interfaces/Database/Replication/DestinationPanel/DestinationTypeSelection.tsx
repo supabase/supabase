@@ -1,6 +1,7 @@
 import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
 import { Snowflake } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import type { ElementType } from 'react'
 import {
   Badge,
   Select,
@@ -29,7 +30,7 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  icon: typeof Database
+  icon: ElementType<{ size?: number; className?: string; strokeWidth?: number }>
   stage: 'Public Alpha' | 'Early Access' | 'Deprecated' | null
   enabled: boolean
 }
@@ -37,6 +38,12 @@ interface DestinationTypeOption {
 interface DestinationTypeGroup {
   label: string
   options: DestinationTypeOption[]
+}
+
+function DestinationOptionIcon({ option }: { option: DestinationTypeOption }) {
+  const Icon = option.icon
+
+  return <Icon size={20} strokeWidth={1.5} className="shrink-0 text-foreground-light" />
 }
 
 export const DestinationTypeSelection = () => {
@@ -147,29 +154,41 @@ export const DestinationTypeSelection = () => {
     .flatMap((group) => group.options)
     .find((option) => option.value === destinationType)
 
+  const stageDescription =
+    selectedOption?.stage === 'Public Alpha' ? (
+      <>
+        In public alpha and may change.{' '}
+        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+          Leave feedback
+        </InlineLink>
+      </>
+    ) : selectedOption?.stage === 'Early Access' ? (
+      <>
+        In early access and may change.{' '}
+        <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+          Leave feedback
+        </InlineLink>
+      </>
+    ) : selectedOption?.stage === 'Deprecated' ? (
+      'This destination type is deprecated.'
+    ) : null
+
+  const typeDescription =
+    !editMode || stageDescription ? (
+      <span>
+        {!editMode && 'Cannot be changed after creation.'}
+        {!editMode && stageDescription ? ' ' : null}
+        {stageDescription}
+      </span>
+    ) : undefined
+
   return (
     <FormItemLayout
       isReactForm={false}
       layout="horizontal"
-      className="p-5 [&>div]:gap-y-1"
+      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
       label="Type"
-      labelOptional="Destination type cannot be changed after creation"
-      description={
-        selectedOption?.stage && (
-          <span className="block text-sm text-foreground-lighter mb-1">
-            {selectedOption.stage === 'Public Alpha'
-              ? 'This destination type is in public alpha and may change as we iterate based on customer feedback. '
-              : selectedOption.stage === 'Deprecated'
-                ? 'This destination type is deprecated.'
-                : 'This destination type is available through early access and may change as we iterate based on customer feedback. '}
-            {selectedOption.stage !== 'Deprecated' && (
-              <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-                Leave feedback
-              </InlineLink>
-            )}
-          </span>
-        )
-      }
+      description={typeDescription}
     >
       <Select
         disabled={editMode}
@@ -179,7 +198,7 @@ export const DestinationTypeSelection = () => {
         <SelectTrigger className="h-auto py-2">
           {selectedOption ? (
             <div className="flex items-center gap-x-3 text-left">
-              <selectedOption.icon size={20} className="shrink-0 text-foreground-light" />
+              <DestinationOptionIcon option={selectedOption} />
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
                 {selectedOption.stage && (
@@ -209,7 +228,7 @@ export const DestinationTypeSelection = () => {
               {group.options.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="py-2">
                   <div className="flex items-center gap-x-3">
-                    <option.icon size={20} className="shrink-0 text-foreground-light" />
+                    <DestinationOptionIcon option={option} />
                     <div className="flex flex-col gap-y-0.5">
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>
