@@ -30,7 +30,7 @@
     "description": "Email sending is not allowed for this address as your project is using the default SMTP service. Emails can only be sent to members in your Supabase organization. If you want to send emails to others, set up a custom SMTP provider.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/auth/auth-smtp",
+        "href": "/docs/guides/auth/auth-smtp",
         "description": "Setting up a custom SMTP provider"
       }
     ]
@@ -75,7 +75,7 @@
     "description": "To call this API, the user must have a higher Authenticator Assurance Level. To resolve, ask the user to solve an MFA challenge.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/auth/auth-mfa",
+        "href": "/docs/guides/auth/auth-mfa",
         "description": "MFA"
       }
     ]
@@ -120,7 +120,7 @@
     "description": "Further MFA verification is rejected. Only returned if the MFA verification attempt hook returns a reject decision.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/auth/auth-hooks/mfa-verification-hook",
+        "href": "/docs/guides/auth/auth-hooks/mfa-verification-hook",
         "description": "MFA verification hook"
       }
     ]
@@ -192,7 +192,7 @@
     "description": "Refresh token has been revoked and falls outside the refresh token reuse interval. See the documentation on sessions for further information.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/auth/sessions",
+        "href": "/docs/guides/auth/sessions",
         "description": "Auth sessions"
       }
     ]
@@ -225,7 +225,7 @@
     "description": "Using Enterprise SSO with SAML 2.0 is not enabled on the Auth server.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml",
+        "href": "/docs/guides/auth/enterprise-sso/auth-sso-saml",
         "description": "Enterprise SSO"
       }
     ]
@@ -240,7 +240,7 @@
     "description": "Session to which the API request relates has expired. This can occur if an inactivity timeout is configured, or the session entry has exceeded the configured timebox value. See the documentation on sessions for more information.",
     "references": [
       {
-        "href": "https://supabase.com/docs/guides/auth/sessions",
+        "href": "/docs/guides/auth/sessions",
         "description": "Auth sessions"
       }
     ]
