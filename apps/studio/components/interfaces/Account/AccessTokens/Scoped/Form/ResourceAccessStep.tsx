@@ -199,7 +199,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
                       disabled={isAccount}
                       label={
                         <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <span className="text-foreground">{option.name}</span>
                             {option.recommended && <Badge variant="success">Recommended</Badge>}
                           </div>
@@ -277,9 +277,9 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
                     badgeLimit="wrap"
                     showIcon={false}
                     deletableBadge
-                    className="w-full"
                     ref={field.ref}
                     renderValue={(value) => projectsByRef[value]?.name}
+                    className="min-w-auto"
                   />
                   <MultiSelectorContent>
                     <MultiSelectorInput placeholder="Search organizations" showResetIcon />
