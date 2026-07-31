@@ -1,0 +1,104 @@
+name: Fix Audit Vulnerabilities
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Every Monday @ 00:00 UTC
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  discover:
+    name: Discover vulnerable modules
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.list.outputs.modules }}
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          ref: master
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: List vulnerable modules
+        id: list
+        run: echo "modules=$(pnpm tsx scripts/fix-audit-vulnerability.ts --list)" >> "$GITHUB_OUTPUT"
+
+  fix:
+    name: Fix vulnerability (${{ matrix.module.module_name }})
+    needs: discover
+    if: needs.discover.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.discover.outputs.modules) }}
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          ref: master
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Fix vulnerability
+        id: fix
+        continue-on-error: true
+        run: pnpm tsx scripts/fix-audit-vulnerability.ts --module "${{ matrix.module.module_name }}"
+
+      - name: Generate token
+        id: app-token
+        if: steps.fix.outcome == 'success'
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.GH_AUTOFIX_APP_CLIENT_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          permission-pull-requests: write
+          permission-contents: write
+
+      - name: Create pull request
+        if: steps.fix.outcome == 'success'
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          commit-message: 'fix: patch ${{ matrix.module.module_name }} vulnerability'
+          title: 'fix: patch ${{ matrix.module.module_name }} vulnerability (${{ matrix.module.highestSeverity }})'
+          body: |
+            This PR patches a ${{ matrix.module.highestSeverity }} severity vulnerability in `${{ matrix.module.module_name }}`.
+
+            **Summary**: ${{ matrix.module.summary }}
+
+            **Override version**: `${{ matrix.module.overrideVersion }}`
+
+            This PR was created automatically by the Fix Audit Vulnerabilities workflow.
+          branch: 'gha/fix-audit-vuln-${{ matrix.module.module_name }}'
+          base: 'master'
