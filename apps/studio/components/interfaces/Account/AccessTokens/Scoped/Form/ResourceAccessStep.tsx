@@ -304,7 +304,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
           render={({ field }) => (
             <FormItemLayout
               layout="flex-row-reverse"
-              label={<span className="sr-only">Organization</span>}
+              label={<span className="sr-only">Organizations</span>}
               id="organizationSlugs"
             >
               <MultiSelector onValuesChange={field.onChange} values={field.value}>
