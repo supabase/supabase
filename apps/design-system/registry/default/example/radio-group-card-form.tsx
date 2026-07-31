@@ -53,21 +53,9 @@ export default function RadioGroupForm() {
                   defaultValue={field.value}
                   className="flex flex-wrap gap-3"
                 >
-                  <FormItem asChild>
-                    <FormControl>
-                      <RadioGroupCardItem value="all" label="All new messages" />
-                    </FormControl>
-                  </FormItem>
-                  <FormItem asChild>
-                    <FormControl>
-                      <RadioGroupCardItem value="mentions" label="Direct messages and mentions" />
-                    </FormControl>
-                  </FormItem>
-                  <FormItem asChild>
-                    <FormControl>
-                      <RadioGroupCardItem value="none" label="Nothing" />
-                    </FormControl>
-                  </FormItem>
+                  <RadioGroupCardItem value="all" label="All new messages" />
+                  <RadioGroupCardItem value="mentions" label="Direct messages and mentions" />
+                  <RadioGroupCardItem value="none" label="Nothing" />
                 </RadioGroupCard>
               </FormControl>
               <FormMessage />
