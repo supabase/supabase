@@ -320,7 +320,7 @@ export function LoopsLogo(props: ComponentProps<'svg'>) {
 
 export function LovableLogo(props: ComponentProps<'svg'>) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 950 173" {...props}>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 -43 950 259" {...props}>
       <path
         fillRule="evenodd"
         clipRule="evenodd"
