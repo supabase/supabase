@@ -5,7 +5,7 @@ import { createRateLimiter } from './rate-limit'
 const makeRequest = (ip?: string) =>
   new Request('http://localhost/test', {
     method: 'POST',
-    headers: ip ? { 'x-forwarded-for': ip } : {},
+    headers: ip === undefined ? {} : { 'x-forwarded-for': ip },
   })
 
 describe('createRateLimiter', () => {
@@ -49,6 +49,22 @@ describe('createRateLimiter', () => {
     const isRateLimited = createRateLimiter({ max: 1, windowMs: 60_000 })
     expect(isRateLimited(makeRequest())).toBe(false)
     expect(isRateLimited(makeRequest())).toBe(true)
+  })
+
+  it('treats an empty x-forwarded-for like a missing one', () => {
+    const isRateLimited = createRateLimiter({ max: 1, windowMs: 60_000 })
+    expect(isRateLimited(makeRequest(''))).toBe(false)
+    expect(isRateLimited(makeRequest())).toBe(true)
+  })
+
+  it('sweeps expired entries once the map grows large', () => {
+    const isRateLimited = createRateLimiter({ max: 1, windowMs: 60_000 })
+    for (let i = 0; i <= 10_000; i++) {
+      isRateLimited(makeRequest(`10.0.${Math.floor(i / 256)}.${i % 256}`))
+    }
+    vi.advanceTimersByTime(60_000)
+    expect(isRateLimited(makeRequest('10.0.0.0'))).toBe(false)
+    expect(isRateLimited(makeRequest('10.0.0.0'))).toBe(true)
   })
 
   it('keeps separate buckets per limiter instance', () => {
