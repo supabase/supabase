@@ -426,7 +426,9 @@ export const DestinationForm = ({
   }, [checkIsDirtyRef, isDirty])
 
   useEffect(() => {
-    if (visible && !isDirty) {
+    // Reset when closed (including after discard) so reopening does not restore
+    // discarded values, and when open but pristine so async defaults can apply.
+    if (!visible || !isDirty) {
       form.reset(defaultValues)
       resetValidation()
     }

@@ -44,9 +44,9 @@ export const NewPublicationPanel = ({ visible, onClose }: NewPublicationPanelPro
     name: z.string().min(1, 'Name is required'),
     tables: z.array(z.string()).min(1, 'At least one table is required'),
   })
-  const defaultValues = {
+  const defaultValues: z.infer<typeof FormSchema> = {
     name: '',
-    tables: [] as string[],
+    tables: [],
   }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
