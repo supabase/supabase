@@ -2081,7 +2081,16 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
+  },
+  // DOCS-1268: 'start' was never a real API reference slug — it only ever
+  // worked because the old /reference/api/* routing collapsed every sub-path
+  // to the same monolith. Keep it redirecting so old links/bookmarks don't 404
+  // now that only real slugs resolve.
+  {
+    permanent: true,
+    source: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
   },
   {
     permanent: true,
