@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
@@ -82,6 +82,7 @@ interface DestinationFormProps {
   selectedType: DestinationType
   visible: boolean
   existingDestination?: ExistingDestination
+  typeSelection?: ReactNode
   onClose: () => void
 }
 
@@ -89,6 +90,7 @@ export const DestinationForm = ({
   selectedType,
   visible,
   existingDestination,
+  typeSelection,
   onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
@@ -422,6 +424,7 @@ export const DestinationForm = ({
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
+        {typeSelection}
         {hasNoAvailableDestinations && !editMode ? (
           <NoDestinationsAvailable />
         ) : (
