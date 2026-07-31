@@ -131,14 +131,11 @@ mkdir supabase-project
 # ├── supabase
 # └── supabase-project
 
-# Copy the compose files over to your project
-cp -rf supabase/docker/* supabase-project
+# Copy the configuration to your project
+cp -rf supabase/docker/. supabase-project
 
-# Copy the example environment file
-cp supabase/docker/.env.example supabase-project/.env
-
-# Switch to your project directory
-cd supabase-project
+# Switch to the project directory and create a .env from the example
+cd supabase-project && cp .env.example .env
 
 # Pull the latest images
 docker compose pull
@@ -167,14 +164,11 @@ mkdir supabase-project
 # ├── supabase
 # └── supabase-project
 
-# Copy the compose files over to your project
-cp -rf supabase/docker/* supabase-project
+# Copy the configuration over to your project
+cp -rf supabase/docker/. supabase-project
 
-# Copy the example environment file
-cp supabase/docker/.env.example supabase-project/.env
-
-# Switch to your project directory
-cd supabase-project
+# Switch to the project directory and create a .env from the example
+cd supabase-project && cp .env.example .env
 
 # Pull the latest images
 docker compose pull
