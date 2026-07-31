@@ -384,11 +384,9 @@ fi
 cd "$target"
 
 current_public_url=$(read_env SUPABASE_PUBLIC_URL)
-current_api_url=$(read_env API_EXTERNAL_URL)
 current_site_url=$(read_env SITE_URL)
 
 [ -z "$current_public_url" ] && current_public_url="http://localhost:8000"
-[ -z "$current_api_url" ]    && current_api_url="$current_public_url/auth/v1"
 [ -z "$current_site_url" ]   && current_site_url="http://localhost:3000"
 
 if [ "$NON_INTERACTIVE" = "1" ]; then
@@ -400,7 +398,7 @@ else
 fi
 
 public_url=$(ask_url "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
-api_url=$(ask_url   "API_EXTERNAL_URL (Auth callbacks)"   "$current_api_url")
+api_url=$(ask_url   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url/auth/v1")
 site_url=$(ask_url  "SITE_URL (default Auth redirect)"    "$current_site_url")
 
 # Suggest PROXY_DOMAIN from the public_url host (unless it's localhost-ish)
