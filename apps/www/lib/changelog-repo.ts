@@ -44,9 +44,9 @@ export type ChangelogEntry = {
   /** Contents of `## Summary` only. */
   summary: string
   /**
-   * Contents of `## Body` through the end of the public sections (including
-   * `## Migration steps`), excluding internal-only planning tables
-   * (`## Rollout timeline`, `## Comms timeline`). Never includes the internal block.
+   * Everything under `## Body` to the end of the public content. The
+   * `<!-- internal -->` block is the only boundary — content authors want kept
+   * off the published page goes inside that block.
    */
   bodySection: string
 }

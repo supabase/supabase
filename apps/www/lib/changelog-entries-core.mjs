@@ -175,8 +175,19 @@ export function parseChangelogEntryFile(filename, raw) {
     frontmatter: toPublicFrontmatter(frontmatter),
     sortDate: toDateString(frontmatter.publish_date) ?? resolveDateFromFilename(filename) ?? '',
     summary: extractSection(publicBody, 'Summary'),
-    bodySection: extractSection(publicBody, 'Body', ['Rollout timeline', 'Comms timeline']),
+    bodySection: extractBodySection(publicBody),
   }
+}
+
+/**
+ * Everything under `## Body` to the end of the public content. The internal
+ * block is already stripped upstream (`stripInternalBlock`), so we don't stop
+ * at any specific heading — the `<!-- internal -->` marker is the boundary.
+ */
+function extractBodySection(publicBody) {
+  const match = publicBody.match(/^##\s+Body\s*\n/im)
+  if (!match) return ''
+  return publicBody.slice(match.index + match[0].length).trim()
 }
 
 /** `public: true` and not scheduled for a future `publish_date`. */
