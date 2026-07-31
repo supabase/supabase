@@ -61,7 +61,7 @@ type ChatSession = {
   createdAt: Date
   updatedAt: Date
   supportMetadata?: SupportChatMetadata
-  branchedFromChatId?: string
+  branchedFrom?: { chatId: string; messageId: string }
 }
 
 export type AiAssistantContext = {
@@ -443,7 +443,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         messages: branchedMessages,
         createdAt: new Date(),
         updatedAt: new Date(),
-        branchedFromChatId: sourceChat.id,
+        branchedFrom: { chatId: sourceChat.id, messageId },
       }
 
       state.chats = {

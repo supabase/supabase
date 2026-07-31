@@ -6,7 +6,7 @@ import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -187,9 +187,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const isChatInputDisabled =
     !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
 
-  const branchedConversation = !!snap.activeChat?.branchedFromChatId
-    ? snap.chats[snap.activeChat?.branchedFromChatId]
-    : undefined
+  const branchedFrom = snap.activeChat?.branchedFrom
+  const branchedConversation = branchedFrom ? snap.chats[branchedFrom.chatId] : undefined
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -294,22 +293,39 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         const isLastMessage = index === chatMessages.length - 1
 
         return (
-          <Message
-            id={message.id}
-            key={message.id}
-            message={message}
-            isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
-            readOnly={message.role === 'user'}
-            addToolApprovalResponse={addToolApprovalResponse}
-            onDelete={deleteMessageFromHere}
-            onEdit={editMessage}
-            isAfterEditedMessage={isAfterEditedMessage}
-            isBeingEdited={isBeingEdited}
-            onCancelEdit={cancelEdit}
-            isLastMessage={isLastMessage}
-            onRate={handleRateMessage}
-            rating={messageRatings[message.id] ?? null}
-          />
+          <Fragment key={message.id}>
+            <Message
+              id={message.id}
+              message={message}
+              isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
+              readOnly={message.role === 'user'}
+              addToolApprovalResponse={addToolApprovalResponse}
+              onDelete={deleteMessageFromHere}
+              onEdit={editMessage}
+              isAfterEditedMessage={isAfterEditedMessage}
+              isBeingEdited={isBeingEdited}
+              onCancelEdit={cancelEdit}
+              isLastMessage={isLastMessage}
+              onRate={handleRateMessage}
+              rating={messageRatings[message.id] ?? null}
+            />
+            {branchedConversation && branchedFrom?.messageId === message.id && (
+              <div className="flex items-center gap-2 mt-6">
+                <div className="flex-1 border-t border-strong" />
+                <div className="flex items-center gap-1 max-w-[80%] text-xs text-foreground-lighter">
+                  <span className="shrink-0">Branched from</span>
+                  <button
+                    tabIndex={0}
+                    className={cn(InlineLinkClassName, 'cursor-pointer truncate min-w-0')}
+                    onClick={() => snap.selectChat(branchedConversation.id)}
+                  >
+                    {branchedConversation.name}
+                  </button>
+                </div>
+                <div className="flex-1 border-t border-strong" />
+              </div>
+            )}
+          </Fragment>
         )
       }),
     [
@@ -322,6 +338,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       addToolApprovalResponse,
       handleRateMessage,
       messageRatings,
+      branchedConversation,
+      branchedFrom,
+      snap,
     ]
   )
 
@@ -495,23 +514,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
                   className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
-              )}
-
-              {branchedConversation && (
-                <div className="flex items-center gap-2 mt-6">
-                  <div className="flex-1 border-t border-strong" />
-                  <div className="flex items-center gap-1 max-w-[80%] text-xs text-foreground-lighter">
-                    <span className="shrink-0">Branched from</span>
-                    <button
-                      tabIndex={0}
-                      className={cn(InlineLinkClassName, 'cursor-pointer truncate min-w-0')}
-                      onClick={() => snap.selectChat(branchedConversation.id)}
-                    >
-                      {branchedConversation.name}
-                    </button>
-                  </div>
-                  <div className="flex-1 border-t border-strong" />
-                </div>
               )}
 
               <p className="text-center text-xs text-foreground-muted mt-6">
