@@ -1,12 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
-
-import { CustomerioAppClient, CustomerioTrackClient } from '~/lib/customerio'
-import { insertPageInDatabase } from '~/lib/notion'
-
 import {
   SupaSquadApplication,
   supaSquadApplicationSchema,
 } from '~/data/open-source/contributing/supasquad.utils'
+import { CustomerioAppClient, CustomerioTrackClient } from '~/lib/customerio'
+import { insertPageInDatabase } from '~/lib/notion'
+import { createRateLimiter } from '~/lib/rate-limit'
 
 // Using a separate Sentry client for community following this guide:
 // https://docs.sentry.io/platforms/javascript/best-practices/multiple-sentry-instances/
@@ -59,7 +58,16 @@ function normalizeTrack(t: { heading: string; description: string } | string) {
   return trackName
 }
 
+const isRateLimited = createRateLimiter({ max: 5, windowMs: 60 * 1000 })
+
 export async function POST(req: Request) {
+  if (isRateLimited(req)) {
+    return new Response(JSON.stringify({ message: 'Too many requests. Try again later.' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 429,
+    })
+  }
+
   if (!NOTION_API_KEY || !NOTION_DB_ID) {
     captureSentryCommunityException(new Error('Server misconfigured: missing Notion credentials'))
     return new Response(

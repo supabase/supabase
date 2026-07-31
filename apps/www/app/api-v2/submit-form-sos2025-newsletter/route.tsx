@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { createRateLimiter } from '~/lib/rate-limit'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,7 +11,16 @@ const isValidEmail = (email: string): boolean => {
   return emailPattern.test(email)
 }
 
+const isRateLimited = createRateLimiter({ max: 5, windowMs: 60 * 1000 })
+
 export async function POST(req: Request) {
+  if (isRateLimited(req)) {
+    return new Response(JSON.stringify({ message: 'Too many requests. Try again later.' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 429,
+    })
+  }
+
   const HUBSPOT_PORTAL_ID = process.env.HUBSPOT_PORTAL_ID
   const HUBSPOT_FORM_GUID = '721fc4aa-13eb-4c25-91be-4fe9b530bed1'
 
