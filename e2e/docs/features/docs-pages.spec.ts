@@ -17,14 +17,7 @@ test.describe('Docs owned pages', () => {
   // passed. Opt this describe block into parallel scheduling explicitly.
   test.describe.configure({ mode: 'parallel' })
 
-  test('resolved page list must not be empty', () => {
-    expect(
-      pagePaths.length,
-      'No pages to test. `pnpm e2e:docs` resolves pages from git changes by default, ' +
-        'or set DOCS_E2E_PAGE_PATHS explicitly.'
-    ).toBeGreaterThan(0)
-  })
-
+  // An empty list is valid — a spec-only change runs reference-pages.spec.ts.
   for (const pagePath of pagePaths) {
     test(`${pagePath} loads and docs-owned article links resolve`, async ({ page }, testInfo) => {
       const baseURL = testInfo.project.use.baseURL

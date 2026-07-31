@@ -96,6 +96,19 @@ function isHiddenMdx(filePath: string): boolean {
 }
 
 /**
+ * Files behind the pages features/reference-pages.spec.ts loads. It uses a
+ * fixed list, so a change here runs Playwright even with no guide pages.
+ */
+function isReferenceRelevantFile(filePath: string): boolean {
+  const path = normalizeRepoPath(filePath)
+  return (
+    path.startsWith('apps/docs/spec/') ||
+    path.startsWith('apps/docs/features/docs/Reference') ||
+    path === 'apps/docs/middleware.ts'
+  )
+}
+
+/**
  * Map a changed content file to a docs URL, or null if not a testable page.
  */
 export function changedFileToPagePath(filePath: string): string | null {
@@ -303,11 +316,11 @@ export async function resolveDocsScope(
     }
   }
 
-  const sorted = [...pages].sort().slice(0, maxPages)
+  const sorted = [...pages].sort()
 
   return {
-    pages: sorted,
-    skip: sorted.length === 0,
+    pages: sorted.slice(0, maxPages),
+    skip: sorted.length === 0 && !options.changedFiles.some(isReferenceRelevantFile),
   }
 }
 

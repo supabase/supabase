@@ -135,17 +135,22 @@ pages linking into reference docs or server-side auth guides.
 
 ### In scope
 
-| Changed path                                 | Behavior                                                 |
-| -------------------------------------------- | -------------------------------------------------------- |
-| `apps/docs/content/guides/**/*.mdx`          | Test `/docs/guides/<slug>`, excluding federated sections |
-| `apps/docs/content/troubleshooting/**/*.mdx` | Test `/docs/guides/troubleshooting/<slug>`               |
-| `apps/docs/content/_partials/**`             | Test owned pages that include that partial               |
+| Changed path                                                                         | Behavior                                                 |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| `apps/docs/content/guides/**/*.mdx`                                                  | Test `/docs/guides/<slug>`, excluding federated sections |
+| `apps/docs/content/troubleshooting/**/*.mdx`                                         | Test `/docs/guides/troubleshooting/<slug>`               |
+| `apps/docs/content/_partials/**`                                                     | Test owned pages that include that partial               |
+| `apps/docs/spec/**`, `apps/docs/features/docs/Reference*`, `apps/docs/middleware.ts` | Load every reference section's landing page              |
+
+Reference landing pages are a fixed list, not a changed-files scope, so they run
+on every Playwright run. They're skipped against `localhost`, where they're too
+slow to compile.
 
 ### Out of scope
 
 - Federated guide sections: `graphql`, `database/extensions/wrappers`,
   `ai/python`, `deployment/terraform`, `deployment/ci`
-- Reference docs under `/docs/reference`
+- Individual reference pages under `/docs/reference/<section>/<slug>`
 - Non-docs routes such as `/dashboard` and `/ui`, which the link checker skips
 
 ### Limits

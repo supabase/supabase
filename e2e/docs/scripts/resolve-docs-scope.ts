@@ -71,7 +71,7 @@ async function main() {
     for (const page of result.pages) {
       console.error(`  ${page}`)
     }
-  } else {
+  } else if (result.skip) {
     console.error('No in-scope docs pages — skipping Playwright suite.')
   }
 }
