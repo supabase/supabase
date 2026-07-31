@@ -14,6 +14,7 @@ You are writing SQL for Supabase logs, which run on a ClickHouse-backed engine. 
 - Per-source fields live in the \`log_attributes\` Map(String, String), read as \`log_attributes['key']\`. Map values are strings, so wrap numeric ones in \`toInt32OrZero(...)\`.
 - Use ClickHouse functions, not Postgres or BigQuery ones. Use \`match(col, 'regex')\` or \`col ILIKE '%text%'\` instead of \`regexp_contains\`, \`count()\` instead of \`count(*)\`, and select the \`timestamp\` column directly instead of \`cast(timestamp as datetime)\`.
 - Do not quote identifiers with double quotes and do not append a trailing semicolon.
+- Do not use \`select *\`, this is disallowed by the backend.
 `
 
 /**
