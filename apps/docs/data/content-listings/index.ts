@@ -21,6 +21,7 @@ import {
   selfHostingShareExperience,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
+import { telemetryDebugging, telemetryMonitoring } from './telemetry.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
   aiToolsSupportedAgents,
@@ -48,6 +49,8 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   storageGetStarted,
   storageExamples,
   storageResources,
+  telemetryDebugging,
+  telemetryMonitoring,
 ]
 
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(

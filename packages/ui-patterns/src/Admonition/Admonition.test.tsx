@@ -110,7 +110,6 @@ describe('Admonition', () => {
   })
 
   it.each([
-    ['tip', 'Tip'],
     ['danger', 'Danger'],
     ['deprecation', 'Deprecated'],
   ] as const)('exposes %s via aria-label as %s', (type, name) => {
@@ -120,7 +119,7 @@ describe('Admonition', () => {
     expect(within(screen.getByRole('alert')).queryByText(`${name}:`)).not.toBeInTheDocument()
   })
 
-  it('renders the title as a paragraph with its own margin', () => {
+  it('renders the title via AlertTitle (paragraph, not a heading)', () => {
     render(<Admonition type="note" title="Manual approval required" description="Body copy." />)
 
     const note = screen.getByRole('alert', { name: 'Note' })
@@ -128,8 +127,8 @@ describe('Admonition', () => {
 
     expect(note.querySelector('h1, h2, h3, h4, h5, h6')).not.toBeInTheDocument()
     expect(title.tagName).toBe('P')
-    expect(title).toHaveAttribute('data-admonition-title')
-    expect(title).toHaveClass('mb-0.5')
+    expect(title).toHaveAttribute('data-slot', 'alert-title')
+    expect(title).toHaveClass('!mt-0', 'mb-0.5', 'font-medium')
   })
 
   it('wraps a string description in a paragraph', () => {
@@ -137,5 +136,20 @@ describe('Admonition', () => {
 
     const note = screen.getByRole('alert', { name: 'Note' })
     expect(within(note).getByText('Body copy.').tagName).toBe('P')
+  })
+
+  it('wraps MDX children in AlertDescription', () => {
+    render(
+      <Admonition type="note">
+        <p>Children body copy.</p>
+      </Admonition>
+    )
+
+    const note = screen.getByRole('alert', { name: 'Note' })
+    const paragraph = within(note).getByText('Children body copy.')
+
+    expect(paragraph.tagName).toBe('P')
+    expect(paragraph.parentElement).toHaveClass('text-sm')
+    expect(paragraph.parentElement).toHaveAttribute('data-slot', 'alert-description')
   })
 })

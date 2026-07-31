@@ -208,13 +208,24 @@ body,
   box-sizing: border-box;
 }
 
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  @apply font-heading font-semibold;
+  @apply font-semibold;
 }
 
 .form-group .form-text,

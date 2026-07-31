@@ -17,71 +17,13 @@ import {
 } from 'ui'
 
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
+import { generateHelpersFromInput } from './Logs.datePickerHelpers'
 import type { DatetimeHelper } from './Logs.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import type { ShortcutId } from '@/state/shortcuts/registry'
-
-type Unit = 'minute' | 'hour' | 'day'
-
-export type ParsedCustomInput =
-  | { type: 'number'; value: number }
-  | { type: 'unit'; value: number; unit: Unit }
-  | { type: 'invalid' }
-
-export const parseCustomInput = (input: string): ParsedCustomInput => {
-  const trimmed = input.trim().toLowerCase()
-  if (!trimmed) return { type: 'invalid' }
-
-  // Try to match "number + optional space + unit prefix"
-  const match = trimmed.match(/^(\d+)\s*([a-z]*)$/)
-  if (!match) return { type: 'invalid' }
-
-  const [, numStr, unitStr] = match
-  const value = parseInt(numStr, 10)
-
-  if (isNaN(value) || value <= 0) return { type: 'invalid' }
-
-  if (!unitStr) {
-    return { type: 'number', value }
-  }
-
-  // Match if unitStr is a prefix of any unit name or its first letter
-  const units: Unit[] = ['minute', 'hour', 'day']
-  const matchedUnit = units.find((u) => u.startsWith(unitStr) || u[0] === unitStr)
-
-  if (!matchedUnit) return { type: 'invalid' }
-
-  return { type: 'unit', value, unit: matchedUnit }
-}
-
-export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper => {
-  return {
-    text: `Last ${value} ${unit}${value === 1 ? '' : 's'}`,
-    calcFrom: () => dayjs().subtract(value, unit).toISOString(),
-    calcTo: () => dayjs().toISOString(),
-  }
-}
-
-export const generateDynamicHelpers = (value: number): DatetimeHelper[] => {
-  const units: Unit[] = ['minute', 'hour', 'day']
-  return units.map((unit) => generateDynamicHelper(value, unit))
-}
-
-export const generateHelpersFromInput = (input: string): DatetimeHelper[] | null => {
-  const parsed = parseCustomInput(input)
-
-  switch (parsed.type) {
-    case 'number':
-      return generateDynamicHelpers(parsed.value)
-    case 'unit':
-      return [generateDynamicHelper(parsed.value, parsed.unit)]
-    case 'invalid':
-      return null
-  }
-}
 
 export type DatePickerValue = {
   to: string
