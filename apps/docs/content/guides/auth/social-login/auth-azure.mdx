@@ -209,6 +209,17 @@ suspend fun signInWithAzure() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Azure` as the provider. Request the `email` scope:
+
+```c#
+var signInUrl = supabase.Auth.SignIn(Provider.Azure, "email");
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -256,6 +267,17 @@ When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) 
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>
@@ -313,6 +335,15 @@ suspend fun signInWithAzure() {
         scopes.add("offline_access")
     }
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var signInUrl = supabase.Auth.SignIn(Provider.Azure, "offline_access");
 ```
 
 </TabPanel>

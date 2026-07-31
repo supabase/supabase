@@ -122,6 +122,17 @@ suspend fun signInWithKeycloak() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.KeyCloak` as the provider:
+
+```c#
+var signInUrl = supabase.Auth.SignIn(Provider.KeyCloak);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -168,6 +179,17 @@ const supabase = createClient('https://your-project-id.supabase.co', 'sb_publish
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>
