@@ -13,6 +13,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { AlertError } from '../AlertError'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
+import { InlineLinkClassName } from '../InlineLink'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
 import {
@@ -185,6 +186,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const supportConversationId = supportMetadata?.frontConversationId
   const isChatInputDisabled =
     !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
+
+  const branchedConversation = !!snap.activeChat?.branchedFromChatId
+    ? snap.chats[snap.activeChat?.branchedFromChatId]
+    : undefined
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -491,8 +496,26 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
               )}
+
+              {branchedConversation && (
+                <div className="flex items-center gap-2 mt-6">
+                  <div className="flex-1 border-t border-strong" />
+                  <div className="flex items-center gap-1 max-w-[80%] text-xs text-foreground-lighter">
+                    <span className="shrink-0">Branched from</span>
+                    <button
+                      tabIndex={0}
+                      className={cn(InlineLinkClassName, 'cursor-pointer truncate min-w-0')}
+                      onClick={() => snap.selectChat(branchedConversation.id)}
+                    >
+                      {branchedConversation.name}
+                    </button>
+                  </div>
+                  <div className="flex-1 border-t border-strong" />
+                </div>
+              )}
+
               <p className="text-center text-xs text-foreground-muted mt-6">
-                Supabase AI may not always produce correct answers. Double check responses.
+                The Assistant can make mistakes. Double check responses.
               </p>
             </ConversationContent>
             <ConversationScrollButton />

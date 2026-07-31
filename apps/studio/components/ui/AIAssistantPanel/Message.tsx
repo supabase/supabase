@@ -8,10 +8,12 @@ import { MessageActions } from './Message.Actions'
 import type { AddToolApprovalResponse, MessageInfo } from './Message.Context'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import { MessageDisplay } from './Message.Display'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
-  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
+  const snap = useAiAssistantStateSnapshot()
   const { onCancelEdit, onRate } = useMessageActionsContext()
+  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
 
   const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
     onRate?.(id, newRating, reason)
@@ -49,7 +51,7 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
             isActive={rating === 'negative'}
             disabled={!!rating}
           />
-          <MessageActions.Branch onClick={() => {}} />
+          <MessageActions.Branch onClick={() => snap.branchChat(id)} />
         </MessageActions>
       )}
     </MessageDisplay.Container>
