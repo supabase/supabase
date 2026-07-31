@@ -22,6 +22,7 @@ import { formatAccessText, getRealAccess } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -110,7 +111,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             <p className="truncate" title={`Manage access for ${token?.name}`}>
               View access for {token?.name}
             </p>
-            <DocsButton href="https://supabase.com/docs/reference/api/introduction" />
+            <DocsButton href={`${DOCS_URL}/reference/api/introduction`} />
           </SheetHeader>
           <ScrollArea className="flex-1 max-h-[calc(100vh-60px)]">
             <div className="space-y-8 px-5 sm:px-6 py-6">

@@ -3,7 +3,7 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-forma
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { Plus, Trash } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -91,7 +91,7 @@ export const CreateFunction = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
-  const { type, language } = form.watch()
+  const [type, language] = useWatch({ control: form.control, name: ['type', 'language'] })
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,

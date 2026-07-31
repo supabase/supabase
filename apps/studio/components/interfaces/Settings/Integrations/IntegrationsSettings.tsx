@@ -1,5 +1,5 @@
 import { Card } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
 import { GitHubSection } from './GithubIntegration/GithubSection'

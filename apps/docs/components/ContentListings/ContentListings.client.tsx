@@ -9,13 +9,17 @@ import {
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { useCallback } from 'react'
+import { Badge } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
+import { resolveContentListingIcon } from './iconChip'
+
 const GRID_ITEM_CLASS = {
+  // Stay 2-up until xl (~1280px) so cards aren't cramped beside the docs sidebar.
   2: 'col-span-12 md:col-span-6',
-  3: 'col-span-12 md:col-span-4',
-  4: 'col-span-12 md:col-span-3',
+  3: 'col-span-12 md:col-span-6 xl:col-span-4',
+  4: 'col-span-12 md:col-span-6 xl:col-span-3',
 } as const
 
 function useContentListingClickHandler(group: ContentListingGroup) {
@@ -76,9 +80,19 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                   >
                     <GlassPanel
                       title={item.title}
-                      icon={item.icon}
-                      hasLightIcon={Boolean(item.icon)}
+                      icon={resolveContentListingIcon(item.icon)}
+                      hasLightIcon={item.hasLightIcon ?? typeof item.icon === 'string'}
+                      badge={
+                        item.badge && item.badgePosition !== 'below' ? (
+                          <Badge variant="success">{item.badge}</Badge>
+                        ) : undefined
+                      }
                     >
+                      {item.badge && item.badgePosition === 'below' && (
+                        <Badge variant="success" className="mb-3 block w-fit">
+                          {item.badge}
+                        </Badge>
+                      )}
                       {item.description}
                     </GlassPanel>
                   </Link>

@@ -12,7 +12,7 @@ The default behavior if you're not using SSR is to store this information in loc
 
 If you're not using SSR, you might also be using the [implicit flow](/docs/guides/auth/sessions/implicit-flow) to get the access and refresh tokens. The server can't access the tokens in this flow, so for SSR, you should change to the [PKCE flow](/docs/guides/auth/sessions/pkce-flow). You can change the flow type when initiating your Supabase client if your client library provides this option.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 In the `@supabase/ssr` package, Supabase clients are initiated to use the PKCE flow by default. They are also automatically configured to handle the saving and retrieval of session information in cookies.
 

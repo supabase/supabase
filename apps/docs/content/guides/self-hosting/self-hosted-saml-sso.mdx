@@ -65,7 +65,7 @@ Keep this key secret. Anyone with the private key can forge SAML requests on beh
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 For a production deployment, consider using a 4096-bit key by adding `-pkeyopt rsa_keygen_bits:4096` to the `openssl genpkey` command above.
 
@@ -115,14 +115,13 @@ auth:
 Apply the configuration changes:
 
 ```sh
-docker compose down && \
-docker compose up -d
+sh run.sh recreate
 ```
 
 Verify the Auth service is healthy:
 
 ```sh
-docker compose ps auth
+sh run.sh status auth
 ```
 
 ## Step 5: Retrieve your service provider metadata
@@ -137,7 +136,7 @@ curl http://<your-domain>/auth/v1/sso/saml/metadata
 
 This returns an XML document containing your SP entity ID, ACS endpoint URL, and signing certificate. You will need to provide this to your IdP.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Add `?download=true` to the request URL to get the metadata as a downloadable XML file with a 5-year validity period - this is useful for IdPs that require a file upload instead of a URL.
@@ -548,7 +547,7 @@ The response should include `app_metadata.provider: "sso:saml"` and any mapped a
 The `GOTRUE_SAML_ENABLED` variable is not set to `true`, or the Auth container did not pick up the change. Verify the env var is passed through `docker-compose.yml` and restart:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ### "Invalid private key" on startup
@@ -569,7 +568,7 @@ base64 -w 0 -i pk_rsa1.der
 
 ### IdP cannot reach the ACS endpoint
 
-- Verify `API_EXTERNAL_URL` is set to a URL containing `/auth/v1` the IdP can reach (not set to `localhost` unless testing locally)
+- Verify `API_EXTERNAL_URL` is set to a URL containing `/auth/v1` the IdP can reach (not `localhost` unless testing locally)
 - Check that the API gateway routes for `/auth/v1/sso/saml/acs` and `/auth/v1/sso/saml/metadata` are configured as open (no `key-auth` plugin).
 - Check the Auth container logs: `docker compose logs auth`
 

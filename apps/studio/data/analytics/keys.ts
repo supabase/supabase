@@ -150,6 +150,17 @@ export const analyticsKeys = {
         databaseIdentifier,
       },
     ] as const,
+  apiKeysLastUsed: (
+    projectRef: string | undefined,
+    {
+      isoTimestampStart,
+      isoTimestampEnd,
+    }: {
+      isoTimestampStart?: string
+      isoTimestampEnd?: string
+    }
+  ) =>
+    ['projects', projectRef, 'api-keys-last-used', { isoTimestampStart, isoTimestampEnd }] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 

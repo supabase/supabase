@@ -1,5 +1,5 @@
 ---
-title: 'Remove superuser access from Studio'
+title: 'Remove Superuser Access from Studio'
 description: 'Learn how to switch from the supabase_admin to postgres role in self-hosted Supabase.'
 subtitle: 'Learn how to switch from the supabase_admin to postgres role in self-hosted Supabase.'
 ---
@@ -29,7 +29,7 @@ Use the provided script to reassign ownership of database objects in the `public
 sh utils/reassign-owner.sh
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 This script only updates ownership for database objects in the `public` schema. Supabase-managed and custom schemas are not affected.
 
@@ -53,7 +53,7 @@ This script only updates ownership for database objects in the `public` schema. 
       PG_META_DB_USER: postgres
   ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Studio uses its own credentials to access Postgres via `postgres-meta`, so this change is only needed for backward compatibility and consistency.
 
@@ -62,7 +62,7 @@ Studio uses its own credentials to access Postgres via `postgres-meta`, so this 
 ### Step 3: Restart Supabase
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ## Verify roles

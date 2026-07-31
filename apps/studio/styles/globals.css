@@ -147,6 +147,7 @@
   --chart-warning: hsl(var(--warning-500));
   --chart-warning-muted: hsl(var(--warning-400));
   --chart-destructive: hsl(var(--destructive-default));
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 50%, white);
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
@@ -169,6 +170,7 @@
   --chart-warning: hsl(var(--warning-default));
   --chart-warning-muted: hsl(var(--warning-500));
   --chart-destructive: hsl(var(--destructive-default));
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 55%, var(--background));
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
@@ -206,13 +208,24 @@ body,
   box-sizing: border-box;
 }
 
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading;
+  }
+}
+
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  @apply font-heading font-semibold;
+  @apply font-semibold;
 }
 
 .form-group .form-text,
@@ -244,45 +257,18 @@ input.form-control,
   /* @apply  w-full ; */
   @apply rounded-md;
   @apply shadow-xs;
-  @apply transition-all;
   @apply text-foreground;
   @apply border;
-  @apply focus:shadow-md;
-
-  @apply focus:border-stronger;
-  @apply focus:ring-border-overlay;
-
   @apply bg-studio;
   @apply border-strong border;
-
-  @apply outline-hidden;
-  @apply focus:ring-2 focus:ring-current;
+  /* Prefer shared focus-ring over legacy green box-shadow / ring-current stacks */
+  @apply focus-ring;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   @apply px-4 py-2;
-}
-
-.form-group input:focus,
-.form-group input[type='text']:focus,
-.form-group input[type='email']:focus,
-.form-group input[type='url']:focus,
-.form-group input[type='password']:focus,
-.form-group input[type='number']:focus,
-.form-group input[type='date']:focus,
-.form-group input[type='datetime-local']:focus,
-.form-group input[type='month']:focus,
-.form-group input[type='search']:focus,
-.form-group input[type='tel']:focus,
-.form-group input[type='time']:focus,
-.form-group input[type='week']:focus,
-.form-group input[multiple]:focus,
-.form-group textarea:focus,
-.form-group select:focus,
-.form-group input:focus .form-control:focus {
-  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.1);
 }
 
 /* icons in date / time inputs */
@@ -295,7 +281,7 @@ input.form-control,
 input.is-invalid {
   @apply bg-red-100;
   @apply border border-red-700;
-  @apply focus:ring-red-500;
+  @apply focus-ring focus-visible:ring-destructive;
   @apply placeholder:text-red-600;
 }
 
@@ -471,4 +457,10 @@ div[data-radix-portal]:not(.portal--toast) {
 
 .prose.text-sm ul > li::before {
   top: 0.65rem;
+}
+
+.prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+strong,
+b {
+  @apply font-bold;
 }

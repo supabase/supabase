@@ -224,7 +224,12 @@ function DialogView({ projectRef, isMobile }: { projectRef: string; isMobile?: b
                 {index === stack.length - 1 ? (
                   <span className="font-semibold text-foreground">{item.title}</span>
                 ) : (
-                  <button onClick={() => popTo(index)} className="hover:underline">
+                  <button
+                    type="button"
+                    tabIndex={0}
+                    onClick={() => popTo(index)}
+                    className="hover:underline"
+                  >
                     {item.title}
                   </button>
                 )}

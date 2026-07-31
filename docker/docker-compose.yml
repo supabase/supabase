@@ -96,6 +96,7 @@ services:
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
       KONG_DNS_NOT_FOUND_TTL: 1
+      KONG_DNS_VALID_TTL: 5
       KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,request-termination,ip-restriction,post-function
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
@@ -456,6 +457,10 @@ services:
     environment:
       # Legacy symmetric HS256 key
       JWT_SECRET: ${JWT_SECRET}
+      # JWKS for token verification (EC public + legacy symmetric).
+      # For Podman, use: SUPABASE_JWKS: ${JWT_JWKS}
+      #SUPABASE_JWKS: ${JWT_JWKS:-{"keys":[]}}
+
       SUPABASE_URL: http://kong:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       # Legacy API keys (HS256-signed JWTs)

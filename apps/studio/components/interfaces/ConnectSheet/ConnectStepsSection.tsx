@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useMemo, useRef, type ComponentType } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type {
@@ -16,13 +16,18 @@ import type {
 } from './Connect.types'
 import { ConnectSheetStep } from './ConnectSheetStep'
 import {
+  resolveContentPath,
   shouldFetchDataApiConfig,
   shouldShowDataApiDisabledWarning,
+  shouldShowIpv4AddonNotice,
+  shouldShowSelfHostedMcpNotice,
+  shouldShowSessionPoolerNotice,
 } from './ConnectStepsSection.utils'
-import { CopyPromptAdmonition } from './CopyPromptAdmonition'
+import { CopyPromptButton } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
@@ -30,6 +35,7 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
+import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -40,35 +46,23 @@ interface ConnectStepsSectionProps {
 }
 
 /**
- * Resolves a content path template by replacing {{key}} placeholders with state values.
- * Empty segments are filtered out to handle optional state values like frameworkVariant.
- *
- * Examples:
- *   - '{{framework}}/{{frameworkVariant}}/{{library}}' with state {framework: 'nextjs', frameworkVariant: 'app', library: 'supabasejs'}
- *     → 'nextjs/app/supabasejs'
- *   - '{{orm}}' with state {orm: 'prisma'}
- *     → 'prisma'
- *   - 'steps/install' (no templates)
- *     → 'steps/install'
- */
-function resolveContentPath(template: string, state: ConnectState): string {
-  return template
-    .replace(/\{\{(\w+)\}\}/g, (_, key) => String(state[key] ?? ''))
-    .split('/')
-    .filter(Boolean)
-    .join('/')
-}
-
-/**
  * Hook to fetch and prepare connection strings for step content.
  */
 function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionStringPooler {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
-  const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+  // Multigres has no pooler, so the pooler config endpoints don't apply
+  const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
+  const { data: supavisorConfig } = useSupavisorConfigurationQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
@@ -128,14 +122,22 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
         connectionStringsShared,
         connectionStringsDedicated,
         ipv4Addon: !!ipv4Addon,
+        isHighAvailability,
       }),
-    [deploymentMode, connectionInfo, connectionStringsShared, connectionStringsDedicated, ipv4Addon]
+    [
+      deploymentMode,
+      connectionInfo,
+      connectionStringsShared,
+      connectionStringsDedicated,
+      ipv4Addon,
+      isHighAvailability,
+    ]
   )
 }
 
 // Vite needs `import.meta.glob` to statically discover the step content
 // modules because the `${filePath}` template can span multiple directory
-// segments (`flask/supabasepy`, `steps/shadcn/explore`, ...) which Vite's
+// segments (`flask/supabasepy`, `steps/shadcn/command`, ...) which Vite's
 // dynamic-import-vars plugin can't analyze. Skip the glob on the SSR bundle
 // — Vite replaces `import.meta.env.SSR` at build time and tree-shakes the
 // call so the 37 content modules stay out of the server graph (pulling them
@@ -219,16 +221,22 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
       },
     }
   )
-  const showIpv4AddonNotice =
-    deploymentMode.isPlatform &&
-    state.mode === 'direct' &&
-    !ipv4Addon &&
-    (state.connectionMethod === 'direct' ||
-      (state.connectionMethod === 'transaction' && !state.useSharedPooler))
-  const showSessionPoolerNotice =
-    deploymentMode.isPlatform && state.mode === 'direct' && state.connectionMethod === 'session'
-
-  const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
+  const showIpv4AddonNotice = shouldShowIpv4AddonNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+    useSharedPooler: state.useSharedPooler,
+    hasIpv4Addon: !!ipv4Addon,
+  })
+  const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+  })
+  const showSelfHostedMcpNotice = shouldShowSelfHostedMcpNotice({
+    isSelfHosted: deploymentMode.isSelfHosted,
+    mode: state.mode,
+  })
 
   const shouldFetchDataApiStatus = shouldFetchDataApiConfig({
     mode: state.mode,
@@ -252,7 +260,10 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
   return (
     <div className="bg-muted/50 flex-1">
       <div className="p-8 flex flex-col gap-y-6">
-        <h3>Connect your app</h3>
+        <div className="flex items-center justify-between gap-4">
+          <h3>Follow these steps</h3>
+          <CopyPromptButton stepsContainerRef={stepsContainerRef} />
+        </div>
 
         {showDataApiDisabledWarning && (
           <Admonition
@@ -271,22 +282,29 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
         {showIpv4AddonNotice && (
           <Admonition
             type="default"
+            layout="responsive"
             title={`${state.connectionMethod === 'direct' ? 'Direct connections use' : 'Transaction pooler uses'} IPv6 by default`}
-            description="Enable the dedicated IPv4 address add-on to connect from IPv4-only networks"
-            actions={[
-              <Button asChild key="addon" variant="default">
+            description={
+              <>
+                Enable the dedicated IPv4 address add-on to connect from IPv4-only networks.{' '}
+                <InlineLink href={`${DOCS_URL}/guides/platform/ipv4-address`}>
+                  Learn more
+                </InlineLink>
+              </>
+            }
+            actions={
+              <Button asChild variant="default">
                 <Link href={`/project/${ref}/settings/addons?panel=ipv4`}>Enable IPv4 add-on</Link>
-              </Button>,
-              <DocsButton key="docs" href={`${DOCS_URL}/guides/platform/ipv4-address`} />,
-            ]}
+              </Button>
+            }
           />
         )}
 
         {showSessionPoolerNotice && (
           <Admonition
             type="default"
-            title="Only use Session Pooler on an IPv4 network"
-            description="Session pooler connections are IPv4 proxied for free. Use Direct Connection if connecting via an IPv6 network."
+            title="Only use session pooler on an IPv4 network"
+            description="Session pooler connections are IPv4 proxied for free. Use direct connection if connecting via an IPv6 network."
           />
         )}
 
@@ -296,23 +314,19 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
             title="MCP for self-hosted Supabase requires extra setup"
             description="The configuration below points at the hosted Supabase MCP server. To use MCP against your self-hosted instance, follow the self-hosted MCP guide."
             actions={[
-              <DocsButton
-                key="docs"
-                href="https://supabase.com/docs/guides/self-hosting/enable-mcp"
-              />,
+              <DocsButton key="docs" href={`${DOCS_URL}/guides/self-hosting/enable-mcp`} />,
             ]}
           />
         )}
 
-        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
-
-        <div className="mt-6" ref={stepsContainerRef}>
+        <div ref={stepsContainerRef}>
           {steps.map((step, index) => (
             <ConnectSheetStep
               key={step.id}
               number={index + 1}
               title={step.title}
               description={step.description}
+              optional={step.optional}
             >
               <StepContent
                 contentId={step.content}

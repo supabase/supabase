@@ -17,7 +17,6 @@ import { CreateProjectForm } from './ProjectCreation.schema'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
-import { getCloudProviderArchitecture } from '@/lib/cloudprovider-utils'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
@@ -32,6 +31,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
         name="instanceSize"
         render={({ field }) => (
           <FormItemLayout
+            id="instanceSize"
             layout="horizontal"
             label="Compute size"
             description={
@@ -51,7 +51,10 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
             }
           >
             <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
-              <SelectTrigger className="[&>span>div>div>[data-field=instance-details]]:hidden">
+              <SelectTrigger
+                id="instanceSize"
+                className="[&>span>div>div>[data-field=instance-details]]:hidden"
+              >
                 <SelectValue placeholder="Select a compute size" />
               </SelectTrigger>
               <SelectContent>
@@ -73,11 +76,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                             <div className="text-sm">
                               <span className="text-foreground">
                                 {instanceSizeSpecs[option].ram} RAM /{' '}
-                                {instanceSizeSpecs[option].cpu}{' '}
-                                {getCloudProviderArchitecture(
-                                  form.getValues('cloudProvider') as CloudProvider
-                                )}{' '}
-                                CPU
+                                {instanceSizeSpecs[option].cpu} CPU
                               </span>
                               <p
                                 translate="no"

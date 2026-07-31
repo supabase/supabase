@@ -7,6 +7,7 @@ import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
 import { getSchemaTools } from './schema-tools'
 import { getStudioTools } from './studio-tools'
+import { getSupportLifecycleTools } from './support-tools'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export const getTools = async ({
@@ -16,6 +17,7 @@ export const getTools = async ({
   aiOptInLevel,
   accessToken,
   baseUrl,
+  supportMode,
   signal,
 }: {
   projectRef: string
@@ -24,6 +26,7 @@ export const getTools = async ({
   aiOptInLevel: AiOptInLevel
   accessToken?: string
   baseUrl?: string
+  supportMode?: boolean
   // Required: tools fetched from the remote MCP server hold an HTTP connection
   // that is closed when this signal aborts (i.e. when the request ends).
   signal: AbortSignal
@@ -66,14 +69,14 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
-        authorization,
       }),
       ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }
   }
 
   // Filter all tools based on the (potentially modified) AI opt-in level
-  const filteredTools: ToolSet = filterToolsByOptInLevel(tools, aiOptInLevel)
+  const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
+  const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
 
   return filteredTools
 }

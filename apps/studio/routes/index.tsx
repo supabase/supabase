@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect, type AnyRouter } from '@tanstack/react-router'
 
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -10,15 +10,35 @@ export const Route = createFileRoute('/')({
   validateSearch: (search: Record<string, unknown>) => ({
     next: typeof search.next === 'string' ? search.next : undefined,
   }),
-  beforeLoad: ({ search }) => {
-    // `href` instead of `to` because these targets aren't in the TanStack
-    // routeTree yet — they're still on the Next.js pages side during the
-    // migration. Swap to `to` once `/org`, `/new/new-project`, and
-    // `/project/default` are migrated.
-    if (IS_PLATFORM) {
-      if (search.next === 'new-project') throw redirect({ href: '/new/new-project' })
-      throw redirect({ href: '/org' })
+  beforeLoad: ({ search, location }) => {
+    // Next's redirects() carries the incoming query and hash through to the
+    // destination — deep links like `/?next=new-project&projectName=x` must
+    // keep `projectName`. Only the consumed `next` param is dropped (and only
+    // when it matched); everything else passes through.
+    const carried = (shouldConsumeNext: boolean) => {
+      const carriedSearch: Record<string, unknown> = { ...location.search }
+      if (shouldConsumeNext) delete carriedSearch.next
+      return carriedSearch
     }
-    throw redirect({ href: '/project/default' })
+    // `to`, never `href`: preloading a Link whose beforeLoad throws
+    // `redirect({ href })` recurses forever
+    // (https://github.com/TanStack/router/issues/7141). The `<AnyRouter,
+    // string>` type arguments opt out of the registered route tree's strict
+    // typing so the carried free-form search record is accepted.
+    if (IS_PLATFORM) {
+      if (search.next === 'new-project') {
+        throw redirect<AnyRouter, string>({
+          to: '/new/new-project',
+          search: carried(true),
+          hash: location.hash,
+        })
+      }
+      throw redirect<AnyRouter, string>({ to: '/org', search: carried(false), hash: location.hash })
+    }
+    throw redirect<AnyRouter, string>({
+      to: '/project/default',
+      search: carried(false),
+      hash: location.hash,
+    })
   },
 })

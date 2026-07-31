@@ -104,7 +104,6 @@ import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/pro
 import { Route as ProjectRefSettingsInfrastructureRouteImport } from './routes/project/$ref/settings/infrastructure'
 import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
 import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
-import { Route as ProjectRefSettingsComputeAndDiskRouteImport } from './routes/project/$ref/settings/compute-and-disk'
 import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
 import { Route as ProjectRefSettingsApiRouteImport } from './routes/project/$ref/settings/api'
 import { Route as ProjectRefSettingsAddonsRouteImport } from './routes/project/$ref/settings/addons'
@@ -118,6 +117,7 @@ import { Route as ProjectRefObservabilityQueryInsightsRouteImport } from './rout
 import { Route as ProjectRefObservabilityPostgrestRouteImport } from './routes/project/$ref/observability/postgrest'
 import { Route as ProjectRefObservabilityEdgeFunctionsRouteImport } from './routes/project/$ref/observability/edge-functions'
 import { Route as ProjectRefObservabilityDatabaseRouteImport } from './routes/project/$ref/observability/database'
+import { Route as ProjectRefObservabilityConnectionsRouteImport } from './routes/project/$ref/observability/connections'
 import { Route as ProjectRefObservabilityAuthRouteImport } from './routes/project/$ref/observability/auth'
 import { Route as ProjectRefObservabilityApiOverviewRouteImport } from './routes/project/$ref/observability/api-overview'
 import { Route as ProjectRefObservabilityIdRouteImport } from './routes/project/$ref/observability/$id'
@@ -807,12 +807,6 @@ const ProjectRefSettingsDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
-const ProjectRefSettingsComputeAndDiskRoute =
-  ProjectRefSettingsComputeAndDiskRouteImport.update({
-    id: '/compute-and-disk',
-    path: '/compute-and-disk',
-    getParentRoute: () => ProjectRefSettingsRoute,
-  } as any)
 const ProjectRefSettingsApiKeysRoute =
   ProjectRefSettingsApiKeysRouteImport.update({
     id: '/api-keys',
@@ -888,6 +882,12 @@ const ProjectRefObservabilityDatabaseRoute =
   ProjectRefObservabilityDatabaseRouteImport.update({
     id: '/database',
     path: '/database',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
+const ProjectRefObservabilityConnectionsRoute =
+  ProjectRefObservabilityConnectionsRouteImport.update({
+    id: '/connections',
+    path: '/connections',
     getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
 const ProjectRefObservabilityAuthRoute =
@@ -2178,6 +2178,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
@@ -2191,7 +2192,6 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
-  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -2473,6 +2473,7 @@ export interface FileRoutesByTo {
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
@@ -2485,7 +2486,6 @@ export interface FileRoutesByTo {
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
-  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -2781,6 +2781,7 @@ export interface FileRoutesById {
   '/project/$ref/observability/$id': typeof ProjectRefObservabilityIdRoute
   '/project/$ref/observability/api-overview': typeof ProjectRefObservabilityApiOverviewRoute
   '/project/$ref/observability/auth': typeof ProjectRefObservabilityAuthRoute
+  '/project/$ref/observability/connections': typeof ProjectRefObservabilityConnectionsRoute
   '/project/$ref/observability/database': typeof ProjectRefObservabilityDatabaseRoute
   '/project/$ref/observability/edge-functions': typeof ProjectRefObservabilityEdgeFunctionsRoute
   '/project/$ref/observability/postgrest': typeof ProjectRefObservabilityPostgrestRoute
@@ -2794,7 +2795,6 @@ export interface FileRoutesById {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
-  '/project/$ref/settings/compute-and-disk': typeof ProjectRefSettingsComputeAndDiskRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -3089,6 +3089,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
     | '/project/$ref/observability/postgrest'
@@ -3102,7 +3103,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
-    | '/project/$ref/settings/compute-and-disk'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -3384,6 +3384,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
     | '/project/$ref/observability/postgrest'
@@ -3396,7 +3397,6 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/settings'
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
-    | '/project/$ref/settings/compute-and-disk'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -3691,6 +3691,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/$id'
     | '/project/$ref/observability/api-overview'
     | '/project/$ref/observability/auth'
+    | '/project/$ref/observability/connections'
     | '/project/$ref/observability/database'
     | '/project/$ref/observability/edge-functions'
     | '/project/$ref/observability/postgrest'
@@ -3704,7 +3705,6 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
-    | '/project/$ref/settings/compute-and-disk'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -4637,13 +4637,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefSettingsDashboardRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
-    '/project/$ref/settings/compute-and-disk': {
-      id: '/project/$ref/settings/compute-and-disk'
-      path: '/compute-and-disk'
-      fullPath: '/project/$ref/settings/compute-and-disk'
-      preLoaderRoute: typeof ProjectRefSettingsComputeAndDiskRouteImport
-      parentRoute: typeof ProjectRefSettingsRoute
-    }
     '/project/$ref/settings/api-keys': {
       id: '/project/$ref/settings/api-keys'
       path: '/api-keys'
@@ -4733,6 +4726,13 @@ declare module '@tanstack/react-router' {
       path: '/database'
       fullPath: '/project/$ref/observability/database'
       preLoaderRoute: typeof ProjectRefObservabilityDatabaseRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
+    '/project/$ref/observability/connections': {
+      id: '/project/$ref/observability/connections'
+      path: '/connections'
+      fullPath: '/project/$ref/observability/connections'
+      preLoaderRoute: typeof ProjectRefObservabilityConnectionsRouteImport
       parentRoute: typeof ProjectRefObservabilityRoute
     }
     '/project/$ref/observability/auth': {
@@ -6557,6 +6557,7 @@ interface ProjectRefObservabilityRouteChildren {
   ProjectRefObservabilityIdRoute: typeof ProjectRefObservabilityIdRoute
   ProjectRefObservabilityApiOverviewRoute: typeof ProjectRefObservabilityApiOverviewRoute
   ProjectRefObservabilityAuthRoute: typeof ProjectRefObservabilityAuthRoute
+  ProjectRefObservabilityConnectionsRoute: typeof ProjectRefObservabilityConnectionsRoute
   ProjectRefObservabilityDatabaseRoute: typeof ProjectRefObservabilityDatabaseRoute
   ProjectRefObservabilityEdgeFunctionsRoute: typeof ProjectRefObservabilityEdgeFunctionsRoute
   ProjectRefObservabilityPostgrestRoute: typeof ProjectRefObservabilityPostgrestRoute
@@ -6573,6 +6574,8 @@ const ProjectRefObservabilityRouteChildren: ProjectRefObservabilityRouteChildren
     ProjectRefObservabilityApiOverviewRoute:
       ProjectRefObservabilityApiOverviewRoute,
     ProjectRefObservabilityAuthRoute: ProjectRefObservabilityAuthRoute,
+    ProjectRefObservabilityConnectionsRoute:
+      ProjectRefObservabilityConnectionsRoute,
     ProjectRefObservabilityDatabaseRoute: ProjectRefObservabilityDatabaseRoute,
     ProjectRefObservabilityEdgeFunctionsRoute:
       ProjectRefObservabilityEdgeFunctionsRoute,
@@ -6627,7 +6630,6 @@ interface ProjectRefSettingsRouteChildren {
   ProjectRefSettingsAddonsRoute: typeof ProjectRefSettingsAddonsRoute
   ProjectRefSettingsApiRoute: typeof ProjectRefSettingsApiRoute
   ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
-  ProjectRefSettingsComputeAndDiskRoute: typeof ProjectRefSettingsComputeAndDiskRoute
   ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
   ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
   ProjectRefSettingsInfrastructureRoute: typeof ProjectRefSettingsInfrastructureRoute
@@ -6644,7 +6646,6 @@ const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
   ProjectRefSettingsAddonsRoute: ProjectRefSettingsAddonsRoute,
   ProjectRefSettingsApiRoute: ProjectRefSettingsApiRoute,
   ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
-  ProjectRefSettingsComputeAndDiskRoute: ProjectRefSettingsComputeAndDiskRoute,
   ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
   ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
   ProjectRefSettingsInfrastructureRoute: ProjectRefSettingsInfrastructureRoute,

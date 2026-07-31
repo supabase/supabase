@@ -27,7 +27,14 @@ vi.mock('ui', () => ({
     children: ReactNode
     asChild?: boolean
     type?: string
-  }) => (asChild ? <>{children}</> : <button {...props}>{children}</button>),
+  }) =>
+    asChild ? (
+      <>{children}</>
+    ) : (
+      <button tabIndex={0} {...props}>
+        {children}
+      </button>
+    ),
   Card: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   CardContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
@@ -48,11 +55,11 @@ vi.mock('@/components/interfaces/Project/ResumeProjectButton', () => ({
 }))
 
 vi.mock('./Infrastructure/PauseProjectButton', () => ({
-  default: () => <div>PauseProjectButton</div>,
+  PauseProjectButton: () => <div>PauseProjectButton</div>,
 }))
 
 vi.mock('./Infrastructure/RestartServerButton', () => ({
-  default: () => <div>RestartServerButton</div>,
+  RestartServerButton: () => <div>RestartServerButton</div>,
 }))
 
 vi.mock('@/data/projects/project-pause-status-query', () => ({

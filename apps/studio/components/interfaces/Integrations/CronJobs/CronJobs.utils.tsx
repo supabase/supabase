@@ -7,6 +7,8 @@ import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
 import { CronJobTableCell } from './CronJobTableCell'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
   const unescaped = value.replaceAll("''", "'")
@@ -129,7 +131,12 @@ const DEFAULT_CRONJOB_COMMAND = {
   httpBody: '',
 } as const
 
-export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
+export const parseCronJobCommand = (
+  originalCommand: string,
+  projectRef: string,
+  restUrl?: string,
+  isPlatform = IS_PLATFORM
+): CronJobType => {
   const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
   if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
@@ -181,8 +188,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     } catch {}
 
     if (
-      url.includes(`${projectRef}.supabase.`) &&
-      url.includes('/functions/v1/') &&
+      isEdgeFunctionUrl(url, projectRef, restUrl, isPlatform) &&
       searchParams.length === 0 &&
       urlHash.length === 0
     ) {

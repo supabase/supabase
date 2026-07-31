@@ -40,6 +40,7 @@ import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/Lo
 import { LogsQueryPanel } from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { useRecentLogSqlSnippets } from '@/components/interfaces/Settings/Logs/useRecentLogSqlSnippets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -53,6 +54,7 @@ import {
 } from '@/data/content/content-upsert-mutation'
 import { constructHeaders } from '@/data/fetchers'
 import { fetchOtelLogKeys } from '@/data/logs/otel-log-keys-query'
+import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -91,16 +93,16 @@ const MISSING_LIMIT_ERROR: LogQueryError = {
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
+  const track = useTrack()
   const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
+  const { ref: projectRef, q, queryId } = useParams()
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
+  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
+
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { ref, q, queryId } = useParams()
-  const track = useTrack()
-  const projectRef = ref as string
-  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
-  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   const allTemplates = useMemo(() => {
     const templates = getLogsTemplates(useOtelEndpoint)
@@ -150,18 +152,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     false
   )
 
-  const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
-    `project-content-${projectRef}-recent-log-sql`,
-    []
-  )
+  const [recentLogs, setRecentLogs] = useRecentLogSqlSnippets(projectRef)
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
-  const { data: content } = useContentQuery({
-    projectRef: ref,
-    type: 'log_sql',
-  })
+  const { data: content } = useContentQuery({ projectRef, type: 'log_sql' })
   const query = content?.content.find((x) => x.id === queryId)
 
   const resolvedRange = useMemo(() => {
@@ -180,15 +176,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     error,
     isLoading: logsLoading,
     setParams,
-  } = useLogsQuery(
+  } = useLogsQuery({
     projectRef,
-    {
+    initialParams: {
       iso_timestamp_start: resolvedRange.from,
       iso_timestamp_end: resolvedRange.to,
     },
-    true,
-    { useOtel: useOtelEndpoint }
-  )
+    enabled: true,
+    options: { useOtel: useOtelEndpoint },
+  })
 
   const results = logData
   const isLoading = logsLoading
@@ -219,7 +215,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
-      sql: '',
+      unchecked_sql: untrustedLogSql(''),
       content_id: '',
     }
     setRecentLogs([...recentLogs, { ...defaults, ...snippet }])
@@ -244,7 +240,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       editorRef.current.focus()
     }
 
-    addRecentLogSqlSnippet({ sql: template.searchString })
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(template.searchString) })
   }
 
   const handleRewrite = async () => {
@@ -258,11 +254,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const headerData = await constructHeaders()
       const source = detectLogSource(currentSql)
       const availableKeys = source
-        ? await fetchOtelLogKeys({ projectRef, source }).catch(() => undefined)
+        ? await fetchOtelLogKeys({ projectRef: projectRef!, source }).catch(() => undefined)
         : undefined
       const rewritten = await rewriteLogsSqlWithAI({
         sql: currentSql,
-        projectRef,
+        projectRef: projectRef!,
         connectionString: project?.connectionString,
         orgSlug: organization?.slug,
         authorizationHeader: headerData.get('Authorization'),
@@ -324,7 +320,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setTimeRange('', '')
     }
     setSearch(query)
-    addRecentLogSqlSnippet({ sql: query })
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(query) })
   }
 
   const handleInsertSource = (source: string) => {
@@ -370,7 +366,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       type: 'log_sql' as const,
       content: {
         content_id: editorId,
-        sql: editorValue,
+        unchecked_sql: untrustedLogSql(editorValue),
         schema_version: '1',
         favorite: false,
       } as LogSqlSnippets.Content,
@@ -396,7 +392,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         projectRef: projectRef!,
         payload: {
           ...query,
-          content: { ...(query.content as LogSqlSnippets.Content), sql: currentSql },
+          content: {
+            ...(query.content as LogSqlSnippets.Content),
+            unchecked_sql: untrustedLogSql(currentSql),
+          },
         },
       })
 
@@ -432,7 +431,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }))
   }
 
-  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.sql
+  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.unchecked_sql
   useEffect(() => {
     if (search) {
       setEditorValue(search)
@@ -566,7 +565,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               hasEditorValue={Boolean(editorValue)}
               data={showMissingLimitError ? [] : results}
               error={showMissingLimitError ? MISSING_LIMIT_ERROR : error}
-              projectRef={projectRef}
+              projectRef={projectRef!}
               onSelectedLogChange={setSelectedLog}
               selectedLog={selectedLog || undefined}
               sqlQuery={editorValue}

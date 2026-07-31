@@ -102,9 +102,9 @@ const GuideTemplate = ({
                 <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
               </h1>
               {meta?.subtitle && (
-                <h2 className="mt-1 text-xl text-foreground-light [&>p]:m-0">
+                <div className="mt-3 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
                   <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-                </h2>
+                </div>
               )}
             </header>
 
@@ -121,7 +121,7 @@ const GuideTemplate = ({
                 className={cn(
                   'w-fit',
                   'flex items-center gap-1',
-                  'text-sm text-scale-1000 hover:text-scale-1200',
+                  'text-sm text-tertiary-foreground hover:text-foreground',
                   'transition-colors'
                 )}
                 target="_blank"

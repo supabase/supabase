@@ -1,7 +1,7 @@
 ---
 title: 'Custom Email Templates'
-description: 'Configure custom email templates with self-hosted Supabase instance'
-subtitle: 'Configure custom email templates with self-hosted Supabase instance'
+description: 'Configure custom email templates with self-hosted Supabase instance.'
+subtitle: 'Configure custom email templates with self-hosted Supabase instance.'
 ---
 
 When running a self-hosted Supabase instance, you can fully customize emails sent by Supabase Auth.
@@ -20,7 +20,7 @@ To provide templates to Supabase Auth, you need a service that serves static HTM
 
 This guide uses [Caddy](https://github.com/caddyserver/caddy) for serving templates.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 If Supabase Auth cannot fetch the template or if the fetched template is invalid, it falls back to the default template.
 
@@ -98,7 +98,7 @@ services:
 ### Step 3: Restart containers
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth templates-server
+sh run.sh recreate auth templates-server
 ```
 
 ## Notification email templates
@@ -171,5 +171,5 @@ services:
 ### Step 3: Restart containers
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth templates-server
+sh run.sh recreate auth templates-server
 ```
