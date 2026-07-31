@@ -117,6 +117,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
+            tabIndex={0}
             className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()

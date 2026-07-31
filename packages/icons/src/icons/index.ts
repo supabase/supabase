@@ -9,6 +9,7 @@ export { default as BoxPlus } from './box-plus';
 export { default as BucketPlus } from './bucket-plus';
 export { default as Chatgpt } from './chatgpt';
 export { default as Claude } from './claude';
+export { default as ClickHouse } from './click-house';
 export { default as Database } from './database';
 export { default as Datadog } from './datadog';
 export { default as EdgeFunctions } from './edge-functions';

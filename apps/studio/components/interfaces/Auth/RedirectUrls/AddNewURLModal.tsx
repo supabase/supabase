@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { useParams } from 'common'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -89,7 +89,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
     resolver: zodResolver(formSchema),
     defaultValues: initialValues,
   })
-  const urls = form.watch('urls')
+  const urls = useWatch({ control: form.control, name: 'urls' })
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     const payload = parseRedirectUrls(

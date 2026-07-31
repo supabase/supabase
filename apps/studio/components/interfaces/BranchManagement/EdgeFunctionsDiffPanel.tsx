@@ -128,6 +128,7 @@ const FunctionDiff = ({
                   <li key={fileInfo.key} className="flex">
                     <button
                       type="button"
+                      tabIndex={0}
                       onClick={() => setActiveFileKey(fileInfo.key)}
                       className={cn(
                         'flex-1 text-left text-xs px-4 py-2 flex items-center gap-2',

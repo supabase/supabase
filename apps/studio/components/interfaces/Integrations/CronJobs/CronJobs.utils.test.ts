@@ -151,6 +151,24 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should return an edge function config for a self-hosted function URL', () => {
+    const command = `select net.http_post( url:='http://kong:8000/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'default', undefined, false)).toMatchObject({
+      edgeFunctionName: 'http://kong:8000/functions/v1/_',
+      type: 'edge_function',
+    })
+  })
+
+  it('should return an edge function config for a self-hosted public function URL', () => {
+    const command = `select net.http_post( url:='https://default.supabase.localhost/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
+    expect(
+      parseCronJobCommand(command, 'default', 'https://default.supabase.localhost/rest/v1/', false)
+    ).toMatchObject({
+      edgeFunctionName: 'https://default.supabase.localhost/functions/v1/_',
+      type: 'edge_function',
+    })
+  })
+
   it("should return an HTTP request config when there's a query parameter or hash in the URL (also handles edge function)", () => {
     const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_?first=1#second=2', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 )`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({

@@ -2,7 +2,7 @@ import { FeatureFlagContext } from 'common'
 import { useRouter } from 'next/router'
 import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { OrganizationSelector } from '../Connect/OrganizationSelector'

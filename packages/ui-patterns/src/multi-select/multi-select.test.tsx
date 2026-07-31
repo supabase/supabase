@@ -48,6 +48,16 @@ function MultiSelectDemo() {
 }
 
 describe('multi-select', () => {
+  it('renders selected values with a custom label', () => {
+    render(
+      <MultiSelector values={['101']} onValuesChange={() => undefined}>
+        <MultiSelectorTrigger renderValue={(value) => `public.table_${value}`} />
+      </MultiSelector>
+    )
+
+    expect(screen.getByRole('combobox')).toHaveTextContent('public.table_101')
+  })
+
   it('opens the dropdown when the MultiSelectorTrigger is clicked', () => {
     render(<MultiSelectDemo />)
 

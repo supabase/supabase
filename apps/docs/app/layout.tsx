@@ -1,17 +1,16 @@
-import '@code-hike/mdx/styles.css'
-import 'config/code-hike.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 import '../styles/globals.css'
 import '../styles/prism-okaidia.css'
 
-import { SkipToContent } from '~/components/SkipToContent'
 import { GlobalProviders } from '~/features/app.providers'
+import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { TelemetryTagManager } from 'common'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { inter, manrope } from '@/fonts'
 
@@ -55,7 +54,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`} suppressHydrationWarning>
       <body>
-        <SkipToContent />
+        <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />
         <TelemetryTagManager />
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>
