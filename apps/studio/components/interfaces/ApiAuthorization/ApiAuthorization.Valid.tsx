@@ -123,7 +123,6 @@ export function ApiAuthorizationValidScreen({
   navigate,
 }: ApiAuthorizationValidScreenProps): ReactNode {
   const [approvalState, setApprovalState] = useState<ApprovalState>('indeterminate')
-  const [actionError, setActionError] = useState<string>()
 
   const form = useForm<IApprovalFormSchema>({
     resolver: zodResolver(approvalFormSchema),
@@ -143,31 +142,46 @@ export function ApiAuthorizationValidScreen({
   } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
 
-  const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
+  const {
+    mutate: approveRequest,
+    error: approveError,
+    reset: resetApproveError,
+  } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
     },
-    onError: (error) => {
+    onError: () => {
       setApprovalState('indeterminate')
-      setActionError(`Failed to authorize request: ${error.message}`)
     },
   })
-  const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
+  const {
+    mutate: declineRequest,
+    error: declineError,
+    reset: resetDeclineError,
+  } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
       navigate('/organizations')
     },
-    onError: (error) => {
+    onError: () => {
       setApprovalState('indeterminate')
-      setActionError(`Failed to cancel authorization request: ${error.message}`)
     },
   })
+  const actionError = approveError
+    ? `Failed to authorize request: ${approveError.message}`
+    : declineError
+      ? `Failed to cancel authorization request: ${declineError.message}`
+      : undefined
+  const resetActionError = () => {
+    resetApproveError()
+    resetDeclineError()
+  }
 
   const onApproveRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
-    setActionError(undefined)
+    resetActionError()
     setApprovalState('approving')
     approveRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
@@ -176,7 +190,7 @@ export function ApiAuthorizationValidScreen({
     if (approvalState !== 'indeterminate') {
       return
     }
-    setActionError(undefined)
+    resetActionError()
     setApprovalState('declining')
     declineRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
@@ -230,7 +244,7 @@ export function ApiAuthorizationValidScreen({
         requestedOrganizationSlug={effectiveOrganizationSlug}
         organizations={effectiveOrganizationsState}
         actionError={actionError}
-        onOrganizationChange={() => setActionError(undefined)}
+        onOrganizationChange={resetActionError}
         onApprove={onApproveRequest}
         onDecline={onDeclineRequest}
       />

@@ -38,13 +38,11 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(null)
   const [linkedOrgSlug, setLinkedOrgSlug] = useState<string | null>(null)
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
-  const [linkError, setLinkError] = useState<string>()
 
   useEffect(() => {
     setSelectedOrgSlug(null)
     setLinkedOrgSlug(null)
     setShowOrgCreationDialog(false)
-    setLinkError(undefined)
   }, [buyerId])
 
   const {
@@ -76,15 +74,23 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
     { enabled: !!shouldLoadOnboardingInfo }
   )
 
-  const { mutate: linkOrganization, isPending: isLinkingOrganization } =
-    useOrganizationLinkAwsMarketplaceMutation({
-      onSuccess: (_, variables) => {
-        setLinkedOrgSlug(variables.slug)
-      },
-      onError: (error) => {
-        setLinkError(`Failed to link organization: ${error.message}`)
-      },
-    })
+  const {
+    mutate: linkOrganization,
+    isPending: isLinkingOrganization,
+    error: linkOrganizationError,
+    reset: resetLinkOrganizationError,
+  } = useOrganizationLinkAwsMarketplaceMutation({
+    onSuccess: (_, variables) => {
+      setLinkedOrgSlug(variables.slug)
+    },
+  })
+  const linkError = linkOrganizationError
+    ? `Failed to link organization: ${linkOrganizationError.message}`
+    : undefined
+
+  useEffect(() => {
+    resetLinkOrganizationError()
+  }, [buyerId, resetLinkOrganizationError])
 
   const effectiveOrganizations = useMemo(
     () => organizations ?? EMPTY_ORGANIZATIONS,
@@ -253,7 +259,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const primaryAction = hasLinkableOrganizations
     ? () => {
         if (!selectedOrgSlug || !buyerId) return
-        setLinkError(undefined)
+        resetLinkOrganizationError()
         linkOrganization({ slug: selectedOrgSlug, buyerId })
       }
     : () => setShowOrgCreationDialog(true)
@@ -285,7 +291,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               disabled={isLinking}
               onSelect={(slug) => {
                 setSelectedOrgSlug(slug)
-                setLinkError(undefined)
+                resetLinkOrganizationError()
               }}
               createLabel={hasLinkableOrganizations ? 'Create new organization' : undefined}
               onCreate={hasLinkableOrganizations ? () => setShowOrgCreationDialog(true) : undefined}
