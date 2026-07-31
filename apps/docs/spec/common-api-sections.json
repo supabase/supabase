@@ -77,6 +77,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-scrape-project-metrics",
+        "title": "Scrape project metrics",
+        "slug": "v1-scrape-project-metrics",
+        "type": "operation"
+      },
+      {
         "id": "v2-update-log-drain",
         "title": "Update log drain",
         "slug": "v2-update-log-drain",
@@ -761,6 +767,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-list-organization-github-connections",
+        "title": "List organization github connections",
+        "slug": "v2-list-organization-github-connections",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-organization-members",
         "title": "List organization members",
         "slug": "v1-list-organization-members",
@@ -770,6 +782,12 @@
         "id": "v2-list-organization-members",
         "title": "List organization members",
         "slug": "v2-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-projects",
+        "title": "List organization projects",
+        "slug": "v2-list-organization-projects",
         "type": "operation"
       },
       {
@@ -788,6 +806,12 @@
         "id": "v2-create-organization-invitations",
         "title": "Create organization invitations",
         "slug": "v2-create-organization-invitations",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-organization-invitations",
+        "title": "Delete organization invitations",
+        "slug": "v2-delete-organization-invitations",
         "type": "operation"
       }
     ]
@@ -842,6 +866,12 @@
         "id": "v2-delete-private-link-association",
         "title": "Delete private link association",
         "slug": "v2-delete-private-link-association",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-private-link-association-for-database",
+        "title": "Delete private link association for database",
+        "slug": "v2-delete-private-link-association-for-database",
         "type": "operation"
       },
       {
