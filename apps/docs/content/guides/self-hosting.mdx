@@ -5,24 +5,25 @@ subtitle: 'Install and run your own Supabase on your computer, server, or cloud 
 hideToc: true
 ---
 
-Run Supabase on your own infrastructure instead of the managed platform. Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent you from using managed services, or want to run Supabase in an isolated environment. Docker is the recommended way to get started.
+Docker is the recommended way to self-host Supabase. Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent you from using managed services, or want to run Supabase in an isolated environment.
 
 <ContentListings id="self-hosting-get-started" />
 
 <ContentListings id="self-hosting-community" />
 
-## More about self-hosting
+## How self-hosted Supabase differs
 
-### How self-hosted Supabase differs
+### Local development
 
-Self-hosted Supabase is different from:
+The [Supabase CLI](/docs/guides/local-development/cli/getting-started) runs Supabase locally for development and testing. It is not intended for self-hosting.
 
-- **Supabase CLI** (local development), which is intended for development and testing only.
-- **Managed Supabase** platform, which is fully hosted and operated by Supabase.
+### Managed Supabase
+
+The managed Supabase platform is fully hosted and operated by Supabase.
 
 Self-hosted Supabase mimics a single project. Studio doesn't support multiple organizations or projects. Platform-only [features](/features) such as branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable** in self-hosted configuration. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
-### Your responsibilities when self-hosting
+## Your responsibilities when self-hosting
 
 When you self-host, **you are responsible for**:
 
@@ -34,7 +35,7 @@ When you self-host, **you are responsible for**:
 - Backups and disaster recovery
 - Monitoring and uptime
 
-### Telemetry
+## Telemetry
 
 Self-hosted Supabase (run via Docker Compose) **does not phone home or collect any telemetry**.
 
