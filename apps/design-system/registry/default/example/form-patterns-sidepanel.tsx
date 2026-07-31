@@ -319,7 +319,7 @@ export default function FormPatternsSidePanel() {
                             tabIndex={0}
                             type="button"
                             onClick={() => uploadButtonRef.current?.click()}
-                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
+                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-ring"
                             style={{
                               backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                             }}

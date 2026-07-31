@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -413,10 +413,10 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           anchor: 'pipeline-initial-sync-data',
           key: PricingMetric.ETL_COPY_BACKFILL_DATA,
           attributes: [{ key: PricingMetric.ETL_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' }],
-          name: 'Pipeline Initial Sync Data',
+          name: 'Initial Sync Data Processed',
           unit: 'bytes',
           description:
-            'Total amount of initial sync data processed across all projects.\nBilling is based on the total amount of initial sync data processed in gigabytes.',
+            'Postgres row data accepted by pipeline destinations during initial sync or resynchronization across all projects.\nBilling is based on the total amount of initial sync data processed in gigabytes.',
           chartDescription: 'The data refreshes every hour.',
           links: [
             {
@@ -429,10 +429,10 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           anchor: 'pipeline-ongoing-replication-data',
           key: PricingMetric.ETL_REPLICATED_DATA,
           attributes: [{ key: PricingMetric.ETL_REPLICATED_DATA.toLowerCase(), color: 'white' }],
-          name: 'Pipeline Ongoing Replication Data',
+          name: 'Ongoing Replication Data Processed',
           unit: 'bytes',
           description:
-            'Total amount of ongoing replication data processed across all projects.\nBilling is based on the total amount of ongoing replication data processed in gigabytes.',
+            'Postgres row data accepted by pipeline destinations during ongoing replication across all projects.\nBilling is based on the total amount of ongoing replication data processed in gigabytes.',
           chartDescription: 'The data refreshes every hour.',
           links: [
             {

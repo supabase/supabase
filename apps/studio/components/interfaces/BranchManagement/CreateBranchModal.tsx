@@ -8,7 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -41,6 +41,7 @@ import {
   estimateRestoreTime,
 } from './BranchManagement.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -111,7 +112,10 @@ export const CreateBranchModal = () => {
     defaultValues: { branchName: '', gitBranchName: '', withData: false },
   })
 
-  const { withData, gitBranchName } = form.watch()
+  const [withData, gitBranchName] = useWatch({
+    control: form.control,
+    name: ['withData', 'gitBranchName'],
+  })
   const debouncedGitBranchName = useDebounce(gitBranchName, 500)
 
   const {
@@ -522,9 +526,9 @@ export const CreateBranchModal = () => {
                                     <InlineLink
                                       onClick={() => setShowCreateBranchModal(false)}
                                       className="pointer-events-auto"
-                                      href={`/project/${ref}/settings/compute-and-disk`}
+                                      href={getInfrastructurePath(projectRef)}
                                     >
-                                      Compute and Disk
+                                      Infrastructure
                                     </InlineLink>
                                   </p>
                                 </TooltipContent>

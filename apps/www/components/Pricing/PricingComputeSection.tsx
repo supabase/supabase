@@ -189,15 +189,18 @@ const PricingComputeSection = () => {
         <button
           tabIndex={0}
           onClick={() => setShowTable(!showTable)}
-          className="w-full p-2 border-t border-muted text-foreground focus-visible:outline-brand-600 focus-visible:rounded-b-xl text-sm bg-alternative flex items-center justify-center gap-2"
+          className="group w-full p-2 border-t border-muted text-foreground outline-hidden rounded-b-xl text-sm bg-alternative flex items-center justify-center"
         >
-          <ChevronDownIcon
-            className={cn(
-              'w-4 transition-transform transform origin-center',
-              showTable ? 'rotate-180' : 'rotate-0'
-            )}
-          />{' '}
-          {!showTable ? 'Expand' : 'Hide'} Pricing breakdown
+          {/* Label-scoped ring: full-bleed focus-ring clips under Panel overflow-hidden */}
+          <span className="inline-flex items-center gap-2 rounded-md px-2 py-0.5 group-focus-visible:ring-2 group-focus-visible:ring-ring">
+            <ChevronDownIcon
+              className={cn(
+                'w-4 transition-transform transform origin-center',
+                showTable ? 'rotate-180' : 'rotate-0'
+              )}
+            />
+            {!showTable ? 'Expand' : 'Hide'} Pricing breakdown
+          </span>
         </button>
       </div>
     </Panel>

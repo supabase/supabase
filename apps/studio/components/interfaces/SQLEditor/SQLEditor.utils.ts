@@ -7,6 +7,7 @@ import {
 } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
+import type { SqlSnippetSource } from './querySource'
 import {
   alterDatabasePreventConnectionStatements,
   destructiveSqlRegex,
@@ -23,6 +24,7 @@ import {
 } from './SQLEditor.types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
+import { untrustedLogSql, type UntrustedLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import type { Database } from '@/data/read-replicas/replicas-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
@@ -72,6 +74,7 @@ export const createSqlSnippetSkeletonV2 = ({
   project_id,
   folder_id,
   idOverride,
+  source = 'database',
 }: {
   name: string
   sql: string
@@ -83,10 +86,14 @@ export const createSqlSnippetSkeletonV2 = ({
    * with a known id, such as to prevent flicker in the SQL editor when adding new unsaved snippets.
    */
   idOverride?: string
+  /**
+   * Which backend the new snippet targets.
+   */
+  source?: SqlSnippetSource
 }): SnippetWithContent => {
   const id = idOverride ?? generateUuid([folder_id, `${name}.sql`])
 
-  return {
+  const base = {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,
     owner_id,
@@ -96,12 +103,29 @@ export const createSqlSnippetSkeletonV2 = ({
     favorite: false,
     inserted_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    status: 'new' as const,
+  }
+
+  if (source === 'logs') {
+    return {
+      ...base,
+      type: 'log_sql',
+      content: {
+        schema_version: NEW_SQL_SNIPPET_SKELETON.content.schema_version,
+        content_id: id ?? '',
+        unchecked_sql: untrustedLogSql(sql ?? ''),
+      },
+    }
+  }
+
+  return {
+    ...base,
+    type: 'sql',
     content: {
       ...NEW_SQL_SNIPPET_SKELETON.content,
       content_id: id ?? '',
       unchecked_sql: untrustedSql(sql ?? ''),
-    } as any,
-    status: 'new',
+    },
   }
 }
 
@@ -433,7 +457,7 @@ export function applyAutoLimit(
  */
 export function getEditorSql(
   editor: IStandaloneCodeEditor,
-  snippetContent?: UntrustedSqlFragment
+  snippetContent?: string
 ): UntrustedSqlFragment {
   const selection = editor.getSelection()
   const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
@@ -511,7 +535,11 @@ export function buildDebugPromptText(sql: string, errorMessage: string): string 
   return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
 }
 
-type DebugSnippet = { snippet: { content?: { unchecked_sql?: UntrustedSqlFragment } } } | undefined
+// Accepts either brand: the debug flow only reads the SQL as text (it's stripped
+// and interpolated into a prompt), so a logs-branded fragment is fine here.
+type DebugSnippet =
+  | { snippet: { content?: { unchecked_sql?: UntrustedSqlFragment | UntrustedLogSqlFragment } } }
+  | undefined
 type DebugResult = { error?: { message?: string } } | undefined
 
 /**

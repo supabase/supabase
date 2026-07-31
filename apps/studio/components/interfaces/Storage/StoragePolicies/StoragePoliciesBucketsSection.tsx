@@ -72,7 +72,7 @@ export const BucketsPolicies = ({
             aria-label="Toggle bucket list"
             className={cn(
               'rounded-md p-1 text-foreground-light hover:text-foreground',
-              'outline-hidden focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background'
+              'focus-ring'
             )}
           >
             <ChevronUp size={14} className={cn(!expanded && 'rotate-180', 'transition')} />

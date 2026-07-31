@@ -314,7 +314,7 @@ export default function IntegrationsContent({
                   title="Grid view"
                   onClick={() => setFilters({ view: 'grid' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 transition-colors rounded-l-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+                    'relative flex items-center justify-center w-8 h-8 rounded-l-lg focus-visible:z-10 focus-ring',
                     viewMode === 'grid'
                       ? 'bg-surface-300 text-foreground'
                       : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
@@ -327,7 +327,7 @@ export default function IntegrationsContent({
                   title="List view"
                   onClick={() => setFilters({ view: 'list' })}
                   className={cn(
-                    'relative flex items-center justify-center w-8 h-8 transition-colors border-l border-muted rounded-r-lg focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+                    'relative flex items-center justify-center w-8 h-8 border-l border-muted rounded-r-lg focus-visible:z-10 focus-ring',
                     viewMode === 'list'
                       ? 'bg-surface-300 text-foreground'
                       : 'bg-surface-75 text-foreground-muted hover:text-foreground hover:bg-surface-200'
@@ -346,7 +346,7 @@ export default function IntegrationsContent({
                     <Link
                       key={p.slug}
                       href={`/partners/catalog/${p.slug}`}
-                      className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+                      className="flex flex-col justify-start items-stretch group cursor-pointer rounded-xl focus-ring"
                     >
                       <Panel
                         hasActiveOnHover

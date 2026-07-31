@@ -37,6 +37,14 @@ const rewrites = [
     source: '/design-system/:path*',
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
   },
+  {
+    source: '/evals',
+    destination: 'https://supabase-evals.vercel.app',
+  },
+  {
+    source: '/evals/:path*',
+    destination: 'https://supabase-evals.vercel.app/:path*',
+  },
 
   {
     source: '/new-docs',

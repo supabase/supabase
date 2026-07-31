@@ -11,7 +11,7 @@ const HamburgerButton = (props: HamburgerButtonProps) => (
     <button
       tabIndex={0}
       className={cn(
-        'text-foreground-lighter focus:ring-brand bg-transparent hover:text-foreground-light transition-colors hover:bg-overlay inline-flex items-center justify-center rounded-md p-2 focus:outline-hidden focus:ring-2 focus:ring-inset'
+        'text-foreground-lighter bg-transparent hover:text-foreground-light hover:bg-overlay inline-flex items-center justify-center rounded-md p-2 focus-ring'
       )}
       aria-expanded="false"
     >
