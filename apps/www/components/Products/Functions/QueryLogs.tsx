@@ -129,8 +129,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
           isPlaying ? 'opacity-100' : 'opacity-0'
         )}
         style={{
-          background:
-            'linear-gradient(to top, hsl(var(--background-surface-75)) 0%, transparent 100%)',
+          background: 'linear-gradient(to top, var(--background-surface-75) 0%, transparent 100%)',
         }}
       />
       <motion.ul

@@ -6,7 +6,7 @@
   "exports": "./index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -24,8 +24,10 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@typescript/native": "catalog:",
     "shadcn": "^3.3.1",
     "tsconfig": "workspace:*",
+    "typescript": "catalog:",
     "vite": "^7.3.2"
   }
 }

@@ -24,7 +24,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
   const { data: policies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: 'storage',
+    schemas: ['storage'],
   })
 
   const { mutateAsync: deletePolicy } = useDatabasePolicyDeleteMutation()

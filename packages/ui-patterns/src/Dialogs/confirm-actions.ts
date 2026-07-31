@@ -8,7 +8,7 @@ export const CONFIRM_ACTION_STRINGS: Record<Exclude<ConfirmAction, 'custom'>, st
   proceed: 'PROCEED',
 }
 
-const CONFIRM_ACTION_VERBS: Record<Exclude<ConfirmAction, 'custom'>, string> = {
+export const CONFIRM_ACTION_VERBS: Record<Exclude<ConfirmAction, 'custom'>, string> = {
   delete: 'delete',
   purge: 'purge',
   disable: 'disable',
@@ -45,7 +45,7 @@ export function getConfirmLabelText(
 ): string {
   if (confirmAction && confirmAction !== 'custom' && confirmSubject) {
     const verb = CONFIRM_ACTION_VERBS[confirmAction]
-    return `Type ${confirmString} to ${verb} this ${confirmSubject}.`
+    return `Type ${confirmString} to ${verb} ${confirmSubject}.`
   }
 
   return `Type ${confirmString} to confirm.`

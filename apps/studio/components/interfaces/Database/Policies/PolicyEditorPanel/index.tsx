@@ -14,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -26,10 +26,10 @@ import {
   Sheet,
   SheetContent,
   SheetFooter,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import * as z from 'zod'
 
@@ -130,7 +130,10 @@ export const PolicyEditorPanel = memo(function ({
     defaultValues,
   })
 
-  const { name, table, behavior, command, roles } = form.watch()
+  const [name, table, behavior, command, roles] = useWatch({
+    control: form.control,
+    name: ['name', 'table', 'behavior', 'command', 'roles'],
+  })
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
@@ -330,7 +333,7 @@ export const PolicyEditorPanel = memo(function ({
               showClose={false}
               size={showTools ? 'lg' : 'default'}
               className={cn(
-                'bg-surface-200 p-0 flex flex-row gap-0',
+                'bg-popover p-0 flex flex-row gap-0',
                 showTools ? 'min-w-screen! lg:min-w-[1000px]!' : 'min-w-screen! lg:min-w-[600px]!'
               )}
             >
@@ -553,18 +556,18 @@ export const PolicyEditorPanel = memo(function ({
                     'bg-studio overflow-auto'
                   )}
                 >
-                  <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
-                    <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
-                      <TabsTrigger_Shadcn_
+                  <Tabs defaultValue="templates" className="flex flex-col h-full w-full">
+                    <TabsList className="flex gap-4 px-content pt-2">
+                      <TabsTrigger
                         key="templates"
                         value="templates"
                         className="px-0 data-[state=active]:bg-transparent"
                       >
                         Templates
-                      </TabsTrigger_Shadcn_>
-                    </TabsList_Shadcn_>
+                      </TabsTrigger>
+                    </TabsList>
 
-                    <TabsContent_Shadcn_
+                    <TabsContent
                       value="templates"
                       className={cn(
                         'mt-0! overflow-y-auto',
@@ -614,8 +617,8 @@ export const PolicyEditorPanel = memo(function ({
                           }}
                         />
                       </ScrollArea>
-                    </TabsContent_Shadcn_>
-                  </Tabs_Shadcn_>
+                    </TabsContent>
+                  </Tabs>
                 </div>
               )}
             </SheetContent>

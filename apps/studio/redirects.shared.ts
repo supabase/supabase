@@ -105,13 +105,18 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/auth/settings',
-    destination: '/project/:ref/auth/users',
+    destination: '/project/:ref/auth/providers',
     permanent: true,
   },
   {
     source: '/project/:ref/settings/billing/subscription',
     has: [{ type: 'query', key: 'panel', value: 'subscriptionPlan' }],
     destination: '/org/_/billing?panel=subscriptionPlan',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/settings/compute-and-disk',
+    destination: '/project/:ref/settings/infrastructure',
     permanent: true,
   },
   {
@@ -123,7 +128,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   {
     source: '/project/:ref/settings/billing/subscription',
     has: [{ type: 'query', key: 'panel', value: 'computeInstance' }],
-    destination: '/project/:ref/settings/compute-and-disk',
+    destination: '/project/:ref/settings/infrastructure#cpu',
     permanent: true,
   },
   {
@@ -393,23 +398,70 @@ function hasQueryMatches(
   return has.every((h) => h.type === 'query' && get(h.key) === h.value)
 }
 
+// Merge the incoming request's query params (and hash) onto a redirect
+// destination, mirroring Next.js `redirects()` semantics: the query string is
+// carried through to the destination; params the destination already sets
+// win; params consumed by the matched rule (its `has` query keys) are
+// dropped; a hash on the destination wins over the incoming one. `hash` is
+// the bare fragment without the leading `#`. Runtime-agnostic (also usable
+// from next.config / Vercel edge). Exported for unit tests.
+export function preserveQueryAndHash(
+  destination: string,
+  search: URLSearchParams | Record<string, string | string[] | undefined>,
+  options: { consumedKeys?: string[]; hash?: string } = {}
+): string {
+  const { consumedKeys = [], hash = '' } = options
+
+  const hashIdx = destination.indexOf('#')
+  const destHash = hashIdx >= 0 ? destination.slice(hashIdx + 1) : ''
+  const beforeHash = hashIdx >= 0 ? destination.slice(0, hashIdx) : destination
+  const queryIdx = beforeHash.indexOf('?')
+  const destPath = queryIdx >= 0 ? beforeHash.slice(0, queryIdx) : beforeHash
+  const params = new URLSearchParams(queryIdx >= 0 ? beforeHash.slice(queryIdx + 1) : '')
+
+  const incoming =
+    search instanceof URLSearchParams
+      ? search
+      : new URLSearchParams(
+          Object.entries(search).flatMap(([key, value]): Array<[string, string]> => {
+            if (value === undefined || value === null) return []
+            if (Array.isArray(value)) return value.map((v) => [key, v])
+            return [[key, value]]
+          })
+        )
+  for (const key of new Set(incoming.keys())) {
+    if (consumedKeys.includes(key)) continue
+    if (params.has(key)) continue // destination's own value wins
+    for (const value of incoming.getAll(key)) params.append(key, value)
+  }
+
+  const queryStr = params.toString()
+  const finalHash = destHash || hash
+  return `${destPath}${queryStr ? `?${queryStr}` : ''}${finalHash ? `#${finalHash}` : ''}`
+}
+
 export function matchRedirect(input: {
   pathname: string
   search: URLSearchParams | Record<string, string | string[] | undefined>
   isPlatform: boolean
   maintenanceMode?: boolean
+  // Bare fragment without the leading `#` (TanStack's `location.hash` shape).
+  hash?: string
 }): RedirectMatch | null {
-  const { pathname, search, isPlatform, maintenanceMode = false } = input
+  const { pathname, search, isPlatform, maintenanceMode = false, hash } = input
 
   // Maintenance mode handled inline — the maintenance-on rule uses a
   // negative-lookahead regex source that the segment matcher above can't
   // parse. Cheap to special-case here.
   if (maintenanceMode) {
     if (!pathname.startsWith('/maintenance') && !pathname.startsWith('/img')) {
-      return { destination: '/maintenance', permanent: false }
+      return {
+        destination: preserveQueryAndHash('/maintenance', search, { hash }),
+        permanent: false,
+      }
     }
   } else if (pathname === '/maintenance') {
-    return { destination: '/', permanent: false }
+    return { destination: preserveQueryAndHash('/', search, { hash }), permanent: false }
   }
 
   const ordered = [
@@ -421,7 +473,12 @@ export function matchRedirect(input: {
     if (!params) continue
     if (!hasQueryMatches(rule.has, search)) continue
     return {
-      destination: substituteDestination(rule.destination, params),
+      // Next.js carries the incoming query and hash through to the
+      // destination; keys the rule matched on (`has`) are consumed.
+      destination: preserveQueryAndHash(substituteDestination(rule.destination, params), search, {
+        consumedKeys: rule.has?.map((h) => h.key) ?? [],
+        hash,
+      }),
       permanent: rule.permanent,
     }
   }

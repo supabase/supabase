@@ -29,7 +29,9 @@ const Page = ({ onClose }: { onClose: () => void }) => {
   const [open, setOpen] = useState(false)
   return (
     <ProjectContextProvider projectRef="default">
-      <button onClick={() => setOpen(true)}>Open</button>
+      <button tabIndex={0} onClick={() => setOpen(true)}>
+        Open
+      </button>
 
       <DeleteBucketModal
         visible={open}

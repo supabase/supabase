@@ -1,3 +1,15 @@
+/**
+ * Shared tweet testimonials for Studio sign-in and www social proof.
+ *
+ * To add a tweet:
+ * 1. Drop the profile image in `apps/www/public/images/twitter-profiles/` (use the raw Twitter image URL/filename as given)
+ * 2. Append an entry below with `text`, `url`, `handle`, and `img_url`
+ *
+ * Weight (optional, default 1):
+ * - Higher weight = more likely on Studio sign-in (weighted random over the full list)
+ * - www `topTweets` shows the top 18 by weight
+ * - Use ~10 for high-signal quotes (notable people / partners), ~9 for strong ones, lower for the rest
+ */
 const tweets = [
   {
     text: "Really impressed with @supabase's Assistant.\n\nIt has helped me troubleshoot and solve complex CORS Configuration issues on Pinger.",
@@ -303,6 +315,13 @@ const tweets = [
     handle: 'adeelibr',
     img_url: '/images/twitter-profiles/k0aPYRHF_400x400.jpg',
     weight: 6,
+  },
+  {
+    text: 'Supabase is really good. ⚡',
+    url: 'https://x.com/shadcn/status/1672913636132790272',
+    handle: 'shadcn',
+    img_url: '/images/twitter-profiles/TUYae5z7.jpg',
+    weight: 10,
   },
 ]
 

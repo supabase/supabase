@@ -40,6 +40,7 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
         {...listeners}
         className="opacity-50 hover:opacity-100 transition cursor-grab text-foreground"
         type="button"
+        tabIndex={0}
       >
         <GripVertical size={16} strokeWidth={1.5} />
       </button>

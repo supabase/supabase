@@ -22,49 +22,37 @@ import {
 } from './RealtimeLimitsEstimator.constants'
 
 export default function RealtimeLimitsEstimater({}) {
-  const findTableValue = ({ computeAddOn, filters, rls, concurrency }) => {
+  const findTableValue = ({ computeAddOn, rls, concurrency }) => {
     return throughputTable.find(
-      (l) =>
-        l.computeAddOn === computeAddOn &&
-        l.filters === filters &&
-        l.rls === rls &&
-        l.concurrency === concurrency
+      (l) => l.computeAddOn === computeAddOn && l.rls === rls && l.concurrency === concurrency
     )
   }
 
   const [computeAddOn, setComputeAddOn] = useState('micro')
-  const [filters, setFilters] = useState(false)
   const [rls, setRLS] = useState(false)
   const [concurrency, setConcurrency] = useState(500)
 
-  const [limits, setLimits] = useState(findTableValue({ computeAddOn, filters, rls, concurrency }))
+  const [limits, setLimits] = useState(findTableValue({ computeAddOn, rls, concurrency }))
 
   const [expandPreview, setExpandPreview] = useState(false)
 
   const handleComputeAddOnSelection = (val) => {
     setComputeAddOn(val)
     setConcurrency(500)
-    setLimits(findTableValue({ computeAddOn: val, filters, rls, concurrency: 500 }))
-  }
-
-  const handleFiltersSelection = (value) => {
-    const val = value.toLowerCase() === 'true'
-    setFilters(val)
-    setConcurrency(500)
-    setLimits(findTableValue({ computeAddOn, filters: val, rls, concurrency: 500 }))
+    setLimits(findTableValue({ computeAddOn: val, rls, concurrency: 500 }))
   }
 
   const handleRLSSelection = (value) => {
     const val = value.toLowerCase() === 'true'
     setRLS(val)
     setConcurrency(500)
-    setLimits(findTableValue({ computeAddOn, filters, rls: val, concurrency: 500 }))
+    setLimits(findTableValue({ computeAddOn, rls: val, concurrency: 500 }))
   }
 
   const handleConcurrencySelection = (value) => {
     const val = parseInt(value)
     setConcurrency(val)
-    setLimits(findTableValue({ computeAddOn, filters, rls, concurrency: val }))
+    setLimits(findTableValue({ computeAddOn, rls, concurrency: val }))
   }
 
   return (
@@ -83,18 +71,6 @@ export default function RealtimeLimitsEstimater({}) {
                   {option.label}
                 </SelectItem>
               ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="filters">Filters:</Label>
-          <Select onValueChange={handleFiltersSelection} value={filters.toString()} disabled>
-            <SelectTrigger id="filters">
-              <SelectValue className="font-mono" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="false">No</SelectItem>
-              <SelectItem value="true">Yes</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -118,9 +94,7 @@ export default function RealtimeLimitsEstimater({}) {
             </SelectTrigger>
             <SelectContent>
               {throughputTable
-                .filter(
-                  (l) => l.computeAddOn === computeAddOn && l.filters === filters && l.rls === rls
-                )
+                .filter((l) => l.computeAddOn === computeAddOn && l.rls === rls)
                 .map((l) => (
                   <SelectItem key={l.concurrency} value={l.concurrency.toString()}>
                     {Intl.NumberFormat().format(l.concurrency)}
@@ -200,7 +174,6 @@ export default function RealtimeLimitsEstimater({}) {
                         .filter((l) => l.computeAddOn === computeAddOn)
                         .map((l) => (
                           <tr>
-                            <td className="border px-4 py-2">{l.filters ? '✅' : '🚫'}</td>
                             <td className="border px-4 py-2">{l.rls ? '✅' : '🚫'}</td>
                             <td className="border px-4 py-2">
                               {Intl.NumberFormat().format(l.concurrency)}

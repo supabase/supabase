@@ -29,20 +29,13 @@ import {
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
-import { Admonition } from './../admonition'
+import { Admonition } from '../Admonition'
 import {
+  CONFIRM_ACTION_VERBS,
   getConfirmPlaceholderFromAction,
   getConfirmStringFromAction,
   type ConfirmAction,
 } from './confirm-actions'
-
-const CONFIRM_ACTION_LABEL_SUFFIX: Record<Exclude<ConfirmAction, 'custom'>, string> = {
-  delete: 'delete',
-  purge: 'purge',
-  disable: 'disable',
-  're-enable': 're-enable',
-  proceed: 'proceed with',
-}
 
 export type { ConfirmAction } from './confirm-actions'
 
@@ -235,7 +228,7 @@ export const TextConfirmModal = forwardRef<
                         </span>
                       )}{' '}
                       {confirmAction && confirmAction !== 'custom' && confirmSubject
-                        ? `to ${CONFIRM_ACTION_LABEL_SUFFIX[confirmAction]} this ${confirmSubject}.`
+                        ? `to ${CONFIRM_ACTION_VERBS[confirmAction]} ${confirmSubject}.`
                         : 'to confirm.'}
                     </FormLabel>
                     <FormControl>
