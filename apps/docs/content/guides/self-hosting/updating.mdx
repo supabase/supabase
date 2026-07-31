@@ -145,7 +145,7 @@ git log --date=short --format='%ad %h %s' -- docker
 git rev-parse <short-hash>
 ```
 
-Record it (or pass it once with `--from`):
+In the deployment directory, record it (or pass it once with `--from`):
 
 ```sh
 printf 'ref=<full-40-char-sha>\n' > .supabase-version
