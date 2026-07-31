@@ -2,13 +2,12 @@
 
 import type { ContentListingGroup, ContentListingItem } from '~/lib/content-listings.schema'
 import {
+  filterContentListingItems,
   getContentListingById,
   getContentListingGroupLabel,
   isExternalContentListingHref,
 } from '~/lib/content-listings.utils'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import type { Feature } from 'common'
-import { isFeatureEnabled } from 'common'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { Badge } from 'ui'
@@ -23,10 +22,6 @@ const GRID_ITEM_CLASS = {
   3: 'col-span-12 md:col-span-6 xl:col-span-4',
   4: 'col-span-12 md:col-span-6 xl:col-span-3',
 } as const
-
-function filterContentListingItems(items: ContentListingItem[]): ContentListingItem[] {
-  return items.filter((item) => !item.feature || isFeatureEnabled(item.feature as Feature))
-}
 
 function useContentListingClickHandler(group: ContentListingGroup) {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -129,7 +124,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
 
 export function ContentListings({ id }: { id: string }) {
   const group = getContentListingById(id)
-  if (!group || !group.items.length) return null
+  if (!group || !filterContentListingItems(group.items).length) return null
 
   return (
     <div className="my-10 space-y-10">
