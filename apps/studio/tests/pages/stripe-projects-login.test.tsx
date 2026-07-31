@@ -1,10 +1,13 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
+import { http, HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { beforeEach, expect, test, vi } from 'vitest'
 
+import { API_URL } from '@/lib/constants'
 import { StripeProjectsLoginPage } from '@/pages/partners/stripe/projects/login'
 import { render } from '@/tests/helpers'
+import { mswServer } from '@/tests/lib/msw'
 
 const mocks = vi.hoisted(() => ({
   routerPush: vi.fn(),
@@ -37,17 +40,8 @@ vi.mock('next/router', () => ({
   useRouter: () => ({ isReady: true, push: mocks.routerPush }),
 }))
 
-vi.mock('@/data/partners/stripe-projects-confirm-mutation', () => ({
-  useConfirmAccountRequestMutation: () => {
-    const [error, setError] = useState<{ message: string }>()
-    return {
-      mutate: () => setError({ message: 'Confirmation failed' }),
-      isPending: false,
-      isSuccess: false,
-      error,
-      reset: () => setError(undefined),
-    }
-  },
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn() },
 }))
 
 vi.mock('@/lib/auth', () => ({
@@ -68,6 +62,12 @@ beforeEach(() => {
 
 test('shows confirmation failures inline and keeps authorization available', async () => {
   const user = userEvent.setup()
+  mswServer.use(
+    http.post(`${API_URL}/platform/stripe/projects/provisioning/account_requests/:id/confirm`, () =>
+      HttpResponse.json({ message: 'Confirmation failed' }, { status: 500 })
+    )
+  )
+
   render(<StripeProjectsLoginPage dehydratedState={undefined} />)
 
   await user.click(screen.getByRole('button', { name: 'Authorize Stripe Projects' }))
@@ -76,5 +76,6 @@ test('shows confirmation failures inline and keeps authorization available', asy
     'Failed to authorize Stripe Projects: Confirmation failed'
   )
   expect(errorMessage).toHaveAttribute('role', 'alert')
+  expect(toast.error).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: 'Authorize Stripe Projects' })).toBeEnabled()
 })
