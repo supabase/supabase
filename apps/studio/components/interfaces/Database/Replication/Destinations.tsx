@@ -30,6 +30,7 @@ import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
+import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -86,6 +87,7 @@ export const Destinations = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+  const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
   const [_, setDestinationType] = useQueryState(
@@ -157,6 +159,8 @@ export const Destinations = () => {
     () => sourcesData?.sources.find((source) => source.name === projectRef),
     [projectRef, sourcesData?.sources]
   )
+  const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
+
   const canDisablePipelines =
     isSourcesSuccess &&
     isDestinationsSuccess &&
@@ -270,18 +274,24 @@ export const Destinations = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItemTooltip
-                disabled={canDisablePipelines}
-                tooltip={{
-                  content: {
-                    side: 'left',
-                    text: 'Remove all existing destinations before disabling Pipelines',
-                  },
-                }}
-                onClick={() => setShowDisablePipelinesDialog(true)}
-              >
-                Disable Pipelines
-              </DropdownMenuItemTooltip>
+              {replicationNotEnabled ? (
+                <DropdownMenuItem onClick={() => setShowEnablePipelinesDialog(true)}>
+                  Enable Pipelines
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItemTooltip
+                  disabled={!canDisablePipelines}
+                  tooltip={{
+                    content: {
+                      side: 'left',
+                      text: 'Remove all existing destinations before disabling Pipelines',
+                    },
+                  }}
+                  onClick={() => setShowDisablePipelinesDialog(true)}
+                >
+                  Disable Pipelines
+                </DropdownMenuItemTooltip>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -390,6 +400,11 @@ export const Destinations = () => {
       </div>
 
       <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+
+      <EnablePipelinesModal
+        open={showEnablePipelinesDialog}
+        setOpen={setShowEnablePipelinesDialog}
+      />
 
       <DisablePipelinesDialog
         open={showDisablePipelinesDialog}
