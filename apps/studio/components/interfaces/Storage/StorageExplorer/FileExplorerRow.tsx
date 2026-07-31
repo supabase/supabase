@@ -398,7 +398,7 @@ export const FileExplorerRow = ({
             />
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger className="focus-ring rounded-sm">
                 <div className="storage-row-menu opacity-0">
                   <MoreVertical size={16} />
                   <span className="sr-only">{item.name} actions</span>
