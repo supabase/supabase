@@ -3,6 +3,128 @@ id: release-notes
 title: Release Notes
 ---
 
+## 1.5.0 - 2026-07-30
+
+- Update dependency: `Supabase.Realtime@7.3.1`
+  - Fix `channel.Send()` hanging on unacknowledged broadcast pushes ([#72](https://github.com/supabase-community/realtime-csharp/issues/72)).
+- Update dependency: `Supabase.Storage@2.6.0`
+  - Add a `CancellationToken` to the `Download` methods ([#49](https://github.com/supabase-community/storage-csharp/issues/49)).
+  - Implement cache purge ([#50](https://github.com/supabase-community/storage-csharp/issues/50)).
+  - Non-JSON Storage errors now throw a `SupabaseStorageException` ([#46](https://github.com/supabase-community/storage-csharp/issues/46)).
+  - Fix a trailing `?` being left on `CreateSignedUrl` results ([#51](https://github.com/supabase-community/storage-csharp/issues/51)).
+
+## 1.4.0 - 2026-07-23
+
+This is the observability release: every child library now emits diagnostics through `System.Diagnostics`, making the SDK compatible with OpenTelemetry.
+
+- Expose aggregated telemetry source names for OpenTelemetry ([#285](https://github.com/supabase-community/supabase-csharp/issues/285)).
+- Update dependency: `Supabase.Core@1.2.0`
+  - Add OpenTelemetry-compatible diagnostics primitives ([#6](https://github.com/supabase-community/core-csharp/issues/6)).
+- Update dependency: `Supabase.Gotrue@6.2.0`
+  - Emit observability via `System.Diagnostics` and deprecate the debug callback ([#140](https://github.com/supabase-community/gotrue-csharp/issues/140)).
+- Update dependency: `Supabase.Postgrest@4.4.0`
+  - Emit observability via `System.Diagnostics` and deprecate the debug callback ([#136](https://github.com/supabase-community/postgrest-csharp/issues/136)).
+- Update dependency: `Supabase.Storage@2.5.0`
+  - Emit observability via `System.Diagnostics` ([#43](https://github.com/supabase-community/storage-csharp/issues/43)).
+- Update dependency: `Supabase.Functions@2.2.0`
+  - Emit observability via `System.Diagnostics` ([#15](https://github.com/supabase-community/functions-csharp/issues/15)).
+
+## 1.3.0 - 2026-07-20
+
+- Wire Realtime's Postgrest client automatically so models received from `postgres_changes` support `Update()` and `Delete()` ([#282](https://github.com/supabase-community/supabase-csharp/issues/282)).
+- Update dependency: `Supabase.Postgrest@4.3.0`
+  - Add `Client.Attach<T>()` to populate a model's client context for `Update`/`Delete` ([#135](https://github.com/supabase-community/postgrest-csharp/issues/135)).
+  - Add `ClientOptions.SerializeEnumsAsStrings` to opt into string enum serialization ([#134](https://github.com/supabase-community/postgrest-csharp/issues/134)).
+  - Fix: exclude reference columns from update and delete select queries ([#132](https://github.com/supabase-community/postgrest-csharp/issues/132)).
+- Update dependency: `Supabase.Realtime@7.3.0`
+  - Attach the Postgrest client context to models returned by `PostgresChangesResponse` ([#70](https://github.com/supabase-community/realtime-csharp/issues/70)).
+
+## 1.2.0 - 2026-07-16
+
+- Lower the `Newtonsoft.Json` minimum version to `13.0.2` across all packages to ease dependency resolution ([#275](https://github.com/supabase-community/supabase-csharp/issues/275)).
+- Update dependency: `Supabase.Gotrue@6.1.0`
+  - Add an option for setting `redirect_url` on MagicLink sign-in.
+  - Add `state` parameter support to OAuth provider sign-in.
+  - Expose `RefreshToken(accessToken, refreshToken)` on `IGotrueClient`.
+  - Fix: correct the PKCE verifier/challenge swap in `SignInWithOtp` and `ResetPasswordForEmail`.
+  - Fix: classify refresh-token rejections coming from current gotrue.
+- Update dependency: `Supabase.Postgrest@4.2.0`
+  - Fix: null-reference crash when a `Where` predicate null-checks a captured value ([#122](https://github.com/supabase-community/postgrest-csharp/issues/122)).
+  - Fix: preserve `DateTime` kind, precision, and wall-clock across read and write ([#123](https://github.com/supabase-community/postgrest-csharp/issues/123)).
+- Update dependency: `Supabase.Storage@2.4.2`
+  - Add resumable uploads ([#29](https://github.com/supabase-community/storage-csharp/issues/29)).
+  - Add `CancellationToken` support to upload methods ([#30](https://github.com/supabase-community/storage-csharp/issues/30)).
+  - In-memory caching for resumable uploads ([#35](https://github.com/supabase-community/storage-csharp/issues/35)).
+- Update dependency: `Supabase.Core@1.1.0`
+  - Add structured `X-Client-Info` header metadata ([#2](https://github.com/supabase-community/core-csharp/issues/2)).
+- Update dependencies: `Supabase.Realtime@7.2.1`, `Supabase.Functions@2.1.1` (maintenance).
+
+## 1.1.2 - 2025-07-07
+
+- Update dependency: `Supabase.Realtime@7.2.0`
+  - Implement Postgres change filters ([#55](https://github.com/supabase-community/realtime-csharp/pull/55)).
+  - Fix: `SerializerSettings` were not being passed to `PostgresChangesResponse`.
+  - Fix: use a compatible websocket library for Blazor WASM.
+- Update dependency: `Supabase.Postgrest@4.1.0`
+  - Add `count` to `ModeledResponse` ([#103](https://github.com/supabase-community/postgrest-csharp/pull/103)).
+  - Add support for `long`, `DateTime`, and `DateTimeOffset` criteria in filter expressions ([#101](https://github.com/supabase-community/postgrest-csharp/pull/101)).
+
+## 1.1.1 - 2024-07-27
+
+- Support for passing Headers specified in `ClientOptions` to the `Supabase.Realtime` Client.
+- Update dependency: `Supabase.Gotrue@6.0.3`
+  - Add admin calls for MFA ([#105](https://github.com/supabase-community/gotrue-csharp/pull/105)). Big thanks to [@michaelschattgen](https://github.com/michaelschattgen).
+- Update dependency: `Supabase.Realtime@7.0.2`
+  - Updates dependency: `Websocket.Client@5.1.2`.
+  - Updates dependency: `Supabase.Postgrest@4.0.3`.
+  - Adds support for specifying `GetHeaders` on the `RealtimeClient`, which are included on the initial request to establish the websocket connection ([#167](https://github.com/supabase-community/supabase-csharp/issues/167)).
+
+## 1.1.0 - 2024-07-25
+
+- Supports passing Headers specified in `ClientOptions` to child APIs.
+- Drop support for `netstandard2.0` — `Supabase` now targets `netstandard2.1`.
+- Update dependency: `Supabase.Gotrue@6.0.2`
+  - Add support for MFA signup and login flows ([#103](https://github.com/supabase-community/gotrue-csharp/pull/103)). Huge thanks to [@michaelschattgen](https://github.com/michaelschattgen).
+  - Add `ExchangeCodeForSession` to `StatelessClient` ([#102](https://github.com/supabase-community/gotrue-csharp/pull/102)). Thanks [@alexbakker](https://github.com/alexbakker).
+  - Major: change target framework to `netstandard2.1`; use a CSPRNG to generate the code verifier ([#99](https://github.com/supabase-community/gotrue-csharp/pull/99)). Thanks [@alexbakker](https://github.com/alexbakker).
+  - Ban user functionality ([#101](https://github.com/supabase-community/gotrue-csharp/pull/101)). Thanks [@celestebyte](https://github.com/celestebyte).
+
+## 1.0.5 - 2024-06-29
+
+- Update dependency: `Supabase.Storage@2.0.2`
+- Update dependency: `Supabase.Gotrue@5.0.6`
+  - Introduces `VerifyTokenHash` to support the PKCE flow for email signup ([#98](https://github.com/supabase-community/gotrue-csharp/pull/98)). Thanks [@alexbakker](https://github.com/alexbakker).
+
+## 1.0.4 - 2024-06-11
+
+- Update dependency: `Supabase.Gotrue@5.0.5`
+  - Allow for scoped `SignOut`. Thanks [@AndrewKahr](https://github.com/AndrewKahr).
+  - Various minor SSO fixes. Thanks [@Rycko1](https://github.com/Rycko1).
+  - Implement `SignInWithSSO`. Huge thank you to [@Rycko1](https://github.com/Rycko1).
+- Update dependency: `Supabase.Postgrest@4.0.3`
+  - Fix set null value on string property ([#97](https://github.com/supabase-community/postgrest-csharp/pull/97)). Thanks [@alustrement-bob](https://github.com/alustrement-bob).
+
+## 1.0.3 - 2024-05-22
+
+- Update dependency: `Supabase.Gotrue@5.0.2`
+  - Add missing properties (`ProviderRefreshToken` and `ProviderToken`) to the `Session` object to reflect the current state of `auth-js`.
+- Update dependency: `Supabase.Realtime@7.0.1`
+  - Return a `Task` from the `Track` and `Untrack` methods ([#47](https://github.com/supabase-community/realtime-csharp/issues/47)).
+
+## 1.0.2 - 2024-05-16
+
+- Update dependency: `Supabase.Postgrest@4.0.2`
+  - Set `ConfigureAwait(false)` on the response to prevent deadlocking applications ([#96](https://github.com/supabase-community/postgrest-csharp/pull/96)). Thanks [@pur3extreme](https://github.com/pur3extreme).
+- Update dependency: `Supabase.Gotrue@5.0.1`
+  - Set `ConfigureAwait(false)` on the response to prevent deadlocking applications.
+- Update dependency: `Supabase.Storage@2.0.1`
+  - Fix `CreateSignedUrl` with `TransformOptions` ([#15](https://github.com/supabase-community/storage-csharp/issues/15), [#16](https://github.com/supabase-community/storage-csharp/pull/16)). Thanks [@alustrement-bob](https://github.com/alustrement-bob).
+
+## 1.0.1 - 2024-05-07
+
+- Update dependency: `Supabase.Postgrest@4.0.1`
+  - Changes the `IPostgrestTable<>` contract to return the interface rather than a concrete type ([#92](https://github.com/supabase-community/postgrest-csharp/issues/92)).
+
 ## 1.0.0 - 2024-04-21
 
 - Assembly Name has been changed to `Supabase.dll`

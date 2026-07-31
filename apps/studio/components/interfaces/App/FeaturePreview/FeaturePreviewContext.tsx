@@ -66,7 +66,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
       // flag-derived defaults (e.g. default opt-in) are reflected in `flags`.
       if (hasLoaded) setIsInitialized(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [hasLoaded])
 
   const value = {

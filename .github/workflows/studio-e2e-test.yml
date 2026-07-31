@@ -93,7 +93,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
           aws-region: us-east-1
-      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
         with:
           registry: public.ecr.aws

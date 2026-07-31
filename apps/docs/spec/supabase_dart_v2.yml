@@ -277,7 +277,7 @@ functions:
         name: Sign up with redirect URL
         isSpotlight: true
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```dart
           final AuthResponse res = await supabase.auth.signUp(
@@ -841,7 +841,7 @@ functions:
   - id: sign-in-with-sso
     title: 'signInWithSSO()'
     notes: |
-      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/enterprise-sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
@@ -1738,8 +1738,8 @@ functions:
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
-      - [Refresh token rotation](/docs/guides/cli/config#auth.enable_refresh_token_rotation) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/guides/cli/config#auth.refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+      - [Refresh token rotation](/docs/guides/local-development/cli/config#auth.enable_refresh_token_rotation) is enabled by default on all projects to guard against replay attacks.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/guides/local-development/cli/config#auth.refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     params:
       - name: refreshToken
         isOptional: false

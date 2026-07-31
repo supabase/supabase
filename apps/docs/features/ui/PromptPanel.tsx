@@ -124,7 +124,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
   return (
     <div>
       <div className="relative">
-        <div className={cn(!isExpanded && 'max-h-30 overflow-hidden')}>{children}</div>
+        <div className={cn(!isExpanded && 'max-h-28 overflow-hidden')}>{children}</div>
         {!isExpanded && (
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-background to-transparent" />
         )}
@@ -133,7 +133,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
         tabIndex={0}
         type="button"
         onClick={() => setIsExpanded((expanded) => !expanded)}
-        className="mt-2 text-sm text-brand-link transition-colors hover:text-brand focus-ring"
+        className="mt-2 cursor-pointer text-sm text-brand-link transition-colors hover:text-foreground focus-ring"
         aria-expanded={isExpanded}
       >
         {isExpanded ? 'Show less' : 'Show more'}
@@ -167,7 +167,7 @@ function PromptBody({
   )
 
   return (
-    <div className="px-4 py-3.5 text-sm leading-6 text-foreground-light">
+    <div className="px-4 py-3.5 text-sm leading-6 text-foreground-light font-normal">
       {prompt.expandable ? <ExpandableContent>{content}</ExpandableContent> : content}
     </div>
   )
@@ -192,7 +192,7 @@ function CopyButton({ label, value }: { label: string; value: string }) {
           setCopied(true)
         })
       }}
-      className="rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
+      className="cursor-pointer rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
       aria-label={copied ? `${label} copied` : `Copy ${label}`}
       title={copied ? 'Copied' : 'Copy to clipboard'}
     >
@@ -296,16 +296,32 @@ function PromptPanel({ children, className }: PromptPanelProps) {
     <Tabs
       value={activeTab}
       onValueChange={setActiveTab}
+      // Manual activation keeps VoiceOver focus from switching tabs before Copy is reached.
+      activationMode="manual"
       onFocusCapture={dismissShimmer}
       onPointerEnter={dismissShimmer}
       className={cn('w-full overflow-hidden rounded-lg border bg-background shadow-sm', className)}
     >
       {header}
-      {prompts.map((prompt) => (
-        <TabsContent key={prompt.value} value={prompt.value} className="m-0">
-          <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
-        </TabsContent>
-      ))}
+      {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
+      <div className="grid">
+        {prompts.map((prompt) => {
+          const isActive = prompt.value === activeTab
+
+          return (
+            <TabsContent
+              key={prompt.value}
+              value={prompt.value}
+              forceMount
+              inert={!isActive}
+              aria-hidden={!isActive}
+              className="col-start-1 row-start-1 m-0 data-[state=inactive]:invisible data-[state=inactive]:pointer-events-none"
+            >
+              <PromptBody prompt={prompt} shimmerEnabled={shimmerEnabled} />
+            </TabsContent>
+          )
+        })}
+      </div>
     </Tabs>
   )
 }
