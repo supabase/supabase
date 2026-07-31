@@ -1,8 +1,6 @@
 // End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
-import type { ComponentProps } from 'react'
-import type { IconPanel } from 'ui-patterns/IconPanel'
 
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
@@ -2527,7 +2525,9 @@ export const contributing: NavMenuConstant = {
   items: [{ name: 'Overview', url: '/contributing' }],
 }
 
-export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
+export const MIGRATION_PAGES: Partial<
+  NavMenuSection & { icon?: string; hasLightIcon?: boolean }
+>[] = [
   {
     name: 'Auth0',
     icon: '/docs/img/icons/auth0-icon',
