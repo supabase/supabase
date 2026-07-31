@@ -47,13 +47,13 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
   const resourceSummary = useMemo(() => {
     if (values.resourceAccess === 'project') {
       const selectedProjects = projects.filter((p) => values.projectRefs.includes(p.ref))
-      return `Projects: ${selectedProjects.length > 0 ? selectedProjects.map((p) => p.ref).join() : '-'}`
+      return `Projects: ${selectedProjects.length > 0 ? selectedProjects.map((p) => p.name).join(', ') : '-'}`
     }
     if (values.resourceAccess === 'organization') {
       const selectedOrganizations = organizations.filter((o) =>
         values.organizationSlugs.includes(o.slug)
       )
-      return `Organization: ${selectedOrganizations.length > 0 ? selectedOrganizations.map((o) => o.slug).join() : '-'}`
+      return `Organization: ${selectedOrganizations.length > 0 ? selectedOrganizations.map((o) => o.name).join(', ') : '-'}`
     }
     return 'Account: Account-level access'
   }, [values, projects, organizations])

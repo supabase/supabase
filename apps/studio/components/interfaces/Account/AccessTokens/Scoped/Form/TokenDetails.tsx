@@ -105,7 +105,7 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
                               {value ? dayjs(value).format('DD MMM, YYYY') : 'Pick a date'}
                             </DatePickerButton>
                           </DatePickerTrigger>
-                          <DatePickerContent>
+                          <DatePickerContent align="end">
                             <Calendar
                               mode="single"
                               selected={value}
