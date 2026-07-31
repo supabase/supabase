@@ -66,6 +66,14 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+# Interactive vs not: -y forces non-interactive; otherwise we're non-interactive
+# when there's no controlling terminal to prompt on (e.g. curl | sh in CI).
+if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
+    NON_INTERACTIVE=1
+else
+    NON_INTERACTIVE=0
+fi
+
 if [ "$(id -u)" = "0" ]; then
     SUDO=""
 else
@@ -81,7 +89,7 @@ die()  { printf "ERROR: %s\n" "$*" >&2; exit 1; }
 # Falls back to the default with -y or when no controlling terminal exists.
 ask() {
     # ask <prompt> <default>  -> echoes chosen value
-    if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
+    if [ "$NON_INTERACTIVE" = "1" ]; then
         printf '%s' "$2"
         return
     fi
@@ -89,6 +97,28 @@ ask() {
     read -r reply < /dev/tty
     [ -z "$reply" ] && reply="$2"
     printf '%s' "$reply"
+}
+
+# True if the value looks like an http(s) URL (scheme check only, not validation).
+valid_url() {
+    case "$1" in
+        http://?*|https://?*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# Like ask, but requires an http(s):// value. Re-prompts interactively; with no
+# usable terminal (-y or curl | sh) a bad value is fatal rather than silently kept.
+ask_url() {
+    # ask_url <prompt> <default>  -> echoes a validated URL
+    while :; do
+        _url=$(ask "$1" "$2")
+        valid_url "$_url" && { printf '%s' "$_url"; return 0; }
+        if [ "$NON_INTERACTIVE" = "1" ]; then
+            die "$1 must start with http:// or https:// (got: '$_url')"
+        fi
+        printf "  '%s' is not a URL - it must start with http:// or https://.\n" "$_url" > /dev/tty
+    done
 }
 
 OS_FAMILY=""
@@ -358,10 +388,10 @@ current_api_url=$(read_env API_EXTERNAL_URL)
 current_site_url=$(read_env SITE_URL)
 
 [ -z "$current_public_url" ] && current_public_url="http://localhost:8000"
-[ -z "$current_api_url" ]    && current_api_url="$current_public_url"
+[ -z "$current_api_url" ]    && current_api_url="$current_public_url/auth/v1"
 [ -z "$current_site_url" ]   && current_site_url="http://localhost:3000"
 
-if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
+if [ "$NON_INTERACTIVE" = "1" ]; then
     log "Non-interactive: using default URLs (edit .env to change)"
 else
     echo ""
@@ -369,9 +399,9 @@ else
     echo ""
 fi
 
-public_url=$(ask "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
-api_url=$(ask   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url/auth/v1")
-site_url=$(ask  "SITE_URL (default Auth redirect)"    "$current_site_url")
+public_url=$(ask_url "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
+api_url=$(ask_url   "API_EXTERNAL_URL (Auth callbacks)"   "$current_api_url")
+site_url=$(ask_url  "SITE_URL (default Auth redirect)"    "$current_site_url")
 
 # Suggest PROXY_DOMAIN from the public_url host (unless it's localhost-ish)
 public_host=$(printf '%s' "$public_url" | sed -e 's|^https*://||' -e 's|/.*$||' -e 's|:.*$||')
@@ -407,7 +437,11 @@ sh utils/add-new-auth-keys.sh --update-env
 write_version_stamp "$RESOLVED_REF"
 
 log "Pulling Docker images"
-docker compose --progress quiet pull || warn "docker compose pull failed; you can retry later."
+if [ "$NON_INTERACTIVE" = "1" ]; then
+    docker compose --progress quiet pull || warn "docker compose pull failed; you can retry later."
+else
+    docker compose pull || warn "docker compose pull failed; you can retry later."
+fi
 
 echo ""
 echo "Setup complete. Project ready at: $(pwd)"
