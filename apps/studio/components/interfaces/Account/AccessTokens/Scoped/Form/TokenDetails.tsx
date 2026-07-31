@@ -50,14 +50,14 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
 
   return (
     <section className="space-y-4 px-5 sm:px-6 py-6">
-      <h3 className="text-sm text-foreground">Token details</h3>
+      <h3 className="text-sm text-foreground sr-only">Token details</h3>
 
       <FormField
         key="tokenName"
         name="tokenName"
         control={control}
         render={({ field }) => (
-          <FormItemLayout name="tokenName" label="Name">
+          <FormItemLayout name="tokenName" label="Name" layout="flex-row-reverse">
             <FormControl>
               <Input id="tokenName" {...field} placeholder="e.g. CI deploy token" />
             </FormControl>
@@ -70,7 +70,7 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
         name="expiresAt"
         control={control}
         render={({ field }) => (
-          <FormItemLayout name="expiresAt" label="Expires in">
+          <FormItemLayout name="expiresAt" label="Expires in" layout="flex-row-reverse">
             <div className="flex gap-2">
               <FormControl className="grow">
                 <Select value={field.value} onValueChange={handleExpiryChange}>
