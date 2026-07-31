@@ -16,9 +16,10 @@ import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { resolveContentListingIcon } from './iconChip'
 
 const GRID_ITEM_CLASS = {
+  // Stay 2-up until xl (~1280px) so cards aren't cramped beside the docs sidebar.
   2: 'col-span-12 md:col-span-6',
-  3: 'col-span-12 md:col-span-4',
-  4: 'col-span-12 md:col-span-3',
+  3: 'col-span-12 md:col-span-6 xl:col-span-4',
+  4: 'col-span-12 md:col-span-6 xl:col-span-3',
 } as const
 
 function useContentListingClickHandler(group: ContentListingGroup) {
@@ -88,9 +89,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                       }
                     >
                       {item.badge && item.badgePosition === 'below' && (
-                        // Pull the badge up close to the title (GlassPanel's icon-row gap is
-                        // large by default), then push extra space before the description below.
-                        <Badge variant="success" className="-mt-4 mb-6 block w-fit">
+                        <Badge variant="success" className="mb-3 block w-fit">
                           {item.badge}
                         </Badge>
                       )}

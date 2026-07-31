@@ -45,9 +45,9 @@ export const RestartCostEstimate = ({
       {tables.length === 0 ? (
         <div className="flex items-center justify-between gap-x-6">
           <div className="min-w-0">
-            <p className="text-sm font-medium">No additional initial-sync copy charge</p>
+            <p className="text-sm font-medium">No additional initial sync charge</p>
             <p className="text-xs text-foreground-lighter">
-              Initial copy is skipped by this pipeline's table-copy policy.
+              This restart will skip initial sync based on the pipeline's settings.
             </p>
           </div>
           <span className="shrink-0 font-mono text-lg font-semibold" translate="no">
@@ -59,10 +59,10 @@ export const RestartCostEstimate = ({
       ) : restartEstimate?.isComplete ? (
         <div className="flex items-center justify-between gap-x-6">
           <div className="min-w-0">
-            <p className="text-sm font-medium">Estimated additional initial sync</p>
+            <p className="text-sm font-medium">Estimated additional initial sync cost</p>
             <p className="text-xs text-foreground-lighter">
-              {formatBytes(restartEstimate.estimatedBytes)} across {tables.length}{' '}
-              {tables.length === 1 ? 'table' : 'tables'}
+              Based on an estimated {formatBytes(restartEstimate.estimatedBytes)} of initial sync
+              data across {tables.length} {tables.length === 1 ? 'table' : 'tables'}
             </p>
           </div>
           <span className="shrink-0 font-mono text-lg font-semibold" translate="no">
@@ -78,7 +78,13 @@ export const RestartCostEstimate = ({
       )}
       {restartEstimate?.isComplete && restartEstimate.hasRowFilteredTables && (
         <p className="mt-2 text-xs text-foreground-lighter">
-          *Tables with row filters may cost less than shown.
+          *Row filters can reduce the data processed compared with this estimate.
+        </p>
+      )}
+      {restartEstimate?.isComplete && (
+        <p className="mt-2 text-xs text-foreground-lighter">
+          Quick planning estimate; the final charge is based on successfully processed initial sync
+          data, which is billed again.
         </p>
       )}
     </div>

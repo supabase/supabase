@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'

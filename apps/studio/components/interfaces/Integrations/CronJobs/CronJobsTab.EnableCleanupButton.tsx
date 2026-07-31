@@ -67,7 +67,6 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
       return toast.error('There was an error scheduling the cleanup. Please try again.')
     }
     track('cron_job_cleanup_enable_button_clicked', {
-      origin: 'dialog',
       retentionInterval: cleanupInterval,
     })
     scheduleCleanup({
@@ -82,7 +81,7 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
       open={open}
       onOpenChange={(isOpen) => {
         setOpen(isOpen)
-        if (isOpen) track('cron_job_cleanup_enable_button_clicked', { origin: 'header' })
+        if (isOpen) track('cron_job_cleanup_dialog_opened')
       }}
     >
       <DialogTrigger asChild>

@@ -4,7 +4,7 @@ title: 'Postgres connection logging'
 description: 'Enable or disable Postgres connection logging for audit and compliance.'
 ---
 
-For security monitoring and compliance audits, Postgres can log connection lifecycle events to your project's [Postgres logs](/docs/guides/telemetry/logs#postgres), including events such as `connection received`, `connection authenticated`, and `connection authorized`.
+For security monitoring and compliance audits, Postgres can log connection lifecycle events to your project's [Postgres logs](/docs/guides/monitoring-and-debugging/logs#postgres), including events such as `connection received`, `connection authenticated`, and `connection authorized`.
 
 ## Default behavior
 
@@ -28,7 +28,7 @@ Connection logging supports audit and monitoring controls required by some compl
 - **HIPAA** — High-compliance projects should keep connection logging enabled. See the [shared responsibility model for healthcare data](/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data) and [HIPAA compliance guide](/docs/guides/security/hipaa-compliance).
 - **SOC 2** — Users who need connection audit evidence should enable logging and retain logs according to their own policies. See the [SOC 2 compliance guide](/docs/guides/security/soc-2-compliance).
 
-Disabling connection logging does not affect other Supabase logging (for example, [Platform Audit Logs](/docs/guides/security/platform-audit-logs), [Auth Audit Logs](/docs/guides/auth/audit-logs), or [pgAudit](/docs/guides/telemetry/logs#configuring-pgauditlog)).
+Disabling connection logging does not affect other Supabase logging (for example, [Platform Audit Logs](/docs/guides/security/platform-audit-logs), [Auth Audit Logs](/docs/guides/auth/audit-logs), or [pgAudit](/docs/guides/monitoring-and-debugging/logs#configuring-pgauditlog)).
 
 ## Manage connection logging via the dashboard
 
