@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { OrganizationInvite } from '@/components/interfaces/OrganizationInvite/OrganizationInvite'
+import { OrganizationInvite } from './OrganizationInvite'
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import type { ProfileContextType } from '@/lib/profile'
 import { render } from '@/tests/helpers'
@@ -172,6 +172,20 @@ describe('OrganizationInvite', () => {
     })
   })
 
+  test('renders an inline error when joining the organization fails', () => {
+    mocks.useAcceptInvitationMutation.mockReturnValue({
+      mutate: mocks.acceptInvitation,
+      isPending: false,
+      error: responseError('You are already a member of this organization'),
+    })
+
+    render(<OrganizationInvite />)
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Failed to join organization: You are already a member of this organization'
+    )
+  })
+
   test('renders a wrong-account warning and signs out', async () => {
     const user = userEvent.setup()
     mocks.useInvitationQuery.mockReturnValue({
@@ -225,7 +239,7 @@ describe('OrganizationInvite', () => {
 
     rerender(<OrganizationInvite />)
 
-    expect(screen.getByText('Invite invalid')).toBeInTheDocument()
+    expect(screen.getByText('Invalid invitation')).toBeInTheDocument()
     expect(
       screen.getByText(
         'Open the full invite link again, or ask the organization owner for a new invite.'

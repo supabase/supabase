@@ -11,15 +11,17 @@ type Params = { slug?: string[] }
 
 const MonitoringTroubleshootingGuidePage = async (props: { params: Promise<Params> }) => {
   const params = await props.params
-  const slug = ['telemetry', ...(params.slug ?? [])]
+  const slug = ['monitoring-and-debugging', ...(params.slug ?? [])]
   const data = await getGuidesMarkdown(slug)
 
   return <GuideTemplate {...data!} />
 }
 
-const generateStaticParams = !IS_DEV ? genGuidesStaticParams('telemetry') : getEmptyArray
+const generateStaticParams = !IS_DEV
+  ? genGuidesStaticParams('monitoring-and-debugging')
+  : getEmptyArray
 const generateMetadata = genGuideMeta((params: { slug?: string[] }) =>
-  getGuidesMarkdown(['telemetry', ...(params.slug ?? [])])
+  getGuidesMarkdown(['monitoring-and-debugging', ...(params.slug ?? [])])
 )
 
 export default MonitoringTroubleshootingGuidePage
