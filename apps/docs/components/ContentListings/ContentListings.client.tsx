@@ -7,8 +7,10 @@ import {
   isExternalContentListingHref,
 } from '~/lib/content-listings.utils'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import type { Feature } from 'common'
+import { isFeatureEnabled } from 'common'
 import Link from 'next/link'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { Badge } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
@@ -21,6 +23,10 @@ const GRID_ITEM_CLASS = {
   3: 'col-span-12 md:col-span-6 xl:col-span-4',
   4: 'col-span-12 md:col-span-6 xl:col-span-3',
 } as const
+
+function filterContentListingItems(items: ContentListingItem[]): ContentListingItem[] {
+  return items.filter((item) => !item.feature || isFeatureEnabled(item.feature as Feature))
+}
 
 function useContentListingClickHandler(group: ContentListingGroup) {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -52,9 +58,12 @@ function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
 
 function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
   const { trackClick } = useContentListingClickHandler(group)
+  const items = useMemo(() => filterContentListingItems(group.items), [group.items])
   const isGrid = group.type === 'grid'
   const listClassName = isGrid ? 'grid md:grid-cols-12 gap-4' : 'list-disc pl-6 space-y-2'
   const gridItemClassName = isGrid ? GRID_ITEM_CLASS[group.columns ?? 3] : undefined
+
+  if (!items.length) return null
 
   // Heading stays outside `not-prose` so it inherits the surrounding MDX prose
   // typography. The list itself opts out so its explicit Tailwind layout wins.
@@ -64,7 +73,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
       <div className="not-prose space-y-4">
         {group.description && <p className="text-foreground-light">{group.description}</p>}
         <ul className={listClassName}>
-          {group.items.map((item) => {
+          {items.map((item) => {
             const external = isExternalContentListingHref(item.href)
             const key = `${group.id}-${item.href}`
 
