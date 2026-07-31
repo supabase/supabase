@@ -7,8 +7,8 @@ import {
   FormControl,
   FormField,
   Label,
-  RadioGroupCard,
-  RadioGroupCardItem,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectItem,
@@ -109,57 +109,123 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
 
   return (
     <section className="space-y-4 px-5 sm:px-6 py-6">
-      <div>
-        <h3 className="text-sm text-foreground">Resource access</h3>
-        <p className="text-xs text-foreground-light">Choose what this token can reach.</p>
-      </div>
-
-      <FormField
-        control={control}
-        name="resourceAccess"
-        render={({ field }) => (
-          <RadioGroupCard
-            className={cn('grid-cols-2', {
-              'pointer-events-none': isAccount,
-            })}
-            value={isAccount ? undefined : resourceAccess}
-            onValueChange={(value) => {
-              field.onChange(value)
-              // Reset dependent selections when switching modes.
-              setValue('projectRefs', [])
-              if (value !== 'account') setValue('accountConfirmed', false)
-            }}
-            disabled={isAccount}
-          >
-            {CARD_OPTIONS.map((option) => (
-              <RadioGroupCardItem
-                key={option.value}
-                id={option.value}
-                value={option.value}
-                className={cn('w-full', isAccount && 'opacity-50')}
-                disabled={isAccount}
-                label={
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-foreground">{option.name}</span>
-                      {option.recommended && <Badge variant="success">Recommended</Badge>}
-                    </div>
-                    <span className="text-foreground-light">{option.description}</span>
-                  </div>
-                }
-              />
-            ))}
-          </RadioGroupCard>
-        )}
-      />
+      {isAccount ? (
+        <>
+          <h3 className="text-sm text-foreground">Resource access</h3>
+          <Admonition
+            type="warning"
+            title="Account-level access is broad."
+            description={
+              <div className="space-y-3">
+                <p>
+                  This token can reach every organization and project you have access to. Prefer a
+                  single project or organization unless you specifically need account-wide access.
+                </p>
+                <div className="flex items-start gap-2">
+                  <FormField
+                    control={control}
+                    name="accountConfirmed"
+                    render={({ field }) => (
+                      <>
+                        <Checkbox
+                          id="accountConfirmed"
+                          checked={accountConfirmed ?? false}
+                          onCheckedChange={(checked) => field.onChange(checked)}
+                        />
+                        <Label htmlFor="accountConfirmed" className="text-xs text-foreground-light">
+                          I understand this token is not limited to one project or organization.
+                        </Label>
+                      </>
+                    )}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="text-xs text-foreground-light underline hover:text-foreground transition-colors"
+                  onClick={switchBackToSingleProject}
+                  tabIndex={0}
+                >
+                  Switch back
+                </button>
+              </div>
+            }
+          />
+        </>
+      ) : (
+        <FormField
+          control={control}
+          name="resourceAccess"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="flex-row-reverse"
+              label="Resource access"
+              description={
+                !isAccount ? (
+                  <p className="text-xs text-foreground-lighter">
+                    Need access to every organization and project?{' '}
+                    <button
+                      type="button"
+                      className="text-foreground-light underline hover:text-foreground transition-colors"
+                      onClick={enableAccountLevel}
+                      tabIndex={0}
+                    >
+                      Advanced options
+                    </button>
+                  </p>
+                ) : null
+              }
+              id="resourceAccess"
+            >
+              <FormControl>
+                <RadioGroupStacked
+                  className={cn({
+                    'pointer-events-none': isAccount,
+                  })}
+                  value={isAccount ? undefined : resourceAccess}
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                    // Reset dependent selections when switching modes.
+                    setValue('projectRefs', [])
+                    if (value !== 'account') setValue('accountConfirmed', false)
+                  }}
+                  disabled={isAccount}
+                >
+                  {CARD_OPTIONS.map((option) => (
+                    <RadioGroupStackedItem
+                      key={option.value}
+                      id={option.value}
+                      value={option.value}
+                      className={cn('w-full', isAccount && 'opacity-50')}
+                      disabled={isAccount}
+                      label={
+                        <div className="flex flex-col gap-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-foreground">{option.name}</span>
+                            {option.recommended && <Badge variant="success">Recommended</Badge>}
+                          </div>
+                          <span className="text-foreground-light">{option.description}</span>
+                        </div>
+                      }
+                    />
+                  ))}
+                </RadioGroupStacked>
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      )}
 
       {!isAccount && resourceAccess === 'project' ? (
-        <div className="grid grid-cols-2 gap-3">
+        <>
           <FormField
             control={control}
             name="organizationSlugs"
             render={({ field }) => (
-              <FormItemLayout layout="vertical" label="Organization" id="organizationSlugs">
+              <FormItemLayout
+                layout="flex-row-reverse"
+                label={<span className="sr-only">Organization</span>}
+                id="organizationSlugs"
+              >
                 <FormControl>
                   <Select
                     value={field.value.length > 0 ? field.value[0] : ''}
@@ -189,11 +255,16 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
             control={control}
             name="projectRefs"
             render={({ field }) => (
-              <FormItemLayout layout="vertical" label="Projects" id="projectRefs">
+              <FormItemLayout
+                layout="flex-row-reverse"
+                label={<span className="sr-only">Projects</span>}
+                id="projectRefs"
+              >
                 <MultiSelector
                   onValuesChange={field.onChange}
                   values={field.value}
                   disabled={!organizationSlugs}
+                  className="w-full"
                 >
                   <MultiSelectorTrigger
                     id="projectRefs"
@@ -206,9 +277,9 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
                     badgeLimit="wrap"
                     showIcon={false}
                     deletableBadge
-                    className="w-full"
                     ref={field.ref}
                     renderValue={(value) => projectsByRef[value]?.name}
+                    className="min-w-auto"
                   />
                   <MultiSelectorContent>
                     <MultiSelectorInput placeholder="Search organizations" showResetIcon />
@@ -224,14 +295,18 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
               </FormItemLayout>
             )}
           />
-        </div>
+        </>
       ) : null}
       {!isAccount && resourceAccess === 'organization' ? (
         <FormField
           control={control}
           name="organizationSlugs"
           render={({ field }) => (
-            <FormItemLayout layout="vertical" label="Organizations" id="organizationSlugs">
+            <FormItemLayout
+              layout="flex-row-reverse"
+              label={<span className="sr-only">Organization</span>}
+              id="organizationSlugs"
+            >
               <MultiSelector onValuesChange={field.onChange} values={field.value}>
                 <MultiSelectorTrigger
                   id="organizationSlugs"
@@ -261,59 +336,6 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
       ) : null}
 
       {error && <p className="text-xs text-destructive">{error}</p>}
-
-      {!isAccount ? (
-        <p className="text-xs text-foreground-lighter">
-          Need access to every organization and project?{' '}
-          <button
-            type="button"
-            className="text-foreground-light underline hover:text-foreground transition-colors"
-            onClick={enableAccountLevel}
-            tabIndex={0}
-          >
-            Advanced options
-          </button>
-        </p>
-      ) : (
-        <Admonition
-          type="warning"
-          title="Account-level access is broad."
-          description={
-            <div className="space-y-3">
-              <p>
-                This token can reach every organization and project you have access to. Prefer a
-                single project or organization unless you specifically need account-wide access.
-              </p>
-              <div className="flex items-start gap-2">
-                <FormField
-                  control={control}
-                  name="accountConfirmed"
-                  render={({ field }) => (
-                    <>
-                      <Checkbox
-                        id="accountConfirmed"
-                        checked={accountConfirmed ?? false}
-                        onCheckedChange={(checked) => field.onChange(checked)}
-                      />
-                      <Label htmlFor="accountConfirmed" className="text-xs text-foreground-light">
-                        I understand this token is not limited to one project or organization.
-                      </Label>
-                    </>
-                  )}
-                />
-              </div>
-              <button
-                type="button"
-                className="text-xs text-foreground-light underline hover:text-foreground transition-colors"
-                onClick={switchBackToSingleProject}
-                tabIndex={0}
-              >
-                Switch back
-              </button>
-            </div>
-          }
-        />
-      )}
     </section>
   )
 }

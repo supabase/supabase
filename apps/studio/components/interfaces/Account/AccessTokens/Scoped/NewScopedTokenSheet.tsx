@@ -77,7 +77,7 @@ export const NewScopedTokenSheet = () => {
       <SheetContent
         showClose={false}
         size="default"
-        className="flex h-full min-w-[720px]! flex-col gap-0"
+        className="flex h-full flex-col gap-0 lg:w-auto"
       >
         <SheetHeader>
           <SheetTitle>{step === 'success' ? 'Token created' : 'Generate token'}</SheetTitle>
