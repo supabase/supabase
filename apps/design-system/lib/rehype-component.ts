@@ -17,7 +17,10 @@ import { UnistNode, UnistTree } from '@/types/unist'
 // config bundling under pnpm's strict module resolution.
 function getRegistryFiles(styleName: string, name: string) {
   const item = registry.find((entry) => entry.name === name)
-  return item?.files.map((file) => `registry/${styleName}/${file}`)
+  if (!item || item.files.length === 0) {
+    throw new Error(`Registry item "${name}" has no source files`)
+  }
+  return item.files.map((file) => `registry/${styleName}/${file}`)
 }
 
 export function rehypeComponent() {
@@ -56,10 +59,10 @@ export function rehypeComponent() {
               // console.log('name', name)
 
               src = fileName
-                ? files!.find((file: string) => {
+                ? files.find((file: string) => {
                     return file.endsWith(`${fileName}.tsx`) || file.endsWith(`${fileName}.ts`)
-                  }) || files![0]
-                : files![0]
+                  }) || files[0]
+                : files[0]
               // console.log('got to END of ELSE STATEMENT')
             }
 
@@ -121,7 +124,7 @@ export function rehypeComponent() {
           for (const style of styles) {
             const files = getRegistryFiles(style.name, name)
             // console.log('GOT HERE')
-            const src = files![0]
+            const src = files[0]
 
             // Read the source file.
             const filePath = path.join(process.cwd(), src)
@@ -173,7 +176,7 @@ export function rehypeComponent() {
           for (const style of styles) {
             const files = getRegistryFiles(style.name, name)
             // console.log('GOT HERE')
-            const src = files![0]
+            const src = files[0]
 
             // Read the source file.
             const filePath = path.join(process.cwd(), src)
