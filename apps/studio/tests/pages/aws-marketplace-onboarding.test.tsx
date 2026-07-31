@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AwsMarketplaceOnboardingScreen } from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
@@ -16,6 +17,10 @@ import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
+
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn() },
+}))
 
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 
@@ -187,6 +192,7 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Failed to link organization: Marketplace link failed'
     )
+    expect(toast.error).not.toHaveBeenCalled()
     expect(screen.queryByText(/Learn more/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Link organization' })).toBeEnabled()
   })
