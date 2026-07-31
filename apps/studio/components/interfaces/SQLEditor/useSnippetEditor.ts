@@ -76,9 +76,6 @@ export function useSnippetEditor({ id, snippetName }: { id: string; snippetName:
   })
   useEffect(() => {
     seedFromContentParam()
-    // The useEffectEvent return is stable and must not be a dependency; this
-    // disable can go once our eslint version understands useEffectEvent.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return { snippet, disableEdit, handleEditorChange }
