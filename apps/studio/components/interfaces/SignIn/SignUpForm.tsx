@@ -5,7 +5,7 @@ import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -126,7 +126,7 @@ export const SignUpForm = () => {
     })
   }
 
-  const password = form.watch('password')
+  const password = useWatch({ control: form.control, name: 'password' })
   const isSubmitting = form.formState.isSubmitting || isSigningUp
 
   return (

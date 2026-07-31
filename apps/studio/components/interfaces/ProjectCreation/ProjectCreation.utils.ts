@@ -45,3 +45,22 @@ export const monthlyInstancePrice = (instance: string | undefined): number => {
 export const instanceLabel = (instance: string | undefined): string => {
   return instanceSizeSpecs[instance as DesiredInstanceSize]?.label || 'Micro'
 }
+
+export const getHighAvailabilityRegionCode = (
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  if (environment === 'local') return 'eu-central-1'
+  if (environment === 'staging') return 'us-east-1'
+  return undefined
+}
+
+export const filterHighAvailabilityRegions = <T extends { code: string }>(
+  regions: T[],
+  highAvailability: boolean,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  const regionCode = getHighAvailabilityRegionCode(environment)
+  return highAvailability && regionCode !== undefined
+    ? regions.filter((region) => region.code === regionCode)
+    : regions
+}
