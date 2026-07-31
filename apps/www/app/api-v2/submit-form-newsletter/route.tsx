@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
-
 import { CustomerioTrackClient } from '~/lib/customerio'
+import { createRateLimiter } from '~/lib/rate-limit'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,9 +13,7 @@ const isValidEmail = (email: string): boolean => {
   return emailPattern.test(email)
 }
 
-const RATE_LIMIT_WINDOW = 60 * 1000 // 1 minute
-const RATE_LIMIT_MAX = 5
-const ipRequestMap = new Map<string, { count: number; resetAt: number }>()
+const isRateLimited = createRateLimiter({ max: 5, windowMs: 60 * 1000 })
 
 export async function OPTIONS() {
   return new Response(null, {
@@ -25,20 +23,11 @@ export async function OPTIONS() {
 }
 
 export async function POST(req: Request) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const now = Date.now()
-  const entry = ipRequestMap.get(ip)
-
-  if (entry && now < entry.resetAt) {
-    if (entry.count >= RATE_LIMIT_MAX) {
-      return new Response(JSON.stringify({ message: 'Too many requests. Try again later.' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 429,
-      })
-    }
-    entry.count++
-  } else {
-    ipRequestMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW })
+  if (isRateLimited(req)) {
+    return new Response(JSON.stringify({ message: 'Too many requests. Try again later.' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 429,
+    })
   }
 
   let body: any
