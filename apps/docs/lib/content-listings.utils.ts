@@ -1,6 +1,5 @@
 import { CONTENT_LISTINGS } from '~/data/content-listings'
-import type { Feature } from 'common'
-import { isFeatureEnabled } from 'common'
+import { isFeatureEnabled, type Feature } from 'common/enabled-features'
 
 import type { ContentListingGroup, ContentListingItem } from './content-listings.schema'
 
