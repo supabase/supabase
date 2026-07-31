@@ -239,11 +239,13 @@ export function RefLink({
   section,
   skipChildren = false,
   className,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
   skipChildren?: boolean
   className?: string
+  realNavigation?: boolean
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
 
@@ -272,16 +274,19 @@ export function RefLink({
   return (
     <>
       {isCompoundSection ? (
-        <CompoundRefLink basePath={basePath} section={section} />
+        <CompoundRefLink basePath={basePath} section={section} realNavigation={realNavigation} />
       ) : (
         <Link
           ref={ref}
-          // We don't use these links because we never do real navigation, so
-          // prefetching just wastes egress
-          prefetch={false}
+          // Most reference "pages" are actually an agglomeration of many
+          // "pages", so by default we never do a real navigation and
+          // prefetching would just waste egress. Reference types that render
+          // one real page per section set `realNavigation` and genuinely
+          // benefit from prefetch instead.
+          prefetch={realNavigation ? undefined : false}
           href={href}
           className={getLinkStyles(isActive, className)}
-          onClick={onClick}
+          onClick={realNavigation ? undefined : onClick}
         >
           {section.title}
         </Link>
@@ -321,9 +326,11 @@ function useCompoundRefLinkActive(basePath: string, section: AbbrevApiReferenceS
 function CompoundRefLink({
   basePath,
   section,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
+  realNavigation?: boolean
 }) {
   const { open, setOpen, isActive } = useCompoundRefLinkActive(basePath, section)
 
@@ -357,7 +364,7 @@ function CompoundRefLink({
           {(section.items || []).map((item, idx) => {
             return (
               <li key={`${section.id}-${idx}`}>
-                <RefLink basePath={basePath} section={item} />
+                <RefLink basePath={basePath} section={item} realNavigation={realNavigation} />
               </li>
             )
           })}

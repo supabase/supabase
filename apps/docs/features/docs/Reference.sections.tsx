@@ -5,6 +5,7 @@ import {
   getCliSpec,
   getFlattenedSections,
   getFunctionsList,
+  getSectionsBySlug,
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
@@ -24,6 +25,7 @@ import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { isFeatureEnabled } from 'common'
+import { notFound } from 'next/navigation'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
@@ -60,6 +62,24 @@ async function RefSections({ libraryId, version }: RefSectionsProps) {
             <SectionSwitch libraryId={libraryId} version={version} section={section} />
           </Fragment>
         ))}
+    </div>
+  )
+}
+
+type RefSectionProps = {
+  libraryId: string
+  version: string
+  slug: string
+}
+
+async function RefSection({ libraryId, version, slug }: RefSectionProps) {
+  const sectionsBySlug = await getSectionsBySlug(libraryId, version)
+  const section = sectionsBySlug?.get(slug)
+  if (!section) notFound()
+
+  return (
+    <div className="flex flex-col my-16 gap-16">
+      <SectionSwitch libraryId={libraryId} version={version} section={section} />
     </div>
   )
 }
@@ -573,4 +593,4 @@ async function FunctionSection({
   )
 }
 
-export { RefSections }
+export { RefSections, RefSection }

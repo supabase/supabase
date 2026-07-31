@@ -1,5 +1,8 @@
 import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
-import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
+import {
+  getFlattenedSections,
+  getSectionsBySlug,
+} from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
@@ -113,11 +116,11 @@ export async function generateReferenceStaticParams() {
     },
   ]
 
-  const apiPages = [
-    {
-      slug: ['api'],
-    },
-  ]
+  const apiFlattenedSections = await getFlattenedSections('api', 'latest')
+  const apiPages = (apiFlattenedSections ?? [])
+    .filter((section) => section.type !== 'category' && !!section.slug)
+    .map((section) => ({ slug: ['api', section.slug] }))
+    .concat([{ slug: ['api'] }])
 
   const selfHostingPages = selfHostingServices.map((service) => ({
     slug: [REFERENCES[service].libPath],
@@ -178,9 +181,19 @@ export async function generateReferenceMetadata(
       description: 'CLI reference for the Supabase CLI',
     }
   } else if (isApiReference) {
+    const { path } = parsedPath
+    const sectionSlug = path[0] !== 'introduction' ? path[0] : undefined
+
+    const sectionsBySlug = await getSectionsBySlug('api', 'latest')
+    const sectionTitle = sectionSlug ? sectionsBySlug?.get(sectionSlug)?.title : undefined
+    const url = [BASE_PATH, 'reference', 'api', sectionSlug].filter(Boolean).join('/')
+
     return {
-      title: 'Management API Reference | Supabase Docs',
+      title: `Management API Reference${sectionTitle ? `: ${sectionTitle}` : ''} | Supabase Docs`,
       description: 'Management API reference for the Supabase API',
+      alternates: {
+        canonical: url,
+      },
     }
   } else if (isSelfHostingReference) {
     return {

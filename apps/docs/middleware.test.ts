@@ -163,3 +163,34 @@ describe('docs middleware — /guides/* content negotiation', () => {
     expect(rewrite).not.toContain('/api/guides-md/')
   })
 })
+
+describe('docs middleware — /reference/api/* routing', () => {
+  // Regression test for INC-703: /reference/api/* used to be collapsed to a
+  // single /reference/api page for every endpoint, which grew unboundedly
+  // with the OpenAPI spec until it exceeded Vercel's ISR page-size cap. Each
+  // endpoint now gets its own statically-generated page, so these paths must
+  // pass through untouched.
+  it('does not rewrite /reference/api/<endpoint-slug> to the bare index', () => {
+    const req = makeRequest('/docs/reference/api/v1-list-all-projects')
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBeNull()
+  })
+
+  it('does not rewrite the bare /reference/api index', () => {
+    const req = makeRequest('/docs/reference/api')
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBeNull()
+  })
+
+  it('still rewrites /reference/cli/* to the single CLI page', () => {
+    const req = makeRequest('/docs/reference/cli/some-command')
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(
+      'https://supabase.com/docs/reference/cli'
+    )
+  })
+
+  it('still rewrites /reference/self-hosting-<service>/* to its single service page', () => {
+    const req = makeRequest('/docs/reference/self-hosting-auth/some-endpoint')
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(
+      'https://supabase.com/docs/reference/self-hosting-auth'
+    )
+  })
+})

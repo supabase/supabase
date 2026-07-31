@@ -1,16 +1,14 @@
-import { isFeatureEnabled } from 'common'
-import { type PropsWithChildren } from 'react'
-
-import { cn } from 'ui'
-
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
 import RefVersionDropdown from '~/components/RefVersionDropdown'
 import { getReferenceSections } from '~/features/docs/Reference.generated.singleton'
 import {
-  RefLink,
   ReferenceNavigationScrollHandler,
+  RefLink,
 } from '~/features/docs/Reference.navigation.client'
 import { type AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { isFeatureEnabled } from 'common'
+import { type PropsWithChildren } from 'react'
+import { cn } from 'ui'
 
 interface ReferenceNavigationProps {
   libraryId: string
@@ -19,6 +17,7 @@ interface ReferenceNavigationProps {
   libPath: string
   version: string
   isLatestVersion: boolean
+  realNavigation?: boolean
 }
 
 export async function ReferenceNavigation({
@@ -28,6 +27,7 @@ export async function ReferenceNavigation({
   libPath,
   version,
   isLatestVersion,
+  realNavigation,
 }: ReferenceNavigationProps) {
   const navSections = await getReferenceSections(libraryId, version)
   const filteredNavSections = navSections?.filter((section) => section.title !== 'Auth')
@@ -46,11 +46,11 @@ export async function ReferenceNavigation({
         {displayedNavSections?.map((section, index) =>
           section.type === 'category' ? (
             <li key={section.id ?? String(index)}>
-              <RefCategory basePath={basePath} section={section} />
+              <RefCategory basePath={basePath} section={section} realNavigation={realNavigation} />
             </li>
           ) : (
             <li key={section.id ?? String(index)} className={topLvlRefNavItemStyles}>
-              <RefLink basePath={basePath} section={section} />
+              <RefLink basePath={basePath} section={section} realNavigation={realNavigation} />
             </li>
           )
         )}
@@ -64,9 +64,11 @@ const topLvlRefNavItemStyles = 'leading-5'
 function RefCategory({
   basePath,
   section,
+  realNavigation,
 }: {
   basePath: string
   section: AbbrevApiReferenceSection
+  realNavigation?: boolean
 }) {
   if (!('items' in section && section.items && section.items.length > 0)) return null
 
@@ -77,7 +79,7 @@ function RefCategory({
       <ul className="space-y-2">
         {section.items?.map((item) => (
           <li key={item.id} className={topLvlRefNavItemStyles}>
-            <RefLink basePath={basePath} section={item} />
+            <RefLink basePath={basePath} section={item} realNavigation={realNavigation} />
           </li>
         ))}
       </ul>

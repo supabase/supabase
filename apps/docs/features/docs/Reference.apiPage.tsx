@@ -3,11 +3,13 @@ import { reference_api } from '~/components/Navigation/NavigationMenu/Navigation
 import { ClientLibIntroduction } from '~/features/docs/Reference.introduction'
 import { ReferenceNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
-import { RefSections } from '~/features/docs/Reference.sections'
+import { RefSection } from '~/features/docs/Reference.sections'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 
-export async function ApiReferencePage() {
+export async function ApiReferencePage({ sectionSlug }: { sectionSlug?: string }) {
+  const isIndexOrIntro = !sectionSlug || sectionSlug === 'introduction'
+
   return (
     <ReferenceContentScrollHandler libPath="api" version="latest" isLatestVersion={true}>
       <SidebarSkeleton
@@ -20,18 +22,22 @@ export async function ApiReferencePage() {
             libPath="api"
             version="latest"
             isLatestVersion={true}
+            realNavigation
           />
         }
       >
         <LayoutMainContent>
           <article className="@container/article">
-            <ClientLibIntroduction
-              libPath="api"
-              version="latest"
-              isLatestVersion={true}
-              className="max-w-[unset]"
-            />
-            <RefSections libraryId="api" version="latest" />
+            {isIndexOrIntro ? (
+              <ClientLibIntroduction
+                libPath="api"
+                version="latest"
+                isLatestVersion={true}
+                className="max-w-[unset]"
+              />
+            ) : (
+              <RefSection libraryId="api" version="latest" slug={sectionSlug} />
+            )}
           </article>
         </LayoutMainContent>
       </SidebarSkeleton>

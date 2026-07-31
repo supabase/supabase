@@ -1,5 +1,3 @@
-import { notFound } from 'next/navigation'
-
 import { REFERENCES } from '~/content/navigation.references'
 import { ApiReferencePage } from '~/features/docs/Reference.apiPage'
 import { CliReferencePage } from '~/features/docs/Reference.cliPage'
@@ -11,6 +9,7 @@ import {
   parseReferencePath,
   redirectNonexistentReferenceSection,
 } from '~/features/docs/Reference.utils'
+import { notFound } from 'next/navigation'
 
 export const dynamicParams = false
 
@@ -46,7 +45,7 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
   } else if (isCliReference) {
     return <CliReferencePage />
   } else if (isApiReference) {
-    return <ApiReferencePage />
+    return <ApiReferencePage sectionSlug={parsedPath.path[0]} />
   } else if (isSelfHostingReference) {
     return (
       <SelfHostingReferencePage service={parsedPath.service} servicePath={parsedPath.servicePath} />

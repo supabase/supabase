@@ -63,11 +63,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
 
-  if (lib === 'api') {
-    const rewritePath = [REFERENCE_PATH, 'api'].join('/')
-    return NextResponse.rewrite(new URL(rewritePath, request.url))
-  }
-
   if (lib?.startsWith('self-hosting-')) {
     const rewritePath = [REFERENCE_PATH, lib].join('/')
     return NextResponse.rewrite(new URL(rewritePath, request.url))

@@ -29,12 +29,14 @@ export async function generateReferencePages() {
         .map(async ({ sdkId, version, libPath, isLatestVersion }) => {
           const flattenedSections = await getFlattenedSections(sdkId, version)
           return (
-            flattenedSections?.map((section) => ({
-              link: isLatestVersion
-                ? `reference/${libPath}/${section.slug}`
-                : `reference/${libPath}/${version}/${section.slug}`,
-              priority: 0.8,
-            })) ?? []
+            flattenedSections
+              ?.filter((section) => !!section.slug)
+              .map((section) => ({
+                link: isLatestVersion
+                  ? `reference/${libPath}/${section.slug}`
+                  : `reference/${libPath}/${version}/${section.slug}`,
+                priority: 0.8,
+              })) ?? []
           )
         })
     )
