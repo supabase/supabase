@@ -13,8 +13,6 @@ See per-service updates below for details. Only the most important changes relev
 ## Unreleased
 - Self-hosted Supabase: Envoy becomes the default API gateway (breaking change) [#48048](https://github.com/orgs/supabase/discussions/48048) (PR [#48153](https://github.com/supabase/supabase/pull/48153))
 
-(Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.)
-
 ---
 
 ## [0.7.1](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.7.1) - 2026-08-03
