@@ -474,7 +474,9 @@ function ProjectConfigVariablesInternal({ variable }: { variable: Variable }) {
 
   return (
     <div className="max-w-[min(100%, 500px)] my-6">
-      <h6 className={cn('mt-0 mb-1', 'text-foreground')}>{prettyFormatVariable[variable]}</h6>
+      <span className={cn('block mt-0 mb-1 font-heading font-semibold', 'text-foreground')}>
+        {prettyFormatVariable[variable]}
+      </span>
       <div className="flex flex-wrap gap-x-6">
         <OrgProjectSelector />
         <BranchSelector />
