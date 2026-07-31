@@ -155,6 +155,43 @@ secret
     expect(entry.bodySection).not.toContain('secret')
   })
 
+  it('treats an unmatched opening <!-- internal --> marker as internal through end of file', () => {
+    const entry = parseChangelogEntryFile(
+      '20260714-unclosed-internal.md',
+      `---
+title: Unclosed internal
+change_type: improvement
+public: true
+publish_date: 2026-07-14
+---
+
+## Summary
+
+Short summary.
+
+## Body
+
+Public body text.
+
+<!-- internal -->
+
+## Internal notes
+
+super secret
+
+## Support FAQ
+
+more secret
+`
+    )
+
+    expect(entry.bodySection).toContain('Public body text.')
+    expect(entry.bodySection).not.toContain('Internal notes')
+    expect(entry.bodySection).not.toContain('super secret')
+    expect(entry.bodySection).not.toContain('Support FAQ')
+    expect(entry.bodySection).not.toContain('more secret')
+  })
+
   it('normalizes date frontmatter reaching detail-page props, even when unquoted', () => {
     // `[slug].tsx` ships `entry.frontmatter` into props; a Date would break serialization.
     const entry = parseChangelogEntryFile(

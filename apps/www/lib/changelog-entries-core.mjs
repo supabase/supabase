@@ -106,7 +106,10 @@ export function toPublicFrontmatter(frontmatter) {
 }
 
 export function stripInternalBlock(body) {
-  let sanitized = body.replace(/<!--\s*internal\s*-->[\s\S]*?<!--\s*\/internal\s*-->/gi, '')
+  // An unmatched opening `<!-- internal -->` (no closing `<!-- /internal -->`) must
+  // still swallow everything after it — otherwise the follow-up comment-stripper
+  // would remove the opener alone and leak the internal text into publicBody.
+  let sanitized = body.replace(/<!--\s*internal\s*-->[\s\S]*?(?:<!--\s*\/internal\s*-->|$)/gi, '')
   // MDX doesn't support raw HTML comments (only {/* */}) — strip any that are left
   // (e.g. author/template notes) so they can't break rendering. Applied repeatedly:
   // a single pass could in principle leave a fresh `<!-- ... -->` behind.
