@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
-
 import { CustomerioTrackClient } from '~/lib/customerio'
+import { createRateLimiter } from '~/lib/rate-limit'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +12,16 @@ const isValidEmail = (email: string): boolean => {
   return emailPattern.test(email)
 }
 
+const isRateLimited = createRateLimiter({ max: 5, windowMs: 60 * 1000 })
+
 export async function POST(req: Request) {
+  if (isRateLimited(req)) {
+    return new Response(JSON.stringify({ message: 'Too many requests. Try again later.' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 429,
+    })
+  }
+
   const body = await req.json()
   const { firstName, lastName, email } = body
 
