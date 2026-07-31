@@ -30,6 +30,7 @@ export const TwoOptionToggle = ({
     <div
       className={`relative border ${borderOverride} rounded-md h-7`}
       style={{ padding: 1, width: (width + 1) * 2 }}
+      role="group"
     >
       <span
         style={{ width, translate: activeOption === options[1] ? '0px' : `${width - 2}px` }}
@@ -41,14 +42,20 @@ export const TwoOptionToggle = ({
       />
       {options.map((option, index: number) => {
         const isDisabled = disabledOptions.includes(option)
+        const isActive = activeOption === option
         const optionButton = (
-          <span
+          <button
             key={`toggle_${index}`}
+            type="button"
+            tabIndex={0}
+            aria-pressed={isActive}
+            // Prefer aria-disabled so TooltipTrigger asChild still receives hover/focus
+            aria-disabled={isDisabled || undefined}
             style={{ width: width + 1 }}
             className={cn(
-              activeOption === option ? 'text-foreground' : 'text-foreground-light',
+              isActive ? 'text-foreground' : 'text-foreground-light',
               index === 0 ? 'right-0' : 'left-0',
-              buttonStyle(activeOption === option),
+              buttonStyle(isActive),
               isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
             )}
             onClick={() => {
@@ -58,13 +65,13 @@ export const TwoOptionToggle = ({
             <span
               className={cn(
                 'capitalize hover:text-foreground',
-                activeOption === option ? 'text-foreground' : 'text-foreground-light',
+                isActive ? 'text-foreground' : 'text-foreground-light',
                 isDisabled && 'hover:text-foreground-light'
               )}
             >
               {option}
             </span>
-          </span>
+          </button>
         )
 
         if (!isDisabled || !disabledOptionTooltip) return optionButton

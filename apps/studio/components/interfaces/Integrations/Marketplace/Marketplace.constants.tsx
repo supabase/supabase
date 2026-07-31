@@ -14,6 +14,7 @@ export type { MarketplaceSource } from '@/components/interfaces/Integrations/Lan
 // Defines featured integrations and their order in the featured hero
 export const FEATURED_INTEGRATION_IDS = [
   'grafana',
+  'grafana-cloud',
   'cron',
   'queues',
   'stripe_sync_engine',

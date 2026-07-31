@@ -28,6 +28,7 @@ import {
   TreeViewItem,
 } from 'ui'
 
+import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
@@ -225,6 +226,7 @@ export const SQLEditorTreeViewItem = ({
       sql,
       owner_id: profile?.id,
       project_id: project?.id,
+      source: getSnippetSource(snippet),
     })
 
     snapV2.addSnippet({ projectRef, snippet: snippetCopy })
@@ -420,16 +422,18 @@ export const SQLEditorTreeViewItem = ({
                   {isFavorite ? 'Remove from' : 'Add to'} favorites
                 </ContextMenuItem>
               )}
-              {onSelectDownload !== undefined && IS_PLATFORM && (
-                <ContextMenuItem
-                  className="gap-x-2"
-                  onSelect={() => onSelectDownload()}
-                  onFocusCapture={(e) => e.stopPropagation()}
-                >
-                  <Download size={14} />
-                  Export query
-                </ContextMenuItem>
-              )}
+              {onSelectDownload !== undefined &&
+                IS_PLATFORM &&
+                getSnippetSource(element.metadata) !== 'logs' && (
+                  <ContextMenuItem
+                    className="gap-x-2"
+                    onSelect={() => onSelectDownload()}
+                    onFocusCapture={(e) => e.stopPropagation()}
+                  >
+                    <Download size={14} />
+                    Export query
+                  </ContextMenuItem>
+                )}
               {onSelectDelete !== undefined && isOwner && (
                 <>
                   <ContextMenuSeparator />

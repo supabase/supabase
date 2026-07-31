@@ -22,7 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'

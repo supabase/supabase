@@ -54,8 +54,8 @@ const RadioGroupStackedItem = React.forwardRef<
         // Checked state
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
         'data-[state=checked]:bg-surface-300 data-[state=checked]:border-foreground-muted',
-        // Group (no transition on ring)
-        'group',
+        // Colors only — avoid bare `transition` so the focus ring does not animate
+        'transition-colors group',
         props.className
       )}
     >
@@ -70,7 +70,7 @@ const RadioGroupStackedItem = React.forwardRef<
               'group-data-[state=checked]:border-foreground-muted',
               'group-focus-visible:border-foreground-muted',
               'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-background',
-              'group-hover:border-foreground-muted'
+              'group-hover:border-foreground-muted transition-colors'
             )}
           >
             <RadioGroupPrimitive.Indicator className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">

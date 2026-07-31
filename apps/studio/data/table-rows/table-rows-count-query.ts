@@ -74,6 +74,7 @@ export async function getTableRowsCount(
       filters: formattedFilters,
       enforceExactCount,
       isReadOnlyContext,
+      scoped,
     }),
     roleImpersonationState
   )
@@ -111,7 +112,7 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
     identifier: readReplicaIdentifier,
     type,
   } = useConnectionStringForReadOps()
-  const { can: canSQLAdminWrite } = useAsyncCheckPermissions(
+  const { can: canSQLAdminWrite, isLoading: isPermissionsLoading } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
@@ -141,7 +142,15 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
       enabled &&
       typeof projectRef !== 'undefined' &&
       typeof tableId !== 'undefined' &&
-      (!IS_PLATFORM || typeof connectionString !== 'undefined'),
+      (!IS_PLATFORM || typeof connectionString !== 'undefined') &&
+      // isReadOnlyContext resolves to `type === 'replica' || !canSQLAdminWrite`: for
+      // read replicas it's already known synchronously, but otherwise it depends on
+      // canSQLAdminWrite, which starts out `false` while permissions are loading.
+      // Firing while that's still in flight would cache a transient
+      // isReadOnlyContext:true (and, on a never-analyzed table, a scoped
+      // count:-1/is_estimate:true) for what may actually be a writable user. Wait
+      // for the permission check to settle before firing in that case.
+      (type === 'replica' || !isPermissionsLoading),
     ...options,
   })
 }

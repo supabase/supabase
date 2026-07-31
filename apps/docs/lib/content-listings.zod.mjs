@@ -27,6 +27,8 @@ export const contentListingItemSchema = z.object({
   icon: contentListingIconSchema.optional(),
   hasLightIcon: z.boolean().optional(),
   badge: z.string().min(1).optional(),
+  /** Grid cards only. Defaults to inline (next to the title), matching existing usage. */
+  badgePosition: z.enum(['inline', 'below']).optional(),
 })
 
 export const contentListingGroupTypeSchema = z.enum(['list', 'grid'])
