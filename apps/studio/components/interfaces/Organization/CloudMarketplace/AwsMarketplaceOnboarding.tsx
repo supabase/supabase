@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -38,12 +38,6 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(null)
   const [linkedOrgSlug, setLinkedOrgSlug] = useState<string | null>(null)
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
-
-  useEffect(() => {
-    setSelectedOrgSlug(null)
-    setLinkedOrgSlug(null)
-    setShowOrgCreationDialog(false)
-  }, [buyerId])
 
   const {
     data: organizations,
@@ -88,10 +82,6 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const linkError = linkOrganizationError
     ? `Failed to link organization: ${linkOrganizationError.message}`
     : undefined
-
-  useEffect(() => {
-    resetLinkOrganizationError()
-  }, [buyerId, resetLinkOrganizationError])
 
   const effectiveOrganizations = useMemo(
     () => organizations ?? EMPTY_ORGANIZATIONS,
@@ -152,6 +142,18 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
         eligibilityByOrganizationSlug: eligibilityBySlug,
       }
     }, [onboardingInfo, effectiveOrganizations])
+
+  const resetOnBuyerChange = useEffectEvent(() => {
+    setSelectedOrgSlug(null)
+    setLinkedOrgSlug(null)
+    setShowOrgCreationDialog(false)
+    resetLinkOrganizationError()
+  })
+
+  useEffect(() => {
+    resetOnBuyerChange()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [buyerId])
 
   if (!buyerId) {
     return (
