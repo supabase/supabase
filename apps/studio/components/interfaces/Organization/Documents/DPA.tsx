@@ -18,9 +18,8 @@ export const DPA = () => {
         <div className="space-y-2 text-sm text-foreground-light [&_p]:m-0">
           <p>
             Our Data Processing Addendum is incorporated into our{' '}
-            <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink> effective
-            August 1, 2026, so all organizations get its protections automatically. No separate
-            signed DPA is needed.
+            <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink>, so all
+            organizations get its protections automatically. No separate signed DPA is needed.
           </p>
           <p>If you signed a DPA with us previously, that agreement remains binding.</p>
         </div>
