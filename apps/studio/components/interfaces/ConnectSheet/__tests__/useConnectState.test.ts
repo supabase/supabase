@@ -498,6 +498,11 @@ describe('useConnectState', () => {
   // ============================================================================
 
   describe('high availability projects', () => {
+    afterEach(async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(false)
+    })
+
     test('should hide connectionMethod field for HA projects', async () => {
       const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
       vi.mocked(useIsHighAvailability).mockReturnValue(true)
