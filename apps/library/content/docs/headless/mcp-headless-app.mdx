@@ -1,0 +1,122 @@
+---
+title: Headless MCP App
+description: A complete MCP app with OAuth screens, an Edge Function, and database tools
+---
+
+Everything needed for a production MCP app in one install: static browser
+screens for OAuth, an MCP server Edge Function, and PostgREST tools generated
+from your database schema. This block owns the toolset manifest that enables the
+installed PostgREST toolset and a starter `supabase/config.toml`.
+
+## Installation
+
+<BlockItem
+  name="mcp-headless-app"
+  description="Complete headless MCP app with PostgREST database tools"
+  installArgs="--yes --overwrite"
+/>
+
+The app composes [MCP Auth](./mcp-auth), [MCP Server](./mcp-server), and
+[MCP Tools: PostgREST](./mcp-tools-postgrest) as registry dependencies. It also
+installs `supabase/functions/mcp-server/tools/index.ts`, with the PostgREST
+toolset registered already, so no source edits are needed after installation.
+The server dependency creates the same file first; the displayed `--overwrite`
+flag deliberately replaces it with this complete manifest. It only overwrites
+that generated toolset manifest and the starter `supabase/config.toml`.
+
+<Callout type="caution">
+
+This is a starter block for a new project. The install command overwrites both
+`supabase/functions/mcp-server/tools/index.ts` and `supabase/config.toml`. For
+an existing project, install the individual MCP blocks and merge their
+configuration deliberately instead.
+
+</Callout>
+
+## Folder structure
+
+<RegistryBlock itemName="mcp-headless-app" />
+
+## Configure and deploy
+
+The installed `supabase/config.toml` already enables the OAuth server,
+access-token hook, and `mcp-server` function. Update `project_id`, `site_url`,
+and `additional_redirect_urls` with the static app's host, then set the static
+site's `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `config.js` as described
+in [MCP Auth](./mcp-auth).
+
+Once the static files are hosted and `site_url` points to that host, deploy the
+database hook and Edge Function:
+
+```bash
+supabase db push
+supabase config push
+supabase functions deploy mcp-server
+```
+
+The server registers `echo`, `whoami`, and the PostgREST toolset. The latter
+builds database tools from the caller's schema and permissions; see [MCP Tools:
+PostgREST](./mcp-tools-postgrest) for its guardrails and RLS guidance.
+
+## Local quickstart
+
+Use three terminals to run the complete app locally. The starter
+`supabase/config.toml` already targets `http://localhost:3000`; update it first
+if you use another static-server origin.
+
+Start Supabase, then copy the **API URL** and **publishable key** printed by
+`supabase status` into `config.js`:
+
+```js
+export const SUPABASE_URL = 'API_URL_FROM_SUPABASE_STATUS'
+export const SUPABASE_PUBLISHABLE_KEY = 'PUBLISHABLE_KEY_FROM_SUPABASE_STATUS'
+```
+
+```bash
+# Terminal 1
+supabase start
+supabase status
+
+# Terminal 2
+npx serve . --listen 3000
+
+# Terminal 3
+cp supabase/functions/mcp-server/.env.example supabase/functions/.env
+# Set MCP_PUBLIC_SUPABASE_URL to the API URL from `supabase status`.
+supabase functions serve mcp-server --env-file supabase/functions/.env
+```
+
+Open `http://localhost:3000`. The static app uses the values in `config.js` to
+connect to the local project and shows the MCP endpoint served by the function.
+
+## Expose database tools safely
+
+The PostgREST toolset only discovers tables and functions that the calling user
+can access. For new tables, enable RLS and grant the `authenticated` role the
+operations your tools need. Some projects require explicit grants before a new
+table is reachable through the Data API.
+
+```sql
+create table public.todos (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users,
+  title text not null,
+  done boolean not null default false
+);
+
+alter table public.todos enable row level security;
+
+grant select, insert, update, delete on table public.todos to authenticated;
+
+create policy "Users can manage their own todos"
+on public.todos
+for all
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+```
+
+The policy limits every operation to the caller's rows. Do not grant a role
+access without an RLS policy that matches the intended ownership model. Views
+over protected tables should use `security_invoker = true`; see [MCP Tools:
+PostgREST](./mcp-tools-postgrest) for the full security model.

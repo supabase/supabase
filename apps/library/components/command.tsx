@@ -10,6 +10,7 @@ import { useLocalStorage } from './use-local-storage'
 interface CommandCopyProps {
   name: string
   highlight?: boolean
+  installArgs?: string
   // For Vue, we need to use the `shadcn-vue` package instead of `shadcn`
   framework?: 'react' | 'vue'
 }
@@ -46,7 +47,7 @@ const getComponentPath = (name: string) => {
   }
 }
 
-export function Command({ name, highlight, framework = 'react' }: CommandCopyProps) {
+export function Command({ name, highlight, framework = 'react', installArgs }: CommandCopyProps) {
   const pathname = usePathname()
   const [value, setValue] = useLocalStorage<InstallationTab>(LOCAL_STORAGE_KEY, 'prompt')
 
@@ -56,30 +57,22 @@ export function Command({ name, highlight, framework = 'react' }: CommandCopyPro
   const commands: Record<PackageManager, string> =
     framework === 'vue'
       ? {
-          npm: `npx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          pnpm: `pnpm dlx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          yarn: `yarn dlx shadcn-vue@latest add ${baseUrl}${componentPath}`,
-          bun: `bunx --bun shadcn-vue@latest add ${baseUrl}${componentPath}`,
+          npm: `npx shadcn-vue@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
+          pnpm: `pnpm dlx shadcn-vue@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
+          yarn: `yarn dlx shadcn-vue@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
+          bun: `bunx --bun shadcn-vue@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
         }
       : {
-          npm: `npx shadcn@latest add ${baseUrl}${componentPath}`,
-          pnpm: `pnpm dlx shadcn@latest add ${baseUrl}${componentPath}`,
-          yarn: `yarn dlx shadcn@latest add ${baseUrl}${componentPath}`,
-          bun: `bunx --bun shadcn@latest add ${baseUrl}${componentPath}`,
+          npm: `npx shadcn@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
+          pnpm: `pnpm dlx shadcn@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
+          yarn: `yarn dlx shadcn@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
+          bun: `bunx --bun shadcn@latest add ${baseUrl}${componentPath}${installArgs ? ` ${installArgs}` : ''}`,
         }
 
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
   const currentPath = pathname?.startsWith(basePath) ? pathname : `${basePath}${pathname ?? ''}`
   const pageUrl = `${getPageBaseUrl()}${currentPath}`
-  const prompt = [
-    `Read the installation instructions at ${pageUrl} before making changes.`,
-    '',
-    `Then install the ${name} block in the current project with:`,
-    '',
-    commands.npm,
-    '',
-    'Follow the remaining setup and configuration steps on that page.',
-  ].join('\n')
+  const prompt = `Read the installation instructions at ${pageUrl} before making changes. Then install the ${name} block in the current project with: ${commands.npm}. Follow the remaining setup and configuration steps on that page.`
   const tabs: InstallationTab[] = ['prompt', ...Object.keys(commands)] as InstallationTab[]
 
   return (

@@ -36,6 +36,11 @@ const nextConfig = {
         destination: '/api/registry/mcp-tools-postgrest',
         permanent: false,
       },
+      {
+        source: '/r/mcp-headless-app.json',
+        destination: '/api/registry/mcp-headless-app',
+        permanent: false,
+      },
     ]
   },
 }

@@ -5,6 +5,7 @@ import currentUserAvatar from './default/blocks/current-user-avatar/registry-ite
 import dropzone from './default/blocks/dropzone/registry-item.json' with { type: 'json' }
 import infiniteQueryHook from './default/blocks/infinite-query-hook/registry-item.json' with { type: 'json' }
 import mcpAuthHtml from './default/blocks/mcp-auth-html/registry-item.json' with { type: 'json' }
+import mcpHeadlessApp from './default/blocks/mcp-headless-app/registry-item.json' with { type: 'json' }
 import mcpServer from './default/blocks/mcp-server/registry-item.json' with { type: 'json' }
 import mcpToolsPostgrest from './default/blocks/mcp-tools-postgrest/registry-item.json' with { type: 'json' }
 import passwordBasedAuthNextjs from './default/blocks/password-based-auth-nextjs/registry-item.json' with { type: 'json' }
@@ -61,12 +62,13 @@ export const blocks = [
   // infinite query hook is intentionally not combined with the clients since it depends on clients having database types.
   infiniteQueryHook as RegistryItem,
 
-  // The headless MCP blocks take no client: mcp-auth-html is plain HTML, and the
-  // other two are Deno Edge Function code. Every file carries an explicit target,
-  // which is what lets `shadcn add` install them into a directory with no
-  // components.json. mcp-tools-postgrest declares mcp-server as a registry
-  // dependency, so installing it lands the framework first.
+  // The headless MCP blocks take no client: mcp-auth-html is plain HTML and the
+  // server and tool blocks are Deno Edge Function code. Every file carries an
+  // explicit target, which is what lets `shadcn add` install them into a
+  // directory with no components.json. mcp-tools-postgrest declares mcp-server
+  // as a registry dependency; mcp-headless-app composes all three.
   mcpAuthHtml as RegistryItem,
+  mcpHeadlessApp as RegistryItem,
   mcpServer as RegistryItem,
   mcpToolsPostgrest as RegistryItem,
 

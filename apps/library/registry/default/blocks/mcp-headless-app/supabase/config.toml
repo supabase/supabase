@@ -1,0 +1,35 @@
+# Headless MCP App configuration.
+#
+# This is a complete starter config for a new local Supabase project. Update
+# project_id and the two browser origins before deploying the static app.
+
+# Use a distinct value when multiple local Supabase projects run on this machine.
+project_id = "headless-mcp-app"
+
+[api]
+enabled = true
+# `public` is where PostgREST discovers tables and functions for the MCP tools.
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+# New public entities are not auto-exposed. Grant the authenticated role the
+# required operations and enable RLS for every table used by MCP tools.
+# auto_expose_new_tables = true
+
+[auth]
+enabled = true
+# Replace both URLs with the origin where you host this block's static files.
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/"]
+
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent/"
+allow_dynamic_registration = true
+
+[auth.hook.custom_access_token]
+enabled = true
+uri = "pg-functions://postgres/private/mcp_custom_access_token_hook"
+
+[functions.mcp-server]
+# The function verifies OAuth and Supabase bearer tokens itself.
+verify_jwt = false

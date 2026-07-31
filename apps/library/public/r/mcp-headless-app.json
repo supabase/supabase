@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mcp-headless-app",
+  "type": "registry:item",
+  "title": "Headless MCP App",
+  "description": "A complete headless MCP app: static OAuth screens, an MCP Edge Function, and PostgREST database tools.",
+  "registryDependencies": [
+    "https://supabase.com/library/r/mcp-auth-html.json",
+    "https://supabase.com/library/r/mcp-server.json",
+    "https://supabase.com/library/r/mcp-tools-postgrest.json"
+  ],
+  "files": [
+    {
+      "path": "registry/default/blocks/mcp-headless-app/supabase/config.toml",
+      "content": "# Headless MCP App configuration.\n#\n# This is a complete starter config for a new local Supabase project. Update\n# project_id and the two browser origins before deploying the static app.\n\n# Use a distinct value when multiple local Supabase projects run on this machine.\nproject_id = \"headless-mcp-app\"\n\n[api]\nenabled = true\n# `public` is where PostgREST discovers tables and functions for the MCP tools.\nschemas = [\"public\", \"graphql_public\"]\nextra_search_path = [\"public\", \"extensions\"]\n# New public entities are not auto-exposed. Grant the authenticated role the\n# required operations and enable RLS for every table used by MCP tools.\n# auto_expose_new_tables = true\n\n[auth]\nenabled = true\n# Replace both URLs with the origin where you host this block's static files.\nsite_url = \"http://localhost:3000\"\nadditional_redirect_urls = [\"http://localhost:3000/auth/\"]\n\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent/\"\nallow_dynamic_registration = true\n\n[auth.hook.custom_access_token]\nenabled = true\nuri = \"pg-functions://postgres/private/mcp_custom_access_token_hook\"\n\n[functions.mcp-server]\n# The function verifies OAuth and Supabase bearer tokens itself.\nverify_jwt = false\n",
+      "type": "registry:file",
+      "target": "supabase/config.toml"
+    },
+    {
+      "path": "registry/default/blocks/mcp-headless-app/supabase/functions/mcp-server/tools/index.ts",
+      "content": "import { echoToolset } from './echo.ts'\nimport { postgrestToolset } from './postgrest/index.ts'\nimport { registerToolset } from './registry.ts'\nimport { whoamiToolset } from './whoami.ts'\n\nexport type { ToolContext } from './types.ts'\n\n// The complete app includes the server's built-in tools and the PostgREST\n// toolset installed by its registry dependency.\nexport function registerToolsets(): void {\n  registerToolset(echoToolset)\n  registerToolset(whoamiToolset)\n  registerToolset(postgrestToolset)\n}\n",
+      "type": "registry:file",
+      "target": "supabase/functions/mcp-server/tools/index.ts"
+    }
+  ],
+  "docs": "Required setup: this starter block installs `supabase/config.toml` with OAuth, access-token-hook, and Edge Function settings. Fill in its `project_id`, `site_url`, and `additional_redirect_urls` for your static app host, then set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `config.js`. The `--yes --overwrite` install command intentionally replaces both this starter config and `supabase/functions/mcp-server/tools/index.ts`; merge those files manually if your project already has either one. Deploy with `supabase db push`, `supabase config push`, and `supabase functions deploy mcp-server`. The complete manifest already registers the PostgREST toolset; no manual source edit is needed. See the block documentation for the local quickstart and RLS/grant requirements."
+}
