@@ -222,7 +222,9 @@ Match feedback to its scope:
 
 Clear stale action feedback when the user retries or changes a relevant
 selection. Error copy should say what failed and, when it is not obvious, what
-the user can do next.
+the user can do next. When passive supporting copy occupies the same footer
+region, replace it with the action error until the error is cleared instead of
+stacking both messages.
 
 <ComponentPreview
   name="connect-interstitial-action-error"

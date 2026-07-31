@@ -318,12 +318,14 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               </Button>
               <InterstitialActionError error={linkError} />
             </div>
-            <p className="text-center text-xs text-foreground-lighter text-balance">
-              <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
-                Learn more
-              </InlineLink>{' '}
-              about billing through AWS.
-            </p>
+            {!linkError && (
+              <p className="text-center text-xs text-foreground-lighter text-balance">
+                <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
+                  Learn more
+                </InlineLink>{' '}
+                about billing through AWS.
+              </p>
+            )}
           </div>
         </div>
       </AwsMarketplaceInterstitial>

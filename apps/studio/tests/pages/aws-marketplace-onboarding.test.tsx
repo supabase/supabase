@@ -187,6 +187,7 @@ describe('AwsMarketplaceOnboardingScreen', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Failed to link organization: Marketplace link failed'
     )
+    expect(screen.queryByText(/Learn more/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Link organization' })).toBeEnabled()
   })
 
