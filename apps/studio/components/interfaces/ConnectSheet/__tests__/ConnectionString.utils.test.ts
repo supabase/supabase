@@ -1,8 +1,11 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  appendConnectionStringParams,
   buildConnectionParameters,
   buildConnectionStringWithPassword,
+  buildJdbcString,
+  buildPsqlCommand,
   buildSafeConnectionString,
   DEFAULT_PORT,
   parseConnectionParams,
@@ -17,6 +20,7 @@ describe('parseConnectionParams', () => {
       port: DEFAULT_PORT,
       user: 'hidden',
       database: 'hidden',
+      search: '',
     })
   })
 
@@ -26,6 +30,7 @@ describe('parseConnectionParams', () => {
       port: DEFAULT_PORT,
       user: 'hidden',
       database: 'hidden',
+      search: '',
     })
   })
 
@@ -37,7 +42,14 @@ describe('parseConnectionParams', () => {
       port: '6543',
       user: 'postgres.projref',
       database: 'postgres',
+      search: '',
     })
+  })
+
+  test('keeps the query string in search', () => {
+    const uri =
+      'postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5432/postgres?sslmode=require&sslnegotiation=direct'
+    expect(parseConnectionParams(uri).search).toBe('?sslmode=require&sslnegotiation=direct')
   })
 
   test('decodes percent-encoded bracket placeholders in the user info', () => {
@@ -159,6 +171,71 @@ describe('resolveConnectionString', () => {
   })
 })
 
+describe('appendConnectionStringParams', () => {
+  test('joins with ? when the URI has no query string', () => {
+    expect(appendConnectionStringParams('postgresql://u@h:5432/db', 'pgbouncer=true')).toBe(
+      'postgresql://u@h:5432/db?pgbouncer=true'
+    )
+  })
+
+  test('joins with & when the URI already has a query string', () => {
+    expect(
+      appendConnectionStringParams('postgresql://u@h:5432/db?sslmode=require', 'pgbouncer=true')
+    ).toBe('postgresql://u@h:5432/db?sslmode=require&pgbouncer=true')
+  })
+
+  test('returns the URI unchanged for empty inputs', () => {
+    expect(appendConnectionStringParams('', 'pgbouncer=true')).toBe('')
+    expect(appendConnectionStringParams('postgresql://u@h:5432/db', '')).toBe(
+      'postgresql://u@h:5432/db'
+    )
+  })
+})
+
+describe('buildPsqlCommand', () => {
+  const params = {
+    host: 'db.proj.supabase.co',
+    port: '5432',
+    user: 'postgres',
+    database: 'postgres',
+    search: '',
+  }
+
+  test('uses flag form when there is no query string', () => {
+    expect(buildPsqlCommand(params)).toBe(
+      'psql -h db.proj.supabase.co -p 5432 -d postgres -U postgres'
+    )
+  })
+
+  test('falls back to the URI form when the query string must be carried', () => {
+    expect(buildPsqlCommand({ ...params, search: '?sslmode=require&sslnegotiation=direct' })).toBe(
+      'psql "postgresql://postgres@db.proj.supabase.co:5432/postgres?sslmode=require&sslnegotiation=direct"'
+    )
+  })
+})
+
+describe('buildJdbcString', () => {
+  const params = {
+    host: 'db.proj.supabase.co',
+    port: '5432',
+    user: 'postgres',
+    database: 'postgres',
+    search: '',
+  }
+
+  test('builds the base string without extra params', () => {
+    expect(buildJdbcString(params)).toBe(
+      `jdbc:postgresql://db.proj.supabase.co:5432/postgres?user=postgres&password=${PASSWORD_PLACEHOLDER}`
+    )
+  })
+
+  test('appends the query string using pgJDBC casing for sslnegotiation', () => {
+    expect(buildJdbcString({ ...params, search: '?sslmode=require&sslnegotiation=direct' })).toBe(
+      `jdbc:postgresql://db.proj.supabase.co:5432/postgres?user=postgres&password=${PASSWORD_PLACEHOLDER}&sslmode=require&sslNegotiation=direct`
+    )
+  })
+})
+
 describe('buildConnectionParameters', () => {
   test('produces host/port/database/user rows in display order', () => {
     expect(
@@ -167,6 +244,7 @@ describe('buildConnectionParameters', () => {
         port: '5432',
         user: 'u',
         database: 'd',
+        search: '',
       })
     ).toEqual([
       { key: 'host', value: 'h' },
