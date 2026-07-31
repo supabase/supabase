@@ -3,6 +3,7 @@ import { TreeView } from 'ui'
 
 import type { TreeViewItemProps } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -12,7 +13,7 @@ interface SqlSnippetTreeProps {
   lastItemIds: Set<string>
   /** Additional (multi-)selected snippet ids to highlight beyond the active one. */
   selectedSnippetIds?: string[]
-  /** Search results show a Private/Shared sublabel under each snippet name. */
+  /** Search results show a source/visibility sublabel under each snippet name. */
   showVisibility?: boolean
   itemClassName?: string
   hasNextPage?: boolean
@@ -25,9 +26,16 @@ interface SqlSnippetTreeProps {
   onSelectUnshare?: (snippet: Snippet) => void
 }
 
-const visibilityLabel = (visibility: string | undefined) => {
-  if (visibility === 'user') return 'Private'
-  if (visibility === 'project') return 'Shared'
+/**
+ * The sublabel under a snippet's name. Logs snippets are labeled by source rather
+ * than visibility: they have no share action, so "Private" says nothing that
+ * distinguishes them from the database query sitting right above them in the
+ * same result list, while "Logs" does.
+ */
+const snippetSublabel = (snippet: Snippet) => {
+  if (getSnippetSource(snippet) === 'logs') return 'Logs'
+  if (snippet.visibility === 'user') return 'Private'
+  if (snippet.visibility === 'project') return 'Shared'
   return undefined
 }
 
@@ -66,7 +74,7 @@ export const SqlSnippetTree = ({
         const isPreview = tabs.previewTabId === tabId
         const isActive = !isPreview && snippet.id === id
         const isSelected = isActive || (selectedSnippetIds?.includes(snippet.id) ?? false)
-        const visibility = showVisibility ? visibilityLabel(snippet.visibility) : undefined
+        const sublabel = showVisibility ? snippetSublabel(snippet) : undefined
 
         return (
           <SQLEditorTreeViewItem
@@ -78,8 +86,8 @@ export const SqlSnippetTree = ({
                     name: (
                       <span className="flex flex-col py-0.5">
                         <span className="truncate">{element.name}</span>
-                        {!!visibility && (
-                          <span className="text-foreground-lighter text-xs">{visibility}</span>
+                        {!!sublabel && (
+                          <span className="text-foreground-lighter text-xs">{sublabel}</span>
                         )}
                       </span>
                     ),

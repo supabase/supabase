@@ -69,6 +69,11 @@ describe('useSqlEditorTabsCleanup', () => {
 
     expect(store.openTabs).toEqual(['sql-logs'])
     expect(store.tabsMap['sql-db-stale']).toBeUndefined()
+
+    // Recent items carry their own logs-source condition, so assert them separately.
+    const recentIds = store.recentItems.map((item) => item.id)
+    expect(recentIds).toContain('sql-logs')
+    expect(recentIds).not.toContain('sql-db-stale')
   })
 
   it('prunes recent items for deleted logs snippets while keeping live ones', () => {

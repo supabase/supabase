@@ -304,9 +304,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   // cleanup treats them as live (and prunes stale ones).
   const [logsSnippetsInView, setLogsSnippetsInView] = useState<{
     snippets: Snippet[]
-    isSuccess: boolean
+    isComplete: boolean
     isSettled: boolean
-  }>({ snippets: [], isSuccess: false, isSettled: false })
+  }>({ snippets: [], isComplete: false, isSettled: false })
 
   const allSnippetsInView = useMemo(
     () => [
@@ -429,7 +429,12 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
   useEffect(() => {
     if (snippet !== undefined && isSuccess) {
-      if (snippet.visibility === 'project') {
+      // Source is checked before visibility: a logs snippet lives in the Logs section
+      // whatever its visibility, so branching on visibility first would open Private
+      // (or Shared) and leave the section the snippet is actually in collapsed.
+      if (getSnippetSource(snippet) === 'logs') {
+        setSectionVisibility({ ...sectionVisibility, logs: true })
+      } else if (snippet.visibility === 'project') {
         setSectionVisibility({ ...sectionVisibility, shared: true })
       } else if (snippet.visibility === 'user') {
         setSectionVisibility({ ...sectionVisibility, private: true })
@@ -483,19 +488,20 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   const sqlEditorTabsCleanup = useSqlEditorTabsCleanup()
   useEffect(() => {
     // Wait for the logs query to settle (when enabled) so a logs failure doesn't
-    // freeze database-tab cleanup. Logs tabs are only prunable once the logs query
-    // has actually succeeded — otherwise they're preserved (we lack authoritative data).
+    // freeze database-tab cleanup. Logs tabs are only prunable once every logs page
+    // has been fetched — until then the list is partial and a tab whose snippet sits
+    // on an unfetched page would be pruned as stale, so they're preserved instead.
     if (isSuccess && (!canShowLogsSection || logsSnippetsInView.isSettled)) {
       sqlEditorTabsCleanup({
         snippets: allSnippetsInView,
-        canPruneLogsTabs: canShowLogsSection && logsSnippetsInView.isSuccess,
+        canPruneLogsTabs: canShowLogsSection && logsSnippetsInView.isComplete,
       })
     }
   }, [
     allSnippetsInView,
     isSuccess,
     canShowLogsSection,
-    logsSnippetsInView.isSuccess,
+    logsSnippetsInView.isComplete,
     logsSnippetsInView.isSettled,
     sqlEditorTabsCleanup,
   ])

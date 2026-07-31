@@ -107,15 +107,16 @@ export const SearchList = ({ search }: SearchListProps) => {
   return (
     <>
       <div className="flex flex-col grow">
-        {isLoadingCounts ? (
+        {isLoadingCounts && (
           <div className="px-4 py-1 pb-2.5">
             <Loader2 className="animate-spin" size={14} />
           </div>
-        ) : hasCounts ? (
+        )}
+        {!isLoadingCounts && hasCounts && (
           <p className="px-4 pb-2 text-sm text-foreground-lighter">
             {totalNumber} result{totalNumber === 1 ? '' : 's'} found
           </p>
-        ) : null}
+        )}
         {isSearchLoading && (
           <div className="px-4 flex flex-col gap-y-1">
             <ShimmeringLoader className="py-2.5" />

@@ -30,7 +30,16 @@ interface LogsSnippetsSectionProps {
   activeSnippet?: Snippet
   selectedSnippetIds: string[]
   /** Bubbles loaded logs snippets up for tab cleanup, mirroring onFolderContentsChange. */
-  onSnippetsLoaded: (info: { snippets: Snippet[]; isSuccess: boolean; isSettled: boolean }) => void
+  onSnippetsLoaded: (info: {
+    snippets: Snippet[]
+    /**
+     * Whether `snippets` is the complete set of logs snippets. Only true once every
+     * page has been fetched — cleanup prunes tabs whose snippet is absent from the
+     * list, and a snippet on an unfetched page would otherwise look deleted.
+     */
+    isComplete: boolean
+    isSettled: boolean
+  }) => void
   onSelectDelete: (snippet: Snippet) => void
   onSelectRename: (snippet: Snippet) => void
 }
@@ -87,8 +96,12 @@ export const LogsSnippetsSection = ({
 
   const onSnippetsLoadedRef = useLatest(onSnippetsLoaded)
   useEffect(() => {
-    onSnippetsLoadedRef.current({ snippets, isSuccess, isSettled: isSuccess || isError })
-  }, [snippets, isSuccess, isError])
+    onSnippetsLoadedRef.current({
+      snippets,
+      isComplete: isSuccess && !hasNextPage,
+      isSettled: isSuccess || isError,
+    })
+  }, [snippets, isSuccess, isError, hasNextPage])
 
   return (
     <InnerSideMenuCollapsible className="px-0" open={open} onOpenChange={onOpenChange}>
