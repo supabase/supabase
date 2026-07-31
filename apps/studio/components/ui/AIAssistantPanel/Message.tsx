@@ -19,12 +19,12 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
     onRate?.(id, newRating, reason)
   }
 
-  const handleCopy = () => {
+  const handleCopy = (onSuccess: () => void) => {
     const response = message.parts
       .filter((x) => x.type === 'text')
       .map((x) => x.text)
       .join('\n')
-    copyToClipboard(response)
+    copyToClipboard(response, onSuccess)
   }
 
   return (

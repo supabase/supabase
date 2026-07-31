@@ -80,7 +80,7 @@ function MessageActionsBranch({ onClick }: { onClick: () => void }) {
 }
 MessageActions.Branch = MessageActionsBranch
 
-function MessageActionsCopy({ onClick }: { onClick: () => void }) {
+function MessageActionsCopy({ onClick }: { onClick: (onSuccess: () => void) => void }) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -91,10 +91,7 @@ function MessageActionsCopy({ onClick }: { onClick: () => void }) {
     <ButtonTooltip
       variant="text"
       icon={copied ? <Check size={14} strokeWidth={2} /> : <Copy size={14} strokeWidth={1.5} />}
-      onClick={() => {
-        setCopied(true)
-        onClick()
-      }}
+      onClick={() => onClick(() => setCopied(true))}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
       title="Copy response"
       aria-label="Copy response"
