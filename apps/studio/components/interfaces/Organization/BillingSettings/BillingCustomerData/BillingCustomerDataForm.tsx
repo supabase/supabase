@@ -259,7 +259,9 @@ export const PurchasingAsRadioButtons = (props: {
       defaultValue={'individual'}
       value={props.purchasingAs}
       onValueChange={(v) => props.onSetPurchasingAs(v === 'business' ? 'business' : 'individual')} // satisfying typescript
-      className="text-sm"
+      // `relative` contains Radix's absolutely positioned hidden radio inputs. Without a positioned
+      // ancestor they resolve against the document and add page-level scroll overflow.
+      className="text-sm relative"
     >
       <div className="flex items-center gap-3">
         <RadioGroupItem
