@@ -96,15 +96,18 @@ function isHiddenMdx(filePath: string): boolean {
 }
 
 /**
- * Files behind the pages features/reference-pages.spec.ts loads. It uses a
- * fixed list, so a change here runs Playwright even with no guide pages.
+ * Changes that should run Playwright even when no guide pages resolve, since
+ * features/reference-pages.spec.ts uses a fixed page list: the sources behind
+ * the reference pages, and the harness that loads them.
  */
-function isReferenceRelevantFile(filePath: string): boolean {
+function runsFixedChecks(filePath: string): boolean {
   const path = normalizeRepoPath(filePath)
   return (
     path.startsWith('apps/docs/spec/') ||
     path.startsWith('apps/docs/features/docs/Reference') ||
-    path === 'apps/docs/middleware.ts'
+    path === 'apps/docs/middleware.ts' ||
+    path.startsWith('e2e/docs/') ||
+    path === '.github/workflows/docs-e2e.yml'
   )
 }
 
@@ -320,7 +323,7 @@ export async function resolveDocsScope(
 
   return {
     pages: sorted.slice(0, maxPages),
-    skip: sorted.length === 0 && !options.changedFiles.some(isReferenceRelevantFile),
+    skip: sorted.length === 0 && !options.changedFiles.some(runsFixedChecks),
   }
 }
 

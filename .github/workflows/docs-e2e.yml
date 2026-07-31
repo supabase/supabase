@@ -73,7 +73,8 @@ jobs:
           node-version-file: '.nvmrc'
 
       # Map changed owned content (guides, troubleshooting, partials) to page
-      # URLs. Harness-only PRs resolve to skip=true and exit before Playwright.
+      # URLs. Reference and harness changes resolve to no pages but still run,
+      # for the fixed set in reference-pages.spec.ts.
       - name: Resolve docs E2E scope
         id: scope
         env:
