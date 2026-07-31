@@ -38,6 +38,19 @@ interface PostHogInitOptions {
   sessionReplay?: SessionRecordingOptions
 }
 
+/**
+ * Enables session recording when given a masking config, and disables it when
+ * given nothing.
+ */
+export function buildSessionRecordingConfig(
+  sessionReplay?: SessionRecordingOptions
+): Partial<PostHogConfig> {
+  return {
+    disable_session_recording: !sessionReplay,
+    ...(sessionReplay && { session_recording: sessionReplay }),
+  }
+}
+
 class PostHogClient {
   /** True after posthog.init() is called (prevents double-init) */
   private initStarted = false
@@ -79,8 +92,7 @@ class PostHogClient {
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
-      disable_session_recording: !sessionReplay,
-      ...(sessionReplay && { session_recording: sessionReplay }),
+      ...buildSessionRecordingConfig(sessionReplay),
       loaded: (posthog) => {
         // Apply pending properties that were set before PostHog
         // initialized due to poor connection or user not accepting

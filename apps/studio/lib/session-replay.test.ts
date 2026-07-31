@@ -1,5 +1,5 @@
-import type { CapturedNetworkRequest } from 'common'
-import { describe, expect, it } from 'vitest'
+import { buildSessionRecordingConfig, type CapturedNetworkRequest } from 'common'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { maskReplayNetworkRequest, maskReplayText, SESSION_REPLAY_CONFIG } from './session-replay'
 
@@ -92,5 +92,64 @@ describe('SESSION_REPLAY_CONFIG', () => {
   it('never records request or response payloads', () => {
     expect(SESSION_REPLAY_CONFIG.recordHeaders).toBe(false)
     expect(SESSION_REPLAY_CONFIG.recordBody).toBe(false)
+  })
+
+  it('never records canvas, which text masking cannot reach', () => {
+    expect(SESSION_REPLAY_CONFIG.captureCanvas).toEqual({ recordCanvas: false })
+  })
+
+  it('strips sensitive URL parts via maskReplayNetworkRequest', () => {
+    expect(SESSION_REPLAY_CONFIG.maskCapturedNetworkRequestFn).toBe(maskReplayNetworkRequest)
+  })
+})
+
+describe('buildSessionRecordingConfig', () => {
+  it('disables recording when given no policy', () => {
+    const config = buildSessionRecordingConfig()
+
+    expect(config.disable_session_recording).toBe(true)
+    expect(config).not.toHaveProperty('session_recording')
+  })
+
+  it('disables recording when the policy is undefined', () => {
+    const config = buildSessionRecordingConfig(undefined)
+
+    expect(config.disable_session_recording).toBe(true)
+    expect(config).not.toHaveProperty('session_recording')
+  })
+
+  it('enables recording and forwards the policy when given one', () => {
+    const config = buildSessionRecordingConfig(SESSION_REPLAY_CONFIG)
+
+    expect(config.disable_session_recording).toBe(false)
+    expect(config.session_recording).toBe(SESSION_REPLAY_CONFIG)
+  })
+})
+
+describe('IS_SESSION_REPLAY_ENABLED', () => {
+  beforeEach(() => {
+    vi.resetModules()
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('is true only for the exact string "true"', async () => {
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_SESSION_REPLAY', 'true')
+    const { IS_SESSION_REPLAY_ENABLED } = await import('./session-replay')
+    expect(IS_SESSION_REPLAY_ENABLED).toBe(true)
+  })
+
+  it.each(['false', '', 'TRUE', '1'])('is false for %o', async (value) => {
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_SESSION_REPLAY', value)
+    const { IS_SESSION_REPLAY_ENABLED } = await import('./session-replay')
+    expect(IS_SESSION_REPLAY_ENABLED).toBe(false)
+  })
+
+  it('is false when unset', async () => {
+    vi.stubEnv('NEXT_PUBLIC_POSTHOG_SESSION_REPLAY', undefined)
+    const { IS_SESSION_REPLAY_ENABLED } = await import('./session-replay')
+    expect(IS_SESSION_REPLAY_ENABLED).toBe(false)
   })
 })

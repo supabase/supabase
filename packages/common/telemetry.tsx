@@ -22,6 +22,7 @@ import {
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useFirstTouchStore, useParams } from './hooks'
 import {
+  buildSessionRecordingConfig,
   posthogClient,
   type CapturedNetworkRequest,
   type ClientTelemetryEvent,
@@ -36,6 +37,7 @@ import {
 import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
 
 export {
+  buildSessionRecordingConfig,
   posthogClient,
   type CapturedNetworkRequest,
   type ClientTelemetryEvent,
