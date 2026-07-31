@@ -75,11 +75,7 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
               <FormControl className="grow">
                 <Select value={field.value} onValueChange={handleExpiryChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select an expiry" asChild>
-                      <span>
-                        {EXPIRY_OPTIONS.find((option) => option.value === field.value)?.label}
-                      </span>
-                    </SelectValue>
+                    <SelectValue placeholder="Select an expiry" />
                   </SelectTrigger>
                   <SelectContent>
                     {EXPIRY_OPTIONS.map((option) => (
