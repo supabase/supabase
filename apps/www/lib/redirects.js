@@ -2046,32 +2046,32 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript',
-    destination: '/docs/reference/javascript/start',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/dart',
-    destination: '/docs/reference/dart/start',
+    destination: '/docs/reference/dart/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/python',
-    destination: '/docs/reference/python/start',
+    destination: '/docs/reference/python/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/csharp',
-    destination: '/docs/reference/csharp/start',
+    destination: '/docs/reference/csharp/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/swift',
-    destination: '/docs/reference/swift/start',
+    destination: '/docs/reference/swift/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/kotlin',
-    destination: '/docs/reference/kotlin/start',
+    destination: '/docs/reference/kotlin/introduction',
   },
   {
     permanent: true,
