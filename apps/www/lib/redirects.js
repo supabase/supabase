@@ -2972,6 +2972,29 @@ module.exports = [
     source: '/docs/guides/cli/managing-environments',
     destination: '/docs/guides/deployment/managing-environments',
   },
+  // These have to stay above the `/docs/guides/cli/:path*` catch-all below.
+  // Next matches redirects in order, so the catch-all would otherwise send
+  // them to `/docs/guides/local-development/cli/...`, which does not exist.
+  {
+    permanent: true,
+    source: '/docs/guides/cli/github-actions/:path*',
+    destination: '/docs/guides/deployment/ci/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/github-action/:path*',
+    destination: '/docs/guides/deployment/ci/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/cicd-workflow',
+    destination: '/docs/guides/deployment/managing-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/cli/seeding-your-database',
+    destination: '/docs/guides/local-development/seeding-your-database',
+  },
   {
     permanent: true,
     source: '/docs/guides/cli/:path*',
@@ -3014,11 +3037,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/shared-responsibility-model',
     destination: '/docs/guides/deployment/shared-responsibility-model',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/cli/github-actions/:path*',
-    destination: '/docs/guides/deployment/ci/:path*',
   },
   {
     permanent: true,
