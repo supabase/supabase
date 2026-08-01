@@ -1,14 +1,8 @@
 import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
-import {
-  buttonVariants,
-  cn,
-  ResizablePanel,
-  ResizablePanelGroup,
-  SidebarProvider,
-  usePanelRef,
-} from 'ui'
+import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
@@ -101,19 +95,7 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <a
-                className={cn(
-                  buttonVariants({
-                    size: 'xlarge',
-                    variant: 'primary',
-                  }),
-                  'absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full focus:translate-y-4'
-                )}
-                href="#main"
-                tabIndex={0}
-              >
-                Skip to content
-              </a>
+              <SkipToContent href="#main" />
               {/* Top Banner */}
               <AppBannerWrapper />
               <div className="shrink-0">
@@ -144,7 +126,7 @@ export const DefaultLayout = ({
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <main id="main" className="h-full overflow-y-auto">
+                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
                       {children}
                     </main>
                   </ResizablePanel>

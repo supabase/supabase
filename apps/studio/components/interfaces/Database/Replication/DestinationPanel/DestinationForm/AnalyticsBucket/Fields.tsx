@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
   FormControl,
@@ -61,7 +61,10 @@ export const AnalyticsBucketFields = ({
   editMode: boolean
   onSelectNewBucket: () => void
 }) => {
-  const { warehouseName, s3AccessKeyId, namespace } = form.watch()
+  const [warehouseName, s3AccessKeyId, namespace] = useWatch({
+    control: form.control,
+    name: ['warehouseName', 's3AccessKeyId', 'namespace'],
+  })
   const [showCatalogToken, setShowCatalogToken] = useState(false)
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 

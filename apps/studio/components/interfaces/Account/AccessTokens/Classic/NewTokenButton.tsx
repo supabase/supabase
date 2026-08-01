@@ -6,6 +6,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { NewTokenDialog } from './NewTokenDialog'
@@ -32,14 +35,19 @@ export const NewTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => 
           Generate new token
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="primary"
-              title="Choose token scope"
-              className="rounded-l-none px-[4px] py-[5px]"
-              icon={<ChevronDown />}
-            />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="primary"
+                  aria-label="Choose token scope"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<ChevronDown />}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Choose token scope</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end" side="bottom">
             <DropdownMenuItem
               key="experimental-token"

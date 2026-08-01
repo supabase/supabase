@@ -220,6 +220,10 @@ export function ComposedChart({
       return value
     }
 
+    if (typeof format === 'function') {
+      return format(value)
+    }
+
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
       const formatted = isMemoryChart

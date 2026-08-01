@@ -140,7 +140,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
           {showAuthorizationState && emailMatches && linkedOrg && (
             <div className="flex flex-col gap-3">
               <Admonition
-                type="tip"
+                type="note"
                 description={
                   <>
                     <span className="font-medium text-foreground">{linkedOrg.name}</span> is already

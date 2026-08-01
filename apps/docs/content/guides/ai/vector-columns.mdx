@@ -61,7 +61,7 @@ create table documents (
 
 In the SQL snippet above, we create a `documents` table with an `embedding` column. This is a standard Postgres column, so you can name it anything you like. The `embedding` column uses the `vector` data type with 384 dimensions. Change this number to match the dimensions your embedding model produces. For example, if you're [generating embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) using the open source [`gte-small`](https://huggingface.co/Supabase/gte-small) model, set this to 384.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 In general, embeddings with fewer dimensions perform best. See our [analysis on fewer dimensions in pgvector](/blog/fewer-dimensions-are-better-pgvector).
 
@@ -156,13 +156,13 @@ const { data: documents } = await supabaseClient.rpc('match_documents', {
 
 In this example `embedding` would be another embedding you wish to compare against your table of pre-generated embedding documents. For example if you were building a search engine, every time the user submits their query you would first generate an embedding on the search query itself, then pass it into the above `rpc()` function to match.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 To filter your vector search by another column from the JS client, extend the function above with an extra parameter and `where` clause. See [Filtering vector search by metadata](/docs/guides/ai/semantic-search#filtering-vector-search-by-metadata) for a worked example.
 
 </Admonition>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Be sure to use embeddings produced from the same embedding model when calculating distance. Comparing embeddings from two different models will produce no meaningful result.
 
