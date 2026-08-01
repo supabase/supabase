@@ -234,17 +234,23 @@ export const EntityListItem = ({
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
-            >
-              <Button
-                variant="text"
-                className="w-6 h-6"
-                icon={<MoreVertical size={14} strokeWidth={2} />}
-                onClick={(e) => e.preventDefault()}
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger
+                  asChild
+                  className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
+                >
+                  <Button
+                    variant="text"
+                    className="w-6 h-6"
+                    icon={<MoreVertical size={14} strokeWidth={2} />}
+                    onClick={(e) => e.preventDefault()}
+                    aria-label={`More options for ${entity.name}`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent side="bottom" align="start" className="w-52">
               <DropdownMenuItem
                 key="copy-name"

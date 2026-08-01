@@ -17,5 +17,6 @@ export interface RowField {
   foreignKey?: PGTableRelationship
   isNullable: boolean
   isIdentity: boolean
+  isGenerated: boolean
   isPrimaryKey: boolean
 }

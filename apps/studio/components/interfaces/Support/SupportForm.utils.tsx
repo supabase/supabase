@@ -1,5 +1,6 @@
 // End of third-party imports
 
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import {
   DocsSearchResultType as PageType,
   type DocsSearchResult as Page,
@@ -17,13 +18,30 @@ import {
   type UseQueryStatesKeysMap,
 } from 'nuqs'
 
-import { CATEGORY_OPTIONS } from './Support.constants'
+import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
 import { DOCS_URL } from '@/lib/constants'
 import type { Organization } from '@/types'
 
 export const NO_PROJECT_MARKER = 'no-project'
 export const NO_ORG_MARKER = 'no-org'
+
+export const DISABLE_SUPPORT_ACCESS_CATEGORIES: ExtendedSupportCategories[] = [
+  SupportCategories.ACCOUNT_DELETION,
+  SupportCategories.SALES_ENQUIRY,
+  SupportCategories.REFUND,
+]
+
+export function canAllowSupportAccess(
+  category: ExtendedSupportCategories | undefined,
+  projectRef: string
+): boolean {
+  return (
+    !!category &&
+    !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) &&
+    projectRef !== NO_PROJECT_MARKER
+  )
+}
 
 export const formatMessage = ({
   message,

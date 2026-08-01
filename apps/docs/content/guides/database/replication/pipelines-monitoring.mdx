@@ -10,14 +10,14 @@ sidebar_label: 'Monitoring'
 
 After setting up Supabase Pipelines, you can monitor the status and health of your pipelines directly from the Dashboard. A pipeline first performs an initial sync of existing rows, then uses ongoing replication (CDC) to send subsequent database changes to your destination.
 
-### Viewing pipeline status
+## Viewing pipeline status
 
 To monitor your pipelines:
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. You'll see a list of all your destinations with their pipeline status
 
-#### Pipeline states
+### Pipeline states
 
 Each destination shows its pipeline in one of these states:
 
@@ -31,7 +31,7 @@ Each destination shows its pipeline in one of these states:
 | **Failed**     | Pipeline has encountered an error (hover over the status to view error details) |
 | **Unknown**    | The Dashboard can't currently determine the pipeline status                     |
 
-### Viewing detailed pipeline metrics
+## Viewing detailed pipeline metrics
 
 For detailed information about a specific pipeline, click **View pipeline** on the destination. This opens the pipeline status page where you can monitor replication performance and table states.
 
@@ -44,7 +44,7 @@ For detailed information about a specific pipeline, click **View pipeline** on t
   zoomable
 />
 
-#### Replication lag metrics
+### Replication lag metrics
 
 The status page shows replication lag metrics that help you determine how far the pipeline is behind Postgres. These metrics are loaded directly from Postgres replication slot state.
 
@@ -64,7 +64,7 @@ Pipelines uses one main pipeline replication slot for ongoing replication. Durin
 
 Temporary table-sync slots show the same kind of lag and slot health metrics while they are active. After a table finishes its initial sync and catches up, its temporary slot is removed and ongoing replication continues through the main pipeline slot. For overall replication health, focus first on the main pipeline slot.
 
-#### Slot statuses
+### Slot statuses
 
 Replication slot status tells you whether Postgres is still retaining the WAL that the pipeline needs to continue from its current position.
 
@@ -76,7 +76,7 @@ Replication slot status tells you whether Postgres is still retaining the WAL th
 | **Lost**       | Broken. Some WAL files this pipeline's replication slot needs have already been removed. The pipeline can no longer continue from this slot. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** in the pipeline's advanced settings and restart it. |
 | **Unknown**    | Postgres reported an unknown or unavailable state for this pipeline's replication slot.                                                                                                                                                                                      |
 
-#### Table states
+### Table states
 
 The pipeline status page also shows the state of individual tables being replicated. Each table can be in one of these states:
 
@@ -91,7 +91,7 @@ The pipeline status page also shows the state of individual tables being replica
 | **Not Available** | Table state is temporarily unavailable while the pipeline changes state  |
 | **Unknown**       | The Dashboard received a table state it doesn't recognize                |
 
-### Dealing with replication lag
+## Dealing with replication lag
 
 Replication lag means the pipeline is behind the source database. Some lag is expected during the initial sync, after a burst of writes, or after restarting a stopped pipeline. Lag becomes a problem when it keeps increasing, when **WAL retention remaining** is running low, or when the slot status moves to **Unreserved** or **Lost**.
 
@@ -104,7 +104,7 @@ Lag can come from several places:
 - **Stopped or disconnected pipeline**: When a pipeline is stopped, disconnected, or failed, Postgres keeps WAL for the slot until the retention limit is reached.
 - **Slow initial sync**: A temporary table-sync slot can fall behind if existing rows are copied more slowly than new changes are written to that table.
 
-#### Initial sync and table-sync slots
+### Initial sync and table-sync slots
 
 A common initial sync issue happens when a large or busy table is still in **Copying** while new rows keep being inserted or updated. The temporary table-sync slot retains changes that happen during the initial sync. If copying is too slow compared to the table's write rate, the slot can move to **Unreserved** and then **Lost** if Postgres removes changes the sync still needs.
 
@@ -116,7 +116,7 @@ When a table-sync slot is lost, the affected table needs to run its initial sync
 
 After the affected table finishes copying and catches up, the temporary slot is deleted. The table then continues through the main pipeline replication slot.
 
-#### Investigate the lag
+### Investigate the lag
 
 1. Open [**Database > Replication**](/dashboard/project/_/database/replication) and check the destination's lag column.
 2. Click **View pipeline** and check **Waiting to sync**, **WAL retention remaining**, **Last check-in**, **Connected**, and **Slot status**.
@@ -124,7 +124,7 @@ After the affected table finishes copying and catches up, the temporary slot is 
 4. Open [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) and look for destination errors, retries, rate limits, schema errors, or repeated restarts.
 5. Compare the lag trend with recent database activity, such as imports, migrations, bulk updates, or long transactions.
 
-#### Respond based on the slot status
+### Respond based on the slot status
 
 | Slot status    | What to do                                                                                                                                                                                                                                                                                                       |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -134,7 +134,7 @@ After the affected table finishes copying and catches up, the temporary slot is 
 | **Lost**       | The pipeline cannot continue from the existing slot because required WAL has been removed. Recreate the pipeline, or set **Invalidated slot behavior** to **Recreate** in the pipeline's advanced settings and restart the pipeline. This creates a new slot and starts replication from scratch for all tables. |
 | **Unknown**    | Check replication logs for errors or missing slot details. If the status remains unknown while the pipeline should be running, contact support with the pipeline ID and recent log details.                                                                                                                      |
 
-#### Reduce future lag risk
+### Reduce future lag risk
 
 - Keep publications focused on the tables and operations you need at the destination.
 - Avoid leaving pipelines stopped for long periods while the source database is still receiving writes.
@@ -142,11 +142,11 @@ After the affected table finishes copying and catches up, the temporary slot is 
 - For BigQuery, verify that service account permissions, table requirements, and replica identity settings match the [BigQuery destination guide](/docs/guides/database/replication/bigquery).
 - If the initial sync is the bottleneck, review **Table sync workers** and **Copy connections per table** in the pipeline's advanced settings. Increasing either can use more source database connections; increasing table sync workers can also use more temporary replication slots.
 
-### Handling errors
+## Handling errors
 
 Errors can occur at two levels: per table or per pipeline.
 
-#### Table errors
+### Table errors
 
 Table errors occur during the initial sync and affect individual tables. These errors can be retried without stopping the entire pipeline.
 
@@ -160,7 +160,7 @@ Table errors occur during the initial sync and affect individual tables. These e
 
 When a table encounters an error during the initial sync, you can reset the table state. This restarts that table's initial sync from the beginning.
 
-#### Pipeline errors
+### Pipeline errors
 
 Pipeline errors can occur during startup or ongoing replication and affect the entire pipeline. If a non-retryable pipeline-level error occurs, the entire pipeline stops and enters a **Failed** state instead of silently skipping the failure.
 
@@ -178,7 +178,7 @@ To recover from a pipeline error, you'll need to:
 2. Fix the underlying issue (e.g., destination connectivity, schema compatibility)
 3. Restart the pipeline from the destinations list
 
-### Viewing logs
+## Viewing logs
 
 To see detailed logs for all your pipelines:
 
@@ -192,16 +192,16 @@ Logs contain diagnostic information that may be too technical for most users. If
 
 </Admonition>
 
-### Common monitoring scenarios
+## Common monitoring scenarios
 
-#### Checking if replication is healthy
+### Checking if replication is healthy
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Verify your destination shows a "Running" status
 3. Click **View pipeline** to check replication lag and table states
 4. Ensure all tables show a "Live" state
 
-#### Investigating errors
+### Investigating errors
 
 If you see a **Failed** status:
 
@@ -211,7 +211,7 @@ If you see a **Failed** status:
 4. Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/replication-logs) section of the Dashboard for full error details
 5. For table errors, attempt to reset the affected tables
 
-#### Monitoring performance
+### Monitoring performance
 
 To ensure optimal performance:
 
@@ -220,7 +220,7 @@ To ensure optimal performance:
 3. Review logs for warnings or performance issues
 4. If lag is consistently high, review your publication and destination configuration
 
-### Troubleshooting
+## Troubleshooting
 
 If you notice issues with your replication:
 
@@ -232,7 +232,7 @@ If you notice issues with your replication:
 
 For more troubleshooting tips, see the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq).
 
-### Next steps
+## Next steps
 
 - [Set up Pipelines](/docs/guides/database/replication/pipelines)
 - [View the Pipelines FAQ](/docs/guides/database/replication/pipelines-faq)

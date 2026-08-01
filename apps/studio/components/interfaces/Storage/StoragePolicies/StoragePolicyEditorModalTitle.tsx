@@ -32,7 +32,7 @@ export const StoragePolicyEditorModalTitle = ({
             tabIndex={0}
             onClick={onSelectBackFromTemplates}
             className={cn(
-              'cursor-pointer rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+              'cursor-pointer rounded-xs opacity-20 hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
               'hit-area-6'
             )}
           >
@@ -51,7 +51,7 @@ export const StoragePolicyEditorModalTitle = ({
       <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
       <DialogPrimitive.Close
         className={cn(
-          'absolute p-0.5 right-3.5 top-4.5 rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+          'absolute p-0.5 right-3.5 top-4.5 rounded-xs opacity-20 hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
           'hit-area-6'
         )}
       >

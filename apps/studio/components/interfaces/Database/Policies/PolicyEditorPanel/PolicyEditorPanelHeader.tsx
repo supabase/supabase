@@ -30,9 +30,8 @@ export const PolicyEditorPanelHeader = ({
       <div className="flex flex-row gap-3 max-w-[75%] items-start">
         <SheetClose
           className={cn(
-            'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-            'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
-            'transition disabled:pointer-events-none data-[state=open]:bg-secondary',
+            'text-muted hover:text hover:opacity-100 focus-ring',
+            'disabled:pointer-events-none data-[state=open]:bg-secondary',
             'mt-1.5'
           )}
         >
