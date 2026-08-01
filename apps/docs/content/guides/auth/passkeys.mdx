@@ -403,7 +403,7 @@ let response = try await supabase.auth.verifyPasskeyAuthentication(
 
 The `options` field returned from the start methods matches the [WebAuthn `PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialcreationoptions) and [`PublicKeyCredentialRequestOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialrequestoptions) shapes (with `ArrayBuffer` fields encoded as base64url).
 
-See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey) · [Dart](/docs/reference/dart/auth-passkey) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
 
 ## Manage passkeys
 
@@ -474,7 +474,7 @@ try await supabase.auth.deletePasskey(id: passkeys.first!.id)
 
 `friendlyName` is limited to 120 characters. `lastUsedAt` is updated each time the passkey is used to sign in.
 
-See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey-api) · [Dart](/docs/reference/dart/auth-passkey-api) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
+See the `auth.passkey` reference ([JavaScript](/docs/reference/javascript/auth-passkey) · [Dart](/docs/reference/dart/auth-passkey) · [Swift](/docs/reference/swift/auth-passkey-api)) for the full API.
 
 ## Admin API
 
@@ -520,7 +520,7 @@ await supabase.auth.admin.passkey.deletePasskey(
 </TabPanel>
 </Tabs>
 
-See the `auth.admin.passkey` reference ([JavaScript](/docs/reference/javascript/auth-admin-passkey-api) · [Dart](/docs/reference/dart/auth-admin-passkey-api)) for the full API. The Swift SDK does not expose admin passkey methods.
+See the `auth.admin.passkey` reference ([JavaScript](/docs/reference/javascript/passkey-admin) · [Dart](/docs/reference/dart/passkey-admin)) for the full API. The Swift SDK does not expose admin passkey methods.
 
 ## Error codes
 
