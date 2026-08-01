@@ -13,13 +13,15 @@ Self-hosting is a good fit if you need full control over your data, have complia
 
 ## How self-hosted Supabase differs
 
-Self-hosted Supabase runs as a single project. Studio doesn't support multiple organizations or projects. Unlike the managed platform, branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable**. 
+Self-hosted Supabase runs as a single project. Studio doesn't support multiple organizations or projects. Unlike the managed platform, which is fully hosted and operated by Supabase, branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable**.
 
 Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
 ### Not the same as local development
 
-The [Supabase CLI](/docs/guides/local-development/cli/getting-started) runs Supabase locally for development and testing. It is not intended for self-hosting.
+[Supabase CLI](/docs/guides/local-development/cli/getting-started) runs a local stack for development and testing. That stack is not a self-hosted deployment: it is not hardened for production and must not be exposed to external traffic. 
+
+To self-host, use [Docker](/docs/guides/self-hosting/docker) or one of the community deployment options.
 
 ## Your responsibilities when self-hosting
 
