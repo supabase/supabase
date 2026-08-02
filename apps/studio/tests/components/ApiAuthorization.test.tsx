@@ -363,7 +363,7 @@ describe('ApiAuthorizationScreen', () => {
           expect(screen.getByAltText('Cursor')).toBeInTheDocument()
           expect(screen.getByAltText('Supabase')).toBeInTheDocument()
           expect(
-            screen.queryByText('Redirect does not match this app name')
+            screen.queryByText('Check this redirect before authorizing')
           ).not.toBeInTheDocument()
         })
 
@@ -377,7 +377,7 @@ describe('ApiAuthorizationScreen', () => {
           )
           renderScreen()
           expect(
-            await screen.findByText('Redirect does not match this app name')
+            await screen.findByText('Check this redirect before authorizing')
           ).toBeInTheDocument()
           expect(
             screen.getByText(
@@ -417,7 +417,7 @@ describe('ApiAuthorizationScreen', () => {
           renderScreen()
           await screen.findByText('Authorization request expired')
           expect(
-            screen.queryByText('Redirect does not match this app name')
+            screen.queryByText('Check this redirect before authorizing')
           ).not.toBeInTheDocument()
           expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
           expect(screen.queryByRole('button', { name: /Authorize Claude/ })).not.toBeInTheDocument()
