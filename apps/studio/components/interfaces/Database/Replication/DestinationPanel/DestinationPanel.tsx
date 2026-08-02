@@ -28,7 +28,6 @@ import { ReadReplicaForm } from './ReadReplicaForm'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
 interface DestinationPanelProps {
@@ -38,7 +37,6 @@ interface DestinationPanelProps {
 export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPanelProps) => {
   const { ref: projectRef } = useParams()
   const enablePgReplicate = useIsETLPrivateAlpha()
-  const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
   const { error: destinationsError } = useReplicationDestinationsQuery({ projectRef })
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
 
@@ -196,11 +194,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <div className="grow overflow-auto min-h-0">
                 {pipelinesTypeSelection}
                 <SheetSection>
-                  <EnablePipelinesCallout
-                    className="p-6!"
-                    type={destinationType}
-                    hasAccess={hasETLReplicationAccess}
-                  />
+                  <EnablePipelinesCallout className="p-6!" type={destinationType} />
                 </SheetSection>
               </div>
             ) : (

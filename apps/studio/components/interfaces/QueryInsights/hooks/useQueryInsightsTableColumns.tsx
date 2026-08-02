@@ -1,6 +1,5 @@
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, ExternalLink, ScanSearch } from 'lucide-react'
 import { useMemo, type RefObject } from 'react'
-// eslint-disable-next-line no-restricted-imports
 import { type Column, type DataGridHandle } from 'react-data-grid'
 import {
   Button,
