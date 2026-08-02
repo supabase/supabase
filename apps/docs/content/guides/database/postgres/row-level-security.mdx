@@ -24,7 +24,7 @@ Also note that Postgres RLS policies apply to `SELECT`, `INSERT`, `UPDATE`, and 
 ```sql
 -- Tables in public often already have broad default grants.
 -- Revoke first, then grant only what each role should have.
-REVOKE ALL ON TABLE <schema_name>.<table_name> FROM anon, authenticated;
+REVOKE ALL ON TABLE <schema_name>.<table_name> FROM anon, authenticated, service_role;
 
 GRANT SELECT ON <schema_name>.<table_name> TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO authenticated;
