@@ -43,10 +43,12 @@ export type ChangelogEntry = {
   sortDate: string
   /** Contents of `## Summary` only. */
   summary: string
-  /** Contents of `## Body` only. Never includes the internal block. */
+  /**
+   * Everything under `## Body` to the end of the public content. The
+   * `<!-- internal -->` block is the only boundary — content authors want kept
+   * off the published page goes inside that block.
+   */
   bodySection: string
-  /** Contents of `## Migration steps`, if present. */
-  migrationSteps: string
 }
 
 function createChangelogRepoOctokit() {

@@ -1,3 +1,4 @@
+import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import {
@@ -39,10 +40,6 @@ test.describe('Docs owned pages', () => {
 
       const article = page.locator(articleSelector)
       await expect(article, 'Page article should be present').toBeVisible()
-      await expect(
-        article.getByRole('heading', { level: 1 }),
-        'Page article should include an h1'
-      ).toBeVisible()
 
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
       const userAgent = await browserLikeUserAgent(page)
@@ -62,6 +59,24 @@ test.describe('Docs owned pages', () => {
             .toBeTruthy()
         }
       }
+    })
+  }
+
+  for (const pagePath of pagePaths) {
+    test(`${pagePath} has a valid heading hierarchy @a11y`, async ({ page }) => {
+      const articleSelector = articleSelectorForPagePath(pagePath)
+      const response = await page.goto(pagePath)
+      expect(response?.ok(), `Expected a successful response for ${pagePath}`).toBeTruthy()
+
+      const axeResults = await new AxeBuilder({ page })
+        .include(articleSelector)
+        .withRules(['heading-order', 'page-has-heading-one'])
+        .analyze()
+
+      expect(
+        axeResults.violations,
+        `Heading hierarchy issues in ${articleSelector}:\n${JSON.stringify(axeResults.violations, null, 2)}`
+      ).toEqual([])
     })
   }
 })
