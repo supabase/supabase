@@ -111,6 +111,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                   href={item.href}
                   onClick={() => trackClick(item)}
                   target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}
                 >
                   <strong>{item.title}</strong>: {item.description}
                 </Link>
