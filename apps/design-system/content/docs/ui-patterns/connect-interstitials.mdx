@@ -217,20 +217,14 @@ Match feedback to its scope:
   feedback for a failure the user needs to resolve on the current card.
 
 ```tsx
-{
-  actionError && (
-    <div className="mt-3 border-t border-muted pt-5">
-      <p role="alert" className="text-center text-xs text-destructive text-balance">
-        {actionError}
-      </p>
-    </div>
-  )
-}
+<InterstitialActionError error={actionError} />
 ```
 
 Clear stale action feedback when the user retries or changes a relevant
 selection. Error copy should say what failed and, when it is not obvious, what
-the user can do next.
+the user can do next. When passive supporting copy occupies the same footer
+region, replace it with the action error until the error is cleared instead of
+stacking both messages.
 
 <ComponentPreview
   name="connect-interstitial-action-error"

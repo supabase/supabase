@@ -419,6 +419,25 @@ describe('ApiAuthorizationScreen', () => {
           await user.click(screen.getByRole('button', { name: /Authorize Test App/ }))
           await waitFor(() => expect(approveHandler).toHaveBeenCalled())
         })
+
+        test('shows an approval failure inline and keeps the action available', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints()
+          addAPIMock({
+            method: 'post',
+            path: '/platform/organizations/:slug/oauth/authorizations/:id',
+            response: () =>
+              HttpResponse.json<APIErrorBody>({ message: 'Authorization failed' }, { status: 500 }),
+          })
+          renderScreen()
+
+          await user.click(await screen.findByRole('button', { name: /Authorize Test App/ }))
+
+          expect(await screen.findByRole('alert')).toHaveTextContent(
+            'Failed to authorize request: Authorization failed'
+          )
+          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeEnabled()
+        })
       })
 
       describe('decline action', () => {
@@ -438,6 +457,25 @@ describe('ApiAuthorizationScreen', () => {
           await user.click(screen.getByRole('button', { name: 'Cancel' }))
           await waitFor(() => expect(declineHandler).toHaveBeenCalled())
           await waitFor(() => expect(navigate).toHaveBeenCalledWith('/organizations'))
+        })
+
+        test('shows a cancellation failure inline and keeps the action available', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints()
+          addAPIMock({
+            method: 'delete',
+            path: '/platform/organizations/:slug/oauth/authorizations/:id',
+            response: () =>
+              HttpResponse.json<APIErrorBody>({ message: 'Cancellation failed' }, { status: 500 }),
+          })
+          renderScreen()
+
+          await user.click(await screen.findByRole('button', { name: 'Cancel' }))
+
+          expect(await screen.findByRole('alert')).toHaveTextContent(
+            'Failed to cancel authorization request: Cancellation failed'
+          )
+          expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled()
         })
       })
 

@@ -23,7 +23,10 @@ import {
   AuthorizeConnectLogo,
   AuthorizeRequesterDetails,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
-import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialActionError,
+  InterstitialLayout,
+} from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization, ResponseError } from '@/types'
 
@@ -71,6 +74,8 @@ export interface ApiAuthorizationMainViewProps {
   requester: ApiAuthorizationResponse
   organizations: OrganizationsState
   requestedOrganizationSlug: string | undefined
+  actionError?: string
+  onOrganizationChange: () => void
   onApprove: () => void
   onDecline: () => void
 }
@@ -81,6 +86,8 @@ export function ApiAuthorizationMainView({
   requester,
   organizations,
   requestedOrganizationSlug,
+  actionError,
+  onOrganizationChange,
   onApprove,
   onDecline,
 }: ApiAuthorizationMainViewProps): ReactNode {
@@ -121,6 +128,7 @@ export function ApiAuthorizationMainView({
                   requester={requester}
                   organizations={organizations.organizations}
                   requestedOrganizationSlug={requestedOrganizationSlug}
+                  onOrganizationChange={onOrganizationChange}
                 />
               )}
               {showReadyContent && (
@@ -134,6 +142,7 @@ export function ApiAuthorizationMainView({
                     approvalState={approvalState}
                     requester={requester}
                     redirectUrl={externalRedirectUrl}
+                    actionError={actionError}
                     onApprove={onApprove}
                     onDecline={onDecline}
                   />
@@ -221,6 +230,7 @@ interface OrganizationSelectorProps {
   requestedOrganizationSlug: string | undefined
   organizations: Array<Organization>
   disabled?: boolean
+  onOrganizationChange: () => void
 }
 
 function OrganizationSelector({
@@ -229,6 +239,7 @@ function OrganizationSelector({
   requestedOrganizationSlug,
   organizations,
   disabled = false,
+  onOrganizationChange,
 }: OrganizationSelectorProps): ReactNode {
   return (
     <Form {...form}>
@@ -251,6 +262,7 @@ function OrganizationSelector({
                 disabled={disabled}
                 onValueChange={(value) => {
                   field.onChange(value)
+                  onOrganizationChange()
                   form.trigger('selectedOrgSlug')
                 }}
               >
@@ -287,6 +299,7 @@ interface FormFooterProps {
   approvalState: ApprovalState
   requester: ApiAuthorizationResponse
   redirectUrl?: string
+  actionError?: string
   onDecline: () => void
   onApprove: () => void
 }
@@ -295,6 +308,7 @@ function FormFooter({
   approvalState,
   requester,
   redirectUrl,
+  actionError,
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
@@ -315,7 +329,8 @@ function FormFooter({
       >
         Cancel
       </Button>
-      {redirectUrl && (
+      <InterstitialActionError error={actionError} />
+      {!actionError && redirectUrl && (
         <div className="mt-3 border-t border-muted pt-5">
           <p className="text-center text-xs text-foreground-lighter text-balance">
             Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
