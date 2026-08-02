@@ -37,15 +37,17 @@ Install the CLI as a project dev dependency. This adds it to a single project ra
 
 ```sh
 npm install supabase --save-dev
-# or: pnpm add -D supabase / yarn add -D supabase / bun add -D supabase
 ```
+
+If you use a different package manager, install with `pnpm add -D supabase`, `yarn add -D supabase`, or `bun add -D supabase`.
 
 Pin the version in `package.json` so your whole team uses the same CLI version. Then run every command through your package runner:
 
 ```sh
 npx supabase --help
-# or: pnpm supabase / yarn supabase / bunx supabase
 ```
+
+With other package runners, use `pnpm supabase`, `yarn supabase`, or `bunx supabase`.
 
 <Admonition type="caution">
 
