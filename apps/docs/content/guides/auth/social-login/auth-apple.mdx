@@ -218,7 +218,7 @@ const hashedNonce = Array.from(new Uint8Array(buf))
         const { data: authData, error } = await supabase.auth.signInWithIdToken({
           provider: 'apple',
           token: event.detail.authorization.id_token,
-          nonce: rawNonce,   // ← raw goes to Supabase ✅
+          nonce: rawNonce,   // ← raw goes to Supabase 
         })
 
         if (error) {
