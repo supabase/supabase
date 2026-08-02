@@ -30,12 +30,13 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
   const passkeysInMenu = Boolean(features.passkeys)
   const baseUrl = `/project/${ref}/auth`
   const showAdvancedAuthMenu = isPlatform || enableSelfHostedAuthMenu
+  const showOverviewItem = showOverview || (!isPlatform && enableSelfHostedAuthMenu)
 
   return [
     {
       title: 'Manage',
       items: [
-        ...(showOverview
+        ...(showOverviewItem
           ? [
               {
                 name: 'Overview',

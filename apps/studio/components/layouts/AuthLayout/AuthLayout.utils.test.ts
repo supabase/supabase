@@ -133,6 +133,16 @@ describe('generateAuthMenu', () => {
     expect(names).not.toContain('OAuth Server')
     expect(names).not.toContain('Performance')
   })
+  it('enhanced self-hosted shows Overview without the remote feature flag', () => {
+    const menu = generateAuthMenu({
+      ...allFeaturesEnabled,
+      isPlatform: false,
+      enableSelfHostedAuthMenu: true,
+      showOverview: false,
+    })
+
+    expect(flatItemNames(menu)).toContain('Overview')
+  })
 
   it('shows Overview when showOverview is true', () => {
     const menu = generateAuthMenu({ ...allFeaturesDisabled, showOverview: true })
