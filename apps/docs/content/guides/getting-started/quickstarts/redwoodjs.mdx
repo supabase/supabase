@@ -6,19 +6,13 @@ breadcrumb: 'Framework Quickstarts'
 
 <AiPrompt id="redwoodjs" />
 
-## 1. Setup your new Supabase project
+<$Partial path="quickstart_create_project.mdx" />
 
-[Create a new project](/dashboard) in the Supabase Dashboard.
-
-<Admonition type="note">
-
-Be sure to make note of the Database Password you used as you will need this later to connect to your database.
-
-</Admonition>
+Save your database password securely. You need it for the connection string.
 
 ## 2. Gather database connection strings
 
-Open the project [**Connect** panel](/dashboard/project/_?showConnect=true). This quickstart connects using the [**Transaction pooler**](/dashboard/project/_?showConnect=true&method=transaction) and [**Session pooler**](/dashboard/project/_?showConnect=true&method=session) mode. Transaction mode is used for application queries and Session mode is used for running migrations with Prisma.
+Open the project [**Connect** panel](/dashboard/project/_?showConnect=true&connectTab=direct). This quickstart connects using the [**Transaction pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=transaction) and [**Session pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=session) mode. Transaction mode is used for application queries and Session mode is used for running migrations with Prisma.
 
 To do this, set the connection mode to `Transaction` in the [Database Settings page](/dashboard/project/_/database/settings) and copy the connection string and append `?pgbouncer=true&connection_limit=1`. `pgbouncer=true` disables Prisma from generating prepared statements. This is required since our connection pooler does not support prepared statements in transaction mode yet. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment. This is the Transaction mode connection string.
 
@@ -48,7 +42,7 @@ While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` f
 yarn create redwood-app my-app --ts
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
@@ -73,11 +67,11 @@ In your `.env` file, add the following environment variables for your database c
 - The `DIRECT_URL` should use the Session mode connection string you copied in Step 2.
 
 ```bash name=.env
-# Transaction mode connection string used for migrations
-DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+# Transaction mode connection string — used by Prisma Client for app queries
+DATABASE_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
 
-# Session mode connection string — used by Prisma Client
-DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
+# Session mode connection string — used by Prisma Migrate
+DIRECT_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres"
 ```
 
 ## 7. Update your Prisma schema

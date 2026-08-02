@@ -18,7 +18,7 @@ The `refine-supabase` preset adds `@refinedev/supabase` supplementary package th
 npm create refine-app@latest -- --preset refine-supabase my-app
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
@@ -32,7 +32,7 @@ npx skills add supabase/agent-skills
 
 ## 5. Update `supabaseClient` with environment variables
 
-Create a `.env` file and populate it with your Supabase URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks).
+Create a `.env` file and populate it with your Supabase URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&connectTab=frameworks).
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=refine">
@@ -161,15 +161,13 @@ function App() {
 export default App
 ```
 
-## 8. View instruments pages
+## 8. Start the app
 
-Start the app with the following command:
+Run the development server, go to http://localhost:5173/instruments in a browser, and you should see the instruments pages along the `/instruments` routes. You can edit and add new instruments using the Inferencer generated UI.
 
 ```bash
 npm run dev
 ```
-
-Open http://localhost:5173/instruments in a browser, and you should be able to see the instruments pages along the `/instruments` routes. You can edit and add new instruments using the Inferencer generated UI.
 
 The Inferencer auto-generated code gives you a good starting point on which to keep building your `list`, `create`, `show` and `edit` pages. You can get these by clicking the `Show the auto-generated code` buttons in their respective pages.
 

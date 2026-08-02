@@ -6,7 +6,11 @@ breadcrumb: 'Framework Quickstarts'
 
 <AiPrompt id="ruby-on-rails" />
 
-## 1. Create a Rails project
+<$Partial path="quickstart_create_project.mdx" />
+
+Save your database password securely. You need it for the connection string.
+
+## 2. Create a Rails project
 
 With your Ruby and Rails versions up to date, run `rails new` on your terminal to scaffold a new project.
 
@@ -18,7 +22,7 @@ Check the [Rails docs](https://guides.rubyonrails.org/getting_started.html) for 
 rails new blog -d=postgresql
 ```
 
-## 2. Install Agent Skills (optional)
+## 3. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
@@ -30,15 +34,13 @@ To install, run the following command in the root of your project:
 npx skills add supabase/agent-skills
 ```
 
-## 3. Install MCP server (optional)
+## 4. Install MCP server (optional)
 
 The Supabase MCP server connects AI assistants to Supabase, allowing you to interact with your projects on your behalf. Find out more on how to add it to your client in [the MCP docs](/docs/guides/ai-tools/mcp).
 
-## 4. Set up the Postgres connection details
+## 5. Set up the Postgres connection details
 
-Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
-
-When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
+Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&connectTab=direct&method=session).
 
 Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
 
@@ -48,11 +50,13 @@ If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/
 
 </Admonition>
 
-```bash name=.env
-export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
+Set the connection string as an environment variable. Rails reads `DATABASE_URL` from the environment and connects with it, so you don't need to edit `config/database.yml`. The export applies to the current shell session, so run it in the same shell as the Rails commands in the following steps.
+
+```bash
+export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres
 ```
 
-## 5. Create and run a database migration
+## 6. Create and run a database migration
 
 Rails includes Active Record as the ORM as well as database migration tooling which generates the SQL migration files for you.
 
@@ -63,7 +67,7 @@ bin/rails generate model Article title:string body:text
 bin/rails db:migrate
 ```
 
-## 6. Use the model to interact with the database
+## 7. Use the model to interact with the database
 
 You can use the included Rails console to interact with the database. For example, you can create new entries or list all entries in a Model's table.
 
@@ -78,7 +82,7 @@ article.save # Saves the entry to the database
 Article.all
 ```
 
-## 7. Start the app
+## 8. Start the app
 
 Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
 
