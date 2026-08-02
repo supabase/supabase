@@ -39,9 +39,7 @@ php artisan breeze:install
 
 ## 6. Set up the Postgres connection details
 
-Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
-
-When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
+Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
 
 Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
 
@@ -98,3 +96,9 @@ Run the development server. Go to http://127.0.0.1:8000 in a browser to see your
 ```bash
 php artisan serve
 ```
+
+## Next steps
+
+- Learn more about [Supabase Auth](/docs/guides/auth) if you want to replace Laravel's built-in authentication
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

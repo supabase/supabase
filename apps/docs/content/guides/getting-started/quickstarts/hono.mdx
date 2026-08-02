@@ -44,8 +44,11 @@ Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the 
 cp .env.example .env
 ```
 
-{/* TODO: Not ideal for frameworks that have no entry in Connect */}
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+</Button>
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
 ## 7. Start the app
 
