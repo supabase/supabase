@@ -4,7 +4,7 @@ import { createElement } from 'react'
 
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from '@/lib/constants'
+import { ENABLE_SELF_HOSTED_AUTH_MENU, IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const ExternalLinkIcon = createElement(ArrowUpRight, { strokeWidth: 1, className: 'h-4 w-4' })
@@ -12,6 +12,7 @@ const ExternalLinkIcon = createElement(ArrowUpRight, { strokeWidth: 1, className
 export interface GenerateAuthMenuOptions {
   ref?: string
   isPlatform: boolean
+  enableSelfHostedAuthMenu: boolean
   showOverview: boolean
   features: {
     signInProviders: boolean
@@ -25,9 +26,10 @@ export interface GenerateAuthMenuOptions {
 }
 
 export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuGroup[] {
-  const { ref, isPlatform, showOverview, features } = options
+  const { ref, isPlatform, enableSelfHostedAuthMenu, showOverview, features } = options
   const passkeysInMenu = Boolean(features.passkeys)
   const baseUrl = `/project/${ref}/auth`
+  const showAdvancedAuthMenu = isPlatform || enableSelfHostedAuthMenu
 
   return [
     {
@@ -64,7 +66,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           : []),
       ],
     },
-    ...(features.emails && isPlatform
+    ...(features.emails && showAdvancedAuthMenu
       ? [
           {
             title: 'Notifications',
@@ -96,7 +98,7 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
           items: [],
           // shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
         },
-        ...(isPlatform
+        ...(showAdvancedAuthMenu
           ? [
               ...(features.signInProviders
                 ? [
@@ -110,24 +112,6 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                     },
                   ]
                 : []),
-              ...(passkeysInMenu
-                ? [
-                    {
-                      name: 'Passkeys',
-                      key: 'passkeys',
-                      url: `${baseUrl}/passkeys`,
-                      label: 'Beta',
-                      shortcutId: SHORTCUT_IDS.NAV_AUTH_PASSKEYS,
-                    },
-                  ]
-                : []),
-              {
-                name: 'OAuth Server',
-                key: 'oauth-server',
-                url: `${baseUrl}/oauth-server`,
-                label: 'Beta',
-                shortcutId: SHORTCUT_IDS.NAV_AUTH_OAUTH_SERVER,
-              },
               {
                 name: 'Sessions',
                 key: 'sessions',
@@ -190,6 +174,28 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
                 items: [],
                 shortcutId: SHORTCUT_IDS.NAV_AUTH_AUDIT_LOGS,
               },
+            ]
+          : []),
+        ...(isPlatform
+          ? [
+              ...(passkeysInMenu
+                ? [
+                    {
+                      name: 'Passkeys',
+                      key: 'passkeys',
+                      url: `${baseUrl}/passkeys`,
+                      label: 'Beta',
+                      shortcutId: SHORTCUT_IDS.NAV_AUTH_PASSKEYS,
+                    },
+                  ]
+                : []),
+              {
+                name: 'OAuth Server',
+                key: 'oauth-server',
+                url: `${baseUrl}/oauth-server`,
+                label: 'Beta',
+                shortcutId: SHORTCUT_IDS.NAV_AUTH_OAUTH_SERVER,
+              },
               ...(features.performance
                 ? [
                     {
@@ -232,6 +238,7 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
   return generateAuthMenu({
     ref,
     isPlatform: IS_PLATFORM,
+    enableSelfHostedAuthMenu: ENABLE_SELF_HOSTED_AUTH_MENU,
     showOverview,
     features: {
       signInProviders: authenticationSignInProviders,

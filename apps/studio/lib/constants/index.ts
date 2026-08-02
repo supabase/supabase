@@ -3,6 +3,8 @@
 export * from './infrastructure'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+export const ENABLE_SELF_HOSTED_AUTH_MENU =
+  process.env.NEXT_PUBLIC_ENABLE_SELF_HOSTED_AUTH_MENU === 'true'
 
 /**
  * Server-side flag for Supabase CLI (local development) runs. Detected via

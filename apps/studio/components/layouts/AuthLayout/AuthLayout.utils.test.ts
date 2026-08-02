@@ -5,6 +5,7 @@ import { generateAuthMenu, GenerateAuthMenuOptions } from './AuthLayout.utils'
 const allFeaturesEnabled: GenerateAuthMenuOptions = {
   ref: 'test-ref',
   isPlatform: true,
+  enableSelfHostedAuthMenu: false,
   showOverview: true,
   features: {
     signInProviders: true,
@@ -20,6 +21,7 @@ const allFeaturesEnabled: GenerateAuthMenuOptions = {
 const allFeaturesDisabled: GenerateAuthMenuOptions = {
   ref: 'test-ref',
   isPlatform: true,
+  enableSelfHostedAuthMenu: false,
   showOverview: false,
   features: {
     signInProviders: false,
@@ -104,6 +106,32 @@ describe('generateAuthMenu', () => {
     const configGroup = menu.find((g) => g.title === 'Configuration')!
     expect(configGroup.items).toHaveLength(1)
     expect(configGroup.items[0].name).toBe('Policies')
+  })
+
+  it('Alazab enhanced self-hosted includes enabled auth menu items', () => {
+    const menu = generateAuthMenu({
+      ...allFeaturesEnabled,
+      isPlatform: false,
+      enableSelfHostedAuthMenu: true,
+    })
+
+    const names = flatItemNames(menu)
+
+    expect(names).toContain('Users')
+    expect(names).toContain('Emails')
+    expect(names).toContain('Sign In / Providers')
+    expect(names).toContain('Sessions')
+    expect(names).toContain('Rate Limits')
+    expect(names).toContain('Multi-Factor')
+    expect(names).toContain('URL Configuration')
+    expect(names).toContain('Attack Protection')
+    expect(names).toContain('Auth Hooks')
+    expect(names).toContain('Audit Logs')
+
+    expect(names).not.toContain('OAuth Apps')
+    expect(names).not.toContain('Passkeys')
+    expect(names).not.toContain('OAuth Server')
+    expect(names).not.toContain('Performance')
   })
 
   it('shows Overview when showOverview is true', () => {
