@@ -58,7 +58,7 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 - [PostgREST](http://postgrest.org/) هو خادم ويب يستطيع تحويل قاعدة بيانات PostgreSQL مباشرة ألي RESTful API
 - [Storage](https://github.com/supabase/storage-api) يقدم واجهة RESTful لأدارة الملفات المخزنة فس S3, باستخدام Postgres لأدارة الصلاحيات
 - [postgres-meta](https://github.com/supabase/postgres-meta) هو RESTful API لأدارة قاعدة البيانات الخاصة بك, تمكنك من الإستعلام عن الجداول, إضافة أدوار (مفرد دور), وتشغيل الأوامر.. الخ
-- [GoTrue](https://github.com/netlify/gotrue) هو API مبني على SWT لأدارة المستخدمين وإنشاء رمز SWT.
+- [GoTrue](https://github.com/supabase/gotrue) هو API مبني على JWT لأدارة المستخدمين وإنشاء رمز JWT.
 - [Kong](https://github.com/Kong/kong) هو بوابة API لـcloud-native
 
 #### مكتبات العميل

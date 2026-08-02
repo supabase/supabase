@@ -66,7 +66,7 @@ Jūs varat arī [pašmāju resursus](https://supabase.com/docs/guides/hosting/ov
 - [pg_graphql](http://github.com/supabase/pg_graphql/) ir PostgreSQL paplašinājums, kas atklāj GraphQL API
 - [Storage](https://github.com/supabase/storage-api) nodrošina RESTful saskarni S3 glabātu failu pārvaldībai, izmantojot Postgres atļauju pārvaldībai.
 - [postgres-meta](https://github.com/supabase/postgres-meta) ir RESTful API jūsu Postgres pārvaldībai, kas ļauj jums iegūt tabulas, pievienot lomas, veikt pieprasījumus utt.
-- [GoTrue](https://github.com/netlify/gotrue) ir uz SWT balstīts API lietotāju pārvaldībai un SWT žetonu izsniegšanai.
+- [GoTrue](https://github.com/supabase/gotrue) ir uz JWT balstīts API lietotāju pārvaldībai un JWT žetonu izsniegšanai.
 - [Kong](https://github.com/Kong/kong) ir mākoņdatošanas API vārtejas.
 
 #### Klienta bibliotēkas

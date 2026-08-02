@@ -65,7 +65,7 @@ Takođe možete da [hostujete sami](https://supabase.com/docs/guides/hosting/ove
 - [PostgREST](http://postgrest.org/) je web server koji pretvara vašu PostgreSQL bazu direktno u RESTful API
 - [Storage](https://github.com/supabase/storage-api) daje RESTful interfejs za upravljanje fajlovima sačuvanim na S3, koristeći Postgres za upravljanje permisijama.
 - [postgres-meta](https://github.com/supabase/postgres-meta) je RESTful API za upravljanje vašom Postgres isntancom, omogućavajući vam da dohvatite tabele, dodate role, izvršavate upite, itd.
-- [GoTrue](https://github.com/netlify/gotrue) je SWT baziran API za upravljanje korisnicima i izdavanje SWT tokena.
+- [GoTrue](https://github.com/supabase/gotrue) je JWT baziran API za upravljanje korisnicima i izdavanje JWT tokena.
 - [Kong](https://github.com/Kong/kong) je cloud-nativan API gateway.
 
 #### Klijentske biblioteke

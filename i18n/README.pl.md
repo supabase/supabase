@@ -66,7 +66,7 @@ Możesz także [self-host](https://supabase.com/docs/guides/hosting/overview) i 
 - [pg_graphql](http://github.com/supabase/pg_graphql/) rozszerzenie PostgreSQL, które udostępnia GraphQL API
 - [Storage](https://github.com/supabase/storage-api) zapewnia interfejs RESTful do zarządzania plikami przechowywanymi w S3, wykorzystując Postgres do zarządzania uprawnieniami.
 - [postgres-meta](https://github.com/supabase/postgres-meta) to interfejs API RESTful do zarządzania Postgres, umożliwiający pobieranie tabel, dodawanie ról, uruchamianie zapytań itp.
-- [GoTrue](https://github.com/netlify/gotrue) to oparte na SWT API do zarządzania użytkownikami i wydawania tokenów SWT.
+- [GoTrue](https://github.com/supabase/gotrue) to oparte na JWT API do zarządzania użytkownikami i wydawania tokenów JWT.
 - [Kong](https://github.com/Kong/kong) to natywna dla chmury brama API.
 
 #### Biblioteki klienckie
