@@ -60,6 +60,8 @@ CMD ["pnpm", "dev:studio"]
 
 # Compile Next.js
 FROM dev AS build-next
+ARG NEXT_PUBLIC_ENABLE_SELF_HOSTED_AUTH_MENU=false
+ENV NEXT_PUBLIC_ENABLE_SELF_HOSTED_AUTH_MENU=${NEXT_PUBLIC_ENABLE_SELF_HOSTED_AUTH_MENU}
 RUN pnpm --filter studio exec next build
 
 # Assemble the runtime tree at /srv in the layout the production stage
