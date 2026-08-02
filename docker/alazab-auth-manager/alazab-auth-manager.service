@@ -1,0 +1,16 @@
+[Unit]
+Description=Alazab Auth Manager Service
+Requires=alazab-auth-manager.socket
+After=network.target
+
+[Service]
+Type=simple
+# Requires python3 to be installed on the host
+ExecStart=/usr/bin/python3 /opt/supabase/docker/alazab-auth-manager/auth-manager.py
+Restart=on-failure
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=alazab-auth-manager
+
+[Install]
+WantedBy=multi-user.target
