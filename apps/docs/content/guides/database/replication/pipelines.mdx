@@ -27,7 +27,7 @@ For billing examples and optimization guidance, see [Manage Pipelines usage](/do
 
 Pipelines requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 If you already have a Postgres publication set up, you can skip to [Step 2: Enable Pipelines](#step-2-enable-pipelines).
 
@@ -199,7 +199,7 @@ Follow these steps to configure your destination. Each destination has its own s
 
    Leave these settings at their defaults unless you need to tune initial sync speed, latency, or recovery behavior.
 
-   Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline starts after Postgres has invalidated the main replication slot, the pipeline resets its saved table-sync state, creates a new slot, and replaces each destination table through a new initial sync. This destructive restart is required for consistency because the old slot can no longer provide every change the pipeline missed, and the new initial sync is billed as initial sync data.
+   Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline starts after Postgres has invalidated the main replication slot, the pipeline resets its saved table-sync state, creates a new slot, and replaces each destination table through a new initial sync. This destructive restart is required for consistency because the old slot can no longer provide every change the pipeline missed, and the data processed during the new initial sync is billed again.
 
 7. Click **Create and start pipeline** to begin replication
 
@@ -329,7 +329,7 @@ Pipelines has the following limitations:
 - **Replica identity**: Requirements are destination-specific. Updates and deletes need enough row identity to apply safely. See [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements) for the supported modes.
 - **Schema changes**: Currently in beta and limited to BigQuery
 - **No user-defined transformations**: Pipelines performs destination-compatible type and name mapping, but doesn't run custom transformations
-- **At-least-once processing**: A retry, restart, or interruption can cause a batch to be processed again. BigQuery uses primary-key-based CDC to converge on the current table state. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
+- **At-least-once processing**: Failed destination write attempts that Pipelines retries are not counted. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count that batch again. BigQuery uses primary-key-based CDC to converge on the current table state. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
 
 Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
 
