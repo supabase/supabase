@@ -81,6 +81,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                     className="block h-full"
                     onClick={() => trackClick(item)}
                     target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
                   >
                     <GlassPanel
                       title={item.title}
