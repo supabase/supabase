@@ -60,7 +60,7 @@ const WrapperOverviewContent = () => {
 
       {!!CreateWrapperSheetComponent && !!wrapperMeta && (
         <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
-          <SheetContent size="lg" tabIndex={undefined}>
+          <SheetContent size="lg">
             <CreateWrapperSheetComponent
               wrapperMeta={wrapperMeta}
               onDirty={setIsDirty}
