@@ -40,12 +40,17 @@ export const PermissionsAccordion = ({
     <div className="space-y-3 px-5 sm:px-6 py-6">
       <div>
         <h3 className="text-sm text-foreground">Permissions</h3>
-        <p className="text-foreground-lighter text-base md:text-sm">
+        <p className="text-foreground-lighter text-sm">
           Grant the minimum access this token needs. Everything defaults to None.
         </p>
       </div>
 
-      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
+      <Accordion
+        type="multiple"
+        value={openCategories}
+        onValueChange={setOpenCategories}
+        className="mt-2"
+      >
         {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
           const configuredCount = countConfiguredInCategory(selection, category.key)
           return (
@@ -58,7 +63,7 @@ export const PermissionsAccordion = ({
                 'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
               })}
             >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
+              <AccordionTrigger className="bg-alternative dark:bg-muted px-4 py-3 hover:no-underline text-foreground-light hover:text-foreground transition data-open:text-foreground-light">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
                   <div className="flex items-center gap-1.5">
                     <span className="font-mono uppercase tracking-widest text-xs">
@@ -76,12 +81,14 @@ export const PermissionsAccordion = ({
                     </Tooltip>
                   </div>
                   {configuredCount > 0 && (
-                    <Badge variant="success">{configuredCount} configured</Badge>
+                    <span className="text-xs text-foreground-lighter">
+                      {configuredCount} configured
+                    </span>
                   )}
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-surface-100 *:pb-0">
-                <div className="divide-y">
+              <AccordionContent className="*:pb-0">
+                <div className="divide-y first:border-t">
                   {category.entries.map((entry) => (
                     <div className="px-4" key={entry.key}>
                       <PermissionRow

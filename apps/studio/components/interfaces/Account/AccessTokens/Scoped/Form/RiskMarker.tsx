@@ -11,7 +11,7 @@ import {
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 const DOT_CLASS: Record<RiskLevel, string> = {
-  low: 'bg-brand',
+  low: 'bg-brand-600',
   medium: 'bg-warning-600',
   high: 'bg-destructive-600',
 }
@@ -21,6 +21,10 @@ const LABEL_CLASS: Record<RiskLevel, string> = {
   medium: 'text-warning-600',
   high: 'text-destructive-600',
 }
+
+const RiskDot = ({ risk }: { risk: RiskLevel }) => (
+  <span className={cn('h-1.5 w-1.5 rounded-full', DOT_CLASS[risk])} />
+)
 
 interface RiskMarkerProps {
   entry: PermissionCatalogEntry
@@ -45,7 +49,7 @@ export const RiskMarker = ({
         className
       )}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full', DOT_CLASS[entry.risk])} />
+      <RiskDot risk={entry.risk} />
       {RISK_LEVEL_LABEL[entry.risk]}
     </span>
   )
@@ -62,11 +66,11 @@ export const RiskMarker = ({
       <TooltipTrigger asChild>
         <span tabIndex={0}>{marker}</span>
       </TooltipTrigger>
-      <TooltipContent side="top" align="start" className="w-72 space-y-2 p-3">
+      <TooltipContent side="top" align="center" className="w-72 space-y-2 p-3">
         <div
           className={cn('flex items-center gap-1.5 text-xs font-medium', LABEL_CLASS[entry.risk])}
         >
-          <span className={cn('h-1.5 w-1.5 rounded-full', DOT_CLASS[entry.risk])} />
+          <RiskDot risk={entry.risk} />
           {RISK_LEVEL_LABEL[entry.risk]}
         </div>
         <p className="text-xs text-foreground-light">{entry.riskReason}</p>
