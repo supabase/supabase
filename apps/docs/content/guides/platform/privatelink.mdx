@@ -38,7 +38,7 @@ To use PrivateLink with your Supabase project:
 
 ## Getting started
 
-#### Step 1: Add AWS account
+### Step 1: Add AWS account
 
 Navigate to your project's Integrations section to set up PrivateLink:
 
@@ -52,7 +52,7 @@ Navigate to your project's Integrations section to set up PrivateLink:
 
 After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS Account ID. This process may take a few moments. Once complete, the account will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted.
 
-#### Step 2: Accept resource share
+### Step 2: Accept resource share
 
 Supabase will send you an AWS Resource Share containing the VPC Lattice Resource Configurations for your projects. To accept this share:
 
@@ -69,7 +69,7 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 After accepting, you'll see the resource configurations appear in your [Shared with me > Shared resources](https://console.aws.amazon.com/ram/home#SharedResources) section of the RAM console and the [PrivateLink and Lattice > Resource configurations](https://console.aws.amazon.com/vpcconsole/home#ResourceConfigs) section of the VPC console.
 
-#### Step 3: Configure security groups
+### Step 3: Configure security groups
 
 Ensure your security groups allow traffic on the appropriate ports:
 
@@ -81,11 +81,11 @@ Ensure your security groups allow traffic on the appropriate ports:
    - Destination that is appropriate for your network. i.e. the subnet of your VPC or security group of your application instances
 5. Finish creating the security group by clicking **Create security group**
 
-#### Step 4: Create connection
+### Step 4: Create connection
 
 In your AWS account, you have two options to establish connectivity:
 
-##### Option A: Create a PrivateLink endpoint
+#### Option A: Create a PrivateLink endpoint
 
 1. Navigate to the VPC console in your AWS account
 2. Go to [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) in the left sidebar
@@ -106,7 +106,7 @@ In your AWS account, you have two options to establish connectivity:
     - The IP addresses of the endpoint will be listed in the **Subnets** section of the endpoint details
     - The DNS record will be in the **Associations** section of the endpoint details in the **DNS Name** field if you enabled it in step 8
 
-##### Option B: Attach resource configuration to an existing VPC lattice service network
+#### Option B: Attach resource configuration to an existing VPC lattice service network
 
 1. **This method is only recommended if you have an existing VPC Lattice Service Network**
 2. Navigate to the VPC Lattice console in your AWS account
@@ -118,7 +118,7 @@ In your AWS account, you have two options to establish connectivity:
 8. After creation, you will see the resource configuration in the Resource configurations section of your service network with the status "Active"
 9. For connectivity, click on the association details and the domain name will be listed in the **DNS entries** section
 
-#### Step 5: Test connectivity
+### Step 5: Test connectivity
 
 Verify the private connection is working correctly from your VPC:
 
@@ -132,7 +132,7 @@ psql "postgresql://[username]:[password]@[private-endpoint]:5432/postgres"
 
 You should see a successful connection without any public internet traffic.
 
-#### Step 6: Update applications
+### Step 6: Update applications
 
 Configure your applications to use the private connection details:
 
@@ -151,7 +151,7 @@ postgresql://user:pass@db.[project-ref].supabase.co:5432/postgres
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:5432/postgres
 ```
 
-#### Step 7: Disable public connectivity (optional)
+### Step 7: Disable public connectivity (optional)
 
 For maximum security, you can disable public internet access for your database:
 

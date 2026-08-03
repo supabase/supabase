@@ -3,3 +3,4 @@ volumes/storage
 .env
 test.http
 docker-compose.override.yml
+.supabase-version

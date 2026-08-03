@@ -9,7 +9,7 @@ Rule003Spelling = "include('supa-mdx-lint/Rule003Spelling.toml')"
 
 [Rule002AdmonitionTypes]
 # Allowed admonition types are:
-admonition_types = ["note", "tip", "caution", "deprecation", "danger"]
+admonition_types = ["note", "caution", "deprecation", "danger"]
 
 [Rule004ExcludeWords]
 rules.filler = "include('supa-mdx-lint/Rule004ExcludeWords/filler.toml')"

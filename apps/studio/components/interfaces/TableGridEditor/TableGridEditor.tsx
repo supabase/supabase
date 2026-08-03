@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'

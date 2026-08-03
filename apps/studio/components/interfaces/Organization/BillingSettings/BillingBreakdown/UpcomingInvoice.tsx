@@ -1,4 +1,5 @@
 import React from 'react'
+import { useInView } from 'react-intersection-observer'
 import { Table, TableBody, TableCell, TableFooter, TableRow } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -53,13 +54,15 @@ const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
+  const { ref, inView } = useInView({ triggerOnce: true })
+
   const {
     data: upcomingInvoice,
     error: error,
     isPending: isLoading,
     isError,
     isSuccess,
-  } = useOrgUpcomingInvoiceQuery({ orgSlug: slug })
+  } = useOrgUpcomingInvoiceQuery({ orgSlug: slug }, { enabled: inView })
 
   const { data: organization } = useOrganizationQuery({ slug })
 
@@ -109,7 +112,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
     !planItem && upcomingInvoice?.fixed_fees_billing_mode === 'in_arrears'
 
   return (
-    <>
+    <div ref={ref}>
       {isLoading && (
         <div className="space-y-2">
           <ShimmeringLoader />
@@ -398,7 +401,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }
 
