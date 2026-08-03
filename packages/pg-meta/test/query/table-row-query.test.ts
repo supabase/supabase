@@ -61,6 +61,39 @@ describe('Table Row Query', () => {
   })
 
   describe('getTableRowsSql', () => {
+    test('should not mutate table columns when generating SQL', () => {
+      const table = {
+        name: 'test_table',
+        schema: 'public',
+        columns: [
+          {
+            name: 'second',
+            data_type: 'integer',
+            format: 'int4',
+            ordinal_position: 2,
+          },
+          {
+            name: 'first',
+            data_type: 'integer',
+            format: 'int4',
+            ordinal_position: 1,
+          },
+        ],
+        primary_keys: [],
+        live_rows_estimate: 0,
+      }
+      const originalColumnOrder = table.columns.map((column) => column.name)
+
+      const sql = getTableRowsSql({
+        table: table as any,
+        page: 1,
+        limit: 10,
+      })
+
+      expect(sql).toContain('select first,second from _base_query;')
+      expect(table.columns.map((column) => column.name)).toEqual(originalColumnOrder)
+    })
+
     withTestDatabase('should handle array of enums correctly', async (db) => {
       // Create an enum type and a table with an array of that enum
       await db.executeQuery(`

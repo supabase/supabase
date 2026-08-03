@@ -183,7 +183,7 @@ export const getTableRowsSql = ({
   // all the rows within the table
   const baseSelectQuery = safeSql`with _base_query as (${queryChains.range(from, to).toSql({ isCTE: false, isFinal: false })})`
 
-  const allColumnNames = table.columns
+  const allColumnNames = [...table.columns]
     .sort((a, b) => a.ordinal_position - b.ordinal_position)
     .map((column) => ({ name: column.name, format: column.format.toLowerCase() }))
 
