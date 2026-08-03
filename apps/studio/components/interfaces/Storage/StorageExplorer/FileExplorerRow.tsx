@@ -1,19 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FilesBucket as FilesBucketIcon } from 'icons'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
   Copy,
   Download,
   Edit,
-  File,
-  Film,
-  FolderOpen,
-  Image,
   LoaderCircle,
   MoreVertical,
   Move,
-  Music,
   Trash2,
 } from 'lucide-react'
 import type { CSSProperties } from 'react'
@@ -41,6 +35,7 @@ import {
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { StorageRowIcon } from '../StorageRowIcon'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
@@ -48,46 +43,6 @@ import { useCopyUrl } from './useCopyUrl'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
-
-export const RowIcon = ({
-  view,
-  status,
-  fileType,
-  isOpened = false,
-  mimeType,
-}: {
-  view: STORAGE_VIEWS
-  status: STORAGE_ROW_STATUS
-  fileType: string
-  isOpened?: boolean
-  mimeType: string | undefined
-}) => {
-  if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return <LoaderCircle size={14} className="animate-spin text-foreground-lighter" />
-  }
-
-  if (fileType === STORAGE_ROW_TYPES.FOLDER) {
-    return isOpened ? (
-      <FolderOpen size={16} className="text-foreground-lighter" />
-    ) : (
-      <FilesBucketIcon size={16} className="text-foreground-lighter" />
-    )
-  }
-
-  if (mimeType?.includes('image')) {
-    return <Image size={16} className="text-foreground-lighter" />
-  }
-
-  if (mimeType?.includes('audio')) {
-    return <Music size={16} className="text-foreground-lighter" />
-  }
-
-  if (mimeType?.includes('video')) {
-    return <Film size={16} className="text-foreground-lighter" />
-  }
-
-  return <File size={16} className="text-foreground-lighter" />
-}
 
 interface FileExplorerRowProps {
   index: number
@@ -329,7 +284,7 @@ export const FileExplorerRow = ({
                 )}
                 style={{ top: '2px' }}
               >
-                <RowIcon
+                <StorageRowIcon
                   view={view}
                   status={item.status}
                   fileType={item.type}
