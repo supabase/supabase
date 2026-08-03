@@ -125,10 +125,11 @@ suspend fun signInWithKaLinkedIn() {
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.LinkedIn` as the provider:
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.LinkedInOIDC` as the provider:
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.LinkedIn);
+var state = await supabase.Auth.SignIn(Provider.LinkedInOIDC);
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

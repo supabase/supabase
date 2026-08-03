@@ -230,7 +230,9 @@ channel = supabase.channel('room:lobby:messages', params={'config': {'private': 
 <TabPanel id="csharp" label="C#">
 
 ```c#
-// Create a channel with a descriptive topic name
+// Create a channel with a descriptive topic name.
+// Note: The C# SDK does not yet support private channel configuration,
+// so this connects to a public channel.
 var channel = supabase.Realtime.Channel("room:lobby:messages");
 ```
 

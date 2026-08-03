@@ -318,7 +318,11 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file, {
 ```c#
 await supabase.Storage
   .From("bucket_name")
-  .Upload("local_file_path", "file_path", new FileOptions { ContentType = "image/jpeg" });
+  .Upload(
+    "local_file_path",
+    "file_path",
+    new FileOptions { ContentType = "image/jpeg" },
+    inferContentType: false);
 ```
 
 </TabPanel>

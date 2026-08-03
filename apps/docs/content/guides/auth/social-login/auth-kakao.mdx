@@ -151,7 +151,8 @@ suspend fun signInWithKakao() {
 When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Kakao` as the provider:
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.Kakao);
+var state = await supabase.Auth.SignIn(Provider.Kakao);
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

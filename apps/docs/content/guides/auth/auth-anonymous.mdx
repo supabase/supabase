@@ -309,7 +309,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 You can use the [`LinkIdentity()`](/docs/reference/csharp/link-identity) method to link an OAuth identity to the anonymous user.
 
 ```c#
-var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions());
+var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
 var authorizeUrl = state.Uri;
 ```
 

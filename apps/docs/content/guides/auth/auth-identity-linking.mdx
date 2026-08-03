@@ -97,7 +97,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/link-identity):
 
 ```c#
-var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions());
+var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
 var authorizeUrl = state.Uri;
 ```
 

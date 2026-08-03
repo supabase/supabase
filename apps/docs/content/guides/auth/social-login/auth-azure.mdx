@@ -215,7 +215,8 @@ suspend fun signInWithAzure() {
 When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Azure` as the provider. Request the `email` scope:
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.Azure, "email");
+var state = await supabase.Auth.SignIn(Provider.Azure, new SignInOptions { Scopes = "email" });
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>
@@ -343,7 +344,8 @@ suspend fun signInWithAzure() {
 <TabPanel id="csharp" label="C#">
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.Azure, "offline_access");
+var state = await supabase.Auth.SignIn(Provider.Azure, new SignInOptions { Scopes = "offline_access" });
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

@@ -136,7 +136,8 @@ suspend fun signInWithGithub() {
 When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Github` as the provider:
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.Github);
+var state = await supabase.Auth.SignIn(Provider.Github);
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

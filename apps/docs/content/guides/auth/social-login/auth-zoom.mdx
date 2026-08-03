@@ -139,7 +139,8 @@ suspend fun signInWithZoom() {
 When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Zoom` as the provider:
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.Zoom);
+var state = await supabase.Auth.SignIn(Provider.Zoom);
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

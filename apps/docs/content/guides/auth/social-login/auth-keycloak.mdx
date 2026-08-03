@@ -128,7 +128,8 @@ suspend fun signInWithKeycloak() {
 When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.KeyCloak` as the provider:
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.KeyCloak);
+var state = await supabase.Auth.SignIn(Provider.KeyCloak, new SignInOptions { Scopes = "openid" });
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>

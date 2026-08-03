@@ -154,7 +154,8 @@ suspend fun signInWithX() {
 When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Twitter` as the provider:
 
 ```c#
-var signInUrl = supabase.Auth.SignIn(Provider.Twitter);
+var state = await supabase.Auth.SignIn(Provider.Twitter);
+var signInUrl = state.Uri;
 ```
 
 </TabPanel>
