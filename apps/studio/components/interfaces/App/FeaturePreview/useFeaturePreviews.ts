@@ -113,7 +113,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
           name: 'Diagnose blocked queries',
-          discussionsUrl: undefined,
+          discussionsUrl: 'https://github.com/orgs/supabase/discussions/48639',
           isNew: true,
           isPlatformOnly: false,
           isDefaultOptIn: false,
