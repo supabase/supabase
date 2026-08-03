@@ -258,7 +258,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
           size="lg"
           showClose={false}
           className="flex flex-col gap-0"
-          tabIndex={undefined}
           aria-describedby={undefined}
         >
           <SheetHeader>

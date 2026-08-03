@@ -101,6 +101,20 @@ const { data: todos, error } = await supabase.from('todos').select('*')
 ```
 
 </TabPanel>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Initialize the client
+var supabase = new Supabase.Client(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+await supabase.InitializeAsync();
+
+// Make a request
+var todos = await supabase.From<Todo>().Get();
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash

@@ -139,6 +139,12 @@ export const useIsMarketplaceEnabled = () => {
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
 }
 
+export const useIsDatabaseConnectionsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
+  return isDatabaseConnectionsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]
+}
+
 export const useFeaturePreviewModal = () => {
   const featurePreviews = useFeaturePreviews()
   const [featurePreviewModal, setFeaturePreviewModal] = useQueryState('featurePreviewModal')

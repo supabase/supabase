@@ -78,6 +78,15 @@ conda install -c conda-forge supabase
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```bash
+dotnet add package Supabase
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### 2. Initialize the client
@@ -147,6 +156,21 @@ supabase: Client = create_client(url, key)
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+using Supabase;
+
+var supabase = new Client(
+  "https://<project>.supabase.co",
+  "<sb_publishable_key>"
+);
+await supabase.InitializeAsync();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### 3. Create your first Channel
@@ -198,6 +222,18 @@ let channel = supabase.channel("room:lobby:messages") {
 ```python
 # Create a channel with a descriptive topic name
 channel = supabase.channel('room:lobby:messages', params={'config': {'private': True }})
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Create a channel with a descriptive topic name.
+// Note: The C# SDK does not yet support private channel configuration,
+// so this connects to a public channel.
+var channel = supabase.Realtime.Channel("room:lobby:messages");
 ```
 
 </TabPanel>
@@ -324,6 +360,42 @@ channel.send_broadcast_message(
         "timestamp": datetime.now().isoformat()
     }
 )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+class MessageBroadcast : BaseBroadcast
+{
+    [JsonProperty("text")]
+    public string Text { get; set; }
+
+    [JsonProperty("user")]
+    public string User { get; set; }
+
+    [JsonProperty("timestamp")]
+    public string Timestamp { get; set; }
+}
+
+// Listen for messages
+var broadcast = channel.Register<MessageBroadcast>();
+broadcast.AddBroadcastEventHandler((sender, _) =>
+{
+    Console.WriteLine($"New message: {broadcast.Current()}");
+});
+
+await channel.Subscribe();
+
+// Send a message
+await broadcast.Send("message_sent", new MessageBroadcast
+{
+    Text = "Hello, world!",
+    User = "john_doe",
+    Timestamp = DateTime.UtcNow.ToString("o")
+});
 ```
 
 </TabPanel>
@@ -638,6 +710,16 @@ class RealtimeManager:
 with RealtimeManager() as channel:
     # Use channel here
     pass
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Remove the channel when you are done with it to free up resources
+supabase.Realtime.Remove(channel);
 ```
 
 </TabPanel>
