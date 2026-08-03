@@ -55,6 +55,14 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Password-Based Auth',
     },
     {
+      title: 'Magic Link Auth',
+      supportedFrameworks: ['nextjs', 'react'],
+      href: '/docs/nextjs/magic-link-auth',
+      items: [],
+      new: true,
+      commandItemLabel: 'Magic Link Auth',
+    },
+    {
       title: 'Social Auth',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/social-auth',
