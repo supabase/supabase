@@ -28,14 +28,17 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
-import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
+
+import { BucketDataProtectionFields } from './BucketDataProtectionFields'
+import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
+import { useIsStorageProtectionEnabled } from './StorageProtection.constants'
+import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 const FormSchema = z
   .object({
@@ -86,6 +89,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const { ref } = useParams()
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
+  const showProtection = useIsStorageProtectionEnabled()
 
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
@@ -395,6 +399,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
                 />
               )}
             </DialogSection>
+
+            {showProtection && <BucketDataProtectionFields />}
           </form>
         </Form>
 

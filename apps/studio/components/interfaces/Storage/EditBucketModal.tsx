@@ -28,6 +28,8 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { BucketDataProtectionFields } from '@/components/interfaces/Storage/BucketDataProtectionFields'
+import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -127,6 +129,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     Boolean(bucket?.allowed_mime_types?.length)
   )
 
+  const showProtection = useIsStorageProtectionEnabled()
   const isChangingBucketVisibility = bucket?.public !== isPublicBucket
   const isMakingBucketPrivate = bucket?.public && !isPublicBucket
   const isMakingBucketPublic = !bucket?.public && isPublicBucket
@@ -424,6 +427,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
                 />
               )}
             </DialogSection>
+
+            {showProtection && <BucketDataProtectionFields bucketName={bucket?.name} />}
           </form>
         </Form>
 

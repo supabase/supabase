@@ -1,0 +1,237 @@
+import { useParams } from 'common'
+import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { Card } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import {
+  useBucketTrashDeleteMutation,
+  useBucketTrashQuery,
+  useBucketTrashRestoreMutation,
+} from '@/data/storage/protection/bucket-trash-query'
+import { type TrashObject } from '@/data/storage/protection/protection-mocks'
+
+import { toggleSelectAll, toggleSelection } from './Trash.utils'
+import { TrashList } from './TrashList'
+import { TrashSelectionBar } from './TrashSelectionBar'
+
+interface TrashProps {
+  bucketId: string
+}
+
+export const Trash = ({ bucketId }: TrashProps) => {
+  const { ref } = useParams()
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [lastToggledId, setLastToggledId] = useState<string | null>(null)
+  const [objectToDelete, setObjectToDelete] = useState<TrashObject>()
+  const [showBulkDelete, setShowBulkDelete] = useState(false)
+  const [showDeleteAll, setShowDeleteAll] = useState(false)
+
+  const {
+    data: objects,
+    isPending,
+    isError,
+    error,
+    isSuccess,
+  } = useBucketTrashQuery({ projectRef: ref, bucketId })
+
+  const { mutate: restoreObjects, isPending: isRestoring } = useBucketTrashRestoreMutation({
+    onSuccess: (_data, variables) => {
+      const count = variables.objectIds.length
+      toast.success(count === 1 ? 'File restored' : `${count} files restored`)
+      setSelectedIds([])
+    },
+  })
+
+  const { mutate: deleteObjects, isPending: isDeleting } = useBucketTrashDeleteMutation({
+    onSuccess: () => {
+      toast.success('Files permanently deleted')
+      setSelectedIds([])
+      setObjectToDelete(undefined)
+      setShowBulkDelete(false)
+      setShowDeleteAll(false)
+    },
+  })
+
+  const orderedIds = (objects ?? []).map((object) => object.id)
+  const selectedObjects = (objects ?? []).filter((object) => selectedIds.includes(object.id))
+  const heldCount = selectedObjects.filter((object) => object.heldBySnapshot).length
+  const deletableIds = selectedObjects
+    .filter((object) => !object.heldBySnapshot)
+    .map((object) => object.id)
+  const heldInBucketCount = (objects ?? []).filter((object) => object.heldBySnapshot).length
+
+  const handleToggleSelect = (id: string, isShiftHeld: boolean) => {
+    setSelectedIds(toggleSelection({ selectedIds, orderedIds, id, lastToggledId, isShiftHeld }))
+    setLastToggledId(id)
+  }
+
+  const handleRestore = (objectIds: string[]) => {
+    if (!ref || objectIds.length === 0) return
+    restoreObjects({ projectRef: ref, bucketId, objectIds })
+  }
+
+  return (
+    <>
+      <PageContainer>
+        <PageSection>
+          <PageSectionContent className="flex flex-col gap-y-4">
+            <div className="flex items-center justify-between gap-x-3">
+              <p className="text-sm text-foreground-lighter">
+                Soft-deleted objects in this bucket, restorable until their retention policy expires
+                them
+              </p>
+              {isSuccess && objects.length > 0 && (
+                <ButtonTooltip
+                  variant="default"
+                  icon={<Trash2 />}
+                  disabled={objects.length === heldInBucketCount}
+                  onClick={() => setShowDeleteAll(true)}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text:
+                        objects.length === heldInBucketCount
+                          ? 'Every deleted file is held by a snapshot'
+                          : undefined,
+                    },
+                  }}
+                >
+                  Delete all permanently
+                </ButtonTooltip>
+              )}
+            </div>
+
+            {isPending && <GenericSkeletonLoader />}
+            {isError && <AlertError error={error} subject="Failed to retrieve deleted files" />}
+            {isSuccess && objects.length === 0 && (
+              <Admonition
+                type="default"
+                title="No deleted files"
+                description="Deleted objects appear here and can be restored until a lifecycle policy removes them."
+              />
+            )}
+            {isSuccess && objects.length > 0 && (
+              <>
+                <Card className="overflow-hidden">
+                  {selectedIds.length > 0 && (
+                    <TrashSelectionBar
+                      count={selectedIds.length}
+                      heldCount={heldCount}
+                      isRestoring={isRestoring}
+                      onRestore={() => handleRestore(selectedIds)}
+                      onDelete={() => setShowBulkDelete(true)}
+                      onClear={() => setSelectedIds([])}
+                    />
+                  )}
+                  <TrashList
+                    objects={objects}
+                    selectedIds={selectedIds}
+                    isRestoring={isRestoring}
+                    onToggleSelect={handleToggleSelect}
+                    onToggleSelectAll={() =>
+                      setSelectedIds(toggleSelectAll(selectedIds, orderedIds))
+                    }
+                    onRestore={(object) => handleRestore([object.id])}
+                    onDeleteForever={setObjectToDelete}
+                  />
+                </Card>
+                <p className="text-sm text-foreground-lighter">
+                  Items held by a snapshot stay recoverable — and billable — until every snapshot
+                  referencing them is deleted, even past their retention period.
+                </p>
+              </>
+            )}
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+
+      <ConfirmationModal
+        variant="destructive"
+        visible={objectToDelete !== undefined}
+        title="Permanently delete file"
+        confirmLabel="Delete permanently"
+        confirmLabelLoading="Deleting..."
+        loading={isDeleting}
+        onCancel={() => setObjectToDelete(undefined)}
+        onConfirm={() => {
+          if (!ref || !objectToDelete) return
+          deleteObjects({
+            projectRef: ref,
+            bucketId,
+            objectIds: [objectToDelete.id],
+          })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          {objectToDelete?.name} will be permanently deleted and can no longer be restored. This
+          action cannot be undone.
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        variant="destructive"
+        visible={showBulkDelete}
+        title={`Permanently delete ${deletableIds.length} file${deletableIds.length === 1 ? '' : 's'}`}
+        confirmLabel="Delete permanently"
+        confirmLabelLoading="Deleting..."
+        loading={isDeleting}
+        onCancel={() => setShowBulkDelete(false)}
+        onConfirm={() => {
+          if (!ref) return
+          deleteObjects({ projectRef: ref, bucketId, objectIds: deletableIds })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          These files will be permanently deleted and can no longer be restored. This action cannot
+          be undone.
+        </p>
+        {heldCount > 0 && (
+          <Admonition
+            className="mt-3"
+            type="warning"
+            showIcon={false}
+            title={`${heldCount} selected file${heldCount === 1 ? '' : 's'} will be kept`}
+            description="Files held by a snapshot can't be deleted until every snapshot referencing them is deleted."
+          />
+        )}
+      </ConfirmationModal>
+
+      <TextConfirmModal
+        variant="destructive"
+        visible={showDeleteAll}
+        size="medium"
+        title={`Delete all deleted files in "${bucketId}"`}
+        confirmLabel="Delete all permanently"
+        confirmPlaceholder="Type bucket name"
+        confirmString={bucketId}
+        loading={isDeleting}
+        onCancel={() => setShowDeleteAll(false)}
+        onConfirm={() => {
+          if (!ref) return
+          deleteObjects({ projectRef: ref, bucketId })
+        }}
+        alert={{
+          title: 'You cannot recover these files once deleted',
+          description: 'This action cannot be undone',
+        }}
+      >
+        <p className="text-sm">
+          Every soft-deleted file in <span className="font-bold text-foreground">{bucketId}</span>{' '}
+          will be permanently deleted.
+          {heldInBucketCount > 0 &&
+            ` ${heldInBucketCount} file${heldInBucketCount === 1 ? '' : 's'} held by a snapshot will be kept.`}
+        </p>
+      </TextConfirmModal>
+    </>
+  )
+}
