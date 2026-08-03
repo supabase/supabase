@@ -115,9 +115,6 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
     onMutate() {
       snapshot.setLoading(true)
     },
-    onError() {
-      snapshot.setLoading(false)
-    },
   })
   const actionError = createConnectionsError
     ? `Creating connection failed: ${createConnectionsError.message}`
