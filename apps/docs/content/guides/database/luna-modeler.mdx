@@ -1,0 +1,88 @@
+---
+id: 'Luna Modeler'
+title: 'Connecting with Luna Modeler'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+[`Luna Modeler`](https://www.datensen.com) is a data modeling tool. You can use it to connect to your database via SSL.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a new database connection">
+      Create a new database connection.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+            ![new database connection](/docs/img/guides/database/connecting-to-postgres/luna-modeler/luna-modeler-new-connection-button.png)
+    </StepHikeCompact.Code>
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Select PostgreSQL">
+            Select PostgreSQL, name your connection and specify connection details.
+     </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+            ![Selection Menu](/docs/img/guides/database/connecting-to-postgres/luna-modeler/luna-modeler-new-connection-to-supabase.png)
+
+    </StepHikeCompact.Code>
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Get Your Credentials">
+      Get your connection credentials from the [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). You will need:
+    - host
+    - port
+    - database
+    - username
+    - password
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ![database credentials](/docs/img/guides/database/connecting-to-postgres/luna-modeler/supabase-session-pooler.png)
+    </StepHikeCompact.Code>
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Fill out credentials">
+        Add your server (host), port, username, password, database and shema values manually. 
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+                ![filling out form](/docs/img/guides/database/connecting-to-postgres/luna-modeler/luna-modeler-connection-to-supabase-credentials.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Download certificate">
+        In the [Database Settings](https://supabase.com/dashboard/project/_/settings/database), download your SSL certificate.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ![filling out form](/docs/img/guides/database/connecting-to-postgres/luna-modeler/supabase-ssl-certificate-download.png)
+    </StepHikeCompact.Code>
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Secure your connection">
+        In Luna Modeler's connection properties, enable SSL, add your SSL certificate and save the connection.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ![filling out form](/docs/img/guides/database/connecting-to-postgres/luna-modeler/luna-modeler-connection-to-supabase-ssl-settings.png)
+    </StepHikeCompact.Code>
+  </StepHikeCompact.Step>
+
+      <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Connect and visualize">
+        Click Connect and load an existing database structure to visualize the database.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ![connected dashboard](/docs/img/guides/database/connecting-to-postgres/luna-modeler/luna-modeler-load-and-visualize-database-button.png)
+    </StepHikeCompact.Code>
+  </StepHikeCompact.Step>
+</StepHikeCompact>
