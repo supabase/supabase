@@ -17,13 +17,15 @@ export type GetUserContentByIdResponse = Omit<
 
 export async function getContentById(
   { projectRef, id }: { projectRef?: string; id?: string },
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
   if (typeof id === 'undefined') throw new Error('Content ID is required')
 
   const { data, error } = await get('/platform/projects/{ref}/content/item/{id}', {
     params: { path: { ref: projectRef, id } },
+    headers,
     signal,
   })
 
