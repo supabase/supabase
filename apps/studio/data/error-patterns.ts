@@ -1,4 +1,4 @@
-import { ConnectionTimeoutError } from '@/types/api-errors'
+import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
 import type { ClassifiedError } from '@/types/api-errors'
 import type { ResponseError } from '@/types/base'
 
@@ -23,3 +23,21 @@ const ERROR_PATTERN_MAP = new Map<ErrorConstructor, RegExp>([
 export const ERROR_PATTERNS: ErrorPattern[] = Array.from(ERROR_PATTERN_MAP.entries()).map(
   ([ErrorClass, pattern]) => ({ ErrorClass, pattern })
 )
+
+/**
+ * Builds the error instance for an API error message, picking the subclass whose
+ * pattern matches and falling back to `UnknownAPIResponseError`.
+ *
+ * Every entry point in the data layer goes through this so that an error carries
+ * the same class regardless of which fetch helper produced it — `ErrorMatcher`
+ * keys its troubleshooting steps off that class.
+ */
+export function createClassifiedError(
+  ...args: ConstructorParameters<typeof ResponseError>
+): ClassifiedError {
+  const [message] = args
+  const matched = message ? ERROR_PATTERNS.find(({ pattern }) => pattern.test(message)) : undefined
+  const ErrorClass = matched?.ErrorClass ?? UnknownAPIResponseError
+
+  return new ErrorClass(...args)
+}

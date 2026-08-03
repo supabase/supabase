@@ -42,24 +42,23 @@ export class YourError extends ResponseError {
   readonly errorType = 'your-error' as const
 }
 
-export type ClassifiedError = ConnectionTimeoutError | FailedToRetrieveProjectsError | YourError
+export type ClassifiedError = ConnectionTimeoutError | UnknownAPIResponseError | YourError
 ```
 
 **2. Add a pattern entry to `data/error-patterns.ts`**
 
+Patterns live in a `Map` keyed by the error class, so a class can only be registered once:
+
 ```ts
 import { YourError } from 'types/api-errors'
 
-export const ERROR_PATTERNS: ErrorPattern[] = [
+const ERROR_PATTERN_MAP = new Map<ErrorConstructor, RegExp>([
   // existing...
-  {
-    pattern: /YOUR_ERROR_PATTERN/i,
-    ErrorClass: YourError,
-  },
-]
+  [YourError, /YOUR_ERROR_PATTERN/i],
+])
 ```
 
-`handleError` picks this up automatically — any matching API error will be thrown as a `YourError` instance.
+`createClassifiedError` picks this up automatically — any matching API error becomes a `YourError` instance, whether it came from the openapi-fetch client (`handleError`) or from the `fetchGet`/`fetchPost` helpers. Messages that match nothing fall back to `UnknownAPIResponseError`.
 
 **3. Create `errorMappings/YourError.tsx`**
 
@@ -108,17 +107,18 @@ export function YourErrorTroubleshooting() {
 
 **4. Add it to `error-mappings.tsx`**
 
+Mappings are keyed by the error class, and `getMappingForError` finds the first entry the error is an `instanceof`:
+
 ```tsx
 import { YourErrorTroubleshooting } from './errorMappings/YourError'
 
-export const ERROR_MAPPINGS: Record<KnownErrorType, ErrorMapping> = {
+export const ERROR_MAPPINGS = new Map<ErrorConstructor, ErrorMapping>([
   // existing...
-  'your-error': {
-    id: 'your-error',
-    Troubleshooting: YourErrorTroubleshooting,
-  },
-}
+  [YourError, { id: 'your-error', Troubleshooting: YourErrorTroubleshooting }],
+])
 ```
+
+If you ever register a class and one of its subclasses, put the subclass first — the lookup returns the first match.
 
 That's it. `ErrorMatcher` picks it up automatically.
 

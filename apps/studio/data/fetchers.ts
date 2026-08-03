@@ -4,7 +4,7 @@ import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
-import { ERROR_PATTERNS } from './error-patterns'
+import { createClassifiedError } from './error-patterns'
 import { API_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { ResponseError } from '@/types'
@@ -208,26 +208,15 @@ export const handleError = (error: unknown, options: HandleErrorOptions = {}): n
         : undefined
 
     if (errorMessage) {
-      const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
-      throw matched
-        ? new matched.ErrorClass(
-            errorMessage,
-            errorCode,
-            requestId,
-            retryAfter,
-            requestPathname,
-            metadata,
-            formattedError
-          )
-        : new UnknownAPIResponseError(
-            errorMessage,
-            errorCode,
-            requestId,
-            retryAfter,
-            requestPathname,
-            metadata,
-            formattedError
-          )
+      throw createClassifiedError(
+        errorMessage,
+        errorCode,
+        requestId,
+        retryAfter,
+        requestPathname,
+        metadata,
+        formattedError
+      )
     }
   }
 
@@ -303,7 +292,7 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
       : null
   const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
-  let error = new ResponseError(message, status, undefined, retryAfter)
+  let error = createClassifiedError(message, status, undefined, retryAfter)
 
   // @ts-expect-error - [Alaister] many of our local api routes check `if (response.error)`.
   // This is a fix to keep those checks working without breaking changes.
