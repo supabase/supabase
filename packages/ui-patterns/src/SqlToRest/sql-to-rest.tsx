@@ -466,7 +466,7 @@ export default function SqlToRest({
                     </button>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4 text-sm">
+                    <div className="text-foreground flex flex-col justify-start items-start px-3 pb-4 text-sm">
                       <Markdown
                         components={{
                           code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
