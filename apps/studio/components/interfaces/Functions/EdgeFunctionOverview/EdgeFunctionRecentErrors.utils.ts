@@ -241,7 +241,7 @@ export const getNoErrorsSinceLastDeployMessage = (invocationCount: number) => {
   const verb = invocationCount === 1 ? 'has' : 'have'
   const invocationPhrase = getSinceLastDeployInvocationPhrase(invocationCount)
 
-  return `There ${verb} been ${invocationPhrase} since last deploy and no errors.`
+  return `There ${verb} been ${invocationPhrase} in the last 24h and no errors.`
 }
 
 export const getFunctionRuntimeLogsSql = ({
