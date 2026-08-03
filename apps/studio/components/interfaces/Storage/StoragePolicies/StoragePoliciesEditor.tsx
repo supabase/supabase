@@ -44,7 +44,7 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
         <p className="text-sm text-foreground-lighter">
           Based on the operations you have selected, you can use the highlighted functions in the{' '}
           <a
-            href={`${DOCS_URL}/reference/javascript/storage-from-list`}
+            href={`${DOCS_URL}/reference/javascript/file-buckets-list`}
             target="_blank"
             rel="noreferrer"
             className="underline"

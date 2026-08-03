@@ -86,7 +86,7 @@ const StorageSecondLevelNav = () => {
     <SecondLevelNavLayout
       category={API_DOCS_CATEGORIES.STORAGE}
       title="Storage"
-      docsUrl={`${DOCS_URL}/reference/javascript/storage-createbucket`}
+      docsUrl={`${DOCS_URL}/reference/javascript/file-buckets-createbucket`}
       menuItemFilter={menuItemFilter}
       renderResourceList={(props) => <StorageResourceList {...props} projectRef={ref} />}
     />

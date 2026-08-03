@@ -1040,7 +1040,7 @@ const channels = supabase.channel('custom-filter-channel')
     key: 'upload-file',
     category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Upload a file',
-    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-upload`,
+    docsUrl: `${DOCS_URL}/reference/javascript/file-buckets-upload`,
     description: `
 Upload a file to an existing bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1076,7 +1076,7 @@ const { data, error } = await supabase
     key: 'delete-files',
     category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Delete files',
-    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-remove`,
+    docsUrl: `${DOCS_URL}/reference/javascript/file-buckets-remove`,
     description: `
 Delete files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1105,7 +1105,7 @@ const { data, error } = await supabase
     key: 'list-files',
     category: API_DOCS_CATEGORIES.STORAGE,
     title: 'List all files',
-    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-list`,
+    docsUrl: `${DOCS_URL}/reference/javascript/file-buckets-list`,
     description: `
 List all files within the bucket. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1137,7 +1137,7 @@ const { data, error } = await supabase
     key: 'download-file',
     category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Download a file',
-    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-download`,
+    docsUrl: `${DOCS_URL}/reference/javascript/file-buckets-download`,
     description: `
 Downloads a file from a private bucket. For public buckets, make a request to the URL returned from getPublicUrl instead. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1166,7 +1166,7 @@ const { data, error } = await supabase
     key: 'create-signed-url',
     category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Create a signed URL',
-    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-createsignedurl`,
+    docsUrl: `${DOCS_URL}/reference/javascript/file-buckets-createsignedurl`,
     description: `
 Create a signed URL which can be used to share a file for a fixed amount of time. RLS policy permissions required:
 - \`buckets\` table permissions: none
@@ -1195,7 +1195,7 @@ const { data, error } = await supabase
     key: 'retrieve-public-url',
     category: API_DOCS_CATEGORIES.STORAGE,
     title: 'Retrieve public URL',
-    docsUrl: `${DOCS_URL}/reference/javascript/storage-from-getpublicurl`,
+    docsUrl: `${DOCS_URL}/reference/javascript/file-buckets-getpublicurl`,
     description: `
 A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
 
