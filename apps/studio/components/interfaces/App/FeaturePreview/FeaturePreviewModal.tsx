@@ -42,6 +42,7 @@ import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -62,6 +63,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 export const FeaturePreviewModal = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const { dismissBanner } = useBannerStack()
   const featurePreviews = useFeaturePreviews()
   const {
     showFeaturePreviewModal,
@@ -113,6 +115,7 @@ export const FeaturePreviewModal = () => {
       toast.success(`${selectedFeature.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })
+      if (selectedFeature.bannerId) dismissBanner(selectedFeature.bannerId)
     } else {
       toggleFeaturePreviewModal(false)
       toast.success(`${selectedFeature.name} enabled`, {

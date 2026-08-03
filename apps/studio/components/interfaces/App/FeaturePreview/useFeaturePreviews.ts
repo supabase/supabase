@@ -1,6 +1,8 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useMemo } from 'react'
 
+import { type BannerId } from '@/components/ui/BannerStack/BannerStackProvider'
+
 export type FeaturePreview = {
   key: string
   name: string
@@ -19,6 +21,7 @@ export type FeaturePreview = {
    * feature has no single destination (e.g. a global layout change).
    */
   getRoute?: (ref?: string) => string
+  bannerId?: BannerId
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
@@ -123,6 +126,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         isDefaultOptIn: false,
         enabled: isDatabaseConnectionsEnabled,
         getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
+        bannerId: 'database-connections-banner',
       },
     ]
 
