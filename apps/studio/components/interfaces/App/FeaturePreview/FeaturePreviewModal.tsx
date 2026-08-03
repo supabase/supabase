@@ -5,6 +5,10 @@ import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Badge,
   Button,
   cn,
@@ -81,6 +85,10 @@ export const FeaturePreviewModal = () => {
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
 
+  const categories = (
+    [...new Set(allFeaturePreviews.map((preview) => preview.category).filter(Boolean))] as string[]
+  ).concat(['others'])
+
   const toggleFeature = () => {
     if (!selectedFeature) return
 
@@ -128,14 +136,44 @@ export const FeaturePreviewModal = () => {
             <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
               <div>
                 <ScrollArea className="hidden md:block h-[550px] w-[280px] border-r">
-                  {allFeaturePreviews.map((feature) => (
+                  <Accordion type="multiple" defaultValue={categories}>
+                    {categories.map((category) => {
+                      const items =
+                        category === 'others'
+                          ? allFeaturePreviews.filter((x) => x.category === undefined)
+                          : allFeaturePreviews.filter((x) => x.category === category)
+                      return (
+                        <AccordionItem
+                          key={category}
+                          value={category}
+                          className="data-[state=open]:border-b-0"
+                        >
+                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2">
+                            {category}
+                          </AccordionTrigger>
+                          <AccordionContent className="[&>div]:pb-0">
+                            {items.map((feature) => (
+                              <FeaturePreviewItem
+                                key={feature.key}
+                                feature={feature}
+                                selectedFeature={selectedFeature}
+                                selectFeaturePreview={selectFeaturePreview}
+                              />
+                            ))}
+                          </AccordionContent>
+                        </AccordionItem>
+                      )
+                    })}
+                  </Accordion>
+
+                  {/* {allFeaturePreviews.map((feature) => (
                     <FeaturePreviewItem
                       key={feature.key}
                       feature={feature}
                       selectedFeature={selectedFeature}
                       selectFeaturePreview={selectFeaturePreview}
                     />
-                  ))}
+                  ))} */}
                 </ScrollArea>
               </div>
               <div className="block md:hidden px-4 pt-4">
