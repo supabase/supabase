@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -28,8 +29,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAWSAccountCreateMutation } from '@/data/aws-accounts/aws-account-create-mutation'
 import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
-import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -48,9 +49,10 @@ interface FormValues {
 export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
   const isNew = !account
   const { data: project } = useSelectedProjectQuery()
+  const showPrivateLinkReadReplica = useFlag('privatelinkReadReplica')
   const { data: databases = [] } = useReadReplicasQuery(
     { projectRef: project?.ref },
-    { enabled: isNew && !!project?.ref }
+    { enabled: isNew && !!project?.ref && showPrivateLinkReadReplica }
   )
   const { mutate: createAccount, isPending } = useAWSAccountCreateMutation()
 
@@ -192,43 +194,46 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   />
                 </>
               )}
-              <FormField
-                control={form.control}
-                name="databaseIdentifier"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Database target"
-                    description="Associations are created per database target. The same AWS account can be associated with both primary and replica databases."
-                  >
-                    <FormControl>
-                      <Select
-                        value={field.value}
-                        disabled={!isNew || !project?.ref}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a database" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {project?.ref && (
-                            <SelectItem value={project.ref}>Primary database</SelectItem>
-                          )}
-                          {readReplicas.map((database) => {
-                            const region = formatDatabaseRegion(database.region) ?? database.region
-                            const id = formatDatabaseID(database.identifier)
+              {(showPrivateLinkReadReplica || !isNew) && (
+                <FormField
+                  control={form.control}
+                  name="databaseIdentifier"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Database target"
+                      description="Associations are created per database target. The same AWS account can be associated with both primary and replica databases."
+                    >
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          disabled={!isNew || !project?.ref}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a database" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {project?.ref && (
+                              <SelectItem value={project.ref}>Primary database</SelectItem>
+                            )}
+                            {readReplicas.map((database) => {
+                              const region =
+                                formatDatabaseRegion(database.region) ?? database.region
+                              const id = formatDatabaseID(database.identifier)
 
-                            return (
-                              <SelectItem key={database.identifier} value={database.identifier}>
-                                {`Read replica (${region} - ${id})`}
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+                              return (
+                                <SelectItem key={database.identifier} value={database.identifier}>
+                                  {`Read replica (${region} - ${id})`}
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
               <FormField
                 control={form.control}
                 name="awsAccountId"
