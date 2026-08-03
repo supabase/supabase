@@ -89,8 +89,9 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
 
         <TableCell className="truncate">{isOn ? extension.schema : '-'}</TableCell>
 
-        <TableCell className="text-foreground-light">
-          <p className="block" title={extension.comment ?? undefined}>
+        {/* FIX APPLIED HERE: Added max-width classes and truncate to handle overflow properly */}
+        <TableCell className="text-foreground-light max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg">
+          <p className="block truncate" title={extension.comment ?? undefined}>
             {extension.comment}
           </p>
         </TableCell>
