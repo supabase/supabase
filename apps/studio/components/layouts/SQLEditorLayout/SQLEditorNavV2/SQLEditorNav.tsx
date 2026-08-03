@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { TreeView } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -14,17 +13,12 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns/InnerSideMenu'
 
-import { DeleteSnippetsModal } from './DeleteSnippetsModal'
 import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
-import { ShareSnippetModal } from './ShareSnippetModal'
-import { SQLEditorLoadingSnippets } from './SQLEditorLoadingSnippets'
+import { SnippetActionModals } from './SnippetActionModals'
+import { SnippetCollectionSection } from './SnippetCollectionSection'
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { formatFolderResponseForTreeView, getLastItemIds, ROOT_NODE } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { UnshareSnippetModal } from './UnshareSnippetModal'
-import { DownloadSnippetModal } from '@/components/interfaces/SQLEditor/DownloadSnippetModal'
-import { MoveQueryModal } from '@/components/interfaces/SQLEditor/MoveQueryModal'
-import { RenameQueryModal } from '@/components/interfaces/SQLEditor/RenameQueryModal'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { EmptyPrivateQueriesPanel } from '@/components/layouts/SQLEditorLayout/PrivateSqlSnippetEmpty'
@@ -467,8 +461,9 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       <InnerSideMenuSeparator />
       {IS_PLATFORM && (
         <>
-          <InnerSideMenuCollapsible
-            className="px-0"
+          <SnippetCollectionSection
+            title="Shared"
+            count={numProjectSnippets}
             open={showSharedSnippets}
             onOpenChange={(value) => {
               setSectionVisibility({
@@ -476,75 +471,39 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                 shared: value,
               })
             }}
-          >
-            <InnerSideMenuCollapsibleTrigger
-              title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
-            />
-            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
-              {isLoadingSharedSqlSnippets ? (
-                <SQLEditorLoadingSnippets />
-              ) : sharedSnippets.length === 0 ? (
-                <InnerSideBarEmptyPanel
-                  className="mx-2"
-                  title="No shared queries"
-                  description="Share queries with your team by right-clicking on the query."
-                />
-              ) : (
-                <TreeView
-                  data={projectSnippetsTreeState}
-                  aria-label="project-level-snippets"
-                  nodeRenderer={({ element, ...props }) => {
-                    const isOpened = Object.values(tabs.tabsMap).some(
-                      (tab) => tab.metadata?.sqlId === element.metadata?.id
-                    )
-                    const tabId = createTabId('sql', {
-                      id: element?.metadata?.id as unknown as Snippet['id'],
-                    })
-                    const isPreview = tabs.previewTabId === tabId
-                    const isActive = !isPreview && element.metadata?.id === id
-                    const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
-
-                    return (
-                      <SQLEditorTreeViewItem
-                        {...props}
-                        isOpened={isOpened && !isPreview}
-                        isSelected={isActive || isSelected}
-                        isPreview={isPreview}
-                        onDoubleClick={(e) => {
-                          e.preventDefault()
-                          tabs.makeTabPermanent(tabId)
-                        }}
-                        element={element}
-                        onSelectDelete={() => {
-                          setShowDeleteModal(true)
-                          setSelectedSnippets([element.metadata as unknown as Snippet])
-                        }}
-                        onSelectRename={() => {
-                          setShowRenameModal(true)
-                          setSelectedSnippetToRename(element.metadata as Snippet)
-                        }}
-                        onSelectDownload={() => {
-                          setSelectedSnippetToDownload(element.metadata as Snippet)
-                        }}
-                        onSelectUnshare={() => {
-                          setSelectedSnippetToUnshare(element.metadata as Snippet)
-                        }}
-                        isLastItem={projectSnippetsLastItemIds.has(element.id as string)}
-                        hasNextPage={hasMoreSharedSqlSnippets}
-                        fetchNextPage={fetchNextSharedSqlSnippets}
-                        isFetchingNextPage={isFetchingMoreSharedSqlSnippets}
-                      />
-                    )
-                  }}
-                />
-              )}
-            </InnerSideMenuCollapsibleContent>
-          </InnerSideMenuCollapsible>
+            isLoading={isLoadingSharedSqlSnippets}
+            snippets={sharedSnippets}
+            treeData={projectSnippetsTreeState}
+            ariaLabel="project-level-snippets"
+            emptyState={
+              <InnerSideBarEmptyPanel
+                className="mx-2"
+                title="No shared queries"
+                description="Share queries with your team by right-clicking on the query."
+              />
+            }
+            selectedSnippets={selectedSnippets}
+            lastItemIds={projectSnippetsLastItemIds}
+            hasNextPage={hasMoreSharedSqlSnippets}
+            fetchNextPage={fetchNextSharedSqlSnippets}
+            isFetchingNextPage={isFetchingMoreSharedSqlSnippets}
+            onSelectDelete={(snippet) => {
+              setShowDeleteModal(true)
+              setSelectedSnippets([snippet])
+            }}
+            onSelectRename={(snippet) => {
+              setShowRenameModal(true)
+              setSelectedSnippetToRename(snippet)
+            }}
+            onSelectDownload={setSelectedSnippetToDownload}
+            onSelectUnshare={setSelectedSnippetToUnshare}
+          />
 
           <InnerSideMenuSeparator />
 
-          <InnerSideMenuCollapsible
-            className="px-0"
+          <SnippetCollectionSection
+            title="Favorites"
+            count={numFavoriteSnippets}
             open={showFavoriteSnippets}
             onOpenChange={(value) => {
               setSectionVisibility({
@@ -552,77 +511,39 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                 favorite: value,
               })
             }}
-          >
-            <InnerSideMenuCollapsibleTrigger
-              title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
-            />
-            <InnerSideMenuCollapsibleContent className="group-data-open:pt-2">
-              {isLoadingFavoriteSqlSnippets ? (
-                <SQLEditorLoadingSnippets />
-              ) : favoriteSnippets.length === 0 ? (
-                <InnerSideBarEmptyPanel
-                  title="No favorite queries"
-                  className="mx-2 px-3"
-                  description={
-                    <>
-                      Save a query to favorites for easy accessibility by clicking the{' '}
-                      <Heart size={12} className="inline-block relative align-center -top-px" />{' '}
-                      icon.
-                    </>
-                  }
-                />
-              ) : (
-                <TreeView
-                  data={favoritesTreeState}
-                  aria-label="favorite-snippets"
-                  nodeRenderer={({ element, ...props }) => {
-                    const isOpened = Object.values(tabs.tabsMap).some(
-                      (tab) => tab.metadata?.sqlId === element.metadata?.id
-                    )
-                    const tabId = createTabId('sql', {
-                      id: element?.metadata?.id as unknown as Snippet['id'],
-                    })
-                    const isPreview = tabs.previewTabId === tabId
-                    const isActive = !isPreview && element.metadata?.id === id
-                    const isSelected = selectedSnippets.some((x) => x.id === element.metadata?.id)
-
-                    return (
-                      <SQLEditorTreeViewItem
-                        {...props}
-                        isSelected={isActive || isSelected}
-                        isOpened={isOpened && !isPreview}
-                        isPreview={isPreview}
-                        onDoubleClick={(e) => {
-                          e.preventDefault()
-                          tabs.makeTabPermanent(tabId)
-                        }}
-                        element={element}
-                        onSelectDelete={() => {
-                          setShowDeleteModal(true)
-                          setSelectedSnippets([element.metadata as unknown as Snippet])
-                        }}
-                        onSelectRename={() => {
-                          setShowRenameModal(true)
-                          setSelectedSnippetToRename(element.metadata as Snippet)
-                        }}
-                        onSelectDownload={() => {
-                          setSelectedSnippetToDownload(element.metadata as Snippet)
-                        }}
-                        onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
-                        onSelectUnshare={() => {
-                          setSelectedSnippetToUnshare(element.metadata as Snippet)
-                        }}
-                        isLastItem={favoriteSnippetsLastItemIds.has(element.id as string)}
-                        hasNextPage={hasMoreFavoriteSqlSnippets}
-                        fetchNextPage={fetchNextFavoriteSqlSnippets}
-                        isFetchingNextPage={isFetchingMoreFavoriteSqlSnippets}
-                      />
-                    )
-                  }}
-                />
-              )}
-            </InnerSideMenuCollapsibleContent>
-          </InnerSideMenuCollapsible>
+            isLoading={isLoadingFavoriteSqlSnippets}
+            snippets={favoriteSnippets}
+            treeData={favoritesTreeState}
+            ariaLabel="favorite-snippets"
+            emptyState={
+              <InnerSideBarEmptyPanel
+                title="No favorite queries"
+                className="mx-2 px-3"
+                description={
+                  <>
+                    Save a query to favorites for easy accessibility by clicking the{' '}
+                    <Heart size={12} className="inline-block relative align-center -top-px" /> icon.
+                  </>
+                }
+              />
+            }
+            selectedSnippets={selectedSnippets}
+            lastItemIds={favoriteSnippetsLastItemIds}
+            hasNextPage={hasMoreFavoriteSqlSnippets}
+            fetchNextPage={fetchNextFavoriteSqlSnippets}
+            isFetchingNextPage={isFetchingMoreFavoriteSqlSnippets}
+            onSelectDelete={(snippet) => {
+              setShowDeleteModal(true)
+              setSelectedSnippets([snippet])
+            }}
+            onSelectRename={(snippet) => {
+              setShowRenameModal(true)
+              setSelectedSnippetToRename(snippet)
+            }}
+            onSelectDownload={setSelectedSnippetToDownload}
+            onSelectShare={setSelectedSnippetToShare}
+            onSelectUnshare={setSelectedSnippetToUnshare}
+          />
 
           <InnerSideMenuSeparator />
         </>
@@ -761,69 +682,34 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
 
       <InnerSideMenuSeparator />
 
-      <RenameQueryModal
-        snippet={selectedSnippetToRename}
-        visible={showRenameModal}
-        onCancel={() => setShowRenameModal(false)}
-        onComplete={() => setShowRenameModal(false)}
-      />
-
-      <MoveQueryModal
-        snippets={selectedSnippets}
-        visible={showMoveModal}
-        onClose={() => {
+      <SnippetActionModals
+        selectedSnippets={selectedSnippets}
+        selectedSnippetToRename={selectedSnippetToRename}
+        selectedSnippetToDownload={selectedSnippetToDownload}
+        selectedSnippetToShare={selectedSnippetToShare}
+        selectedSnippetToUnshare={selectedSnippetToUnshare}
+        selectedFolderToDelete={selectedFolderToDelete}
+        showRenameModal={showRenameModal}
+        showMoveModal={showMoveModal}
+        showDeleteModal={showDeleteModal}
+        isDeletingFolder={isDeletingFolder}
+        onRenameClose={() => setShowRenameModal(false)}
+        onMoveClose={() => {
           setShowMoveModal(false)
           setSelectedSnippets([])
         }}
-      />
-
-      <DownloadSnippetModal
-        id={selectedSnippetToDownload?.id ?? ''}
-        open={selectedSnippetToDownload !== undefined}
-        onOpenChange={() => setSelectedSnippetToDownload(undefined)}
-      />
-
-      <ShareSnippetModal
-        snippet={selectedSnippetToShare}
-        onClose={() => setSelectedSnippetToShare(undefined)}
-        onSuccess={() => setSectionVisibility({ ...sectionVisibility, shared: true })}
-      />
-
-      <UnshareSnippetModal
-        snippet={selectedSnippetToUnshare}
-        onClose={() => setSelectedSnippetToUnshare(undefined)}
-        onSuccess={() => setSectionVisibility({ ...sectionVisibility, private: true })}
-      />
-
-      <DeleteSnippetsModal
-        visible={showDeleteModal}
-        snippets={selectedSnippets}
-        onClose={() => {
+        onDownloadClose={() => setSelectedSnippetToDownload(undefined)}
+        onShareClose={() => setSelectedSnippetToShare(undefined)}
+        onShareSuccess={() => setSectionVisibility({ ...sectionVisibility, shared: true })}
+        onUnshareClose={() => setSelectedSnippetToUnshare(undefined)}
+        onUnshareSuccess={() => setSectionVisibility({ ...sectionVisibility, private: true })}
+        onDeleteClose={() => {
           setShowDeleteModal(false)
           setSelectedSnippets([])
         }}
+        onFolderDeleteCancel={() => setSelectedFolderToDelete(undefined)}
+        onFolderDeleteConfirm={onConfirmDeleteFolder}
       />
-
-      <ConfirmationModal
-        size="small"
-        title="Confirm to delete folder"
-        confirmLabel="Delete folder"
-        confirmLabelLoading="Deleting folder"
-        loading={isDeletingFolder}
-        visible={selectedFolderToDelete !== undefined}
-        variant="destructive"
-        onCancel={() => setSelectedFolderToDelete(undefined)}
-        onConfirm={onConfirmDeleteFolder}
-        alert={{
-          title: 'This action cannot be undone',
-          description:
-            'All SQL snippets within the folder will be permanently removed, and cannot be recovered.',
-        }}
-      >
-        <p className="text-sm">
-          Are you sure you want to delete the folder '{selectedFolderToDelete?.name}'?
-        </p>
-      </ConfirmationModal>
     </>
   )
 }
