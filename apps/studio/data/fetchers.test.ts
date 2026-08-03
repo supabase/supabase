@@ -40,7 +40,7 @@ describe('fetch helpers — error classification', () => {
     const error = await fetchGet('http://localhost/test')
 
     expect(error).toBeInstanceOf(ConnectionTimeoutError)
-    expect((error as ConnectionTimeoutError).errorType).toBe('connection-timeout')
+    expect(error).toMatchObject({ errorType: 'connection-timeout' })
   })
 
   it('classifies a known error returned by fetchPost', async () => {
@@ -78,18 +78,16 @@ describe('fetch helpers — error classification', () => {
     const error = await fetchGet('http://localhost/test')
 
     expect(error).toBeInstanceOf(UnknownAPIResponseError)
-    expect((error as ResponseError).message).toBe('An error has occurred: 500')
+    expect(error).toMatchObject({ message: 'An error has occurred: 500' })
   })
 
   it('preserves status and the legacy `error` self-reference', async () => {
     mockFailedResponse({ message: TIMEOUT_MESSAGE }, 503)
 
-    const error = (await fetchGet('http://localhost/test')) as ResponseError & {
-      error: ResponseError
-    }
+    const error = await fetchGet('http://localhost/test')
 
-    expect(error.code).toBe(503)
-    expect(error.error).toBe(error)
+    expect(error).toMatchObject({ code: 503 })
+    expect(error).toHaveProperty('error', error)
   })
 
   it('classifies a thrown network error', async () => {
