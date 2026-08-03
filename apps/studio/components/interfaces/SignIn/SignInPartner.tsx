@@ -9,6 +9,8 @@ export const SignInPartner = () => {
   const router = useRouter()
 
   useEffect(() => {
+    let isMounted = true // ✅ Flag added
+
     ;(async () => {
       const params = new URLSearchParams(window.location.hash.substring(1))
 
@@ -17,17 +19,30 @@ export const SignInPartner = () => {
 
       const { data } = await auth.getSession()
 
+      if (!isMounted) return 
+
       if (!data.session && partner && token) {
         try {
           await auth.signInWithIdToken({ provider: partner, token })
         } finally {
-          router.replace({ pathname: '/sign-in-mfa' })
+          if (isMounted) { 
+            router.replace({ pathname: '/sign-in-mfa' })
+          }
         }
       } else {
-        router.replace({ pathname: '/sign-in' })
+        if (isMounted) { 
+          router.replace({ pathname: '/sign-in' })
+        }
       }
     })()
-  }, [])
+
+    return () => { 
+      isMounted = false
+    }
+  // Intentionally omitting 'router' to prevent Next.js router reference mutations
+  // from triggering duplicate re-renders and spamming the auth endpoints.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) 
 
   return (
     <div className="relative mx-auto w-full flex flex-col items-center justify-center gap-y-6">
