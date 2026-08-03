@@ -33,7 +33,12 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import * as z from 'zod'
 
 import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constants'
-import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import {
+  extractMethod,
+  getRevokePermissionStatements,
+  isHttpHookUrl,
+  isValidHook,
+} from './hooks.utils'
 import { convertArgumentTypes } from '@/components/interfaces/Database/Functions/Functions.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -69,8 +74,8 @@ const FormSchema = z
   .object({
     hookType: z.string(),
     enabled: z.boolean(),
-    selectedType: z.union([z.literal('https'), z.literal('postgres')]),
-    httpsValues: z.object({
+    selectedType: z.union([z.literal('http'), z.literal('postgres')]),
+    httpValues: z.object({
       url: z.string(),
       secret: z.string(),
     }),
@@ -80,17 +85,17 @@ const FormSchema = z
     }),
   })
   .superRefine((data, ctx) => {
-    if (data.selectedType === 'https') {
-      if (!data.httpsValues.url.startsWith('https://')) {
+    if (data.selectedType === 'http') {
+      if (!isHttpHookUrl(data.httpValues.url)) {
         ctx.addIssue({
-          path: ['httpsValues', 'url'],
+          path: ['httpValues', 'url'],
           code: z.ZodIssueCode.custom,
-          message: 'The URL must start with https://',
+          message: 'The URL must start with http:// or https://',
         })
       }
-      if (!data.httpsValues.secret) {
+      if (!data.httpValues.secret) {
         ctx.addIssue({
-          path: ['httpsValues', 'secret'],
+          path: ['httpValues', 'secret'],
           code: z.ZodIssueCode.custom,
           message: 'Missing secret value',
         })
@@ -155,7 +160,7 @@ export const CreateHookSheet = ({
       hookType: title || '',
       enabled: true,
       selectedType: 'postgres',
-      httpsValues: {
+      httpValues: {
         url: '',
         secret: '',
       },
@@ -244,13 +249,13 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
     if (values.selectedType === 'postgres') {
       url = `pg-functions://postgres/${values.postgresValues.schema}/${values.postgresValues.functionName}`
     } else {
-      url = values.httpsValues.url
+      url = values.httpValues.url
     }
 
     const payload = {
       [enabledLabel]: values.enabled,
       [uriLabel]: url,
-      [secretsLabel]: values.selectedType === 'https' ? values.httpsValues.secret : null,
+      [secretsLabel]: values.selectedType === 'http' ? values.httpValues.secret : null,
     }
 
     updateAuthHooks({ projectRef: projectRef!, config: payload })
@@ -268,9 +273,9 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
           hookType: definition.title,
           enabled: isCreating ? true : authConfig?.[definition.enabledKey],
           selectedType: values.type,
-          httpsValues: {
-            url: (values.type === 'https' && values.url) || '',
-            secret: (values.type === 'https' && values.secret) || '',
+          httpValues: {
+            url: (values.type === 'http' && values.url) || '',
+            secret: (values.type === 'http' && values.secret) || '',
           },
           postgresValues: {
             schema: (values.type === 'postgres' && values.schema) || 'public',
@@ -282,7 +287,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
           hookType: title || '',
           enabled: true,
           selectedType: 'postgres',
-          httpsValues: {
+          httpValues: {
             url: '',
             secret: '',
           },
@@ -382,11 +387,11 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           description="Used to call a Postgres function."
                         />
                         <RadioGroupStackedItem
-                          value="https"
-                          id="https"
-                          key="https"
-                          label="HTTPS"
-                          description="Used to call any HTTPS endpoint."
+                          value="http"
+                          id="http"
+                          key="http"
+                          label="HTTP"
+                          description="Used to call any HTTP or HTTPS endpoint."
                         />
                       </RadioGroupStacked>
                     </FormControl>
@@ -486,14 +491,14 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
               ) : (
                 <div className="flex flex-col gap-4 px-5">
                   <FormField
-                    key="httpsValues.url"
+                    key="httpValues.url"
                     control={form.control}
-                    name="httpsValues.url"
+                    name="httpValues.url"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="horizontal"
                         label="URL"
-                        description="Supabase Auth will send a HTTPS POST request to this URL each time the hook is triggered."
+                        description="Supabase Auth will send an HTTP POST request to this URL each time the hook is triggered."
                       >
                         <FormControl>
                           <Input {...field} placeholder="https://www.example.com" />
@@ -502,9 +507,9 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                     )}
                   />
                   <FormField
-                    key="httpsValues.secret"
+                    key="httpValues.secret"
                     control={form.control}
-                    name="httpsValues.secret"
+                    name="httpValues.secret"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="horizontal"
@@ -531,7 +536,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                               className="rounded-l-none text-xs h-auto"
                               onClick={() => {
                                 const authHookSecret = generateAuthHookSecret()
-                                form.setValue('httpsValues.secret', authHookSecret, {
+                                form.setValue('httpValues.secret', authHookSecret, {
                                   shouldDirty: true,
                                 })
                               }}

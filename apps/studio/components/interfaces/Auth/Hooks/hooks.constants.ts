@@ -79,5 +79,5 @@ export interface Hook {
   docSlug: string
   method:
     | { type: 'postgres'; schema: string; functionName: string }
-    | { type: 'https'; url: string; secret: string }
+    | { type: 'http'; url: string; secret: string }
 }

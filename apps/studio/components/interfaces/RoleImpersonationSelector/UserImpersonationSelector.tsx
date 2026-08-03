@@ -107,9 +107,9 @@ export const UserImpersonationSelector = () => {
       return updated.slice(0, 5)
     })
 
-    if (customAccessTokenHookDetails?.type === 'https') {
+    if (customAccessTokenHookDetails?.type === 'http') {
       toast.info(
-        'Please note that HTTPS custom access token hooks are not yet supported in the dashboard.'
+        'Please note that HTTP custom access token hooks are not yet supported in the dashboard.'
       )
     }
 
