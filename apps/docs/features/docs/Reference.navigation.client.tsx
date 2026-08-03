@@ -284,9 +284,9 @@ export function RefLink({
       ) : (
         <Link
           ref={ref}
-          // Same-page anchor links skip prefetch since navigation never
-          // actually happens; real per-page links keep the Next.js default.
-          prefetch={realNavigation ? undefined : false}
+          // Scroll-hijack links never navigate, so disable prefetch. Real API
+          // pages omit the prop and keep Next.js's default prefetch behavior.
+          {...(!realNavigation ? { prefetch: false } : {})}
           href={href}
           className={getLinkStyles(isActive, className)}
           onClick={onClick}
