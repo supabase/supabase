@@ -28,15 +28,15 @@ const ObservabilityLayoutContent = ({
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [isIndexAdvisorBannerDismissed, , { isSuccess: isLocalStorageReady }] =
-    useLocalStorageQuery(LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''), false)
+  const [isIndexAdvisorBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
+    false
+  )
 
   const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
 
-  const [isDatabaseConnectionsBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
+  const [isDatabaseConnectionsBannerDismissed, , { isSuccess: isLocalStorageReady }] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''), false)
 
   const prevPathnameRef = useRef(pathname)
 
