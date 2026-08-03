@@ -67,7 +67,7 @@ services:
 
   kong:
     container_name: supabase-kong
-    image: kong/kong:3.9.1
+    image: kong/kong:3.9.3
     restart: unless-stopped
     networks:
       default:
