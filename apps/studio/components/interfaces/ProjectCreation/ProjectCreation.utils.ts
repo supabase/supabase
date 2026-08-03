@@ -1,5 +1,5 @@
 import type { CloudProvider, Region } from 'shared-data'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
@@ -25,8 +25,6 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
       return {
         EAST_US: AWS_REGIONS.EAST_US,
       }
-    case 'FLY':
-      return FLY_REGIONS
     default:
       throw new Error('Invalid cloud provider')
   }

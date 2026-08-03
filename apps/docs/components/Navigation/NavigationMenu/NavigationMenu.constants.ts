@@ -2621,6 +2621,7 @@ export const security: NavMenuConstant = {
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+        { name: 'GDPR', url: '/guides/security/gdpr-compliance' },
       ],
     },
     {
@@ -3085,6 +3086,7 @@ export const self_hosting: NavMenuConstant = {
       name: 'Add Reverse Proxy with HTTPS',
       url: '/guides/self-hosting/self-hosted-proxy-https',
     },
+    { name: 'Update your deployment', url: '/guides/self-hosting/updating' },
     {
       name: 'How-to Guides',
       items: [
@@ -3098,7 +3100,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         {
-          name: 'Custom Postgres Extensions',
+          name: 'Build Custom Extensions',
           url: '/guides/self-hosting/custom-postgres-extensions',
         },
         {
