@@ -212,8 +212,6 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   useEffect(() => {
     // Save the departing snippet's scroll position on unmount / snippet switch.
     return () => saveScrollPosition(id)
-    // Temporary until we update eslint to ignore useEffectEvent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   useEffect(() => {

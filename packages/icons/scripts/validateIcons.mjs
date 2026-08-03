@@ -21,12 +21,22 @@ export const validateIconSource = (source, filename = 'icon.svg') => {
     .slice((rootMatch.index ?? 0) + rootMatch[0].length)
     .match(/<(?!\/)[a-z][^>]*>/gi)
   const childAttributeViolations = []
+  let hasChildInlineStyle = false
+
+  if ('style' in rootAttributes) {
+    errors.push(`${filename}: inline style attributes are not allowed on the root <svg>`)
+  }
 
   for (const element of childElements ?? []) {
     const attributes = readAttributes(element)
+    if ('style' in attributes) hasChildInlineStyle = true
     for (const attribute of CHILD_STROKE_ATTRIBUTES) {
       if (attribute in attributes) childAttributeViolations.push(attribute)
     }
+  }
+
+  if (hasChildInlineStyle) {
+    errors.push(`${filename}: inline style attributes are not allowed on child elements`)
   }
 
   if (childAttributeViolations.length > 0) {

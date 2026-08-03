@@ -47,6 +47,30 @@ test('rejects child-level stroke styling', () => {
   ])
 })
 
+test('rejects inline styles on the root icon', () => {
+  const source = `
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" style="stroke: none">
+      <path d="M2 2L22 22" />
+    </svg>
+  `
+
+  assert.deepEqual(validateIconSource(source, 'root-style.svg'), [
+    'root-style.svg: inline style attributes are not allowed on the root <svg>',
+  ])
+})
+
+test('rejects inline styles on child elements', () => {
+  const source = `
+    <svg fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M2 2L22 22" style="stroke-width: 2" />
+    </svg>
+  `
+
+  assert.deepEqual(validateIconSource(source, 'child-style.svg'), [
+    'child-style.svg: inline style attributes are not allowed on child elements',
+  ])
+})
+
 test('rejects the legacy zero-width fill-only convention', () => {
   const source = `
     <svg fill="currentColor" stroke="currentColor" stroke-width="0">

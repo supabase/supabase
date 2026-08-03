@@ -144,6 +144,74 @@ describe('serializeContentListingGroupToMarkdown', () => {
     expect(markdown).not.toMatch(/^#+\s/m)
     expect(markdown).toContain('**[Connect]')
   })
+
+  it('omits feature-gated items when those features are disabled', () => {
+    const previous = process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+    process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = 'true'
+
+    try {
+      const markdown = serializeContentListingGroupToMarkdown(
+        {
+          id: 'frameworks',
+          heading: 'Frameworks',
+          items: [
+            {
+              title: 'React',
+              href: '/guides/getting-started/quickstarts/reactjs',
+              description: 'Web framework.',
+            },
+            {
+              title: 'Flutter',
+              href: '/guides/getting-started/quickstarts/flutter',
+              description: 'Mobile framework.',
+              feature: 'sdk:dart',
+            },
+          ],
+        },
+        ''
+      )
+
+      expect(markdown).toContain('**[React]')
+      expect(markdown).not.toContain('Flutter')
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+      } else {
+        process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = previous
+      }
+    }
+  })
+
+  it('returns empty string when every item is feature-gated off', () => {
+    const previous = process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+    process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = 'true'
+
+    try {
+      const markdown = serializeContentListingGroupToMarkdown(
+        {
+          id: 'sdk-only',
+          heading: 'SDKs',
+          items: [
+            {
+              title: 'Flutter',
+              href: '/guides/getting-started/quickstarts/flutter',
+              description: 'Mobile framework.',
+              feature: 'sdk:dart',
+            },
+          ],
+        },
+        ''
+      )
+
+      expect(markdown).toBe('')
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+      } else {
+        process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = previous
+      }
+    }
+  })
 })
 
 describe('ContentListings markdown handler', () => {
@@ -189,7 +257,7 @@ describe('dashboard content listing hrefs', () => {
 describe('contentListingItemSchema icon', () => {
   const baseItem = {
     title: 'Datadog',
-    href: '/guides/telemetry/log-drains#datadog',
+    href: '/guides/monitoring-and-debugging/log-drains#datadog',
     description: 'Stream logs directly into Datadog for monitoring and analysis.',
   }
 
