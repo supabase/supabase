@@ -23,6 +23,7 @@ import {
 } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
@@ -177,7 +178,7 @@ export const DatabaseSelector = ({
                         <TooltipContent side="right" className="w-80">
                           <Markdown
                             className="text-xs text-foreground"
-                            content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](/project/${projectRef}/settings/infrastructure) for more information.`}
+                            content={`Replica unable to accept requests as its ${status}. [View infrastructure settings](${getInfrastructurePath(projectRef)}) for more information.`}
                           />
                         </TooltipContent>
                       </Tooltip>

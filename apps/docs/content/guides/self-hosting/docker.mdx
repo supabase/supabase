@@ -54,7 +54,7 @@ Minimum requirements for running all Supabase components, suitable for developme
 
 If you don't need specific services, such as Realtime, Storage, imgproxy, or Edge Runtime (`functions`), you can remove the corresponding sections and dependencies from `docker-compose.yml` to reduce resource requirements.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can [enable](#enabling-analytics) Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional docker-compose override file. Note that enabling these services will increase resource requirements.
 
@@ -131,14 +131,11 @@ mkdir supabase-project
 # ├── supabase
 # └── supabase-project
 
-# Copy the compose files over to your project
-cp -rf supabase/docker/* supabase-project
+# Copy the configuration to your project
+cp -rf supabase/docker/. supabase-project
 
-# Copy the example environment file
-cp supabase/docker/.env.example supabase-project/.env
-
-# Switch to your project directory
-cd supabase-project
+# Switch to the project directory and create a .env from the example
+cd supabase-project && cp .env.example .env
 
 # Pull the latest images
 docker compose pull
@@ -167,14 +164,11 @@ mkdir supabase-project
 # ├── supabase
 # └── supabase-project
 
-# Copy the compose files over to your project
-cp -rf supabase/docker/* supabase-project
+# Copy the configuration over to your project
+cp -rf supabase/docker/. supabase-project
 
-# Copy the example environment file
-cp supabase/docker/.env.example supabase-project/.env
-
-# Switch to your project directory
-cd supabase-project
+# Switch to the project directory and create a .env from the example
+cd supabase-project && cp .env.example .env
 
 # Pull the latest images
 docker compose pull
@@ -184,7 +178,7 @@ docker compose pull
 
 </Tabs>
 
-<Admonition type="tip">
+<Admonition type="note">
 
   If you are using rootless Docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`.
 

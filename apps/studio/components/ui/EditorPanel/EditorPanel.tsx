@@ -34,7 +34,7 @@ import {
   PopoverTrigger,
   SQL_ICON,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
@@ -46,8 +46,8 @@ import { SaveSnippetDialog } from './SaveSnippetDialog'
 import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import {
+  applyAutoLimit,
   createSqlSnippetSkeletonV2,
-  suffixWithLimit,
 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
 import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
@@ -231,7 +231,7 @@ export const EditorPanel = () => {
     }
 
     executeSql({
-      sql: suffixWithLimit(acceptUntrustedSql(currentValue), 100),
+      sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,
@@ -640,7 +640,7 @@ export const EditorPanel = () => {
                     owner_id: profile.id,
                     content: {
                       ...activeSnippet.content,
-                      sql: currentValue,
+                      unchecked_sql: untrustedSql(currentValue),
                     },
                   },
                 })

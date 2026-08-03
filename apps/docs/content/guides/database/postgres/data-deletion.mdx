@@ -89,7 +89,7 @@ create view active_orders as
   select * from orders where deleted_at is null;
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Combine soft deletes with a scheduled hard-delete job (using [pg_cron](/docs/guides/database/extensions/pg_cron)) to permanently remove old soft-deleted rows in batches during low-traffic periods.
 
@@ -147,7 +147,7 @@ Dropping a regular index takes an `ACCESS EXCLUSIVE` lock on the index but **not
 drop index if exists idx_users_legacy_field;
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The `inspect` command in the [Supabase CLI](/docs/reference/cli/supabase-inspect-db-index-stats) can help you identify unused indexes:
 

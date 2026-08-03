@@ -212,6 +212,7 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
   const [activeTab, setActiveTab] = useState<string>('events')
   const [flagsSubTab, setFlagsSubTab] = useState<'posthog' | 'configcat'>('posthog')
   const [eventFilter, setEventFilter] = useState<string>('')
+  const [flagFilter, setFlagFilter] = useState<string>('')
   const { posthog: posthogFlags, configcat: configcatFlags } = useFeatureFlags()
   const [phFlagOverrides, setPhFlagOverrides] = useState<Record<string, unknown>>({})
   const [ccFlagOverrides, setCcFlagOverrides] = useState<Record<string, unknown>>({})
@@ -353,6 +354,20 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
   const ccOverrideCount = Object.keys(ccFlagOverrides).length
   const totalOverrideCount = phOverrideCount + ccOverrideCount
 
+  const normalizedFlagFilter = flagFilter.trim().toLowerCase()
+
+  const filteredPosthogEntries = normalizedFlagFilter
+    ? Object.entries(posthogFlags).filter(([flagName]) =>
+        flagName.toLowerCase().includes(normalizedFlagFilter)
+      )
+    : Object.entries(posthogFlags)
+
+  const filteredConfigcatEntries = normalizedFlagFilter
+    ? Object.entries(configcatFlags).filter(([flagName]) =>
+        flagName.toLowerCase().includes(normalizedFlagFilter)
+      )
+    : Object.entries(configcatFlags)
+
   if (!IS_TOOLBAR_ENABLED || !isEnabled) return null
 
   return (
@@ -493,7 +508,10 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                       <button
                         key={id}
                         type="button"
-                        onClick={() => setFlagsSubTab(id)}
+                        onClick={() => {
+                          setFlagsSubTab(id)
+                          setFlagFilter('')
+                        }}
                         className={cn(
                           'flex items-center justify-between px-3 py-1.5 rounded-sm text-sm text-left uppercase font-mono tracking-wide',
                           flagsSubTab === id
@@ -520,13 +538,35 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                 {/* Flag list */}
                 <div className="flex-1 min-h-0 overflow-y-auto pb-6">
                   <div className="divide-y">
+                    <div className="flex items-center gap-x-1 p-2">
+                      <Input
+                        size="tiny"
+                        value={flagFilter}
+                        onChange={(e) => setFlagFilter(e.target.value)}
+                        placeholder="Search flag"
+                        className="w-64"
+                      />
+                      {!!flagFilter && (
+                        <Button
+                          className="px-1"
+                          variant="text"
+                          icon={<X />}
+                          onClick={() => setFlagFilter('')}
+                        />
+                      )}
+                    </div>
+
                     {flagsSubTab === 'posthog' &&
                       (Object.keys(posthogFlags).length === 0 ? (
                         <div className="text-center text-foreground-lighter py-8 text-sm">
                           No PostHog feature flags loaded yet.
                         </div>
+                      ) : filteredPosthogEntries.length === 0 ? (
+                        <div className="text-center text-foreground-lighter py-8 text-sm">
+                          No PostHog flags match &quot;{flagFilter}&quot;.
+                        </div>
                       ) : (
-                        Object.entries(posthogFlags).map(([flagName, flagValue]) => (
+                        filteredPosthogEntries.map(([flagName, flagValue]) => (
                           <FlagRow
                             key={flagName}
                             flagName={flagName}
@@ -539,13 +579,18 @@ export function DevToolbar({ extraTabs = [] }: { extraTabs?: ExtraTab[] }) {
                           />
                         ))
                       ))}
+
                     {flagsSubTab === 'configcat' &&
                       (Object.keys(configcatFlags).length === 0 ? (
                         <div className="text-center text-foreground-lighter py-8 text-sm">
                           No ConfigCat feature flags loaded yet.
                         </div>
+                      ) : filteredConfigcatEntries.length === 0 ? (
+                        <div className="text-center text-foreground-lighter py-8 text-sm">
+                          No ConfigCat flags match &quot;{flagFilter}&quot;.
+                        </div>
                       ) : (
-                        Object.entries(configcatFlags).map(([flagName, flagValue]) => (
+                        filteredConfigcatEntries.map(([flagName, flagValue]) => (
                           <FlagRow
                             key={flagName}
                             flagName={flagName}

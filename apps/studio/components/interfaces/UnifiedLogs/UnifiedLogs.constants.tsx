@@ -94,6 +94,10 @@ export const SEARCH_PARAMS_PARSER = {
   edge_auth: parseAsBoolean.withDefault(true),
   edge_storage: parseAsBoolean.withDefault(true),
   edge_postgrest: parseAsBoolean.withDefault(true),
+
+  // Support searching for user against user ID
+  // See userAttributionCondition in UnifiedLogs.queries.ts.
+  user: parseAsString,
 }
 
 const POSTGRES_STATUS_CODE_LABELS = {

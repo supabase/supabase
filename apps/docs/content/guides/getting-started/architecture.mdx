@@ -20,7 +20,7 @@ Our goal at Supabase is to make _all_ of Postgres easy to use. That doesn’t me
 Each Supabase project consists of several tools:
 
 <Image
-  alt="Diagram showing the architecture of Supabase. The Kong API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  alt="Diagram showing the architecture of Supabase. The Envoy API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
   src={{
     dark: '/docs/img/supabase-architecture.svg',
     light: '/docs/img/supabase-architecture--light.svg',
@@ -52,7 +52,7 @@ An open source Dashboard for managing your database and services.
 
 A JWT-based API for managing users and issuing access tokens. This integrates with Postgres's Row Level Security and the API servers.
 
-- Official Docs: [Supabase Auth reference docs](/docs/reference/auth)
+- Official Docs: [Supabase Auth reference docs](/docs/reference/self-hosting-auth/start)
 - Source code: [github.com/supabase/gotrue](https://github.com/supabase/gotrue)
 - License: [MIT](https://github.com/supabase/gotrue/blob/master/LICENSE)
 - Language: Go
@@ -80,7 +80,7 @@ A scalable WebSocket engine for managing user Presence, broadcasting messages, a
 
 An S3-compatible object storage service that stores metadata in Postgres.
 
-- Official Docs: [Supabase Storage reference docs](/docs/reference/storage)
+- Official Docs: [Supabase Storage reference docs](/docs/reference/self-hosting-storage/start)
 - Source code: [github.com/supabase/storage-api](https://github.com/supabase/storage-api)
 - License: [Apache 2.0](https://github.com/supabase/storage-api/blob/master/LICENSE)
 - Language: Node.js / TypeScript
@@ -112,14 +112,14 @@ A cloud-native, multi-tenant Postgres connection pooler.
 - License: [Apache 2.0](https://github.com/supabase/supavisor/blob/main/LICENSE)
 - Language: Elixir
 
-### Kong (API gateway)
+### Envoy (API gateway)
 
-A cloud-native API gateway, built on top of NGINX.
+A cloud-native, high-performance edge and service proxy.
 
-- Official Docs: [docs.konghq.com](https://docs.konghq.com/)
-- Source code: [github.com/kong/kong](https://github.com/kong/kong)
-- License: [Apache 2.0](https://github.com/Kong/kong/blob/master/LICENSE)
-- Language: Lua
+- Official Docs: [envoyproxy.io](https://www.envoyproxy.io/docs/envoy/latest/)
+- Source code: [github.com/envoyproxy/envoy](https://github.com/envoyproxy/envoy)
+- License: [Apache 2.0](https://github.com/envoyproxy/envoy/blob/main/LICENSE)
+- Language: C++
 
 ## Product principles
 
