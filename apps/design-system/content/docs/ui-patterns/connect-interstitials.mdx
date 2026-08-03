@@ -165,12 +165,17 @@ the pair should use the dark set together.
 
 **Where logos come from on `/authorize`**
 
-- Curated partner logos resolve from allowlisted `redirect_uri` hosts only,
-  not from self-asserted `name` or `website`. Those pairs may use theme tiles
-  and dark assets when the partner has them.
+- Curated partner logos resolve from allowlisted `redirect_uri` hosts, or from
+  a trusted partner name when `redirect_uri` is localhost / loopback (local MCP
+  clients). Do not resolve curated logos from self-asserted `name` or `website`
+  on a remote host. Those pairs may use theme tiles and dark assets when the
+  partner has them.
 - Published organisation OAuth app icons uploaded in Studio remain trusted
   remote images, paired with forced-light tiles on both sides.
 - Everything else falls back to `SupabaseLogo` alone.
+- If the requester name looks like a known partner but `redirect_uri` is a
+  remote host outside that partner's allowlist, show a caution admonition.
+  Localhost MCP redirects are excluded.
 
 ## Account row
 
@@ -199,6 +204,42 @@ for new states instead of inventing a parallel card style.
 
 Prefer one full-width primary action. A full-width text button is fine for a
 secondary action that still belongs in the flow.
+
+### Action feedback
+
+Match feedback to its scope:
+
+- Use `FormMessage` or `FieldError` beside a field when that field needs to
+  change.
+- Show a submission or action failure as simple destructive text below the
+  actions. Separate it with a subtle divider when needed for composition. Keep
+  the current account, selections, and actions visible so the user can retry.
+- Use `Admonition` when the whole interstitial is blocked or has materially
+  changed state, such as an invalid link, wrong account, or partially completed
+  setup.
+- Use a toast only for non-blocking feedback or a completed action whose
+  originating surface is no longer visible. A toast must not be the only
+  feedback for a failure the user needs to resolve on the current card.
+
+```tsx
+<InterstitialActionError error={actionError} />
+```
+
+Clear stale action feedback when the user retries or changes a relevant
+selection. Error copy should say what failed and, when it is not obvious, what
+the user can do next. When passive supporting copy occupies the same footer
+region, replace it with the action error until the error is cleared instead of
+stacking both messages.
+
+<ComponentPreview
+  name="connect-interstitial-action-error"
+  description="Retryable action error shown beside the actions"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
 
 ## States
 

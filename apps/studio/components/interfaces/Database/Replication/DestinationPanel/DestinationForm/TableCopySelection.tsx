@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField, Select, SelectContent, SelectItem, SelectTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
@@ -16,11 +16,11 @@ interface TableCopySelectionProps {
   editMode: boolean
 }
 
-const TABLE_COPY_LABELS = {
-  include_all_tables: 'Copy all tables',
-  skip_all_tables: 'Skip all table copies',
-  include_tables: 'Copy only selected tables',
-  skip_tables: 'Skip selected table copies',
+const INITIAL_SYNC_LABELS = {
+  include_all_tables: 'All tables',
+  skip_all_tables: 'No tables',
+  include_tables: 'Selected tables only',
+  skip_tables: 'All except selected tables',
 }
 
 const isSelectiveMode = (mode: DestinationPanelSchemaType['tableSyncCopyMode']) =>
@@ -32,7 +32,10 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
 
-  const { publicationName, tableSyncCopyMode, tableSyncCopyTableIds } = form.watch()
+  const [publicationName, tableSyncCopyMode, tableSyncCopyTableIds] = useWatch({
+    control: form.control,
+    name: ['publicationName', 'tableSyncCopyMode', 'tableSyncCopyTableIds'],
+  })
 
   const {
     data: publications = [],
@@ -75,33 +78,35 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Initial table copy"
-            description="Choose which existing rows to copy before change streaming begins. All publication tables continue streaming new changes."
+            label="Initial sync"
+            description="Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped."
           >
             <FormControl>
               <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>{TABLE_COPY_LABELS[field.value]}</SelectTrigger>
+                <SelectTrigger>{INITIAL_SYNC_LABELS[field.value]}</SelectTrigger>
                 <SelectContent>
                   <SelectItem value="include_all_tables" className="[&>span]:top-2.5">
-                    <p>Copy all tables</p>
-                    <p className="text-foreground-lighter">Copy existing rows from every table.</p>
+                    <p>All tables</p>
+                    <p className="text-foreground-lighter">
+                      Run initial sync for every publication table.
+                    </p>
                   </SelectItem>
                   <SelectItem value="skip_tables" className="[&>span]:top-2.5">
-                    <p>Skip selected table copies</p>
+                    <p>All except selected tables</p>
                     <p className="text-foreground-lighter">
-                      Stream selected tables without copying existing rows.
+                      Skip initial sync for selected tables.
                     </p>
                   </SelectItem>
                   <SelectItem value="include_tables" className="[&>span]:top-2.5">
-                    <p>Copy only selected tables</p>
+                    <p>Selected tables only</p>
                     <p className="text-foreground-lighter">
-                      Only copy existing rows from selected tables.
+                      Run initial sync only for selected tables.
                     </p>
                   </SelectItem>
                   <SelectItem value="skip_all_tables" className="[&>span]:top-2.5">
-                    <p>Skip all table copies</p>
+                    <p>No tables</p>
                     <p className="text-foreground-lighter">
-                      Start streaming without copying any existing rows.
+                      Skip initial sync and replicate new changes only.
                     </p>
                   </SelectItem>
                 </SelectContent>
@@ -112,10 +117,10 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
       />
 
       {editMode && (
-        <Admonition type="note" title="Only applies to tables pending initial sync">
+        <Admonition type="note" title="Changes apply only before initial sync completes">
           <p className="leading-normal!">
-            Tables that already completed their initial sync will not be re-copied until they
-            require one again.
+            Tables that have completed initial sync will not sync existing rows again unless you
+            restart them.
           </p>
         </Admonition>
       )}
@@ -123,7 +128,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
       {isErrorPublications && (
         <Admonition type="warning" title="Publication tables could not be loaded">
           <p className="leading-normal!">
-            Refresh before changing or saving the initial copy configuration.
+            Refresh the page before changing or saving the initial sync settings.
           </p>
         </Admonition>
       )}
@@ -135,11 +140,13 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label={tableSyncCopyMode === 'skip_tables' ? 'Tables to skip' : 'Tables to copy'}
+              label={
+                tableSyncCopyMode === 'skip_tables' ? 'Tables to exclude' : 'Tables to include'
+              }
               description={
                 tableSyncCopyMode === 'skip_tables'
-                  ? `${selectedPublicationCount} of ${tableCount} publication tables will stream without an initial copy.`
-                  : `${selectedPublicationCount} of ${tableCount} publication tables will have their existing rows copied.`
+                  ? `${selectedPublicationCount} of ${tableCount} publication tables will skip initial sync. Ongoing replication will still include every publication table.`
+                  : `${selectedPublicationCount} of ${tableCount} publication tables will run initial sync. Ongoing replication will still include every publication table.`
               }
             >
               <FormControl>
@@ -191,7 +198,7 @@ export const TableCopySelection = ({ form, editMode }: TableCopySelectionProps) 
                 >
                   <p className="leading-normal!">
                     {staleSelectedCount === 1 ? 'It' : 'They'} will be excluded from this pipeline's
-                    initial-copy configuration when you save.
+                    initial sync settings when you save.
                   </p>
                 </Admonition>
               )}

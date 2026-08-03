@@ -8,28 +8,91 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 import { ServiceStatus } from './ServiceStatus'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { SingleStat } from '@/components/ui/SingleStat'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 
+interface BranchStatValueProps {
+  currentBranch?: { created_at?: string }
+  isDefaultProject: boolean
+  isError: boolean
+  isHighAvailability: boolean
+  isLoading: boolean
+  latestNonDefaultBranch?: { name?: string }
+}
+
+export const BranchStatValue = ({
+  currentBranch,
+  isDefaultProject,
+  isError,
+  isHighAvailability,
+  isLoading,
+  latestNonDefaultBranch,
+}: BranchStatValueProps) => {
+  if (isHighAvailability) {
+    return <p className="text-foreground-lighter">Unavailable</p>
+  }
+
+  if (isLoading) {
+    return <Skeleton className="h-6 w-24" />
+  }
+
+  if (isError) {
+    return <p className="text-foreground-lighter">Unable to load</p>
+  }
+
+  if (isDefaultProject) {
+    return (
+      <p
+        className={cn('truncate min-w-0', !latestNonDefaultBranch && 'text-foreground-lighter')}
+        title={latestNonDefaultBranch?.name ?? 'No branches'}
+      >
+        {latestNonDefaultBranch?.name ?? 'No branches'}
+      </p>
+    )
+  }
+
+  if (currentBranch?.created_at) {
+    return (
+      <TimestampInfo
+        className="text-base"
+        label={dayjs(currentBranch.created_at).fromNow()}
+        utcTimestamp={currentBranch.created_at}
+      />
+    )
+  }
+
+  return <p className="text-foreground-lighter">Unknown</p>
+}
+
 export const ActivityStats = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: resourceWarnings } = useResourceWarningsQuery({ slug: organization?.slug })
   const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
   const parentProjectRef = project?.parent_project_ref ?? project?.ref
 
-  const { data: branchesData, isPending: isLoadingBranches } = useBranchesQuery({
-    projectRef: parentProjectRef,
-  })
+  const {
+    data: branchesData,
+    isPending: isLoadingBranches,
+    isError: isBranchesError,
+  } = useBranchesQuery(
+    {
+      projectRef: parentProjectRef,
+    },
+    { enabled: !isHighAvailability }
+  )
   const isDefaultProject = project?.parent_project_ref === undefined
   const currentBranch = useMemo(
     () => (branchesData ?? []).find((b) => b.project_ref === ref),
@@ -132,38 +195,27 @@ export const ActivityStats = () => {
           }
         />
 
-        <SingleStat
-          href={`/project/${ref}/branches`}
-          icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
-          label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
-          trackingProperties={{
-            stat_type: 'branches',
-            stat_value: branchesData?.length ?? 0,
-          }}
-          value={
-            isLoadingBranches ? (
-              <Skeleton className="h-6 w-24" />
-            ) : isDefaultProject ? (
-              <p
-                className={cn(
-                  'truncate min-w-0',
-                  !latestNonDefaultBranch && 'text-foreground-lighter'
-                )}
-                title={latestNonDefaultBranch?.name ?? 'No branches'}
-              >
-                {latestNonDefaultBranch?.name ?? 'No branches'}
-              </p>
-            ) : currentBranch?.created_at ? (
-              <TimestampInfo
-                className="text-base"
-                label={dayjs(currentBranch.created_at).fromNow()}
-                utcTimestamp={currentBranch.created_at}
+        <DisableInteraction disabled={isHighAvailability} aria-disabled={isHighAvailability}>
+          <SingleStat
+            href={isHighAvailability ? undefined : `/project/${ref}/branches`}
+            icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
+            label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
+            trackingProperties={{
+              stat_type: 'branches',
+              stat_value: branchesData?.length ?? 0,
+            }}
+            value={
+              <BranchStatValue
+                currentBranch={currentBranch}
+                isDefaultProject={isDefaultProject}
+                isError={isBranchesError}
+                isHighAvailability={isHighAvailability}
+                isLoading={isLoadingBranches}
+                latestNonDefaultBranch={latestNonDefaultBranch}
               />
-            ) : (
-              <p className="text-foreground-lighter">Unknown</p>
-            )
-          }
-        />
+            }
+          />
+        </DisableInteraction>
 
         <SingleStat
           href={`/project/${ref}/database/migrations`}

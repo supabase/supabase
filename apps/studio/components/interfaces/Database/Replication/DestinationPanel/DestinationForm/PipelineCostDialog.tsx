@@ -27,9 +27,11 @@ import {
   type ReplicationTableIdentity,
   type TableSyncCopyConfig,
 } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useLatest } from '@/hooks/misc/useLatest'
+import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
 
 const MAX_VISIBLE_TABLES = 10
@@ -138,11 +140,15 @@ export const PipelineCostDialog = ({
 
                 <div className="flex flex-col gap-y-2">
                   <p className="text-sm font-medium text-foreground">Initial sync</p>
+                  <p className="text-xs text-foreground-lighter">
+                    Quick planning estimate using available source table information. Final usage is
+                    measured from the data successfully processed during initial sync.
+                  </p>
 
                   {copyTableCount === 0 ? (
                     <p className="text-sm text-foreground-light">
-                      No tables will be initially copied. All publication tables will still stream
-                      new changes, with no initial-copy charge.
+                      No tables will run an initial sync. Ongoing replication will still process new
+                      changes for every publication table, with no initial sync charge.
                     </p>
                   ) : copyEstimate?.isComplete ? (
                     <Card>
@@ -150,7 +156,7 @@ export const PipelineCostDialog = ({
                         <TableHeader className="[&_th]:h-auto [&_th]:py-2">
                           <TableRow>
                             <TableHead>Table</TableHead>
-                            <TableHead className="text-right">Est. size</TableHead>
+                            <TableHead className="text-right">Est. volume</TableHead>
                             <TableHead className="text-right" translate="no">
                               Est. cost ({formatCurrency(estimate.table_copy.rate_per_gb)}/GB)
                             </TableHead>
@@ -194,7 +200,7 @@ export const PipelineCostDialog = ({
                     </Card>
                   ) : (
                     <p className="text-sm text-foreground-light">
-                      An initial-copy estimate is unavailable for one or more selected tables. You
+                      An initial sync estimate is unavailable for one or more selected tables. You
                       can still create the pipeline.
                     </p>
                   )}
@@ -213,18 +219,24 @@ export const PipelineCostDialog = ({
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-x-4 text-sm">
-                    <span className="text-foreground-light">Ongoing replication data</span>
+                    <span className="text-foreground-light">
+                      Ongoing replication data processed
+                    </span>
                     <span className="shrink-0 text-right font-mono text-foreground" translate="no">
                       {formatCurrency(estimate.streaming.rate_per_gb)}/GB
                     </span>
                   </div>
                   <p className="text-xs text-foreground-lighter">
-                    Ongoing replication is billed on the volume of changes processed after the
-                    initial sync, so the total depends on how often your data changes.
+                    Ongoing replication is billed on Postgres row data accepted by the destination,
+                    so the total depends on how often your published data changes.
                   </p>
                   <p className="text-xs text-foreground-lighter">
                     Destination-provider charges, such as BigQuery ingestion, storage, and compute,
-                    are separate.
+                    are separate. See{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
+                      how data processed is measured
+                    </InlineLink>
+                    .
                   </p>
                 </div>
 
@@ -233,7 +245,7 @@ export const PipelineCostDialog = ({
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-foreground">Estimated initial sync</p>
                       <p className="text-xs text-foreground-lighter">
-                        Pipeline hours and ongoing replication data are billed separately
+                        Pipeline hours and ongoing replication are billed separately.
                       </p>
                     </div>
                     <span
@@ -247,7 +259,7 @@ export const PipelineCostDialog = ({
 
                   {copyEstimate?.isComplete && hasRowFilteredTables && (
                     <p className="text-xs text-foreground-lighter">
-                      *Tables with row filters may cost less than shown.
+                      *Row filters can reduce the data processed compared with this estimate.
                     </p>
                   )}
                 </div>

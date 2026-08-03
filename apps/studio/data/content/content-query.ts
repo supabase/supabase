@@ -35,7 +35,8 @@ interface GetContentVariables {
 
 export async function getContent(
   { projectRef, type, name, limit = 10 }: GetContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
@@ -43,6 +44,7 @@ export async function getContent(
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef }, query: { type, name, limit: limit.toString() } },
+    headers,
     signal,
   })
 

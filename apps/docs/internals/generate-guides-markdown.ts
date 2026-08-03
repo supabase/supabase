@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { parsePartialVariables, substitutePartialVars } from '~/lib/partials.utils'
 import matter from 'gray-matter'
 import type { Content, Parent, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -101,6 +102,17 @@ function propsFrom(node: JsxNode): Props {
   return props
 }
 
+function resolvePartialPath(partialPath: string): string {
+  if (!partialPath.endsWith('.md') && !partialPath.endsWith('.mdx')) {
+    throw new Error('Invalid $Partial path: path must end with .mdx or .md')
+  }
+  const resolved = path.join(PARTIALS_DIR, partialPath)
+  if (!resolved.startsWith(PARTIALS_DIR)) {
+    throw new Error(`Invalid $Partial path: path must be inside ${PARTIALS_DIR}`)
+  }
+  return resolved
+}
+
 /**
  * Replaces every `<$Partial path="..." />` in the tree with the parsed AST of
  * the referenced file. Recurses so partials may include other partials.
@@ -109,10 +121,14 @@ async function inlinePartials(parent: Parent): Promise<void> {
   const next: Content[] = []
   for (const child of parent.children as Content[]) {
     if (isJsx(child) && child.name === '$Partial') {
-      const partialPath = String(propsFrom(child).path ?? '')
+      const props = propsFrom(child)
+      const partialPath = String(props.path ?? '')
+      const variables = parsePartialVariables(props.variables)
+      const resolvedPath = resolvePartialPath(partialPath)
       try {
-        const raw = await fs.readFile(path.join(PARTIALS_DIR, partialPath), 'utf8')
-        const subtree = parseMdx(matter(raw).content)
+        const raw = await fs.readFile(resolvedPath, 'utf8')
+        const content = substitutePartialVars(matter(raw).content, variables)
+        const subtree = parseMdx(content)
         await inlinePartials(subtree)
         next.push(...(subtree.children as Content[]))
       } catch {
@@ -183,7 +199,6 @@ const SCHEMA: ComponentSchema = {
   Price,
   ...PromptPanel,
   GlassPanel: Panel,
-  IconPanel: Panel,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,

@@ -34,16 +34,15 @@ import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
 import { Badge, Button } from 'ui'
-import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
-import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from '../ui/PromptPanel'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
@@ -71,6 +70,7 @@ const components = {
   AccordionItem,
   Admonition: AdmonitionWithMargin,
   AgentPluginsPanel,
+  AiPrompt,
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
@@ -90,7 +90,6 @@ const components = {
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
-  IconPanel,
   IconX: X,
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
   Link,
@@ -101,11 +100,6 @@ const components = {
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
-  Prompt,
-  PromptContent,
-  PromptCopy,
-  PromptPanel,
-  PromptTitle,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,
