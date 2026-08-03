@@ -21,7 +21,13 @@ import {
 } from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useFirstTouchStore, useParams } from './hooks'
-import { posthogClient, type ClientTelemetryEvent } from './posthog-client'
+import {
+  buildSessionRecordingConfig,
+  posthogClient,
+  type CapturedNetworkRequest,
+  type ClientTelemetryEvent,
+  type SessionRecordingOptions,
+} from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
 import {
   clearFirstTouchData,
@@ -30,7 +36,13 @@ import {
 } from './telemetry-first-touch-store'
 import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
 
-export { posthogClient, type ClientTelemetryEvent }
+export {
+  buildSessionRecordingConfig,
+  posthogClient,
+  type CapturedNetworkRequest,
+  type ClientTelemetryEvent,
+  type SessionRecordingOptions,
+}
 
 export const TelemetryTagManager = () => {
   const { hasAccepted } = useConsentState()
@@ -255,12 +267,15 @@ export const PageTelemetry = ({
   enabled = true,
   organizationSlug,
   projectRef,
+  sessionReplay,
 }: {
   API_URL: string
   hasAcceptedConsent: boolean
   enabled?: boolean
   organizationSlug?: string
   projectRef?: string
+  /** Masking policy for session replay. Omit to disable recording. */
+  sessionReplay?: SessionRecordingOptions
 }) => {
   const router = useRouter()
 
@@ -315,9 +330,9 @@ export const PageTelemetry = ({
 
   useEffect(() => {
     if (hasAcceptedConsent && IS_PLATFORM) {
-      posthogClient.init(true)
+      posthogClient.init({ sessionReplay })
     }
-  }, [hasAcceptedConsent, IS_PLATFORM])
+  }, [hasAcceptedConsent, IS_PLATFORM, sessionReplay])
 
   // Waiting for router.isReady before sending to avoid dynamic route placeholders
   useEffect(() => {

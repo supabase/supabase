@@ -268,6 +268,10 @@ export const FileExplorerRow = ({
   const mimeType = item.metadata ? item.metadata.mimetype : '-'
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
+  const isFile = item.type === STORAGE_ROW_TYPES.FILE
+  // Files: checkbox replaces icon on hover, keyboard focus, and when selected.
+  // Folders: icon only (no selection checkbox).
+  const showRowIcon = !isFile || !isSelected
 
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
@@ -290,12 +294,14 @@ export const FileExplorerRow = ({
     >
       <div
         className={cn(
-          'storage-row group flex h-full items-center px-2.5',
+          'storage-row group flex h-full items-center px-2.5 rounded-sm',
           'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-selection' : ''}`,
-          `${isSelected ? 'bg-selection' : ''}`,
-          `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+          isOpened && 'bg-selection',
+          isSelected && 'bg-selection',
+          isPreviewed && 'bg-selection hover:bg-selection',
+          item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
+          // Keyboard focus on the checkbox: ring the whole row
+          'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
         )}
         onClick={(event) => {
           event.stopPropagation()
@@ -313,12 +319,14 @@ export const FileExplorerRow = ({
             view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
           )}
         >
-          <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
-            {!isSelected && (
+          <div className="relative flex h-4 w-[30px] shrink-0 items-center">
+            {showRowIcon && (
               <div
-                className={`absolute ${
-                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
-                }`}
+                className={cn(
+                  'absolute',
+                  // Swap icon → checkbox on hover / keyboard focus (files only)
+                  isFile && 'group-hover:hidden group-focus-within:hidden'
+                )}
                 style={{ top: '2px' }}
               >
                 <RowIcon
@@ -330,17 +338,25 @@ export const FileExplorerRow = ({
                 />
               </div>
             )}
-            <Checkbox
-              className={`${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
-                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-              }`}
-              checked={isSelected}
-              // use onClick instead of onCheckedChange to handle shift-key selection
-              onClick={(event) => {
-                onCheckItem(event.nativeEvent.shiftKey)
-              }}
-              aria-label="Check to select this item"
-            />
+            {isFile ? (
+              <Checkbox
+                className={
+                  isSelected
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100'
+                }
+                checked={isSelected}
+                // use onClick instead of onCheckedChange to handle shift-key selection
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onCheckItem(event.nativeEvent.shiftKey)
+                }}
+                aria-label="Check to select this item"
+              />
+            ) : (
+              // Reserve the same slot as the file checkbox without a focusable control
+              <span aria-hidden className="h-4 w-4 shrink-0" />
+            )}
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
             {item.name}
@@ -382,7 +398,7 @@ export const FileExplorerRow = ({
             />
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger className="focus-ring rounded-sm">
                 <div className="storage-row-menu opacity-0">
                   <MoreVertical size={16} />
                   <span className="sr-only">{item.name} actions</span>

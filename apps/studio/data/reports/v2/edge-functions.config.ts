@@ -12,6 +12,7 @@ import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { millisecondFormatter } from '@/components/ui/Charts/Charts.utils'
 import type { AnalyticsInterval } from '@/data/analytics/constants'
 import {
   analyticsLiteral,
@@ -290,10 +291,10 @@ export const edgeFunctionReports = ({
     defaultChartStyle: 'line',
     titleTooltip: 'Average execution time for edge functions.',
     YAxisProps: {
-      width: 50,
-      tickFormatter: (value: number) => `${value}ms`,
+      width: 68,
+      tickFormatter: (value: number) => millisecondFormatter(value),
     },
-    format: (value: unknown) => `${Number(value).toFixed(0)}ms`,
+    format: (value: unknown) => millisecondFormatter(Number(value)),
     dataProvider: async () => {
       const sql = METRIC_SQL.ExecutionTime(interval, filters)
       const rawData = await fetchLogs(projectRef, sql, startDate, endDate)
