@@ -88,8 +88,7 @@ export function useSupportForm(
     if (hasAppliedOrgProjectRef.current) return
     if (!urlParamsRef.current) return
     if (organizationsLoading) return
-
-    hasAppliedOrgProjectRef.current = true
+    if (organizations === undefined) return
 
     const orgSlugFromUrl =
       urlParamsRef.current.orgSlug && urlParamsRef.current.orgSlug !== NO_ORG_MARKER
@@ -118,6 +117,7 @@ export function useSupportForm(
         // Ignored: fall back to defaults when lookup fails
       })
       .finally(() => {
+        hasAppliedOrgProjectRef.current = true
         dispatch({ type: 'INITIALIZE', debugSource: 'useSupportForm' })
       })
   }, [organizations, organizationsLoading, form, dispatch])
