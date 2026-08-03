@@ -40,7 +40,7 @@ export const PermissionsAccordion = ({
     <div className="space-y-3 px-5 sm:px-6 py-6">
       <div>
         <h3 className="text-sm text-foreground">Permissions</h3>
-        <p className="text-xs text-foreground-light">
+        <p className="text-foreground-lighter text-base md:text-sm">
           Grant the minimum access this token needs. Everything defaults to None.
         </p>
       </div>

@@ -161,7 +161,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
               label="Resource access"
               description={
                 !isAccount ? (
-                  <p className="text-xs text-foreground-lighter">
+                  <p className="text-foreground-lighter text-base md:text-sm">
                     Need access to every organization and project?{' '}
                     <button
                       type="button"
