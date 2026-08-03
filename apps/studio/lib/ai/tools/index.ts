@@ -5,6 +5,7 @@ import { filterToolsByOptInLevel } from '../tool-filter'
 import { getFallbackTools } from './fallback-tools'
 import { getIncidentTools } from './incident-tools'
 import { getMcpTools } from './mcp-tools'
+import { getReportTools } from './report-tools'
 import { getSchemaTools } from './schema-tools'
 import { getStudioTools } from './studio-tools'
 import { getSupportLifecycleTools } from './support-tools'
@@ -70,6 +71,7 @@ export const getTools = async ({
         projectRef,
         connectionString,
       }),
+      ...getReportTools({ projectRef, authorization }),
       ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }
   }

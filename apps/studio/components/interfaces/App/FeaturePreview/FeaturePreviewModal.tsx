@@ -29,6 +29,7 @@ import {
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
+import { DatabaseConnectionsPreview } from './DatabaseConnectionsPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
@@ -51,6 +52,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]: <DatabaseConnectionsPreview />,
 }
 
 export const FeaturePreviewModal = () => {
@@ -94,13 +96,17 @@ export const FeaturePreviewModal = () => {
       return
     }
 
-    toggleFeaturePreviewModal(false)
     if (hasRoute) {
+      // Navigating away drops the `featurePreviewModal` query param, which is
+      // what closes the modal. Don't also close it via
+      // toggleFeaturePreviewModal — its queued nuqs URL update races the push
+      // and can navigate back to the current page, swallowing the redirect.
       router.push(selectedFeatureRoute)
       toast.success(`${selectedFeature.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })
     } else {
+      toggleFeaturePreviewModal(false)
       toast.success(`${selectedFeature.name} enabled`, {
         description: "It's now active across the dashboard.",
       })

@@ -5155,7 +5155,10 @@ export interface components {
         reasons: (
           | 'AWS_ACTIVATE_CREDITS_DEAL'
           | 'AGREEMENT_BASED_OFFER'
-          | 'NO_ACTIVE_CONTRACT_FOUND'
+          | 'NO_CONTRACT_FOUND'
+          | 'CONTRACT_INACTIVE'
+          | 'CONTRACT_TERMINATED_EARLY'
+          | 'CONTRACT_IN_SETTLING_WINDOW'
         )[]
       }
     }
