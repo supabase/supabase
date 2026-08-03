@@ -141,9 +141,12 @@ export const AWSPrivateLinkSection = () => {
         <p className="text-sm text-foreground-light">
           Are you sure you want to delete the AWS account connection for{' '}
           {selectedAccount?.aws_account_id}
-          {selectedAccount?.database_type === 'READ_REPLICA' &&
-            selectedAccount.database_identifier &&
-            ` on ${selectedAccount.database_identifier}`}
+          {selectedAccount &&
+            ` (${
+              selectedAccount.database_type === 'READ_REPLICA'
+                ? `Read replica (${selectedAccount.database_identifier ?? 'Unknown identifier'})`
+                : 'Primary database'
+            })`}
           ?
         </p>
       </ConfirmationModal>

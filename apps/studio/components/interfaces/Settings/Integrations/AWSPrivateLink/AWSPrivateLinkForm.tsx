@@ -50,9 +50,12 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
   const isNew = !account
   const { data: project } = useSelectedProjectQuery()
   const showPrivateLinkReadReplica = useFlag('privatelinkReadReplica')
+  const shouldLoadReadReplicas =
+    !!project?.ref &&
+    (isNew ? showPrivateLinkReadReplica : account?.database_type === 'READ_REPLICA')
   const { data: databases = [] } = useReadReplicasQuery(
     { projectRef: project?.ref },
-    { enabled: isNew && !!project?.ref && showPrivateLinkReadReplica }
+    { enabled: shouldLoadReadReplicas }
   )
   const { mutate: createAccount, isPending } = useAWSAccountCreateMutation()
 
