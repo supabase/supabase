@@ -432,7 +432,7 @@ export default function SqlToRest({
               </span>
               <ol className="my-0 text-foreground">
                 {relevantAssumptions.map((assumption) => (
-                  <li className="text-sm">
+                  <li key={assumption} className="text-sm">
                     <Markdown>{assumption}</Markdown>
                   </li>
                 ))}
