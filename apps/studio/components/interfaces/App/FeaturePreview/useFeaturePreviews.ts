@@ -20,10 +20,11 @@ export type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
-  const platformWebhooksEnabled = useFlag('platformWebhooks')
+  const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
-  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
+  const isSqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
+  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
 
   const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
 
@@ -64,17 +65,17 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
           name: 'Platform webhooks',
           discussionsUrl: undefined,
-          isNew: true,
+          isNew: false,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          enabled: platformWebhooksEnabled,
+          enabled: isPlatformWebhooksEnabled,
           getRoute: (ref?: string) => `/project/${ref}/settings/webhooks`,
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
-          name: 'Temporary access',
+          name: 'Temporary database access',
           discussionsUrl: undefined,
-          isNew: true,
+          isNew: false,
           isPlatformOnly: true,
           isDefaultOptIn: false,
           enabled: jitDbAccessEnabled,
@@ -107,15 +108,26 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: true,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          enabled: sqlEditorManualSaveEnabled,
+          enabled: isSqlEditorManualSaveEnabled,
+        },
+        {
+          key: LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
+          name: 'Diagnose blocked queries',
+          discussionsUrl: 'https://github.com/orgs/supabase/discussions/48639',
+          isNew: true,
+          isPlatformOnly: false,
+          isDefaultOptIn: false,
+          enabled: isDatabaseConnectionsEnabled,
+          getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
     [
       unifiedLogsDefaultOptIn,
-      platformWebhooksEnabled,
+      isPlatformWebhooksEnabled,
       jitDbAccessEnabled,
       isMarketplaceEnabled,
-      sqlEditorManualSaveEnabled,
+      isSqlEditorManualSaveEnabled,
+      isDatabaseConnectionsEnabled,
     ]
   )
 }
