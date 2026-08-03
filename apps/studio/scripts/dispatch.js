@@ -18,14 +18,10 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { getDispatchScript, getPnpmSpawnOptions } from './lib/dispatch.js'
 import { readEnvFiles } from './lib/env.js'
 
 const target = process.argv[2]
-if (!target) {
-  console.error('dispatch.js: missing target (expected one of: dev, build, start)')
-  process.exit(2)
-}
-
 const studioRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 // Shell env wins, then `.env.local`, then `.env` — the same precedence
@@ -33,17 +29,24 @@ const studioRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.
 // picked up (not just `.env.local`).
 const fileEnv = readEnvFiles(studioRoot, ['.env', '.env.local'])
 const studioFramework = process.env.STUDIO_FRAMEWORK ?? fileEnv.STUDIO_FRAMEWORK
-const framework = studioFramework === 'tanstack' ? 'tanstack' : 'next'
-const script = `${target}:${framework}`
+const script = getDispatchScript(target, studioFramework)
+
+if (!script) {
+  console.error('dispatch.js: invalid target (expected one of: dev, build, start)')
+  process.exit(2)
+}
 
 // Use async `spawn` rather than `spawnSync` — long-running dev servers
 // (vite dev / next dev) wedge under `spawnSync` because Node holds the
 // event loop and stdin doesn't flow through cleanly. The dev server says
 // "ready" then exits ~1s later. `spawn` + manual forwarding keeps the
 // child interactive and lets the parent exit cleanly when the child does.
+// Windows needs a shell to resolve pnpm.cmd; spawning `pnpm` directly
+// otherwise fails with ENOENT even when pnpm is available in PowerShell.
 const child = spawn('pnpm', ['run', script], {
   stdio: 'inherit',
   env: process.env,
+  ...getPnpmSpawnOptions(),
 })
 
 const forwardSignal = (signal) => {
