@@ -1,13 +1,12 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { http, HttpResponse } from 'msw'
+import { HttpResponse } from 'msw'
 import { toast } from 'sonner'
 import { beforeEach, expect, test, vi } from 'vitest'
 
-import { API_URL } from '@/lib/constants'
 import { StripeProjectsLoginPage } from '@/pages/partners/stripe/projects/login'
-import { render } from '@/tests/helpers'
-import { mswServer } from '@/tests/lib/msw'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const mocks = vi.hoisted(() => ({
   routerPush: vi.fn(),
@@ -62,13 +61,14 @@ beforeEach(() => {
 
 test('shows confirmation failures inline and keeps authorization available', async () => {
   const user = userEvent.setup()
-  mswServer.use(
-    http.post(`${API_URL}/platform/stripe/projects/provisioning/account_requests/:id/confirm`, () =>
-      HttpResponse.json({ message: 'Confirmation failed' }, { status: 500 })
-    )
-  )
+  addAPIMock({
+    method: 'post',
+    path: '/platform/stripe/projects/provisioning/account_requests/:id/confirm',
+    response: () =>
+      HttpResponse.json<APIErrorBody>({ message: 'Confirmation failed' }, { status: 500 }),
+  })
 
-  render(<StripeProjectsLoginPage dehydratedState={undefined} />)
+  customRender(<StripeProjectsLoginPage dehydratedState={undefined} />)
 
   await user.click(screen.getByRole('button', { name: 'Authorize Stripe Projects' }))
 
