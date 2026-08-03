@@ -38,7 +38,7 @@ See per-service updates below for details. Only the most important changes relev
 - Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.3` (requires `docker-compose.nginx.yml` update)
 
 ### Studio
-- Updated to `2026.03.08-sha-xxxxxxx`
+- Updated to `2026.08.03-sha-022b374`
 - Fixed URL generation for Edge Functions - PR [#47861](https://github.com/supabase/supabase/pull/47861) (via [@7ttp](https://github.com/7ttp))
 - Fixed the Logs tab visibility in **Auth > Users** - PR [#48122](https://github.com/supabase/supabase/pull/48122) (via [@luizfelmach](https://github.com/luizfelmach/))
 

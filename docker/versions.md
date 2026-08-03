@@ -1,7 +1,7 @@
 # Docker image version updates in docker-compose.yml
 
 ## 2026-08-03
-- supabase/studio:2026.03.08-sha-xxxxxxx (prev supabase/studio:2026.07.07-sha-a6a04f2)
+- supabase/studio:2026.08.03-sha-022b374 (prev supabase/studio:2026.07.07-sha-a6a04f2)
 - kong/kong:3.9.3 (prev kong/kong:3.9.1)
 
 ## 2026-07-07
