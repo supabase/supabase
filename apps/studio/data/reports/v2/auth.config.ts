@@ -323,17 +323,7 @@ const AUTH_REPORT_SQL: Record<
   },
 }
 
-// --- OTEL / ClickHouse variants -------------------------------------------------
-// The OTEL `logs` table is a single table keyed by `source`. For `auth_logs` the
-// per-event fields the BigQuery queries read via `json_value(event_message, "$.x")`
-// are still only present in the raw JSON `event_message`, so they are extracted with
-// ClickHouse `JSONExtractString`. For `edge_logs` the request/response fields live in
-// the `log_attributes` Map, matching the API report migration. Result column names
-// are kept identical to the BigQuery builders so the formatters need no changes.
-
-// The chart consumer (`fillTimeseries`/`isUnixMicro`) treats `timestamp` as a
-// 16-digit unix-microsecond number, which is what BigQuery `timestamp_trunc` returns.
-// ClickHouse `toStartOf*` yields a second-precision DateTime, so convert to micros.
+// fillTimeseries/isUnixMicro expects a 16-digit unix-microsecond timestamp, matching BigQuery's timestamp_trunc.
 const OTEL_TIMESTAMP: Record<Granularity, SafeLogSqlFragment> = {
   minute: safeSql`toUnixTimestamp(toStartOfMinute(timestamp)) * 1000000`,
   hour: safeSql`toUnixTimestamp(toStartOfHour(timestamp)) * 1000000`,

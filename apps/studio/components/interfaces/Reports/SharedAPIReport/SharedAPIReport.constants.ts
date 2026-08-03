@@ -20,21 +20,12 @@ function sourceTable(src: string): SafeLogSqlFragment {
   return SOURCE_TABLE[src] ?? SOURCE_TABLE.edge_logs
 }
 
-// --- OTEL / ClickHouse variants -------------------------------------------------
-// The OTEL `logs` table is a single table keyed by `source`, with request/response
-// fields stored in the `log_attributes` Map. These helpers mirror the BigQuery
-// builders so the chart-facing result columns (timestamp/count/avg/path/...) stay
-// identical; only the SQL dialect changes.
-
 const OTEL_SOURCE = new Set(['edge_logs', 'function_edge_logs'])
 const otelSourceName = (src: string): string => (OTEL_SOURCE.has(src) ? src : 'edge_logs')
 
-// The chart consumer (`fillTimeseries`/`isUnixMicro`) treats `timestamp` as a
-// 16-digit unix-microsecond number; ClickHouse `toStartOfHour` yields a
-// second-precision DateTime, so convert to micros.
+// fillTimeseries/isUnixMicro expects a 16-digit unix-microsecond timestamp, matching BigQuery's timestamp_trunc.
 const OTEL_TIMESTAMP: SafeLogSqlFragment = safeSql`toUnixTimestamp(toStartOfHour(timestamp)) * 1000000`
 
-/** `where source = '<src>' [and <extra>] [and <user filters>]` for the OTEL logs table. */
 function otelWhere(
   src: string,
   filters: ReportFilterItem[],
@@ -326,8 +317,6 @@ export const useSharedAPIReport = ({
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const queryClient = useQueryClient()
 
-  // When enabled, route report queries through the OTEL ClickHouse endpoint
-  // (logs.all.otel) with the ClickHouse SQL variants instead of BigQuery.
   const useOtel = useFlag('otelReports')
   const buildSql = (entry: (typeof SHARED_API_REPORT_SQL)[SharedAPIReportKey]) =>
     useOtel ? entry.safeSqlOtel : entry.safeSql

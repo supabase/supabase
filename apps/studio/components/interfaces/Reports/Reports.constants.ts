@@ -143,16 +143,7 @@ export function generateRegexpWhereSafe(
   return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
 }
 
-/**
- * OTEL/ClickHouse counterpart of `generateRegexpWhereSafe`. Each filter key maps
- * to a `log_attributes['<key>']` lookup (the OTEL `logs` table stores per-request
- * fields in that Map, keyed by the *full* dotted path, e.g.
- * `request.headers.x_client_info` — unlike BigQuery, which unnests `request.headers`
- * into an aliased `headers` struct and so only needs the last two segments). `matches`
- * uses ClickHouse `match()` (re2), ordering comparisons cast the string value to an
- * int, and equality compares string-to-string. Mirrors the BigQuery generator's value
- * lowercasing for parity, but keeps the key untruncated.
- */
+// Key is used as-is here: log_attributes is keyed by the full dotted path, unlike the BigQuery unnest above.
 export function generateOtelWhereSafe(
   filters: ReportFilterItem[],
   prepend = true
