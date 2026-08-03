@@ -196,7 +196,7 @@ export const useRealtimeMessages = (
 
         newChannel.unsubscribe()
         setChannel(undefined)
-        setRealtimeConfig({ ...config, channelName: '', enabled: false })
+        setRealtimeConfig((prev) => ({ ...prev, channelName: '', enabled: false }))
       }
     })
 
@@ -213,6 +213,7 @@ export const useRealtimeMessages = (
     enablePresence,
     filter,
     host,
+    isChannelPrivate,
     schema,
     table,
   ])
