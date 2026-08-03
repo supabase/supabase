@@ -18,7 +18,7 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { getDispatchScript, getPnpmSpawnOptions } from './lib/dispatch.js'
+import { getDispatchScript, getPnpmSpawnInvocation } from './lib/dispatch.js'
 import { readEnvFiles } from './lib/env.js'
 
 const target = process.argv[2]
@@ -43,10 +43,11 @@ if (!script) {
 // child interactive and lets the parent exit cleanly when the child does.
 // Windows needs a shell to resolve pnpm.cmd; spawning `pnpm` directly
 // otherwise fails with ENOENT even when pnpm is available in PowerShell.
-const child = spawn('pnpm', ['run', script], {
+const pnpm = getPnpmSpawnInvocation(script)
+const child = spawn(pnpm.command, pnpm.args, {
   stdio: 'inherit',
   env: process.env,
-  ...getPnpmSpawnOptions(),
+  ...pnpm.options,
 })
 
 const forwardSignal = (signal) => {
