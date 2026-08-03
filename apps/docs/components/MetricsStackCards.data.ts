@@ -43,7 +43,7 @@ export const metricsStackOptions: MetricsStackOption[] = [
     title: 'Elastic',
     description:
       'Agentlessly ship Supabase metrics to Kibana using the Elastic Supabase Integration, with a native OpenTelemetry experience end to end.',
-    href: 'https://www.elastic.co/docs/reference/integrations/statsd_input',
+    href: 'https://www.elastic.co/docs/reference/integrations/supabase',
     iconKind: 'elastic',
     iconColor: '#00BFB3',
     iconBg: 'rgba(0,191,179,0.1)',

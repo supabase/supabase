@@ -3048,7 +3048,7 @@ export const telemetry: NavMenuConstant = {
             },
             {
               name: 'Elastic',
-              url: 'https://www.elastic.co/docs/reference/integrations/statsd_input' as `/${string}`,
+              url: 'https://www.elastic.co/docs/reference/integrations/supabase' as `/${string}`,
             },
             {
               name: 'Vendor-agnostic setup',
