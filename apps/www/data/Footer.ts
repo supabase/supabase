@@ -105,10 +105,6 @@ const footerData = [
         url: '/security',
       },
       {
-        text: 'DPA',
-        url: '/legal/dpa',
-      },
-      {
         text: 'SOC2',
         url: '/security',
       },

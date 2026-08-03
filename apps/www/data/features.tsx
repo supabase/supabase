@@ -672,7 +672,7 @@ Schema change support is currently in beta and limited to supported BigQuery cha
 Pipelines keeps the current destination table state synchronized. It does not automatically create a queryable history of every row version.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
     docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
     slug: 'supabase-pipelines',
     status: {

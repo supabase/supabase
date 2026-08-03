@@ -241,6 +241,7 @@ Qiao Han
 Quintin Willison
 Rafael Chacón
 Raminder Singh
+Rand Arete
 Raúl Barroso
 Riccardo Busetti
 Richard Kasprzak
@@ -324,7 +325,7 @@ Supabase would not be possible without the work of some other amazing open sourc
 
 - Postgres - https://www.postgresql.org/
 - PostgREST - https://github.com/PostgREST
-- Kong - https://github.com/kong/
+- Envoy - https://github.com/envoyproxy/envoy
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
 - shadcn/ui - https://ui.shadcn.com/

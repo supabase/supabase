@@ -20,6 +20,8 @@ import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/Conne
 import {
   buildConnectionParameters,
   buildConnectionStringWithPassword,
+  buildJdbcString,
+  buildPsqlCommand,
   buildSafeConnectionString,
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
@@ -38,12 +40,6 @@ import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
-const buildPsqlCommand = (params: { host: string; port: string; database: string; user: string }) =>
-  `psql -h ${params.host} -p ${params.port} -d ${params.database} -U ${params.user}`
-
-const buildJdbcString = (params: { host: string; port: string; database: string; user: string }) =>
-  `jdbc:postgresql://${params.host}:${params.port}/${params.database}?user=${params.user}&password=${PASSWORD_PLACEHOLDER}`
-
 /**
  * [Joshen] ConnectStepsSection does something similar but since only this page needs to consider connection strings
  * from all databases (including read replicas), am opting to separate the logic for retrieving connection strings here
@@ -54,10 +50,18 @@ const buildJdbcString = (params: { host: string; port: string; database: string;
 const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
-  const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+  // Multigres has no pooler, so the pooler config endpoints don't apply
+  const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
+  const { data: supavisorConfig } = useSupavisorConfigurationQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
@@ -115,6 +119,7 @@ const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
             connectionStringsShared,
             connectionStringsDedicated,
             ipv4Addon: !!ipv4Addon,
+            isHighAvailability,
           }),
         ]
       })
@@ -127,6 +132,7 @@ const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
     ipv4Addon,
     projectRef,
     deploymentMode,
+    isHighAvailability,
   ])
 }
 
