@@ -8,6 +8,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -98,6 +99,9 @@ export const CreateWorkOSIntegrationDialog = ({
           <DialogTitle className="truncate">
             {isCreating ? `Add new WorkOS connection` : `Update existing WorkOS connection`}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Add a WorkOS connection by registering the issuer URL for this Supabase project.
+          </DialogDescription>
         </DialogHeader>
 
         <Separator />

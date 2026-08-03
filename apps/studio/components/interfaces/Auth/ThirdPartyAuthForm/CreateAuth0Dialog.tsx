@@ -8,6 +8,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -93,6 +94,10 @@ export const CreateAuth0IntegrationDialog = ({
           <DialogTitle className="truncate">
             {isCreating ? `Add new Auth0 connection` : `Update existing Auth0 connection`}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Add an Auth0 connection so JWTs issued by your Auth0 tenant can access this Supabase
+            project.
+          </DialogDescription>
         </DialogHeader>
         <Separator />
         <DialogSection>
