@@ -216,9 +216,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         with:
           version: latest
 
@@ -250,6 +250,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+  environment: staging #This name must match your env name for your secrets
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -257,9 +258,9 @@ jobs:
       SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         with:
           version: latest
 
@@ -282,6 +283,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+  environment: production 
 
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
