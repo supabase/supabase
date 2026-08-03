@@ -2621,6 +2621,7 @@ export const security: NavMenuConstant = {
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+        { name: 'GDPR', url: '/guides/security/gdpr-compliance' },
       ],
     },
     {
