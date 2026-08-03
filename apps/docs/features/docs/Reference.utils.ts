@@ -197,7 +197,9 @@ export async function generateReferenceMetadata(
     const { path } = parsedPath
     const operationSlug = path[0]
 
-    const flattenedSections = operationSlug ? await getFlattenedSections('api', 'latest') : undefined
+    const flattenedSections = operationSlug
+      ? await getFlattenedSections('api', 'latest')
+      : undefined
     const sectionTitle = flattenedSections?.find((section) => section.slug === operationSlug)?.title
 
     const url = [BASE_PATH, 'reference', 'api', operationSlug].filter(Boolean).join('/')
