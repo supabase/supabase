@@ -427,7 +427,9 @@ export default function SqlToRest({
         >
           {relevantAssumptions.length > 0 && (
             <div>
-              <h3 className="my-1 text-base text-inherit">Assumptions</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                Assumptions
+              </span>
               <ol className="my-0 text-foreground">
                 {relevantAssumptions.map((assumption) => (
                   <li className="text-sm">
@@ -440,7 +442,9 @@ export default function SqlToRest({
 
           {relevantFaqs.length > 0 && (
             <>
-              <h3 className="my-1 text-base text-inherit">FAQs</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                FAQs
+              </span>
               {relevantFaqs.map((faq) => (
                 <Collapsible
                   key={faq.id}
