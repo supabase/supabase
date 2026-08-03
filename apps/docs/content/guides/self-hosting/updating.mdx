@@ -40,6 +40,12 @@ Your secrets and data are never merged. The values in the `.env` file you set ar
 - `update.sh` needs `git` and `jq` on the host.
 - Deployments created with `setup.sh` record their version in `.supabase-version`, and `update.sh` advances it after each successful update. If that file is missing, refer to [Setting a recorded version](#setting-a-recorded-version).
 
+If your deployment predates `update.sh` - it ships with the self-hosted configuration from v0.7.1 onward - download it into your deployment directory first. You only need to do this once; later updates keep the script current for you.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/supabase/supabase/master/docker/update.sh -o update.sh
+```
+
 ## How to update
 
 Preview what would change, without affecting anything:
