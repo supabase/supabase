@@ -21,6 +21,36 @@ If a lock timeout error occurs, in your migration file, consider increasing your
 
 </Admonition>
 
+### Preview lock impact before applying
+
+`lock_timeout` limits the damage when a heavy statement runs against a populated table, but it doesn't tell you that a statement was dangerous in the first place. Some DDL takes an `ACCESS EXCLUSIVE` lock that blocks reads and writes for the duration of the rewrite, including:
+
+- `add column ... not null` on an existing table without a default
+- `create index` (without `concurrently`) on a large table
+- `alter column ... type` on a column that requires a full table rewrite
+
+Before you apply a migration, run it through a migration-safety linter. The three open-source options below each read your SQL and report the lock mode of every statement, plus a safer rewrite where one exists:
+
+- [Squawk](https://squawkhq.com) — TypeScript-based, the original Postgres migration linter
+- [Eugene](https://github.com/kaaveland/eugene) — Rust-based, focused on safe online migrations
+- [pgfence](https://pgfence.com) — Python-based, integrates with the Postgres language server
+
+To see which locks a statement is currently waiting on or holding against your running database, query `pg_locks` directly:
+
+```sql name=supabase/migrations/<timestamp>_inspect_locks.sql
+select
+  relation::regclass as table_name,
+  mode,
+  granted,
+  pg_size_pretty(pg_relation_size(relation)) as table_size
+from pg_locks
+join pg_class on pg_class.oid = pg_locks.relation
+where relation is not null
+order by table_size desc;
+```
+
+A long-running migration that shows a non-`granted` row on a large table is the same footgun the linters warn about. Rewriting the migration to take a weaker lock (for example, `create index concurrently`) lets reads and writes continue while the index builds.
+
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
