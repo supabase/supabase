@@ -43,6 +43,17 @@ describe('SHARED_API_REPORT_SQL safeSqlOtel', () => {
     expect(out).toContain("match(log_attributes['request.path'], '/auth')")
   })
 
+  it('preserves the full dotted key for 3-segment filters (e.g. request headers)', () => {
+    const headerFilter: ReportFilterItem = {
+      key: 'request.headers.x_client_info',
+      value: 'supabase-js',
+      compare: 'is',
+    }
+    const out = sql(SHARED_API_REPORT_SQL.totalRequests.safeSqlOtel([headerFilter]))
+    expect(out).toContain("log_attributes['request.headers.x_client_info'] = 'supabase-js'")
+    expect(out).not.toContain("log_attributes['headers.x_client_info']")
+  })
+
   it('reads route dimensions from log_attributes with an int status_code', () => {
     const out = sql(SHARED_API_REPORT_SQL.topRoutes.safeSqlOtel([]))
 

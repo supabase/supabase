@@ -146,10 +146,12 @@ export function generateRegexpWhereSafe(
 /**
  * OTEL/ClickHouse counterpart of `generateRegexpWhereSafe`. Each filter key maps
  * to a `log_attributes['<key>']` lookup (the OTEL `logs` table stores per-request
- * fields in that Map, keyed by the same dotted path). `matches` uses ClickHouse
- * `match()` (re2), ordering comparisons cast the string value to an int, and
- * equality compares string-to-string. Mirrors the BigQuery generator's key
- * normalization and value lowercasing for parity.
+ * fields in that Map, keyed by the *full* dotted path, e.g.
+ * `request.headers.x_client_info` — unlike BigQuery, which unnests `request.headers`
+ * into an aliased `headers` struct and so only needs the last two segments). `matches`
+ * uses ClickHouse `match()` (re2), ordering comparisons cast the string value to an
+ * int, and equality compares string-to-string. Mirrors the BigQuery generator's value
+ * lowercasing for parity, but keeps the key untruncated.
  */
 export function generateOtelWhereSafe(
   filters: ReportFilterItem[],
@@ -159,12 +161,7 @@ export function generateOtelWhereSafe(
 
   const conditions = filters
     .map((filter) => {
-      const splitKey = filter.key.split('.')
-      const normalizedKey = filter.key.includes('.')
-        ? [splitKey[splitKey.length - 2], splitKey[splitKey.length - 1]].join('.')
-        : filter.key
-
-      const col = safeLogSql`log_attributes[${analyticsLiteral(normalizedKey)}]`
+      const col = safeLogSql`log_attributes[${analyticsLiteral(filter.key)}]`
 
       const valueIsNumber = !isNaN(Number(filter.value))
       const stringLit = analyticsLiteral(String(filter.value).toLowerCase())
