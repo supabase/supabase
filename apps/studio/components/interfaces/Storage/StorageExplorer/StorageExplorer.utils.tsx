@@ -1,3 +1,4 @@
+import { escapeRegExp } from 'lodash'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
@@ -99,7 +100,14 @@ export function sanitizeNameForDuplicateInColumn(
       const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
       const fileExt = fileNameSegments[fileNameSegments.length - 1]
 
-      const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
+      // Escape the user-controlled name/extension before interpolating into a
+      // RegExp. Storage object keys may contain regex-special characters (e.g.
+      // `(`, `)`, `+`, `*`, `?`) which would otherwise corrupt the pattern -
+      // producing an incorrect duplicate count (and thus a name that already
+      // exists) or, for unbalanced parens, throwing a SyntaxError.
+      const dupeNameRegex = new RegExp(
+        `${escapeRegExp(fileName)} \\([-0-9]+\\)${fileExt ? '\\.' + escapeRegExp(fileExt) : ''}$`
+      )
       const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
         item.name.match(dupeNameRegex)
       )
