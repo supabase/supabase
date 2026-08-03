@@ -1,5 +1,5 @@
 import { parseAsString, useQueryState } from 'nuqs'
-import { Dialog, DialogContent, DialogSection, DialogTitle } from 'ui'
+import { Dialog, DialogContent, DialogDescription, DialogSection, DialogTitle } from 'ui'
 
 import { TerminalInstructions } from './TerminalInstructions'
 
@@ -16,6 +16,9 @@ export const TerminalInstructionsDialog = () => {
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent size="large">
         <DialogTitle className="sr-only">Create your first Edge Function via the CLI</DialogTitle>
+        <DialogDescription className="sr-only">
+          Follow the CLI instructions to create your first Edge Function for this project.
+        </DialogDescription>
         <DialogSection padding="small">
           <TerminalInstructions closable={false} />
         </DialogSection>
