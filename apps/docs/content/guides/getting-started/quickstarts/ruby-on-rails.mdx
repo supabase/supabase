@@ -20,6 +20,7 @@ Check the [Rails docs](https://guides.rubyonrails.org/getting_started.html) for 
 
 ```bash
 rails new blog -d=postgresql
+cd blog
 ```
 
 ## 3. Install Supabase's Agent Skills (optional)
@@ -42,7 +43,7 @@ The Supabase MCP server connects AI assistants to Supabase, allowing you to inte
 
 Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&connectTab=direct&method=session).
 
-Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
+Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password, and [percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
 
 <Admonition type="note">
 
@@ -50,10 +51,10 @@ If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/
 
 </Admonition>
 
-Set the connection string as an environment variable. Rails reads `DATABASE_URL` from the environment and connects with it, so you don't need to edit `config/database.yml`. The export applies to the current shell session, so run it in the same shell as the Rails commands in the following steps.
+Set the connection string as an environment variable. Rails reads `DATABASE_URL` from the environment and connects with it, so you don't need to edit `config/database.yml`. The export applies to the current shell session, so run it in the same shell as the Rails commands in the following steps. `sslmode=require` stops the driver from falling back to sending your data in plaintext.
 
 ```bash
-export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres
+export DATABASE_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres?sslmode=require
 ```
 
 ## 6. Create and run a database migration
