@@ -14,7 +14,21 @@ Because the headers follow the W3C standard, any compliant tracing SDK (OpenTele
 - `@opentelemetry/api` available at runtime — either installed directly or pulled in as a transitive dependency of your tracing SDK
 - A tracing SDK that registers a W3C-compliant propagator with the OpenTelemetry API
 
-If `@opentelemetry/api` is not installed, or there is no active trace context at request time, the SDK silently no-ops.
+<Admonition type="caution">
+
+As of `@supabase/supabase-js` version `2.112.0`, the OpenTelemetry integration lives in an opt-in subpath that you load once at your application entry point:
+
+```ts
+import '@supabase/supabase-js/tracing'
+```
+
+The main bundle contains no OpenTelemetry code — this import is what wires it up. The subpath imports `@opentelemetry/api` directly, so your bundler includes it and module resolution fails loudly if it isn't installed. If `tracePropagation` is enabled without this import, the SDK logs a one-time warning and sends requests without trace headers.
+
+On versions `2.106.0`–`2.111.x`, the subpath doesn't exist — don't add the import there. Those versions load `@opentelemetry/api` dynamically and silently no-op when it's missing.
+
+</Admonition>
+
+Trace propagation isn't available through the CDN (UMD) build — there's no way to load the tracing runtime there.
 
 ## Set up OpenTelemetry first
 
@@ -24,9 +38,11 @@ The Supabase SDK only takes care of propagating the trace context that's already
 
 ## Enable trace propagation
 
-Trace propagation is opt-in. Pass `tracePropagation: true` when creating the client:
+Trace propagation is opt-in and takes two steps: load the tracing runtime at your entry point (version `2.112.0` and later), and pass `tracePropagation: true` when creating the client:
 
 ```ts
+import '@supabase/supabase-js/tracing'
+
 import { trace } from '@opentelemetry/api'
 import { createClient } from '@supabase/supabase-js'
 
@@ -50,6 +66,8 @@ For security, trace headers are only attached to requests targeting Supabase dom
 Pass an object instead of `true` for fine-grained control:
 
 ```ts
+import '@supabase/supabase-js/tracing'
+
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   tracePropagation: {
     enabled: true,
@@ -81,10 +99,12 @@ Many tracing SDKs are built on top of OpenTelemetry. They work with this guide a
 
 ## Troubleshooting
 
-The SDK silently no-ops when it can't propagate, which keeps it safe to enable but can mask configuration issues. If `trace_id` is missing from your Supabase logs, check these in order:
+The SDK never throws when it can't propagate, which keeps it safe to enable but can mask configuration issues. If `trace_id` is missing from your Supabase logs, check these in order:
 
+- **The tracing runtime isn't loaded** (version `2.112.0` and later). `tracePropagation` is enabled but your entry point never imports `@supabase/supabase-js/tracing`. The SDK logs a one-time console warning and sends requests without trace headers — look for that warning in your console.
 - **No active span at request time.** The SDK reads the _current_ context. If `supabase.from(...)` is called outside `tracer.startActiveSpan(...)` (or equivalent), there's nothing to propagate. Wrap the call in a span or use OpenTelemetry's automatic instrumentation.
-- **`@opentelemetry/api` is not installed** in the app making the request. The SDK imports it dynamically and no-ops if it's missing.
+- **`@opentelemetry/api` is not installed** in the app making the request. On `2.112.0` and later the tracing subpath imports it directly, so a missing package surfaces as a module resolution error. On `2.106.0`–`2.111.x` it's loaded dynamically and the SDK silently no-ops.
 - **No `TracerProvider` registered.** `@opentelemetry/api` defaults to a noop provider that produces non-recorded spans. Make sure your app calls `provider.register()` (or your vendor SDK's equivalent) before making requests.
 - **The upstream trace is not sampled.** By default the SDK respects upstream sampling decisions. Set `respectSamplingDecision: false` to propagate every request regardless of sampling.
 - **You're calling a non-Supabase host through a custom `fetch`.** Trace headers are only attached to Supabase domains (`*.supabase.co`, `*.supabase.in`, `localhost`).
+- **You're using the CDN (UMD) build.** Trace propagation isn't available there — the tracing runtime can't be loaded from a script tag.
