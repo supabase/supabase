@@ -4,7 +4,9 @@ import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { ObservabilityMenu } from './ObservabilityMenu'
+import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { BannerDatabaseConnections } from '@/components/ui/BannerStack/Banners/BannerDatabaseConnections'
 import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
@@ -30,7 +32,27 @@ const ObservabilityLayoutContent = ({
     false
   )
 
+  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
+
+  const [isDatabaseConnectionsBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+
   const prevPathnameRef = useRef(pathname)
+
+  useEffect(() => {
+    if (!isDatabaseConnectionsBannerDismissed && !isDatabaseConnectionsEnabled) {
+      addBanner({
+        id: 'database-connections-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerDatabaseConnections />,
+      })
+    } else {
+      dismissBanner('database-connections-banner')
+    }
+  }, [addBanner, dismissBanner, isDatabaseConnectionsBannerDismissed, isDatabaseConnectionsEnabled])
 
   useEffect(() => {
     const isQueryPerformancePage = pathname?.includes('/query-performance')
