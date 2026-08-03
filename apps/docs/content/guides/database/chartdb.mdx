@@ -1,0 +1,116 @@
+---
+id: 'chartdb'
+title: 'Connecting to ChartDB'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+[`ChartDB`](https://chartdb.io/) is an open source database diagramming tool. You can use it to visualize your Supabase database schema with live ERD diagrams that automatically sync.
+
+<Admonition type="note">
+  ChartDB only reads your database schema metadata. It does not access your actual data.
+</Admonition>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Create New Diagram">
+
+    Go to the [ChartDB app](https://app.chartdb.io/) and click **New Diagram** to open the diagram creation dialog.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Select Supabase Database">
+
+    In the database selection screen, choose **Supabase** (the green lightning bolt icon), then click **Continue**.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Select Supabase database](/docs/img/guides/database/connecting-to-postgres/chartdb/select-supabase-database.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Choose Cloud Platforms Connection">
+
+    On the import method screen, select **Cloud Platforms** which shows the OAuth option.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Connect with Supabase OAuth](/docs/img/guides/database/connecting-to-postgres/chartdb/connect-with-supabase-oauth.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Authenticate with Supabase">
+
+    Click the **Connect with Supabase** button. A popup window will open directing you to the Supabase authentication page. Log in with your Supabase account credentials and authorize ChartDB to access your projects.
+
+    <Admonition type="note">
+    Make sure popups are enabled for ChartDB in your browser.
+    </Admonition>
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+
+    <StepHikeCompact.Details title="Select Project and Enter Password">
+
+    After successful authentication, you'll see a list of your Supabase projects. Select the project you want to visualize, then enter your Supabase database password.
+
+    You can find your database password in your [Database Settings](/dashboard/project/_/database/settings).
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Select project and enter password](/docs/img/guides/database/connecting-to-postgres/chartdb/supabase-project-password.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+
+    <StepHikeCompact.Details title="Connect & Import">
+
+    Click **Connect & Import** to start the synchronization process. ChartDB will import your schema metadata and redirect you to your new diagram.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={7}>
+
+    <StepHikeCompact.Details title="Re-sync Your Database">
+
+    Your Supabase database automatically syncs every hour. To manually trigger a re-sync, click the **Connected** button in the top navigation bar and select **Re-sync Now**.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ![Re-sync database](/docs/img/guides/database/connecting-to-postgres/chartdb/supabase-connection-status-resync.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
