@@ -1,6 +1,10 @@
 import { withDocsBasePath } from '~/internals/internal-links'
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
-import { getContentListingById, isExternalContentListingHref } from '~/lib/content-listings.utils'
+import {
+  filterContentListingItems,
+  getContentListingById,
+  isExternalContentListingHref,
+} from '~/lib/content-listings.utils'
 
 import { getInternalLinkBaseUrl } from '../internal-links'
 
@@ -14,6 +18,9 @@ export function serializeContentListingGroupToMarkdown(
   group: ContentListingGroup,
   linkBaseUrl: string
 ): string {
+  const items = filterContentListingItems(group.items)
+  if (!items.length) return ''
+
   const lines: string[] = []
   if (group.heading) {
     const level = group.headingLevel ?? 'h2'
@@ -26,7 +33,7 @@ export function serializeContentListingGroupToMarkdown(
     lines.push('')
   }
 
-  for (const item of group.items) {
+  for (const item of items) {
     const href = isExternalContentListingHref(item.href)
       ? item.href
       : `${linkBaseUrl}${withDocsBasePath(item.href)}`

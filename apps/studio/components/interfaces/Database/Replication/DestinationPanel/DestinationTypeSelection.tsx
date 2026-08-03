@@ -1,7 +1,4 @@
-import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
-import { Snowflake } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
-import type { ElementType } from 'react'
 import {
   Badge,
   Select,
@@ -14,6 +11,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { DestinationIcon } from '../DestinationIcon'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -30,7 +28,6 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  icon: ElementType<{ size?: number; className?: string; strokeWidth?: number }>
   stage: 'Public Alpha' | 'Early Access' | 'Deprecated' | null
   enabled: boolean
 }
@@ -38,12 +35,6 @@ interface DestinationTypeOption {
 interface DestinationTypeGroup {
   label: string
   options: DestinationTypeOption[]
-}
-
-function DestinationOptionIcon({ option }: { option: DestinationTypeOption }) {
-  const Icon = option.icon
-
-  return <Icon size={20} strokeWidth={1.5} className="shrink-0 text-foreground-light" />
 }
 
 export const DestinationTypeSelection = () => {
@@ -92,7 +83,6 @@ export const DestinationTypeSelection = () => {
           label: 'Read Replica',
           description:
             'Deploy a read-only database in another region for lower latency and workload isolation',
-          icon: Database,
           stage: null,
           enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
         },
@@ -105,7 +95,6 @@ export const DestinationTypeSelection = () => {
           value: 'Analytics Bucket',
           label: 'Analytics Bucket',
           description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
-          icon: AnalyticsBucket,
           stage: 'Deprecated',
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
@@ -113,7 +102,6 @@ export const DestinationTypeSelection = () => {
           value: 'BigQuery',
           label: 'BigQuery',
           description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
-          icon: BigQuery,
           stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
         },
@@ -121,7 +109,6 @@ export const DestinationTypeSelection = () => {
           value: 'DuckLake',
           label: 'DuckLake',
           description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
-          icon: Database,
           stage: 'Early Access',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
@@ -130,7 +117,6 @@ export const DestinationTypeSelection = () => {
           label: 'Snowflake',
           description:
             'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
-          icon: Snowflake,
           stage: 'Early Access',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
         },
@@ -138,7 +124,6 @@ export const DestinationTypeSelection = () => {
           value: 'ClickHouse',
           label: 'ClickHouse',
           description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
-          icon: ClickHouse,
           stage: 'Early Access',
           enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
@@ -198,7 +183,11 @@ export const DestinationTypeSelection = () => {
         <SelectTrigger className="h-auto py-2">
           {selectedOption ? (
             <div className="flex items-center gap-x-3 text-left">
-              <DestinationOptionIcon option={selectedOption} />
+              <DestinationIcon
+                type={selectedOption.value}
+                size={20}
+                className="shrink-0 text-foreground-light"
+              />
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
                 {selectedOption.stage && (
@@ -228,7 +217,11 @@ export const DestinationTypeSelection = () => {
               {group.options.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="py-2">
                   <div className="flex items-center gap-x-3">
-                    <DestinationOptionIcon option={option} />
+                    <DestinationIcon
+                      type={option.value}
+                      size={20}
+                      className="shrink-0 text-foreground-light"
+                    />
                     <div className="flex flex-col gap-y-0.5">
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>

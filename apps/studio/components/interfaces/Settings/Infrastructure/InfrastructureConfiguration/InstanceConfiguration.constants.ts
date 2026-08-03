@@ -89,12 +89,7 @@ export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   WEST_EU_3: [2.35, 48.86],
 }
 
-export const FLY_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
-  SOUTHEAST_ASIA: [103.8, 1.37],
-}
-
 // [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available
-// regions for replicas. Just FYI - might need to update this if we support Fly in future
 export const AVAILABLE_REPLICA_REGIONS: Region[] = Object.keys(AWS_REGIONS)
   .map((key) => {
     return {

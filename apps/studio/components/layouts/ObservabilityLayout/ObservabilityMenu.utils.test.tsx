@@ -26,10 +26,14 @@ vi.mock('@/lib/constants', async () => {
   }
 })
 
-vi.mock('common', () => ({
-  useFlag: vi.fn().mockReturnValue(false),
-  useParams: vi.fn().mockReturnValue({ ref: REF }),
-}))
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    useFlag: vi.fn().mockReturnValue(false),
+    useParams: vi.fn().mockReturnValue({ ref: REF }),
+  }
+})
 
 vi.mock('@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus', () => ({
   useSupamonitorStatus: vi.fn(),

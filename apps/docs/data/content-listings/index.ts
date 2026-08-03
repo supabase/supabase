@@ -11,8 +11,16 @@ import {
   functionsExamplesWebhooksPayments,
   functionsGetStarted,
 } from './functions.data'
+import {
+  gettingStartedFrameworkQuickstarts,
+  gettingStartedMobileTutorials,
+  gettingStartedOverview,
+  gettingStartedUseCases,
+  gettingStartedWebAppDemos,
+} from './getting-started.data'
 import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
+import { resourcesMigrate, resourcesOverview, resourcesPostgres } from './resources.data'
 import {
   selfHostingCommunity,
   selfHostingGetHelp,
@@ -37,10 +45,18 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   functionsExamplesAiMedia,
   functionsExamplesMessaging,
   functionsExamplesOperations,
+  gettingStartedOverview,
+  gettingStartedUseCases,
+  gettingStartedFrameworkQuickstarts,
+  gettingStartedWebAppDemos,
+  gettingStartedMobileTutorials,
   logDrainsDestinations,
   realtimeGetStarted,
   realtimeExamples,
   realtimeResources,
+  resourcesOverview,
+  resourcesMigrate,
+  resourcesPostgres,
   selfHostingGetStarted,
   selfHostingCommunity,
   selfHostingResolveIssues,

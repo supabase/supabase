@@ -78,6 +78,17 @@ All instances and subclasses of a `AuthRestException` have a `errorCode` propert
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+All exceptions originating from the `supabase.Auth` namespace of the C# client library are wrapped by the `GotrueException` class.
+
+`GotrueException` exposes:
+
+- `StatusCode` -- the HTTP status code returned by the Supabase Auth API.
+- `Reason` -- a `FailureHint.Reason` value that categorizes the error, so you can branch on it without parsing the message.
+
+</TabPanel>
+</$Show>
 
 </Tabs>
 
