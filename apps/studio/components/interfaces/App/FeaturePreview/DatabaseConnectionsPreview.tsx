@@ -19,7 +19,7 @@ export const DatabaseConnectionsPreview = () => {
       </p>
 
       <Image
-        alt="new-logs-preview"
+        alt="database-connections-preview"
         src={`${BASE_PATH}/img/previews/database-connections-preview.png`}
         width={1200}
         height={626}
