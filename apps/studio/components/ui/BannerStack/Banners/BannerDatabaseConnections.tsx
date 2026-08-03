@@ -23,8 +23,8 @@ export const BannerDatabaseConnections = () => {
     <BannerCard
       onDismiss={() => {
         setIsDismissed(true)
-        dismissBanner('unified-logs-banner')
-        track('unified_logs_banner_dismiss_button_clicked')
+        dismissBanner('database-connections-banner')
+        track('database_connections_banner_dismiss_button_clicked')
       }}
     >
       <div className="flex flex-col gap-y-4">

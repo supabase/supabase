@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFeatureFlags, useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
@@ -24,13 +24,12 @@ const ObservabilityLayoutContent = ({
 }: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
   const pathname = usePathname()
+  const { hasLoaded } = useFeatureFlags()
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
-  const [isIndexAdvisorBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
-    false
-  )
+  const [isIndexAdvisorBannerDismissed, , { isSuccess: isLocalStorageReady }] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''), false)
 
   const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
 
@@ -42,17 +41,28 @@ const ObservabilityLayoutContent = ({
   const prevPathnameRef = useRef(pathname)
 
   useEffect(() => {
-    if (!isDatabaseConnectionsBannerDismissed && !isDatabaseConnectionsEnabled) {
-      addBanner({
-        id: 'database-connections-banner',
-        priority: 2,
-        isDismissed: false,
-        content: <BannerDatabaseConnections />,
-      })
-    } else {
-      dismissBanner('database-connections-banner')
-    }
-  }, [addBanner, dismissBanner, isDatabaseConnectionsBannerDismissed, isDatabaseConnectionsEnabled])
+    if (
+      !hasLoaded ||
+      !isLocalStorageReady ||
+      isDatabaseConnectionsBannerDismissed ||
+      isDatabaseConnectionsEnabled
+    )
+      return
+
+    addBanner({
+      id: 'database-connections-banner',
+      priority: 2,
+      isDismissed: false,
+      content: <BannerDatabaseConnections />,
+    })
+  }, [
+    hasLoaded,
+    addBanner,
+    dismissBanner,
+    isDatabaseConnectionsBannerDismissed,
+    isDatabaseConnectionsEnabled,
+    isLocalStorageReady,
+  ])
 
   useEffect(() => {
     const isQueryPerformancePage = pathname?.includes('/query-performance')
