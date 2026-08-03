@@ -155,7 +155,7 @@ export function generateOtelWhereSafe(
       const col = safeLogSql`log_attributes[${analyticsLiteral(filter.key)}]`
 
       const valueIsNumber = !isNaN(Number(filter.value))
-      const stringLit = analyticsLiteral(String(filter.value).toLowerCase())
+      const stringLit = analyticsLiteral(String(filter.value))
 
       switch (filter.compare) {
         case 'matches':

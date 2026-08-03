@@ -43,6 +43,16 @@ describe('SHARED_API_REPORT_SQL safeSqlOtel', () => {
     expect(out).toContain("match(log_attributes['request.path'], '/auth')")
   })
 
+  it('preserves value casing so uppercase HTTP methods match', () => {
+    const methodFilter: ReportFilterItem = {
+      key: 'request.method',
+      value: 'DELETE',
+      compare: 'is',
+    }
+    const out = sql(SHARED_API_REPORT_SQL.totalRequests.safeSqlOtel([methodFilter]))
+    expect(out).toContain("log_attributes['request.method'] = 'DELETE'")
+  })
+
   it('preserves the full dotted key for 3-segment filters (e.g. request headers)', () => {
     const headerFilter: ReportFilterItem = {
       key: 'request.headers.x_client_info',
