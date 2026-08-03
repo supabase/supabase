@@ -161,7 +161,8 @@ export const consentState = proxy({
         consentState.categories = consentState.UC?.getCategoriesBaseInfo() ?? null
       })
       .catch(() => {
-        consentState.showConsentToast = previousConsentValue
+        consentState.hasConsented = previousConsentValue
+        consentState.showConsentToast = true
       })
   },
   updateServices: (decisions: UserDecision[]) => {
