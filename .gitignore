@@ -167,3 +167,10 @@ keys.json
 examples/**/package-lock.json
 examples/**/yarn.lock
 examples/**/pnpm-lock.yaml
+# Python generated files
+__pycache__/
+*.py[cod]
+
+# Python generated files
+__pycache__/
+*.py[cod]

@@ -46,9 +46,9 @@ export const configEnvMap: Record<string, string> = {
 
   // Twilio
   sms_provider: 'SMS_PROVIDER',
-  sms_twilio_account_sid: 'TWILIO_ACCOUNT_SID',
-  sms_twilio_auth_token: 'TWILIO_AUTH_TOKEN',
-  sms_twilio_message_service_sid: 'TWILIO_MESSAGE_SERVICE_SID',
+  sms_twilio_account_sid: 'SMS_TWILIO_ACCOUNT_SID',
+  sms_twilio_auth_token: 'SMS_TWILIO_AUTH_TOKEN',
+  sms_twilio_message_service_sid: 'SMS_TWILIO_MESSAGE_SERVICE_SID',
 
   // SAML
   saml_enabled: 'SAML_ENABLED',

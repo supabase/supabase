@@ -4,6 +4,7 @@ import { envConfigMap, configEnvMap } from '@/lib/self-hosted-auth/config-map'
 import { validateConfigUpdate } from '@/lib/self-hosted-auth/validation'
 import { processSecretUpdates } from '@/lib/self-hosted-auth/secrets'
 import { requestManager } from '@/lib/self-hosted-auth/manager-client'
+import { IS_PLATFORM, ENABLE_SELF_HOSTED_AUTH_MENU } from '@/lib/constants'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const refError = validateProjectRef(req.query.ref as string)
@@ -41,6 +42,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'PATCH') {
+    if (
+      IS_PLATFORM ||
+      !ENABLE_SELF_HOSTED_AUTH_MENU ||
+      req.headers['content-type'] !== 'application/json' ||
+      (process.env.NEXT_PUBLIC_SITE_URL && req.headers.origin !== process.env.NEXT_PUBLIC_SITE_URL)
+    ) {
+      return res.status(403).json({ error: 'Unauthorized configuration update' })
+    }
+
     try {
       const payload = req.body || {}
       

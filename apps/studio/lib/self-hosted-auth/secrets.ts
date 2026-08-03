@@ -4,8 +4,9 @@ export const SECRET_FIELDS = [
   'external_github_secret',
   'external_azure_secret',
   'external_facebook_secret',
-  'twilio_auth_token',
+  'sms_twilio_auth_token',
   'hook_custom_access_token_secrets',
+  'saml_private_key',
 ]
 
 

@@ -48,6 +48,11 @@ export async function requestManager<T = any>(
       console.error(`[AuthManagerClient] Request failed: ${err.message}`)
       reject(err)
     })
+    
+    req.on('timeout', () => {
+      console.error(`[AuthManagerClient] Request timed out`)
+      req.destroy(new Error('Request Timeout'))
+    })
 
     if (body) {
       req.write(body)

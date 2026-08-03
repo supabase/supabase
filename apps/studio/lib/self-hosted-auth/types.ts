@@ -21,9 +21,9 @@ export interface SelfHostedAuthCapabilities {
 }
 
 export interface SelfHostedAuthApplyStatus {
-  status: 'healthy' | 'unhealthy' | 'applying' | 'rollback_failed' | 'rollback_success'
-  revision: string
-  appliedAt: string
+  status: 'healthy' | 'unhealthy' | 'applying' | 'rollback_failed' | 'rollback_success' | 'unknown'
+  revision: string | null
+  appliedAt: string | null
   authContainer: string
   health: 'healthy' | 'unhealthy' | 'unknown'
 }
