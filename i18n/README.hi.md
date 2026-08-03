@@ -188,4 +188,6 @@
 
 ## हमारे प्रायोजक
 
-[![New Sponsor](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
+<a href="https://github.com/sponsors/supabase">
+  <img src="https://github.com/user-attachments/assets/9e5d9fa8-4e26-4161-b1f2-b348da4d7d07" width="220" alt="प्रायोजक बनें" />
+</a>
