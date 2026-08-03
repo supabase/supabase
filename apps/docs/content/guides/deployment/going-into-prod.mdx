@@ -26,6 +26,7 @@ Check and review issues in your database using [Security Advisor](/dashboard/pro
   - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Supabase Dashboard to manage replication tables.
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) from the [**Database > Settings > SSL Configuration**](/dashboard/project/_/database/settings#ssl-configuration) section of the dashboard.
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for the database from the [**Database > Settings > Network Restrictions**](/dashboard/project/_/database/settings#network-restrictions) section of the dashboard.
+- Review `information_schema.role_table_grants` for `anon`/`authenticated` roles to understand default privileges, and note that RLS does not cover `TRUNCATE` operations.
 - Ensure that you protect your Supabase Account with multi-factor authentication (MFA).
   - If using a GitHub sign-in, [enable 2FA on GitHub](https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication).
   - Since your GitHub account gives you administrative rights to your Supabase org, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
