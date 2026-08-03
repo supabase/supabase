@@ -94,13 +94,17 @@ export const FeaturePreviewModal = () => {
       return
     }
 
-    toggleFeaturePreviewModal(false)
     if (hasRoute) {
+      // Navigating away drops the `featurePreviewModal` query param, which is
+      // what closes the modal. Don't also close it via
+      // toggleFeaturePreviewModal — its queued nuqs URL update races the push
+      // and can navigate back to the current page, swallowing the redirect.
       router.push(selectedFeatureRoute)
       toast.success(`${selectedFeature.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })
     } else {
+      toggleFeaturePreviewModal(false)
       toast.success(`${selectedFeature.name} enabled`, {
         description: "It's now active across the dashboard.",
       })
