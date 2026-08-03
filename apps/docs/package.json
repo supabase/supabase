@@ -16,7 +16,7 @@
     "clean": "rimraf .next .turbo features/docs/generated examples __generated__ tsconfig.tsbuildinfo",
     "codegen:examples": "shx cp -r ../../examples ./examples",
     "codegen:graphql": "tsx --conditions=react-server ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",
-    "codegen:references:new:ensure": "(test -f spec/reference/javascript/v2/supabase.json || (cd spec && make download.tsdoc.v2)) && (test -f spec/reference/server/v1/server.json || (cd spec && make download.server.v1))",
+    "codegen:references:new:ensure": "(test -f spec/reference/javascript/v2/supabase.json || (cd spec && make download.tsdoc.v2)) && (test -f spec/reference/server/v1/server.json || (cd spec && make download.server.v1)) && (test -f spec/reference/ssr/v1/ssr.json || (cd spec && make download.ssr.v1))",
     "codegen:references:dart": "tsx scripts/generate-dart-reference.ts",
     "precodegen:references:new": "pnpm run codegen:references:new:ensure && pnpm run codegen:references:dart",
     "codegen:references:new": "pnpm run codegen:references:new:ensure && tsx scripts/build-reference-content.ts",

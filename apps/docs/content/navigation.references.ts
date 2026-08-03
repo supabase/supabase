@@ -44,6 +44,23 @@ export const REFERENCES = {
       },
     },
   },
+  ssr: {
+    type: 'sdk',
+    name: 'SSR',
+    library: '@supabase/ssr',
+    libPath: 'ssr',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        // SSR is driven by the new reference pipeline
+        // (`scripts/build-reference-content.ts` + `spec/reference/ssr/v1/`).
+        // It intentionally has no `specFile` — the legacy YAML loader skips it.
+        libId: 'reference_ssr_v1',
+      },
+    },
+  },
   dart: {
     type: 'sdk',
     name: 'Flutter',

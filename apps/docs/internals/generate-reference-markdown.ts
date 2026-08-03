@@ -117,6 +117,13 @@ const REFERENCES: Ref[] = [
     contentDir: path.join(process.cwd(), 'content/reference/server/v1'),
   },
   {
+    kind: 'sdk-new',
+    title: 'Supabase SSR Reference',
+    outFile: 'ssr.md',
+    mdxDir: path.join(MDX_ROOT, 'ssr'),
+    contentDir: path.join(process.cwd(), 'content/reference/ssr/v1'),
+  },
+  {
     kind: 'sdk-legacy',
     title: 'Kotlin Client Library Reference',
     outFile: 'kotlin.md',

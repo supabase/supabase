@@ -1,0 +1,10 @@
+---
+id: introduction
+title: Introduction
+---
+
+`@supabase/ssr` lets you use Supabase in server-side rendering (SSR) frameworks by persisting the user's session in cookies instead of browser local storage. Cookies are sent with every request, so the server can read and refresh the session while rendering.
+
+It exposes two client factories — `createBrowserClient` for the browser and `createServerClient` for the server — that share the same cookie-based storage, plus the cookie helper types you need to wire them into your framework. It replaces the deprecated `@supabase/auth-helpers-*` packages.
+
+For end-to-end setup in Next.js, Remix, SvelteKit, and other frameworks, see the [server-side rendering guides](/docs/guides/auth/server-side). If you need token-based authentication for backend APIs and edge runtimes rather than cookie-based sessions, see [which package to use](/docs/guides/auth/choosing-a-server-package) and [`@supabase/server`](/docs/reference/server).
