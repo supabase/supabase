@@ -213,9 +213,13 @@ export const SubscriptionPlanUpdateDialog = ({
       slug: selectedOrganization?.slug,
       tier,
       paymentMethod: result?.paymentMethod?.id,
-      address: result?.address,
-      tax_id: result?.taxId ?? undefined,
-      billing_name: result?.customerName ?? undefined,
+      ...(result?.isNewPaymentMethod
+        ? {
+            address: result.address,
+            tax_id: result.taxId ?? undefined,
+            billing_name: result.customerName ?? undefined,
+          }
+        : {}),
     })
   }
 
