@@ -4,6 +4,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -56,6 +57,9 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{`Empty bucket “${bucket?.name}”`}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Review the consequences before permanently deleting every object in this bucket.
+          </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <Admonition

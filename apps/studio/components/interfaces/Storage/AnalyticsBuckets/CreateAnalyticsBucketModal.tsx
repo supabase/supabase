@@ -1,4 +1,11 @@
-import { Dialog, DialogContent, DialogHeader, DialogSectionSeparator, DialogTitle } from 'ui'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogSectionSeparator,
+  DialogTitle,
+} from 'ui'
 
 import { BUCKET_TYPES } from '../Storage.constants'
 import { CreateAnalyticsBucketForm } from './CreateAnalyticsBucketForm'
@@ -16,9 +23,12 @@ export const CreateAnalyticsBucketModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="medium" aria-describedby={undefined}>
+      <DialogContent size="medium">
         <DialogHeader>
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a new {config.singularName} bucket and configure it with the form below.
+          </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <CreateAnalyticsBucketForm type="dialog" onOpenChange={onOpenChange} />
