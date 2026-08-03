@@ -58,10 +58,10 @@ class EnvDocument:
     def delete(self, key: str):
         if key in self.keys_map:
             idx = self.keys_map[key]
-            # Instead of removing the line (which shifts indices), we comment it out
-            # Or we can just set it to empty
-            self.lines[idx] = f"# {self.lines[idx]} (removed by Alazab Auth Manager)"
-            del self.keys_map[key]
+            self.lines.pop(idx)
+            # Rebuild keys_map since indices have shifted
+            self.keys_map = {}
+            self._parse()
 
     def to_string(self) -> str:
         return '\n'.join(self.lines) + '\n'

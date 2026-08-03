@@ -11,6 +11,19 @@ export function validateUrl(url: string | undefined): string | null {
   }
 }
 
+export function validateHookUrl(url: string | undefined): string | null {
+  if (!url) return null
+  try {
+    const parsed = new URL(url)
+    if (!['http:', 'https:', 'pg-functions:'].includes(parsed.protocol)) {
+      return 'Hook URI must use http, https, or pg-functions protocol'
+    }
+    return null
+  } catch (e) {
+    return 'Invalid URL format'
+  }
+}
+
 export function validateRedirectList(urls: string | undefined): string | null {
   if (!urls) return null
   const urlList = urls.split(',').map((u) => u.trim())
@@ -31,6 +44,9 @@ export function validateRedirectList(urls: string | undefined): string | null {
 
 export function validateSmtpPort(port: string | undefined): string | null {
   if (!port) return null
+  if (!/^\d+$/.test(port)) {
+    return 'SMTP Port must be a valid number'
+  }
   const num = parseInt(port, 10)
   if (isNaN(num) || num <= 0 || num > 65535) {
     return 'SMTP Port must be a valid port number between 1 and 65535'
@@ -57,8 +73,18 @@ export function validateConfigUpdate(payload: Record<string, any>): Record<strin
   }
 
   if (payload.hook_custom_access_token_uri) {
-    const err = validateUrl(payload.hook_custom_access_token_uri)
+    const err = validateHookUrl(payload.hook_custom_access_token_uri)
     if (err) errors.hook_custom_access_token_uri = err
+  }
+
+  if (payload.hook_mfa_verification_attempt_uri) {
+    const err = validateHookUrl(payload.hook_mfa_verification_attempt_uri)
+    if (err) errors.hook_mfa_verification_attempt_uri = err
+  }
+
+  if (payload.hook_password_verification_attempt_uri) {
+    const err = validateHookUrl(payload.hook_password_verification_attempt_uri)
+    if (err) errors.hook_password_verification_attempt_uri = err
   }
 
   return errors

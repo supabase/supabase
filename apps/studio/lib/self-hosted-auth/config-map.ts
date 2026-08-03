@@ -29,33 +29,59 @@ export const configEnvMap: Record<string, string> = {
   external_google_client_id: 'GOOGLE_CLIENT_ID',
   external_google_secret: 'GOOGLE_SECRET',
 
-  // GitHub
-  external_github_enabled: 'GITHUB_ENABLED',
-  external_github_client_id: 'GITHUB_CLIENT_ID',
-  external_github_secret: 'GITHUB_SECRET',
+  // GitHub (suspended)
+  // external_github_enabled: 'GITHUB_ENABLED',
+  // external_github_client_id: 'GITHUB_CLIENT_ID',
+  // external_github_secret: 'GITHUB_SECRET',
 
   // Azure
   external_azure_enabled: 'AZURE_ENABLED',
   external_azure_client_id: 'AZURE_CLIENT_ID',
   external_azure_secret: 'AZURE_SECRET',
 
-  // MFA
-  mfa_totp_enroll_enabled: 'MFA_TOTP_ENROLL_ENABLED',
-  mfa_totp_verify_enabled: 'MFA_TOTP_VERIFY_ENABLED',
-  mfa_phone_enroll_enabled: 'MFA_PHONE_ENROLL_ENABLED',
-  mfa_phone_verify_enabled: 'MFA_PHONE_VERIFY_ENABLED',
-  mfa_max_enrolled_factors: 'MFA_MAX_ENROLLED_FACTORS',
+  // Facebook
+  external_facebook_enabled: 'FACEBOOK_ENABLED',
+  external_facebook_client_id: 'FACEBOOK_CLIENT_ID',
+  external_facebook_secret: 'FACEBOOK_SECRET',
 
-  // Hooks
-  hook_custom_access_token_enabled: 'HOOK_CUSTOM_ACCESS_TOKEN_ENABLED',
-  hook_custom_access_token_uri: 'HOOK_CUSTOM_ACCESS_TOKEN_URI',
-  hook_custom_access_token_secrets: 'HOOK_CUSTOM_ACCESS_TOKEN_SECRETS',
+  // Twilio
+  sms_provider: 'SMS_PROVIDER',
+  sms_twilio_account_sid: 'TWILIO_ACCOUNT_SID',
+  sms_twilio_auth_token: 'TWILIO_AUTH_TOKEN',
+  sms_twilio_message_service_sid: 'TWILIO_MESSAGE_SERVICE_SID',
 
-  hook_mfa_verification_attempt_enabled: 'HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED',
-  hook_mfa_verification_attempt_uri: 'HOOK_MFA_VERIFICATION_ATTEMPT_URI',
+  // SAML
+  saml_enabled: 'SAML_ENABLED',
+  saml_private_key: 'SAML_PRIVATE_KEY',
+  saml_external_url: 'SAML_EXTERNAL_URL',
+  saml_allow_encrypted_assertions: 'SAML_ALLOW_ENCRYPTED_ASSERTIONS',
 
-  hook_password_verification_attempt_enabled: 'HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED',
-  hook_password_verification_attempt_uri: 'HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI',
+  // MFA (suspended)
+  // mfa_totp_enroll_enabled: 'MFA_TOTP_ENROLL_ENABLED',
+  // mfa_totp_verify_enabled: 'MFA_TOTP_VERIFY_ENABLED',
+  // mfa_phone_enroll_enabled: 'MFA_PHONE_ENROLL_ENABLED',
+  // mfa_phone_verify_enabled: 'MFA_PHONE_VERIFY_ENABLED',
+  // mfa_max_enrolled_factors: 'MFA_MAX_ENROLLED_FACTORS',
+
+  // Hooks (suspended)
+  // hook_custom_access_token_enabled: 'HOOK_CUSTOM_ACCESS_TOKEN_ENABLED',
+  // hook_custom_access_token_uri: 'HOOK_CUSTOM_ACCESS_TOKEN_URI',
+  // hook_custom_access_token_secrets: 'HOOK_CUSTOM_ACCESS_TOKEN_SECRETS',
+
+  // hook_mfa_verification_attempt_enabled: 'HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED',
+  // hook_mfa_verification_attempt_uri: 'HOOK_MFA_VERIFICATION_ATTEMPT_URI',
+
+  // hook_password_verification_attempt_enabled: 'HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED',
+  // hook_password_verification_attempt_uri: 'HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI',
+
+  // Secret _configured keys
+  smtp_pass_configured: 'SMTP_PASS_CONFIGURED',
+  external_google_secret_configured: 'GOOGLE_SECRET_CONFIGURED',
+  external_github_secret_configured: 'GITHUB_SECRET_CONFIGURED',
+  external_azure_secret_configured: 'AZURE_SECRET_CONFIGURED',
+  external_facebook_secret_configured: 'FACEBOOK_SECRET_CONFIGURED',
+  sms_twilio_auth_token_configured: 'TWILIO_AUTH_TOKEN_CONFIGURED',
+  hook_custom_access_token_secrets_configured: 'HOOK_CUSTOM_ACCESS_TOKEN_SECRETS_CONFIGURED',
 }
 
 // Map GoTrue env names back to Studio config field names

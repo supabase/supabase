@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { validateProjectRef } from '@/lib/self-hosted-auth/project-registry'
 import { envConfigMap, configEnvMap } from '@/lib/self-hosted-auth/config-map'
 import { validateConfigUpdate } from '@/lib/self-hosted-auth/validation'
-import { maskSecrets, processSecretUpdates } from '@/lib/self-hosted-auth/secrets'
+import { processSecretUpdates } from '@/lib/self-hosted-auth/secrets'
 import { requestManager } from '@/lib/self-hosted-auth/manager-client'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -34,9 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
       }
 
-      // Mask secrets
-      const safeConfig = maskSecrets(configObj)
-      return res.status(200).json(safeConfig)
+      return res.status(200).json(configObj)
     } catch (error: any) {
       return res.status(500).json({ error: error.message })
     }
@@ -51,14 +49,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Validation failed', details: validationErrors })
       }
 
-      // Get current config to properly process secrets
-      const currentRes = await requestManager('GET', '/platform/auth/default/config')
-      const currentEnv = currentRes.data.env || {}
-      
-      // We don't map currentEnv to studio keys here since processSecretUpdates only needs the payload to determine what to clear/keep. 
-      // Actually processSecretUpdates in our implementation only uses payload.
-      
-      const processedUpdates = processSecretUpdates(payload, currentEnv)
+      const processedUpdates = processSecretUpdates(payload)
       
       // Map Studio keys back to env keys
       const envUpdates: Record<string, string> = {}

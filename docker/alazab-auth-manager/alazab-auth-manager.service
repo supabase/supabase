@@ -1,6 +1,5 @@
 [Unit]
 Description=Alazab Auth Manager Service
-Requires=alazab-auth-manager.socket
 After=network.target
 
 [Service]

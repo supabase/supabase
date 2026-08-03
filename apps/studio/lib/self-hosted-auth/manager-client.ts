@@ -1,6 +1,6 @@
 import http from 'http'
 
-const SOCKET_PATH = process.env.ALAZAB_AUTH_MANAGER_SOCKET || '/run/alazab-auth-manager.sock'
+const SOCKET_PATH = process.env.ALAZAB_AUTH_MANAGER_SOCKET || '/run/alazab-auth-manager/manager.sock'
 
 export interface ManagerResponse<T = any> {
   status: number
@@ -17,11 +17,16 @@ export async function requestManager<T = any>(
       socketPath: SOCKET_PATH,
       path,
       method,
-      headers: {},
+      headers: {
+        'X-Alazab-Manager-Token': process.env.ALAZAB_AUTH_MANAGER_TOKEN || '',
+      },
+      timeout: 10000,
     }
 
-    if (payload) {
+    const body = payload === undefined ? undefined : JSON.stringify(payload)
+    if (body) {
       options.headers!['Content-Type'] = 'application/json'
+      options.headers!['Content-Length'] = Buffer.byteLength(body)
     }
 
     const req = http.request(options, (res) => {
@@ -44,8 +49,8 @@ export async function requestManager<T = any>(
       reject(err)
     })
 
-    if (payload) {
-      req.write(JSON.stringify(payload))
+    if (body) {
+      req.write(body)
     }
     req.end()
   })
