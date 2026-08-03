@@ -275,7 +275,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
                         : 'Select an organization first'
                     }
                     badgeLimit="wrap"
-                    showIcon={false}
+                    showIcon={true}
                     deletableBadge
                     ref={field.ref}
                     renderValue={(value) => projectsByRef[value]?.name}
