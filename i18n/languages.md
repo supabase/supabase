@@ -42,6 +42,7 @@
 - [Spanish / Español](/i18n/README.es.md)
 - [Simplified Chinese / 简体中文](/i18n/README.zh-cn.md)
 - [Swedish / Svenska](/i18n/README.sv.md)
+- [Swahili / Kiswahili](/i18n/README.sw.md)
 - [Tamil / தமிழ்](/i18n/README.ta.md)
 - [Thai / ไทย](/i18n/README.th.md)
 - [Traditional Chinese / 繁體中文](/i18n/README.zh-tw.md)
