@@ -61,6 +61,7 @@ interface EventData {
   main_cta?: CTA
   description: string
   type: EventType
+  type_label?: string
   company?: CompanyType
   onDemand?: boolean
   disable_page_build?: boolean
@@ -283,7 +284,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 <div className="flex flex-col gap-2 md:gap-3 items-start mb-8">
                   <div className="flex flex-row text-sm items-center flex-wrap">
                     <Icon className="hidden sm:inline-block w-4 h-4 text-brand mr-2" />
-                    <span className="uppercase text-brand font-mono">{event.type}</span>
+                    <span className="uppercase text-brand font-mono">
+                      {event.type_label ?? event.type}
+                    </span>
                     <span className="mx-3 px-3 border-x">
                       {dayjs(event.date).tz(event.timezone).format(`DD MMM YYYY [at] hA z`)}
                     </span>

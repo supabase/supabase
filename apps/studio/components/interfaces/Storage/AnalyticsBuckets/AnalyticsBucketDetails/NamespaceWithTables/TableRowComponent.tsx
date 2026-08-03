@@ -124,9 +124,9 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       setIsUpdatingReplication(true)
       // [Joshen ALPHA] Assumption here is that all the namespace tables have _changelog as suffix
       // May need to update if that assumption falls short (e.g for those dealing with iceberg APIs directly)
-      const updatedTables = publication.tables.filter(
-        (x) => table.name !== getNamespaceTableNameFromPostgresTableName(x)
-      )
+      const updatedTables = publication.tables
+        .filter((x) => table.name !== getNamespaceTableNameFromPostgresTableName(x))
+        .map(({ schema, name }) => ({ schema, name }))
       await updatePublication({
         projectRef,
         sourceId,
@@ -158,9 +158,9 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
     try {
       setIsUpdatingReplication(true)
-      const updatedTables = publication.tables.concat([
-        { schema: pgTable.schema, name: pgTable.name },
-      ])
+      const updatedTables = publication.tables
+        .map(({ schema, name }) => ({ schema, name }))
+        .concat([{ schema: pgTable.schema, name: pgTable.name }])
       await updatePublication({
         projectRef,
         sourceId,

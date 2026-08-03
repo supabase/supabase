@@ -26,7 +26,7 @@ export function CommandListItem({
       onClick={() => onSelect(item)}
       className={cn(
         'relative flex items-center justify-between gap-2 px-2 h-[28px] text-xs cursor-pointer select-none outline-hidden text-foreground',
-        isHighlighted && 'bg-surface-300',
+        isHighlighted && 'bg-overlay-hover',
         !isHighlighted && 'hover:bg-surface-200'
       )}
       data-testid={`filter-menu-item-${item.value}`}

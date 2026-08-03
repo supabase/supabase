@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -32,7 +32,7 @@ import { withAuth } from '@/hooks/misc/withAuth'
 import {
   buildVercelInstallRouteQuery,
   getErrorMessage,
-  getVercelInstallSource,
+  resolveVercelInstallSource,
 } from '@/lib/integrations/vercel-install.utils'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
@@ -56,13 +56,14 @@ const PAGE_TITLE = buildStudioPageTitle({
 export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 
 const VercelIntegration: NextPageWithLayout = () => {
-  const router = useRouter()
-  const { code, configurationId, currentProjectId, externalId, next, teamId, source } = useParams()
-  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
-  const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
   const track = useTrack()
-
+  const router = useRouter()
   const snapshot = useIntegrationInstallationSnapshot()
+  const { code, configurationId, currentProjectId, externalId, next, teamId, source } = useParams()
+
+  const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
+
+  const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
   const displayName = primaryEmail ?? username ?? ''
 
   /**
@@ -84,16 +85,6 @@ const VercelIntegration: NextPageWithLayout = () => {
     isError: isOrganizationsError,
     error: organizationsError,
   } = useOrganizationsQuery()
-
-  useEffect(() => {
-    if (organizationsData !== undefined && integrationData !== undefined) {
-      const firstOrg = organizationsData[0]
-
-      if (firstOrg && selectedOrg === null) {
-        setSelectedOrg(firstOrg)
-      }
-    }
-  }, [organizationsData, integrationData, selectedOrg])
 
   /**
    * Organizations with extra `installationInstalled` attribute
@@ -124,7 +115,11 @@ const VercelIntegration: NextPageWithLayout = () => {
    */
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
-    const vercelInstallSource = getVercelInstallSource(source)
+    const vercelInstallSource = resolveVercelInstallSource({
+      source,
+      currentProjectId,
+      externalId,
+    })
     const query = buildVercelInstallRouteQuery({
       source: vercelInstallSource,
       organizationSlug: orgSlug,
@@ -224,12 +219,6 @@ const VercelIntegration: NextPageWithLayout = () => {
     return isOrganizationsDataSuccess && organizationsData?.length === 0 ? true : false
   }, [isOrganizationsDataSuccess, organizationsData])
 
-  const alreadyInstalled = useMemo(() => {
-    return selectedOrg && installed[selectedOrg.slug] && source === 'marketplace' && !dataLoading
-      ? true
-      : false
-  }, [dataLoading, installed, selectedOrg, source])
-
   const missingParams = [
     !code ? 'code' : undefined,
     !configurationId ? 'configurationId' : undefined,
@@ -241,13 +230,18 @@ const VercelIntegration: NextPageWithLayout = () => {
   const showLoadingState = isLoadingOrganizationsQuery || isLoadingIntegrationsQuery
 
   const disableInstallationForm =
-    dataLoading ||
-    // disables installation button if integration is already installed and it is Marketplace flow
-    alreadyInstalled ||
-    noOrganizations ||
-    !selectedOrg ||
-    missingParams.length > 0 ||
-    isError
+    dataLoading || noOrganizations || !selectedOrg || missingParams.length > 0 || isError
+
+  useEffect(() => {
+    if (organizationsData !== undefined && integrationData !== undefined) {
+      const firstOrg = organizationsData[0]
+
+      if (firstOrg && selectedOrg === null) {
+        setSelectedOrg(firstOrg)
+      }
+    }
+  }, [organizationsData, integrationData, selectedOrg])
+
   return (
     <>
       <Head>
@@ -256,7 +250,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
       <InterstitialLayout
         logo={<VercelIntegrationLogo />}
-        title="Install Vercel Integration"
+        title="Install Vercel integration"
         description="Choose the Supabase organization Vercel can connect to"
         footer={<VercelIntegrationFooter />}
       >
@@ -290,14 +284,6 @@ const VercelIntegration: NextPageWithLayout = () => {
                 />
               )}
 
-              {alreadyInstalled && (
-                <Admonition
-                  type="warning"
-                  title="Vercel integration is already installed"
-                  description="Choose another organization to install this marketplace integration."
-                />
-              )}
-
               {noOrganizations && (
                 <Admonition
                   type="warning"
@@ -323,7 +309,7 @@ const VercelIntegration: NextPageWithLayout = () => {
                   loading={dataLoading}
                   onClick={onInstall}
                 >
-                  Install integration
+                  {selectedOrg && installed[selectedOrg.slug] ? 'Continue' : 'Install integration'}
                 </Button>
               </div>
             </div>
