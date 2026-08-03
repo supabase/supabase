@@ -91,6 +91,18 @@ response = supabase.auth.link_identity({'provider': 'google'})
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`LinkIdentity()`](/docs/reference/csharp/link-identity):
+
+```c#
+var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
+var authorizeUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the Google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/auth/providers) or by setting the environment variable `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED: true` when self-hosting.
@@ -256,6 +268,24 @@ google_identity = next((identity for identity in response.identities if identity
 # unlink the google identity from the user
 if google_identity:
     response = supabase.auth.unlink_identity(google_identity.identity_id)
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+Use `CurrentUser.Identities` to get all the identities linked to a user. Then, call [`UnlinkIdentity()`](/docs/reference/csharp/unlink-identity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+
+```c#
+// get all identities linked to the user
+var identities = supabase.Auth.CurrentUser.Identities;
+
+// find the google identity linked to the user
+var googleIdentity = identities.First(x => x.Provider == "google");
+
+// unlink the google identity from the user
+await supabase.Auth.UnlinkIdentity(googleIdentity);
 ```
 
 </TabPanel>
