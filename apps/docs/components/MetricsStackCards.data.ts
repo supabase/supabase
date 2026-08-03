@@ -42,7 +42,7 @@ export const metricsStackOptions: MetricsStackOption[] = [
   {
     title: 'Elastic',
     description:
-      "Use Elastic's managed Supabase integration to scrape metrics. Dashboards, alert and SLO templates get auto-installed as data arrives.",
+      "Use Elastic's managed Supabase integration to scrape metrics. The integration automatically installs dashboards, alert templates, and SLO templates as data arrives.",
     href: 'https://www.elastic.co/docs/reference/integrations/supabase',
     iconKind: 'elastic',
     iconColor: '#00BFB3',
