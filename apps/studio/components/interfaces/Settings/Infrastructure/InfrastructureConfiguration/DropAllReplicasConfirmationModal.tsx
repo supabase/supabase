@@ -61,7 +61,10 @@ const DropAllReplicasConfirmationModal = ({
       onCancel()
     } catch (error) {
       const message =
-        error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
+        error &&
+        typeof error === 'object' &&
+        'message' in error &&
+        typeof error.message === 'string'
           ? error.message
           : ''
       toast.error(getRemoveReplicaErrorMessage(message))
