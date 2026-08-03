@@ -1,22 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { HttpResponse } from 'msw'
+import { describe, expect, it } from 'vitest'
+
+import { components } from 'api-types'
 
 import { getReportTools } from './report-tools'
-import { getContentById, type ContentIdData } from '@/data/content/content-id-query'
-import { getContent, type Content } from '@/data/content/content-query'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-vi.mock('@/data/content/content-query', () => ({
-  getContent: vi.fn(),
-}))
-vi.mock('@/data/content/content-id-query', () => ({
-  getContentById: vi.fn(),
-}))
+type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse']
 
 describe('ai/tools/report-tools', () => {
-  beforeEach(() => {
-    vi.mocked(getContent).mockReset()
-    vi.mocked(getContentById).mockReset()
-  })
-
   describe('getReportTools', () => {
     it('should return list_reports and get_report tools', () => {
       const tools = getReportTools()
@@ -34,25 +26,40 @@ describe('ai/tools/report-tools', () => {
 
   describe('list_reports', () => {
     it('should list reports with summary fields, forwarding the authorization header', async () => {
-      vi.mocked(getContent).mockResolvedValue({
-        cursor: undefined,
-        content: [
-          {
-            id: 'report-1',
-            name: 'Home',
-            description: undefined,
-            visibility: 'project',
-            updated_at: '2026-01-01T00:00:00.000Z',
-            type: 'report',
-            content: {
-              schema_version: 1,
-              period_start: { time_period: '7d' },
-              period_end: { time_period: 'today' },
-              interval: '1d',
-              layout: [{ id: 'a' }, { id: 'b' }],
-            },
-          } as unknown as Content,
-        ],
+      let capturedRequest: Request | undefined
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content',
+        response: ({ request }) => {
+          capturedRequest = request
+          return HttpResponse.json({
+            data: [
+              {
+                id: 'report-1',
+                name: 'Home',
+                description: undefined,
+                visibility: 'project',
+                favorite: false,
+                folder_id: null,
+                inserted_at: '2026-01-01T00:00:00.000Z',
+                updated_at: '2026-01-01T00:00:00.000Z',
+                owner_id: 1,
+                owner: { id: 1, username: 'test' },
+                updated_by: { id: 1, username: 'test' },
+                project_id: 1,
+                type: 'report',
+                content: {
+                  schema_version: 1,
+                  period_start: { time_period: '7d' },
+                  period_end: { time_period: 'today' },
+                  interval: '1d',
+                  layout: [{ id: 'a' }, { id: 'b' }],
+                },
+              },
+            ],
+          })
+        },
       })
 
       const tools = getReportTools({ projectRef: 'test-project', authorization: 'Bearer token' })
@@ -63,11 +70,12 @@ describe('ai/tools/report-tools', () => {
         { toolCallId: 'test', messages: [] }
       )
 
-      expect(getContent).toHaveBeenCalledWith(
-        { projectRef: 'test-project', type: 'report', limit: 20 },
-        undefined,
-        { Authorization: 'Bearer token' }
-      )
+      expect(capturedRequest?.headers.get('authorization')).toBe('Bearer token')
+      const url = new URL(capturedRequest!.url)
+      expect(url.pathname).toContain('/projects/test-project/content')
+      expect(url.searchParams.get('type')).toBe('report')
+      expect(url.searchParams.get('limit')).toBe('20')
+
       expect(result).toEqual([
         {
           id: 'report-1',
@@ -83,57 +91,78 @@ describe('ai/tools/report-tools', () => {
 
   describe('get_report', () => {
     it('should resolve snippet_ chart blocks to their SQL', async () => {
-      vi.mocked(getContentById).mockImplementation(async ({ id }) => {
-        if (id === 'report-1') {
-          return {
-            id: 'report-1',
-            name: 'My report',
-            description: undefined,
-            visibility: 'project',
-            type: 'report',
-            content: {
-              schema_version: 1,
-              period_start: { time_period: '7d' },
-              period_end: { time_period: 'today' },
-              interval: '1d',
-              layout: [
-                {
-                  id: 'snippet-1',
-                  attribute: 'snippet_snippet-1',
-                  x: 0,
-                  y: 0,
-                  w: 1,
-                  h: 1,
-                  label: 'My query',
-                  provider: 'daily-stats',
-                  chart_type: 'bar',
-                },
-                {
-                  id: 'total_egress',
-                  attribute: 'total_egress',
-                  x: 1,
-                  y: 0,
-                  w: 1,
-                  h: 1,
-                  label: 'Egress',
-                  provider: 'daily-stats',
-                  chart_type: 'bar',
-                },
-              ],
-            },
-          } as unknown as ContentIdData
-        }
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content/item/:id',
+        response: ({ params }) => {
+          if (params.id === 'report-1') {
+            return HttpResponse.json<GetUserContentByIdResponse>({
+              id: 'report-1',
+              name: 'My report',
+              description: undefined,
+              visibility: 'project',
+              favorite: false,
+              folder_id: null,
+              inserted_at: '2026-01-01T00:00:00.000Z',
+              updated_at: '2026-01-01T00:00:00.000Z',
+              owner_id: 1,
+              project_id: 1,
+              type: 'report',
+              content: {
+                schema_version: 1,
+                period_start: { time_period: '7d' },
+                period_end: { time_period: 'today' },
+                interval: '1d',
+                layout: [
+                  {
+                    id: 'snippet-1',
+                    attribute: 'snippet_snippet-1',
+                    x: 0,
+                    y: 0,
+                    w: 1,
+                    h: 1,
+                    label: 'My query',
+                    provider: 'daily-stats',
+                    chart_type: 'bar',
+                  },
+                  {
+                    id: 'total_egress',
+                    attribute: 'total_egress',
+                    x: 1,
+                    y: 0,
+                    w: 1,
+                    h: 1,
+                    label: 'Egress',
+                    provider: 'daily-stats',
+                    chart_type: 'bar',
+                  },
+                ],
+              },
+            })
+          }
 
-        if (id === 'snippet-1') {
-          return {
-            id: 'snippet-1',
-            name: 'My query',
-            type: 'sql',
-            content: { content_id: 'snippet-1', unchecked_sql: 'select 1', schema_version: '1' },
-          } as unknown as ContentIdData
-        }
+          if (params.id === 'snippet-1') {
+            return HttpResponse.json<GetUserContentByIdResponse>({
+              id: 'snippet-1',
+              name: 'My query',
+              description: undefined,
+              visibility: 'user',
+              favorite: false,
+              folder_id: null,
+              inserted_at: '2026-01-01T00:00:00.000Z',
+              updated_at: '2026-01-01T00:00:00.000Z',
+              owner_id: 1,
+              project_id: 1,
+              type: 'sql',
+              content: { content_id: 'snippet-1', sql: 'select 1', schema_version: '1' },
+            })
+          }
 
-        throw new Error(`Unexpected id: ${id}`)
+          return HttpResponse.json<APIErrorBody>(
+            { message: `Unexpected id: ${params.id}` },
+            { status: 404 }
+          )
+        },
       })
 
       const tools = getReportTools({ projectRef: 'test-project' })
@@ -156,11 +185,25 @@ describe('ai/tools/report-tools', () => {
     })
 
     it('should throw when the content id is not a report', async () => {
-      vi.mocked(getContentById).mockResolvedValue({
-        id: 'snippet-1',
-        type: 'sql',
-        content: { content_id: 'snippet-1', unchecked_sql: 'select 1', schema_version: '1' },
-      } as unknown as ContentIdData)
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content/item/:id',
+        response: () =>
+          HttpResponse.json<GetUserContentByIdResponse>({
+            id: 'snippet-1',
+            name: 'My query',
+            description: undefined,
+            visibility: 'user',
+            favorite: false,
+            folder_id: null,
+            inserted_at: '2026-01-01T00:00:00.000Z',
+            updated_at: '2026-01-01T00:00:00.000Z',
+            owner_id: 1,
+            project_id: 1,
+            type: 'sql',
+            content: { content_id: 'snippet-1', sql: 'select 1', schema_version: '1' },
+          }),
+      })
 
       const tools = getReportTools({ projectRef: 'test-project' })
       if (!tools.get_report.execute) throw new Error('execute is undefined')
