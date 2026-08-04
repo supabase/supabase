@@ -27,7 +27,7 @@ Other HTTP clients on the same machine can behave differently, which is a useful
 ## How to diagnose
 
 - Compare behavior across HTTP clients on the same machine. If `curl -v https://api.supabase.com` or a browser succeeds while the CLI fails, the network path itself is fine and something local to the machine is the difference.
-- Check the certificate actually being served for `api.supabase.com`. In a browser, click the padlock icon next to the address bar and check the certificate's **Issuer** field. It should be a public CA (e.g. Google Trust Services). If it's your antivirus vendor or a corporate proxy CA instead, that's what's intercepting the connection.
+- Check the certificate being served for `api.supabase.com`. In a browser, click the padlock icon next to the address bar and check the certificate's **Issuer** field. It should be a public CA (e.g. Google Trust Services). If it's your antivirus vendor or a corporate proxy CA instead, that's what's intercepting the connection.
 - If you're on a corporate network, check whether your organization uses an SSL-inspecting proxy (Zscaler, Netskope, or similar) and whether its root CA is installed and trusted on your machine.
 
 ## How to resolve
