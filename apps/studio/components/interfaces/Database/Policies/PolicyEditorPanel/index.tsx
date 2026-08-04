@@ -195,15 +195,14 @@ export const PolicyEditorPanel = memo(function ({
     const usingExpr = command !== 'insert' ? using : undefined
     const checkExpr = command === 'insert' ? using : check
 
-    if (command === 'insert' && !checkExpr?.trim()) {
-      return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
-    } else if (command !== 'insert' && !usingExpr?.trim()) {
-      return setFieldError('Please provide a SQL expression for the USING statement')
-    } else {
-      setFieldError(undefined)
-    }
-
     if (selectedPolicy === undefined) {
+      if (command === 'insert' && !checkExpr?.trim()) {
+        return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
+      } else if (command !== 'insert' && !usingExpr?.trim()) {
+        return setFieldError('Please provide a SQL expression for the USING statement')
+      }
+      setFieldError(undefined)
+
       const sql = generateCreatePolicyQuery({
         name,
         schema,
@@ -227,12 +226,28 @@ export const PolicyEditorPanel = memo(function ({
     } else if (selectedProject !== undefined) {
       const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
 
-      // ALTER POLICY can only replace an expression, not remove it
-      if (selectedPolicy.command !== 'INSERT' && selectedPolicy.check !== null && !check?.trim()) {
-        return setFieldError(
-          'The WITH CHECK expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
-        )
+      // A null definition/check is valid (the policy was created without that clause), so
+      // updates only require an expression where the policy already has one — ALTER POLICY
+      // can only replace an expression, not remove it.
+      if (selectedPolicy.command === 'INSERT') {
+        if (selectedPolicy.check !== null && !using?.trim()) {
+          return setFieldError(
+            'The WITH CHECK expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+          )
+        }
+      } else {
+        if (selectedPolicy.definition !== null && !using?.trim()) {
+          return setFieldError(
+            'The USING expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+          )
+        }
+        if (selectedPolicy.check !== null && !check?.trim()) {
+          return setFieldError(
+            'The WITH CHECK expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+          )
+        }
       }
+      setFieldError(undefined)
 
       const payload = generateUpdatePolicyPayload(selectedPolicy, {
         name,
