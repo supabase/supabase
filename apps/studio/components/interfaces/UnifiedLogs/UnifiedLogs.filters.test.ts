@@ -151,4 +151,18 @@ describe('buildDefaultColumnFilters', () => {
       { id: 'log_type', value: ['postgres'] },
     ])
   })
+
+  it('omits `date` for a malformed single-element range', () => {
+    const columnFilters = buildDefaultColumnFilters({
+      filter: ['log_type:eq:postgres'],
+      date: [new Date('2026-05-08T00:00:00Z')],
+    })
+    expect(columnFilters).toEqual([{ id: 'log_type', value: ['postgres'] }])
+  })
+
+  it('does not duplicate the `date` id when a hand-crafted `filter` param also targets it', () => {
+    const range = [new Date('2026-05-08T00:00:00Z'), new Date('2026-05-08T01:00:00Z')]
+    const columnFilters = buildDefaultColumnFilters({ filter: ['date:eq:123'], date: range })
+    expect(columnFilters).toEqual([{ id: 'date', value: range }])
+  })
 })
