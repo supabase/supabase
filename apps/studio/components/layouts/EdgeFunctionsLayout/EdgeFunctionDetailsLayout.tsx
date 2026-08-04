@@ -24,6 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Separator,
+  Skeleton,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
@@ -82,6 +83,7 @@ const EdgeFunctionDetailsLayout = ({
     data: selectedFunction,
     error,
     isError,
+    isPending: isLoadingFunction,
   } = useEdgeFunctionQuery({ projectRef: ref, slug: functionSlug })
   const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
 
@@ -306,53 +308,60 @@ const EdgeFunctionDetailsLayout = ({
                   </ShortcutTooltip>
                 </div>
 
-                <HoverCard
-                  openDelay={250}
-                  closeDelay={100}
-                  open={isTimestampHoverCardOpen}
-                  onOpenChange={setIsTimestampHoverCardOpen}
-                >
-                  <HoverCardTrigger asChild>
-                    <button type="button" tabIndex={0} className="flex items-center gap-2 group">
-                      <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                      <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
-                        {updatedRelative ?? 'Deploy status unavailable'}
-                      </span>
-                    </button>
-                  </HoverCardTrigger>
-                  <HoverCardContent side="bottom" align="start" className="w-40 p-0">
-                    {createdRelative && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Created</h3>
-                        {!!selectedFunction && (
-                          <TimestampInfo
-                            className="text-sm"
-                            label={createdRelative}
-                            utcTimestamp={selectedFunction.created_at}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {updatedRelative && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Last deployed</h3>
-                        {!!selectedFunction && (
-                          <TimestampInfo
-                            className="text-sm"
-                            label={updatedRelative}
-                            utcTimestamp={selectedFunction.updated_at}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {selectedFunction?.version !== undefined && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Deployments</h3>
-                        <p className="text-sm text-foreground">{selectedFunction.version}</p>
-                      </div>
-                    )}
-                  </HoverCardContent>
-                </HoverCard>
+                {isLoadingFunction ? (
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                ) : (
+                  <HoverCard
+                    openDelay={250}
+                    closeDelay={100}
+                    open={isTimestampHoverCardOpen}
+                    onOpenChange={setIsTimestampHoverCardOpen}
+                  >
+                    <HoverCardTrigger asChild>
+                      <button type="button" tabIndex={0} className="flex items-center gap-2 group">
+                        <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                        <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
+                          {updatedRelative ?? 'Deploy status unavailable'}
+                        </span>
+                      </button>
+                    </HoverCardTrigger>
+                    <HoverCardContent side="bottom" align="start" className="w-40 p-0">
+                      {createdRelative && (
+                        <div className="px-4 py-2 space-y-1">
+                          <h3 className="heading-meta text-foreground-light">Created</h3>
+                          {!!selectedFunction && (
+                            <TimestampInfo
+                              className="text-sm"
+                              label={createdRelative}
+                              utcTimestamp={selectedFunction.created_at}
+                            />
+                          )}
+                        </div>
+                      )}
+                      {updatedRelative && (
+                        <div className="px-4 py-2 space-y-1">
+                          <h3 className="heading-meta text-foreground-light">Last deployed</h3>
+                          {!!selectedFunction && (
+                            <TimestampInfo
+                              className="text-sm"
+                              label={updatedRelative}
+                              utcTimestamp={selectedFunction.updated_at}
+                            />
+                          )}
+                        </div>
+                      )}
+                      {selectedFunction?.version !== undefined && (
+                        <div className="px-4 py-2 space-y-1">
+                          <h3 className="heading-meta text-foreground-light">Deployments</h3>
+                          <p className="text-sm text-foreground">{selectedFunction.version}</p>
+                        </div>
+                      )}
+                    </HoverCardContent>
+                  </HoverCard>
+                )}
               </PageHeaderDescription>
             </PageHeaderSummary>
 
