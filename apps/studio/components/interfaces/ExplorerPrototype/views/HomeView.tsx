@@ -5,7 +5,7 @@
  * launch surface for the three ways to start exploring a project.
  */
 
-import { NotebookText, SquareCode } from 'lucide-react'
+import { MessageSquare, NotebookText, SquareCode } from 'lucide-react'
 
 import { ChatComposer } from './ChatComposer'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
@@ -49,6 +49,54 @@ export const HomeView = ({ onCreateNotebook, onCreateSnippet, onCreateChat }: Ho
                 description="Combine notes, queries, and results"
                 bgColor="bg-blue-500"
                 onClick={onCreateNotebook}
+              />
+            </div>
+          </section>
+
+          <section className="mt-8">
+            <h2 className="mb-3 text-sm font-medium text-foreground">Start with a template</h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <ActionCard
+                icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Authentication health"
+                description="Notebook template"
+                bgColor="bg-blue-500"
+                onClick={onCreateNotebook}
+              />
+              <ActionCard
+                icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Signup funnel"
+                description="Notebook template"
+                bgColor="bg-blue-500"
+                onClick={onCreateNotebook}
+              />
+              <ActionCard
+                icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Incident review"
+                description="Notebook template"
+                bgColor="bg-blue-500"
+                onClick={onCreateNotebook}
+              />
+              <ActionCard
+                icon={<MessageSquare className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Investigate errors"
+                description="Chat template"
+                bgColor="bg-blue-500"
+                onClick={() => onCreateChat('Help me investigate recent errors in my project.')}
+              />
+              <ActionCard
+                icon={<MessageSquare className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Explore your schema"
+                description="Chat template"
+                bgColor="bg-blue-500"
+                onClick={() => onCreateChat('Help me understand my database schema.')}
+              />
+              <ActionCard
+                icon={<MessageSquare className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Optimize a query"
+                description="Chat template"
+                bgColor="bg-blue-500"
+                onClick={() => onCreateChat('Help me optimize a slow database query.')}
               />
             </div>
           </section>
