@@ -142,38 +142,57 @@ export function ApiAuthorizationValidScreen({
   } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
 
-  const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
+  const {
+    mutate: approveRequest,
+    error: approveError,
+    reset: resetApproveError,
+  } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
     },
+    onError: () => {
+      setApprovalState('indeterminate')
+    },
   })
-  const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
+  const {
+    mutate: declineRequest,
+    error: declineError,
+    reset: resetDeclineError,
+  } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
       navigate('/organizations')
     },
+    onError: () => {
+      setApprovalState('indeterminate')
+    },
   })
+  const actionError = approveError
+    ? `Failed to authorize request: ${approveError.message}`
+    : declineError
+      ? `Failed to cancel authorization request: ${declineError.message}`
+      : undefined
+  const resetActionError = () => {
+    resetApproveError()
+    resetDeclineError()
+  }
 
   const onApproveRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
+    resetActionError()
     setApprovalState('approving')
-    approveRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    approveRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   const onDeclineRequest = form.handleSubmit((values) => {
     if (approvalState !== 'indeterminate') {
       return
     }
+    resetActionError()
     setApprovalState('declining')
-    declineRequest(
-      { id: auth_id, slug: values.selectedOrgSlug },
-      { onError: () => setApprovalState('indeterminate') }
-    )
+    declineRequest({ id: auth_id, slug: values.selectedOrgSlug })
   })
 
   if (isLoading) {
@@ -224,6 +243,8 @@ export function ApiAuthorizationValidScreen({
         requester={effectiveRequester}
         requestedOrganizationSlug={effectiveOrganizationSlug}
         organizations={effectiveOrganizationsState}
+        actionError={actionError}
+        onOrganizationChange={resetActionError}
         onApprove={onApproveRequest}
         onDecline={onDeclineRequest}
       />

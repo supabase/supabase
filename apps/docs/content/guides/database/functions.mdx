@@ -136,6 +136,17 @@ Reference: [`rpc()`](../../reference/python/rpc)
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("hello_world", null);
+```
+
+Reference: [`Rpc()`](../../reference/csharp/rpc)
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Returning data sets
@@ -390,6 +401,15 @@ val data = supabase.postgrest.rpc(
 
 ```python
 data = supabase.rpc('add_planet', params={'name': 'Jakku'}).execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("add_planet", new Dictionary<string, object> { { "name", "Jakku" } });
 ```
 
 </TabPanel>
