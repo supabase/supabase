@@ -1,0 +1,47 @@
+---
+title = "SQLSTATE 40001 (serialization_failure) in an RPC function causes infinite retries"
+date_created = "2026-07-27T07:04:18+00:00"
+topics = [ "functions" ]
+keywords = []
+[[errors]]
+code = "40001"
+message = "serialization_failure"
+---
+
+A custom `raise exception` using SQLSTATE `40001` (`serialization_failure`) in your PL/pgSQL function tells PostgREST the failure is transient, so PostgREST retries the transaction. That floods your logs with duplicates and splits one API request into several independent Postgres transactions.
+
+This [bug](https://github.com/PostgREST/postgrest/pull/4222) is present in PostgREST 14 and is fixed in PostgREST 16. Follow the [Supabase changelog](/changelog) to get notified when PostgREST 16 is released.
+
+### How to resolve
+
+To resolve this, update your Postgres function to use standard exception handling or SQLSTATE codes that map correctly to HTTP status codes.
+
+**1. Modify the Raise Statement**
+Replace custom `errcode` assignments with a standard exception or a PostgREST-compliant code:
+
+- **Standard Fix**: Change `raise exception using errcode = '40001', message = '...';` to `raise exception 'YOUR_ERROR_MESSAGE';`. This defaults to SQLSTATE `P0001`, which does not trigger the retry loop.
+- **HTTP Mapping**: Use the `PT` [prefix](https://docs.postgrest.org/en/v14/references/errors.html#raise-errors-with-http-status-codes) to map to specific HTTP status codes. For example, to return an HTTP 409, use: `raise sqlstate 'PT409' using message = 'YOUR_ERROR_MESSAGE';`
+
+**2. Terminate Hanging Backends**
+Existing looping processes must be stopped manually — fixing the function does not stop transactions already in flight. The repeated error entries in your Postgres logs (Logs Explorer) include a `process_id` field identifying the exact backend raising the error, e.g.:
+
+```json
+"process_id": 183165,
+"sql_state_code": "40001",
+"user_name": "authenticator"
+```
+
+You can also find candidate backends in `pg_stat_activity` by filtering on `authenticator`, the role PostgREST connects as:
+
+```sql
+select pid, state, query_start, query
+from pg_stat_activity
+where usename = 'authenticator'
+order by query_start;
+```
+
+Match the `pid` against the `process_id` from your logs to confirm you have the right backend, then terminate it from the [SQL editor](/dashboard/project/_/sql/new):
+
+`SELECT pg_terminate_backend(pid);`
+
+Alternatively, you can restart the project from the dashboard to clear all hanging backends at once.
