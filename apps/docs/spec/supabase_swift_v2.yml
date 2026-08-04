@@ -116,6 +116,26 @@ functions:
           Go to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - id: initialize-client-with-opentelemetry
+        name: Initialize Client with OpenTelemetry tracing
+        description: |
+          Supabase Swift supports W3C `traceparent` header propagation via an opt-in SwiftPM package trait.
+          When enabled, the active OpenTelemetry span's trace context is automatically injected into every outgoing request across PostgREST, Storage, Auth, Functions, and Realtime — no additional runtime configuration needed.
+
+          Enable the `OpenTelemetry` trait in your `Package.swift` dependency declaration:
+        code: |
+          ```swift
+          // Package.swift
+          .package(
+            url: "https://github.com/supabase/supabase-swift.git",
+            from: "2.51.0",
+            traits: ["OpenTelemetry"]
+          )
+          ```
+        notes: |
+          - Requires swift-tools-version 6.1 or later (trait support).
+          - The trait is **off by default** — no OTel dependency is linked unless you opt in.
+          - When no span is active, the header is not added; it is always safe to call unconditionally.
   - id: auth-api
     title: 'Overview'
     notes: |

@@ -404,6 +404,7 @@ allow_list = [
     "mTLS",
     "Supavisor",
     "SvelteKit",
+    "SwiftPM",
     "SwiftUI",
     "Reddit",
     "Remapper",
