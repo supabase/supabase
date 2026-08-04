@@ -121,7 +121,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             <AlertDescription className="text-xs mb-2 wrap-break-word">
               Error: {(schemasError as any)?.message}
             </AlertDescription>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
                 Reload schemas
               </Button>
