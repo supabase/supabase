@@ -1,40 +1,6 @@
-import { constants, permissions } from '@supabase/shared-types'
+import { permissions } from '@supabase/shared-types'
 
 import { McpMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
-
-const { OAuthScope } = constants
-
-// Manually extracted from platform mcp controller code
-const MCPToolOAuthScopeMapping = {
-  apply_migration: [OAuthScope.DATABASE_WRITE],
-  create_branch: [OAuthScope.ENVIRONMENT_WRITE],
-  create_project: [OAuthScope.PROJECTS_WRITE],
-  delete_branch: [OAuthScope.ENVIRONMENT_WRITE],
-  deploy_edge_function: [OAuthScope.EDGE_FUNCTIONS_WRITE],
-  execute_sql: [OAuthScope.DATABASE_READ, OAuthScope.DATABASE_WRITE],
-  generate_typescript_types: [OAuthScope.DATABASE_READ],
-  get_security_advisors: [OAuthScope.DATABASE_READ],
-  get_performance_advisors: [OAuthScope.DATABASE_READ],
-  get_edge_function: [OAuthScope.EDGE_FUNCTIONS_READ],
-  get_logs: [OAuthScope.ANALYTICS_READ],
-  get_organization: [OAuthScope.ORGANIZATIONS_READ],
-  get_project: [OAuthScope.PROJECTS_READ],
-  get_project_url: [OAuthScope.PROJECTS_READ],
-  get_publishable_keys: [OAuthScope.SECRETS_READ],
-  get_storage_config: [OAuthScope.STORAGE_READ],
-  list_branches: [OAuthScope.ENVIRONMENT_READ],
-  list_edge_functions: [OAuthScope.EDGE_FUNCTIONS_READ],
-  list_migrations: [OAuthScope.DATABASE_READ],
-  list_organizations: [OAuthScope.ORGANIZATIONS_READ],
-  list_projects: [OAuthScope.PROJECTS_READ],
-  list_storage_buckets: [OAuthScope.STORAGE_READ],
-  merge_branch: [OAuthScope.ENVIRONMENT_WRITE],
-  pause_project: [OAuthScope.PROJECTS_WRITE],
-  rebase_branch: [OAuthScope.ENVIRONMENT_WRITE],
-  reset_branch: [OAuthScope.ENVIRONMENT_WRITE],
-  restore_project: [OAuthScope.PROJECTS_WRITE],
-  update_storage_config: [OAuthScope.STORAGE_WRITE],
-}
 
 type ExtractIds<T> = {
   [K in keyof T]: {
@@ -48,127 +14,120 @@ const FGA_PERMISSIONS = Object.fromEntries(
   ])
 ) as ExtractIds<typeof permissions.FgaPermissions>
 
-// Duplicated from platform (packages/api-core/src/lib/permissions/fga-permissions.ts)
-// Ideally, this could be exported from @supabase/shared-types
-export const legacyOauthScopeToFgaPermissionMap: Record<string, string[]> = {
-  'analytics:read': [
-    FGA_PERMISSIONS.PROJECT.ANALYTICS_LOGS_READ,
-    FGA_PERMISSIONS.PROJECT.ANALYTICS_USAGE_READ,
-  ],
-  'analytics:write': [],
-  'analytics_config:read': [FGA_PERMISSIONS.PROJECT.ANALYTICS_CONFIG_READ],
-  'analytics_config:write': [FGA_PERMISSIONS.PROJECT.ANALYTICS_CONFIG_WRITE],
-  'auth:read': [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ],
-  // Note(Hieu) Auth:write scope grants access to all auth config endpoints.
-  // However, one endpoint requires minimum administrator role, so this oauth scope must also include the FGA PROJECT.ADMIN_WRITE permission
-  'auth:write': [FGA_PERMISSIONS.PROJECT.ADMIN_WRITE, FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE],
-  'database:read': [
-    FGA_PERMISSIONS.USER.SNIPPETS_READ,
-    FGA_PERMISSIONS.PROJECT.ADVISORS_READ,
-    FGA_PERMISSIONS.PROJECT.BACKUPS_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_JIT_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_READONLY_CONFIG_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_READ,
-    FGA_PERMISSIONS.PROJECT.SNIPPETS_READ,
-  ],
-  'database:write': [
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-    FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE,
-    // Note(Hieu): Include database read permission here to align with the project query endpoint.
-    // RLS and FGA guard this endpoint with database read first, then perform an additional check for write queries.
-    // The OAuth guard requires database write directly, which causes a discrepancy error if we don't include read here.
-    FGA_PERMISSIONS.PROJECT.DATABASE_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_POOLING_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_READONLY_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_WRITE,
-  ],
-  'domains:read': [
-    FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_READ,
-    FGA_PERMISSIONS.PROJECT.VANITY_SUBDOMAIN_READ,
-  ],
-  'domains:write': [
-    FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_WRITE,
-    FGA_PERMISSIONS.PROJECT.VANITY_SUBDOMAIN_WRITE,
-  ],
-  'edge_functions:read': [FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ],
-  'edge_functions:write': [FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE],
-  'environment:read': [
-    FGA_PERMISSIONS.PROJECT.ACTION_RUNS_READ,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_READ,
-  ],
-  'environment:write': [
-    FGA_PERMISSIONS.PROJECT.ACTION_RUNS_WRITE,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_DELETE,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_CREATE,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_DELETE,
-    FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE,
-  ],
-  'organizations:read': [
-    FGA_PERMISSIONS.USER.ORGANIZATIONS_READ,
-    FGA_PERMISSIONS.ORGANIZATION.ADMIN_READ,
-    FGA_PERMISSIONS.ORGANIZATION.MEMBERS_READ,
-  ],
-  'organizations:write': [],
-  'projects:read': [
-    FGA_PERMISSIONS.USER.PROJECTS_READ,
-    FGA_PERMISSIONS.ORGANIZATION.PROJECTS_READ,
-    FGA_PERMISSIONS.PROJECT.ADMIN_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_READ,
-    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_READ,
-  ],
-  'projects:write': [
-    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE,
-    FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE,
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_WRITE,
-    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_RESTRICTIONS_WRITE,
-  ],
-  'rest:read': [FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_READ],
-  'rest:write': [FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE],
-  'secrets:read': [
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_READ,
-  ],
-  'secrets:write': [
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_WRITE,
-    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_WRITE,
-    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE,
-  ],
-  'storage:read': [
-    FGA_PERMISSIONS.PROJECT.STORAGE_READ,
-    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ,
-  ],
-  'storage:write': [
-    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE,
-    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE,
-  ],
-}
+const { USER, ORGANIZATION, PROJECT } = FGA_PERMISSIONS
 
-/*
- * Build a map of MCP tools/FGA permissions by mapping their OAuth Scopes to the FGA permissions:
- * {
- *    apply_migration: ["project_admin_write", ...]
- * }
- * The code is duplicated from platform until we find a better way to share those mappings
+/**
+ * MCP tool -> the FGA permissions a scoped token needs to call it.
+ *
+ * Each entry is derived from the Management API endpoint(s) the tool's handler actually calls, and
+ * the groups are copied verbatim from that endpoint's `x-fga-permissions` — the same annotation the
+ * endpoint half of this map is built from. The comment above each entry names the endpoint so the
+ * whole map can be re-audited against `${NEXT_PUBLIC_API_DOMAIN}/api/v1-json` in one pass. Comment
+ * paths follow the spec's parameter names; the pinned client's generated types may use older names
+ * for the same routes (its `{branch_id}` is the spec's `{branch_id_or_ref}`).
+ *
+ * Why not the platform MCP controller's `assertMcpOAuthScope` calls: those assert coarse OAuth
+ * scope bundles ('database:read' covers advisors, backups, migrations, snippets, …) and are no-ops
+ * for personal access tokens. Expanding a bundle into its FGA permissions produces a conjunction of
+ * everything in it, which demands permissions the tool never uses and hides the tool from tokens
+ * that can genuinely call it. The endpoint's own FGA annotation is what the guard enforces for a
+ * scoped token, so that is what we mirror.
+ *
+ * SCOPE: this describes the MCP server that calls the Management API with the token — the
+ * `@supabase/mcp-server-supabase` package, whose `src/platform/api-platform.ts` maps every tool to
+ * a v1 endpoint. It does NOT describe the platform-hosted MCP endpoint (`/mcp` in the mgmt-api),
+ * which reimplements the same tools with its own authorization and currently rejects scoped PATs
+ * outright, pending a migration to FGA permission checks. Revisit this file if that lands, since
+ * the hosted checks do not all match the endpoint ones.
+ *
+ * `[[]]` — a single empty group — marks a tool that no permission gates, because its handler makes
+ * no Management API call. See `ScopeGroupAlternatives` for why that, and not `[]`, is "ungated".
+ *
+ * The tool list is pinned to the installed @supabase/mcp-server-supabase by a test that diffs these
+ * keys against its registry, so a dependency bump that adds or drops a tool fails CI by name.
  */
-export const MCPToolScopeMappings = Object.entries(MCPToolOAuthScopeMapping).reduce(
-  (acc, [mcpTool, oAuthScopes]) => {
-    acc[mcpTool] = oAuthScopes.flatMap(
-      (oAuthScope) => legacyOauthScopeToFgaPermissionMap[oAuthScope]
-    )
-    return acc
-  },
-  {} as McpMap
-)
+export const MCPToolScopeMappings: McpMap = {
+  // GET /v1/organizations
+  list_organizations: [[USER.ORGANIZATIONS_READ]],
+  // GET /v1/organizations/{slug}
+  get_organization: [[ORGANIZATION.ADMIN_READ]],
+  // GET /v1/projects
+  list_projects: [[USER.PROJECTS_READ]],
+  // GET /v1/projects/{ref}
+  get_project: [[PROJECT.ADMIN_READ]],
+  // `type: 'branch'` returns a local constant and needs no permission. The `type: 'project'` path
+  // additionally calls GET /v1/organizations/{slug} and GET /v1/projects, but this tool-level map
+  // records the least-privileged useful invocation, consistent with execute_sql below.
+  get_cost: [[]],
+  // Hashes the cost object locally, no Management API call
+  confirm_cost: [[]],
+  // The cost flow above, then POST /v1/projects
+  create_project: [[ORGANIZATION.ADMIN_READ, USER.PROJECTS_READ, ORGANIZATION.PROJECTS_CREATE]],
+  // POST /v1/projects/{ref}/pause
+  pause_project: [[PROJECT.ADMIN_WRITE]],
+  // POST /v1/projects/{ref}/restore
+  restore_project: [[PROJECT.ADMIN_WRITE]],
+
+  // POST /v1/projects/{ref}/database/query. The spec annotates this
+  // `[[database_read], [database_write]]`, but those are NOT alternatives: the route uses
+  // `AuthWithFgaPermissions([DATABASE_READ], [[DATABASE_WRITE]])`, so the guard requires
+  // database_read and database_write is a doc-only group. A write query without database_write is
+  // downgraded to a read-only connection rather than rejected, so read alone is the real
+  // requirement to call the tool.
+  execute_sql: [[PROJECT.DATABASE_READ]],
+  // POST /v1/projects/{ref}/database/query with read_only: true
+  list_tables: [[PROJECT.DATABASE_READ]],
+  // POST /v1/projects/{ref}/database/query with read_only: true
+  list_extensions: [[PROJECT.DATABASE_READ]],
+  // GET /v1/projects/{ref}/database/migrations
+  list_migrations: [[PROJECT.DATABASE_MIGRATIONS_READ]],
+  // POST /v1/projects/{ref}/database/migrations
+  apply_migration: [[PROJECT.DATABASE_MIGRATIONS_WRITE]],
+
+  // GET /v1/projects/{ref}/analytics/endpoints/logs.all
+  get_logs: [[PROJECT.ANALYTICS_LOGS_READ]],
+  // GET /v1/projects/{ref}/advisors/security and /advisors/performance (one tool, `type` param)
+  get_advisors: [[PROJECT.ADVISORS_READ]],
+
+  // Builds the URL from the project ref and API hostname, no Management API call
+  get_project_url: [[]],
+  // GET /v1/projects/{ref}/api-keys, plus /api-keys/legacy — both api_gateway_keys_read
+  get_publishable_keys: [[PROJECT.API_GATEWAY_KEYS_READ]],
+  // GET /v1/projects/{ref}/types/typescript
+  generate_typescript_types: [[PROJECT.DATABASE_READ]],
+
+  // GET /v1/projects/{ref}/functions
+  list_edge_functions: [[PROJECT.EDGE_FUNCTIONS_READ]],
+  // GET /v1/projects/{ref}/functions/{function_slug} and /body
+  get_edge_function: [[PROJECT.EDGE_FUNCTIONS_READ]],
+  // POST /v1/projects/{ref}/functions/deploy. It first tries to read the existing function to reuse
+  // its import map, but that call is wrapped in try/catch, so read is not actually required.
+  deploy_edge_function: [[PROJECT.EDGE_FUNCTIONS_WRITE]],
+
+  // POST /v1/projects/{ref}/branches. The MCP client never sends `is_default`, so the endpoint
+  // always checks the development-create permission for this tool.
+  create_branch: [[PROJECT.BRANCHING_DEVELOPMENT_CREATE]],
+  // GET /v1/projects/{ref}/branches
+  list_branches: [[PROJECT.BRANCHING_DEVELOPMENT_READ], [PROJECT.BRANCHING_PRODUCTION_READ]],
+  // For the four branch-id endpoints below, the handler checks exactly ONE of the two groups at
+  // runtime, keyed on the target branch's `is_default` (production when true, development
+  // otherwise) — so the OR is "either alternative unlocks some invocations", not a fallback. A
+  // development-only token still gets a 403 when targeting the default branch, and vice versa.
+  // DELETE /v1/branches/{branch_id_or_ref}
+  delete_branch: [[PROJECT.BRANCHING_DEVELOPMENT_DELETE], [PROJECT.BRANCHING_PRODUCTION_DELETE]],
+  // POST /v1/branches/{branch_id_or_ref}/merge
+  merge_branch: [[PROJECT.BRANCHING_DEVELOPMENT_WRITE], [PROJECT.BRANCHING_PRODUCTION_WRITE]],
+  // POST /v1/branches/{branch_id_or_ref}/reset
+  reset_branch: [[PROJECT.BRANCHING_DEVELOPMENT_WRITE], [PROJECT.BRANCHING_PRODUCTION_WRITE]],
+  // POST /v1/branches/{branch_id_or_ref}/push
+  rebase_branch: [[PROJECT.BRANCHING_DEVELOPMENT_WRITE], [PROJECT.BRANCHING_PRODUCTION_WRITE]],
+
+  // Content API lookup, no Management API call
+  search_docs: [[]],
+  // GET /v1/projects/{ref}/storage/buckets
+  list_storage_buckets: [[PROJECT.STORAGE_READ]],
+  // GET /v1/projects/{ref}/config/storage
+  get_storage_config: [[PROJECT.STORAGE_CONFIG_READ]],
+  // PATCH /v1/projects/{ref}/config/storage
+  update_storage_config: [[PROJECT.STORAGE_CONFIG_WRITE]],
+}
