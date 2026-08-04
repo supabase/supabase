@@ -55,21 +55,25 @@ export const RiskMarker = ({
         <Badge variant={RISK_VARIANT[entry.risk]}>{RISK_LEVEL_LABEL[entry.risk]}</Badge>
         <p className="text-xs text-foreground-light">{entry.riskReason}</p>
         {(entry.allowsRead.length > 0 || entry.allowsWrite.length > 0) && (
-          <div className="space-y-2 mt-5">
+          <div className="flex flex-col gap-5 mt-5">
             {/*<h3 className="text-[11px] font-mono uppercase tracking-wide text-foreground-muted">
               Allows
             </h3>*/}
             {entry.allowsRead.length > 0 && (
-              <p className="text-xs text-foreground-light">
-                <span className="text-foreground-lighter">Read: </span>
+              <span className="text-xs text-foreground-light">
+                <h3 className="text-foreground-muted text-xs uppercase font-mono tracking-wide font-normal mb-0.5">
+                  Read:{' '}
+                </h3>
                 {entry.allowsRead.join(', ')}
-              </p>
+              </span>
             )}
             {entry.allowsWrite.length > 0 && (
-              <p className="text-xs text-foreground-light">
-                <span className="text-foreground-lighter">Write: </span>
+              <span className="text-xs text-foreground-light">
+                <h3 className="text-foreground-muted text-xs uppercase font-mono tracking-wide font-normal mb-0.5">
+                  Write:{' '}
+                </h3>
                 {entry.allowsWrite.join(', ')}
-              </p>
+              </span>
             )}
           </div>
         )}
