@@ -1,38 +1,35 @@
-# Supabase UI Package
+# `packages/ui`
 
-## Figma-tokens setup
+Supabase's shared React component library. Built on [Radix UI](https://www.radix-ui.com/) primitives and [shadcn/ui](https://ui.shadcn.com/), styled with Tailwind CSS, and used across all Supabase apps.
 
-Tokens setup is based partly on blogpost on the [Mirahi Digital Garden](https://garden.mirahi.io/how-to-use-the-color-tokens-from-your-design-system-directly-in-tailwind-css/).
+## Usage
 
-Transforms tokens stored on [Figma Tokens](https://github.com/six7/figma-tokens) using token-transformer and [Style Dictionary](https://github.com/amzn/style-dictionary) to css-variables with references, and use them in your [TailwindCSS](https://github.com/tailwindlabs/tailwindcss) environment with multiple themes.
+Import from the `'ui'` package alias:
 
-### Build all the styles files (css-variables and tailwind config)
-
-```bash
-npm run build-styles
+```tsx
+import { Badge, Button, Input } from 'ui'
 ```
 
-This creates a directory called `styles` with the tokens and also CSS required.
+Some of the components have the `_Shadcn_` suffix. These components should be preferred, they're in a process of replacing the other ones.
 
-### Other examples
+### Utilities
 
-You can find [other examples here](https://github.com/six7/figma-tokens-examples) by [Jan Six](https://twitter.com/six7)
+```tsx
+// deep object merge (used for themes)
+import { clipboard, cn, mergeDeep } from 'ui' // clsx + tailwind-merge
 
-### Adding new themes/sets
-
-Add new sets by extending the scripts in package.json. Currently theme sets derive from `exported/[set name]` but can come from anywhere.
-
-Adding a new set can be done with the following:
-
-```json package.json
-// package.json
-
-//..
-"build-transform-light": "npx token-transformer tokens.json styles/tokens/02_themes/light.json global,exported/light,theme global",
-// add a new line like this:
-"build-transform-new": "npx token-transformer tokens.json styles/tokens/02_themes/new.json global,new,theme global",
-//..
-// append the new theme/set command to end of the build-transform command
-"build-transform": "npm run build-transform-global && npm run build-transform-typography && npm run build-transform-dark  && npm run build-transform-light && npm run build-transform-new",
-
+// copy-to-clipboard helper
 ```
+
+## Styling conventions
+
+- Tailwind only — no inline styles or CSS modules.
+- Use shadcn semantic pairs (`bg-card text-card-foreground`, `bg-muted text-muted-foreground`,
+  `bg-tertiary text-tertiary-foreground`) rather than hardcoded colors. Legacy utilities such as
+  `text-foreground-light` and `border-default` are compatibility aliases only.
+- Themes set the core `--hue` (or the split `--surface-hue` / `--primary-hue`), `--chroma`,
+  `--surface`, `--foreground-lightness`, and `--contrast` inputs, plus their
+  `--muted-foreground-level` and `--tertiary-foreground-level` hierarchy.
+  Semantic colors are derived from them in OKLCH; `--contrast: 1` is the baseline and the supported
+  adjustment range is `0.75` to `1.25`.
+- The workspace root owns the actual `tailwind.config.js`. The file in this package is a stub for IntelliSense only.

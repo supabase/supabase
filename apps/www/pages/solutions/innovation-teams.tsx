@@ -1,14 +1,13 @@
-import { NextPage } from 'next'
-import dynamic from 'next/dynamic'
-import { NextSeo } from 'next-seo'
-import Link from 'next/link'
-import { Check } from 'lucide-react'
-
 import Layout from 'components/Layouts/Default'
-import SolutionsStickyNav from 'components/SolutionsStickyNav'
 import SectionContainer from 'components/Layouts/SectionContainer'
-import content from 'data/solutions/innovation-teams'
+import SolutionsStickyNav from 'components/SolutionsStickyNav'
 import { Solutions } from 'data/Solutions'
+import content from 'data/solutions/innovation-teams'
+import { Check } from 'lucide-react'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import { Button, cn } from 'ui'
 
 const ProductHeader = dynamic(() => import('components/Sections/ProductHeader2'))
@@ -65,7 +64,7 @@ const InnovationTeams: NextPage = () => {
               role: data.secondaryQuote.role,
               logo: data.secondaryQuote.logo,
             }}
-            className="!pt-0"
+            className="pt-0!"
           />
         )}
         {/* AI Builder Ecosystem Section */}
@@ -114,7 +113,7 @@ const InnovationTeams: NextPage = () => {
                 <svg className="w-[300px] h-[120px]" viewBox="0 0 300 120" fill="none">
                   <path
                     d="M 150 0 L 30 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -122,7 +121,7 @@ const InnovationTeams: NextPage = () => {
                   />
                   <path
                     d="M 150 0 L 100 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -130,13 +129,13 @@ const InnovationTeams: NextPage = () => {
                   />
                   <path
                     d="M 150 0 L 150 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     fill="none"
                   />
                   <path
                     d="M 150 0 L 200 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -144,7 +143,7 @@ const InnovationTeams: NextPage = () => {
                   />
                   <path
                     d="M 150 0 L 270 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -153,35 +152,35 @@ const InnovationTeams: NextPage = () => {
                 </svg>
 
                 {/* Provider Logos Bar */}
-                <div className="flex items-center gap-6 px-6 py-4 rounded-lg border border-strong bg-surface-100">
+                <div className="flex flex-wrap items-center justify-center max-w-full gap-3 sm:gap-4 md:gap-6 px-6 sm:px-4 py-3 sm:py-4 rounded-lg border border-strong bg-surface-100">
                   <img
                     src="/images/logos/publicity/lovable.svg"
                     alt="Lovable"
-                    className="h-8"
+                    className="h-5 min-[1080px]:h-6 xl:h-7 w-auto max-w-full shrink-0"
                     draggable={false}
                   />
                   <img
                     src="/images/logos/publicity/bolt.svg"
                     alt="Bolt"
-                    className="h-8"
+                    className="h-5 min-[1080px]:h-6 xl:h-7 w-auto max-w-full shrink-0"
                     draggable={false}
                   />
                   <img
                     src="/images/logos/publicity/v0.svg"
                     alt="v0"
-                    className="h-8"
+                    className="h-5 min-[1080px]:h-6 xl:h-7 w-auto max-w-full shrink-0"
                     draggable={false}
                   />
                   <img
                     src="/images/logos/publicity/figma.svg"
                     alt="Figma"
-                    className="h-8"
+                    className="h-5 min-[1080px]:h-6 xl:h-7 w-auto max-w-full shrink-0"
                     draggable={false}
                   />
                   <img
                     src="/images/logos/publicity/tempo.svg"
                     alt="Tempo"
-                    className="h-8"
+                    className="h-5 min-[1080px]:h-6 xl:h-7 w-auto max-w-full shrink-0"
                     draggable={false}
                   />
                 </div>
@@ -257,10 +256,10 @@ const InnovationTeams: NextPage = () => {
                         {option.type}
                       </span>
                       <h3 className="text-lg text-foreground font-medium mb-2">{option.title}</h3>
-                      <p className="text-foreground-lighter text-sm mb-6 flex-grow">
+                      <p className="text-foreground-lighter text-sm mb-6 grow">
                         {option.description}
                       </p>
-                      <Button type={index === 0 ? 'primary' : 'default'} asChild>
+                      <Button variant={index === 0 ? 'primary' : 'default'} asChild>
                         <Link href={option.cta.href}>{option.cta.label}</Link>
                       </Button>
                     </div>
@@ -269,7 +268,7 @@ const InnovationTeams: NextPage = () => {
                         <svg className="w-8 h-full" viewBox="0 0 32 100" fill="none">
                           <path
                             d="M 0 50 L 32 50"
-                            stroke="hsl(var(--border-strong))"
+                            stroke="var(--border-strong)"
                             strokeWidth="2"
                             strokeDasharray="4 4"
                           />

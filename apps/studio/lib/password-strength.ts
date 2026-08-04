@@ -1,8 +1,21 @@
-import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from 'lib/constants'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH, PASSWORD_STRENGTH } from '@/lib/constants'
 
 // This is the same as the ZXCVBNScore type from zxcvbn
 // but we need to define it here because we don't to import zxcvbn everywhere
 export type PasswordStrengthScore = 0 | 1 | 2 | 3 | 4
+
+/**
+ * True when the password contains characters that must be percent-encoded
+ * before the password can be used in a connection string URL.
+ */
+export function passwordNeedsPercentEncoding(password: string) {
+  try {
+    return password !== encodeURIComponent(password)
+  } catch {
+    // encodeURIComponent throws on lone surrogates
+    return true
+  }
+}
 
 export async function passwordStrength(value: string) {
   // [Alaister]: Lazy load zxcvbn to avoid bundling it with the main app (it's pretty chunky)

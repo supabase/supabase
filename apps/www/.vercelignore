@@ -30,8 +30,12 @@ public/fonts/**/*
 **/coverage
 
 # Documentation
+# We can't use a `*.md` + `!content/md/**` pattern here — Vercel's ignore
+# engine excludes content/md/ anyway, breaking generateMdContent.mjs at build
+# time. Match READMEs explicitly. Other stray .md files (Edge Function READMEs,
+# scratch notes) will ship in the build artifact but aren't routable.
 README.md
-*.md
+**/README.md
 docs/**/*
 
 # IDE files

@@ -1,27 +1,43 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { awsAccountKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { ResponseError } from '@/types'
 
 export type AWSAccountDeleteVariables = {
   projectRef: string
   awsAccountId: string
+  databaseIdentifier?: string
 }
 
-export async function deleteAWSAccount({ projectRef, awsAccountId }: AWSAccountDeleteVariables) {
-  const { data, error } = await del(
-    '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}',
-    {
+export async function deleteAWSAccount({
+  projectRef,
+  awsAccountId,
+  databaseIdentifier,
+}: AWSAccountDeleteVariables) {
+  const deleteRequest = del as unknown as (
+    path: string,
+    init: {
       params: {
-        path: {
-          ref: projectRef,
-          aws_account_id: awsAccountId,
-        },
-      },
+        path: Record<string, string>
+      }
     }
-  )
+  ) => Promise<{ data: unknown; error: unknown }>
+
+  const path = databaseIdentifier
+    ? '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}/database/{database_identifier}'
+    : '/platform/projects/{ref}/privatelink/associations/aws-account/{aws_account_id}'
+
+  const { data, error } = await deleteRequest(path, {
+    params: {
+      path: {
+        ref: projectRef,
+        aws_account_id: awsAccountId,
+        ...(databaseIdentifier ? { database_identifier: databaseIdentifier } : {}),
+      },
+    },
+  })
 
   if (error) handleError(error)
   return data

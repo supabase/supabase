@@ -7,12 +7,12 @@ import * as React from 'react'
 import {
   Button,
   CommandDialog,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   DialogProps,
 } from 'ui'
 
@@ -53,7 +53,7 @@ export function CommandMenu({ ...props }: DialogProps) {
   return (
     <>
       <Button
-        type="outline"
+        variant="outline"
         className={cn(
           `relative h-8 w-full justify-start rounded-[0.5rem] bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12
             hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
@@ -64,17 +64,17 @@ export function CommandMenu({ ...props }: DialogProps) {
       >
         <span className="hidden lg:inline-flex">Search UI Library...</span>
         <span className="inline-flex lg:hidden">Search...</span>
-        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded border bg-surface-200 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex text-foreground-light">
+        <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded-sm border bg-surface-200 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex text-foreground-light">
           <span className="text-sm">⌘</span>K
         </kbd>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput_Shadcn_ placeholder="Type a command or search..." />
-        <CommandList_Shadcn_>
-          <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-          <CommandGroup_Shadcn_ key="pages" heading="Pages">
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup key="pages" heading="Pages">
             {COMMAND_ITEMS.map((navItem) => (
-              <CommandItem_Shadcn_
+              <CommandItem
                 key={navItem.href}
                 value={navItem.label}
                 onSelect={() => runCommand(() => router.push(navItem.href as string))}
@@ -83,29 +83,29 @@ export function CommandMenu({ ...props }: DialogProps) {
                   <CircleIcon className="h-3 w-3" strokeWidth={1} />
                 </div>
                 {navItem.label}
-              </CommandItem_Shadcn_>
+              </CommandItem>
             ))}
-          </CommandGroup_Shadcn_>
-          <CommandSeparator_Shadcn_ />
-          <CommandGroup_Shadcn_ heading="Theme">
-            <CommandItem_Shadcn_ onSelect={() => runCommand(() => setTheme('light'))}>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Theme">
+            <CommandItem onSelect={() => runCommand(() => setTheme('light'))}>
               <SunIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               Light
-            </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_ onSelect={() => runCommand(() => setTheme('dark'))}>
+            </CommandItem>
+            <CommandItem onSelect={() => runCommand(() => setTheme('dark'))}>
               <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               Dark
-            </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_ onSelect={() => runCommand(() => setTheme('classic-dark'))}>
+            </CommandItem>
+            <CommandItem onSelect={() => runCommand(() => setTheme('classic-dark'))}>
               <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               Classic dark
-            </CommandItem_Shadcn_>
-            <CommandItem_Shadcn_ onSelect={() => runCommand(() => setTheme('system'))}>
+            </CommandItem>
+            <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
               <LaptopIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               System
-            </CommandItem_Shadcn_>
-          </CommandGroup_Shadcn_>
-        </CommandList_Shadcn_>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
       </CommandDialog>
     </>
   )

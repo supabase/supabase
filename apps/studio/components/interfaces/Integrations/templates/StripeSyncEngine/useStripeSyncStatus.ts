@@ -1,14 +1,47 @@
-import { useStripeSyncingState } from 'data/database-integrations/stripe/sync-state-query'
-import { SchemasVariables, useSchemasQuery } from 'data/database/schemas-query'
+import { getCurrentVersion, parseSchemaComment } from '@stripe/sync-engine/supabase'
 import { useEffect } from 'react'
 
 import {
   findStripeSchema,
   isInProgress,
   isInstalled,
-  parseStripeSchema,
   type StripeSyncStatusResult,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+import { useStripeSyncingState } from '@/data/database-integrations/stripe/sync-state-query'
+import { Schema, useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+// Maximum time allowed for installation or uninstallation operations before the UI times out
+const OPERATION_TIME_OUT_MS: number = 5 * 60 * 1000 // 5 minutes
+
+export const getStripeSyncSchemaComment = (schemas: Schema[]) => {
+  // Find and parse stripe schema status
+  const stripeSchema = findStripeSchema(schemas)
+  const rawSchemaComment = parseSchemaComment(stripeSchema?.comment)
+
+  const now = Date.now()
+  const timedOut = rawSchemaComment.startTime
+    ? now - rawSchemaComment.startTime > OPERATION_TIME_OUT_MS
+    : false
+
+  const status = timedOut
+    ? rawSchemaComment.status === 'installing'
+      ? 'install error'
+      : rawSchemaComment.status === 'uninstalling'
+        ? 'uninstall error'
+        : rawSchemaComment.status
+    : rawSchemaComment.status
+
+  const errorMessage = timedOut
+    ? rawSchemaComment.status === 'installing'
+      ? 'Installation timed out'
+      : rawSchemaComment.status === 'uninstalling'
+        ? 'Uninstallation timed out'
+        : rawSchemaComment.errorMessage
+    : rawSchemaComment.errorMessage
+
+  return { ...rawSchemaComment, status, errorMessage, timedOut }
+}
 
 /**
  * Unified hook for Stripe Sync installation status.
@@ -17,10 +50,11 @@ import {
  * into a single source of truth. It returns a discriminated union status that
  * makes impossible states unrepresentable.
  */
-export function useStripeSyncStatus({
-  projectRef,
-  connectionString,
-}: SchemasVariables): StripeSyncStatusResult {
+export function useStripeSyncStatus(): StripeSyncStatusResult {
+  const latestAvailableVersion = getCurrentVersion()
+  const { data: project } = useSelectedProjectQuery()
+  const { ref: projectRef, connectionString } = project || {}
+
   // Query schemas once
   const {
     data: schemas,
@@ -28,12 +62,19 @@ export function useStripeSyncStatus({
     refetch,
   } = useSchemasQuery({ projectRef, connectionString }, { enabled: !!projectRef })
 
-  // Find and parse stripe schema status
-  const stripeSchema = findStripeSchema(schemas)
-  const parsedSchema = parseStripeSchema(stripeSchema)
+  const schemaComment = getStripeSyncSchemaComment(schemas ?? [])
+  const timedOut = schemaComment.timedOut
+  const installed = isInstalled(schemaComment.status)
+  const inProgress = isInProgress(schemaComment.status)
 
-  const installed = isInstalled(parsedSchema.status)
-  const inProgress = isInProgress(parsedSchema.status)
+  // Query sync state only when installed
+  const { data: syncState, isPending: isLoadingStripeSyncState } = useStripeSyncingState(
+    { projectRef: projectRef!, connectionString },
+    {
+      refetchInterval: 4000,
+      enabled: !!projectRef && installed,
+    }
+  )
 
   // Poll schemas during install/uninstall operations
   useEffect(() => {
@@ -48,18 +89,11 @@ export function useStripeSyncStatus({
     return () => clearInterval(interval)
   }, [inProgress, refetch])
 
-  // Query sync state only when installed
-  const { data: syncState, isLoading: isSyncStateLoading } = useStripeSyncingState(
-    { projectRef: projectRef!, connectionString },
-    {
-      refetchInterval: 4000,
-      enabled: !!projectRef && installed,
-    }
-  )
-
   return {
-    parsedSchema,
+    schemaComment,
     syncState: installed ? syncState : undefined,
-    isLoading: isSchemasLoading,
+    isLoading: isSchemasLoading || isLoadingStripeSyncState,
+    latestAvailableVersion,
+    timedOut,
   }
 }

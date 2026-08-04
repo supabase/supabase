@@ -12,16 +12,16 @@ export function useKeyboardNavigation({
   activeInput,
   setActiveInput,
   activeFilters,
-  onFilterChange,
+  commitFilters,
   highlightedConditionPath,
   setHighlightedConditionPath,
 }: KeyboardNavigationConfig) {
   const removeByPath = useCallback(
     (path: ConditionPath) => {
       const updatedFilters = removeFromGroup(activeFilters, path)
-      onFilterChange(updatedFilters)
+      commitFilters(updatedFilters)
     },
-    [activeFilters, onFilterChange]
+    [activeFilters, commitFilters]
   )
 
   const findFirstConditionInGroup = useCallback(
@@ -124,7 +124,7 @@ export function useKeyboardNavigation({
 
   const handleBackspace = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (activeInput?.type === 'operator') return
+      if (activeInput?.type === 'operator' || activeInput?.type === 'property') return
 
       const inputElement = e.target as HTMLInputElement
       const isEmpty = inputElement.value === ''
@@ -172,6 +172,8 @@ export function useKeyboardNavigation({
 
   const handleArrowLeft = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
+      if (activeInput?.type === 'property') return
+
       const inputElement = e.target as HTMLInputElement
       const isEmpty = inputElement.value === ''
 
@@ -201,6 +203,8 @@ export function useKeyboardNavigation({
 
   const handleArrowRight = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
+      if (activeInput?.type === 'property') return
+
       const inputElement = e.target as HTMLInputElement
       const isEmpty = inputElement.value === ''
 
@@ -255,7 +259,10 @@ export function useKeyboardNavigation({
       } else if (e.key === 'ArrowRight') {
         handleArrowRight(e)
       } else if (e.key === 'Escape') {
-        if (highlightedConditionPath) {
+        if (activeInput?.type === 'property') {
+          e.preventDefault()
+          setActiveInput({ type: 'value', path: activeInput.path })
+        } else if (highlightedConditionPath) {
           e.preventDefault()
           setHighlightedConditionPath(null)
         } else {
@@ -271,6 +278,10 @@ export function useKeyboardNavigation({
           setHighlightedConditionPath(null)
         } else if (activeInput?.type === 'value') {
           e.preventDefault()
+          // Enter from a value input (with no menu item highlighted) is the user committing
+          // the typed value. `handleInputChange` has already pushed it through onFilterChange
+          // on each keystroke, so we just need to surface the commit via onApply here.
+          commitFilters(activeFilters)
           setActiveInput({ type: 'group', path: activeInput.path.slice(0, -1) })
         } else if (activeInput?.type === 'operator') {
           e.preventDefault()
@@ -281,6 +292,8 @@ export function useKeyboardNavigation({
     },
     [
       activeInput,
+      activeFilters,
+      commitFilters,
       handleBackspace,
       handleArrowLeft,
       handleArrowRight,

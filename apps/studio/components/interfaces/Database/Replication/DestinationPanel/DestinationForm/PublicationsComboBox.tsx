@@ -1,41 +1,53 @@
+import { useParams } from 'common'
 import { Check, ChevronsUpDown, Loader2, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
-
-import type { ReplicationPublication } from 'data/replication/publications-query'
 import {
   Badge,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 
 interface PublicationsComboBoxProps {
-  publications: ReplicationPublication[]
-  isLoadingPublications: boolean
+  sourceId?: number
+  field: ControllerRenderProps<DestinationPanelSchemaType, 'publicationName'>
   onNewPublicationClick: () => void
-  field: ControllerRenderProps<any, 'publicationName'>
 }
 
 export const PublicationsComboBox = ({
-  publications,
-  isLoadingPublications,
-  onNewPublicationClick,
+  sourceId,
   field,
+  onNewPublicationClick,
 }: PublicationsComboBoxProps) => {
+  const { ref: projectRef } = useParams()
+
+  const [searchTerm, setSearchTerm] = useState('')
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [selectedPublication, setSelectedPublication] = useState<string>(field?.value || '')
-  const [searchTerm, setSearchTerm] = useState('')
+
+  const {
+    data: publications = [],
+    isPending,
+    isFetching,
+    refetch: refetchPublications,
+  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const isLoadingPublications = isPending || isFetching
+  const showLoadingState = isLoadingPublications && publications.length === 0
 
   function handlePublicationSelect(pub: string) {
     setSelectedPublication(pub)
@@ -48,65 +60,67 @@ export const PublicationsComboBox = ({
   }, [field?.value])
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={dropdownOpen}
       onOpenChange={(open) => {
         setDropdownOpen(open)
+        if (open) {
+          if (typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined') {
+            refetchPublications()
+          }
+        }
+
         if (!open && field?.onBlur) {
           field.onBlur()
         }
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="medium"
           className={cn(
             'w-full [&>span]:w-full text-left',
             !selectedPublication && 'text-foreground-muted'
           )}
-          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
+          iconRight={showLoadingState ? <Loader2 className="animate-spin" /> : <ChevronsUpDown />}
           name={field.name}
           onBlur={field.onBlur}
         >
           {selectedPublication || 'Select publication'}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ sameWidthAsTrigger className="p-0" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent sameWidthAsTrigger className="p-0" align="start">
+        <Command>
+          <CommandInput
             placeholder="Find publication..."
             className="text-xs"
             value={searchTerm}
             onValueChange={setSearchTerm}
           />
-          <div className="px-2 pt-2 pb-1">
-            <p className="text-xs text-foreground-lighter">
-              Publications with no tables are hidden
-            </p>
-          </div>
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>
-              {isLoadingPublications ? (
-                <div className="flex items-center gap-2 text-center justify-center">
-                  <Loader2 size={12} className="animate-spin" />
-                  Loading...
-                </div>
-              ) : (
-                'No publications found'
-              )}
-            </CommandEmpty_Shadcn_>
+          <CommandList>
+            <CommandEmpty>No publications found</CommandEmpty>
 
-            <CommandGroup_Shadcn_>
-              {publications.length === 0 && (
-                <p className="text-foreground-lighter text-xs py-3 px-2">
-                  No publications available
-                </p>
+            {showLoadingState && (
+              <div className="flex items-center gap-2 p-2 pb-0 text-center justify-center">
+                <GenericSkeletonLoader className="w-full" />
+              </div>
+            )}
+
+            <CommandGroup>
+              {publications.length === 0 && !showLoadingState && (
+                <div className="text-foreground-lighter text-xs py-3 px-2 space-y-0.5">
+                  <p>No publications available</p>
+                  <p className="text-foreground-muted">Publications with no tables are hidden</p>
+                </div>
               )}
-              <ScrollArea className={publications.length > 7 ? 'h-[210px]' : ''}>
+              <ScrollArea
+                className={publications.length > 7 ? 'h-[210px]' : ''}
+                onWheel={(e) => e.stopPropagation()}
+              >
                 {publications.map((pub) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={pub.name}
                     className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                     onSelect={() => {
@@ -128,26 +142,26 @@ export const PublicationsComboBox = ({
                         <Check className="text-brand" strokeWidth={2} size={13} />
                       )}
                     </div>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
               </ScrollArea>
-            </CommandGroup_Shadcn_>
+            </CommandGroup>
 
-            <CommandSeparator_Shadcn_ />
+            <CommandSeparator />
 
-            <CommandGroup_Shadcn_>
-              <CommandItem_Shadcn_
+            <CommandGroup>
+              <CommandItem
                 className="cursor-pointer w-full"
                 onSelect={onNewPublicationClick}
                 onClick={onNewPublicationClick}
               >
                 <Plus size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -1,9 +1,6 @@
+import { useParams } from 'common'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-
-import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
-import { useParams } from 'common'
-import { useRollbackTablesMutation } from 'data/replication/rollback-tables-mutation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,13 +12,21 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { PipelineStatusName } from './Replication.constants'
+import { RestartCostEstimate } from './RestartCostEstimate'
+import { getTableCopyTargets, type TableSyncCopyConfig } from './TableSyncCopy.utils'
+import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
+import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
+
 interface BatchRestartDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: 'all' | 'errored'
-  totalTables: number
-  erroredTablesCount: number
   tables: ReplicationPipelineTableStatus[]
+  sourceId?: number
+  publicationName?: string
+  tableSyncCopy?: TableSyncCopyConfig
+  pipelineStatusName?: PipelineStatusName
   onRestartStart?: (tableIds: number[]) => void
   onRestartComplete?: (tableIds: number[]) => void
 }
@@ -30,58 +35,86 @@ export const BatchRestartDialog = ({
   open,
   onOpenChange,
   mode,
-  totalTables,
-  erroredTablesCount,
   tables,
+  sourceId,
+  publicationName,
+  tableSyncCopy,
+  pipelineStatusName,
   onRestartStart,
   onRestartComplete,
 }: BatchRestartDialogProps) => {
   const { ref: projectRef, pipelineId: _pipelineId } = useParams()
   const pipelineId = Number(_pipelineId)
-
-  // Calculate which table IDs will be restarted based on mode (memoized)
-  const affectedTableIds = useMemo(() => {
+  const affectedTables = useMemo(() => {
     if (mode === 'all') {
-      return tables.map((t) => t.table_id)
-    } else {
       return tables
-        .filter(
-          (t) =>
-            t.state.name === 'error' &&
-            'retry_policy' in t.state &&
-            t.state.retry_policy?.policy === 'manual_retry'
-        )
-        .map((t) => t.table_id)
+    } else {
+      return tables.filter((table) => table.state.name === 'error')
     }
   }, [mode, tables])
+  const affectedTableIds = useMemo(() => affectedTables.map((table) => table.id), [affectedTables])
 
-  const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
+  const copiedTables = useMemo(
+    () => getTableCopyTargets(affectedTables, tableSyncCopy),
+    [affectedTables, tableSyncCopy]
+  )
+
+  const initialSyncDescription =
+    copiedTables.length === 0 ? (
+      <li>
+        <strong>No table will run an initial sync.</strong> Replication will resume with new changes
+        only, without syncing existing source rows. There is no additional initial sync charge.
+      </li>
+    ) : copiedTables.length === affectedTables.length ? (
+      <li>
+        <strong>
+          {copiedTables.length === 1
+            ? 'The table will run its initial sync again.'
+            : `All ${copiedTables.length} tables will run initial sync again.`}
+        </strong>{' '}
+        Existing source rows will be synced again. Data successfully processed during this initial
+        sync is billed again.
+      </li>
+    ) : (
+      <li>
+        <strong>
+          {copiedTables.length} of {affectedTables.length} tables will run initial sync again.
+        </strong>{' '}
+        Existing source rows for those tables will be synced again and billed again. The remaining
+        tables will resume replication with new changes only.
+      </li>
+    )
+
+  const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(
         `Restarting replication for ${count} table${count > 1 ? 's' : ''}. Pipeline will restart automatically.`
       )
+    },
+    onSettled: () => {
       onRestartComplete?.(affectedTableIds)
       onOpenChange(false)
     },
     onError: (error) => {
       toast.error(`Failed to restart replication: ${error.message}`)
-      onRestartComplete?.(affectedTableIds)
-      onOpenChange(false)
     },
   })
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
 
     onRestartStart?.(affectedTableIds)
 
-    rollbackTables({
-      projectRef,
-      pipelineId,
-      target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
-      rollbackType: 'full',
-    })
+    try {
+      await rollbackTables({
+        projectRef,
+        pipelineId,
+        target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
+        rollbackType: 'full',
+        pipelineStatusName,
+      })
+    } catch (error) {}
   }
 
   const dialogContent =
@@ -91,14 +124,11 @@ export const BatchRestartDialog = ({
           description: (
             <div className="space-y-3 text-sm">
               <p>
-                This will restart replication for <strong>all {totalTables} tables</strong> in this
-                pipeline from scratch:
+                This will restart replication for all {affectedTables.length} table
+                {affectedTables.length === 1 ? '' : 's'} in this pipeline from scratch:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
-                <li>
-                  <strong>All table copies will be re-initialized.</strong> Every table will be
-                  copied again from the source.
-                </li>
+                {initialSyncDescription}
                 <li>
                   <strong>All downstream data will be deleted.</strong> All replicated data will be
                   removed.
@@ -117,21 +147,18 @@ export const BatchRestartDialog = ({
           description: (
             <div className="space-y-3 text-sm">
               <p>
-                This will restart replication for{' '}
-                <strong>all {erroredTablesCount} failed tables</strong> from scratch:
+                This will restart replication for all{' '}
+                <strong>{affectedTables.length} currently failed tables</strong> from scratch:
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
-                <li>
-                  <strong>Failed table copies will be re-initialized.</strong> These tables will be
-                  copied again from the source.
-                </li>
+                {initialSyncDescription}
                 <li>
                   <strong>Existing downstream data will be deleted.</strong> Replicated data for
                   these tables will be removed.
                 </li>
                 <li>
-                  <strong>All other tables remain untouched.</strong> Only failed tables are
-                  affected.
+                  <strong>Tables that are not failed remain untouched.</strong> The request resets
+                  every table that is failed when it runs.
                 </li>
                 <li>
                   <strong>The pipeline will restart automatically.</strong> This is required to
@@ -150,6 +177,13 @@ export const BatchRestartDialog = ({
           <AlertDialogTitle>{dialogContent.title}</AlertDialogTitle>
           <AlertDialogDescription asChild>{dialogContent.description}</AlertDialogDescription>
         </AlertDialogHeader>
+        <RestartCostEstimate
+          open={open}
+          projectRef={projectRef}
+          sourceId={sourceId}
+          publicationName={publicationName}
+          tables={copiedTables}
+        />
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">

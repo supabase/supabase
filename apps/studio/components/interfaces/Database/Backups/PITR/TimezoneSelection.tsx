@@ -3,15 +3,15 @@ import { useId, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 
@@ -34,31 +34,32 @@ export const TimezoneSelection = ({
 
   return (
     <div className="w-full">
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             role="combobox"
             aria-expanded={open}
             aria-controls={listboxId}
-            className="w-[350px] justify-between"
+            className="w-[350px] justify-start"
             size="small"
+            variant="default"
             icon={<Globe />}
-            iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} />}
+            iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} className="ml-auto" />}
           >
             {selectedTimezone
               ? timezoneOptions.find((option) => option === selectedTimezone.text)
               : 'Select timezone...'}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ id={listboxId} className="w-[350px] p-0">
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search timezone..." className="h-9" />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No timezones found...</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
+        </PopoverTrigger>
+        <PopoverContent id={listboxId} className="w-[350px] p-0">
+          <Command>
+            <CommandInput placeholder="Search timezone..." className="h-9" />
+            <CommandList>
+              <CommandEmpty>No timezones found...</CommandEmpty>
+              <CommandGroup>
                 <ScrollArea className="h-72">
                   {timezoneOptions.map((option) => (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={option}
                       value={option}
                       onSelect={(text) => {
@@ -78,14 +79,14 @@ export const TimezoneSelection = ({
                           selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
                         )}
                       />
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   ))}
                 </ScrollArea>
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

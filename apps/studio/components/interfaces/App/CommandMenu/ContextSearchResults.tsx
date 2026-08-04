@@ -1,10 +1,11 @@
 'use client'
 
-import dynamic from 'next/dynamic'
-import { Database } from 'lucide-react'
 import { Auth, EdgeFunctions, Storage } from 'icons'
+import { Database } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+import { EmptyState, SkeletonResults } from './ContextSearchResults.shared'
 import type { SearchContextValue } from './SearchContext.types'
-import { SkeletonResults, EmptyState } from './ContextSearchResults.shared'
 
 const TableSearchResults = dynamic(
   () => import('./TableSearchResults').then((mod) => ({ default: mod.TableSearchResults })),
@@ -44,6 +45,7 @@ const StorageSearchResults = dynamic(
 interface ContextSearchResultsProps {
   context: SearchContextValue
   query: string
+  debouncedFilterString: string
 }
 
 const CONTEXT_CONFIG: Record<
@@ -76,13 +78,17 @@ const CONTEXT_CONFIG: Record<
   },
 }
 
-export function ContextSearchResults({ context, query }: ContextSearchResultsProps) {
+export function ContextSearchResults({
+  context,
+  query,
+  debouncedFilterString,
+}: ContextSearchResultsProps) {
   const config = CONTEXT_CONFIG[context]
 
   if (context === 'database-tables') {
     return (
       <div className="flex-1 min-h-0 flex flex-col">
-        <TableSearchResults query={query} />
+        <TableSearchResults debouncedFilterString={debouncedFilterString} />
       </div>
     )
   }

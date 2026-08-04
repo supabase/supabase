@@ -29,6 +29,18 @@
     "title": "Analytics",
     "items": [
       {
+        "id": "v2-create-log-drain",
+        "title": "Create log drain",
+        "slug": "v2-create-log-drain",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-log-drain",
+        "title": "Delete log drain",
+        "slug": "v2-delete-log-drain",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-function-combined-stats",
         "title": "Get project function combined stats",
         "slug": "v1-get-project-function-combined-stats",
@@ -41,6 +53,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-project-logs-all",
+        "title": "Get project logs all",
+        "slug": "v1-get-project-logs-all",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-usage-api-count",
         "title": "Get project usage api count",
         "slug": "v1-get-project-usage-api-count",
@@ -50,6 +68,18 @@
         "id": "v1-get-project-usage-request-count",
         "title": "Get project usage request count",
         "slug": "v1-get-project-usage-request-count",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-log-drains",
+        "title": "List log drains",
+        "slug": "v2-list-log-drains",
+        "type": "operation"
+      },
+      {
+        "id": "v2-update-log-drain",
+        "title": "Update log drain",
+        "slug": "v2-update-log-drain",
         "type": "operation"
       }
     ]
@@ -197,6 +227,12 @@
     "title": "Database",
     "items": [
       {
+        "id": "v1-accept-invite-external-jit-access",
+        "title": "Accept invite external jit access",
+        "slug": "v1-accept-invite-external-jit-access",
+        "type": "operation"
+      },
+      {
         "id": "v1-apply-a-migration",
         "title": "Apply a migration",
         "slug": "v1-apply-a-migration",
@@ -212,6 +248,12 @@
         "id": "v1-create-login-role",
         "title": "Create login role",
         "slug": "v1-create-login-role",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-invite-external-jit-access",
+        "title": "Delete invite external jit access",
+        "slug": "v1-delete-invite-external-jit-access",
         "type": "operation"
       },
       {
@@ -257,9 +299,21 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-backup-schedule",
+        "title": "Get backup schedule",
+        "slug": "v1-get-backup-schedule",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-database-metadata",
         "title": "Get database metadata",
         "slug": "v1-get-database-metadata",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-database-openapi",
+        "title": "Get database openapi",
+        "slug": "v1-get-database-openapi",
         "type": "operation"
       },
       {
@@ -302,6 +356,12 @@
         "id": "v1-get-ssl-enforcement-config",
         "title": "Get ssl enforcement config",
         "slug": "v1-get-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-invite-external-jit-access",
+        "title": "Invite external jit access",
+        "slug": "v1-invite-external-jit-access",
         "type": "operation"
       },
       {
@@ -368,6 +428,12 @@
         "id": "v1-setup-a-read-replica",
         "title": "Setup a read replica",
         "slug": "v1-setup-a-read-replica",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-backup-schedule",
+        "title": "Update backup schedule",
+        "slug": "v1-update-backup-schedule",
         "type": "operation"
       },
       {
@@ -665,6 +731,12 @@
     "title": "Organizations",
     "items": [
       {
+        "id": "v2-assign-organization-member-role",
+        "title": "Assign organization member role",
+        "slug": "v2-assign-organization-member-role",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-an-organization",
         "title": "Create an organization",
         "slug": "v1-create-an-organization",
@@ -677,6 +749,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-organization-entitlements",
+        "title": "Get organization entitlements",
+        "slug": "v1-get-organization-entitlements",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-organizations",
         "title": "List all organizations",
         "slug": "v1-list-all-organizations",
@@ -686,6 +764,42 @@
         "id": "v1-list-organization-members",
         "title": "List organization members",
         "slug": "v1-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-members",
+        "title": "List organization members",
+        "slug": "v2-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-roles",
+        "title": "List organization roles",
+        "slug": "v2-list-organization-roles",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Organizations Members Invitations",
+    "items": [
+      {
+        "id": "v2-create-organization-invitations",
+        "title": "Create organization invitations",
+        "slug": "v2-create-organization-invitations",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Profile",
+    "items": [
+      {
+        "id": "v1-get-profile",
+        "title": "Get profile",
+        "slug": "v1-get-profile",
         "type": "operation"
       }
     ]
@@ -707,6 +821,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-create-private-link-association",
+        "title": "Create private link association",
+        "slug": "v2-create-private-link-association",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-project",
         "title": "Delete a project",
         "slug": "v1-delete-a-project",
@@ -716,6 +836,12 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-private-link-association",
+        "title": "Delete private link association",
+        "slug": "v2-delete-private-link-association",
         "type": "operation"
       },
       {
@@ -803,6 +929,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-list-private-link-associations",
+        "title": "List private link associations",
+        "slug": "v2-list-private-link-associations",
+        "type": "operation"
+      },
+      {
         "id": "v1-modify-database-disk",
         "title": "Modify database disk",
         "slug": "v1-modify-database-disk",
@@ -821,9 +953,27 @@
         "type": "operation"
       },
       {
+        "id": "v2-preview-a-project-transfer",
+        "title": "Preview a project transfer",
+        "slug": "v2-preview-a-project-transfer",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restart-a-project",
+        "title": "Restart a project",
+        "slug": "v1-restart-a-project",
+        "type": "operation"
+      },
+      {
         "id": "v1-restore-a-project",
         "title": "Restore a project",
         "slug": "v1-restore-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v2-transfer-a-project",
+        "title": "Transfer a project",
+        "slug": "v2-transfer-a-project",
         "type": "operation"
       },
       {

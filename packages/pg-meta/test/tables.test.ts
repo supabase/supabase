@@ -35,6 +35,168 @@ const withTestDatabase = (name: string, fn: (db: TestDb) => Promise<void>) => {
   })
 }
 
+// Legacy relationships come out in plan-dependent order (frozen TABLES_SQL has
+// no ORDER BY; proven by the adversarial-FK test below), so canonicalize ONLY
+// the legacy side to the scoped ORDER BY: constraint_name, then the column names
+// (a composite FK expands to one entry per source×target column pair).
+const sortRels = (rels: any[]) =>
+  [...rels].sort(
+    (a, b) =>
+      a.constraint_name.localeCompare(b.constraint_name) ||
+      a.source_column_name.localeCompare(b.source_column_name) ||
+      a.target_column_name.localeCompare(b.target_column_name)
+  )
+
+withTestDatabase(
+  'scoped tables.retrieve matches legacy (FKs both directions, PK, comment, enums)',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+    create type mood as enum ('sad', 'ok', 'happy');
+    create table public.parent (id int primary key, label text);
+    create table public.child (
+      id int primary key,
+      parent_id int references public.parent(id),
+      feeling mood,
+      self_ref int references public.child(id)
+    );
+    comment on table public.child is 'a child table';
+  `)
+
+    const [{ parent_id }] = await executeQuery<{ parent_id: number }[]>(
+      `select 'public.parent'::regclass::oid::int8 as parent_id;`
+    )
+    const [{ child_id }] = await executeQuery<{ child_id: number }[]>(
+      `select 'public.child'::regclass::oid::int8 as child_id;`
+    )
+
+    // parent: incoming FK (child.parent_id -> parent.id). child: outgoing FK to
+    // parent + a self-referential FK. Cover the id and name+schema branches.
+    const cases = [
+      {
+        label: 'parent by id',
+        legacy: { id: Number(parent_id) },
+        scoped: { id: Number(parent_id), scoped: true },
+      },
+      {
+        label: 'child by name+schema',
+        legacy: { name: 'child', schema: 'public' },
+        scoped: { name: 'child', schema: 'public', scoped: true },
+      },
+      {
+        label: 'child by id',
+        legacy: { id: Number(child_id) },
+        scoped: { id: Number(child_id), scoped: true },
+      },
+    ] as const
+
+    for (const c of cases) {
+      const legacy = pgMeta.tables.retrieve(c.legacy as any)
+      const scoped = pgMeta.tables.retrieve(c.scoped as any)
+      const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+      const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+
+      // Everything raw except the legacy relationships array, canonicalized to
+      // the scoped ORDER BY (legacy order is plan-dependent, see above).
+      legacyRow.relationships = sortRels(legacyRow.relationships)
+      expect(scopedRow, c.label).toEqual(legacyRow)
+      // Scoped's array is already in that order raw (no scoped-side sort).
+      expect(scopedRow.relationships, c.label).toEqual(sortRels(scopedRow.relationships))
+    }
+
+    // Sanity: the scoped parent retrieve surfaces the INCOMING FK from child.
+    const scopedParent = pgMeta.tables.retrieve({ id: Number(parent_id), scoped: true })
+    const parentRow: any = scopedParent.zod.parse((await executeQuery(scopedParent.sql))[0])
+    expect(
+      parentRow.relationships.some(
+        (r: any) => r.source_table_name === 'child' && r.target_table_name === 'parent'
+      )
+    ).toBe(true)
+  }
+)
+
+// Regression proof for the relationships exception: FK creation order (zzz, aaa,
+// mmm) differs from constraint_name order, so legacy's plan order cannot match
+// scoped's without the legacy-side sort, while scoped is deterministic by name.
+withTestDatabase(
+  'scoped tables.retrieve orders relationships by constraint_name (adversarial)',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.ref (id int primary key);
+      create table public.multi (id int primary key, a int, b int, c int);
+      alter table public.multi add constraint zzz_fk foreign key (a) references public.ref (id);
+      alter table public.multi add constraint aaa_fk foreign key (b) references public.ref (id);
+      alter table public.multi add constraint mmm_fk foreign key (c) references public.ref (id);
+    `)
+    const legacy = pgMeta.tables.retrieve({ name: 'multi', schema: 'public' })
+    const scoped = pgMeta.tables.retrieve({ name: 'multi', schema: 'public', scoped: true })
+    const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+    const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+
+    // Scoped is deterministically constraint_name-ordered, raw.
+    expect(scopedRow.relationships.map((r: any) => r.constraint_name)).toEqual([
+      'aaa_fk',
+      'mmm_fk',
+      'zzz_fk',
+    ])
+    // Equal only after canonicalizing the (plan-dependent) legacy side.
+    legacyRow.relationships = sortRels(legacyRow.relationships)
+    expect(scopedRow).toEqual(legacyRow)
+  }
+)
+
+// Composite (multi-column) FK: the relationships subquery expands it to one
+// entry per source×target column pair, all sharing constraint_name, so the
+// scoped ORDER BY tie-breaks on the column names to stay deterministic.
+withTestDatabase(
+  'scoped tables.retrieve orders composite-FK relationship entries deterministically',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.ctgt (x int, y int, primary key (x, y));
+      create table public.csrc (a int, b int, foreign key (a, b) references public.ctgt (x, y));
+    `)
+    const scoped = pgMeta.tables.retrieve({ name: 'csrc', schema: 'public', scoped: true })
+    const legacy = pgMeta.tables.retrieve({ name: 'csrc', schema: 'public' })
+    const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+    const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+
+    // Four entries (2 source cols × 2 target cols), all one constraint_name.
+    expect(scopedRow.relationships).toHaveLength(4)
+    expect(new Set(scopedRow.relationships.map((r: any) => r.constraint_name)).size).toBe(1)
+    // Scoped is already ordered by (name, source col, target col), raw.
+    expect(
+      scopedRow.relationships.map((r: any) => [r.source_column_name, r.target_column_name])
+    ).toEqual([
+      ['a', 'x'],
+      ['a', 'y'],
+      ['b', 'x'],
+      ['b', 'y'],
+    ])
+    legacyRow.relationships = sortRels(legacyRow.relationships)
+    expect(scopedRow).toEqual(legacyRow)
+  }
+)
+
+withTestDatabase(
+  'scoped tables.retrieve preserves composite primary-key column order (indkey, not sorted)',
+  async ({ executeQuery }) => {
+    // PK declared (b, a) -- index column order is the reverse of alphabetical, so
+    // an accidental name-sort would be caught here.
+    await executeQuery(
+      `create table public.composite_pk (a int not null, b int not null, c int, primary key (b, a));`
+    )
+    const scoped = pgMeta.tables.retrieve({ name: 'composite_pk', schema: 'public', scoped: true })
+    const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
+    // Emitted in index (indkey) order (b, a), the semantically meaningful order.
+    expect(scopedRow.primary_keys.map((pk: any) => pk.name)).toEqual(['b', 'a'])
+
+    // Legacy emits the same PK order (the PK aggregate is ordered identically in
+    // both renderings), so primary_keys match without any normalization.
+    const legacy = pgMeta.tables.retrieve({ name: 'composite_pk', schema: 'public' })
+    const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
+    expect(scopedRow.primary_keys).toEqual(legacyRow.primary_keys)
+  }
+)
+
 /** Original tests ported from postgres-meta */
 withTestDatabase('list tables', async ({ executeQuery }) => {
   const { sql, zod } = await pgMeta.tables.list()
@@ -58,106 +220,109 @@ withTestDatabase('list tables', async ({ executeQuery }) => {
       size: expect.any(String),
     },
     `
-      {
-        "bytes": Any<Number>,
-        "columns": [
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "bigint",
-            "default_value": null,
-            "enums": [],
-            "format": "int8",
-            "identity_generation": "BY DEFAULT",
-            "is_generated": false,
-            "is_identity": true,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "id",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "users",
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "text",
-            "default_value": null,
-            "enums": [],
-            "format": "text",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "name",
-            "ordinal_position": 2,
-            "schema": "public",
-            "table": "users",
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "USER-DEFINED",
-            "default_value": "'ACTIVE'::user_status",
-            "enums": [
-              "ACTIVE",
-              "INACTIVE",
-            ],
-            "format": "user_status",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "status",
-            "ordinal_position": 3,
-            "schema": "public",
-            "table": "users",
-          },
-        ],
-        "comment": null,
-        "dead_rows_estimate": Any<Number>,
-        "id": Any<Number>,
-        "live_rows_estimate": Any<Number>,
-        "name": "users",
-        "primary_keys": [
-          {
-            "name": "id",
-            "schema": "public",
-            "table_name": "users",
-          },
-        ],
-        "relationships": [
-          {
-            "constraint_name": "todos_user-id_fkey",
-            "source_column_name": "user-id",
-            "source_schema": "public",
-            "source_table_name": "todos",
-            "target_column_name": "id",
-            "target_table_name": "users",
-            "target_table_schema": "public",
-          },
-          {
-            "constraint_name": "user_details_user_id_fkey",
-            "source_column_name": "user_id",
-            "source_schema": "public",
-            "source_table_name": "user_details",
-            "target_column_name": "id",
-            "target_table_name": "users",
-            "target_table_schema": "public",
-          },
-        ],
-        "replica_identity": "DEFAULT",
-        "rls_enabled": false,
-        "rls_forced": false,
-        "schema": "public",
-        "size": Any<String>,
-      }
-    `
+    {
+      "bytes": Any<Number>,
+      "columns": [
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "bigint",
+          "default_value": null,
+          "enums": [],
+          "format": "int8",
+          "format_schema": "pg_catalog",
+          "identity_generation": "BY DEFAULT",
+          "is_generated": false,
+          "is_identity": true,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "users",
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "text",
+          "default_value": null,
+          "enums": [],
+          "format": "text",
+          "format_schema": "pg_catalog",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "name",
+          "ordinal_position": 2,
+          "schema": "public",
+          "table": "users",
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "USER-DEFINED",
+          "default_value": "'ACTIVE'::user_status",
+          "enums": [
+            "ACTIVE",
+            "INACTIVE",
+          ],
+          "format": "user_status",
+          "format_schema": "public",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "status",
+          "ordinal_position": 3,
+          "schema": "public",
+          "table": "users",
+        },
+      ],
+      "comment": null,
+      "dead_rows_estimate": Any<Number>,
+      "id": Any<Number>,
+      "live_rows_estimate": Any<Number>,
+      "name": "users",
+      "primary_keys": [
+        {
+          "name": "id",
+          "schema": "public",
+          "table_name": "users",
+        },
+      ],
+      "relationships": [
+        {
+          "constraint_name": "todos_user-id_fkey",
+          "source_column_name": "user-id",
+          "source_schema": "public",
+          "source_table_name": "todos",
+          "target_column_name": "id",
+          "target_table_name": "users",
+          "target_table_schema": "public",
+        },
+        {
+          "constraint_name": "user_details_user_id_fkey",
+          "source_column_name": "user_id",
+          "source_schema": "public",
+          "source_table_name": "user_details",
+          "target_column_name": "id",
+          "target_table_name": "users",
+          "target_table_schema": "public",
+        },
+      ],
+      "replica_identity": "DEFAULT",
+      "rls_enabled": false,
+      "rls_forced": false,
+      "schema": "public",
+      "size": Any<String>,
+    }
+  `
   )
 })
 
@@ -501,71 +666,73 @@ withTestDatabase('primary keys', async ({ executeQuery }) => {
       size: expect.any(String),
     },
     `
-      {
-        "bytes": Any<Number>,
-        "columns": [
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "bigint",
-            "default_value": null,
-            "enums": [],
-            "format": "int8",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "c",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "t",
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "text",
-            "default_value": null,
-            "enums": [],
-            "format": "text",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "cc",
-            "ordinal_position": 2,
-            "schema": "public",
-            "table": "t",
-          },
-        ],
-        "comment": null,
-        "dead_rows_estimate": Any<Number>,
-        "id": Any<Number>,
-        "live_rows_estimate": Any<Number>,
-        "name": "t",
-        "primary_keys": [
-          {
-            "name": "c",
-            "schema": "public",
-            "table_name": "t",
-          },
-          {
-            "name": "cc",
-            "schema": "public",
-            "table_name": "t",
-          },
-        ],
-        "relationships": [],
-        "replica_identity": "DEFAULT",
-        "rls_enabled": false,
-        "rls_forced": false,
-        "schema": "public",
-        "size": Any<String>,
-      }
-      `
+    {
+      "bytes": Any<Number>,
+      "columns": [
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "bigint",
+          "default_value": null,
+          "enums": [],
+          "format": "int8",
+          "format_schema": "pg_catalog",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "c",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "t",
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "text",
+          "default_value": null,
+          "enums": [],
+          "format": "text",
+          "format_schema": "pg_catalog",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "cc",
+          "ordinal_position": 2,
+          "schema": "public",
+          "table": "t",
+        },
+      ],
+      "comment": null,
+      "dead_rows_estimate": Any<Number>,
+      "id": Any<Number>,
+      "live_rows_estimate": Any<Number>,
+      "name": "t",
+      "primary_keys": [
+        {
+          "name": "c",
+          "schema": "public",
+          "table_name": "t",
+        },
+        {
+          "name": "cc",
+          "schema": "public",
+          "table_name": "t",
+        },
+      ],
+      "relationships": [],
+      "replica_identity": "DEFAULT",
+      "rls_enabled": false,
+      "rls_forced": false,
+      "schema": "public",
+      "size": Any<String>,
+    }
+  `
   )
 })
 
@@ -593,6 +760,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "text",
+          "format_schema": "pg_catalog",
           "id": "16510.2",
           "identity_generation": null,
           "is_generated": false,
@@ -613,6 +781,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "int4",
+          "format_schema": "pg_catalog",
           "id": "16510.3",
           "identity_generation": null,
           "is_generated": false,
@@ -633,6 +802,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "jsonb",
+          "format_schema": "pg_catalog",
           "id": "16510.4",
           "identity_generation": null,
           "is_generated": false,
@@ -653,6 +823,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": null,
           "enums": [],
           "format": "timestamp",
+          "format_schema": "pg_catalog",
           "id": "16510.5",
           "identity_generation": null,
           "is_generated": false,
@@ -673,6 +844,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "default_value": "nextval('memes_id_seq'::regclass)",
           "enums": [],
           "format": "int4",
+          "format_schema": "pg_catalog",
           "id": "16510.1",
           "identity_generation": null,
           "is_generated": false,
@@ -697,6 +869,7 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
             "retired",
           ],
           "format": "meme_status",
+          "format_schema": "public",
           "id": "16510.6",
           "identity_generation": null,
           "is_generated": false,
@@ -759,166 +932,172 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
       size: expect.any(String),
     },
     `
-      {
-        "bytes": Any<Number>,
-        "columns": [
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "text",
-            "default_value": null,
-            "enums": [],
-            "format": "text",
-            "id": "16510.2",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "name",
-            "ordinal_position": 2,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "integer",
-            "default_value": null,
-            "enums": [],
-            "format": "int4",
-            "id": "16510.3",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "category",
-            "ordinal_position": 3,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "jsonb",
-            "default_value": null,
-            "enums": [],
-            "format": "jsonb",
-            "id": "16510.4",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "metadata",
-            "ordinal_position": 4,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "timestamp without time zone",
-            "default_value": null,
-            "enums": [],
-            "format": "timestamp",
-            "id": "16510.5",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "created_at",
-            "ordinal_position": 5,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "integer",
-            "default_value": "nextval('memes_id_seq'::regclass)",
-            "enums": [],
-            "format": "int4",
-            "id": "16510.1",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": false,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "id",
-            "ordinal_position": 1,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-          {
-            "check": null,
-            "comment": null,
-            "data_type": "USER-DEFINED",
-            "default_value": "'old'::meme_status",
-            "enums": [
-              "new",
-              "old",
-              "retired",
-            ],
-            "format": "meme_status",
-            "id": "16510.6",
-            "identity_generation": null,
-            "is_generated": false,
-            "is_identity": false,
-            "is_nullable": true,
-            "is_unique": false,
-            "is_updatable": true,
-            "name": "status",
-            "ordinal_position": 6,
-            "schema": "public",
-            "table": "memes",
-            "table_id": 16510,
-          },
-        ],
-        "comment": null,
-        "dead_rows_estimate": Any<Number>,
-        "id": Any<Number>,
-        "live_rows_estimate": Any<Number>,
-        "name": "memes",
-        "primary_keys": [
-          {
-            "name": "id",
-            "schema": "public",
-            "table_id": 16510,
-            "table_name": "memes",
-          },
-        ],
-        "relationships": [
-          {
-            "constraint_name": "memes_category_fkey",
-            "id": 16519,
-            "source_column_name": "category",
-            "source_schema": "public",
-            "source_table_name": "memes",
-            "target_column_name": "id",
-            "target_table_name": "category",
-            "target_table_schema": "public",
-          },
-        ],
-        "replica_identity": "DEFAULT",
-        "rls_enabled": false,
-        "rls_forced": false,
-        "schema": "public",
-        "size": Any<String>,
-      }
-    `
+    {
+      "bytes": Any<Number>,
+      "columns": [
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "text",
+          "default_value": null,
+          "enums": [],
+          "format": "text",
+          "format_schema": "pg_catalog",
+          "id": "16510.2",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "name",
+          "ordinal_position": 2,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "integer",
+          "default_value": null,
+          "enums": [],
+          "format": "int4",
+          "format_schema": "pg_catalog",
+          "id": "16510.3",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "category",
+          "ordinal_position": 3,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "jsonb",
+          "default_value": null,
+          "enums": [],
+          "format": "jsonb",
+          "format_schema": "pg_catalog",
+          "id": "16510.4",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "metadata",
+          "ordinal_position": 4,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "timestamp without time zone",
+          "default_value": null,
+          "enums": [],
+          "format": "timestamp",
+          "format_schema": "pg_catalog",
+          "id": "16510.5",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "created_at",
+          "ordinal_position": 5,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "integer",
+          "default_value": "nextval('memes_id_seq'::regclass)",
+          "enums": [],
+          "format": "int4",
+          "format_schema": "pg_catalog",
+          "id": "16510.1",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
+          "data_type": "USER-DEFINED",
+          "default_value": "'old'::meme_status",
+          "enums": [
+            "new",
+            "old",
+            "retired",
+          ],
+          "format": "meme_status",
+          "format_schema": "public",
+          "id": "16510.6",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": true,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "status",
+          "ordinal_position": 6,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+      ],
+      "comment": null,
+      "dead_rows_estimate": Any<Number>,
+      "id": Any<Number>,
+      "live_rows_estimate": Any<Number>,
+      "name": "memes",
+      "primary_keys": [
+        {
+          "name": "id",
+          "schema": "public",
+          "table_id": 16510,
+          "table_name": "memes",
+        },
+      ],
+      "relationships": [
+        {
+          "constraint_name": "memes_category_fkey",
+          "id": 16519,
+          "source_column_name": "category",
+          "source_schema": "public",
+          "source_table_name": "memes",
+          "target_column_name": "id",
+          "target_table_name": "category",
+          "target_table_schema": "public",
+        },
+      ],
+      "replica_identity": "DEFAULT",
+      "rls_enabled": false,
+      "rls_forced": false,
+      "schema": "public",
+      "size": Any<String>,
+    }
+  `
   )
 })
 
@@ -1077,6 +1256,12 @@ withTestDatabase('update table - replica identity', async ({ executeQuery }) => 
   })
   const res = zod.parse((await executeQuery(retrieveSql))[0])
   expect(res!.replica_identity).toBe('NOTHING')
+})
+
+withTestDatabase('update table - replica identity INDEX requires index name', async () => {
+  expect(() =>
+    pgMeta.tables.update({ id: 1, name: 'test', schema: 'public' }, { replica_identity: 'INDEX' })
+  ).toThrow('replica_identity_index is required')
 })
 
 withTestDatabase('update table - primary keys', async ({ executeQuery }) => {

@@ -1,15 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
 import { useBreakpoint } from 'common'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import { companyStats } from 'data/company-stats'
-import { useSendTelemetryEvent } from 'lib/telemetry'
 import {
   ArrowLeftRight,
   Check,
@@ -17,7 +7,6 @@ import {
   FolderLock,
   Globe2,
   HeartPulse,
-  InfoIcon,
   Lightbulb,
   List,
   Lock,
@@ -25,23 +14,29 @@ import {
   ShieldCheck,
   Sparkles,
   Timer,
-  UserX,
   Users,
+  UserX,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import type { ReactNode } from 'react'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { Image } from 'ui'
+import { Image } from 'ui-patterns/Image'
 
 import MainProducts from '../MainProducts'
 import {
-  type FeaturesSection,
   FrameworkLink,
-  type FrameworkLinkProps,
+  getEditors,
+  type FeaturesSection,
   type HeroSection,
   type Metadata,
-  getEditors,
 } from './solutions.utils'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { companyStats } from '@/data/company-stats'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -51,9 +46,9 @@ interface Quote {
   text: string
   author: string
   role: string
-  logo?: string | JSX.Element
+  logo?: ReactNode
   link?: string
-  avatar?: string | JSX.Element
+  avatar?: ReactNode
 }
 
 interface AIBuilderEcosystemSection {
@@ -281,7 +276,7 @@ const data: () => {
       customers: [
         {
           name: 'eXp Realty',
-          logo: '/images/customers/logos/exprealty.svg',
+          logo: '/images/customers/logos/exprealty.png',
           highlights: [
             'Saved $3M+ annually across multiple systems',
             '70+ vibe-coded applications in production',
@@ -365,7 +360,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                  bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
                 "
               />
             </div>
@@ -394,15 +389,15 @@ const data: () => {
               magic links, OAuth (Google, GitHub, Twitter, etc.), SAML, SSO, and phone/SMS OTP.
             </>
           ),
-          className: '!border-l-0 sm:!border-l sm:!border-t-0',
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          className: 'border-l-0! sm:border-l! sm:border-t-0!',
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'rbac',
           title: 'Role-Based Access Control',
           icon: 'M17.6874 22.888V20.3886C17.6874 17.5888 15.4178 15.3192 12.618 15.3192C9.8182 15.3192 7.54852 17.5888 7.54852 20.3886V22.888M21.5531 11.5235C21.8189 14.1669 20.9393 16.9038 18.9141 18.9289C18.5359 19.3072 18.1328 19.6455 17.7101 19.9438M20.8038 8.70448C20.3598 7.71036 19.7299 6.77911 18.9141 5.96334C15.3338 2.38299 9.52889 2.38299 5.94855 5.96334C4.17501 7.73687 3.28 10.0562 3.26352 12.3807M24.0875 13.1161L23.2046 12.2332C22.3264 11.355 20.9026 11.355 20.0244 12.2332L19.1415 13.1161M0.875198 10.9503L1.75809 11.8331C2.63629 12.7113 4.06012 12.7113 4.93832 11.8331L5.82121 10.9503M7.49904 20.4919C5.77226 19.4557 4.37848 17.8555 3.62143 15.8584M15.6799 12.1942C15.6799 13.9201 14.2808 15.3192 12.5549 15.3192C10.829 15.3192 9.42993 13.9201 9.42993 12.1942C9.42993 10.4683 10.829 9.06917 12.5549 9.06917C14.2808 9.06917 15.6799 10.4683 15.6799 12.1942Z',
           subheading: <>Secure your data properly.</>,
-          className: '!border-l-0',
+          className: 'border-l-0!',
           image: (
             <Image
               draggable={false}
@@ -429,9 +424,9 @@ const data: () => {
               applications.
             </>
           ),
-          className: '!border-l-0 sm:!border-l',
+          className: 'border-l-0! sm:border-l!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -444,7 +439,7 @@ const data: () => {
               managing files, images, and videos.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -474,7 +469,7 @@ const data: () => {
               deployed globally for low-latency execution.
             </>
           ),
-          className: '!border-l-0 sm:!border-l lg:!border-l-0',
+          className: 'border-l-0! sm:border-l! lg:border-l-0!',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -487,7 +482,7 @@ const data: () => {
               for AI/ML applications, enabling fast semantic search and embedding storage.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -531,7 +526,7 @@ const data: () => {
     },
     developerExperience: {
       id: 'developer-experience',
-      className: '[&_h2]:!max-w-lg',
+      className: '[&_h2]:max-w-lg!',
       title: (
         <>
           Built for How <span className="text-foreground">AI Builders</span> Work
@@ -626,7 +621,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
                 "
               />
               <Image
@@ -924,7 +919,7 @@ const data: () => {
             '## Overview of implementing Supabase Auth SSR\n1. Install @supabase/supabase-js and...',
           code: `1. Install @supabase/supabase-js and @supabase/ssr packages.
 2. Set up environment variables.
-3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client. 
+3. Write two utility functions with \u0060createClient\u0060 functions to create a browser client and a server client.
 4. Hook up middleware to refresh auth tokens
 `,
           language: 'markdown',

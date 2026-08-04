@@ -41,7 +41,7 @@ From the `Add Products to your App` screen:
 - Enter your callback URI under **Valid OAuth Redirect URIs** on the **Facebook Login Settings** page
 - Click **Save Changes** at the bottom right
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Your callback URI follows this pattern: `https://<project-ref>.supabase.co/auth/v1/callback`
 
@@ -64,7 +64,7 @@ You must configure the email permission in your Facebook app's Use Cases:
 3. Verify that both `public_profile` and `email` show status **Ready for testing**
 4. If `email` is not listed, click the **Add** button next to it
 
-<Admonition type="tip">
+<Admonition type="note">
 
 You can verify the permissions are set correctly by checking that both `public_profile` and `email` appear with a green check mark or "Ready for testing" status.
 
@@ -116,7 +116,8 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithFacebook() {
@@ -160,7 +161,7 @@ dependencies:
   flutter_facebook_auth: ^7.0.0
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Check [pub.dev](https://pub.dev/packages/flutter_facebook_auth) for the latest version of `flutter_facebook_auth`.
 
@@ -260,6 +261,18 @@ suspend fun signInWithFacebook() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.Facebook` as the provider:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.Facebook);
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -277,7 +290,8 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signOut() {
@@ -330,6 +344,17 @@ suspend fun signOut() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Testing your integration
@@ -346,7 +371,7 @@ To add test users:
 3. Add users as Testers, Developers, or Administrators
 4. Users must accept the invitation from their Facebook notification settings
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Development mode is sufficient for local development and testing. You only need to submit for App Review when you're ready to allow any Facebook user to authenticate with your app.
 
@@ -357,19 +382,16 @@ Development mode is sufficient for local development and testing. You only need 
 Before your app can be used by the general public, you need to complete Facebook's App Review process:
 
 1. **Complete App Settings**: In your Facebook app's **Settings > Basic**, fill in all required fields including:
-
    - App Icon
    - Privacy Policy URL
    - Terms of Service URL (if applicable)
    - App Domain
 
 2. **Request Permissions**: Navigate to **App Review > Permissions and Features** and request the permissions you need:
-
    - `public_profile` - Usually pre-approved
    - `email` - Requires verification that your app needs email access
 
 3. **Submit for Review**: Click **Submit for Review** and provide:
-
    - Detailed instructions for how Facebook reviewers should test your login flow
    - A screencast video demonstrating the Facebook Login feature
    - Explanation of how user data will be used

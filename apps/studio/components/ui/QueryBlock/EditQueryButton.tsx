@@ -1,16 +1,6 @@
-import { useParams } from 'common'
-import { useIsInlineEditorEnabled } from 'components/interfaces/Account/Preferences/InlineEditorSettings'
-import useNewQuery from 'components/interfaces/SQLEditor/hooks'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import { Edit } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentProps } from 'react'
-import { editorPanelState } from 'state/editor-panel-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   cn,
   DropdownMenu,
@@ -21,13 +11,21 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useNewQuery } from '@/components/interfaces/SQLEditor/hooks'
+import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useTrack } from '@/lib/telemetry/track'
+import { editorPanelState } from '@/state/editor-panel-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorDiffRequestSnapshot } from '@/state/sql-editor/sql-editor-diff-request'
 
 interface EditQueryButtonProps {
   id?: string
   title: string
   sql?: string
   className?: string
-  type?: 'default' | 'text'
+  variant?: 'default' | 'text'
 }
 
 export const EditQueryButton = ({
@@ -35,13 +33,12 @@ export const EditQueryButton = ({
   sql,
   title,
   className,
-  type = 'text',
+  variant = 'text',
 }: EditQueryButtonProps) => {
   const router = useRouter()
-  const { ref } = useParams()
   const { newQuery } = useNewQuery()
 
-  const sqlEditorSnap = useSqlEditorV2StateSnapshot()
+  const diffRequest = useSqlEditorDiffRequestSnapshot()
   const { closeSidebar, openSidebar } = useSidebarManagerSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
@@ -51,13 +48,12 @@ export const EditQueryButton = ({
     content: { side: 'bottom', text: 'Edit in SQL Editor' },
   }
 
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   if (id !== undefined) {
     return (
       <ButtonTooltip
-        type={type}
+        variant={variant}
         size="tiny"
         className={cn('w-7 h-7', className)}
         icon={<Edit size={14} strokeWidth={1.5} />}
@@ -72,7 +68,7 @@ export const EditQueryButton = ({
 
   return !isInSQLEditor || isInNewSnippet ? (
     <ButtonTooltip
-      type={type}
+      variant={variant}
       size="tiny"
       className={cn('w-7 h-7', className)}
       icon={<Edit size={14} strokeWidth={1.5} />}
@@ -85,13 +81,9 @@ export const EditQueryButton = ({
         } else {
           if (sql) newQuery(sql, title)
         }
-        sendEvent({
-          action: 'assistant_edit_in_sql_editor_clicked',
-          properties: {
-            isInSQLEditor,
-            isInNewSnippet,
-          },
-          groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+        track('assistant_edit_in_sql_editor_clicked', {
+          isInSQLEditor,
+          isInNewSnippet,
         })
       }}
       tooltip={tooltip}
@@ -100,7 +92,7 @@ export const EditQueryButton = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <ButtonTooltip
-          type={type}
+          variant={variant}
           size="tiny"
           disabled={!sql}
           className={cn('w-7 h-7', className)}
@@ -110,12 +102,10 @@ export const EditQueryButton = ({
       </DropdownMenuTrigger>
       {!!sql && (
         <DropdownMenuContent className="w-36">
-          <DropdownMenuItem onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.Addition)}>
+          <DropdownMenuItem onClick={() => diffRequest.requestDiff(sql, DiffType.Addition)}>
             Insert code
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.Modification)}
-          >
+          <DropdownMenuItem onClick={() => diffRequest.requestDiff(sql, DiffType.Modification)}>
             Replace code
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => newQuery(sql, title)}>

@@ -1,9 +1,10 @@
+import { describe, expect, it } from 'vitest'
+
 import {
   checkHasNonPositiveValues,
   formatLogTick,
   getCumulativeResults,
-} from 'components/ui/QueryBlock/QueryBlock.utils'
-import { describe, expect, it } from 'vitest'
+} from '@/components/ui/QueryBlock/QueryBlock.utils'
 
 describe('checkHasNonPositiveValues', () => {
   it('returns false for an empty array', () => {
@@ -154,5 +155,53 @@ describe('getCumulativeResults', () => {
     }
     const output = getCumulativeResults(results, config)
     expect(output).toEqual([{ x: 'a', y: 42 }])
+  })
+
+  // Postgres returns `bigint`, `numeric`, `money` and `count(*)` columns as
+  // strings, so the running total must sum numerically rather than concatenate.
+  it('sums numeric string yKey values instead of concatenating them', () => {
+    const results = {
+      rows: [
+        { x: 'a', y: '10' },
+        { x: 'b', y: '20' },
+        { x: 'c', y: '30' },
+      ],
+    }
+    const config = {
+      type: 'bar' as const,
+      xKey: 'x',
+      yKey: 'y',
+      cumulative: true,
+      showLabels: false,
+      showGrid: false,
+    }
+    const output = getCumulativeResults(results, config)
+    expect(output).toEqual([
+      { x: 'a', y: 10 },
+      { x: 'b', y: 30 },
+      { x: 'c', y: 60 },
+    ])
+  })
+
+  it('treats null/undefined and non-numeric yKey values as 0', () => {
+    const results = {
+      rows: [
+        { x: 'a', y: null },
+        { x: 'b', y: '5' },
+        { x: 'c', y: undefined },
+        { x: 'd', y: 'not-a-number' },
+        { x: 'e', y: 4 },
+      ],
+    }
+    const config = {
+      type: 'bar' as const,
+      xKey: 'x',
+      yKey: 'y',
+      cumulative: true,
+      showLabels: false,
+      showGrid: false,
+    }
+    const output = getCumulativeResults(results, config)
+    expect(output.map((row: { y: number }) => row.y)).toEqual([0, 5, 5, 5, 9])
   })
 })

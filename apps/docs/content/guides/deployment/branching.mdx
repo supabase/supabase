@@ -3,6 +3,8 @@ title: 'Branching'
 subtitle: 'Use Supabase Branches to test and preview changes'
 ---
 
+You can deploy directly from GitHub on any plan — connect your repository and changes pushed to `main` are automatically deployed to your project. Branching takes this further, adding isolated preview environments for each pull request.
+
 Use branching to safely experiment with changes to your Supabase project.
 
 Supabase branches create separate environments that spin off from your main project. You can use these branching environments to create and test changes like new configurations, database schemas, or features without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
@@ -27,4 +29,4 @@ When you merge any branch into your main project, Supabase automatically runs a 
 6. **Seed** - Runs seed files to populate your branch with initial data (must be [enabled in config.toml](/docs/guides/deployment/branching/configuration#branch-configuration-with-remotes) for persistent branches)
 7. **Deploy** - Deploys any changed Edge Functions and updates function secrets
 
-If a parent deployment step fails, all dependent children steps will be skipped. For e.g., if your database migrations failed at step 5, our runner will not seed your branch because step 6 is skipped. If you are using GitHub integration, the same deployment workflow will be run on every commit pushed to your git branch.
+If a parent deployment step fails, all dependent child steps will be skipped. For instance, if your database migrations failed at step 5, our runner will not seed your branch because step 6 is skipped. If you are using GitHub integration, the same deployment workflow will be run on every commit pushed to your git branch.

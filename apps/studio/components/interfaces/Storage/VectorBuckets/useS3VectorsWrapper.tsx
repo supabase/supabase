@@ -1,9 +1,9 @@
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { INTEGRATIONS } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import {
   DatabaseExtension,
   useDatabaseExtensionsQuery,
-} from 'data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+} from '@/data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const useS3VectorsWrapperExtension = (): {
   extension: DatabaseExtension | undefined

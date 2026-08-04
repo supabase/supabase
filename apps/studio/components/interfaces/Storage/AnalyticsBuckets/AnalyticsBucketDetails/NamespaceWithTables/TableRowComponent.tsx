@@ -1,26 +1,10 @@
+import { useParams } from 'common'
+import { SqlEditor, TableEditor } from 'icons'
 import { uniq } from 'lodash'
 import { Eye, Loader2, MoreVertical, Pause, Play, Table2, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import {
-  convertKVStringArrayToJson,
-  formatWrapperTables,
-} from 'components/interfaces/Integrations/Wrappers/Wrappers.utils'
-import { getDecryptedParameters } from 'components/interfaces/Storage/Storage.utils'
-import { DotPing } from 'components/ui/DotPing'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useFDWDropForeignTableMutation } from 'data/fdw/fdw-drop-foreign-table-mutation'
-import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useUpdatePublicationMutation } from 'data/replication/publication-update-mutation'
-import { useStartPipelineMutation } from 'data/replication/start-pipeline-mutation'
-import { useReplicationTablesQuery } from 'data/replication/tables-query'
-import { useIcebergNamespaceTableDeleteMutation } from 'data/storage/iceberg-namespace-table-delete-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { SqlEditor, TableEditor } from 'icons'
 import {
   Button,
   cn,
@@ -36,6 +20,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { HIDE_REPLICATION_USER_FLOW } from '../AnalyticsBucketDetails.constants'
 import {
   getAnalyticsBucketFDWServerName,
@@ -45,6 +30,21 @@ import { useAnalyticsBucketAssociatedEntities } from '../useAnalyticsBucketAssoc
 import { useAnalyticsBucketWrapperInstance } from '../useAnalyticsBucketWrapperInstance'
 import { InsertDataDialog } from './InsertDataDialog'
 import { inferPostgresTableFromNamespaceTable } from './NamespaceWithTables.utils'
+import {
+  convertKVStringArrayToJson,
+  formatWrapperTables,
+} from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
+import { getDecryptedParameters } from '@/components/interfaces/Storage/Storage.utils'
+import { DotPing } from '@/components/ui/DotPing'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useFDWDropForeignTableMutation } from '@/data/fdw/fdw-drop-foreign-table-mutation'
+import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useUpdatePublicationMutation } from '@/data/replication/publication-update-mutation'
+import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { useReplicationTablesQuery } from '@/data/replication/tables-query'
+import { useIcebergNamespaceTableDeleteMutation } from '@/data/storage/iceberg-namespace-table-delete-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface TableRowComponentProps {
   table: { id: number; name: string; isConnected: boolean }
@@ -124,9 +124,9 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       setIsUpdatingReplication(true)
       // [Joshen ALPHA] Assumption here is that all the namespace tables have _changelog as suffix
       // May need to update if that assumption falls short (e.g for those dealing with iceberg APIs directly)
-      const updatedTables = publication.tables.filter(
-        (x) => table.name !== getNamespaceTableNameFromPostgresTableName(x)
-      )
+      const updatedTables = publication.tables
+        .filter((x) => table.name !== getNamespaceTableNameFromPostgresTableName(x))
+        .map(({ schema, name }) => ({ schema, name }))
       await updatePublication({
         projectRef,
         sourceId,
@@ -158,9 +158,9 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
 
     try {
       setIsUpdatingReplication(true)
-      const updatedTables = publication.tables.concat([
-        { schema: pgTable.schema, name: pgTable.name },
-      ])
+      const updatedTables = publication.tables
+        .map(({ schema, name }) => ({ schema, name }))
+        .concat([{ schema: pgTable.schema, name: pgTable.name }])
       await updatePublication({
         projectRef,
         sourceId,
@@ -333,7 +333,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" className="w-7" icon={<MoreVertical />} />
+                  <Button variant="default" className="w-7" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
@@ -345,7 +345,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                             href={`/project/${projectRef}/database/replication/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
                           >
                             <Eye size={12} className="text-foreground-lighter" />
-                            <p>View replication</p>
+                            <p>View pipeline</p>
                           </Link>
                         </DropdownMenuItem>
                       )}
@@ -395,7 +395,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
               <DropdownMenuTrigger asChild>
                 <Button
                   loading={isDeletingNamespaceTable}
-                  type="default"
+                  variant="default"
                   className="w-7"
                   icon={<MoreVertical />}
                 />
@@ -418,7 +418,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
       {connectedForeignTables?.map((x) => (
         <TableRow key={x.id}>
           <TableCell className="pl-6">
-            <div className="flex items-center gap-x-2 rounded">
+            <div className="flex items-center gap-x-2 rounded-sm">
               <div className="w-4 h-5 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-2" />
               <div
                 className={cn(
@@ -437,7 +437,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <InsertDataDialog table={table.name} fdwTable={x} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" className="w-7" icon={<MoreVertical />} />
+                <Button variant="default" className="w-7" icon={<MoreVertical />} />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-fit min-w-[180px]" align="end">
                 <DropdownMenuItem asChild className="flex items-center gap-x-2">
@@ -466,7 +466,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
           <TableCell className="pl-6">
             <Tooltip>
               <TooltipTrigger>
-                <div className="flex items-center gap-x-2 rounded">
+                <div className="flex items-center gap-x-2 rounded-sm">
                   <div className="w-4 h-4 rounded-bl-lg border-l-2 border-b-2 border-control -translate-y-1.5" />
                   <div
                     className={cn(

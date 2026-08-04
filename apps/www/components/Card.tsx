@@ -56,7 +56,7 @@ const Card = (props: Props) => {
       target="_blank"
       className="relative flex transform flex-col overflow-hidden rounded-md shadow-lg transition hover:-translate-y-1 hover:shadow-2xl"
     >
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <img className="h-64 w-full text-foreground-light object-cover" src={imgUrl} alt={title} />
       </div>
       <div className="bg-surface-100 flex flex-1 flex-col justify-between p-8">
@@ -77,7 +77,7 @@ const Card = (props: Props) => {
         </div>
         {type === 'Case Study' && postMeta.name.length > 0 && (
           <div className="mt-6 flex items-center">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <span className="sr-only">{postMeta.name}</span>
               <img className="h-10 w-10 rounded-full" src={postMeta.avatarUrl} alt="" />
             </div>

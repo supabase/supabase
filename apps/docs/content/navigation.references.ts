@@ -19,12 +19,28 @@ export const REFERENCES = {
     icon: 'reference-javascript',
     meta: {
       v2: {
+        // JS v2 is driven by the new reference pipeline
+        // (`scripts/build-reference-content.ts` + `spec/reference/javascript/v2/`).
+        // It intentionally has no `specFile` — the legacy YAML loader skips it.
         libId: 'reference_javascript_v2',
-        specFile: 'supabase_js_v2',
       },
       v1: {
         libId: 'reference_javascript_v1',
         specFile: 'supabase_js_v1',
+      },
+    },
+  },
+  server: {
+    type: 'sdk',
+    name: 'Server',
+    library: '@supabase/server',
+    libPath: 'server',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_server_v1',
       },
     },
   },
@@ -37,8 +53,10 @@ export const REFERENCES = {
     icon: 'reference-dart',
     meta: {
       v2: {
+        // Dart v2 is driven by the new reference pipeline
+        // (`scripts/build-reference-content.ts` + `spec/reference/dart/v2/`).
+        // It intentionally has no `specFile`, so the legacy YAML loader skips it.
         libId: 'reference_dart_v2',
-        specFile: 'supabase_dart_v2',
       },
       v1: {
         libId: 'reference_dart_v1',

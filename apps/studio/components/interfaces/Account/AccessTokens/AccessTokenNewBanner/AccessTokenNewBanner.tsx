@@ -1,10 +1,11 @@
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { TokenPermissionsSection } from './TokenPermissionSection'
+
 import { useGroupedPermissions } from '../hooks/useGroupedPermissions'
+import { TokenPermissionsSection } from './TokenPermissionSection'
 
 interface AccessTokenNewBannerProps<T> {
   token: T
@@ -28,16 +29,22 @@ export const AccessTokenNewBanner = <T,>({
 
   return (
     <Admonition
-      type="tip"
+      type="note"
       title={title}
       className="mb-6 relative"
       actions={
-        <Button
-          type="text"
-          icon={<X />}
-          className="w-7 h-7 absolute top-2.5 right-2.5"
-          onClick={onClose}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="text"
+              aria-label="Close token banner"
+              icon={<X />}
+              className="w-7 h-7 absolute top-2.5 right-2.5"
+              onClick={onClose}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Close token banner</TooltipContent>
+        </Tooltip>
       }
     >
       <div className="space-y-4">

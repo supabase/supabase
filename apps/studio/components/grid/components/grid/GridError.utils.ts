@@ -6,6 +6,7 @@ const FILTER_ERROR_PATTERNS = [
   'malformed array literal',
   'invalid byte sequence',
   'syntax error',
+  'does not exist',
 ]
 
 export function isFilterRelatedError(errorMessage: string | undefined | null): boolean {

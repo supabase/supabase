@@ -111,6 +111,21 @@ You can access them only by:
 
 ### Signing URLs
 
+<Admonition type="note">
+
+Storage signed URLs are signed with a dedicated internal key that is separate from your project's Auth JWT signing key. Each project has its own signing key.
+
+Because signed URLs use this separate key, they are not affected by:
+
+- Rotating or revoking Auth JWT legacy secret or signing key
+- Disabling legacy keys in the dashboard
+- Switching from HS256 to asymmetric (ES256) signing key
+
+Signed URLs remain valid until their expiry time regardless of any Auth key changes.
+
+If you need to revoke signed URLs, [contact Supabase support](/dashboard/support/new?projectRef=).
+
+</Admonition>
 You can sign a time-limited URL that you can share to your users by invoking the `createSignedUrl` method on the SDK.
 
 ```js

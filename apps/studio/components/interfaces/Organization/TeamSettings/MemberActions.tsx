@@ -1,24 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { MoreVertical, Redo2, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
-import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
-import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import {
-  useOrganizationMembersQuery,
-  type OrganizationMember,
-} from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProfile } from 'lib/profile'
 import {
   Button,
   DropdownMenu,
@@ -27,9 +11,25 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
+import { useOrganizationDeleteInvitationMutation } from '@/data/organization-members/organization-invitation-delete-mutation'
+import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
+import { useOrganizationMemberDeleteMutation } from '@/data/organizations/organization-member-delete-mutation'
+import {
+  useOrganizationMembersQuery,
+  type OrganizationMember,
+} from '@/data/organizations/organization-members-query'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useProfile } from '@/lib/profile'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -128,12 +128,12 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
             const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
-              email: member.primary_email,
+              emails: [member.primary_email],
               roleId: projectScopedRole.base_role_id,
               projects,
             })
           } else {
-            inviteMember({ slug, email: member.primary_email, roleId })
+            inviteMember({ slug, emails: [member.primary_email], roleId })
           }
         },
       }
@@ -163,7 +163,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     <>
       <div className="flex items-center justify-end gap-x-2">
         <ButtonTooltip
-          type="default"
+          variant="default"
           disabled={isPendingInviteAcceptance || !canRemoveMember}
           onClick={() => setShowAccessModal(true)}
           tooltip={{
@@ -183,7 +183,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               className="px-1.5"
               disabled={isLoading}
               loading={isLoading}

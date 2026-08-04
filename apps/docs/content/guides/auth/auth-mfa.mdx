@@ -82,10 +82,8 @@ When a user unenrolls a factor, call `supabase.auth.mfa.unenroll()` with the ID 
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient(
-  'https://your-project-id.supabase.co',
-  'sb_publishable_... or anon key'
-)
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 supabase.auth.mfa.unenroll({ factorId: 'd30fd651-184e-4748-a928-0a4b9be1d429' })
@@ -129,7 +127,7 @@ Unenrolling a factor will downgrade the assurance level from `aal2` to `aal1` on
 
 ```tsx
 /**
- * UnenrollMFA shows a simple table with the list of factors together with a button to unenroll.
+ * UnenrollMFA shows a table with the list of factors together with a button to unenroll.
  * When a user types in the factorId of the factor that they wish to unenroll and clicks unenroll
  * the corresponding factor will be unenrolled.
  */
@@ -226,7 +224,7 @@ create policy "Policy name."
 - The policy will accept both `aal1` and `aal2` for users with a `created_at`
   timestamp prior to 12th December 2022 at 00:00 UTC, but will only accept
   `aal2` for all other timestamps.
-- The `<@` operator is PostgreSQL's ["contained in"
+- The `<@` operator is Postgres's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
@@ -256,14 +254,14 @@ create policy "Policy name."
 - The policy will only accept only `aal2` when the user has at least one MFA
   factor verified.
 - Otherwise, it will accept both `aal1` and `aal2`.
-- The `<@` operator is PostgreSQL's ["contained in"
+- The `<@` operator is Postgres's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
 - **Using `as restrictive` ensures this policy will restrict all commands on the
   table regardless of other policies!**
 
 ### Server-Side Rendering
 
-<Admonition type="tip">
+<Admonition type="note">
 
 When using the Supabase JavaScript library in a server-side rendering context, make sure you always create a new object for each request! This will prevent you from accidentally rendering and serving content belonging to different users.
 
@@ -273,7 +271,7 @@ It is possible to enforce MFA on the Server-Side Rendering level. However, this 
 
 You can use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` and `supabase.auth.mfa.listFactors()` APIs to identify the AAL level of the session and any factors that are enabled for a user, similar to how you would use these on the browser.
 
-However, encountering a different AAL level on the server may not actually be a security problem. Consider these likely scenarios:
+However, encountering a different AAL level on the server may not be a security problem. Consider these likely scenarios:
 
 1. User signed-in with a conventional method but closed their tab on the MFA
    flow.
@@ -286,7 +284,7 @@ We thus recommend you redirect users to a page where they can authenticate using
 
 ### APIs
 
-If your application uses the Supabase Database, Storage or Edge Functions, just using Row Level Security policies will give you sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
+If your application uses the Supabase Database, Storage or Edge Functions, Row Level Security policies provide sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
 
 1. **Use a good JWT verification and parsing library for your language.**
    This will let you securely parse JWTs and extract their claims.
@@ -302,7 +300,6 @@ If your application uses the Supabase Database, Storage or Edge Functions, just 
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
@@ -310,7 +307,7 @@ If your application uses the Supabase Database, Storage or Edge Functions, just 
 >
 
 <AccordionItem
-header={<span className="text-foreground">How do I check when a user went through MFA?</span>}
+header="How do I check when a user went through MFA?"
 id="how-do-i-check-when-a-user-went-through-mfa"
 >
 

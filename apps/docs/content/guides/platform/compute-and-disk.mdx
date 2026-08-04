@@ -10,32 +10,34 @@ Every project on the Supabase Platform comes with its own dedicated Postgres ins
 
 The following table describes the base instances, Nano (free plan) and Micro (paid plans), with additional compute instance sizes available if you need extra performance when scaling up.
 
-<Admonition type="note" label="Nano instances in paid plan organizations">
+<Admonition type="note" title="Nano instances in paid plan organizations">
 
 In paid organizations, Nano Compute are billed at the same price as Micro Compute. It is recommended to upgrade your Project from Nano Compute to Micro Compute when it's convenient for you. Compute sizes are not auto-upgraded because of the downtime incurred. See [Supabase Pricing](/pricing) for more information. You cannot launch Nano instances on paid plans, only Micro and above - but you might have Nano instances after upgrading from Free Plan.
 
 </Admonition>
 
-| Compute Size | Hourly Price USD          | Monthly Price USD                                                                                       | CPU                     | Memory       | Max DB Size (Recommended)[^2] |
-| ------------ | ------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------- | ------------ | ----------------------------- |
-| Nano[^3]     | <Price price="0" />       | <Price price="0" />                                                                                     | Shared                  | Up to 0.5 GB | 500 MB                        |
-| Micro        | <Price price="0.01344" /> | ~<Price price="10" />                                                                                   | 2-core ARM (shared)     | 1 GB         | 10 GB                         |
-| Small        | <Price price="0.0206" />  | ~<Price price="15" />                                                                                   | 2-core ARM (shared)     | 2 GB         | 50 GB                         |
-| Medium       | <Price price="0.0822" />  | ~<Price price="60" />                                                                                   | 2-core ARM (shared)     | 4 GB         | 100 GB                        |
-| Large        | <Price price="0.1517" />  | ~<Price price="110" />                                                                                  | 2-core ARM (dedicated)  | 8 GB         | 200 GB                        |
-| XL           | <Price price="0.2877" />  | ~<Price price="210" />                                                                                  | 4-core ARM (dedicated)  | 16 GB        | 500 GB                        |
-| 2XL          | <Price price="0.562" />   | ~<Price price="410" />                                                                                  | 8-core ARM (dedicated)  | 32 GB        | 1 TB                          |
-| 4XL          | <Price price="1.32" />    | ~<Price price="960" />                                                                                  | 16-core ARM (dedicated) | 64 GB        | 2 TB                          |
-| 8XL          | <Price price="2.562" />   | ~<Price price="1" />,870                                                                                | 32-core ARM (dedicated) | 128 GB       | 4 TB                          |
-| 12XL         | <Price price="3.836" />   | ~<Price price="2" />,800                                                                                | 48-core ARM (dedicated) | 192 GB       | 6 TB                          |
-| 16XL         | <Price price="5.12" />    | ~<Price price="3" />,730                                                                                | 64-core ARM (dedicated) | 256 GB       | 10 TB                         |
-| >16XL        | -                         | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) | Custom                  | Custom       | Custom                        |
+| Compute Size | Hourly Price USD          | Monthly Price USD                                                                                       | CPU                 | Memory       | Max DB Size (Recommended)[^2] |
+| ------------ | ------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------- | ------------ | ----------------------------- |
+| Nano[^3]     | <Price price="0" />       | <Price price="0" />                                                                                     | Shared              | Up to 0.5 GB | 500 MB                        |
+| Micro        | <Price price="0.01344" /> | ~<Price price="10" />                                                                                   | 2-core (shared)     | 1 GB         | 10 GB                         |
+| Small        | <Price price="0.0206" />  | ~<Price price="15" />                                                                                   | 2-core (shared)     | 2 GB         | 50 GB                         |
+| Medium       | <Price price="0.0822" />  | ~<Price price="60" />                                                                                   | 2-core (shared)     | 4 GB         | 100 GB                        |
+| Large        | <Price price="0.1517" />  | ~<Price price="110" />                                                                                  | 2-core (dedicated)  | 8 GB         | 200 GB                        |
+| XL           | <Price price="0.2877" />  | ~<Price price="210" />                                                                                  | 4-core (dedicated)  | 16 GB        | 500 GB                        |
+| 2XL          | <Price price="0.562" />   | ~<Price price="410" />                                                                                  | 8-core (dedicated)  | 32 GB        | 1 TB                          |
+| 4XL          | <Price price="1.32" />    | ~<Price price="960" />                                                                                  | 16-core (dedicated) | 64 GB        | 2 TB                          |
+| 8XL          | <Price price="2.562" />   | ~<Price price="1" />,870                                                                                | 32-core (dedicated) | 128 GB       | 4 TB                          |
+| 12XL         | <Price price="3.836" />   | ~<Price price="2" />,800                                                                                | 48-core (dedicated) | 192 GB       | 6 TB                          |
+| 16XL         | <Price price="5.12" />    | ~<Price price="3" />,730                                                                                | 64-core (dedicated) | 256 GB       | 10 TB                         |
+| >16XL        | -                         | [Contact Us](/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes) | Custom              | Custom       | Custom                        |
 
 [^1]: Database max connections are recommended values and can be [customized via `max_connections`](/docs/guides/database/custom-postgres-config) depending on your use case. Be aware of [these considerations](/docs/guides/troubleshooting/how-to-change-max-database-connections-_BQ8P5) before modifying.
-[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/platform/shared-responsibility-model) for more information.
+
+[^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](/docs/guides/deployment/shared-responsibility-model) for more information.
+
 [^3]: Compute resources on the Free plan are subject to change.
 
-Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
+Compute sizes can be changed by first selecting your project in the dashboard [here](/dashboard/project/_/settings/infrastructure) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrades).
 
 <Image
   alt="Compute Size Selection"
@@ -54,7 +56,7 @@ We charge hourly for additional compute based on your usage. Read more about [us
 
 ### Dedicated vs shared CPU
 
-All Postgres databases on Supabase run in isolated environments. Compute instances smaller than `Large` compute size have CPUs which can burst to higher performance levels for short periods of time. Instances bigger than `Large` have predictable performance levels and do not exhibit the same burst behavior.
+All Postgres databases on Supabase run in isolated environments. Compute instances `Nano` to `2XL` compute size have CPUs which can burst to higher performance levels for short periods of time. Instances bigger than `Large` have predictable performance levels and do not exhibit the same burst behavior.
 
 ### Compute upgrades [#upgrades]
 
@@ -100,7 +102,7 @@ If you need consistent disk performance, choose the 4XL or larger compute instan
 
 ### Provisioned disk throughput and IOPS
 
-The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/compute-and-disk) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
+The default disk type is gp3, which comes with a baseline throughput of 125 MB/s and a default IOPS of 3,000. You can provision additional IOPS and throughput from the [Infrastructure settings](/dashboard/project/_/settings/infrastructure) page, but keep in mind that the effective IOPS and throughput will be limited by the compute instance size. This requires Large compute size or above.
 
 <Admonition type="caution">
 
@@ -164,5 +166,5 @@ As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/para
 
 ### Constraints
 
-- After **any** disk attribute change, there is a cooldown period of approximately six hours before you can make further adjustments. During this time, no changes are allowed. If you encounter throttling, you’ll need to wait until the cooldown period concludes before making additional modifications.
+- You can modify disk attributes up to **four times** within a rolling 24-hour window. A new modification can be initiated as soon as the previous one completes. If you reach this limit, you will encounter throttling and must wait for the rolling 24-hour window to permit further adjustments.
 - You can increase disk size but cannot decrease it.

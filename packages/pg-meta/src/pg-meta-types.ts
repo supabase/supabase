@@ -2,7 +2,8 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { TYPES_SQL } from './sql/types'
+import { literal, safeSql, type SafeSqlFragment } from './pg-format'
+import { SCOPED_TYPES_SQL, TYPES_SQL } from './sql/types'
 
 const pgTypeZod = z.object({
   id: z.number(),
@@ -20,6 +21,7 @@ const pgTypeZod = z.object({
 })
 
 const pgTypeArrayZod = z.array(pgTypeZod)
+export type PGType = z.infer<typeof pgTypeZod>
 
 function list({
   includeArrayTypes = false,
@@ -28,6 +30,7 @@ function list({
   excludedSchemas,
   limit,
   offset,
+  scoped = false,
 }: {
   includeArrayTypes?: boolean
   includeSystemSchemas?: boolean
@@ -35,13 +38,17 @@ function list({
   excludedSchemas?: string[]
   limit?: number
   offset?: number
+  scoped?: boolean
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTypeArrayZod
 } {
-  let sql = TYPES_SQL
+  // Both bases end at the same trailing WHERE `)`, so the filter/limit fragments
+  // below extend the same single-level WHERE regardless of which base is used.
+  // scoped=false keeps the rendered SQL byte-identical to the pre-change query.
+  let sql = scoped ? SCOPED_TYPES_SQL : TYPES_SQL
   if (!includeArrayTypes) {
-    sql += ` and not exists (
+    sql = safeSql`${sql} and not exists (
       select from pg_type el
       where el.oid = t.typelem
         and el.typarray = t.oid
@@ -53,13 +60,18 @@ function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += ` and n.nspname ${filter}`
+    sql = safeSql`${sql} and n.nspname ${filter}`
+  }
+  if (scoped) {
+    // Scoped only: legacy TYPES_SQL has no ORDER BY (plan-dependent order); sort
+    // the scoped result by t.oid for a stable, comparable order. Before LIMIT.
+    sql = safeSql`${sql} order by t.oid`
   }
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -67,7 +79,4 @@ function list({
   }
 }
 
-export default {
-  list,
-  zod: pgTypeZod,
-}
+export { list }

@@ -20,6 +20,7 @@
   "authentication:show_manual_linking": true,
   "authentication:show_provider_filter": true,
   "authentication:show_providers": true,
+  "authentication:show_custom_providers": true,
   "authentication:show_send_invitation": true,
   "authentication:show_sort_by_email": true,
   "authentication:show_sort_by_phone": true,
@@ -33,6 +34,7 @@
 
   "dashboard_auth:sign_up": true,
   "dashboard_auth:sign_in_with_github": true,
+  "dashboard_auth:sign_in_with_chatgpt": true,
   "dashboard_auth:sign_in_with_sso": true,
   "dashboard_auth:sign_in_with_email": true,
   "dashboard_auth:show_testimonial": true,
@@ -63,6 +65,9 @@
   "docs:pgtap": true,
   "docs:production_checklist": true,
   "docs:web_apps": true,
+  "docs:agent_plugin": true,
+  "docs:agent_skills": true,
+  "docs:prompts": true,
 
   "edge_functions:show_stripe_example": true,
   "edge_functions:show_all_edge_function_invocation_examples": true,
@@ -76,6 +81,7 @@
 
   "infrastructure:read_replicas": true,
 
+  "logs:all": true,
   "logs:templates": true,
   "logs:collections": true,
   "logs:metadata": true,

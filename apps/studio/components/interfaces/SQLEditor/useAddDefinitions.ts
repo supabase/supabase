@@ -1,20 +1,25 @@
 import { Monaco } from '@monaco-editor/react'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import type { IDisposable } from 'monaco-editor'
 import { useEffect, useRef } from 'react'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
-import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
-import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
-import { useKeywordsQuery } from 'data/database/keywords-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useTableColumnsQuery } from 'data/database/table-columns-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { formatSql } from 'lib/formatSql'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import getPgsqlCompletionProvider from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
+import getPgsqlSignatureHelpProvider from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
+import { useKeywordsQuery } from '@/data/database/keywords-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useTableColumnsQuery } from '@/data/database/table-columns-query'
+import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
-export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
+export const useAddDefinitions = (
+  id: string,
+  monaco: Monaco | null,
+  { enabled = true }: { enabled?: boolean } = {}
+) => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
@@ -28,33 +33,36 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
   const { data: functions, isSuccess: isFunctionsSuccess } = useDatabaseFunctionsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
   const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
   const { data: tableColumns, isSuccess: isTableColumnsSuccess } = useTableColumnsQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { enabled: intellisenseEnabled }
+    { enabled: enabled && intellisenseEnabled }
   )
 
   const pgInfoRef = useRef<any>(null)
 
+  const filteredSchemas = useSchemasFilteredForHighAvailability(schemas)
+
   const isPgInfoReady =
+    enabled &&
     intellisenseEnabled &&
     isTableColumnsSuccess &&
     isSchemasSuccess &&
@@ -66,7 +74,7 @@ export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
       pgInfoRef.current = {}
     }
     pgInfoRef.current.tableColumns = tableColumns
-    pgInfoRef.current.schemas = schemas
+    pgInfoRef.current.schemas = filteredSchemas
     pgInfoRef.current.keywords = keywords
     pgInfoRef.current.functions = functions
   }

@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { Dashboards, LogSqlSnippets, SqlSnippets, UseCustomQueryOptions } from 'types'
+
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { Dashboards, LogSqlSnippets, SqlSnippets, UseCustomQueryOptions } from '@/types'
 
 export type ContentBase = components['schemas']['GetUserContentResponse']['data'][number]
 
@@ -34,7 +35,8 @@ interface GetContentVariables {
 
 export async function getContent(
   { projectRef, type, name, limit = 10 }: GetContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
@@ -42,6 +44,7 @@ export async function getContent(
 
   const { data, error } = await get('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef }, query: { type, name, limit: limit.toString() } },
+    headers,
     signal,
   })
 
@@ -49,7 +52,7 @@ export async function getContent(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as Content[],
+    content: remapSqlContentFields(data.data as unknown as Content[]),
   }
 }
 

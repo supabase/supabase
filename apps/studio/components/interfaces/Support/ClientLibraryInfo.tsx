@@ -1,25 +1,26 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import type { UseFormReturn } from 'react-hook-form'
 // End of third-party imports
 
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  FormControl,
+  FormField,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface ClientLibraryInfoProps {
   form: UseFormReturn<SupportFormValues>
@@ -35,27 +36,27 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
 
   return (
     <div className="flex flex-col gap-y-1">
-      <FormField_Shadcn_
+      <FormField
         name="library"
         control={form.control}
         render={({ field }) => (
           <FormItemLayout layout="vertical" label="Which library are you having issues with">
-            <FormControl_Shadcn_>
-              <Select_Shadcn_ {...field} defaultValue={field.value} onValueChange={field.onChange}>
-                <SelectTrigger_Shadcn_ className="w-full" aria-label="Select a library">
-                  <SelectValue_Shadcn_ placeholder="Select a library" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+            <FormControl>
+              <Select {...field} defaultValue={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full" aria-label="Select a library">
+                  <SelectValue placeholder="Select a library" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
                     {CLIENT_LIBRARIES.map((option) => (
-                      <SelectItem_Shadcn_ key={option.language} value={option.language}>
+                      <SelectItem key={option.language} value={option.language}>
                         {option.language}
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-            </FormControl_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </FormControl>
           </FormItemLayout>
         )}
       />
@@ -86,7 +87,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
           return (
             <div
               key={lib.name}
-              className="w-[230px] min-w-[230px] min-h-[128px] rounded border border-control bg-surface-100 space-y-3 px-4 py-3"
+              className="w-[230px] min-w-[230px] min-h-[128px] rounded-sm border border-control bg-surface-100 space-y-3 px-4 py-3"
             >
               <div className="space-y-1">
                 <p className="text-sm">{lib.name}</p>
@@ -95,7 +96,11 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
                 </p>
               </div>
               <div>
-                <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+                <Button
+                  asChild
+                  variant="default"
+                  icon={<ExternalLink size={14} strokeWidth={1.5} />}
+                >
                   <Link href={lib.url} target="_blank" rel="noreferrer">
                     View GitHub issues
                   </Link>
@@ -106,7 +111,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
         })}
         <div
           className={cn(
-            'px-4 py-3 rounded border border-control bg-surface-100',
+            'px-4 py-3 rounded-sm border border-control bg-surface-100',
             'w-[230px] min-w-[230px] min-h-[128px] flex flex-col justify-between space-y-3'
           )}
         >
@@ -115,7 +120,7 @@ const LibrarySuggestions = ({ library }: LibrarySuggestionsProps) => {
             <p className="text-sm text-foreground-light">For any issues about our API</p>
           </div>
           <div>
-            <Button asChild type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
+            <Button asChild variant="default" icon={<ExternalLink size={14} strokeWidth={1.5} />}>
               <Link href="https://github.com/supabase/supabase" target="_blank" rel="noreferrer">
                 View GitHub issues
               </Link>

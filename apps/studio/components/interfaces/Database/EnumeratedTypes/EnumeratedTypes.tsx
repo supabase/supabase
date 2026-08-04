@@ -1,13 +1,6 @@
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useIsProtectedSchema } from 'hooks/useProtectedSchemas'
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -22,6 +15,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -30,11 +26,24 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useEnumeratedTypeDeleteMutation } from '@/data/enumerated-types/enumerated-type-delete-mutation'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const EnumeratedTypes = () => {
   const { data: project } = useSelectedProjectQuery()
   const [search, setSearch] = useState('')
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const {
@@ -80,6 +89,19 @@ export const EnumeratedTypes = () => {
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search enumerated types' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => {
+    setSearch('')
+  })
+
   const onConfirmDeleteType = () => {
     if (typeToDelete === undefined) return console.error('No enumerated type selected')
     if (project?.ref === undefined) return console.error('Project ref required')
@@ -112,18 +134,29 @@ export const EnumeratedTypes = () => {
     <div className="space-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
         <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-          <SchemaSelector
-            className="w-full lg:w-[180px]"
-            size="tiny"
-            showError={false}
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={setSelectedSchema}
-          />
+          <Shortcut
+            id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+            onTrigger={() => setSchemaSelectorOpen(true)}
+            side="bottom"
+            tooltipOpen={schemaSelectorOpen ? false : undefined}
+          >
+            <SchemaSelector
+              className="w-full lg:w-[180px]"
+              size="tiny"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+              open={schemaSelectorOpen}
+              onOpenChange={setSchemaSelectorOpen}
+            />
+          </Shortcut>
           <Input
+            ref={searchInputRef}
             size="tiny"
             value={search}
             className="w-full lg:w-52"
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={onSearchInputEscape(search, setSearch)}
             placeholder="Search for a type"
             icon={<Search />}
           />
@@ -132,13 +165,20 @@ export const EnumeratedTypes = () => {
         <div className="flex items-center gap-2">
           <DocsButton href="https://www.postgresql.org/docs/current/datatype-enum.html" />
           {!isSchemaLocked && (
-            <Button
-              className="ml-auto flex-1"
-              type="primary"
-              onClick={() => setShowCreateTypePanel(true)}
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Create new enumerated type"
+              onTrigger={() => setShowCreateTypePanel(true)}
+              side="bottom"
             >
-              Create type
-            </Button>
+              <Button
+                className="ml-auto flex-1"
+                variant="primary"
+                onClick={() => setShowCreateTypePanel(true)}
+              >
+                Create type
+              </Button>
+            </Shortcut>
           )}
         </div>
       </div>
@@ -198,9 +238,19 @@ export const EnumeratedTypes = () => {
                         {!isSchemaLocked && (
                           <div className="flex justify-end items-center space-x-2">
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="default"
+                                      className="px-1"
+                                      icon={<MoreVertical />}
+                                      aria-label={`${type.name} actions`}
+                                    />
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">More options</TooltipContent>
+                              </Tooltip>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
                                   className="space-x-2"

@@ -1,14 +1,13 @@
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-
-import { useParams } from 'common'
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
-import CountdownTimerSpan from 'components/ui/CountdownTimer/CountdownTimerSpan'
-import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
-import { COOLDOWN_DURATION } from 'data/config/disk-attributes-update-mutation'
 import { Card, CardContent } from 'ui'
 
 import FormMessage from './FormMessage'
+import CountdownTimerRadial from '@/components/ui/CountdownTimer/CountdownTimerRadial'
+import CountdownTimerSpan from '@/components/ui/CountdownTimer/CountdownTimerSpan'
+import { useRemainingDurationForDiskAttributeUpdate } from '@/data/config/disk-attributes-query'
+import { COOLDOWN_DURATION } from '@/data/config/disk-attributes-update-mutation'
 
 export function DiskCountdownRadial() {
   const { ref } = useParams()
@@ -47,17 +46,15 @@ export function DiskCountdownRadial() {
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <Card className="px-2 rounded bg-surface-100">
+          <Card className="px-2 rounded-sm bg-surface-100">
             <CardContent className="py-3 flex gap-3 px-3 items-start">
               <CountdownTimerRadial progress={progressPercentage} />
               <div className="flex flex-col gap-2">
                 <div>
-                  <p className="text-foreground text-sm p-0">
-                    4-hour cooldown period is in progress
-                  </p>
+                  <p className="text-foreground text-sm p-0">Disk modification limit reached</p>
                   <p className="text-foreground-lighter text-sm p-0">
-                    You can't modify your disk configuration again until the 4-hour cool down period
-                    ends.
+                    You can modify disk attributes up to 4 times within a rolling 24-hour window.
+                    You'll be able to make changes again once the window allows it.
                   </p>
                 </div>
                 <CountdownTimerSpan seconds={remainingTime} />

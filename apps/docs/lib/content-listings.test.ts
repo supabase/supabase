@@ -1,0 +1,310 @@
+import { CONTENT_LISTINGS } from '~/data/content-listings'
+import { storageGetStarted } from '~/data/content-listings/storage.data'
+import {
+  ContentListings as ContentListingsMarkdownHandler,
+  serializeContentListingGroupToMarkdown,
+} from '~/internals/markdown-schema/ContentListings'
+import { contentListingItemSchema } from '~/lib/content-listings.schema'
+import { isExternalContentListingHref } from '~/lib/content-listings.utils'
+import { describe, expect, it } from 'vitest'
+
+const SUPABASE_DASHBOARD_ORIGIN = 'https://supabase.com/dashboard'
+
+function isDashboardHref(href: string): boolean {
+  try {
+    const url = new URL(href, 'https://supabase.com')
+    return url.pathname === '/dashboard' || url.pathname.startsWith('/dashboard/')
+  } catch {
+    return href === '/dashboard' || href.startsWith('/dashboard/')
+  }
+}
+
+function isAbsoluteSupabaseDashboardHref(href: string): boolean {
+  return href === SUPABASE_DASHBOARD_ORIGIN || href.startsWith(`${SUPABASE_DASHBOARD_ORIGIN}/`)
+}
+
+describe('isExternalContentListingHref', () => {
+  it('treats protocol-relative URLs as external', () => {
+    expect(isExternalContentListingHref('//example.com/path')).toBe(true)
+  })
+
+  it('treats absolute http(s) URLs as external', () => {
+    expect(isExternalContentListingHref('https://github.com/supabase/storage-api')).toBe(true)
+  })
+
+  it('treats internal guide paths as not external', () => {
+    expect(isExternalContentListingHref('/guides/storage/quickstart')).toBe(false)
+  })
+})
+
+describe('serializeContentListingGroupToMarkdown', () => {
+  it('renders grouped items with absolute URLs and descriptions', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        heading: 'Get started',
+        description: 'Read these first.',
+        items: [
+          {
+            title: 'Connect to your database',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings and pooler modes.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain('## Get started')
+    expect(markdown).toContain('Read these first.')
+    expect(markdown).toContain(
+      '**[Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres):** Connection strings and pooler modes.'
+    )
+  })
+
+  it('preserves external hrefs in markdown export', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'resources',
+        items: [
+          {
+            title: 'Storage API',
+            href: 'https://github.com/supabase/storage-api',
+            description: 'View the source code.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '**[Storage API](https://github.com/supabase/storage-api):** View the source code.'
+    )
+  })
+
+  it('respects heading-level in markdown export', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        heading: 'Get started',
+        headingLevel: 'h3',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings.',
+          },
+        ],
+      },
+      ''
+    )
+
+    expect(markdown).toContain('### Get started')
+  })
+
+  it('renders heading and description only once', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        heading: 'Get started',
+        description: 'Read these first.',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings.',
+          },
+        ],
+      },
+      ''
+    )
+
+    expect(markdown.match(/^## Get started$/gm)).toHaveLength(1)
+    expect(markdown.match(/^Read these first\.$/gm)).toHaveLength(1)
+    expect(markdown).toBe(
+      '## Get started\n\nRead these first.\n\n- **[Connect](/docs/guides/database/connecting-to-postgres):** Connection strings.'
+    )
+  })
+
+  it('omits heading line when heading is not set', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings.',
+          },
+        ],
+      },
+      ''
+    )
+
+    expect(markdown).not.toMatch(/^#+\s/m)
+    expect(markdown).toContain('**[Connect]')
+  })
+
+  it('omits feature-gated items when those features are disabled', () => {
+    const previous = process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+    process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = 'true'
+
+    try {
+      const markdown = serializeContentListingGroupToMarkdown(
+        {
+          id: 'frameworks',
+          heading: 'Frameworks',
+          items: [
+            {
+              title: 'React',
+              href: '/guides/getting-started/quickstarts/reactjs',
+              description: 'Web framework.',
+            },
+            {
+              title: 'Flutter',
+              href: '/guides/getting-started/quickstarts/flutter',
+              description: 'Mobile framework.',
+              feature: 'sdk:dart',
+            },
+          ],
+        },
+        ''
+      )
+
+      expect(markdown).toContain('**[React]')
+      expect(markdown).not.toContain('Flutter')
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+      } else {
+        process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = previous
+      }
+    }
+  })
+
+  it('returns empty string when every item is feature-gated off', () => {
+    const previous = process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+    process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = 'true'
+
+    try {
+      const markdown = serializeContentListingGroupToMarkdown(
+        {
+          id: 'sdk-only',
+          heading: 'SDKs',
+          items: [
+            {
+              title: 'Flutter',
+              href: '/guides/getting-started/quickstarts/flutter',
+              description: 'Mobile framework.',
+              feature: 'sdk:dart',
+            },
+          ],
+        },
+        ''
+      )
+
+      expect(markdown).toBe('')
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL
+      } else {
+        process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL = previous
+      }
+    }
+  })
+})
+
+describe('ContentListings markdown handler', () => {
+  it('serializes the group looked up by id', () => {
+    const markdown = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
+
+    expect(markdown).toContain('## Get started')
+    expect(markdown).toContain('Files buckets')
+    expect(markdown).toContain('/guides/storage/quickstart')
+  })
+
+  it('returns empty string when id is missing or unknown', () => {
+    expect(ContentListingsMarkdownHandler({ props: {} })).toBe('')
+    expect(ContentListingsMarkdownHandler({ props: { id: 'nonexistent-id' } })).toBe('')
+  })
+
+  it('matches direct serializeContentListingGroupToMarkdown for the same data', () => {
+    const handler = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
+    const direct = serializeContentListingGroupToMarkdown(storageGetStarted, '')
+    expect(handler).toBe(direct)
+  })
+})
+
+describe('dashboard content listing hrefs', () => {
+  // Root-relative /dashboard hrefs get the docs basePath and 404; use absolute URLs.
+  it('uses absolute https://supabase.com dashboard URLs', () => {
+    const dashboardLinks = Object.values(CONTENT_LISTINGS).flatMap((group) =>
+      group.items
+        .filter((item) => isDashboardHref(item.href))
+        .map((item) => ({ listingId: group.id, title: item.title, href: item.href }))
+    )
+
+    expect(dashboardLinks.length).toBeGreaterThan(0)
+
+    const relativeOrNonCanonical = dashboardLinks.filter(
+      (link) => !isAbsoluteSupabaseDashboardHref(link.href)
+    )
+
+    expect(relativeOrNonCanonical).toEqual([])
+  })
+})
+
+describe('contentListingItemSchema icon', () => {
+  const baseItem = {
+    title: 'Datadog',
+    href: '/guides/monitoring-and-debugging/log-drains#datadog',
+    description: 'Stream logs directly into Datadog for monitoring and analysis.',
+  }
+
+  it('accepts a plain string icon path', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: '/docs/img/icons/github-icon',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts a well-formed icon chip object', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'datadog', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an icon chip object missing bg', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'datadog', color: '#632CA6' },
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects an icon chip object with an unknown kind', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      icon: { kind: 'not-a-real-kind', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
+    })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('TelemetryEvent union', () => {
+  it('includes docs_content_listing_clicked', () => {
+    const event = {
+      action: 'docs_content_listing_clicked' as const,
+      properties: {
+        targetPath: '/guides/storage',
+        linkTitle: 'Storage',
+      },
+    }
+
+    const _typeCheck: import('common/telemetry-constants').TelemetryEvent = event
+    expect(_typeCheck.action).toBe('docs_content_listing_clicked')
+  })
+})

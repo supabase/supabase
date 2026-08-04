@@ -1,9 +1,9 @@
+import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+import { Alert, AlertDescription, Button } from 'ui'
 
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
-import { DOCS_URL } from 'lib/constants'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { DOCS_URL } from '@/lib/constants'
 
 interface CPUWarningsProps {
   hasAccessToComputeSizes: boolean
@@ -18,49 +18,49 @@ export const CPUWarnings = ({
 }: CPUWarningsProps) => {
   if (severity === 'warning') {
     return (
-      <Alert_Shadcn_ variant="warning">
+      <Alert variant="warning">
         <AlertCircle />
         <AlertTitle>Your max CPU usage has exceeded 80%</AlertTitle>
-        <AlertDescription_Shadcn_>
+        <AlertDescription>
           High CPU usage could result in slower queries, disruption of daily back up routines, and
           in rare cases, your instance may become unresponsive. If you need more resources, consider
           upgrading to a larger compute add-on.
-        </AlertDescription_Shadcn_>
+        </AlertDescription>
         <div className="mt-3 flex items-center space-x-2">
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
-          <Button asChild type="warning">
+          <Button asChild variant="warning">
             <Link href={upgradeUrl}>
               {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   }
 
   if (severity === 'critical') {
     return (
-      <Alert_Shadcn_ variant="destructive">
+      <Alert variant="destructive">
         <AlertCircle />
         <AlertTitle>Your max CPU usage has reached 100%</AlertTitle>
-        <AlertDescription_Shadcn_>
+        <AlertDescription>
           High CPU usage could result in slower queries, disruption of daily back up routines, and
           in rare cases, your instance may become unresponsive. If you need more resources, consider
           upgrading to a larger compute add-on.
-        </AlertDescription_Shadcn_>
+        </AlertDescription>
         <div className="mt-3 flex items-center space-x-2">
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
-          <Button asChild type="danger">
+          <Button asChild variant="danger">
             <Link href={upgradeUrl}>
               {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
           </Button>
         </div>
-      </Alert_Shadcn_>
+      </Alert>
     )
   }
 

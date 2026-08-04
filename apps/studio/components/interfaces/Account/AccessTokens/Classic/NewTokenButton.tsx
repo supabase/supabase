@@ -1,15 +1,18 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+
 import { NewTokenDialog } from './NewTokenDialog'
-import { type NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { type NewAccessToken } from '@/data/access-tokens/access-tokens-create-mutation'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: NewAccessToken) => void
@@ -32,14 +35,19 @@ export const NewTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => 
           Generate new token
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="primary"
-              title="Choose token scope"
-              className="rounded-l-none px-[4px] py-[5px]"
-              icon={<ChevronDown />}
-            />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="primary"
+                  aria-label="Choose token scope"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<ChevronDown />}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Choose token scope</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end" side="bottom">
             <DropdownMenuItem
               key="experimental-token"

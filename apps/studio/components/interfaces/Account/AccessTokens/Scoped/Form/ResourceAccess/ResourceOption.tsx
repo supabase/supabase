@@ -1,6 +1,5 @@
+import { Box, Check } from 'lucide-react'
 import { cn } from 'ui'
-import { Box } from 'lucide-react'
-import { Check } from 'lucide-react'
 
 export const ResourceOption = ({
   value,

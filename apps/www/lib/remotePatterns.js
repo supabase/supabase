@@ -45,7 +45,7 @@ module.exports = [
     protocol: 'https',
     hostname: 'img.youtube.com',
     port: '',
-    pathname: '/vi/*',
+    pathname: '/vi/**',
   },
   {
     protocol: 'https',
@@ -113,5 +113,19 @@ module.exports = [
     hostname: 'zhfonblqamxferhoguzj.supabase.co',
     port: '',
     pathname: '/functions/v1/generate-og',
+  },
+  // Marketplace DB staging
+  {
+    protocol: 'https',
+    hostname: 'fgxbxpvumhvzrhqngsyu.supabase.co',
+    port: '',
+    pathname: '**',
+  },
+  // Marketplace DB prod
+  {
+    protocol: 'https',
+    hostname: 'otqhrpbxhxkrhrnjqbba.supabase.co',
+    port: '',
+    pathname: '**',
   },
 ]

@@ -1,4 +1,5 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+
 import { makeRandomString } from './helpers'
 
 const GITHUB_INTEGRATION_APP_NAME =
@@ -51,7 +52,7 @@ export function openInstallGitHubIntegrationWindow(
     windowUrl = GITHUB_INTEGRATION_INSTALLATION_URL
   } else {
     const state = makeRandomString(32)
-    localStorage.setItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE, state)
+    safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE, state)
     windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}&prompt=select_account`
   }
 

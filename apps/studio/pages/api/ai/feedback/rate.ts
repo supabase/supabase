@@ -1,15 +1,17 @@
-import { generateObject } from 'ai'
+import { generateText, Output } from 'ai'
 import { currentLogger } from 'braintrust'
 import { IS_PLATFORM } from 'common'
-import { rateMessageResponseSchema } from 'components/ui/AIAssistantPanel/Message.utils'
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { IS_TRACING_ENABLED } from 'lib/ai/braintrust-logger'
-import { getModel } from 'lib/ai/model'
-import { getOrgAIDetails } from 'lib/ai/org-ai-details'
-import { sanitizeMessagePart } from 'lib/ai/tools/tool-sanitizer'
-import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
+
+import { rateMessageResponseSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
+import { IS_TRACING_ENABLED, isTracingAllowed } from '@/lib/ai/braintrust-logger'
+import { getModel } from '@/lib/ai/model'
+import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 
 export const maxDuration = 30
 
@@ -53,7 +55,9 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let isHipaaEnabled = false
+  let orgHasHipaaAddon: boolean | undefined
+  let projectIsSensitive: boolean | undefined
+  let projectRegion: string | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -61,16 +65,15 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
-      // Get organizations and compute opt in level server-side
-      const { aiOptInLevel: orgAIOptInLevel, isHipaaEnabled: orgIsHipaaEnabled } =
-        await getOrgAIDetails({
-          orgSlug,
-          authorization,
-          projectRef,
-        })
+      const [orgDetails, projectDetails] = await Promise.all([
+        getOrgAIDetails({ orgSlug, authorization }),
+        getProjectAIDetails({ projectRef, authorization }),
+      ])
 
-      aiOptInLevel = orgAIOptInLevel
-      isHipaaEnabled = orgIsHipaaEnabled
+      aiOptInLevel = orgDetails.aiOptInLevel
+      orgHasHipaaAddon = orgDetails.hasHipaaAddon
+      projectIsSensitive = projectDetails.isSensitive
+      projectRegion = projectDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -96,24 +99,18 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   })
 
   try {
-    const {
-      model,
-      error: modelError,
-      providerOptions,
-    } = await getModel({
+    const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
-      isLimited: true,
-      routingKey: 'feedback',
+      modelEntry: DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    const { object } = await generateObject({
-      model,
-      providerOptions,
-      schema: rateMessageResponseSchema,
+    const { output } = await generateText({
+      ...modelParams,
+      output: Output.object({ schema: rateMessageResponseSchema }),
       prompt: `
 Your job is to look at a Supabase Assistant conversation, which the user has given feedback on, and classify it.
 
@@ -137,7 +134,11 @@ Instructions:
     })
 
     // Log feedback to Braintrust if tracing is enabled and span ID is available
-    if (IS_TRACING_ENABLED && !isHipaaEnabled && spanId) {
+    if (
+      IS_TRACING_ENABLED &&
+      isTracingAllowed({ orgHasHipaaAddon, projectIsSensitive, projectRegion }) &&
+      spanId
+    ) {
       try {
         const logger = currentLogger()
         logger?.logFeedback({
@@ -148,7 +149,7 @@ Instructions:
         })
         logger?.updateSpan({
           id: spanId,
-          metadata: { feedbackCategory: object.category },
+          metadata: { feedbackCategory: output.category },
         })
       } catch (error) {
         console.error('Failed to log feedback to Braintrust:', error)
@@ -156,7 +157,7 @@ Instructions:
     }
 
     return res.json({
-      category: object.category,
+      category: output.category,
     })
   } catch (error) {
     if (error instanceof Error) {

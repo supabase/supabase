@@ -1,14 +1,18 @@
+import { useParams } from 'common'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { HorizontalShimmerWithIcon } from 'components/ui/Shimmers'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { DOCS_URL } from 'lib/constants'
-import { Button, Modal, ScrollArea, cn } from 'ui'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  cn,
+  ScrollArea,
+} from 'ui'
 import {
   PageSection,
   PageSectionAside,
@@ -18,11 +22,17 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+
+import { parseRedirectUrls } from '../Auth.constants'
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
-
-const MAX_URLS_LENGTH = 2 * 1024
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 export const RedirectUrls = () => {
   const { ref: projectRef } = useParams()
@@ -33,12 +43,11 @@ export const RedirectUrls = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
-  const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutateAsync: updateAuthConfig, isPending: isUpdatingConfig } =
+    useAuthConfigUpdateMutation()
 
   const URI_ALLOW_LIST_ARRAY = useMemo(() => {
-    return authConfig?.URI_ALLOW_LIST
-      ? authConfig.URI_ALLOW_LIST.split(/\s*[,]+\s*/).filter((url: string) => url)
-      : []
+    return parseRedirectUrls(authConfig?.URI_ALLOW_LIST)
   }, [authConfig?.URI_ALLOW_LIST])
 
   const [open, setOpen] = useState(false)
@@ -48,13 +57,9 @@ export const RedirectUrls = () => {
   const onConfirmDeleteUrl = async (urls?: string[]) => {
     if (!urls || urls.length === 0) return
 
-    // Remove selectedUrl from array and update
-    const payload = URI_ALLOW_LIST_ARRAY.filter((url: string) => !selectedUrls.includes(url))
+    const payload = URI_ALLOW_LIST_ARRAY.filter((url: string) => !urls.includes(url))
     const payloadString = payload.join(',')
-    if (payloadString.length > MAX_URLS_LENGTH) {
-      return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
-    }
-    updateAuthConfig(
+    await updateAuthConfig(
       { projectRef: projectRef!, config: { URI_ALLOW_LIST: payloadString } },
       {
         onError: (error) => {
@@ -116,60 +121,48 @@ export const RedirectUrls = () => {
           onClose={() => setOpen(false)}
         />
 
-        <Modal
-          hideFooter
-          size="large"
-          visible={openRemoveSelected}
-          header="Remove URLs"
-          onCancel={() => {
+        <AlertDialog
+          open={openRemoveSelected}
+          onOpenChange={() => {
             setSelectedUrls([])
             setOpenRemoveSelected(false)
           }}
         >
-          <Modal.Content className="flex flex-col gap-y-2">
-            <p className="mb-2 text-sm text-foreground-light">
-              Are you sure you want to remove the following {selectedUrls.length} URL
-              {selectedUrls.length > 1 ? 's' : ''}?
-            </p>
-            <ScrollArea className={cn(selectedUrls.length > 4 ? 'h-[250px]' : '')}>
-              <div className="flex flex-col -space-y-1">
-                {selectedUrls.map((url) => {
-                  return (
-                    <ValueContainer key={url} className="px-4 py-3 hover:bg-surface-100">
-                      {url}
-                    </ValueContainer>
-                  )
-                })}
-              </div>
-            </ScrollArea>
-            <p className="text-foreground-light text-sm">
-              These URLs will no longer work with your authentication configuration.
-            </p>
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content className="flex items-center gap-x-2">
-            <Button
-              block
-              type="default"
-              size="medium"
-              onClick={() => {
-                setSelectedUrls([])
-                setOpenRemoveSelected(false)
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              block
-              size="medium"
-              type="warning"
-              loading={isUpdatingConfig}
-              onClick={() => onConfirmDeleteUrl(selectedUrls)}
-            >
-              {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
-            </Button>
-          </Modal.Content>
-        </Modal>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove URLs</AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="flex flex-col gap-y-2">
+                  <p className="mb-2 text-sm text-foreground-light">
+                    Are you sure you want to remove the following {selectedUrls.length} URL
+                    {selectedUrls.length > 1 ? 's' : ''}?
+                  </p>
+                  <ScrollArea className={cn(selectedUrls.length > 4 ? 'h-[250px]' : '')}>
+                    <div className="flex flex-col -space-y-1">
+                      {selectedUrls.map((url) => {
+                        return (
+                          <ValueContainer key={url} className="px-4 py-3 hover:bg-surface-100">
+                            {url}
+                          </ValueContainer>
+                        )
+                      })}
+                    </div>
+                  </ScrollArea>
+                  <p className="text-foreground-light text-sm">
+                    These URLs will no longer work with your authentication configuration.
+                  </p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            <AlertDialogFooter className="flex items-center gap-x-2">
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction variant="warning" onClick={() => onConfirmDeleteUrl(selectedUrls)}>
+                {isUpdatingConfig ? 'Removing...' : 'Remove URL'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </PageSectionContent>
     </PageSection>
   )

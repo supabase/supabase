@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { FC, PropsWithChildren, useMemo } from 'react'
+import { useMemo, type FC, type ReactElement } from 'react'
 import { ResponsiveContainer } from 'recharts'
 
 import { DateTimeFormats } from './Charts.constants'
@@ -71,6 +71,24 @@ export const precisionFormatter = (num: number, precision: number): string => {
  */
 export const compactNumberFormatter = (num: number): string => {
   return new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(num)
+}
+
+/**
+ * Formats a duration in milliseconds with thousands separators and a unit suffix.
+ *
+ * @example
+ * millisecondFormatter(123)          // "123ms"
+ * millisecondFormatter(90000)        // "90,000ms"
+ * millisecondFormatter(1234.56)      // "1,235ms"
+ * millisecondFormatter(1234.56, 2)   // "1,234.56ms"
+ */
+export const millisecondFormatter = (value: number, precision = 0) => {
+  if (!Number.isFinite(value)) return '0ms'
+
+  return `${value.toLocaleString('en-US', {
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
+  })}ms`
 }
 
 /**
@@ -174,6 +192,45 @@ export function computeYAxisDomain({
   return [0, Math.max(maxRefValue, maxStackedTotal)]
 }
 
+export function normalizeStackedSeriesData<T extends Record<string, unknown>>({
+  data,
+  attributeNames,
+  totalTarget = 100,
+}: {
+  data: T[]
+  attributeNames: string[]
+  totalTarget?: number
+}): T[] {
+  return data.map((point) => {
+    const values = attributeNames.map((name) => ({
+      name,
+      value: typeof point[name] === 'number' ? point[name] : 0,
+    }))
+    const total = values.reduce((sum, entry) => sum + entry.value, 0)
+
+    if (total <= 0) return point
+
+    const largestEntry = values.reduce((largest, entry) =>
+      entry.value > largest.value ? entry : largest
+    )
+
+    let normalizedTotal = 0
+    const nextPoint: Record<string, unknown> = { ...point }
+
+    values.forEach(({ name, value }) => {
+      if (name === largestEntry.name) return
+
+      const normalizedValue = (value / total) * totalTarget
+      nextPoint[name] = normalizedValue
+      normalizedTotal += normalizedValue
+    })
+
+    nextPoint[largestEntry.name] = Math.max(0, totalTarget - normalizedTotal)
+
+    return nextPoint as T
+  })
+}
+
 /**
  * Hook to create common wrapping components, perform data transformations
  * returns a Container component and the minHeight set
@@ -193,7 +250,7 @@ export const useChartSize = (
   }
 ) => {
   const minHeight = sizeMap[size]
-  const Container: FC<PropsWithChildren & { className?: string }> = useMemo(
+  const Container: FC<{ children: ReactElement; className?: string }> = useMemo(
     () =>
       ({ className, children }) => (
         <ResponsiveContainer
@@ -202,7 +259,7 @@ export const useChartSize = (
           minHeight={minHeight}
           width="100%"
         >
-          {children as JSX.Element}
+          {children}
         </ResponsiveContainer>
       ),
     [size]

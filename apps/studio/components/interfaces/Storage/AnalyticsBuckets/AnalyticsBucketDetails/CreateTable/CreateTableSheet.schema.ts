@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { NEW_NAMESPACE_MARKER } from './CreateTableSheet.constants'
+
+import { COLUMN_TYPES, NEW_NAMESPACE_MARKER } from './CreateTableSheet.constants'
 
 const getValidRegex = (type: 'namespace' | 'table') =>
   type === 'namespace'
@@ -36,7 +37,7 @@ export const createFormSchema = () =>
       columns: z
         .object({
           name: z.string().min(1, 'Provide a name for your column'),
-          type: z.string().min(1, 'Select a type for your column'),
+          type: z.enum(COLUMN_TYPES, { message: 'Select a type for your column' }),
           // For decimal type
           precision: z.number().optional(),
           scale: z.number().int().optional(),
@@ -68,6 +69,35 @@ export const createFormSchema = () =>
           })
         }
       }
+
+      data.columns.forEach((column, index) => {
+        if (column.type === 'decimal') {
+          if (column.precision == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Required',
+              path: [`columns.${index}.precision`],
+            })
+          }
+          if (column.scale == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Required',
+              path: [`columns.${index}.scale`],
+            })
+          }
+        }
+
+        if (column.type === 'fixed') {
+          if (column.length == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Required',
+              path: [`columns.${index}.length`],
+            })
+          }
+        }
+      })
 
       if (data.name) {
         const newTableError = validateName({ name: data.name, type: 'table' })

@@ -2,16 +2,16 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
-import { type SubmitHandler, useForm } from 'react-hook-form'
+import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Button, Form, FormControl, FormField, Input } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
-import { BASE_PATH } from 'lib/constants'
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth, buildPathWithParams } from 'lib/gotrue'
-import { Button, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
+import { BASE_PATH } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, buildPathWithParams } from '@/lib/gotrue'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -72,23 +72,28 @@ export const SignInSSOForm = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
-      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField_Shadcn_
+    <Form {...form}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
+        <FormField
           key="email"
           name="email"
           control={form.control}
           render={({ field }) => (
             <FormItemLayout name="email" label="Email">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
+              <FormControl>
+                <Input
                   id="email"
                   type="email"
                   autoComplete="email"
                   {...field}
                   placeholder="gavin@hooli.com"
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
@@ -107,10 +112,10 @@ export const SignInSSOForm = () => {
           />
         </div>
 
-        <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
+        <Button block form={formId} type="submit" size="large" loading={isSubmitting}>
           Sign in
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

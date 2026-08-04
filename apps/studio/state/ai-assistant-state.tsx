@@ -1,17 +1,19 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { constructHeaders } from 'data/fetchers'
-import { prepareMessagesForAPI } from 'lib/ai/message-utils'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
+import { constructHeaders } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
+import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
   title: string
@@ -22,7 +24,35 @@ export type AssistantMessageType = MessageType
 
 export type SqlSnippet = string | { label: string; content: string }
 
-export type AssistantModel = 'gpt-5' | 'gpt-5-mini'
+export type AssistantModel = AssistantModelId
+
+export type SupportChatMetadata = {
+  subject: string
+  category: string
+  severity: string
+  organizationSlug?: string
+  projectRef?: string
+  library?: string
+  affectedServices?: string
+  allowSupportAccess: boolean
+  browserInformation?: string
+  frontConversationId?: string
+  // Front thread_ref shared with the submit-time conversation. Sent as the sync
+  // API `chatId` so AI messages thread into that same Front conversation.
+  threadRef?: string
+  isSupportChat: true
+  lifecycleStatus: AiSupportStatus
+  // A lifecycle transition requested before the Front conversation id existed
+  // (e.g. the assistant resolved the chat before the first message sync
+  // returned an id). Flushed by syncSupportChatToFront once the id is assigned.
+  pendingLifecycleStatus?: AiSupportStatus
+  lifecycleClosedAt?: string
+  lastSyncedMessageCount: number
+  // Guards message syncs; lifecycle syncs use `isLifecycleSyncing` so the two
+  // never block each other.
+  isSyncing: boolean
+  isLifecycleSyncing: boolean
+}
 
 type ChatSession = {
   id: string
@@ -30,6 +60,8 @@ type ChatSession = {
   messages: AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
+  supportMetadata?: SupportChatMetadata
+  branchedFrom?: { chatId: string; messageId: string }
 }
 
 export type AiAssistantContext = {
@@ -45,7 +77,7 @@ type AiAssistantData = {
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
   activeChatId?: string
-  model: AssistantModel
+  model?: AssistantModel
   context: AiAssistantContext
 }
 
@@ -57,16 +89,16 @@ type StoredAiAssistantState = {
   model?: AssistantModel
 }
 
-const INITIAL_AI_ASSISTANT: AiAssistantData = {
+const createInitialAiAssistantData = (): AiAssistantData => ({
   initialInput: '',
   sqlSnippets: undefined,
   suggestions: undefined,
   tables: [],
   chats: {},
   activeChatId: undefined,
-  model: 'gpt-5',
+  model: undefined,
   context: {},
-}
+})
 
 const DB_NAME = 'ai-assistant-db'
 const DB_VERSION = 1
@@ -121,7 +153,7 @@ async function clearStorage(): Promise<void> {
 
 // Helper function to sanitize objects to ensure they're cloneable
 // Issue due to addToolResult
-function sanitizeForCloning(obj: any): any {
+export function sanitizeForCloning(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (typeof obj !== 'object') return obj
   return JSON.parse(JSON.stringify(obj))
@@ -160,7 +192,7 @@ async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantS
 async function tryMigrateFromLocalStorage(
   projectRef: string
 ): Promise<StoredAiAssistantState | null> {
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+  const stored = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   if (!stored) {
     return null
   }
@@ -179,23 +211,23 @@ async function tryMigrateFromLocalStorage(
         projectRef: projectRef,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
-        model: parsedFromLocalStorage.model ?? INITIAL_AI_ASSISTANT.model,
+        model: parsedFromLocalStorage.model ?? createInitialAiAssistantData().model,
       }
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
       // Clean up invalid data
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
     }
   } catch (error) {
     console.error('Failed to parse state from localStorage:', error)
     // Clear potentially corrupted data
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   }
 
   if (migratedState) {
     try {
       await saveAiState(migratedState)
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
       return migratedState
     } catch (saveError) {
       console.error('Failed to save migrated state to IndexedDB:', saveError)
@@ -231,7 +263,7 @@ function createChatInstance(
   return new Chat<MessageType>({
     id: options.id,
     messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
       fetch: async (url, init) => {
@@ -258,6 +290,7 @@ function createChatInstance(
             connectionString: state.context.connectionString,
             chatId: options.id,
             chatName: chat?.name,
+            supportMode: chat?.supportMetadata?.isSupportChat ?? false,
             orgSlug: state.context.orgSlug,
             context: state.context,
             model: state.model,
@@ -272,6 +305,16 @@ function createChatInstance(
         return
       }
 
+      if (toolCall.toolName === 'escalate_to_human') {
+        state.setSupportLifecycleStatus(options.id, 'escalated')
+        return
+      }
+
+      if (toolCall.toolName === 'resolve_support_conversation') {
+        state.setSupportLifecycleStatus(options.id, 'bot_resolved')
+        return
+      }
+
       if (toolCall.toolName === 'rename_chat') {
         const { newName } = toolCall.input as { newName: string }
 
@@ -280,14 +323,15 @@ function createChatInstance(
         }
       }
     },
-    onFinish(result) {
+    onFinish(_result) {
       // Sync messages back to state
       const chatInstance = state.chatInstances[options.id]
       if (chatInstance) {
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages as AssistantMessageType[]
+          // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
+          chat.messages = messages.map((message) => sanitizeForCloning(message))
           chat.updatedAt = new Date()
         }
 
@@ -300,6 +344,13 @@ function createChatInstance(
           }
           delete state.pendingSpanIds[options.id]
         }
+
+        // Sync support chat messages to Front (fire-and-forget, dynamic import to avoid SSR issues)
+        if (chat?.supportMetadata) {
+          import('@/state/ai-chat-front-sync')
+            .then(({ syncSupportChatToFront }) => syncSupportChatToFront(options.id, state))
+            .catch(() => {})
+        }
       }
     },
   })
@@ -307,7 +358,7 @@ function createChatInstance(
 
 export const createAiAssistantState = (): AiAssistantState => {
   // Initialize with defaults, loading happens asynchronously in the provider
-  const initialState = { ...INITIAL_AI_ASSISTANT }
+  const initialState = createInitialAiAssistantData()
 
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
@@ -320,7 +371,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     },
 
     resetAiAssistantPanel: () => {
-      Object.assign(state, INITIAL_AI_ASSISTANT)
+      Object.assign(state, createInitialAiAssistantData())
     },
 
     setModel: (model: AssistantModel) => {
@@ -365,12 +416,75 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
 
       // Update non-chat related state based on options, falling back to current state, then initial
-      state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
-      state.sqlSnippets = options?.sqlSnippets ?? INITIAL_AI_ASSISTANT.sqlSnippets
-      state.suggestions = options?.suggestions ?? INITIAL_AI_ASSISTANT.suggestions
-      state.tables = options?.tables ?? INITIAL_AI_ASSISTANT.tables
+      const initialAiAssistantData = createInitialAiAssistantData()
+      state.initialInput = options?.initialInput ?? initialAiAssistantData.initialInput
+      state.sqlSnippets = options?.sqlSnippets ?? initialAiAssistantData.sqlSnippets
+      state.suggestions = options?.suggestions ?? initialAiAssistantData.suggestions
+      state.tables = options?.tables ?? initialAiAssistantData.tables
 
       return chatId
+    },
+
+    branchChat: (messageId: string) => {
+      const sourceChat = state.activeChat
+      if (!sourceChat) return
+
+      const messageIndex = sourceChat.messages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      const branchedMessages = sourceChat.messages
+        .slice(0, messageIndex + 1)
+        .map((message) => sanitizeForCloning(message))
+
+      const chatId = uuidv4()
+      const newChat: ChatSession = {
+        id: chatId,
+        name: `Branch - ${sourceChat.name}`,
+        messages: branchedMessages,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        branchedFrom: { chatId: sourceChat.id, messageId },
+      }
+
+      state.chats = {
+        ...state.chats,
+        [chatId]: newChat,
+      }
+      state.activeChatId = chatId
+
+      state.chatInstances[chatId] = ref(
+        createChatInstance(state, { id: chatId, initialMessages: branchedMessages })
+      )
+
+      const initialAiAssistantData = createInitialAiAssistantData()
+      state.initialInput = initialAiAssistantData.initialInput
+      state.sqlSnippets = initialAiAssistantData.sqlSnippets
+      state.suggestions = initialAiAssistantData.suggestions
+      state.tables = initialAiAssistantData.tables
+
+      return chatId
+    },
+
+    setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => {
+      const chat = state.chats[chatId]
+      if (!chat?.supportMetadata) return
+
+      chat.supportMetadata.lifecycleStatus = status
+      if (status !== 'bot_active') {
+        chat.supportMetadata.lifecycleClosedAt = new Date().toISOString()
+      }
+
+      // No Front conversation yet (the initial message sync hasn't returned an
+      // id). Queue the transition so syncSupportChatToFront can flush it once the
+      // id is assigned, rather than silently dropping it.
+      if (!chat.supportMetadata.frontConversationId) {
+        chat.supportMetadata.pendingLifecycleStatus = status
+        return
+      }
+
+      import('@/state/ai-chat-front-sync').then(({ syncSupportLifecycleToFront }) => {
+        syncSupportLifecycleToFront(chatId, state, status).catch(() => {})
+      })
     },
 
     selectChat: (id: string) => {
@@ -438,37 +552,14 @@ export const createAiAssistantState = (): AiAssistantState => {
       chat.updatedAt = new Date()
     },
 
-    saveMessage: (message: MessageType | MessageType[]) => {
-      const chat = state.activeChat
-      if (!chat) return
-
-      const incomingMessages = Array.isArray(message) ? message : [message]
-
-      const messagesToAdd: AssistantMessageType[] = []
-
-      incomingMessages.forEach((msg) => {
-        const index = chat.messages.findIndex((existing) => existing.id === msg.id)
-
-        if (index !== -1) {
-          state.updateMessage(msg)
-        } else {
-          messagesToAdd.push(msg as AssistantMessageType)
-        }
-      })
-
-      if (messagesToAdd.length > 0) {
-        chat.messages.push(...messagesToAdd)
-        chat.updatedAt = new Date()
-      }
-    },
-
     updateMessage: (updatedMessage: MessageType) => {
       const chat = state.activeChat
       if (!chat) return
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage as AssistantMessageType
+        // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
+        chat.messages[messageIndex] = sanitizeForCloning(updatedMessage)
         chat.updatedAt = new Date()
       }
     },
@@ -486,7 +577,25 @@ export const createAiAssistantState = (): AiAssistantState => {
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
-      state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
+      const storedModel = persistedState.model
+      state.model =
+        storedModel && isKnownAssistantModelId(storedModel)
+          ? storedModel
+          : createInitialAiAssistantData().model
+
+      // Reset sync guards on any support chats (can't be mid-sync after reload)
+      Object.values(state.chats).forEach((chat) => {
+        if (chat.supportMetadata) {
+          if (!chat.supportMetadata.isSupportChat) {
+            chat.supportMetadata.isSupportChat = true
+          }
+          if (!chat.supportMetadata.lifecycleStatus) {
+            chat.supportMetadata.lifecycleStatus = 'bot_active'
+          }
+          chat.supportMetadata.isSyncing = false
+          chat.supportMetadata.isLifecycleSyncing = false
+        }
+      })
 
       // Ensure an active chat exists after loading
       if (!state.activeChat) {
@@ -540,12 +649,13 @@ export type AiAssistantState = AiAssistantData & {
       Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
+  branchChat: (messageId: string) => string | undefined
+  setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => void
   selectChat: (id: string) => void
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
   clearMessages: () => void
   deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
-  saveMessage: (message: MessageType | MessageType[]) => void
   updateMessage: (message: MessageType) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
@@ -608,22 +718,25 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
+
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,
           activeChatId: snap.activeChatId,
           model: snap.model,
           chats: snap.chats
-            ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
-                // Limit messages before saving
-                return {
-                  ...acc,
-                  [chatId]: {
-                    ...chat,
-                    messages: chat.messages?.slice(-20) || [],
-                  },
-                }
-              }, {})
+            ? (Object.entries(snap.chats) as Array<[string, ChatSession]>).reduce(
+                (acc, [chatId, chat]) => {
+                  return {
+                    ...acc,
+                    [chatId]: {
+                      ...chat,
+                      messages: chat.messages?.slice(-20) || [],
+                    },
+                  }
+                },
+                {} as Record<string, ChatSession>
+              )
             : {},
         }
         debouncedSaveAiState(stateToSave)

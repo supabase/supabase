@@ -43,17 +43,23 @@ const AiIconAnimationComponent = ({
     y.set(mouseY / 5)
   }
 
-  const outerVariants = {
-    rest: { rotate: 0 },
-    loading: { rotate: 360 },
-    hover: { rotate: 10 },
-  }
+  const outerAnimate = loading ? { rotate: 360 } : { rotate: isHovering ? 10 : 0 }
 
-  const innerVariants = {
-    rest: { scale: 1, x: 0, y: 0 },
-    loading: { scale: [1, 1.1, 1], x: 0, y: 0 },
-    hover: { scale: 1.1 },
-  }
+  const outerTransition = loading
+    ? {
+        type: 'spring' as const,
+        stiffness: 60,
+        damping: 10,
+        repeat: Infinity,
+        repeatType: 'loop' as const,
+      }
+    : { type: 'spring' as const, stiffness: 300, damping: 30 }
+
+  const innerAnimate = loading ? { scale: [1, 1.1, 1] } : { scale: isHovering ? 1.1 : 1 }
+
+  const innerTransition = loading
+    ? { duration: 2, repeat: Infinity, ease: 'easeInOut' as const, repeatType: 'loop' as const }
+    : { type: 'spring' as const, stiffness: 300, damping: 30 }
 
   return (
     <div
@@ -92,16 +98,10 @@ const AiIconAnimationComponent = ({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          animate={loading ? 'loading' : isHovering ? 'hover' : 'rest'}
-          variants={outerVariants}
-          transition={{
-            duration: 2,
-            repeat: loading ? Infinity : 0,
-            ease: 'circInOut',
-            type: 'spring',
-            stiffness: 60,
-            damping: 10,
-          }}
+          initial={{ rotate: 0 }}
+          animate={outerAnimate}
+          transition={outerTransition}
+          style={{ transformBox: 'view-box', transformOrigin: 'center' }}
         />
         <motion.path
           fillRule="evenodd"
@@ -110,14 +110,15 @@ const AiIconAnimationComponent = ({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          variants={innerVariants}
-          animate={isHovering ? 'hover' : loading ? 'loading' : 'rest'}
-          style={{ x: springX, y: springY }}
-          transition={{
-            duration: 2,
-            repeat: loading ? Infinity : 0,
-            ease: 'easeInOut',
+          initial={{ scale: 1 }}
+          animate={innerAnimate}
+          style={{
+            x: springX,
+            y: springY,
+            transformBox: 'view-box',
+            transformOrigin: 'center',
           }}
+          transition={innerTransition}
         />
       </motion.svg>
     </div>

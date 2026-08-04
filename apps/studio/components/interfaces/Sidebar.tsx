@@ -1,26 +1,11 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
-import {
-  generateOtherRoutes,
-  generateProductRoutes,
-  generateSettingsRoutes,
-  generateToolRoutes,
-} from 'components/layouts/ProjectLayout/NavigationBar/NavigationBar.utils'
-import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AnimatePresence, motion, MotionProps } from 'framer-motion'
-import { useHideSidebar } from 'hooks/misc/useHideSidebar'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLints } from 'hooks/misc/useLints'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   cn,
@@ -42,11 +27,22 @@ import {
   useSidebar,
 } from 'ui'
 
+import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
 import {
-  useIsAPIDocsSidePanelEnabled,
-  useUnifiedLogsPreview,
-} from './App/FeaturePreview/FeaturePreviewContext'
+  generateProductRoutes,
+  generateSettingsRoutes,
+  generateToolRoutes,
+  useGenerateOtherRoutes,
+} from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
+import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
+import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLints } from '@/hooks/misc/useLints'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32
 export const ICON_STROKE_WIDTH = 1.5
@@ -98,9 +94,10 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
-                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? '!px-2' : ''}`}
+                    variant="text"
+                    className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
                     icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                    aria-label="Sidebar control"
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" align="start" className="w-40">
@@ -134,11 +131,11 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
       <AnimatePresence mode="wait">
         <SidebarContentPrimitive>
           {projectRef ? (
-            <motion.div key="project-links">
+            <motion.nav key="project-links">
               <ProjectLinks />
-            </motion.div>
+            </motion.nav>
           ) : (
-            <motion.div
+            <motion.nav
               key="org-links"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -146,7 +143,7 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <OrganizationLinks />
-            </motion.div>
+            </motion.nav>
           )}
         </SidebarContentPrimitive>
       </AnimatePresence>
@@ -161,22 +158,33 @@ export function SideBarNavLink({
   route,
   active,
   onClick,
+  isLoading,
   ...props
 }: {
   route: Route
   active?: boolean
   onClick?: () => void
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
+  const router = useRouter()
+  const { state: sidebarState } = useSidebar()
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
   )
 
+  const isActiveLink = !!(route.link && !route.disabled)
+  const hasShortcut = !!(route.shortcutId && isActiveLink)
+
+  // Collapsed: show immediately (replaces the old label-only tooltip
+  // that used to surface the name of an icon-only item). Expanded:
+  // slight delay so the tooltip doesn't flash while skimming the nav.
+  const shortcutPopoverDelay = sidebarState === 'collapsed' ? 0 : 1000
+
   const buttonProps = {
     disabled: route.disabled,
-    tooltip: sidebarBehaviour === 'closed' ? route.label : '',
     isActive: active,
-    className: cn('text-sm', sidebarBehaviour === 'open' ? '!px-2' : ''),
+    isLoading,
+    className: cn('text-sm', sidebarBehaviour === 'open' ? 'px-2!' : ''),
     size: 'default' as const,
     onClick: onClick,
   }
@@ -190,24 +198,48 @@ export function SideBarNavLink({
     </>
   )
 
+  const button = isActiveLink ? (
+    <SidebarMenuButton {...buttonProps} asChild>
+      <Link href={route.link!}>{content}</Link>
+    </SidebarMenuButton>
+  ) : (
+    <SidebarMenuButton {...buttonProps}>{content}</SidebarMenuButton>
+  )
+
   return (
     <SidebarMenuItem>
-      {route.link && !route.disabled ? (
-        <SidebarMenuButton {...buttonProps} asChild>
-          <Link href={route.link}>{content}</Link>
-        </SidebarMenuButton>
+      {hasShortcut ? (
+        <Shortcut
+          id={route.shortcutId!}
+          onTrigger={() => router.push(route.link!)}
+          side="right"
+          delayDuration={shortcutPopoverDelay}
+        >
+          {button}
+        </Shortcut>
       ) : (
-        <SidebarMenuButton {...buttonProps}>{content}</SidebarMenuButton>
+        button
       )}
     </SidebarMenuItem>
   )
 }
 
 const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
+  const [sidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
+
+  // The nav icon only shifts right (pl-1.5 -> pl-2) when the sidebar is
+  // persistently open — not on hover-expand. Tie the dot to the same
+  // condition so it stays put while skimming the nav.
+  const isPersistentlyOpen = sidebarBehaviour === 'open'
+
   return (
     <div
       className={cn(
-        'absolute pointer-events-none flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
+        'absolute pointer-events-none flex h-2 w-2 top-2 z-10 rounded-full',
+        isPersistentlyOpen ? 'left-[20px]' : 'left-[18px]',
         hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
       )}
     />
@@ -217,15 +249,8 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 const ProjectLinks = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const snap = useAppStateSnapshot()
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
-  const showReports = useIsFeatureEnabled('reports:all')
-  const { mutate: sendEvent } = useSendEventMutation()
-
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -251,112 +276,98 @@ const ProjectLinks = () => {
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project, {
-    unifiedLogs: isUnifiedLogsEnabled,
-    showReports,
-    apiDocsSidePanel: isNewAPIDocsEnabled,
-  })
-  const settingsRoutes = generateSettingsRoutes(ref, project)
+  const otherRoutes = useGenerateOtherRoutes()
+  const settingsRoutes = generateSettingsRoutes(ref)
 
   return (
-    <SidebarMenu>
+    <>
       <SidebarGroup className="gap-0.5">
-        <SideBarNavLink
-          key="home"
-          active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
-          route={{
-            key: 'HOME',
-            label: 'Project Overview',
-            icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: `/project/${ref}`,
-            linkElement: <ProjectIndexPageLink projectRef={ref} />,
-          }}
-        />
-        {toolRoutes.map((route, i) => (
+        <SidebarMenu>
           <SideBarNavLink
-            key={`tools-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
+            key="home"
+            active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+            route={{
+              key: 'HOME',
+              label: 'Project Overview',
+              icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+              link: `/project/${ref}`,
+              linkElement: <ProjectIndexPageLink projectRef={ref} />,
+              shortcutId: SHORTCUT_IDS.NAV_HOME,
+            }}
           />
-        ))}
+          {toolRoutes.map((route, i) => (
+            <SideBarNavLink
+              key={`tools-routes-${i}`}
+              route={route}
+              active={activeRoute === route.key}
+              isLoading={isProjectPending}
+            />
+          ))}
+        </SidebarMenu>
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        {productRoutes.map((route, i) => (
-          <SideBarNavLink
-            key={`product-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
-          />
-        ))}
+        <SidebarMenu>
+          {productRoutes.map((route, i) => (
+            <SideBarNavLink
+              key={`product-routes-${i}`}
+              route={route}
+              active={activeRoute === route.key}
+              isLoading={isProjectPending}
+            />
+          ))}
+        </SidebarMenu>
       </SidebarGroup>
       <Separator className="w-[calc(100%-1rem)] mx-auto" />
       <SidebarGroup className="gap-0.5">
-        {otherRoutes.map((route, i) => {
-          if (route.key === 'api') {
-            const handleApiClick = () => {
-              if (isNewAPIDocsEnabled) {
-                snap.setShowProjectApiDocs(true)
-              }
-              sendEvent({
-                action: 'api_docs_opened',
-                properties: {
-                  source: 'sidebar',
-                },
-                groups: {
-                  project: ref ?? 'Unknown',
-                  organization: org?.slug ?? 'Unknown',
-                },
-              })
+        <SidebarMenu>
+          {otherRoutes.map((route) => {
+            if (route.key === 'advisors') {
+              return (
+                <SideBarNavLink
+                  key={route.key}
+                  route={route}
+                  active={activeRoute === route.key}
+                  isLoading={isProjectPending}
+                >
+                  {route.icon}
+                  <span>{route.label}</span>
+                  {!route.disabled && (
+                    <ActiveDot
+                      hasErrors={errorLints.length > 0}
+                      hasWarnings={securityLints.length > 0}
+                    />
+                  )}
+                </SideBarNavLink>
+              )
+            } else {
+              return (
+                <SideBarNavLink
+                  key={route.key}
+                  route={route}
+                  active={activeRoute === route.key}
+                  isLoading={isProjectPending}
+                />
+              )
             }
-
-            return (
-              <SideBarNavLink
-                key={route.key}
-                route={
-                  isNewAPIDocsEnabled
-                    ? {
-                        label: route.label,
-                        icon: route.icon,
-                        key: route.key,
-                        disabled: route.disabled,
-                      }
-                    : route
-                }
-                active={activeRoute === route.key}
-                onClick={handleApiClick}
-              />
-            )
-          } else if (route.key === 'advisors') {
-            return (
-              <div className="relative" key={route.key}>
-                {!route.disabled && (
-                  <ActiveDot
-                    hasErrors={errorLints.length > 0}
-                    hasWarnings={securityLints.length > 0}
-                  />
-                )}
-                <SideBarNavLink key={route.key} route={route} active={activeRoute === route.key} />
-              </div>
-            )
-          } else {
-            return (
-              <SideBarNavLink key={route.key} route={route} active={activeRoute === route.key} />
-            )
-          }
-        })}
+          })}
+        </SidebarMenu>
       </SidebarGroup>
+      <Separator className="w-[calc(100%-1rem)] mx-auto" />
       {/* Settings routes to be added in with project/org nav */}
       <SidebarGroup className="gap-0.5">
-        {settingsRoutes.map((route, i) => (
-          <SideBarNavLink
-            key={`settings-routes-${i}`}
-            route={route}
-            active={activeRoute === route.key}
-          />
-        ))}
+        <SidebarMenu>
+          {settingsRoutes.map((route, i) => (
+            <SideBarNavLink
+              key={`settings-routes-${i}`}
+              route={route}
+              active={activeRoute === route.key}
+              isLoading={isProjectPending}
+            />
+          ))}
+        </SidebarMenu>
       </SidebarGroup>
-    </SidebarMenu>
+    </>
   )
 }
 
@@ -388,24 +399,28 @@ const OrganizationLinks = () => {
       href: `/org/${organizationSlug}`,
       key: 'projects',
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     },
     {
       label: 'Team',
       href: `/org/${organizationSlug}/team`,
       key: 'team',
       icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_TEAM,
     },
     {
       label: 'Integrations',
       href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     },
     {
       label: 'Usage',
       href: `/org/${organizationSlug}/usage`,
       key: 'usage',
       icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_USAGE,
     },
     ...(showBilling
       ? [
@@ -414,6 +429,7 @@ const OrganizationLinks = () => {
             href: `/org/${organizationSlug}/billing`,
             key: 'billing',
             icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_BILLING,
           },
         ]
       : []),
@@ -422,14 +438,15 @@ const OrganizationLinks = () => {
       href: `/org/${organizationSlug}/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     },
   ]
 
   if (!organizationSlug) return null
 
   return (
-    <SidebarMenu className="flex flex-col gap-1 items-start">
-      <SidebarGroup className="gap-0.5">
+    <SidebarGroup className="gap-0.5">
+      <SidebarMenu className="flex flex-col gap-1">
         {navMenuItems.map((item, i) => (
           <SideBarNavLink
             key={item.key}
@@ -446,10 +463,11 @@ const OrganizationLinks = () => {
               key: item.label,
               icon: item.icon,
               disabled: disableAccessMfa,
+              shortcutId: item.shortcutId,
             }}
           />
         ))}
-      </SidebarGroup>
-    </SidebarMenu>
+      </SidebarMenu>
+    </SidebarGroup>
   )
 }

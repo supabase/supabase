@@ -1,17 +1,18 @@
+import { useBreakpoint } from 'common'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
 import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
-
-import { useBreakpoint } from 'common'
 import { ExpandingTextArea } from 'ui'
 import { cn } from 'ui/src/lib/utils'
+
 import { ButtonTooltip } from '../ButtonTooltip'
 import { type SqlSnippet } from './AIAssistant.types'
 import { ModelSelector } from './ModelSelector'
 import { getSnippetContent, SnippetRow } from './SnippetRow'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
 
 export interface FormProps {
   /* The ref for the textarea, optional. Exposed for the CommandsPopover to attach events. */
-  textAreaRef?: React.RefObject<HTMLTextAreaElement>
+  textAreaRef?: React.RefObject<HTMLTextAreaElement | null>
   /* The loading state of the form */
   loading: boolean
   /* The disabled state of the form */
@@ -45,9 +46,9 @@ export interface FormProps {
   /* If currently editing an existing message */
   isEditing?: boolean
   /* The currently selected AI model */
-  selectedModel: 'gpt-5' | 'gpt-5-mini'
+  selectedModel: AssistantModelId
   /* Callback when a model is chosen */
-  onSelectModel: (model: 'gpt-5' | 'gpt-5-mini') => void
+  onSelectModel: (model: AssistantModelId) => void
 }
 
 const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
@@ -71,14 +72,14 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       onSelectModel,
       ...props
     },
-    ref
+    _ref
   ) => {
     const formRef = useRef<HTMLFormElement>(null)
     const isMobile = useBreakpoint('md')
 
     const handleSubmit = (event?: FormEvent<HTMLFormElement>) => {
       if (event) event.preventDefault()
-      if (!value || (loading && !isEditing)) return
+      if (disabled || !value || (loading && !isEditing)) return
 
       let finalMessage = value
       if (includeSnippetsInMessage && sqlSnippets && sqlSnippets.length > 0) {
@@ -95,10 +96,12 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault()
         handleSubmit()
+      } else if (event.key === 'Escape') {
+        event.currentTarget.blur()
       }
     }
 
-    const canSubmit = !loading && !!value
+    const canSubmit = !disabled && !loading && !!value
 
     return (
       <div className="w-full">
@@ -121,7 +124,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
             ref={textAreaRef}
             disabled={disabled}
             className={cn(
-              'text-sm pr-10 pb-9 max-h-64',
+              'text-base md:text-sm pr-10 pb-9 max-h-64',
               sqlSnippets && sqlSnippets.length > 0 && 'pt-10'
             )}
             placeholder={placeholder}
@@ -140,7 +143,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
               {loading ? (
                 onStop ? (
                   <ButtonTooltip
-                    type="outline"
+                    variant="outline"
                     aria-label="Stop response"
                     icon={<Square fill="currentColor" className="scale-75" />}
                     onClick={onStop}
@@ -152,7 +155,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                 )
               ) : (
                 <ButtonTooltip
-                  htmlType="submit"
+                  type="submit"
                   aria-label="Send message"
                   icon={<ArrowUp />}
                   disabled={!canSubmit}

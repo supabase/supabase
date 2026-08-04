@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { organizationKeys } from 'data/organizations/keys'
-import { UseCustomQueryOptions } from 'types'
-import { ResponseError } from 'types/base'
+
+import { get, handleError } from '@/data/fetchers'
+import { organizationKeys } from '@/data/organizations/keys'
+import { EMPTY_ARR } from '@/lib/void'
+import { UseCustomQueryOptions } from '@/types'
+import { ResponseError } from '@/types/base'
 
 export type FeatureKey =
   components['schemas']['ListEntitlementsResponse']['entitlements'][number]['feature']['key']
@@ -31,7 +33,10 @@ export async function getEntitlements(
   })
   if (error) handleError(error)
 
-  return data
+  return {
+    ...data,
+    entitlements: Array.isArray(data?.entitlements) ? data.entitlements : EMPTY_ARR,
+  }
 }
 
 export type EntitlementsData = Awaited<ReturnType<typeof getEntitlements>>
@@ -65,7 +70,7 @@ export const useEntitlementsQuery = <TData = EntitlementsData>(
   }: UseCustomQueryOptions<EntitlementsData, EntitlementsError, TData> = {}
 ) => {
   return useQuery<EntitlementsData, EntitlementsError, TData>({
-    queryKey: [organizationKeys.entitlements(slug)],
+    queryKey: organizationKeys.entitlements(slug),
     queryFn: ({ signal }) => getEntitlements({ slug }, signal),
     enabled: enabled && typeof slug !== 'undefined',
     ...options,

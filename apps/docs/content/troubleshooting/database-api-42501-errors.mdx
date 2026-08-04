@@ -37,19 +37,19 @@ limit 100;
 
 They tend to be caused by one of the following factors.
 
-### Attempted to access a forbidden schema
+## Attempted to access a forbidden schema
 
 API roles cannot access certain schemas, most notably `auth` and `vault`. This restriction extends to Foreign Data Wrappers relying on `vault`. While you can bypass it using a [security definer function](/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker), these schemas are intentionally restricted for security reasons.
 
-### Attempted to access a custom schema
+## Attempted to access a custom schema
 
 If you created a custom schema, you will have to give the Database API permission to query it. Follow our [Using Custom Schemas guide](/docs/guides/api/using-custom-schemas) for more directions.
 
-### Missing table-level privileges
+## Missing table-level privileges
 
 If you see an error like `permission denied for table your_table`, the querying role may not have the required privilege for the operation.
 
-By default, tables in the `public` schema are granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` to the `anon` and `authenticated` roles. However, these privileges can be adjusted via the [Dashboard Table Editor](/dashboard/project/_/editor) or via SQL.
+By default, tables in the `public` schema are granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` to the `anon` and `authenticated` roles. However, you can change these privileges in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard or via SQL.
 
 To check the current privileges on a table:
 
@@ -75,14 +75,14 @@ grant select, insert, update, delete on table public.your_table to anon, authent
 
 Granting privileges allows access to your table through the Data API, so you should ensure you [enable RLS](/docs/guides/database/postgres/row-level-security) and write appropriate policies to protect your data.
 
-For more information, see [Adjusting table-level privileges](/docs/guides/database/hardening-data-api#adjusting-table-level-privileges).
+For more information, see [Securing your API](/docs/guides/api/securing-your-api).
 
 </Admonition>
 
-### Configured column-level restrictions
+## Configured column-level restrictions
 
 If you've set column-based access in the [Dashboard](/dashboard/project/_/database/column-privileges) or via SQL, queries will fail with a `42501` error when accessing restricted columns. This includes using `select *`, as it expands to include forbidden columns.
 
-### RLS:
+## RLS:
 
 If the anon or authenticated roles attempt to UPDATE or INSERT values without the necessary RLS permissions, Postgres will return a 42501 error.

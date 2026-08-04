@@ -1,14 +1,13 @@
+import { getEntityDefinitionsSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
+import { IS_PLATFORM } from 'common'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
-// import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
-import { IS_PLATFORM } from 'common'
-import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
-import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
-import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { executeQuery } from 'lib/api/self-hosted/query'
+import { getDatabaseFunctions } from '@/data/database-functions/database-functions-query'
+import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const getFallbackTools = ({
   projectRef,
@@ -37,7 +36,7 @@ export const getFallbackTools = ({
       }),
       execute: async ({ schemas }) => {
         try {
-          const result = includeSchemaMetadata
+          const { result } = includeSchemaMetadata
             ? await executeSql(
                 {
                   projectRef,
@@ -91,10 +90,9 @@ export const getFallbackTools = ({
               {
                 projectRef,
                 connectionString,
-                schema: schemas?.join(','),
+                schemas,
               },
-              undefined,
-              headers
+              undefined
             )
           : []
 

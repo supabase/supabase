@@ -1,14 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download } from 'lucide-react'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import type { DatabaseBackup } from 'data/database/backups-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Download } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import type { DatabaseBackup } from '@/data/database/backups-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface BackupItemProps {
   index: number
@@ -42,7 +42,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
       return (
         <div className="flex space-x-4">
           <ButtonTooltip
-            type="default"
+            variant="default"
             disabled={!isHealthy || !canTriggerScheduledBackups}
             onClick={onSelectBackup}
             tooltip={{
@@ -61,7 +61,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
 
           {!backup.isPhysicalBackup && (
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<Download />}
               loading={isDownloading}
               disabled={!canTriggerScheduledBackups || isDownloading}
@@ -97,7 +97,7 @@ export const BackupItem = ({ index, isHealthy, backup, onSelectBackup }: BackupI
           displayAs="utc"
           utcTimestamp={backup.inserted_at}
           labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-          className="text-left !text-sm font-mono tracking-tight"
+          className="text-left text-sm! font-mono tracking-tight"
         />
         <Tooltip>
           <TooltipTrigger>

@@ -200,14 +200,11 @@ function withPendingAddPlaceholders(
     const value = props.row[props.column.key]
 
     if (isPendingAddRow(props.row) && (value === undefined || value === null || value === '')) {
-      if (columnDef.defaultValue !== undefined && columnDef.defaultValue !== null) {
-        return <DefaultValue />
-      }
-      if (columnDef.isIdentity || columnDef.isGeneratable) {
-        return <DefaultValue />
-      }
-      if (columnDef.isNullable) {
+      if (value === null) {
         return <NullValue />
+      }
+      if (columnDef.defaultValue !== undefined || columnDef.isIdentity || columnDef.isGeneratable) {
+        return <DefaultValue />
       }
     }
 
@@ -231,7 +228,6 @@ function getCellRenderer(
       if (!columnDef.isUpdatable) {
         formatter = DefaultFormatter
       } else {
-        // eslint-disable-next-line react/display-name
         formatter = (p: any) => <ForeignKeyFormatter {...p} tableId={metadata.tableId} />
       }
       break
@@ -253,7 +249,7 @@ function getCellRenderer(
   return withPendingAddPlaceholders(formatter, columnDef)
 }
 
-function getColumnType(columnDef: SupaColumn): ColumnType {
+export function getColumnType(columnDef: SupaColumn): ColumnType {
   if (isForeignKeyColumn(columnDef)) {
     return 'foreign_key'
   } else if (isNumericalColumn(columnDef.dataType)) {

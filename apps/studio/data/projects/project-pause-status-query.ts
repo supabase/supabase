@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { projectKeys } from './keys'
+import { buildPauseStatus, getPauseStatusOverride } from './project-pause-status-override'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ProjectPauseStatusVariables = { ref?: string }
 
@@ -11,6 +12,9 @@ export async function getProjectPausedStatus(
   signal?: AbortSignal
 ) {
   if (!ref) throw new Error('Project ref is required')
+
+  const override = getPauseStatusOverride(ref)
+  if (override) return buildPauseStatus(override)
 
   const { data, error } = await get('/platform/projects/{ref}/pause/status', {
     params: { path: { ref } },

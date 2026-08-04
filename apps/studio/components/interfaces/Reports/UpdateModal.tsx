@@ -1,11 +1,35 @@
-import { toast } from 'sonner'
-
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Content } from 'data/content/content-query'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { Button, Form, Input, Modal } from 'ui'
+import { useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
-type CustomReport = { name: string; description?: string }
+import { Content } from '@/data/content/content-query'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+
+const formSchema = z.object({
+  name: z.string().min(1, 'Required'),
+  description: z.string().optional(),
+})
+
+type CustomReport = z.infer<typeof formSchema>
 
 export interface UpdateCustomReportProps {
   selectedReport?: Content
@@ -29,7 +53,7 @@ export const UpdateCustomReportModal = ({
     },
   })
 
-  const onConfirmUpdateReport = (newVals: { name: string; description?: string }) => {
+  const onConfirmUpdateReport: SubmitHandler<CustomReport> = (newVals) => {
     if (!ref) return console.error('Project ref is required')
     if (!selectedReport) return
     if (!selectedReport.id) return
@@ -48,53 +72,75 @@ export const UpdateCustomReportModal = ({
     })
   }
 
-  function validate(values: CustomReport) {
-    const errors: Partial<CustomReport> = {}
-    if (!values.name) errors.name = 'This field is required'
-    return errors
+  const handleCancel = () => {
+    onCancel()
+    form.reset()
   }
 
+  const form = useForm<CustomReport>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialValues,
+  })
+  const { formState, reset } = form
+  const { isDirty } = formState
+
+  useEffect(() => {
+    if (isDirty) return
+    reset(initialValues)
+  }, [initialValues, isDirty, reset])
+
   return (
-    <Modal
-      visible={selectedReport !== undefined}
-      onCancel={onCancel}
-      hideFooter
-      header="Update custom report"
-      size="small"
-    >
-      <Form
-        onReset={onCancel}
-        validateOnBlur
-        initialValues={initialValues}
-        validate={validate}
-        onSubmit={onConfirmUpdateReport}
-      >
-        {() => (
-          <>
-            <Modal.Content>
-              <Input label="Name" id="name" name="name" />
-            </Modal.Content>
-            <Modal.Content>
-              <Input.TextArea
-                label="Description"
-                id="description"
-                placeholder="Describe your custom report"
-                size="medium"
-                textAreaClassName="resize-none"
+    <Dialog open={selectedReport !== undefined} onOpenChange={handleCancel}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Update custom report</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onConfirmUpdateReport)} noValidate>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout name="name" layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} id="name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
               />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isUpdating}>
+            </DialogSection>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout name="description" layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        id="description"
+                        rows={4}
+                        placeholder="Describe your custom report"
+                        className="resize-none"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isUpdating}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isUpdating} disabled={isUpdating}>
+              <Button type="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
                 Save custom report
               </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
-    </Modal>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -1,12 +1,13 @@
+import { ident, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useConstant } from 'common'
 import { createContext, PropsWithChildren, useCallback, useContext, useEffect } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { useConstant } from 'common'
-import { executeSql } from 'data/sql/execute-sql-query'
-import useLatest from 'hooks/misc/useLatest'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { getPostgrestClaims, ImpersonationRole } from 'lib/role-impersonation'
 import { CustomAccessTokenHookDetails } from '../hooks/misc/useCustomAccessTokenHookDetails'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { useLatest } from '@/hooks/misc/useLatest'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getPostgrestClaims, ImpersonationRole } from '@/lib/role-impersonation'
 
 export function createRoleImpersonationState(
   projectRef: string,
@@ -73,7 +74,7 @@ export const RoleImpersonationStateContextProvider = ({ children }: PropsWithChi
     const result = await executeSql({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      sql: `select ${schema}.${functionName}('${JSON.stringify(event)}'::jsonb) as event;`,
+      sql: safeSql`select ${ident(schema)}.${ident(functionName)}(${literal(JSON.stringify(event))}::jsonb) as event;`,
       queryKey: ['customize-access-token', project?.ref],
     })
 
@@ -124,4 +125,38 @@ export function useSubscribeToImpersonatedRole(
 
 export function isRoleImpersonationEnabled(impersonationRole?: ImpersonationRole) {
   return impersonationRole?.type === 'postgrest'
+}
+
+export const useIsImpersonatingAnon = () => {
+  const state = useRoleImpersonationStateSnapshot()
+  return state.role?.type === 'postgrest' && state.role.role === 'anon'
+}
+
+export const useImpersonatedUser = () => {
+  const state = useRoleImpersonationStateSnapshot()
+  return state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'native'
+    ? state.role.user
+    : undefined
+}
+
+export const useImpersonatedExternalAuth = () => {
+  const state = useRoleImpersonationStateSnapshot()
+  return state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'external' &&
+    state.role.externalAuth
+    ? state.role.externalAuth.sub
+    : undefined
+}
+
+export const useImpersonatedAAL = () => {
+  const state = useRoleImpersonationStateSnapshot()
+  return (
+    state.role?.type === 'postgrest' &&
+    state.role.role === 'authenticated' &&
+    state.role.userType === 'external' &&
+    state.role.aal
+  )
 }

@@ -1,5 +1,3 @@
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Link } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge, copyToClipboard } from 'ui'
@@ -11,6 +9,8 @@ import {
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import { orderCommandSectionsByPriority } from './ordering'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export function useApiUrlCommand() {
   const setIsOpen = useSetCommandMenuOpen()

@@ -1,10 +1,11 @@
 import { IS_PLATFORM } from 'common'
-import { useDeploymentCommitQuery } from 'data/utils/deployment-commit-query'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, StatusIcon } from 'ui'
+
+import { useDeploymentCommitQuery } from '@/data/utils/deployment-commit-query'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()
@@ -20,10 +21,19 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
       </div>
 
       <div className="flex gap-5 justify-end">
-        <Button type="outline" onClick={() => toast.dismiss(id)}>
+        <Button variant="outline" onClick={() => toast.dismiss(id)}>
           Not now
         </Button>
-        <Button onClick={() => router.reload()}>Refresh</Button>
+        <Button
+          onClick={() => {
+            // Document requests carry no skew-protection pin (only built
+            // asset URLs do — see skewProtectionDpl in vite.config.ts), so a
+            // plain reload lands on the latest deployment.
+            router.reload()
+          }}
+        >
+          Refresh
+        </Button>
       </div>
     </div>
   )

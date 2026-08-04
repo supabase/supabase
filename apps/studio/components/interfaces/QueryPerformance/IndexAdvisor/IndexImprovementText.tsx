@@ -1,6 +1,6 @@
 import { HTMLAttributes } from 'react'
-
 import { cn } from 'ui'
+
 import { calculateImprovement } from './index-advisor.utils'
 
 interface IndexImprovementTextProps extends HTMLAttributes<HTMLParagraphElement> {

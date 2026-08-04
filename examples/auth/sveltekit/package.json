@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.55.0"
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "^2"
   }
 }

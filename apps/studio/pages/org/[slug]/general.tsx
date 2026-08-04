@@ -1,10 +1,4 @@
-import { GeneralSettings } from 'components/interfaces/Organization/GeneralSettings/GeneralSettings'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import type { NextPageWithLayout } from 'types'
+import { LogoLoader } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -13,7 +7,14 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { LogoLoader } from 'ui'
+
+import { GeneralSettings } from '@/components/interfaces/Organization/GeneralSettings/GeneralSettings'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgGeneralSettings: NextPageWithLayout = () => {
   const { isPending: isLoadingPermissions } = usePermissionsQuery()
@@ -44,8 +45,8 @@ const OrgGeneralSettings: NextPageWithLayout = () => {
 
 OrgGeneralSettings.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="General">{page}</OrganizationSettingsLayout>
+    <OrganizationLayout title="General">
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
 )

@@ -1,10 +1,10 @@
 import { toast } from 'sonner'
-
-import { StorageObject } from 'data/storage/bucket-objects-list-mutation'
 import { copyToClipboard } from 'ui'
+
 import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
+import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import type { StorageExplorerState } from '@/state/storage-explorer'
 
 type UploadProgress = {
@@ -164,7 +164,8 @@ export const formatFolderItems = (items: StorageObject[] = [], prefix?: string):
       .map((item) => {
         const type = item.id ? STORAGE_ROW_TYPES.FILE : STORAGE_ROW_TYPES.FOLDER
 
-        const durationSinceCreated = Number(new Date()) - Number(new Date(item.created_at))
+        const durationSinceCreated =
+          Number(new Date()) - Number(item.created_at ? new Date(item.created_at) : new Date())
         const isCorrupted =
           type === STORAGE_ROW_TYPES.FILE &&
           !item.metadata &&

@@ -1,33 +1,41 @@
 import { useParams } from 'common'
-import { ProductMenu } from 'components/ui/ProductMenu'
-import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { useGenerateAuthMenu } from './AuthLayout.utils'
+import { ProductMenu } from '@/components/ui/ProductMenu'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { useAuthConfigPrefetch } from '@/data/auth/auth-config-query'
+import { withAuth } from '@/hooks/misc/withAuth'
 
-const AuthProductMenu = () => {
+export const AuthProductMenu = () => {
   const router = useRouter()
   const { ref: projectRef = 'default' } = useParams()
 
   useAuthConfigPrefetch({ projectRef })
   const page = router.pathname.split('/')[4]
-
   const menu = useGenerateAuthMenu()
 
   return <ProductMenu page={page} menu={menu} />
 }
 
-const AuthLayout = ({ children }: PropsWithChildren<{}>) => {
+const AuthLayout = ({ title, children }: PropsWithChildren<{ title: string }>) => {
+  const router = useRouter()
+  const { ref: projectRef = 'default' } = useParams()
+
+  useAuthConfigPrefetch({ projectRef })
+  const page = router.pathname.split('/')[4]
+  const menu = useGenerateAuthMenu()
+
   return (
     <ProjectLayout
-      title="Authentication"
       product="Authentication"
-      productMenu={<AuthProductMenu />}
+      browserTitle={{ section: title }}
+      productMenu={<ProductMenu page={page} menu={menu} />}
       isBlocking={false}
     >
+      <ProductMenuShortcuts menu={menu} />
       {children}
     </ProjectLayout>
   )

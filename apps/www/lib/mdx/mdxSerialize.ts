@@ -1,10 +1,20 @@
-import { serialize } from 'next-mdx-remote/serialize'
+import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
+import { preprocessMdxWithCodeTabs } from '~/components/CodeTabs'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { serialize } from 'next-mdx-remote-client/serialize'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { preprocessMdxWithCodeTabs } from '~/components/CodeTabs'
+/**
+ * Applies a string transform only to content outside fenced code blocks
+ * (``` or ~~~) so pre-parse fixes never corrupt code examples.
+ */
+function transformOutsideCodeFences(source: string, transform: (chunk: string) => string): string {
+  const fenceRe = /(^(?:`{3,}|~{3,})[^\n]*\n[\s\S]*?\n(?:`{3,}|~{3,})[ \t]*$)/gm
+  const parts = source.split(fenceRe)
+  // split() with a capture group: even indices are outside fences, odd are fence blocks
+  return parts.map((part, i) => (i % 2 === 0 ? transform(part) : part)).join('')
+}
 
 // mdx2 needs self-closing tags.
 // dragging an image onto a GitHub discussion creates an <img>
@@ -15,16 +25,75 @@ function addSelfClosingTags(htmlString: string): string {
   if (!htmlString || typeof htmlString !== 'string') {
     return ''
   }
+  return transformOutsideCodeFences(htmlString, (chunk) =>
+    chunk.replace(/<img[^>]*>|<br[^>]*>|<hr[^>]*>/g, (match) =>
+      match.endsWith('/>') ? match : match.slice(0, -1) + ' />'
+    )
+  )
+}
 
-  const modifiedHTML = htmlString.replace(/<img[^>]*>|<br[^>]*>|<hr[^>]*>/g, (match) => {
-    if (match.endsWith('/>')) {
-      return match
-    } else {
-      // Add slash (/) to make it self-closing
-      return match.slice(0, -1) + ' />'
+/**
+ * Remark plugin: converts raw HTML `<img>` nodes and MDX JSX `<img />` elements
+ * to standard markdown `image` AST nodes so they go through the mdxComponents
+ * img rendering pipeline.
+ *
+ * Operating on the AST means code/inlineCode nodes are already separate subtrees
+ * and are never visited, so code fences are never affected.
+ */
+function remarkNormalizeHtmlImages() {
+  return function transformer(tree: any) {
+    const getAttrFromString = (attrs: string, name: string) => {
+      const m = attrs.match(new RegExp(`${name}\\s*=\\s*("([^"]*)"|'([^']*)')`, 'i'))
+      return (m?.[2] ?? m?.[3] ?? '').trim()
     }
-  })
-  return modifiedHTML
+
+    const walk = (node: any, parent: any, index: number) => {
+      // Never descend into code nodes — content there is literal text.
+      if (node.type === 'code' || node.type === 'inlineCode') return
+
+      if (parent !== null) {
+        // Standard markdown / non-MDX: raw HTML blocks become `html` nodes.
+        if (node.type === 'html') {
+          const match = /^\s*<img\b([^>]*)\/?>\s*$/i.exec(node.value)
+          if (match) {
+            const src = getAttrFromString(match[1], 'src')
+            if (src) {
+              const alt = getAttrFromString(match[1], 'alt')
+              parent.children[index] = { type: 'image', url: src, alt, title: null }
+              return
+            }
+          }
+        }
+
+        // MDX mode: remark-mdx parses <img /> as mdxJsxFlowElement / mdxJsxTextElement.
+        if (
+          (node.type === 'mdxJsxFlowElement' || node.type === 'mdxJsxTextElement') &&
+          node.name === 'img'
+        ) {
+          const getJsxAttr = (name: string): string => {
+            const attr = node.attributes?.find(
+              (a: any) => a.type === 'mdxJsxAttribute' && a.name === name
+            )
+            return typeof attr?.value === 'string' ? attr.value : ''
+          }
+          const src = getJsxAttr('src')
+          if (src) {
+            const alt = getJsxAttr('alt')
+            parent.children[index] = { type: 'image', url: src, alt, title: null }
+            return
+          }
+        }
+      }
+
+      if (node.children) {
+        for (let i = 0; i < node.children.length; i++) {
+          walk(node.children[i], node, i)
+        }
+      }
+    }
+
+    walk(tree, null, 0)
+  }
 }
 
 type TocItem = { content: string; slug: string; lvl: number }
@@ -88,37 +157,41 @@ export async function mdxSerialize(source: string, options?: { tocDepth?: number
   const tocDepth = options?.tocDepth ?? 2
   let collectedToc: TocItem[] = []
 
-  const mdxSource = await serialize(preprocessedSource, {
-    blockJS: false,
-    scope: {
-      chCodeConfig: codeHikeOptions,
-    },
-    mdxOptions: {
-      remarkPlugins: [
-        [remarkCodeHike, codeHikeOptions],
-        remarkGfm,
-        // Collect headings into a simple TOC structure
-        () => {
-          const plugin = createRemarkCollectToc(tocDepth)
-          const transformer = (plugin as any)()
-          return (tree: any) => {
-            transformer(tree)
-            if (tree?.data?.__collectedToc) {
-              collectedToc = tree.data.__collectedToc as TocItem[]
+  const mdxSource = await serialize({
+    source: preprocessedSource,
+    options: {
+      scope: {
+        toc: { content: '', json: collectedToc },
+      },
+      mdxOptions: {
+        remarkPlugins: [
+          remarkNormalizeHtmlImages,
+          [remarkCodeHike, codeHikeOptions],
+          remarkGfm,
+          // Collect headings into a simple TOC structure
+          () => {
+            const plugin = createRemarkCollectToc(tocDepth)
+            const transformer = (plugin as any)()
+            return (tree: any) => {
+              transformer(tree)
+              if (tree?.data?.__collectedToc) {
+                collectedToc = tree.data.__collectedToc as TocItem[]
+              }
             }
-          }
-        },
-      ],
-      rehypePlugins: [
-        // @ts-ignore
-        rehypeSlug, // add IDs to any h1-h6 tag that doesn't have one, using a slug made from its text
-      ],
+          },
+        ],
+        rehypePlugins: [
+          // @ts-ignore
+          rehypeSlug, // add IDs to any h1-h6 tag that doesn't have one, using a slug made from its text
+        ],
+      },
     },
   })
 
   // Expose TOC via scope for consumers (keeps function signature stable)
+  const minLvl = collectedToc.length > 0 ? Math.min(...collectedToc.map((h) => h.lvl)) : 1
   const tocMarkdown = collectedToc
-    .map((h) => `${'  '.repeat(Math.max(0, h.lvl - 1))}- [${h.content}](#${h.slug})`)
+    .map((h) => `${'  '.repeat(Math.max(0, h.lvl - minLvl))}- [${h.content}](#${h.slug})`)
     .join('\n')
 
   mdxSource.scope = {

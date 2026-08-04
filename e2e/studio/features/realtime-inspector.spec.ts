@@ -12,10 +12,14 @@ import {
 } from '../utils/realtime-helpers.js'
 import { test } from '../utils/test.js'
 
-const testChannelName = 'pw_realtime_test_channel'
-
 test.describe('Realtime Inspector', () => {
   test.beforeEach(async ({ page, ref }) => {
+    // `navigateToRealtimeInspector` already waits for "Join a channel" to be
+    // visible, which only renders once the project settings have loaded. A
+    // separate `waitForResponse(/settings/)` registered here is both redundant
+    // and racy: settings is a one-shot, non-refetching request, so under the
+    // faster TanStack render it resolves before this listener attaches and the
+    // wait hangs until the test timeout. The UI assertion is the real gate.
     await navigateToRealtimeInspector(page, ref)
   })
 
@@ -41,6 +45,7 @@ test.describe('Realtime Inspector', () => {
     })
 
     test('can join and leave a channel', async ({ page }) => {
+      const testChannelName = 'pw_realtime_test_channel_join_leave'
       await joinChannel(page, testChannelName)
 
       await expect(page.getByText('Listening', { exact: true })).toBeVisible({ timeout: 10000 })
@@ -52,6 +57,7 @@ test.describe('Realtime Inspector', () => {
     })
 
     test('start/stop listening button works', async ({ page }) => {
+      const testChannelName = 'pw_realtime_test_channel_listening'
       await joinChannel(page, testChannelName)
 
       await expect(page.getByText('Listening', { exact: true })).toBeVisible({ timeout: 10000 })
@@ -72,6 +78,7 @@ test.describe('Realtime Inspector', () => {
 
   test.describe('Broadcast Messages', () => {
     test('broadcast messages appear in the UI when listening', async ({ page }) => {
+      const testChannelName = 'pw_realtime_test_channel_broadcast_ui'
       await joinChannel(page, testChannelName)
 
       await expect(page.getByText('Listening', { exact: true })).toBeVisible({ timeout: 10000 })
@@ -93,32 +100,40 @@ test.describe('Realtime Inspector', () => {
     })
 
     test('clicking broadcast message shows detail panel', async ({ page }) => {
+      const testChannelName = 'pw_realtime_test_channel_broadcast_details'
       await joinChannel(page, testChannelName)
 
       await openBroadcastModal(page)
       await page.getByRole('button', { name: 'Confirm' }).click()
-      await expect(page.getByText('Successfully broadcasted message')).toBeVisible({
-        timeout: 10000,
-      })
+      await expect(page.getByText('Successfully broadcasted message')).toBeVisible()
+      await expect(page.getByText('Broadcast a message to all clients')).not.toBeVisible()
       await waitForRealtimeMessage(page, { timeout: 30000 })
 
       const messageRow = page.getByRole('row').filter({ hasText: 'broadcast' }).first()
-      await expect(messageRow).toBeVisible({ timeout: 5000 })
-      await messageRow.click()
+      await expect(messageRow).toBeVisible()
+      // The message cell renders the full (untruncated) JSON, so the data-grid
+      // row is far wider than its column and its geometric center sits under the
+      // always-present detail panel — a default center-click is intercepted by
+      // that panel. Click the timestamp text instead: it's at the row's left,
+      // always inside the visible grid viewport, and still triggers the row's
+      // onClick that opens the detail panel.
+      await messageRow
+        .getByText(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
+        .first()
+        .click()
 
-      await expect(page.getByText('Timestamp')).toBeVisible({ timeout: 5000 })
+      await expect(page.getByText('Timestamp')).toBeVisible()
 
       await leaveChannel(page)
     })
 
     test('broadcast modal validates JSON payload', async ({ page }) => {
+      const testChannelName = 'pw_realtime_test_channel_broadcast_json'
       await joinChannel(page, testChannelName)
 
       await openBroadcastModal(page)
 
-      const codeEditor = page.getByRole('textbox', { name: /Editor content/i })
-      await expect(codeEditor).toBeInViewport({ timeout: 5000 })
-      await codeEditor.click({ force: true })
+      await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.press('ControlOrMeta+KeyA')
       await page.keyboard.type('{ invalid json }')
 
@@ -134,7 +149,7 @@ test.describe('Realtime Inspector', () => {
 
   test.describe('Message Display', () => {
     test('messages counter shows correct count', async ({ page }) => {
-      await joinChannel(page, `${testChannelName}_counter`)
+      await joinChannel(page, `pw_realtime_test_channel_counter`)
 
       const initialCount = await getMessageCount(page)
 

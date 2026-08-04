@@ -1,30 +1,32 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Button } from 'ui'
 
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import { ReportChartV2 } from 'components/interfaces/Reports/v2/ReportChartV2'
-import { LogsDatePicker } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import { useRefreshHandler, useReportDateRange } from 'hooks/misc/useReportDateRange'
-
-import { SharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
-import { useSharedAPIReport } from 'components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
-import { realtimeReports } from 'data/reports/v2/realtime.config'
-import type { NextPageWithLayout } from 'types'
-import { Admonition } from 'ui-patterns'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
+import { useSharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport.constants'
+import { ReportChartV2 } from '@/components/interfaces/Reports/v2/ReportChartV2'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { realtimeReports } from '@/data/reports/v2/realtime.config'
+import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import type { NextPageWithLayout } from '@/types'
 
 const RealtimeReport: NextPageWithLayout = () => {
   return (
@@ -43,10 +45,12 @@ RealtimeReport.getLayout = (page) => (
 export type UpdateDateRange = (from: string, to: string) => void
 export default RealtimeReport
 
+const REPORT_TITLE = 'Realtime'
+
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const { db, chart, ref } = useParams()
-  const showEUAlert = useFlag('realtimeReportEUAlert')
 
   const {
     selectedDateRange,
@@ -106,6 +110,13 @@ const RealtimeUsage = () => {
     }
   )
 
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !isRefreshing,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
   const urlStateHasSyncedRef = useRef(false)
   useEffect(() => {
     if (urlStateHasSyncedRef.current) return
@@ -133,30 +144,32 @@ const RealtimeUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Realtime" />
-      {showEUAlert ? (
-        <Admonition
-          type="warning"
-          title="EU projects metrics limitation"
-          description="For EU projects, Realtime metrics may not be accurate at this time. Please do not rely on these numbers for the time being."
-        />
-      ) : null}
+      <ReportHeader showDatabaseSelector={false} title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-2">
-              <ButtonTooltip
-                type="default"
-                disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={onRefreshReport}
-              />
+          <div className="flex flex-col gap-3 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.realtime} topic={REPORT_TITLE} />
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+                label="Refresh report"
+                side="bottom"
+              >
+                <Button
+                  variant="default"
+                  disabled={isRefreshing}
+                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  className="w-7"
+                  onClick={onRefreshReport}
+                />
+              </ShortcutTooltip>
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}

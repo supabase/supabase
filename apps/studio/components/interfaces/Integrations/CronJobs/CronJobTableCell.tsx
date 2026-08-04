@@ -1,9 +1,5 @@
 import parser from 'cron-parser'
-import { useDatabaseCronJobRunCommandMutation } from 'data/database-cron-jobs/database-cron-job-run-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Copy, Edit, Minus, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -12,12 +8,11 @@ import {
   Badge,
   Button,
   cn,
-  CodeBlock,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   copyToClipboard,
   Dialog,
   DialogContent,
@@ -26,7 +21,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -40,15 +34,25 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
+import { type CronTableColumn } from './CronJobs.constants'
+import { useDatabaseCronJobRunCommandMutation } from '@/data/database-cron-jobs/database-cron-job-run-mutation'
+import { type CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useDatabaseCronJobToggleMutation } from '@/data/database-cron-jobs/database-cron-jobs-toggle-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const getNextRun = (schedule: string, lastRun?: string) => {
   // cron-parser can only deal with the traditional cron syntax but technically users can also
   // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
   // (can't guarantee as scope is quite big)
-  if (schedule.includes('*')) {
+  if (schedule.includes('*') || schedule.includes('$')) {
     try {
-      const interval = parser.parseExpression(schedule, { tz: 'UTC' })
+      // pg_cron uses '$' for "last day of month", but cron-parser uses 'L'
+      // Convert pg_cron syntax to cron-parser syntax before parsing
+      const normalizedSchedule = schedule.replace(/\$/g, 'L')
+      const interval = parser.parseExpression(normalizedSchedule, { tz: 'UTC' })
       return interval.next().getTime()
     } catch (error) {
       return undefined
@@ -71,8 +75,8 @@ const getNextRun = (schedule: string, lastRun?: string) => {
 }
 
 interface CronJobTableCellProps {
-  col: any
-  row: any
+  col: CronTableColumn
+  row: CronJob
   onSelectEdit: (job: CronJob) => void
   onSelectDelete: (job: CronJob) => void
 }
@@ -88,20 +92,22 @@ export const CronJobTableCell = ({
 
   const [showToggleModal, setShowToggleModal] = useState(false)
 
-  const value = row?.[col.id]
-  const hasValue = col.id in row
+  const value = row?.[col.id as keyof typeof row]
   const { jobid, schedule, latest_run, status, active, jobname } = row
 
-  const formattedValue =
+  const formattedValue = (
     col.id === 'jobname' && !jobname
       ? 'No name provided'
       : col.id === 'lastest_run'
         ? !!value
-          ? dayjs(value).valueOf()
+          ? dayjs(value as string).valueOf()
           : undefined
         : col.id === 'next_run'
           ? getNextRun(schedule, latest_run)
           : value
+  ) as string
+
+  const hasValue = col.id === 'next_run' ? !!formattedValue : col.id in row
 
   const { mutate: runCronJob, isPending: isRunning } = useDatabaseCronJobRunCommandMutation({
     onSuccess: () => {
@@ -140,15 +146,21 @@ export const CronJobTableCell = ({
     return (
       <div className="flex items-center">
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="text"
-              loading={isRunning}
-              className="h-6 w-6"
-              icon={<MoreVertical />}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="text"
+                  loading={isRunning}
+                  className="h-6 w-6"
+                  icon={<MoreVertical />}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`${jobname} actions`}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">{jobname} actions</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent align="end" className="w-44 space-y-1">
             <Tooltip>
               <TooltipTrigger className="w-full">
@@ -197,48 +209,56 @@ export const CronJobTableCell = ({
 
   if (col.id === 'active') {
     return (
-      <Dialog open={showToggleModal} onOpenChange={setShowToggleModal}>
-        <DialogTrigger className="flex items-center" onClick={(e) => e.stopPropagation()}>
+      <>
+        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
           <Switch
             id={`cron-job-active-${jobid}`}
             size="medium"
             disabled={isToggling}
             checked={active}
+            aria-label="Cron job active status"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowToggleModal(true)
+            }}
           />
-        </DialogTrigger>
-        <DialogContent
-          onClick={(e) => e.stopPropagation()}
-          dialogOverlayProps={{ onClick: (e) => e.stopPropagation() }}
-        >
-          <DialogHeader>
-            <DialogTitle>{active ? 'Disable' : 'Enable'} cron job</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection>
-            <p className="text-sm">
-              Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}"?{' '}
-            </p>
-          </DialogSection>
-          <DialogFooter>
-            <Button type="default" onClick={() => setShowToggleModal(false)}>
-              Cancel
-            </Button>
-            <Button
-              type={active ? 'warning' : 'primary'}
-              loading={isToggling}
-              onClick={onConfirmToggle}
-            >
-              {active ? 'Disable' : 'Enable'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+        <Dialog open={showToggleModal} onOpenChange={setShowToggleModal}>
+          <DialogContent
+            onClick={(e) => e.stopPropagation()}
+            dialogOverlayProps={{ onClick: (e) => e.stopPropagation() }}
+          >
+            <DialogHeader>
+              <DialogTitle>{active ? 'Disable' : 'Enable'} cron job</DialogTitle>
+            </DialogHeader>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <p className="text-sm">
+                Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}
+                "?{' '}
+              </p>
+            </DialogSection>
+            <DialogFooter>
+              <Button variant="default" onClick={() => setShowToggleModal(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant={active ? 'warning' : 'primary'}
+                loading={isToggling}
+                onClick={onConfirmToggle}
+              >
+                {active ? 'Disable' : 'Enable'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     )
   }
 
   return (
-    <ContextMenu_Shadcn_>
-      <ContextMenuTrigger_Shadcn_ asChild>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
         <div className={cn('w-full flex items-center text-xs')}>
           {['latest_run', 'next_run'].includes(col.id) ? (
             !hasValue ? (
@@ -298,18 +318,18 @@ export const CronJobTableCell = ({
             </Badge>
           )}
         </div>
-      </ContextMenuTrigger_Shadcn_>
-      <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
-        <ContextMenuItem_Shadcn_
+      </ContextMenuTrigger>
+      <ContextMenuContent onClick={(e) => e.stopPropagation()}>
+        <ContextMenuItem
           className="gap-x-2"
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => copyToClipboard(formattedValue)}
         >
           <Copy size={12} />
           <span>Copy {col.name.toLowerCase()}</span>
-        </ContextMenuItem_Shadcn_>
+        </ContextMenuItem>
 
-        <ContextMenuItem_Shadcn_
+        <ContextMenuItem
           disabled={!jobname}
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectEdit(row)}
@@ -328,19 +348,19 @@ export const CronJobTableCell = ({
               </TooltipContent>
             )}
           </Tooltip>
-        </ContextMenuItem_Shadcn_>
+        </ContextMenuItem>
 
-        <ContextMenuSeparator_Shadcn_ />
+        <ContextMenuSeparator />
 
-        <ContextMenuItem_Shadcn_
+        <ContextMenuItem
           className="gap-x-2"
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectDelete(row)}
         >
           <Trash size={12} />
           <span>Delete job</span>
-        </ContextMenuItem_Shadcn_>
-      </ContextMenuContent_Shadcn_>
-    </ContextMenu_Shadcn_>
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }

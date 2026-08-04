@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
-import { TableCell } from 'ui/src/components/shadcn/ui/table'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+import { TableCell } from 'ui/src/components/shadcn/ui/table'
 
 interface TokenNameCellProps {
   name: string

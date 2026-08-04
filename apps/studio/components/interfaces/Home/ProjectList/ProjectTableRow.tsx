@@ -1,29 +1,35 @@
-import { Github, MoreVertical, Settings, Copy, Check } from 'lucide-react'
+import { Check, Copy, Github, MoreVertical, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
-import InlineSVG from 'react-inlinesvg'
 import { useState } from 'react'
-
-import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
-import type { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { BASE_PATH } from 'lib/constants'
-import { createNavigationHandler } from 'lib/navigation'
-import type { Organization } from 'types'
+import InlineSVG from 'react-inlinesvg'
+import { toast } from 'sonner'
 import {
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuContent,
+  Button,
+  copyToClipboard,
   DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   TableCell,
   TableRow,
-  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
-import { toast } from 'sonner'
-import { copyToClipboard } from 'ui'
+import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { getManagedByFromOrganizationPartner } from '@/data/organizations/managed-by-utils'
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
+import { BASE_PATH } from '@/lib/constants'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { createNavigationHandler } from '@/lib/navigation'
+import type { Organization } from '@/types'
 
 export interface ProjectTableRowProps {
   project: OrgProject
@@ -51,6 +57,11 @@ export const ProjectTableRow = ({
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined
+  const projectManagedBy = getManagedByFromOrganizationPartner(
+    undefined,
+    project.integration_source
+  )
+  const hasPartnerIcon = projectManagedBy !== MANAGED_BY.SUPABASE
   const handleNavigation = createNavigationHandler(url, router)
 
   const handleCopyProjectRef = (e: React.SyntheticEvent) => {
@@ -64,7 +75,7 @@ export const ProjectTableRow = ({
   return (
     <>
       <TableRow
-        className="cursor-pointer hover:bg-surface-200 inset-focus"
+        className="cursor-pointer hover:bg-surface-200 focus-inset"
         onClick={handleNavigation}
         onAuxClick={handleNavigation}
         onKeyDown={handleNavigation}
@@ -73,31 +84,36 @@ export const ProjectTableRow = ({
         <TableCell>
           <div className="flex flex-col gap-y-2">
             <div>
-              <h5 className="text-sm">{name}</h5>
-              <button
-                tabIndex={0}
-                onClick={handleCopyProjectRef}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    handleCopyProjectRef(e)
-                  }
-                }}
-                className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
-              >
-                {projectRef}
-                {isCopied ? (
-                  <Check size={12} strokeWidth={1.25} className="text-brand" />
-                ) : (
-                  <Copy
-                    size={12}
-                    strokeWidth={1.25}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  />
-                )}
-              </button>
+              <h2 className="text-sm">{name}</h2>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    tabIndex={0}
+                    onClick={handleCopyProjectRef}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleCopyProjectRef(e)
+                      }
+                    }}
+                    className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
+                  >
+                    {projectRef}
+                    {isCopied ? (
+                      <Check size={12} strokeWidth={1.25} className="text-brand" />
+                    ) : (
+                      <Copy
+                        size={12}
+                        strokeWidth={1.25}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      />
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Copy project reference</TooltipContent>
+              </Tooltip>
             </div>
-            {(isGithubIntegrated || isVercelIntegrated) && (
+            {(isGithubIntegrated || isVercelIntegrated || hasPartnerIcon) && (
               <div className="flex items-center gap-x-1.5">
                 {isVercelIntegrated && (
                   <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center text-black dark:text-white">
@@ -108,6 +124,7 @@ export const ProjectTableRow = ({
                     />
                   </div>
                 )}
+                <PartnerIcon organization={{ managed_by: projectManagedBy }} />
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
                     <div className="w-5 h-5 p-1 flex items-center">
@@ -137,6 +154,7 @@ export const ProjectTableRow = ({
                 projectRef={project.ref}
                 cloudProvider={project.cloud_provider}
                 computeSize={getComputeSize(project)}
+                resourceWarnings={resourceWarnings}
               />
             ) : (
               <span className="text-xs text-foreground-muted">–</span>
@@ -163,9 +181,9 @@ export const ProjectTableRow = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   icon={<MoreVertical />}
-                  aria-label="More actions"
+                  aria-label={`Project ${name} actions`}
                   className="w-7"
                   onClick={(e) => e.stopPropagation()}
                 />

@@ -1,37 +1,54 @@
+import { NextPage } from 'next'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { cn } from 'ui'
+
+import { parseCatchAllRoute } from '@/compat/next/router'
 import {
   Header,
   LoadingCardView,
   NoOrganizationsState,
-} from 'components/interfaces/Home/ProjectList/EmptyStates'
-import { buildOrgUrl } from 'components/interfaces/Organization/Organization.utils'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks/misc/withAuth'
-import { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import { cn } from 'ui'
-
+} from '@/components/interfaces/Home/ProjectList/EmptyStates'
+import { buildOrgUrl } from '@/components/interfaces/Organization/Organization.utils'
 import { OrganizationCard } from '@/components/interfaces/Organization/OrganizationCard'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
 
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
-  const { routeSlug, ...queryParams } = router.query
+  const { appTitle } = useCustomContent(['app:title'])
+  // Normalise the catch-all path across Next (`routeSlug: string[]`) and
+  // TanStack (`_splat: string`) so downstream URL building (buildOrgUrl)
+  // keeps working — see parseCatchAllRoute.
+  const { segments: routeSlug, queryParams } = parseCatchAllRoute(router.query, 'routeSlug')
   const queryString =
     Object.keys(queryParams).length > 0
       ? new URLSearchParams(queryParams as Record<string, string>).toString()
       : ''
 
   const { data: organizations, isPending: isLoading } = useOrganizationsQuery()
+  const pageTitle = buildStudioPageTitle({
+    section: 'Select an organization',
+    surface: 'Organizations',
+    brand: appTitle || 'Supabase',
+  })
 
   return (
     <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content="Supabase Studio" />
+      </Head>
       <Header />
-      <PageLayout className="flex-grow min-h-0" title="Select an organization to continue">
+      <PageLayout className="grow min-h-0" title="Select an organization to continue">
         <ScaffoldContainer>
           <ScaffoldSection isFullWidth>
             <div
-              className="flex-grow overflow-y-auto"
+              className="grow overflow-y-auto"
               style={{ maxHeight: 'calc(100vh - 49px - 64px)' }}
             >
               <div className="w-full mx-auto flex flex-col gap-y-8">

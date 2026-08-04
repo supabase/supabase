@@ -1,8 +1,7 @@
-import { LOCAL_STORAGE_KEYS } from 'common/constants'
-import useLatest from 'hooks/misc/useLatest'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { ReactNode, useEffect } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
+
+import { useLatest } from '@/hooks/misc/useLatest'
 
 type SidebarHandlers = {
   onOpen?: () => void
@@ -18,6 +17,7 @@ type SidebarManagerData = {
   sidebars: Partial<Record<string, ManagedSidebar>>
   activeSidebar: ManagedSidebar | undefined
   pendingSidebarOpen: string | undefined
+  isMaximised: boolean
 }
 
 type SidebarManagerState = SidebarManagerData & {
@@ -32,17 +32,20 @@ type SidebarManagerState = SidebarManagerData & {
   closeSidebar: (id: string) => void
   isSidebarOpen: (id: string) => boolean
   closeActive: () => void
+  clearActiveSidebar: () => void
+  toggleMaximise: () => void
 }
 
-const INITIAL_SIDEBAR_MANAGER_DATA: SidebarManagerData = {
+const createInitialSidebarManagerData = (): SidebarManagerData => ({
   sidebars: {},
   activeSidebar: undefined,
   pendingSidebarOpen: undefined,
-}
+  isMaximised: false,
+})
 
 const createSidebarManagerState = () => {
   const state: SidebarManagerState = proxy({
-    ...INITIAL_SIDEBAR_MANAGER_DATA,
+    ...createInitialSidebarManagerData(),
 
     registerSidebar(
       id: string,
@@ -116,6 +119,10 @@ const createSidebarManagerState = () => {
         return
       }
 
+      if (id !== 'ai-assistant' && state.isMaximised) {
+        state.toggleMaximise()
+      }
+
       if (state.activeSidebar && state.activeSidebar.id !== id) {
         const previousPanel = state.activeSidebar
         previousPanel?.onClose?.()
@@ -145,6 +152,14 @@ const createSidebarManagerState = () => {
       state.activeSidebar?.onClose?.()
       state.activeSidebar = undefined
     },
+
+    clearActiveSidebar() {
+      state.activeSidebar = undefined
+    },
+
+    toggleMaximise() {
+      state.isMaximised = !state.isMaximised
+    },
   })
 
   return state
@@ -161,14 +176,8 @@ export const useRegisterSidebar = (
   id: string,
   component: () => ReactNode,
   handlers: SidebarHandlers = {},
-  hotKey?: string,
   enabled?: boolean
 ) => {
-  const [isSidebarHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(id),
-    true
-  )
-
   const componentRef = useLatest(component)
   const handlersRef = useLatest(handlers)
 
@@ -181,21 +190,4 @@ export const useRegisterSidebar = (
       sidebarManagerState.unregisterSidebar(id)
     }
   }, [id, enabled])
-
-  useEffect(() => {
-    if (!hotKey) return
-
-    function hotKeyHandler(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === hotKey && !e.altKey && !e.shiftKey) {
-        sidebarManagerState.toggleSidebar(id)
-      }
-    }
-
-    if (isSidebarHotkeyEnabled) {
-      window.addEventListener('keydown', hotKeyHandler)
-      return () => {
-        window.removeEventListener('keydown', hotKeyHandler)
-      }
-    }
-  }, [id, hotKey, isSidebarHotkeyEnabled])
 }

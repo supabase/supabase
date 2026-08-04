@@ -2,7 +2,7 @@ services:
   db:
     build: .
     ports:
-      - 5432:5432
+      - ${PG_TEST_PORT:-5432}:5432
     volumes:
       - .:/docker-entrypoint-initdb.d
     environment:

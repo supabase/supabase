@@ -37,6 +37,14 @@ const rewrites = [
     source: '/design-system/:path*',
     destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
   },
+  {
+    source: '/evals',
+    destination: 'https://supabase-evals.vercel.app',
+  },
+  {
+    source: '/evals/:path*',
+    destination: 'https://supabase-evals.vercel.app/:path*',
+  },
 
   {
     source: '/new-docs',
@@ -64,14 +72,6 @@ const rewrites = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
-  },
-  {
-    source: '/llms.txt',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms.txt`,
-  },
-  {
-    source: '/llms/:path(.*\\.txt$)',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms/:path`,
   },
   { source: '/feed.xml', destination: `/rss.xml` },
 ]

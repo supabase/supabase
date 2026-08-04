@@ -1,18 +1,20 @@
 import { useParams } from 'common'
-import { Documents } from 'components/interfaces/Organization/Documents/Documents'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/OrganizationSettingsLayout'
 import {
-  ScaffoldContainer,
-  ScaffoldDescription,
-  ScaffoldDivider,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import type { NextPageWithLayout } from 'types'
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+
+import { Documents } from '@/components/interfaces/Organization/Documents/Documents'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import OrganizationLayout from '@/components/layouts/OrganizationLayout'
+import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
+import { ScaffoldDivider } from '@/components/layouts/Scaffold'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { NextPageWithLayout } from '@/types'
 
 const OrgDocuments: NextPageWithLayout = () => {
   const { slug } = useParams()
@@ -25,12 +27,16 @@ const OrgDocuments: NextPageWithLayout = () => {
 
   return (
     <>
-      <ScaffoldContainer>
-        <ScaffoldHeader>
-          <ScaffoldTitle>Legal documents</ScaffoldTitle>
-          <ScaffoldDescription>Compliance documentation and legal agreements</ScaffoldDescription>
-        </ScaffoldHeader>
-      </ScaffoldContainer>
+      <PageHeader size="default" className="pb-12">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Legal Documents</PageHeaderTitle>
+            <PageHeaderDescription>
+              Compliance documentation and legal agreements
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
       <ScaffoldDivider />
       <Documents />
     </>
@@ -39,8 +45,8 @@ const OrgDocuments: NextPageWithLayout = () => {
 
 OrgDocuments.getLayout = (page) => (
   <DefaultLayout>
-    <OrganizationLayout>
-      <OrganizationSettingsLayout pageTitle="Legal Documents">{page}</OrganizationSettingsLayout>
+    <OrganizationLayout title="Legal Documents">
+      <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
     </OrganizationLayout>
   </DefaultLayout>
 )
