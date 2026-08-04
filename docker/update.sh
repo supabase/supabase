@@ -70,6 +70,7 @@ cd "$(dirname "$0")"
 
 REPO_URL="${SUPABASE_REPO_URL:-https://github.com/supabase/supabase}"
 STAMP_FILE=".supabase-version"
+SELF_NAME=$(basename "$0")
 DRY_RUN=0
 ASSUME_YES=0
 TO_REF=""
@@ -468,6 +469,19 @@ merge_one_file() {
     fi
 }
 
+# The running script is a vendor file too, but overwriting it in place would
+# corrupt this process (the shell reads $0 as it runs). Never write it directly:
+# if the target ships a different version, stage it as <name>.new to review.
+stage_self_update() {
+    _t="$TARGET_DIR/$SELF_NAME"
+    if [ ! -f "$_t" ] || cmp -s "$SELF_NAME" "$_t"; then
+        record "unchanged" "$SELF_NAME"
+        return 0
+    fi
+    [ "$DRY_RUN" = "1" ] || cp -f "$_t" "$SELF_NAME.new"
+    record "self-staged" "$SELF_NAME"
+}
+
 merge_vendor_files() {
     _empty="$TMP_ROOT/empty"
     : > "$_empty"
@@ -476,6 +490,10 @@ merge_vendor_files() {
     while IFS= read -r f; do
         [ -n "$f" ] || continue
         is_excluded "$f" && continue
+        if [ "$f" = "$SELF_NAME" ]; then
+            stage_self_update
+            continue
+        fi
         merge_one_file "$f" "$_empty"
     done <<EOF
 $( { list_files "$BASE_DIR"; list_files "$TARGET_DIR"; } | sort -u )
@@ -554,6 +572,15 @@ print_summary() {
         echo ""
         log "Removed upstream but kept in place (you may no longer need these):"
         list_status removed-upstream
+    fi
+    if [ "$(count_status self-staged)" != "0" ]; then
+        echo ""
+        if [ "$DRY_RUN" = "1" ]; then
+            log "$SELF_NAME differs from the target release's version; a real run would stage that version as $SELF_NAME.new (the running script is never overwritten in place)."
+        else
+            log "$SELF_NAME differs from the target release's version, staged as $SELF_NAME.new (the running script was not modified)."
+            log "Review it, then swap it in if you want it:  mv $SELF_NAME.new $SELF_NAME"
+        fi
     fi
     if [ -s "$ENV_ADDED" ]; then
         echo ""
