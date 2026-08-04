@@ -208,7 +208,11 @@ export const useExplorerPrototypeState = () => {
         schema_version: 1,
         settings: { run_mode: 'manual', default_row_limit: 100 },
         cells: [
-          { id: nextId('cell'), type: 'markdown', markdown: '' },
+          {
+            id: nextId('cell'),
+            type: 'markdown',
+            markdown: '# Untitled notebook\n\nAdd context, notes, and observations here.',
+          },
           {
             id: nextId('cell'),
             type: 'query',

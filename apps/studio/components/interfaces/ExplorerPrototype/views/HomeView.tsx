@@ -37,18 +37,18 @@ export const HomeView = ({ onCreateNotebook, onCreateSnippet, onCreateChat }: Ho
           <section className="mt-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ActionCard
+                icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                title="Run SQL"
+                description="Write and run an ad-hoc query"
+                bgColor="bg-blue-500"
+                onClick={onCreateSnippet}
+              />
+              <ActionCard
                 icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                 title="Create a notebook"
                 description="Combine notes, queries, and results"
                 bgColor="bg-blue-500"
                 onClick={onCreateNotebook}
-              />
-              <ActionCard
-                icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
-                title="Create a snippet"
-                description="Save a query for later"
-                bgColor="bg-blue-500"
-                onClick={onCreateSnippet}
               />
             </div>
           </section>

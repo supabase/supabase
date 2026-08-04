@@ -209,7 +209,10 @@ describe('home launch surface', () => {
     const notebookTab = result.current.tabs.find((tab) => tab.id === result.current.activeTabId)
     if (notebookTab?.resource.type === 'notebook') {
       expect(result.current.notebooks[notebookTab.resource.id].cells).toEqual([
-        expect.objectContaining({ type: 'markdown', markdown: '' }),
+        expect.objectContaining({
+          type: 'markdown',
+          markdown: '# Untitled notebook\n\nAdd context, notes, and observations here.',
+        }),
         expect.objectContaining({ type: 'query', name: 'Untitled query' }),
       ])
     }
