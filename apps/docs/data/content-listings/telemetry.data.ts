@@ -63,7 +63,7 @@ export const telemetryMonitoring: ContentListingGroup = {
     },
     {
       title: 'MCP server setup',
-      href: '/guides/getting-started/mcp',
+      href: '/docs/guides/ai-tools/mcp',
       description: 'Connect Claude, Cursor, or any MCP-compatible agent to your Supabase project.',
     },
   ],
