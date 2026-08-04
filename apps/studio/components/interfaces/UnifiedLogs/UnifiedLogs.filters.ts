@@ -63,6 +63,24 @@ export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {
   return filters.map((f) => `${f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.value}`)
 }
 
+/**
+ * Seeds the initial `columnFilters` table state from the URL on mount, including the
+ * `date` timerange (not part of the `filter` param's shape, so `logsFiltersToColumnFilters`
+ * alone never carries it). Without this, a deep-linked `date` range gets nulled out by the
+ * debounced `columnFilters` -> `search` sync shortly after mount, since `buildFilterSearchUpdate`
+ * treats a timerange field absent from `columnFilters` as a cleared brush.
+ */
+export const buildDefaultColumnFilters = (search: {
+  filter?: string[] | null
+  date?: Date[] | null
+}): { id: string; value: unknown }[] => {
+  const filters: { id: string; value: unknown }[] = logsFiltersToColumnFilters(
+    parseLogsFilterUrlParams(search.filter)
+  )
+  if (search.date?.length === 2) filters.push({ id: 'date', value: search.date })
+  return filters
+}
+
 export const groupLogsFiltersByColumn = (
   filters: LogsFilter[]
 ): Record<string, LogsColumnFilterValue> => {
