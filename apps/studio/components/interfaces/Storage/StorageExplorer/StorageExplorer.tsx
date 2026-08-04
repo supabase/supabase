@@ -3,10 +3,18 @@ import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import type { Bucket } from '@/data/storage/buckets-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
+import { DeletedFilePreviewPane } from './DeletedFilePreviewPane'
+import { useDeletedFilesContext } from './DeletedFilesContext'
+import { DeletedFilesList } from './DeletedFilesList'
 import { FileExplorer } from './FileExplorer'
 import { FileExplorerHeader } from './FileExplorerHeader'
 import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
@@ -14,10 +22,6 @@ import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
 import { useStoragePreference } from './useStoragePreference'
-import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
-import type { Bucket } from '@/data/storage/buckets-query'
-import { IS_PLATFORM } from '@/lib/constants'
-import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
@@ -42,6 +46,7 @@ export const StorageExplorer = () => {
     setSelectedItemsToMove,
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
+  const { isShowingDeleted } = useDeletedFilesContext()
   const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
@@ -154,7 +159,7 @@ export const StorageExplorer = () => {
 
   return (
     <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
-      {selectedItems.length === 0 ? (
+      {selectedItems.length === 0 || isShowingDeleted ? (
         <FileExplorerHeader
           itemSearchString={itemSearchString}
           setItemSearchString={setItemSearchString}
@@ -164,19 +169,30 @@ export const StorageExplorer = () => {
         <FileExplorerHeaderSelection />
       )}
       <div className="flex flex-1 min-h-0">
-        <FileExplorer
-          columns={columns}
-          selectedItems={selectedItems}
-          itemSearchString={itemSearchString}
-          isLoading={isLoading}
-          onFilesUpload={onFilesUpload}
-          onSelectAllItemsInColumn={onSelectAllItemsInColumn}
-          onSelectColumnEmptySpace={onSelectColumnEmptySpace}
-          onColumnLoadMore={(index, column) =>
-            fetchMoreFolderContents({ index, column, searchString: itemSearchString })
-          }
-        />
-        <PreviewPane />
+        {isShowingDeleted ? (
+          <>
+            <div className="flex-1 overflow-auto">
+              <DeletedFilesList bucketId={selectedBucket.name} />
+            </div>
+            <DeletedFilePreviewPane />
+          </>
+        ) : (
+          <>
+            <FileExplorer
+              columns={columns}
+              selectedItems={selectedItems}
+              itemSearchString={itemSearchString}
+              isLoading={isLoading}
+              onFilesUpload={onFilesUpload}
+              onSelectAllItemsInColumn={onSelectAllItemsInColumn}
+              onSelectColumnEmptySpace={onSelectColumnEmptySpace}
+              onColumnLoadMore={(index, column) =>
+                fetchMoreFolderContents({ index, column, searchString: itemSearchString })
+              }
+            />
+            <PreviewPane />
+          </>
+        )}
       </div>
 
       <ConfirmDeleteModal />

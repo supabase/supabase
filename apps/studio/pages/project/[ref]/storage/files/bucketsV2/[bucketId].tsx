@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import {
@@ -18,8 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  NavMenu,
-  NavMenuItem,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -36,18 +34,13 @@ import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.c
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
 import { DeletedFilesProvider } from '@/components/interfaces/Storage/StorageExplorer/DeletedFilesContext'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
-import { Trash } from '@/components/interfaces/Storage/Trash/Trash'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
 
-type BucketView = 'files' | 'trash'
-const BUCKET_VIEWS: BucketView[] = ['files', 'trash']
-
-const BucketPage: NextPageWithLayout = () => {
+const BucketV2Page: NextPageWithLayout = () => {
   const router = useRouter()
   const { bucketId, ref } = useParams()
   const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
@@ -65,16 +58,8 @@ const BucketPage: NextPageWithLayout = () => {
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [view, setView] = useQueryState(
-    'view',
-    parseAsStringEnum<BucketView>(BUCKET_VIEWS)
-      .withDefault('files')
-      .withOptions({ history: 'push', clearOnDefault: true })
-  )
-
   const { getPolicyCount } = useBucketPolicyCount()
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
-  const showProtection = useIsStorageProtectionEnabled()
 
   useEffect(() => {
     if (isSuccess && !bucket) {
@@ -90,7 +75,7 @@ const BucketPage: NextPageWithLayout = () => {
 
   return (
     <StorageExplorerStateContextProvider key={`storage-explorer-state-${ref}`}>
-      <DeletedFilesProvider enabled={false}>
+      <DeletedFilesProvider enabled>
         <div className="w-full min-h-full flex flex-col items-stretch">
           <PageBreadcrumbs
             actions={
@@ -179,34 +164,16 @@ const BucketPage: NextPageWithLayout = () => {
             </BreadcrumbList>
           </PageBreadcrumbs>
 
-          {showProtection && (
-            <NavMenu aria-label="Bucket views" className="px-4">
-              <NavMenuItem active={view === 'files'}>
-                <button type="button" onClick={() => setView('files')}>
-                  Files
-                </button>
-              </NavMenuItem>
-              <NavMenuItem active={view === 'trash'}>
-                <button type="button" onClick={() => setView('trash')}>
-                  Deleted files
-                </button>
-              </NavMenuItem>
-            </NavMenu>
-          )}
-
-          {view === 'files' && (
-            <PageContainer size="full" className="flex flex-1 min-h-0 flex-col px-0 xl:px-0">
-              {ref && bucketId && (
-                <div className="px-4 py-4 empty:hidden">
-                  <PublicBucketWarning projectRef={ref} bucketId={bucketId} />
-                </div>
-              )}
-              <div className="flex-1 min-h-0">
-                <StorageExplorer />
+          <PageContainer size="full" className="flex flex-1 min-h-0 flex-col px-0 xl:px-0">
+            {ref && bucketId && (
+              <div className="px-4 py-4 empty:hidden">
+                <PublicBucketWarning projectRef={ref} bucketId={bucketId} />
               </div>
-            </PageContainer>
-          )}
-          {view === 'trash' && bucket && <Trash bucketId={bucket.name} />}
+            )}
+            <div className="flex-1 min-h-0">
+              <StorageExplorer />
+            </div>
+          </PageContainer>
         </div>
 
         {bucket && (
@@ -233,10 +200,10 @@ const BucketPage: NextPageWithLayout = () => {
   )
 }
 
-BucketPage.getLayout = (page) => (
+BucketV2Page.getLayout = (page) => (
   <DefaultLayout>
     <StorageLayout title="Buckets">{page}</StorageLayout>
   </DefaultLayout>
 )
 
-export default BucketPage
+export default BucketV2Page
