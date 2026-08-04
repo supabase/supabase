@@ -49,6 +49,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
           return { ...a, [b.key]: false }
         }
 
+        // A forced preview has become the default behavior, so it's on whatever
+        // the user stored previously — including an explicit opt-out. Applied
+        // here rather than in the individual `useIsXEnabled` helpers so that the
+        // feature preview modal reflects it too.
+        if (b.isForced) {
+          return { ...a, [b.key]: true }
+        }
+
         const defaultOptIn = b.isDefaultOptIn
         const localStorageValue = safeLocalStorage.getItem(b.key)
         return {
@@ -127,10 +135,14 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
+/**
+ * Whether the SQL Editor saves snippets only on request. True when the user
+ * opted into the preview themselves *or* the `sqlEditorManualSaveForced` rollout
+ * has reached them — the preview's `isForced` flag folds the latter into `flags`.
+ */
 export const useIsSqlEditorManualSaveEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
-  return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
 export const useIsMarketplaceEnabled = () => {
