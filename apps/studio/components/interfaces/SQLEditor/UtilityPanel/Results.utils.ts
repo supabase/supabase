@@ -3,6 +3,22 @@ import Papa from 'papaparse'
 
 type ResultRow = Record<string, unknown>
 
+const ESTIMATED_CHARACTER_WIDTH = 8.25
+const MIN_COLUMN_WIDTH = 100
+const MAX_COLUMN_WIDTH = 500
+
+export function calculateResultColumnWidth(columnName: string, rows: readonly ResultRow[]) {
+  const maxContentLength = rows.reduce(
+    (maxLength, row) => Math.max(maxLength, String(row[columnName]).length),
+    columnName.length
+  )
+
+  return Math.min(
+    Math.max(maxContentLength * ESTIMATED_CHARACTER_WIDTH, MIN_COLUMN_WIDTH),
+    MAX_COLUMN_WIDTH
+  )
+}
+
 export function formatClipboardValue(value: unknown) {
   if (value === null) return ''
   if (typeof value == 'object' || Array.isArray(value)) {
