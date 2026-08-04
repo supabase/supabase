@@ -128,15 +128,15 @@ export function useSqlEditorAi({
     const result = sessionSnap.results[id]?.[0]
     const { sql, errorMessage } = extractDebugContext(snippet, result)
 
-    return buildDebugPromptText(sql, errorMessage)
-  }, [id, sessionSnap.results, snapV2.snippets])
+    return buildDebugPromptText(sql, errorMessage, sqlSource)
+  }, [id, sessionSnap.results, snapV2.snippets, sqlSource])
 
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = sessionSnap.results[id]?.[0]
       openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      aiSnap.newChat(buildDebugChatArgs(snippet, result))
+      aiSnap.newChat(buildDebugChatArgs(snippet, result, sqlSource))
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the
@@ -147,7 +147,7 @@ export function useSqlEditorAi({
         )
       }
     }
-  }, [id, sessionSnap.results, snapV2.snippets, aiSnap, openSidebar])
+  }, [id, sessionSnap.results, snapV2.snippets, aiSnap, openSidebar, sqlSource])
 
   const acceptAiHandler = useCallback(async () => {
     try {
