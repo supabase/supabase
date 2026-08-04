@@ -122,7 +122,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
     : { opacity: 1, scale: 1, filter: 'none' }
 
   return (
-    <section className="relative space-y-4 px-5 sm:px-6 py-6 min-h-[300px]">
+    <section className="relative space-y-4 px-5 sm:px-6 py-6">
       <motion.div
         className={cn('space-y-4', isAccount && 'pointer-events-none')}
         animate={formBackdropAnimate}

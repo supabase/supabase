@@ -56,12 +56,9 @@ export const RiskMarker = ({
         <p className="text-xs text-foreground-light">{entry.riskReason}</p>
         {(entry.allowsRead.length > 0 || entry.allowsWrite.length > 0) && (
           <div className="flex flex-col gap-5 mt-5">
-            {/*<h3 className="text-[11px] font-mono uppercase tracking-wide text-foreground-muted">
-              Allows
-            </h3>*/}
             {entry.allowsRead.length > 0 && (
               <span className="text-xs text-foreground-light">
-                <h3 className="text-foreground-muted text-xs uppercase font-mono tracking-wide font-normal mb-0.5">
+                <h3 className="text-foreground-muted text-[11px] uppercase font-mono tracking-wide font-normal mb-0.5">
                   Read:{' '}
                 </h3>
                 {entry.allowsRead.join(', ')}
@@ -69,7 +66,7 @@ export const RiskMarker = ({
             )}
             {entry.allowsWrite.length > 0 && (
               <span className="text-xs text-foreground-light">
-                <h3 className="text-foreground-muted text-xs uppercase font-mono tracking-wide font-normal mb-0.5">
+                <h3 className="text-foreground-muted text-[11px] uppercase font-mono tracking-wide font-normal mb-0.5">
                   Write:{' '}
                 </h3>
                 {entry.allowsWrite.join(', ')}

@@ -20,13 +20,12 @@ export const PermissionRow = ({
   return (
     <div className="flex items-center justify-between gap-4 py-4">
       <div className="min-w-0 flex flex-col gap-1">
-        <span className="flex items-center gap-2">
+        <span className="flex items-start md:items-center gap-2 flex-col-reverse md:flex-row">
           <Label htmlFor={`${entry.key}-permissions`}>
             <span className="text-sm text-foreground">
               {entry.name} <span className="sr-only">permissions</span>
             </span>
           </Label>
-
           <RiskMarker entry={entry} permissionScopeMap={permissionScopeMap} />
         </span>
         <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-lighter">
