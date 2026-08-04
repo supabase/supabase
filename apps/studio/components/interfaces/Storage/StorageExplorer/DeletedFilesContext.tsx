@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
 
 import { type TrashObject } from '@/data/storage/protection/protection-mocks'
 
@@ -8,6 +8,11 @@ interface DeletedFilesContextValue {
   setIsShowingDeleted: (value: boolean) => void
   selectedDeletedFile: TrashObject | undefined
   setSelectedDeletedFile: (file: TrashObject | undefined) => void
+  selectedDeletedIds: string[]
+  setSelectedDeletedIds: (ids: string[]) => void
+  lastToggledId: string | null
+  setLastToggledId: (id: string | null) => void
+  clearDeletedSelection: () => void
 }
 
 const DeletedFilesContext = createContext<DeletedFilesContextValue>({
@@ -16,6 +21,11 @@ const DeletedFilesContext = createContext<DeletedFilesContextValue>({
   setIsShowingDeleted: () => {},
   selectedDeletedFile: undefined,
   setSelectedDeletedFile: () => {},
+  selectedDeletedIds: [],
+  setSelectedDeletedIds: () => {},
+  lastToggledId: null,
+  setLastToggledId: () => {},
+  clearDeletedSelection: () => {},
 })
 
 export const useDeletedFilesContext = () => useContext(DeletedFilesContext)
@@ -28,6 +38,13 @@ interface DeletedFilesProviderProps {
 export const DeletedFilesProvider = ({ enabled, children }: DeletedFilesProviderProps) => {
   const [isShowingDeleted, setIsShowingDeleted] = useState(false)
   const [selectedDeletedFile, setSelectedDeletedFile] = useState<TrashObject>()
+  const [selectedDeletedIds, setSelectedDeletedIds] = useState<string[]>([])
+  const [lastToggledId, setLastToggledId] = useState<string | null>(null)
+
+  const clearDeletedSelection = useCallback(() => {
+    setSelectedDeletedIds([])
+    setLastToggledId(null)
+  }, [])
 
   return (
     <DeletedFilesContext.Provider
@@ -37,6 +54,11 @@ export const DeletedFilesProvider = ({ enabled, children }: DeletedFilesProvider
         setIsShowingDeleted,
         selectedDeletedFile,
         setSelectedDeletedFile,
+        selectedDeletedIds,
+        setSelectedDeletedIds,
+        lastToggledId,
+        setLastToggledId,
+        clearDeletedSelection,
       }}
     >
       {children}

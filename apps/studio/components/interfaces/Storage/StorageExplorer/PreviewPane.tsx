@@ -33,7 +33,7 @@ import { VersionHistory } from './VersionHistory'
 
 const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
-const PreviewFile = ({ item }: { item: StorageItem }) => {
+export const PreviewFile = ({ item }: { item: StorageItem }) => {
   const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
   const folderPath = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
   const path = [folderPath, item.name].filter(Boolean).join('/')

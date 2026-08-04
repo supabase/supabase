@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { RotateCcw, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
+import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -13,6 +14,7 @@ import {
 } from '@/data/storage/protection/bucket-trash-query'
 import { type TrashObject } from '@/data/storage/protection/protection-mocks'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { BASE_PATH } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -69,6 +71,8 @@ export const DeletedFilePreviewPane = () => {
           />
         </div>
 
+        <DeletedFilePreview file={file} />
+
         <div className="w-full space-y-6 mt-4">
           <div className="space-y-1">
             <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
@@ -113,7 +117,7 @@ export const DeletedFilePreviewPane = () => {
               Restore
             </ButtonTooltip>
             <ButtonTooltip
-              variant="destructive"
+              variant="default"
               icon={<Trash2 size={14} />}
               disabled={!canUpdateFiles || file.heldBySnapshot}
               onClick={() => setShowDeleteConfirm(true)}
@@ -150,6 +154,44 @@ export const DeletedFilePreviewPane = () => {
         </p>
       </ConfirmationModal>
     </>
+  )
+}
+
+const DeletedFilePreview = ({ file }: { file: TrashObject }) => {
+  const mimeType = file.name.match(/\.(png|jpe?g|gif|webp|svg|bmp|ico)$/i)
+    ? 'image'
+    : file.name.match(/\.(mp4|webm|ogg|mov)$/i)
+      ? 'video'
+      : file.name.match(/\.(mp3|wav|ogg|aac|flac)$/i)
+        ? 'audio'
+        : null
+
+  if (!mimeType) {
+    return (
+      <div className="my-4 border border-overlay">
+        <div className="flex h-56 w-full items-center justify-center 2xl:h-72">
+          <SVG
+            src={`${BASE_PATH}/img/file-filled.svg`}
+            preProcessor={(code: string) =>
+              code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
+            }
+          />
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="my-4 border border-overlay">
+      <div className="flex h-56 w-full items-center justify-center 2xl:h-72">
+        <SVG
+          src={`${BASE_PATH}/img/file-filled.svg`}
+          preProcessor={(code: string) =>
+            code.replace(/svg/, 'svg class="mx-auto w-32 h-32 text-color-inherit opacity-75"')
+          }
+        />
+      </div>
+    </div>
   )
 }
 

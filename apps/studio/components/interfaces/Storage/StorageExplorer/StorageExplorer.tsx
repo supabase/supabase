@@ -172,7 +172,7 @@ export const StorageExplorer = () => {
         {isShowingDeleted ? (
           <>
             <div className="flex-1 overflow-auto">
-              <DeletedFilesList bucketId={selectedBucket.name} />
+              <DeletedFilesList bucketId={selectedBucket.name} searchString={itemSearchString} />
             </div>
             <DeletedFilePreviewPane />
           </>

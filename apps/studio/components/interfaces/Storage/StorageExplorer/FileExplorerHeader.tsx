@@ -9,7 +9,6 @@ import {
   List,
   RefreshCw,
   Search,
-  Trash2,
   Upload,
   X,
 } from 'lucide-react'
@@ -289,11 +288,7 @@ export const FileExplorerHeader = ({
     snap.setIsSearching(value.length > 0)
   }
 
-  const {
-    isEnabled: isDeletedFilesEnabled,
-    isShowingDeleted,
-    setIsShowingDeleted,
-  } = useDeletedFilesContext()
+  const { isShowingDeleted } = useDeletedFilesContext()
 
   const refreshData = async () => {
     await refreshAll()
@@ -322,56 +317,35 @@ export const FileExplorerHeader = ({
                 }}
               />
             )}
-            {!isShowingDeleted && (
-              <Input
-                ref={searchInputRef}
-                size="tiny"
-                className="w-52"
-                icon={<Search />}
-                actions={
-                  itemSearchString.length > 0
-                    ? [
-                        <Button
-                          key="cancel"
-                          size="tiny"
-                          variant="text"
-                          icon={<X />}
-                          onClick={onCancelSearch}
-                          className="p-0 h-5 w-5"
-                        />,
-                      ]
-                    : undefined
-                }
-                placeholder={searchPlaceholder}
-                type="text"
-                value={itemSearchString}
-                onChange={onSearchChange}
-                onFocus={() => setIsPathDialogOpen(false)}
-              />
-            )}
+            <Input
+              ref={searchInputRef}
+              size="tiny"
+              className="w-52"
+              icon={<Search />}
+              actions={
+                itemSearchString.length > 0
+                  ? [
+                      <Button
+                        key="cancel"
+                        size="tiny"
+                        variant="text"
+                        icon={<X />}
+                        onClick={onCancelSearch}
+                        className="p-0 h-5 w-5"
+                      />,
+                    ]
+                  : undefined
+              }
+              placeholder={isShowingDeleted ? 'Search deleted files...' : searchPlaceholder}
+              type="text"
+              value={itemSearchString}
+              onChange={onSearchChange}
+              onFocus={() => setIsPathDialogOpen(false)}
+            />
           </div>
 
           <div className="flex shrink-0 items-center gap-2 whitespace-nowrap">
             <div className="flex shrink-0 items-center gap-1">
-              {isDeletedFilesEnabled && (
-                <ButtonTooltip
-                  size="tiny"
-                  icon={<Trash2 size={16} />}
-                  variant={isShowingDeleted ? 'default' : 'outline'}
-                  aria-label="Show deleted files"
-                  aria-pressed={isShowingDeleted}
-                  className="px-2"
-                  onClick={() => setIsShowingDeleted(!isShowingDeleted)}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: isShowingDeleted ? 'Back to files' : 'Show deleted files',
-                    },
-                  }}
-                >
-                  {isShowingDeleted ? 'Deleted files' : 'Deleted files'}
-                </ButtonTooltip>
-              )}
               {view === STORAGE_VIEWS.COLUMNS && !isShowingDeleted && (
                 <Button
                   size="tiny"
