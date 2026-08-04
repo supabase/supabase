@@ -40,15 +40,16 @@ curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
 # Enable IPv4 add-on
-curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/addons" \
+curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
+    "addon_variant": "ipv4_default",
     "addon_type": "ipv4"
   }'
 
 # Disable IPv4 add-on
-curl -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons/ipv4" \
+curl -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/billing/addons/ipv4_default" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
@@ -76,7 +77,7 @@ By default, Supabase Postgres use IPv6 addresses. If your system doesn't support
 
 ### Checking your network IPv6 support
 
-You can check if your personal network is IPv6 compatible at https://test-ipv6.com.
+You can check if your personal network is IPv6 compatible at https://ipv6test.google.com/.
 
 ### Checking platforms for IPv6 support:
 
@@ -99,7 +100,7 @@ nslookup db.<PROJECT_REF>.supabase.co
 
 The pooler and direct connection strings can be found in the [project connect page](/dashboard/project/_?showConnect=true):
 
-#### Direct connection
+### Direct connection
 
 IPv6 unless IPv4 Add-On is enabled
 
@@ -108,7 +109,7 @@ IPv6 unless IPv4 Add-On is enabled
 postgresql://postgres:[YOUR-PASSWORD]@db.ajrbwkcuthywfihaarmflo.supabase.co:5432/postgres
 ```
 
-#### Supavisor in transaction mode (port 6543)
+### Supavisor in transaction mode (port 6543)
 
 Always uses an IPv4 address
 
@@ -117,7 +118,7 @@ Always uses an IPv4 address
 postgresql://postgres.ajrbwkcuthywddfihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres
 ```
 
-#### Supavisor in session mode (port 5432)
+### Supavisor in session mode (port 5432)
 
 Always uses an IPv4 address
 

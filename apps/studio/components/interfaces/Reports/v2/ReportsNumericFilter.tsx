@@ -1,6 +1,3 @@
-import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import {
@@ -10,6 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@ui/components/shadcn/ui/select'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { z } from 'zod'
@@ -111,7 +110,7 @@ export const ReportsNumericFilter = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          type={isActive ? 'default' : 'outline'}
+          variant={isActive ? 'default' : 'outline'}
           className={cn(
             'min-w-20 border-dashed relative group justify-between',
             { 'border-solid': isActive },
@@ -182,15 +181,15 @@ export const ReportsNumericFilter = ({
         </form>
 
         <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-          <Button size="tiny" type="outline" onClick={handleClearAll}>
+          <Button size="tiny" variant="outline" onClick={handleClearAll}>
             Clear
           </Button>
           <Button
             loading={isLoading}
             size="tiny"
-            type="primary"
+            variant="primary"
             onClick={handleApply}
-            htmlType="button"
+            type="button"
           >
             Apply
           </Button>

@@ -14,7 +14,6 @@ import {
 import type { McpFeatureGroup } from '../types'
 
 interface McpConfigurationOptionsProps {
-  isPlatform: boolean
   readonly: boolean
   onReadonlyChange: (readonly: boolean) => void
   selectedFeatures: string[]
@@ -24,7 +23,6 @@ interface McpConfigurationOptionsProps {
 }
 
 export function McpConfigurationOptions({
-  isPlatform,
   readonly,
   onReadonlyChange,
   selectedFeatures,
@@ -35,7 +33,7 @@ export function McpConfigurationOptions({
   return (
     <div className={cn('flex flex-col gap-4 lg:flex-row lg:gap-12 lg:items-baseline', className)}>
       {/* Readonly Mode */}
-      <div className="space-y-3 lg:flex-shrink-0">
+      <div className="space-y-3 lg:shrink-0">
         <div className="flex items-center gap-2">
           <Label htmlFor="readonly" className="text-sm">
             Read-only
@@ -52,15 +50,15 @@ export function McpConfigurationOptions({
         <div className="flex items-center gap-2">
           <Label className="text-sm">Feature Groups</Label>
           <InfoTooltip>
-            Only enable a subset of features. Helps keep the number of tools within MCP client
-            limits
+            Choose which MCP tools to include. Storage is off by default to keep tool counts
+            manageable.
           </InfoTooltip>
         </div>
 
         <MultiSelector values={selectedFeatures} onValuesChange={onFeaturesChange}>
           <MultiSelectorTrigger
             className="w-full"
-            label="All features except Storage enabled by default"
+            label="Select features"
             badgeLimit="wrap"
             showIcon={true}
           />

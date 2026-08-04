@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
 import type { ProjectConfig } from '@supabase-dx/config'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useQuery } from '@tanstack/react-query'
+
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const ENV_SERVER = 'http://localhost:3457'
 

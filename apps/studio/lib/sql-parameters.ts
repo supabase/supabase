@@ -102,7 +102,7 @@ export const processParameterizedSql = (sql: string, parameters: Record<string, 
 
   // Replace :parameters with values
   const paramRegex = /:(\w+)/g
-  processedSql = processedSql.replace(paramRegex, (match, paramName) => {
+  processedSql = processedSql.replace(paramRegex, (_match, paramName) => {
     const value = parameters[paramName] ?? paramDefaults[paramName]?.value
     if (value === undefined) {
       throw new Error(`Missing value for parameter: ${paramName}`)

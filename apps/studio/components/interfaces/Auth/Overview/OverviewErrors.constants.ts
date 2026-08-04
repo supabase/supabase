@@ -1,5 +1,7 @@
 import dayjs from 'dayjs'
-import { fetchLogs } from 'data/reports/report.utils'
+
+import { safeSql } from '@/data/logs/safe-analytics-sql'
+import { fetchLogs } from '@/data/reports/report.utils'
 
 export type ResponseErrorRow = {
   method: string
@@ -21,7 +23,7 @@ export const getDateRange = () => {
 }
 
 // Top API response errors for /auth/v1 endpoints (path/method/status)
-export const AUTH_TOP_RESPONSE_ERRORS_SQL = `
+export const AUTH_TOP_RESPONSE_ERRORS_SQL = safeSql`
   select
     request.method as method,
     request.path as path,
@@ -39,7 +41,7 @@ export const AUTH_TOP_RESPONSE_ERRORS_SQL = `
 `
 
 // Top Auth service error codes from x_sb_error_code header for /auth/v1 endpoints
-export const AUTH_TOP_ERROR_CODES_SQL = `
+export const AUTH_TOP_ERROR_CODES_SQL = safeSql`
   select
     h.x_sb_error_code as error_code,
     count(*) as count

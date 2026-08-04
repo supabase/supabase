@@ -1,26 +1,31 @@
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
-import ReportStickyNav from 'components/interfaces/Reports/ReportStickyNav'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { REPORT_DATERANGE_HELPER_LABELS } from 'components/interfaces/Reports/Reports.constants'
+import { useCallback } from 'react'
+
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
+  RequestsByCountryMapRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
-  RequestsByCountryMapRenderer,
   TotalRequestsChartRenderer,
-} from 'components/interfaces/Reports/renderers/ApiRenderers'
-import { DatePickerValue } from 'components/interfaces/Settings/Logs/Logs.DatePickers'
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import ObservabilityLayout from 'components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { useApiReport } from 'data/reports/api-report-query'
-import { useReportDateRange } from 'hooks/misc/useReportDateRange'
-import { useCallback } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { ObservabilityLink } from 'components/ui/ObservabilityLink'
+} from '@/components/interfaces/Reports/renderers/ApiRenderers'
+import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
+import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
+import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
+import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
+import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { useApiReport } from '@/data/reports/api-report-query'
+import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import type { NextPageWithLayout } from '@/types'
+
+const REPORT_TITLE = 'API Gateway'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -93,10 +98,10 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="API Gateway" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-3">
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}
@@ -108,9 +113,10 @@ export const ApiReport: NextPageWithLayout = () => {
               filters={filters}
               datepickerHelpers={datePickerHelpers}
               initialDatePickerValue={datePickerValue}
-              className="w-full"
+              className="flex-1 min-w-0"
               showDatabaseSelector={false}
             />
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.apiGateway} topic={REPORT_TITLE} />
             <UpgradePrompt
               show={showUpgradePrompt}
               setShowUpgradePrompt={setShowUpgradePrompt}

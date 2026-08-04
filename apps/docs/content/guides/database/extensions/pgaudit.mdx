@@ -1,7 +1,7 @@
 ---
 id: 'pgaudit'
 title: 'PGAudit: Postgres Auditing'
-description: 'Session and object auditing via PostgreSQL standard logging'
+description: 'Session and object auditing via Postgres standard logging'
 ---
 
 [PGAudit](https://www.pgaudit.org) extends Postgres's built-in logging abilities. It can be used to selectively track activities within your database.
@@ -47,7 +47,7 @@ PGAudit can be configured with different levels of precision.
 
 **PGAudit logging precision:**
 
-- **[Session](#session-logging):** Logs activity within a connection, such as a [psql](/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection.
+- **[Session](#session-logging):** Logs activity within a connection, such as a [psql](/docs/guides/database/psql) connection.
 - **[User](#user-logging):** Logs activity by a particular database user (for example, `anon` or `postgres`).
 - **[Global](#global-logging):** Logs activity across the entire database.
 - **[Object](#object-logging):** Logs events related to specific database objects (for example, the auth.users table).
@@ -83,7 +83,7 @@ Below is a limited example of how to assign PGAudit to monitor specific categori
 
 ### Session logging
 
-When you are connecting in a session environment, such as a [psql](/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection, you can configure PGAudit to record events initiated within the session.
+When you are connecting in a session environment, such as a [psql](/docs/guides/database/psql) connection, you can configure PGAudit to record events initiated within the session.
 
 <Admonition type="note">
 
@@ -113,7 +113,7 @@ set pgaudit.log = 'none';
 
 ### User logging
 
-There are some cases where you may want to monitor a database user's actions. For instance, let's say you connected your database to [Zapier](/partners/integrations/zapier) and created a custom role for it to use:
+There are some cases where you may want to monitor a database user's actions. For instance, say you connected your database to [Zapier](/partners/integrations/zapier) and created a custom role for it to use:
 
 ```sql
 create user "zapier" with password '<new password>';
@@ -193,7 +193,7 @@ You can then assign the role to monitor only approved object events, such as `se
 grant select on random_table to "some_audit_role";
 ```
 
-With this privilege granted, PGAudit will record all select statements that reference the `random_table`, regardless of _who_ or _what_ actually initiated the event. All assignable privileges can be viewed in the [Postgres documentation](https://www.postgresql.org/docs/current/ddl-priv.html).
+With this privilege granted, PGAudit will record all select statements that reference the `random_table`, regardless of _who_ or _what_ initiated the event. All assignable privileges can be viewed in the [Postgres documentation](https://www.postgresql.org/docs/current/ddl-priv.html).
 
 If you would no longer like to use object logging, you will need to unassign the `pgaudit.role` variable:
 
@@ -345,15 +345,15 @@ To prevent PGAudit from monitoring the problematic roles, you'll want to change 
 
 ## FAQ
 
-#### Using PGAudit to debug database functions
+### Using PGAudit to debug database functions
 
 Technically yes, but it is not the best approach. It is better to check out our [function debugging guide](/docs/guides/database/functions#general-logging) instead.
 
-#### Downloading database logs
+### Downloading database logs
 
 In the [Logs Dashboard](/dashboard/project/_/logs/postgres-logs) you can download logs as CSVs.
 
-#### Logging observed table rows
+### Logging observed table rows
 
 By default, PGAudit records queries, but not the returned rows. You can modify this behavior with the `pgaudit.log_rows` variable:
 
@@ -367,13 +367,13 @@ alter role "postgres" set pgaudit.log_rows to 'off';
 
 You should not do this unless you are _absolutely_ certain it is necessary for your use case. It can expose sensitive values to your logs that ideally should not be preserved. Furthermore, if done in excess, it can noticeably reduce database performance.
 
-#### Logging function parameters
+### Logging function parameters
 
 We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [pgsodium](/docs/guides/database/extensions/pgsodium) or[Vault](/docs/guides/database/vault).
 
 You can upvote this [feature request](https://github.com/orgs/supabase/discussions/20183) with your use-case if you'd like this restriction lifted.
 
-#### Does PGAudit support system wide configurations?
+### Does PGAudit support system wide configurations?
 
 PGAudit allows settings to be applied to 3 different database scopes:
 
@@ -391,5 +391,5 @@ PGAudit's [official documentation](https://www.pgaudit.org) focuses on system an
 
 - [Official `PGAudit` documentation](https://www.pgaudit.org)
 - [Database Function Logging](/docs/guides/database/functions#general-logging)
-- [Supabase Logging](/docs/guides/platform/logs)
+- [Supabase Logging](/docs/guides/monitoring-and-debugging/logs)
 - [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)

@@ -89,7 +89,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   await Supabase.initialize(
     url: 'https://<supabase-project>.supabase.co',
-    anonKey: 'SUPABASE_PUBLISHABLE_KEY',
+    publishableKey: 'SUPABASE_PUBLISHABLE_KEY',
     accessToken: () async {
       final session = await Amplify.Auth.fetchAuthSession();
       final cognitoSession = session as CognitoAuthSession;

@@ -1,52 +1,53 @@
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import pgMeta, { type PGTrigger } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
+import { executeSql } from '../sql/execute-sql-mutation'
 import { databaseTriggerKeys } from './keys'
+import type { PostgresTrigger } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+function markSavedTriggerSafe(trigger: DatabaseTriggersData[number]): PostgresTrigger {
+  return trigger as PostgresTrigger
+}
 
 export type DatabaseTriggersVariables = {
   projectRef?: string
   connectionString?: string | null
+  schemas?: string[]
 }
 
 export async function getDatabaseTriggers(
-  { projectRef, connectionString }: DatabaseTriggersVariables,
+  { projectRef, connectionString, schemas }: DatabaseTriggersVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/triggers', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: undefined as any,
+  const { sql } = pgMeta.triggers.list({ includedSchemas: schemas })
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['triggers'],
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data
+  return result as PGTrigger[]
 }
 
 export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers>>
 export type DatabaseTriggersError = ResponseError
 
 export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
-  { projectRef, connectionString }: DatabaseTriggersVariables,
+  { projectRef, connectionString, schemas }: DatabaseTriggersVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
   useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
-    queryKey: databaseTriggerKeys.list(projectRef),
+    queryKey: databaseTriggerKeys.list(projectRef, schemas),
     queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
     select: (data) => {
       return data.filter((trigger) => {
@@ -60,16 +61,19 @@ export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
     ...options,
   })
 
-export const useDatabaseTriggersQuery = <TData = DatabaseTriggersData>(
+export const useDatabaseTriggersQuery = <TData = PostgresTrigger[]>(
   { projectRef, connectionString }: DatabaseTriggersVariables,
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
+  }: UseCustomQueryOptions<PostgresTrigger[], DatabaseTriggersError, TData> = {}
 ) =>
-  useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
+  useQuery<PostgresTrigger[], DatabaseTriggersError, TData>({
     queryKey: databaseTriggerKeys.list(projectRef),
-    queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
+    queryFn: ({ signal }) =>
+      getDatabaseTriggers({ projectRef, connectionString }, signal).then((data) =>
+        data.map(markSavedTriggerSafe)
+      ),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })

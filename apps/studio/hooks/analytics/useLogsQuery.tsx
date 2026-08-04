@@ -1,23 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 
-import { IS_PLATFORM } from 'common'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
-} from 'components/interfaces/Settings/Logs/Logs.constants'
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
   LogData,
   Logs,
   LogsEndpointParams,
-} from 'components/interfaces/Settings/Logs/Logs.types'
+} from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
   checkForILIKEClause,
   checkForWithClause,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'data/fetchers'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { get } from '@/data/fetchers'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -31,11 +32,18 @@ export interface LogsQueryHook {
   enabled?: boolean
 }
 
-export const useLogsQuery = (
-  projectRef: string,
-  initialParams: Partial<LogsEndpointParams> = {},
-  enabled = true
-): LogsQueryHook => {
+export const useLogsQuery = ({
+  projectRef,
+  initialParams = {},
+  enabled = true,
+  options = {},
+}: {
+  projectRef?: string
+  initialParams?: Partial<LogsEndpointParams>
+  enabled?: boolean
+  options?: { useOtel?: boolean }
+}): LogsQueryHook => {
+  const { useOtel = false } = options
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',
@@ -71,11 +79,11 @@ export const useLogsQuery = (
     isRefetching,
     refetch,
   } = useQuery({
-    queryKey: ['projects', projectRef, 'logs', params],
+    queryKey: ['projects', projectRef, 'logs', params, { otel: useOtel }],
     queryFn: async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
+      const { data, error } = await get(logsAllEndpointUrl(useOtel), {
         params: {
-          path: { ref: projectRef },
+          path: { ref: projectRef! },
           query: params,
         },
         signal,
@@ -96,7 +104,9 @@ export const useLogsQuery = (
     error = data?.error
   }
 
-  if (IS_PLATFORM) {
+  // BigQuery-specific parser limitations don't apply to the ClickHouse-backed
+  // OTEL endpoint, so skip these warnings when querying it.
+  if (IS_PLATFORM && !useOtel) {
     if (usesWith) {
       error = {
         message: 'The parser does not yet support WITH and subquery statements.',
@@ -133,4 +143,3 @@ export const useLogsQuery = (
     setParams,
   }
 }
-export default useLogsQuery

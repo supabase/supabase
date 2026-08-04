@@ -1,6 +1,7 @@
-import SqlEditor from 'components/ui/SqlEditor'
 import { useState } from 'react'
-import { Button, Modal } from 'ui'
+import { Button, DialogFooter, DialogSection, DialogSectionSeparator } from 'ui'
+
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 const ReviewEmptyState = () => {
   return (
@@ -16,7 +17,7 @@ interface StoragePoliciesReviewProps {
   onSelectSave: any
 }
 
-const StoragePoliciesReview = ({
+export const StoragePoliciesReview = ({
   policyStatements = [],
   onSelectBack = () => {},
   onSelectSave = () => {},
@@ -29,7 +30,7 @@ const StoragePoliciesReview = ({
 
   return (
     <>
-      <Modal.Content className="space-y-6">
+      <DialogSection className="space-y-6">
         <div className="flex items-center justify-between space-y-8 space-x-4">
           <div className="flex flex-col">
             <p className="text-sm text-foreground-light">
@@ -45,28 +46,31 @@ const StoragePoliciesReview = ({
             let formattedSQLStatement = policy.statement || ''
             return (
               <div key={`policy_${idx}`} className="space-y-2">
-                <span>{policy.description}</span>
+                <p className="text-sm">{policy.description}</p>
                 <div className="h-40">
-                  <SqlEditor readOnly defaultValue={formattedSQLStatement} />
+                  <CodeEditor
+                    hideLineNumbers
+                    isReadOnly
+                    language="pgsql"
+                    defaultValue={formattedSQLStatement}
+                  />
                 </div>
               </div>
             )
           })}
         </div>
-      </Modal.Content>
-      <Modal.Separator />
-      <Modal.Content className="flex w-full items-center justify-end gap-2">
-        <Button type="default" onClick={onSelectBack}>
+      </DialogSection>
+      <DialogSectionSeparator />
+      <DialogFooter>
+        <Button variant="default" onClick={onSelectBack}>
           Back to edit
         </Button>
         {policyStatements.length > 0 && (
-          <Button type="primary" onClick={onSavePolicy} loading={isSaving}>
+          <Button variant="primary" onClick={onSavePolicy} loading={isSaving}>
             Save policy
           </Button>
         )}
-      </Modal.Content>
+      </DialogFooter>
     </>
   )
 }
-
-export default StoragePoliciesReview

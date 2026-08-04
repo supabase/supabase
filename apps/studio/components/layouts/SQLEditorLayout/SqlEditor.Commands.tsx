@@ -1,30 +1,17 @@
-import { type PostgresColumn } from '@supabase/postgres-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { orderCommandSectionsByPriority } from 'components/interfaces/App/CommandMenu/ordering'
-import { useSqlSnippetsQuery, type SqlSnippet } from 'data/content/sql-snippets-query'
-import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { useProfile } from 'lib/profile'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef } from 'react'
-import {
-  cn,
-  CodeBlock,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-} from 'ui'
+import { useEffect, useRef, useState } from 'react'
+import { cn, CommandGroup, CommandItem, CommandList } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   escapeAttributeSelector,
   generateCommandClassNames,
@@ -36,6 +23,19 @@ import {
   useSetCommandMenuSize,
   useSetPage,
 } from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
+import { type SnippetWithContent } from '@/data/content/sql-folders-query'
+import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
+import {
+  useInfiniteTablesQuery,
+  usePrefetchTables,
+  type TablesData,
+} from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -117,7 +117,7 @@ function RunSnippetPage() {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput autoFocus />
+        <CommandMenuInput autoFocus />
       </CommandHeader>
       {isLoading && <LoadingState />}
       {isError && <ErrorState />}
@@ -165,17 +165,17 @@ function EmptyState({
   return (
     <div className="p-6">
       <p className="mb-2 text-center">No snippets found.</p>
-      <CommandList_Shadcn_ className="py-2">
-        <CommandGroup_Shadcn_>
-          <CommandItem_Shadcn_
+      <CommandList className="py-2">
+        <CommandGroup>
+          <CommandItem
             id="create-snippet"
             className={generateCommandClassNames(false)}
             onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
           >
             {canCreateNew ? 'Create new snippet' : 'Run new SQL'}
-          </CommandItem_Shadcn_>
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
     </div>
   )
 }
@@ -186,7 +186,7 @@ function SnippetSelector({
   canCreateNew,
 }: {
   projectRef: string | undefined
-  snippets: Array<SqlSnippet> | undefined
+  snippets: Array<SnippetWithContent> | undefined
   canCreateNew: boolean
 }) {
   const router = useRouter()
@@ -196,17 +196,17 @@ function SnippetSelector({
   const isSQLSnippet = selectedSnippet?.type === 'sql'
 
   return (
-    <div className="w-full flex-grow min-h-0 grid gap-4 md:grid-cols-2">
-      <CommandList_Shadcn_
+    <div className="w-full grow min-h-0 grid gap-4 md:grid-cols-2">
+      <CommandList
         className={cn(
-          '!h-full min-h-0 max-h-[unset] py-2 overflow-hidden',
-          '[&>[cmdk-list-sizer]]:h-full [&>[cmdk-list-sizer]]:flex [&>[cmdk-list-sizer]]:flex-col'
+          'h-full! min-h-0 max-h-[unset] py-2 overflow-hidden',
+          '*:[[cmdk-list-sizer]]:h-full *:[[cmdk-list-sizer]]:flex *:[[cmdk-list-sizer]]:flex-col'
         )}
       >
         {!!snippets && snippets.length > 0 && (
-          <CommandGroup_Shadcn_ className="flex-grow min-h-0 overflow-auto">
+          <CommandGroup className="grow min-h-0 overflow-auto">
             {snippets.map((snippet) => (
-              <CommandItem_Shadcn_
+              <CommandItem
                 key={snippet.id}
                 id={`${snippet.id}-${snippet.name}`}
                 className={generateCommandClassNames(false)}
@@ -214,29 +214,29 @@ function SnippetSelector({
                 onSelect={() => void router.push(`/project/${projectRef ?? '_'}/sql/${snippet.id}`)}
               >
                 {snippet.name}
-              </CommandItem_Shadcn_>
+              </CommandItem>
             ))}
-          </CommandGroup_Shadcn_>
+          </CommandGroup>
         )}
         {canCreateNew && (
-          <div className="min-h-fit flex-grow-0">
+          <div className="min-h-fit grow-0">
             <hr className="mt-4 mb-2 mx-2" />
-            <CommandGroup_Shadcn_ forceMount={true}>
-              <CommandItem_Shadcn_
+            <CommandGroup forceMount={true}>
+              <CommandItem
                 id="create-snippet"
                 className={generateCommandClassNames(false)}
                 onSelect={() => router.push(`/project/${projectRef ?? '_'}/sql/new`)}
                 forceMount={true}
               >
                 Create new snippet
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
+              </CommandItem>
+            </CommandGroup>
           </div>
         )}
-      </CommandList_Shadcn_>
+      </CommandList>
       <CodeBlock
         language="sql"
-        value={isSQLSnippet ? selectedSnippet?.content?.sql : ''}
+        value={isSQLSnippet ? selectedSnippet?.content?.unchecked_sql : ''}
         wrapperClassName="hidden md:block"
         className="w-full h-full border-0 [&>code]:overflow-scroll [&>code]:block [&>code]:w-full [&>code]:h-full"
         hideCopy
@@ -245,10 +245,10 @@ function SnippetSelector({
   )
 }
 
-function snippetValue(snippet: SqlSnippet) {
+function snippetValue(snippet: SnippetWithContent) {
   if (snippet.type !== 'sql') return ''
   return escapeAttributeSelector(
-    `${snippet.id}-${snippet.name}-${snippet?.content?.sql.slice(0, 30)}`
+    `${snippet.id}-${snippet.name}-${snippet?.content?.unchecked_sql.slice(0, 30)}`
   ).toLowerCase()
 }
 
@@ -299,36 +299,68 @@ export function useQueryTableCommands(options?: CommandOptions) {
 function TableSelector() {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
-  const { data: protectedSchemas } = useProtectedSchemas()
+
+  const [filterString, setFilterString] = useState('')
+  const debouncedFilterString = useDebounce(filterString, 300)
+
+  const [sentinelRef, sentinelEntry] = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '200px 0px 200px 0px',
+  })
+
   const {
     data: tablesData,
-    isPending: isLoading,
     isError,
     isSuccess,
-  } = useTablesQuery({
+    isPending: isLoading,
+    hasNextPage: hasNextTablesPage,
+    isFetchingNextPage: isFetchingNextTablesPage,
+    fetchNextPage: fetchNextTablesPage,
+  } = useInfiniteTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     includeColumns: true,
+    pageSize: 50,
+    nameFilter: debouncedFilterString,
   })
-  const tables = useMemo(() => {
-    return tablesData?.filter((table) => !protectedSchemas.find((s) => s.name === table.schema))
-  }, [tablesData, protectedSchemas])
+  const tables = tablesData?.pages.flat() ?? []
+
+  useEffect(() => {
+    if (
+      sentinelEntry?.isIntersecting &&
+      hasNextTablesPage &&
+      !isFetchingNextTablesPage &&
+      isSuccess
+    ) {
+      fetchNextTablesPage()
+    }
+  }, [
+    isSuccess,
+    sentinelEntry?.isIntersecting,
+    hasNextTablesPage,
+    isFetchingNextTablesPage,
+    fetchNextTablesPage,
+  ])
 
   return (
-    <CommandWrapper>
+    <CommandWrapper shouldFilter={false}>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput autoFocus />
+        <CommandMenuInput
+          autoFocus
+          placeholder="Search for schema or a table to query"
+          value={filterString}
+          onValueChange={setFilterString}
+        />
       </CommandHeader>
-      <CommandList_Shadcn_>
+      <CommandList className="pb-9">
         {isLoading && <LoadingState />}
         {isError && <ErrorState />}
         {isSuccess && (
           <>
-            <CommandEmpty_Shadcn_ />
-            <CommandGroup_Shadcn_>
+            <CommandGroup className="py-2">
               {tables?.map((table) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={table.id}
                   className={generateCommandClassNames(false)}
                   value={escapeAttributeSelector(`${table.schema}.${table.name}`)}
@@ -339,23 +371,47 @@ function TableSelector() {
                   }}
                 >
                   {`${table.schema}.${table.name}`}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
+            </CommandGroup>
+            {tables.length === 0 && debouncedFilterString && (
+              <p className="text-xs text-center text-foreground-lighter py-3">
+                No tables found based on your search
+              </p>
+            )}
+            {tables.length > 0 && (
+              <>
+                <div ref={sentinelRef} />
+                <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
+                  <div className="flex items-center gap-x-2">
+                    {isFetchingNextTablesPage ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 size={14} className="animate-spin" /> Loading...
+                      </span>
+                    ) : (
+                      <span>
+                        Total: {tables.length} {tables.length === 1 ? 'table' : 'tables'}
+                        {hasNextTablesPage ? ' loaded' : ''}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
-      </CommandList_Shadcn_>
+      </CommandList>
     </CommandWrapper>
   )
 }
 
-function generateSelectStatement(table: TablesData[number] & { columns?: Array<PostgresColumn> }) {
+function generateSelectStatement(table: TablesData[number] & { columns?: Array<PGColumn> }) {
   return `
 select ${
     !table.columns
       ? '*'
       : `
-${table.columns.map((column, index, array) => `\t${column.name}`).join(',\n')}`
+${table.columns.map((column) => `\t${column.name}`).join(',\n')}`
   }
 from ${formatTableIdentifier(table)}
 -- where

@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import { useSecretsQuery } from 'data/secrets/secrets-query'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -13,17 +11,19 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import z from 'zod'
 
-import { DuplicateSecretWarningModal } from 'components/interfaces/Functions/EdgeFunctionSecrets/DuplicateSecretWarningModal'
+import { DuplicateSecretWarningModal } from '@/components/interfaces/Functions/EdgeFunctionSecrets/DuplicateSecretWarningModal'
+import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
+import { useSecretsQuery } from '@/data/secrets/secrets-query'
 
 type SecretPair = {
   name: string
@@ -193,7 +193,7 @@ const AddEnvironmentVariableForm = () => {
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
@@ -202,13 +202,13 @@ const AddEnvironmentVariableForm = () => {
             <CardContent>
               {fields.map((fieldItem, index) => (
                 <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="w-full">
-                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
+                      <FormItem className="w-full">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
                           <Input
                             {...field}
                             placeholder="e.g. CLIENT_KEY"
@@ -218,18 +218,18 @@ const AddEnvironmentVariableForm = () => {
                             data-bwignore
                             onPaste={(e) => handlePaste(e.nativeEvent)}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name={`secrets.${index}.value`}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="w-full relative">
-                        <FormLabel_Shadcn_>Value</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
+                      <FormItem className="w-full relative">
+                        <FormLabel>Value</FormLabel>
+                        <FormControl>
                           <Input
                             {...field}
                             type={isSecretVisible(fieldItem.id) ? 'text' : 'password'}
@@ -240,7 +240,7 @@ const AddEnvironmentVariableForm = () => {
                             actions={
                               <div className="mr-1">
                                 <Button
-                                  type="text"
+                                  variant="text"
                                   className="px-1"
                                   icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
                                   onClick={() => handleToggleSecretVisibility(fieldItem.id)}
@@ -248,14 +248,14 @@ const AddEnvironmentVariableForm = () => {
                               </div>
                             }
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
 
                   <Button
-                    type="default"
+                    variant="default"
                     className="h-[34px] mt-6"
                     icon={<MinusCircle />}
                     disabled={fields.length <= 1}
@@ -264,7 +264,7 @@ const AddEnvironmentVariableForm = () => {
                 </div>
               ))}
 
-              <Button type="default" onClick={handleAddAnotherSecret}>
+              <Button variant="default" onClick={handleAddAnotherSecret}>
                 Add another
               </Button>
             </CardContent>
@@ -273,13 +273,13 @@ const AddEnvironmentVariableForm = () => {
                 Insert or update multiple variables at once by pasting key-value pairs
               </p>
 
-              <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
+              <Button type="submit" variant="primary" disabled={isCreating} loading={isCreating}>
                 {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
               </Button>
             </CardFooter>
           </Card>
         </form>
-      </Form_Shadcn_>
+      </Form>
       <DuplicateSecretWarningModal
         visible={!!duplicateSecretName}
         onCancel={handleCancelDuplicate}

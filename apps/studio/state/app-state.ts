@@ -1,6 +1,6 @@
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
+import { type ConnectSheetSource } from 'common/telemetry-constants'
 import { proxy, snapshot, useSnapshot } from 'valtio'
-
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 
 const getInitialState = () => {
   return {
@@ -9,7 +9,6 @@ const getInitialState = () => {
     showProjectApiDocs: false,
     showCreateBranchModal: false,
     showAiSettingsModal: false,
-    showConnectDialog: false,
     ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
@@ -37,8 +36,8 @@ export const appState = proxy({
   isOptedInTelemetry: false,
   setIsOptedInTelemetry: (value: boolean | null) => {
     appState.isOptedInTelemetry = value === null ? false : value
-    if (typeof window !== 'undefined' && value !== null) {
-      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+    if (value !== null) {
+      safeLocalStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
 
@@ -70,6 +69,11 @@ export const appState = proxy({
   mobileMenuOpen: false,
   setMobileMenuOpen: (value: boolean) => {
     appState.mobileMenuOpen = value
+  },
+
+  connectSheetSource: 'header_button' as ConnectSheetSource,
+  setConnectSheetSource: (value: ConnectSheetSource) => {
+    appState.connectSheetSource = value
   },
 
   lastRouteBeforeVisitingAccountPage: '',

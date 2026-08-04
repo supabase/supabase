@@ -1,8 +1,10 @@
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import pgMeta, { type PGPublication } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
+import { executeSql } from '../sql/execute-sql-mutation'
 import { databasePublicationsKeys } from './keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabasePublicationsVariables = {
   projectRef?: string
@@ -15,25 +17,18 @@ export async function getDatabasePublications(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/publications', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: {
-        ref: projectRef,
-      },
+  const { sql } = pgMeta.publications.list()
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['publications'].filter(Boolean),
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data
+  return result as PGPublication[]
 }
 
 export type DatabasePublicationsData = Awaited<ReturnType<typeof getDatabasePublications>>
@@ -52,3 +47,17 @@ export const useDatabasePublicationsQuery = <TData = DatabasePublicationsData>(
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
+
+export const useIsTableRealtimeEnabled = ({ id }: { id: number }) => {
+  const { data: project } = useSelectedProjectQuery()
+  const { data: publications } = useDatabasePublicationsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const realtimePublication = (publications ?? []).find(
+    (publication) => publication.name === 'supabase_realtime'
+  )
+  const realtimeEnabledTables = realtimePublication?.tables ?? []
+  const isRealtimeEnabled = realtimeEnabledTables.some((t) => t.id === id)
+  return isRealtimeEnabled
+}

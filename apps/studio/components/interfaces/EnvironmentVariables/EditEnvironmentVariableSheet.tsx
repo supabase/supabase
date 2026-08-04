@@ -1,23 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { Eye, EyeOff, X } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import { SubmitHandler, useForm, type UseFormReturn } from 'react-hook-form'
-import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import type { ProjectSecret } from 'data/secrets/secrets-query'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { Eye, EyeOff, X } from 'lucide-react'
 import { useLatest } from 'react-use'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Input,
-  Input_Shadcn_,
   Separator,
   Sheet,
   SheetClose,
@@ -29,6 +23,11 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
+import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
+import type { ProjectSecret } from '@/data/secrets/secrets-query'
+import { useConfirmOnClose, type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
 
 const FORM_ID = 'edit-env-var-sidepanel'
 
@@ -94,10 +93,10 @@ export function EditEnvironmentVariableSheet({
         <Separator />
         <FormBody form={form} onSubmit={onSubmit} />
         <SheetFooter>
-          <Button disabled={isUpdating} type="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdating} variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={!isValid} loading={isUpdating}>
+          <Button form={FORM_ID} type="submit" disabled={!isValid} loading={isUpdating}>
             Save
           </Button>
         </SheetFooter>
@@ -133,7 +132,7 @@ type FormBodyProps = {
 
 const FormBody = ({ form, onSubmit }: FormBodyProps): ReactNode => {
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form id={FORM_ID} className="flex-grow overflow-auto" onSubmit={form.handleSubmit(onSubmit)}>
         <SheetSection>
           <NameField form={form} />
@@ -144,7 +143,7 @@ const FormBody = ({ form, onSubmit }: FormBodyProps): ReactNode => {
         </SheetSection>
         <Separator />
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
@@ -154,18 +153,14 @@ type NameFieldProps = {
 
 const NameField = ({ form }: NameFieldProps): ReactNode => {
   return (
-    <FormField_Shadcn_
+    <FormField
       control={form.control}
       name="name"
       render={({ field }) => (
         <FormItemLayout label="Name" layout="horizontal">
-          <FormControl_Shadcn_>
-            <Input_Shadcn_
-              {...field}
-              readOnly
-              className="!text-foreground-light cursor-not-allowed"
-            />
-          </FormControl_Shadcn_>
+          <FormControl>
+            <Input {...field} readOnly className="!text-foreground-light cursor-not-allowed" />
+          </FormControl>
         </FormItemLayout>
       )}
     />
@@ -180,7 +175,7 @@ const SecretField = ({ form }: SecretFieldProps): ReactNode => {
   const [showSecretValue, setShowSecretValue] = useState(false)
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={form.control}
       name="value"
       render={({ field }) => (
@@ -189,27 +184,25 @@ const SecretField = ({ form }: SecretFieldProps): ReactNode => {
           layout="horizontal"
           description="Secrets can't be retrieved once saved. Enter a new value to overwrite the existing value."
         >
-          <FormControl_Shadcn_>
-            <Input
-              {...field}
-              type={showSecretValue ? 'text' : 'password'}
-              placeholder="my-secret-value"
-              data-1p-ignore
-              data-lpignore="true"
-              data-form-type="other"
-              data-bwignore
-              actions={
-                <div className="mr-1">
-                  <Button
-                    type="text"
-                    className="px-1"
-                    icon={showSecretValue ? <EyeOff /> : <Eye />}
-                    onClick={() => setShowSecretValue(!showSecretValue)}
-                  />
-                </div>
-              }
-            />
-          </FormControl_Shadcn_>
+          <FormControl>
+            <div className="relative w-full">
+              <Input
+                {...field}
+                type={showSecretValue ? 'text' : 'password'}
+                placeholder="my-secret-value"
+                data-1p-ignore
+                data-lpignore="true"
+                data-form-type="other"
+                data-bwignore
+              />
+              <Button
+                variant="text"
+                className="absolute right-1 top-1 px-1"
+                icon={showSecretValue ? <EyeOff /> : <Eye />}
+                onClick={() => setShowSecretValue(!showSecretValue)}
+              />
+            </div>
+          </FormControl>
         </FormItemLayout>
       )}
     />

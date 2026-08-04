@@ -2,148 +2,108 @@
 title: 'Use Supabase with iOS and SwiftUI'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from an iOS app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="ios-swiftui" />
 
-  <StepHikeCompact.Step step={1}>
+<$Partial path="quickstart_db_setup.mdx" />
 
-    <$Partial path="quickstart_db_setup.mdx" />
+## 3. Create an iOS SwiftUI app with Xcode
 
-  </StepHikeCompact.Step>
+Select the **Xcode > New Project > iOS > App** menu item.
 
-  <StepHikeCompact.Step step={2}>
+## 4. Install Supabase's Agent Skills (optional)
 
-    <StepHikeCompact.Details title="Create an iOS SwiftUI app with Xcode">
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-    Open Xcode > New Project > iOS > App. You can skip this step if you already have a working app.
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
 
-    </StepHikeCompact.Details>
+To install, run the following command in the root of your project:
 
-  </StepHikeCompact.Step>
+```bash
+npx skills add supabase/agent-skills
+```
 
-  <StepHikeCompact.Step step={3}>
+## 5. Install the Supabase client library
 
-    <StepHikeCompact.Details title="Install the Supabase client library">
+Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to your app using the Swift Package Manager.
 
-      Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to your app using the Swift Package Manager.
+In Xcode, navigate to **File > Add Package Dependencies...** and enter the repository URL `https://github.com/supabase/supabase-swift` in the search bar. For detailed instructions, see Apple's [tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
-      In Xcode, navigate to **File > Add Package Dependencies...** and enter the repository URL `https://github.com/supabase/supabase-swift` in the search bar. For detailed instructions, see Apple's [tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
+Make sure to add `Supabase` product package as a dependency to your application target.
 
-      Make sure to add `Supabase` product package as a dependency to your application target.
+## 6. Initialize the Supabase client
 
-    </StepHikeCompact.Details>
+Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&connectTab=mobiles):
 
-  </StepHikeCompact.Step>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=swift">
+    Open Connect panel
+  </a>
+</Button>
 
-  <StepHikeCompact.Step step={4}>
+```swift name=Supabase.swift
+import Supabase
 
-    <StepHikeCompact.Details title="Initialize the Supabase client">
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
+  supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
+)
+```
 
-      Create a new `Supabase.swift` file add a new Supabase instance using your project URL and public API (anon) key:
+<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
 
-      <ProjectConfigVariables variable="url" />
-      <ProjectConfigVariables variable="publishable" />
-      <ProjectConfigVariables variable="anon" />
+## 7. Create a data model for instruments
 
-    </StepHikeCompact.Details>
+Create a decodable struct to deserialize the data from the database.
 
-    <StepHikeCompact.Code>
+Add the following code to a new file named `Instrument.swift`.
 
-      ```swift name=Supabase.swift
-      import Supabase
+```swift name=Instrument.swift
+struct Instrument: Decodable, Identifiable {
+  let id: Int
+  let name: String
+}
+```
 
-      let supabase = SupabaseClient(
-        supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
-        supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
-      )
-      ```
+## 8. Query data from the app
 
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
+Use a `task` to fetch the data from the database and display it using a `List`.
 
-    </StepHikeCompact.Code>
+Replace the default `ContentView` with the following code.
 
-  </StepHikeCompact.Step>
+```swift name=ContentView.swift
+import SwiftUI
 
-  <StepHikeCompact.Step step={5}>
+struct ContentView: View {
 
-    <StepHikeCompact.Details title="Create a data model for instruments">
+  @State var instruments: [Instrument] = []
 
-    Create a decodable struct to deserialize the data from the database.
-
-    Add the following code to a new file named `Instrument.swift`.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```swift name=Instrument.swift
-      struct Instrument: Decodable, Identifiable {
-        let id: Int
-        let name: String
+  var body: some View {
+    List(instruments) { instrument in
+      Text(instrument.name)
+    }
+    .overlay {
+      if instruments.isEmpty {
+        ProgressView()
       }
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-
-    <StepHikeCompact.Details title="Query data from the app">
-
-      Use a `task` to fetch the data from the database and display it using a `List`.
-
-      Replace the default `ContentView` with the following code.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```swift name=ContentView.swift
-      import SwiftUI
-
-      struct ContentView: View {
-
-        @State var instruments: [Instrument] = []
-
-        var body: some View {
-          List(instruments) { instrument in
-            Text(instrument.name)
-          }
-          .overlay {
-            if instruments.isEmpty {
-              ProgressView()
-            }
-          }
-          .task {
-            do {
-              instruments = try await supabase.from("instruments").select().execute().value
-            } catch {
-              dump(error)
-            }
-          }
-        }
+    }
+    .task {
+      do {
+        instruments = try await supabase.from("instruments").select().execute().value
+      } catch {
+        dump(error)
       }
-      ```
+    }
+  }
+}
+```
 
-    </StepHikeCompact.Code>
+## 9. Start the app
 
-  </StepHikeCompact.Step>
+Run the app on a simulator or a physical device by hitting `Cmd + R` on Xcode.
 
-  <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the app on a simulator or a physical device by hitting `Cmd + R` on Xcode.
-
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
-
-## Setting up deep links
+## 10. Setting up deep links (optional)
 
 If you want to implement authentication features like magic links or OAuth, you need to set up deep links to redirect users back to your app. For instructions on configuring custom URL schemes for your iOS app, see the [deep linking guide](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
 
@@ -151,3 +111,5 @@ If you want to implement authentication features like magic links or OAuth, you 
 
 - Learn how to build a complete user management app with authentication in the [Swift tutorial](/docs/guides/getting-started/tutorials/with-swift)
 - Explore the [supabase-swift](https://github.com/supabase/supabase-swift) library on GitHub
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

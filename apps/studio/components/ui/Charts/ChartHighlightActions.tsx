@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { ArrowRight, SearchIcon } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useState } from 'react'
-
 import {
   cn,
   DropdownMenu,
@@ -11,7 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { ChartHighlight } from './useChartHighlight'
+import { useFormatDateTime } from '@/lib/datetime'
+
+const toFormattableDate = (value: string): string | number => {
+  const asNumber = Number(value)
+  return value !== '' && Number.isFinite(asNumber) ? asNumber : value
+}
 
 export type UpdateDateRange = (from: string, to: string) => void
 
@@ -44,9 +50,10 @@ export const ChartHighlightActions = ({
 }) => {
   const { left: selectedRangeStart, right: selectedRangeEnd, clearHighlight } = chartHighlight ?? {}
   const [isOpen, setIsOpen] = useState(!!chartHighlight?.popoverPosition)
+  const formatChartDate = useFormatDateTime()
 
   useEffect(() => {
-    setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
+    setIsOpen(!!chartHighlight?.popoverPosition)
   }, [chartHighlight?.popoverPosition])
 
   const ctx: ChartHighlightActionContext | undefined =
@@ -78,8 +85,12 @@ export const ChartHighlightActions = ({
     return [...defaultActions, ...provided]
   }, [defaultActions, actions])
 
+  const positionKey = chartHighlight?.popoverPosition
+    ? `${chartHighlight.popoverPosition.x}-${chartHighlight.popoverPosition.y}`
+    : 'closed'
+
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu key={positionKey} open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger
         className="w-auto p-0"
         style={{
@@ -88,11 +99,21 @@ export const ChartHighlightActions = ({
           top: chartHighlight?.popoverPosition?.y + 'px' || 0,
         }}
       />
-      <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit text-left">
+      <DropdownMenuContent
+        className="flex flex-col gap-1 p-1 w-fit text-left data-[state=open]:animate-none! data-[state=closed]:animate-none!"
+        onEscapeKeyDown={() => clearHighlight?.()}
+        onInteractOutside={(e) => {
+          const target = e.target as Element | null
+          // If the user clicked on a chart, handleMouseDown will manage the new selection.
+          // Calling clearHighlight here would race with it and clobber the new state.
+          if (target?.closest('.recharts-wrapper')) return
+          clearHighlight?.()
+        }}
+      >
         <DropdownMenuLabel className="flex items-center justify-center text-foreground-light font-mono gap-x-2 text-xs">
-          <span>{dayjs(selectedRangeStart).format('MMM D, H:mm')}</span>
+          <span>{formatChartDate(toFormattableDate(selectedRangeStart!), 'MMM D, H:mm')}</span>
           <ArrowRight size={10} />
-          <span>{dayjs(selectedRangeEnd).format('MMM D, H:mm')}</span>
+          <span>{formatChartDate(toFormattableDate(selectedRangeEnd!), 'MMM D, H:mm')}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-0" />
         {allActions.map((action) => {
@@ -113,11 +134,12 @@ export const ChartHighlightActions = ({
             <DropdownMenuItem asChild key={action.id} disabled={disabled} className={cn('group')}>
               <button
                 disabled={disabled}
+                tabIndex={-1}
                 onClick={() => ctx && action.onSelect({ ...ctx })}
                 className="w-full flex items-center gap-1.5"
               >
                 {action.icon}
-                <span className="flex-grow text-left">{labelNode}</span>
+                <span className="grow text-left">{labelNode}</span>
                 {rightNode}
               </button>
             </DropdownMenuItem>

@@ -29,5 +29,5 @@ export default function GraphiQLPage() {
     notFound()
   }
 
-  return <LazyGraphiQL className="!h-[calc(100vh-var(--header-height))]" />
+  return <LazyGraphiQL className="h-[calc(100vh-var(--header-height))]!" />
 }

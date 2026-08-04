@@ -24,18 +24,6 @@ export const gettingStarted: SidebarNavGroup = {
   ],
 }
 
-export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Editors Rules',
-  items: [
-    {
-      title: 'Prompts',
-      href: '/docs/ai-editors-rules/prompts',
-      items: [],
-      commandItemLabel: 'AI Editors Rules',
-    },
-  ],
-}
-
 export const platformBlocks: SidebarNavGroup = {
   title: 'Platform',
   items: [
@@ -89,43 +77,55 @@ export const componentPages: SidebarNavGroup = {
       commandItemLabel: 'Realtime Cursor',
     },
     {
-      title: 'Current User Avatar',
+      title: 'Realtime Monaco',
       supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-monaco',
+      items: [],
+      new: true,
+      commandItemLabel: 'Realtime Monaco',
+    },
+    {
+      title: 'Realtime Flow',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      href: '/docs/nextjs/realtime-flow',
+      items: [],
+      new: true,
+      commandItemLabel: 'Realtime Flow',
+    },
+    {
+      title: 'Current User Avatar',
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/current-user-avatar',
       items: [],
       commandItemLabel: 'Current User Avatar',
     },
     {
       title: 'Realtime Avatar Stack',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-avatar-stack',
       items: [],
       commandItemLabel: 'Realtime Avatar Stack',
     },
     {
       title: 'Realtime Chat',
-      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react'],
+      supportedFrameworks: ['nextjs', 'react-router', 'tanstack', 'react', 'vue', 'nuxtjs'],
       href: '/docs/nextjs/realtime-chat',
       items: [],
       commandItemLabel: 'Realtime Chat',
     },
     {
-      title: 'Infinite Query Hook',
-      supportedFrameworks: [],
-      href: '/docs/infinite-query-hook',
+      title: 'Infinite Query',
+      supportedFrameworks: ['react', 'vue'],
+      href: '/docs/react/infinite-query',
       new: true,
       items: [],
-      commandItemLabel: 'Infinite Query Hook',
+      commandItemLabel: 'Infinite Query',
     },
   ],
 }
 
 export const COMMAND_ITEMS = [
   ...gettingStarted.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...aiEditorsRules.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),

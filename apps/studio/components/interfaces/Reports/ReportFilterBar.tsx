@@ -1,16 +1,12 @@
-import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
-import { ComponentProps, useEffect, useState } from 'react'
-import SVG from 'react-inlinesvg'
-
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DatabaseSelector } from 'components/ui/DatabaseSelector'
-import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
-import { BASE_PATH } from 'lib/constants'
+import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
+import { ComponentProps, useCallback, useEffect, useState } from 'react'
+import SVG from 'react-inlinesvg'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -18,11 +14,23 @@ import {
   DropdownMenuTrigger,
   Input,
   Select,
-  cn,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
+import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
+import { BASE_PATH } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -105,6 +113,8 @@ const ReportFilterBar = ({
     'response.status_code',
   ]
   const [showAdder, setShowAdder] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showProductFilter, setShowProductFilter] = useState(false)
   const [currentProductFilter, setCurrentProductFilter] = useState<
     null | (typeof PRODUCT_FILTERS)[number]
   >(null)
@@ -155,6 +165,45 @@ const ReportFilterBar = ({
     }
   }, [])
 
+  const customFilters = filters.filter(
+    (filter) =>
+      filter.value !== currentProductFilter?.filterValue ||
+      filter.key !== currentProductFilter?.filterKey
+  )
+
+  const handleClearFilters = useCallback(() => {
+    if (customFilters.length === 0) return
+    onRemoveFilters(customFilters)
+  }, [customFilters, onRemoveFilters])
+
+  useShortcut(
+    SHORTCUT_IDS.OBSERVABILITY_REFRESH,
+    () => {
+      onRefresh?.()
+    },
+    { enabled: Boolean(onRefresh) && !isLoading }
+  )
+  useShortcut(
+    SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER,
+    () => {
+      setShowDatePicker((open) => !open)
+    },
+    { enabled: !hideDatepicker }
+  )
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_FOCUS_FILTER, () => {
+    setShowAdder(true)
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_RESET_FILTERS, handleClearFilters, {
+    enabled: customFilters.length > 0,
+  })
+  useShortcut(
+    SHORTCUT_IDS.OBSERVABILITY_FILTER_REQUESTS,
+    () => {
+      setShowProductFilter((open) => !open)
+    },
+    { enabled: !selectedProduct }
+  )
+
   const getInitialDatePickerValue = () => {
     if (initialDatePickerValue) {
       return initialDatePickerValue
@@ -181,35 +230,49 @@ const ReportFilterBar = ({
     <div className={cn('flex items-center justify-between', className)}>
       <div className="flex flex-row justify-start items-center flex-wrap gap-2">
         {onRefresh && (
-          <ButtonTooltip
-            type="default"
-            disabled={isLoading}
-            icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
-            className="w-7"
-            tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-            onClick={() => onRefresh()}
-          />
+          <ShortcutTooltip
+            shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+            label="Refresh report"
+            side="bottom"
+          >
+            <Button
+              variant="default"
+              disabled={isLoading}
+              icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+              className="w-7"
+              onClick={() => onRefresh()}
+            />
+          </ShortcutTooltip>
         )}
         {!hideDatepicker && (
           <LogsDatePicker
             onSubmit={handleDatepickerChange}
             value={selectedRange}
             helpers={datepickerHelpers}
+            open={showDatePicker}
+            onOpenChange={setShowDatePicker}
+            shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
           />
         )}
         {!selectedProduct && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                className="inline-flex flex-row gap-2"
-                iconRight={<ChevronDown size={14} />}
-              >
-                <span>
-                  {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
+          <DropdownMenu open={showProductFilter} onOpenChange={setShowProductFilter}>
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_FILTER_REQUESTS}
+              side="bottom"
+              open={showProductFilter ? false : undefined}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="default"
+                  className="inline-flex flex-row gap-2"
+                  iconRight={<ChevronDown size={14} />}
+                >
+                  <span>
+                    {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+            </ShortcutTooltip>
             <DropdownMenuContent side="bottom" align="start">
               <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
                 <Network size={14} strokeWidth={1.5} className="mr-2" />
@@ -253,95 +316,124 @@ const ReportFilterBar = ({
             </DropdownMenuContent>
           </DropdownMenu>
         )}
-        {filters
-          .filter(
-            (filter) =>
-              filter.value !== currentProductFilter?.filterValue ||
-              filter.key !== currentProductFilter?.filterKey
-          )
-          .map((filter) => (
-            <div
-              key={`${filter.key}-${filter.compare}-${filter.value}`}
-              className="text-xs rounded-md font-mono bg-surface-300 px-2 h-[26px] flex flex-row justify-center gap-1 items-center"
-            >
-              <span className="">{filter.key}</span>
-              <span className="text-foreground-lighter">{filter.compare}</span>
-              <span className="">{filter.value}</span>
-              <Button
-                type="text"
-                size="tiny"
-                className="!p-0 !space-x-0"
-                onClick={() => onRemoveFilters([filter])}
-                icon={<X className="text-foreground-light" />}
-              >
-                <span className="sr-only">Remove</span>
-              </Button>
-            </div>
-          ))}
-        <Popover open={showAdder} onOpenChange={(openValue) => setShowAdder(openValue)}>
-          <PopoverTrigger>
+        {customFilters.map((filter) => (
+          <div
+            key={`${filter.key}-${filter.compare}-${filter.value}`}
+            className="text-xs rounded-md font-mono bg-surface-300 px-2 h-[26px] flex flex-row justify-center gap-1 items-center"
+          >
+            <span className="">{filter.key}</span>
+            <span className="text-foreground-lighter">{filter.compare}</span>
+            <span className="">{filter.value}</span>
             <Button
-              asChild
-              type="default"
+              variant="text"
               size="tiny"
-              icon={<Plus className={`text-foreground-light `} />}
+              className="p-0! space-x-0!"
+              onClick={() => onRemoveFilters([filter])}
+              icon={<X className="text-foreground-light" />}
             >
-              <span>Add filter</span>
+              <span className="sr-only">Remove</span>
             </Button>
-          </PopoverTrigger>
+          </div>
+        ))}
+        <Popover open={showAdder} onOpenChange={(openValue) => setShowAdder(openValue)}>
+          <ShortcutTooltip
+            shortcutId={SHORTCUT_IDS.OBSERVABILITY_FOCUS_FILTER}
+            side="bottom"
+            open={showAdder ? false : undefined}
+          >
+            <PopoverTrigger asChild>
+              <Button
+                variant="default"
+                size="tiny"
+                icon={<Plus className={`text-foreground-light `} />}
+              >
+                Add filter
+              </Button>
+            </PopoverTrigger>
+          </ShortcutTooltip>
           <PopoverContent align={filters.length > 0 ? 'end' : 'start'} className="p-0 w-60">
             <div className="flex flex-col gap-3 p-3">
-              <Select
-                size="tiny"
-                value={addFilterValues.key}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, key: e.target.value }))
-                }}
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Attribute Filter"
                 className="gap-[2px]"
-              >
-                {filterKeys.map((key) => (
-                  <Select.Option key={key} value={key}>
-                    {key}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Select
                 size="tiny"
-                value={addFilterValues.compare}
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({
-                    ...prev,
-                    compare: e.target.value as ReportFilterItem['compare'],
-                  }))
-                }}
+              >
+                <Select
+                  value={addFilterValues.key}
+                  onValueChange={(value: string) =>
+                    setAddFilterValues((prev) => ({ ...prev, key: value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="---" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {filterKeys.map((key) => (
+                        <SelectItem key={key} value={key}>
+                          {key}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormItemLayout>
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Comparison"
                 className="gap-[2px]"
-              >
-                {['is', 'matches'].map((value) => (
-                  <Select.Option key={value} value={value}>
-                    {value}
-                  </Select.Option>
-                ))}
-              </Select>
-              <Input
                 size="tiny"
+              >
+                <Select
+                  value={addFilterValues.compare}
+                  onValueChange={(value: string) =>
+                    setAddFilterValues((prev) => ({
+                      ...prev,
+                      compare: value as ReportFilterItem['compare'],
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="---" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {['is', 'matches'].map((value) => (
+                        <SelectItem key={value} value={value}>
+                          {value}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormItemLayout>
+              <FormItemLayout
+                isReactForm={false}
+                layout="vertical"
                 label="Value"
                 className="gap-[2px]"
-                placeholder={
-                  addFilterValues.compare === 'matches'
-                    ? 'Provide a regex expression'
-                    : 'Provide a string'
-                }
-                onChange={(e) => {
-                  setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
-                }}
-              />
+                size="tiny"
+              >
+                <Input
+                  placeholder={
+                    addFilterValues.compare === 'matches'
+                      ? 'Provide a regex expression'
+                      : 'Provide a string'
+                  }
+                  value={addFilterValues.value}
+                  onChange={(e) => {
+                    setAddFilterValues((prev) => ({ ...prev, value: e.target.value }))
+                  }}
+                />
+              </FormItemLayout>
             </div>
 
             <div className="flex items-center justify-end gap-2 border-t border-default p-2">
               <Button
-                type="primary"
+                variant="primary"
                 size="tiny"
                 onClick={() => {
                   onAddFilter(addFilterValues)

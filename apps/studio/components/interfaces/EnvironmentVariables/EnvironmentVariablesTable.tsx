@@ -1,26 +1,26 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { KeyRound } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
+import { KeyRound } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Card, Table, TableBody } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { EnvironmentVariable } from './EnvironmentVariables.types'
 import { DeleteEnvironmentVariableModal } from './DeleteEnvironmentVariableModal'
 import { EditEnvironmentVariableSheet } from './EditEnvironmentVariableSheet'
 import EnvironmentVariableRow from './EnvironmentVariableRow'
+import type { EnvironmentVariable } from './EnvironmentVariables.types'
 import {
   EnvironmentVariablesFilters,
   type ScopeFilter,
   type SortOption,
 } from './EnvironmentVariablesFilters'
 import { useEnvironmentVariables } from './useEnvironmentVariables'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const ENV_SERVER = 'http://localhost:3457'
 
@@ -28,8 +28,7 @@ function matchesScope(variable: EnvironmentVariable, scopeFilter: ScopeFilter): 
   if (scopeFilter === 'all') return true
   if (scopeFilter === 'production')
     return variable.scope === 'production' || variable.category === 'platform'
-  if (scopeFilter === 'preview')
-    return variable.scope === 'preview' || variable.scope === 'branch'
+  if (scopeFilter === 'preview') return variable.scope === 'preview' || variable.scope === 'branch'
   if (scopeFilter === 'development') return variable.scope === 'development'
   return true
 }
@@ -98,14 +97,16 @@ export const EnvironmentVariablesTable = () => {
   }
 
   if (isLoadingSecretsPermissions || (canReadSecrets && isPending)) return <GenericSkeletonLoader />
-  if (!canReadSecrets) return <NoPermission resourceText="view this project's environment variables" />
-  if (isError) return (
-    <>
-      {errors.map((err, i) => (
-        <AlertError key={i} error={err} subject="Failed to retrieve environment variables" />
-      ))}
-    </>
-  )
+  if (!canReadSecrets)
+    return <NoPermission resourceText="view this project's environment variables" />
+  if (isError)
+    return (
+      <>
+        {errors.map((err, i) => (
+          <AlertError key={i} error={err} subject="Failed to retrieve environment variables" />
+        ))}
+      </>
+    )
 
   return (
     <>
@@ -137,13 +138,17 @@ export const EnvironmentVariablesTable = () => {
             <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
               <KeyRound size={24} className="text-foreground-muted" strokeWidth={1.5} />
               <p className="text-sm text-foreground-light">No variables match your filters</p>
-              <p className="text-xs text-foreground-lighter">Try adjusting your search or scope filter</p>
+              <p className="text-xs text-foreground-lighter">
+                Try adjusting your search or scope filter
+              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 px-4 py-16 text-center">
               <KeyRound size={24} className="text-foreground-muted" strokeWidth={1.5} />
               <p className="text-sm text-foreground">No environment variables yet</p>
-              <p className="text-xs text-foreground-lighter">Add a variable above to configure your project's environment</p>
+              <p className="text-xs text-foreground-lighter">
+                Add a variable above to configure your project's environment
+              </p>
             </div>
           )}
         </Card>

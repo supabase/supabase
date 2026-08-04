@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import { paths } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { UseCustomQueryOptions } from 'types'
 
 import type { AnalyticsInterval } from './constants'
 import { analyticsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { UseCustomQueryOptions } from '@/types'
 
 export type InfraMonitoringAttribute = NonNullable<
   paths['/platform/projects/{ref}/infra-monitoring']['get']['parameters']['query']['attributes']

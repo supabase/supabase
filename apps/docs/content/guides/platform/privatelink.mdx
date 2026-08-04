@@ -6,7 +6,7 @@ description: 'Secure private network connectivity to your Supabase database usin
 
 <Admonition type="note">
 
-PrivateLink is currently in beta and available only to Team and Enterprise customers.
+PrivateLink is available only to Team and Enterprise customers.
 Contact support if you would like to create a PrivateLink connection for a read-only replica.
 
 </Admonition>
@@ -20,13 +20,12 @@ By enabling PrivateLink, database connections never traverse the public internet
 Supabase PrivateLink is an organisation level configuration. It works by sharing a [VPC Lattice Resource Configuration](https://docs.aws.amazon.com/vpc-lattice/latest/ug/resource-configuration.html) to any number of AWS Accounts for each of your Supabase projects. Connectivity can be achieved by either associating the Resource Configuration to a PrivateLink endpoint, or a [VPC Lattice Service Network](https://docs.aws.amazon.com/vpc-lattice/latest/ug/service-networks.html). This means:
 
 - Database traffic flows through private AWS infrastructure only
-- Connection latency is typically reduced compared to public internet routing
 - Network isolation provides enhanced security posture
 - Attack surface is minimized by eliminating public exposure
 
 The connection architecture changes from public internet routing to a dedicated private path through AWS's secure network backbone.
 
-Supabase PrivateLink is currently just for direct database and PgBouncer connections only. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
+Supabase PrivateLink supports direct database connections on port `5432` and PgBouncer connections on port `6543`. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
 
 ## Requirements
 
@@ -38,7 +37,7 @@ To use PrivateLink with your Supabase project:
 
 ## Getting started
 
-#### Step 1: Add AWS account
+### Step 1: Add AWS account
 
 Navigate to your project's Integrations section to set up PrivateLink:
 
@@ -52,7 +51,7 @@ Navigate to your project's Integrations section to set up PrivateLink:
 
 After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS Account ID. This process may take a few moments. Once complete, the account will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted.
 
-#### Step 2: Accept resource share
+### Step 2: Accept resource share
 
 Supabase will send you an AWS Resource Share containing the VPC Lattice Resource Configurations for your projects. To accept this share:
 
@@ -69,23 +68,25 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
 {/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 After accepting, you'll see the resource configurations appear in your [Shared with me > Shared resources](https://console.aws.amazon.com/ram/home#SharedResources) section of the RAM console and the [PrivateLink and Lattice > Resource configurations](https://console.aws.amazon.com/vpcconsole/home#ResourceConfigs) section of the VPC console.
 
-#### Step 3: Configure security groups
+### Step 3: Configure security groups
 
 Ensure your security groups allow traffic on the appropriate ports:
 
 1. Navigate to the [VPC console > Security Groups](https://console.aws.amazon.com/vpcconsole/home#SecurityGroups:)
 2. Create a new security group for the endpoint or service network by clicking [Create security group](https://console.aws.amazon.com/vpcconsole/home#CreateSecurityGroup:)
 3. Give your security group a descriptive name and select the appropriate VPC
-4. Add an inbound rule for:
-   - Type: Postgres (TCP, port 5432)
-   - Destination that is appropriate for your network. i.e. the subnet of your VPC or security group of your application instances
+4. Add inbound rule(s) for the connection mode you use:
+   - Direct connection: Postgres (TCP, port `5432`)
+   - PgBouncer connection: Custom TCP (port `6543`)
+   - If you use both direct and PgBouncer connections, add both rules
+   - Set the destination appropriate for your network (for example, your VPC subnet or your application instances' security group)
 5. Finish creating the security group by clicking **Create security group**
 
-#### Step 4: Create connection
+### Step 4: Create connection
 
 In your AWS account, you have two options to establish connectivity:
 
-##### Option A: Create a PrivateLink endpoint
+#### Option A: Create a PrivateLink endpoint
 
 1. Navigate to the VPC console in your AWS account
 2. Go to [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) in the left sidebar
@@ -106,7 +107,7 @@ In your AWS account, you have two options to establish connectivity:
     - The IP addresses of the endpoint will be listed in the **Subnets** section of the endpoint details
     - The DNS record will be in the **Associations** section of the endpoint details in the **DNS Name** field if you enabled it in step 8
 
-##### Option B: Attach resource configuration to an existing VPC lattice service network
+#### Option B: Attach resource configuration to an existing VPC lattice service network
 
 1. **This method is only recommended if you have an existing VPC Lattice Service Network**
 2. Navigate to the VPC Lattice console in your AWS account
@@ -118,7 +119,7 @@ In your AWS account, you have two options to establish connectivity:
 8. After creation, you will see the resource configuration in the Resource configurations section of your service network with the status "Active"
 9. For connectivity, click on the association details and the domain name will be listed in the **DNS entries** section
 
-#### Step 5: Test connectivity
+### Step 5: Test connectivity
 
 Verify the private connection is working correctly from your VPC:
 
@@ -127,12 +128,16 @@ Verify the private connection is working correctly from your VPC:
 3. Test the connection using the private endpoint:
 
 ```bash
+# Direct connection (Postgres)
 psql "postgresql://[username]:[password]@[private-endpoint]:5432/postgres"
+
+# PgBouncer connection
+psql "postgresql://[username]:[password]@[private-endpoint]:6543/postgres"
 ```
 
 You should see a successful connection without any public internet traffic.
 
-#### Step 6: Update applications
+### Step 6: Update applications
 
 Configure your applications to use the private connection details:
 
@@ -141,27 +146,33 @@ Configure your applications to use the private connection details:
 3. Update any database connection pooling configurations
 4. Test application connectivity thoroughly
 
-Example connection string update:
+Example connection string updates:
 
 ```
+# Direct connection (Postgres)
 # Before (public)
 postgresql://user:pass@db.[project-ref].supabase.co:5432/postgres
 
 # After (private)
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:5432/postgres
+
+# PgBouncer connection
+# Before (public)
+postgresql://user:pass@db.[project-ref].supabase.co:6543/postgres
+
+# After (private)
+postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:6543/postgres
 ```
 
-#### Step 7: Disable public connectivity (optional)
+### Step 7: Restrict public database access (optional)
 
-For maximum security, you can disable public internet access for your database:
+For maximum security, you can restrict public database access in your project settings:
 
-1. Contact Supabase support to disable public connectivity
-2. Ensure all applications are successfully using the private connection
-3. Update any monitoring or backup tools to use the private endpoint
+1. Go to [**Database** > **Settings**](/dashboard/project/_/database/settings)
+2. In **Network Restrictions**, enable **Restrict all access**
+3. Ensure all applications, monitoring, and backup tools are using the private endpoint before enabling this setting
 
-## Beta limitations
-
-During the beta phase:
+## Limitations
 
 - **Read Replicas**: To establish PrivateLink with a Read Replica, reach out to your account rep.
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
@@ -178,9 +189,3 @@ The PrivateLink endpoint is a layer 3 solution so behaves like a standard Postgr
 Ready to enhance your database security with PrivateLink? [Contact our Enterprise team](/contact/enterprise) to discuss your requirements and begin the setup process.
 
 Our support team will guide you through the configuration and ensure your private database connectivity meets your security and performance requirements.
-
-## Regional availability
-
-PrivateLink is not currently available in the following regions:
-
-- **eu-central-2 (Zurich)** - Expected availability: April 2026

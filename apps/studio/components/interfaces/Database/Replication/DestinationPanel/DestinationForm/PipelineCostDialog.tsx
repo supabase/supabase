@@ -1,0 +1,287 @@
+import { useParams } from 'common'
+import { useEffect, useMemo } from 'react'
+import {
+  Button,
+  Card,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import {
+  getTableCopyTargets,
+  summarizeTableCopyEstimate,
+  type ReplicationTableIdentity,
+  type TableSyncCopyConfig,
+} from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
+import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { useLatest } from '@/hooks/misc/useLatest'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes, formatCurrency } from '@/lib/helpers'
+
+const MAX_VISIBLE_TABLES = 10
+
+interface PipelineCostDialogProps {
+  open: boolean
+  isConfirming: boolean
+  publicationName?: string
+  publicationTables: ReplicationTableIdentity[]
+  tableSyncCopy?: TableSyncCopyConfig
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => void
+}
+
+/**
+ * Shows an estimate of what the pipeline will cost (one-time initial sync, hourly pipeline
+ * fee, and the ongoing replication rate).
+ *
+ * This should be a non-blocking enhancement - so if there's an error while fetching the
+ * pricing estimate, we skip this gate rather than block the user from creating pipeline
+ */
+export const PipelineCostDialog = ({
+  open,
+  isConfirming,
+  publicationName,
+  publicationTables,
+  tableSyncCopy,
+  onOpenChange,
+  onConfirm,
+}: PipelineCostDialogProps) => {
+  const { ref: projectRef } = useParams()
+  const sourceId = useReplicationSourceId({ projectRef })
+
+  const onConfirmRef = useLatest(onConfirm)
+
+  const {
+    data: estimate,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useReplicationCostEstimateQuery({ projectRef, sourceId, publicationName }, { enabled: open })
+
+  const copyTargets = useMemo(
+    () => getTableCopyTargets(publicationTables, tableSyncCopy),
+    [publicationTables, tableSyncCopy]
+  )
+  const copyEstimate = useMemo(
+    () =>
+      estimate === undefined
+        ? undefined
+        : summarizeTableCopyEstimate(estimate.table_copy.tables, copyTargets),
+    [copyTargets, estimate]
+  )
+  const tables = copyEstimate?.tables ?? []
+  const tableCount = publicationTables.length
+  const copyTableCount = copyTargets.length
+  const visibleTables = tables.slice(0, MAX_VISIBLE_TABLES)
+  const hiddenTableCount = tables.length - visibleTables.length
+  const hasRowFilteredTables = copyEstimate?.hasRowFilteredTables ?? false
+
+  const initialSyncTotal = copyEstimate?.estimatedCost ?? 0
+
+  useEffect(() => {
+    if (open && isError) onConfirmRef.current()
+  }, [open, isError, onConfirmRef])
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent size="large">
+        <DialogHeader>
+          <DialogTitle>Confirm to create and start pipeline</DialogTitle>
+          <DialogDescription>
+            Review the estimated costs before you create and start the pipeline.
+          </DialogDescription>
+        </DialogHeader>
+
+        <DialogSectionSeparator />
+
+        {/* Review these costs before you create and start the pipeline. */}
+        {isLoading || isError ? (
+          <DialogSection className="py-6">
+            <GenericSkeletonLoader className="w-full" />
+          </DialogSection>
+        ) : (
+          isSuccess &&
+          estimate && (
+            <>
+              <DialogSection className="flex flex-col gap-y-5">
+                <p className="text-sm text-foreground-light">
+                  This pipeline will replicate{' '}
+                  <span className="text-foreground">
+                    {tableCount} {tableCount === 1 ? 'table' : 'tables'}
+                  </span>
+                  {publicationName ? (
+                    <>
+                      {' '}
+                      from the{' '}
+                      <span className="text-foreground" translate="no">
+                        {publicationName}
+                      </span>{' '}
+                      publication
+                    </>
+                  ) : null}
+                  .
+                </p>
+
+                <div className="flex flex-col gap-y-2">
+                  <p className="text-sm font-medium text-foreground">Initial sync</p>
+                  <p className="text-xs text-foreground-lighter">
+                    Quick planning estimate using available source table information. Final usage is
+                    measured from the data successfully processed during initial sync.
+                  </p>
+
+                  {copyTableCount === 0 ? (
+                    <p className="text-sm text-foreground-light">
+                      No tables will run an initial sync. Ongoing replication will still process new
+                      changes for every publication table, with no initial sync charge.
+                    </p>
+                  ) : copyEstimate?.isComplete ? (
+                    <Card>
+                      <Table>
+                        <TableHeader className="[&_th]:h-auto [&_th]:py-2">
+                          <TableRow>
+                            <TableHead>Table</TableHead>
+                            <TableHead className="text-right">Est. volume</TableHead>
+                            <TableHead className="text-right" translate="no">
+                              Est. cost ({formatCurrency(estimate.table_copy.rate_per_gb)}/GB)
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody className="[&_td]:py-2">
+                          {visibleTables.map((table) => (
+                            <TableRow key={JSON.stringify([table.schema, table.name])}>
+                              <TableCell className="font-mono text-xs" translate="no">
+                                {table.schema}.{table.name}
+                              </TableCell>
+                              <TableCell className="text-right text-xs">
+                                {formatBytes(table.estimated_bytes)}
+                              </TableCell>
+                              <TableCell className="text-right font-mono text-xs" translate="no">
+                                {formatCurrency(table.estimated_cost)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          {hiddenTableCount > 0 && (
+                            <TableRow>
+                              <TableCell colSpan={3} className="text-xs text-foreground-lighter">
+                                +{hiddenTableCount} more{' '}
+                                {hiddenTableCount === 1 ? 'table' : 'tables'}
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                        <TableFooter>
+                          <TableRow>
+                            <TableCell className="py-2">Total</TableCell>
+                            <TableCell className="text-right py-2 text-xs">
+                              {formatBytes(copyEstimate.estimatedBytes)}
+                            </TableCell>
+                            <TableCell className="text-right py-2 font-mono" translate="no">
+                              {formatCurrency(copyEstimate.estimatedCost)}
+                            </TableCell>
+                          </TableRow>
+                        </TableFooter>
+                      </Table>
+                    </Card>
+                  ) : (
+                    <p className="text-sm text-foreground-light">
+                      An initial sync estimate is unavailable for one or more selected tables. You
+                      can still create the pipeline.
+                    </p>
+                  )}
+                </div>
+              </DialogSection>
+
+              <DialogSectionSeparator />
+
+              <DialogSection className="flex flex-col gap-y-5">
+                <div className="flex flex-col gap-y-2">
+                  <p className="text-sm font-medium text-foreground">Ongoing</p>
+                  <div className="flex items-center justify-between gap-x-4 text-sm">
+                    <span className="text-foreground-light">Configured pipeline</span>
+                    <span className="shrink-0 text-right font-mono text-foreground" translate="no">
+                      ${estimate.pipeline.hourly_cost}/hour
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-x-4 text-sm">
+                    <span className="text-foreground-light">
+                      Ongoing replication data processed
+                    </span>
+                    <span className="shrink-0 text-right font-mono text-foreground" translate="no">
+                      {formatCurrency(estimate.streaming.rate_per_gb)}/GB
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground-lighter">
+                    Ongoing replication is billed on Postgres row data accepted by the destination,
+                    so the total depends on how often your published data changes.
+                  </p>
+                  <p className="text-xs text-foreground-lighter">
+                    Destination-provider charges, such as BigQuery ingestion, storage, and compute,
+                    are separate. See{' '}
+                    <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
+                      how data processed is measured
+                    </InlineLink>
+                    .
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-y-2">
+                  <div className="flex items-center justify-between gap-x-6 rounded-md border bg-surface-100 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground">Estimated initial sync</p>
+                      <p className="text-xs text-foreground-lighter">
+                        Pipeline hours and ongoing replication are billed separately.
+                      </p>
+                    </div>
+                    <span
+                      className="shrink-0 text-right font-mono text-lg font-semibold text-foreground"
+                      translate="no"
+                    >
+                      {copyEstimate?.isComplete ? formatCurrency(initialSyncTotal) : 'Unavailable'}
+                      {copyEstimate?.isComplete && hasRowFilteredTables ? '*' : null}
+                    </span>
+                  </div>
+
+                  {copyEstimate?.isComplete && hasRowFilteredTables && (
+                    <p className="text-xs text-foreground-lighter">
+                      *Row filters can reduce the data processed compared with this estimate.
+                    </p>
+                  )}
+                </div>
+              </DialogSection>
+            </>
+          )
+        )}
+
+        <DialogFooter>
+          <Button variant="default" disabled={isConfirming} onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            loading={isConfirming}
+            disabled={isConfirming || isLoading || isError}
+            onClick={onConfirm}
+          >
+            Create and start pipeline
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

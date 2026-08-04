@@ -1,4 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
+import { safeSql } from '@supabase/pg-meta'
+import { describe, expect, it, vi } from 'vitest'
+
 import { transformStatementDataToRows } from './WithStatements.utils'
 
 vi.mock('../IndexAdvisor/index-advisor.utils', () => ({
@@ -12,13 +14,14 @@ vi.mock('../IndexAdvisor/index-advisor.utils', () => ({
 }))
 
 const makeRow = (overrides: Record<string, any> = {}) => ({
-  query: 'SELECT 1',
+  query: safeSql`SELECT 1`,
   rolname: 'postgres',
   calls: 10,
   mean_time: 5.0,
   min_time: 1.0,
   max_time: 20.0,
   total_time: 50.0,
+  prop_total_time: 0,
   rows_read: 100,
   cache_hit_rate: 0.95,
   index_advisor_result: null,
@@ -49,8 +52,18 @@ describe('transformStatementDataToRows', () => {
     })
   })
 
-  it('defaults missing numeric fields to 0', () => {
-    const data = [{ query: 'SELECT 1' }]
+  it('preserves zero-valued numeric fields as 0', () => {
+    const data = [
+      makeRow({
+        calls: 0,
+        mean_time: 0,
+        min_time: 0,
+        max_time: 0,
+        total_time: 0,
+        rows_read: 0,
+        cache_hit_rate: 0,
+      }),
+    ]
     const result = transformStatementDataToRows(data)
 
     expect(result).toHaveLength(1)
@@ -71,8 +84,8 @@ describe('transformStatementDataToRows', () => {
 
   it('calculates prop_total_time as percentage of total time', () => {
     const data = [
-      makeRow({ query: 'Q1', total_time: 75 }),
-      makeRow({ query: 'Q2', total_time: 25 }),
+      makeRow({ query: safeSql`Q1`, total_time: 75 }),
+      makeRow({ query: safeSql`Q2`, total_time: 25 }),
     ]
     const result = transformStatementDataToRows(data)
 
@@ -107,7 +120,7 @@ describe('transformStatementDataToRows', () => {
 
   describe('filterIndexAdvisor mode', () => {
     it('keeps rows for non-protected schema queries', () => {
-      const data = [makeRow({ query: 'SELECT * FROM public.users' })]
+      const data = [makeRow({ query: safeSql`SELECT * FROM public.users` })]
       const result = transformStatementDataToRows(data, true)
       expect(result).toHaveLength(1)
     })
@@ -115,7 +128,7 @@ describe('transformStatementDataToRows', () => {
     it('keeps protected-schema rows that have valid recommendations', () => {
       const data = [
         makeRow({
-          query: 'SELECT * FROM auth.users',
+          query: safeSql`SELECT * FROM auth.users`,
           index_advisor_result: { index_statements: ['CREATE INDEX ON auth.users (id)'] },
         }),
       ]
@@ -126,7 +139,7 @@ describe('transformStatementDataToRows', () => {
     it('filters out protected-schema rows with no valid recommendations', () => {
       const data = [
         makeRow({
-          query: 'SELECT * FROM auth.users',
+          query: safeSql`SELECT * FROM auth.users`,
           index_advisor_result: { _mock_filter_null: true },
         }),
       ]
@@ -137,7 +150,7 @@ describe('transformStatementDataToRows', () => {
     it('does not filter protected-schema rows when filterIndexAdvisor is false', () => {
       const data = [
         makeRow({
-          query: 'SELECT * FROM auth.users',
+          query: safeSql`SELECT * FROM auth.users`,
           index_advisor_result: { _mock_filter_null: true },
         }),
       ]

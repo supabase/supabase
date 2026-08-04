@@ -1,5 +1,5 @@
-import type { OrgSubscription, PlanId, ProjectSelectedAddon } from 'data/subscriptions/types'
-import { IS_PLATFORM } from 'lib/constants'
+import type { OrgSubscription, PlanId, ProjectSelectedAddon } from '@/data/subscriptions/types'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export const getAddons = (selectedAddons: ProjectSelectedAddon[]) => {
   const computeInstance = selectedAddons.find((addon) => addon.type === 'compute_instance')
@@ -22,8 +22,6 @@ export const billingPartnerLabel = (billingPartner?: string) => {
   if (!billingPartner) return billingPartner
 
   switch (billingPartner) {
-    case 'fly':
-      return 'Fly.io'
     case 'aws':
       return 'AWS'
     case 'vercel_marketplace':

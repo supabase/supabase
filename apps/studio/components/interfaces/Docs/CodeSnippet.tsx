@@ -1,8 +1,6 @@
-import { useParams } from 'common'
-import { SimpleCodeBlock } from 'ui'
+import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface CodeSnippetProps {
   selectedLang: 'bash' | 'js'
@@ -14,21 +12,12 @@ interface CodeSnippetProps {
 }
 
 const CodeSnippet = ({ selectedLang, snippet }: CodeSnippetProps) => {
-  const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const handleCopy = () => {
-    sendEvent({
-      action: 'api_docs_code_copy_button_clicked',
-      properties: {
-        title: snippet.title,
-        selectedLanguage: selectedLang,
-      },
-      groups: {
-        project: projectRef ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
+    track('api_docs_code_copy_button_clicked', {
+      title: snippet.title,
+      selectedLanguage: selectedLang,
     })
   }
 

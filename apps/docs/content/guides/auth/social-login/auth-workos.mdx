@@ -20,7 +20,7 @@ Visit the getting started page of the [WorkOS Dashboard](https://dashboard.worko
 - `WORKOS_CLIENT_ID`
 - `WORKOS_API_KEY`
 
-<Admonition type="tip">
+<Admonition type="note">
 
 You must be signed in to see these values.
 
@@ -73,7 +73,7 @@ When a user signs in, call `signInWithOAuth` with `workos` as the provider.
 
 ```javascript
 import { createClient } from '@supabase/supabase-js';
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>');
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...');
 const redirect = (url: string) => {}
 
 // ---cut---
@@ -94,7 +94,7 @@ async function signInWithWorkOS() {
 }
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 You can find your `connection_id` in the WorkOS dashboard under the Organizations tab. Select your organization and then click View connection.
 

@@ -1,17 +1,18 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useParams } from 'common'
 import { Auth } from 'icons'
 import { Loader2 } from 'lucide-react'
-import { useParams } from 'common'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { useMemo } from 'react'
+
 import {
-  SkeletonResults,
   EmptyState,
   ResultsList,
+  SkeletonResults,
   type SearchResult,
 } from './ContextSearchResults.shared'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PolicySearchResultsProps {
   query: string
@@ -140,14 +141,14 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
           getRoute={(result) => {
             const policy = policies?.find((p) => String(p.id) === result.id)
             if (!policy || !projectRef)
-              return `/project/${projectRef}/auth/policies` as `/${string}`
+              return `/project/${projectRef}/database/policies` as `/${string}`
 
             const params = new URLSearchParams()
             params.set('edit', String(policy.id))
             if (policy.schema) {
               params.set('schema', policy.schema)
             }
-            return `/project/${projectRef}/auth/policies?${params.toString()}` as `/${string}`
+            return `/project/${projectRef}/database/policies?${params.toString()}` as `/${string}`
           }}
           className="pb-9"
         />

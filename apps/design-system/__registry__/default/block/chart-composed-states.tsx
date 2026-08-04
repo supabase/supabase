@@ -1,18 +1,18 @@
 'use client'
 
 import { BarChart2, ExternalLink } from 'lucide-react'
+import { Badge, CriticalIcon } from 'ui'
 import {
   Chart,
-  ChartCard,
-  ChartHeader,
-  ChartTitle,
   ChartActions,
+  ChartCard,
   ChartContent,
-  ChartEmptyState,
-  ChartLoadingState,
   ChartDisabledState,
+  ChartEmptyState,
+  ChartHeader,
+  ChartLoadingState,
+  ChartTitle,
 } from 'ui-patterns/Chart'
-import { Badge } from 'ui'
 
 export default function ChartComposedStates() {
   const actions = [
@@ -41,6 +41,35 @@ export default function ChartComposedStates() {
             <ChartActions actions={actions} />
           </ChartHeader>
           <ChartContent loadingState={<ChartLoadingState />}>My chart here...</ChartContent>
+        </ChartCard>
+      </Chart>
+
+      <Chart isErrored={true}>
+        <ChartCard>
+          <ChartHeader>
+            <ChartTitle tooltip="This is a tooltip">Response Errors</ChartTitle>
+            <ChartActions actions={actions} />
+          </ChartHeader>
+          <ChartContent
+            isEmpty={true}
+            errorState={
+              <ChartEmptyState
+                icon={<CriticalIcon />}
+                title="Some error happened"
+                description="Error happened why trying to fetch data. Please try again later."
+              />
+            }
+            emptyState={
+              <ChartEmptyState
+                icon={<BarChart2 size={20} />}
+                title="No data to show"
+                description="It may take up to 24 hours for data to refresh"
+              />
+            }
+            loadingState={<ChartLoadingState />}
+          >
+            My chart here...
+          </ChartContent>
         </ChartCard>
       </Chart>
 

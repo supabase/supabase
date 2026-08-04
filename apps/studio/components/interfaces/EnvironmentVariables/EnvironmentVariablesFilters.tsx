@@ -54,7 +54,7 @@ export const EnvironmentVariablesFilters = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" size="small" iconRight={<ChevronDown size={14} />}>
+          <Button variant="default" size="small" iconRight={<ChevronDown size={14} />}>
             {SCOPE_LABELS[scopeFilter]}
           </Button>
         </DropdownMenuTrigger>
@@ -74,15 +74,17 @@ export const EnvironmentVariablesFilters = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" size="small" icon={<ArrowUpDown size={14} />} iconRight={<ChevronDown size={14} />}>
+          <Button
+            variant="default"
+            size="small"
+            icon={<ArrowUpDown size={14} />}
+            iconRight={<ChevronDown size={14} />}
+          >
             {SORT_LABELS[sort]}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end">
-          <DropdownMenuRadioGroup
-            value={sort}
-            onValueChange={(v) => onSortChange(v as SortOption)}
-          >
+          <DropdownMenuRadioGroup value={sort} onValueChange={(v) => onSortChange(v as SortOption)}>
             {Object.entries(SORT_LABELS).map(([value, label]) => (
               <DropdownMenuRadioItem key={value} value={value}>
                 {label}

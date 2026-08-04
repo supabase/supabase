@@ -15,7 +15,7 @@ export default function AlertDialogDestructive() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="danger">Show Alert Dialog</Button>
+        <Button variant="danger">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getDefaultHeadersByType,
   getHeadersSectionDescription,
   HEADER_VALIDATION_ERRORS,
+  headerRecordToRows,
+  headerRowsToRecord,
+  logDrainHeaderEntriesSchema,
   otlpConfigSchema,
-  validateNewHeader,
 } from './LogDrains.utils'
 
 describe('getHeadersSectionDescription', () => {
@@ -32,87 +35,130 @@ describe('getHeadersSectionDescription', () => {
   })
 })
 
-describe('validateNewHeader', () => {
-  describe('valid cases', () => {
-    it('accepts valid header with empty existing headers', () => {
-      const result = validateNewHeader({}, { name: 'Authorization', value: 'Bearer token' })
-      expect(result.valid).toBe(true)
-      expect(result.error).toBeUndefined()
-    })
+describe('getDefaultHeadersByType', () => {
+  it('does not return a default Content-Type header for webhook destinations', () => {
+    expect(getDefaultHeadersByType('webhook')).toEqual({})
+  })
 
-    it('accepts valid header with existing headers', () => {
-      const existingHeaders = {
-        'Content-Type': 'application/json',
-        'X-Custom': 'value',
-      }
-      const result = validateNewHeader(existingHeaders, {
-        name: 'Authorization',
-        value: 'Bearer token',
-      })
-      expect(result.valid).toBe(true)
-      expect(result.error).toBeUndefined()
+  it('returns the protobuf content type header for OTLP destinations', () => {
+    expect(getDefaultHeadersByType('otlp')).toEqual({
+      'Content-Type': 'application/x-protobuf',
     })
   })
 
-  describe('validation errors', () => {
-    it('rejects when 20 headers already exist', () => {
-      const existingHeaders = Object.fromEntries(
-        Array.from({ length: 20 }, (_, i) => [`Header-${i}`, `value-${i}`])
-      )
-      const result = validateNewHeader(existingHeaders, { name: 'New-Header', value: 'value' })
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe(HEADER_VALIDATION_ERRORS.MAX_LIMIT)
-    })
+  it('returns an empty object for destinations without default headers', () => {
+    expect(getDefaultHeadersByType('loki')).toEqual({})
+    expect(getDefaultHeadersByType('datadog')).toEqual({})
+  })
+})
 
-    it('rejects duplicate header names', () => {
-      const existingHeaders = {
+describe('headerRecordToRows', () => {
+  it('converts a header record into key/value rows', () => {
+    expect(
+      headerRecordToRows({
+        Authorization: 'Bearer token',
         'Content-Type': 'application/json',
-        Authorization: 'Bearer old-token',
-      }
-      const result = validateNewHeader(existingHeaders, {
-        name: 'Authorization',
-        value: 'Bearer new-token',
       })
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe(HEADER_VALIDATION_ERRORS.DUPLICATE)
-    })
+    ).toEqual([
+      { key: 'Authorization', value: 'Bearer token' },
+      { key: 'Content-Type', value: 'application/json' },
+    ])
+  })
 
-    it('rejects header with empty name', () => {
-      const result = validateNewHeader({}, { name: '', value: 'some-value' })
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe(HEADER_VALIDATION_ERRORS.REQUIRED)
-    })
+  it('returns an empty array for empty header records', () => {
+    expect(headerRecordToRows({})).toEqual([])
+  })
+})
 
-    it('rejects header with empty value', () => {
-      const result = validateNewHeader({}, { name: 'Some-Header', value: '' })
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe(HEADER_VALIDATION_ERRORS.REQUIRED)
-    })
-
-    it('rejects header with both empty name and value', () => {
-      const result = validateNewHeader({}, { name: '', value: '' })
-      expect(result.valid).toBe(false)
-      expect(result.error).toBe(HEADER_VALIDATION_ERRORS.REQUIRED)
+describe('headerRowsToRecord', () => {
+  it('converts key/value rows back into a header record', () => {
+    expect(
+      headerRowsToRecord([
+        { key: 'Authorization', value: 'Bearer token' },
+        { key: 'Content-Type', value: 'application/json' },
+      ])
+    ).toEqual({
+      Authorization: 'Bearer token',
+      'Content-Type': 'application/json',
     })
   })
 
-  describe('edge cases', () => {
-    it('allows exactly 19 existing headers', () => {
-      const existingHeaders = Object.fromEntries(
-        Array.from({ length: 19 }, (_, i) => [`Header-${i}`, `value-${i}`])
-      )
-      const result = validateNewHeader(existingHeaders, { name: 'New-Header', value: 'value' })
-      expect(result.valid).toBe(true)
+  it('trims row values and skips incomplete rows', () => {
+    expect(
+      headerRowsToRecord([
+        { key: ' Authorization ', value: ' Bearer token ' },
+        { key: '', value: 'missing-key' },
+        { key: 'X-Skip', value: '' },
+      ])
+    ).toEqual({
+      Authorization: 'Bearer token',
     })
+  })
+})
 
-    it('is case-sensitive for duplicate checking', () => {
-      const existingHeaders = { authorization: 'bearer token' }
-      const result = validateNewHeader(existingHeaders, {
-        name: 'Authorization',
-        value: 'Bearer token',
-      })
-      expect(result.valid).toBe(true)
-    })
+describe('logDrainHeaderEntriesSchema', () => {
+  it('accepts fully empty draft rows', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([
+      { key: 'Content-Type', value: 'application/json' },
+      { key: '', value: '' },
+    ])
+
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects rows with a key but no value', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([{ key: 'X-Draft-Only', value: '' }])
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: HEADER_VALIDATION_ERRORS.VALUE_REQUIRED,
+            path: [0, 'value'],
+          }),
+        ])
+      )
+    }
+  })
+
+  it('rejects rows with a value but no key', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([{ key: '', value: 'draft-value' }])
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: HEADER_VALIDATION_ERRORS.KEY_REQUIRED,
+            path: [0, 'key'],
+          }),
+        ])
+      )
+    }
+  })
+
+  it('still rejects duplicate completed header names', () => {
+    const result = logDrainHeaderEntriesSchema.safeParse([
+      { key: 'Content-Type', value: 'application/json' },
+      { key: 'Content-Type', value: 'application/custom' },
+    ])
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'Header name already exists',
+            path: [0, 'key'],
+          }),
+          expect.objectContaining({
+            message: 'Header name already exists',
+            path: [1, 'key'],
+          }),
+        ])
+      )
+    }
   })
 })
 
@@ -221,6 +267,18 @@ describe('otlpConfigSchema', () => {
       }
       const result = otlpConfigSchema.safeParse(config)
       expect(result.success).toBe(false)
+    })
+
+    it('rejects endpoint with an incomplete hostname', () => {
+      const config = {
+        type: 'otlp' as const,
+        endpoint: 'https://webhook',
+      }
+      const result = otlpConfigSchema.safeParse(config)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain('must be a valid URL')
+      }
     })
 
     it('rejects wrong type field', () => {

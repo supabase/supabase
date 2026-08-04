@@ -1,0 +1,142 @@
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { useMemo } from 'react'
+
+import { type BannerId } from '@/components/ui/BannerStack/BannerStackProvider'
+
+export type FeaturePreview = {
+  key: string
+  name: string
+  discussionsUrl?: string
+  isNew: boolean
+  /** If feature flag is only relevant for the hosted platform */
+  isPlatformOnly: boolean
+  /** If feature flag should be enabled by default for users, if not yet toggled before */
+  isDefaultOptIn: boolean
+  /** Visibility in the feature preview modal (For feature flagging a feature preview) */
+  enabled: boolean
+  /** Optional category that the feature preview falls under, defaults to "Others" in the UI otherwise */
+  category?: 'observability' | 'database'
+  /**
+   * Where to send the user after enabling, to try the feature out. Omit if the
+   * feature has no single destination (e.g. a global layout change).
+   */
+  getRoute?: (ref?: string) => string
+  bannerId?: BannerId
+}
+
+export const useFeaturePreviews = (): FeaturePreview[] => {
+  const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
+  const jitDbAccessEnabled = useFlag('jitDbAccess')
+  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isSqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
+  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
+
+  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
+
+  return useMemo(() => {
+    const previews: FeaturePreview[] = [
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
+        name: 'Updated Logs interface',
+        category: 'observability',
+        discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
+        enabled: true,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: unifiedLogsDefaultOptIn,
+        getRoute: (ref?: string) => `/project/${ref}/logs`,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
+        name: 'Disable Advisor rules',
+        discussionsUrl: undefined,
+        enabled: true,
+        isNew: false,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        getRoute: (ref?: string) => `/project/${ref}/advisors/rules/security`,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
+        name: 'PG Delta Diff',
+        discussionsUrl: undefined,
+        isNew: false,
+        isPlatformOnly: true,
+        isDefaultOptIn: true,
+        enabled: true,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS,
+        name: 'Platform webhooks',
+        discussionsUrl: undefined,
+        isNew: false,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        enabled: isPlatformWebhooksEnabled,
+        getRoute: (ref?: string) => `/project/${ref}/settings/webhooks`,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
+        name: 'Temporary database access',
+        category: 'database',
+        discussionsUrl: undefined,
+        isNew: false,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        enabled: jitDbAccessEnabled,
+        getRoute: (ref?: string) => `/project/${ref}/database/settings`,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
+        name: 'Column-level privileges',
+        category: 'database',
+        discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
+        enabled: true,
+        isNew: false,
+        isPlatformOnly: false,
+        isDefaultOptIn: false,
+        getRoute: (ref?: string) => `/project/${ref}/database/column-privileges`,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+        name: 'One-Click Integrations',
+        discussionsUrl: undefined,
+        enabled: isMarketplaceEnabled,
+        isNew: true,
+        isPlatformOnly: false,
+        isDefaultOptIn: true,
+        getRoute: (ref?: string) => `/project/${ref}/integrations`,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
+        name: 'Disable snippet auto-saving',
+        discussionsUrl: undefined,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+        enabled: isSqlEditorManualSaveEnabled,
+      },
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
+        name: 'Diagnose blocked queries',
+        category: 'observability',
+        discussionsUrl: 'https://github.com/orgs/supabase/discussions/48639',
+        isNew: true,
+        isPlatformOnly: false,
+        isDefaultOptIn: false,
+        enabled: isDatabaseConnectionsEnabled,
+        getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
+        bannerId: 'database-connections-banner',
+      },
+    ]
+
+    return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
+  }, [
+    unifiedLogsDefaultOptIn,
+    isPlatformWebhooksEnabled,
+    jitDbAccessEnabled,
+    isMarketplaceEnabled,
+    isSqlEditorManualSaveEnabled,
+    isDatabaseConnectionsEnabled,
+  ])
+}

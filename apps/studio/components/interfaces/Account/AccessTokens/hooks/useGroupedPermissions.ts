@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
+
 import { ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
-import { getRealAccess, formatAccessText } from '../AccessToken.utils'
+import { formatAccessText, getRealAccess } from '../AccessToken.utils'
 
 export const useGroupedPermissions = (tokenPermissions: string[] | undefined) => {
   const groupedPermissions = useMemo(() => {

@@ -3,16 +3,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
 import { toast } from 'sonner'
-
-import {
-  IntegrationConnection,
-  IntegrationConnectionProps,
-} from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Button,
   DropdownMenu,
@@ -23,13 +13,23 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import {
+  IntegrationConnection,
+  IntegrationConnectionProps,
+} from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useIntegrationsVercelConnectionSyncEnvsMutation } from '@/data/integrations/integrations-vercel-connection-sync-envs-mutation'
+import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
 export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ disabled, onDeleteConnection, ...props }, ref) => {
+  ({ disabled, onDeleteConnection, ...props }, _ref) => {
     const router = useRouter()
     const { data: org } = useSelectedOrganizationQuery()
 
@@ -80,7 +80,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
               <ButtonTooltip
                 disabled
                 iconRight={<ChevronDown size={14} />}
-                type="default"
+                variant="default"
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -97,7 +97,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<ChevronDown size={14} />} type="default">
+                  <Button iconRight={<ChevronDown size={14} />} variant="default">
                     <span>Manage</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -155,8 +155,9 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
           loading={isDeleting}
         >
           <p className="text-sm text-foreground-light">
-            Deleting this GitHub connection will stop automatic creation and merging of preview
-            branches. Existing preview branches will remain unchanged.
+            {type === 'Vercel'
+              ? 'Deleting this Vercel connection will stop syncing environment variables to your Vercel project. Existing environment variables will remain unchanged.'
+              : 'Deleting this GitHub connection will stop automatic creation and merging of preview branches. Existing preview branches will remain unchanged.'}
           </p>
         </ConfirmationModal>
       </>

@@ -1,15 +1,17 @@
 import { SparklesIcon } from '@heroicons/react/outline'
+
 import { Article } from '../../types'
 
 const ProductButton = (props: Article) => {
   return (
     <div className="mr-2 mb-2 inline-block">
       <button
+        tabIndex={0}
         className=" 
                 text-brand-600
                 hover:bg-surface-100 flex items-start gap-3 rounded-md border bg-transparent p-3 
                 px-6 transition
-                drop-shadow-sm"
+                drop-shadow-xs"
       >
         <div className="w-6">
           <SparklesIcon strokeWidth={1} />

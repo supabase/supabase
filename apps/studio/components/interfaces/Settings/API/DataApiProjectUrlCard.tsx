@@ -1,8 +1,9 @@
 import { useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { useEffect, useEffectEvent } from 'react'
+import { Alert, AlertTitle } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
   PageSectionAside,
@@ -11,18 +12,16 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
-import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 
 export const DataApiProjectUrlCard = () => {
   const { isPending: isLoading } = useSelectedProjectQuery()
@@ -31,7 +30,7 @@ export const DataApiProjectUrlCard = () => {
 
   const [querySource, setQuerySource] = useQueryState('source', parseAsString)
 
-  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+  const { data: resolvedEndpoint } = useProjectApiUrl({ projectRef })
   const {
     data: databases,
     isError,
@@ -39,14 +38,14 @@ export const DataApiProjectUrlCard = () => {
   } = useReadReplicasQuery({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
 
-  const syncSelectedDb = useStaticEffectEvent(() => {
+  const syncSelectedDb = useEffectEvent(() => {
     if (querySource && querySource !== state.selectedDatabaseId) {
       state.setSelectedDatabaseId(querySource)
     }
   })
   useEffect(() => {
     syncSelectedDb()
-  }, [syncSelectedDb, querySource, projectRef])
+  }, [querySource, projectRef])
 
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
   const loadBalancerSelected = state.selectedDatabaseId === 'load-balancer'
@@ -55,7 +54,7 @@ export const DataApiProjectUrlCard = () => {
   const endpoint = getApiEndpoint({
     selectedDatabaseId: state.selectedDatabaseId,
     projectRef,
-    customDomainData,
+    resolvedEndpoint,
     loadBalancers,
     selectedDatabase,
   })
@@ -93,10 +92,10 @@ export const DataApiProjectUrlCard = () => {
             <ShimmeringLoader className="w-3/4" delayIndex={1} />
           </div>
         ) : isError ? (
-          <Alert_Shadcn_ variant="destructive">
+          <Alert variant="destructive">
             <AlertCircle size={16} />
-            <AlertTitle_Shadcn_>Failed to retrieve project URL</AlertTitle_Shadcn_>
-          </Alert_Shadcn_>
+            <AlertTitle>Failed to retrieve project URL</AlertTitle>
+          </Alert>
         ) : (
           <Input copy readOnly className="font-mono" value={endpoint} />
         )}

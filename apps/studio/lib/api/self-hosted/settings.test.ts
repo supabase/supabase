@@ -6,9 +6,10 @@ vi.mock('./util', () => ({
   assertSelfHosted: vi.fn(),
 }))
 
-vi.mock('lib/constants/api', () => ({
+vi.mock('@/lib/constants/api', () => ({
   PROJECT_ENDPOINT: 'localhost:8000',
   PROJECT_ENDPOINT_PROTOCOL: 'http',
+  PROJECT_DB_HOST: 'localhost',
 }))
 
 describe('api/self-hosted/settings', () => {
@@ -50,7 +51,7 @@ describe('api/self-hosted/settings', () => {
       expect(settings.db_port).toBe(5432)
       expect(settings.db_user).toBe('postgres')
       expect(settings.ref).toBe('default')
-      expect(settings.region).toBe('ap-southeast-1')
+      expect(settings.region).toBe('local')
       expect(settings.status).toBe('ACTIVE_HEALTHY')
       expect(settings.ssl_enforced).toBe(false)
     })
@@ -70,10 +71,10 @@ describe('api/self-hosted/settings', () => {
       const settings = getProjectSettings()
 
       expect(settings.service_api_keys).toHaveLength(2)
-      expect(settings.service_api_keys[0].name).toBe('service_role key')
-      expect(settings.service_api_keys[0].tags).toBe('service_role')
-      expect(settings.service_api_keys[1].name).toBe('anon key')
-      expect(settings.service_api_keys[1].tags).toBe('anon')
+      expect(settings.service_api_keys[0].name).toBe('anon key')
+      expect(settings.service_api_keys[0].tags).toBe('anon')
+      expect(settings.service_api_keys[1].name).toBe('service_role key')
+      expect(settings.service_api_keys[1].tags).toBe('service_role')
     })
 
     it('should use environment variables when set', async () => {
@@ -90,8 +91,8 @@ describe('api/self-hosted/settings', () => {
 
       expect(settings.jwt_secret).toBe('custom-jwt-secret-with-at-least-32-chars')
       expect(settings.name).toBe('My Custom Project')
-      expect(settings.service_api_keys[0].api_key).toBe('custom-service-key')
-      expect(settings.service_api_keys[1].api_key).toBe('custom-anon-key')
+      expect(settings.service_api_keys[0].api_key).toBe('custom-anon-key')
+      expect(settings.service_api_keys[1].api_key).toBe('custom-service-key')
     })
 
     it('should use default JWT secret when not set', async () => {

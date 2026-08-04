@@ -1,10 +1,14 @@
-import { diffRemoteAuthConfig, diffRemotePostgrestConfig, type PromotableConfigChange } from '@supabase-dx/config'
+import {
+  diffRemoteAuthConfig,
+  diffRemotePostgrestConfig,
+  type PromotableConfigChange,
+} from '@supabase-dx/config'
 import { ArrowRight, Wind } from 'lucide-react'
 import { useMemo } from 'react'
 import { Badge, Skeleton } from 'ui'
 
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined || value === '') return '(not set)'
@@ -29,8 +33,9 @@ export const EnvironmentVariablesDiffPanel = ({
   })
   const { data: branchPostgrest, isPending: isBranchPostgrestPending } =
     useProjectPostgrestConfigQuery({ projectRef: branchRef })
-  const { data: mainPostgrest, isPending: isMainPostgrestPending } =
-    useProjectPostgrestConfigQuery({ projectRef: parentProjectRef })
+  const { data: mainPostgrest, isPending: isMainPostgrestPending } = useProjectPostgrestConfigQuery(
+    { projectRef: parentProjectRef }
+  )
 
   const isLoading =
     isBranchAuthPending || isMainAuthPending || isBranchPostgrestPending || isMainPostgrestPending
@@ -90,15 +95,22 @@ export const EnvironmentVariablesDiffPanel = ({
               className="flex items-center gap-4 px-4 py-3 bg-surface-100 hover:bg-surface-200 transition-colors"
             >
               {/* Key */}
-              <p className="font-mono text-xs text-foreground w-64 shrink-0 truncate" title={`${diff.section}.${diff.key}`}>
+              <p
+                className="font-mono text-xs text-foreground w-64 shrink-0 truncate"
+                title={`${diff.section}.${diff.key}`}
+              >
                 {diff.section}.{diff.key}
               </p>
 
               {/* Before → After */}
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <Badge variant="warning" className="font-mono truncate max-w-[180px]">{from}</Badge>
+                <Badge variant="warning" className="font-mono truncate max-w-[180px]">
+                  {from}
+                </Badge>
                 <ArrowRight size={12} className="text-foreground-muted shrink-0" />
-                <Badge variant="success" className="font-mono truncate max-w-[180px]">{to}</Badge>
+                <Badge variant="success" className="font-mono truncate max-w-[180px]">
+                  {to}
+                </Badge>
               </div>
             </div>
           )

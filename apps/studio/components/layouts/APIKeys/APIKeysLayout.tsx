@@ -1,10 +1,10 @@
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { ScaffoldContainer } from 'components/layouts/Scaffold'
+import { useParams } from 'common'
 import { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 
 const ApiKeysLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef } = useParams()

@@ -1,21 +1,10 @@
 import { useParams } from 'common'
-import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
-import { cleanPointerEventsNoneOnBody, isAtBottom } from 'lib/helpers'
-import { createNavigationHandler } from 'lib/navigation'
-import { isGreaterThanOrEqual } from 'lib/semver'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { MouseEvent, UIEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { LoadingLine, Sheet, SheetContent } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { LoadingLine } from 'ui'
 
 import { formatCronJobColumns } from './CronJobs.utils'
 import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
@@ -23,6 +12,15 @@ import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
 import { CronJobsTabHeader } from './CronJobsTab.Header'
 import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { DeleteCronJob } from './DeleteCronJob'
+import { CreateCronJobSheet } from '@/components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
+import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
+import { createNavigationHandler } from '@/lib/navigation'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
 
@@ -30,11 +28,10 @@ export const CronjobsTab = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
-  const [isDirty, setIsDirty] = useState(false)
   const [search, setSearch] = useState(searchQuery)
 
   const handleSearchSubmit = () => {
@@ -62,65 +59,45 @@ export const CronjobsTab = () => {
 
   const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
 
-  const { data: extensions = [] } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const pgCronExtension = extensions.find((ext) => ext.name === 'pg_cron')
-  const supportsSeconds = pgCronExtension?.installed_version
-    ? isGreaterThanOrEqual(pgCronExtension.installed_version, '1.5')
-    : false
-
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const columns = useMemo(
     () =>
       formatCronJobColumns({
         onSelectEdit: (job: CronJob) => {
-          sendEvent({
-            action: 'cron_job_update_clicked',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('cron_job_update_clicked')
           setCronJobForEditing(job.jobid.toString())
         },
         onSelectDelete: (job: CronJob) => {
-          sendEvent({
-            action: 'cron_job_delete_clicked',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('cron_job_delete_clicked')
           setCronJobForDeletion(job.jobid.toString())
         },
       }),
-    [org?.slug, ref, sendEvent, setCronJobForEditing, setCronJobForDeletion]
+    [track, setCronJobForEditing, setCronJobForDeletion]
   )
 
-  const xScroll = useRef<number>(0)
-
-  const handleScroll = (event: UIEvent<HTMLDivElement>) => {
-    const isScrollingHorizontally = xScroll.current !== event.currentTarget.scrollLeft
-    xScroll.current = event.currentTarget.scrollLeft
-
-    if (
-      grid.isLoading ||
-      grid.isFetchingNextPage ||
-      isScrollingHorizontally ||
-      !isAtBottom(event) ||
-      !grid.hasNextPage
-    ) {
-      return
-    }
-
-    grid.fetchNextPage()
-  }
+  const handleScroll = useInfiniteScroll({
+    isLoading: grid.isLoading,
+    isFetchingNextPage: grid.isFetchingNextPage,
+    hasNextPage: grid.hasNextPage,
+    fetchNextPage: grid.fetchNextPage,
+  })
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({
-      action: 'cron_job_create_clicked',
-      groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('cron_job_create_clicked')
     setCreateCronJobSheetShown(true)
   }
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search cron jobs' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleClearSearch)
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, onOpenCreateJobSheet, { label: 'Create cron job' })
 
   // Row click handler
   const handleRowClick = (row: CronJob, event: MouseEvent<HTMLDivElement>) => {
@@ -129,10 +106,7 @@ export const CronjobsTab = () => {
       jobname || `Job #${jobid}`
     )}`
 
-    sendEvent({
-      action: 'cron_job_history_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('cron_job_history_clicked')
 
     createNavigationHandler(url, router)(event)
   }
@@ -142,13 +116,6 @@ export const CronjobsTab = () => {
     setCreateCronJobSheetShown(false)
     cleanPointerEventsNoneOnBody(500)
   }
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setIsDirty(false)
-      onClose()
-    },
-  })
 
   useEffect(() => {
     if (grid.isSuccess && !!cronJobIdForEditing && !cronJobForEditing) {
@@ -164,6 +131,7 @@ export const CronjobsTab = () => {
           <CronJobsTabHeader
             search={search}
             isRefreshing={grid.isRefetching && !grid.isFetchingNextPage}
+            searchInputRef={searchInputRef}
             onSearchChange={setSearch}
             onSearchSubmit={handleSearchSubmit}
             onClearSearch={handleClearSearch}
@@ -192,18 +160,11 @@ export const CronjobsTab = () => {
 
       <DeleteCronJob />
 
-      <Sheet open={!!createCronJobSheetShown || !!cronJobForEditing} onOpenChange={confirmOnClose}>
-        <SheetContent size="default" tabIndex={undefined}>
-          <CreateCronJobSheet
-            selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
-            supportsSeconds={supportsSeconds}
-            onDirty={setIsDirty}
-            onClose={onClose}
-            onCloseWithConfirmation={confirmOnClose}
-          />
-        </SheetContent>
-      </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <CreateCronJobSheet
+        open={!!createCronJobSheetShown || !!cronJobForEditing}
+        selectedCronJob={cronJobForEditing ?? EMPTY_CRON_JOB}
+        onClose={onClose}
+      />
     </>
   )
 }
@@ -227,20 +188,4 @@ const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
       `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`
     )}
   </div>
-)
-
-// Confirmation modal for unsaved changes
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
 )

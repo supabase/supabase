@@ -1,17 +1,23 @@
+import * as Sentry from '@sentry/nextjs'
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { ResponseError } from 'types'
-import apiWrapper from './apiWrapper'
-import { apiAuthenticate } from './apiAuthenticate'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('lib/constants', () => ({
+import { apiAuthenticate } from './apiAuthenticate'
+import { apiWrapper } from './apiWrapper'
+import { ResponseError } from '@/types'
+
+vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: true,
   API_URL: 'https://api.example.com',
 }))
 
 vi.mock('./apiAuthenticate', () => ({
   apiAuthenticate: vi.fn(),
+}))
+
+vi.mock('@sentry/nextjs', () => ({
+  captureException: vi.fn(),
 }))
 
 describe('apiWrapper', () => {
@@ -57,5 +63,15 @@ describe('apiWrapper', () => {
     await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: true })
     expect(mockRes.status).toHaveBeenCalledWith(401)
     expect(mockHandler).not.toHaveBeenCalled()
+  })
+
+  it('should report to Sentry and return 500 when the handler throws', async () => {
+    const mockError = new Error('boom')
+    mockHandler.mockRejectedValue(mockError)
+
+    await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: false })
+    expect(Sentry.captureException).toHaveBeenCalledWith(mockError)
+    expect(mockRes.status).toHaveBeenCalledWith(500)
+    expect(mockRes.json).toHaveBeenCalledWith({ error: mockError })
   })
 })

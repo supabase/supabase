@@ -1,11 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Code, Edit2, Eye, EyeOff, Lock, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -16,10 +15,11 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-  cn,
 } from 'ui'
 
 import type { EnvironmentVariable } from './EnvironmentVariables.types'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 function getScopeLabel(variable: EnvironmentVariable): string {
   if (variable.category === 'platform') return 'Production'
@@ -72,12 +72,16 @@ const EnvironmentVariableRow = ({
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-mono text-sm">{variable.name}</p>
             {variable.isSecret && (
-              <Badge variant="default" className="shrink-0">Sensitive</Badge>
+              <Badge variant="default" className="shrink-0">
+                Sensitive
+              </Badge>
             )}
             {variable.hasEnvVar === false && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Badge variant="destructive" className="shrink-0">No env var</Badge>
+                  <Badge variant="destructive" className="shrink-0">
+                    No env var
+                  </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="top">
                   This config value has no backing env var in the env server
@@ -87,7 +91,9 @@ const EnvironmentVariableRow = ({
             {variable.hasConfig === false && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Badge variant="default" className="shrink-0 !text-foreground-lighter">No config</Badge>
+                  <Badge variant="default" className="shrink-0 !text-foreground-lighter">
+                    No config
+                  </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="top">
                   This env var has no corresponding platform config mapping
@@ -103,7 +109,7 @@ const EnvironmentVariableRow = ({
       <TableCell className="w-72">
         <div className="flex items-center gap-2">
           <Button
-            type="text"
+            variant="text"
             className={cn(
               'px-1 h-6 text-foreground-light hover:text-foreground shrink-0',
               !variable.isSecret && 'invisible'
@@ -141,7 +147,7 @@ const EnvironmentVariableRow = ({
             <DropdownMenuTrigger asChild>
               <Button
                 aria-label="More options"
-                type="text"
+                variant="text"
                 className="px-1"
                 icon={<MoreVertical size={14} />}
               />
@@ -149,7 +155,7 @@ const EnvironmentVariableRow = ({
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem asChild>
                 <ButtonTooltip
-                  type="text"
+                  variant="text"
                   icon={<Edit2 size={14} />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}
@@ -169,7 +175,7 @@ const EnvironmentVariableRow = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <ButtonTooltip
-                  type="text"
+                  variant="text"
                   icon={<Trash size={14} className="group-[&:not(:disabled)]:text-destructive" />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}

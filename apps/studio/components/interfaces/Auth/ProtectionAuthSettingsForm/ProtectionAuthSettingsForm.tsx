@@ -1,39 +1,27 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
-import { boolean, number, object, string } from 'yup'
-
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
   Card,
   CardContent,
   CardFooter,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -42,37 +30,81 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 
 const CAPTCHA_PROVIDERS = [
   { key: 'hcaptcha', label: 'hCaptcha' },
   { key: 'turnstile', label: 'Turnstile by Cloudflare' },
 ]
 
-const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
-  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
-  SECURITY_CAPTCHA_ENABLED: boolean().required(),
-  SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) => schema.required('Must have a Captcha secret'),
-  }),
-  SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
-    is: true,
-    then: (schema) =>
-      schema
-        .oneOf(['hcaptcha', 'turnstile'])
-        .required('Captcha provider must be either hcaptcha or turnstile'),
-  }),
-  SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
-  SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
-  SESSIONS_SINGLE_PER_USER: boolean(),
-  PASSWORD_MIN_LENGTH: number().min(6, 'Must be greater or equal to 6.'),
-  PASSWORD_REQUIRED_CHARACTERS: string(),
-  PASSWORD_HIBP_ENABLED: boolean(),
+type CaptchaProviders = 'hcaptcha' | 'turnstile'
+
+const baseSchema = z.object({
+  DISABLE_SIGNUP: z.boolean(),
+  EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
+  SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
+  SITE_URL: z.string().min(1, 'Must have a Site URL'),
+  SESSIONS_TIMEBOX: z
+    .preprocess(
+      (val) => (val === '' || val == null ? undefined : val),
+      z.coerce
+        .number({
+          required_error: 'Must have a sessions timebox',
+          invalid_type_error: 'Must have a sessions timebox',
+        })
+        .min(0, 'Must be greater than or equal to 0.')
+    )
+    .optional(),
+  SESSIONS_INACTIVITY_TIMEOUT: z.number().min(0, 'Must be greater than or equal to 0').optional(),
+  SESSIONS_SINGLE_PER_USER: z.boolean().optional(),
+  PASSWORD_MIN_LENGTH: z
+    .preprocess(
+      (val) => (val === '' || val == null ? undefined : val),
+      z.coerce
+        .number({
+          required_error: 'Must have a password min length',
+          invalid_type_error: 'Must have a password min length',
+        })
+        .min(6, 'Must be greater or equal to 6.')
+    )
+    .optional(),
+  PASSWORD_REQUIRED_CHARACTERS: z.string().optional(),
+  PASSWORD_HIBP_ENABLED: z.boolean().optional(),
 })
+
+const captchaEnabledSchema = z
+  .object({
+    SECURITY_CAPTCHA_ENABLED: z.literal(true),
+    SECURITY_CAPTCHA_SECRET: z.string().min(1, 'Must have a Captcha secret'),
+    SECURITY_CAPTCHA_PROVIDER: z.enum(['hcaptcha', 'turnstile'], {
+      required_error: 'Captcha provider must be either hcaptcha or turnstile',
+    }),
+  })
+  .merge(baseSchema)
+
+const captchaDisabledSchema = z
+  .object({
+    SECURITY_CAPTCHA_ENABLED: z.literal(false),
+    SECURITY_CAPTCHA_SECRET: z.string().optional(),
+    SECURITY_CAPTCHA_PROVIDER: z.string().optional(),
+  })
+  .merge(baseSchema)
+
+const formSchema = z.discriminatedUnion('SECURITY_CAPTCHA_ENABLED', [
+  captchaEnabledSchema,
+  captchaDisabledSchema,
+])
+type FormSchema = z.infer<typeof formSchema>
 
 export const ProtectionAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -90,7 +122,6 @@ export const ProtectionAuthSettingsForm = () => {
       toast.success('Successfully updated settings')
     },
   })
-  const [hidden, setHidden] = useState(true)
 
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -101,8 +132,8 @@ export const ProtectionAuthSettingsForm = () => {
     'custom_config_gotrue'
   )
 
-  const protectionForm = useForm({
-    resolver: yupResolver(schema),
+  const protectionForm = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
@@ -120,24 +151,48 @@ export const ProtectionAuthSettingsForm = () => {
     },
   })
 
+  const { isDirty } = protectionForm.formState
+
   useEffect(() => {
     if (authConfig && !isUpdatingConfig) {
-      protectionForm.reset({
-        DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
-        EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
-        SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
-        SITE_URL: authConfig.SITE_URL || '',
-        SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED || false,
-        SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
-        SECURITY_CAPTCHA_PROVIDER: authConfig.SECURITY_CAPTCHA_PROVIDER || 'hcaptcha',
-        SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
-        SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
-        SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
-        PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
-        PASSWORD_REQUIRED_CHARACTERS:
-          authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
-        PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
-      })
+      const SECURITY_CAPTCHA_PROVIDER = (authConfig.SECURITY_CAPTCHA_PROVIDER ||
+        'hcaptcha') as CaptchaProviders
+
+      if (authConfig.SECURITY_CAPTCHA_ENABLED) {
+        protectionForm.reset({
+          DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
+          EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
+          SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
+          SITE_URL: authConfig.SITE_URL || '',
+          SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
+          SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
+          SECURITY_CAPTCHA_PROVIDER,
+          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
+          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
+          SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
+          PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
+          PASSWORD_REQUIRED_CHARACTERS:
+            authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
+          PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
+        })
+      } else {
+        protectionForm.reset({
+          DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
+          EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
+          SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
+          SITE_URL: authConfig.SITE_URL || '',
+          SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
+          SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
+          SECURITY_CAPTCHA_PROVIDER,
+          SESSIONS_TIMEBOX: authConfig.SESSIONS_TIMEBOX || 0,
+          SESSIONS_INACTIVITY_TIMEOUT: authConfig.SESSIONS_INACTIVITY_TIMEOUT || 0,
+          SESSIONS_SINGLE_PER_USER: authConfig.SESSIONS_SINGLE_PER_USER || false,
+          PASSWORD_MIN_LENGTH: authConfig.PASSWORD_MIN_LENGTH || 6,
+          PASSWORD_REQUIRED_CHARACTERS:
+            authConfig.PASSWORD_REQUIRED_CHARACTERS || NO_REQUIRED_CHARACTERS,
+          PASSWORD_HIBP_ENABLED: authConfig.PASSWORD_HIBP_ENABLED || false,
+        })
+      }
     }
   }, [authConfig, isUpdatingConfig])
 
@@ -151,6 +206,11 @@ export const ProtectionAuthSettingsForm = () => {
 
     updateAuthConfig({ projectRef: projectRef!, config: payload })
   }
+
+  const SECURITY_CAPTCHA_ENABLED = useWatch({
+    name: 'SECURITY_CAPTCHA_ENABLED',
+    control: protectionForm.control,
+  })
 
   if (isError) {
     return (
@@ -190,11 +250,11 @@ export const ProtectionAuthSettingsForm = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...protectionForm}>
+        <Form {...protectionForm}>
           <form onSubmit={protectionForm.handleSubmit(onSubmitProtection)} className="space-y-4">
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={protectionForm.control}
                   name="SECURITY_CAPTCHA_ENABLED"
                   render={({ field }) => (
@@ -203,22 +263,22 @@ export const ProtectionAuthSettingsForm = () => {
                       label="Enable Captcha protection"
                       description="Protect authentication endpoints from bots and abuse."
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           checked={field.value}
                           onCheckedChange={field.onChange}
                           disabled={!canUpdateConfig}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
               </CardContent>
 
-              {protectionForm.watch('SECURITY_CAPTCHA_ENABLED') && (
+              {SECURITY_CAPTCHA_ENABLED && (
                 <>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={protectionForm.control}
                       name="SECURITY_CAPTCHA_PROVIDER"
                       render={({ field }) => {
@@ -227,24 +287,24 @@ export const ProtectionAuthSettingsForm = () => {
                         )
                         return (
                           <FormItemLayout layout="flex-row-reverse" label="Choose Captcha Provider">
-                            <FormControl_Shadcn_>
-                              <Select_Shadcn_
+                            <FormControl>
+                              <Select
                                 value={field.value}
                                 onValueChange={field.onChange}
                                 disabled={!canUpdateConfig}
                               >
-                                <SelectTrigger_Shadcn_>
-                                  <SelectValue_Shadcn_ placeholder="Select provider" />
-                                </SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_ align="end">
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select provider" />
+                                </SelectTrigger>
+                                <SelectContent align="end">
                                   {CAPTCHA_PROVIDERS.map((x) => (
-                                    <SelectItem_Shadcn_ key={x.key} value={x.key}>
+                                    <SelectItem key={x.key} value={x.key}>
                                       {x.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
-                            </FormControl_Shadcn_>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
                             <InlineLink
                               href={
                                 field.value === 'hcaptcha'
@@ -264,7 +324,7 @@ export const ProtectionAuthSettingsForm = () => {
                   </CardContent>
 
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={protectionForm.control}
                       name="SECURITY_CAPTCHA_SECRET"
                       render={({ field }) => (
@@ -273,26 +333,9 @@ export const ProtectionAuthSettingsForm = () => {
                           label="Captcha secret"
                           description="Obtain this secret from the provider."
                         >
-                          <FormControl_Shadcn_>
-                            <div className="flex items-center gap-2">
-                              <PrePostTab
-                                postTab={
-                                  <Button
-                                    type="text"
-                                    className="p-0"
-                                    onClick={() => setHidden(!hidden)}
-                                    icon={hidden ? <Eye /> : <EyeOff />}
-                                  />
-                                }
-                              >
-                                <Input_Shadcn_
-                                  {...field}
-                                  type={hidden ? 'password' : 'text'}
-                                  disabled={!canUpdateConfig}
-                                />
-                              </PrePostTab>
-                            </div>
-                          </FormControl_Shadcn_>
+                          <FormControl>
+                            <Input {...field} reveal copy disabled={!canUpdateConfig} />
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
@@ -301,7 +344,7 @@ export const ProtectionAuthSettingsForm = () => {
               )}
 
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={protectionForm.control}
                   name="PASSWORD_HIBP_ENABLED"
                   render={({ field }) => (
@@ -315,7 +358,7 @@ export const ProtectionAuthSettingsForm = () => {
                           {field.value ? 'Enabled' : 'Disabled'}
                         </Badge>
                         <Link href={`/project/${projectRef}/auth/providers?provider=Email`}>
-                          <Button type="default">Configure email provider</Button>
+                          <Button variant="default">Configure in email provider</Button>
                         </Link>
                       </div>
                     </FormItemLayout>
@@ -324,17 +367,15 @@ export const ProtectionAuthSettingsForm = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {protectionForm.formState.isDirty && (
-                  <Button type="default" onClick={() => protectionForm.reset()}>
+                {isDirty && (
+                  <Button variant="default" onClick={() => protectionForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !canUpdateConfig || isUpdatingConfig || !protectionForm.formState.isDirty
-                  }
+                  variant="primary"
+                  type="submit"
+                  disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                   loading={isUpdatingConfig}
                 >
                   Save changes
@@ -342,7 +383,7 @@ export const ProtectionAuthSettingsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

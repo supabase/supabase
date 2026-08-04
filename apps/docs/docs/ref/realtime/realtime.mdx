@@ -6,24 +6,24 @@ title: Supabase Realtime Server
 sidebar_label: Supabase Realtime Server
 ---
 
-Supabase Realtime is a server built with Elixir using the [Phoenix Framework](https://www.phoenixframework.org) that allows you to listen to changes in your PostgreSQL database via logical replication and then broadcast those changes via WebSockets.
+Supabase Realtime is a server built with Elixir using the [Phoenix Framework](https://www.phoenixframework.org) that allows you to listen to changes in your Postgres database via logical replication and then broadcast those changes via WebSockets.
 
 There are two versions of this server: `Realtime` and `Realtime RLS`.
 
 `Realtime` server works by:
 
-1. listening to PostgreSQL's replication functionality (using PostgreSQL's logical decoding)
+1. listening to Postgres's replication functionality (using Postgres's logical decoding)
 2. converting the byte stream into JSON
 3. broadcasting to all connected clients over WebSockets
 
 `Realtime RLS` server works by:
 
-1. polling PostgreSQL's replication functionality (using PostgreSQL's logical decoding and [wal2json](https://github.com/eulerto/wal2json) output plugin)
-2. passing database changes to a [Write Ahead Log Realtime Unified Security (WALRUS)](https://github.com/supabase/walrus) PostgreSQL function and receiving a list of authorized subscribers depending on Row Level Security (RLS) policies
+1. polling Postgres's replication functionality (using Postgres's logical decoding and [wal2json](https://github.com/eulerto/wal2json) output plugin)
+2. passing database changes to a [Write Ahead Log Realtime Unified Security (WALRUS)](https://github.com/supabase/walrus) Postgres function and receiving a list of authorized subscribers depending on Row Level Security (RLS) policies
 3. converting the changes into JSON
 4. broadcasting to authorized subscribers over WebSockets
 
-## Why not just use PostgreSQL's `NOTIFY`?
+## Why not just use Postgres's `NOTIFY`?
 
 A few reasons:
 

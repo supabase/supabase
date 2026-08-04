@@ -1,7 +1,19 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useCallback, useContext, useState } from 'react'
+
+export const BANNER_ID = {
+  DATABASE_CONNECTIONS: 'database-connections-banner',
+  INDEX_ADVISOR: 'index-advisor-banner',
+  TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
+  RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
+  FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
+  TOS_UPDATE: 'tos-update-banner',
+  UNIFIED_LOGS: 'unified-logs-banner',
+} as const
+
+export type BannerId = (typeof BANNER_ID)[keyof typeof BANNER_ID]
 
 export interface Banner {
-  id: string
+  id: BannerId
   content: React.ReactNode
   isDismissed: boolean
   priority?: number
@@ -11,7 +23,7 @@ export interface Banner {
 interface BannerStackContextType {
   banners: Banner[]
   addBanner: (banner: Banner) => void
-  dismissBanner: (id: string) => void
+  dismissBanner: (id: BannerId) => void
 }
 
 const BannerStackContext = createContext<BannerStackContextType | undefined>(undefined)
@@ -21,8 +33,13 @@ export const BannerStackProvider = ({ children }: { children: React.ReactNode })
 
   const addBanner = useCallback((banner: Banner) => {
     setBanners((prev) => {
-      const exists = prev.some((b) => b.id === banner.id)
-      if (exists) return prev
+      const existingIndex = prev.findIndex((b) => b.id === banner.id)
+      if (existingIndex !== -1) {
+        if (!prev[existingIndex].isDismissed) return prev
+        const revived = [...prev]
+        revived[existingIndex] = banner
+        return revived.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+      }
       const newBanners = [...prev, banner]
       return newBanners.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
     })

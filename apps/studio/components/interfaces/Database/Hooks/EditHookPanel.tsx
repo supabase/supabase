@@ -1,42 +1,34 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PGTriggerCreate } from '@supabase/pg-meta/src/pg-meta-triggers'
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import { keyword } from '@supabase/pg-meta'
+import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form_Shadcn_, SidePanel } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Button, Form, SidePanel } from 'ui'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
+import {
+  PG_META_SCOPED_INTROSPECTION_FLAG,
+  tableEditorQueryOptions,
+} from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from '@/hooks/ui/useConfirmOnClose'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
 
-export const isEdgeFunction = ({
-  ref,
-  restUrlTld,
-  url,
-}: {
-  ref?: string
-  restUrlTld?: string
-  url: string
-}) =>
-  url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
-  url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
-
 const FORM_ID = 'edit-hook-panel-form'
 
-const parseHeaders = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
+const parseHeaders = (selectedHook?: PGTrigger): HTTPArgument[] => {
   if (typeof selectedHook === 'undefined') {
     return [{ id: uuidv4(), name: 'Content-type', value: 'application/json' }]
   }
@@ -56,7 +48,7 @@ const parseHeaders = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
   }))
 }
 
-const parseParameters = (selectedHook?: PostgresTrigger): HTTPArgument[] => {
+const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
   if (typeof selectedHook === 'undefined') {
     return [{ id: uuidv4(), name: '', value: '' }]
   }
@@ -80,6 +72,7 @@ export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isLoadingTable, setIsLoadingTable] = useState(false)
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
     projectRef: project?.ref,
@@ -139,7 +132,6 @@ export const EditHookPanel = () => {
   const isSubmitting = isCreating || isUpdating || isLoadingTable
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const form = useForm<WebhookFormValues>({
     resolver: zodResolver(FormSchema),
@@ -148,11 +140,7 @@ export const EditHookPanel = () => {
       table_id: selectedHook?.table_id?.toString() ?? '',
       http_url: selectedHook?.function_args?.[0] ?? '',
       http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-      function_type: isEdgeFunction({
-        ref,
-        restUrlTld,
-        url: selectedHook?.function_args?.[0] ?? '',
-      })
+      function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
         ? 'supabase_function'
         : 'http_request',
       timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -184,11 +172,7 @@ export const EditHookPanel = () => {
         table_id: selectedHook?.table_id?.toString() ?? '',
         http_url: selectedHook?.function_args?.[0] ?? '',
         http_method: (selectedHook?.function_args?.[1] as 'GET' | 'POST') ?? 'POST',
-        function_type: isEdgeFunction({
-          ref,
-          restUrlTld,
-          url: selectedHook?.function_args?.[0] ?? '',
-        })
+        function_type: isEdgeFunctionUrl(selectedHook?.function_args?.[0] ?? '', ref ?? '', restUrl)
           ? 'supabase_function'
           : 'http_request',
         timeout_ms: Number(selectedHook?.function_args?.[4] ?? 5000),
@@ -197,7 +181,7 @@ export const EditHookPanel = () => {
         httpParameters: parseParameters(selectedHook),
       })
     }
-  }, [visible, selectedHook, ref, restUrlTld, form])
+  }, [visible, selectedHook, ref, restUrl, form])
 
   const queryClient = useQueryClient()
   const onSubmit: SubmitHandler<WebhookFormValues> = async (values) => {
@@ -212,6 +196,7 @@ export const EditHookPanel = () => {
           id: Number(values.table_id),
           projectRef: project?.ref,
           connectionString: project?.connectionString,
+          scoped,
         })
       )
       if (!selectedTable) {
@@ -238,7 +223,7 @@ export const EditHookPanel = () => {
         )
 
       // replacer function with JSON.stringify to handle quotes properly
-      const stringifiedParameters = JSON.stringify(parameters, (key, value) => {
+      const stringifiedParameters = JSON.stringify(parameters, (_key, value) => {
         if (typeof value === 'string') {
           // Return the raw string without any additional escaping
           return value
@@ -275,7 +260,11 @@ export const EditHookPanel = () => {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,
-          updatedTrigger: { ...payload, enabled_mode: 'ORIGIN' },
+          updatedTrigger: {
+            ...payload,
+            enabled_mode: 'ORIGIN',
+            events: payload.events.map(keyword),
+          },
         })
       }
     } catch (error) {
@@ -288,7 +277,7 @@ export const EditHookPanel = () => {
 
   // This is intentionally kept outside of the useConfirmOnClose hook to force RHF to update the isDirty state.
   const isDirty = form.formState.isDirty
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => onClose(),
   })
@@ -314,8 +303,8 @@ export const EditHookPanel = () => {
           <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
             <Button
               size="tiny"
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={confirmOnClose}
               disabled={isSubmitting}
             >
@@ -323,8 +312,8 @@ export const EditHookPanel = () => {
             </Button>
             <Button
               size="tiny"
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               form={FORM_ID}
               disabled={isSubmitting}
               loading={isSubmitting}
@@ -334,28 +323,13 @@ export const EditHookPanel = () => {
           </div>
         }
       >
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <FormContents form={form} selectedHook={selectedHook} />
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SidePanel>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      <DiscardChangesConfirmationDialog {...modalProps} />
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

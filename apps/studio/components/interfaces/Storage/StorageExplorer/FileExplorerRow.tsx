@@ -5,23 +5,12 @@ import {
   Copy,
   Download,
   Edit,
-  File,
-  Film,
-  Image,
-  Loader,
+  LoaderCircle,
   MoreVertical,
   Move,
-  Music,
   Trash2,
 } from 'lucide-react'
-import { useContextMenu } from 'react-contexify'
-import SVG from 'react-inlinesvg'
-
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import type { CSSProperties } from 'react'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import {
   Checkbox,
   cn,
@@ -38,64 +27,22 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import {
-  CONTEXT_MENU_KEYS,
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_VIEWS,
   URL_EXPIRY_DURATION,
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { StorageRowIcon } from '../StorageRowIcon'
+import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
-
-export const RowIcon = ({
-  view,
-  status,
-  fileType,
-  mimeType,
-}: {
-  view: STORAGE_VIEWS
-  status: STORAGE_ROW_STATUS
-  fileType: string
-  mimeType: string | undefined
-}) => {
-  if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return <Loader size={16} strokeWidth={2} className="animate-spin" />
-  }
-
-  if (fileType === STORAGE_ROW_TYPES.BUCKET || fileType === STORAGE_ROW_TYPES.FOLDER) {
-    const iconSrc =
-      fileType === STORAGE_ROW_TYPES.BUCKET
-        ? `${BASE_PATH}/img/bucket-filled.svg`
-        : fileType === STORAGE_ROW_TYPES.FOLDER
-          ? `${BASE_PATH}/img/folder-filled.svg`
-          : `${BASE_PATH}/img/file-filled.svg`
-    return (
-      <SVG
-        src={iconSrc}
-        preProcessor={(code) =>
-          code.replace(/svg/, 'svg class="w-4 h-4 text-color-inherit opacity-75"')
-        }
-      />
-    )
-  }
-
-  if (mimeType?.includes('image')) {
-    return <Image size={16} strokeWidth={2} />
-  }
-
-  if (mimeType?.includes('audio')) {
-    return <Music size={16} strokeWidth={2} />
-  }
-
-  if (mimeType?.includes('video')) {
-    return <Film size={16} strokeWidth={2} />
-  }
-
-  return <File size={16} strokeWidth={2} />
-}
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { formatBytes } from '@/lib/helpers'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface FileExplorerRowProps {
   index: number
@@ -132,8 +79,8 @@ export const FileExplorerRow = ({
     downloadFolder,
     selectRangeItems,
   } = useStorageExplorerStateSnapshot()
-  const { show } = useContextMenu()
   const { onCopyUrl } = useCopyUrl()
+  const ctx = useFileExplorerContextMenu()
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
@@ -173,19 +120,19 @@ export const FileExplorerRow = ({
             ? [
                 {
                   name: 'Rename',
-                  icon: <Edit size={14} strokeWidth={1} />,
+                  icon: <Edit size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                 },
               ]
             : []),
           {
             name: 'Download',
-            icon: <Download size={14} strokeWidth={1} />,
+            icon: <Download size={12} className="text-foreground-light" />,
             onClick: () => downloadFolder(itemWithColumnIndex),
           },
           {
             name: 'Copy path to folder',
-            icon: <Copy size={14} strokeWidth={1} />,
+            icon: <Copy size={12} className="text-foreground-light" />,
             onClick: () => copyPathToFolder(openedFolders, itemWithColumnIndex),
           },
           ...(canUpdateFiles
@@ -193,7 +140,7 @@ export const FileExplorerRow = ({
                 { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  icon: <Trash2 size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -206,29 +153,31 @@ export const FileExplorerRow = ({
                   ? [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={14} strokeWidth={1} />,
-                        onClick: () => onCopyUrl(itemWithColumnIndex.name),
+                        icon: <Copy size={12} className="text-foreground-light" />,
+                        onClick: () => {
+                          onCopyUrl(itemWithColumnIndex.path!)
+                        },
                       },
                     ]
                   : [
                       {
                         name: 'Get URL',
-                        icon: <Copy size={14} strokeWidth={1} />,
+                        icon: <Copy size={12} className="text-foreground-light" />,
                         children: [
                           {
                             name: 'Expire in 1 week',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.WEEK),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.WEEK),
                           },
                           {
                             name: 'Expire in 1 month',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.MONTH),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.MONTH),
                           },
                           {
                             name: 'Expire in 1 year',
                             onClick: () =>
-                              onCopyUrl(itemWithColumnIndex.name, URL_EXPIRY_DURATION.YEAR),
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.YEAR),
                           },
                           {
                             name: 'Custom expiry',
@@ -237,22 +186,22 @@ export const FileExplorerRow = ({
                         ],
                       },
                     ]),
+                {
+                  name: 'Download',
+                  icon: <Download size={12} className="text-foreground-light" />,
+                  onClick: () => downloadFile(itemWithColumnIndex),
+                },
                 ...(canUpdateFiles
                   ? [
                       {
                         name: 'Rename',
-                        icon: <Edit size={14} strokeWidth={1} />,
+                        icon: <Edit size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemToRename(itemWithColumnIndex),
                       },
                       {
                         name: 'Move',
-                        icon: <Move size={14} strokeWidth={1} />,
+                        icon: <Move size={12} className="text-foreground-light" />,
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
-                      },
-                      {
-                        name: 'Download',
-                        icon: <Download size={14} strokeWidth={1} />,
-                        onClick: () => downloadFile(itemWithColumnIndex),
                       },
                       { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
@@ -263,7 +212,7 @@ export const FileExplorerRow = ({
             ? [
                 {
                   name: 'Delete',
-                  icon: <Trash2 size={14} strokeWidth={1} />,
+                  icon: <Trash2 size={12} className="text-foreground-light" />,
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
               ]
@@ -274,18 +223,10 @@ export const FileExplorerRow = ({
   const mimeType = item.metadata ? item.metadata.mimetype : '-'
   const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
   const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
-
-  const displayMenu = (event: any, rowType: STORAGE_ROW_TYPES) => {
-    show(event, {
-      id:
-        rowType === STORAGE_ROW_TYPES.FILE
-          ? CONTEXT_MENU_KEYS.STORAGE_ITEM
-          : CONTEXT_MENU_KEYS.STORAGE_FOLDER,
-      props: {
-        item: itemWithColumnIndex,
-      },
-    })
-  }
+  const isFile = item.type === STORAGE_ROW_TYPES.FILE
+  // Files: checkbox replaces icon on hover, keyboard focus, and when selected.
+  // Folders: icon only (no selection checkbox).
+  const showRowIcon = !isFile || !isSelected
 
   const nameWidth =
     view === STORAGE_VIEWS.LIST && item.isCorrupted
@@ -304,27 +245,24 @@ export const FileExplorerRow = ({
     <div
       style={style}
       className="h-full border-b border-default"
-      onContextMenu={(event) => {
-        event.stopPropagation()
-        item.type === STORAGE_ROW_TYPES.FILE
-          ? displayMenu(event, STORAGE_ROW_TYPES.FILE)
-          : displayMenu(event, STORAGE_ROW_TYPES.FOLDER)
-      }}
+      onContextMenu={(e) => ctx?.onRowContextMenu(e, rowOptions)}
     >
       <div
         className={cn(
-          'storage-row group flex h-full items-center px-2.5',
-          'hover:bg-panel-footer-light [[data-theme*=dark]_&]:hover:bg-panel-footer-dark',
-          `${isOpened ? 'bg-selection' : ''}`,
-          `${isSelected ? 'bg-selection' : ''}`,
-          `${isPreviewed ? 'bg-selection hover:bg-selection' : ''}`,
-          `${item.status !== STORAGE_ROW_STATUS.LOADING ? 'cursor-pointer' : ''}`
+          'storage-row group flex h-full items-center px-2.5 rounded-sm',
+          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
+          isOpened && 'bg-selection',
+          isSelected && 'bg-selection',
+          isPreviewed && 'bg-selection hover:bg-selection',
+          item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
+          // Keyboard focus on the checkbox: ring the whole row
+          'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
         )}
         onClick={(event) => {
           event.stopPropagation()
           event.preventDefault()
           if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
-            item.type === STORAGE_ROW_TYPES.FOLDER || item.type === STORAGE_ROW_TYPES.BUCKET
+            item.type === STORAGE_ROW_TYPES.FOLDER
               ? openFolder(columnIndex, item)
               : onSelectFile(columnIndex)
           }
@@ -336,33 +274,44 @@ export const FileExplorerRow = ({
             view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
           )}
         >
-          <div className="relative w-[30px]" onClick={(event) => event.stopPropagation()}>
-            {!isSelected && (
+          <div className="relative flex h-4 w-[30px] shrink-0 items-center">
+            {showRowIcon && (
               <div
-                className={`absolute ${
-                  item.type === STORAGE_ROW_TYPES.FILE ? 'group-hover:hidden' : ''
-                }`}
+                className={cn(
+                  'absolute',
+                  // Swap icon → checkbox on hover / keyboard focus (files only)
+                  isFile && 'group-hover:hidden group-focus-within:hidden'
+                )}
                 style={{ top: '2px' }}
               >
-                <RowIcon
+                <StorageRowIcon
                   view={view}
                   status={item.status}
                   fileType={item.type}
+                  isOpened={isOpened}
                   mimeType={item.metadata?.mimetype}
                 />
               </div>
             )}
-            <Checkbox
-              label={''}
-              className={`w-full ${item.type !== STORAGE_ROW_TYPES.FILE ? 'invisible' : ''} ${
-                isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
-              }`}
-              checked={isSelected}
-              onChange={(event) => {
-                event.stopPropagation()
-                onCheckItem((event.nativeEvent as KeyboardEvent).shiftKey)
-              }}
-            />
+            {isFile ? (
+              <Checkbox
+                className={
+                  isSelected
+                    ? 'opacity-100'
+                    : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100'
+                }
+                checked={isSelected}
+                // use onClick instead of onCheckedChange to handle shift-key selection
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onCheckItem(event.nativeEvent.shiftKey)
+                }}
+                aria-label="Check to select this item"
+              />
+            ) : (
+              // Reserve the same slot as the file checkbox without a focusable control
+              <span aria-hidden className="h-4 w-4 shrink-0" />
+            )}
           </div>
           <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
             {item.name}
@@ -370,7 +319,7 @@ export const FileExplorerRow = ({
           {item.isCorrupted && (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
+                <AlertCircle size={18} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 File is corrupted, please delete and reupload again.
@@ -390,7 +339,7 @@ export const FileExplorerRow = ({
 
         <div
           className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'flex-grow' : 'w-[10%]'
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
           }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
@@ -398,16 +347,16 @@ export const FileExplorerRow = ({
           }
         >
           {item.status === STORAGE_ROW_STATUS.LOADING ? (
-            <Loader
-              className={`animate-spin ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
-              size={16}
-              strokeWidth={2}
+            <LoaderCircle
+              className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
+              size={14}
             />
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger className="focus-ring rounded-sm">
                 <div className="storage-row-menu opacity-0">
-                  <MoreVertical size={16} strokeWidth={2} />
+                  <MoreVertical size={16} />
+                  <span className="sr-only">{item.name} actions</span>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">

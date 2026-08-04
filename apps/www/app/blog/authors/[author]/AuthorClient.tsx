@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import DefaultLayout from 'components/Layouts/Default'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
-import { cn, Button, Input } from 'ui'
-import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 import { AlignJustify, Grid, Search } from 'lucide-react'
-
+import Image from 'next/image'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
+import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
+
+import BlogViewToggle from '../../../../components/Blog/BlogViewToggle'
+import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
 
 export type BlogView = 'list' | 'grid'
 
@@ -26,14 +27,15 @@ interface AuthorClientProps {
   author: Author | null
   authorId: string
   blogs: PostTypes[]
+  initialView: BlogView
 }
 
-export default function AuthorClient({ author, authorId, blogs }: AuthorClientProps) {
-  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
-  const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
-  const [view, setView] = useState<BlogView>(localView ?? 'list')
+export default function AuthorClient({ author, authorId, blogs, initialView }: AuthorClientProps) {
+  const [view, setView] = useState<BlogView>(initialView)
   const [searchTerm, setSearchTerm] = useState('')
   const isList = view === 'list'
+
+  const handleViewSelection = () => setView(isList ? 'grid' : 'list')
 
   const filteredBlogs = useMemo(() => {
     if (!searchTerm) return blogs
@@ -41,22 +43,15 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
     return blogs.filter(
       (blog) =>
         (blog.title ?? '').toLowerCase().includes(term) ||
-        (blog.description ?? '').toLowerCase().includes(term)
+        (blog.description ?? '').toLowerCase().includes(term) ||
+        (blog.author ?? '').toLowerCase().includes(term)
     )
   }, [blogs, searchTerm])
 
-  const handleViewSelection = () => {
-    setView((prevView) => {
-      const newValue = prevView === 'list' ? 'grid' : 'list'
-      localStorage.setItem(BLOG_VIEW, newValue)
-      return newValue
-    })
-  }
-
   return (
-    <DefaultLayout>
-      <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-        <div className="text-foreground-lighter flex space-x-1 mb-8">
+    <>
+      <SectionContainerWithCn height="narrow" className="space-y-6">
+        <div className="text-foreground-lighter flex space-x-1">
           <h1 className="cursor-pointer">
             <Link href="/blog">Blog</Link>
             <span className="px-2">/</span>
@@ -65,7 +60,7 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
         </div>
 
         {author && (
-          <div className="flex items-center gap-6 pb-8">
+          <div className="flex items-center gap-6">
             {author.author_image_url && (
               <Image
                 src={author.author_image_url}
@@ -97,72 +92,58 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
             </div>
           </div>
         )}
+      </SectionContainerWithCn>
+
+      {/* Filters row — divider above the header, search aligned with the view toggle */}
+      <div className="border-default border-t">
+        <SectionContainerWithCn height="none" className="py-6">
+          <div className="flex flex-row items-center justify-between gap-2">
+            <div className="flex-1 max-w-[280px]">
+              <InputGroup className="w-full">
+                <InputGroupInput
+                  size="small"
+                  autoComplete="off"
+                  type="search"
+                  placeholder="Search posts"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+            <BlogViewToggle view={view} setView={setView} />
+          </div>
+        </SectionContainerWithCn>
       </div>
 
-      <div className="border-default border-t">
-        <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-          <div className="flex flex-row items-center justify-between gap-2 mb-6">
-            <div className="flex-1 max-w-[280px]">
-              <Input
-                icon={<Search size="14" />}
-                size="small"
-                layout="vertical"
-                autoComplete="off"
-                type="search"
-                placeholder="Search posts"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
-              />
+      {/* Posts */}
+      <SectionContainerWithCn height="none">
+        {filteredBlogs.length > 0 ? (
+          isList ? (
+            <div>
+              {filteredBlogs.map((blog, idx) => (
+                <BlogListItem post={blog} key={`list-${idx}-${blog.slug}`} />
+              ))}
             </div>
-            <Button
-              type="default"
-              title={isList ? 'Grid View' : 'List View'}
-              onClick={handleViewSelection}
-              className="h-full p-2 text-foreground-light"
-            >
-              {isList ? (
-                <Grid className="w-4 h-4 stroke-1.5" />
-              ) : (
-                <AlignJustify className="w-4 h-4 stroke-1.5" />
-              )}
-            </Button>
-          </div>
-
-          {filteredBlogs.length > 0 ? (
-            <ol
-              className={cn(
-                'grid -mx-2 sm:-mx-4 py-6 lg:py-6 lg:pb-20',
-                isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4'
-              )}
-            >
-              {filteredBlogs.map((blog: PostTypes, idx: number) =>
-                isList ? (
-                  <div
-                    className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none"
-                    key={`list-${idx}-${blog.slug}`}
-                  >
-                    <BlogListItem post={blog} />
-                  </div>
-                ) : (
-                  <div
-                    className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
-                    key={`grid-${idx}-${blog.slug}`}
-                  >
-                    <BlogGridItem post={blog} />
-                  </div>
-                )
-              )}
-            </ol>
           ) : (
-            <p className="text-foreground-lighter py-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 py-4">
+              {filteredBlogs.map((blog, idx) => (
+                <BlogGridItem post={blog} key={`grid-${idx}-${blog.slug}`} />
+              ))}
+            </div>
+          )
+        ) : (
+          <div className="px-6 py-12">
+            <p className="text-sm text-light">
               {searchTerm
                 ? 'No posts found matching your search.'
                 : 'No posts found by this author.'}
             </p>
-          )}
-        </div>
-      </div>
-    </DefaultLayout>
+          </div>
+        )}
+      </SectionContainerWithCn>
+    </>
   )
 }

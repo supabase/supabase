@@ -1,19 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  SupaSquadApplication,
+  supaSquadApplicationSchema,
+} from '~/data/open-source/contributing/supasquad.utils'
 import { AlertCircle } from 'lucide-react'
 import { FC, memo, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
   Separator,
-  TextArea_Shadcn_,
+  TextArea,
 } from 'ui'
 import {
   MultiSelector,
@@ -32,19 +36,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui/src/components/shadcn/ui/alert-dialog'
-import {
-  SupaSquadApplication,
-  supaSquadApplicationSchema,
-} from '~/data/open-source/contributing/supasquad.utils'
+
 import { CountrySelector } from '../Supasquad/CountrySelector'
 
-interface FormItem_Shadcn_ {
+interface FormItem {
   type: 'text' | 'textarea'
   label: string
   placeholder: string
   required: boolean
   className?: string
-  component: typeof TextArea_Shadcn_ | typeof Input_Shadcn_
+  component: typeof TextArea | typeof Input
 }
 
 interface Track {
@@ -139,7 +140,7 @@ const FormContent = memo(function FormContent({
 }) {
   return (
     <div className="flex flex-col">
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-6 text-left"
@@ -147,65 +148,57 @@ const FormContent = memo(function FormContent({
           noValidate
         >
           <div className="flex flex-col md:flex-row gap-4 items-start text-left">
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="first_name"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="w-full md:flex-1">
-                  <FormLabel_Shadcn_ className="text-foreground">First Name *</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      placeholder="Your first name"
-                      autoComplete="given-name"
-                      {...field}
-                    />
-                  </FormControl_Shadcn_>
+                <FormItem className="w-full md:flex-1">
+                  <FormLabel className="text-foreground">First Name *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your first name" autoComplete="given-name" {...field} />
+                  </FormControl>
 
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="last_name"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="w-full md:flex-1">
-                  <FormLabel_Shadcn_ className="text-foreground">Last Name *</FormLabel_Shadcn_>
-                  <FormControl_Shadcn_>
+                <FormItem className="w-full md:flex-1">
+                  <FormLabel className="text-foreground">Last Name *</FormLabel>
+                  <FormControl>
                     <div className="relative ">
-                      <Input_Shadcn_
-                        placeholder="Your last name"
-                        autoComplete="family-name"
-                        {...field}
-                      />
+                      <Input placeholder="Your last name" autoComplete="family-name" {...field} />
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
 
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </div>
 
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem_Shadcn_>
-                <FormLabel_Shadcn_ className="text-foreground">Email Address *</FormLabel_Shadcn_>
-                <FormControl_Shadcn_>
+              <FormItem>
+                <FormLabel className="text-foreground">Email Address *</FormLabel>
+                <FormControl>
                   <div className="relative">
-                    <Input_Shadcn_
+                    <Input
                       type="email"
                       placeholder="Your personal or work email"
                       autoComplete="email"
                       {...field}
                     />
                   </div>
-                </FormControl_Shadcn_>
-                <FormMessage_Shadcn_ />
-              </FormItem_Shadcn_>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
 
@@ -214,18 +207,18 @@ const FormContent = memo(function FormContent({
           <div className="space-y-8">
             <h3 className="h3 text-foreground">Interests and skills</h3>
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="tracks"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_ className="text-foreground">
+                <FormItem>
+                  <FormLabel className="text-foreground">
                     What track would you like to be considered for? *
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                  </FormLabel>
+                  <FormDescription className="text-foreground-lighter">
                     See longer descriptions of the 4 options above
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
+                  </FormDescription>
+                  <FormControl>
                     <div className="relative mt-1">
                       <MultiSelector
                         onValuesChange={(values) => {
@@ -261,48 +254,48 @@ const FormContent = memo(function FormContent({
                         </MultiSelectorContent>
                       </MultiSelector>
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
 
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="why_you_want_to_join"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-1">
-                  <FormLabel_Shadcn_ className="text-foreground">
+                <FormItem className="space-y-1">
+                  <FormLabel className="text-foreground">
                     Why do you want to join the program? *
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                  </FormLabel>
+                  <FormDescription className="text-foreground-lighter">
                     What do you have to contribute? What would you like to get out of it?
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
+                  </FormDescription>
+                  <FormControl>
                     <div className="relative">
-                      <TextArea_Shadcn_
+                      <TextArea
                         autoComplete="off"
                         rows={3}
                         className="bg-foreground/[.026]"
                         {...field}
                       />
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="contributions"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-1">
-                  <FormLabel_Shadcn_ className="text-foreground">
+                <FormItem className="space-y-1">
+                  <FormLabel className="text-foreground">
                     Share some of your recent contributions *
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                  </FormLabel>
+                  <FormDescription className="text-foreground-lighter">
                     <p>
                       Any relevant links to show your current engagement with the Supabase
                       community.
@@ -311,10 +304,10 @@ const FormContent = memo(function FormContent({
                       If you haven&apos;t contributed yet, spend some time engaging with the
                       community, then reapply once you&apos;ve built up a few contributions.
                     </p>
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
+                  </FormDescription>
+                  <FormControl>
                     <div className="relative">
-                      <TextArea_Shadcn_
+                      <TextArea
                         autoComplete="off"
                         rows={3}
                         className="bg-foreground/[.026]"
@@ -323,25 +316,23 @@ const FormContent = memo(function FormContent({
                         {...field}
                       />
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
             <Separator />
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="areas_of_interest"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_ className="text-foreground">
-                    Product Areas of Interest *
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                <FormItem>
+                  <FormLabel className="text-foreground">Product Areas of Interest *</FormLabel>
+                  <FormDescription className="text-foreground-lighter">
                     What specific areas would you like to help with? Leave blank if you&apos;re not
                     sure.
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
+                  </FormDescription>
+                  <FormControl>
                     <div className="relative mt-1">
                       <MultiSelector
                         onValuesChange={field.onChange}
@@ -366,30 +357,30 @@ const FormContent = memo(function FormContent({
                         </MultiSelectorContent>
                       </MultiSelector>
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="skills"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_ className="text-foreground">
+                <FormItem>
+                  <FormLabel className="text-foreground">
                     Skills (frameworks, tools, programming languages)
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                  </FormLabel>
+                  <FormDescription className="text-foreground-lighter">
                     Know Postgres really well? React? Expo? Python? Rust? Terraform? Add it here!
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
+                  </FormDescription>
+                  <FormControl>
                     <div className="relative mt-1">
-                      <Input_Shadcn_ type="text" {...field} />
+                      <Input type="text" {...field} />
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </div>
@@ -400,72 +391,68 @@ const FormContent = memo(function FormContent({
             <h3 className="h3 text-foreground">Location and Availability</h3>
 
             <div className="flex flex-col md:flex-row gap-4 items-start text-left">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="country"
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="w-full md:flex-1">
-                    <FormLabel_Shadcn_ className="text-foreground">Country *</FormLabel_Shadcn_>
-                    <FormControl_Shadcn_>
+                  <FormItem className="w-full md:flex-1">
+                    <FormLabel className="text-foreground">Country *</FormLabel>
+                    <FormControl>
                       <div className="relative mt-1">
                         <CountrySelector value={field.value || ''} onValueChange={field.onChange} />
                       </div>
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="city"
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="w-full md:flex-1">
-                    <FormLabel_Shadcn_ className="text-foreground">City *</FormLabel_Shadcn_>
-                    <FormControl_Shadcn_>
+                  <FormItem className="w-full md:flex-1">
+                    <FormLabel className="text-foreground">City *</FormLabel>
+                    <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="City" {...field} />
+                        <Input type="text" placeholder="City" {...field} />
                       </div>
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
             </div>
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="monthly_commitment"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_ className="text-foreground">
-                    Monthly Commitment
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                <FormItem>
+                  <FormLabel className="text-foreground">Monthly Commitment</FormLabel>
+                  <FormDescription className="text-foreground-lighter">
                     How many hours can you commit per month? If not sure, leave blank.
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
+                  </FormDescription>
+                  <FormControl>
                     <div className="relative mt-1">
-                      <Input_Shadcn_ {...field} />
+                      <Input {...field} />
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               control={form.control}
               name="languages_spoken"
               render={({ field }) => (
-                <FormItem_Shadcn_>
-                  <FormLabel_Shadcn_ className="text-foreground">
-                    Languages spoken *
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-foreground-lighter">
+                <FormItem>
+                  <FormLabel className="text-foreground">Languages spoken *</FormLabel>
+                  <FormDescription className="text-foreground-lighter">
                     What languages do you speak?
-                  </FormDescription_Shadcn_>
-                  <FormControl_Shadcn_>
+                  </FormDescription>
+                  <FormControl>
                     <div className="relative mt-1">
                       <MultiSelector
                         onValuesChange={field.onChange}
@@ -490,9 +477,9 @@ const FormContent = memo(function FormContent({
                         </MultiSelectorContent>
                       </MultiSelector>
                     </div>
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
           </div>
@@ -503,51 +490,51 @@ const FormContent = memo(function FormContent({
             <h3 className="h4 text-foreground">Social Links</h3>
 
             <div className="space-y-3">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="discord"
                 render={({ field }) => (
-                  <FormItem_Shadcn_>
-                    <FormLabel_Shadcn_ className="text-foreground">Discord</FormLabel_Shadcn_>
-                    <FormControl_Shadcn_>
+                  <FormItem>
+                    <FormLabel className="text-foreground">Discord</FormLabel>
+                    <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="#username" {...field} />
+                        <Input type="text" placeholder="#username" {...field} />
                       </div>
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="github"
                 render={({ field }) => (
-                  <FormItem_Shadcn_>
-                    <FormLabel_Shadcn_ className="text-foreground">GitHub</FormLabel_Shadcn_>
-                    <FormControl_Shadcn_>
+                  <FormItem>
+                    <FormLabel className="text-foreground">GitHub</FormLabel>
+                    <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="@yourusername" {...field} />
+                        <Input type="text" placeholder="@yourusername" {...field} />
                       </div>
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
 
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="twitter"
                 render={({ field }) => (
-                  <FormItem_Shadcn_>
-                    <FormLabel_Shadcn_ className="text-foreground">Twitter</FormLabel_Shadcn_>
-                    <FormControl_Shadcn_>
+                  <FormItem>
+                    <FormLabel className="text-foreground">Twitter</FormLabel>
+                    <FormControl>
                       <div className="relative mt-1">
-                        <Input_Shadcn_ type="text" placeholder="@yourhandle" {...field} />
+                        <Input type="text" placeholder="@yourhandle" {...field} />
                       </div>
-                    </FormControl_Shadcn_>
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
                 )}
               />
             </div>
@@ -557,15 +544,15 @@ const FormContent = memo(function FormContent({
             <div className="flex flex-row gap-3">
               <Button
                 size="small"
-                htmlType="button"
-                type="outline"
+                type="button"
+                variant="outline"
                 onClick={handleCancel}
                 disabled={isSubmitting}
                 className="border-border text-foreground hover:bg-muted flex-1"
               >
                 Cancel
               </Button>
-              <Button size="small" htmlType="submit" disabled={isSubmitting} className="flex-1">
+              <Button size="small" type="submit" disabled={isSubmitting} className="flex-1">
                 {isSubmitting ? <>Submitting...</> : <>Submit Application</>}
               </Button>
             </div>
@@ -583,7 +570,7 @@ const FormContent = memo(function FormContent({
             aria-hidden="true"
           />
         </form>
-      </Form_Shadcn_>
+      </Form>
 
       {Object.values(errors).length > 0 && (
         <Alert variant="destructive" className="mt-6">

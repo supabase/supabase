@@ -15,7 +15,9 @@ This guide shows you how to set up your local Supabase development environment t
     light: '/docs/img/local-dev-environment--light.svg',
     dark: '/docs/img/local-dev-environment.svg',
   }}
-  zoomable
+
+width={1600}
+height={933}
 />
 
 ## Set up a local environment
@@ -90,7 +92,7 @@ supabase db reset
 
 This command recreates your local database from scratch and applies all migration scripts under `supabase/migrations` directory. Now your local database is up to date.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The new migration command also supports stdin as input. This allows you to pipe in an existing script from another file or stdout:
 
@@ -144,7 +146,7 @@ This is because the default schema diff tool does not account for default privil
 
 Commit the new migration script to git and you are ready to deploy.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Alternatively, you may pass in the `--use-migra` experimental flag to generate a more concise migration using [`migra`](https://github.com/djrobstep/migra).
 
@@ -164,6 +166,8 @@ In a production environment, we recommend using a CI/CD pipeline to deploy new m
     light: '/docs/img/local-dev-environment--light.svg',
     dark: '/docs/img/local-dev-environment.svg',
   }}
+  width={1600}
+  height={933}
 />
 
 This example uses two Supabase projects, one for production and one for staging.

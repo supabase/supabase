@@ -1,9 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import NoPermission from 'components/ui/NoPermission'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 
 import AddEnvironmentVariableForm from './AddEnvironmentVariableForm'
 import { EnvironmentVariablesTable } from './EnvironmentVariablesTable'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const EnvironmentVariablesPage = () => {
   const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')

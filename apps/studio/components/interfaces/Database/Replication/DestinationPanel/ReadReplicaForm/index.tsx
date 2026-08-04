@@ -1,45 +1,62 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { AVAILABLE_REPLICA_REGIONS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import { RefObject, useEffect, useState, type ReactNode } from 'react'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
+import { toast } from 'sonner'
 import {
   Button,
   InfoIcon,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SheetFooter,
   SheetSection,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { ReadReplicaEligibilityWarnings } from './ReadReplicaEligibilityWarnings'
 import { ReadReplicaPricingDialog } from './ReadReplicaPricingDialog'
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
-import { useGetReplicaCost } from './useGetReplicaCost'
+import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
+  typeSelection?: ReactNode
+  checkIsDirtyRef?: RefObject<() => boolean>
   onSuccess: () => void
   onClose: () => void
+  onCancel?: () => void
 }
 
-export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) => {
+export const ReadReplicaForm = ({
+  typeSelection,
+  checkIsDirtyRef,
+  onSuccess,
+  onClose,
+  onCancel = onClose,
+}: ReadReplicaFormProps) => {
   const { ref: projectRef } = useParams()
   const { data } = useReadReplicasQuery({ projectRef })
 
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
     ([_, name]) => name === AWS_REGIONS_DEFAULT
   ) ?? ['ap-southeast-1']
-  const { totalCost } = useGetReplicaCost()
   const { can: canDeployReplica } = useCheckEligibilityDeployReplica()
 
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
+  const isDirty = selectedRegion !== defaultRegion
+
+  useEffect(() => {
+    if (!checkIsDirtyRef) return
+
+    checkIsDirtyRef.current = () => isDirty
+    return () => {
+      checkIsDirtyRef.current = () => false
+    }
+  }, [checkIsDirtyRef, isDirty])
 
   const { mutate: setUpReplica, isPending: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
@@ -68,13 +85,13 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
 
   return (
     <>
-      {!canDeployReplica && (
-        <SheetSection>
-          <ReadReplicaEligibilityWarnings />
-        </SheetSection>
-      )}
-
-      <SheetSection className="flex-grow overflow-auto px-0 py-0">
+      <SheetSection className="grow overflow-auto px-0 py-0">
+        {typeSelection}
+        {!canDeployReplica && (
+          <SheetSection>
+            <ReadReplicaEligibilityWarnings />
+          </SheetSection>
+        )}
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"
@@ -82,21 +99,21 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
           label="Region"
           labelOptional="Select a region to deploy your replica in"
         >
-          <Select_Shadcn_
+          <Select
             value={selectedRegion}
             onValueChange={setSelectedRegion}
             disabled={!canDeployReplica}
           >
-            <SelectTrigger_Shadcn_>
-              <SelectValue_Shadcn_ placeholder="Select a region" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a region" />
+            </SelectTrigger>
+            <SelectContent>
               {availableRegions.map((region) => (
-                <SelectItem_Shadcn_ key={region.key} value={region.key}>
+                <SelectItem key={region.key} value={region.key}>
                   <div className="flex gap-x-3 items-center">
                     <img
                       alt="region icon"
-                      className="w-5 rounded-sm"
+                      className="w-5 rounded-xs"
                       src={`${BASE_PATH}/img/regions/${region.region}.svg`}
                     />
                     <p className="flex items-center gap-x-2">
@@ -106,23 +123,20 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
                       </span>
                     </p>
                   </div>
-                </SelectItem_Shadcn_>
+                </SelectItem>
               ))}
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       </SheetSection>
-      <SheetFooter className="!justify-between">
-        <div className="flex items-center gap-x-4">
+      <SheetFooter className="justify-between! gap-x-6">
+        <div className="flex items-center gap-x-3">
           <InfoIcon className="h-5 w-5" />
-          <p className="text-sm">
-            New replica will cost an additional <span translate="no">{totalCost}/month</span>
-          </p>
           <ReadReplicaPricingDialog />
         </div>
 
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSettingUp} type="default" onClick={onClose}>
+          <Button disabled={isSettingUp} variant="default" onClick={onCancel}>
             Cancel
           </Button>
           <Button disabled={!canDeployReplica} loading={isSettingUp} onClick={onSubmit}>

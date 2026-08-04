@@ -1,7 +1,3 @@
-import { ConfigStoragePage } from 'components/interfaces/ConfigStorage/ConfigStoragePage'
-import BranchLayout from 'components/layouts/BranchLayout/BranchLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import type { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -11,15 +7,20 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { ConfigStoragePage } from '@/components/interfaces/ConfigStorage/ConfigStoragePage'
+import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import type { NextPageWithLayout } from '@/types'
+
 const ConfigStoragePageEntry: NextPageWithLayout = () => {
   return (
     <>
       <PageHeader>
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Config Storage</PageHeaderTitle>
+            <PageHeaderTitle>GitHub Config</PageHeaderTitle>
             <PageHeaderDescription>
-              Browse config snapshots per branch — pushed by <code>supa push</code>
+              Read and inspect the config managed by the current Git branch
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>

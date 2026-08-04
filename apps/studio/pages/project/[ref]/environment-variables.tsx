@@ -1,12 +1,6 @@
-import { EnvironmentVariablesPage } from 'components/interfaces/EnvironmentVariables/EnvironmentVariablesPage'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { ProjectLayout } from 'components/layouts/ProjectLayout'
-import { useEnvVarBindings } from 'hooks/misc/useEnvVarBindings'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { Toggle } from 'ui'
+import { Switch } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -15,6 +9,13 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
+import { EnvironmentVariablesPage } from '@/components/interfaces/EnvironmentVariables/EnvironmentVariablesPage'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectLayout } from '@/components/layouts/ProjectLayout'
+import { useEnvVarBindings } from '@/hooks/misc/useEnvVarBindings'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { NextPageWithLayout } from '@/types'
 
 const EnvironmentVariablesPageEntry: NextPageWithLayout = () => {
   const router = useRouter()
@@ -42,7 +43,7 @@ const EnvironmentVariablesPageEntry: NextPageWithLayout = () => {
           {/* TODO: temporary dev toggle — remove once env var bindings are stable */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-foreground-light">Env var bindings</span>
-            <Toggle checked={enabled} onChange={(v) => setEnabled(v)} size="tiny" />
+            <Switch checked={enabled} onCheckedChange={setEnabled} size="small" />
           </div>
         </PageHeaderMeta>
       </PageHeader>

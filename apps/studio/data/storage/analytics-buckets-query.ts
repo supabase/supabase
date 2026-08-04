@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { useIsAnalyticsBucketsEnabled } from 'data/config/project-storage-config-query'
-import { get, handleError } from 'data/fetchers'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { storageKeys } from './keys'
+import { useIsAnalyticsBucketsEnabled } from '@/data/config/project-storage-config-query'
+import { get, handleError } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type AnalyticsBucketsVariables = { projectRef?: string }
 export type AnalyticsBucket = components['schemas']['StorageAnalyticsBucketResponse']

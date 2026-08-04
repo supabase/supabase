@@ -1,62 +1,106 @@
-import { Markdown } from 'components/interfaces/Markdown'
-import { DatePicker } from 'components/ui/DatePicker'
-import dayjs from 'dayjs'
-import { useParams } from 'common'
-import { BASE_PATH } from 'lib/constants'
-import { Eye, EyeOff, Globe } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { format } from 'date-fns'
+import { CalendarIcon, ExternalLink, Globe } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect } from 'react'
+import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
-import { Badge, Button, Input, InputNumber, Listbox, Toggle } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import {
+  Badge,
+  Button,
+  Calendar,
+  FormControl,
+  FormInputGroupInput,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Separator,
+  SheetSection,
+  Switch,
+  Textarea,
+  FormField as UIFormField,
+  useWatch,
+} from 'ui'
+import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { AUTH_KEY_TO_ENV_NAME } from 'components/interfaces/EnvironmentVariables/EnvironmentVariables.constants'
-import type { EnvironmentVariable } from 'components/interfaces/EnvironmentVariables/EnvironmentVariables.types'
 import type { Enum } from './AuthProvidersForm.types'
+import { AUTH_KEY_TO_ENV_NAME } from '@/components/interfaces/EnvironmentVariables/EnvironmentVariables.constants'
+import type { EnvironmentVariable } from '@/components/interfaces/EnvironmentVariables/EnvironmentVariables.types'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { BASE_PATH } from '@/lib/constants'
 
 interface FormFieldProps {
+  projectRef: string | undefined
+  organizationSlug: string | undefined
   name: string
   properties: any
-  formValues: any
-  setFieldValue: (field: string, v: any) => any
+  control: Control
+  hasAccess: boolean
   disabled?: boolean
+  readOnly?: boolean
   isEnvVar?: boolean
   envVarScopes?: EnvironmentVariable[]
 }
 
-function formatDate(date: Date): string {
-  return dayjs(date).format('dddd, MMMM D, YYYY HH:mm:ss Z')
-}
-
 const FormField = ({
+  projectRef,
   name,
   properties,
-  formValues,
-  disabled = false,
-  setFieldValue,
+  organizationSlug,
+  control,
+  hasAccess,
+  disabled: disabledProp,
+  readOnly,
   isEnvVar = false,
   envVarScopes = [],
 }: FormFieldProps) => {
-  const { ref } = useParams()
-  const router = useRouter()
-  const [hidden, setHidden] = useState(!!properties.isSecret)
-  const [dateAsText, setDateAsText] = useState(
-    formValues[name] ? formatDate(new Date(formValues[name])) : ''
-  )
+  const { setValue } = useFormContext()
+  const { description: originalDescription } = properties
+  let description = originalDescription
+
+  if (originalDescription && projectRef) {
+    description = originalDescription.replace(
+      /\(\.\.\/auth\/(.*?)\)/g,
+      `(/project/${projectRef}/auth/$1)`
+    )
+  }
+
+  const fieldValue = useWatch({ control, name })
+  if (!hasAccess) {
+    const planMessage = organizationSlug
+      ? `Only available on [Pro plan](/org/${organizationSlug}/billing?panel=subscriptionPlan) and above.`
+      : ''
+    description = originalDescription ? `${originalDescription} ${planMessage}` : planMessage
+  }
+  const disabled =
+    disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
+
+  const showValue = useWatch({
+    control,
+    name: properties.show?.key,
+    disabled: properties.show == null,
+  })
 
   useEffect(() => {
-    if (properties.show && properties.show.key && !formValues[properties.show.key]) {
-      setFieldValue(name, '')
-      setDateAsText('')
+    if (properties.show?.key != null && !showValue && fieldValue !== '') {
+      setValue(name, '', { shouldDirty: true })
     }
-  }, [properties.show && properties.show.key && !formValues[properties.show.key]])
+  }, [fieldValue, name, properties.show?.key, setValue, showValue])
 
   if (properties.show) {
     if (properties.show.matches) {
-      if (!properties.show.matches.includes(formValues[properties.show.key])) {
+      if (!properties.show.matches.includes(showValue)) {
         return null
       }
-    } else if (!formValues[properties.show.key]) {
+    } else if (!showValue) {
       return null
     }
   }
@@ -64,300 +108,344 @@ const FormField = ({
   switch (properties.type) {
     case 'datetime':
       return (
-        <Input
-          size="small"
-          layout="vertical"
-          id={name}
-          name={name}
-          type="text"
-          value={dateAsText}
-          readOnly
-          label={properties.title}
-          labelOptional={
-            properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
-            ) : null
-          }
-          descriptionText={
-            properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
-            ) : null
-          }
-          actions={
-            <DatePicker
-              selectsRange={false}
-              minDate={new Date()}
-              from={formValues[name]}
-              to={formValues[name]}
-              onChange={(date) => {
-                if (date && date.to) {
-                  setFieldValue(name, date.to)
-                  setDateAsText(formatDate(new Date(date.to)))
-                } else {
-                  setDateAsText('')
-                  setFieldValue(name, '')
-                }
-              }}
-            >
-              <span>Pick</span>
-            </DatePicker>
-          }
-        />
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
+              name={name}
+              disabled={disabled || readOnly}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                        {description}
+                      </ReactMarkdown>
+                    ) : null
+                  }
+                >
+                  <FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal px-3 py-4"
+                          icon={<CalendarIcon className="h-4 w-4" />}
+                          size="small"
+                        >
+                          {field.value ? format(new Date(field.value), 'PPP') : 'Pick a date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(date) => {
+                            field.onChange(date?.toISOString())
+                          }}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'string': {
       const envVarName = AUTH_KEY_TO_ENV_NAME[name]
 
       return (
-        <div>
-          {isEnvVar && envVarName ? (
-            <div className="space-y-1">
-              <label className="text-sm text-foreground-light">{properties.title}</label>
-              <button
-                type="button"
-                onClick={() => router.push(`/project/${ref}/environment-variables`)}
-                className="flex h-[34px] w-full items-center rounded-md overflow-hidden hover:opacity-80 transition-opacity"
-              >
-                <div className="flex h-full items-center px-2.5 bg-[rgba(89,210,247,0.12)] border-t border-b border-l border-[rgba(34,128,157,0.4)] rounded-l-md">
-                  <Globe size={13} className="shrink-0 text-[#25c8ff]" strokeWidth={1.5} />
-                </div>
-                <div className="flex h-full flex-1 items-center gap-2 px-2.5 bg-[rgba(89,210,247,0.12)] border border-[rgba(34,128,157,0.4)] rounded-r-md">
-                  <span className="font-mono text-xs text-[#25c8ff] truncate flex-1 text-left">
-                    {properties.isSecret ? '••••••••' : formValues[name]}
-                  </span>
-                  {envVarScopes.map((v) => (
-                    <span
-                      key={v.sourceKey}
-                      className="text-[10px] leading-none shrink-0 rounded-full border border-border bg-surface-100 px-1.5 py-[3px] text-foreground-lighter"
-                    >
-                      {v.scope === null
-                        ? 'All'
-                        : v.scope === 'branch'
-                          ? v.branch
-                          : v.scope === 'preview'
-                            ? 'All Previews'
-                            : v.scope}
-                    </span>
-                  ))}
-                </div>
-              </button>
-
-              {properties.description && (
-                <Markdown content={properties.description} className="text-xs text-foreground-lighter" />
-              )}
-            </div>
-          ) : (
-            <Input
-              size="small"
-              layout="vertical"
-              id={name}
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
               name={name}
               disabled={disabled}
-              type={hidden ? 'password' : 'text'}
-              label={properties.title}
-              labelOptional={
-                properties.descriptionOptional ? (
-                  <Markdown
-                    content={properties.descriptionOptional}
-                    className="text-foreground-lighter"
-                  />
-                ) : null
-              }
-              descriptionText={
-                properties.description ? (
-                  <Markdown content={properties.description} className="text-foreground-lighter" />
-                ) : null
-              }
-              actions={
-                !!properties.isSecret ? (
-                  <Button
-                    icon={hidden ? <Eye /> : <EyeOff />}
-                    type="default"
-                    onClick={() => setHidden(!hidden)}
-                  />
-                ) : (
-                  <span className="mr-3 text-foreground-lighter">
-                    {properties.units ? (
-                      <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                        {properties.units}
-                      </ReactMarkdown>
-                    ) : null}
-                  </span>
-                )
-              }
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <div className="col-span-6 space-y-2">
+                    {isEnvVar && envVarName && projectRef ? (
+                      <Link
+                        href={`/project/${projectRef}/environment-variables`}
+                        className="flex h-[34px] w-full items-center overflow-hidden rounded-md transition-opacity hover:opacity-80"
+                      >
+                        <div className="flex h-full items-center rounded-l-md border-y border-l border-[rgba(34,128,157,0.4)] bg-[rgba(89,210,247,0.12)] px-2.5">
+                          <Globe size={13} className="shrink-0 text-[#25c8ff]" strokeWidth={1.5} />
+                        </div>
+                        <div className="flex h-full flex-1 items-center gap-2 rounded-r-md border border-[rgba(34,128,157,0.4)] bg-[rgba(89,210,247,0.12)] px-2.5">
+                          <span className="flex-1 truncate text-left font-mono text-xs text-[#25c8ff]">
+                            {properties.isSecret ? '••••••••' : field.value}
+                          </span>
+                          {envVarScopes.map((variable) => (
+                            <span
+                              key={variable.sourceKey}
+                              className="shrink-0 rounded-full border border-border bg-surface-100 px-1.5 py-[3px] text-[10px] leading-none text-foreground-lighter"
+                            >
+                              {variable.scope === null
+                                ? 'All'
+                                : variable.scope === 'branch'
+                                  ? variable.branch
+                                  : variable.scope === 'preview'
+                                    ? 'All Previews'
+                                    : variable.scope}
+                            </span>
+                          ))}
+                        </div>
+                      </Link>
+                    ) : properties.isSecret ? (
+                      <FormControl>
+                        <DataInput
+                          {...field}
+                          id={name}
+                          size="small"
+                          copy
+                          reveal
+                          readOnly={readOnly}
+                        />
+                      </FormControl>
+                    ) : (
+                      <FormControl>
+                        <Input {...field} id={name} readOnly={readOnly} />
+                      </FormControl>
+                    )}
+                    {envVarName && (
+                      <Badge
+                        variant="secondary"
+                        className="font-mono text-xs text-foreground-lighter"
+                      >
+                        {envVarName}
+                      </Badge>
+                    )}
+                  </div>
+                </FormItemLayout>
+              )}
             />
-          )}
-          {AUTH_KEY_TO_ENV_NAME[name] && (
-            <div className="mt-1">
-              <Badge variant="secondary" className="font-mono text-xs text-foreground-lighter">
-                {AUTH_KEY_TO_ENV_NAME[name]}
-              </Badge>
-            </div>
-          )}
-        </div>
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
     }
 
     case 'multiline-string':
       return (
-        <div>
-          <Input.TextArea
-            size="small"
-            layout="vertical"
-            id={name}
-            name={name}
-            disabled={disabled}
-            type={hidden ? 'password' : 'text'}
-            label={properties.title}
-            labelOptional={
-              properties.descriptionOptional ? (
-                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                  {properties.descriptionOptional}
-                </ReactMarkdown>
-              ) : undefined
-            }
-            descriptionText={
-              properties.description ? (
-                <Markdown content={properties.description} className="text-foreground-lighter" />
-              ) : null
-            }
-            actions={
-              !!properties.isSecret ? (
-                <Button
-                  icon={hidden ? <Eye /> : <EyeOff />}
-                  type="default"
-                  onClick={() => setHidden(!hidden)}
-                />
-              ) : (
-                <span className="mr-3 text-scale-900">
-                  {properties.units ? (
-                    <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                      {properties.units}
-                    </ReactMarkdown>
-                  ) : null}
-                </span>
-              )
-            }
-          />
-          {AUTH_KEY_TO_ENV_NAME[name] && (
-            <div className="mt-1">
-              <Badge variant="secondary" className="font-mono text-xs text-foreground-lighter">
-                {AUTH_KEY_TO_ENV_NAME[name]}
-              </Badge>
-            </div>
-          )}
-        </div>
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <div className="col-span-6 space-y-2">
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        id={name}
+                        rows={4}
+                        placeholder="Enter multi-line text"
+                        className="resize-none"
+                        readOnly={readOnly}
+                      />
+                    </FormControl>
+                    {AUTH_KEY_TO_ENV_NAME[name] && (
+                      <Badge
+                        variant="secondary"
+                        className="font-mono text-xs text-foreground-lighter"
+                      >
+                        {AUTH_KEY_TO_ENV_NAME[name]}
+                      </Badge>
+                    )}
+                  </div>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'number':
       return (
-        <InputNumber
-          size="small"
-          layout="vertical"
-          id={name}
-          name={name}
-          disabled={disabled}
-          label={properties.title}
-          labelOptional={
-            properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
-            ) : null
-          }
-          descriptionText={
-            properties.description ? (
-              <Markdown content={properties.description} className="text-foreground-lighter" />
-            ) : null
-          }
-          actions={
-            <span className="mr-3 text-foreground-lighter">
-              {properties.units ? (
-                <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                  {properties.units}
-                </ReactMarkdown>
-              ) : null}
-            </span>
-          }
-        />
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
+              name={name}
+              disabled={disabled}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <Markdown content={description} className="text-foreground-lighter" />
+                    ) : null
+                  }
+                >
+                  <FormControl className="col-span-6">
+                    {properties.units ? (
+                      <InputGroup>
+                        <FormInputGroupInput
+                          {...field}
+                          id={name}
+                          type="number"
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
+                          readOnly={readOnly}
+                        />
+                        <InputGroupAddon align="inline-end">
+                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                            {properties.units}
+                          </ReactMarkdown>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    ) : (
+                      <Input
+                        {...field}
+                        id={name}
+                        type="number"
+                        onChange={(e) =>
+                          field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                        }
+                        readOnly={readOnly}
+                      />
+                    )}
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'boolean':
       return (
-        <Toggle
-          size="small"
-          id={name}
-          name={name}
-          disabled={disabled}
-          label={
-            <div className="flex items-center gap-x-2">
-              <span>{properties.title}</span>
-              {properties.link && (
-                <a href={properties.link} target="_blank" rel="noreferrer noopener">
-                  <InfoTooltip side="bottom">Documentation</InfoTooltip>
-                </a>
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
+              name={name}
+              disabled={disabled || readOnly}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    <div className="flex flex-col gap-1">
+                      {description ? <Markdown content={description} /> : null}
+                      {properties.link && (
+                        <span>
+                          <Button asChild variant="default" size="tiny" icon={<ExternalLink />}>
+                            <a href={properties.link} target="_blank" rel="noreferrer noopener">
+                              Documentation
+                            </a>
+                          </Button>
+                        </span>
+                      )}
+                    </div>
+                  }
+                >
+                  <FormControl className="col-span-6">
+                    <Switch
+                      id={name}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      size="small"
+                    />
+                  </FormControl>
+                </FormItemLayout>
               )}
-            </div>
-          }
-          descriptionText={
-            properties.description ? <Markdown content={properties.description} /> : null
-          }
-        />
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     case 'select':
       return (
-        <Listbox
-          size="small"
-          name={name}
-          disabled={disabled}
-          label={properties.title}
-          descriptionText={
-            properties.description ? (
-              <ReactMarkdown
-                unwrapDisallowed
-                disallowedElements={['p']}
-                className="form-field-markdown"
-              >
-                {properties.description}
-              </ReactMarkdown>
-            ) : null
-          }
-          defaultValue={properties.enum[0]}
-        >
-          {properties.enum.map((option: Enum) => {
-            return (
-              <Listbox.Option
-                id={option.value}
-                key={option.value}
-                label={option.label}
-                value={option.value}
-                addOnBefore={() => {
-                  return option.icon ? (
-                    <img
-                      alt={`${option.label} icon`}
-                      className="h-6 w-6"
-                      src={`${BASE_PATH}/img/icons/${option.icon}`}
-                    />
-                  ) : null
-                }}
-              >
-                {option.label}
-              </Listbox.Option>
-            )
-          })}
-        </Listbox>
+        <>
+          <SheetSection>
+            <UIFormField
+              control={control}
+              name={name}
+              disabled={disabled || readOnly}
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="horizontal"
+                  label={properties.title}
+                  description={
+                    description ? (
+                      <div className="form-field-markdown">
+                        <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
+                          {description}
+                        </ReactMarkdown>
+                      </div>
+                    ) : null
+                  }
+                >
+                  <FormControl className="col-span-6">
+                    <Select
+                      defaultValue={properties.enum[0]?.value}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {properties.enum.map((option: Enum) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <span className="flex gap-2 items-center">
+                              {option.icon ? (
+                                <img
+                                  alt={`${option.label} icon`}
+                                  className="h-6 w-6"
+                                  src={`${BASE_PATH}/img/icons/${option.icon}`}
+                                />
+                              ) : null}
+                              {option.label}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+          </SheetSection>
+          <Separator className="w-full" />
+        </>
       )
 
     default:
-      break
+      return null
   }
-
-  return null
 }
 
 export default FormField

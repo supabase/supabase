@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import { COMMAND_MENU_SECTIONS } from 'components/interfaces/App/CommandMenu/CommandMenu.utils'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+
+import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useAuthGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -37,13 +38,6 @@ export function useAuthGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/auth/users`,
         defaultHidden: true,
       },
-      {
-        id: 'nav-auth-policies',
-        name: 'Policies',
-        value: 'Auth: Policies (RLS)',
-        route: `/project/${ref}/auth/policies`,
-        defaultHidden: true,
-      },
       ...(authenticationSignInProviders
         ? [
             {
@@ -58,7 +52,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
       ...(authenticationThirdPartyAuth
         ? [
             {
-              id: 'nav-auth-providers',
+              id: 'nav-auth-providers-third-party',
               name: 'Providers (Third Party)',
               value: 'Auth: Providers (Third Party)',
               route: `/project/${ref}/auth/third-party`,

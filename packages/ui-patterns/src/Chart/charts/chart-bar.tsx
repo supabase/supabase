@@ -16,8 +16,8 @@ import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
-  TICK: 'hsl(var(--background-overlay-hover))',
-  AXIS: 'hsl(var(--background-overlay-hover))',
+  TICK: 'var(--background-overlay-hover)',
+  AXIS: 'var(--background-overlay-hover)',
   BRAND: 'hsl(var(--brand-default))',
   BRAND_HOVER: 'hsl(var(--brand-500))',
 }
@@ -54,8 +54,6 @@ export interface ChartBarProps {
   color?: string
   hoverColor?: string
   chartHighlight?: ChartHighlight
-  updateDateRange?: (from: string, to: string) => void
-  highlightActions?: ChartHighlightAction[]
   syncId?: string
   showHighlightArea?: boolean
   cursor?: string
@@ -80,8 +78,6 @@ export const ChartBar = ({
   color = CHART_COLORS.BRAND,
   hoverColor = CHART_COLORS.BRAND_HOVER,
   chartHighlight,
-  updateDateRange,
-  highlightActions,
   syncId,
   showHighlightArea = true,
   cursor,
@@ -112,10 +108,12 @@ export const ChartBar = ({
   const chartCursor = cursor || (chartHighlight ? 'crosshair' : 'default')
 
   const yAxisConfig = {
-    tick: showYAxis,
+    tick: showYAxis
+      ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+      : false,
     hide: !showYAxis,
-    tickMargin: showYAxis ? YAxisProps?.tickMargin ?? 4 : 0,
-    width: showYAxis ? YAxisProps?.width ?? undefined : 0,
+    tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
+    width: showYAxis ? (YAxisProps?.width ?? 60) : 0,
     axisLine: { stroke: CHART_COLORS.AXIS },
     tickLine: { stroke: CHART_COLORS.AXIS },
     ...YAxisProps,
@@ -124,7 +122,7 @@ export const ChartBar = ({
   const margin = {
     top: 0,
     right: 0,
-    left: showYAxis ? -40 : 0,
+    left: 0,
     bottom: 0,
   }
 
@@ -133,7 +131,7 @@ export const ChartBar = ({
       data-testid="chart-bar"
       className={cn('flex flex-col gap-y-3 w-full', isFullHeight ? 'h-full' : 'h-24', className)}
     >
-      <ChartContainer className="!w-full h-full" config={chartConfig}>
+      <ChartContainer className="w-full! h-full" config={chartConfig}>
         <RechartBarChart
           data={data}
           syncId={syncId}
@@ -220,7 +218,7 @@ export const ChartBar = ({
         </RechartBarChart>
       </ChartContainer>
       {data && data.length > 0 && (
-        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
+        <div className="text-foreground-lighter -mt-6 flex items-center justify-between text-[10px] font-mono">
           <span>{dayjs(data[0]['timestamp']).format(DateTimeFormat)}</span>
           <span>{dayjs(data[data.length - 1]?.['timestamp']).format(DateTimeFormat)}</span>
         </div>

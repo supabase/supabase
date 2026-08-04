@@ -1,15 +1,15 @@
-import { useQuery } from '@tanstack/react-query'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
 import { SENTINEL_KEYS, type Scope } from '@supabase-dx/env-vars'
+import { useQuery } from '@tanstack/react-query'
 
 import {
   AUTH_CONFIG_ENV_VAR_MAP,
   POSTGREST_CONFIG_ENV_VAR_MAP,
 } from './EnvironmentVariables.constants'
 import type { EnvironmentVariable } from './EnvironmentVariables.types'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const ENV_SERVER = 'http://localhost:3457'
 

@@ -1,8 +1,8 @@
-import { Link, Check } from 'lucide-react'
+import { Check, Link } from 'lucide-react'
 import { useState } from 'react'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { copyToClipboard } from 'ui'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface ReportSectionHeaderProps {
   id: string
@@ -32,7 +32,7 @@ export const ReportSectionHeader = ({ id, title, description }: ReportSectionHea
       >
         <h3 className="text-foreground text-lg font-medium">{title}</h3>
         <ButtonTooltip
-          type="text"
+          variant="text"
           icon={copiedLink === id ? <Check size={14} /> : <Link size={14} />}
           className="w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity"
           tooltip={{

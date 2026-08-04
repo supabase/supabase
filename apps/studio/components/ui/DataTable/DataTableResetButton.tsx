@@ -1,30 +1,36 @@
 import { X } from 'lucide-react'
+import { Button } from 'ui'
 
-import { useHotKey } from 'hooks/ui/useHotKey'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-export function DataTableResetButton() {
+export interface DataTableResetButtonProps {
+  /** Called alongside `table.resetColumnFilters()` — for filters that live outside TanStack Table's columnFilters state (e.g. a cross-cutting URL param). */
+  onReset?: () => void
+}
+
+export function DataTableResetButton({ onReset }: DataTableResetButtonProps) {
   const { table } = useDataTable()
-  useHotKey(() => table.resetColumnFilters(), 'Escape')
+  const reset = () => {
+    table.resetColumnFilters()
+    onReset?.()
+  }
+
+  useShortcut(SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS, reset, {
+    registerInCommandMenu: true,
+  })
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button type="default" size="tiny" onClick={() => table.resetColumnFilters()} icon={<X />}>
-          Reset
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side="left">
-        <p>
-          Reset filters with{' '}
-          <Kbd className="ml-1 text-muted-foreground group-hover:text-accent-foreground">
-            <span className="mr-1">⌘</span>
-            <span>Esc</span>
-          </Kbd>
-        </p>
-      </TooltipContent>
-    </Tooltip>
+    <ShortcutTooltip
+      shortcutId={SHORTCUT_IDS.DATA_TABLE_RESET_FILTERS}
+      label="Reset filters"
+      side="left"
+    >
+      <Button variant="default" size="tiny" onClick={reset} icon={<X />}>
+        Reset
+      </Button>
+    </ShortcutTooltip>
   )
 }

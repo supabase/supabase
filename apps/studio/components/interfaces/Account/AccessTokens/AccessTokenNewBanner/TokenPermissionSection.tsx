@@ -1,11 +1,7 @@
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from 'ui'
-import {
-  Collapsible_Shadcn_ as Collapsible,
-  CollapsibleContent_Shadcn_ as CollapsibleContent,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
-} from 'ui'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+
 import { PermissionsList } from './PermissionList'
 
 const PERMISSIONS_COLLAPSE_THRESHOLD = 5
@@ -30,7 +26,7 @@ export const TokenPermissionsSection = ({
         <Collapsible open={permissionsOpen} onOpenChange={setPermissionsOpen}>
           <CollapsibleTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className="w-full justify-start px-0.5 h-auto text-sm font-medium text-foreground-light hover:text-foreground"
             >
@@ -40,7 +36,7 @@ export const TokenPermissionsSection = ({
               </div>
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="pt-3 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+          <CollapsibleContent className="pt-3 transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
             <PermissionsList groupedPermissions={groupedPermissions} />
           </CollapsibleContent>
         </Collapsible>

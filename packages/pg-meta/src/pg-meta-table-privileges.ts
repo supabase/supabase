@@ -2,8 +2,15 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, literal } from './pg-format'
-import { TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from './pg-format'
+import { getScopedTablePrivilegesSql, TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
 
 const pgTablePrivilegesZod = z.object({
   relation_id: z.number(),
@@ -43,34 +50,56 @@ function list({
   excludedSchemas,
   limit,
   offset,
+  scoped = false,
 }: {
   includeSystemSchemas?: boolean
   includedSchemas?: string[]
   excludedSchemas?: string[]
   limit?: number
   offset?: number
+  scoped?: boolean
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesArrayZod
 } {
-  let sql = `
-with table_privileges as (${TABLE_PRIVILEGES_SQL})
-select *
-from table_privileges
-`
   const filter = filterByList(
     includedSchemas,
     excludedSchemas,
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
+  // Scoped path: push the schema filter into the base query's WHERE (before the
+  // aclexplode lateral / GROUP BY) instead of filtering the aggregated CTE.
+  if (scoped) {
+    const base = getScopedTablePrivilegesSql(filter ? safeSql`and nc.nspname ${filter}` : undefined)
+    let sql = safeSql`
+with table_privileges as (${base})
+select *
+from table_privileges
+`
+    if (limit) {
+      sql = safeSql`${sql} limit ${literal(limit)}`
+    }
+    if (offset) {
+      sql = safeSql`${sql} offset ${literal(offset)}`
+    }
+    return {
+      sql,
+      zod: pgTablePrivilegesArrayZod,
+    }
+  }
+  let sql = safeSql`
+with table_privileges as (${TABLE_PRIVILEGES_SQL})
+select *
+from table_privileges
+`
   if (filter) {
-    sql += ` where schema ${filter}`
+    sql = safeSql`${sql} where schema ${filter}`
   }
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -78,25 +107,47 @@ from table_privileges
   }
 }
 
-function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgTablePrivilegesOptionalZod }
-function retrieve({ name, schema }: { name: string; schema?: string }): {
-  sql: string
+function retrieve({ id, scoped }: { id: number; scoped?: boolean }): {
+  sql: SafeSqlFragment
+  zod: typeof pgTablePrivilegesOptionalZod
+}
+function retrieve({ name, schema, scoped }: { name: string; schema?: string; scoped?: boolean }): {
+  sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesOptionalZod
 }
 function retrieve({
   id,
   name,
   schema = 'public',
+  scoped = false,
 }: {
   id?: number
   name?: string
   schema?: string
+  scoped?: boolean
 }): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesOptionalZod
 } {
+  // Scoped path: push the oid / schema+name predicate into the base query's
+  // WHERE (before the aclexplode lateral / GROUP BY) so pg_class is pruned to
+  // the target relation instead of scanning every relation then filtering.
+  if (scoped) {
+    const scopeFilter = id
+      ? safeSql`and c.oid = ${literal(id)}`
+      : safeSql`and nc.nspname = ${literal(schema)} and c.relname = ${literal(name)}`
+    const sql = /* SQL */ safeSql`
+with table_privileges as (${getScopedTablePrivilegesSql(scopeFilter)})
+select *
+from table_privileges
+`
+    return {
+      sql,
+      zod: pgTablePrivilegesOptionalZod,
+    }
+  }
   if (id) {
-    const sql = /* SQL */ `
+    const sql = /* SQL */ safeSql`
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -106,7 +157,7 @@ where table_privileges.relation_id = ${literal(id)};`
       zod: pgTablePrivilegesOptionalZod,
     }
   } else {
-    const sql = /* SQL */ `
+    const sql = /* SQL */ safeSql`
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -135,18 +186,19 @@ type TablePrivilegesGrant = {
     | 'MAINTAIN'
   isGrantable?: boolean
 }
-function grant(grants: TablePrivilegesGrant[]): { sql: string } {
-  const sql = `
+function grant(grants: TablePrivilegesGrant[]): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 begin
-${grants
-  .map(
+${joinSqlFragments(
+  grants.map(
     ({ privilegeType, relationId, grantee, isGrantable }) =>
-      `execute format('grant ${privilegeType} on table %s to ${
-        grantee.toLowerCase() === 'public' ? 'public' : ident(grantee)
-      } ${isGrantable ? 'with grant option' : ''}', ${relationId}::regclass);`
-  )
-  .join('\n')}
+      safeSql`execute format('grant ${keyword(privilegeType)} on table %s to ${
+        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+      } ${isGrantable ? safeSql`with grant option` : safeSql``}', ${literal(relationId)}::regclass);`
+  ),
+  '\n'
+)}
 end $$;
 `
   return { sql }
@@ -166,16 +218,19 @@ type TablePrivilegesRevoke = {
     | 'TRIGGER'
     | 'MAINTAIN'
 }
-function revoke(revokes: TablePrivilegesRevoke[]): { sql: string } {
-  const sql = `
+function revoke(revokes: TablePrivilegesRevoke[]): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 begin
-${revokes
-  .map(
+${joinSqlFragments(
+  revokes.map(
     ({ privilegeType, relationId, grantee }) =>
-      `execute format('revoke ${privilegeType} on table %s from ${grantee.toLowerCase() === 'public' ? 'public' : ident(grantee)}', ${relationId}::regclass);`
-  )
-  .join('\n')}
+      safeSql`execute format('revoke ${keyword(privilegeType)} on table %s from ${
+        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+      }', ${literal(relationId)}::regclass);`
+  ),
+  '\n'
+)}
 end $$;
 `
   return { sql }

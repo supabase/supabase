@@ -1,5 +1,4 @@
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useRef } from 'react'
-
 import { Button, ExpandingTextArea } from 'ui'
 
 interface AskAIWidgetProps {
@@ -59,7 +58,7 @@ export const AskAIWidget = ({
     <div className="overflow-hidden rounded-md p-0 bg-popover border border-foreground/20 focus-within:border-foreground/30 shadow-xl text-sm max-w-xl">
       <ExpandingTextArea
         ref={textAreaRef}
-        className="bg-transparent border-0 outline-0 ring-0 ring-offset-0 focus:outline-0 focus:ring-0 focus:ring-offset-0 focus-visible:outline-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-within:outline-0 focus-within:ring-0 focus-within:ring-offset-0 shadow-none rounded-none gap-4 text-xs md:text-xs py-2 pl-3 !leading-[20px]"
+        className="bg-transparent border-0 outline-0 ring-0 ring-offset-0 focus:outline-0 focus:ring-0 focus:ring-offset-0 focus-visible:outline-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-within:outline-0 focus-within:ring-0 focus-within:ring-offset-0 shadow-none rounded-none gap-4 text-xs md:text-xs py-2 pl-3 leading-[20px]!"
         placeholder={isDiffVisible ? 'Make an edit...' : 'Edit via the Assistant...'}
         value={value}
         onChange={handleChange}
@@ -69,7 +68,7 @@ export const AskAIWidget = ({
       {isDiffVisible ? (
         <div className="flex justify-start p-0 border-t">
           <Button
-            type="text"
+            variant="text"
             onClick={onAccept}
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
@@ -78,7 +77,7 @@ export const AskAIWidget = ({
           </Button>
           <Button
             onClick={onReject}
-            type="text"
+            variant="text"
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
           >
@@ -88,7 +87,7 @@ export const AskAIWidget = ({
       ) : (
         <div className="flex justify-start p-0 border-t">
           <Button
-            type="text"
+            variant="text"
             onClick={handleSubmit}
             loading={isLoading}
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
@@ -99,7 +98,7 @@ export const AskAIWidget = ({
           </Button>
           <Button
             onClick={onCancel}
-            type="text"
+            variant="text"
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
           >

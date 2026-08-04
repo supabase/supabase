@@ -15,7 +15,7 @@ export default function AlertDialogWarning() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="warning">Show Alert Dialog</Button>
+        <Button variant="warning">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

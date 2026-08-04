@@ -1,27 +1,43 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { safeLocalStorage, safeSessionStorage } from 'common'
 import { compact } from 'lodash'
-import { useEffect, useMemo } from 'react'
-import { CalculatedColumn, CellKeyboardEvent } from 'react-data-grid'
-
-import type { Filter, SavedState } from 'components/grid/types'
-import { Entity, isTableLike } from 'data/table-editor/table-editor-types'
-import { BASE_PATH } from 'lib/constants'
 import { useSearchParams } from 'next/navigation'
 import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
+import { useEffect, useMemo } from 'react'
+import {
+  CalculatedColumn,
+  CellKeyboardEvent,
+  CellKeyDownArgs,
+  RowsChangeData,
+} from 'react-data-grid'
+import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
+
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
-import type { Sort, SupaColumn, SupaTable } from './types'
+import type { Sort, SupaColumn, SupaRow, SupaTable } from './types'
 import { formatClipboardValue } from './utils/common'
+import { isBoolColumn } from './utils/types'
+import type { Filter, SavedState } from '@/components/grid/types'
+import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
+import { BASE_PATH } from '@/lib/constants'
+import { eventMatchesAnyShortcut } from '@/state/shortcuts/matchEvent'
+import { tableEditorRegistry } from '@/state/shortcuts/registry/table-editor'
 
-export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
+export function formatSortURLParams(
+  // Should match the Entity type.
+  table: { name: string; columns: { name: string }[] },
+  sort?: string[]
+): Sort[] {
   if (Array.isArray(sort)) {
     return compact(
       sort.map((s) => {
         const [column, order] = s.split(':')
         // Reject any possible malformed sort param
         if (!column || !order) return undefined
-        else return { table: tableName, column, ascending: order === 'asc' }
+        // if the sort column name doesn't exist in the table, reject it as well to avoid confusion
+        if (table.columns.find((c) => c.name === column) === undefined) return undefined
+        else return { table: table.name, column, ascending: order === 'asc' }
       })
     )
   }
@@ -139,7 +155,7 @@ export function loadTableEditorStateFromLocalStorage(
 ): SavedState | undefined {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   // Prefer sessionStorage (scoped to current tab) over localStorage
-  const jsonStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
+  const jsonStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
   return json[tableId]
@@ -181,20 +197,23 @@ export function saveTableEditorStateToLocalStorage({
   gridColumns,
   sorts,
   filters,
+  sensitiveDataColumns,
 }: {
   projectRef: string
   tableId: number
   gridColumns?: CalculatedColumn<any, any>[]
   sorts?: string[]
   filters?: string[]
+  sensitiveDataColumns?: string[]
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
-  const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
+  const savedStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
 
   const config = {
     ...(gridColumns !== undefined && { gridColumns }),
     ...(sorts !== undefined && { sorts: sorts.filter((sort) => sort !== '') }),
     ...(filters !== undefined && { filters: filters.filter((filter) => filter !== '') }),
+    ...(sensitiveDataColumns !== undefined && { sensitiveDataColumns }),
   }
 
   let savedJson
@@ -206,8 +225,8 @@ export function saveTableEditorStateToLocalStorage({
     savedJson = { [tableId]: config }
   }
   // Save to both localStorage and sessionStorage so it's consistent to current tab
-  localStorage.setItem(storageKey, JSON.stringify(savedJson))
-  sessionStorage.setItem(storageKey, JSON.stringify(savedJson))
+  safeLocalStorage.setItem(storageKey, JSON.stringify(savedJson))
+  safeSessionStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
 export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromise(
@@ -230,7 +249,7 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   table: Entity | undefined
 }) {
   // Warning: nuxt url state often fails to update to changes to URL
-  const [, updateUrlParams] = useQueryStates(
+  useQueryStates(
     {
       sort: parseAsNativeArrayOf(parseAsString),
       filter: parseAsNativeArrayOf(parseAsString),
@@ -242,8 +261,8 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   // Use nextjs useSearchParams to get the latest URL params
   const searchParams = useSearchParams()
   const urlParams = useMemo(() => {
-    const sort = searchParams.getAll('sort')
-    const filter = searchParams.getAll('filter')
+    const sort = searchParams?.getAll('sort') ?? []
+    const filter = searchParams?.getAll('filter') ?? []
     return { sort, filter }
   }, [searchParams])
 
@@ -264,18 +283,77 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
   }, [urlParams, table, projectRef])
 }
 
-export const handleCopyCell = (
-  {
-    mode,
-    column,
-    row,
-  }: { mode: 'SELECT' | 'EDIT'; column: CalculatedColumn<any, unknown>; row: any },
-  event: CellKeyboardEvent
-) => {
-  if (mode === 'SELECT' && event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
-    const colKey = column.key
-    const cellValue = row[colKey] ?? ''
-    const value = formatClipboardValue(cellValue)
-    copyToClipboard(value)
+export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
+  args: CellKeyDownArgs<TRow, unknown>,
+  event: CellKeyboardEvent,
+  context?: {
+    rows: TRow[]
+    columns: SupaColumn[]
+    onRowsChange: (rows: TRow[], data: RowsChangeData<TRow, unknown>) => void
+    sensitiveDataColumns?: Set<string>
   }
+) => {
+  const { mode, column, row, rowIdx } = args
+  if (mode !== 'SELECT') return
+  const key = event.key.toLowerCase()
+
+  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
+    if (window.getSelection()?.isCollapsed === false) return
+
+    const isSensitive = context?.sensitiveDataColumns?.has(column.key as string)
+    const value = formatClipboardValue(row[column.key] ?? '')
+    event.preventDefault()
+    event.preventGridDefault()
+    void copyToClipboard(value, () => {
+      if (isSensitive) {
+        toast.warning('Copied sensitive data to clipboard')
+      } else {
+        toast.success('Copied cell value to clipboard')
+      }
+    })
+    return
+  }
+
+  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default,
+  // unless a printable key enters edit mode.
+  if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
+    if (
+      event.key.length === 1 &&
+      event.key !== ' ' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      column.renderEditCell != null
+    ) {
+      event.stopPropagation()
+    } else {
+      event.preventGridDefault()
+      return
+    }
+  }
+
+  // Toggle boolean cells with T/F when no modifier keys are pressed.
+  if (context === undefined) return
+
+  if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
+
+  const supaColumn = context.columns.find((c) => c.name === column.key)
+  if (
+    supaColumn === undefined ||
+    !isBoolColumn(supaColumn.dataType) ||
+    column.renderEditCell == null
+  ) {
+    return
+  }
+
+  event.preventDefault()
+  event.preventGridDefault()
+
+  const nextValue = key === 't'
+  if (row[column.key] === nextValue) return
+
+  const updatedRows = [...context.rows]
+  updatedRows[rowIdx] = { ...row, [column.key]: nextValue }
+  context.onRowsChange(updatedRows, { indexes: [rowIdx], column })
 }

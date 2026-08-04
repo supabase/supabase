@@ -1,13 +1,12 @@
-import {
-  QueuedOperation,
-  isAddRowOperation,
-  isDeleteRowOperation,
-  isEditCellContentOperation,
-} from 'state/table-editor-operation-queue.types'
-
 import { AddRowOperationItem } from './AddRowOperationItem'
 import { DeleteRowOperationItem } from './DeleteRowOperationItem'
 import { OperationItem } from './OperationItem'
+import {
+  isAddRowOperation,
+  isDeleteRowOperation,
+  isEditCellContentOperation,
+  QueuedOperation,
+} from '@/state/table-editor-operation-queue.types'
 
 interface OperationListProps {
   operations: readonly QueuedOperation[]
@@ -27,10 +26,10 @@ export const OperationList = ({ operations }: OperationListProps) => {
   const editOperations = operations.filter(isEditCellContentOperation)
 
   return (
-    <div className="space-y-8">
+    <div className="divide-y">
       {deleteOperations.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-xs text-foreground-lighter">
+        <div className="space-y-3 p-4">
+          <h3 className="text-xs text-foreground-lighter font-mono uppercase">
             {deleteOperations.length} row deletion{deleteOperations.length !== 1 ? 's' : ''}
           </h3>
 
@@ -48,8 +47,8 @@ export const OperationList = ({ operations }: OperationListProps) => {
       )}
 
       {addOperations.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-xs text-foreground-lighter">
+        <div className="space-y-3 p-4">
+          <h3 className="text-xs text-foreground-lighter font-mono uppercase">
             {addOperations.length} row addition{addOperations.length !== 1 ? 's' : ''}
           </h3>
           <div className="space-y-3">
@@ -66,8 +65,8 @@ export const OperationList = ({ operations }: OperationListProps) => {
       )}
 
       {editOperations.length > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-xs text-foreground-lighter">
+        <div className="space-y-3 p-4">
+          <h3 className="text-xs text-foreground-lighter font-mono uppercase">
             {editOperations.length} cell edit{editOperations.length !== 1 ? 's' : ''}
           </h3>
 

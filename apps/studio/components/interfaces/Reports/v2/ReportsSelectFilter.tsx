@@ -1,24 +1,16 @@
-import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import { CommandGroup } from '@ui/components/shadcn/ui/command'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import {
-  Button,
-  cn,
-  Command_Shadcn_ as Command,
-  CommandEmpty_Shadcn_ as CommandEmpty,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_ as CommandList,
-} from 'ui'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Button, cn, Command, CommandEmpty, CommandInput, CommandItem, CommandList } from 'ui'
 import { z } from 'zod'
 
 export interface ReportSelectOption {
   label: React.ReactNode
   value: string
+  quantity?: number
   description?: string
 }
 
@@ -32,6 +24,7 @@ interface ReportsSelectFilterProps {
   onChange: (value: SelectFilters) => void
   isLoading?: boolean
   className?: string
+  popoverClassName?: string
   showSearch?: boolean
 }
 
@@ -42,6 +35,7 @@ export const ReportsSelectFilter = ({
   onChange,
   isLoading = false,
   className,
+  popoverClassName,
   showSearch = false,
 }: ReportsSelectFilterProps) => {
   const [open, setOpen] = useState(false)
@@ -56,7 +50,7 @@ export const ReportsSelectFilter = ({
   }, [open, value])
 
   const handleApply = () => {
-    onChange(tempValue)
+    onChange([...tempValue].sort())
     setOpen(false)
   }
 
@@ -75,7 +69,7 @@ export const ReportsSelectFilter = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          type={isActive ? 'default' : 'outline'}
+          variant={isActive ? 'default' : 'outline'}
           className={cn(
             'min-w-20 border-dashed relative group justify-between',
             { 'border-solid': isActive },
@@ -89,19 +83,17 @@ export const ReportsSelectFilter = ({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="p-0 w-72">
+      <PopoverContent align="start" className={cn('p-0 w-72', popoverClassName)}>
         <Command>
-          {showSearch && <CommandInput placeholder="Search..." />}
-          <CommandList>
+          {showSearch && <CommandInput placeholder="Search..." className="text-xs" />}
+          <CommandList className="max-h-72">
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
-                <CommandItem_Shadcn_ key={option.value}>
+                <CommandItem key={option.value}>
                   <Label
                     key={option.value}
-                    className={
-                      'flex items-center overflow-hidden p-1 rounded-sm gap-x-3 w-full h-full'
-                    }
+                    className={'flex items-center overflow-hidden rounded-xs gap-x-3 w-full h-full'}
                   >
                     <Checkbox
                       id={`${label}-${option.value}`}
@@ -115,29 +107,34 @@ export const ReportsSelectFilter = ({
                       }}
                       onKeyDown={handleKeyDown}
                     />
-                    <div className="flex flex-col text-xs">
-                      {option.label}
-                      {option.description && (
-                        <span className="text-foreground-lighter">{option.description}</span>
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex flex-col text-xs">
+                        <span className="flex items-center gap-x-2">{option.label}</span>
+                        {option.description && (
+                          <span className="text-foreground-lighter">{option.description}</span>
+                        )}
+                      </div>
+                      {!!option.quantity && (
+                        <code className="p-0 px-1 text-code-inline">{option.quantity}</code>
                       )}
                     </div>
                   </Label>
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
             </CommandGroup>
           </CommandList>
         </Command>
 
         <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-          <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
+          <Button size="tiny" variant="outline" onClick={handleClearAll} disabled={isLoading}>
             Clear
           </Button>
           <Button
             loading={isLoading}
             size="tiny"
-            type="primary"
+            variant="primary"
             onClick={handleApply}
-            htmlType="button"
+            type="button"
           >
             Apply
           </Button>

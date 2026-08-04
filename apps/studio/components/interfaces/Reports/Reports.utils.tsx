@@ -1,20 +1,41 @@
 import dayjs from 'dayjs'
 
 import {
+  type BaseQueries,
+  type PresetConfig,
+  type ReportFilterItem,
+  type ReportQuery,
+} from './Reports.types'
+import {
   isUnixMicro,
   unixMicroToIsoTimestamp,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { REPORT_STATUS_CODE_COLORS } from 'data/reports/report.utils'
-import useDbQuery, { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from 'hooks/analytics/useLogsQuery'
-import { getHttpStatusCodeInfo } from 'lib/http-status-codes'
-import type { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
+} from '@/components/interfaces/Settings/Logs/Logs.utils'
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
+import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
+import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
+import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
 
 /**
  * Converts a query params string to an object
  */
 export const queryParamsToObject = (params: string) => {
   return Object.fromEntries(new URLSearchParams(params))
+}
+
+/**
+ * Decodes a URI component, returning the original string if it is malformed.
+ *
+ * `decodeURIComponent` throws a `URIError` on invalid percent-encoding (e.g. a
+ * literal `%` such as `?discount=100%`). Request paths are user-controlled, so
+ * decoding inline during render can crash the page.
+ */
+export const safeDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
 }
 
 export type PresetHookResult = LogsQueryHook | DbQueryHook
@@ -28,23 +49,27 @@ export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
   projectRef: string
 ): PresetHooks => {
-  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce(
-    (acc, [k, { sql, queryType }]) => {
-      if (queryType === 'db') {
-        return {
-          ...acc,
-          [k]: () => useDbQuery({ sql }),
-        }
-      } else {
-        return {
-          ...acc,
-          [k]: () => useLogsQuery(projectRef),
-        }
+  const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
+    if (query.queryType === 'db') {
+      return {
+        ...acc,
+        [k]: () => useDbQuery({ sql: query.safeSql }),
       }
-    },
-    {}
-  )
+    } else {
+      return {
+        ...acc,
+        [k]: () => useLogsQuery({ projectRef }),
+      }
+    }
+  }, {})
   return hooks
+}
+
+export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): SafeLogSqlFragment {
+  if (query.queryType !== 'logs') {
+    throw new Error(`Expected logs query, got ${query.queryType}`)
+  }
+  return query.safeSql(filters)
 }
 
 /**

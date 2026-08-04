@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { profileKeys } from './keys'
 import type { Profile } from './types'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getProfile(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile', {

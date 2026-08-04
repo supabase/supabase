@@ -1,21 +1,12 @@
 'use client'
 
+import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
 import type { HTMLAttributes, PropsWithChildren } from 'react'
 import { useContext, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { safeHistoryReplaceState } from '~/lib/historyUtils'
+import { cn, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
-import {
-  cn,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
-
-import { ReferenceContentInitiallyScrolledContext } from '~/features/docs/Reference.navigation.client'
 import { type IApiEndPoint } from './Reference.api.utils'
 import { API_REFERENCE_REQUEST_BODY_SCHEMA_DATA_ATTRIBUTES } from './Reference.ui.shared'
 
@@ -93,25 +84,25 @@ export function ApiOperationBodySchemeSelector({
   return (
     <div ref={containerRef} className={cn('flex items-center justify-between gap-2', className)}>
       <h3 className="text-base text-foreground">Body</h3>
-      <Select_Shadcn_
+      <Select
         value={selectedScheme}
         onValueChange={(value) =>
           setSelectedScheme(value as 'application/json' | 'application/x-www-form-urlencoded')
         }
       >
-        <SelectTrigger_Shadcn_ className="w-48 [&>span]:w-full [&>span]:truncate">
-          <SelectValue_Shadcn_ />
-        </SelectTrigger_Shadcn_>
-        <SelectContent_Shadcn_>
-          <SelectGroup_Shadcn_>
+        <SelectTrigger className="w-48 [&>span]:w-full [&>span]:truncate">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
             {availableSchemes.map((scheme) => (
-              <SelectItem_Shadcn_ key={scheme} value={scheme}>
+              <SelectItem key={scheme} value={scheme}>
                 {scheme}
-              </SelectItem_Shadcn_>
+              </SelectItem>
             ))}
-          </SelectGroup_Shadcn_>
-        </SelectContent_Shadcn_>
-      </Select_Shadcn_>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </div>
   )
 }

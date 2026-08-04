@@ -22,7 +22,7 @@ export default function WrappedClient() {
       <CustomerStories />
       <ProductsCta
         currentProduct="functions"
-        className="max-w-[60rem] mx-auto px-6 w-full !py-24 xl:!gap-24 lg:!py-44"
+        className="max-w-240 mx-auto px-6 w-full py-24! xl:gap-24! lg:py-44!"
       />
     </DefaultLayout>
   )

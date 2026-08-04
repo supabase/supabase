@@ -1,7 +1,8 @@
 import { useParams } from 'common'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+
+import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
+import { queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
+import { DbQueryHook } from '@/hooks/analytics/useDbQuery'
 
 export const useDatabaseReport = () => {
   const { ref: projectRef } = useParams()

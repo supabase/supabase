@@ -1,18 +1,65 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import { FOREIGN_KEY_CASCADE_ACTION, ident, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import type { PGColumn } from '@supabase/pg-meta'
 import { isNull } from 'lodash'
-import type { Dictionary } from 'types'
-
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import type { RetrievedTableColumn, RetrieveTableResult } from 'data/tables/table-retrieve-query'
-import { uuidv4 } from 'lib/helpers'
 import { toast } from 'sonner'
+
 import {
   ColumnField,
   CreateColumnPayload,
   ExtendedPostgresRelationship,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
+import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
+import { uuidv4 } from '@/lib/helpers'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
+import { trimSafeSqlFragment } from '@/lib/sql'
+import type { DeepReadonly } from '@/lib/type-helpers'
+import type { Dictionary } from '@/types'
+
+// Schemas where types are considered "unqualified" — matches the ColumnType dropdown convention,
+// which omits formatSchema for built-in (pg_catalog) and public types.
+const isImplicitTypeSchema = (schema: string | undefined) =>
+  schema === 'public' || schema === 'pg_catalog'
+
+export const normalizeFormatSchema = (schema: string | undefined): string | undefined =>
+  isImplicitTypeSchema(schema) ? undefined : schema
+
+// Helper functions to encode/decode sensitivity flag in column comments
+const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+
+const isSensitiveDataInComment = (comment: string | null | undefined): boolean => {
+  return comment ? comment.includes(SENSITIVE_DATA_MARKER) : false
+}
+
+const encodeCommentWithSensitivityFlag = (
+  comment: string | null | undefined,
+  isSensitive: boolean
+): string | null => {
+  let cleanComment = comment?.replace(SENSITIVE_DATA_MARKER, '').trim() ?? ''
+  if (isSensitive && cleanComment) {
+    return `${SENSITIVE_DATA_MARKER} ${cleanComment}`
+  } else if (isSensitive) {
+    return SENSITIVE_DATA_MARKER
+  }
+  return cleanComment || null
+}
+
+const decodeCommentWithoutSensitivityFlag = (comment: string | null | undefined): string | null => {
+  if (!comment) return null
+  return comment.replace(SENSITIVE_DATA_MARKER, '').trim() || null
+}
+
+export const displayColumnType = (
+  format: string,
+  formatSchema: string | undefined,
+  isArray?: boolean
+): string => {
+  const bareFormat = isArray && format.startsWith('_') ? format.slice(1) : format
+  const normalized = normalizeFormatSchema(formatSchema)
+  const qualified = normalized ? `${normalized}.${bareFormat}` : bareFormat
+  return isArray ? `${qualified}[]` : qualified
+}
 
 const isSQLExpression = (input: string) => {
   if (['CURRENT_DATE'].includes(input)) return true
@@ -32,8 +79,16 @@ const isSQLExpression = (input: string) => {
   return false
 }
 
-export const generateColumnField = (field: any = {}): ColumnField => {
-  const { name, table, schema, format } = field
+export const generateColumnField = (
+  field: {
+    name?: string
+    table?: string
+    schema?: string
+    format?: string
+    formatSchema?: string
+  } = {}
+): ColumnField => {
+  const { name, table, schema, format, formatSchema } = field
   return {
     id: uuidv4(),
     name: name || '',
@@ -41,6 +96,7 @@ export const generateColumnField = (field: any = {}): ColumnField => {
     schema: schema || '',
     comment: '',
     format: format || '',
+    formatSchema,
     defaultValue: null,
     foreignKey: undefined,
     check: null,
@@ -51,11 +107,19 @@ export const generateColumnField = (field: any = {}): ColumnField => {
     isIdentity: false,
     isNewColumn: true,
     isEncrypted: false,
+    isSensitiveData: false,
   }
 }
 
-export const generateColumnFieldFromPostgresColumn = (
-  column: PostgresColumn,
+// SafePostgresColumn (the type carried through Studio state) doesn't expose the type's schema,
+// but the column row returned by pg-meta's tables.retrieve does. Look it up by id.
+const lookupFormatSchema = (
+  column: DeepReadonly<SafePostgresColumn>,
+  table: RetrieveTableResult
+): string | undefined => table.columns?.find((c) => c.id === column.id)?.format_schema
+
+export const generateColumnFieldFromPGColumn = (
+  column: DeepReadonly<SafePostgresColumn>,
   table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ): ColumnField => {
@@ -63,6 +127,7 @@ export const generateColumnFieldFromPostgresColumn = (
   const primaryKeyColumns = primary_keys.map((key) => key.name)
   const foreignKey = getColumnForeignKey(column, table, foreignKeys)
   const isArray = column?.data_type === 'ARRAY'
+  const isSensitiveData = isSensitiveDataInComment(column?.comment)
 
   return {
     foreignKey,
@@ -70,8 +135,9 @@ export const generateColumnFieldFromPostgresColumn = (
     table: column.table,
     schema: column.schema,
     name: column.name,
-    comment: column?.comment,
+    comment: decodeCommentWithoutSensitivityFlag(column?.comment),
     format: isArray ? column.format.slice(1) : column.format,
+    formatSchema: normalizeFormatSchema(lookupFormatSchema(column, table)),
     defaultValue: column?.default_value as string | null,
     check: column.check,
     isArray: isArray,
@@ -82,6 +148,7 @@ export const generateColumnFieldFromPostgresColumn = (
     isNewColumn: false,
     isEncrypted: false,
     isPrimaryKey: primaryKeyColumns.includes(column.name),
+    isSensitiveData,
   }
 }
 
@@ -96,9 +163,12 @@ export const generateCreateColumnPayload = (
     table: table.name,
     isIdentity,
     name: field.name.trim(),
-    comment: field.comment?.trim(),
-    type: field.isArray ? `${field.format}[]` : field.format,
-    check: field.check?.trim() || undefined,
+    comment: encodeCommentWithSensitivityFlag(
+      field.comment?.trim(),
+      field.isSensitiveData ?? false
+    ) as string | undefined,
+    type: { schema: field.formatSchema, name: field.format, isArray: field.isArray },
+    check: trimSafeSqlFragment(field.check) ?? undefined,
     isUnique: field.isUnique,
     isPrimaryKey: field.isPrimaryKey,
     ...(!field.isPrimaryKey && !isIdentity && { isNullable: field.isNullable }),
@@ -116,7 +186,7 @@ export const generateCreateColumnPayload = (
 }
 
 export const generateUpdateColumnPayload = (
-  originalColumn: RetrievedTableColumn,
+  originalColumn: DeepReadonly<SafePostgresColumn>,
   table: RetrieveTableResult,
   field: ColumnField
 ): Partial<UpdateColumnPayload> => {
@@ -125,9 +195,11 @@ export const generateUpdateColumnPayload = (
 
   // Only append the properties which are getting updated
   const name = field.name.trim()
-  const type = field.isArray ? `${field.format}[]` : field.format
-  const comment = field.comment?.trim()
-  const check = field.check?.trim()
+  const comment = encodeCommentWithSensitivityFlag(
+    field.comment?.trim(),
+    field.isSensitiveData ?? false
+  ) as string | undefined
+  const check = trimSafeSqlFragment(field.check) ?? undefined
 
   const payload: Partial<UpdateColumnPayload> = {}
   // [Joshen] Trimming on the original name as well so we don't rename columns that already
@@ -142,12 +214,17 @@ export const generateUpdateColumnPayload = (
     payload.check = check
   }
 
-  const originalFormat =
-    originalColumn.data_type === 'ARRAY'
-      ? `${originalColumn.format.replace(/^_/, '')}[]`
-      : originalColumn.format
-  if (originalFormat !== type) {
-    payload.type = type
+  const originalIsArray = originalColumn.data_type === 'ARRAY'
+  const originalFormat = originalIsArray
+    ? originalColumn.format.replace(/^_/, '')
+    : originalColumn.format
+  const originalFormatSchema = normalizeFormatSchema(lookupFormatSchema(originalColumn, table))
+  if (
+    originalFormat !== field.format ||
+    originalFormatSchema !== field.formatSchema ||
+    originalIsArray !== field.isArray
+  ) {
+    payload.type = { schema: field.formatSchema, name: field.format, isArray: field.isArray }
   }
 
   if (originalColumn.default_value !== field.defaultValue) {
@@ -173,7 +250,7 @@ export const generateUpdateColumnPayload = (
 }
 
 export const validateFields = (field: ColumnField) => {
-  const errors = {} as Dictionary<any>
+  const errors = {} as Dictionary<string>
   if (field.name.length === 0) {
     errors['name'] = `Please assign a name for your column`
     toast.error(errors['name'])
@@ -211,7 +288,7 @@ export const getForeignKeyUIState = (
 }
 
 export const getColumnForeignKey = (
-  column: PostgresColumn,
+  column: DeepReadonly<PGColumn>,
   table: RetrieveTableResult,
   foreignKeys: ForeignKeyConstraint[]
 ) => {
@@ -256,49 +333,49 @@ export const getForeignKeyCascadeAction = (action?: string) => {
   }
 }
 
-export const getPlaceholderText = (format?: string, columnFieldName?: string) => {
-  const columnName = columnFieldName || 'column_name'
+export const getPlaceholderText = (format?: string, columnFieldName?: string): SafeSqlFragment => {
+  const col = ident(columnFieldName || 'column_name')
 
   switch (format) {
     case 'int2':
     case 'int4':
     case 'int8':
     case 'numeric':
-      return `"${columnName}" > 0`
+      return safeSql`${col} > 0`
 
     case 'float4':
     case 'float8':
-      return `"${columnName}" > 0.0`
+      return safeSql`${col} > 0.0`
 
     case 'text':
     case 'varchar':
-      return `length("${columnName}") <= 50`
+      return safeSql`length(${col}) <= 50`
 
     case 'json':
     case 'jsonb':
-      return `jsonb_typeof("${columnName}"->'active') = 'boolean'`
+      return safeSql`jsonb_typeof(${col}->'active') = 'boolean'`
 
     case 'bool':
-      return `"${columnName}" in (true, false)`
+      return safeSql`${col} in (true, false)`
 
     case 'date':
-      return `"${columnName}" > '2024-01-01'`
+      return safeSql`${col} > '2024-01-01'`
 
     case 'time':
-      return `"${columnName}" between '09:00:00' and '12:00:00'`
+      return safeSql`${col} between '09:00:00' and '12:00:00'`
 
     case 'timetz':
-      return `"${columnName}" at time zone 'UTC' between '09:00:00+00' and '17:00:00+00'`
+      return safeSql`${col} at time zone 'UTC' between '09:00:00+00' and '17:00:00+00'`
 
     case 'uuid':
-      return `"${columnName}" '00000000-0000-0000-0000-000000000000'`
+      return safeSql`${col} '00000000-0000-0000-0000-000000000000'`
 
     case 'timestamp':
-      return `"${columnName}" > '2023-01-01 00:00' and "${columnName}" < '2025-01-01 00:00'`
+      return safeSql`${col} > '2023-01-01 00:00' and ${col} < '2025-01-01 00:00'`
     case 'timestamptz':
-      return `"${columnName}" > '2023-01-01 00:00:00+00' and "${columnName}" < '2025-01-01 00:00:00+00'`
+      return safeSql`${col} > '2023-01-01 00:00:00+00' and ${col} < '2025-01-01 00:00:00+00'`
 
     default:
-      return `length("${columnName}") < 500`
+      return safeSql`length(${col}) < 500`
   }
 }

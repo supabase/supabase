@@ -49,10 +49,10 @@ const EnterpriseLogos: React.FC<Props> = ({ className }) => {
             alt={logo.alt}
             className="
               w-auto block
-              h-10 !min-h-10
-              md:h-12 md:!min-h-12
-              lg:h-11 lg:!min-h-11
-              2xl:h-12 2xl:!min-h-12
+              h-10 min-h-10!
+              md:h-12 md:min-h-12!
+              lg:h-11 lg:min-h-11!
+              2xl:h-12 2xl:min-h-12!
             "
             draggable={false}
           />

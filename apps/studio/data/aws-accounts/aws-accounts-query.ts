@@ -1,27 +1,22 @@
 import type { UseQueryOptions } from '@tanstack/react-query'
 import { useQuery } from '@tanstack/react-query'
+import { components } from 'api-types'
 
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { awsAccountKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError } from '@/types'
 
 type AWSAccountsVariables = {
   projectRef?: string
 }
 
-export interface AWSAccount {
-  aws_account_id: string
-  account_name?: string
-  status:
-    | 'CREATING'
-    | 'READY'
-    | 'ASSOCIATION_REQUEST_EXPIRED'
-    | 'ASSOCIATION_ACCEPTED'
-    | 'CREATION_FAILED'
-    | 'DELETING'
-  shared_at: string | null
-}
+// [Joshen] API types should be updated with these 2 parameters, so remove once verified
+export type AWSAccount =
+  components['schemas']['GetPrivateLinkResponse']['private_link_associations'][number] & {
+    database_type?: 'PRIMARY' | 'READ_REPLICA'
+    database_identifier?: string
+  }
 
 async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')

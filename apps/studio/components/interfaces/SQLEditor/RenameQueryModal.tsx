@@ -1,26 +1,42 @@
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { getContentById } from 'data/content/content-id-query'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  AiIconAnimation,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
+import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
+import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import { Snippet } from 'data/content/sql-folders-query'
-import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
-import { useRouter } from 'next/router'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createTabId, useTabsStateSnapshot } from 'state/tabs'
-import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
-import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+} from '@/data/content/content-upsert-mutation'
+import { Snippet } from '@/data/content/sql-folders-query'
+import type { SqlSnippet } from '@/data/content/sql-snippets-query'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface RenameQueryModalProps {
   snippet?: SqlSnippet | Snippet
@@ -29,7 +45,12 @@ export interface RenameQueryModalProps {
   onComplete: () => void
 }
 
-const RenameQueryModal = ({
+const formSchema = z.object({
+  name: z.string().min(1, 'Please enter a query name'),
+  description: z.string().optional(),
+})
+
+export const RenameQueryModal = ({
   snippet = {} as any,
   visible,
   onCancel,
@@ -37,87 +58,76 @@ const RenameQueryModal = ({
 }: RenameQueryModalProps) => {
   const { ref } = useParams()
   const router = useRouter()
-  const { data: organization } = useSelectedOrganizationQuery()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-  const { data: subscription } = useOrgSubscriptionQuery(
-    { orgSlug: organization?.slug },
-    { enabled: visible }
-  )
   const isSQLSnippet = snippet.type === 'sql'
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: ref })
 
-  // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
+  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
+  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { id, name, description } = snippet
 
-  const [nameInput, setNameInput] = useState(name)
-  const [descriptionInput, setDescriptionInput] = useState(description)
-
-  const { mutate: titleSql, isPending: isTitleGenerationLoading } = useSqlTitleGenerateMutation({
-    onSuccess: (data) => {
-      const { title, description } = data
-      setNameInput(title)
-      if (!descriptionInput) setDescriptionInput(description)
-    },
-    onError: (error) => {
-      toast.error(`Failed to rename query: ${error.message}`)
-    },
-  })
+  const { mutate: getGeneratedValues, isPending: isTitleGenerationLoading } =
+    useSqlTitleGenerateMutation({
+      onSuccess: (data) => {
+        const { title, description } = data
+        form.setValue('name', title, { shouldDirty: true })
+        if (!form.getValues().description) {
+          form.setValue('description', description, { shouldDirty: true })
+        }
+      },
+      onError: (error) => {
+        toast.error(`Failed to generate title and description: ${error.message}`)
+      },
+    })
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = !!check?.hasKey
 
   const generateTitle = async () => {
     if ('content' in snippet && isSQLSnippet) {
-      titleSql({ sql: snippet.content.sql })
+      getGeneratedValues({ sql: snippet.content.unchecked_sql })
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        if ('sql' in content) titleSql({ sql: content.sql })
+        if ('unchecked_sql' in content) getGeneratedValues({ sql: content.unchecked_sql })
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }
     }
   }
 
-  const validate = () => {
-    const errors: any = {}
-    if (!nameInput) errors.name = 'Please enter a query name'
-    return errors
-  }
-
   const { mutateAsync: upsertContent } = useContentUpsertMutation()
 
-  const onSubmit = async (values: any, { setSubmitting }: any) => {
+  const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async ({ name, description }) => {
     if (!ref) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
 
-    setSubmitting(true)
     try {
       let localSnippet = snippet
 
       // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
       if (!('content' in localSnippet)) {
-        localSnippet = await getContentById({ projectRef: ref, id })
-        snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
+        const fetched = await getSqlSnippetById({ projectRef: ref, id })
+        snapV2.addSnippet({ projectRef: ref, snippet: fetched })
+        localSnippet = fetched
       }
 
       const changedSnippet = await upsertContent({
         projectRef: ref,
         payload: {
           ...localSnippet,
-          name: nameInput,
-          description: descriptionInput,
+          name,
+          description,
         } as UpsertContentPayload,
       })
 
       if (IS_PLATFORM) {
-        snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
+        snapV2.renameSnippet({ id, name, description })
 
         const tabId = createTabId('sql', { id })
-        tabsSnap.updateTab(tabId, { label: nameInput })
+        tabsSnap.updateTab(tabId, { label: name })
       } else if (changedSnippet) {
         // In self-hosted, the snippet also updates the id when renaming it. This code is to ensure the previous snippet
         // is removed, new one is added, tab state is updated and the router is updated.
@@ -138,88 +148,110 @@ const RenameQueryModal = ({
       toast.success('Successfully renamed snippet!')
       if (onComplete) onComplete()
     } catch (error: any) {
-      setSubmitting(false)
       // [Joshen] We probably need some rollback cause all the saving is async
       toast.error(`Failed to rename snippet: ${error.message}`)
     }
   }
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: name ?? '', description: description ?? '' },
+  })
+  const { reset, formState } = form
+  const { isDirty, isSubmitting } = formState
+
   useEffect(() => {
-    setNameInput(name)
-    setDescriptionInput(description)
-  }, [snippet.id])
+    if (isDirty) return
+    reset({ name: name ?? '', description: description ?? '' })
+  }, [id, name, description, reset, isDirty])
+
+  const handleCancel = () => {
+    onCancel()
+    reset()
+  }
 
   return (
-    <Modal visible={visible} onCancel={onCancel} hideFooter header="Rename" size="small">
-      <Form
-        onReset={onCancel}
-        validateOnBlur
-        initialValues={{
-          name: name ?? '',
-          description: description ?? '',
-        }}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <>
-            <Modal.Content className="space-y-4">
-              <Input
-                label="Name"
-                id="name"
+    <Dialog open={visible} onOpenChange={handleCancel}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Rename</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            <DialogSection className="space-y-4">
+              <FormField
+                control={form.control}
                 name="name"
-                value={nameInput}
-                onChange={(e) => setNameInput(e.target.value)}
+                render={({ field }) => (
+                  <FormItemLayout name="name" layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} id="name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
               />
               <div className="flex w-full justify-end mt-2">
-                {!hasHipaaAddon && (
-                  <ButtonTooltip
-                    type="default"
-                    onClick={() => generateTitle()}
-                    size="tiny"
-                    disabled={isTitleGenerationLoading || !isApiKeySet}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: isApiKeySet
-                          ? undefined
-                          : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
-                      },
-                    }}
-                  >
-                    <div className="flex items-center gap-1">
-                      <div className="scale-75">
-                        <AiIconAnimation loading={isTitleGenerationLoading} />
-                      </div>
-                      <span>Rename with Supabase AI</span>
+                <ButtonTooltip
+                  variant="default"
+                  onClick={() => generateTitle()}
+                  size="tiny"
+                  disabled={
+                    isTitleGenerationLoading ||
+                    !isApiKeySet ||
+                    isHipaaProjectDisallowed ||
+                    isAiOptedOut
+                  }
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: isHipaaProjectDisallowed
+                        ? 'This feature is not available for HIPAA projects.'
+                        : isAiOptedOut
+                          ? 'Your organization has opted out of AI features.'
+                          : isApiKeySet
+                            ? undefined
+                            : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                    },
+                  }}
+                >
+                  <div className="flex items-center gap-1">
+                    <div className="scale-75">
+                      <AiIconAnimation loading={isTitleGenerationLoading} />
                     </div>
-                  </ButtonTooltip>
-                )}
+                    <span>Rename with Supabase AI</span>
+                  </div>
+                </ButtonTooltip>
               </div>
-              <Input.TextArea
-                label="Description"
-                id="description"
-                placeholder="Describe query"
-                size="medium"
-                textAreaClassName="resize-none"
-                value={descriptionInput}
-                onChange={(e) => setDescriptionInput(e.target.value)}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout name="description" layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        id="description"
+                        rows={4}
+                        placeholder="Describe query"
+                        className="resize-none"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
               />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+            </DialogSection>
+            <DialogFooter>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+              <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
                 Rename query
               </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
-    </Modal>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default RenameQueryModal

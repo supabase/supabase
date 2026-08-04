@@ -1,4 +1,12 @@
-import posthog, { PostHogConfig } from 'posthog-js'
+import posthog, {
+  type CapturedNetworkRequest,
+  type PostHogConfig,
+  type SessionRecordingOptions,
+} from 'posthog-js'
+
+import { safeSessionStorage } from './safe-storage'
+
+export type { CapturedNetworkRequest, SessionRecordingOptions }
 
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
@@ -21,6 +29,30 @@ interface PostHogClientConfig {
   uiHost?: string
 }
 
+interface PostHogInitOptions {
+  hasConsent?: boolean
+  /**
+   * Masking policy for session replay. Omit to disable recording, which every app
+   * sharing this PostHog project does unless it passes a policy of its own.
+   */
+  sessionReplay?: SessionRecordingOptions
+}
+
+/**
+ * Enables session recording when given a masking config, and disables it when
+ * given nothing.
+ */
+export function buildSessionRecordingConfig(
+  sessionReplay?: SessionRecordingOptions
+): Partial<PostHogConfig> {
+  return {
+    disable_session_recording: !sessionReplay,
+    // Console output is not in the DOM, so text masking cannot reach it.
+    enable_recording_console_log: false,
+    ...(sessionReplay && { session_recording: sessionReplay }),
+  }
+}
+
 class PostHogClient {
   /** True after posthog.init() is called (prevents double-init) */
   private initStarted = false
@@ -33,6 +65,7 @@ class PostHogClient {
   private config: PostHogClientConfig
   private readonly maxPendingEvents = MAX_PENDING_EVENTS
   private devListeners: Set<ClientTelemetryListener> = new Set()
+  private pendingFeatureFlagCallbacks: Set<() => void> = new Set()
 
   constructor(config: PostHogClientConfig = {}) {
     const apiHost =
@@ -47,7 +80,7 @@ class PostHogClient {
     }
   }
 
-  init(hasConsent: boolean = true) {
+  init({ hasConsent = true, sessionReplay }: PostHogInitOptions = {}) {
     if (this.initStarted || typeof window === 'undefined' || !hasConsent) return
 
     if (!this.config.apiKey) {
@@ -61,6 +94,7 @@ class PostHogClient {
       autocapture: false, // We'll manually track events
       capture_pageview: false, // We'll manually track pageviews
       capture_pageleave: false, // We'll manually track page leaves
+      ...buildSessionRecordingConfig(sessionReplay),
       loaded: (posthog) => {
         // Apply pending properties that were set before PostHog
         // initialized due to poor connection or user not accepting
@@ -107,6 +141,10 @@ class PostHogClient {
 
     this.initStarted = true
     posthog.init(this.config.apiKey, config)
+
+    // Register any feature flag callbacks that were queued before init
+    this.pendingFeatureFlagCallbacks.forEach((cb) => posthog.onFeatureFlags(cb))
+    this.pendingFeatureFlagCallbacks.clear()
   }
 
   capturePageView(properties: Record<string, any>, hasConsent: boolean = true) {
@@ -165,8 +203,15 @@ class PostHogClient {
     if (!hasConsent) return
 
     if (!this.initialized) {
-      // Queue the identification for when PostHog initializes
-      this.pendingIdentification = { userId, properties }
+      // Queue the identification for when PostHog initializes. Merge properties
+      // across pre-init calls for the same user so callers don't clobber each
+      // other (e.g. useTelemetryIdentify sets gotrue_id, then a separate effect
+      // sets org_count — both should land when the SDK flushes).
+      const pending = this.pendingIdentification
+      this.pendingIdentification =
+        pending && pending.userId === userId
+          ? { userId, properties: { ...pending.properties, ...properties } }
+          : { userId, properties }
       return
     }
 
@@ -248,6 +293,73 @@ class PostHogClient {
   }
 
   /**
+   * Returns the current value of a person property as stored locally by posthog-js.
+   * Returns undefined if PostHog hasn't initialized or the property hasn't been set.
+   * Use this to gate behavior on whether a property has actually landed in the SDK
+   * (e.g., waiting for an identify to complete before evaluating flag-dependent UI).
+   *
+   * Person properties set via `identify(id, props)` are stored under the
+   * `$stored_person_properties` bucket in persistence — `get_property(key)`
+   * reads top-level super properties, not person properties, so we index in.
+   */
+  getPersonProperty(key: string): unknown {
+    if (!this.initialized) return undefined
+    try {
+      const stored = posthog.get_property('$stored_person_properties')
+      if (!stored || typeof stored !== 'object') return undefined
+      return (stored as Record<string, unknown>)[key]
+    } catch {
+      return undefined
+    }
+  }
+
+  /**
+   * Returns a PostHog feature flag value directly from the client-side SDK.
+   * Use this for www/docs pages where server-side evaluation lacks full person context.
+   * In local dev, DevToolbar overrides (x-ph-flag-overrides cookie) take priority.
+   */
+  getFeatureFlag(key: string): string | boolean | undefined {
+    if (typeof document === 'undefined') return undefined
+
+    if (process.env.NODE_ENV === 'development') {
+      try {
+        const cookieEntry = document.cookie
+          .split(';')
+          .map((c) => c.trim())
+          .find((c) => c.startsWith('x-ph-flag-overrides='))
+        if (cookieEntry) {
+          const overrides = JSON.parse(
+            decodeURIComponent(cookieEntry.substring('x-ph-flag-overrides='.length))
+          )
+          if (key in overrides) return overrides[key]
+        }
+      } catch {}
+    }
+
+    if (!this.initialized) return undefined
+
+    try {
+      return posthog.getFeatureFlag(key)
+    } catch {
+      return undefined
+    }
+  }
+
+  /**
+   * Subscribe to PostHog feature flag loads/reloads.
+   * Returns an unsubscribe function.
+   */
+  onFeatureFlags(callback: () => void): () => void {
+    if (!this.initStarted) {
+      // Queue until init() is called
+      this.pendingFeatureFlagCallbacks.add(callback)
+      return () => this.pendingFeatureFlagCallbacks.delete(callback)
+    }
+    if (typeof posthog.onFeatureFlags !== 'function') return () => {}
+    return posthog.onFeatureFlags(callback) ?? (() => {})
+  }
+
+  /**
    * Returns PostHog's session_id for the current session.
    * Returns undefined until PostHog's `loaded` callback fires.
    */
@@ -294,11 +406,11 @@ class PostHogClient {
     const storageKey = `ph_exposed:${experimentId}`
 
     try {
-      if (sessionStorage.getItem(storageKey) === sessionId) return
+      if (safeSessionStorage.getItem(storageKey) === sessionId) return
 
       const eventName = `${experimentId}_experiment_exposed`
       posthog.capture(eventName, { experiment_id: experimentId, ...properties })
-      sessionStorage.setItem(storageKey, sessionId)
+      safeSessionStorage.setItem(storageKey, sessionId)
     } catch (error) {
       console.error('PostHog experiment exposure capture failed:', error)
     }

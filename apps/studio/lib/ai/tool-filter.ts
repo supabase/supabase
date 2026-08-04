@@ -1,8 +1,7 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
-// End of third-party imports
 
-import type { AiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
 export type DatabaseExtension = {
@@ -33,13 +32,19 @@ export const toolSetValidationSchema = z.record(
     'execute_sql',
     'deploy_edge_function',
     'rename_chat',
+    'escalate_to_human',
+    'resolve_support_conversation',
     'list_policies',
+    'list_reports',
+    'get_report',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
     'getRlsKnowledge',
     'getFunctions',
     'getEdgeFunctionKnowledge',
+
+    'load_knowledge',
   ]),
   basicToolSchema
 )
@@ -69,8 +74,11 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   execute_sql: TOOL_CATEGORIES.UI,
   deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
+  escalate_to_human: TOOL_CATEGORIES.UI,
+  resolve_support_conversation: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
   get_active_incidents: TOOL_CATEGORIES.UI,
+  load_knowledge: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,
@@ -78,6 +86,8 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
   list_policies: TOOL_CATEGORIES.SCHEMA,
+  list_reports: TOOL_CATEGORIES.SCHEMA,
+  get_report: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,

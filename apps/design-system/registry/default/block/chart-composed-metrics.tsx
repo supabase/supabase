@@ -71,7 +71,7 @@ export default function ChartComposedMetrics() {
           </ChartHeader>
           <ChartContent
             className="p-0"
-            loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
+            loadingState={<Skeleton className="w-full h-24 rounded-none mt-4" />}
           >
             <ChartSparkline data={data} dataKey="value" />
           </ChartContent>
@@ -89,7 +89,7 @@ export default function ChartComposedMetrics() {
           </ChartHeader>
           <ChartContent
             className="p-0"
-            loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
+            loadingState={<Skeleton className="w-full h-24 rounded-none mt-4" />}
           >
             <ChartSparkline data={data} dataKey="value" />
           </ChartContent>

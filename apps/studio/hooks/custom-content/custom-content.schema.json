@@ -13,7 +13,15 @@
 
     "dashboard_auth:custom_provider": {
       "type": ["string", "null"],
-      "description": "Show a custom provider on the sign in page (Continue with X)"
+      "description": "Show a custom provider on the sign in page (Continue with X). Will be deprecated by dashboard_auth:custom_providers."
+    },
+
+    "dashboard_auth:custom_providers": {
+      "type": ["array", "null"],
+      "description": "Show a custom provider on the sign in page (Continue with X)",
+      "items": {
+        "type": "string"
+      }
     },
 
     "docs:row_level_security_guide_path": {

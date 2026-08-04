@@ -1,36 +1,26 @@
 import type { UIMessage as MessageType } from '@ai-sdk/react'
 import { useChat } from '@ai-sdk/react'
-import { lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
+import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { Markdown } from 'components/interfaces/Markdown'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { useRateMessageMutation } from 'data/ai/rate-message-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useOrgAiOptInLevel } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useHotKey } from 'hooks/ui/useHotKey'
-import { IS_PLATFORM } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import type { AssistantModel } from 'state/ai-assistant-state'
-import { useAiAssistantState, useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import { AlertError } from '../AlertError'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
+import { InlineLinkClassName } from '../InlineLink'
+import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
-import { onErrorChat } from './AIAssistant.utils'
+import {
+  hasPendingToolApproval,
+  onErrorChat,
+  resolvePendingToolApprovalsAsDenied,
+} from './AIAssistant.utils'
 import { AIAssistantHeader } from './AIAssistantHeader'
 import { AIOnboarding } from './AIOnboarding'
 import { AssistantChatForm } from './AssistantChatForm'
@@ -40,8 +30,32 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
-import AlertError from '../AlertError'
-import { ASSISTANT_ERRORS } from './AiAssistant.constants'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
+import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
+import {
+  DEFAULT_ASSISTANT_BASE_MODEL_ID,
+  defaultAssistantModelId,
+  isAssistantBaseModelId,
+  isKnownAssistantModelId,
+} from '@/lib/ai/model.utils'
+import { IS_PLATFORM } from '@/lib/constants'
+import { uuidv4 } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
+import type { AssistantModel } from '@/state/ai-assistant-state'
+import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined
@@ -50,14 +64,15 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { ref, id: entityId } = useParams()
+  const { id: entityId } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const searchParams = useSearchParamsShallow()
 
   const { data: selectedOrganization, isPending: isLoadingOrganization } =
     useSelectedOrganizationQuery()
 
-  useHotKey(() => cancelEdit(), 'Escape')
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit())
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT, () => snap.newChat())
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -65,18 +80,25 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const state = useAiAssistantState()
   const { activeSidebar, closeSidebar } = useSidebarManagerSnapshot()
 
-  const isPaidPlan = selectedOrganization?.plan?.id !== 'free'
+  const { hasAccess: hasAccessToAdvanceModel, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('assistant.advance_model')
 
   const selectedModel = useMemo<AssistantModel>(() => {
-    const defaultModel: AssistantModel = isPaidPlan ? 'gpt-5' : 'gpt-5-mini'
+    // While entitlements are loading, use the stored model without enforcing access
+    if (isLoadingEntitlements) {
+      return snap.model ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
+    }
+
+    const defaultModel = defaultAssistantModelId(hasAccessToAdvanceModel)
     const model = snap.model ?? defaultModel
 
-    if (!isPaidPlan && model === 'gpt-5') {
-      return 'gpt-5-mini'
+    if (!isKnownAssistantModelId(model)) return defaultModel
+    if (!hasAccessToAdvanceModel && !isAssistantBaseModelId(model)) {
+      return DEFAULT_ASSISTANT_BASE_MODEL_ID
     }
 
     return model
-  }, [isPaidPlan, snap.model])
+  }, [isLoadingEntitlements, hasAccessToAdvanceModel, snap.model])
 
   const [updatedOptInSinceMCP] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.AI_ASSISTANT_MCP_OPT_IN,
@@ -112,7 +134,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
-  const snippetContent = snippet?.snippet?.content?.sql
+  const snippetContent = snippet?.snippet?.content?.unchecked_sql
 
   const { data: tables } = useTablesQuery(
     {
@@ -135,7 +157,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     })
   }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const {
     messages: chatMessages,
@@ -143,7 +165,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     error,
     sendMessage,
     setMessages,
-    addToolResult,
+    addToolApprovalResponse,
     stop,
     regenerate,
   } = useChat({
@@ -151,11 +173,22 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     ...(snap.activeChatId && snap.chatInstances[snap.activeChatId]
       ? { chat: snap.chatInstances[snap.activeChatId] }
       : {}),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: onErrorChat,
   })
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
+  const hasPendingApproval = hasPendingToolApproval(chatMessages)
+  const supportMetadata = snap.activeChat?.supportMetadata
+  const isSupportChat = !!supportMetadata?.isSupportChat
+  const isSupportChatClosed = isSupportChat && supportMetadata.lifecycleStatus !== 'bot_active'
+  const activeChatId = snap.activeChatId
+  const supportConversationId = supportMetadata?.frontConversationId
+  const isChatInputDisabled =
+    !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
+
+  const branchedFrom = snap.activeChat?.branchedFrom
+  const branchedConversation = branchedFrom ? snap.chats[branchedFrom.chatId] : undefined
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -224,19 +257,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           projectRef: project.ref,
           orgSlug: selectedOrganization.slug,
           reason,
+          spanId: state.messageSpanIds[messageId],
         })
 
-        sendEvent({
-          action: 'assistant_message_rating_submitted',
-          properties: {
-            rating,
-            category: result.category,
-            ...(reason && { reason }),
-          },
-          groups: {
-            project: project.ref,
-            organization: selectedOrganization.slug,
-          },
+        track('assistant_message_rating_submitted', {
+          rating,
+          category: result.category,
+          ...(reason && { reason }),
+          chatId: state.activeChatId,
         })
       } catch (error) {
         console.error('Failed to rate message:', error)
@@ -247,7 +275,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         })
       }
     },
-    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, sendEvent]
+    [chatMessages, project?.ref, selectedOrganization?.slug, rateMessage, track, state]
   )
 
   const isContextExceededError =
@@ -265,22 +293,39 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         const isLastMessage = index === chatMessages.length - 1
 
         return (
-          <Message
-            id={message.id}
-            key={message.id}
-            message={message}
-            isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
-            readOnly={message.role === 'user'}
-            addToolResult={addToolResult}
-            onDelete={deleteMessageFromHere}
-            onEdit={editMessage}
-            isAfterEditedMessage={isAfterEditedMessage}
-            isBeingEdited={isBeingEdited}
-            onCancelEdit={cancelEdit}
-            isLastMessage={isLastMessage}
-            onRate={handleRateMessage}
-            rating={messageRatings[message.id] ?? null}
-          />
+          <Fragment key={message.id}>
+            <Message
+              id={message.id}
+              message={message}
+              isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
+              readOnly={message.role === 'user'}
+              addToolApprovalResponse={addToolApprovalResponse}
+              onDelete={deleteMessageFromHere}
+              onEdit={editMessage}
+              isAfterEditedMessage={isAfterEditedMessage}
+              isBeingEdited={isBeingEdited}
+              onCancelEdit={cancelEdit}
+              isLastMessage={isLastMessage}
+              onRate={handleRateMessage}
+              rating={messageRatings[message.id] ?? null}
+            />
+            {branchedConversation && branchedFrom?.messageId === message.id && (
+              <div className="flex items-center gap-2 mt-6">
+                <div className="flex-1 border-t border-strong" />
+                <div className="flex items-center gap-1 max-w-[80%] text-xs text-foreground-lighter">
+                  <span className="shrink-0">Branched from</span>
+                  <button
+                    tabIndex={0}
+                    className={cn(InlineLinkClassName, 'cursor-pointer truncate min-w-0')}
+                    onClick={() => snap.selectChat(branchedConversation.id)}
+                  >
+                    {branchedConversation.name}
+                  </button>
+                </div>
+                <div className="flex-1 border-t border-strong" />
+              </div>
+            )}
+          </Fragment>
         )
       }),
     [
@@ -290,9 +335,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       cancelEdit,
       editingMessageId,
       chatStatus,
-      addToolResult,
+      addToolApprovalResponse,
       handleRateMessage,
       messageRatings,
+      branchedConversation,
+      branchedFrom,
+      snap,
     ]
   )
 
@@ -316,6 +364,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
     snap.clearSqlSnippets()
     lastUserMessageRef.current = payload
+    if (hasPendingApproval && !editingMessageId) {
+      setMessages(resolvePendingToolApprovalsAsDenied(chatMessages))
+    }
     sendMessage(payload, {
       body: {
         schema: currentSchema,
@@ -325,21 +376,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     setValue('')
 
     if (finalContent.includes('Help me to debug')) {
-      sendEvent({
-        action: 'assistant_debug_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_debug_submitted', { chatId: snap.activeChatId })
     } else {
-      sendEvent({
-        action: 'assistant_prompt_submitted',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: selectedOrganization?.slug ?? 'Unknown',
-        },
-      })
+      track('assistant_prompt_submitted', { chatId: snap.activeChatId })
     }
   }
 
@@ -358,6 +397,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       setIsResubmitting(false)
     }
   }, [isResubmitting, chatStatus, error])
+
+  useEffect(() => {
+    // Approval-required tools can't run in parallel. Auto-deny extras so the model reissues them sequentially.
+    for (const id of getParallelApprovalIdsToReject(chatMessages)) {
+      addToolApprovalResponse?.({
+        id,
+        approved: false,
+        reason:
+          'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
+      })
+    }
+  }, [chatMessages, addToolApprovalResponse])
 
   useEffect(() => {
     setValue(snap.initialInput || '')
@@ -394,19 +445,19 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         },
       ]}
     >
-      <div className={cn('flex flex-col h-full w-full md:h-full max-h-[100dvh]', className)}>
+      <div className={cn('flex bg-card flex-col h-full w-full md:h-full max-h-dvh', className)}>
         <AIAssistantHeader
           isChatLoading={isChatLoading}
           onNewChat={snap.newChat}
           onCloseAssistant={() => closeSidebar(SIDEBAR_KEYS.AI_ASSISTANT)}
           showMetadataWarning={showMetadataWarning}
           updatedOptInSinceMCP={updatedOptInSinceMCP}
-          isHipaaProjectDisallowed={isHipaaProjectDisallowed as boolean}
+          isHipaaProjectDisallowed={isHipaaProjectDisallowed}
           aiOptInLevel={aiOptInLevel}
         />
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
               {renderedMessages}
               {error && (
                 <>
@@ -425,7 +476,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
                           <Button
-                            type="default"
+                            variant="default"
                             size="tiny"
                             onClick={() => snap.newChat()}
                             className="text-xs"
@@ -435,7 +486,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                         ) : (
                           <>
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={() => regenerate()}
                               className="text-xs"
@@ -443,7 +494,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                               Retry
                             </Button>
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
@@ -464,11 +515,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
               )}
+
+              <p className="text-center text-xs text-foreground-muted mt-6">
+                The Assistant can make mistakes. Double check responses.
+              </p>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
         ) : (
           <AIOnboarding
+            key={snap.activeChatId}
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
             suggestions={
               snap.suggestions as
@@ -488,7 +544,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               exit={{ opacity: 0 }}
               className="pointer-events-none z-10 -mt-24"
             >
-              <div className="h-24 w-full bg-gradient-to-t from-background to-transparent relative">
+              <div className="h-24 w-full bg-linear-to-t from-background to-transparent relative">
                 <motion.div
                   className="absolute left-1/2 z-20 bottom-8 pointer-events-auto"
                   variants={{
@@ -506,7 +562,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <span>Editing message</span>
                     </div>
                     <ButtonTooltip
-                      type="outline"
+                      variant="outline"
                       size="tiny"
                       icon={<X size={14} />}
                       onClick={cancelEdit}
@@ -524,7 +580,35 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative">
+        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
+          {isSupportChat && !isSupportChatClosed && (
+            <div>
+              <div className="mb-3 border-t" />
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="tiny"
+                  disabled={!activeChatId || !supportConversationId}
+                  onClick={() =>
+                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'escalated')
+                  }
+                >
+                  Escalate to human
+                </Button>
+                <Button
+                  variant="outline"
+                  size="tiny"
+                  disabled={!activeChatId || !supportConversationId}
+                  onClick={() =>
+                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'user_resolved')
+                  }
+                >
+                  Resolve
+                </Button>
+              </div>
+            </div>
+          )}
+
           {disablePrompts && (
             <Admonition
               showIcon={false}
@@ -551,17 +635,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border-1 [&>form>textarea]:rounded-md [&>form>textarea]:!outline-none [&>form>textarea]:!ring-offset-0 [&>form>textarea]:!ring-0'
+              'z-20',
+              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
+              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
+              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
-            disabled={!isApiKeySet || disablePrompts || isLoadingOrganization}
+            disabled={isChatInputDisabled}
             placeholder={
               hasMessages
-                ? 'Ask a follow up question...'
+                ? isSupportChat
+                  ? 'Share details so the assistant can help with your support request...'
+                  : 'Ask a follow up question...'
                 : (snap.sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
-                  : 'Chat to Postgres...'
+                  : isSupportChat
+                    ? 'Describe your support issue...'
+                    : 'Chat to Postgres...'
             }
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
@@ -591,3 +682,5 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     </ErrorBoundary>
   )
 }
+
+export { SupportAssistantSuccessCardContent } from './SupportAssistantSuccessCardContent'

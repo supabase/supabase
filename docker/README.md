@@ -1,3 +1,10 @@
+<div align="center">
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)
+
+</div>
+
 # Self-Hosted Supabase with Docker
 
 This is the official Docker Compose setup for self-hosted Supabase. It provides a complete stack with all Supabase services running locally or on your infrastructure.
@@ -33,22 +40,25 @@ This Docker Compose configuration includes the following services:
 
 ## Documentation
 
-- **[Documentation](https://supabase.com/docs/guides/self-hosting/docker)** - Setup and configuration guides
+- **[Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker)** - Setup and configuration guides
 - **[CHANGELOG.md](./CHANGELOG.md)** - Track recent updates and changes to services
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
+- **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
+- **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
+- **[Update your deployment](https://supabase.com/docs/guides/self-hosting/updating)** - Update an existing deployment with `update.sh`
 
 ## Updates
 
-To update your self-hosted Supabase instance:
+Back up your database, then:
 
-1. Review [CHANGELOG.md](./CHANGELOG.md) for breaking changes
-2. Check [versions.md](./versions.md) for new image versions
-3. Update `docker-compose.yml` if there are configuration changes
-4. Pull the latest images: `docker compose pull`
-5. Stop services: `docker compose down`
-6. Start services with new configuration: `docker compose up -d`
+```sh
+sh update.sh --dry-run   # optional preview
+sh update.sh
+sh run.sh pull && sh run.sh recreate
+```
 
-**Note:** Consider to always backup your database before updating.
+See the **[update guide](https://supabase.com/docs/guides/self-hosting/updating)** for conflicts,
+breaking changes, pinning a release, and older installs without `.supabase-version`.
 
 ## Community & Support
 
@@ -73,14 +83,13 @@ Share your self-hosting experience:
 ⚠️ **The default configuration is not secure for production use.**
 
 Before deploying to production, you must:
-- Update all default passwords and secrets in the `.env` file
-- Generate new JWT secrets
+- [Update](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase) all default passwords and secrets in the `.env` file
 - Review and update CORS settings
 - Consider setting up a secure proxy in front of self-hosted Supabase
 - Review and adjust network security configuration (ACLs, etc.)
 - Set up proper backup procedures
 
-See the [security section](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase) in the documentation.
+See the [main installation guide](https://supabase.com/docs/guides/self-hosting/docker) and the how-tos in the documentation.
 
 ## License
 

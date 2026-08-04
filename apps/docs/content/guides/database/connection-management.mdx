@@ -7,11 +7,11 @@ subtitle: 'Using your connections resourcefully'
 
 ## Connections
 
-Every [Compute Add-On](/docs/guides/platform/compute-add-ons) has a pre-configured direct connection count and Supavisor pool size. This guide discusses ways to observe and manage them resourcefully.
+Every [Compute Add-On](/docs/guides/platform/compute-and-disk) has a pre-configured direct connection count and Supavisor pool size. This guide discusses ways to observe and manage them resourcefully.
 
 ### Configuring Supavisor's pool size
 
-You can change how many database connections Supavisor can manage by altering the pool size in the "Connection pooling configuration" section of the [Database Settings](/dashboard/project/_/database/settings):
+You can change how many database connections Supavisor can manage by altering the pool size in the "Connection pooling" section of the [Database Settings](/dashboard/project/_/database/settings):
 
 ![Connection Info and Certificate.](/docs/img/database/pool-size.png)
 
@@ -27,11 +27,13 @@ These numbers are generalizations and depends on other Supabase products that yo
 
 <Image
   alt="Database client connections chart"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/reports/db-connections-chart-dark.png',
     light: '/docs/img/database/reports/db-connections-chart-light.png',
   }}
+width={2062}
+height={608}
 />
 
 For Teams and Enterprise plans, Supabase provides Advanced Telemetry charts directly within the Dashboard. The `Database client connections` chart displays historical connection data broken down by connection type:
@@ -45,11 +47,11 @@ For Teams and Enterprise plans, Supabase provides Advanced Telemetry charts dire
 
 This chart helps you monitor connection pool usage, identify connection leaks, and plan capacity. It also shows a reference line for your compute size's maximum connection limit.
 
-For more details on using these monitoring charts, see the [Reports guide](/docs/guides/telemetry/reports#advanced-telemetry).
+For more details on using these monitoring charts, see the [Reports guide](/docs/guides/monitoring-and-debugging/reports#advanced-telemetry).
 
 #### Grafana Dashboard
 
-Supabase offers a Grafana Dashboard that records and visualizes over 200 project metrics, including connections. For setup instructions, check the [metrics docs](/docs/guides/platform/metrics).
+Supabase offers a Grafana Dashboard that records and visualizes over 200 project metrics, including connections. For setup instructions, check the [metrics docs](/docs/guides/monitoring-and-debugging/metrics).
 
 Its "Client Connections" graph displays connections for both Supavisor and Postgres
 ![client connection graph](/docs/img/database/grafana-connections.png)

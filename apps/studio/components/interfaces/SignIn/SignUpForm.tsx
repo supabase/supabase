@@ -5,26 +5,28 @@ import { CheckCircle, Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { BASE_PATH } from 'lib/constants'
-import { buildPathWithParams } from 'lib/gotrue'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
   cn,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { useSignUpMutation } from '@/data/misc/signup-mutation'
+import { BASE_PATH } from '@/lib/constants'
+import { buildPathWithParams } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -65,7 +67,10 @@ export const SignUpForm = () => {
   const [searchParams] = useQueryStates({
     auth_id: parseAsString.withDefault(''),
     token: parseAsString.withDefault(''),
+    organization_slug: parseAsString.withDefault(''),
   })
+
+  const trackFunnelError = useTrackFunnelError()
 
   const { mutate: signup, isPending: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
@@ -75,7 +80,8 @@ export const SignUpForm = () => {
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(`Failed to sign up: ${error.message}`)
+      const toastId = toast.error(`Failed to sign up: ${error.message}`)
+      trackFunnelError('signup', classifyApiError('signup', error), 'toast', toastId)
     },
   })
 
@@ -97,7 +103,12 @@ export const SignUpForm = () => {
     let redirectTo: string
 
     if (isInsideOAuthFlow) {
-      redirectTo = `${redirectUrlBase}/authorize?auth_id=${searchParams.auth_id}${searchParams.token && `&token=${searchParams.token}`}`
+      const authorizeParams = new URLSearchParams({ auth_id: searchParams.auth_id })
+      if (searchParams.token) authorizeParams.set('token', searchParams.token)
+      if (searchParams.organization_slug) {
+        authorizeParams.set('organization_slug', searchParams.organization_slug)
+      }
+      redirectTo = `${redirectUrlBase}/authorize?${authorizeParams.toString()}`
     } else {
       // Use getRedirectToPath to handle redirect_to parameter and other query params
       const { returnTo } = router.query
@@ -115,7 +126,7 @@ export const SignUpForm = () => {
     })
   }
 
-  const password = form.watch('password')
+  const password = useWatch({ control: form.control, name: 'password' })
   const isSubmitting = form.formState.isSubmitting || isSigningUp
 
   return (
@@ -127,14 +138,14 @@ export const SignUpForm = () => {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="absolute top-0 w-full"
         >
-          <Alert_Shadcn_ variant="default">
+          <Alert variant="default">
             <CheckCircle />
-            <AlertTitle_Shadcn_>Check your email to confirm</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs">
+            <AlertTitle>Check your email to confirm</AlertTitle>
+            <AlertDescription className="text-xs">
               You've successfully signed up. Please check your email to confirm your account before
               signing in to the Supabase dashboard. The confirmation link expires in 10 minutes.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         </motion.div>
       )}
       <div
@@ -143,36 +154,43 @@ export const SignUpForm = () => {
           isSubmitted ? 'max-h-[100px] opacity-0 pointer-events-none' : 'max-h-[1000px] opacity-100'
         )}
       >
-        <Form_Shadcn_ {...form}>
-          <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <FormField_Shadcn_
+        <Form {...form}>
+          <form
+            id={formId}
+            method="POST"
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(onSubmit, (errors) =>
+              trackFunnelError('signup', classifyValidationError('signup', errors), 'form')
+            )}
+          >
+            <FormField
               key="email"
               name="email"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="email" label="Email">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
+                  <FormControl>
+                    <Input
                       id="email"
                       autoComplete="email"
                       disabled={isSubmitting}
                       {...field}
                       placeholder="you@example.com"
                     />
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
-            <FormField_Shadcn_
+            <FormField
               key="password"
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout name="password" label="Password">
-                  <FormControl_Shadcn_>
+                  <FormControl>
                     <div className="relative">
-                      <Input_Shadcn_
+                      <Input
                         id="password"
                         type={passwordHidden ? 'password' : 'text'}
                         autoComplete="new-password"
@@ -182,23 +200,23 @@ export const SignUpForm = () => {
                         disabled={isSubmitting}
                       />
                       <Button
-                        type="default"
-                        title={passwordHidden ? `Hide password` : `Show password`}
-                        aria-label={passwordHidden ? `Hide password` : `Show password`}
+                        variant="default"
+                        title={passwordHidden ? `Show password` : `Hide password`}
+                        aria-label={passwordHidden ? `Show password` : `Hide password`}
                         className="absolute right-1 top-1 px-1.5"
                         icon={passwordHidden ? <Eye /> : <EyeOff />}
                         disabled={isSubmitting}
                         onClick={() => setPasswordHidden((prev) => !prev)}
                       />
                     </div>
-                  </FormControl_Shadcn_>
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
 
             <div
               className={`${
-                showConditions ? 'max-h-[500px]' : 'max-h-[0px]'
+                showConditions ? 'max-h-[500px]' : 'max-h-0'
               } transition-all duration-400 overflow-y-hidden`}
             >
               <PasswordConditionsHelper password={password} />
@@ -217,7 +235,7 @@ export const SignUpForm = () => {
             <Button
               block
               form={formId}
-              htmlType="submit"
+              type="submit"
               size="large"
               disabled={password.length === 0 || isSubmitting}
               loading={isSubmitting}
@@ -225,7 +243,7 @@ export const SignUpForm = () => {
               Sign up
             </Button>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
     </div>
   )

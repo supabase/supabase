@@ -1,4 +1,4 @@
-import type { OptimizedSearchColumns } from '@supabase/pg-meta/src/sql/studio/get-users-types'
+import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 
 export const authKeys = {
   user: (projectRef: string | undefined, userId?: string | null) =>
@@ -14,6 +14,8 @@ export const authKeys = {
       column?: OptimizedSearchColumns
     }
   ) => ['projects', projectRef, 'users-infinite', params].filter(Boolean),
+  usersSearch: (projectRef: string | undefined, keywords: string) =>
+    ['projects', projectRef, 'users-search', keywords] as const,
   usersCount: (
     projectRef: string | undefined,
     params?: {

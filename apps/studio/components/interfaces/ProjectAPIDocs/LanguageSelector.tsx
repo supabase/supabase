@@ -1,17 +1,18 @@
-import { BASE_PATH } from 'lib/constants'
-import { Terminal, ChevronDown } from 'lucide-react'
+import { ChevronDown, Terminal } from 'lucide-react'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 interface LanguageSelectorProps {
   /**
@@ -31,10 +32,10 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
 
   return (
     <div className="flex items-center gap-x-2">
-      <Popover_Shadcn_ modal={false} open={showLanguage} onOpenChange={setShowLanguage}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover modal={false} open={showLanguage} onOpenChange={setShowLanguage}>
+        <PopoverTrigger asChild>
           <Button
-            type="default"
+            variant="default"
             className={simplifiedVersion ? 'px-1' : ''}
             icon={
               simplifiedVersion ? (
@@ -55,30 +56,30 @@ const LanguageSelector = ({ simplifiedVersion = false }: LanguageSelectorProps) 
               ? `Language: ${snap.docsLanguage === 'js' ? 'Javascript' : 'Bash'}`
               : undefined}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-24" side="bottom" align="end">
-          <Command_Shadcn_>
-            <CommandList_Shadcn_>
-              <CommandGroup_Shadcn_>
-                <CommandItem_Shadcn_
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-24" side="bottom" align="end">
+          <Command>
+            <CommandList>
+              <CommandGroup>
+                <CommandItem
                   className="cursor-pointer"
                   onSelect={() => updateLanguage('js')}
                   onClick={() => updateLanguage('js')}
                 >
                   <p>Javascript</p>
-                </CommandItem_Shadcn_>
-                <CommandItem_Shadcn_
+                </CommandItem>
+                <CommandItem
                   className="cursor-pointer"
                   onSelect={() => updateLanguage('bash')}
                   onClick={() => updateLanguage('bash')}
                 >
                   <p>Bash</p>
-                </CommandItem_Shadcn_>
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+                </CommandItem>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

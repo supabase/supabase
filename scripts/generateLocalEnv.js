@@ -11,7 +11,10 @@ const defaultEnv = {
   // NEXT_ANALYTICS_BACKEND_PROVIDER: 'postgres',
   // SUPABASE_REST_URL: 'http://127.0.0.1:54321/rest/v1/',
   // NEXT_PUBLIC_ENABLE_LOGS: 'false',
-  // NEXT_PUBLIC_IS_PLATFORM: 'false',
+  // E2E tests target self-hosted studio (no auth). Explicitly written so that
+  // .env.test overrides any IS_PLATFORM=true that a developer's .env.local
+  // might set for their own platform-mode work.
+  NEXT_PUBLIC_IS_PLATFORM: 'false',
   PG_META_CRYPTO_KEY: 'SAMPLE_KEY',
   POSTGRES_PASSWORD: 'postgres',
   POSTGRES_HOST: 'db',
@@ -31,7 +34,7 @@ const defaultEnv = {
   NEXT_PUBLIC_HCAPTCHA_SITE_KEY: '10000000-ffff-ffff-ffff-000000000001',
   NEXT_PUBLIC_NODE_ENV: 'test',
   SNIPPETS_MANAGEMENT_FOLDER: '../../supabase/snippets',
-  EDGE_FUNCTIONS_MANAGEMENT_FOLDER: '../../supabase/functions' // path relative to studio project
+  EDGE_FUNCTIONS_MANAGEMENT_FOLDER: '../../supabase/functions', // path relative to studio project
 }
 
 const environment = { ...generatedEnv, ...defaultEnv }

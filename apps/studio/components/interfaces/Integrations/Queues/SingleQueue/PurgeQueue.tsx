@@ -1,8 +1,8 @@
 import { toast } from 'sonner'
 
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useDatabaseQueuePurgeMutation } from 'data/database-queues/database-queues-purge-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDatabaseQueuePurgeMutation } from '@/data/database-queues/database-queues-purge-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PurgeQueueProps {
   queueName: string

@@ -1,17 +1,18 @@
-import Link from 'next/link'
-
 import { useParams } from 'common'
-import { DOCS_URL } from 'lib/constants'
+import Link from 'next/link'
 import { Button } from 'ui'
-import { NoticeBar } from './ui/NoticeBar'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageSection'
+
 import { DocsButton } from '../../ui/DocsButton'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { DOCS_URL } from '@/lib/constants'
 
 // [Joshen] Only used for non AWS projects
 export function DiskManagementPanelForm() {
@@ -21,24 +22,19 @@ export function DiskManagementPanelForm() {
     <PageSection id="disk-management">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Disk Management</PageSectionTitle>
+          <PageSectionTitle>Disk management</PageSectionTitle>
         </PageSectionSummary>
         <DocsButton href={`${DOCS_URL}/guides/platform/database-size#disk-management`} />
       </PageSectionMeta>
       <PageSectionContent>
-        <NoticeBar
-          visible={true}
+        <Admonition
           type="default"
+          layout="responsive"
           title="Disk Management has moved"
-          description="Disk configuration is now managed alongside Project Compute on the new Compute and Disk page."
+          description="Disk configuration is now managed alongside Project Compute on the Infrastructure page."
           actions={
-            <Button type="default" asChild>
-              <Link
-                href={`/project/${projectRef}/settings/compute-and-disk`}
-                className="!no-underline"
-              >
-                Go to Compute and Disk
-              </Link>
+            <Button variant="default" asChild>
+              <Link href={getInfrastructurePath(projectRef)}>Go to Infrastructure</Link>
             </Button>
           }
         />
