@@ -7,6 +7,7 @@ export interface ParsedTabId {
 
 /** A tab's id is always `${kind}-${contentId}` — kind names never contain a dash. */
 export function createTabId(kind: TabKind, contentId: string): string {
+  if (!contentId) throw new Error('contentId must not be empty')
   return `${kind}-${contentId}`
 }
 

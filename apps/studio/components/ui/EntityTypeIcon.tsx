@@ -2,9 +2,7 @@ import { GitBranch } from 'lucide-react'
 import { cn, SQL_ICON } from 'ui'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
-import { LogsSnippetIcon, TAB_KIND_ICONS } from '@/state/tabs/kinds.icons'
-
-export { LogsSnippetIcon }
+import { TAB_KIND_ICONS } from '@/state/tabs/kinds.icons'
 
 interface EntityTypeIconProps {
   type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p'

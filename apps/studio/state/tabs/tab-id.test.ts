@@ -14,8 +14,17 @@ describe('createTabId / parseTabId round-trip', () => {
     expect(parseTabId(tabId)).toEqual({ kind, contentId })
   })
 
+  it('rejects an empty content id at creation, so createTabId/parseTabId never disagree', () => {
+    expect(() => createTabId('sql', '')).toThrow()
+  })
+
   it('rejects an id with an unknown kind', () => {
     expect(parseTabId('bogus-123')).toBeNull()
+  })
+
+  it('rejects an id whose kind is an inherited Object property name', () => {
+    expect(parseTabId('constructor-123')).toBeNull()
+    expect(parseTabId('toString-123')).toBeNull()
   })
 
   it('rejects an id with no dash separator', () => {

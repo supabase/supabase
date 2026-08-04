@@ -78,9 +78,10 @@ export const TAB_KINDS: Record<TabKind, TabKindDescriptor> = {
   },
 }
 
-const TAB_KIND_LIST = Object.keys(TAB_KINDS) as Array<TabKind>
+export const isTabKind = (value: string): value is TabKind =>
+  Object.prototype.hasOwnProperty.call(TAB_KINDS, value)
 
-export const isTabKind = (value: string): value is TabKind => value in TAB_KINDS
+const TAB_KIND_LIST = Object.keys(TAB_KINDS).filter(isTabKind)
 
 export const surfaceOf = (kind: TabKind): TabSurface => TAB_KINDS[kind].surface
 
