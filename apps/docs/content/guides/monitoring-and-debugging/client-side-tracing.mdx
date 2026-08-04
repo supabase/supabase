@@ -18,7 +18,7 @@ Because the headers follow the W3C standard, any compliant tracing SDK (such as 
 
 <TabPanel id="js" label="JavaScript">
 
-### Requirements
+## Requirements
 
 - `@supabase/supabase-js` version `2.106.0` or later
 - `@opentelemetry/api` available at runtime — either installed directly or pulled in as a transitive dependency of your tracing SDK
@@ -40,13 +40,13 @@ On versions `2.106.0`–`2.111.x`, the subpath doesn't exist — don't add the i
 
 Trace propagation isn't available through the CDN (UMD) build — there's no way to load the tracing runtime there.
 
-### Set up OpenTelemetry first
+## Set up OpenTelemetry first
 
 The SDK reads from whatever `TracerProvider` you register globally — it doesn't configure one for you. If you haven't instrumented your app yet, follow the [OpenTelemetry JavaScript getting started guide](https://opentelemetry.io/docs/languages/js/getting-started/) to install an SDK (`@opentelemetry/sdk-trace-node` for Node, `@opentelemetry/sdk-trace-web` for browsers) and an exporter for your backend (OTLP, Jaeger, Zipkin, or a vendor-specific one).
 
 The Supabase SDK only propagates the trace context that's already active when a request is made.
 
-### Enable trace propagation
+## Enable trace propagation
 
 Trace propagation is opt-in and takes two steps: load the tracing runtime at your entry point (version `2.112.0` and later), and pass `tracePropagation: true` when creating the client:
 
@@ -71,7 +71,7 @@ await tracer.startActiveSpan('fetch-users', async (span) => {
 
 For security, trace headers are only attached to requests targeting Supabase domains (`*.supabase.co`, `*.supabase.in`, and `localhost` for local development). Third-party hosts called through a custom `fetch` are never tagged.
 
-### Advanced configuration
+## Advanced configuration
 
 Pass an object instead of `true` for fine-grained control:
 
@@ -94,11 +94,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 | `enabled`                 | `boolean` | `false` | Enable trace propagation.                                           |
 | `respectSamplingDecision` | `boolean` | `true`  | If `true`, skip propagation when the upstream trace is not sampled. |
 
-### Using a vendor tracing SDK
+## Using a vendor tracing SDK
 
 Many tracing SDKs are built on top of OpenTelemetry. They work with this guide as long as a W3C-compliant propagator is registered. Some vendor SDKs inject only their proprietary headers by default and need extra configuration to also emit the standard `traceparent` header. Check your vendor's OTel integration docs for the exact setup.
 
-### Troubleshooting
+## Troubleshooting
 
 The SDK never throws when it can't propagate, which keeps it safe to enable but can mask configuration issues. If `trace_id` is missing from your Supabase logs, check these in order:
 
@@ -196,7 +196,7 @@ Requires `supabase` `2.x` or later (Flutter or Dart-only).
    );
    ```
 
-### Options
+## Options
 
 | Option                    | Type                    | Default | Description                                                                                                                                                                       |
 | ------------------------- | ----------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
