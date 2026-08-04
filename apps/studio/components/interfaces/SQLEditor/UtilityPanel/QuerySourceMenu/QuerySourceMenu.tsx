@@ -116,7 +116,15 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
-          <DropdownMenuItem className="justify-between" onClick={() => switchSource('database')}>
+          <DropdownMenuItem
+            className="justify-between"
+            onSelect={(e) => {
+              // Keep the menu open so the source-specific controls that appear
+              // below (e.g. time range for logs) are immediately visible.
+              e.preventDefault()
+              switchSource('database')
+            }}
+          >
             <span className="flex items-center gap-x-2">
               <Database size={14} className="text-foreground-light" />
               Database
@@ -124,7 +132,13 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
             {!isLogs && <Check size={14} />}
           </DropdownMenuItem>
           {(canCreateLogsSnippet || isLogs) && (
-            <DropdownMenuItem className="justify-between" onClick={() => switchSource('logs')}>
+            <DropdownMenuItem
+              className="justify-between"
+              onSelect={(e) => {
+                e.preventDefault()
+                switchSource('logs')
+              }}
+            >
               <span className="flex items-center gap-x-2">
                 <ScrollText size={14} className="text-foreground-light" />
                 Logs
