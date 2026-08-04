@@ -175,12 +175,15 @@ export const PolicyEditorPanel = memo(function ({
             name,
             roles: roles.length === 0 ? ['public'] : roles.split(', '),
             definition: editorOneFormattedValue,
-            check: command === 'INSERT' ? editorOneFormattedValue : editorTwoFormattedValue,
+            check:
+              selectedPolicy.command === 'INSERT'
+                ? editorOneFormattedValue
+                : editorTwoFormattedValue,
           })
         : false
 
     return policyCreateUnsaved || policyUpdateUnsaved
-  }, [command, name, roles, selectedPolicy])
+  }, [name, roles, selectedPolicy])
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: hasUnsavedChanges,
