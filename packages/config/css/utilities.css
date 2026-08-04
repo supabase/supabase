@@ -76,6 +76,28 @@
 }
 
 /*
+ * Soft edge fades for scrollable transcripts and lists. The mask follows the
+ * shadcn scroll-fade convention while keeping the content area interaction-free.
+ */
+@utility scroll-fade {
+  --scroll-fade-size: 1.5rem;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black var(--scroll-fade-size),
+    black calc(100% - var(--scroll-fade-size)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black var(--scroll-fade-size),
+    black calc(100% - var(--scroll-fade-size)),
+    transparent 100%
+  );
+}
+
+/*
  * Text shimmer (shadcn shimmer utility, inlined so we don't pull in the full
  * shadcn CSS package). Apply `shimmer` to text to draw attention.
  */

@@ -20,11 +20,10 @@ import {
 } from 'recharts'
 import { ChartContainer, ChartTooltipContent, cn } from 'ui'
 
+import { CHART_SERIES_COLORS } from './chartColors'
 import type { ChartDisplay, QueryDisplay, ResultRow } from './ExplorerPrototype.types'
 import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { CHART_COLORS } from '@/components/ui/Charts/Charts.constants'
-
-const SERIES_COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)']
 
 /** Running total per series, computed independently for each field. */
 export const applyCumulative = (rows: ResultRow[], fields: string[]): ResultRow[] => {
@@ -107,7 +106,7 @@ const ChartRenderer = ({ chart, rows }: ChartRendererProps) => {
               type="monotone"
               dataKey={entry.field}
               name={entry.label ?? entry.field}
-              stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
+              stroke={CHART_SERIES_COLORS[index % CHART_SERIES_COLORS.length]}
               strokeWidth={2}
               dot={false}
               label={chart.show_labels ? { fontSize: 10, position: 'top' } : undefined}
@@ -123,7 +122,7 @@ const ChartRenderer = ({ chart, rows }: ChartRendererProps) => {
               radius={1}
               dataKey={entry.field}
               name={entry.label ?? entry.field}
-              fill={SERIES_COLORS[index % SERIES_COLORS.length]}
+              fill={CHART_SERIES_COLORS[index % CHART_SERIES_COLORS.length]}
               label={chart.show_labels ? { fontSize: 10, position: 'top' } : undefined}
             />
           ))}
@@ -160,7 +159,7 @@ export const QueryCellDisplay = ({ display, rows, className }: QueryCellDisplayP
     <div
       className={cn('flex max-h-72 w-full flex-col overflow-auto overscroll-contain', className)}
     >
-      <Results rows={rows} />
+      <Results rows={rows} headerClassName="heading-meta text-muted-foreground" />
     </div>
   )
 }

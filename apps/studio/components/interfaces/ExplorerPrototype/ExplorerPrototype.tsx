@@ -20,6 +20,7 @@ import type { Tab } from './ExplorerPrototype.types'
 import { useExplorerPrototype } from './ExplorerPrototypeContext'
 import { ExplorerTabBar } from './ExplorerTabBar'
 import { ChatView } from './views/ChatView'
+import { HomeView } from './views/HomeView'
 import { NotebookView } from './views/NotebookView'
 import { snippetToQueryCell } from './views/snippetAdapter'
 import { SnippetView } from './views/SnippetView'
@@ -27,6 +28,7 @@ import { SnippetView } from './views/SnippetView'
 export const ExplorerPrototype = () => {
   const state = useExplorerPrototype()
   const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId)
+  const isHomeActive = state.activeTabId === 'home'
 
   const renderTab = (tab: Tab) => {
     if (tab.resource.type === 'snippet') {
@@ -55,6 +57,9 @@ export const ExplorerPrototype = () => {
           onAddCell={(type, afterCellId) => state.addCell(notebookId, type, afterCellId)}
           onRemoveCell={(cellId) => state.removeCell(notebookId, cellId)}
           onMoveCell={(cellId, direction) => state.moveCell(notebookId, cellId, direction)}
+          onMoveCellTo={(cellId, targetCellId, placement) =>
+            state.moveCellTo(notebookId, cellId, targetCellId, placement)
+          }
           onSettingsChange={(settings) => state.updateNotebookSettings(notebookId, settings)}
           onRunCell={(cell, rowLimit) => state.runCell(cell, rowLimit)}
           onRunAll={() => state.runNotebook(notebookId)}
@@ -72,7 +77,11 @@ export const ExplorerPrototype = () => {
           state.setChatApproval(chat.id, messageId, 'approved')
           state.runCell(cell, 100)
         }}
+        onApproveNotebook={(messageId, title, notebook) =>
+          state.createNotebookFromChat(chat.id, messageId, title, notebook)
+        }
         onDeny={(messageId) => state.setChatApproval(chat.id, messageId, 'denied')}
+        onSendMessage={(message) => state.sendChatMessage(chat.id, message)}
       />
     )
   }
@@ -85,13 +94,24 @@ export const ExplorerPrototype = () => {
           tabs={state.tabs}
           activeTabId={state.activeTabId}
           dirtyResources={state.dirtyResources}
+          isHomeActive={isHomeActive}
+          onHomeSelect={() => state.setActiveTabId('home')}
+          onCreateSnippet={state.createSnippet}
+          onCreateNotebook={state.createNotebook}
+          onCreateChat={() => state.createChat()}
           onSelect={state.setActiveTabId}
           onClose={state.closeTab}
         />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {activeTab ? (
+        {isHomeActive ? (
+          <HomeView
+            onCreateNotebook={state.createNotebook}
+            onCreateSnippet={state.createSnippet}
+            onCreateChat={state.createChat}
+          />
+        ) : activeTab ? (
           renderTab(activeTab)
         ) : (
           <div className="mx-auto max-w-lg p-10">

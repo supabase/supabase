@@ -153,6 +153,13 @@ export type ChatMessage =
       cell: QueryCellModel
       approval: 'pending' | 'approved' | 'denied'
     }
+  | {
+      id: string
+      role: 'assistant'
+      /** A notebook the Assistant can read from or create for the user. */
+      notebook: { title: string; content: NotebookContent }
+      approval: 'pending' | 'approved' | 'denied'
+    }
 
 export type ChatSession = {
   id: string

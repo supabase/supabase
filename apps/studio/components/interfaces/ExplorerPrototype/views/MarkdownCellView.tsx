@@ -16,10 +16,30 @@ import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 interface MarkdownCellViewProps {
   cell: MarkdownCell
   onChange: (cell: MarkdownCell) => void
+  readOnly?: boolean
 }
 
-export const MarkdownCellView = ({ cell, onChange }: MarkdownCellViewProps) => {
+export const MarkdownCellView = ({ cell, onChange, readOnly = false }: MarkdownCellViewProps) => {
   const [isEditing, setIsEditing] = useState(false)
+
+  const preview =
+    cell.markdown.trim().length > 0 ? (
+      <Markdown
+        content={cell.markdown}
+        className={cn(
+          'prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground',
+          '[--tw-prose-body:var(--foreground-muted)]',
+          '[--tw-prose-headings:var(--foreground-default)]',
+          '[--tw-prose-links:var(--foreground-muted)]',
+          '[--tw-prose-bold:var(--foreground-muted)]',
+          '[--tw-prose-quotes:var(--foreground-muted)]'
+        )}
+      />
+    ) : (
+      <span className="text-xs text-foreground-lighter">Empty markdown cell</span>
+    )
+
+  if (readOnly) return <div className="rounded-md px-3 py-2">{preview}</div>
 
   return (
     <div className="rounded-md">
@@ -56,13 +76,7 @@ export const MarkdownCellView = ({ cell, onChange }: MarkdownCellViewProps) => {
             'hover:border-default hover:bg-surface-100'
           )}
         >
-          {cell.markdown.trim().length > 0 ? (
-            <Markdown content={cell.markdown} className="max-w-none" />
-          ) : (
-            <span className="text-xs text-foreground-lighter">
-              Empty markdown cell — click to edit
-            </span>
-          )}
+          {cell.markdown.trim().length > 0 ? preview : 'Empty markdown cell — click to edit'}
         </button>
       )}
     </div>

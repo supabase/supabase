@@ -173,8 +173,94 @@ export const useExplorerPrototypeState = () => {
       return { ...notebook, cells }
     })
 
+  const moveCellTo = (
+    notebookId: string,
+    cellId: string,
+    targetCellId: string,
+    placement: 'before' | 'after'
+  ) =>
+    updateNotebook(notebookId, (notebook) => {
+      if (cellId === targetCellId) return notebook
+
+      const cells = [...notebook.cells]
+      const sourceIndex = cells.findIndex((cell) => cell.id === cellId)
+      if (sourceIndex < 0) return notebook
+
+      const [moved] = cells.splice(sourceIndex, 1)
+      const targetIndex = cells.findIndex((cell) => cell.id === targetCellId)
+      if (targetIndex < 0) return notebook
+
+      cells.splice(targetIndex + (placement === 'after' ? 1 : 0), 0, moved)
+      return { ...notebook, cells }
+    })
+
   const updateNotebookSettings = (notebookId: string, settings: NotebookContent['settings']) =>
     updateNotebook(notebookId, (notebook) => ({ ...notebook, settings }))
+
+  // -- resource creation ----------------------------------------------------
+
+  const createNotebook = () => {
+    const id = nextId('notebook')
+    const resource: TabResource = { type: 'notebook', id }
+    setNotebooks((current) => ({
+      ...current,
+      [id]: {
+        schema_version: 1,
+        settings: { run_mode: 'manual', default_row_limit: 100 },
+        cells: [
+          { id: nextId('cell'), type: 'markdown', markdown: '' },
+          {
+            id: nextId('cell'),
+            type: 'query',
+            name: 'Untitled query',
+            query: {
+              type: 'inline',
+              source: { id: 'database', parameters: { identifier: 'primary' } },
+              sql: '',
+            },
+            display: { type: 'table' },
+          },
+        ],
+      },
+    }))
+    markModified(resource)
+    openTab(resource, 'Untitled notebook')
+  }
+
+  const createSnippet = () => {
+    const id = nextId('snippet')
+    const resource: TabResource = { type: 'snippet', id }
+    setSnippets((current) => ({
+      ...current,
+      [id]: {
+        id,
+        name: 'Untitled snippet',
+        contentType: 'sql',
+        sql: 'select ',
+        display: { type: 'table' },
+      },
+    }))
+    markModified(resource)
+    openTab(resource, 'Untitled snippet')
+  }
+
+  const createChat = (prompt?: string) => {
+    const text = prompt?.trim() ?? ''
+
+    const id = nextId('chat')
+    const resource: TabResource = { type: 'chat', id }
+    const title = text.length > 0 ? text.slice(0, 48) : 'New chat'
+    setChats((current) => ({
+      ...current,
+      [id]: {
+        id,
+        name: title,
+        messages: text.length > 0 ? [{ id: nextId('message'), role: 'user', text }] : [],
+      },
+    }))
+    markModified(resource)
+    openTab(resource, title)
+  }
 
   // -- snippets & chat ------------------------------------------------------
 
@@ -194,6 +280,23 @@ export const useExplorerPrototypeState = () => {
       },
     }))
     // Resolving an approval changes the stored session, so the chat counts as modified.
+    markModified({ type: 'chat', id: chatId })
+  }
+
+  const sendChatMessage = (chatId: string, text: string) => {
+    const message = text.trim()
+    if (message.length === 0) return
+
+    setChats((current) => ({
+      ...current,
+      [chatId]: {
+        ...current[chatId],
+        messages: [
+          ...current[chatId].messages,
+          { id: nextId('message'), role: 'user', text: message },
+        ],
+      },
+    }))
     markModified({ type: 'chat', id: chatId })
   }
 
@@ -237,6 +340,27 @@ export const useExplorerPrototypeState = () => {
     }
   }
 
+  const createNotebookFromChat = async (
+    chatId: string,
+    messageId: string,
+    title: string,
+    notebook: NotebookContent
+  ) => {
+    const id = nextId('notebook')
+    const resource: TabResource = { type: 'notebook', id }
+
+    setNotebooks((current) => ({ ...current, [id]: notebook }))
+    setChatApproval(chatId, messageId, 'approved')
+    markModified(resource)
+    openTab(resource, title)
+
+    for (const cell of notebook.cells) {
+      if (cell.type !== 'query') continue
+      if (isWriteQuery(cell.query.sql)) break
+      await runCell(cell, resolveEffectiveRowLimit(cell, notebook.settings))
+    }
+  }
+
   return {
     tabs,
     activeTabId,
@@ -249,11 +373,17 @@ export const useExplorerPrototypeState = () => {
     addCell,
     removeCell,
     moveCell,
+    moveCellTo,
     updateNotebookSettings,
+    createNotebook,
+    createSnippet,
     snippets,
     updateSnippet,
     chats,
+    createChat,
+    sendChatMessage,
     setChatApproval,
+    createNotebookFromChat,
     results,
     recentItems,
     runCell,

@@ -40,13 +40,18 @@ export const MOCK_REPLICAS = [
 export const INITIAL_NOTEBOOKS: Record<string, NotebookContent> = {
   'nb-auth-health': {
     schema_version: 1,
-    settings: { run_mode: 'manual', default_row_limit: 100 },
+    settings: { run_mode: 'on_open', default_row_limit: 100 },
     cells: [
       {
         id: 'cell-heading',
         type: 'markdown',
+        markdown: '## Authentication health',
+      },
+      {
+        id: 'cell-signups-context',
+        type: 'markdown',
         markdown:
-          '## Authentication health\n\nRun the cells below to check signup volume and recent auth failures. Cells run top to bottom.',
+          '### 1. Establish the baseline\n\nThis chart compares daily account creation with confirmed email addresses. A widening gap suggests users are arriving but not completing the confirmation step; a decline in both lines points to acquisition or availability instead.',
       },
       {
         id: 'cell-signups',
@@ -70,6 +75,12 @@ export const INITIAL_NOTEBOOKS: Record<string, NotebookContent> = {
         },
       },
       {
+        id: 'cell-auth-errors-context',
+        type: 'markdown',
+        markdown:
+          '### 2. Look for delivery and callback failures\n\nReview the most recent authentication errors after checking the trend. The log query is limited to 50 rows so common failures are easy to scan without drowning out the newest incidents.',
+      },
+      {
         id: 'cell-auth-errors',
         type: 'query',
         name: 'Recent authentication errors',
@@ -83,6 +94,12 @@ export const INITIAL_NOTEBOOKS: Record<string, NotebookContent> = {
         },
         display: { type: 'table' },
         execution: { row_limit: 50 },
+      },
+      {
+        id: 'cell-active-users-context',
+        type: 'markdown',
+        markdown:
+          '### 3. Inspect the affected cohort\n\nUse this final table to spot recently created accounts that may need closer investigation. It is deliberately a lightweight sample; add provider or confirmation fields here if the earlier blocks indicate a specific failure mode.',
       },
       {
         id: 'cell-active-users',
@@ -132,10 +149,22 @@ export const INITIAL_CHATS: Record<string, ChatSession> = {
       {
         id: 'm2',
         role: 'assistant',
-        text: "Let's start by looking at daily signups alongside confirmation rate. I can run this for you:",
+        text: `The drop starts on Tuesday and is concentrated in new email-password signups. The strongest change is in confirmation rate, not traffic.
+
+I would compare daily signups with confirmations first, then split the result by provider if the gap persists.`,
       },
       {
         id: 'm3',
+        role: 'user',
+        text: 'Can you check whether it is also affecting OAuth signups?',
+      },
+      {
+        id: 'm4',
+        role: 'assistant',
+        text: 'Yes — I will compare the last 14 days across signup methods and confirmation status.',
+      },
+      {
+        id: 'm5',
         role: 'assistant',
         approval: 'pending',
         cell: {
@@ -162,6 +191,86 @@ export const INITIAL_CHATS: Record<string, ChatSession> = {
       },
     ],
   },
+  'chat-2': {
+    id: 'chat-2',
+    name: 'Turn signup analysis into a notebook',
+    messages: [
+      {
+        id: 'n1',
+        role: 'user',
+        text: 'Turn the signup investigation into a notebook I can build on.',
+      },
+      {
+        id: 'n2',
+        role: 'assistant',
+        text: 'I assembled the investigation with the baseline comparison, an OAuth cut, and follow-up notes.',
+      },
+      {
+        id: 'n3',
+        role: 'assistant',
+        approval: 'pending',
+        notebook: {
+          title: 'Signup investigation',
+          content: {
+            schema_version: 1,
+            settings: { run_mode: 'manual', default_row_limit: 100 },
+            cells: [
+              {
+                id: 'agent-notebook-heading',
+                type: 'markdown',
+                markdown:
+                  '## Signup investigation\n\nCompare signup volume and email confirmation rate over the last 14 days.',
+              },
+              {
+                id: 'agent-notebook-query-overview',
+                type: 'query',
+                name: 'Signups vs confirmations',
+                query: {
+                  type: 'inline',
+                  source: { id: 'database', parameters: { identifier: 'primary' } },
+                  sql: "select date_trunc('day', created_at)::date as day,\n       count(*) as signups,\n       count(*) filter (where email_confirmed_at is not null) as confirmed\nfrom auth.users\nwhere created_at > now() - interval '14 days'\ngroup by 1\norder by 1",
+                },
+                display: {
+                  type: 'chart',
+                  chart: {
+                    type: 'bar',
+                    x_axis: { field: 'day' },
+                    series: [
+                      { field: 'signups', label: 'Signups' },
+                      { field: 'confirmed', label: 'Confirmed' },
+                    ],
+                  },
+                },
+              },
+              {
+                id: 'agent-notebook-observation',
+                type: 'markdown',
+                markdown:
+                  '### What to look for\n\nCompare the confirmation gap against the provider breakdown below before changing the signup flow.',
+              },
+              {
+                id: 'agent-notebook-query-oauth',
+                type: 'query',
+                name: 'OAuth signups by provider',
+                query: {
+                  type: 'inline',
+                  source: { id: 'database', parameters: { identifier: 'primary' } },
+                  sql: "select raw_app_meta_data->>'provider' as provider,\n       count(*) as signups\nfrom auth.users\nwhere created_at > now() - interval '14 days'\ngroup by 1\norder by 2 desc",
+                },
+                display: { type: 'table' },
+              },
+              {
+                id: 'agent-notebook-next-steps',
+                type: 'markdown',
+                markdown:
+                  '### Next steps\n\n- Review confirmation delivery failures\n- Compare the same window to the previous fortnight\n- Add a provider-level funnel if OAuth is also affected',
+              },
+            ],
+          },
+        },
+      },
+    ],
+  },
 }
 
 export const INITIAL_TABS: Tab[] = [
@@ -176,6 +285,11 @@ export const INITIAL_TABS: Tab[] = [
     resource: { type: 'snippet', id: 'snip-slow-queries' },
   },
   { id: 'tab-chat', title: 'Debugging signups', resource: { type: 'chat', id: 'chat-1' } },
+  {
+    id: 'tab-chat-notebook',
+    title: 'Turn signup analysis into a notebook',
+    resource: { type: 'chat', id: 'chat-2' },
+  },
 ]
 
 /** Seeded so the "Recent" group isn't empty on first load. Mixed across types. */
@@ -187,6 +301,10 @@ export const INITIAL_RECENT_ITEMS: RecentItem[] = [
   {
     resource: { type: 'chat', id: 'chat-1' },
     modifiedAt: Date.now() - 26 * 60_000,
+  },
+  {
+    resource: { type: 'chat', id: 'chat-2' },
+    modifiedAt: Date.now() - 44 * 60_000,
   },
   {
     resource: { type: 'snippet', id: 'snip-slow-queries' },

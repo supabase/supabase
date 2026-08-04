@@ -9,10 +9,11 @@
  * and charts want the room, while markdown stays at a readable measure.
  */
 
-import { Play, Settings } from 'lucide-react'
+import { FileText, Play, Settings, SquareCode } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
@@ -49,9 +50,13 @@ interface NotebookViewProps {
   onAddCell: (type: 'query' | 'markdown', afterCellId?: string) => void
   onRemoveCell: (cellId: string) => void
   onMoveCell: (cellId: string, direction: -1 | 1) => void
+  onMoveCellTo: (cellId: string, targetCellId: string, placement: 'before' | 'after') => void
   onSettingsChange: (settings: NotebookContent['settings']) => void
   onRunCell: (cell: QueryCellModel, rowLimit: number) => void
   onRunAll: () => void
+  /** Renders the same notebook chrome inside an Assistant message. */
+  embedded?: boolean
+  readOnly?: boolean
 }
 
 export const NotebookView = ({
@@ -62,93 +67,117 @@ export const NotebookView = ({
   onAddCell,
   onRemoveCell,
   onMoveCell,
+  onMoveCellTo,
   onSettingsChange,
   onRunCell,
   onRunAll,
+  embedded = false,
+  readOnly = false,
 }: NotebookViewProps) => {
   const hasAutoRun = useRef(false)
 
   // `on_open` runs the notebook once when it is opened. Write-detected cells
   // halt the sequence — that rule lives in the state module, shared with the Assistant.
   useEffect(() => {
+    if (readOnly) return
     if (hasAutoRun.current) return
     if (notebook.settings.run_mode !== 'on_open') return
     hasAutoRun.current = true
     onRunAll()
-  }, [notebook.settings.run_mode, onRunAll])
+  }, [notebook.settings.run_mode, onRunAll, readOnly])
 
   return (
-    <div className="flex h-full flex-col">
+    <div
+      className={cn(
+        'flex flex-col',
+        embedded ? 'max-h-[32rem] overflow-hidden rounded-md border bg-surface-100' : 'h-full'
+      )}
+    >
       <TabToolbar
         icon={RESOURCE_ICON.notebook}
         title={title}
         actions={
-          <>
-            <Button variant="default" size="tiny" icon={<Play size={14} />} onClick={onRunAll}>
-              Run all
-            </Button>
+          readOnly ? undefined : (
+            <>
+              <Button
+                variant="text"
+                size="tiny"
+                className="w-7 px-0"
+                icon={<Play size={14} strokeWidth={1.5} />}
+                aria-label="Run all"
+                onClick={onRunAll}
+              />
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="text"
-                  size="tiny"
-                  className="w-7 px-0"
-                  aria-label="Notebook settings"
-                  icon={<Settings size={14} />}
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuLabel>Run mode</DropdownMenuLabel>
-                <DropdownMenuRadioGroup
-                  value={notebook.settings.run_mode}
-                  onValueChange={(value) =>
-                    onSettingsChange({ ...notebook.settings, run_mode: value as RunMode })
-                  }
-                >
-                  <DropdownMenuRadioItem value="manual">Manual</DropdownMenuRadioItem>
-                  <DropdownMenuRadioItem value="on_open">On open</DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel>Default row limit</DropdownMenuLabel>
-                <DropdownMenuRadioGroup
-                  value={String(notebook.settings.default_row_limit)}
-                  onValueChange={(value) =>
-                    onSettingsChange({ ...notebook.settings, default_row_limit: Number(value) })
-                  }
-                >
-                  {ROW_LIMITS.map((limit) => (
-                    <DropdownMenuRadioItem key={limit} value={String(limit)}>
-                      {limit} rows
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="text"
+                    size="tiny"
+                    className="w-7 px-0"
+                    aria-label="Notebook settings"
+                    icon={<Settings size={14} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuLabel>Run mode</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup
+                    value={notebook.settings.run_mode}
+                    onValueChange={(value) =>
+                      onSettingsChange({ ...notebook.settings, run_mode: value as RunMode })
+                    }
+                  >
+                    <DropdownMenuRadioItem value="manual">Manual</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="on_open">On open</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Default row limit</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup
+                    value={String(notebook.settings.default_row_limit)}
+                    onValueChange={(value) =>
+                      onSettingsChange({ ...notebook.settings, default_row_limit: Number(value) })
+                    }
+                  >
+                    {ROW_LIMITS.map((limit) => (
+                      <DropdownMenuRadioItem key={limit} value={String(limit)}>
+                        {limit} rows
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          )
         }
       />
 
-      <div className="flex-1 overflow-y-auto">
+      <div className={cn('flex-1 overflow-y-auto', embedded && 'scroll-fade no-scrollbar')}>
         <div className="flex flex-col gap-2 p-4">
           {notebook.cells.map((cell, index) => (
             <NotebookCellShell
               key={cell.id}
+              cellId={cell.id}
               isFirst={index === 0}
               isLast={index === notebook.cells.length - 1}
               contained={cell.type === 'markdown'}
+              readOnly={readOnly}
               onMoveUp={() => onMoveCell(cell.id, -1)}
               onMoveDown={() => onMoveCell(cell.id, 1)}
+              onMoveTo={(targetCellId, placement) => onMoveCellTo(cell.id, targetCellId, placement)}
               onRemove={() => onRemoveCell(cell.id)}
               onAddCell={(type) => onAddCell(type, cell.id)}
             >
               {cell.type === 'markdown' ? (
-                <MarkdownCellView cell={cell} onChange={(next) => onCellChange(cell.id, next)} />
+                <MarkdownCellView
+                  cell={cell}
+                  readOnly={readOnly}
+                  onChange={(next) => onCellChange(cell.id, next)}
+                />
               ) : (
                 <QueryCell
                   value={cell}
                   result={results[cell.id] ?? { status: 'idle' }}
                   rowLimit={resolveEffectiveRowLimit(cell, notebook.settings)}
+                  defaultSqlVisible={embedded || cell.query.sql.trim().length === 0}
                   footerSlot={
                     resolveEffectiveRunMode(cell, notebook.settings) === 'on_open' ? (
                       <p className="border-t px-3 py-1 text-xs text-foreground-lighter">
@@ -156,14 +185,40 @@ export const NotebookView = ({
                       </p>
                     ) : undefined
                   }
-                  onChange={(next) => onCellChange(cell.id, next)}
-                  onRun={() => onRunCell(cell, resolveEffectiveRowLimit(cell, notebook.settings))}
+                  readOnly={readOnly}
+                  onChange={readOnly ? undefined : (next) => onCellChange(cell.id, next)}
+                  onRun={
+                    readOnly
+                      ? undefined
+                      : () => onRunCell(cell, resolveEffectiveRowLimit(cell, notebook.settings))
+                  }
                 />
               )}
             </NotebookCellShell>
           ))}
 
-          {notebook.cells.length === 0 && (
+          {!readOnly && notebook.cells.length > 0 && (
+            <div className="flex justify-center gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="tiny"
+                className="w-7 px-0"
+                aria-label="Add query block"
+                icon={<SquareCode size={14} strokeWidth={1.5} />}
+                onClick={() => onAddCell('query')}
+              />
+              <Button
+                variant="outline"
+                size="tiny"
+                className="w-7 px-0"
+                aria-label="Add markdown block"
+                icon={<FileText size={14} strokeWidth={1.5} />}
+                onClick={() => onAddCell('markdown')}
+              />
+            </div>
+          )}
+
+          {notebook.cells.length === 0 && !readOnly && (
             <div
               className={`flex flex-col items-center gap-2 rounded-md border border-dashed py-10 ${PROSE_WIDTH}`}
             >

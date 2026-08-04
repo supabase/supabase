@@ -23,6 +23,7 @@ import {
   ToggleGroupItem,
 } from 'ui'
 
+import { CHART_SERIES_COLORS } from './chartColors'
 import type { ChartDisplay, QueryDisplay } from './ExplorerPrototype.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -139,7 +140,9 @@ export const QueryCellDisplayConfig = ({
                   <div key={entry.field} className="flex items-center gap-1">
                     <span
                       className="size-2 shrink-0 rounded-full"
-                      style={{ background: `var(--chart-${(index % 4) + 1})` }}
+                      style={{
+                        background: CHART_SERIES_COLORS[index % CHART_SERIES_COLORS.length],
+                      }}
                     />
                     <span className="flex-1 truncate text-xs">{entry.label ?? entry.field}</span>
                     <Button

@@ -19,7 +19,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
 
 import type {
@@ -190,20 +190,39 @@ export const ExplorerSidebar = ({
             </nav>
 
             <section className="flex flex-col gap-px">
-              <h3 className="heading-meta mb-1 px-3 text-muted-foreground">Recent</h3>
+              <h3 className="heading-meta mb-1 px-3 text-tertiary-foreground">Recent</h3>
               {resolvedRecents.map((item) => {
                 const Icon = RESOURCE_ICON[item.resource.type]
+                const isRecentActive = isActive(item.resource.type, item.resource.id)
                 return (
                   <button
                     key={`${item.resource.type}-${item.resource.id}`}
                     type="button"
                     tabIndex={0}
-                    className={rowClassName(isActive(item.resource.type, item.resource.id))}
+                    className={rowClassName(isRecentActive)}
                     onClick={() => onOpen(item.resource, item.title)}
                   >
-                    <Icon size={14} className="shrink-0 text-foreground-muted" />
-                    <span className="flex-1 truncate text-left">{item.title}</span>
-                    <span className="shrink-0 text-xs text-foreground-lighter">
+                    <Icon
+                      size={14}
+                      className={cn(
+                        'shrink-0',
+                        isRecentActive ? 'text-foreground' : 'text-tertiary-foreground'
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        'flex-1 truncate text-left',
+                        isRecentActive ? 'text-foreground' : 'text-tertiary-foreground'
+                      )}
+                    >
+                      {item.title}
+                    </span>
+                    <span
+                      className={cn(
+                        'shrink-0 text-xs',
+                        isRecentActive ? 'text-foreground' : 'text-tertiary-foreground'
+                      )}
+                    >
                       {formatModifiedAt(item.modifiedAt)}
                     </span>
                   </button>
@@ -227,15 +246,14 @@ export const ExplorerSidebar = ({
             className="absolute inset-0 flex flex-col"
           >
             <div className="flex items-center gap-1 p-3 pb-2">
-              <button
-                type="button"
-                tabIndex={0}
+              <Button
+                variant="outline"
+                size="tiny"
                 aria-label="Back to all resources"
                 onClick={goBack}
-                className="flex size-7 shrink-0 items-center justify-center rounded-md text-foreground-light hover:bg-surface-200 hover:text-foreground"
-              >
-                <ChevronLeft size={16} />
-              </button>
+                className="size-7 shrink-0 px-0"
+                icon={<ChevronLeft size={16} />}
+              />
               <span id="explorer-sidebar-search-label" className="sr-only">
                 {section?.searchPlaceholder}
               </span>

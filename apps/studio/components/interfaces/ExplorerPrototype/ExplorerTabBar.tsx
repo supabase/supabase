@@ -6,8 +6,8 @@
  * is what makes adding a fourth resource type cheap later.
  */
 
-import { X } from 'lucide-react'
-import { cn } from 'ui'
+import { Home, MessageSquare, NotebookText, Plus, SquareCode, X } from 'lucide-react'
+import { cn, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 import type { Tab } from './ExplorerPrototype.types'
 import { RESOURCE_ICON } from './ExplorerResources'
@@ -16,6 +16,11 @@ interface ExplorerTabBarProps {
   tabs: Tab[]
   activeTabId: string
   dirtyResources: Record<string, boolean>
+  isHomeActive: boolean
+  onHomeSelect: () => void
+  onCreateSnippet: () => void
+  onCreateNotebook: () => void
+  onCreateChat: () => void
   onSelect: (tabId: string) => void
   onClose: (tabId: string) => void
 }
@@ -24,58 +29,113 @@ export const ExplorerTabBar = ({
   tabs,
   activeTabId,
   dirtyResources,
+  isHomeActive,
+  onHomeSelect,
+  onCreateSnippet,
+  onCreateNotebook,
+  onCreateChat,
   onSelect,
   onClose,
 }: ExplorerTabBarProps) => (
-  <div className="flex h-full items-stretch overflow-x-auto">
-    {tabs.map((tab) => {
-      const Icon = RESOURCE_ICON[tab.resource.type]
-      const isActive = tab.id === activeTabId
-      const isDirty = dirtyResources[tab.resource.id] ?? false
-
-      return (
-        <div
-          key={tab.id}
+  <div className="flex h-full items-stretch overflow-hidden">
+    <div className="flex min-w-0 flex-1 items-stretch overflow-x-auto">
+      <div
+        className={cn(
+          'relative flex shrink-0 items-center border-r',
+          isHomeActive ? 'bg-background' : 'bg-transparent hover:bg-surface-200'
+        )}
+      >
+        <button
+          type="button"
+          tabIndex={0}
+          aria-label="Home"
+          onClick={onHomeSelect}
           className={cn(
-            'group/tab relative flex items-center border-r',
-            // The active tab is the page surface pushed up into the muted row,
-            // so it reads as continuous with the content below it.
-            isActive ? 'bg-background' : 'bg-transparent hover:bg-surface-200'
+            'flex h-full aspect-square items-center justify-center px-0 text-xs',
+            isHomeActive ? 'text-foreground' : 'text-muted-foreground'
           )}
         >
-          <button
-            type="button"
-            tabIndex={0}
-            onClick={() => onSelect(tab.id)}
-            className="flex h-full items-center gap-2 pl-3 pr-8 text-xs"
-          >
-            <Icon size={14} className="shrink-0 text-foreground-muted" />
-            <span className="max-w-40 truncate">{tab.title}</span>
-          </button>
+          <Home size={14} />
+        </button>
+      </div>
 
-          {isDirty && (
-            <span
-              aria-label="Unsaved changes"
-              className="absolute right-3 size-1.5 rounded-full bg-foreground-light group-hover/tab:opacity-0"
-            />
-          )}
+      {tabs.map((tab) => {
+        const Icon = RESOURCE_ICON[tab.resource.type]
+        const isActive = tab.id === activeTabId
+        const isDirty = dirtyResources[tab.resource.id] ?? false
 
-          <button
-            type="button"
-            tabIndex={0}
-            aria-label={`Close ${tab.title}`}
-            onClick={() => onClose(tab.id)}
+        return (
+          <div
+            key={tab.id}
             className={cn(
-              'absolute right-1.5 flex size-5 items-center justify-center rounded-xs',
-              'opacity-0 hover:bg-surface-300 group-hover/tab:opacity-100'
+              'group/tab relative flex items-center border-r',
+              // The active tab is the page surface pushed up into the muted row,
+              // so it reads as continuous with the content below it.
+              isActive ? 'bg-background' : 'bg-transparent hover:bg-surface-200'
             )}
           >
-            <X size={12} className="text-foreground-light" />
-          </button>
+            <button
+              type="button"
+              tabIndex={0}
+              onClick={() => onSelect(tab.id)}
+              className={cn(
+                'flex h-full items-center gap-2 pl-3 pr-8 text-xs',
+                isActive ? 'text-foreground' : 'text-muted-foreground'
+              )}
+            >
+              <Icon size={14} className="shrink-0 text-foreground-muted" />
+              <span className="max-w-40 truncate">{tab.title}</span>
+            </button>
 
-          {isActive && <div className="absolute inset-x-0 top-0 h-px bg-foreground" />}
-        </div>
-      )
-    })}
+            {isDirty && (
+              <span
+                aria-label="Unsaved changes"
+                className="absolute right-3 size-1.5 rounded-full bg-foreground-light group-hover/tab:opacity-0"
+              />
+            )}
+
+            <button
+              type="button"
+              tabIndex={0}
+              aria-label={`Close ${tab.title}`}
+              onClick={() => onClose(tab.id)}
+              className={cn(
+                'absolute right-1.5 flex size-5 items-center justify-center rounded-xs',
+                'opacity-0 hover:bg-surface-300 group-hover/tab:opacity-100'
+              )}
+            >
+              <X size={12} className="text-foreground-light" />
+            </button>
+          </div>
+        )
+      })}
+    </div>
+
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          tabIndex={0}
+          aria-label="Create new resource"
+          className="sticky right-0 z-10 flex h-full aspect-square shrink-0 items-center justify-center px-0 text-muted-foreground hover:bg-surface-200 hover:text-foreground"
+        >
+          <Plus size={14} />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" side="bottom" className="w-44">
+        <DropdownMenuItem className="gap-x-2" onClick={onCreateSnippet}>
+          <SquareCode size={14} strokeWidth={1.5} />
+          New SQL query
+        </DropdownMenuItem>
+        <DropdownMenuItem className="gap-x-2" onClick={onCreateNotebook}>
+          <NotebookText size={14} strokeWidth={1.5} />
+          New notebook
+        </DropdownMenuItem>
+        <DropdownMenuItem className="gap-x-2" onClick={onCreateChat}>
+          <MessageSquare size={14} strokeWidth={1.5} />
+          New chat
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   </div>
 )

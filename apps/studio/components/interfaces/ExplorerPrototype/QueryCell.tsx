@@ -13,7 +13,7 @@
  * live. Surface-specific chrome comes in through the three slots.
  */
 
-import { AlertTriangle, Play } from 'lucide-react'
+import { AlertTriangle, Eye, EyeOff, Play } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Badge, Button, cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -26,9 +26,11 @@ import type {
   QueryCellModel,
   QueryDisplay,
 } from './ExplorerPrototype.types'
+import { RESOURCE_ICON } from './ExplorerResources'
 import { QueryCellDisplay } from './QueryCellDisplay'
 import { QueryCellDisplayConfig } from './QueryCellDisplayConfig'
 import { QueryCellSourceMenu } from './QueryCellSourceMenu'
+import { TabToolbar } from './TabToolbar'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 const editorHeight = (sql: string) => {
@@ -41,6 +43,10 @@ export interface QueryCellProps {
   result: CellResultState
   /** Effective limit, already resolved from cell override + notebook default. */
   rowLimit: number
+  /** Turns the cell into a tab surface: no outer frame and results fill the tab. */
+  full?: boolean
+  /** Initial editor visibility. A user toggle remains local to the query block. */
+  defaultSqlVisible?: boolean
   readOnly?: boolean
   /**
    * Below the results — assistant approval, notebook run-mode hints.
@@ -58,12 +64,15 @@ export const QueryCell = ({
   value,
   result,
   rowLimit,
+  full = false,
+  defaultSqlVisible = true,
   readOnly = false,
   footerSlot,
   onChange,
   onRun,
 }: QueryCellProps) => {
   const [pendingWriteConfirm, setPendingWriteConfirm] = useState(false)
+  const [isSqlVisible, setIsSqlVisible] = useState(defaultSqlVisible)
 
   const isWrite = isWriteQuery(value.query.sql)
   const isRunning = result.status === 'running'
@@ -87,60 +96,97 @@ export const QueryCell = ({
     onRun?.()
   }
 
-  return (
-    <div className="flex flex-col overflow-hidden rounded-md border bg-surface-100 shadow-xs">
-      {/* Toolbar */}
-      <div className="flex h-9 shrink-0 items-center gap-2 border-b px-2">
-        {readOnly ? (
-          <span className="truncate px-1 text-xs font-medium">{value.name}</span>
-        ) : (
-          // Borderless and ring-less: the cell already has a border, and the
-          // input's own default border/focus ring reads as a double outline.
-          <input
-            value={value.name}
-            aria-label="Cell name"
-            onChange={(event) => update({ name: event.target.value })}
-            className={cn(
-              'min-w-0 flex-1 truncate rounded-sm border-0 bg-transparent px-1 text-xs font-medium shadow-none',
-              'outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0',
-              'focus-visible:outline-none focus-visible:ring-0 focus:bg-surface-200'
-            )}
-          />
-        )}
-
-        {isWrite && (
-          <Badge variant="warning" className="shrink-0">
-            Write
-          </Badge>
-        )}
-
-        <div className="ml-auto flex shrink-0 items-center gap-1">
-          <QueryCellSourceMenu
-            source={value.query.source}
-            rowLimit={rowLimit}
-            disabled={readOnly}
-            onSourceChange={updateSource}
-            onRowLimitChange={updateRowLimit}
-          />
-          {columns.length > 0 && (
-            <QueryCellDisplayConfig
-              display={value.display}
-              columns={columns}
-              onChange={updateDisplay}
-            />
-          )}
-          <Button
-            variant="text"
-            size="tiny"
-            className="w-7 px-0"
-            icon={<Play size={14} strokeWidth={1.5} />}
-            loading={isRunning}
-            disabled={isRunning || !onRun}
-            aria-label="Run cell"
-            onClick={handleRun}
-          />
-        </div>
+  const resultContent =
+    result.status === 'idle' ? (
+      <div className="flex flex-1 items-center justify-center p-3">
+        <p className="text-xs text-foreground-light">Run the query to see results</p>
       </div>
+    ) : result.status === 'running' ? (
+      <div className="w-full p-3">
+        <ShimmeringLoader />
+      </div>
+    ) : result.status === 'error' ? (
+      <div className="w-full px-3.5 py-2">
+        <span className="font-mono text-xs text-destructive-600">ERROR: {result.message}</span>
+      </div>
+    ) : (
+      <>
+        <QueryCellDisplay
+          display={value.display}
+          rows={result.rows}
+          className={full ? 'min-h-0 max-h-none flex-1' : undefined}
+        />
+        <p className="border-t px-3 py-1 font-mono text-xs text-foreground-lighter">
+          {result.rows.length} rows · limit {result.rowLimitApplied}
+        </p>
+      </>
+    )
+
+  return (
+    <div
+      className={cn(
+        'flex flex-col overflow-hidden bg-surface-100',
+        full ? 'h-full min-h-0 border-0 shadow-none' : 'rounded-md border shadow-xs'
+      )}
+    >
+      <TabToolbar
+        icon={RESOURCE_ICON.snippet}
+        title={
+          readOnly ? (
+            <span className="block truncate text-sm">{value.name}</span>
+          ) : (
+            // Borderless and ring-less: the toolbar provides the framing.
+            <input
+              value={value.name}
+              aria-label="Cell name"
+              onChange={(event) => update({ name: event.target.value })}
+              className={cn(
+                'w-full truncate rounded-sm border-0 bg-transparent px-0 text-sm shadow-none',
+                'outline-none ring-0 focus:border-0 focus:outline-none focus:ring-0',
+                'focus-visible:outline-none focus-visible:ring-0 focus:bg-surface-200'
+              )}
+            />
+          )
+        }
+        actions={
+          <>
+            {isWrite && <Badge variant="warning">Write</Badge>}
+            <QueryCellSourceMenu
+              source={value.query.source}
+              rowLimit={rowLimit}
+              disabled={readOnly}
+              onSourceChange={updateSource}
+              onRowLimitChange={updateRowLimit}
+            />
+            {columns.length > 0 && (
+              <QueryCellDisplayConfig
+                display={value.display}
+                columns={columns}
+                onChange={updateDisplay}
+              />
+            )}
+            <Button
+              variant="text"
+              size="tiny"
+              className="w-7 px-0"
+              icon={isSqlVisible ? <EyeOff size={14} /> : <Eye size={14} />}
+              aria-label={isSqlVisible ? 'Hide SQL' : 'Show SQL'}
+              aria-pressed={isSqlVisible}
+              onClick={() => setIsSqlVisible((visible) => !visible)}
+            />
+            <Button
+              variant="text"
+              size="tiny"
+              className="w-7 px-0"
+              icon={<Play size={14} strokeWidth={1.5} />}
+              loading={isRunning}
+              disabled={isRunning || !onRun}
+              aria-label="Run cell"
+              onClick={handleRun}
+            />
+          </>
+        }
+      />
 
       {/* Write confirmation */}
       {pendingWriteConfirm && (
@@ -158,52 +204,43 @@ export const QueryCell = ({
         </div>
       )}
 
-      {/* SQL editor */}
-      <div className="shrink-0 border-b" style={{ height: editorHeight(value.query.sql) }}>
-        {readOnly ? (
-          <CodeBlock
-            hideLineNumbers
-            wrapLines={false}
-            value={value.query.sql}
-            language="sql"
-            className={cn(
-              'block h-full w-full max-w-none overflow-auto rounded-none! border-0 bg-transparent! px-3.5! py-3! text-foreground',
-              '[&>code]:m-0 [&>code>span]:text-foreground'
-            )}
-          />
-        ) : (
-          <CodeEditor
-            id={value.id}
-            language="pgsql"
-            value={value.query.sql}
-            autofocus={false}
-            hideLineNumbers
-            onInputChange={(next) => updateSql(next ?? '')}
-            actions={{ runQuery: { enabled: true, callback: handleRun } }}
-            options={{ scrollBeyondLastLine: false, padding: { top: 10, bottom: 10 } }}
-          />
-        )}
-      </div>
+      {isSqlVisible && (
+        /* SQL editor */
+        <div className="shrink-0 border-b" style={{ height: editorHeight(value.query.sql) }}>
+          {readOnly ? (
+            <CodeBlock
+              hideLineNumbers
+              wrapLines={false}
+              value={value.query.sql}
+              language="sql"
+              className={cn(
+                'block h-full w-full max-w-none overflow-auto rounded-none! border-0 bg-transparent! px-3.5! py-3! text-foreground',
+                '[&>code]:m-0 [&>code>span]:text-foreground'
+              )}
+            />
+          ) : (
+            <CodeEditor
+              id={value.id}
+              language="pgsql"
+              value={value.query.sql}
+              autofocus={false}
+              hideLineNumbers
+              onInputChange={(next) => updateSql(next ?? '')}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
+              // CodeEditor supplies a small first-line view zone; avoid stacking an
+              // additional top inset on this compact query-block surface.
+              options={{ scrollBeyondLastLine: false, padding: { top: 0, bottom: 10 } }}
+            />
+          )}
+        </div>
+      )}
 
-      {/* Results */}
-      {result.status === 'running' && (
-        <div className="w-full p-3">
-          <ShimmeringLoader />
-        </div>
-      )}
-      {result.status === 'error' && (
-        <div className="w-full px-3.5 py-2">
-          <span className="font-mono text-xs text-destructive-600">ERROR: {result.message}</span>
-        </div>
-      )}
-      {result.status === 'success' && (
-        <>
-          <QueryCellDisplay display={value.display} rows={result.rows} />
-          <p className="border-t px-3 py-1 font-mono text-xs text-foreground-lighter">
-            {result.rows.length} rows · limit {result.rowLimitApplied}
-          </p>
-        </>
-      )}
+      {/* Always present, so an unrun query still reserves a results surface. */}
+      <div
+        className={cn('flex min-h-24 w-full flex-col', full && 'min-h-0 flex-1 overflow-hidden')}
+      >
+        {resultContent}
+      </div>
 
       {footerSlot}
     </div>
