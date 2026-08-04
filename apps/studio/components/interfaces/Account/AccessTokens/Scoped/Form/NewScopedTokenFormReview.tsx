@@ -216,11 +216,9 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
       </div>
 
       {hasCapabilities && (
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              Management API endpoints enabled
-            </p>
+        <>
+          <div className="flex flex-col gap-3">
+            <h3 className="text-sm">Management API endpoints enabled</h3>
             {capabilityGroups.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No Management API endpoints are enabled by the selected capabilities.
@@ -250,10 +248,8 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
             )}
           </div>
 
-          <div className="space-y-2">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              MCP tools
-            </p>
+          <div className="flex flex-col gap-3">
+            <h3 className="text-sm">MCP tools</h3>
             {mcpTools.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No MCP tools are enabled by the selected capabilities.
@@ -271,7 +267,7 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
               </div>
             )}
           </div>
-        </div>
+        </>
       )}
     </div>
   )
