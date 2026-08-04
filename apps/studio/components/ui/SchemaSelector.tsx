@@ -66,7 +66,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
     ref
   ) => {
     const [internalOpen, setInternalOpen] = useState(false)
-    const [showRestartDialog, setShowRestartDialog] = useState(false)
+    const [isRestartDialogVisible, setIsRestartDialogVisible] = useState(false)
     const isControlled = openProp !== undefined
     const open = isControlled ? openProp : internalOpen
     const setOpen = (next: boolean) => {
@@ -125,13 +125,13 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
               <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
                 Reload schemas
               </Button>
-              <Button variant="default" size="tiny" onClick={() => setShowRestartDialog(true)}>
+              <Button variant="default" size="tiny" onClick={() => setIsRestartDialogVisible(true)}>
                 Restart database
               </Button>
             </div>
             <RestartProjectDialog
-              visible={showRestartDialog}
-              onClose={() => setShowRestartDialog(false)}
+              visible={isRestartDialogVisible}
+              onClose={() => setIsRestartDialogVisible(false)}
               restartType="database"
             />
           </Alert>
