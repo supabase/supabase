@@ -189,6 +189,19 @@ export function generateOtelWhereSafe(
   return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
 }
 
+function statusInListLiteral(statuses: string[]): SafeLogSqlFragment {
+  return safeLogSql`(${joinSqlFragments(statuses.map(analyticsLiteral), ', ')})`
+}
+
+const STORAGE_CACHE_HIT_STATUSES = statusInListLiteral(['HIT', 'STALE', 'REVALIDATED', 'UPDATING'])
+const STORAGE_CACHE_MISS_STATUSES = statusInListLiteral([
+  'MISS',
+  'NONE/UNKNOWN',
+  'EXPIRED',
+  'BYPASS',
+  'DYNAMIC',
+])
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',
@@ -410,6 +423,19 @@ where starts_with(r.path, '/storage/v1/object') and r.method = 'GET'
 group by timestamp
 order by timestamp desc
 `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-storage-cache-hit-rate (otel)
+select
+  toUnixTimestamp(toStartOfHour(timestamp)) * 1000000 as timestamp,
+  countIf(log_attributes['response.headers.cf_cache_status'] in ${STORAGE_CACHE_HIT_STATUSES}) as hit_count,
+  countIf(log_attributes['response.headers.cf_cache_status'] in ${STORAGE_CACHE_MISS_STATUSES}) as miss_count
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '/storage/v1/object%'
+  and log_attributes['request.method'] = 'GET'
+  ${generateOtelWhereSafe(filters, false)}
+group by timestamp
+order by timestamp desc`,
       },
       topCacheMisses: {
         queryType: 'logs',
@@ -433,6 +459,21 @@ group by path, search
 order by count desc
 limit 12
     `,
+        safeSqlOtel: (filters) => safeLogSql`
+        -- reports-storage-top-cache-misses (otel)
+select
+  log_attributes['request.path'] as path,
+  log_attributes['request.search'] as search,
+  count() as count
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '/storage/v1/object%'
+  and log_attributes['request.method'] = 'GET'
+  and log_attributes['response.headers.cf_cache_status'] in ${STORAGE_CACHE_MISS_STATUSES}
+  ${generateOtelWhereSafe(filters, false)}
+group by path, search
+order by count desc
+limit 12`,
       },
     },
   },
