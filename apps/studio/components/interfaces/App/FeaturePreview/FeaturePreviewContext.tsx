@@ -66,7 +66,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
       // flag-derived defaults (e.g. default opt-in) are reflected in `flags`.
       if (hasLoaded) setIsInitialized(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [hasLoaded])
 
   const value = {
@@ -94,10 +93,11 @@ export const useUnifiedLogsPreview = () => {
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn = isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn =
+    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -133,15 +133,16 @@ export const useIsSqlEditorManualSaveEnabled = () => {
   return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
-export const useIsRLSTesterEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
-}
-
 export const useIsMarketplaceEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
+}
+
+export const useIsDatabaseConnectionsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
+  return isDatabaseConnectionsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]
 }
 
 export const useFeaturePreviewModal = () => {

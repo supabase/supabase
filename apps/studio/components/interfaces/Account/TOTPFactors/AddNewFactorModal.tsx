@@ -59,25 +59,28 @@ interface FirstStepProps {
   onClose: () => void
 }
 
+const ENROLL_FORM_ID = 'add-totp-factor-form'
+
+const EnrollFormSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required'),
+})
+type EnrollFormValues = z.infer<typeof EnrollFormSchema>
+
+const enrollFormDefaultValues: EnrollFormValues = { name: '' }
+
 const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) => {
-  const FormSchema = z.object({
-    name: z.string().min(1, 'Please provide a name to identify this app'),
-  })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: { name: '' },
+  const form = useForm<EnrollFormValues>({
+    resolver: zodResolver(EnrollFormSchema),
+    defaultValues: enrollFormDefaultValues,
     mode: 'onChange',
   })
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<EnrollFormValues> = async (values) => {
     enroll({ factorType: 'totp', friendlyName: values.name })
   }
 
   useEffect(() => {
-    if (!visible) {
-      // Generate a name with a number between 0 and 1000
-      form.reset({ name: `App ${Math.floor(Math.random() * 1000)}` })
-    }
+    if (visible) form.reset(enrollFormDefaultValues)
   }, [form, visible])
 
   return (
@@ -93,7 +96,7 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
     >
       <Form {...form}>
         <form
-          id="verify-otp-form"
+          id={ENROLL_FORM_ID}
           className="flex flex-col gap-4"
           onSubmit={form.handleSubmit(onSubmit)}
         >
@@ -104,11 +107,11 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
             render={({ field }) => (
               <FormItemLayout
                 name="name"
-                label="Provide a name to identify this app"
-                description="A string will be randomly generated if a name is not provided"
+                label="Authenticator app name"
+                description="Used to identify the app in your account settings and during sign-in."
               >
                 <FormControl>
-                  <Input id="name" {...field} />
+                  <Input placeholder="e.g.: Google Authenticator" autoFocus {...field} />
                 </FormControl>
               </FormItemLayout>
             )}

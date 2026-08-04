@@ -2,6 +2,12 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    "lint": {
+      "env": ["GITHUB_TOKEN"],
+    },
+    "typecheck": {
+      "env": ["GITHUB_TOKEN"],
+    },
     "build": {
       "dependsOn": ["^build"],
       "env": [
@@ -51,6 +57,9 @@
         "GITHUB_CHANGELOG_APP_INSTALLATION_ID",
         "GITHUB_CHANGELOG_APP_REST_KEY",
         "GITHUB_CHANGELOG_APP_PRIVATE_KEY",
+        "CHANGELOG_SYNC_APP_ID",
+        "CHANGELOG_SYNC_APP_INSTALLATION_ID",
+        "CHANGELOG_SYNC_APP_PRIVATE_KEY",
         "NEXT_PUBLIC_EMAIL_ABUSE_URL",
         "EMAIL_ABUSE_SERVICE_KEY",
         "HUBSPOT_PORTAL_ID",

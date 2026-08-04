@@ -70,6 +70,11 @@ import { ShortcutDefinition } from './types'
 export const SHORTCUT_IDS = {
   COMMAND_MENU_OPEN: 'command-menu.open',
   AI_ASSISTANT_TOGGLE: 'ai-assistant.toggle',
+  AI_ASSISTANT_NEW_CHAT: 'ai-assistant.new-chat',
+  AI_ASSISTANT_MAXIMIZE: 'ai-assistant.maximize',
+  AI_ASSISTANT_COPY_CHAT_ID: 'ai-assistant.copy-chat-id',
+  AI_ASSISTANT_TOGGLE_HISTORY: 'ai-assistant.toggle-history',
+  AI_ASSISTANT_OPEN_PERMISSIONS: 'ai-assistant.open-permissions',
   AI_ASSISTANT_CANCEL_EDIT: 'ai-assistant.cancel-edit',
   INLINE_EDITOR_TOGGLE: 'inline-editor.toggle',
   RESULTS_COPY_MARKDOWN: 'results.copy-markdown',
@@ -252,6 +257,36 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.RESULTS_DOWNLOAD_CSV,
     label: 'Download results as CSV',
     sequence: ['Mod+Shift+D'],
+  },
+  [SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT]: {
+    id: SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT,
+    label: 'Start new chat',
+    sequence: ['A', 'N'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE]: {
+    id: SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE,
+    label: 'Maximize assistant',
+    sequence: ['A', '='],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID]: {
+    id: SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID,
+    label: 'Copy chat ID',
+    sequence: ['A', 'C'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY]: {
+    id: SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY,
+    label: 'Toggle chat history',
+    sequence: ['A', 'Y'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS]: {
+    id: SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS,
+    label: 'Permission settings',
+    sequence: ['A', 'P'],
+    showInSettings: false,
   },
   [SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT]: {
     id: SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT,

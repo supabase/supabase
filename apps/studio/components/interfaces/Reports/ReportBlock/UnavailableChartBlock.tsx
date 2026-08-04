@@ -1,7 +1,7 @@
-import { HeartIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 
 import { ReportBlockContainer } from './ReportBlockContainer'
+import { InstanceHealthIcon } from '@/lib/constants/metrics'
 
 interface UnavailableChartBlockProps {
   label: string
@@ -14,7 +14,7 @@ export const UnavailableChartBlock = ({ label, actions }: UnavailableChartBlockP
       draggable
       showDragHandle
       loading={false}
-      icon={<HeartIcon size={14} className="text-foreground-muted" />}
+      icon={<InstanceHealthIcon size={14} className="text-foreground-muted" />}
       label={label}
       actions={actions}
     >

@@ -93,8 +93,8 @@ const footerData = [
         url: '/partners',
       },
       {
-        text: 'Integrations',
-        url: '/partners/integrations',
+        text: 'Partner Catalog',
+        url: '/partners/catalog',
       },
       {
         text: 'Brand Assets',
@@ -103,10 +103,6 @@ const footerData = [
       {
         text: 'Security & Compliance',
         url: '/security',
-      },
-      {
-        text: 'DPA',
-        url: '/legal/dpa',
       },
       {
         text: 'SOC2',

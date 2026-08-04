@@ -112,7 +112,7 @@ functions:
     notes: |
       - The auth methods can be accessed via the `supabase.auth` namespace.
       - By default, the supabase client sets `persist_session` to true and attempts to store the session in memory.
-      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
+      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/deployment/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
       - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/jwt/legacy). A refresh token never expires and can only be used once.
   - id: sign-up
     title: 'sign_up()'
@@ -891,7 +891,7 @@ functions:
               - name: captcha_token
                 type: string
     notes: |
-      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/enterprise-sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `provider_id` property. For example:
           - Mapping specific user email addresses with an identity provider.

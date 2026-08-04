@@ -1,11 +1,10 @@
 import { createContext, useCallback, useContext, useState } from 'react'
 
 export const BANNER_ID = {
-  METRICS_API: 'metrics-api-banner',
+  DATABASE_CONNECTIONS: 'database-connections-banner',
   INDEX_ADVISOR: 'index-advisor-banner',
   TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
-  RLS_TESTER: 'rls-tester-banner',
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
   TOS_UPDATE: 'tos-update-banner',
   UNIFIED_LOGS: 'unified-logs-banner',
@@ -34,8 +33,13 @@ export const BannerStackProvider = ({ children }: { children: React.ReactNode })
 
   const addBanner = useCallback((banner: Banner) => {
     setBanners((prev) => {
-      const exists = prev.some((b) => b.id === banner.id)
-      if (exists) return prev
+      const existingIndex = prev.findIndex((b) => b.id === banner.id)
+      if (existingIndex !== -1) {
+        if (!prev[existingIndex].isDismissed) return prev
+        const revived = [...prev]
+        revived[existingIndex] = banner
+        return revived.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
+      }
       const newBanners = [...prev, banner]
       return newBanners.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
     })

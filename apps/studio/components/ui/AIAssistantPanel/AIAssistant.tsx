@@ -6,13 +6,14 @@ import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Eraser, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { AlertError } from '../AlertError'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
+import { InlineLinkClassName } from '../InlineLink'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
 import type { SqlSnippet } from './AIAssistant.types'
 import {
@@ -71,6 +72,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     useSelectedOrganizationQuery()
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_CANCEL_EDIT, () => cancelEdit())
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT, () => snap.newChat())
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { snippets } = useSqlEditorV2StateSnapshot()
@@ -185,6 +187,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const isChatInputDisabled =
     !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
 
+  const branchedFrom = snap.activeChat?.branchedFrom
+  const branchedConversation = branchedFrom ? snap.chats[branchedFrom.chatId] : undefined
+
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
       // Find the message index in current chatMessages
@@ -288,22 +293,39 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         const isLastMessage = index === chatMessages.length - 1
 
         return (
-          <Message
-            id={message.id}
-            key={message.id}
-            message={message}
-            isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
-            readOnly={message.role === 'user'}
-            addToolApprovalResponse={addToolApprovalResponse}
-            onDelete={deleteMessageFromHere}
-            onEdit={editMessage}
-            isAfterEditedMessage={isAfterEditedMessage}
-            isBeingEdited={isBeingEdited}
-            onCancelEdit={cancelEdit}
-            isLastMessage={isLastMessage}
-            onRate={handleRateMessage}
-            rating={messageRatings[message.id] ?? null}
-          />
+          <Fragment key={message.id}>
+            <Message
+              id={message.id}
+              message={message}
+              isLoading={chatStatus === 'submitted' || chatStatus === 'streaming'}
+              readOnly={message.role === 'user'}
+              addToolApprovalResponse={addToolApprovalResponse}
+              onDelete={deleteMessageFromHere}
+              onEdit={editMessage}
+              isAfterEditedMessage={isAfterEditedMessage}
+              isBeingEdited={isBeingEdited}
+              onCancelEdit={cancelEdit}
+              isLastMessage={isLastMessage}
+              onRate={handleRateMessage}
+              rating={messageRatings[message.id] ?? null}
+            />
+            {branchedConversation && branchedFrom?.messageId === message.id && (
+              <div className="flex items-center gap-2 mt-6">
+                <div className="flex-1 border-t border-strong" />
+                <div className="flex items-center gap-1 max-w-[80%] text-xs text-foreground-lighter">
+                  <span className="shrink-0">Branched from</span>
+                  <button
+                    tabIndex={0}
+                    className={cn(InlineLinkClassName, 'cursor-pointer truncate min-w-0')}
+                    onClick={() => snap.selectChat(branchedConversation.id)}
+                  >
+                    {branchedConversation.name}
+                  </button>
+                </div>
+                <div className="flex-1 border-t border-strong" />
+              </div>
+            )}
+          </Fragment>
         )
       }),
     [
@@ -316,6 +338,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       addToolApprovalResponse,
       handleRateMessage,
       messageRatings,
+      branchedConversation,
+      branchedFrom,
+      snap,
     ]
   )
 
@@ -432,7 +457,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         />
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10">
+            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
               {renderedMessages}
               {error && (
                 <>
@@ -490,14 +515,16 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   className="inline-block w-1.5 h-4 bg-foreground-lighter mt-4"
                 />
               )}
+
               <p className="text-center text-xs text-foreground-muted mt-6">
-                Supabase AI may not always produce correct answers. Double check responses.
+                The Assistant can make mistakes. Double check responses.
               </p>
             </ConversationContent>
             <ConversationScrollButton />
           </Conversation>
         ) : (
           <AIOnboarding
+            key={snap.activeChatId}
             sqlSnippets={snap.sqlSnippets as SqlSnippet[] | undefined}
             suggestions={
               snap.suggestions as
@@ -553,9 +580,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative">
+        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
           {isSupportChat && !isSupportChatClosed && (
-            <div className="mb-3">
+            <div>
               <div className="mb-3 border-t" />
               <div className="flex items-center gap-2">
                 <Button
@@ -581,6 +608,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               </div>
             </div>
           )}
+
           {disablePrompts && (
             <Admonition
               showIcon={false}
@@ -607,7 +635,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
+              'z-20',
+              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
+              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
+              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}

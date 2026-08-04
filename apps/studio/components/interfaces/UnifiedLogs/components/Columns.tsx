@@ -45,6 +45,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       cell: ({ row }) => {
         return (
           <Checkbox
+            className="hit-area-2 hover:border-foreground-muted"
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
             onClick={(e) => e.stopPropagation()}
@@ -112,7 +113,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const logType = row.getValue<ColumnSchema['log_type']>('log_type')
         return (
           <div className="flex items-center justify-end gap-1">
-            <LogTypeIcon type={logType} size={16} className="text-foreground-muted" />
+            <LogTypeIcon type={logType} size={14} className="text-foreground-lighter" />
           </div>
         )
       },
@@ -197,8 +198,11 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 64,
       maxSize: 64,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[64px]',
-        headerClassName: 'w-[64px]',
+        // Hidden on narrow viewports so the table fits mobile without horizontal
+        // overflow; revealed from `sm` up. Full row detail is still available via
+        // the ServiceFlow panel on row click.
+        cellClassName: 'font-mono tracking-tight w-[64px] hidden sm:table-cell',
+        headerClassName: 'w-[64px] hidden sm:table-cell',
       },
     },
     // Pathname column - controlled by columnVisibility
@@ -212,8 +216,9 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 250,
       maxSize: 250,
       meta: {
-        cellClassName: 'font-mono tracking-tight w-[250px]',
-        headerClassName: 'w-[250px]',
+        // Hidden until `md` — wider than method, so it earns space one step later.
+        cellClassName: 'font-mono tracking-tight w-[250px] hidden md:table-cell',
+        headerClassName: 'w-[250px] hidden md:table-cell',
       },
       cell: ({ row }) => {
         const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
@@ -268,7 +273,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       minSize: 200,
       maxSize: 400,
       meta: {
-        cellClassName: 'font-mono tracking-tight',
+        // Widest column — hidden until `lg`. No width class so it keeps flexing to
+        // fill remaining space once shown.
+        cellClassName: 'font-mono tracking-tight hidden lg:table-cell',
+        headerClassName: 'hidden lg:table-cell',
       },
     },
   ]
