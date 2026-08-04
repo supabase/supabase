@@ -47,7 +47,7 @@ export const instanceLabel = (instance: string | undefined): string => {
 export const getHighAvailabilityRegionCode = (
   environment = process.env.NEXT_PUBLIC_ENVIRONMENT
 ) => {
-  if (environment === 'local') return 'eu-central-1'
+  // Local dev stacks can run in any of the supported regions, so they're left unrestricted
   if (environment === 'staging') return 'us-east-1'
   return undefined
 }

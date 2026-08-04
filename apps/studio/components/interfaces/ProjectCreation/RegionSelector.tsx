@@ -131,9 +131,8 @@ export const RegionSelector = ({
   )
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
-  const showNonProdFields =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+  const isLocalEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+  const showNonProdFields = isLocalEnvironment || process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const allSelectableRegions = [...smartRegions, ...regionOptions]
 
@@ -220,6 +219,11 @@ export const RegionSelector = ({
                             <li>Central EU (Frankfurt)</li>
                             <li>Southeast Asia (Singapore)</li>
                           </ul>
+                          {isLocalEnvironment && (
+                            <p className="mt-1">
+                              Use Central EU (Frankfurt) unless you're on a personal dev stack.
+                            </p>
+                          )}
                         </div>
                       )
                     )}
