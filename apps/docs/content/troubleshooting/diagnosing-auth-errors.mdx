@@ -28,12 +28,12 @@ The error message shown in the Response tab can be matched against the [Auth err
 
 ## Finding error messages in the logs
 
-When the error can't be reproduced in a browser — or you need more context than the client shows — the [Log Explorer](https://supabase.com/dashboard/project/_/logs/explorer) is the primary tool.
+When the error can't be reproduced in a browser — or you need more context than the client shows — the [Log Explorer](/dashboard/project/_/logs/explorer) is the primary tool.
 
 Two things to keep in mind before you start:
 
 - **Logs are batched.** New entries can take up to **5 minutes** to appear, so a very recent error may not show up immediately.
-- **Set an appropriate time range.** The Log Explorer defaults to a narrow window. Widen the range to cover when the error actually occurred, or your query will return nothing.
+- **Set an appropriate time range.** The Log Explorer defaults to a narrow window. Widen the range to cover when the error occurred, or your query will return nothing.
 
 Results are returned in a table, which can be hard to read for nested fields. **Double-click any row** to expand it into formatted JSON.
 
@@ -127,9 +127,9 @@ limit 100;
 
 ### Find Auth API errors in the edge logs
 
-This query pulls every Auth API request that returned a 4xx or 5xx status from the [edge logs](https://supabase.com/dashboard/project/_/logs/explorer). Uncomment and edit the `regexp_contains` filter on `event_message` to narrow to specific keywords in the request URL.
+This query pulls every Auth API request that returned a 4xx or 5xx status from the [edge logs](/dashboard/project/_/logs/explorer). Uncomment and edit the `regexp_contains` filter on `event_message` to narrow to specific keywords in the request URL.
 
-> For examples of Auth API paths you can filter on, see the [self-hosting Auth reference](https://supabase.com/docs/reference/self-hosting-auth/get-a-user).
+> For examples of Auth API paths you can filter on, see the [self-hosting Auth reference](/docs/reference/self-hosting-auth/get-a-user).
 
 ```sql
 select
@@ -180,7 +180,7 @@ order by reoccurrence_per_path;
 ## A suggested workflow
 
 1. **Reproduce and capture.** If the error happens in a browser, grab the status code and Response-tab message from the Network tab (Section 1).
-2. **Look it up.** Match the message against the [Auth error codes table](https://supabase.com/docs/guides/auth/debugging/error-codes#auth-error-codes-table).
+2. **Look it up.** Match the message against the [Auth error codes table](/docs/guides/auth/debugging/error-codes#auth-error-codes-table).
 3. **Broaden to the server logs.** If the client message isn't enough, run the consolidated Auth server query (3.1) over the relevant time range.
 4. **Rule in or out the database.** If the error looks like it comes from Postgres, run the database-level query (3.2) and check the `sql_state_code`.
 5. **Quantify.** If you need to understand scale — is this a one-off or a pattern? — use the checks how often an error occurs.
