@@ -15,6 +15,8 @@ This page covers:
 - [Override which pages run](#override-which-pages-run) — when the default git
   scope is wrong
 - [What the suite covers](#what-the-suite-covers) — in-scope paths and limits
+- [Accessibility scans](#accessibility-scans) — WCAG rules, scan modes, and
+  reports
 - [Debug failures](#debug-failures) — reports and traces
 - [How CI uses this suite](#how-ci-uses-this-suite) — pull request behavior
 
@@ -168,6 +170,66 @@ staged and unstaged working-tree changes.
 } | pnpm -C e2e/docs resolve-docs-scope
 ```
 
+## Accessibility scans
+
+The `@a11y`-tagged test scans each in-scope page for WCAG 2.1 A/AA violations
+using `@axe-core/playwright`, limited to the main article.
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:a11y
+```
+
+### Which rules fail
+
+Only `heading-order` and `page-has-heading-one` fail a run. Both reached zero
+across the whole site, so the check guards that. Every other rule reports without
+failing, because the site still carries a backlog that would otherwise block
+every pull request.
+
+As a class of issue reaches zero, add its rule to `ENFORCED_RULES` in
+`utils/axe-helpers.ts` so it can't come back. To preview what failing on
+everything would look like:
+
+```bash
+A11Y_ENFORCE_ALL=1 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:a11y
+```
+
+### Excluded rules
+
+`LEAN_EXCLUDED_RULES` in `utils/axe-helpers.ts` skips `color-contrast` and eight
+document-level rules, roughly halving scan time on a large page.
+
+`color-contrast` accounts for most of that time and finds nothing inside an
+article — docs contrast issues come from shared design tokens and site chrome,
+which a content change can neither introduce nor fix. The document-level rules
+target `<html>`, `<head>`, and `<body>`, so they can't fire when the scan is
+limited to an article.
+
+Cross-origin frames are skipped too. Without that, embedded YouTube players get
+scanned and YouTube's own markup is reported as ours; on a page with one embed
+that accounted for 11 of 15 violations. `frame-title` still fires, because the
+`<iframe>` docs renders lives in our own document.
+
+### How findings are reported
+
+Violations appear in the Playwright output, and the full axe result for each page
+is attached to the HTML report as `axe-results.json`.
+
+Results record whether each page actually loaded, so a 404 is reported as a
+failed load rather than as a clean page or an accessibility failure. A scan that
+sees implausibly few elements fails outright instead of reporting a false pass —
+that catches scanning before a page finishes rendering.
+
+### Known gaps
+
+- `/docs/reference/*` isn't scanned, matching the rest of this suite. Those
+  routes render client-side into tens of thousands of elements, where axe exceeds
+  its timeout and results depend on whether the scan caught the page mid-render.
+- Shared chrome — nav, sidebar, footer, menus, and drawers — is outside the
+  article scope and isn't covered here.
+- axe catches roughly 30-40% of WCAG issues. Keyboard navigation, focus
+  management, and screen reader behavior still need manual testing.
+
 ## Debug failures
 
 1. Open the HTML report after a run:
@@ -188,6 +250,10 @@ owned docs content, partials, or `e2e/docs`.
 3. When `apps/docs` changed, wait for the Vercel docs preview and set
    `PLAYWRIGHT_BASE_URL` to that preview. Otherwise use production.
 4. Run the suite with `DOCS_E2E_PAGE_PATHS` set to the resolved list.
+
+Accessibility findings other than the two failing rules don't fail the job; read
+them in the Playwright output, or from the `axe-results.json` attachment in the
+report artifact.
 
 Draft pull requests stay skipped until you mark them ready for review. Manual
 `workflow_dispatch` runs require a `page_paths` input and accept an optional

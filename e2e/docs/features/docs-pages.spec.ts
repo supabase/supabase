@@ -1,6 +1,16 @@
-import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
+import {
+  assertMeaningfulScan,
+  attachScanReport,
+  blockingViolations,
+  ENFORCED_RULES,
+  formatViolations,
+  scanArticle,
+  settleForAxe,
+  shouldEnforceAll,
+  unloadedResult,
+} from '../utils/axe-helpers.js'
 import {
   articleSelectorForPagePath,
   browserLikeUserAgent,
@@ -63,19 +73,48 @@ test.describe('Docs owned pages', () => {
   }
 
   for (const pagePath of pagePaths) {
-    test(`${pagePath} has a valid heading hierarchy @a11y`, async ({ page }) => {
-      const articleSelector = articleSelectorForPagePath(pagePath)
-      const response = await page.goto(pagePath)
-      expect(response?.ok(), `Expected a successful response for ${pagePath}`).toBeTruthy()
+    test(`${pagePath} meets WCAG 2.1 A/AA @a11y`, async ({ page }, testInfo) => {
+      // A full WCAG scan is heavier than the two heading rules this test used to
+      // run. The link check above keeps the config's 60s.
+      test.setTimeout(120_000)
 
-      const axeResults = await new AxeBuilder({ page })
-        .include(articleSelector)
-        .withRules(['heading-order', 'page-has-heading-one'])
-        .analyze()
+      const include = articleSelectorForPagePath(pagePath)
+      const response = await page.goto(pagePath)
+      const status = response?.status() ?? null
+
+      // Record load failures as load failures — otherwise a 404 reports as an
+      // a11y problem and hides the page's real a11y state.
+      if (!response?.ok()) {
+        await attachScanReport(testInfo, unloadedResult(pagePath, page.url(), status, include))
+        expect(
+          response?.ok(),
+          `Expected a successful response for ${pagePath}, got ${status}`
+        ).toBeTruthy()
+        return
+      }
+
+      await settleForAxe(page)
+
+      // Axe's own failure here is a bare "No elements found for include in page
+      // Context", which says nothing about the cause.
+      await expect(
+        page.locator(include),
+        `No article matching "${include}" on ${pagePath}. This suite covers guides and ` +
+          'troubleshooting entries; other routes have no article element to scan.'
+      ).toBeVisible()
+
+      const result = await scanArticle(page, pagePath, include)
+      result.status = status
+
+      await attachScanReport(testInfo, result)
+      assertMeaningfulScan(result)
+
+      const blocking = blockingViolations(result)
+      const enforced = shouldEnforceAll() ? 'all WCAG 2.1 A/AA rules' : ENFORCED_RULES.join(', ')
 
       expect(
-        axeResults.violations,
-        `Heading hierarchy issues in ${articleSelector}:\n${JSON.stringify(axeResults.violations, null, 2)}`
+        blocking,
+        `${pagePath} has blocking a11y violations (${enforced}):\n${formatViolations(blocking)}`
       ).toEqual([])
     })
   }
