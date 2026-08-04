@@ -194,7 +194,7 @@ export const ChatView = ({
                   {isPending && (
                     <AssistantApprovalBar
                       prompt="The Assistant wants to create this notebook."
-                      confirmLabel="Create and run"
+                      confirmLabel="Create notebook"
                       onDeny={() => onDeny(message.id)}
                       onConfirm={() =>
                         onApproveNotebook(

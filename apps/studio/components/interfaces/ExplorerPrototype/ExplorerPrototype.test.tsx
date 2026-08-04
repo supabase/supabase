@@ -231,13 +231,13 @@ describe('home launch surface', () => {
 })
 
 describe('assistant notebook creation', () => {
-  it('creates and runs a notebook resource when the Assistant proposal is approved', async () => {
+  it('creates a notebook resource when the Assistant proposal is approved', () => {
     const { result } = customRenderHook(() => useExplorerPrototypeState())
     const message = INITIAL_CHATS['chat-2'].messages.find((entry) => 'notebook' in entry)
 
     if (!message || !('notebook' in message)) throw new Error('Expected an assistant notebook')
 
-    await act(async () =>
+    act(() =>
       result.current.createNotebookFromChat(
         'chat-2',
         message.id,
@@ -398,7 +398,7 @@ describe('agent chat surface', () => {
     expect(screen.getByText('OAuth signups by provider')).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Hide SQL' })).toHaveLength(2)
     expect(screen.getByText('The Assistant wants to create this notebook.')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Create and run' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Create notebook' })).toBeInTheDocument()
   })
 
   it('runs the query once approved and reports the row count', async () => {

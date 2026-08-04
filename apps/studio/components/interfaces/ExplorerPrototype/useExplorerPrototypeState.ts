@@ -340,7 +340,7 @@ export const useExplorerPrototypeState = () => {
     }
   }
 
-  const createNotebookFromChat = async (
+  const createNotebookFromChat = (
     chatId: string,
     messageId: string,
     title: string,
@@ -353,12 +353,6 @@ export const useExplorerPrototypeState = () => {
     setChatApproval(chatId, messageId, 'approved')
     markModified(resource)
     openTab(resource, title)
-
-    for (const cell of notebook.cells) {
-      if (cell.type !== 'query') continue
-      if (isWriteQuery(cell.query.sql)) break
-      await runCell(cell, resolveEffectiveRowLimit(cell, notebook.settings))
-    }
   }
 
   return {
