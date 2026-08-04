@@ -88,7 +88,7 @@ The SDK silently no-ops when it can't propagate, which keeps it safe to enable b
 
 ### Using a vendor tracing SDK
 
-Many tracing SDKs are built on top of OpenTelemetry. They work with this guide as long as a W3C-compliant propagator is registered — but propagator behavior varies. Some vendor SDKs inject only their proprietary headers by default and need extra configuration to also emit the standard `traceparent` header. Check your vendor's OTel integration docs for the exact setup.
+Many tracing SDKs are built on top of OpenTelemetry. They work with this guide as long as a W3C-compliant propagator is registered. Some vendor SDKs inject only their proprietary headers by default and need extra configuration to also emit the standard `traceparent` header. Check your vendor's OTel integration docs for the exact setup.
 
 </TabPanel>
 
