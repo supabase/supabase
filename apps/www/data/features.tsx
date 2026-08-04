@@ -2696,7 +2696,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     icon: JsIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2721,7 +2721,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     icon: FlutterIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2746,7 +2746,7 @@ This feature is particularly valuable for iOS developers looking to leverage the
     icon: SwiftIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/swift/start',
+    docsUrl: 'https://supabase.com/docs/reference/swift/introduction',
     slug: 'client-library-swift',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2771,7 +2771,7 @@ This feature is especially beneficial for Python developers looking to build rob
     icon: PythonIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/python/start',
+    docsUrl: 'https://supabase.com/docs/reference/python/introduction',
     slug: 'client-library-python',
     status: {
       stage: PRODUCT_STAGES.BETA,
