@@ -199,6 +199,17 @@ describe('home launch surface', () => {
     expect(onCreateChat).toHaveBeenCalledWith('Show recent signup trends')
   })
 
+  it('dismisses the template section', async () => {
+    const user = userEvent.setup()
+    customRender(
+      <HomeView onCreateNotebook={vi.fn()} onCreateSnippet={vi.fn()} onCreateChat={vi.fn()} />
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Dismiss' }))
+
+    expect(screen.queryByText('Start with a template')).not.toBeInTheDocument()
+  })
+
   it('creates and opens a notebook, snippet, or chat', () => {
     const { result } = customRenderHook(() => useExplorerPrototypeState())
 
