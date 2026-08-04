@@ -12,7 +12,6 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { isEqual } from 'lodash'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -35,7 +34,11 @@ import * as z from 'zod'
 
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
-import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
+import {
+  checkIfPolicyHasChanged,
+  generateCreatePolicyQuery,
+  generateUpdatePolicyPayload,
+} from './PolicyEditorPanel.utils'
 import { PolicyEditorPanelHeader } from './PolicyEditorPanelHeader'
 import { PolicyTemplates } from './PolicyTemplates'
 import { QueryError } from './QueryError'
@@ -222,34 +225,21 @@ export const PolicyEditorPanel = memo(function ({
         },
       })
     } else if (selectedProject !== undefined) {
-      const payload: {
-        name?: string
-        definition?: SafeSqlFragment
-        check?: SafeSqlFragment
-        roles?: Array<string>
-      } = {}
       const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
-      // Trim for string comparison against the stored policy values. The Save click is the
-      // explicit user gesture that promotes editor content to executable SQL.
-      const usingVal = using?.trim()
-      const checkVal = check?.trim()
 
-      if (name !== selectedPolicy.name) payload.name = name
-      if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
-      if (selectedPolicy.definition !== null && selectedPolicy.definition !== usingVal)
-        payload.definition =
-          usingVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(usingVal))
-
-      if (selectedPolicy.command === 'INSERT') {
-        // [Joshen] Cause editor one will be the check statement in this scenario
-        if (selectedPolicy.check !== usingVal)
-          payload.check =
-            usingVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(usingVal))
-      } else {
-        if (selectedPolicy.check !== checkVal)
-          payload.check =
-            checkVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(checkVal))
+      // ALTER POLICY can only replace an expression, not remove it
+      if (selectedPolicy.command !== 'INSERT' && selectedPolicy.check !== null && !check?.trim()) {
+        return setFieldError(
+          'The WITH CHECK expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+        )
       }
+
+      const payload = generateUpdatePolicyPayload(selectedPolicy, {
+        name,
+        roles: updatedRoles,
+        using,
+        check,
+      })
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
 
@@ -257,7 +247,15 @@ export const PolicyEditorPanel = memo(function ({
         projectRef: selectedProject.ref,
         connectionString: selectedProject?.connectionString,
         originalPolicy: selectedPolicy,
-        payload,
+        // The Save click is the explicit user gesture that promotes editor content
+        // to executable SQL.
+        payload: {
+          name: payload.name,
+          roles: payload.roles,
+          definition:
+            payload.definition === undefined ? undefined : acceptUntrustedSql(payload.definition),
+          check: payload.check === undefined ? undefined : acceptUntrustedSql(payload.check),
+        },
       })
     }
   }
