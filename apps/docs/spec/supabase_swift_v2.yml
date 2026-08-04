@@ -116,6 +116,26 @@ functions:
           Go to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - id: initialize-client-with-opentelemetry
+        name: Initialize Client with OpenTelemetry tracing
+        description: |
+          Supabase Swift supports W3C `traceparent` header propagation via an opt-in SwiftPM package trait.
+          When enabled, the active OpenTelemetry span's trace context is automatically injected into every outgoing request across PostgREST, Storage, Auth, Functions, and Realtime — no additional runtime configuration needed.
+
+          Enable the `OpenTelemetry` trait in your `Package.swift` dependency declaration:
+        code: |
+          ```swift
+          // Package.swift
+          .package(
+            url: "https://github.com/supabase/supabase-swift.git",
+            from: "2.51.0",
+            traits: ["OpenTelemetry"]
+          )
+          ```
+        notes: |
+          - Requires swift-tools-version 6.1 or later (trait support).
+          - The trait is **off by default** — no OTel dependency is linked unless you opt in.
+          - When no span is active, the header is not added; it is always safe to call unconditionally.
   - id: auth-api
     title: 'Overview'
     notes: |
@@ -286,7 +306,7 @@ functions:
         name: Sign up with a redirect URL
         description: |
           - You can provide a default redirect URL when initializing the client.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```swift
           try await supabase.auth.signUp(
@@ -471,9 +491,9 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -643,7 +663,7 @@ functions:
       - name: captchaToken
         type: String
     notes: |
-      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/enterprise-sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.

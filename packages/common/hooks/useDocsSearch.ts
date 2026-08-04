@@ -3,13 +3,15 @@
 import { compact, debounce, uniqBy } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
-import { isFeatureEnabled } from '../enabled-features'
-
 const NUMBER_SOURCES = 2
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-const FUNCTIONS_URL = '/functions/v1/'
+// This app's own base path, set only for apps deployed under a path prefix (docs' is '/docs').
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+// Public URL of the docs deployment, which hosts the search API routes.
+// Same constant apps/studio already uses for cross-linking to docs (see lib/constants/index.ts).
+const DOCS_URL = process.env.NEXT_PUBLIC_DOCS_URL || 'https://supabase.com/docs'
+// From inside the docs app itself, call our own routes relatively; from studio/www, call docs directly.
+const SEARCH_API_BASE = BASE_PATH === '/docs' ? BASE_PATH : DOCS_URL
 
 enum PageType {
   Markdown = 'markdown',
@@ -203,18 +205,9 @@ const useDocsSearch = () => {
 
     let sourcesLoaded = 0
 
-    const useAlternateSearchIndex = !isFeatureEnabled('search:fullIndex')
-
-    const searchEndpoint = useAlternateSearchIndex ? 'docs_search_fts_nimbus' : 'docs_search_fts'
-    fetch(`${SUPABASE_URL}/rest/v1/rpc/${searchEndpoint}`, {
+    fetch(`${SEARCH_API_BASE}/api/search/fts`, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...(SUPABASE_ANON_KEY && {
-          apikey: SUPABASE_ANON_KEY,
-          authorization: `Bearer ${SUPABASE_ANON_KEY}`,
-        }),
-      },
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ query: query.trim() }),
     })
       .then((res) => res.json())
@@ -248,9 +241,10 @@ const useDocsSearch = () => {
         })
       })
 
-    fetch(`${SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {
+    fetch(`${SEARCH_API_BASE}/api/search/embeddings`, {
       method: 'POST',
-      body: JSON.stringify({ query, useAlternateSearchIndex }),
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ query }),
     })
       .then((response) => response.json())
       .then((results) => {

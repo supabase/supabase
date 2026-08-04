@@ -14,7 +14,7 @@ cli = [ "supabase-postgres-config-update" ]
 
 ## Changing max database connections
 
-Each compute instance has a default direct connection and pooler connection settings. You can find the most recent settings in the [compute docs](/docs/guides/platform/compute-add-ons#disk-io):
+Each compute instance has a default direct connection and pooler connection settings. You can find the most recent settings in the [compute docs](/docs/guides/platform/compute-and-disk#disk):
 
 | Compute Size | Direct Connections | Pooler Connections |
 | ------------ | ------------------ | ------------------ |
@@ -34,7 +34,7 @@ Each compute instance has a default direct connection and pooler connection sett
 
 > Note: the Supavisor connection limits are hard-coded and cannot be changed without upgrading the compute size:
 
-You can configure the maximum amount of connections that Postgres will tolerate with the [Supabase CLI.](/docs/guides/platform/custom-postgres-config)
+You can configure the maximum amount of connections that Postgres will tolerate with the [Supabase CLI.](/docs/guides/database/custom-postgres-config)
 
 You can run the following commands:
 
@@ -54,17 +54,17 @@ SHOW max_connections;
 
 **Three** factors must be taken into consideration when adjusting the direct connection limit:
 
-#### Process schedulers and Postgres internals
+### Process schedulers and Postgres internals
 
 Allowing too many direct connections in your database can overburden Postgres schedulers and other internal modules. This will result in a noticeable decrease in query throughput, despite having more connections available. EnterpriseDB wrote a wonderful [article](https://www.enterprisedb.com/postgres-tutorials/why-you-should-use-connection-pooling-when-setting-maxconnections-postgres) that outlines some of the considerations.
 
 The default connection values are set based on a solid understanding of Postgres architecture, and straying too far from them is _likely_ to hinder performance. However, with some experimentation, you might discover a value better suited to your specific needs. Still, unless there's a compelling reason to adjust the setting, it's generally advisable to stick with the defaults or change the values judiciously.'
 
-#### Memory
+### Memory
 
 > If you do not know how to monitor memory and CPU with Supabase Grafana, [check here](https://github.com/orgs/supabase/discussions/27141).
 
-##### Each direct connection is a running process that will consume active memory
+#### Each direct connection is a running process that will consume active memory
 
 This is a Grafana Chart of unhealthy memory usage:
 
@@ -83,7 +83,7 @@ To avoid displacing cache or straining system resources, it is advised to not in
 
 Postgres will allow you to overcommit memory. You can run the below query to find out the hypothetical max value you could change it to without risking memory failure:
 
-> NOTE: You can find your server memory in the [compute add-ons docs](/docs/guides/platform/compute-add-ons)
+> NOTE: You can find your server memory in the [compute add-ons docs](/docs/guides/platform/compute-and-disk)
 
 ```sql
 select
@@ -92,7 +92,7 @@ select
   ) || ' * ' || current_setting('maintenance_work_mem') || ')) / ' || current_setting('work_mem');
 ```
 
-#### CPU
+### CPU
 
 The below chart is an example of what can occur to the CPU if 100s of connections are inappropriately opened/closed every second or many CPU intensive queries are run in parallel
 

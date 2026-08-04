@@ -13,7 +13,7 @@ import {
   DialogTitle,
   TextArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
