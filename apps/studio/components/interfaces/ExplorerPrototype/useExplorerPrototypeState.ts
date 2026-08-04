@@ -49,7 +49,7 @@ export const resolveEffectiveRowLimit = (
 
 export const useExplorerPrototypeState = () => {
   const [tabs, setTabs] = useState<Tab[]>(INITIAL_TABS)
-  const [activeTabId, setActiveTabId] = useState<string>(INITIAL_TABS[0].id)
+  const [activeTabId, setActiveTabId] = useState<string>('home')
   const [notebooks, setNotebooks] = useState<Record<string, NotebookContent>>(INITIAL_NOTEBOOKS)
   const [snippets, setSnippets] = useState<Record<string, SnippetDoc>>(INITIAL_SNIPPETS)
   const [chats, setChats] = useState<Record<string, ChatSession>>(INITIAL_CHATS)
