@@ -62,13 +62,13 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
 
   const readReplicas = databases.filter((database) => database.identifier !== project?.ref)
 
-  const form = useForm<FormValues>({
-    defaultValues: {
-      awsAccountId: account?.aws_account_id ?? '',
-      accountName: account?.account_name ?? '',
-      databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
-    },
-  })
+  const defaultValues = {
+    awsAccountId: account?.aws_account_id ?? '',
+    accountName: account?.account_name ?? '',
+    databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
+  }
+
+  const form = useForm<FormValues>({ defaultValues })
 
   const title =
     account?.status === 'ASSOCIATION_ACCEPTED'
@@ -111,6 +111,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
         },
         {
           onSuccess: () => {
+            form.reset(defaultValues)
             toast.success('Successfully added AWS account')
             onOpenChange(false)
           },
