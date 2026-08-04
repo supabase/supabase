@@ -220,6 +220,42 @@ failed load rather than as a clean page or an accessibility failure. A scan that
 sees implausibly few elements fails outright instead of reporting a false pass —
 that catches scanning before a page finishes rendering.
 
+### Exhaustive triage harness (temporary)
+
+> [!NOTE]
+> The exhaustive scan is throwaway tooling for producing a one-off triage report,
+> and is not intended to ship. Only the per-page check above is permanent.
+
+`pnpm e2e:docs:a11y:all` scans every guide and troubleshooting page, plus the
+shared chrome the per-page check can't reach: the command menu, the mobile
+navigation drawer, and the feedback widget. It differs from the per-page check in
+three ways — whole pages rather than articles, the complete rule set rather than
+the lean one, and nothing fails.
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:a11y:all -- --workers=6
+```
+
+Expect around 10 minutes at six workers against a deployed site. Each surface
+writes one JSON file to `a11y-results/`, so an interrupted run is resumable by
+re-running only what's missing.
+
+Summarize a completed run:
+
+```bash
+pnpm e2e:docs:a11y:summarize
+```
+
+That writes `a11y-report/summary.md` and `summary.json`, grouping findings by rule
+and by docs area, then deduplicating: contrast collapses by color pair, so one bad
+token counts once, and everything else collapses by element shape, so a shared
+component failing on hundreds of pages counts once with a tally of where it
+appears. Because per-page and exhaustive runs measure different things, the
+summarizer refuses to combine them — clear `a11y-results/` between modes.
+
+`a11y-results/` and `a11y-report/` are both ignored by Git. Reports are published
+to Notion, not committed.
+
 ### Known gaps
 
 - `/docs/reference/*` isn't scanned, matching the rest of this suite. Those

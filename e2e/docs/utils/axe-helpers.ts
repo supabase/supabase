@@ -1,3 +1,5 @@
+import { mkdirSync, renameSync, writeFileSync } from 'node:fs'
+import path from 'node:path'
 import { AxeBuilder } from '@axe-core/playwright'
 import type { Page, TestInfo } from '@playwright/test'
 import type { Result } from 'axe-core'
@@ -14,12 +16,12 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
 
 /**
- * Rules skipped when scanning article content.
+ * Rules skipped in `article` scope.
  *
- * `color-contrast` is 55-60% of scan time and finds nothing inside an article —
- * docs contrast debt lives in shared design tokens and site chrome, neither of
- * which a content change can introduce or fix. The rest target `<html>`,
- * `<head>`, or `<body>` and so cannot fire within an article at all.
+ * `color-contrast` is 55-60% of scan time and found nothing article-scoped on
+ * any page sampled — docs contrast debt lives entirely in shared chrome, which
+ * the exhaustive run measures once. The rest target `<html>`, `<head>`, or
+ * `<body>` and so cannot fire inside an article at all.
  *
  * `bypass` needs no entry: axe skips page-level rules whenever an include
  * selector is used.
@@ -36,22 +38,63 @@ export const LEAN_EXCLUDED_RULES = [
   'css-orientation-lock',
 ]
 
-export interface A11yScanResult {
+export type A11yScope = 'article' | 'page'
+
+export interface A11ySurfaceResult {
   surface: string
   url: string
-  include: string
+  area: string
+  /**
+   * Which rule set applies and whether violations block. Independent of
+   * `include` — a chrome overlay uses the complete rule set while still
+   * targeting one element.
+   */
+  scope: A11yScope
+  include: string | null
   excludedRules: string[]
   /** Recorded separately so a 404 isn't reported as an a11y failure. */
   loaded: boolean
   status: number | null
   /** Guards against scanning before hydration, which reads as clean. */
   elementCount: number
-  /** Axe's native shape, so `failureSummary` and check data survive. */
+  /** Axe's native shape, so `failureSummary` and contrast check data survive. */
   violations: Result[]
+}
+
+const RESULTS_DIR = process.env.A11Y_RESULTS_DIR
+  ? path.resolve(process.env.A11Y_RESULTS_DIR)
+  : path.resolve(import.meta.dirname, '../a11y-results')
+
+export function resolveScope(): A11yScope {
+  return process.env.A11Y_SCOPE === 'page' ? 'page' : 'article'
 }
 
 export function shouldEnforceAll(): boolean {
   return !!process.env.A11Y_ENFORCE_ALL
+}
+
+export function surfaceSlug(surface: string): string {
+  return (
+    surface
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'surface'
+  )
+}
+
+/** Guides group by top-level section so the by-area table stays readable. */
+export function areaForSurface(surface: string): string {
+  if (!surface.startsWith('/')) return `chrome/${surface}`
+  if (surface === '/docs') return 'home'
+  if (surface.startsWith('/docs/reference')) return 'reference'
+  if (surface.startsWith('/docs/guides/troubleshooting')) return 'troubleshooting'
+
+  const guidesMatch = surface.match(/^\/docs\/guides\/([^/]+)(\/.*)?$/)
+  if (guidesMatch) {
+    return guidesMatch[2] ? `guides/${guidesMatch[1]}` : 'guides'
+  }
+
+  return 'other'
 }
 
 /**
@@ -92,35 +135,41 @@ export async function settleForAxe(page: Page): Promise<void> {
     .catch(() => {})
 }
 
-export async function scanArticle(
+export async function scanSurface(
   page: Page,
   surface: string,
-  include: string
-): Promise<A11yScanResult> {
+  options: { include?: string; scope?: A11yScope; area?: string } = {}
+): Promise<A11ySurfaceResult> {
+  const scope = options.scope ?? resolveScope()
+  const excludedRules = scope === 'article' ? LEAN_EXCLUDED_RULES : []
+
   // Legacy mode skips cross-origin frames. Without it, Playwright hands axe every
   // frame and embedded YouTube players get scanned, reporting YouTube's own
-  // markup as ours — on a page with one embed that was 11 of 15 violations.
+  // markup as ours — 73 elements across three rules in the first full run.
   // `frame-title` still fires, since the `<iframe>` we render is in our document.
   //
   // Note axe's `iframes: false` run option does not do this: the Playwright
   // integration enumerates frames itself rather than relying on axe's traversal.
-  const { violations } = await new AxeBuilder({ page })
-    .setLegacyMode(true)
-    .withTags(WCAG_TAGS)
-    .include(include)
-    .disableRules(LEAN_EXCLUDED_RULES)
-    .analyze()
+  let builder = new AxeBuilder({ page }).setLegacyMode(true).withTags(WCAG_TAGS)
+  if (options.include) builder = builder.include(options.include)
+  if (excludedRules.length) builder = builder.disableRules(excludedRules)
+
+  const { violations } = await builder.analyze()
 
   const elementCount = await page.evaluate(
-    (selector) => document.querySelector(selector)?.querySelectorAll('*').length ?? 0,
-    include
+    (selector) =>
+      (selector ? document.querySelector(selector) : document.body)?.querySelectorAll('*').length ??
+      0,
+    options.include ?? null
   )
 
   return {
     surface,
     url: page.url(),
-    include,
-    excludedRules: LEAN_EXCLUDED_RULES,
+    area: options.area ?? areaForSurface(surface),
+    scope,
+    include: options.include ?? null,
+    excludedRules,
     loaded: true,
     status: null,
     elementCount,
@@ -132,13 +181,15 @@ export function unloadedResult(
   surface: string,
   url: string,
   status: number | null,
-  include: string
-): A11yScanResult {
+  scope: A11yScope = resolveScope()
+): A11ySurfaceResult {
   return {
     surface,
     url,
-    include,
-    excludedRules: LEAN_EXCLUDED_RULES,
+    area: areaForSurface(surface),
+    scope,
+    include: null,
+    excludedRules: scope === 'article' ? LEAN_EXCLUDED_RULES : [],
     loaded: false,
     status,
     elementCount: 0,
@@ -146,30 +197,50 @@ export function unloadedResult(
   }
 }
 
+/** Floor for a whole page or article. Small scoped components pass their own. */
 export const MIN_MEANINGFUL_ELEMENTS = 20
 
 export function assertMeaningfulScan(
-  result: A11yScanResult,
+  result: A11ySurfaceResult,
   minElements: number = MIN_MEANINGFUL_ELEMENTS
 ): void {
   if (result.elementCount >= minElements) return
   throw new Error(
     `${result.surface} scanned only ${result.elementCount} element(s) within ` +
-      `${result.include} (expected at least ${minElements}) — the content almost certainly had ` +
-      `not rendered yet, so this result is not trustworthy. Investigate rather than treating it ` +
-      `as clean.`
+      `${result.include ?? 'the document'} (expected at least ${minElements}) — the content ` +
+      `almost certainly had not rendered yet, so this result is not trustworthy. Investigate ` +
+      `rather than treating it as clean.`
   )
 }
 
-export async function attachScanReport(testInfo: TestInfo, result: A11yScanResult): Promise<void> {
-  await testInfo.attach('axe-results.json', {
+/**
+ * One file per surface: parallel workers never contend, and a partial run is
+ * resumable by re-running whatever is missing. Written via a temp file so a
+ * killed run can't leave truncated JSON for the summarizer.
+ */
+export function writeSurfaceResult(result: A11ySurfaceResult): void {
+  mkdirSync(RESULTS_DIR, { recursive: true })
+
+  const target = path.join(RESULTS_DIR, `${surfaceSlug(result.surface)}.json`)
+  const temp = `${target}.tmp`
+  writeFileSync(temp, `${JSON.stringify(result, null, 2)}\n`)
+  renameSync(temp, target)
+}
+
+export async function attachSurfaceReport(
+  testInfo: TestInfo,
+  result: A11ySurfaceResult
+): Promise<void> {
+  await testInfo.attach(`axe-${surfaceSlug(result.surface)}.json`, {
     body: JSON.stringify(result, null, 2),
     contentType: 'application/json',
   })
 }
 
-export function blockingViolations(result: A11yScanResult): Result[] {
+export function blockingViolations(result: A11ySurfaceResult): Result[] {
   if (shouldEnforceAll()) return result.violations
+  // Page scope is a diagnostic capture: reports everything, fails on nothing.
+  if (result.scope === 'page') return []
   return result.violations.filter((violation) => ENFORCED_RULES.includes(violation.id))
 }
 
@@ -185,3 +256,5 @@ export function formatViolations(violations: Result[]): string {
     )
     .join('\n')
 }
+
+export { RESULTS_DIR }

@@ -157,6 +157,11 @@ async function main() {
   const env = {
     ...process.env,
     DOCS_E2E_PAGE_PATHS: pages.join(','),
+    // An exhaustive run is a diagnostic capture: scan the entire page (nav,
+    // sidebar, footer) with the complete WCAG rule set, and report rather than
+    // fail. Scoped runs stay article-only on a lean rule set so the required
+    // `Docs E2E` check stays fast. See utils/axe-helpers.ts.
+    A11Y_SCOPE: runAll ? 'page' : (process.env.A11Y_SCOPE ?? 'article'),
   }
 
   const child = spawn('pnpm', ['exec', 'playwright', 'test', ...finalPlaywrightArgs], {

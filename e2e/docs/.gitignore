@@ -4,3 +4,5 @@ node_modules/
 /playwright-report-local-smoke/
 /blob-report/
 /playwright/.cache/
+/a11y-results/
+/a11y-report/

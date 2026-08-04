@@ -2,14 +2,16 @@ import { expect, test } from '@playwright/test'
 
 import {
   assertMeaningfulScan,
-  attachScanReport,
+  attachSurfaceReport,
   blockingViolations,
   ENFORCED_RULES,
   formatViolations,
-  scanArticle,
+  resolveScope,
+  scanSurface,
   settleForAxe,
   shouldEnforceAll,
   unloadedResult,
+  writeSurfaceResult,
 } from '../utils/axe-helpers.js'
 import {
   articleSelectorForPagePath,
@@ -74,18 +76,18 @@ test.describe('Docs owned pages', () => {
 
   for (const pagePath of pagePaths) {
     test(`${pagePath} meets WCAG 2.1 A/AA @a11y`, async ({ page }, testInfo) => {
-      // A full WCAG scan is heavier than the two heading rules this test used to
-      // run. The link check above keeps the config's 60s.
+      // color-contrast alone can take seconds on a long page in the exhaustive
+      // full-page mode. The link check above keeps the config's 60s.
       test.setTimeout(120_000)
 
-      const include = articleSelectorForPagePath(pagePath)
+      const scope = resolveScope()
       const response = await page.goto(pagePath)
       const status = response?.status() ?? null
 
       // Record load failures as load failures — otherwise a 404 reports as an
       // a11y problem and hides the page's real a11y state.
       if (!response?.ok()) {
-        await attachScanReport(testInfo, unloadedResult(pagePath, page.url(), status, include))
+        writeSurfaceResult(unloadedResult(pagePath, page.url(), status, scope))
         expect(
           response?.ok(),
           `Expected a successful response for ${pagePath}, got ${status}`
@@ -95,18 +97,26 @@ test.describe('Docs owned pages', () => {
 
       await settleForAxe(page)
 
-      // Axe's own failure here is a bare "No elements found for include in page
-      // Context", which says nothing about the cause.
-      await expect(
-        page.locator(include),
-        `No article matching "${include}" on ${pagePath}. This suite covers guides and ` +
-          'troubleshooting entries; other routes have no article element to scan.'
-      ).toBeVisible()
+      // Per-page runs scan the article only, matching the scope this test has
+      // always used. The exhaustive run scans the whole page so shared chrome is
+      // covered once rather than on every page in the corpus.
+      const include = scope === 'article' ? articleSelectorForPagePath(pagePath) : undefined
 
-      const result = await scanArticle(page, pagePath, include)
+      if (include) {
+        // Axe's own failure here is a bare "No elements found for include in
+        // page Context", which says nothing about the cause.
+        await expect(
+          page.locator(include),
+          `No article matching "${include}" on ${pagePath}. This suite covers guides and ` +
+            'troubleshooting entries; other routes have no article element to scan.'
+        ).toBeVisible()
+      }
+
+      const result = await scanSurface(page, pagePath, { include })
       result.status = status
 
-      await attachScanReport(testInfo, result)
+      writeSurfaceResult(result)
+      await attachSurfaceReport(testInfo, result)
       assertMeaningfulScan(result)
 
       const blocking = blockingViolations(result)
