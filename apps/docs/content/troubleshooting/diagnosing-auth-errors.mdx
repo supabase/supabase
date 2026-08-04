@@ -160,7 +160,7 @@ Once you've identified a status code worth investigating, this query counts how 
 select
   status_code,
   path,
-  count(path) as reoccurrence_per_path,
+  count(path) as reoccurrence_per_path
 from edge_logs
 cross join unnest(metadata) as metadata
 cross join unnest(response) AS response
