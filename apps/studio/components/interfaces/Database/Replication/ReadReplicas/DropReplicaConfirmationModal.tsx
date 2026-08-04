@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { REPLICA_STATUS } from './InstanceConfiguration.constants'
+import { REPLICA_STATUS } from '../Replication.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { replicaKeys } from '@/data/read-replicas/keys'
 import { useReadReplicaRemoveMutation } from '@/data/read-replicas/replica-remove-mutation'
 import type { Database } from '@/data/read-replicas/replicas-query'
@@ -29,7 +30,15 @@ export const DropReplicaConfirmationModal = ({
       /private\s*link/i.test(message) && /association/i.test(message)
 
     if (isPrivateLinkAssociationError) {
-      return 'Remove the replica PrivateLink association before dropping this read replica'
+      return (
+        <span>
+          Remove the replica{' '}
+          <InlineLink href={`/project/${projectRef}/settings/integrations`}>
+            PrivateLink association
+          </InlineLink>{' '}
+          before dropping this read replica
+        </span>
+      )
     }
 
     return `Failed to remove read replica: ${message}`

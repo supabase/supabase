@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+
 interface AWSPrivateLinkAccountItemProps {
   aws_account_id: string
   account_name?: string
@@ -38,7 +40,7 @@ export const AWSPrivateLinkAccountItem = ({
 }: AWSPrivateLinkAccountItemProps) => {
   const databaseTarget =
     database_type === 'READ_REPLICA'
-      ? `Read replica (${database_identifier ?? 'Unknown identifier'})`
+      ? `Read replica (ID: ${database_identifier ? formatDatabaseID(database_identifier) : 'Unknown identifier'})`
       : 'Primary database'
 
   const getStatusBadge = () => {

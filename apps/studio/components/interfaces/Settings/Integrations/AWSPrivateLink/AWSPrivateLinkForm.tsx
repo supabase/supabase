@@ -1,4 +1,5 @@
 import { useFlag } from 'common'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -151,6 +152,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                       <>
                         <span>{title}</span>
                         <Badge
+                          className="ml-2"
                           variant={
                             account.status === 'ASSOCIATION_ACCEPTED'
                               ? 'success'
@@ -183,7 +185,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                     description={description}
                     actions={
                       account.status === 'READY' && (
-                        <Button variant="default" className="w-min mt-2">
+                        <Button variant="default" className="w-min" icon={<ExternalLink />}>
                           <Link
                             target="_blank"
                             rel="noopener noreferrer"

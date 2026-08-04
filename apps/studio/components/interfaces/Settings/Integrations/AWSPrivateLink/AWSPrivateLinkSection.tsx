@@ -19,6 +19,7 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAWSAccountDeleteMutation } from '@/data/aws-accounts/aws-account-delete-mutation'
 import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
 import { useAWSAccountsQuery } from '@/data/aws-accounts/aws-accounts-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -140,14 +141,16 @@ export const AWSPrivateLinkSection = () => {
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to delete the AWS account connection for{' '}
-          {selectedAccount?.aws_account_id}
+          {selectedAccount?.aws_account_id}?
+        </p>
+        <p className="text-sm text-foreground-lighter mt-1">
+          Database:{' '}
           {selectedAccount &&
-            ` (${
+            ` ${
               selectedAccount.database_type === 'READ_REPLICA'
-                ? `Read replica (${selectedAccount.database_identifier ?? 'Unknown identifier'})`
+                ? `Read replica (ID: ${selectedAccount.database_identifier ? formatDatabaseID(selectedAccount.database_identifier) : 'Unknown identifier'})`
                 : 'Primary database'
-            })`}
-          ?
+            }`}
         </p>
       </ConfirmationModal>
     </>
