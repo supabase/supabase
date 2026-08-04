@@ -11,7 +11,11 @@ import {
 
 import { CellDetailPanel } from './CellDetailPanel'
 import { ResultCell } from './ResultCell'
-import { calculateResultColumnWidth, formatClipboardValue } from './Results.utils'
+import {
+  calculateResultColumnWidth,
+  formatClipboardValue,
+  RESULT_COLUMN_MIN_WIDTH,
+} from './Results.utils'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
 export const Results = ({ rows }: { rows: readonly any[] }) => {
@@ -38,14 +42,8 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
   }, [])
 
   const columnRender = (name: string) => {
-    return (
-      <div className="flex h-full items-center justify-center font-mono text-xs" title={name}>
-        {name}
-      </div>
-    )
+    return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
   }
-
-  const MIN_COLUMN_WIDTH = 100
 
   const columns: CalculatedColumn<any>[] = useMemo(
     () =>
@@ -58,7 +56,7 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
           parent: undefined,
           level: 0,
           width: calculateResultColumnWidth(key, rows),
-          minWidth: MIN_COLUMN_WIDTH,
+          minWidth: RESULT_COLUMN_MIN_WIDTH,
           maxWidth: undefined,
           draggable: false,
           frozen: false,

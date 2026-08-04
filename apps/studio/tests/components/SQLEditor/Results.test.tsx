@@ -59,9 +59,3 @@ test('shows empty state when no rows provided', () => {
   render(<Results rows={[]} />)
   expect(screen.getByText('Success. No rows returned')).toBeTruthy()
 })
-
-test('exposes the full column name as a title', () => {
-  render(<Results rows={[{ source_campaign_id: null }]} />)
-
-  expect(screen.getByTitle('source_campaign_id')).toBeTruthy()
-})

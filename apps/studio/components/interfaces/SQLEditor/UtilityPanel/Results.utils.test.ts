@@ -28,6 +28,18 @@ describe('Results.utils', () => {
       expect(calculateResultColumnWidth('name', [{ name: 'a'.repeat(20) }])).toBe(165)
     })
 
+    it('accounts for the formatted JSON representation of an object value', () => {
+      expect(
+        calculateResultColumnWidth('metadata', [{ metadata: { campaign: 'a'.repeat(20) } }])
+      ).toBe(288.75)
+    })
+
+    it('accounts for the formatted JSON representation of an array value', () => {
+      expect(calculateResultColumnWidth('tags', [{ tags: ['a'.repeat(10), 'b'.repeat(10)] }])).toBe(
+        222.75
+      )
+    })
+
     it('caps the width when the column name exceeds the maximum', () => {
       expect(calculateResultColumnWidth('a'.repeat(100), [])).toBe(500)
     })
