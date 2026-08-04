@@ -14,6 +14,7 @@ import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
 import { DeletedFilePreviewPane } from './DeletedFilePreviewPane'
 import { useDeletedFilesContext } from './DeletedFilesContext'
+import { DeletedFilesHeaderSelection } from './DeletedFilesHeaderSelection'
 import { DeletedFilesList } from './DeletedFilesList'
 import { FileExplorer } from './FileExplorer'
 import { FileExplorerHeader } from './FileExplorerHeader'
@@ -46,7 +47,7 @@ export const StorageExplorer = () => {
     setSelectedItemsToMove,
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
-  const { isShowingDeleted } = useDeletedFilesContext()
+  const { isShowingDeleted, selectedDeletedIds } = useDeletedFilesContext()
   const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
@@ -159,14 +160,16 @@ export const StorageExplorer = () => {
 
   return (
     <div ref={storageExplorerRef} className="bg-studio flex h-full w-full flex-col">
-      {selectedItems.length === 0 || isShowingDeleted ? (
+      {isShowingDeleted && selectedDeletedIds.length > 0 ? (
+        <DeletedFilesHeaderSelection />
+      ) : selectedItems.length > 0 && !isShowingDeleted ? (
+        <FileExplorerHeaderSelection />
+      ) : (
         <FileExplorerHeader
           itemSearchString={itemSearchString}
           setItemSearchString={setItemSearchString}
           onFilesUpload={onFilesUpload}
         />
-      ) : (
-        <FileExplorerHeaderSelection />
       )}
       <div className="flex flex-1 min-h-0">
         {isShowingDeleted ? (
