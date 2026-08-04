@@ -66,7 +66,7 @@ Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview) ja [a
 - [pg_graphql](http://github.com/supabase/pg_graphql/) on PostgreSQLi laiendus, mis avab GraphQL API
 - [Storage](https://github.com/supabase/storage-api) pakub RESTful liidest S3-s salvestatud failide haldamiseks, kasutades Postgres'i õiguste haldamiseks.
 - [postgres-meta](https://github.com/supabase/postgres-meta) on RESTful API oma Postgres'i haldamiseks, mis võimaldab tabelite hankimist, rollide lisamist ja päringute käivitamist jne.
-- [GoTrue](https://github.com/netlify/gotrue) on SWT-põhine API kasutajate haldamiseks ja SWT-tokenite väljastamiseks.
+- [GoTrue](https://github.com/supabase/gotrue) on JWT-põhine API kasutajate haldamiseks ja JWT-tokenite väljastamiseks.
 - [Kong](https://github.com/Kong/kong) on pilvepõhine API-värav.
 
 #### Klientide raamatukogud

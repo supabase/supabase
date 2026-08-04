@@ -66,7 +66,7 @@ Lahko tudi [gostujete sami](https://supabase.com/docs/guides/hosting/overview) i
 - [pg_graphql](http://github.com/supabase/pg_graphql/) je razširitev PostgreSQL, ki izpostavlja API GraphQL
 - [Storage](https://github.com/supabase/storage-api) zagotavlja vmesnik RESTful za upravljanje datotek, shranjenih v S3, z uporabo Postgresa za upravljanje dovoljenj.
 - [postgres-meta](https://github.com/supabase/postgres-meta) je vmesnik RESTful API za upravljanje vašega Postgresa, ki omogoča pridobivanje tabel, dodajanje vlog, izvajanje poizvedb itd.
-- [GoTrue](https://github.com/netlify/gotrue) je API, ki temelji na SWT, za upravljanje uporabnikov in izdajanje žetonov SWT.
+- [GoTrue](https://github.com/supabase/gotrue) je API, ki temelji na JWT, za upravljanje uporabnikov in izdajanje žetonov JWT.
 - [Kong](https://github.com/Kong/kong) je prehod API v oblaku.
 
 #### Odjemalske knjižnice
