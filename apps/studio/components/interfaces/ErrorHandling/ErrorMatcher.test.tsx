@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
-import { ConnectionTimeoutError } from '@/types/api-errors'
+import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
 import { ResponseError } from '@/types/base'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
@@ -44,6 +44,12 @@ describe('ErrorMatcher', () => {
     expect(screen.getByText('Try restarting your project')).toBeInTheDocument()
     expect(screen.getByText('Try our troubleshooting guide')).toBeInTheDocument()
     expect(screen.getByText('Debug with AI')).toBeInTheDocument()
+  })
+
+  it('offers to restart the project for unclassified API errors', () => {
+    const error = new UnknownAPIResponseError('Something went wrong')
+    render(<ErrorMatcher title="Failed to load tables" error={error} supportFormParams={{}} />)
+    expect(screen.getByText('Try restarting your project')).toBeInTheDocument()
   })
 
   it('renders fallback for plain ResponseError (not a classified subclass)', () => {

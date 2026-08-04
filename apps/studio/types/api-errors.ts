@@ -1,7 +1,7 @@
 import { ResponseError } from './base'
 import type { ErrorMetadata } from './base'
 
-export type KnownErrorType = 'connection-timeout'
+export type KnownErrorType = 'connection-timeout' | 'unknown'
 
 export class ConnectionTimeoutError extends ResponseError {
   readonly errorType = 'connection-timeout' as const
