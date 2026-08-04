@@ -159,13 +159,7 @@ function CustomerStoriesPage(props: any) {
                           },
                         }}
                       >
-                        <GlassPanel
-                          {...caseStudy}
-                          background={true}
-                          showIconBg={true}
-                          showLink={true}
-                          hasLightIcon
-                        >
+                        <GlassPanel {...caseStudy} showIconBg={true} showLink={true} hasLightIcon>
                           {caseStudy.description}
                         </GlassPanel>
                       </motion.a>

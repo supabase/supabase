@@ -26,6 +26,16 @@ export function getSnippetSource(snippet: Pick<Snippet, 'type'>): SqlSnippetSour
 }
 
 /**
+ * Parse a raw `source` value (e.g. the `?source=` query param a creation entry
+ * threads through `/sql/new`) into a `SqlSnippetSource`. Only the explicit
+ * `'logs'` opts a new snippet into the logs backend; anything else — including an
+ * absent param — is a database snippet, keeping database the safe default.
+ */
+export function parseSqlSnippetSource(raw: string | undefined): SqlSnippetSource {
+  return raw === 'logs' ? 'logs' : 'database'
+}
+
+/**
  * An ISO-8601 datetime proven valid at construction via a dayjs parse. Absolute
  * log ranges carry these instead of raw strings so an unvalidated datetime can
  * never reach execution.
@@ -133,6 +143,22 @@ export function logDateRangeToDatePickerValue(range: LogDateRange): DatePickerVa
     return { from: helper.calcFrom(), to: helper.calcTo(), isHelper: true, text: helper.text }
   }
   return { from: range.from, to: range.to, isHelper: false }
+}
+
+/**
+ * Structural equality for two log date ranges. Relative ranges match on amount +
+ * unit, NOT display text — "Last hour" and "Last 1 hour" render differently but
+ * are the same range, so comparing labels is unreliable. Absolute ranges match on
+ * their (validated) ISO endpoints.
+ */
+export function logDateRangesEqual(a: LogDateRange, b: LogDateRange): boolean {
+  if (a.kind === 'relative' && b.kind === 'relative') {
+    return a.last.amount === b.last.amount && a.last.unit === b.last.unit
+  }
+  if (a.kind === 'absolute' && b.kind === 'absolute') {
+    return a.from === b.from && a.to === b.to
+  }
+  return false
 }
 
 /**

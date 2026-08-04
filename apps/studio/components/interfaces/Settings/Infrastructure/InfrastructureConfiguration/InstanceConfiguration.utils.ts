@@ -74,10 +74,7 @@ export const generateNodes = ({
     type: 'PRIMARY',
     data: {
       id: primary.identifier,
-      region:
-        primary.cloud_provider === 'FLY'
-          ? { name: 'Singapore (sin)', key: 'SOUTHEAST_ASIA' }
-          : (primaryRegion ?? { name: primary.region }),
+      region: primaryRegion ?? { name: primary.region },
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
       computeSize: primary.size,

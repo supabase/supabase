@@ -6,12 +6,12 @@ subtitle: 'The architecture behind Supabase Auth.'
 There are four major layers to Supabase Auth:
 
 1. [Client layer.](#client-layer) This can be one of the Supabase client SDKs, or manually made HTTP requests using the HTTP client of your choice.
-1. Kong API gateway. This is shared between all Supabase products.
+1. Envoy API gateway. This is shared between all Supabase products.
 1. [Auth service](#auth-service) (formerly known as GoTrue).
 1. [Postgres database.](#postgres) This is shared between all Supabase products.
 
 <Image
-  alt="Diagram showing the architecture of Supabase. The Kong API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  alt="Diagram showing the architecture of Supabase. The Envoy API gateway sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
   src={{
     dark: '/docs/img/supabase-architecture.svg',
     light: '/docs/img/supabase-architecture--light.svg',
