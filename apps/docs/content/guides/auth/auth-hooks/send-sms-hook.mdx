@@ -336,7 +336,7 @@ begin
     insert into job_queue (job_data, priority, scheduled_at, max_retries)
     values (job_data, priority, scheduled_time, 2);
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer;
 
 grant all
   on table public.job_queue
@@ -344,7 +344,7 @@ grant all
 
 revoke all
   on table public.job_queue
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 Create a function to periodically run and dequeue all jobs
@@ -383,7 +383,7 @@ begin
         end;
     end loop;
 end;
-$$ language plpgsql;
+$$ language plpgsql security definer;
 
 grant execute
   on function public.dequeue_and_run_jobs
@@ -391,7 +391,7 @@ grant execute
 
 revoke execute
   on function public.dequeue_and_run_jobs
-  from authenticated, anon;
+  from authenticated, anon, public;
 ```
 
 Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
