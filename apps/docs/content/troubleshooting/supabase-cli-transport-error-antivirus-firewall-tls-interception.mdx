@@ -20,7 +20,7 @@ failed to list projects: HttpClientError: Transport error (GET https://api.supab
 
 The CLI's HTTP client buckets any failure that happens before it receives an HTTP response — timeouts, connection resets, certificate rejections — under one generic `TransportError` label. The message alone doesn't tell you which of these occurred, which makes this error hard to diagnose from the output alone.
 
-One confirmed cause: antivirus software or corporate SSL-inspecting proxies that intercept HTTPS traffic to scan it. These install a local root certificate and re-sign connections so they can decrypt, inspect, and re-encrypt traffic in transit — a documented feature of products like Norton (under names like "Web and Mail Shield" or "Safe Web") and corporate proxies like Zscaler or Netskope. The CLI receives the substituted certificate instead of Supabase's real one and rejects it, surfacing as the generic transport error above rather than a certificate-specific one.
+One confirmed cause: antivirus software or corporate SSL-inspecting proxies that intercept HTTPS traffic to scan it. These install a local root certificate and re-sign connections so they can decrypt, inspect, and re-encrypt traffic in transit — a documented feature of products like Norton (under names like "Web and Mail Shield" or "Safe Web") and of enterprise network security proxies. The CLI receives the substituted certificate instead of Supabase's real one and rejects it, surfacing as the generic transport error above rather than a certificate-specific one.
 
 Other HTTP clients on the same machine can behave differently, which is a useful diagnostic signal. In one confirmed case (Norton 360 on Windows), `curl` connected successfully while the CLI failed, and Node's `fetch()` surfaced a more specific `UNABLE_TO_VERIFY_LEAF_SIGNATURE` error for the same request.
 
@@ -28,7 +28,7 @@ Other HTTP clients on the same machine can behave differently, which is a useful
 
 - Compare behavior across HTTP clients on the same machine. If `curl -v https://api.supabase.com` or a browser succeeds while the CLI fails, the network path itself is fine and something local to the machine is the difference.
 - Check the certificate being served for `api.supabase.com`. In a browser, click the padlock icon next to the address bar and check the certificate's **Issuer** field. It should be a public CA (e.g. Google Trust Services). If it's your antivirus vendor or a corporate proxy CA instead, that's what's intercepting the connection.
-- If you're on a corporate network, check whether your organization uses an SSL-inspecting proxy (Zscaler, Netskope, or similar) and whether its root CA is installed and trusted on your machine.
+- If you're on a corporate network, check whether your organization uses an SSL-inspecting proxy and whether its root CA is installed and trusted on your machine.
 
 ## How to resolve
 
