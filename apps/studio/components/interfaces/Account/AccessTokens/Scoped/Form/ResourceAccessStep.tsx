@@ -1,3 +1,4 @@
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useMemo } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import {
@@ -90,6 +91,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
   const accountConfirmed = useWatch({ control, name: 'accountConfirmed' })
 
   const isAccount = resourceAccess === 'account'
+  const prefersReducedMotion = useReducedMotion()
 
   const projectsForOrg = useMemo(
     () => projects.filter((project) => organizationSlugs.includes(project.organization_slug)),
