@@ -302,10 +302,7 @@ const MapView = () => {
 
                             <DropdownMenuSeparator />
 
-                            <DropdownMenuItem
-                              className="gap-x-2"
-                              disabled={database.status !== REPLICA_STATUS.ACTIVE_HEALTHY}
-                            >
+                            <DropdownMenuItem className="gap-x-2">
                               <Link
                                 href={`/project/${ref}/database/replication/replica/${database.identifier}`}
                               >
