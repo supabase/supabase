@@ -162,7 +162,7 @@ export const UtilityActions = ({
             tooltip={{
               content: {
                 side: 'left',
-                text: isLogs ? 'Can only prettify SQL queries' : undefined,
+                text: isLogs ? 'Can only prettify database queries' : undefined,
               },
             }}
           >
@@ -239,7 +239,7 @@ export const UtilityActions = ({
               side: 'bottom',
               className: isLogs ? undefined : 'p-1 pl-2.5',
               text: isLogs ? (
-                'Can only prettify SQL queries'
+                'Can only prettify database queries'
               ) : (
                 <div className="flex items-center gap-2.5">
                   <span>Prettify SQL</span>
