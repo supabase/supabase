@@ -75,26 +75,28 @@ export const EdgeFunctionInvocationsSection = ({
           <div className="flex flex-col gap-5">
             <PageSectionMeta className="items-center!">
               <PageSectionSummary>
-                <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
-                  <ChartMetric
-                    label="Total Invocations"
-                    value={totalInvocationCount}
-                    status="default"
-                    tooltip="Total number of invocations"
-                  />
-                  <ChartMetric
-                    label="5xx Rate"
-                    value={formatRate(totalErrorCount, totalInvocationCount)}
-                    status="negative"
-                    tooltip="Share of invocations that returned a 5xx status code"
-                  />
-                  <ChartMetric
-                    label="4xx Rate"
-                    value={formatRate(totalWarningCount, totalInvocationCount)}
-                    status="warning"
-                    tooltip="Share of invocations that returned a 4xx status code"
-                  />
-                </div>
+                <Chart isLoading={isLoadingChart}>
+                  <div className="flex flex-wrap items-start gap-x-8 gap-y-4">
+                    <ChartMetric
+                      label="Total Invocations"
+                      value={totalInvocationCount}
+                      status="default"
+                      tooltip="Total number of invocations"
+                    />
+                    <ChartMetric
+                      label="5xx Rate"
+                      value={formatRate(totalErrorCount, totalInvocationCount)}
+                      status="negative"
+                      tooltip="Share of invocations that returned a 5xx status code"
+                    />
+                    <ChartMetric
+                      label="4xx Rate"
+                      value={formatRate(totalWarningCount, totalInvocationCount)}
+                      status="warning"
+                      tooltip="Share of invocations that returned a 4xx status code"
+                    />
+                  </div>
+                </Chart>
               </PageSectionSummary>
               <PageSectionAside className="flex-wrap @xl:self-center">
                 <div className="flex items-center">
