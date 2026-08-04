@@ -15,7 +15,7 @@ toc_depth: 2
 
 Postgres Changes just got more capable. We're shipping three improvements: filters that combine across multiple columns, more filter operators, and column selection so a subscription returns only the fields you ask for. All three are available now.
 
-Postgres Changes lets you subscribe to row-level inserts, updates, and deletes on a Postgres table and receive them over a WebSocket. Add the table to the `supabase_realtime` publication, subscribe with a `channel.on('postgres_changes', ...)` listener, and changes arrive as they happen.
+Postgres Changes lets you subscribe to inserts, updates, and deletes on a Postgres table and receive them over a WebSocket as they happen.
 
 ## Filter on more than one column
 
