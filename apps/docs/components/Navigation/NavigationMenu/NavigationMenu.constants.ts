@@ -3062,7 +3062,7 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
         },
         {
-          name: 'Client-side tracing',
+          name: 'Tracing with the client SDKs',
           url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
       ],
