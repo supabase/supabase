@@ -228,8 +228,9 @@ Follow these rules:
     operation: \`results_eq()\` for visibility, \`lives_ok()\` for a permitted
     write, and \`throws_ok(..., '42501', ...)\` where a \`with check\` or a missing
     grant rejects the statement. A denied \`update\` or \`delete\` raises nothing,
-    because \`using\` filters the rows out, so assert that it changed no rows
-    instead. Use \`policies_are()\` to confirm the policy set.
+    because \`using\` filters the rows out, so run it with \`lives_ok()\` and then
+    assert with \`results_eq()\` that the row is unchanged. Use \`policies_are()\`
+    to confirm the policy set.
 11. Plain pgTAP needs no extra packages. If you want helpers like
     \`tests.create_supabase_user()\`, \`tests.authenticate_as()\`, and
     \`tests.rls_enabled()\`, install \`basejump-supabase_test_helpers\` with dbdev
