@@ -21,14 +21,10 @@ export const generateNodes = ({
   primary,
   replicas,
   loadBalancers,
-  onSelectRestartReplica,
-  onSelectDropReplica,
 }: {
   primary: Database
   replicas: Database[]
   loadBalancers: LoadBalancer[]
-  onSelectRestartReplica: (database: Database) => void
-  onSelectDropReplica: (database: Database) => void
 }): Node[] => {
   const position = { x: 0, y: 0 }
   const regions = groupBy(replicas, (d) => {
@@ -107,8 +103,6 @@ export const generateNodes = ({
           inserted_at: database.inserted_at,
           computeSize: database.size,
           status: database.status,
-          onSelectRestartReplica: () => onSelectRestartReplica(database),
-          onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }
     })
