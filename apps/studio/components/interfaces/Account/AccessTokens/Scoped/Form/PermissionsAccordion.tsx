@@ -21,9 +21,7 @@ export const PermissionsAccordion = ({
   onChange,
   permissionScopeMap,
 }: PermissionsAccordionProps) => {
-  const [openCategories, setOpenCategories] = useState<string[]>([
-    PERMISSION_CATALOG_BY_CATEGORY[0]?.key,
-  ])
+  const [openCategories, setOpenCategories] = useState<string[]>([])
 
   return (
     <div className="space-y-3 px-5 sm:px-6 py-6">
