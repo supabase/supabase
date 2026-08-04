@@ -3,6 +3,15 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
 
+/**
+ * Look a header up by its case-insensitive name, since HTTP header names are
+ * case-insensitive (RFC 9110 §5.1) but a plain object lookup is not.
+ */
+function getHeader(headers: Record<string, string>, name: string) {
+  const match = Object.keys(headers).find((key) => key.toLowerCase() === name)
+  return match === undefined ? undefined : headers[match]
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
@@ -47,9 +56,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       {} as Record<string, string>
     )
 
-    // Only use custom headers and ensure Content-Type is set
+    // Only use custom headers and ensure Content-Type is set. Header names are
+    // case-insensitive (RFC 9110 §5.1), so the default is only applied when the
+    // caller has not supplied a Content-Type under any casing - spreading it
+    // unconditionally would leave both keys in the object and send them as
+    // "Content-Type: application/json, text/plain".
     const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(getHeader(sanitizedCustomHeaders, 'content-type') === undefined
+        ? { 'Content-Type': 'application/json' }
+        : {}),
       ...sanitizedCustomHeaders,
     }
 
@@ -63,7 +78,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     // Prepare the request body based on method and Content-Type
     let finalBody = undefined
     if (method !== 'GET' && method !== 'HEAD') {
-      if (requestHeaders['Content-Type'] === 'application/json') {
+      if (getHeader(requestHeaders, 'content-type') === 'application/json') {
         finalBody = typeof requestBody === 'string' ? requestBody : JSON.stringify(requestBody)
       } else {
         finalBody = requestBody
