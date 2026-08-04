@@ -177,7 +177,7 @@ fetch_snapshot() {
     _dest="$2"
     _work=$(mktemp -d "$TMP_ROOT/fetch.XXXXXX")
     if _sparse_init "$_work" \
-        && git -C "$_work" fetch --depth=1 -q origin "$_ref" 2>/dev/null \
+        && git -C "$_work" fetch --depth=1 --filter=blob:none -q origin "$_ref" 2>/dev/null \
         && git -C "$_work" checkout -q FETCH_HEAD 2>/dev/null \
         && [ -d "$_work/docker" ]; then
         mkdir -p "$_dest"
@@ -311,9 +311,8 @@ $(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' "$TARGET_DIR/.env.example" | cut -d= -f1)
 EOF
     fi
     echo ""
-    warn "This is NOT the full update. To see what would actually change (updated files,"
-    warn "conflicts, breaking-change gate), record a base version - see the guidance above -"
-    warn "then re-run. Nothing was written."
+    warn "This is NOT the full update. To see what would actually change, record a base version."
+    warn "See the guidance above and re-run the script. Nothing was written."
 }
 
 # --- breaking-change gate (manifest-driven, before any writes) ---------------
@@ -333,9 +332,9 @@ build_gate_report() {
     fi
 
     if [ -z "$BASE_VER" ] || [ -z "$TARGET_VER" ]; then
-        warn "Base or target is not a self-hosted/vX.Y.Z tag; cannot compute an exact"
-        warn "update window. Showing all applicable manual-action releases - review"
-        warn "which ones apply to your deployment."
+        warn "Base or target is not a self-hosted/vX.Y.Z tag; cannot compute an exact update window."
+        warn "Showing all applicable manual-action releases."
+        warn "Review which ones apply to your deployment."
     fi
 
     for k in $(jq -r 'keys[]' "$_manifest" 2>/dev/null); do
@@ -586,7 +585,7 @@ write_stamp() {
 print_next_steps() {
     echo ""
     log "Next steps:"
-    echo "  1. Review the changes (git diff, or compare against the backup in backups/)."
+    echo "  1. Review the changes above (compare against the latest backup in backups/ if needed)."
     echo "  2. sh run.sh pull"
     echo "  3. sh run.sh recreate"
 }
