@@ -4,6 +4,7 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react
 import { toast } from 'sonner'
 
 import type { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
+import type { SqlSnippetSource } from './querySource'
 import { DiffType, type IStandaloneDiffEditor } from './SQLEditor.types'
 import {
   assembleCompletionDiff,
@@ -13,12 +14,15 @@ import {
   createSqlSnippetSkeletonV2,
   extractDebugContext,
   planDiffRequestApplication,
+  sqlSourceToDialect,
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
+import { stripSqlCodeFences } from '@/data/logs/logs-sql-rewrite'
 import { isError } from '@/data/utils/error-check'
+import { useLogsAttributeKeys } from '@/hooks/analytics/useLogsAttributeKeys'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
@@ -37,6 +41,11 @@ type UseSqlEditorAiArgs = {
   editorMountCount: number
   diff: ReturnType<typeof useSqlEditorDiff>
   prompt: ReturnType<typeof useSqlEditorPrompt>
+  /**
+   * Where the snippet runs. Selects the dialect the AI writes in — logs snippets
+   * get ClickHouse SQL for the `logs` table, database snippets get Postgres.
+   */
+  sqlSource: SqlSnippetSource
 }
 
 /**
@@ -45,7 +54,13 @@ type UseSqlEditorAiArgs = {
  * lifecycle effects (one-shot diff-request drain, diff-editor value sync, and the
  * ask-AI widget visibility).
  */
-export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEditorAiArgs) {
+export function useSqlEditorAi({
+  id,
+  editorMountCount,
+  diff,
+  prompt,
+  sqlSource,
+}: UseSqlEditorAiArgs) {
   const {
     sourceSqlDiff,
     setSourceSqlDiff,
@@ -76,6 +91,14 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   const [isCompletionLoading, setIsCompletionLoading] = useState<boolean>(false)
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
   const [showWidget, setShowWidget] = useState(false)
+
+  const dialect = sqlSourceToDialect(sqlSource)
+  const isClickhouse = dialect === 'clickhouse'
+
+  // Grounds ClickHouse edits in the source's real log_attributes keys, the same way
+  // the whole-query rewrite does — otherwise inline edits invent dotted paths.
+  // Looked up when the user submits, not while they type.
+  const { fetchAttributeKeys } = useLogsAttributeKeys()
 
   const handleNewQuery = useCallback(
     async (sql: string, name: string) => {
@@ -196,6 +219,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               orgSlug: org?.slug,
+              dialect,
               options: options?.body,
             })
           ),
@@ -210,9 +234,16 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
         const text: string = await response.json()
 
         const meta = options?.body?.completionMetadata ?? {}
-        const { original, modified } = assembleCompletionDiff(meta, text)
+        // The clickhouse system prompt forbids fences, but strip them defensively
+        // so a chatty model can't leak backticks into the snippet.
+        const { original, modified } = assembleCompletionDiff(
+          meta,
+          isClickhouse ? stripSqlCodeFences(text) : text
+        )
 
-        const formattedModified = formatSql(modified)
+        // sql-formatter is Postgres-only — it mangles ClickHouse backticks and
+        // map lookups — so ClickHouse output goes into the diff unformatted.
+        const formattedModified = isClickhouse ? modified : formatSql(modified)
         setSourceSqlDiff({ original, modified: formattedModified })
         setSelectedDiffType(DiffType.Modification)
         setPromptState((prev) => ({ ...prev, isLoading: false }))
@@ -224,6 +255,8 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
       }
     },
     [
+      dialect,
+      isClickhouse,
       org?.slug,
       project?.connectionString,
       project?.ref,
@@ -249,10 +282,23 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
           beforeSelection: context.beforeSelection,
           afterSelection: context.afterSelection,
         }))
-        const headerData = await constructHeaders()
+        // ClickHouse only: there's no server-side schema to fetch for the logs
+        // table, so the real log_attributes keys travel with the request. Detected
+        // from the whole document, which is what the three context fields spell.
+        const [headerData, availableKeys] = await Promise.all([
+          constructHeaders(),
+          isClickhouse
+            ? fetchAttributeKeys(
+                context.beforeSelection + context.selection + context.afterSelection
+              )
+            : undefined,
+        ])
 
         const authorizationHeader = headerData.get('Authorization')
 
+        // The instruction goes over as-is for both dialects — the route assembles
+        // the schema section and the cursor context around it, so there's exactly
+        // one place that knows how a completion prompt is built.
         await complete(prompt, {
           ...(authorizationHeader
             ? { headers: { Authorization: authorizationHeader } }
@@ -264,6 +310,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
               language: 'pgsql',
               prompt,
               selection: context.selection,
+              ...(availableKeys ? { availableKeys } : {}),
             },
           },
         })
@@ -271,7 +318,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
         setPromptState((prev) => ({ ...prev, isLoading: false }))
       }
     },
-    [complete, setPromptState]
+    [complete, fetchAttributeKeys, isClickhouse, setPromptState]
   )
 
   const handleDiffEditorMount = useCallback(
