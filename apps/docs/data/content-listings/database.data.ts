@@ -86,5 +86,11 @@ export const databaseNextSteps: ContentListingGroup = {
       href: '/guides/database/postgres/roles',
       description: 'The Postgres roles Supabase ships with and how to add your own.',
     },
+    {
+      title: 'Deployment & Branching',
+      href: '/guides/deployment',
+      description:
+        'Preview environments, branching, migrations, and production readiness for your database changes.',
+    },
   ],
 }
