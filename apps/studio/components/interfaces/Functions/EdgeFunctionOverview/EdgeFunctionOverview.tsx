@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -58,6 +59,7 @@ export const EdgeFunctionOverview = () => {
     },
     {
       enabled: IS_PLATFORM,
+      placeholderData: keepPreviousData,
     }
   )
 
