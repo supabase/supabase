@@ -18,33 +18,37 @@ export const PermissionRow = ({
   permissionScopeMap,
 }: PermissionRowProps) => {
   return (
-    <div className="flex items-start justify-between gap-4 py-3">
-      <div className="min-w-0 space-y-1">
-        <Label htmlFor={`${entry.key}-permissions`} className="flex items-center gap-2">
-          <span className="text-sm text-foreground">
-            {entry.name} <span className="sr-only">permissions</span>
-          </span>
+    <div className="flex items-center justify-between gap-4 py-4">
+      <div className="min-w-0 flex flex-col gap-1">
+        <span className="flex items-start md:items-center gap-2 flex-col-reverse md:flex-row">
+          <Label htmlFor={`${entry.key}-permissions`}>
+            <span className="text-sm text-foreground">
+              {entry.name} <span className="sr-only">permissions</span>
+            </span>
+          </Label>
           <RiskMarker entry={entry} permissionScopeMap={permissionScopeMap} />
-        </Label>
-        <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-light">
+        </span>
+        <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-lighter">
           {entry.description}
         </p>
       </div>
 
-      <Select value={mode} onValueChange={(value) => onChange(value as PermissionMode)}>
-        <SelectTrigger
-          className="w-36 shrink-0"
-          id={`${entry.key}-permissions`}
-          aria-describedby={`${entry.key}-permissions-description`}
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="none">None</SelectItem>
-          <SelectItem value="read">Read</SelectItem>
-          {entry.writable && <SelectItem value="readwrite">Read-write</SelectItem>}
-        </SelectContent>
-      </Select>
+      <div className="flex shrink-0 items-center gap-2">
+        <Select value={mode} onValueChange={(value) => onChange(value as PermissionMode)}>
+          <SelectTrigger
+            className="w-36 shrink-0"
+            id={`${entry.key}-permissions`}
+            aria-describedby={`${entry.key}-permissions-description`}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">None</SelectItem>
+            <SelectItem value="read">Read</SelectItem>
+            {entry.writable && <SelectItem value="readwrite">Read-write</SelectItem>}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   )
 }

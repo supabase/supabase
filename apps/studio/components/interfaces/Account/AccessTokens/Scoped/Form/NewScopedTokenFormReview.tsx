@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import {
@@ -10,10 +10,10 @@ import {
   type OverallRisk,
   type PermissionCatalogEntry,
   type PermissionMode,
+  type RiskLevel,
 } from '../../AccessToken.permissions'
 import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
-import { RiskMarker } from './RiskMarker'
 import {
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
@@ -25,15 +25,24 @@ interface ReviewStepProps {
   permissionScopeMap: PermissionScopeMap | undefined
 }
 
-const RISK_TEXT_CLASS: Record<OverallRisk['tone'], string> = {
-  default: 'text-foreground-light',
-  low: 'text-brand-600',
-  medium: 'text-warning-600',
-  high: 'text-destructive-600',
+const RISK_TONE_VARIANT: Record<
+  OverallRisk['tone'],
+  'default' | 'success' | 'warning' | 'destructive'
+> = {
+  default: 'default',
+  low: 'success',
+  medium: 'warning',
+  high: 'destructive',
 }
 
 const modeLabel = (mode: PermissionMode) =>
   mode === 'readwrite' ? 'Read-write' : mode === 'read' ? 'Read' : 'None'
+
+const RISK_DOT_CLASS: Record<RiskLevel, string> = {
+  low: 'bg-brand-600',
+  medium: 'bg-warning-600',
+  high: 'bg-destructive-600',
+}
 
 export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
@@ -47,15 +56,21 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
   const resourceSummary = useMemo(() => {
     if (values.resourceAccess === 'project') {
       const selectedProjects = projects.filter((p) => values.projectRefs.includes(p.ref))
-      return `Projects: ${selectedProjects.length > 0 ? selectedProjects.map((p) => p.name).join(', ') : '-'}`
+      return {
+        title: 'Project',
+        items: selectedProjects.length > 0 ? selectedProjects.map((p) => p.name) : ['-'],
+      }
     }
     if (values.resourceAccess === 'organization') {
       const selectedOrganizations = organizations.filter((o) =>
         values.organizationSlugs.includes(o.slug)
       )
-      return `Organization: ${selectedOrganizations.length > 0 ? selectedOrganizations.map((o) => o.name).join(', ') : '-'}`
+      return {
+        title: 'Organization',
+        items: selectedOrganizations.length > 0 ? selectedOrganizations.map((o) => o.name) : ['-'],
+      }
     }
-    return 'Account: Account-level access'
+    return { title: 'Account', items: ['Account-level access'] }
   }, [values, projects, organizations])
 
   const expiresSummary = useMemo(() => {
@@ -107,27 +122,52 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
 
   const rows: [string, React.ReactNode][] = [
     ['Name', values.tokenName || <span className="text-foreground-lighter">Untitled token</span>],
-    ['Resource access', resourceSummary],
+    ['Expires', expiresSummary],
+    [
+      'Resource access',
+      <div key="resource-access" className="space-y-2">
+        <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
+          {resourceSummary.title}
+        </p>
+        <div className="divide-y">
+          {resourceSummary.items.map((item) => (
+            <p key={item} className="py-2 text-sm text-foreground">
+              {item}
+            </p>
+          ))}
+        </div>
+      </div>,
+    ],
     [
       'Capabilities',
       hasCapabilities ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {activeByCategory.map((category) => (
-            <div key={category.key} className="space-y-1">
+            <div key={category.key} className="space-y-2">
               <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
                 {category.name}
               </p>
-              {category.entries.map(({ entry, mode }) => (
-                <div key={entry.key} className="flex items-center gap-2 text-sm">
-                  <span className="text-foreground">{entry.name}</span>
-                  <span className="text-foreground-light">· {modeLabel(mode)}</span>
-                  <RiskMarker
-                    entry={entry}
-                    withTooltip={false}
-                    permissionScopeMap={permissionScopeMap}
-                  />
-                </div>
-              ))}
+              <div className="divide-y">
+                {category.entries.map(({ entry, mode }) => (
+                  <div
+                    key={entry.key}
+                    className="flex items-center justify-between gap-2 text-sm py-2"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          'h-1.5 w-1.5 shrink-0 rounded-full',
+                          RISK_DOT_CLASS[entry.risk]
+                        )}
+                      />
+                      <span className="text-foreground text-wrap">{entry.name}</span>
+                    </span>
+                    <span className="text-foreground-lighter text-xs font-mono uppercase font-normal text-right">
+                      {modeLabel(mode)}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -135,32 +175,50 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
         <span className="text-foreground-lighter">No capabilities selected</span>
       ),
     ],
-    ['Expires', expiresSummary],
     [
       'Risk level',
-      <span key="risk" className={cn('text-sm', RISK_TEXT_CLASS[risk.tone])}>
-        {risk.text}
+      <span key="risk" className="flex flex-wrap items-center gap-2">
+        <span className="flex">
+          <Badge variant={RISK_TONE_VARIANT[risk.tone]}>{risk.level} Risk</Badge>
+        </span>
+        <span className="text-sm text-foreground leading-px">
+          {risk.text.replace(`${risk.level} — `, '')}
+        </span>
       </span>,
     ],
   ]
 
   return (
     <div className="space-y-6 px-5 sm:px-6 py-6">
-      <dl className="divide-y rounded-md border">
-        {rows.map(([key, value]) => (
-          <div key={key} className="grid grid-cols-3 gap-4 px-4 py-3">
-            <dt className="text-sm text-foreground-light">{key}</dt>
-            <dd className="col-span-2 text-sm text-foreground">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      {hasCapabilities ? (
+        <Admonition
+          type="warning"
+          title="Token access can't be edited after creation"
+          description="Once created, a token's access can't be edited. To change it, revoke this token and create a new one."
+        />
+      ) : (
+        <Admonition
+          type="warning"
+          title="This token has no capabilities"
+          description="Go back and grant at least one permission before creating it."
+        />
+      )}
+      <div className="flex flex-col gap-3">
+        <h3 className="text-sm">Token summary</h3>
+        <dl className="divide-y rounded-md border bg-surface-300">
+          {rows.map(([key, value]) => (
+            <div key={key} className="grid grid-cols-3 gap-4 px-4 py-3">
+              <dt className="text-sm text-foreground-lighter">{key}</dt>
+              <dd className="col-span-2 text-sm text-foreground">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
 
       {hasCapabilities && (
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              Management API endpoints enabled
-            </p>
+        <>
+          <div className="flex flex-col gap-3">
+            <h3 className="text-sm">Management API endpoints enabled</h3>
             {capabilityGroups.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No Management API endpoints are enabled by the selected capabilities.
@@ -190,10 +248,8 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
             )}
           </div>
 
-          <div className="space-y-2">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              MCP tools
-            </p>
+          <div className="flex flex-col gap-3">
+            <h3 className="text-sm">MCP tools</h3>
             {mcpTools.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No MCP tools are enabled by the selected capabilities.
@@ -211,21 +267,7 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
               </div>
             )}
           </div>
-        </div>
-      )}
-
-      {hasCapabilities ? (
-        <Admonition
-          type="warning"
-          title="Token access can't be edited after creation"
-          description="Once created, a token's access can't be edited. To change it, revoke this token and create a new one."
-        />
-      ) : (
-        <Admonition
-          type="warning"
-          title="This token has no capabilities"
-          description="Go back and grant at least one permission before creating it."
-        />
+        </>
       )}
     </div>
   )

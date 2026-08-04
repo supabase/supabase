@@ -1,4 +1,4 @@
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import {
   RISK_LEVEL_LABEL,
@@ -10,16 +10,10 @@ import {
   PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
-const DOT_CLASS: Record<RiskLevel, string> = {
-  low: 'bg-brand',
-  medium: 'bg-warning-600',
-  high: 'bg-destructive-600',
-}
-
-const LABEL_CLASS: Record<RiskLevel, string> = {
-  low: 'text-brand-600',
-  medium: 'text-warning-600',
-  high: 'text-destructive-600',
+const RISK_VARIANT: Record<RiskLevel, 'success' | 'warning' | 'destructive'> = {
+  low: 'success',
+  medium: 'warning',
+  high: 'destructive',
 }
 
 interface RiskMarkerProps {
@@ -37,17 +31,12 @@ export const RiskMarker = ({
   permissionScopeMap,
 }: RiskMarkerProps) => {
   const marker = (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 text-xs',
-        withTooltip && 'cursor-help',
-        LABEL_CLASS[entry.risk],
-        className
-      )}
+    <Badge
+      variant={RISK_VARIANT[entry.risk]}
+      className={cn(withTooltip && 'cursor-help', className)}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full', DOT_CLASS[entry.risk])} />
       {RISK_LEVEL_LABEL[entry.risk]}
-    </span>
+    </Badge>
   )
 
   if (!withTooltip) return marker
@@ -62,26 +51,26 @@ export const RiskMarker = ({
       <TooltipTrigger asChild>
         <span tabIndex={0}>{marker}</span>
       </TooltipTrigger>
-      <TooltipContent side="top" align="start" className="w-72 space-y-2 p-3">
-        <div
-          className={cn('flex items-center gap-1.5 text-xs font-medium', LABEL_CLASS[entry.risk])}
-        >
-          <span className={cn('h-1.5 w-1.5 rounded-full', DOT_CLASS[entry.risk])} />
-          {RISK_LEVEL_LABEL[entry.risk]}
-        </div>
+      <TooltipContent side="top" align="center" className="w-72 space-y-2 p-3">
+        <Badge variant={RISK_VARIANT[entry.risk]}>{RISK_LEVEL_LABEL[entry.risk]}</Badge>
         <p className="text-xs text-foreground-light">{entry.riskReason}</p>
         {(entry.allowsRead.length > 0 || entry.allowsWrite.length > 0) && (
-          <div className="space-y-1">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              Allows
-            </p>
+          <div className="flex flex-col gap-5 mt-5">
             {entry.allowsRead.length > 0 && (
-              <p className="text-xs text-foreground-light">Read · {entry.allowsRead.join(', ')}</p>
+              <span className="text-xs text-foreground-light">
+                <h3 className="text-foreground-muted text-[11px] uppercase font-mono tracking-wide font-normal mb-0.5">
+                  Read:{' '}
+                </h3>
+                {entry.allowsRead.join(', ')}
+              </span>
             )}
             {entry.allowsWrite.length > 0 && (
-              <p className="text-xs text-foreground-light">
-                Write · {entry.allowsWrite.join(', ')}
-              </p>
+              <span className="text-xs text-foreground-light">
+                <h3 className="text-foreground-muted text-[11px] uppercase font-mono tracking-wide font-normal mb-0.5">
+                  Write:{' '}
+                </h3>
+                {entry.allowsWrite.join(', ')}
+              </span>
             )}
           </div>
         )}

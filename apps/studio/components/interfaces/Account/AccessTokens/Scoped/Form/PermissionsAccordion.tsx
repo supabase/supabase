@@ -1,16 +1,5 @@
-import { HelpCircle } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Badge,
-  cn,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import {
   countConfiguredInCategory,
@@ -32,20 +21,23 @@ export const PermissionsAccordion = ({
   onChange,
   permissionScopeMap,
 }: PermissionsAccordionProps) => {
-  const [openCategories, setOpenCategories] = useState<string[]>([
-    PERMISSION_CATALOG_BY_CATEGORY[0]?.key,
-  ])
+  const [openCategories, setOpenCategories] = useState<string[]>([])
 
   return (
     <div className="space-y-3 px-5 sm:px-6 py-6">
       <div>
         <h3 className="text-sm text-foreground">Permissions</h3>
-        <p className="text-xs text-foreground-light">
+        <p className="text-foreground-lighter text-sm">
           Grant the minimum access this token needs. Everything defaults to None.
         </p>
       </div>
 
-      <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
+      <Accordion
+        type="multiple"
+        value={openCategories}
+        onValueChange={setOpenCategories}
+        className="mt-2"
+      >
         {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
           const configuredCount = countConfiguredInCategory(selection, category.key)
           return (
@@ -58,30 +50,21 @@ export const PermissionsAccordion = ({
                 'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
               })}
             >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
+              <AccordionTrigger className="bg-surface-300 first:rounded-t last:rounded-b px-4 py-3 hover:no-underline transition">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono uppercase tracking-widest text-xs">
-                      {category.name}
-                    </span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span tabIndex={0} className="text-foreground-lighter">
-                          <HelpCircle size={13} />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="w-64">
-                        {category.description}
-                      </TooltipContent>
-                    </Tooltip>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium">{category.name}</span>
+                    <span className="text-xs text-foreground-lighter">{category.description}</span>
                   </div>
                   {configuredCount > 0 && (
-                    <Badge variant="success">{configuredCount} configured</Badge>
+                    <span className="text-xs text-primary font-medium">
+                      {configuredCount} configured
+                    </span>
                   )}
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="bg-surface-100 *:pb-0">
-                <div className="divide-y">
+              <AccordionContent className="*:pb-0">
+                <div className="divide-y first:border-t">
                   {category.entries.map((entry) => (
                     <div className="px-4" key={entry.key}>
                       <PermissionRow

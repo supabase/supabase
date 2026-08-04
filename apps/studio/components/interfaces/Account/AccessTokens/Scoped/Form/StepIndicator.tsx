@@ -15,12 +15,12 @@ export const StepIndicator = ({ step, total, label }: StepIndicatorProps) => (
           key={index}
           className={cn(
             'h-1.5 w-1.5 rounded-full transition-colors',
-            index < step ? 'bg-foreground' : 'bg-border-stronger'
+            index < step ? 'bg-primary' : 'bg-border-stronger'
           )}
         />
       ))}
     </div>
-    <span>
+    <span className="text-foreground-lighter">
       <span className="text-foreground">
         Step {step} of {total}
       </span>{' '}

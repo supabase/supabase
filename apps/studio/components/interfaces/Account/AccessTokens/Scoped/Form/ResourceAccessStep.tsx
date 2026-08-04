@@ -1,3 +1,4 @@
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useMemo } from 'react'
 import type { Control, UseFormSetValue } from 'react-hook-form'
 import {
@@ -90,6 +91,7 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
   const accountConfirmed = useWatch({ control, name: 'accountConfirmed' })
 
   const isAccount = resourceAccess === 'account'
+  const prefersReducedMotion = useReducedMotion()
 
   const projectsForOrg = useMemo(
     () => projects.filter((project) => organizationSlugs.includes(project.organization_slug)),
@@ -107,51 +109,27 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
     setValue('accountConfirmed', false)
   }
 
+  const exitTransition = prefersReducedMotion
+    ? { opacity: 0 }
+    : { opacity: 0, scale: 0.97, filter: 'blur(4px)' }
+  const enterTransition = prefersReducedMotion ? false : { opacity: 0, y: 16 }
+  const formBackdropAnimate = isAccount
+    ? {
+        opacity: 0.5,
+        scale: prefersReducedMotion ? 1 : 0.98,
+        filter: prefersReducedMotion ? 'none' : 'blur(4px)',
+      }
+    : { opacity: 1, scale: 1, filter: 'none' }
+
   return (
-    <section className="space-y-4 px-5 sm:px-6 py-6">
-      {isAccount ? (
-        <>
-          <h3 className="text-sm text-foreground">Resource access</h3>
-          <Admonition
-            type="warning"
-            title="Account-level access is broad."
-            description={
-              <div className="space-y-3">
-                <p>
-                  This token can reach every organization and project you have access to. Prefer a
-                  single project or organization unless you specifically need account-wide access.
-                </p>
-                <div className="flex items-start gap-2">
-                  <FormField
-                    control={control}
-                    name="accountConfirmed"
-                    render={({ field }) => (
-                      <>
-                        <Checkbox
-                          id="accountConfirmed"
-                          checked={accountConfirmed ?? false}
-                          onCheckedChange={(checked) => field.onChange(checked)}
-                        />
-                        <Label htmlFor="accountConfirmed" className="text-xs text-foreground-light">
-                          I understand this token is not limited to one project or organization.
-                        </Label>
-                      </>
-                    )}
-                  />
-                </div>
-                <button
-                  type="button"
-                  className="text-xs text-foreground-light underline hover:text-foreground transition-colors"
-                  onClick={switchBackToSingleProject}
-                  tabIndex={0}
-                >
-                  Switch back
-                </button>
-              </div>
-            }
-          />
-        </>
-      ) : (
+    <section className="relative space-y-4 px-5 sm:px-6 py-6">
+      <motion.div
+        className={cn('space-y-4', isAccount && 'pointer-events-none')}
+        animate={formBackdropAnimate}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
+        aria-hidden={isAccount}
+        inert={isAccount}
+      >
         <FormField
           control={control}
           name="resourceAccess"
@@ -160,43 +138,36 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
               layout="flex-row-reverse"
               label="Resource access"
               description={
-                !isAccount ? (
-                  <p className="text-xs text-foreground-lighter">
-                    Need access to every organization and project?{' '}
-                    <button
-                      type="button"
-                      className="text-foreground-light underline hover:text-foreground transition-colors"
-                      onClick={enableAccountLevel}
-                      tabIndex={0}
-                    >
-                      Advanced options
-                    </button>
-                  </p>
-                ) : null
+                <p className="text-foreground-lighter text-sm">
+                  Need access to every organization and project?{' '}
+                  <button
+                    type="button"
+                    className="text-foreground-light underline hover:text-foreground transition-colors"
+                    onClick={enableAccountLevel}
+                    tabIndex={isAccount ? -1 : 0}
+                  >
+                    Advanced options
+                  </button>
+                </p>
               }
               id="resourceAccess"
             >
               <FormControl>
                 <RadioGroupStacked
-                  className={cn({
-                    'pointer-events-none': isAccount,
-                  })}
-                  value={isAccount ? undefined : resourceAccess}
+                  value={resourceAccess}
                   onValueChange={(value) => {
                     field.onChange(value)
                     // Reset dependent selections when switching modes.
                     setValue('projectRefs', [])
                     if (value !== 'account') setValue('accountConfirmed', false)
                   }}
-                  disabled={isAccount}
                 >
                   {CARD_OPTIONS.map((option) => (
                     <RadioGroupStackedItem
                       key={option.value}
                       id={option.value}
                       value={option.value}
-                      className={cn('w-full', isAccount && 'opacity-50')}
-                      disabled={isAccount}
+                      className="w-full"
                       label={
                         <div className="flex flex-col gap-1">
                           <div className="flex flex-wrap items-center gap-2">
@@ -213,80 +184,117 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
             </FormItemLayout>
           )}
         />
-      )}
 
-      {!isAccount && resourceAccess === 'project' ? (
-        <>
+        {resourceAccess === 'project' && (
+          <>
+            <FormField
+              control={control}
+              name="organizationSlugs"
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="flex-row-reverse"
+                  label={<span className="sr-only">Organization</span>}
+                  id="organizationSlugs"
+                >
+                  <FormControl>
+                    <Select
+                      value={field.value.length > 0 ? field.value[0] : ''}
+                      onValueChange={(value) => {
+                        field.onChange([value])
+                        setValue('projectRefs', [])
+                      }}
+                    >
+                      <SelectTrigger id="organizationSlugs" ref={field.ref}>
+                        <SelectValue placeholder="Select an organization" asChild>
+                          <span>{organizationsBySlug[field.value[0]]?.name}</span>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {organizations.map((org) => (
+                          <SelectItem key={org.slug} value={org.slug}>
+                            {org.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItemLayout>
+              )}
+            />
+            <FormField
+              control={control}
+              name="projectRefs"
+              render={({ field }) => (
+                <FormItemLayout
+                  layout="flex-row-reverse"
+                  label={<span className="sr-only">Projects</span>}
+                  id="projectRefs"
+                >
+                  <MultiSelector
+                    onValuesChange={field.onChange}
+                    values={field.value}
+                    disabled={!organizationSlugs}
+                    className="w-full"
+                  >
+                    <MultiSelectorTrigger
+                      id="projectRefs"
+                      mode="combobox"
+                      label={
+                        organizationSlugs.length > 0
+                          ? 'Select projects'
+                          : 'Select an organization first'
+                      }
+                      badgeLimit="wrap"
+                      showIcon={true}
+                      deletableBadge
+                      ref={field.ref}
+                      renderValue={(value) => projectsByRef[value]?.name}
+                      className="min-w-auto"
+                    />
+                    <MultiSelectorContent>
+                      <MultiSelectorInput placeholder="Search organizations" showResetIcon />
+                      <MultiSelectorList>
+                        {projectsForOrg.map((project) => (
+                          <MultiSelectorItem key={project.ref} value={project.ref}>
+                            {project.name}
+                          </MultiSelectorItem>
+                        ))}
+                      </MultiSelectorList>
+                    </MultiSelectorContent>
+                  </MultiSelector>
+                </FormItemLayout>
+              )}
+            />
+          </>
+        )}
+        {resourceAccess === 'organization' && (
           <FormField
             control={control}
             name="organizationSlugs"
             render={({ field }) => (
               <FormItemLayout
                 layout="flex-row-reverse"
-                label={<span className="sr-only">Organization</span>}
+                label={<span className="sr-only">Organizations</span>}
                 id="organizationSlugs"
               >
-                <FormControl>
-                  <Select
-                    value={field.value.length > 0 ? field.value[0] : ''}
-                    onValueChange={(value) => {
-                      field.onChange([value])
-                      setValue('projectRefs', [])
-                    }}
-                  >
-                    <SelectTrigger id="organizationSlugs" ref={field.ref}>
-                      <SelectValue placeholder="Select an organization" asChild>
-                        <span>{organizationsBySlug[field.value[0]]?.name}</span>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {organizations.map((org) => (
-                        <SelectItem key={org.slug} value={org.slug}>
-                          {org.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              </FormItemLayout>
-            )}
-          />
-          <FormField
-            control={control}
-            name="projectRefs"
-            render={({ field }) => (
-              <FormItemLayout
-                layout="flex-row-reverse"
-                label={<span className="sr-only">Projects</span>}
-                id="projectRefs"
-              >
-                <MultiSelector
-                  onValuesChange={field.onChange}
-                  values={field.value}
-                  disabled={!organizationSlugs}
-                  className="w-full"
-                >
+                <MultiSelector onValuesChange={field.onChange} values={field.value}>
                   <MultiSelectorTrigger
-                    id="projectRefs"
+                    id="organizationSlugs"
                     mode="combobox"
-                    label={
-                      organizationSlugs.length > 0
-                        ? 'Select projects'
-                        : 'Select an organization first'
-                    }
+                    label="Select organizations"
                     badgeLimit="wrap"
                     showIcon={false}
                     deletableBadge
+                    className="w-full"
                     ref={field.ref}
-                    renderValue={(value) => projectsByRef[value]?.name}
-                    className="min-w-auto"
+                    renderValue={(value) => organizationsBySlug[value]?.name}
                   />
                   <MultiSelectorContent>
                     <MultiSelectorInput placeholder="Search organizations" showResetIcon />
                     <MultiSelectorList>
-                      {projectsForOrg.map((project) => (
-                        <MultiSelectorItem key={project.ref} value={project.ref}>
-                          {project.name}
+                      {organizations.map((organization) => (
+                        <MultiSelectorItem key={organization.slug} value={organization.slug}>
+                          {organization.name}
                         </MultiSelectorItem>
                       ))}
                     </MultiSelectorList>
@@ -295,45 +303,63 @@ export const ResourceAccessStep = ({ control, setValue, error }: ResourceAccessS
               </FormItemLayout>
             )}
           />
-        </>
-      ) : null}
-      {!isAccount && resourceAccess === 'organization' ? (
-        <FormField
-          control={control}
-          name="organizationSlugs"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="flex-row-reverse"
-              label={<span className="sr-only">Organizations</span>}
-              id="organizationSlugs"
-            >
-              <MultiSelector onValuesChange={field.onChange} values={field.value}>
-                <MultiSelectorTrigger
-                  id="organizationSlugs"
-                  mode="combobox"
-                  label="Select organizations"
-                  badgeLimit="wrap"
-                  showIcon={false}
-                  deletableBadge
-                  className="w-full"
-                  ref={field.ref}
-                  renderValue={(value) => organizationsBySlug[value]?.name}
-                />
-                <MultiSelectorContent>
-                  <MultiSelectorInput placeholder="Search organizations" showResetIcon />
-                  <MultiSelectorList>
-                    {organizations.map((organization) => (
-                      <MultiSelectorItem key={organization.slug} value={organization.slug}>
-                        {organization.name}
-                      </MultiSelectorItem>
-                    ))}
-                  </MultiSelectorList>
-                </MultiSelectorContent>
-              </MultiSelector>
-            </FormItemLayout>
-          )}
-        />
-      ) : null}
+        )}
+      </motion.div>
+
+      <AnimatePresence>
+        {isAccount && (
+          <motion.div
+            key="account"
+            className="absolute inset-x-5 bottom-6 space-y-4 sm:inset-x-6"
+            initial={enterTransition}
+            animate={{ opacity: 1, y: 0 }}
+            exit={exitTransition}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <Admonition
+              type="warning"
+              title="Account-level access is broad."
+              description={
+                <div className="space-y-3">
+                  <p>
+                    This token can reach every organization and project you have access to. Prefer a
+                    single project or organization unless you specifically need account-wide access.
+                  </p>
+                  <div className="flex items-start gap-2">
+                    <FormField
+                      control={control}
+                      name="accountConfirmed"
+                      render={({ field }) => (
+                        <>
+                          <Checkbox
+                            id="accountConfirmed"
+                            checked={accountConfirmed ?? false}
+                            onCheckedChange={(checked) => field.onChange(checked)}
+                          />
+                          <Label
+                            htmlFor="accountConfirmed"
+                            className="text-xs text-foreground-light"
+                          >
+                            I understand this token is not limited to one project or organization.
+                          </Label>
+                        </>
+                      )}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="text-xs text-foreground-light underline hover:text-foreground transition-colors"
+                    onClick={switchBackToSingleProject}
+                    tabIndex={0}
+                  >
+                    Switch back
+                  </button>
+                </div>
+              }
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {error && <p className="text-xs text-destructive">{error}</p>}
     </section>
