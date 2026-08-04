@@ -60,81 +60,83 @@ export const DeletedFilePreviewPane = () => {
     <>
       <div
         key={file.id}
-        className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
+        className="flex h-full flex-col border-l border-overlay bg-surface-100"
         style={{ width }}
       >
-        <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-          <X
-            className="cursor-pointer"
-            size={14}
-            onClick={() => setSelectedDeletedFile(undefined)}
-          />
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
+            <X
+              className="cursor-pointer"
+              size={14}
+              onClick={() => setSelectedDeletedFile(undefined)}
+            />
+          </div>
+
+          <DeletedFilePreview file={file} />
+
+          <div className="w-full space-y-3 mt-4">
+            <div className="space-y-1">
+              <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
+              <p className="text-sm text-foreground-light">{formatBytes(file.size)}</p>
+            </div>
+
+            <DeletedFileDetail label="Original location" value={file.originalPath} />
+            <DeletedFileDetail
+              label="Deleted at"
+              value={dayjs(file.deletedAt).format('MMM D, YYYY HH:mm')}
+            />
+            <DeletedFileDetail label="Deleted by" value={file.deletedBy} />
+            <DeletedFileDetail label="Size" value={formatBytes(file.size)} />
+            <DeletedFileDetail
+              label="Expires"
+              value={file.expiresAt ? dayjs(file.expiresAt).format('MMM D, YYYY') : 'Never'}
+            />
+
+            {file.heldBySnapshot && (
+              <p className="text-xs text-foreground-lighter">
+                Held by a snapshot — this file cannot be permanently deleted until the snapshot is
+                removed.
+              </p>
+            )}
+          </div>
         </div>
 
-        <DeletedFilePreview file={file} />
-
-        <div className="w-full space-y-6 mt-4">
-          <div className="space-y-1">
-            <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
-            <p className="text-sm text-foreground-light">{formatBytes(file.size)}</p>
-          </div>
-
-          <DeletedFileDetail label="Original location" value={file.originalPath} />
-          <DeletedFileDetail
-            label="Deleted at"
-            value={dayjs(file.deletedAt).format('MMM D, YYYY HH:mm')}
-          />
-          <DeletedFileDetail label="Deleted by" value={file.deletedBy} />
-          <DeletedFileDetail label="Size" value={formatBytes(file.size)} />
-          <DeletedFileDetail
-            label="Expires"
-            value={file.expiresAt ? dayjs(file.expiresAt).format('MMM D, YYYY') : 'Never'}
-          />
-
-          {file.heldBySnapshot && (
-            <p className="text-xs text-foreground-lighter">
-              Held by a snapshot — this file cannot be permanently deleted until the snapshot is
-              removed.
-            </p>
-          )}
-
-          <div className="flex gap-2 pt-2 border-t border-overlay">
-            <ButtonTooltip
-              variant="default"
-              icon={<RotateCcw size={14} />}
-              loading={isRestoring}
-              disabled={!canUpdateFiles}
-              onClick={handleRestore}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canUpdateFiles
-                    ? 'You need additional permissions to restore files'
+        <div className="flex gap-2 border-t border-overlay p-4">
+          <ButtonTooltip
+            variant="default"
+            icon={<RotateCcw size={14} />}
+            loading={isRestoring}
+            disabled={!canUpdateFiles}
+            onClick={handleRestore}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to restore files'
+                  : undefined,
+              },
+            }}
+          >
+            Restore
+          </ButtonTooltip>
+          <ButtonTooltip
+            variant="default"
+            icon={<Trash2 size={14} />}
+            disabled={!canUpdateFiles || file.heldBySnapshot}
+            onClick={() => setShowDeleteConfirm(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to delete files'
+                  : file.heldBySnapshot
+                    ? 'Held by a snapshot — delete the snapshot first'
                     : undefined,
-                },
-              }}
-            >
-              Restore
-            </ButtonTooltip>
-            <ButtonTooltip
-              variant="default"
-              icon={<Trash2 size={14} />}
-              disabled={!canUpdateFiles || file.heldBySnapshot}
-              onClick={() => setShowDeleteConfirm(true)}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canUpdateFiles
-                    ? 'You need additional permissions to delete files'
-                    : file.heldBySnapshot
-                      ? 'Held by a snapshot — delete the snapshot first'
-                      : undefined,
-                },
-              }}
-            >
-              Delete permanently
-            </ButtonTooltip>
-          </div>
+              },
+            }}
+          >
+            Delete permanently
+          </ButtonTooltip>
         </div>
       </div>
 
