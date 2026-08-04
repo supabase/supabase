@@ -71,7 +71,7 @@ export function RecentItems() {
                     className="flex items-center gap-4 rounded-lg bg-surface-100 py-2 transition-colors hover:bg-surface-200"
                   >
                     <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-surface-100 border">
-                      <EntityTypeIcon type={item.type} />
+                      <EntityTypeIcon type={item.type} sqlSource={item.metadata?.sqlSource} />
                     </div>
                     <div className="flex flex-1 gap-5 items-center">
                       <span className="text-sm text-foreground">
