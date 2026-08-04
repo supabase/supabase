@@ -22,6 +22,7 @@ import {
 } from 'ui-patterns/DatePicker'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { getMaxCustomExpiryDate } from '../../AccessToken.utils'
 import {
   EXPIRY_OPTIONS,
   getDefaultCustomExpiryDate,
@@ -35,6 +36,7 @@ interface TokenDetailsProps {
 
 export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
   const customExpiryDate = useWatch({ control, name: 'customExpiryDate' })
+  const maxExpiryDate = getMaxCustomExpiryDate().toDate()
 
   const handleExpiryChange = (value: string) => {
     setValue('expiresAt', value as TokenFormValues['expiresAt'], { shouldValidate: true })
@@ -115,7 +117,12 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
                                 )
                               }
                               initialFocus
-                              disabled={{ before: dayjs().startOf('day').toDate() }}
+                              startMonth={dayjs().startOf('month').toDate()}
+                              endMonth={maxExpiryDate}
+                              disabled={{
+                                before: dayjs().startOf('day').toDate(),
+                                after: maxExpiryDate,
+                              }}
                             />
                           </DatePickerContent>
                         </DatePicker>

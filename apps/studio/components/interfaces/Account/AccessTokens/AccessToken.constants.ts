@@ -7,6 +7,16 @@ export type ScopedAccessTokenPermission =
 export const NON_EXPIRING_TOKEN_VALUE = 'never'
 export const CUSTOM_EXPIRY_VALUE = 'custom'
 
+/** Warning shown on both entry points that create a classic (account-wide) token. */
+export const CLASSIC_TOKEN_WARNING = {
+  title: 'Access tokens can be used to control your whole account',
+  description: 'Be careful when sharing your tokens',
+} as const
+
+/** Shown wherever scoped-token MCP support is mentioned; remove once MCP support ships. */
+export const MCP_UNSUPPORTED_TITLE = "This token doesn't work with the Supabase MCP server yet"
+export const MCP_UNSUPPORTED_DESCRIPTION = 'Support for scoped tokens is coming soon.'
+
 export const EXPIRES_AT_OPTIONS = {
   hour: { value: 'hour', label: '1 hour' },
   day: { value: 'day', label: '1 day' },

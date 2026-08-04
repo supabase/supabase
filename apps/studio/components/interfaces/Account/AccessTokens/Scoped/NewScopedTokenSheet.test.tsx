@@ -13,6 +13,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
 type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
+type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
 
 const user = userEvent.setup({
   writeToClipboard: true,
@@ -101,15 +102,37 @@ const mockCreateToken = () =>
       }),
   })
 
+const mockCreateClassicToken = () =>
+  addAPIMock({
+    method: 'post',
+    path: '/platform/profile/access-tokens',
+    response: () =>
+      HttpResponse.json<CreateClassicTokenResponse>({
+        created_at: '',
+        expires_at: null,
+        id: 1,
+        last_used_at: null,
+        name: 'test',
+        token: 'a_classic_token_value',
+        token_alias: '',
+      }),
+  })
+
 describe('NewScopedTokenSheet', () => {
+  const renderSheet = () =>
+    customRender(<NewScopedTokenSheet onCreateExperimentalToken={() => {}} />, {
+      profileContext: PROFILE_CONTEXT,
+    })
+
   beforeEach(() => {
     mockPermissionsMap()
     mockOrganizations()
     mockProjects()
     mockCreateToken()
+    mockCreateClassicToken()
   })
   test('requires a token name', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
@@ -117,7 +140,7 @@ describe('NewScopedTokenSheet', () => {
   })
   // Project scope tests
   test('requires an organization when scope is Project', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
@@ -125,7 +148,7 @@ describe('NewScopedTokenSheet', () => {
     expect(await screen.findByText('Please select an organization to continue.'))
   })
   test('requires a project when scope is Project', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
@@ -135,7 +158,7 @@ describe('NewScopedTokenSheet', () => {
     expect(await screen.findByText('Please select a project to continue.'))
   })
   test('requires permissions when scope is Project', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
@@ -147,7 +170,7 @@ describe('NewScopedTokenSheet', () => {
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
   })
   test('creates the token when scope is Project', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
@@ -174,7 +197,7 @@ describe('NewScopedTokenSheet', () => {
 
   // Organization scope tests
   test('requires an organization when scope is Organization', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
@@ -183,7 +206,7 @@ describe('NewScopedTokenSheet', () => {
     expect(await screen.findByText('Please select an organization to continue.'))
   })
   test('requires permissions when scope is Organization', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
@@ -194,7 +217,7 @@ describe('NewScopedTokenSheet', () => {
     expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
   })
   test('creates the token when scope is Organization', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
@@ -218,42 +241,44 @@ describe('NewScopedTokenSheet', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
   })
 
-  // Account scope tests
-  test('requires permissions when scope is Account', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
-    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
-    await screen.findByRole('dialog')
-    await user.type(await screen.findByLabelText('Name'), 'test')
-    await user.click(await screen.findByText('Advanced options'))
+  test('opens the experimental API dialog from the dropdown', async () => {
+    renderSheet()
+    await user.click(await screen.findByRole('button', { name: 'Choose token scope' }))
     await user.click(
-      await screen.findByText(
-        'I understand this token is not limited to one project or organization.'
-      )
+      await screen.findByRole('menuitem', { name: 'Generate token for experimental API' })
     )
-    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
-    expect(await screen.findByText('No permissions selected', { selector: '[role="alert"] *' }))
+    // The experimental API dialog is open
+    await screen.findByText(
+      'The experimental API provides additional endpoints which allows you to manage your organizations and projects.'
+    )
   })
-  test('creates the token when scope is Account', async () => {
-    customRender(<NewScopedTokenSheet />, { profileContext: PROFILE_CONTEXT })
+
+  // Classic (account-wide) token tests
+  test('switches to the classic token form via the legacy link', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.click(await screen.findByText('Create legacy token'))
+    // The classic warning replaces resource access and permissions
+    await screen.findByText('Access tokens can be used to control your whole account')
+    expect(screen.queryByRole('button', { name: 'Review access' })).toBeNull()
+    await screen.findByRole('button', { name: 'Generate token' })
+    // Switching back restores the scoped form
+    await user.click(await screen.findByText('Switch back'))
+    await screen.findByRole('button', { name: 'Review access' })
+    expect(screen.queryByText('Access tokens can be used to control your whole account')).toBeNull()
+  })
+  test('creates a classic token via the legacy link', async () => {
+    renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
     await user.type(await screen.findByLabelText('Name'), 'test')
-    await user.click(await screen.findByText('Advanced options'))
-    await user.click(
-      await screen.findByText(
-        'I understand this token is not limited to one project or organization.'
-      )
-    )
-    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
-    fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
-    // Review screen
-    await screen.findByText('Elevated — account-wide read-only access')
-    fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
-    // If we can click this checkbox, the token was created
+    await user.click(await screen.findByText('Create legacy token'))
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate token' }))
+    // If we can click this button, the token was created
     fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
     await waitFor(async () =>
-      expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
+      expect(await window.navigator.clipboard.readText()).toEqual('a_classic_token_value')
     )
     fireEvent.click(await screen.findByLabelText('I have copied the key and stored it securely'))
     fireEvent.click(await screen.findByRole('button', { name: 'Done' }))

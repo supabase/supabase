@@ -4,7 +4,6 @@ import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { DOCS_URL } from '@/lib/constants'
 
 export const MigrationAdmonition = () => {
   const [isDismissed, setIsDismissed] = useLocalStorageQuery(
@@ -21,9 +20,12 @@ export const MigrationAdmonition = () => {
       className="relative mb-5"
       actions={
         <>
-          {/* Awaiting correct documentation link */}
           <Button asChild variant="default" size="tiny">
-            <Link href={`${DOCS_URL}/guides/api`} target="_blank" rel="noreferrer">
+            <Link
+              href="https://github.com/orgs/supabase/discussions/48717"
+              target="_blank"
+              rel="noreferrer"
+            >
               Learn more
             </Link>
           </Button>

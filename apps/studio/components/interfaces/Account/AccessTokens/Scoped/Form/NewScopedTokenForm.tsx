@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Button, Form, ScrollArea, Separator, SheetClose, SheetFooter } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
 import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
 import { DEFAULT_EXPIRY, TokenFormSchema, TokenFormValues } from './NewScopedTokenForm.utils'
 import { NewScopedTokenFormReview } from './NewScopedTokenFormReview'
@@ -13,6 +14,7 @@ import { PermissionsAccordion } from './PermissionsAccordion'
 import { ResourceAccessStep } from './ResourceAccessStep'
 import { StepIndicator } from './StepIndicator'
 import { TokenDetails } from './TokenDetails'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 const FORM_ID = 'scoped-token-form'
@@ -24,7 +26,6 @@ const DEFAULT_VALUES: TokenFormValues = {
   resourceAccess: 'project',
   organizationSlugs: [],
   projectRefs: [],
-  accountConfirmed: false,
   permissions: {},
 }
 
@@ -39,12 +40,6 @@ export const NewScopedTokenForm = ({
 }) => {
   const form = useForm<TokenFormValues>({
     resolver: zodResolver(TokenFormSchema),
-    validate: ({ formValues }) => {
-      if (formValues.resourceAccess === 'account') {
-        if (!formValues.accountConfirmed) return 'Confirm account-level access to continue.'
-      }
-      return true
-    },
     defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })
@@ -52,6 +47,7 @@ export const NewScopedTokenForm = ({
   const [formValues, setFormValues] = useState<TokenFormValues>(DEFAULT_VALUES)
   const [showMissingPermissionsWarning, setShowMissingPermissionsWarning] = useState(false)
   const resourceSectionRef = useRef<HTMLDivElement>(null)
+  const resourceAccess = useWatch({ control: form.control, name: 'resourceAccess' })
   const selection = useWatch({ control: form.control, name: 'permissions' })
   const configuredCount = useWatch({
     control: form.control,
@@ -68,7 +64,21 @@ export const NewScopedTokenForm = ({
     }
   }, [onCancel, isError])
 
+  // 'account' switches to the classic token flow: name + expiry only, no permissions or review.
+  const isClassicMode = resourceAccess === 'account'
+
+  // Single owner of the mode switch, so every entry point resets the same dependent fields.
+  const handleSelectLegacyMode = () => {
+    form.setValue('resourceAccess', 'account', { shouldValidate: true })
+    form.setValue('organizationSlugs', [])
+    form.setValue('projectRefs', [])
+  }
+
   const handleReviewAccess = async (values: TokenFormValues) => {
+    if (values.resourceAccess === 'account') {
+      onCreateToken(values)
+      return
+    }
     if (configuredCount === 0) {
       setShowMissingPermissionsWarning(true)
       return
@@ -88,37 +98,80 @@ export const NewScopedTokenForm = ({
         {step === 'form' ? (
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(handleReviewAccess)}>
-              <TokenDetails control={form.control} setValue={form.setValue} />
-              <Separator />
-              <div ref={resourceSectionRef}>
-                <ResourceAccessStep control={form.control} setValue={form.setValue} />
-              </div>
-              <Separator />
-              <PermissionsAccordion
-                selection={selection}
-                onChange={handlePermissionChange}
-                permissionScopeMap={permissionScopeMap}
-              />
-              {showMissingPermissionsWarning && (
-                <div className="space-y-3 px-5 sm:px-6 pb-6">
+              {isClassicMode && (
+                <div className="px-5 sm:px-6 pt-6">
                   <Admonition
-                    ref={(node) => {
-                      node?.scrollIntoView()
-                    }}
                     type="warning"
-                    title="No permissions selected"
-                    description="This token won't be able to do anything until you grant at least one permission."
+                    className="mb-0"
+                    title={CLASSIC_TOKEN_WARNING.title}
+                    description={CLASSIC_TOKEN_WARNING.description}
                   />
                 </div>
+              )}
+              <TokenDetails control={form.control} setValue={form.setValue} />
+              {isClassicMode ? (
+                <p className="px-5 sm:px-6 pb-6 text-foreground-lighter text-sm">
+                  Only need access to specific projects or organizations?{' '}
+                  <button
+                    type="button"
+                    className={InlineLinkClassName}
+                    onClick={() =>
+                      form.setValue('resourceAccess', 'project', { shouldValidate: true })
+                    }
+                    tabIndex={0}
+                  >
+                    Switch back
+                  </button>
+                </p>
+              ) : (
+                <>
+                  <Separator />
+                  <div ref={resourceSectionRef}>
+                    <ResourceAccessStep
+                      control={form.control}
+                      setValue={form.setValue}
+                      onSelectLegacyToken={handleSelectLegacyMode}
+                    />
+                  </div>
+                  <Separator />
+                  <PermissionsAccordion
+                    selection={selection}
+                    onChange={handlePermissionChange}
+                    permissionScopeMap={permissionScopeMap}
+                  />
+                  {showMissingPermissionsWarning && (
+                    <div className="space-y-3 px-5 sm:px-6 pb-6">
+                      <Admonition
+                        ref={(node) => {
+                          node?.scrollIntoView()
+                        }}
+                        type="warning"
+                        title="No permissions selected"
+                        description="This token won't be able to do anything until you grant at least one permission."
+                      />
+                    </div>
+                  )}
+                </>
               )}
             </form>
           </Form>
         ) : (
-          <NewScopedTokenFormReview values={formValues} permissionScopeMap={permissionScopeMap} />
+          <NewScopedTokenFormReview
+            values={formValues}
+            permissionScopeMap={permissionScopeMap}
+            onSelectLegacyToken={() => {
+              handleSelectLegacyMode()
+              setStep('form')
+            }}
+          />
         )}
       </ScrollArea>
       <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4 px-5 sm:px-6">
-        <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
+        {isClassicMode ? (
+          <span />
+        ) : (
+          <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
+        )}
         <div className="flex gap-2">
           {step === 'review' && (
             <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
@@ -128,11 +181,17 @@ export const NewScopedTokenForm = ({
           <SheetClose asChild disabled={isPending}>
             <Button variant="default">Cancel</Button>
           </SheetClose>
-          {step === 'form' ? (
+          {step === 'form' && isClassicMode && (
+            <Button type="submit" form={FORM_ID} loading={isPending}>
+              Generate token
+            </Button>
+          )}
+          {step === 'form' && !isClassicMode && (
             <Button type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
               Review access
             </Button>
-          ) : (
+          )}
+          {step === 'review' && (
             <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
               Create token
             </Button>

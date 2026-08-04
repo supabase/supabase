@@ -8,6 +8,9 @@ import {
   BaseToken,
 } from './AccessToken.types'
 
+/** Custom expiry dates are capped at one year from today, for classic and scoped tokens alike. */
+export const getMaxCustomExpiryDate = (): dayjs.Dayjs => dayjs().add(1, 'year').endOf('day')
+
 export const handleSortChange = (
   currentSort: AccessTokenSort,
   column: AccessTokenSortColumn,

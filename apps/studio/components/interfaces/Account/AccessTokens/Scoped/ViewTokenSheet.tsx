@@ -1,8 +1,10 @@
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
 import { Badge, cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { MCP_UNSUPPORTED_DESCRIPTION, MCP_UNSUPPORTED_TITLE } from '../AccessToken.constants'
 import {
   computeOverallRisk,
   PERMISSION_CATALOG_BY_CATEGORY,
@@ -322,6 +324,11 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
                     <div className="flex flex-col gap-3">
                       <h3 className="text-sm">MCP tools</h3>
+                      <Admonition
+                        type="warning"
+                        title={MCP_UNSUPPORTED_TITLE}
+                        description={MCP_UNSUPPORTED_DESCRIPTION}
+                      />
                       {mcpTools.length === 0 ? (
                         <p className="text-xs text-foreground-light">
                           No MCP tools are enabled by the selected capabilities.

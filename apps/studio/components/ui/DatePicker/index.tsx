@@ -82,6 +82,9 @@ export function DatePicker({
 
   const disabledDays = useMemo(() => calculateDisabledDays(minDate, maxDate), [minDate, maxDate])
 
+  const startMonth = minDate ? dayjs(minDate).startOf('month').toDate() : undefined
+  const endMonth = maxDate ? dayjs(maxDate).endOf('month').toDate() : undefined
+
   const clampDateToRange = useCallback(
     (date: Date | null) => {
       if (!date) return date
@@ -286,6 +289,8 @@ export function DatePicker({
             {selectsRange ? (
               <CalendarPicker
                 mode="range"
+                startMonth={startMonth}
+                endMonth={endMonth}
                 disabled={disabledDays}
                 selected={{ from: startDate ?? undefined, to: endDate ?? undefined }}
                 onSelect={(range) => {
@@ -295,6 +300,8 @@ export function DatePicker({
             ) : (
               <CalendarPicker
                 mode="single"
+                startMonth={startMonth}
+                endMonth={endMonth}
                 disabled={disabledDays}
                 selected={endDate ?? undefined}
                 onSelect={(date) => {

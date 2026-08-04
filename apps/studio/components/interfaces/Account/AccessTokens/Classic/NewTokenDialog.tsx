@@ -29,11 +29,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import {
+  CLASSIC_TOKEN_WARNING,
   CUSTOM_EXPIRY_VALUE,
   EXPIRES_AT_OPTIONS,
   NON_EXPIRING_TOKEN_VALUE,
 } from '../AccessToken.constants'
-import { getExpirationDate } from '../AccessToken.utils'
+import { getExpirationDate, getMaxCustomExpiryDate } from '../AccessToken.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import {
   useAccessTokenCreateMutation,
@@ -171,8 +172,8 @@ export const NewTokenDialog = ({
           <Admonition
             type="warning"
             className="rounded-none border-t-0 border-x-0"
-            title="Access tokens can be used to control your whole account"
-            description="Be careful when sharing your tokens"
+            title={CLASSIC_TOKEN_WARNING.title}
+            description={CLASSIC_TOKEN_WARNING.description}
           />
         )}
         <DialogSection className="flex flex-col gap-4">
@@ -228,7 +229,7 @@ export const NewTokenDialog = ({
                           contentSide="top"
                           to={customExpiryDate?.date}
                           minDate={new Date()}
-                          maxDate={dayjs().add(1, 'year').toDate()}
+                          maxDate={getMaxCustomExpiryDate().toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}
