@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
-import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
+import { ConnectionTimeoutError } from '@/types/api-errors'
 import { ResponseError } from '@/types/base'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
@@ -46,12 +46,6 @@ describe('ErrorMatcher', () => {
     expect(screen.getByText('Debug with AI')).toBeInTheDocument()
   })
 
-  it('offers to restart the project for unclassified API errors', () => {
-    const error = new UnknownAPIResponseError('Something went wrong')
-    render(<ErrorMatcher title="Failed to load tables" error={error} supportFormParams={{}} />)
-    expect(screen.getByText('Try restarting your project')).toBeInTheDocument()
-  })
-
   it('renders fallback for plain ResponseError (not a classified subclass)', () => {
     render(
       <ErrorMatcher
@@ -70,6 +64,32 @@ describe('ErrorMatcher', () => {
     )
     expect(screen.getByText('Failed to load tables')).toBeInTheDocument()
     expect(screen.getByText('UNKNOWN ERROR')).toBeInTheDocument()
+  })
+
+  it('renders the caller-provided fallback when the error is unclassified', () => {
+    render(
+      <ErrorMatcher
+        title="Failed to load tables"
+        error="UNKNOWN ERROR"
+        supportFormParams={{}}
+        fallback={<div>Custom fallback</div>}
+      />
+    )
+    expect(screen.getByText('Custom fallback')).toBeInTheDocument()
+  })
+
+  it('ignores the caller-provided fallback when the error is classified', () => {
+    const error = new ConnectionTimeoutError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')
+    render(
+      <ErrorMatcher
+        title="Failed to load tables"
+        error={error}
+        supportFormParams={{}}
+        fallback={<div>Custom fallback</div>}
+      />
+    )
+    expect(screen.queryByText('Custom fallback')).not.toBeInTheDocument()
+    expect(screen.getByText('Try restarting your project')).toBeInTheDocument()
   })
 
   it('accepts error as object with message property', () => {

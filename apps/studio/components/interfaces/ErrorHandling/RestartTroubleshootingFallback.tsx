@@ -1,9 +1,9 @@
-import { TroubleshootingAccordion } from '../TroubleshootingAccordion'
-import { RestartDatabaseTroubleshootingSection } from '../TroubleshootingSections'
+import { TroubleshootingAccordion } from './TroubleshootingAccordion'
+import { RestartDatabaseTroubleshootingSection } from './TroubleshootingSections'
 
 const ERROR_TYPE = 'unknown'
 
-export function UnknownErrorTroubleshooting() {
+export function RestartTroubleshootingFallback() {
   return (
     <TroubleshootingAccordion
       errorType={ERROR_TYPE}
