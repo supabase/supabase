@@ -471,14 +471,14 @@ merge_one_file() {
 
 # The running script is a vendor file too, but overwriting it in place would
 # corrupt this process (the shell reads $0 as it runs). Never write it directly:
-# if the target ships a different version, stage it as <name>.new to review.
+# if the target ships a different version, stage it as <name>.dist to review.
 stage_self_update() {
     _t="$TARGET_DIR/$SELF_NAME"
     if [ ! -f "$_t" ] || cmp -s "$SELF_NAME" "$_t"; then
         record "unchanged" "$SELF_NAME"
         return 0
     fi
-    [ "$DRY_RUN" = "1" ] || cp -f "$_t" "$SELF_NAME.new"
+    [ "$DRY_RUN" = "1" ] || cp -f "$_t" "$SELF_NAME.dist"
     record "self-staged" "$SELF_NAME"
 }
 
@@ -576,10 +576,10 @@ print_summary() {
     if [ "$(count_status self-staged)" != "0" ]; then
         echo ""
         if [ "$DRY_RUN" = "1" ]; then
-            log "$SELF_NAME differs from the target release's version; a real run would stage that version as $SELF_NAME.new (the running script is never overwritten in place)."
+            log "$SELF_NAME differs from the version in '$TARGET_REF'; a real run would stage that version as $SELF_NAME.dist (the running script is never overwritten in place)."
         else
-            log "$SELF_NAME differs from the target release's version, staged as $SELF_NAME.new (the running script was not modified)."
-            log "Review it, then swap it in if you want it:  mv $SELF_NAME.new $SELF_NAME"
+            log "$SELF_NAME differs from the version in '$TARGET_REF', staged as $SELF_NAME.dist (the running script was not modified)."
+            log "Review it, then swap it in if needed: mv $SELF_NAME.dist $SELF_NAME"
         fi
     fi
     if [ -s "$ENV_ADDED" ]; then

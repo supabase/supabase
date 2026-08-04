@@ -340,10 +340,10 @@ assert_path_absent   "backups"                                 "malformed manife
 assert_file_contains ".supabase-version" "ref=self-hosted/v0.9.0" "malformed manifest: stamp not advanced"
 
 echo ""
-echo "=== update.sh: never overwrites the running script; stages a newer one as .new ==="
+echo "=== update.sh: never overwrites the running script; stages the target's copy as .dist ==="
 
 # A dedicated upstream whose docker/ ships an update.sh that DIFFERS from the one
-# we run, so the merge must divert it to update.sh.new rather than rewrite the
+# we run, so the merge must divert it to update.sh.dist rather than rewrite the
 # live script mid-run (which would corrupt this process).
 SELFSRC="$WORK/selfsrc"
 mkdir -p "$SELFSRC/docker"
@@ -369,9 +369,9 @@ SUPABASE_REPO_URL="$SELFSRC" sh ./update.sh --to self-hosted/v2.0.0 --yes > "$WO
 if [ "$rc" = "0" ]; then ok "self-update run exits 0"; else bad "expected exit 0, got $rc"; fi
 if cmp -s ./update.sh "$UPDATE_SH"; then ok "running update.sh left byte-identical"; else bad "running update.sh was modified in place"; fi
 assert_no_line "./update.sh" '^(<<<<<<<|=======|>>>>>>>)'      "no conflict markers written into the running update.sh"
-assert_path_exists "$SELFDEP/update.sh.new"                    "newer update.sh staged as update.sh.new"
-assert_file_contains "$SELFDEP/update.sh.new" "THIS-IS-THE-NEW-UPDATE-SH" "update.sh.new holds the target's version"
-assert_file_contains "$WORK/self.log" "update.sh.new"          "summary points the user at update.sh.new"
+assert_path_exists "$SELFDEP/update.sh.dist"                   "target's update.sh staged as update.sh.dist"
+assert_file_contains "$SELFDEP/update.sh.dist" "THIS-IS-THE-NEW-UPDATE-SH" "update.sh.dist holds the target's version"
+assert_file_contains "$WORK/self.log" "update.sh.dist"         "summary points the user at update.sh.dist"
 
 # --- summary -----------------------------------------------------------------
 
