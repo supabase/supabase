@@ -556,6 +556,21 @@ export const selectionToScopes = (
   return Array.from(new Set(scopes))
 }
 
+/** Reverses `selectionToScopes`: derives a selection from a token's granted FGA scope ids. */
+export const scopesToSelection = (grantedScopes: string[]): PermissionSelection => {
+  const granted = new Set(grantedScopes)
+  const selection: PermissionSelection = {}
+  for (const entry of PERMISSION_CATALOG) {
+    const hasWrite =
+      entry.writeScopes.length > 0 && entry.writeScopes.every((scope) => granted.has(scope))
+    const hasRead =
+      entry.readScopes.length > 0 && entry.readScopes.every((scope) => granted.has(scope))
+    if (hasWrite) selection[entry.key] = 'readwrite'
+    else if (hasRead) selection[entry.key] = 'read'
+  }
+  return selection
+}
+
 export const countConfiguredInCategory = (
   selection: PermissionSelection,
   categoryKey: PermissionCategoryKey
