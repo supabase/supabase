@@ -393,6 +393,25 @@ th code {
   width: 30%;
 }
 
+/*
+ * The scroll container is a block formatting context, so the table's margins can no longer
+ * collapse with its neighbours. Move the vertical rhythm onto the container to keep spacing
+ * unchanged, in rem because the table renders at a smaller font size than the container.
+ */
+.prose :where(.table-scroll) {
+  margin-top: 1.75rem;
+  margin-bottom: 1.75rem;
+}
+
+.prose :where(.table-scroll) > table {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.prose :where(h2 + .table-scroll, h3 + .table-scroll, h4 + .table-scroll, hr + .table-scroll) {
+  margin-top: 0;
+}
+
 /* Zoomable image */
 
 [data-rmiz-modal]:focus,
