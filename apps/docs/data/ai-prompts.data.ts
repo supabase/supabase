@@ -218,10 +218,10 @@ Follow these rules:
    can build a better query plan. Mirror the branch of the policy you want, so
    a redundant filter does not drop rows the policy would allow.
 9. Test every policy with pgTAP — this is the recommended way to verify RLS.
-   Scaffold with \`supabase test new <name>\`, begin the file with
-   \`create extension if not exists pgtap with schema extensions;\`, wrap it in
-   \`begin;\`, \`select plan(<n>);\`, \`select * from finish();\`, \`rollback;\`, and
-   run it with \`supabase test db\`.
+   Scaffold with \`supabase test new <name>\`, then open with \`begin;\` followed
+   by \`create extension if not exists pgtap with schema extensions;\` and
+   \`select plan(<n>);\`, close with \`select * from finish();\` and \`rollback;\`,
+   and run it with \`supabase test db\`.
 10. In each test, switch roles with \`set local role authenticated;\` and
     \`set local request.jwt.claim.sub = '<user-uuid>';\`, and cover \`anon\` as
     well as \`authenticated\`. Assert both the allow and the deny case for every
