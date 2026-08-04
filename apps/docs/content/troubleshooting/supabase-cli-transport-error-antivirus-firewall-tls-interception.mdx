@@ -32,7 +32,9 @@ Other HTTP clients on the same machine can behave differently, which is a useful
 
 ## How to resolve
 
-Identify and disable the specific feature doing HTTPS/TLS inspection. This is often a separate setting from the general firewall or "protection" toggle, so disabling the main antivirus switch alone may not be enough.
+Only disable HTTPS/TLS inspection after the diagnostic step above confirms it's the cause — a `Transport error` can also come from an unrelated timeout or connection reset, and disabling scanning you don't need reduces your protection unnecessarily.
+
+Once confirmed, identify and disable the specific feature doing the inspection. This is often a separate setting from the general firewall or "protection" toggle, so disabling the main antivirus switch alone may not be enough. Treat this as temporary while you resolve connectivity — prefer a narrower host-specific exclusion for `api.supabase.com` over disabling scanning outright, if your software supports one.
 
 For **Norton 360 on Windows**, the responsible feature is **Safe Web / Web & Mail Shield**, not Smart Firewall — disabling Smart Firewall alone does not stop the interception. After disabling it, confirm the certificate reverts to the expected issuer before retrying.
 
