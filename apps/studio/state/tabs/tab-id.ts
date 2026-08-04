@@ -5,9 +5,9 @@ export interface ParsedTabId {
   contentId: string
 }
 
-/** A tab's id is always `${kind}-${contentId}` — kind names never contain a dash. */
-export function createTabId(kind: TabKind, contentId: string): string {
-  if (!contentId) throw new Error('contentId must not be empty')
+/** A tab's id is always `${kind}-${contentId}` — kind names never contain a dash. Returns null for an empty contentId, since `parseTabId` can't invert it. */
+export function createTabId(kind: TabKind, contentId: string): string | null {
+  if (!contentId) return null
   return `${kind}-${contentId}`
 }
 
@@ -23,8 +23,10 @@ export function parseTabId(tabId: string): ParsedTabId | null {
   return { kind, contentId }
 }
 
-/** The URL segment a tab id renders as. Drops the prefix for a bare kind (`sql-<uuid>` → `<uuid>`, and every table kind); keeps it otherwise (`notebook-<uuid>` → `notebook-<uuid>`). */
-export function toUrlSegment(tabId: string): string | null {
+/** The URL segment a tab id renders as. Drops the prefix for a bare kind (`sql-<uuid>` → `<uuid>`, and every table kind); keeps it otherwise (`notebook-<uuid>` → `notebook-<uuid>`). Passes through a null `tabId`, so it composes directly with `createTabId`. */
+export function toUrlSegment(tabId: string | null): string | null {
+  if (tabId === null) return null
+
   const parsed = parseTabId(tabId)
   if (!parsed) return null
 

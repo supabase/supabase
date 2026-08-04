@@ -5,17 +5,24 @@ import { createTabId, parseTabId, parseUrlSegment, toUrlSegment } from './tab-id
 
 const ALL_KINDS = Object.keys(TAB_KINDS) as Array<TabKind>
 
+/** Test-only narrowing: every call site below passes a known-non-empty literal. */
+function mustCreateTabId(kind: TabKind, contentId: string): string {
+  const tabId = createTabId(kind, contentId)
+  if (tabId === null) throw new Error(`createTabId unexpectedly returned null for ${kind}`)
+  return tabId
+}
+
 describe('createTabId / parseTabId round-trip', () => {
   it.each(ALL_KINDS)('round-trips a uuid-like content id for kind %s', (kind) => {
     const contentId = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
-    const tabId = createTabId(kind, contentId)
+    const tabId = mustCreateTabId(kind, contentId)
 
     expect(tabId).toBe(`${kind}-${contentId}`)
     expect(parseTabId(tabId)).toEqual({ kind, contentId })
   })
 
-  it('rejects an empty content id at creation, so createTabId/parseTabId never disagree', () => {
-    expect(() => createTabId('sql', '')).toThrow()
+  it('returns null for an empty content id, so createTabId/parseTabId never disagree', () => {
+    expect(createTabId('sql', '')).toBeNull()
   })
 
   it('rejects an id with an unknown kind', () => {
@@ -47,16 +54,20 @@ describe('toUrlSegment: bare vs. prefixed', () => {
   it.each(['sql', 'r', 'v', 'm', 'f', 'p'] as const)(
     'drops the prefix for the bare kind %s',
     (kind) => {
-      expect(toUrlSegment(createTabId(kind, 'abc'))).toBe('abc')
+      expect(toUrlSegment(mustCreateTabId(kind, 'abc'))).toBe('abc')
     }
   )
 
   it.each(['notebook', 'chat'] as const)('keeps the prefix for kind %s', (kind) => {
-    expect(toUrlSegment(createTabId(kind, 'abc'))).toBe(`${kind}-abc`)
+    expect(toUrlSegment(mustCreateTabId(kind, 'abc'))).toBe(`${kind}-abc`)
   })
 
   it('returns null for a malformed tab id', () => {
     expect(toUrlSegment('not-a-real-kind-abc')).toBeNull()
+  })
+
+  it('passes through a null tab id, so it composes directly with createTabId', () => {
+    expect(toUrlSegment(createTabId('sql', ''))).toBeNull()
   })
 })
 
