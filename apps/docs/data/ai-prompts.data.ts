@@ -177,6 +177,45 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/refine.md`,
+  'row-level-security': `Help me write secure, performant Row Level Security (RLS) policies for my
+Supabase Postgres database. Follow these rules:
+1. Enable RLS on every table in an exposed schema (typically \`public\`) before
+   writing any policies: \`alter table <table> enable row level security;\`.
+   Also run \`alter table <table> force row level security;\` if the table
+   should be protected even from its owning role, since table owners and
+   superusers otherwise bypass RLS entirely.
+2. Write one policy per operation (\`select\`, \`insert\`, \`update\`, \`delete\`)
+   and always scope it with \`to authenticated\` or \`to anon\` — never leave the
+   role unspecified. Remember \`insert\` only uses \`with check\`, \`delete\` only
+   uses \`using\`, and \`update\` needs both.
+3. Wrap row-invariant helper calls in \`select\` so Postgres computes them once
+   per statement instead of once per row, e.g. use
+   \`(select auth.uid()) = user_id\` instead of \`auth.uid() = user_id\`. This
+   only helps for \`stable\`/\`immutable\` functions — a \`volatile\` function can
+   still run per row regardless of the wrapper.
+4. Add a btree index on every column referenced in a policy's \`using\` or
+   \`with check\` expression, e.g.
+   \`create index on <table> using btree (<column>);\`.
+5. Avoid joins inside policies. Instead of joining the target table to the
+   source table's column, select the matching set from the target table
+   (filtered by \`(select auth.uid())\`) and use \`in\`/\`any\` against it.
+6. For checks that need to bypass RLS on a lookup table (e.g. team membership
+   or role checks), use a \`security definer\` function in a private,
+   non-exposed schema, with \`execute\` revoked from \`public\`, and verify
+   \`auth.uid()\` inside the function body.
+7. Even though RLS acts as an implicit filter, still add the equivalent filter
+   to application queries (e.g. \`.eq('user_id', userId)\`) so Postgres can
+   build a better query plan.
+8. RLS only runs after schema and table \`grant\`s let a role reach the object
+   at all. If access looks blocked, confirm the required \`grant\`s exist before
+   assuming the policy logic is wrong.
+9. Write pgTAP tests for each policy (\`supabase test new\`, then
+   \`supabase test db\`), asserting the expected allow/deny outcome per role and
+   per operation, e.g. with \`policies_are()\`, \`results_eq()\`, and
+   \`tests.rls_enabled()\`.
+
+REFERENCE
+https://supabase.com/docs/guides/database/postgres/row-level-security.md#rls-performance-recommendations`,
   'ruby-on-rails': `Help me add Supabase to my Ruby on Rails project. Create a Supabase project at
 database.new. Then:
 1. Run \`rails new blog -d=postgresql\` to scaffold a new Rails project.
