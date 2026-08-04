@@ -1,0 +1,56 @@
+---
+id: 'provider-metadata'
+title: 'OAuth Provider Metadata'
+description: 'Metadata returned by each OAuth provider stored in the `raw_user_meta_data` column.'
+---
+
+# OAuth Provider Metadata
+
+Supabase stores the raw metadata returned by an OAuth provider in the `auth.users.raw_user_meta_data` JSONB column. This page lists the typical fields you can expect from each supported provider. Keep in mind that provider responses can change, and additional fields may appear depending on scopes and user settings.
+
+## Table of Providers
+
+| Provider | Typical Fields in `raw_user_meta_data` |
+|----------|------------------------------------------|
+| Google | `sub`, `email`, `email_verified`, `name`, `picture`, `given_name`, `family_name`, `locale` |
+| GitHub | `sub`, `email`, `email_verified`, `name`, `picture`, `login`, `id`, `node_id`, `avatar_url`, `html_url` |
+| Apple | `sub`, `email`, `email_verified`, `name` (optional), `family_name`, `given_name` |
+| Discord | `sub`, `email`, `email_verified`, `username`, `avatar`, `discriminator`, `id` |
+| Facebook | `sub`, `email`, `email_verified`, `name`, `picture`, `id` |
+| Twitter | `sub`, `email` (if permission granted), `name`, `profile_image_url`, `id` |
+| LinkedIn | `sub`, `email`, `email_verified`, `localizedFirstName`, `localizedLastName`, `profilePicture`, `id` |
+| Slack | `sub`, `email`, `email_verified`, `name`, `picture`, `team_id`, `user_id` |
+| Azure AD | `sub`, `email`, `email_verified`, `name`, `given_name`, `family_name`, `tid`, `oid` |
+| Bitbucket | `sub`, `email`, `email_verified`, `username`, `display_name`, `avatar_url`, `account_id` |
+| Figma | `sub`, `email`, `email_verified`, `id`, `img_url`, `handle` |
+| Notion | `sub`, `email`, `email_verified`, `name`, `avatar_url`, `id` |
+| Spotify | `sub`, `email`, `email_verified`, `display_name`, `id`, `images` |
+| Twitch | `sub`, `email`, `email_verified`, `preferred_username`, `profile_image_url`, `id` |
+| Zoom | `sub`, `email`, `email_verified`, `name`, `picture`, `id` |
+| Kakao | `sub`, `email`, `email_verified`, `profile_nickname`, `profile_image`, `id` |
+| WorkOS | `sub`, `email`, `email_verified`, `first_name`, `last_name`, `idp_id`, `provider` |
+
+> **Note:** The `sub` field is the unique identifier for the user in the provider's system. The presence of `email_verified` depends on the provider and scopes requested.
+
+## How to Inspect Metadata
+
+You can query the metadata directly from your Supabase database:
+
+```sql
+SELECT raw_user_meta_data FROM auth.users WHERE id = '<user-id>';
+```
+
+Or, using the JavaScript client:
+
+```js
+const { data, error } = await supabase.auth.getUser()
+console.log(data.user?.raw_user_meta_data)
+```
+
+## Caveats
+
+- Some providers (e.g., Google) do not return a `username` field, which can cause issues if your application requires a username. You may need to prompt the user for a username after sign‑up.
+- The fields returned can vary based on the scopes you request when configuring the provider.
+- Provider responses may include additional fields not listed here; treat the metadata as opaque and only rely on fields you explicitly need.
+
+---
