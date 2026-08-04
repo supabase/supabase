@@ -119,8 +119,6 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
           <DropdownMenuItem
             className="justify-between"
             onSelect={(e) => {
-              // Keep the menu open so the source-specific controls that appear
-              // below (e.g. time range for logs) are immediately visible.
               e.preventDefault()
               switchSource('database')
             }}
