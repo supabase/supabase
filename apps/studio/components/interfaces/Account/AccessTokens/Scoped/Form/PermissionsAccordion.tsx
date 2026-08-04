@@ -52,7 +52,7 @@ export const PermissionsAccordion = ({
                 'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
               })}
             >
-              <AccordionTrigger className="bg-surface-300 px-4 py-3 hover:no-underline transition">
+              <AccordionTrigger className="bg-surface-300 first:rounded-t last:rounded-b px-4 py-3 hover:no-underline transition">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
                   <div className="flex flex-col gap-1">
                     <span className="text-sm font-medium">{category.name}</span>
