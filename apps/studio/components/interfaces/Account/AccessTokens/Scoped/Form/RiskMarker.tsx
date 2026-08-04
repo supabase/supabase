@@ -1,4 +1,4 @@
-import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import {
   RISK_LEVEL_LABEL,
@@ -10,21 +10,11 @@ import {
   PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
-const DOT_CLASS: Record<RiskLevel, string> = {
-  low: 'bg-brand-600',
-  medium: 'bg-warning-600',
-  high: 'bg-destructive-600',
+const RISK_VARIANT: Record<RiskLevel, 'success' | 'warning' | 'destructive'> = {
+  low: 'success',
+  medium: 'warning',
+  high: 'destructive',
 }
-
-const LABEL_CLASS: Record<RiskLevel, string> = {
-  low: 'text-brand-600',
-  medium: 'text-warning-600',
-  high: 'text-destructive-600',
-}
-
-const RiskDot = ({ risk }: { risk: RiskLevel }) => (
-  <span className={cn('h-1.5 w-1.5 rounded-full', DOT_CLASS[risk])} />
-)
 
 interface RiskMarkerProps {
   entry: PermissionCatalogEntry
@@ -41,17 +31,12 @@ export const RiskMarker = ({
   permissionScopeMap,
 }: RiskMarkerProps) => {
   const marker = (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 text-xs',
-        withTooltip && 'cursor-help',
-        LABEL_CLASS[entry.risk],
-        className
-      )}
+    <Badge
+      variant={RISK_VARIANT[entry.risk]}
+      className={cn(withTooltip && 'cursor-help', className)}
     >
-      <RiskDot risk={entry.risk} />
       {RISK_LEVEL_LABEL[entry.risk]}
-    </span>
+    </Badge>
   )
 
   if (!withTooltip) return marker
@@ -67,24 +52,23 @@ export const RiskMarker = ({
         <span tabIndex={0}>{marker}</span>
       </TooltipTrigger>
       <TooltipContent side="top" align="center" className="w-72 space-y-2 p-3">
-        <div
-          className={cn('flex items-center gap-1.5 text-xs font-medium', LABEL_CLASS[entry.risk])}
-        >
-          <RiskDot risk={entry.risk} />
-          {RISK_LEVEL_LABEL[entry.risk]}
-        </div>
+        <Badge variant={RISK_VARIANT[entry.risk]}>{RISK_LEVEL_LABEL[entry.risk]}</Badge>
         <p className="text-xs text-foreground-light">{entry.riskReason}</p>
         {(entry.allowsRead.length > 0 || entry.allowsWrite.length > 0) && (
-          <div className="space-y-1">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
+          <div className="space-y-2 mt-5">
+            {/*<h3 className="text-[11px] font-mono uppercase tracking-wide text-foreground-muted">
               Allows
-            </p>
+            </h3>*/}
             {entry.allowsRead.length > 0 && (
-              <p className="text-xs text-foreground-light">Read · {entry.allowsRead.join(', ')}</p>
+              <p className="text-xs text-foreground-light">
+                <span className="text-foreground-lighter">Read: </span>
+                {entry.allowsRead.join(', ')}
+              </p>
             )}
             {entry.allowsWrite.length > 0 && (
               <p className="text-xs text-foreground-light">
-                Write · {entry.allowsWrite.join(', ')}
+                <span className="text-foreground-lighter">Write: </span>
+                {entry.allowsWrite.join(', ')}
               </p>
             )}
           </div>

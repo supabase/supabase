@@ -1,16 +1,5 @@
-import { HelpCircle } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Badge,
-  cn,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import {
   countConfiguredInCategory,
@@ -63,25 +52,14 @@ export const PermissionsAccordion = ({
                 'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
               })}
             >
-              <AccordionTrigger className="bg-alternative dark:bg-muted px-4 py-3 hover:no-underline text-foreground-light hover:text-foreground transition data-open:text-foreground-light">
+              <AccordionTrigger className="bg-surface-300 px-4 py-3 hover:no-underline transition">
                 <div className="flex flex-1 items-center justify-between gap-2 pr-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-mono uppercase tracking-widest text-xs">
-                      {category.name}
-                    </span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span tabIndex={0} className="text-foreground-lighter">
-                          <HelpCircle size={13} />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="w-64">
-                        {category.description}
-                      </TooltipContent>
-                    </Tooltip>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-sm font-medium">{category.name}</span>
+                    <span className="text-xs text-foreground-lighter">{category.description}</span>
                   </div>
                   {configuredCount > 0 && (
-                    <span className="text-xs text-foreground-lighter">
+                    <span className="text-xs text-primary font-medium">
                       {configuredCount} configured
                     </span>
                   )}
