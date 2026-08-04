@@ -117,7 +117,7 @@ export const NewScopedTokenForm = ({
           <NewScopedTokenFormReview values={formValues} permissionScopeMap={permissionScopeMap} />
         )}
       </ScrollArea>
-      <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">
+      <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4 px-5 sm:px-6">
         <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
         <div className="flex gap-2">
           {step === 'review' && (
