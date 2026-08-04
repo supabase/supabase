@@ -92,16 +92,20 @@ const CommunitySlider = () => {
   }, [width])
 
   useEffect(() => {
-    if (!ref.current || !swiperInstance?.autoplay) return
+    const el = ref.current
+    if (!el || !swiperInstance?.autoplay) return
 
-    ref.current?.addEventListener('mouseover', () => swiperInstance?.autoplay?.stop())
-    ref.current?.addEventListener('mouseleave', () => swiperInstance?.autoplay?.start())
+    const stopAutoplay = () => swiperInstance?.autoplay?.stop()
+    const startAutoplay = () => swiperInstance?.autoplay?.start()
+
+    el.addEventListener('mouseover', stopAutoplay)
+    el.addEventListener('mouseleave', startAutoplay)
 
     return () => {
-      ref.current?.removeEventListener('mouseover', () => swiperInstance?.autoplay?.stop())
-      ref.current?.removeEventListener('mouseleave', () => swiperInstance?.autoplay?.start())
+      el.removeEventListener('mouseover', stopAutoplay)
+      el.removeEventListener('mouseleave', startAutoplay)
     }
-  }, [ref.current, swiperInstance?.autoplay])
+  }, [swiperInstance?.autoplay])
 
   const Card = (card: CardInterface) => (
     <div className="bg-surface-100 hover:border-strong border-overlay rounded-2xl border p-6 drop-shadow-xs flex flex-col gap-4">
