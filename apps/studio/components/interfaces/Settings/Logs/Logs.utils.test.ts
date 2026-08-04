@@ -13,7 +13,6 @@ import {
   genChartQuery,
   genDefaultQuery,
   getAuthLogSeverity,
-  parseMultigresEventMessage,
 } from './Logs.utils'
 
 const createLog = (overrides: Partial<LogData> = {}): LogData => ({
@@ -187,42 +186,6 @@ describe('Logs.utils', () => {
 
     test('handles trailing slash', () => {
       expect(extractEdgeFunctionName('/functions/v1/hello-world-1/')).toBe('hello-world-1')
-    })
-  })
-
-  describe('parseMultigresEventMessage', () => {
-    test('parses a JSON object event_message into a plain object', () => {
-      const eventMessage = JSON.stringify({
-        time: '2026-06-02T15:44:52.84043038Z',
-        level: 'ERROR',
-        msg: 'Failed to write heartbeat',
-        error: 'context deadline exceeded',
-      })
-      expect(parseMultigresEventMessage(eventMessage)).toEqual({
-        time: '2026-06-02T15:44:52.84043038Z',
-        level: 'ERROR',
-        msg: 'Failed to write heartbeat',
-        error: 'context deadline exceeded',
-      })
-    })
-
-    test('returns null when event_message is not valid JSON', () => {
-      expect(parseMultigresEventMessage('connection closed')).toBeNull()
-    })
-
-    test('returns null when event_message parses to an array', () => {
-      expect(parseMultigresEventMessage('[1, 2, 3]')).toBeNull()
-    })
-
-    test('returns null when event_message parses to a primitive', () => {
-      expect(parseMultigresEventMessage('42')).toBeNull()
-      expect(parseMultigresEventMessage('"a string"')).toBeNull()
-    })
-
-    test('returns null for non-string input', () => {
-      expect(parseMultigresEventMessage(undefined)).toBeNull()
-      expect(parseMultigresEventMessage(null)).toBeNull()
-      expect(parseMultigresEventMessage(42)).toBeNull()
     })
   })
 
