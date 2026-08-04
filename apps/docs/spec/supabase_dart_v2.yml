@@ -4600,6 +4600,15 @@ functions:
         - `.lt('column', value)` listens to rows where the column is less than the value
         - `.lte('column', value)` listens to rows where the column is less than or equal to the value
         - `.inFilter('column', [val1, val2, val3])` listens to rows where the column is one of the values
+        - `.like('column', pattern)` listens to rows where the column matches the given `LIKE` pattern
+        - `.ilike('column', pattern)` listens to rows where the column matches the given case-insensitive `LIKE` pattern
+        - `.match(Map)` listens to rows where all the given columns match the given values
+        - `.imatch(Map)` listens to rows where all the given columns case-insensitively match the given values
+        - `.isFilter('column', value)` listens to rows where the column `IS` the given value (e.g. `null`, `true`, `false`)
+        - `.isDistinct('column', value)` listens to rows where the column `IS DISTINCT FROM` the given value
+      - Multiple filters can be chained together on the same `stream()` call, and they are combined with `AND` both when fetching the initial data and when filtering realtime changes.
+      - For `UPDATE` events, a filter such as `.eq()` is only re-evaluated against the new row. If a row stops matching the filter after an update, it is not removed from the stream and will remain in its last known state until it is deleted or the stream is restarted.
+      - `DELETE` events only include the primary key columns of the deleted row by default, not the full previous row.
     examples:
       - id: listen-to-table
         name: Listen to a table
@@ -4629,6 +4638,19 @@ functions:
           supabase.from('countries')
             .stream(primaryKey: ['id'])
             .inFilter('id', [1, 2, 3])
+            .order('name')
+            .limit(10);
+          ```
+      - id: with-multiple-filters
+        name: With multiple filters
+        description: |
+          Multiple filters can be chained together and are combined with `AND`.
+        code: |
+          ```dart
+          supabase.from('countries')
+            .stream(primaryKey: ['id'])
+            .eq('continent', 'Asia')
+            .like('name', '%Republic%')
             .order('name')
             .limit(10);
           ```
