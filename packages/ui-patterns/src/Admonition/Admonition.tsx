@@ -98,7 +98,7 @@ export const Admonition = forwardRef<
             {actions && (
               <div
                 className={cn(
-                  'flex flex-row gap-3',
+                  'flex flex-row gap-2',
                   layout === 'vertical' && 'mt-3 items-start',
                   layout === 'horizontal' && 'items-center',
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'
