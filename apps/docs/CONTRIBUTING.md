@@ -201,6 +201,24 @@ Your content here
 </Admonition>
 ```
 
+Use the `title` prop for an optional callout title. Don't put Markdown or HTML headings inside an admonition. If the content needs a heading to structure the page, move the heading and its section outside the admonition.
+
+Admonition children can contain rich body content such as paragraphs, lists, links, and code. Put standalone calls to action in the `actions` prop so they remain separate from the body content:
+
+```
+<Admonition
+  type="note"
+  title="Optional title"
+  actions={<Button>Continue</Button>}
+>
+
+Your content here
+
+</Admonition>
+```
+
+The `actions` prop is optional. Keep contextual links and interactive examples in the body when they are part of the explanation rather than a standalone call to action.
+
 ### Blockquotes
 
 Don't use blockquotes.

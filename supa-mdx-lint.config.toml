@@ -27,3 +27,6 @@ rules.slang = "include('supa-mdx-lint/Rule004ExcludeWords/slang.toml')"
 
 [Rule006NoAbsoluteUrls]
 base_url = "https://supabase.com"
+
+[Rule007NoHeadingsInAdmonitions]
+level = "error"
