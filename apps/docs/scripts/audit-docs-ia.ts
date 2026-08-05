@@ -19,16 +19,16 @@
  * (contents + pull requests) on docs-agent-skills for both the `git push` and the PR
  * creation call.
  *
- * Federated route evidence comes from statically analyzing the
- * `federated-content/sources/*.ts` definitions, not from the fetched content itself —
- * run `pnpm run build:federated-content` first (wired up as this script's pre-task) if
- * content/guides/ needs to be current for the harness-sensitive MDX scan below.
+ * `pnpm run build:federated-content` (wired up as this script's pre-task) fetches
+ * federated guide content before evidence gathering runs, so those pages already exist
+ * under content/guides/ and get scanned like any other guide content below — no
+ * special-casing needed for federated sources.
  *
  * Run from apps/docs:
- *   pnpm run audit:information-architecture             # print JSON report to stdout
- *   pnpm run audit:information-architecture --report    # also write it to scripts/reports/<UTC date>-docs-ia-audit.json
- *   pnpm run audit:information-architecture --pr        # also open a PR adding the report to
- *                                                        # .claude/skills/audit-docs-ia/reports/ upstream
+ *   pnpm run experimental:audit-ia             # print JSON report to stdout
+ *   pnpm run experimental:audit-ia --report    # also write it to scripts/reports/<UTC date>-docs-ia-audit.json
+ *   pnpm run experimental:audit-ia --pr        # also open a PR adding the report to
+ *                                              # .claude/skills/audit-docs-ia/reports/ upstream
  */
 
 import { execFileSync } from 'node:child_process'
@@ -43,7 +43,6 @@ import { OpenAI } from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { z } from 'zod'
 
-import type { FederatedContentSource } from './federated-content/types.js'
 import _configureDotEnv from './utils/dotenv.js'
 
 const _ = _configureDotEnv
@@ -90,7 +89,7 @@ function downloadSkill(): SkillBundle {
         { stdio: ['ignore', 'ignore', 'pipe'] }
       )
     } catch (error) {
-      throw new Error(
+      fail(
         `Could not clone ${SKILL_REPO_URL}. It's a private repo — check that git can already ` +
           `authenticate to it (credential helper / cached token) and that "git" is on PATH.\n${describeError(error)}`
       )
@@ -99,14 +98,14 @@ function downloadSkill(): SkillBundle {
     try {
       execFileSync('git', ['sparse-checkout', 'set', SKILL_PATH], { cwd: tmpDir, stdio: 'pipe' })
     } catch (error) {
-      throw new Error(`Could not sparse-checkout "${SKILL_PATH}".\n${describeError(error)}`)
+      fail(`Could not sparse-checkout "${SKILL_PATH}".\n${describeError(error)}`)
     }
 
     let commit: string
     try {
       commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmpDir, encoding: 'utf-8' }).trim()
     } catch (error) {
-      throw new Error(`Could not resolve the cloned commit SHA.\n${describeError(error)}`)
+      fail(`Could not resolve the cloned commit SHA.\n${describeError(error)}`)
     }
 
     const skillDir = path.join(tmpDir, SKILL_PATH)
@@ -115,7 +114,7 @@ function downloadSkill(): SkillBundle {
     try {
       skillMd = fs.readFileSync(path.join(skillDir, 'SKILL.md'), 'utf-8')
     } catch (error) {
-      throw new Error(
+      fail(
         `Could not read SKILL.md at ${SKILL_PATH} — the audit-docs-ia skill layout may have ` +
           `changed upstream.\n${describeError(error)}`
       )
@@ -126,7 +125,7 @@ function downloadSkill(): SkillBundle {
       try {
         referenceDocs[file] = fs.readFileSync(path.join(skillDir, 'reference', file), 'utf-8')
       } catch (error) {
-        throw new Error(
+        fail(
           `Could not read reference/${file} — the audit-docs-ia skill layout may have changed ` +
             `upstream.\n${describeError(error)}`
         )
@@ -153,7 +152,7 @@ async function requestInstallationAuth(appId: string, installationId: string, pr
   try {
     return await createAppAuth({ appId, installationId, privateKey })({ type: 'installation' })
   } catch (error) {
-    throw new Error(
+    fail(
       `Could not get an installation access token for installation ${installationId}.\n${describeError(error)}`
     )
   }
@@ -165,7 +164,7 @@ async function getInstallationToken(): Promise<string> {
   const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
 
   if (!appId || !installationId || !privateKey) {
-    throw new Error(
+    fail(
       'DOCS_GITHUB_APP_ID, DOCS_GITHUB_APP_INSTALLATION_ID, and DOCS_GITHUB_APP_PRIVATE_KEY are ' +
         'all required to open a PR. Add them to apps/docs/.env.local (this is the same GitHub ' +
         'App used for fetching federated content).'
@@ -181,20 +180,20 @@ async function getInstallationToken(): Promise<string> {
       .export({ type: 'pkcs8', format: 'pem' })
       .toString()
   } catch (error) {
-    throw new Error(`Could not parse DOCS_GITHUB_APP_PRIVATE_KEY.\n${describeError(error)}`)
+    fail(`Could not parse DOCS_GITHUB_APP_PRIVATE_KEY.\n${describeError(error)}`)
   }
 
   const auth = await requestInstallationAuth(appId, installationId, privateKeyPkcs8)
 
   if (auth.repositorySelection === 'selected' && !auth.repositoryNames?.includes(SKILL_REPO_NAME)) {
-    throw new Error(
+    fail(
       `The docs GitHub App installation (${installationId}) doesn't have access to ` +
         `${SKILL_REPO_OWNER}/${SKILL_REPO_NAME} — it's scoped to: ${(auth.repositoryNames ?? []).join(', ') || '(none)'}. ` +
         `Add the repo to the installation to open a PR.`
     )
   }
   if (auth.permissions.contents !== 'write' || auth.permissions.pull_requests !== 'write') {
-    throw new Error(
+    fail(
       `The docs GitHub App installation (${installationId}) doesn't have contents+pull_requests ` +
         `write permission on ${SKILL_REPO_OWNER}/${SKILL_REPO_NAME} (has: ${JSON.stringify(auth.permissions)}).`
     )
@@ -218,7 +217,7 @@ async function openReportPr(json: string, fileName: string, issueCount: number):
         { stdio: ['ignore', 'ignore', 'pipe'] }
       )
     } catch (error) {
-      throw new Error(
+      fail(
         `Could not clone ${SKILL_REPO_URL} to open the PR using the docs GitHub App's ` +
           `installation token.\n${describeError(error)}`
       )
@@ -227,15 +226,13 @@ async function openReportPr(json: string, fileName: string, issueCount: number):
     try {
       execFileSync('git', ['sparse-checkout', 'set', SKILL_PATH], { cwd: tmpDir, stdio: 'pipe' })
     } catch (error) {
-      throw new Error(
-        `Could not sparse-checkout "${SKILL_PATH}" to open the PR.\n${describeError(error)}`
-      )
+      fail(`Could not sparse-checkout "${SKILL_PATH}" to open the PR.\n${describeError(error)}`)
     }
 
     try {
       execFileSync('git', ['checkout', '-b', branch], { cwd: tmpDir, stdio: 'pipe' })
     } catch (error) {
-      throw new Error(`Could not create branch "${branch}".\n${describeError(error)}`)
+      fail(`Could not create branch "${branch}".\n${describeError(error)}`)
     }
 
     const reportRelativePath = path.posix.join(SKILL_PATH, 'reports', fileName)
@@ -244,7 +241,7 @@ async function openReportPr(json: string, fileName: string, issueCount: number):
       fs.mkdirSync(path.dirname(reportAbsolutePath), { recursive: true })
       fs.writeFileSync(reportAbsolutePath, json)
     } catch (error) {
-      throw new Error(
+      fail(
         `Could not write the report into the clone at ${reportAbsolutePath}.\n${describeError(error)}`
       )
     }
@@ -257,13 +254,13 @@ async function openReportPr(json: string, fileName: string, issueCount: number):
         { cwd: tmpDir, stdio: 'pipe' }
       )
     } catch (error) {
-      throw new Error(`Could not commit the report.\n${describeError(error)}`)
+      fail(`Could not commit the report.\n${describeError(error)}`)
     }
 
     try {
       execFileSync('git', ['push', '-u', 'origin', branch], { cwd: tmpDir, stdio: 'pipe' })
     } catch (error) {
-      throw new Error(
+      fail(
         `Could not push branch "${branch}" using the docs GitHub App's installation token.\n${describeError(error)}`
       )
     }
@@ -291,13 +288,13 @@ async function openReportPr(json: string, fileName: string, issueCount: number):
         }
       )
     } catch (error) {
-      throw new Error(
+      fail(
         `Branch "${branch}" was pushed, but the GitHub API request to open the PR failed.\n${describeError(error)}`
       )
     }
 
     if (!response.ok) {
-      throw new Error(
+      fail(
         `Branch "${branch}" was pushed, but opening the PR failed: ${response.status} ${await response.text()}`
       )
     }
@@ -318,19 +315,10 @@ async function openReportPr(json: string, fileName: string, issueCount: number):
 // skill's reference docs specify, run against the live apps/docs checkout.
 // ---------------------------------------------------------------------------
 
-interface FederatedSourceSummary {
-  section: string
-  org: string
-  repo: string
-  docsDir: string
-  slugs: Array<string | null>
-}
-
 interface Evidence {
   navConstantsExcerpt: string
   guideSections: string[]
   duplicateGuideUrls: Array<{ url: string; occurrences: number }>
-  federatedSources: FederatedSourceSummary[]
   harnessSensitiveMdxFiles: string[]
 }
 
@@ -356,43 +344,7 @@ function walkFiles(root: string, extension: string): string[] {
   return results
 }
 
-async function gatherFederatedSources(): Promise<FederatedSourceSummary[]> {
-  const sourcesDir = path.join(__dirname, 'federated-content/sources')
-
-  let files: string[]
-  try {
-    files = fs.readdirSync(sourcesDir).filter((file) => /\.tsx?$/.test(file))
-  } catch (error) {
-    throw new Error(
-      `Could not list federated-content sources at ${sourcesDir} — has the directory moved?\n${describeError(error)}`
-    )
-  }
-
-  const sources: FederatedSourceSummary[] = []
-  for (const file of files) {
-    let source: FederatedContentSource
-    try {
-      const mod = await import(path.join(sourcesDir, file))
-      source = mod.default as FederatedContentSource
-    } catch (error) {
-      throw new Error(
-        `Could not statically analyze federated-content source "${file}".\n${describeError(error)}`
-      )
-    }
-
-    sources.push({
-      section: source.section,
-      org: source.org,
-      repo: source.repo,
-      docsDir: source.docsDir,
-      slugs: source.pageMap.map((page) => page.slug ?? null),
-    })
-  }
-
-  return sources
-}
-
-async function gatherEvidence(): Promise<Evidence> {
+function gatherEvidence(): Evidence {
   const navConstantsPath = path.join(
     DOCS_ROOT,
     'components/Navigation/NavigationMenu/NavigationMenu.constants.ts'
@@ -401,7 +353,7 @@ async function gatherEvidence(): Promise<Evidence> {
   try {
     navContent = fs.readFileSync(navConstantsPath, 'utf-8')
   } catch (error) {
-    throw new Error(
+    fail(
       `Could not read nav constants at ${navConstantsPath} — has the file moved?\n${describeError(error)}`
     )
   }
@@ -430,12 +382,10 @@ async function gatherEvidence(): Promise<Evidence> {
       .map((e) => e.name)
       .sort()
   } catch (error) {
-    throw new Error(
+    fail(
       `Could not list guide sections at ${guidesDir} — has the directory moved?\n${describeError(error)}`
     )
   }
-
-  const federatedSources = await gatherFederatedSources()
 
   const harnessPattern = /quickstarts|ai-tools\/mcp|ai-tools\/plugins/
   let harnessSensitiveMdxFiles: string[]
@@ -444,7 +394,7 @@ async function gatherEvidence(): Promise<Evidence> {
       .filter((file) => harnessPattern.test(fs.readFileSync(file, 'utf-8')))
       .map((file) => path.relative(REPO_ROOT, file))
   } catch (error) {
-    throw new Error(
+    fail(
       `Could not scan apps/docs/content/guides for harness-sensitive MDX.\n${describeError(error)}`
     )
   }
@@ -453,7 +403,6 @@ async function gatherEvidence(): Promise<Evidence> {
     navConstantsExcerpt,
     guideSections,
     duplicateGuideUrls,
-    federatedSources,
     harnessSensitiveMdxFiles,
   }
 }
@@ -513,6 +462,10 @@ function describeError(error: unknown): string {
   return String(error)
 }
 
+function fail(message: string): never {
+  throw new Error(`[experimental:audit-ia] ${message}`)
+}
+
 function utcTimestamp(): string {
   return new Date()
     .toISOString()
@@ -531,13 +484,13 @@ async function requestCompletion(client: OpenAI, system: string, user: string) {
       response_format: zodResponseFormat(ReportPayloadSchema, 'docs_ia_audit_report'),
     })
   } catch (error) {
-    throw new Error(`OpenAI request failed (model "${MODEL}").\n${describeError(error)}`)
+    fail(`OpenAI request failed (model "${MODEL}").\n${describeError(error)}`)
   }
 }
 
 async function runAudit(system: string, user: string) {
   if (!process.env.OPENAI_API_KEY) {
-    throw new Error(
+    fail(
       'OPENAI_API_KEY is not set. Add it to apps/docs/.env.local (this script only supports OpenAI).'
     )
   }
@@ -547,12 +500,10 @@ async function runAudit(system: string, user: string) {
 
   const message = completion.choices[0]?.message
   if (message?.refusal) {
-    throw new Error(`OpenAI refused to produce the audit: ${message.refusal}`)
+    fail(`OpenAI refused to produce the audit: ${message.refusal}`)
   }
   if (!message?.parsed) {
-    throw new Error(
-      `OpenAI response did not include a parsed result: ${JSON.stringify(completion)}`
-    )
+    fail(`OpenAI response did not include a parsed result: ${JSON.stringify(completion)}`)
   }
 
   return message.parsed
@@ -570,7 +521,7 @@ async function main() {
   const skill = downloadSkill()
 
   console.error('Gathering evidence from apps/docs...')
-  const evidence = await gatherEvidence()
+  const evidence = gatherEvidence()
 
   console.error(`Running audit via OpenAI (${MODEL})...`)
   const payload = await runAudit(buildSystemPrompt(skill), buildUserPrompt(evidence))
@@ -595,7 +546,7 @@ async function main() {
       fs.mkdirSync(reportsDir, { recursive: true })
       fs.writeFileSync(filePath, json)
     } catch (error) {
-      throw new Error(`Could not write report to ${filePath}.\n${describeError(error)}`)
+      fail(`Could not write report to ${filePath}.\n${describeError(error)}`)
     }
     console.error(`Report written to ${filePath}`)
   }
