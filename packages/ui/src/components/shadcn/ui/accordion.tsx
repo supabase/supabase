@@ -24,31 +24,33 @@ const AccordionTrigger = React.forwardRef<
   const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        ref={ref}
-        className={cn(
-          'cursor-pointer flex flex-1 gap-2 items-center justify-between py-4 text-left',
-          'font-medium transition-all hover:underline',
-          '[&[data-state=open]>svg]:rotate-180',
-          className
-        )}
-        {...props}
-        disabled={disabled}
-        tabIndex={computedTabIndex}
-      >
-        {children}
-        {!hideIcon && (
-          <ChevronDown
-            aria-hidden="true"
-            className={cn(
-              'h-4 w-4 shrink-0',
-              'transition-transform duration-200',
-              'motion-reduce:transition-none motion-reduce:duration-0'
-            )}
-          />
-        )}
-      </AccordionPrimitive.Trigger>
+    <AccordionPrimitive.Header asChild>
+      <div className="flex">
+        <AccordionPrimitive.Trigger
+          ref={ref}
+          className={cn(
+            'cursor-pointer flex flex-1 gap-2 items-center justify-between py-4 text-left',
+            'font-medium transition-all hover:underline',
+            '[&[data-state=open]>svg]:rotate-180',
+            className
+          )}
+          {...props}
+          disabled={disabled}
+          tabIndex={computedTabIndex}
+        >
+          {children}
+          {!hideIcon && (
+            <ChevronDown
+              aria-hidden="true"
+              className={cn(
+                'h-4 w-4 shrink-0',
+                'transition-transform duration-200',
+                'motion-reduce:transition-none motion-reduce:duration-0'
+              )}
+            />
+          )}
+        </AccordionPrimitive.Trigger>
+      </div>
     </AccordionPrimitive.Header>
   )
 })

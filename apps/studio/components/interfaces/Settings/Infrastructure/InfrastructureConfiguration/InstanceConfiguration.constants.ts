@@ -2,9 +2,6 @@ import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/share
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
 
-import { components } from '@/data/api'
-import { PROJECT_STATUS } from '@/lib/constants'
-
 export interface Region {
   key: AWS_REGIONS_KEYS
   name: string
@@ -57,14 +54,6 @@ export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
   PRIMARY: 140,
   READ_REPLICA: 140,
   REGION: REGION_NODE_HEIGHT,
-}
-
-export const REPLICA_STATUS: {
-  [key: string]: components['schemas']['DatabaseStatusResponse']['status']
-} = {
-  ...PROJECT_STATUS,
-  INIT_READ_REPLICA: 'INIT_READ_REPLICA',
-  INIT_READ_REPLICA_FAILED: 'INIT_READ_REPLICA_FAILED',
 }
 
 // [Joshen] Coordinates from https://github.com/tobilg/aws-edge-locations/blob/main/data/aws-edge-locations.json
