@@ -135,17 +135,19 @@ export const formatBytes = (
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
   const sizes = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  const requestedSizeIndex = size === undefined ? -1 : sizes.indexOf(size)
 
-  if (bytes === 0 || bytes === undefined) return size !== undefined ? `0 ${size}` : '0 bytes'
+  if (bytes === 0 || bytes === undefined) {
+    return requestedSizeIndex >= 0 ? `0 ${sizes[requestedSizeIndex]}` : '0 bytes'
+  }
 
   // Handle negative values
   const isNegative = bytes < 0
   const absBytes = Math.abs(bytes)
 
   let i = Math.floor(Math.log(absBytes) / Math.log(k))
-  if (size !== undefined) {
-    const idx = sizes.indexOf(size)
-    i = idx !== -1 ? idx : i
+  if (requestedSizeIndex >= 0) {
+    i = requestedSizeIndex
   }
   // clamp index to available sizes
   i = Math.max(0, Math.min(i, sizes.length - 1))
