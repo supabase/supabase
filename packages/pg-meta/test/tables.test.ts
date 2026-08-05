@@ -159,16 +159,14 @@ withTestDatabase(
     const scopedRow: any = scoped.zod.parse((await executeQuery(scoped.sql))[0])
     const legacyRow: any = legacy.zod.parse((await executeQuery(legacy.sql))[0])
 
-    // Four entries (2 source cols × 2 target cols), all one constraint_name.
-    expect(scopedRow.relationships).toHaveLength(4)
+    // Two entries (1 per pair mapped positionally), all one constraint_name.
+    expect(scopedRow.relationships).toHaveLength(2)
     expect(new Set(scopedRow.relationships.map((r: any) => r.constraint_name)).size).toBe(1)
     // Scoped is already ordered by (name, source col, target col), raw.
     expect(
       scopedRow.relationships.map((r: any) => [r.source_column_name, r.target_column_name])
     ).toEqual([
       ['a', 'x'],
-      ['a', 'y'],
-      ['b', 'x'],
       ['b', 'y'],
     ])
     legacyRow.relationships = sortRels(legacyRow.relationships)
