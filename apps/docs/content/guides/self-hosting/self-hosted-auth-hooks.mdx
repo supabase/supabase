@@ -120,7 +120,7 @@ docker compose up -d --force-recreate --no-deps auth
 
 ### Step 4: Verify
 
-Sign in, and decode the JWT. If the hook ran successfully, your custom claim should be present. If something doesn't work, check the auth logs:
+Sign in and decode the JWT. If the hook ran successfully, your custom claim should be present. If something doesn't work, check the auth logs:
 
 ```sh
 docker compose logs auth --tail 20
@@ -172,11 +172,11 @@ Generate a secret using the following command:
 echo "v1,whsec_$(openssl rand -base64 32)"
 ```
 
-Copy the output of this command e.g., `v1,whsec_abc123...`.
+Copy the output of this command, for example: `v1,whsec_abc123...`.
 
 ### Step 3: Update `.env` file
 
-Add the following environment variables in your `.env` file:
+Add the following environment variables to your `.env` file:
 
 ```bash name=.env
 HOOK_SEND_SMS_URI=http://host.docker.internal:8000/functions/v1/send_sms
