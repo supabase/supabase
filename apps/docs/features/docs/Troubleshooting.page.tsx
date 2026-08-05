@@ -22,7 +22,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
         <article
           id="sb-docs-troubleshooting-main-article"
-          data-e2e-testid="sb-docs-troubleshooting-main-article"
+          data-testid="sb-docs-troubleshooting-main-article"
           className="prose max-w-none mt-4"
         >
           <h1>{entry.data.title}</h1>
