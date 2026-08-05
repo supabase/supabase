@@ -180,6 +180,18 @@ data = supabase.from_('orchestral_sections').select('id, name, instruments(id, n
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<OrchestralSection>()
+  .Select("id, name, instruments(id, name)")
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -768,6 +780,18 @@ data = supabase.from_('teams').select('id, team_name, users(id, name)').execute(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Team>()
+  .Select("id, team_name, users(id, name)")
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ````javascript
@@ -980,6 +1004,30 @@ data = supabase.from_('shifts').select("""
     badge_scan_time
   )
 """).execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Shift>()
+  .Select(@"
+    *,
+    start_scan:scans!scan_id_start (
+      id,
+      user_id,
+      badge_scan_time
+    ),
+    end_scan:scans!scan_id_end (
+      id,
+      user_id,
+      badge_scan_time
+    )
+  ")
+  .Get();
 ```
 
 </TabPanel>

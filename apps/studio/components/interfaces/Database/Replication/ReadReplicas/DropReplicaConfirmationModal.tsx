@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { REPLICA_STATUS } from './InstanceConfiguration.constants'
+import { REPLICA_STATUS } from '../Replication.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { replicaKeys } from '@/data/read-replicas/keys'
 import { useReadReplicaRemoveMutation } from '@/data/read-replicas/replica-remove-mutation'
 import type { Database } from '@/data/read-replicas/replicas-query'
@@ -23,6 +24,26 @@ export const DropReplicaConfirmationModal = ({
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
+
+  const getRemoveReplicaErrorMessage = (message: string) => {
+    const isPrivateLinkAssociationError =
+      /private\s*link/i.test(message) && /association/i.test(message)
+
+    if (isPrivateLinkAssociationError) {
+      return (
+        <span>
+          Remove the replica{' '}
+          <InlineLink href={`/project/${projectRef}/settings/integrations`}>
+            PrivateLink association
+          </InlineLink>{' '}
+          before dropping this read replica
+        </span>
+      )
+    }
+
+    return `Failed to remove read replica: ${message}`
+  }
+
   const { mutate: removeReadReplica, isPending: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
       toast.success(`Tearing down read replica (ID: ${formattedId})`)
@@ -43,6 +64,9 @@ export const DropReplicaConfirmationModal = ({
 
       onSuccess()
       onCancel()
+    },
+    onError: (error) => {
+      toast.error(getRemoveReplicaErrorMessage(error.message))
     },
   })
 

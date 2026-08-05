@@ -2,13 +2,14 @@
 
 import type { ContentListingGroup, ContentListingItem } from '~/lib/content-listings.schema'
 import {
+  filterContentListingItems,
   getContentListingById,
   getContentListingGroupLabel,
   isExternalContentListingHref,
 } from '~/lib/content-listings.utils'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
@@ -53,9 +54,12 @@ function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
 
 function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
   const { trackClick } = useContentListingClickHandler(group)
+  const items = useMemo(() => filterContentListingItems(group.items), [group.items])
   const isGrid = group.type === 'grid'
   const listClassName = isGrid ? 'grid md:grid-cols-12 gap-4' : 'list-disc pl-6 space-y-2'
   const gridItemClassName = isGrid ? GRID_ITEM_CLASS[group.columns ?? 3] : undefined
+
+  if (!items.length) return null
 
   // Heading stays outside `not-prose` so it inherits the surrounding MDX prose
   // typography. The list itself opts out so its explicit Tailwind layout wins.
@@ -69,7 +73,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
           </div>
         )}
         <ul className={listClassName}>
-          {group.items.map((item) => {
+          {items.map((item) => {
             const external = isExternalContentListingHref(item.href)
             const key = `${group.id}-${item.href}`
 
@@ -82,6 +86,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                     className="block h-full"
                     onClick={() => trackClick(item)}
                     target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
                   >
                     <GlassPanel
                       title={item.title}
@@ -111,6 +116,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                   href={item.href}
                   onClick={() => trackClick(item)}
                   target={external ? '_blank' : undefined}
+                  rel={external ? 'noopener noreferrer' : undefined}
                 >
                   <strong>{item.title}</strong>: {item.description}
                 </Link>
@@ -125,7 +131,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
 
 export function ContentListings({ id }: { id: string }) {
   const group = getContentListingById(id)
-  if (!group || !group.items.length) return null
+  if (!group || !filterContentListingItems(group.items).length) return null
 
   return (
     <div className="my-10 space-y-10">

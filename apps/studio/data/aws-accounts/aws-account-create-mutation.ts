@@ -9,12 +9,14 @@ export type AWSAccountCreateVariables = {
   projectRef: string
   awsAccountId: string
   accountName?: string
+  databaseIdentifier?: string
 }
 
 export async function createAWSAccount({
   projectRef,
   awsAccountId,
   accountName,
+  databaseIdentifier,
 }: AWSAccountCreateVariables) {
   const { data, error } = await post(
     '/platform/projects/{ref}/privatelink/associations/aws-account',
@@ -25,6 +27,7 @@ export async function createAWSAccount({
       body: {
         aws_account_id: awsAccountId,
         account_name: accountName,
+        database_identifier: databaseIdentifier,
       },
     }
   )

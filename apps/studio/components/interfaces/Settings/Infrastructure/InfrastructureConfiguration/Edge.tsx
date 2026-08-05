@@ -3,7 +3,8 @@ import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { EdgeData, REPLICA_STATUS } from './InstanceConfiguration.constants'
+import { EdgeData } from './InstanceConfiguration.constants'
+import { REPLICA_STATUS } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 

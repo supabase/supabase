@@ -102,7 +102,7 @@ function getDiskNoticeDescription({
   if (isBranch) {
     return 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
   }
-  return 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud provider to configure your disk.'
+  return undefined
 }
 
 export function DiskSection({

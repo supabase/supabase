@@ -13,7 +13,11 @@ Before you begin, make sure you have:
 - Java 17 or later, which you can check with `java -version`
 - `curl` and `unzip`, to download and extract the generated project
 
-## 1. Create a Spring Boot project
+<$Partial path="quickstart_create_project.mdx" />
+
+Save your database password securely. You need it for the connection string.
+
+## 2. Create a Spring Boot project
 
 Use [Spring Initializr](https://start.spring.io) to scaffold a new project with the Web, Spring Data JPA, and Postgres Driver dependencies. Run the following from the directory where you keep your projects.
 
@@ -29,7 +33,7 @@ curl https://start.spring.io/starter.zip \
 unzip instruments.zip -d instruments && cd instruments
 ```
 
-## 2. Install Supabase's Agent Skills (optional)
+## 3. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
@@ -41,11 +45,9 @@ To install, run the following command in the root of your project:
 npx skills add supabase/agent-skills
 ```
 
-## 3. Set up the Postgres connection details
+## 4. Set up the Postgres connection details
 
-Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
-
-When your project is up and running, navigate to its dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
+Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&connectTab=direct&method=session).
 
 <Admonition type="caution">
 
@@ -64,7 +66,7 @@ You can reset your database password in your [Database Settings](/dashboard/proj
 The connection string contains your database password, and `application.properties` is committed with your project. Set the string as an environment variable instead, and set it the same way on whatever platform you deploy to.
 
 ```bash
-export SUPABASE_DB_URL='jdbc:postgresql://xxxx.pooler.supabase.com:5432/postgres?user=postgres.xxxx&password=[YOUR-PASSWORD]&sslmode=require'
+export SUPABASE_DB_URL='jdbc:postgresql://aws-[REGION].pooler.supabase.com:5432/postgres?user=postgres.[PROJECT-REF]&password=[YOUR-PASSWORD]&sslmode=require'
 ```
 
 The string you copied doesn't set `sslmode`, so add it. The driver defaults to `prefer`, which falls back to sending your data in plaintext if the encrypted attempt fails. You can also [enforce SSL](/docs/guides/platform/ssl-enforcement) on the database side.
@@ -79,7 +81,7 @@ spring.jpa.hibernate.ddl-auto=update
 
 If the app fails to start with `Unable to determine Dialect without JDBC metadata`, Hibernate couldn't open a connection at all. Look above that line in the logs for the real cause, most commonly `password authentication failed`.
 
-## 4. Change the default schema
+## 5. Change the default schema
 
 By default Hibernate creates tables in the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
 
@@ -89,7 +91,7 @@ Create the schema from the [Table Editor](/dashboard/project/_/editor) as your a
 spring.jpa.properties.hibernate.default_schema=app
 ```
 
-## 5. Create an entity and repository
+## 6. Create an entity and repository
 
 Spring Data JPA maps Java classes to database tables. Create an `Instrument` entity in `src/main/java/com/example/instruments/Instrument.java`. With `spring.jpa.hibernate.ddl-auto=update` set, Hibernate creates the `instruments` table for you when the app starts.
 
@@ -142,7 +144,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface InstrumentRepository extends JpaRepository<Instrument, Long> {}
 ```
 
-## 6. Seed sample data
+## 7. Seed sample data
 
 Add a `CommandLineRunner` bean to `InstrumentsApplication.java` that saves some sample instruments the first time the app starts.
 
@@ -174,7 +176,7 @@ public class InstrumentsApplication {
 }
 ```
 
-## 7. Query data from the app
+## 8. Query data from the app
 
 Create an `InstrumentController` that fetches every row from the `instruments` table through the repository and returns it as JSON.
 
@@ -202,7 +204,7 @@ public class InstrumentController {
 }
 ```
 
-## 8. Start the app
+## 9. Start the app
 
 Run the Spring Boot app, and go to http://localhost:8080/instruments in your browser. You should see the list of instruments.
 

@@ -427,10 +427,12 @@ export default function SqlToRest({
         >
           {relevantAssumptions.length > 0 && (
             <div>
-              <h3 className="my-1 text-base text-inherit">Assumptions</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                Assumptions
+              </span>
               <ol className="my-0 text-foreground">
                 {relevantAssumptions.map((assumption) => (
-                  <li className="text-sm">
+                  <li key={assumption} className="text-sm">
                     <Markdown>{assumption}</Markdown>
                   </li>
                 ))}
@@ -440,7 +442,9 @@ export default function SqlToRest({
 
           {relevantFaqs.length > 0 && (
             <>
-              <h3 className="my-1 text-base text-inherit">FAQs</h3>
+              <span className="block my-1 text-base text-inherit font-heading font-semibold">
+                FAQs
+              </span>
               {relevantFaqs.map((faq) => (
                 <Collapsible
                   key={faq.id}
@@ -462,7 +466,7 @@ export default function SqlToRest({
                     </button>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
-                    <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4 text-sm">
+                    <div className="text-foreground flex flex-col justify-start items-start px-3 pb-4 text-sm">
                       <Markdown
                         components={{
                           code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
