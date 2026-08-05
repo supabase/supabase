@@ -20,7 +20,6 @@ import {
   analyticsIntervalToGranularity,
   fetchLogs,
   SAFE_COMPARISON_OPERATOR_SQL,
-  SAFE_GRANULARITY_SQL,
   type Granularity,
 } from '@/data/reports/report.utils'
 
@@ -49,276 +48,28 @@ type AuthReportFilters = {
   provider?: string[] | null
 }
 
-const PROVIDER_SELECT_FRAGMENT = safeSql`COALESCE(JSON_VALUE(event_message, "$.provider"), 'unknown') as provider,`
-const PROVIDER_SELECT_FRAGMENT_F_ALIAS = safeSql`COALESCE(JSON_VALUE(f.event_message, "$.provider"), 'unknown') as provider,`
-
 const PROVIDER_GROUP_BY_FRAGMENT = safeSql`, provider`
 const EMPTY = safeSql``
-
-function providerSelectFragment(groupByProvider: boolean, aliased: boolean): SafeLogSqlFragment {
-  if (!groupByProvider) return EMPTY
-  return aliased ? PROVIDER_SELECT_FRAGMENT_F_ALIAS : PROVIDER_SELECT_FRAGMENT
-}
 
 function providerGroupBy(groupByProvider: boolean): SafeLogSqlFragment {
   return groupByProvider ? PROVIDER_GROUP_BY_FRAGMENT : EMPTY
 }
 
-function authFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment {
-  const conditions: SafeLogSqlFragment[] = []
-
-  if (filters?.status_code) {
-    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.status_code.operator]
-    conditions.push(
-      safeSql`response.status_code ${op} ${analyticsLiteral(filters.status_code.value)}`
-    )
-  }
-
-  if (filters?.provider && filters.provider.length > 0) {
-    const list = joinSqlFragments(filters.provider.map(analyticsLiteral), ', ')
-    conditions.push(safeSql`JSON_VALUE(event_message, "$.provider") IN (${list})`)
-  }
-
-  if (conditions.length === 0) return EMPTY
-  return safeSql`AND ${joinSqlFragments(conditions, ' AND ')}`
-}
-
-function edgeLogsFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment {
-  const conditions: SafeLogSqlFragment[] = []
-
-  if (filters?.status_code) {
-    const op = SAFE_COMPARISON_OPERATOR_SQL[filters.status_code.operator]
-    conditions.push(
-      safeSql`response.status_code ${op} ${analyticsLiteral(filters.status_code.value)}`
-    )
-  }
-
-  if (conditions.length === 0) return EMPTY
-  return safeSql`AND ${joinSqlFragments(conditions, ' AND ')}`
-}
-
-function authQuerySetup(interval: AnalyticsInterval, filters?: AuthReportFilters) {
-  return {
-    granularity: SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)],
-    filterSql: authFilterSql(filters),
-    groupByProvider: Boolean(filters?.provider && filters.provider.length > 0),
-  }
-}
-
-const AUTH_REPORT_SQL: Record<
-  MetricKey,
-  (interval: AnalyticsInterval, filters?: AuthReportFilters) => SafeLogSqlFragment
-> = {
-  ActiveUsers: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --active-users
-        select
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, true)}
-          count(distinct json_value(f.event_message, "$.auth_event.actor_id")) as count
-        from auth_logs f
-        where json_value(f.event_message, "$.auth_event.action") in (
-          'login', 'user_signedup', 'token_refreshed', 'user_modified',
-          'user_recovery_requested', 'user_reauthenticate_requested'
-        )
-        ${filterSql}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
-      `
-  },
-  SignInAttempts: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --sign-in-attempts
-        SELECT
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, false)}
-          CASE
-            WHEN JSON_VALUE(event_message, "$.provider") IS NOT NULL
-                AND JSON_VALUE(event_message, "$.provider") != ''
-            THEN CONCAT(
-              JSON_VALUE(event_message, "$.login_method"),
-              ' (',
-              JSON_VALUE(event_message, "$.provider"),
-              ')'
-            )
-            ELSE JSON_VALUE(event_message, "$.login_method")
-          END as login_type_provider,
-          COUNT(*) as count
-        FROM
-          auth_logs
-        WHERE
-          JSON_VALUE(event_message, "$.action") = 'login'
-          AND JSON_VALUE(event_message, "$.metering") = "true"
-          ${filterSql}
-        GROUP BY
-          timestamp, login_type_provider${providerGroupBy(groupByProvider)}
-        ORDER BY
-          timestamp desc, login_type_provider${providerGroupBy(groupByProvider)}
-      `
-  },
-  PasswordResetRequests: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --password-reset-requests
-        select
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, true)}
-          count(*) as count
-        from auth_logs f
-        where json_value(f.event_message, "$.auth_event.action") = 'user_recovery_requested'
-        ${filterSql}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
-      `
-  },
-  TotalSignUps: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --total-signups
-        select
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, false)}
-          count(*) as count
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-        ${filterSql}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
-      `
-  },
-  SignInProcessingTimeBasic: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --signin-processing-time-basic
-        select
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, false)}
-          count(*) as count,
-          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_processing_time_ms,
-          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_processing_time_ms,
-          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'login'
-        ${filterSql}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
-      `
-  },
-  SignInProcessingTimePercentiles: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --signin-processing-time-percentiles
-        select
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, false)}
-          count(*) as count,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'login'
-        ${filterSql}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
-      `
-  },
-  SignUpProcessingTimeBasic: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --signup-processing-time-basic
-        select
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, false)}
-          count(*) as count,
-          round(avg(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as avg_processing_time_ms,
-          round(min(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as min_processing_time_ms,
-          round(max(cast(json_value(event_message, "$.duration") as int64)) / 1000000, 2) as max_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-        ${filterSql}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
-      `
-  },
-  SignUpProcessingTimePercentiles: (interval, filters) => {
-    const { granularity, filterSql, groupByProvider } = authQuerySetup(interval, filters)
-    return safeSql`
-        --signup-processing-time-percentiles
-        select
-          timestamp_trunc(timestamp, ${granularity}) as timestamp,
-          ${providerSelectFragment(groupByProvider, false)}
-          count(*) as count,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(50)] / 1000000, 2) as p50_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(95)] / 1000000, 2) as p95_processing_time_ms,
-          round(approx_quantiles(cast(json_value(event_message, "$.duration") as int64), 100)[offset(99)] / 1000000, 2) as p99_processing_time_ms
-        from auth_logs
-        where json_value(event_message, "$.auth_event.action") = 'user_signedup'
-        ${filterSql}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
-      `
-  },
-  ErrorsByStatus: (interval, filters) => {
-    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
-    const filterSql = edgeLogsFilterSql(filters)
-    return safeSql`
-        --auth-errors-by-status
-  select
-    timestamp_trunc(timestamp, ${granularity}) as timestamp,
-    count(*) as count,
-    response.status_code
-  from edge_logs
-    cross join unnest(metadata) as m
-    cross join unnest(m.request) as request
-    cross join unnest(m.response) as response
-    cross join unnest(response.headers) as h
-  where path like '%auth/v1%'
-    and response.status_code >= 400 and response.status_code <= 599
-    ${filterSql}
-  group by timestamp, status_code
-  order by timestamp desc
-      `
-  },
-  ErrorsByAuthCode: (interval, filters) => {
-    const granularity = SAFE_GRANULARITY_SQL[analyticsIntervalToGranularity(interval)]
-    const filterSql = edgeLogsFilterSql(filters)
-    return safeSql`
-        --auth-errors-by-code
-  select
-    timestamp_trunc(timestamp, ${granularity}) as timestamp,
-    count(*) as count,
-    h.x_sb_error_code as error_code
-  from edge_logs
-    cross join unnest(metadata) as m
-    cross join unnest(m.request) as request
-    cross join unnest(m.response) as response
-    cross join unnest(response.headers) as h
-  where path like '%auth/v1%'
-    and response.status_code >= 400 and response.status_code <= 599
-    ${filterSql}
-  group by timestamp, error_code
-  order by timestamp desc
-      `
-  },
-}
-
 // fillTimeseries/isUnixMicro expects a 16-digit unix-microsecond timestamp, matching BigQuery's timestamp_trunc.
-const OTEL_TIMESTAMP: Record<Granularity, SafeLogSqlFragment> = {
+const TIMESTAMP_BUCKET: Record<Granularity, SafeLogSqlFragment> = {
   minute: safeSql`toUnixTimestamp(toStartOfMinute(timestamp)) * 1000000`,
   hour: safeSql`toUnixTimestamp(toStartOfHour(timestamp)) * 1000000`,
   day: safeSql`toUnixTimestamp(toStartOfDay(timestamp)) * 1000000`,
 }
 
-const PROVIDER_SELECT_FRAGMENT_OTEL = safeSql`coalesce(nullIf(JSONExtractString(event_message, 'provider'), ''), 'unknown') as provider,`
+const PROVIDER_SELECT_FRAGMENT = safeSql`coalesce(nullIf(JSONExtractString(event_message, 'provider'), ''), 'unknown') as provider,`
 
-function providerSelectFragmentOtel(groupByProvider: boolean): SafeLogSqlFragment {
-  return groupByProvider ? PROVIDER_SELECT_FRAGMENT_OTEL : EMPTY
+function providerSelectFragment(groupByProvider: boolean): SafeLogSqlFragment {
+  return groupByProvider ? PROVIDER_SELECT_FRAGMENT : EMPTY
 }
 
 // auth_logs rows have no HTTP response fields, so status_code can't apply here.
-function authOtelFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment {
+function authFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment {
   if (filters?.provider && filters.provider.length > 0) {
     const list = joinSqlFragments(filters.provider.map(analyticsLiteral), ', ')
     return safeSql`AND JSONExtractString(event_message, 'provider') IN (${list})`
@@ -327,7 +78,7 @@ function authOtelFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment {
 }
 
 // edge_logs rows have no auth provider field, so provider can't apply here.
-function edgeLogsOtelFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment {
+function edgeLogsFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment {
   if (filters?.status_code) {
     const op = SAFE_COMPARISON_OPERATOR_SQL[filters.status_code.operator]
     return safeSql`AND toInt32OrZero(log_attributes['response.status_code']) ${op} ${analyticsLiteral(filters.status_code.value)}`
@@ -335,25 +86,25 @@ function edgeLogsOtelFilterSql(filters?: AuthReportFilters): SafeLogSqlFragment 
   return EMPTY
 }
 
-function authOtelQuerySetup(interval: AnalyticsInterval, filters?: AuthReportFilters) {
+function authQuerySetup(interval: AnalyticsInterval, filters?: AuthReportFilters) {
   return {
-    ts: OTEL_TIMESTAMP[analyticsIntervalToGranularity(interval)],
-    filterSql: authOtelFilterSql(filters),
+    ts: TIMESTAMP_BUCKET[analyticsIntervalToGranularity(interval)],
+    filterSql: authFilterSql(filters),
     groupByProvider: Boolean(filters?.provider && filters.provider.length > 0),
   }
 }
 
-export const AUTH_REPORT_SQL_OTEL: Record<
+export const AUTH_REPORT_SQL: Record<
   MetricKey,
   (interval: AnalyticsInterval, filters?: AuthReportFilters) => SafeLogSqlFragment
 > = {
   ActiveUsers: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --active-users (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           count(distinct JSONExtractString(event_message, 'auth_event', 'actor_id')) as count
         from logs
         where source = 'auth_logs'
@@ -367,12 +118,12 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   SignInAttempts: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --sign-in-attempts (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           case
             when JSONExtractString(event_message, 'provider') != ''
             then concat(
@@ -394,12 +145,12 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   PasswordResetRequests: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --password-reset-requests (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           count() as count
         from logs
         where source = 'auth_logs'
@@ -410,12 +161,12 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   TotalSignUps: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --total-signups (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           count() as count
         from logs
         where source = 'auth_logs'
@@ -426,12 +177,12 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   SignInProcessingTimeBasic: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --signin-processing-time-basic (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           count() as count,
           round(avg(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as avg_processing_time_ms,
           round(min(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as min_processing_time_ms,
@@ -445,12 +196,12 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   SignInProcessingTimePercentiles: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --signin-processing-time-percentiles (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           count() as count,
           round(quantile(0.5)(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as p50_processing_time_ms,
           round(quantile(0.95)(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as p95_processing_time_ms,
@@ -464,12 +215,12 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   SignUpProcessingTimeBasic: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --signup-processing-time-basic (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           count() as count,
           round(avg(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as avg_processing_time_ms,
           round(min(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as min_processing_time_ms,
@@ -483,12 +234,12 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   SignUpProcessingTimePercentiles: (interval, filters) => {
-    const { ts, filterSql, groupByProvider } = authOtelQuerySetup(interval, filters)
+    const { ts, filterSql, groupByProvider } = authQuerySetup(interval, filters)
     return safeSql`
         --signup-processing-time-percentiles (otel)
         select
           ${ts} as timestamp,
-          ${providerSelectFragmentOtel(groupByProvider)}
+          ${providerSelectFragment(groupByProvider)}
           count() as count,
           round(quantile(0.5)(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as p50_processing_time_ms,
           round(quantile(0.95)(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as p95_processing_time_ms,
@@ -502,8 +253,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   ErrorsByStatus: (interval, filters) => {
-    const ts = OTEL_TIMESTAMP[analyticsIntervalToGranularity(interval)]
-    const filterSql = edgeLogsOtelFilterSql(filters)
+    const ts = TIMESTAMP_BUCKET[analyticsIntervalToGranularity(interval)]
+    const filterSql = edgeLogsFilterSql(filters)
     return safeSql`
         --auth-errors-by-status (otel)
         select
@@ -520,8 +271,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
       `
   },
   ErrorsByAuthCode: (interval, filters) => {
-    const ts = OTEL_TIMESTAMP[analyticsIntervalToGranularity(interval)]
-    const filterSql = edgeLogsOtelFilterSql(filters)
+    const ts = TIMESTAMP_BUCKET[analyticsIntervalToGranularity(interval)]
+    const filterSql = edgeLogsFilterSql(filters)
     return safeSql`
         --auth-errors-by-code (otel)
         select
@@ -654,17 +405,14 @@ export const createUsageReportConfig = ({
   endDate,
   interval,
   filters,
-  useOtel = false,
 }: {
   projectRef: string
   startDate: string
   endDate: string
   interval: AnalyticsInterval
   filters: AuthReportFilters
-  useOtel?: boolean
 }): ReportConfig<AuthReportFilters>[] => {
   const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-  const queries = useOtel ? AUTH_REPORT_SQL_OTEL : AUTH_REPORT_SQL
 
   return [
     {
@@ -684,9 +432,9 @@ export const createUsageReportConfig = ({
           { attribute: 'ActiveUsers', provider: 'logs', label: 'Auth Activity', enabled: true },
         ]
 
-        const sql = queries.ActiveUsers(interval, filters)
+        const sql = AUTH_REPORT_SQL.ActiveUsers(interval, filters)
 
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
 
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
@@ -740,8 +488,8 @@ export const createUsageReportConfig = ({
           },
         ]
 
-        const sql = queries.SignInAttempts(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.SignInAttempts(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
         return {
@@ -772,8 +520,8 @@ export const createUsageReportConfig = ({
           },
         ]
 
-        const sql = queries.TotalSignUps(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.TotalSignUps(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
         return {
@@ -804,8 +552,8 @@ export const createUsageReportConfig = ({
           },
         ]
 
-        const sql = queries.PasswordResetRequests(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.PasswordResetRequests(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
         return {
@@ -824,16 +572,13 @@ export const createErrorsReportConfig = ({
   endDate,
   interval,
   filters,
-  useOtel = false,
 }: {
   projectRef: string
   startDate: string
   endDate: string
   interval: AnalyticsInterval
   filters: AuthReportFilters
-  useOtel?: boolean
 }): ReportConfig<AuthReportFilters>[] => {
-  const queries = useOtel ? AUTH_REPORT_SQL_OTEL : AUTH_REPORT_SQL
   return [
     {
       id: 'auth-errors',
@@ -847,8 +592,8 @@ export const createErrorsReportConfig = ({
       defaultChartStyle: 'line',
       titleTooltip: 'The total number of auth errors by status code from the API Gateway.',
       dataProvider: async () => {
-        const sql = queries.ErrorsByStatus(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.ErrorsByStatus(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
 
         if (!rawData?.result) return { data: [], query: sql }
 
@@ -872,8 +617,8 @@ export const createErrorsReportConfig = ({
       titleTooltip:
         'The total number of auth errors by Supabase Auth error code from the API Gateway.',
       dataProvider: async () => {
-        const sql = queries.ErrorsByAuthCode(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.ErrorsByAuthCode(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
 
         if (!rawData?.result) return { data: [], query: sql }
 
@@ -906,17 +651,14 @@ export const createLatencyReportConfig = ({
   endDate,
   interval,
   filters,
-  useOtel = false,
 }: {
   projectRef: string
   startDate: string
   endDate: string
   interval: AnalyticsInterval
   filters: AuthReportFilters
-  useOtel?: boolean
 }): ReportConfig<AuthReportFilters>[] => {
   const groupByProvider = Boolean(filters?.provider && filters.provider.length > 0)
-  const queries = useOtel ? AUTH_REPORT_SQL_OTEL : AUTH_REPORT_SQL
 
   return [
     {
@@ -948,8 +690,8 @@ export const createLatencyReportConfig = ({
           },
         ]
 
-        const sql = queries.SignInProcessingTimeBasic(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.SignInProcessingTimeBasic(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
         return {
@@ -990,8 +732,8 @@ export const createLatencyReportConfig = ({
           },
         ]
 
-        const sql = queries.SignInProcessingTimePercentiles(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.SignInProcessingTimePercentiles(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
         return {
@@ -1030,8 +772,8 @@ export const createLatencyReportConfig = ({
           },
         ]
 
-        const sql = queries.SignUpProcessingTimeBasic(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.SignUpProcessingTimeBasic(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
         return {
@@ -1072,8 +814,8 @@ export const createLatencyReportConfig = ({
           },
         ]
 
-        const sql = queries.SignUpProcessingTimePercentiles(interval, filters)
-        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
+        const sql = AUTH_REPORT_SQL.SignUpProcessingTimePercentiles(interval, filters)
+        const rawData = await fetchLogs(projectRef, sql, startDate, endDate, true)
         const transformedData = defaultAuthReportFormatter(rawData, attributes, groupByProvider)
 
         return {
