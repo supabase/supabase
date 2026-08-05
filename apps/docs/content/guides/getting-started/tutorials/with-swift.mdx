@@ -93,7 +93,13 @@ struct AuthView: View {
       }
     }
     .onOpenURL(perform: { url in
-      supabase.auth.handle(url)
+      Task {
+        do {
+          try await supabase.auth.session(from: url)
+        } catch {
+          self.result = .failure(error)
+        }
+      }
     })
   }
 
