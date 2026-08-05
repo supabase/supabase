@@ -198,12 +198,7 @@ export function VercelConnectionError({
       <Admonition
         type="danger"
         title="Supabase project created but Vercel connection failed"
-        description={
-          <>
-            Your Supabase project was created, but it could not be connected to Vercel.
-            <span className="mt-1 block text-foreground-lighter">Error: {message}</span>
-          </>
-        }
+        description={`Error: ${message}`}
       />
       <Button variant="primary" block onClick={onRetry}>
         Retry connection
