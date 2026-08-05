@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import {
@@ -54,7 +55,11 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
   )
 
-  const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
+  const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation({
+    onError(error) {
+      toast.error(`Failed to create connection: ${error.message}`)
+    },
+  })
 
   useEffect(() => {
     if (!isSuccess) return
