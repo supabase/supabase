@@ -18,7 +18,7 @@ interface ExplorerTabBarProps {
   dirtyResources: Record<string, boolean>
   isHomeActive: boolean
   onHomeSelect: () => void
-  onCreateSnippet: () => void
+  onCreateQuery: () => void
   onCreateNotebook: () => void
   onCreateChat: () => void
   onSelect: (tabId: string) => void
@@ -31,7 +31,7 @@ export const ExplorerTabBar = ({
   dirtyResources,
   isHomeActive,
   onHomeSelect,
-  onCreateSnippet,
+  onCreateQuery,
   onCreateNotebook,
   onCreateChat,
   onSelect,
@@ -123,7 +123,7 @@ export const ExplorerTabBar = ({
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="bottom" className="w-44">
-        <DropdownMenuItem className="gap-x-2" onClick={onCreateSnippet}>
+        <DropdownMenuItem className="gap-x-2" onClick={onCreateQuery}>
           <SquareCode size={14} strokeWidth={1.5} />
           New SQL query
         </DropdownMenuItem>

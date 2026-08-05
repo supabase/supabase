@@ -10,8 +10,8 @@ import type { NextPageWithLayout } from '@/types'
  *
  * Uses the same project chrome as the SQL editor (`DefaultLayout` →
  * `ProjectLayoutWithAuth` with a resizable `productMenu`). It does not go
- * through `EditorBaseLayout`, because that layout renders the existing
- * snippet-only `EditorTabs`; the Explorer brings its own resource-typed tab
+ * through `EditorBaseLayout`, because that layout renders the existing editor
+ * tabs; the Explorer brings its own resource-typed tab
  * strip, which is exactly the swap PR E3 makes behind the `explorer` flag.
  *
  * Mock data only — nothing reaches a project.

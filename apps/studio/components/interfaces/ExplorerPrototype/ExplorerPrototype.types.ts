@@ -7,8 +7,8 @@
  *
  * Two deliberate departures from the spec text:
  *
- * 1. `QueryBinding` is inline-only. `SnippetReference` was dropped — Notebooks
- *    ship as a new feature, so there are no legacy cells to stay compatible with.
+ * 1. `QueryBinding` is inline-only. Notebook cells always own their query
+ *    payload, so there are no legacy resource references to stay compatible with.
  * 2. `CellSource` is a discriminated union rather than `{ id, parameters }` with
  *    loose parameter typing. Same wire shape, but the compiler can then tell that
  *    `time_range` belongs to logs and `identifier` belongs to database.
@@ -19,7 +19,7 @@
 // ---------------------------------------------------------------------------
 
 export type TabResource =
-  | { type: 'snippet'; id: string }
+  | { type: 'query'; id: string }
   | { type: 'notebook'; id: string }
   | { type: 'chat'; id: string }
 
@@ -118,7 +118,7 @@ export type NotebookContent = {
 
 // ---------------------------------------------------------------------------
 // Execution result — caller-owned state, so each surface decides where it lives
-// (notebook session state, assistant message state, snippet session state).
+// (ad-hoc query, notebook session, or assistant message state).
 // ---------------------------------------------------------------------------
 
 export type ResultRow = Record<string, string | number | null>
@@ -132,16 +132,6 @@ export type CellResultState =
 // ---------------------------------------------------------------------------
 // Surfaces other than notebooks
 // ---------------------------------------------------------------------------
-
-/** A saved snippet. The snippet adapter maps this to and from a one-cell QueryCellModel. */
-export type SnippetDoc = {
-  id: string
-  name: string
-  /** Mirrors today's content types: 'sql' means database, 'log_sql' means logs. */
-  contentType: 'sql' | 'log_sql'
-  sql: string
-  display: QueryDisplay
-}
 
 export type ChatMessage =
   | { id: string; role: 'user'; text: string }

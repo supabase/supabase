@@ -2,8 +2,7 @@
  * PROTOTYPE — the per-cell source picker.
  *
  * In the real build this is PR E1's controlled `QuerySourceMenu`: same idea,
- * fully driven by props, no editor context. Source is per-cell here, which is
- * the departure from today's snippets (where source is fixed by content type).
+ * fully driven by props, no editor context. Source is configured per-cell.
  */
 
 import { Check, ChevronDown, Database, ScrollText } from 'lucide-react'

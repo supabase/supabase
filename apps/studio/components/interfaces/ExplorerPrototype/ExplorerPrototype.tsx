@@ -19,27 +19,36 @@ import { Admonition } from 'ui-patterns/Admonition'
 import type { Tab } from './ExplorerPrototype.types'
 import { useExplorerPrototype } from './ExplorerPrototypeContext'
 import { ExplorerTabBar } from './ExplorerTabBar'
+import { QueryCell } from './QueryCell'
+import { notebookTitle } from './ExplorerResources'
 import { ChatView } from './views/ChatView'
 import { HomeView } from './views/HomeView'
 import { NotebookView } from './views/NotebookView'
-import { snippetToQueryCell } from './views/snippetAdapter'
-import { SnippetView } from './views/SnippetView'
 
 export const ExplorerPrototype = () => {
   const state = useExplorerPrototype()
   const activeTab = state.tabs.find((tab) => tab.id === state.activeTabId)
   const isHomeActive = state.activeTabId === 'home'
+  const notebookTargets = Object.entries(state.notebooks).map(([id, notebook]) => ({
+    id,
+    title: notebookTitle(notebook),
+  }))
 
   const renderTab = (tab: Tab) => {
-    if (tab.resource.type === 'snippet') {
-      const snippet = state.snippets[tab.resource.id]
-      if (!snippet) return null
+    if (tab.resource.type === 'query') {
+      const query = state.queries[tab.resource.id]
+      if (!query) return null
       return (
-        <SnippetView
-          snippet={snippet}
-          result={state.results[snippet.id] ?? { status: 'idle' }}
-          onChange={(next) => state.updateSnippet(snippet.id, next)}
-          onRun={(rowLimit) => state.runCell(snippetToQueryCell(snippet), rowLimit)}
+        <QueryCell
+          full
+          value={query}
+          result={state.results[query.id] ?? { status: 'idle' }}
+          rowLimit={100}
+          notebookTargets={notebookTargets}
+          onAddToNotebook={(notebookId) => state.addQueryToNotebook(query, notebookId)}
+          onExplain={() => state.explainQuery(query)}
+          onChange={(next) => state.updateQuery(query.id, next)}
+          onRun={() => state.runCell(query, 100)}
         />
       )
     }
@@ -63,6 +72,10 @@ export const ExplorerPrototype = () => {
           onSettingsChange={(settings) => state.updateNotebookSettings(notebookId, settings)}
           onRunCell={(cell, rowLimit) => state.runCell(cell, rowLimit)}
           onRunAll={() => state.runNotebook(notebookId)}
+          notebookTargets={notebookTargets}
+          onAddQueryToNotebook={state.addQueryToNotebook}
+          onExplainQuery={state.explainQuery}
+          onAnalyse={() => state.analyseNotebook(tab.title)}
         />
       )
     }
@@ -82,6 +95,9 @@ export const ExplorerPrototype = () => {
         }
         onDeny={(messageId) => state.setChatApproval(chat.id, messageId, 'denied')}
         onSendMessage={(message) => state.sendChatMessage(chat.id, message)}
+        notebookTargets={notebookTargets}
+        onAddQueryToNotebook={state.addQueryToNotebook}
+        onExplainQuery={state.explainQuery}
       />
     )
   }
@@ -96,7 +112,7 @@ export const ExplorerPrototype = () => {
           dirtyResources={state.dirtyResources}
           isHomeActive={isHomeActive}
           onHomeSelect={() => state.setActiveTabId('home')}
-          onCreateSnippet={state.createSnippet}
+          onCreateQuery={state.createQuery}
           onCreateNotebook={state.createNotebook}
           onCreateChat={() => state.createChat()}
           onSelect={state.setActiveTabId}
@@ -107,8 +123,8 @@ export const ExplorerPrototype = () => {
       <div className="min-h-0 flex-1 overflow-y-auto">
         {isHomeActive ? (
           <HomeView
+            onCreateQuery={state.createQuery}
             onCreateNotebook={state.createNotebook}
-            onCreateSnippet={state.createSnippet}
             onCreateChat={state.createChat}
           />
         ) : activeTab ? (
@@ -118,7 +134,7 @@ export const ExplorerPrototype = () => {
             <Admonition
               type="default"
               title="No tabs open"
-              description="Choose a notebook, snippet, or chat from the sidebar."
+              description="Choose a notebook or chat from the sidebar, or start a new query."
             />
           </div>
         )}

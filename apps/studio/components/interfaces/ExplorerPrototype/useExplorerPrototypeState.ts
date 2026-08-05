@@ -10,7 +10,6 @@ import {
   INITIAL_CHATS,
   INITIAL_NOTEBOOKS,
   INITIAL_RECENT_ITEMS,
-  INITIAL_SNIPPETS,
   INITIAL_TABS,
   isWriteQuery,
   runMockQuery,
@@ -23,7 +22,6 @@ import type {
   QueryCellModel,
   RecentItem,
   RunMode,
-  SnippetDoc,
   Tab,
   TabResource,
 } from './ExplorerPrototype.types'
@@ -50,8 +48,8 @@ export const resolveEffectiveRowLimit = (
 export const useExplorerPrototypeState = () => {
   const [tabs, setTabs] = useState<Tab[]>(INITIAL_TABS)
   const [activeTabId, setActiveTabId] = useState<string>('home')
+  const [queries, setQueries] = useState<Record<string, QueryCellModel>>({})
   const [notebooks, setNotebooks] = useState<Record<string, NotebookContent>>(INITIAL_NOTEBOOKS)
-  const [snippets, setSnippets] = useState<Record<string, SnippetDoc>>(INITIAL_SNIPPETS)
   const [chats, setChats] = useState<Record<string, ChatSession>>(INITIAL_CHATS)
   const [results, setResults] = useState<Record<string, CellResultState>>({})
   const [dirtyResources, setDirtyResources] = useState<Record<string, boolean>>({})
@@ -91,7 +89,13 @@ export const useExplorerPrototypeState = () => {
 
   const closeTab = (tabId: string) => {
     setTabs((current) => {
+      const closedTab = current.find((tab) => tab.id === tabId)
       const remaining = current.filter((tab) => tab.id !== tabId)
+      if (closedTab?.resource.type === 'query') {
+        setQueries(({ [closedTab.resource.id]: _, ...next }) => next)
+        setResults(({ [closedTab.resource.id]: _, ...next }) => next)
+        setDirtyResources(({ [closedTab.resource.id]: _, ...next }) => next)
+      }
       setActiveTabId((active) => {
         if (active !== tabId) return active
         const closedIndex = current.findIndex((tab) => tab.id === tabId)
@@ -199,6 +203,42 @@ export const useExplorerPrototypeState = () => {
 
   // -- resource creation ----------------------------------------------------
 
+  /**
+   * Ad-hoc queries have no document or sidebar entry. Closing their tab drops
+   * the query and its local result state.
+   */
+  const createQuery = () => {
+    const id = nextId('query')
+    const resource: TabResource = { type: 'query', id }
+    setQueries((current) => ({
+      ...current,
+      [id]: {
+        id,
+        type: 'query',
+        name: 'Untitled query',
+        query: {
+          type: 'inline',
+          source: { id: 'database', parameters: { identifier: 'primary' } },
+          sql: 'select ',
+        },
+        display: { type: 'table' },
+      },
+    }))
+    setDirtyResources((current) => ({ ...current, [id]: true }))
+    openTab(resource, 'Untitled query')
+  }
+
+  const updateQuery = (queryId: string, next: QueryCellModel) => {
+    setQueries((current) => ({ ...current, [queryId]: next }))
+    setDirtyResources((current) => ({ ...current, [queryId]: true }))
+  }
+
+  const addQueryToNotebook = (query: QueryCellModel, notebookId: string) =>
+    updateNotebook(notebookId, (notebook) => ({
+      ...notebook,
+      cells: [...notebook.cells, { ...query, id: nextId('cell') }],
+    }))
+
   const createNotebook = () => {
     const id = nextId('notebook')
     const resource: TabResource = { type: 'notebook', id }
@@ -231,23 +271,6 @@ export const useExplorerPrototypeState = () => {
     openTab(resource, 'Untitled notebook')
   }
 
-  const createSnippet = () => {
-    const id = nextId('snippet')
-    const resource: TabResource = { type: 'snippet', id }
-    setSnippets((current) => ({
-      ...current,
-      [id]: {
-        id,
-        name: 'Untitled snippet',
-        contentType: 'sql',
-        sql: 'select ',
-        display: { type: 'table' },
-      },
-    }))
-    markModified(resource)
-    openTab(resource, 'Untitled snippet')
-  }
-
   const createChat = (prompt?: string) => {
     const text = prompt?.trim() ?? ''
 
@@ -266,12 +289,15 @@ export const useExplorerPrototypeState = () => {
     openTab(resource, title)
   }
 
-  // -- snippets & chat ------------------------------------------------------
+  const explainQuery = (query: QueryCellModel) =>
+    createChat(
+      `Explain the following SQL query and suggest any improvements.\n\n\`\`\`sql\n${query.query.sql}\n\`\`\``
+    )
 
-  const updateSnippet = (snippetId: string, next: SnippetDoc) => {
-    setSnippets((current) => ({ ...current, [snippetId]: next }))
-    markModified({ type: 'snippet', id: snippetId })
-  }
+  const analyseNotebook = (title: string) =>
+    createChat(`Run the notebook "${title}" and analyse the results.`)
+
+  // -- chat -----------------------------------------------------------------
 
   const setChatApproval = (chatId: string, messageId: string, approval: 'approved' | 'denied') => {
     setChats((current) => ({
@@ -366,6 +392,10 @@ export const useExplorerPrototypeState = () => {
     openTab,
     closeTab,
     reorderTabs,
+    queries,
+    createQuery,
+    updateQuery,
+    addQueryToNotebook,
     notebooks,
     updateCell,
     addCell,
@@ -374,11 +404,10 @@ export const useExplorerPrototypeState = () => {
     moveCellTo,
     updateNotebookSettings,
     createNotebook,
-    createSnippet,
-    snippets,
-    updateSnippet,
     chats,
     createChat,
+    explainQuery,
+    analyseNotebook,
     sendChatMessage,
     setChatApproval,
     createNotebookFromChat,

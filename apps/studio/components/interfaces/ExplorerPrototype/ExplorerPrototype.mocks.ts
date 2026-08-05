@@ -12,7 +12,6 @@ import type {
   NotebookContent,
   RecentItem,
   ResultRow,
-  SnippetDoc,
   Source,
   Tab,
 } from './ExplorerPrototype.types'
@@ -113,30 +112,6 @@ export const INITIAL_NOTEBOOKS: Record<string, NotebookContent> = {
         display: { type: 'table' },
       },
     ],
-  },
-}
-
-export const INITIAL_SNIPPETS: Record<string, SnippetDoc> = {
-  'snip-slow-queries': {
-    id: 'snip-slow-queries',
-    name: 'Slowest queries',
-    contentType: 'sql',
-    sql: 'select calls, mean_exec_time, query\nfrom pg_stat_statements\norder by mean_exec_time desc\nlimit 20',
-    display: { type: 'table' },
-  },
-  'snip-edge-errors': {
-    id: 'snip-edge-errors',
-    name: 'Edge errors by hour',
-    contentType: 'log_sql',
-    sql: 'select toStartOfHour(timestamp) as hour, count(*) as errors\nfrom logs\nwhere status_code >= 500\ngroup by hour\norder by hour',
-    display: {
-      type: 'chart',
-      chart: {
-        type: 'bar',
-        x_axis: { field: 'hour' },
-        series: [{ field: 'errors', label: 'Errors' }],
-      },
-    },
   },
 }
 
@@ -279,11 +254,6 @@ export const INITIAL_TABS: Tab[] = [
     title: 'Authentication health',
     resource: { type: 'notebook', id: 'nb-auth-health' },
   },
-  {
-    id: 'tab-snip',
-    title: 'Slowest queries',
-    resource: { type: 'snippet', id: 'snip-slow-queries' },
-  },
   { id: 'tab-chat', title: 'Debugging signups', resource: { type: 'chat', id: 'chat-1' } },
   {
     id: 'tab-chat-notebook',
@@ -305,14 +275,6 @@ export const INITIAL_RECENT_ITEMS: RecentItem[] = [
   {
     resource: { type: 'chat', id: 'chat-2' },
     modifiedAt: Date.now() - 44 * 60_000,
-  },
-  {
-    resource: { type: 'snippet', id: 'snip-slow-queries' },
-    modifiedAt: Date.now() - 3 * 3_600_000,
-  },
-  {
-    resource: { type: 'snippet', id: 'snip-edge-errors' },
-    modifiedAt: Date.now() - 2 * 86_400_000,
   },
 ]
 

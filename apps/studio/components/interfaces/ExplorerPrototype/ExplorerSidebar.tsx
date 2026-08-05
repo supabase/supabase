@@ -1,7 +1,7 @@
 /**
  * PROTOTYPE — the Explorer sidebar, as a drill-down menu.
  *
- * Root level is three resource types plus a mixed "Recent" group, ordered by
+ * Root level is saved resource types plus a mixed "Recent" group, ordered by
  * last modification. Choosing a type drills into that type's full list, with a
  * search field and a back button. The sidebar never renders a resource — it
  * only opens tabs.
@@ -26,26 +26,19 @@ import type {
   ChatSession,
   NotebookContent,
   RecentItem,
-  SnippetDoc,
   TabResource,
 } from './ExplorerPrototype.types'
 import { useExplorerPrototype } from './ExplorerPrototypeContext'
-import { RESOURCE_ICON, RESOURCE_SECTIONS, type ResourceType } from './ExplorerResources'
+import {
+  notebookTitle,
+  RESOURCE_ICON,
+  RESOURCE_SECTIONS,
+  type ResourceType,
+  type SidebarResourceType,
+} from './ExplorerResources'
 
 /** One list entry, uniform across resource types. */
 type ResourceEntry = { id: string; title: string }
-
-export const notebookTitle = (notebook: NotebookContent) => {
-  const heading = notebook.cells.find((cell) => cell.type === 'markdown')
-  if (heading && heading.type === 'markdown') {
-    const firstLine = heading.markdown
-      .split('\n')[0]
-      .replace(/^#+\s*/, '')
-      .trim()
-    if (firstLine.length > 0) return firstLine
-  }
-  return 'Untitled notebook'
-}
 
 const formatModifiedAt = (modifiedAt: number) => {
   const minutes = Math.round((Date.now() - modifiedAt) / 60_000)
@@ -75,7 +68,6 @@ const rowClassName = (isActive: boolean) =>
 
 interface ExplorerSidebarProps {
   notebooks: Record<string, NotebookContent>
-  snippets: Record<string, SnippetDoc>
   chats: Record<string, ChatSession>
   recentItems: RecentItem[]
   activeResource?: TabResource
@@ -84,16 +76,15 @@ interface ExplorerSidebarProps {
 
 export const ExplorerSidebar = ({
   notebooks,
-  snippets,
   chats,
   recentItems,
   activeResource,
   onOpen,
 }: ExplorerSidebarProps) => {
-  const [drilledType, setDrilledType] = useState<ResourceType | undefined>(undefined)
+  const [drilledType, setDrilledType] = useState<SidebarResourceType | undefined>(undefined)
   // Kept separately from `drilledType` so the level-1 panel still has a type to
   // render from while it animates out, after `drilledType` has been cleared.
-  const [panelType, setPanelType] = useState<ResourceType>('snippet')
+  const [panelType, setPanelType] = useState<SidebarResourceType>('notebook')
   const [search, setSearch] = useState('')
   const searchRef = useRef<HTMLInputElement>(null)
 
@@ -113,24 +104,21 @@ export const ExplorerSidebar = ({
       const notebook = notebooks[resource.id]
       return notebook ? notebookTitle(notebook) : undefined
     }
-    if (resource.type === 'snippet') return snippets[resource.id]?.name
+    if (resource.type === 'query') return undefined
     return chats[resource.id]?.name
   }
 
-  const entriesFor = (type: ResourceType): ResourceEntry[] => {
+  const entriesFor = (type: SidebarResourceType): ResourceEntry[] => {
     if (type === 'notebook') {
       return Object.entries(notebooks).map(([id, notebook]) => ({
         id,
         title: notebookTitle(notebook),
       }))
     }
-    if (type === 'snippet') {
-      return Object.entries(snippets).map(([id, snippet]) => ({ id, title: snippet.name }))
-    }
     return Object.entries(chats).map(([id, chat]) => ({ id, title: chat.name }))
   }
 
-  const drillInto = (type: ResourceType) => {
+  const drillInto = (type: SidebarResourceType) => {
     setSearch('')
     setPanelType(type)
     setDrilledType(type)
@@ -190,7 +178,9 @@ export const ExplorerSidebar = ({
             </nav>
 
             <section className="flex flex-col gap-px">
-              <h3 className="heading-meta mb-1 px-3 text-tertiary-foreground">Recent</h3>
+              <h3 className="mb-2 px-3 font-mono text-sm font-normal uppercase text-foreground-lighter">
+                Recent
+              </h3>
               {resolvedRecents.map((item) => {
                 const Icon = RESOURCE_ICON[item.resource.type]
                 const isRecentActive = isActive(item.resource.type, item.resource.id)
@@ -312,7 +302,6 @@ export const ExplorerSidebarMenu = () => {
   return (
     <ExplorerSidebar
       notebooks={state.notebooks}
-      snippets={state.snippets}
       chats={state.chats}
       recentItems={state.recentItems}
       activeResource={activeTab?.resource}

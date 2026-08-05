@@ -2,7 +2,7 @@
  * PROTOTYPE — Explorer's fixed home tab.
  *
  * Home is intentionally not a resource or a closable tab. It is a compact
- * launch surface for the three ways to start exploring a project.
+ * launch surface for ad-hoc queries, notebooks, and chats.
  */
 
 import { MessageSquare, NotebookText, SquareCode } from 'lucide-react'
@@ -13,12 +13,12 @@ import { ChatComposer } from './ChatComposer'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 
 interface HomeViewProps {
+  onCreateQuery: () => void
   onCreateNotebook: () => void
-  onCreateSnippet: () => void
   onCreateChat: (prompt: string) => void
 }
 
-export const HomeView = ({ onCreateNotebook, onCreateSnippet, onCreateChat }: HomeViewProps) => {
+export const HomeView = ({ onCreateQuery, onCreateNotebook, onCreateChat }: HomeViewProps) => {
   const [showTemplates, setShowTemplates] = useState(true)
 
   return (
@@ -45,7 +45,7 @@ export const HomeView = ({ onCreateNotebook, onCreateSnippet, onCreateChat }: Ho
                 title="Run SQL"
                 description="Write and run an ad-hoc query"
                 bgColor="bg-blue-500"
-                onClick={onCreateSnippet}
+                onClick={onCreateQuery}
               />
               <ActionCard
                 icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}

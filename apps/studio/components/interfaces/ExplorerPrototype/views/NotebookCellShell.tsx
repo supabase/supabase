@@ -4,7 +4,7 @@
  * Reorder / delete / insert are properties of the *notebook*, not of the cell,
  * so they live here in a left gutter rather than inside `QueryCell` or
  * `MarkdownCellView`. That keeps the cell components identical on every surface
- * (notebook, snippet, agent chat) and lets both cell kinds share one control
+ * (notebook, agent chat) and lets both cell kinds share one control
  * layout. The horizontal plus + drag affordances mirror notebook editors: the
  * drag button opens the block menu on click and remains the native drag handle.
  */

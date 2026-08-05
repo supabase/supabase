@@ -2,7 +2,7 @@
  * PROTOTYPE — Agent chat view.
  *
  * The agent query block is the *same* QueryCell component the notebook and
- * snippet views render, passed `readOnly`. What differs is chrome, not machinery:
+ * notebook views render, passed `readOnly`. What differs is chrome, not machinery:
  * an approval footer in the footer slot, and a data-sharing gate on the results.
  *
  * Messages stay at a readable measure; agent query blocks run the full width,
@@ -30,6 +30,7 @@ import type {
 } from '../ExplorerPrototype.types'
 import { RESOURCE_ICON } from '../ExplorerResources'
 import { QueryCell } from '../QueryCell'
+import type { NotebookTarget } from '../QueryCell'
 import { TabToolbar } from '../TabToolbar'
 import { ChatComposer } from './ChatComposer'
 import { NotebookView } from './NotebookView'
@@ -48,6 +49,9 @@ interface ChatViewProps {
   onApproveNotebook: (messageId: string, title: string, notebook: NotebookContent) => void
   onDeny: (messageId: string) => void
   onSendMessage: (message: string) => void
+  notebookTargets?: NotebookTarget[]
+  onAddQueryToNotebook?: (query: QueryCellModel, notebookId: string) => void
+  onExplainQuery?: (query: QueryCellModel) => void
 }
 
 const CHAT_ROW_LIMIT = 100
@@ -99,6 +103,9 @@ export const ChatView = ({
   onApproveNotebook,
   onDeny,
   onSendMessage,
+  notebookTargets = [],
+  onAddQueryToNotebook,
+  onExplainQuery,
 }: ChatViewProps) => {
   // Stands in for `useOrgAiOptInLevel()` — query results only reach the model
   // at the `schema_and_log_and_data` level.
@@ -189,6 +196,9 @@ export const ChatView = ({
                       onSettingsChange={() => undefined}
                       onRunCell={() => undefined}
                       onRunAll={() => undefined}
+                      notebookTargets={notebookTargets}
+                      onAddQueryToNotebook={onAddQueryToNotebook}
+                      onExplainQuery={onExplainQuery}
                     />
                   </div>
                   {isPending && (
@@ -221,6 +231,13 @@ export const ChatView = ({
                     result={result}
                     rowLimit={CHAT_ROW_LIMIT}
                     readOnly
+                    notebookTargets={notebookTargets}
+                    onAddToNotebook={
+                      onAddQueryToNotebook
+                        ? (notebookId) => onAddQueryToNotebook(message.cell, notebookId)
+                        : undefined
+                    }
+                    onExplain={onExplainQuery ? () => onExplainQuery(message.cell) : undefined}
                     onRun={isPending ? undefined : () => onApprove(message.id, message.cell)}
                     footerSlot={
                       <>

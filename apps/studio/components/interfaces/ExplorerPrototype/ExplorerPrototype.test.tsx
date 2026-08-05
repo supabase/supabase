@@ -7,15 +7,16 @@ import {
   INITIAL_CHATS,
   INITIAL_NOTEBOOKS,
   INITIAL_RECENT_ITEMS,
-  INITIAL_SNIPPETS,
   isWriteQuery,
   runMockQuery,
 } from './ExplorerPrototype.mocks'
 import type {
   CellResultState,
+  ChatMessage,
+  NotebookCell,
   QueryCellModel,
   RecentItem,
-  SnippetDoc,
+  Tab,
 } from './ExplorerPrototype.types'
 import { ExplorerSidebar } from './ExplorerSidebar'
 import { QueryCell } from './QueryCell'
@@ -27,51 +28,7 @@ import {
 } from './useExplorerPrototypeState'
 import { ChatView } from './views/ChatView'
 import { HomeView } from './views/HomeView'
-import { queryCellToSnippet, snippetToQueryCell } from './views/snippetAdapter'
 import { customRender, customRenderHook } from '@/tests/lib/custom-render'
-
-describe('snippet adapter', () => {
-  const snippet: SnippetDoc = {
-    id: 'snip-1',
-    name: 'Slowest queries',
-    contentType: 'sql',
-    sql: 'select 1',
-    display: { type: 'table' },
-  }
-
-  it('maps a database snippet to a one-cell query model and back unchanged', () => {
-    const cell = snippetToQueryCell(snippet)
-
-    expect(cell.type).toBe('query')
-    expect(cell.query.type).toBe('inline')
-    expect(cell.query.source.id).toBe('database')
-    expect(queryCellToSnippet(cell, snippet)).toEqual(snippet)
-  })
-
-  it('maps a logs snippet onto the logs source with a default time range', () => {
-    const logsSnippet: SnippetDoc = { ...snippet, contentType: 'log_sql' }
-    const cell = snippetToQueryCell(logsSnippet)
-
-    expect(cell.query.source.id).toBe('logs')
-    expect(queryCellToSnippet(cell, logsSnippet)).toEqual(logsSnippet)
-  })
-
-  it('writes the content type back from the chosen source', () => {
-    const cell = snippetToQueryCell(snippet)
-    const switched: QueryCellModel = {
-      ...cell,
-      query: {
-        ...cell.query,
-        source: {
-          id: 'logs',
-          parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
-        },
-      },
-    }
-
-    expect(queryCellToSnippet(switched, snippet).contentType).toBe('log_sql')
-  })
-})
 
 describe('run mode and row limit resolution', () => {
   const settings = { run_mode: 'manual', default_row_limit: 100 } as const
@@ -104,6 +61,39 @@ describe('run mode and row limit resolution', () => {
 })
 
 describe('query cell results surface', () => {
+  it('can add a query to a notebook or ask the Assistant to explain it', async () => {
+    const user = userEvent.setup()
+    const onAddToNotebook = vi.fn()
+    const onExplain = vi.fn()
+    customRender(
+      <QueryCell
+        value={{
+          id: 'interconnection-cell',
+          type: 'query',
+          name: 'Query review',
+          query: {
+            type: 'inline',
+            source: { id: 'database', parameters: {} },
+            sql: 'select 1',
+          },
+          display: { type: 'table' },
+        }}
+        result={{ status: 'idle' }}
+        rowLimit={100}
+        notebookTargets={[{ id: 'nb-1', title: 'Query review' }]}
+        onAddToNotebook={onAddToNotebook}
+        onExplain={onExplain}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Add to notebook' }))
+    await user.click(await screen.findByRole('menuitem', { name: 'Query review' }))
+    await user.click(screen.getByRole('button', { name: 'Explain' }))
+
+    expect(onAddToNotebook).toHaveBeenCalledWith('nb-1')
+    expect(onExplain).toHaveBeenCalledOnce()
+  })
+
   it('shows an empty state before the query has been run', () => {
     customRender(
       <QueryCell
@@ -185,12 +175,60 @@ describe('query cell results surface', () => {
   })
 })
 
+describe('resource interconnection', () => {
+  const query = INITIAL_NOTEBOOKS['nb-auth-health'].cells.find(
+    (cell): cell is QueryCellModel => cell.type === 'query'
+  )
+
+  if (!query) throw new Error('Expected a seeded query cell')
+
+  it('copies query blocks into notebooks and opens seeded chat tabs', () => {
+    const { result } = customRenderHook(() => useExplorerPrototypeState())
+    const originalLength = result.current.notebooks['nb-auth-health'].cells.length
+
+    act(() => result.current.addQueryToNotebook(query, 'nb-auth-health'))
+    const copiedCell = result.current.notebooks['nb-auth-health'].cells.at(-1)
+    expect(result.current.notebooks['nb-auth-health'].cells).toHaveLength(originalLength + 1)
+    expect(copiedCell).toMatchObject({ name: query.name, query: query.query })
+    expect(copiedCell?.id).not.toBe(query.id)
+
+    act(() => result.current.explainQuery(query))
+    let activeTab = result.current.tabs.find((tab: Tab) => tab.id === result.current.activeTabId)
+    expect(activeTab?.resource.type).toBe('chat')
+    if (activeTab?.resource.type === 'chat') {
+      expect(result.current.chats[activeTab.resource.id].messages[0]).toMatchObject({
+        text: expect.stringContaining(`\`\`\`sql\n${query.query.sql}`),
+      })
+    }
+
+    act(() => result.current.analyseNotebook('Authentication health'))
+    activeTab = result.current.tabs.find((tab: Tab) => tab.id === result.current.activeTabId)
+    if (activeTab?.resource.type === 'chat') {
+      expect(result.current.chats[activeTab.resource.id].messages[0]).toMatchObject({
+        text: 'Run the notebook "Authentication health" and analyse the results.',
+      })
+    }
+  })
+})
+
 describe('home launch surface', () => {
+  it('starts an ad-hoc query from Run SQL', async () => {
+    const user = userEvent.setup()
+    const onCreateQuery = vi.fn()
+    customRender(
+      <HomeView onCreateQuery={onCreateQuery} onCreateNotebook={vi.fn()} onCreateChat={vi.fn()} />
+    )
+
+    await user.click(screen.getByText('Run SQL'))
+
+    expect(onCreateQuery).toHaveBeenCalledOnce()
+  })
+
   it('starts a new chat from the composer', async () => {
     const user = userEvent.setup()
     const onCreateChat = vi.fn()
     customRender(
-      <HomeView onCreateNotebook={vi.fn()} onCreateSnippet={vi.fn()} onCreateChat={onCreateChat} />
+      <HomeView onCreateQuery={vi.fn()} onCreateNotebook={vi.fn()} onCreateChat={onCreateChat} />
     )
 
     await user.type(screen.getByLabelText('Ask about your project'), 'Show recent signup trends')
@@ -202,7 +240,7 @@ describe('home launch surface', () => {
   it('dismisses the template section', async () => {
     const user = userEvent.setup()
     customRender(
-      <HomeView onCreateNotebook={vi.fn()} onCreateSnippet={vi.fn()} onCreateChat={vi.fn()} />
+      <HomeView onCreateQuery={vi.fn()} onCreateNotebook={vi.fn()} onCreateChat={vi.fn()} />
     )
 
     await user.click(screen.getByRole('button', { name: 'Dismiss' }))
@@ -210,14 +248,27 @@ describe('home launch surface', () => {
     expect(screen.queryByText('Start with a template')).not.toBeInTheDocument()
   })
 
-  it('creates and opens a notebook, snippet, or chat', () => {
+  it('creates an ad-hoc query, notebook, or chat', () => {
     const { result } = customRenderHook(() => useExplorerPrototypeState())
+
+    act(() => result.current.createQuery())
+    const queryTab = result.current.tabs.find((tab: Tab) => tab.id === result.current.activeTabId)
+    expect(queryTab?.resource.type).toBe('query')
+    if (queryTab?.resource.type === 'query') {
+      expect(result.current.queries[queryTab.resource.id]).toMatchObject({
+        name: 'Untitled query',
+        query: { sql: 'select ' },
+      })
+
+      act(() => result.current.closeTab(queryTab.id))
+      expect(result.current.queries[queryTab.resource.id]).toBeUndefined()
+    }
 
     act(() => result.current.createNotebook())
     expect(
-      result.current.tabs.find((tab) => tab.id === result.current.activeTabId)?.resource.type
+      result.current.tabs.find((tab: Tab) => tab.id === result.current.activeTabId)?.resource.type
     ).toBe('notebook')
-    const notebookTab = result.current.tabs.find((tab) => tab.id === result.current.activeTabId)
+    const notebookTab = result.current.tabs.find((tab: Tab) => tab.id === result.current.activeTabId)
     if (notebookTab?.resource.type === 'notebook') {
       expect(result.current.notebooks[notebookTab.resource.id].cells).toEqual([
         expect.objectContaining({
@@ -228,13 +279,8 @@ describe('home launch surface', () => {
       ])
     }
 
-    act(() => result.current.createSnippet())
-    expect(
-      result.current.tabs.find((tab) => tab.id === result.current.activeTabId)?.resource.type
-    ).toBe('snippet')
-
     act(() => result.current.createChat('Why did signups drop?'))
-    const activeTab = result.current.tabs.find((tab) => tab.id === result.current.activeTabId)
+    const activeTab = result.current.tabs.find((tab: Tab) => tab.id === result.current.activeTabId)
     expect(activeTab?.resource.type).toBe('chat')
     if (activeTab?.resource.type === 'chat') {
       expect(result.current.chats[activeTab.resource.id].messages).toEqual([
@@ -247,7 +293,9 @@ describe('home launch surface', () => {
 describe('assistant notebook creation', () => {
   it('creates a notebook resource when the Assistant proposal is approved', () => {
     const { result } = customRenderHook(() => useExplorerPrototypeState())
-    const message = INITIAL_CHATS['chat-2'].messages.find((entry) => 'notebook' in entry)
+    const message = INITIAL_CHATS['chat-2'].messages.find(
+      (entry: ChatMessage) => 'notebook' in entry
+    )
 
     if (!message || !('notebook' in message)) throw new Error('Expected an assistant notebook')
 
@@ -260,7 +308,7 @@ describe('assistant notebook creation', () => {
       )
     )
 
-    const activeTab = result.current.tabs.find((tab) => tab.id === result.current.activeTabId)
+    const activeTab = result.current.tabs.find((tab: Tab) => tab.id === result.current.activeTabId)
     expect(activeTab).toMatchObject({
       title: 'Signup investigation',
       resource: { type: 'notebook' },
@@ -269,7 +317,7 @@ describe('assistant notebook creation', () => {
       expect(result.current.notebooks[activeTab.resource.id]).toEqual(message.notebook.content)
     }
     expect(
-      result.current.chats['chat-2'].messages.find((entry) => entry.id === message.id)
+      result.current.chats['chat-2'].messages.find((entry: ChatMessage) => entry.id === message.id)
     ).toMatchObject({ approval: 'approved' })
   })
 })
@@ -460,7 +508,6 @@ describe('sidebar drill-down', () => {
     customRender(
       <ExplorerSidebar
         notebooks={INITIAL_NOTEBOOKS}
-        snippets={INITIAL_SNIPPETS}
         chats={INITIAL_CHATS}
         recentItems={INITIAL_RECENT_ITEMS}
         onOpen={onOpen}
@@ -471,35 +518,32 @@ describe('sidebar drill-down', () => {
 
   const rootPanel = () => within(screen.getByRole('group', { name: 'All resources' }))
 
-  it('shows the three resource types and a mixed recent group at root', () => {
+  it('shows the two resource types and a mixed recent group at root', () => {
     renderSidebar()
     const root = rootPanel()
 
-    expect(root.getByRole('button', { name: /Snippets/ })).toBeInTheDocument()
     expect(root.getByRole('button', { name: /Notebooks/ })).toBeInTheDocument()
     expect(root.getByRole('button', { name: /Chats/ })).toBeInTheDocument()
 
     expect(root.getByText('Recent')).toBeInTheDocument()
-    // Recent mixes types: a notebook, a chat and a snippet all appear.
+    // Recent mixes types: notebooks and chats both appear.
     expect(root.getByRole('button', { name: /Authentication health/ })).toBeInTheDocument()
     expect(root.getByRole('button', { name: /Debugging signups/ })).toBeInTheDocument()
-    expect(root.getByRole('button', { name: /Slowest queries/ })).toBeInTheDocument()
 
     // The drilled level exists in the DOM but is out of the a11y tree.
-    expect(screen.queryByRole('group', { name: 'Snippets' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('group', { name: 'Notebooks' })).not.toBeInTheDocument()
   })
 
   it('drills into a type, showing its list with search and a back button', async () => {
     const user = userEvent.setup()
     renderSidebar()
 
-    await user.click(rootPanel().getByRole('button', { name: /Snippets/ }))
+    await user.click(rootPanel().getByRole('button', { name: /Notebooks/ }))
 
-    const panel = within(await screen.findByRole('group', { name: 'Snippets' }))
+    const panel = within(await screen.findByRole('group', { name: 'Notebooks' }))
     expect(panel.getByRole('button', { name: 'Back to all resources' })).toBeInTheDocument()
-    expect(panel.getByPlaceholderText('Search snippets')).toBeInTheDocument()
-    expect(panel.getByRole('button', { name: /Slowest queries/ })).toBeInTheDocument()
-    expect(panel.getByRole('button', { name: /Edge errors by hour/ })).toBeInTheDocument()
+    expect(panel.getByPlaceholderText('Search notebooks')).toBeInTheDocument()
+    expect(panel.getByRole('button', { name: /Authentication health/ })).toBeInTheDocument()
 
     // Root is now the hidden level.
     expect(screen.queryByRole('group', { name: 'All resources' })).not.toBeInTheDocument()
@@ -509,14 +553,11 @@ describe('sidebar drill-down', () => {
     const user = userEvent.setup()
     renderSidebar()
 
-    await user.click(rootPanel().getByRole('button', { name: /Snippets/ }))
-    const panel = within(await screen.findByRole('group', { name: 'Snippets' }))
-    await user.type(panel.getByPlaceholderText('Search snippets'), 'edge')
+    await user.click(rootPanel().getByRole('button', { name: /Notebooks/ }))
+    const panel = within(await screen.findByRole('group', { name: 'Notebooks' }))
+    await user.type(panel.getByPlaceholderText('Search notebooks'), 'health')
 
-    await waitFor(() =>
-      expect(panel.queryByRole('button', { name: /Slowest queries/ })).not.toBeInTheDocument()
-    )
-    expect(panel.getByRole('button', { name: /Edge errors by hour/ })).toBeInTheDocument()
+    expect(panel.getByRole('button', { name: /Authentication health/ })).toBeInTheDocument()
   })
 
   it('reports when a search matches nothing', async () => {
@@ -567,25 +608,20 @@ describe('recent items track modification, not navigation', () => {
     const { result } = customRenderHook(() => useExplorerPrototypeState())
     const before = result.current.recentItems
 
-    act(() => result.current.openTab({ type: 'snippet', id: 'snip-edge-errors' }, 'Edge errors'))
+    act(() => result.current.openTab({ type: 'notebook', id: 'nb-auth-health' }, 'Authentication health'))
 
     expect(result.current.recentItems).toEqual(before)
   })
 
   it('moves a resource to the top when it is edited', () => {
     const { result } = customRenderHook(() => useExplorerPrototypeState())
-    expect(result.current.recentItems[0].resource.id).not.toBe('snip-edge-errors')
+    expect(result.current.recentItems[0].resource.id).not.toBe('chat-1')
 
-    act(() =>
-      result.current.updateSnippet('snip-edge-errors', {
-        ...INITIAL_SNIPPETS['snip-edge-errors'],
-        sql: 'select 1',
-      })
-    )
+    act(() => result.current.sendChatMessage('chat-1', 'Show the provider breakdown'))
 
     expect(result.current.recentItems[0].resource).toEqual({
-      type: 'snippet',
-      id: 'snip-edge-errors',
+      type: 'chat',
+      id: 'chat-1',
     })
   })
 
@@ -612,7 +648,7 @@ describe('notebook cell reordering', () => {
       result.current.moveCellTo('nb-auth-health', 'cell-active-users', 'cell-signups', 'before')
     )
 
-    expect(result.current.notebooks['nb-auth-health'].cells.map((cell) => cell.id)).toEqual([
+    expect(result.current.notebooks['nb-auth-health'].cells.map((cell: NotebookCell) => cell.id)).toEqual([
       'cell-heading',
       'cell-signups-context',
       'cell-active-users',

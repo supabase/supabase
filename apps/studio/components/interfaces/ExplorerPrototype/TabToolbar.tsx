@@ -12,7 +12,7 @@ import type { ResourceIcon } from './ExplorerResources'
 
 interface TabToolbarProps {
   icon: ResourceIcon
-  /** Static tab title or an editable title control, such as a snippet name. */
+  /** Static tab title or an editable title control, such as a query cell name. */
   title: ReactNode
   /** Omitted entirely when a view has no primary actions. */
   actions?: ReactNode

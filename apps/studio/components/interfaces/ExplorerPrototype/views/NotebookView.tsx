@@ -9,7 +9,7 @@
  * and charts want the room, while markdown stays at a readable measure.
  */
 
-import { FileText, Play, Settings, SquareCode } from 'lucide-react'
+import { FileText, Play, Settings, Sparkles, SquareCode } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import {
   Button,
@@ -32,6 +32,7 @@ import type {
 } from '../ExplorerPrototype.types'
 import { RESOURCE_ICON } from '../ExplorerResources'
 import { QueryCell } from '../QueryCell'
+import type { NotebookTarget } from '../QueryCell'
 import { TabToolbar } from '../TabToolbar'
 import { resolveEffectiveRowLimit, resolveEffectiveRunMode } from '../useExplorerPrototypeState'
 import { MarkdownCellView } from './MarkdownCellView'
@@ -54,6 +55,10 @@ interface NotebookViewProps {
   onSettingsChange: (settings: NotebookContent['settings']) => void
   onRunCell: (cell: QueryCellModel, rowLimit: number) => void
   onRunAll: () => void
+  notebookTargets?: NotebookTarget[]
+  onAddQueryToNotebook?: (query: QueryCellModel, notebookId: string) => void
+  onExplainQuery?: (query: QueryCellModel) => void
+  onAnalyse?: () => void
   /** Renders the same notebook chrome inside an Assistant message. */
   embedded?: boolean
   readOnly?: boolean
@@ -71,6 +76,10 @@ export const NotebookView = ({
   onSettingsChange,
   onRunCell,
   onRunAll,
+  notebookTargets = [],
+  onAddQueryToNotebook,
+  onExplainQuery,
+  onAnalyse,
   embedded = false,
   readOnly = false,
 }: NotebookViewProps) => {
@@ -99,6 +108,16 @@ export const NotebookView = ({
         actions={
           readOnly ? undefined : (
             <>
+              {onAnalyse && (
+                <Button
+                  variant="text"
+                  size="tiny"
+                  icon={<Sparkles size={14} />}
+                  onClick={onAnalyse}
+                >
+                  Analyse
+                </Button>
+              )}
               <Button
                 variant="text"
                 size="tiny"
@@ -186,6 +205,13 @@ export const NotebookView = ({
                     ) : undefined
                   }
                   readOnly={readOnly}
+                  notebookTargets={notebookTargets}
+                  onAddToNotebook={
+                    onAddQueryToNotebook
+                      ? (notebookId) => onAddQueryToNotebook(cell, notebookId)
+                      : undefined
+                  }
+                  onExplain={onExplainQuery ? () => onExplainQuery(cell) : undefined}
                   onChange={readOnly ? undefined : (next) => onCellChange(cell.id, next)}
                   onRun={
                     readOnly

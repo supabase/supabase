@@ -2,9 +2,8 @@
  * PROTOTYPE — the shared QueryCell component (PR E4).
  *
  * This is the "generic SQL editor" from the design diagram: toolbar, SQL editor,
- * results (table or chart). It is rendered by all three surfaces:
+ * results (table or chart). It is rendered by both surfaces:
  *
- *   - Snippet view    — editable, via the snippet adapter
  *   - Notebook cell   — editable
  *   - Agent chat block — `readOnly`, still runnable behind approval
  *
@@ -13,9 +12,18 @@
  * live. Surface-specific chrome comes in through the three slots.
  */
 
-import { AlertTriangle, Eye, EyeOff, Play } from 'lucide-react'
+import { AlertTriangle, Eye, EyeOff, NotebookText, Play, Sparkles } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
-import { Badge, Button, cn } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -38,6 +46,8 @@ const editorHeight = (sql: string) => {
   return Math.min(Math.max(lines * 19 + 24, 80), 260)
 }
 
+export type NotebookTarget = { id: string; title: string }
+
 export interface QueryCellProps {
   value: QueryCellModel
   result: CellResultState
@@ -54,8 +64,12 @@ export interface QueryCellProps {
    * There is deliberately no header or actions slot: controls that belong to
    * the *surface* rather than the query (reorder, delete, insert) live outside
    * this component, so the cell renders identically everywhere it appears.
-   */
+  */
   footerSlot?: ReactNode
+  /** Saved notebooks that can receive a copy of this query cell. */
+  notebookTargets?: NotebookTarget[]
+  onAddToNotebook?: (notebookId: string) => void
+  onExplain?: () => void
   onChange?: (next: QueryCellModel) => void
   onRun?: () => void
 }
@@ -68,6 +82,9 @@ export const QueryCell = ({
   defaultSqlVisible = true,
   readOnly = false,
   footerSlot,
+  notebookTargets = [],
+  onAddToNotebook,
+  onExplain,
   onChange,
   onRun,
 }: QueryCellProps) => {
@@ -130,7 +147,7 @@ export const QueryCell = ({
       )}
     >
       <TabToolbar
-        icon={RESOURCE_ICON.snippet}
+        icon={RESOURCE_ICON.query}
         title={
           readOnly ? (
             <span className="block truncate text-sm">{value.name}</span>
@@ -158,6 +175,41 @@ export const QueryCell = ({
               onSourceChange={updateSource}
               onRowLimitChange={updateRowLimit}
             />
+            {onAddToNotebook && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="text"
+                    size="tiny"
+                    className="w-7 px-0"
+                    aria-label="Add to notebook"
+                    disabled={notebookTargets.length === 0}
+                    icon={<NotebookText size={14} />}
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuLabel>Add to notebook</DropdownMenuLabel>
+                  {notebookTargets.map((notebook) => (
+                    <DropdownMenuItem
+                      key={notebook.id}
+                      onClick={() => onAddToNotebook(notebook.id)}
+                    >
+                      {notebook.title}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            {onExplain && (
+              <Button
+                variant="text"
+                size="tiny"
+                className="w-7 px-0"
+                aria-label="Explain"
+                icon={<Sparkles size={14} />}
+                onClick={onExplain}
+              />
+            )}
             {columns.length > 0 && (
               <QueryCellDisplayConfig
                 display={value.display}
