@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -37,56 +37,60 @@ import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 import { BucketDataProtectionFields } from './BucketDataProtectionFields'
-import { validateVersioningFields } from './BucketDataProtectionFields.utils'
+import {
+  bucketProtectionFormFields,
+  superRefineBucketProtection,
+} from './BucketDataProtectionFields.schema'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import {
   getVersioningPlanLimits,
   useIsStorageProtectionEnabled,
+  type VersioningPlanLimits,
 } from './StorageProtection.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
-const FormSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, 'Please provide a name for your bucket')
-      .max(100, 'Bucket name should be below 100 characters')
-      .refine(
-        (value) => !value.endsWith(' '),
-        'The name of the bucket cannot end with a whitespace'
-      )
-      .refine(
-        (value) => value !== 'public',
-        '"public" is a reserved name. Please choose another name'
-      ),
-    public: z.boolean().default(false),
-    has_file_size_limit: z.boolean().default(false),
-    formatted_size_limit: z.coerce
-      .number()
-      .min(0, 'File size upload limit has to be at least 0')
-      .optional(),
-    allowed_mime_types: z.string().trim().default(''),
-    enable_versioning: z.boolean().default(false),
-    version_expiry_days: z.string().trim().optional(),
-    max_noncurrent_versions: z.string().trim().optional(),
-  })
-  .superRefine((data, ctx) => {
-    if (!validBucketNameRegex.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
-        path: ['name'],
-        code: z.ZodIssueCode.custom,
-        message: !!match
-          ? `Bucket name cannot contain the "${match}" character`
-          : 'Bucket name contains an invalid special character',
-      })
-    }
-  })
+const buildFormSchema = (planLimits: VersioningPlanLimits | null) =>
+  z
+    .object({
+      name: z
+        .string()
+        .trim()
+        .min(1, 'Please provide a name for your bucket')
+        .max(100, 'Bucket name should be below 100 characters')
+        .refine(
+          (value) => !value.endsWith(' '),
+          'The name of the bucket cannot end with a whitespace'
+        )
+        .refine(
+          (value) => value !== 'public',
+          '"public" is a reserved name. Please choose another name'
+        ),
+      public: z.boolean().default(false),
+      has_file_size_limit: z.boolean().default(false),
+      formatted_size_limit: z.coerce
+        .number()
+        .min(0, 'File size upload limit has to be at least 0')
+        .optional(),
+      allowed_mime_types: z.string().trim().default(''),
+      ...bucketProtectionFormFields,
+    })
+    .superRefine((data, ctx) => {
+      if (!validBucketNameRegex.test(data.name)) {
+        const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
+        ctx.addIssue({
+          path: ['name'],
+          code: z.ZodIssueCode.custom,
+          message: !!match
+            ? `Bucket name cannot contain the "${match}" character`
+            : 'Bucket name contains an invalid special character',
+        })
+      }
+      superRefineBucketProtection(data, ctx, planLimits)
+    })
 
 const formId = 'create-storage-bucket-form'
 
-export type CreateBucketForm = z.infer<typeof FormSchema>
+export type CreateBucketForm = z.infer<ReturnType<typeof buildFormSchema>>
 
 interface CreateBucketModalProps {
   open: boolean
@@ -112,8 +116,12 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
     onError: () => {},
   })
 
+  // Depends on the org's plan, which loads asynchronously — rebuild the
+  // schema (and its versioning min/max validation) once it resolves.
+  const formSchema = useMemo(() => buildFormSchema(planLimits), [planLimits])
+
   const form = useForm<CreateBucketForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
       public: false,
@@ -121,8 +129,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
       formatted_size_limit: undefined,
       allowed_mime_types: '',
       enable_versioning: false,
-      version_expiry_days: undefined,
-      max_noncurrent_versions: undefined,
+      version_expiry_days: '',
+      max_noncurrent_versions: '',
     },
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
@@ -149,28 +157,6 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
           type: 'manual',
           message: 'exceed_global_limit',
         })
-      }
-
-      const versioningErrors = validateVersioningFields({
-        isEnabled: values.enable_versioning,
-        expiryDaysRaw: values.version_expiry_days,
-        maxVersionsRaw: values.max_noncurrent_versions,
-        limits: planLimits,
-      })
-      if (versioningErrors.version_expiry_days || versioningErrors.max_noncurrent_versions) {
-        if (versioningErrors.version_expiry_days) {
-          form.setError('version_expiry_days', {
-            type: 'manual',
-            message: versioningErrors.version_expiry_days,
-          })
-        }
-        if (versioningErrors.max_noncurrent_versions) {
-          form.setError('max_noncurrent_versions', {
-            type: 'manual',
-            message: versioningErrors.max_noncurrent_versions,
-          })
-        }
-        return
       }
 
       await createBucket({

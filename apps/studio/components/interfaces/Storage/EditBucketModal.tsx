@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -29,11 +29,15 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import { BucketDataProtectionFields } from '@/components/interfaces/Storage/BucketDataProtectionFields'
-import { validateVersioningFields } from '@/components/interfaces/Storage/BucketDataProtectionFields.utils'
+import {
+  bucketProtectionFormFields,
+  superRefineBucketProtection,
+} from '@/components/interfaces/Storage/BucketDataProtectionFields.schema'
 import {
   getMockBucketProtection,
   getVersioningPlanLimits,
   useIsStorageProtectionEnabled,
+  type VersioningPlanLimits,
 } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
@@ -53,19 +57,20 @@ export interface EditBucketModalProps {
   onClose: () => void
 }
 
-const BucketSchema = z.object({
-  name: z.string(),
-  public: z.boolean().default(false),
-  has_file_size_limit: z.boolean().default(false),
-  formatted_size_limit: z.coerce
-    .number()
-    .min(0, 'File size upload limit has to be at least 0')
-    .optional(),
-  allowed_mime_types: z.string().trim().default(''),
-  enable_versioning: z.boolean().default(false),
-  version_expiry_days: z.string().trim().optional(),
-  max_noncurrent_versions: z.string().trim().optional(),
-})
+const buildBucketSchema = (planLimits: VersioningPlanLimits | null) =>
+  z
+    .object({
+      name: z.string(),
+      public: z.boolean().default(false),
+      has_file_size_limit: z.boolean().default(false),
+      formatted_size_limit: z.coerce
+        .number()
+        .min(0, 'File size upload limit has to be at least 0')
+        .optional(),
+      allowed_mime_types: z.string().trim().default(''),
+      ...bucketProtectionFormFields,
+    })
+    .superRefine((data, ctx) => superRefineBucketProtection(data, ctx, planLimits))
 
 const formId = 'edit-storage-bucket-form'
 
@@ -127,12 +132,16 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     formatted_size_limit: bucket?.file_size_limit ? (fileSizeLimit ?? 0) : undefined,
     allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
     enable_versioning: !!planLimits && bucketProtection.versioning === 'enabled',
-    version_expiry_days: bucketProtection.versionExpiryDays?.toString(),
-    max_noncurrent_versions: bucketProtection.maxNoncurrentVersions?.toString(),
+    version_expiry_days: bucketProtection.versionExpiryDays ?? ('' as const),
+    max_noncurrent_versions: bucketProtection.maxNoncurrentVersions ?? ('' as const),
   }
 
-  const form = useForm<z.infer<typeof BucketSchema>>({
-    resolver: zodResolver(BucketSchema),
+  // Depends on the org's plan, which loads asynchronously — rebuild the
+  // schema (and its versioning min/max validation) once it resolves.
+  const bucketSchema = useMemo(() => buildBucketSchema(planLimits), [planLimits])
+
+  const form = useForm<z.infer<typeof bucketSchema>>({
+    resolver: zodResolver(bucketSchema),
     defaultValues,
     values: defaultValues,
     mode: 'onSubmit',
@@ -155,7 +164,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     onClose()
   }
 
-  const onSubmit: SubmitHandler<z.infer<typeof BucketSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<z.infer<typeof bucketSchema>> = async (values) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
@@ -177,28 +186,6 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           message: 'exceed_global_limit',
         })
       }
-    }
-
-    const versioningErrors = validateVersioningFields({
-      isEnabled: values.enable_versioning,
-      expiryDaysRaw: values.version_expiry_days,
-      maxVersionsRaw: values.max_noncurrent_versions,
-      limits: planLimits,
-    })
-    if (versioningErrors.version_expiry_days || versioningErrors.max_noncurrent_versions) {
-      if (versioningErrors.version_expiry_days) {
-        form.setError('version_expiry_days', {
-          type: 'manual',
-          message: versioningErrors.version_expiry_days,
-        })
-      }
-      if (versioningErrors.max_noncurrent_versions) {
-        form.setError('max_noncurrent_versions', {
-          type: 'manual',
-          message: versioningErrors.max_noncurrent_versions,
-        })
-      }
-      return
     }
 
     updateBucket({

@@ -1,4 +1,4 @@
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import {
   DialogSection,
   DialogSectionSeparator,
@@ -15,24 +15,15 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
+import { type BucketProtectionFormValues } from './BucketDataProtectionFields.schema'
 import { getVersioningPlanLimits } from './StorageProtection.constants'
 
-/**
- * Form fields consumed by this component. The parent form's schema must
- * include fields with these names/types for `useFormContext` to resolve them.
- */
-export interface BucketProtectionFormFields {
-  enable_versioning: boolean
-  version_expiry_days?: string
-  max_noncurrent_versions?: string
-}
-
 export const BucketDataProtectionFields = () => {
-  const { control, watch } = useFormContext<BucketProtectionFormFields>()
+  const { control } = useFormContext<BucketProtectionFormValues>()
   const { data: organization, isSuccess: isOrganizationLoaded } = useSelectedOrganizationQuery()
 
   const planLimits = getVersioningPlanLimits(organization?.plan.id)
-  const isVersioningEnabled = watch('enable_versioning')
+  const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
   // Avoid flashing the "upgrade" prompt before we actually know the org's plan
   const showUpgradePrompt = isOrganizationLoaded && !planLimits
 
