@@ -67,10 +67,10 @@ Thumbs.db
 ../design-system
 ../docs
 ../studio
-../ui-library
+../library
 ../../examples
 ../../tests
 ../../supabase
 ../../packages/ui-patterns
 ../../packages/ui
-../../packages/shared-data 
+../../packages/shared-data

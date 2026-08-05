@@ -10,7 +10,7 @@ pnpm 11 + Turborepo monorepo. Requires Node >= 22.13.
 | `apps/docs`              | Documentation site — Next.js app router, MDX (port 3001)                    |
 | `apps/www`               | Marketing website — Next.js, app + pages (port 3000)                        |
 | `apps/design-system`     | Component demos — source of truth for Studio UI patterns (port 3003)        |
-| `apps/ui-library`        | shadcn-style registry site for Supabase UI blocks (port 3004)               |
+| `apps/library`           | shadcn-style registry site for Supabase blocks (port 3004)                  |
 | `apps/lite-studio`       | Lightweight Studio — different stack: React Router 7 + Vite + Tailwind v4   |
 | `packages/ui`            | Shared UI components (shadcn/ui based) — `import { Button } from 'ui'`      |
 | `packages/ui-patterns`   | Composite components — subpath imports, e.g. `ui-patterns/AssistantChat`    |
