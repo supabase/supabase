@@ -18,12 +18,12 @@ const whatToExpect: { title: string; description: string }[] = [
   },
   {
     title: 'Open conversation',
-    description: "Time with the Supabase team to dig into what's on your mind.",
+    description: 'Bring your questions, ideas, and hot takes straight to the Supabase team.',
   },
   {
-    title: 'Meet your fellow partners',
+    title: 'Meet the ecosystem',
     description:
-      'The builders, founders, and partner teams shaping the ecosystem, all in one room. Some of your favorite tools will be standing next to you.',
+      "You'll be standing next to the builders, founders, and partner teams behind some of your favorite tools.",
   },
   {
     title: 'Happy hour',
@@ -44,7 +44,7 @@ const page: GoPageInput = {
     title: 'Supabase Partner Day',
     subtitle: 'Supabase Select 2026',
     description:
-      "You're helping us build this ecosystem, so come celebrate it with us. Join the Supabase team and your fellow partners for our first ever Partner Day: an intimate afternoon of real talk, sneak peeks, and good company the day before Select.",
+      "You're helping us build this ecosystem, so come celebrate it with us. Join the Supabase team and your fellow partners for our first ever Partner Day: an intimate afternoon of real talk, sneak peeks, and good company.",
     ctas: [
       {
         label: 'Reserve your spot',
@@ -87,9 +87,7 @@ const page: GoPageInput = {
         <div className="max-w-2xl mx-auto flex flex-col gap-4 text-foreground-light text-lg text-center text-balance">
           <p>
             This is Supabase's inaugural Partner Day: the partnerships we're shipping together have
-            become a real part of what makes Supabase work, and we want to celebrate that IRL. We're
-            keeping it deliberately small, and since it's the first one, you can say you were there
-            when it all started.
+            become a real part of what makes Supabase work, and we want to celebrate that IRL.
           </p>
           <p>
             <span className="text-foreground font-medium">And then there's Select.</span> Partner
