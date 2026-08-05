@@ -55,7 +55,7 @@ const SKILL_REPO_NAME = 'docs-agent-skills'
 const SKILL_REPO_URL = `https://github.com/${SKILL_REPO_OWNER}/${SKILL_REPO_NAME}.git`
 const SKILL_REPO_DEFAULT_BRANCH = 'main'
 const SKILL_PATH = '.claude/skills/audit-docs-ia'
-const MODEL = process.env.AUDIT_DOCS_IA_MODEL ?? 'gpt-4.1'
+const MODEL = 'gpt-4.1'
 
 // ---------------------------------------------------------------------------
 // Skill download — shallow, sparse clone of the private docs-agent-skills repo.
