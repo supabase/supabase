@@ -19,30 +19,35 @@ The Supabase CLI is a single binary Go application that provides everything you 
 You can [install the CLI](https://www.npmjs.com/package/supabase) via npm or other supported package managers. The minimum required version of the CLI is [v1.8.1](https://github.com/supabase/cli/releases).
 
 ```bash
+# Make sure Node.js is installed before running this command
 npm i supabase@">=1.8.1" --save-dev
 ```
 
 Login with your Personal Access Token:
 
 ```bash
+# Make sure Node.js is installed before running this command
 npx supabase login
 ```
 
 Before generating types, ensure you initialize your Supabase project:
 
 ```bash
+# Make sure Node.js is installed before running this command
 npx supabase init
 ```
 
 Generate types for your project to produce the `database.types.ts` file:
 
 ```bash
+# Make sure Node.js is installed before running this command
 npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > database.types.ts
 ```
 
 or in case of local development:
 
 ```bash
+# Make sure Node.js is installed before running this command
 npx supabase gen types typescript --local > database.types.ts
 ```
 
