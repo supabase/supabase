@@ -61,7 +61,7 @@ function SideNavigation() {
           <ThemeSwitcherDropdown />
         </div>
         <Link href="/" className="mb-4 block">
-          <h1>Supabase UI Library</h1>
+          <h1>Supabase Library</h1>
         </Link>
         {/* <TopNavigationSearch /> */}
         <CommandMenu />
@@ -76,7 +76,7 @@ function SideNavigation() {
       </div>
       <div className="pb-6">
         <div className="font-mono uppercase text-xs text-foreground-lighter/75 mb-2 px-6 tracking-widest">
-          Blocks
+          UI Blocks
         </div>
         <div className="space-y-0.5">
           {/* Render items based on component definitions */}
