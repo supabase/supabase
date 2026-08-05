@@ -266,7 +266,12 @@ These errors indicate issues with function loading, execution, or the underlying
 
 ### NOT_FOUND_FUNCTION_BLOB
 
-**Cause:** Your Edge Function metadata resolved, but its deployment bundle was missing from storage and could not be loaded. This means the metadata points at a different version than the stored bundle, usually because concurrent or batched deploys double-incremented the metadata version, for example two deploys of the same function racing each other, or a batch deploy using `/deploy?bundleOnly=true` where the bulk metadata update failed. This returns the same `Requested function was not found` message as `NOT_FOUND`, so check the `sb-error-code` header to tell them apart. See [Edge Function 404 error response](/docs/guides/troubleshooting/edge-function-404-error-response).
+**Cause:** Your Edge Function metadata resolved, but its deployment bundle was missing from storage and could not be loaded (the metadata points at a different version than the stored bundle). This returns the same `Requested function was not found` message as `NOT_FOUND`, so the `sb-error-code` header is what distinguishes them — see [Edge Function 404 error response](/docs/guides/troubleshooting/edge-function-404-error-response).
+
+**Common causes:**
+
+- Two deploys of the same function running concurrently, double-incrementing the metadata version
+- A batch deploy using `/deploy?bundleOnly=true` where the bulk metadata update failed
 
 **Solution:**
 
