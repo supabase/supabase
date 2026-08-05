@@ -217,7 +217,7 @@ export const ResourceAccessStep = ({
                     className="min-w-auto"
                   />
                   <MultiSelectorContent>
-                    <MultiSelectorInput placeholder="Search organizations" showResetIcon />
+                    <MultiSelectorInput placeholder="Search projects" showResetIcon />
                     <MultiSelectorList>
                       {projectsForOrg.map((project) => (
                         <MultiSelectorItem key={project.ref} value={project.ref}>
