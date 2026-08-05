@@ -42,8 +42,8 @@ export default function Home() {
                       Blocks for Supabase Projects
                     </h1>
                     <h2 className="text-lg text-foreground-light mb-4">
-                      A collection of components, blocks, and developer tools that connect your project to
-                      Supabase via a single command.
+                      A collection of components, blocks, and developer tools that connect your
+                      project to Supabase via a single command.
                     </h2>
                     <div className="flex gap-3 mt-4">
                       <Button_Shadcn_ variant="secondary" size="lg">

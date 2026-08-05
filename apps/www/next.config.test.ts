@@ -45,8 +45,8 @@ describe('next.config.mjs', () => {
         }),
       ])
     )
-    expect(redirects.findIndex((redirect) => redirect.source === '/ui/docs/ai-editors-rules/prompts')).toBeLessThan(
-      redirects.findIndex((redirect) => redirect.source === '/ui/:path*')
-    )
+    expect(
+      redirects.findIndex((redirect) => redirect.source === '/ui/docs/ai-editors-rules/prompts')
+    ).toBeLessThan(redirects.findIndex((redirect) => redirect.source === '/ui/:path*'))
   })
 })

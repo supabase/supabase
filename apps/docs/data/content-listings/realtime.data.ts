@@ -29,12 +29,14 @@ export const realtimeExamples: ContentListingGroup = {
     {
       title: 'Chat',
       href: 'https://supabase.com/library/docs/nextjs/realtime-chat',
-      description: 'Supabase Library chat component using Broadcast to send messages between users.',
+      description:
+        'Supabase Library chat component using Broadcast to send messages between users.',
     },
     {
       title: 'Avatar Stack',
       href: 'https://supabase.com/library/docs/nextjs/realtime-avatar-stack',
-      description: 'Supabase Library avatar stack component using Presence to track connected users.',
+      description:
+        'Supabase Library avatar stack component using Presence to track connected users.',
     },
     {
       title: 'Realtime Cursor',
