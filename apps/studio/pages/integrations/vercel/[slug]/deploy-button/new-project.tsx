@@ -199,7 +199,7 @@ export function VercelConnectionError({
         <Admonition
           type="danger"
           title="Unable to connect to Vercel"
-          description={`Your Supabase project was created. Error: ${message}`}
+          description={`Your Supabase project was still created. Error: ${message}`}
         />
       </div>
       <div className="flex h-12 items-center justify-end gap-x-2 border-t border-default bg-surface-100 px-card">

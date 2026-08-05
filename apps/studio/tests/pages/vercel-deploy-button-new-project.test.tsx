@@ -20,7 +20,7 @@ test('shows a recoverable partial-success state without recreating the project',
   const alert = screen.getByRole('alert')
   expect(alert).toHaveTextContent('Unable to connect to Vercel')
   expect(alert).toHaveTextContent(
-    'Your Supabase project was created. Error: Connection request failed'
+    'Your Supabase project was still created. Error: Connection request failed'
   )
   expect(screen.getByRole('link', { name: 'Open project' })).toHaveAttribute(
     'href',
