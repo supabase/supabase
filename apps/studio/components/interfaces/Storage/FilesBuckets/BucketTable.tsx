@@ -13,6 +13,7 @@ import {
 } from 'ui'
 
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { isBucketVersioned } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
@@ -50,6 +51,7 @@ export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeader
         <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
         <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
+        <BucketTableHead className={stickyClasses}>Versioning</BucketTableHead>
         <BucketTableHead className={stickyClasses}>
           <span className="sr-only">Actions</span>
         </BucketTableHead>
@@ -69,7 +71,7 @@ export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptySt
 
   return (
     <BucketTableRow className="[&>td]:hover:bg-inherit">
-      <BucketTableCell colSpan={5}>
+      <BucketTableCell colSpan={6}>
         <p className="text-sm text-foreground">No results found</p>
         <p className="text-sm text-foreground-lighter">
           Your search for “{filterString}” did not return any results
@@ -151,6 +153,16 @@ export const BucketTableRow = ({
           className={bucket.allowed_mime_types ? 'text-foreground-light' : 'text-foreground-muted'}
         >
           {bucket.allowed_mime_types ? bucket.allowed_mime_types.join(', ') : 'Any'}
+        </p>
+      </BucketTableCell>
+
+      <BucketTableCell>
+        <p
+          className={
+            isBucketVersioned(bucket.id) ? 'text-foreground-light' : 'text-foreground-muted'
+          }
+        >
+          {isBucketVersioned(bucket.id) ? 'object-level' : '-'}
         </p>
       </BucketTableCell>
 

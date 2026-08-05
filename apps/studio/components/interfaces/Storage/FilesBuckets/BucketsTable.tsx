@@ -1,11 +1,12 @@
 import { useRef } from 'react'
 import { Table, TableBody } from 'ui'
 
+import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
+import { Bucket } from '@/data/storage/buckets-query'
+
 import { LoadMoreRow } from './BucketsTable.LoadMoreRow'
 import type { BucketsTablePaginationProps } from './BucketsTable.types'
 import { BucketTableEmptyState, BucketTableHeader, BucketTableRow } from './BucketTable'
-import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
-import { Bucket } from '@/data/storage/buckets-query'
 
 type BucketsTableProps = {
   buckets: Bucket[]
@@ -57,7 +58,7 @@ const BucketsTableUnvirtualized = ({
         )}
         <LoadMoreRow
           mode="standard"
-          colSpan={6}
+          colSpan={7}
           hasMore={hasMore}
           isLoadingMore={isLoadingMore}
           onLoadMore={onLoadMore}
@@ -86,7 +87,7 @@ const BucketsTableVirtualized = ({
     >
       <BucketTableHeader mode="virtualized" hasBuckets={buckets.length > 0} />
       <VirtualizedTableBody<Bucket>
-        paddingColSpan={5}
+        paddingColSpan={6}
         emptyContent={
           showSearchEmptyState ? (
             <BucketTableEmptyState mode="virtualized" filterString={filterString} />
@@ -95,7 +96,7 @@ const BucketsTableVirtualized = ({
         trailingContent={
           <LoadMoreRow
             mode="virtualized"
-            colSpan={6}
+            colSpan={7}
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
             onLoadMore={onLoadMore}
