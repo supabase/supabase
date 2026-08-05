@@ -123,7 +123,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
         <SheetHeader>
           <SheetTitle>{step === 'success' ? 'Token created' : 'Generate token'}</SheetTitle>
           <SheetDescription className="sr-only">
-            Generate a new scoped access token in two steps: configure, then review.
+            Configure and create a new access token.
           </SheetDescription>
         </SheetHeader>
         {step === 'success' && createdToken ? (
