@@ -47,8 +47,9 @@ export const instanceLabel = (instance: string | undefined): string => {
 export const getHighAvailabilityRegionCode = (
   environment = process.env.NEXT_PUBLIC_ENVIRONMENT
 ) => {
-  if (environment === 'local') return 'eu-central-1'
+  // Local dev stacks can run in any of the supported regions, so they're left unrestricted
   if (environment === 'staging') return 'us-east-1'
+  if (environment === 'local') return 'eu-central-1'
   return undefined
 }
 
@@ -57,8 +58,9 @@ export const filterHighAvailabilityRegions = <T extends { code: string }>(
   highAvailability: boolean,
   environment = process.env.NEXT_PUBLIC_ENVIRONMENT
 ) => {
+  const isLocal = environment === 'local'
   const regionCode = getHighAvailabilityRegionCode(environment)
-  return highAvailability && regionCode !== undefined
+  return highAvailability && !isLocal && regionCode !== undefined
     ? regions.filter((region) => region.code === regionCode)
     : regions
 }
