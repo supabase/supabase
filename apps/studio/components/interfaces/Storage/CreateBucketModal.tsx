@@ -32,12 +32,17 @@ import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSetting
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 import { BucketDataProtectionFields } from './BucketDataProtectionFields'
+import { validateVersioningFields } from './BucketDataProtectionFields.utils'
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
-import { useIsStorageProtectionEnabled } from './StorageProtection.constants'
+import {
+  getVersioningPlanLimits,
+  useIsStorageProtectionEnabled,
+} from './StorageProtection.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
 
 const FormSchema = z
@@ -62,6 +67,9 @@ const FormSchema = z
       .min(0, 'File size upload limit has to be at least 0')
       .optional(),
     allowed_mime_types: z.string().trim().default(''),
+    enable_versioning: z.boolean().default(false),
+    version_expiry_days: z.string().trim().optional(),
+    max_noncurrent_versions: z.string().trim().optional(),
   })
   .superRefine((data, ctx) => {
     if (!validBucketNameRegex.test(data.name)) {
@@ -91,6 +99,9 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
   const showProtection = useIsStorageProtectionEnabled()
 
+  const { data: organization } = useSelectedOrganizationQuery()
+  const planLimits = getVersioningPlanLimits(organization?.plan.id)
+
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
@@ -109,6 +120,9 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
       has_file_size_limit: false,
       formatted_size_limit: undefined,
       allowed_mime_types: '',
+      enable_versioning: false,
+      version_expiry_days: undefined,
+      max_noncurrent_versions: undefined,
     },
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
@@ -135,6 +149,28 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
           type: 'manual',
           message: 'exceed_global_limit',
         })
+      }
+
+      const versioningErrors = validateVersioningFields({
+        isEnabled: values.enable_versioning,
+        expiryDaysRaw: values.version_expiry_days,
+        maxVersionsRaw: values.max_noncurrent_versions,
+        limits: planLimits,
+      })
+      if (versioningErrors.version_expiry_days || versioningErrors.max_noncurrent_versions) {
+        if (versioningErrors.version_expiry_days) {
+          form.setError('version_expiry_days', {
+            type: 'manual',
+            message: versioningErrors.version_expiry_days,
+          })
+        }
+        if (versioningErrors.max_noncurrent_versions) {
+          form.setError('max_noncurrent_versions', {
+            type: 'manual',
+            message: versioningErrors.max_noncurrent_versions,
+          })
+        }
+        return
       }
 
       await createBucket({

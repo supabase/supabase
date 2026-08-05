@@ -29,7 +29,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import { BucketDataProtectionFields } from '@/components/interfaces/Storage/BucketDataProtectionFields'
-import { useIsStorageProtectionEnabled } from '@/components/interfaces/Storage/StorageProtection.constants'
+import { validateVersioningFields } from '@/components/interfaces/Storage/BucketDataProtectionFields.utils'
+import {
+  getMockBucketProtection,
+  getVersioningPlanLimits,
+  useIsStorageProtectionEnabled,
+} from '@/components/interfaces/Storage/StorageProtection.constants'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -39,6 +44,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketUpdateMutation } from '@/data/storage/bucket-update-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export interface EditBucketModalProps {
@@ -56,6 +62,9 @@ const BucketSchema = z.object({
     .min(0, 'File size upload limit has to be at least 0')
     .optional(),
   allowed_mime_types: z.string().trim().default(''),
+  enable_versioning: z.boolean().default(false),
+  version_expiry_days: z.string().trim().optional(),
+  max_noncurrent_versions: z.string().trim().optional(),
 })
 
 const formId = 'edit-storage-bucket-form'
@@ -66,6 +75,10 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
   const formattedGlobalUploadLimit = `${value} ${unit}`
+
+  const { data: organization } = useSelectedOrganizationQuery()
+  const planLimits = getVersioningPlanLimits(organization?.plan.id)
+  const bucketProtection = getMockBucketProtection(bucket?.name)
 
   const bucketIdRef = useRef<string | null>(null)
   const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
@@ -113,6 +126,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     has_file_size_limit: Boolean(bucket?.file_size_limit),
     formatted_size_limit: bucket?.file_size_limit ? (fileSizeLimit ?? 0) : undefined,
     allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
+    enable_versioning: !!planLimits && bucketProtection.versioning === 'enabled',
+    version_expiry_days: bucketProtection.versionExpiryDays?.toString(),
+    max_noncurrent_versions: bucketProtection.maxNoncurrentVersions?.toString(),
   }
 
   const form = useForm<z.infer<typeof BucketSchema>>({
@@ -161,6 +177,28 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           message: 'exceed_global_limit',
         })
       }
+    }
+
+    const versioningErrors = validateVersioningFields({
+      isEnabled: values.enable_versioning,
+      expiryDaysRaw: values.version_expiry_days,
+      maxVersionsRaw: values.max_noncurrent_versions,
+      limits: planLimits,
+    })
+    if (versioningErrors.version_expiry_days || versioningErrors.max_noncurrent_versions) {
+      if (versioningErrors.version_expiry_days) {
+        form.setError('version_expiry_days', {
+          type: 'manual',
+          message: versioningErrors.version_expiry_days,
+        })
+      }
+      if (versioningErrors.max_noncurrent_versions) {
+        form.setError('max_noncurrent_versions', {
+          type: 'manual',
+          message: versioningErrors.max_noncurrent_versions,
+        })
+      }
+      return
     }
 
     updateBucket({
@@ -428,7 +466,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
               )}
             </DialogSection>
 
-            {showProtection && <BucketDataProtectionFields bucketName={bucket?.name} />}
+            {showProtection && <BucketDataProtectionFields />}
           </form>
         </Form>
 
