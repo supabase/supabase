@@ -24,18 +24,37 @@ You might be affected by this if:
 - You recently created a project on Lovable and enabled the backend from the chat interface. By default, the Lovable platform uses **Lovable Cloud** for backend hosting.
 - You see Supabase references in your project’s configuration but **can’t access the project** from your [Supabase Dashboard](/dashboard).
 - The project ID or credentials used in your Lovable setup don’t match any project under your Supabase account.
+- You previously had your own Supabase project connected, but enabled Lovable Cloud by mistake and lost access to your Supabase backend from Lovable.
 
 ## How to fix
 
-There is **no automated way** to transfer a Supabase project from Lovable Cloud to your own Supabase account.
+There is **no one-click transfer** from Lovable Cloud to your own Supabase account. However, you can export your data, restore it into a project you own, and then remove Lovable Cloud:
 
-However, you can manually clone your project backend and migrate your data following Lovable’s official guide: [Self-Hosting Guide (Lovable Docs)](https://docs.lovable.dev/tips-tricks/self-hosting)
+1. **Export your data.** In Lovable, open the project panel (layers icon in the top bar) and go to **Cloud > Overview > Advanced settings**, then use **Export data** to download a copy of your database. Exports are limited to 5 GB, and you can request one export every 24 hours. Download any storage files you need separately.
 
-This process allows you to create a new Supabase project under your own account and connect it independently.
+   ![Export, Pause, and Remove options in Lovable Cloud Advanced settings](/docs/img/troubleshooting/cant-access-supabase-project-lovable-cloud-0.png)
+
+2. **Create your own Supabase project and import your data.** Create a project from the [Supabase Dashboard](/dashboard) and restore the exported data into it. See [Import Lovable Cloud Data into Your Own Supabase Project](/docs/guides/troubleshooting/import-lovable-cloud-data-to-supabase) for detailed restore steps and post-restore fixes. Verify that your data, users, and policies are in place before continuing.
+
+3. **Remove Lovable Cloud.** Once you have verified the import, go to **Cloud > Overview > Advanced settings** and use the **Remove Lovable Cloud** flow. Lovable asks you to confirm the warnings and type the project name before removal.
+
+   ![Remove Lovable Cloud confirmation dialog](/docs/img/troubleshooting/cant-access-supabase-project-lovable-cloud-1.png)
+
+4. **Connect your own Supabase project.** Connect the new project to your Lovable project by following Lovable's official guide: [Connect to Supabase (Lovable Docs)](https://docs.lovable.dev/integrations/supabase).
+
+   ![Connect your own Supabase project after removing Lovable Cloud](/docs/img/troubleshooting/cant-access-supabase-project-lovable-cloud-2.png)
+
+For more details, see Lovable's [Cloud documentation](https://docs.lovable.dev/integrations/cloud).
 
 <Admonition type="note">
 
-There are certain limitations described in Lovable’s documentation, so review the guide carefully before proceeding.
+If you enabled Lovable Cloud by mistake and your data still lives in your own Supabase project, you can skip the export and import steps: remove Lovable Cloud and reconnect your Supabase project. If you added data while Lovable Cloud was enabled, that data lives in the Cloud instance, so export it before removing.
+
+</Admonition>
+
+<Admonition type="danger">
+
+Removing Lovable Cloud permanently deletes the Cloud instance, including your database tables, users, storage, edge functions, and secrets. This cannot be undone. Export your database and download any storage files you need before removing Lovable Cloud.
 
 </Admonition>
 
@@ -48,7 +67,8 @@ If you want direct access to your Supabase project from the start, make sure to:
 
 ## Additional resources
 
-For more information, read [the Lovable Cloud FAQ](https://docs.lovable.dev/features/cloud#faq)
+- [Lovable Cloud FAQ](https://docs.lovable.dev/features/cloud#faq)
+- [Deployment, hosting, and ownership options with Lovable Cloud](https://docs.lovable.dev/tips-tricks/self-hosting)
 
 ## Frequently asked questions
 
@@ -59,15 +79,6 @@ For more information, read [the Lovable Cloud FAQ](https://docs.lovable.dev/feat
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <AccordionItem
-      header="Can I get access to the Supabase SQL editor when using Lovable Cloud?"
-      id="sql-editor-access"
-    >
-
-    No. Projects running on **Lovable Cloud** use a managed Supabase backend that doesn't provide direct SQL editor access through [supabase.com/dashboard](/dashboard).
-
-    </AccordionItem>
-
   <AccordionItem
       header="Why doesn't my Supabase project appear on my dashboard?"
       id="project-not-showing"
@@ -82,9 +93,22 @@ For more information, read [the Lovable Cloud FAQ](https://docs.lovable.dev/feat
       id="disconnect-project"
     >
 
-    Once Lovable Cloud is enabled for a project, it **cannot be disconnected or switched** to an external Supabase connection.
+    Yes. You can remove Lovable Cloud from your project under **Cloud > Overview > Advanced settings > Remove Lovable Cloud**, then connect your own Supabase project through the [Supabase integration](https://docs.lovable.dev/integrations/supabase).
 
-    However, you can **create a new Supabase project under your own account** and migrate your data by following Lovable's [Project Migration Guide](https://docs.lovable.dev/tips-tricks/self-hosting).
+    Removing Lovable Cloud **permanently deletes** the Cloud instance and its data, so export your database first. There is no one-click transfer: you need to re-import your data and reconfigure authentication and external services manually.
+
+    </AccordionItem>
+
+  <AccordionItem
+      header="Can I get access to the Supabase SQL editor when using Lovable Cloud?"
+      id="sql-editor-access"
+    >
+
+    Projects running on **Lovable Cloud** use a managed Supabase backend that doesn't provide access to the SQL editor on [supabase.com/dashboard](/dashboard).
+
+    However, Lovable Cloud includes its own SQL editor inside Lovable, under **Cloud > SQL editor**. You can also make schema and policy changes via SQL migrations, or ask the Lovable agent to run SQL for you.
+
+    To use the Supabase SQL editor on the Supabase Dashboard, remove Lovable Cloud and connect your own Supabase project (see [How to fix](#how-to-fix)).
 
     </AccordionItem>
 
@@ -93,7 +117,11 @@ For more information, read [the Lovable Cloud FAQ](https://docs.lovable.dev/feat
       id="database-url"
     >
 
-    External connections are **not supported** when your project runs on Lovable Cloud.
+    Direct database connections are **not supported** when your project runs on Lovable Cloud.
+
+    Many external services can connect to your app through [Lovable's connectors](https://docs.lovable.dev/integrations/introduction) instead, which offer 70+ pre-built integrations.
+
+    If you need a direct Postgres connection (for example, for BI tools), remove Lovable Cloud and connect your own Supabase project (see [How to fix](#how-to-fix)).
 
     </AccordionItem>
 
@@ -104,7 +132,7 @@ For more information, read [the Lovable Cloud FAQ](https://docs.lovable.dev/feat
 
     Service role and API keys are **not accessible** for Lovable Cloud–managed projects.
 
-    If you need to integrate with external automation or API-based tools, you'll need to **create and manage your own Supabase project**, then connect Lovable to it directly.
+    To integrate with external automation or API-based tools, remove Lovable Cloud and connect your own Supabase project (see [How to fix](#how-to-fix)).
 
     </AccordionItem>
 
