@@ -137,6 +137,8 @@ Create `volumes/functions/send_sms/index.ts`:
 ```ts name=volumes/functions/send_sms/index.ts
 import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
 
+// Note: this example assumes a single secret. If you use multiple secrets (e.g. "v1,whsec_new|v1,whsec_old"), split on '|'
+// and try each secret in turn until wh.verify() succeeds.
 const hookSecret = Deno.env.get('SEND_SMS_HOOK_SECRET')?.replace('v1,whsec_', '')
 
 Deno.serve(async (req) => {
