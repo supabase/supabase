@@ -1,0 +1,28 @@
+{
+  "name": "kb",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 3008",
+    "build": "astro build",
+    "preview": "astro preview --port 3008",
+    "typecheck": "astro check",
+    "clean": "rimraf dist .astro tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@astrojs/react": "^6.0.2",
+    "astro": "^7.1.6",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@tailwindcss/vite": "4.2.4",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "config": "workspace:*",
+    "tailwindcss": "catalog:",
+    "typescript": "catalog:"
+  }
+}

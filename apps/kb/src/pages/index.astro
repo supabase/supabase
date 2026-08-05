@@ -1,0 +1,31 @@
+---
+import { Card } from '../components/Card'
+import { Header } from '../components/Header'
+import '../styles/global.css'
+
+const sections = [
+  { title: 'Agents', description: 'Guides for building and deploying AI agents with Supabase.' },
+  {
+    title: 'Troubleshooting guides',
+    description: 'Solutions to common issues and errors across the platform.',
+  },
+  { title: 'Quickstarts', description: 'Get up and running with Supabase in a few minutes.' },
+]
+---
+
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Supabase Knowledge Base</title>
+  </head>
+  <body class="bg-background text-foreground min-h-screen">
+    <Header />
+    <main class="max-w-5xl mx-auto px-6 py-16">
+      <h1 class="text-3xl font-medium">Knowledge Base</h1>
+      <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {sections.map((section) => <Card title={section.title} description={section.description} />)}
+      </div>
+    </main>
+  </body>
+</html>
