@@ -141,8 +141,6 @@ export const getExpirationDate = (key: string): string | undefined => {
       return dayjs().add(7, 'days').toISOString()
     case 'month':
       return dayjs().add(30, 'days').toISOString()
-    case 'never':
-      return undefined
     default:
       return undefined
   }

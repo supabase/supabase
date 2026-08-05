@@ -4,7 +4,6 @@ import { components } from 'api-types'
 export type ScopedAccessTokenPermission =
   components['schemas']['CreateScopedAccessTokenBody']['permissions'][number]
 
-export const NON_EXPIRING_TOKEN_VALUE = 'never'
 export const CUSTOM_EXPIRY_VALUE = 'custom'
 
 export const EXPIRES_AT_OPTIONS = {
@@ -12,7 +11,6 @@ export const EXPIRES_AT_OPTIONS = {
   day: { value: 'day', label: '1 day' },
   week: { value: 'week', label: '7 days' },
   month: { value: 'month', label: '30 days' },
-  never: { value: NON_EXPIRING_TOKEN_VALUE, label: 'Never' },
   custom: { value: CUSTOM_EXPIRY_VALUE, label: 'Custom' },
 } as const
 
