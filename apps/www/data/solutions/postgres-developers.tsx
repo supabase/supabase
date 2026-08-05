@@ -391,7 +391,7 @@ const data: () => {
           ),
         },
         {
-          id: 'row-level-security',
+          id: 'full-sql-access',
           title: 'Full SQL access',
           icon: '',
           subheading: (
