@@ -69,6 +69,8 @@ const getDisplayNameForSmartRegion = (name: string): string => {
   return name
 }
 
+const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
 export const RegionSelector = ({
   form,
   instanceSize,
@@ -104,7 +106,7 @@ export const RegionSelector = ({
   const allSmartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
   const restrictHighAvailabilityRegion =
-    highAvailability && highAvailabilityRegionCode !== undefined
+    highAvailability && !isLocal && highAvailabilityRegionCode !== undefined
   const smartRegions = highAvailability ? [] : allSmartRegions
 
   const recommendedSmartRegions = new Set(
