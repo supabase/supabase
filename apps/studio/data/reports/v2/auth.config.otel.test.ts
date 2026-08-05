@@ -98,6 +98,16 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     expect(out).not.toContain('approx_quantiles')
   })
 
+  it('averages sign-in processing time without percentiles for the basic variant', () => {
+    const out = sql(AUTH_REPORT_SQL_OTEL.SignInProcessingTimeBasic('1h'))
+
+    expect(out).toContain("JSONExtractString(event_message, 'auth_event', 'action') = 'login'")
+    expect(out).toContain(
+      "round(avg(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as avg_processing_time_ms"
+    )
+    expect(out).not.toContain('quantile(')
+  })
+
   it('averages sign-up processing time without percentiles for the basic variant', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.SignUpProcessingTimeBasic('1h'))
 

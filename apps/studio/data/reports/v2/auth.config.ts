@@ -40,7 +40,7 @@ const METRIC_KEYS = [
   'SignUpProcessingTimePercentiles',
   'ErrorsByStatus',
   'ErrorsByAuthCode',
-]
+] as const
 
 type MetricKey = (typeof METRIC_KEYS)[number]
 
