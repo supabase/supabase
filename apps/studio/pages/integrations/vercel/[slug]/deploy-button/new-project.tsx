@@ -197,7 +197,7 @@ export function VercelConnectionError({
     <div className="flex flex-col gap-3">
       <Admonition
         type="danger"
-        title="Project created, connection failed"
+        title="Supabase project created but Vercel connection failed"
         description={
           <>
             Your Supabase project was created, but it could not be connected to Vercel.
