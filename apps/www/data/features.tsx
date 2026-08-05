@@ -600,7 +600,7 @@ Dedicated Poolers provide an alternative to Supavisor for specific use cases, gi
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres#serverside-poolers',
+    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres#server-side-poolers',
     slug: 'dedicated-poolers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -952,7 +952,7 @@ Broadcast from Database provides a powerful way to trigger real-time events dire
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-database',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast#broadcast-from-the-database',
     slug: 'realtime-broadcast-from-database',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_BETA,
