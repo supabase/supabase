@@ -902,7 +902,7 @@ export const createErrorsReportConfig = ({
         const sql = sqlSet.ErrorsByStatus(interval, filters)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
 
-        if (!rawData?.result) return { data: [] }
+        if (!rawData?.result) return { data: [], query: sql }
 
         const statusCodes = extractStatusCodesFromData(rawData.result)
         const attributes = generateStatusCodeAttributes(statusCodes)
@@ -927,11 +927,15 @@ export const createErrorsReportConfig = ({
         const sql = sqlSet.ErrorsByAuthCode(interval, filters)
         const rawData = await fetchLogs(projectRef, sql, startDate, endDate, useOtel)
 
-        if (!rawData?.result) return { data: [] }
+        if (!rawData?.result) return { data: [], query: sql }
 
-        const categories = rawData.result
-          .map((r: any) => r.error_code)
-          .filter((v: any) => v !== null && v !== undefined)
+        const rows = z
+          .array(z.object({ error_code: z.string().nullish() }).catchall(z.unknown()))
+          .parse(rawData.result)
+
+        const categories = rows
+          .map((r) => r.error_code)
+          .filter((v): v is string => v !== null && v !== undefined)
         const distinct = Array.from(new Set(categories)).sort()
 
         const attributes = distinct.map((c: string) => ({
@@ -940,7 +944,7 @@ export const createErrorsReportConfig = ({
           tooltip: AUTH_ERROR_CODE_LIST.find((e) => e.key === c)?.description,
         }))
 
-        const pivoted = transformCategoricalCountData(rawData.result, 'error_code', distinct)
+        const pivoted = transformCategoricalCountData(rows, 'error_code', distinct)
 
         return { data: pivoted, attributes, query: sql }
       },

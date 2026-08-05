@@ -78,6 +78,35 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     expect(out).not.toContain('approx_quantiles')
   })
 
+  it('filters TotalSignUps/PasswordResetRequests to their respective auth_event actions', () => {
+    expect(sql(AUTH_REPORT_SQL_OTEL.TotalSignUps('1h'))).toContain(
+      "JSONExtractString(event_message, 'auth_event', 'action') = 'user_signedup'"
+    )
+    expect(sql(AUTH_REPORT_SQL_OTEL.PasswordResetRequests('1h'))).toContain(
+      "JSONExtractString(event_message, 'auth_event', 'action') = 'user_recovery_requested'"
+    )
+  })
+
+  it('uses ClickHouse quantile() for sign-up percentiles over the duration field', () => {
+    const out = sql(AUTH_REPORT_SQL_OTEL.SignUpProcessingTimePercentiles('1h'))
+
+    expect(out).toContain(
+      "round(quantile(0.5)(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as p50_processing_time_ms"
+    )
+    expect(out).toContain('quantile(0.95)')
+    expect(out).toContain('quantile(0.99)')
+    expect(out).not.toContain('approx_quantiles')
+  })
+
+  it('averages sign-up processing time without percentiles for the basic variant', () => {
+    const out = sql(AUTH_REPORT_SQL_OTEL.SignUpProcessingTimeBasic('1h'))
+
+    expect(out).toContain(
+      "round(avg(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as avg_processing_time_ms"
+    )
+    expect(out).not.toContain('quantile(')
+  })
+
   it('reads edge_logs error fields from log_attributes', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.ErrorsByStatus('1h'))
 
@@ -106,11 +135,11 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     const out = sql(
       AUTH_REPORT_SQL_OTEL.ActiveUsers('1h', { status_code: { operator: '>=', value: 500 } })
     )
-    expect(out).not.toContain('status_code')
+    expect(out).not.toContain("toInt32OrZero(log_attributes['response.status_code'])")
   })
 
   it('ignores a provider filter on edge_logs-sourced queries (no auth provider attribute there)', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.ErrorsByStatus('1h', { provider: ['google'] }))
-    expect(out).not.toContain('provider')
+    expect(out).not.toContain("JSONExtractString(event_message, 'provider')")
   })
 })

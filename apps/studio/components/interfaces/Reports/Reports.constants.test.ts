@@ -169,4 +169,11 @@ describe('generateOtelWhereSafe', () => {
       "WHERE log_attributes['request.method'] = 'GET'"
     )
   })
+
+  it('should generate an AND clause with prepend=false, for appending after an existing WHERE', () => {
+    const filters: ReportFilterItem[] = [{ key: 'request.method', value: 'GET', compare: 'is' }]
+    expect(generateOtelWhereSafe(filters, false)).toBe(
+      "AND log_attributes['request.method'] = 'GET'"
+    )
+  })
 })
