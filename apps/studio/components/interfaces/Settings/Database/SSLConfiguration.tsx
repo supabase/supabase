@@ -42,16 +42,15 @@ export const SSLConfiguration = () => {
     projectRef: ref,
   })
   const { data: jitDbAccessConfiguration } = useJitDbAccessQuery({ projectRef: ref })
-  const { mutate: updateSSLEnforcement, isPending: isSubmitting } = useSSLEnforcementUpdateMutation(
-    {
+  const { mutateAsync: updateSSLEnforcement, isPending: isSubmitting } =
+    useSSLEnforcementUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully updated SSL configuration')
       },
       onError: (error) => {
         toast.error(`Failed to update SSL enforcement: ${error.message}`)
       },
-    }
-  )
+    })
 
   const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
@@ -110,7 +109,7 @@ export const SSLConfiguration = () => {
 
   const toggleSSLEnforcement = async () => {
     if (!ref) return console.error('Project ref is required')
-    updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
+    await updateSSLEnforcement({ projectRef: ref, requestedConfig: { database: !isEnforced } })
   }
 
   return (

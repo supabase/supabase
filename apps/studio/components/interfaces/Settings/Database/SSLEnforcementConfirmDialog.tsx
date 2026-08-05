@@ -14,7 +14,7 @@ import {
 interface SSLEnforcementConfirmDialogProps {
   targetEnforced: boolean
   isSubmitting: boolean
-  onConfirm: () => void
+  onConfirm: () => Promise<void>
 }
 
 export const SSLEnforcementConfirmDialog = ({

@@ -128,7 +128,7 @@ export const JitDbAccessConfiguration = () => {
       onError: () => {},
     })
 
-  const { mutate: enableSSLEnforcement, isPending: isEnablingSSLEnforcement } =
+  const { mutateAsync: enableSSLEnforcement, isPending: isEnablingSSLEnforcement } =
     useSSLEnforcementUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully enabled SSL enforcement')
@@ -138,9 +138,9 @@ export const JitDbAccessConfiguration = () => {
       },
     })
 
-  const handleEnableSSLEnforcement = () => {
+  const handleEnableSSLEnforcement = async () => {
     if (!ref) return console.error('Project ref is required')
-    enableSSLEnforcement({ projectRef: ref, requestedConfig: { database: true } })
+    await enableSSLEnforcement({ projectRef: ref, requestedConfig: { database: true } })
   }
 
   const { mutateAsync: revokeUserAccess, isPending: isRevokingAccess } =
