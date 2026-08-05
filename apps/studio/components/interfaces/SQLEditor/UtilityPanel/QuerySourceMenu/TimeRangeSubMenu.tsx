@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import { Check, Lock } from 'lucide-react'
 import {
   DropdownMenuItem,
@@ -50,7 +51,9 @@ export const TimeRangeSubMenu = ({
         <div className="flex flex-col">
           <span>Time range</span>
           <span className="text-foreground-lighter text-xs">
-            {isCustomRange ? 'Custom range' : (selectedPreset?.helper.text ?? 'Custom range')}
+            {isCustomRange
+              ? `${dayjs(range.from).format('DD MMM, HH:mm')} - ${dayjs(range.to).format('DD MMM, HH:mm')}`
+              : (selectedPreset?.helper.text ?? 'Custom range')}
           </span>
         </div>
       </DropdownMenuSubTrigger>

@@ -1,45 +1,36 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  buildClickhouseRewritePrompt,
   detectLogSource,
   looksLikeLegacyLogsQuery,
   rewriteLogsSqlWithAI,
+  shouldOfferLegacyLogsRewrite,
   stripSqlCodeFences,
 } from './logs-sql-rewrite'
 
-describe('buildClickhouseRewritePrompt', () => {
-  it('includes the query, the schema, and a reply-with-only-SQL instruction', () => {
-    const prompt = buildClickhouseRewritePrompt('select count(*) from edge_logs')
-    expect(prompt).toContain('select count(*) from edge_logs')
-    expect(prompt).toContain('log_attributes')
-    expect(prompt).toContain("source = 'edge_logs'")
-    expect(prompt.toLowerCase()).toContain('reply with only')
+describe('shouldOfferLegacyLogsRewrite', () => {
+  const legacySql = 'select 1 from edge_logs cross join unnest(metadata) as m'
+
+  it('offers the rewrite for BigQuery-dialect SQL once logs run on ClickHouse', () => {
+    expect(shouldOfferLegacyLogsRewrite({ sql: legacySql, isClickhouseLogsEnabled: true })).toBe(
+      true
+    )
   })
 
-  it('spells out the FROM-to-logs conversion and shows a worked example', () => {
-    const prompt = buildClickhouseRewritePrompt('select 1 from postgres_logs')
-    expect(prompt).toContain("from logs where source = 'postgres_logs'")
-    expect(prompt.toLowerCase()).toContain('remove every')
-    expect(prompt).toContain('cross join unnest')
-    expect(prompt).toContain('BigQuery:')
-    expect(prompt).toContain('ClickHouse:')
-    expect(prompt).toContain("log_attributes['parsed.error_severity']")
+  it('never offers it on a non-migrated org, where the BigQuery SQL is still correct', () => {
+    expect(shouldOfferLegacyLogsRewrite({ sql: legacySql, isClickhouseLogsEnabled: false })).toBe(
+      false
+    )
   })
 
-  it('lists the real log_attributes keys when provided and demands exact paths', () => {
-    const prompt = buildClickhouseRewritePrompt('select 1 from edge_logs', [
-      'request.headers.x_real_ip',
-      'request.cf.country',
-    ])
-    expect(prompt).toContain("log_attributes['request.headers.x_real_ip']")
-    expect(prompt).toContain("log_attributes['request.cf.country']")
-    expect(prompt.toLowerCase()).toContain('exact')
-  })
-
-  it('omits the keys section when none are provided', () => {
-    const prompt = buildClickhouseRewritePrompt('select 1 from edge_logs')
-    expect(prompt).not.toContain('actual log_attributes keys present')
+  it('does not offer it for SQL that is already ClickHouse, or for empty SQL', () => {
+    expect(
+      shouldOfferLegacyLogsRewrite({
+        sql: "select timestamp from logs where source = 'edge_logs' limit 5",
+        isClickhouseLogsEnabled: true,
+      })
+    ).toBe(false)
+    expect(shouldOfferLegacyLogsRewrite({ sql: '', isClickhouseLogsEnabled: true })).toBe(false)
   })
 })
 
@@ -65,6 +56,21 @@ describe('detectLogSource', () => {
 
   it('returns undefined when nothing matches', () => {
     expect(detectLogSource('select 1')).toBeUndefined()
+  })
+
+  it('ignores a column that merely ends in "source"', () => {
+    expect(detectLogSource("select 1 from logs where resource = 'nope'")).toBeUndefined()
+    expect(detectLogSource("select 1 from logs where datasource = 'nope'")).toBeUndefined()
+  })
+
+  it('still reads a qualified source column', () => {
+    expect(detectLogSource("select 1 from logs t where t.source = 'auth_logs'")).toBe('auth_logs')
+  })
+
+  it('prefers the real source column over a lookalike earlier in the query', () => {
+    expect(detectLogSource("select resource = 'nope' from logs where source = 'edge_logs'")).toBe(
+      'edge_logs'
+    )
   })
 })
 
@@ -112,7 +118,7 @@ describe('rewriteLogsSqlWithAI', () => {
     vi.unstubAllGlobals()
   })
 
-  it('posts to the completion endpoint and returns the cleaned query', async () => {
+  it('declares the rewrite intent and sends the query as the selection', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => '```sql\nselect 1 from logs\n```',
@@ -122,6 +128,7 @@ describe('rewriteLogsSqlWithAI', () => {
     const result = await rewriteLogsSqlWithAI({
       sql: 'select 1 from edge_logs',
       projectRef: 'abc',
+      availableKeys: ['request.method'],
     })
 
     expect(result).toBe('select 1 from logs')
@@ -129,8 +136,14 @@ describe('rewriteLogsSqlWithAI', () => {
     expect(url).toContain('/api/ai/code/complete')
     const body = JSON.parse(init.body)
     expect(body.dialect).toBe('clickhouse')
+    expect(body.intent).toBe('rewrite')
+    // The whole query is the selection, so the rewrite replaces all of it.
     expect(body.completionMetadata.selection).toBe('select 1 from edge_logs')
-    expect(body.completionMetadata.prompt.toLowerCase()).toContain('reply with only')
+    expect(body.completionMetadata.textBeforeCursor).toBe('')
+    expect(body.completionMetadata.textAfterCursor).toBe('')
+    expect(body.completionMetadata.availableKeys).toEqual(['request.method'])
+    // No prompt text is carried client-side — the route owns the instruction.
+    expect(body.completionMetadata.prompt).toBe('')
   })
 
   it('throws when the request fails', async () => {
