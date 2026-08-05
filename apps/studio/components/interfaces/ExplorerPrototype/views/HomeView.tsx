@@ -22,7 +22,7 @@ export const HomeView = ({ onCreateQuery, onCreateNotebook, onCreateChat }: Home
   const [showTemplates, setShowTemplates] = useState(true)
 
   return (
-    <div className="h-full overflow-y-auto bg-background">
+    <div className="h-full overflow-y-auto">
       <div className="flex min-h-full items-center justify-center px-6 py-12">
         <div className="w-full max-w-2xl">
           <div className="mb-12 space-y-1 text-center">

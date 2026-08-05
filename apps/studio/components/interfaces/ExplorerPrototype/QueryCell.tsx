@@ -142,8 +142,10 @@ export const QueryCell = ({
   return (
     <div
       className={cn(
-        'flex flex-col overflow-hidden bg-surface-100',
-        full ? 'h-full min-h-0 border-0 shadow-none' : 'rounded-md border shadow-xs'
+        'flex flex-col overflow-hidden',
+        full
+          ? 'h-full min-h-0 border-0 shadow-none'
+          : 'rounded-md border bg-muted shadow-xs'
       )}
     >
       <TabToolbar

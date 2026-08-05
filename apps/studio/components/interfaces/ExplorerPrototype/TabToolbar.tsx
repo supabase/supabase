@@ -19,7 +19,7 @@ interface TabToolbarProps {
 }
 
 export const TabToolbar = ({ icon: Icon, title, actions }: TabToolbarProps) => (
-  <div className="flex h-10 shrink-0 items-center gap-2 border-b bg-background px-3 md:min-h-(--header-height)">
+  <div className="flex h-10 shrink-0 items-center gap-2 border-b bg-transparent px-3 md:min-h-(--header-height)">
     <Icon size={14} className="shrink-0 text-foreground-muted" />
     <div className="min-w-0 flex-1">
       {typeof title === 'string' ? <h2 className="truncate text-sm">{title}</h2> : title}

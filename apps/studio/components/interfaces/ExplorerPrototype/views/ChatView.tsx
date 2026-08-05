@@ -276,7 +276,7 @@ export const ChatView = ({
         <ConversationScrollButton aria-label="Jump to latest" />
       </Conversation>
 
-      <div className="bg-background p-4">
+      <div className="p-4">
         <ChatComposer onSubmit={onSendMessage} />
       </div>
     </div>

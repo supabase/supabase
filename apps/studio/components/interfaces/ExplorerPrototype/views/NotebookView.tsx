@@ -99,7 +99,7 @@ export const NotebookView = ({
     <div
       className={cn(
         'flex flex-col',
-        embedded ? 'max-h-[32rem] overflow-hidden rounded-md border bg-surface-100' : 'h-full'
+        embedded ? 'max-h-[32rem] overflow-hidden rounded-md border bg-muted' : 'h-full'
       )}
     >
       <TabToolbar

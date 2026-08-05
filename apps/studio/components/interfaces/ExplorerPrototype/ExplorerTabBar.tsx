@@ -42,7 +42,7 @@ export const ExplorerTabBar = ({
       <div
         className={cn(
           'relative flex shrink-0 items-center border-r',
-          isHomeActive ? 'bg-background' : 'bg-transparent hover:bg-surface-200'
+          isHomeActive ? 'bg-muted' : 'bg-background hover:bg-surface-200'
         )}
       >
         <button
@@ -69,9 +69,9 @@ export const ExplorerTabBar = ({
             key={tab.id}
             className={cn(
               'group/tab relative flex items-center border-r',
-              // The active tab is the page surface pushed up into the muted row,
-              // so it reads as continuous with the content below it.
-              isActive ? 'bg-background' : 'bg-transparent hover:bg-surface-200'
+              // The active tab shares the muted content surface; inactive tabs
+              // remain on the background surface until selected.
+              isActive ? 'bg-muted' : 'bg-background hover:bg-surface-200'
             )}
           >
             <button

@@ -103,9 +103,8 @@ export const ExplorerPrototype = () => {
   }
 
   return (
-    // `bg-background` is the page surface the active tab blends into.
-    <div className="flex h-full flex-col bg-background">
-      <div className="flex h-10 items-center border-b bg-muted md:min-h-(--header-height)">
+    <div className="flex h-full flex-col">
+      <div className="flex h-10 items-center border-b bg-transparent md:min-h-(--header-height)">
         <ExplorerTabBar
           tabs={state.tabs}
           activeTabId={state.activeTabId}
@@ -120,7 +119,7 @@ export const ExplorerPrototype = () => {
         />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-muted">
         {isHomeActive ? (
           <HomeView
             onCreateQuery={state.createQuery}
