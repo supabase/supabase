@@ -401,7 +401,7 @@ export const JitDbAccessConfiguration = () => {
                   </Button>
                 ) : unavailableReason === 'ssl_enforcement_required' && ref ? (
                   <SSLEnforcementConfirmDialog
-                    targetEnforced
+                    isTargetEnforced
                     isSubmitting={isEnablingSSLEnforcement}
                     onConfirm={handleEnableSSLEnforcement}
                   >

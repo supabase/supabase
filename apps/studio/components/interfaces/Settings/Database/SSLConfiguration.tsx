@@ -89,13 +89,16 @@ export const SSLConfiguration = () => {
     !hasAccessToSSLEnforcement ||
     isTemporaryAccessEnabled
 
-  const switchTooltipMessage = !canUpdateSSLEnforcement
-    ? 'You need additional permissions to update SSL enforcement for your project'
-    : !hasAccessToSSLEnforcement
-      ? 'Your project does not have access to SSL enforcement'
-      : isTemporaryAccessEnabled
-        ? 'Temporary access must first be disabled before SSL enforcement can be disabled'
-        : undefined
+  let switchTooltipMessage: string | undefined
+  if (!canUpdateSSLEnforcement) {
+    switchTooltipMessage =
+      'You need additional permissions to update SSL enforcement for your project'
+  } else if (!hasAccessToSSLEnforcement) {
+    switchTooltipMessage = 'Your project does not have access to SSL enforcement'
+  } else if (isTemporaryAccessEnabled) {
+    switchTooltipMessage =
+      'Temporary access must first be disabled before SSL enforcement can be disabled'
+  }
 
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
@@ -129,7 +132,7 @@ export const SSLConfiguration = () => {
               description="Reject non-SSL connections to your database"
             >
               <SSLEnforcementConfirmDialog
-                targetEnforced={!isEnforced}
+                isTargetEnforced={!isEnforced}
                 isSubmitting={isSubmitting}
                 onConfirm={toggleSSLEnforcement}
               >

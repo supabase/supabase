@@ -12,13 +12,13 @@ import {
 } from 'ui'
 
 interface SSLEnforcementConfirmDialogProps {
-  targetEnforced: boolean
+  isTargetEnforced: boolean
   isSubmitting: boolean
   onConfirm: () => Promise<void>
 }
 
 export const SSLEnforcementConfirmDialog = ({
-  targetEnforced,
+  isTargetEnforced,
   isSubmitting,
   onConfirm,
   children,
@@ -37,7 +37,7 @@ export const SSLEnforcementConfirmDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="warning" disabled={isSubmitting} onClick={onConfirm}>
-            {targetEnforced ? 'Enable SSL' : 'Disable SSL'}
+            {isTargetEnforced ? 'Enable SSL' : 'Disable SSL'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
