@@ -140,23 +140,23 @@ const VercelIntegration: NextPageWithLayout = () => {
       >
         {newProjectRef === undefined ? (
           <ProjectCreationForm isVercelIntegrationFlow onCreateSuccess={setNewProjectRef} />
+        ) : isProjectSettingsError ? (
+          <VercelConnectionError
+            projectRef={newProjectRef}
+            message={
+              projectSettingsError?.message ?? 'Unable to check whether the project is ready.'
+            }
+            onRetry={() => void refetchProjectSettings()}
+          />
+        ) : connectionError ? (
+          <VercelConnectionError
+            projectRef={newProjectRef}
+            message={connectionError}
+            onRetry={() => void connectProject()}
+          />
         ) : (
           <div className="px-6 pb-6">
-            {isProjectSettingsError ? (
-              <VercelConnectionError
-                projectRef={newProjectRef}
-                message={
-                  projectSettingsError?.message ?? 'Unable to check whether the project is ready.'
-                }
-                onRetry={() => void refetchProjectSettings()}
-              />
-            ) : connectionError ? (
-              <VercelConnectionError
-                projectRef={newProjectRef}
-                message={connectionError}
-                onRetry={() => void connectProject()}
-              />
-            ) : isConnectionComplete ? (
+            {isConnectionComplete ? (
               <div className="flex flex-col gap-3">
                 <Admonition
                   type="success"
@@ -194,18 +194,20 @@ export function VercelConnectionError({
   onRetry: () => void
 }) {
   return (
-    <div className="flex flex-col gap-3">
-      <Admonition
-        type="danger"
-        title="Supabase project created but Vercel connection failed"
-        description={`Error: ${message}`}
-      />
-      <Button variant="primary" block onClick={onRetry}>
-        Retry connection
-      </Button>
-      <Button asChild variant="text" block>
-        <Link href={`/project/${projectRef}`}>Open project</Link>
-      </Button>
+    <div>
+      <div className="px-6 pb-6">
+        <Admonition
+          type="danger"
+          title="Unable to connect to Vercel"
+          description={`Your Supabase project was created. Error: ${message}`}
+        />
+      </div>
+      <div className="flex h-12 items-center justify-end gap-x-2 border-t border-default bg-surface-100 px-card">
+        <Button asChild variant="default">
+          <Link href={`/project/${projectRef}`}>Open project</Link>
+        </Button>
+        <Button onClick={onRetry}>Retry connection</Button>
+      </div>
     </div>
   )
 }
