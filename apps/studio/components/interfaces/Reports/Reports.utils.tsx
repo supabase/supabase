@@ -157,32 +157,6 @@ export function transformStatusCodeData(data: any[], statusCodes: string[]) {
 }
 
 /**
- * Extract distinct string values for a given field from data rows
- */
-export function extractDistinctValuesFromData(data: any[], field: string): string[] {
-  const values = new Set<string>()
-  data.forEach((item: any) => {
-    if (item[field] !== undefined && item[field] !== null) {
-      values.add(String(item[field]))
-    }
-  })
-  return Array.from(values).sort()
-}
-
-/**
- * Generates chart attributes from a list of category values
- */
-export function generateCategoryAttributes(
-  values: string[],
-  labelResolver?: (v: string) => string
-) {
-  return values.map((v) => ({
-    attribute: v,
-    label: labelResolver ? labelResolver(v) : v,
-  }))
-}
-
-/**
  * Pivot rows of { timestamp, [categoryField], count } into { timestamp, [category]: count }
  */
 export function transformCategoricalCountData(
