@@ -84,6 +84,10 @@ supabase
 
 The table's primary key always comes through, even if you leave it out, so you can still tell which row changed. This one is opt in: existing subscriptions keep receiving the full row until you add `select`.
 
+## What this does to your usage
+
+Realtime [bills on messages](https://supabase.com/docs/guides/realtime/pricing) and egress. A database change counts as one message for every client subscribed to it, so an event a filter rejects saves a message per subscriber. A payload trimmed by `select` sends fewer bytes to every subscriber. Both reduce billable usage, so the same workload costs less.
+
 ## Things to know
 
 - Column selection requires `@supabase/supabase-js` 2.109.0 or newer. The filter changes work with the client library you already have.
