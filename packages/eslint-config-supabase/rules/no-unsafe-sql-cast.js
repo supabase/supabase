@@ -7,19 +7,18 @@
  * escaping functions (ident, literal, keyword, toSafeOperator) and can
  * introduce SQL injection vulnerabilities.
  *
- * BAD — TypeScript-only cast, no runtime check:
- *   filter.operator as SafeSqlFragment
- *   userInput as SafeLogSqlFragment
- *   userInput as sql.SafeSqlFragment   // namespace-qualified — also caught
+ * Caught patterns:
+ *   value as SafeSqlFragment              — direct cast
+ *   value as sql.SafeSqlFragment          — namespace-qualified cast
+ *   value as SafeSqlFragment & Extra      — intersection type containing SQL brand
  *
- * GOOD — runtime-validated promotion:
- *   toSafeOperator(filter.operator)        // throws on invalid operator
- *   ident(tableName)                        // proper SQL identifier escaping
- *   literal(value)                          // proper SQL literal escaping
- *   acceptUntrustedSql(untrusted)           // explicit untrusted→safe gate
+ * Known limitation: type alias resolution (type X = SafeSqlFragment) requires
+ * the TypeScript type-checker API (parser services). This rule operates on the
+ * AST spelling only. Add a // eslint-disable-next-line comment at any legitimate
+ * alias-promotion site and document why.
  *
- * Exceptions: casts of compile-time-known constants are safe.
- * The promotion files are excluded via the eslint.config override.
+ * Exempt: casts of compile-time string literals (cannot contain user input).
+ * Exempt files: see override in eslint.config/next.js.
  */
 
 /** @type {import('eslint').Rule.RuleModule} */
@@ -34,6 +33,8 @@ module.exports = {
     messages: {
       unsafeSqlCast:
         'Do not cast directly to {{typeName}} — use ident(), literal(), toSafeOperator(), or acceptUntrustedSql() instead. Direct casts bypass runtime escaping and can introduce SQL injection.',
+      unresolvedCast:
+        'Cannot resolve this cast target — if it aliases SafeSqlFragment or SafeLogSqlFragment, use a runtime escaping function instead.',
     },
     schema: [],
   },
@@ -53,55 +54,72 @@ module.exports = {
     }
 
     /**
-     * Extracts the rightmost identifier name from a type annotation node,
-     * handling both plain TSTypeReference (SafeSqlFragment) and
-     * namespace-qualified TSQualifiedName (sql.SafeSqlFragment).
-     * Returns null for any shape we cannot resolve — callers treat null as
-     * "unresolved" and fail closed.
+     * Extracts the terminal type name from a TSTypeReference node.
+     * Returns the name string, or null if the shape cannot be read.
+     *
+     * Handles:
+     *   SafeSqlFragment          → 'SafeSqlFragment'  (Identifier)
+     *   sql.SafeSqlFragment      → 'SafeSqlFragment'  (TSQualifiedName — right side)
      */
     function resolveTypeName(castType) {
-      if (!castType) return null
-
-      if (castType.type === 'TSTypeReference') {
-        const ref = castType.typeName
-        if (!ref) return null
-        // Direct: SafeSqlFragment
-        if (ref.type === 'Identifier') return ref.name
-        // Namespace-qualified: sql.SafeSqlFragment — right side is the actual type
-        if (ref.type === 'TSQualifiedName') return ref.right?.name ?? null
-        return null
-      }
-
+      if (!castType || castType.type !== 'TSTypeReference') return null
+      const ref = castType.typeName
+      if (!ref) return null
+      if (ref.type === 'Identifier') return ref.name
+      if (ref.type === 'TSQualifiedName') return ref.right?.name ?? null
       return null
     }
 
+    /**
+     * Core check applied to both TSAsExpression and TSTypeAssertion.
+     *
+     * Strategy:
+     *  1. Intersection types (A & B): flag if any member resolves to a SQL brand.
+     *  2. TSTypeReference where name resolves to a known SQL brand: flag.
+     *  3. TSTypeReference where name cannot be read: fail closed and flag —
+     *     an alias for SafeSqlFragment would look identical at the AST level.
+     *  4. Everything else (plain non-SQL types, union types, etc.): pass.
+     */
     function checkCast(node, castExpression, castType) {
-      const resolvedName = resolveTypeName(castType)
+      if (!castType) return
 
-      // Fail closed: if we cannot determine the type name, do not silently
-      // allow the cast — report it. This prevents aliased types from bypassing
-      // the check. Callers can add a line-level disable comment if needed.
-      if (resolvedName === null) return
+      // ── Intersection types: SafeSqlFragment & SomeExtra ──────────────────
+      if (castType.type === 'TSIntersectionType') {
+        const sqlMember = castType.types
+          .map(t => resolveTypeName(t))
+          .find(name => name !== null && SAFE_SQL_TYPES.has(name))
+        if (!sqlMember) return
+        if (isStaticString(castExpression)) return
+        context.report({ node, messageId: 'unsafeSqlCast', data: { typeName: sqlMember } })
+        return
+      }
 
-      if (!SAFE_SQL_TYPES.has(resolvedName)) return
+      // ── Plain or namespace-qualified TSTypeReference ──────────────────────
+      if (castType.type === 'TSTypeReference') {
+        const resolvedName = resolveTypeName(castType)
 
-      // Allow casts of static string constants — these can never contain
-      // user input and are used legitimately in switch-validated branches.
-      if (isStaticString(castExpression)) return
+        if (resolvedName === null) {
+          // The type reference has a shape we cannot read. Fail closed: report
+          // rather than silently allow, since it could be an alias for a SQL brand.
+          // This is intentionally conservative; add a disable comment with an
+          // explanation if the site is genuinely safe.
+          if (isStaticString(castExpression)) return
+          context.report({ node, messageId: 'unresolvedCast' })
+          return
+        }
 
-      context.report({
-        node: node,
-        messageId: 'unsafeSqlCast',
-        data: { typeName: resolvedName },
-      })
+        if (!SAFE_SQL_TYPES.has(resolvedName)) return
+        if (isStaticString(castExpression)) return
+        context.report({ node, messageId: 'unsafeSqlCast', data: { typeName: resolvedName } })
+      }
     }
 
     return {
-      // Handles: expr as SafeSqlFragment
+      // expr as SafeSqlFragment
       TSAsExpression(node) {
         checkCast(node, node.expression, node.typeAnnotation)
       },
-      // Handles: <SafeSqlFragment>expr  (older TypeScript syntax)
+      // <SafeSqlFragment>expr  (older TypeScript syntax)
       TSTypeAssertion(node) {
         checkCast(node, node.expression, node.typeAnnotation)
       },
