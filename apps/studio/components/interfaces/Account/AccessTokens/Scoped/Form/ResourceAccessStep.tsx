@@ -106,12 +106,7 @@ export const ResourceAccessStep = ({
             description={
               <p className="text-foreground-lighter text-sm">
                 Need a token with full access to your account or one for the Supabase MCP server?{' '}
-                <button
-                  type="button"
-                  className={InlineLinkClassName}
-                  onClick={onSelectLegacyToken}
-                  tabIndex={0}
-                >
+                <button type="button" className={InlineLinkClassName} onClick={onSelectLegacyToken}>
                   Create legacy token
                 </button>
               </p>

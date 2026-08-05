@@ -120,7 +120,6 @@ export const NewScopedTokenForm = ({
                     onClick={() =>
                       form.setValue('resourceAccess', 'project', { shouldValidate: true })
                     }
-                    tabIndex={0}
                   >
                     Create scoped token
                   </button>

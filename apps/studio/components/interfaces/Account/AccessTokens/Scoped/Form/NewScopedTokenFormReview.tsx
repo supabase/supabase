@@ -268,7 +268,6 @@ export const NewScopedTokenFormReview = ({
                     type="button"
                     className={InlineLinkClassName}
                     onClick={onSelectLegacyToken}
-                    tabIndex={0}
                   >
                     create a legacy token
                   </button>
