@@ -121,6 +121,64 @@ const VercelIntegration: NextPageWithLayout = () => {
     }
   }, [connectProject, connectionError, isConnecting, isConnectionComplete, isSuccess])
 
+  const renderContent = () => {
+    if (newProjectRef === undefined) {
+      return <ProjectCreationForm isVercelIntegrationFlow onCreateSuccess={setNewProjectRef} />
+    }
+
+    if (isProjectSettingsError) {
+      return (
+        <VercelConnectionError
+          projectRef={newProjectRef}
+          message={
+            projectSettingsError?.message ?? 'Unable to check whether the project is ready.'
+          }
+          onRetry={() => void refetchProjectSettings()}
+        />
+      )
+    }
+
+    if (connectionError) {
+      return (
+        <VercelConnectionError
+          projectRef={newProjectRef}
+          message={connectionError}
+          onRetry={() => void connectProject()}
+        />
+      )
+    }
+
+    if (isConnectionComplete) {
+      return (
+        <div className="px-6 pb-6">
+          <div className="flex flex-col gap-3">
+            <Admonition
+              type="success"
+              title="Project connected"
+              description="Your Supabase project is connected to Vercel."
+            />
+            <Button asChild variant="primary" block>
+              <Link href={`/project/${newProjectRef}`}>Open project</Link>
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    return (
+      <div className="px-6 pb-6">
+        <div className="space-y-3" role="status">
+          <p className="text-sm text-foreground-light">
+            {isConnecting
+              ? 'Connecting your project to Vercel'
+              : 'Waiting for your project to be ready'}
+          </p>
+          <ShimmeringLoader className="h-2 w-full rounded-full py-0" />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       <Head>
@@ -134,47 +192,7 @@ const VercelIntegration: NextPageWithLayout = () => {
         footer={<VercelIntegrationFooter />}
         widthClassName="max-w-2xl"
       >
-        {newProjectRef === undefined ? (
-          <ProjectCreationForm isVercelIntegrationFlow onCreateSuccess={setNewProjectRef} />
-        ) : isProjectSettingsError ? (
-          <VercelConnectionError
-            projectRef={newProjectRef}
-            message={
-              projectSettingsError?.message ?? 'Unable to check whether the project is ready.'
-            }
-            onRetry={() => void refetchProjectSettings()}
-          />
-        ) : connectionError ? (
-          <VercelConnectionError
-            projectRef={newProjectRef}
-            message={connectionError}
-            onRetry={() => void connectProject()}
-          />
-        ) : (
-          <div className="px-6 pb-6">
-            {isConnectionComplete ? (
-              <div className="flex flex-col gap-3">
-                <Admonition
-                  type="success"
-                  title="Project connected"
-                  description="Your Supabase project is connected to Vercel."
-                />
-                <Button asChild variant="primary" block>
-                  <Link href={`/project/${newProjectRef}`}>Open project</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3" role="status">
-                <p className="text-sm text-foreground-light">
-                  {isConnecting
-                    ? 'Connecting your project to Vercel'
-                    : 'Waiting for your project to be ready'}
-                </p>
-                <ShimmeringLoader className="h-2 w-full rounded-full py-0" />
-              </div>
-            )}
-          </div>
-        )}
+        {renderContent()}
       </InterstitialLayout>
     </>
   )
