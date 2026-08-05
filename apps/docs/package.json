@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "preexperimental:audit-ia": "pnpm run build:federated-content",
+    "experimental:audit-ia": "tsx scripts/audit-docs-ia.ts",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "build:guides-markdown": "tsx ./internals/generate-guides-markdown.ts",
