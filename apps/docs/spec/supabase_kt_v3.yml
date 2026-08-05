@@ -1633,6 +1633,34 @@ functions:
           }
           ```
 
+  - id: notin
+    title: notIn()
+    description: |
+      Finds all rows whose value on the stated `column` is not found on the specified `values`. The negation of `in_()`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List<Any>
+        description: The values to exclude.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.from("cities").select(columns = Columns.list("name")) {
+              filter {
+                 City::name notIn listOf("Hobbiton", "Edoras")
+                 //or
+                 notIn("name", listOf("Hobbiton", "Edoras"))
+              }
+          }
+          ```
+
   - id: contains
     title: contains()
     description: |
@@ -2775,6 +2803,69 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: maybe-single
+    title: maybeSingle()
+    $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.maybeSingle'
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val result = supabase.from("characters").select(Columns.list("name")) {
+              limit(1)
+              maybeSingle()
+          }
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              characters (id int8 primary key, name text);
+
+            insert into
+              characters (id, name)
+            values
+              (1, 'Luke'),
+              (2, 'Leia'),
+              (3, 'Han');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Luke"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+
+  - id: dry-run
+    title: dryRun()
+    description: |
+      Executes the mutation but rolls back the transaction instead of committing it, so no changes are persisted.
+    notes: |
+      - The mutation runs and its result (including side effects such as triggers) is returned in the response, but the transaction is rolled back afterward.
+      - Useful for testing mutations without touching real data.
+      - Requires PostgREST's `db-tx-end` setting to allow client-controlled transaction rollback.
+    examples:
+      - id: with-update
+        name: With `update()`
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val toUpdate = City(name = "Mordor")
+          supabase.from("cities").update(toUpdate) {
+              filter {
+                 City::name eq "Gondor"
+              }
+              dryRun()
+          }
+          // Row is not actually updated in the database.
+          ```
 
   - id: csv
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.csv'

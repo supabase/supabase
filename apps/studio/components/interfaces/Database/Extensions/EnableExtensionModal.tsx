@@ -157,23 +157,6 @@ export const EnableExtensionModal = ({
           </Admonition>
         )}
 
-        {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
-          <Admonition
-            type="warning"
-            title="The pg_cron extension is not fully supported for Fly projects"
-            className="border-x-0 border-t-0 rounded-none"
-          >
-            <p>
-              You can still enable the extension, but pg_cron jobs may not run due to the behavior
-              of Fly projects.
-            </p>
-            <DocsButton
-              className="mt-2"
-              href={`${DOCS_URL}/guides/platform/fly-postgres#limitations`}
-            />
-          </Admonition>
-        )}
-
         <DialogSection>
           <Form {...form}>
             <form id="enable-extensions-form" onSubmit={form.handleSubmit(onSubmit)}>

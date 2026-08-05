@@ -1,12 +1,22 @@
 /**
- * Extracts a human-readable error message from various error types.
+ * Extracts a human-readable message from an unknown thrown value, optionally
+ * falling back when there isn't one.
  */
-export function getErrorMessage(error: unknown): string | null {
-  if (error === null || error === undefined) return null
-  if (typeof error === 'string') return error
-  if (error instanceof Error) return error.message
-  if (typeof error === 'object' && error !== null && 'message' in error) {
-    return String(error.message)
+export function getErrorMessage(error: unknown): string | null
+export function getErrorMessage(error: unknown, fallback: string): string
+export function getErrorMessage(error: unknown, fallback?: string): string | null {
+  if (typeof error === 'string') {
+    const trimmed = error.trim()
+    if (trimmed.length > 0) return trimmed
   }
-  return String(error)
+
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    const { message } = error
+    if (typeof message === 'string') {
+      const trimmed = message.trim()
+      if (trimmed.length > 0) return trimmed
+    }
+  }
+
+  return fallback ?? null
 }
