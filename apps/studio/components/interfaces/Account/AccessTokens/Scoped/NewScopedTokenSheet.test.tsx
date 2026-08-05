@@ -178,11 +178,14 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
     fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
     fireEvent.click(await screen.findByRole('option', { name: 'Project 1' }))
+    // Permission categories start collapsed; expand "Project" to reach its rows
+    fireEvent.click(await screen.findByRole('button', { name: /Core project visibility/ }))
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     // Review screen
-    await screen.findByText('Low — single-project read-only access')
+    await screen.findByText('Low Risk')
+    await screen.findByText('single-project read-only access')
     fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
     // If we can click this checkbox, the token was created
     fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
@@ -224,11 +227,14 @@ describe('NewScopedTokenSheet', () => {
     await user.click(await screen.findByRole('radio', { name: /Organization/ }))
     fireEvent.click(await screen.findByRole('combobox', { name: 'Organizations' }))
     fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    // Permission categories start collapsed; expand "Project" to reach its rows
+    fireEvent.click(await screen.findByRole('button', { name: /Core project visibility/ }))
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     // Review screen
-    await screen.findByText('Low — organization-wide read-only access')
+    await screen.findByText('Low Risk')
+    await screen.findByText('organization-wide read-only access')
     fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
     // If we can click this checkbox, the token was created
     fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
@@ -264,7 +270,7 @@ describe('NewScopedTokenSheet', () => {
     expect(screen.queryByRole('button', { name: 'Review access' })).toBeNull()
     await screen.findByRole('button', { name: 'Generate token' })
     // Switching back restores the scoped form
-    await user.click(await screen.findByText('Switch back'))
+    await user.click(await screen.findByText('Create scoped token'))
     await screen.findByRole('button', { name: 'Review access' })
     expect(screen.queryByText('Access tokens can be used to control your whole account')).toBeNull()
   })

@@ -111,7 +111,7 @@ export const NewScopedTokenForm = ({
               <TokenDetails control={form.control} setValue={form.setValue} />
               {isClassicMode ? (
                 <p className="px-5 sm:px-6 pb-6 text-foreground-lighter text-sm">
-                  Only need access to specific projects or organizations?{' '}
+                  Only need a token for specific projects or organizations?{' '}
                   <button
                     type="button"
                     className={InlineLinkClassName}
@@ -120,7 +120,7 @@ export const NewScopedTokenForm = ({
                     }
                     tabIndex={0}
                   >
-                    Switch back
+                    Create scoped token
                   </button>
                 </p>
               ) : (
