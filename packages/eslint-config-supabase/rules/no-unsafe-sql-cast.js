@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ESLint rule to prevent unsafe TypeScript casts of arbitrary strings to
  * SafeSqlFragment or SafeLogSqlFragment.
  *
@@ -10,6 +10,7 @@
  * BAD — TypeScript-only cast, no runtime check:
  *   filter.operator as SafeSqlFragment
  *   userInput as SafeLogSqlFragment
+ *   userInput as sql.SafeSqlFragment   // namespace-qualified — also caught
  *
  * GOOD — runtime-validated promotion:
  *   toSafeOperator(filter.operator)        // throws on invalid operator
@@ -18,8 +19,7 @@
  *   acceptUntrustedSql(untrusted)           // explicit untrusted→safe gate
  *
  * Exceptions: casts of compile-time-known constants are safe.
- * The two promotion files (safe-analytics-sql.ts, Query.utils.ts) are
- * excluded from this rule via the eslint.config.cjs override.
+ * The promotion files are excluded via the eslint.config override.
  */
 
 /** @type {import('eslint').Rule.RuleModule} */
@@ -53,25 +53,40 @@ module.exports = {
     }
 
     /**
-     * Checks both TypeScript `as` expressions (TSTypeAssertion in newer
-     * parsers) and angle-bracket casts.
+     * Extracts the rightmost identifier name from a type annotation node,
+     * handling both plain TSTypeReference (SafeSqlFragment) and
+     * namespace-qualified TSQualifiedName (sql.SafeSqlFragment).
+     * Returns null for any shape we cannot resolve — callers treat null as
+     * "unresolved" and fail closed.
      */
-    function checkCast(node, castExpression, castType) {
-      const typeName =
-        castType.typeName?.name ?? castType.type?.name ?? castType.typeParameters?.type
+    function resolveTypeName(castType) {
+      if (!castType) return null
 
-      // Resolve the actual type name from TSTypeReference
-      let resolvedName = null
       if (castType.type === 'TSTypeReference') {
-        resolvedName = castType.typeName?.name
-      } else if (castType.typeName) {
-        resolvedName = castType.typeName.name
+        const ref = castType.typeName
+        if (!ref) return null
+        // Direct: SafeSqlFragment
+        if (ref.type === 'Identifier') return ref.name
+        // Namespace-qualified: sql.SafeSqlFragment — right side is the actual type
+        if (ref.type === 'TSQualifiedName') return ref.right?.name ?? null
+        return null
       }
 
-      if (!resolvedName || !SAFE_SQL_TYPES.has(resolvedName)) return
+      return null
+    }
+
+    function checkCast(node, castExpression, castType) {
+      const resolvedName = resolveTypeName(castType)
+
+      // Fail closed: if we cannot determine the type name, do not silently
+      // allow the cast — report it. This prevents aliased types from bypassing
+      // the check. Callers can add a line-level disable comment if needed.
+      if (resolvedName === null) return
+
+      if (!SAFE_SQL_TYPES.has(resolvedName)) return
 
       // Allow casts of static string constants — these can never contain
-      // user input and are used legitimately in `switch`-validated branches.
+      // user input and are used legitimately in switch-validated branches.
       if (isStaticString(castExpression)) return
 
       context.report({

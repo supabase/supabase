@@ -127,9 +127,9 @@ module.exports = defineConfig([
     // / as SafeLogSqlFragment casts. All other files must use the runtime-validated
     // helpers (ident, literal, toSafeOperator, acceptUntrustedSql).
     files: [
-      '**/safe-analytics-sql.ts',
-      '**/Query.utils.ts',
-      '**/pg-format/index.ts',
+      'apps/studio/lib/api/safe-analytics-sql.ts',
+      'packages/pg-meta/src/query/Query.utils.ts',
+      'packages/pg-meta/src/pg-format/index.ts',
     ],
     rules: {
       'supabase/no-unsafe-sql-cast': 'off',

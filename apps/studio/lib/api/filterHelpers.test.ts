@@ -1,12 +1,15 @@
-import { describe, expect, it } from 'vitest'
-import { validateFilterGroup } from './filterHelpers'
+﻿import { describe, expect, it } from 'vitest'
+import { filterPropertySchema, validateFilterGroup } from './filterHelpers'
 import type { FilterGroupType } from './filterHelpers'
+import type { z } from 'zod'
+
+type FilterProperty = z.infer<typeof filterPropertySchema>
 
 const makeGroup = (
   operator: string,
   propertyName = 'status',
   operators?: string[]
-): { group: FilterGroupType; properties: any[] } => ({
+): { group: FilterGroupType; properties: FilterProperty[] } => ({
   group: {
     logicalOperator: 'AND',
     conditions: [{ propertyName, operator, value: 'active' }],
@@ -15,7 +18,7 @@ const makeGroup = (
     {
       label: 'Status',
       name: propertyName,
-      type: 'string' as const,
+      type: 'string',
       ...(operators !== undefined ? { operators } : {}),
     },
   ],
@@ -33,9 +36,8 @@ describe('validateFilterGroup', () => {
   })
 
   it('returns false (not true) when property.operators is undefined — fail-closed', () => {
-    // This is the critical regression: the old code returned true here,
-    // allowing any operator to bypass the allowlist when the column had no
-    // defined operators. The new code returns false.
+    // Regression: old code returned true here, allowing any operator to bypass
+    // the allowlist when the column had no defined operators. New code returns false.
     const { group, properties } = makeGroup('DROP TABLE; --', 'status', undefined)
     expect(validateFilterGroup(group, properties)).toBe(false)
   })
@@ -47,7 +49,8 @@ describe('validateFilterGroup', () => {
 
   it('returns false when property is not found at all', () => {
     const { group } = makeGroup('=', 'unknown_column', ['='])
-    expect(validateFilterGroup(group, [{ label: 'Status', name: 'status', type: 'string', operators: ['='] }])).toBe(false)
+    const properties: FilterProperty[] = [{ label: 'Status', name: 'status', type: 'string', operators: ['='] }]
+    expect(validateFilterGroup(group, properties)).toBe(false)
   })
 
   it('validates nested filter groups recursively', () => {
@@ -63,7 +66,7 @@ describe('validateFilterGroup', () => {
         },
       ],
     }
-    const properties = [{ label: 'Status', name: 'status', type: 'string' as const, operators: ['='] }]
+    const properties: FilterProperty[] = [{ label: 'Status', name: 'status', type: 'string', operators: ['='] }]
     expect(validateFilterGroup(group, properties)).toBe(false)
   })
 
@@ -80,7 +83,7 @@ describe('validateFilterGroup', () => {
         },
       ],
     }
-    const properties = [{ label: 'Status', name: 'status', type: 'string' as const, operators: ['=', '<>'] }]
+    const properties: FilterProperty[] = [{ label: 'Status', name: 'status', type: 'string', operators: ['=', '<>'] }]
     expect(validateFilterGroup(group, properties)).toBe(true)
   })
 })

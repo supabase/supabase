@@ -57,7 +57,7 @@ export const DecryptedReadOnlyInput = ({
                   <Link
                     target="_blank"
                     rel="noreferrer noopener"
-                    href={studioLinks.vaultSecrets(ref, value)}
+                    href={ref ? studioLinks.vaultSecrets(ref, value) : undefined}
                   >
                     <ExternalLink
                       size={14}

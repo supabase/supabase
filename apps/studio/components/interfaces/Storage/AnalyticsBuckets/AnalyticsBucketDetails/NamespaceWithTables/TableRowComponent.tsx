@@ -343,7 +343,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                       {!!inferredPostgresTable && (
                         <DropdownMenuItem asChild className="flex items-center gap-x-2">
                           <Link
-                            href={studioLinks.databaseReplication(projectRef, pipeline?.id ?? '', `${inferredPostgresTable.schema}.${inferredPostgresTable.name}`)}
+                            href={projectRef ? studioLinks.databaseReplication(projectRef, pipeline?.id ?? '', `${inferredPostgresTable.schema}.${inferredPostgresTable.name}`) : undefined}
                           >
                             <Eye size={12} className="text-foreground-lighter" />
                             <p>View pipeline</p>

@@ -352,7 +352,7 @@ export const SortPopoverPrimitive = ({
         <p className="text-foreground-light text-sm">
           We highly recommend only sorting on columns which are{' '}
           <InlineLink
-            href={studioLinks.databaseIndexes(ref, tableSchema, tableName)}
+            href={ref ? studioLinks.databaseIndexes(ref, tableSchema, tableName) : undefined}
           >
             indexed
           </InlineLink>
