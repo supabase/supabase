@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test'
 
+import { findRedirect } from './www-redirects.ts'
+
 export const GUIDE_ARTICLE_SELECTOR = '[data-testid="sb-docs-guide-main-article"]'
 export const TROUBLESHOOTING_ARTICLE_SELECTOR =
   '[data-testid="sb-docs-troubleshooting-main-article"]'
@@ -63,6 +65,38 @@ export async function collectDocsOwnedLinks(
   }
 
   return [...links].sort()
+}
+
+/**
+ * Explains a failed docs-owned link, adding redirect detail when one applies.
+ *
+ * A docs preview never serves apps/www/lib/redirects.js. That table belongs to
+ * the www project, which production requests pass through first. So a
+ * redirect-backed link fails on a preview even though it works on
+ * supabase.com, which is worth saying. A link with no redirect is just broken.
+ */
+export function formatLinkFailure({
+  url,
+  status,
+  lookupRedirect = findRedirect,
+}: {
+  url: string
+  status: number | string
+  lookupRedirect?: typeof findRedirect
+}): string {
+  const message = `${url} should resolve (status ${status})`
+  const redirect = lookupRedirect(new URL(url).pathname)
+  if (!redirect) return message
+
+  return [
+    message,
+    '',
+    `This link is a redirect: ${redirect.source} → ${redirect.destination}`,
+    'Docs previews do not serve apps/www/lib/redirects.js, so it fails here even',
+    'though it works on supabase.com.',
+    '',
+    `Fix: change the link to ${redirect.destination}.`,
+  ].join('\n')
 }
 
 /**

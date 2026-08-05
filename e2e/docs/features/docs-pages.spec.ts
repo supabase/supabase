@@ -5,6 +5,7 @@ import {
   articleSelectorForPagePath,
   browserLikeUserAgent,
   collectDocsOwnedLinks,
+  formatLinkFailure,
   parseDocsE2EPagePaths,
 } from '../utils/docs-links.js'
 
@@ -48,13 +49,16 @@ test.describe('Docs owned pages', () => {
         try {
           const linkResponse = await page.request.get(url, { headers: { 'user-agent': userAgent } })
           expect
-            .soft(linkResponse.ok(), `${url} should resolve (status ${linkResponse.status()})`)
+            .soft(linkResponse.ok(), formatLinkFailure({ url, status: linkResponse.status() }))
             .toBeTruthy()
         } catch (error) {
           expect
             .soft(
               null,
-              `${url} should be reachable (${error instanceof Error ? error.message : error})`
+              formatLinkFailure({
+                url,
+                status: error instanceof Error ? error.message : String(error),
+              })
             )
             .toBeTruthy()
         }
