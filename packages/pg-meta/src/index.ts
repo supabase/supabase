@@ -43,6 +43,7 @@ export {
   acceptUntrustedSql,
   joinSqlFragments,
 } from './pg-format'
+export { VALID_FILTER_OPERATORS } from './query/Query.utils'
 export type { SafeSqlFragment, UntrustedSqlFragment, DisplayableSqlFragment } from './pg-format'
 
 export type { PGTable, PGTablePrimaryKey, PGTableRelationship } from './pg-meta-tables'

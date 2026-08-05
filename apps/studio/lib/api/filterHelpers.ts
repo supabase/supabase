@@ -1,4 +1,4 @@
-import { z } from 'zod'
+﻿import { z } from 'zod'
 
 export const filterOptionSchema = z.union([
   z.string(),
@@ -80,8 +80,8 @@ export function validateFilterGroup(
     if (property.operators && property.operators.length > 0) {
       return property.operators.includes(condition.operator)
     }
-
-    return true
+    // No operators list means no operator is allowed — fail closed
+    return false
   })
 }
 
@@ -118,3 +118,4 @@ export function serializeOperators(
 
   return serialized.length > 0 ? serialized : ['=']
 }
+
