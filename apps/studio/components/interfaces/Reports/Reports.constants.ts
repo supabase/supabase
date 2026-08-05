@@ -168,6 +168,7 @@ export function generateOtelWhereSafe(
         case '<=':
         case '>':
         case '<': {
+          // Dropped, not coerced: toInt64OrZero(non-numeric) silently becomes 0, which is worse than a no-op.
           if (!valueIsNumber) return null
           const num = analyticsLiteral(Number(filter.value))
           const lhs = safeLogSql`toInt64OrZero(${col})`

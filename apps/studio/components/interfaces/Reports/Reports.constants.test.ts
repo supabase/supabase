@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { generateRegexpWhereSafe } from './Reports.constants'
+import { generateOtelWhereSafe, generateRegexpWhereSafe } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
 
 describe('generateRegexpWhereSafe', () => {
@@ -129,5 +129,44 @@ describe('generateRegexpWhereSafe', () => {
     ]
     const result = generateRegexpWhereSafe(filters, true)
     expect(result).toBe("WHERE `request`.`method` = 'DELETE'")
+  })
+})
+
+describe('generateOtelWhereSafe', () => {
+  it('should return empty fragment when no filters provided', () => {
+    expect(generateOtelWhereSafe([])).toBe('')
+  })
+
+  it('should generate a WHERE clause keyed by the full dotted log_attributes path', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'request.path', value: '/api/users', compare: 'is' },
+    ]
+    expect(generateOtelWhereSafe(filters, true)).toBe(
+      "WHERE log_attributes['request.path'] = '/api/users'"
+    )
+  })
+
+  it('should translate a numeric comparison filter using toInt64OrZero', () => {
+    const filters: ReportFilterItem[] = [{ key: 'response.status_code', value: 500, compare: '>=' }]
+    expect(generateOtelWhereSafe(filters, true)).toBe(
+      "WHERE toInt64OrZero(log_attributes['response.status_code']) >= 500"
+    )
+  })
+
+  it('should drop a numeric comparison filter with a non-numeric value instead of coercing it', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'response.status_code', value: 'not-a-number', compare: '>=' },
+    ]
+    expect(generateOtelWhereSafe(filters, true)).toBe('')
+  })
+
+  it('should keep valid filters when a numeric comparison filter is dropped', () => {
+    const filters: ReportFilterItem[] = [
+      { key: 'response.status_code', value: 'not-a-number', compare: '>=' },
+      { key: 'request.method', value: 'GET', compare: 'is' },
+    ]
+    expect(generateOtelWhereSafe(filters, true)).toBe(
+      "WHERE log_attributes['request.method'] = 'GET'"
+    )
   })
 })

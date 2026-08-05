@@ -92,4 +92,16 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     )
     expect(out).toContain("AND toInt32OrZero(log_attributes['response.status_code']) >= 500")
   })
+
+  it('ignores a status_code filter on auth_logs-sourced queries (no HTTP response fields there)', () => {
+    const out = sql(
+      AUTH_REPORT_SQL_OTEL.ActiveUsers('1h', { status_code: { operator: '>=', value: 500 } })
+    )
+    expect(out).not.toContain('status_code')
+  })
+
+  it('ignores a provider filter on edge_logs-sourced queries (no auth provider attribute there)', () => {
+    const out = sql(AUTH_REPORT_SQL_OTEL.ErrorsByStatus('1h', { provider: ['google'] }))
+    expect(out).not.toContain('provider')
+  })
 })
