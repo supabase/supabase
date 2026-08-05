@@ -17,7 +17,6 @@ import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-que
 import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
 import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
@@ -39,9 +38,6 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const { data: integrationData } = useIntegrationsQuery()
   const organizationIntegration = integrationData?.find((x) => x.organization.slug === slug)
-
-  const { data: organizationData } = useOrganizationsQuery()
-  const organization = organizationData?.find((x) => x.slug === slug)
 
   const { data: vercelProjects } = useVercelProjectsQuery(
     { organization_integration_id: organizationIntegration?.id },
@@ -96,7 +92,7 @@ const VercelIntegration: NextPageWithLayout = () => {
             },
           },
         },
-        orgSlug: organization?.slug,
+        orgSlug: slug,
       })
       snapshot.setLoading(false)
       setIsConnectionComplete(true)
@@ -113,9 +109,9 @@ const VercelIntegration: NextPageWithLayout = () => {
     foreignProjectId,
     newProjectRef,
     next,
-    organization?.slug,
     organizationIntegration,
     snapshot,
+    slug,
     vercelProjects,
   ])
 
