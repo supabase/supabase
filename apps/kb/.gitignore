@@ -1,0 +1,15 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# generated types
+tsconfig.tsbuildinfo
+
+# environment variables
+.env
+.env.local
+
+.DS_Store
