@@ -382,8 +382,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
             'user_recovery_requested', 'user_reauthenticate_requested'
           )
         ${andPredicates}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
+        group by ${ts}${providerGroupBy(groupByProvider)}
+        order by ${ts} desc${providerGroupBy(groupByProvider)}
       `
   },
   SignInAttempts: (interval, filters) => {
@@ -411,8 +411,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
           and JSONExtractString(event_message, 'action') = 'login'
           and JSONExtractString(event_message, 'metering') = 'true'
         ${andPredicates}
-        group by timestamp, login_type_provider${providerGroupBy(groupByProvider)}
-        order by timestamp desc, login_type_provider${providerGroupBy(groupByProvider)}
+        group by ${ts}, login_type_provider${providerGroupBy(groupByProvider)}
+        order by ${ts} desc, login_type_provider${providerGroupBy(groupByProvider)}
       `
   },
   PasswordResetRequests: (interval, filters) => {
@@ -429,8 +429,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         where source = 'auth_logs'
           and JSONExtractString(event_message, 'auth_event', 'action') = 'user_recovery_requested'
         ${andPredicates}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
+        group by ${ts}${providerGroupBy(groupByProvider)}
+        order by ${ts} desc${providerGroupBy(groupByProvider)}
       `
   },
   TotalSignUps: (interval, filters) => {
@@ -447,8 +447,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         where source = 'auth_logs'
           and JSONExtractString(event_message, 'auth_event', 'action') = 'user_signedup'
         ${andPredicates}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
+        group by ${ts}${providerGroupBy(groupByProvider)}
+        order by ${ts} desc${providerGroupBy(groupByProvider)}
       `
   },
   SignInProcessingTimeBasic: (interval, filters) => {
@@ -468,8 +468,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         where source = 'auth_logs'
           and JSONExtractString(event_message, 'auth_event', 'action') = 'login'
         ${andPredicates}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
+        group by ${ts}${providerGroupBy(groupByProvider)}
+        order by ${ts} desc${providerGroupBy(groupByProvider)}
       `
   },
   SignInProcessingTimePercentiles: (interval, filters) => {
@@ -489,8 +489,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         where source = 'auth_logs'
           and JSONExtractString(event_message, 'auth_event', 'action') = 'login'
         ${andPredicates}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
+        group by ${ts}${providerGroupBy(groupByProvider)}
+        order by ${ts} desc${providerGroupBy(groupByProvider)}
       `
   },
   SignUpProcessingTimeBasic: (interval, filters) => {
@@ -510,8 +510,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         where source = 'auth_logs'
           and JSONExtractString(event_message, 'auth_event', 'action') = 'user_signedup'
         ${andPredicates}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
+        group by ${ts}${providerGroupBy(groupByProvider)}
+        order by ${ts} desc${providerGroupBy(groupByProvider)}
       `
   },
   SignUpProcessingTimePercentiles: (interval, filters) => {
@@ -531,8 +531,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
         where source = 'auth_logs'
           and JSONExtractString(event_message, 'auth_event', 'action') = 'user_signedup'
         ${andPredicates}
-        group by timestamp${providerGroupBy(groupByProvider)}
-        order by timestamp desc${providerGroupBy(groupByProvider)}
+        group by ${ts}${providerGroupBy(groupByProvider)}
+        order by ${ts} desc${providerGroupBy(groupByProvider)}
       `
   },
   ErrorsByStatus: (interval, filters) => {
@@ -549,8 +549,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
           and log_attributes['request.path'] like '%auth/v1%'
           and toInt32OrZero(log_attributes['response.status_code']) between 400 and 599
         ${andPredicates}
-        group by timestamp, status_code
-        order by timestamp desc
+        group by ${ts}, status_code
+        order by ${ts} desc
       `
   },
   ErrorsByAuthCode: (interval, filters) => {
@@ -567,8 +567,8 @@ export const AUTH_REPORT_SQL_OTEL: Record<
           and log_attributes['request.path'] like '%auth/v1%'
           and toInt32OrZero(log_attributes['response.status_code']) between 400 and 599
         ${andPredicates}
-        group by timestamp, error_code
-        order by timestamp desc
+        group by ${ts}, error_code
+        order by ${ts} desc
       `
   },
 }

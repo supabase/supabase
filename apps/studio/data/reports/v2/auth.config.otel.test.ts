@@ -26,6 +26,15 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     )
   })
 
+  it('groups and orders by the full bucket expression, not the timestamp alias', () => {
+    const out = sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))
+
+    expect(out).toContain('group by toUnixTimestamp(toStartOfHour(timestamp)) * 1000000')
+    expect(out).toContain('order by toUnixTimestamp(toStartOfHour(timestamp)) * 1000000 desc')
+    expect(out).not.toContain('group by timestamp')
+    expect(out).not.toContain('order by timestamp desc')
+  })
+
   it('reads auth_logs fields from the raw JSON event_message, not BigQuery json_value', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))
 

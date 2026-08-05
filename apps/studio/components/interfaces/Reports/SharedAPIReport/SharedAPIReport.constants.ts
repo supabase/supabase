@@ -431,25 +431,28 @@ export const useSharedAPIReport = ({
   const isLoadingData = Object.values(isLoading).some(Boolean)
 
   const SQLMap: Record<SharedAPIReportKey, SafeLogSqlFragment> = {
-    totalRequests: SHARED_API_REPORT_SQL.totalRequests.safeSql(
+    totalRequests: buildSql(SHARED_API_REPORT_SQL.totalRequests)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    topRoutes: SHARED_API_REPORT_SQL.topRoutes.safeSql(allFilters, filterByMapSource[filterBy]),
-    errorCounts: SHARED_API_REPORT_SQL.errorCounts.safeSql(allFilters, filterByMapSource[filterBy]),
-    topErrorRoutes: SHARED_API_REPORT_SQL.topErrorRoutes.safeSql(
+    topRoutes: buildSql(SHARED_API_REPORT_SQL.topRoutes)(allFilters, filterByMapSource[filterBy]),
+    errorCounts: buildSql(SHARED_API_REPORT_SQL.errorCounts)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    responseSpeed: SHARED_API_REPORT_SQL.responseSpeed.safeSql(
+    topErrorRoutes: buildSql(SHARED_API_REPORT_SQL.topErrorRoutes)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    topSlowRoutes: SHARED_API_REPORT_SQL.topSlowRoutes.safeSql(
+    responseSpeed: buildSql(SHARED_API_REPORT_SQL.responseSpeed)(
       allFilters,
       filterByMapSource[filterBy]
     ),
-    networkTraffic: SHARED_API_REPORT_SQL.networkTraffic.safeSql(
+    topSlowRoutes: buildSql(SHARED_API_REPORT_SQL.topSlowRoutes)(
+      allFilters,
+      filterByMapSource[filterBy]
+    ),
+    networkTraffic: buildSql(SHARED_API_REPORT_SQL.networkTraffic)(
       allFilters,
       filterByMapSource[filterBy]
     ),
