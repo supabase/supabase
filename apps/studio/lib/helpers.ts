@@ -142,7 +142,14 @@ export const formatBytes = (
   const isNegative = bytes < 0
   const absBytes = Math.abs(bytes)
 
-  const i = size !== undefined ? sizes.indexOf(size) : Math.floor(Math.log(absBytes) / Math.log(k))
+  let i = Math.floor(Math.log(absBytes) / Math.log(k))
+  if (size !== undefined) {
+    const idx = sizes.indexOf(size)
+    i = idx !== -1 ? idx : i
+  }
+  // clamp index to available sizes
+  i = Math.max(0, Math.min(i, sizes.length - 1))
+
   const formattedValue = parseFloat((absBytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 
   return isNegative ? '-' + formattedValue : formattedValue
