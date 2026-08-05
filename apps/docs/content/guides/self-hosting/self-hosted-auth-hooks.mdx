@@ -181,8 +181,8 @@ Copy the output of this command, for example: `v1,whsec_abc123...`.
 Add the following environment variables to your `.env` file:
 
 ```bash name=.env
-HOOK_SEND_SMS_URI=http://host.docker.internal:8000/functions/v1/send_sms
-HOOK_SEND_SMS_SECRETS=YOUR_GENERATED_SECRET_HERE # Paste the secret generated in the last step here
+SEND_SMS_HOOK_URI=http://host.docker.internal:8000/functions/v1/send_sms
+SEND_SMS_HOOK_SECRET=YOUR_GENERATED_SECRET_HERE # Paste the secret generated in the last step here
 ```
 
 ### Step 4: Update `docker-compose.yml`
@@ -194,14 +194,14 @@ services:
   auth:
     environment:
       GOTRUE_HOOK_SEND_SMS_ENABLED: 'true'
-      GOTRUE_HOOK_SEND_SMS_URI: ${HOOK_SEND_SMS_URI}
-      GOTRUE_HOOK_SEND_SMS_SECRETS: ${HOOK_SEND_SMS_SECRETS}
+      GOTRUE_HOOK_SEND_SMS_URI: ${SEND_SMS_HOOK_URI}
+      GOTRUE_HOOK_SEND_SMS_SECRETS: ${SEND_SMS_HOOK_SECRET}
     extra_hosts: # 👈 required so the container can resolve host.docker.internal
       - 'host.docker.internal:host-gateway'
 
   functions:
     environment:
-      SEND_SMS_HOOK_SECRET: ${HOOK_SEND_SMS_SECRETS}
+      SEND_SMS_HOOK_SECRET: ${SEND_SMS_HOOK_SECRET}
 ```
 
 ### Step 5: Restart auth and functions services
@@ -241,7 +241,16 @@ echo "v1,whsec_$(openssl rand -base64 32)"
 Separate multiple secrets with `|` to rotate keys without downtime. For example:
 
 ```bash name=.env
-HOOK_SEND_EMAIL_SECRETS=v1,whsec_new-secret|v1,whsec_old-secret
+SEND_EMAIL_HOOK_SECRET=v1,whsec_new-secret|v1,whsec_old-secret
+```
+
+```yml name=docker-compose.yml
+services:
+  auth:
+    environment:
+      GOTRUE_HOOK_SEND_EMAIL_ENABLED: 'true'
+      GOTRUE_HOOK_SEND_EMAIL_URI: 'https://example.com'
+      GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${SEND_EMAIL_HOOK_SECRET}
 ```
 
 The Auth service tries each secret in order. Once all clients are using the new secret, remove the old one.
