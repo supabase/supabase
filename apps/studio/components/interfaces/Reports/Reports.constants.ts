@@ -143,6 +143,52 @@ export function generateRegexpWhereSafe(
   return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
 }
 
+// Key is used as-is here: log_attributes is keyed by the full dotted path, unlike the BigQuery unnest above.
+export function generateOtelWhereSafe(
+  filters: ReportFilterItem[],
+  prepend = true
+): SafeLogSqlFragment {
+  if (filters.length === 0) return safeLogSql``
+
+  const conditions = filters
+    .map((filter) => {
+      const col = safeLogSql`log_attributes[${analyticsLiteral(filter.key)}]`
+
+      const valueIsNumber = !isNaN(Number(filter.value))
+      const stringLit = analyticsLiteral(String(filter.value))
+
+      switch (filter.compare) {
+        case 'matches':
+          return safeLogSql`match(${col}, ${stringLit})`
+        case 'is':
+          return safeLogSql`${col} = ${stringLit}`
+        case '!=':
+          return safeLogSql`${col} != ${stringLit}`
+        case '>=':
+        case '<=':
+        case '>':
+        case '<': {
+          // Dropped, not coerced: toInt64OrZero(non-numeric) silently becomes 0, which is worse than a no-op.
+          if (!valueIsNumber) return null
+          const num = analyticsLiteral(Number(filter.value))
+          const lhs = safeLogSql`toInt64OrZero(${col})`
+          if (filter.compare === '>=') return safeLogSql`${lhs} >= ${num}`
+          if (filter.compare === '<=') return safeLogSql`${lhs} <= ${num}`
+          if (filter.compare === '>') return safeLogSql`${lhs} > ${num}`
+          return safeLogSql`${lhs} < ${num}`
+        }
+        default:
+          return safeLogSql`${col} = ${stringLit}`
+      }
+    })
+    .filter((c) => c !== null)
+
+  if (conditions.length === 0) return safeLogSql``
+
+  const joined = joinSqlFragments(conditions, ' AND ')
+  return prepend ? safeLogSql`WHERE ${joined}` : safeLogSql`AND ${joined}`
+}
+
 export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
   [Presets.API]: {
     title: 'API',
