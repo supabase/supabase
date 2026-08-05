@@ -83,12 +83,13 @@ export const VersionHistory = ({
           {versions.map((version, index) => {
             const isLast = index === versions.length - 1
             return (
-              <li key={version.versionId} className="flex gap-x-3">
+              <li key={version.versionId} className="group flex gap-x-3">
                 <div className="flex flex-col items-center pt-1.5">
                   <span
                     className={cn(
                       'h-2.5 w-2.5 rounded-full',
-                      version.isCurrent ? 'bg-brand' : 'bg-foreground-muted'
+                      version.isCurrent ? 'bg-brand' : 'bg-foreground-muted',
+                      onPreview && 'group-hover:underline'
                     )}
                   />
                   {!isLast && <span className="w-px flex-1 bg-border" />}
@@ -97,11 +98,7 @@ export const VersionHistory = ({
                 <div
                   role="button"
                   tabIndex={0}
-                  className={cn(
-                    'flex-1 pb-8 -mx-2 px-2 rounded-md transition-colors cursor-pointer',
-                    onPreview && 'hover:bg-surface-200',
-                    previewedVersionId === version.versionId && 'bg-surface-200'
-                  )}
+                  className="flex-1 pb-4 -mx-2 px-2 cursor-pointer"
                   onClick={() => onPreview?.(version)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') onPreview?.(version)
