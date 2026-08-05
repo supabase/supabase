@@ -56,6 +56,33 @@ what to enable when that happens.
 
 </Callout>
 
+### Use an asymmetric JWT signing key
+
+OAuth works with the legacy HS256 JWT secret, but an asymmetric signing key is
+recommended for production MCP servers. It lets clients verify tokens using the
+project's public JWKS and keeps the JWT secret out of distributed services.
+This is a project-level setting, not a `config.toml` setting and not part of the
+access-token hook.
+
+In the [JWT Signing Keys dashboard](https://supabase.com/dashboard/project/_/settings/jwt),
+migrate the legacy JWT secret if needed, then rotate to an `ES256` (recommended)
+or `RS256` signing key. Rotation changes how every newly issued project token is
+signed, so review callers that verify tokens with the legacy secret before doing
+it.
+
+An agent with Management API access can automate the setup: list
+`/v1/projects/{ref}/config/auth/signing-keys`, create a standby `ES256` key,
+then update that key to `in_use`. It must get explicit approval before the final
+update because it is a project-wide authentication change. Do not generate or
+commit a private JWK for this block; Supabase can generate and retain the private
+key when creating the signing key.
+
+After rotation, obtain a **fresh** access token and confirm its header has
+`alg` `ES256` or `RS256` and a `kid` present in
+`https://<project-ref>.supabase.co/auth/v1/.well-known/jwks.json`. Checking the
+JWKS alone is not enough: standby asymmetric keys are published before they are
+used to issue tokens.
+
 ## Run it locally
 
 ```bash

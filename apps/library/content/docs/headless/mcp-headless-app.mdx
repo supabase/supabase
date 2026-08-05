@@ -45,6 +45,12 @@ and `additional_redirect_urls` with the static app's host, then set the static
 site's `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `config.js` as described
 in [MCP Auth](./mcp-auth).
 
+For a production OAuth deployment, also configure an asymmetric JWT signing key
+(`ES256` is recommended). This is a project-level key rotation, so it cannot be
+installed through `config.toml`. Follow [MCP Server's signing-key setup](./mcp-server#use-an-asymmetric-jwt-signing-key)
+before deploying. An agent may create a standby key through the Management API,
+but must ask for approval before rotating it to `in_use`.
+
 Once the static files are hosted and `site_url` points to that host, deploy the
 database hook and Edge Function:
 

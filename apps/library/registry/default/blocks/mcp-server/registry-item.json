@@ -3,6 +3,7 @@
   "type": "registry:item",
   "title": "MCP Server",
   "description": "An MCP server as a Supabase Edge Function: Streamable HTTP transport, @supabase/server-powered OAuth 2.1 plus first-party JWT auth, and verified per-request tool context.",
+  "docs": "Required setup: enable the OAuth server, dynamic client registration, and custom access-token hook in supabase/config.toml, then deploy the included migration and Edge Function. For production OAuth, configure an ES256 or RS256 JWT signing key separately: this is a project-level rotation, not a config.toml setting. An agent may create a standby key through the Management API, but must get approval before rotating it to in_use. See the block documentation for verification and local setup.",
   "files": [
     {
       "path": "registry/default/blocks/mcp-server/supabase/functions/mcp-server/index.ts",
