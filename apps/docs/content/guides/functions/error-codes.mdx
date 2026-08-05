@@ -264,6 +264,16 @@ These errors indicate issues with function loading, execution, or the underlying
 
 **Solution:** Try redeploying your function and wait a few minutes to make sure all regions have been updated.
 
+### NOT_FOUND_FUNCTION_BLOB
+
+**Cause:** Your Edge Function metadata resolved, but its deployment bundle was missing from storage and could not be loaded. This means the metadata points at a different version than the stored bundle, usually because concurrent or batched deploys double-incremented the metadata version, for example two deploys of the same function racing each other, or a batch deploy using `/deploy?bundleOnly=true` where the bulk metadata update failed. This returns the same `Requested function was not found` message as `NOT_FOUND`, so check the `sb-error-code` header to tell them apart. See [Edge Function 404 error response](/docs/guides/troubleshooting/edge-function-404-error-response).
+
+**Solution:**
+
+- Redeploy your function with the latest version of the Supabase CLI
+- Avoid running concurrent deploys of the same function, such as overlapping GitHub Actions runs
+- If the problem persists, contact support so your function metadata can be re-synced
+
 ### BOOT_ERROR
 
 **Cause:** Your Edge Function failed to start.
@@ -297,6 +307,15 @@ These errors indicate issues with function loading, execution, or the underlying
 ### LOAD_FUNCTION_INVALID_ENTRYPOINT_PATH_ERROR
 
 **Cause:** Your Edge Function metadata is broken or contains an invalid entrypoint.
+
+**Solution:**
+
+- Try redeploying your function
+- If the problem persists, contact support
+
+### LOAD_FUNCTION_UNBUNDLING_ERROR
+
+**Cause:** Your Edge Function deployment bundle was fetched, but could not be unbundled because decompressing or parsing it failed. This usually means the bundle is corrupt or was only partially written.
 
 **Solution:**
 
