@@ -139,9 +139,12 @@ jobs:
       # Poll the "Vercel – docs" commit status instead — Vercel keeps posting
       # those — then resolve the deployment it points to via Vercel's own API
       # to get the actual preview URL. See scripts/waitForVercelDocsPreview.js.
+      # A Vercel failure or timeout is not the author's problem, and the required
+      # "Vercel – docs" check already reports it. Resolve no URL and skip below.
       - name: Wait for Vercel docs preview
         if: steps.scope.outputs.skip == 'false' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.docs_app == 'true'
         id: deployment
+        continue-on-error: true
         run: node scripts/waitForVercelDocsPreview.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -156,30 +159,61 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_URL_INPUT: ${{ inputs.base_url }}
           DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
-          DOCS_APP_CHANGED: ${{ steps.changes.outputs.docs_app }}
+          PAGE_PATHS: ${{ steps.scope.outputs.paths }}
         run: |
+          set -euo pipefail
+
           if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             printf 'url=%s\n' "$BASE_URL_INPUT" >> "$GITHUB_OUTPUT"
-            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
-          elif [ "$DOCS_APP_CHANGED" = "true" ] && [ -n "$DEPLOYMENT_URL" ]; then
-            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
-            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
-          else
-            # Harness-only PRs have no docs preview; test against production.
-            echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
-            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            # Non-production targets are previews, which may need the bypass.
+            if [ "$BASE_URL_INPUT" = "https://supabase.com" ]; then
+              echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            fi
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
+          if [ -n "$DEPLOYMENT_URL" ]; then
+            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Production is not a substitute: it lacks pages this pull request
+          # adds, so testing it fails a required check for a valid change.
+          echo "url=" >> "$GITHUB_OUTPUT"
+          echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          echo "should_test=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::No Vercel docs preview URL for this pull request, so there is nothing serving its content to test. Skipping Playwright rather than testing production, which does not have pages this pull request adds."
+          {
+            echo "### Docs E2E skipped: no preview to test against"
+            echo
+            echo "Nothing is serving this pull request's content, and production is not a"
+            echo "substitute — pages it adds do not exist there yet."
+            echo
+            echo "Fork pull requests reach this path because they run without repository"
+            echo "secrets. A maintainer can run the suite against the preview manually:"
+            echo
+            echo '```'
+            echo "gh workflow run docs-e2e.yml \\"
+            echo "  -f base_url=<preview-url> \\"
+            echo "  -f page_paths=$PAGE_PATHS"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Install dependencies
-        if: steps.scope.outputs.skip == 'false'
+        if: steps.base-url.outputs.should_test == 'true'
         run: pnpm install --frozen-lockfile --filter=e2e-docs...
 
       - name: Install Playwright Chromium
-        if: steps.scope.outputs.skip == 'false'
+        if: steps.base-url.outputs.should_test == 'true'
         run: pnpm -C e2e/docs exec playwright install chromium --with-deps --only-shell
 
       - name: Run docs E2E
-        if: steps.scope.outputs.skip == 'false'
+        if: steps.base-url.outputs.should_test == 'true'
         working-directory: e2e/docs
         run: pnpm run e2e:docs
         env:

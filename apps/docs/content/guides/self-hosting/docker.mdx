@@ -122,7 +122,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 --branch self-hosted/v0.7.1 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -139,7 +139,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.7.1\n' > .supabase-version
+printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -153,7 +153,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.7.1 https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -175,7 +175,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.7.1\n' > .supabase-version
+printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
