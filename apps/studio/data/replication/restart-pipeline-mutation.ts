@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
@@ -66,12 +65,10 @@ export const useRestartPipelineMutation = ({
 
       await onSuccess?.(data, variables, context)
     },
+    // No default error toast here: callers already show one from their try/catch around
+    // mutateAsync, so a default here would double up. onError is only for opt-in callers.
     async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to restart pipeline: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
+      await onError?.(data, variables, context)
     },
     ...options,
   })
