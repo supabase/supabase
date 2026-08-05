@@ -1,13 +1,14 @@
 import type { Page } from '@playwright/test'
 
-export const GUIDE_ARTICLE_SELECTOR = '#sb-docs-guide-main-article'
-export const TROUBLESHOOTING_ARTICLE_SELECTOR = '#sb-docs-troubleshooting-main-article'
+export const GUIDE_ARTICLE_SELECTOR = '[data-e2e-testid="sb-docs-guide-main-article"]'
+export const TROUBLESHOOTING_ARTICLE_SELECTOR =
+  '[data-e2e-testid="sb-docs-troubleshooting-main-article"]'
 const DOCS_PATH_PREFIX = '/docs'
 const TROUBLESHOOTING_PATH_PREFIX = '/docs/guides/troubleshooting/'
 
 /**
  * Pick the main article selector for a docs page path.
- * Both guides and troubleshooting entries expose a stable id.
+ * Both guides and troubleshooting entries expose a stable data-e2e-testid.
  */
 export function articleSelectorForPagePath(pagePath: string): string {
   const pathname = pagePath.startsWith('http') ? new URL(pagePath).pathname : pagePath
