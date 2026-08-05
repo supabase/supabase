@@ -194,6 +194,8 @@ services:
       GOTRUE_HOOK_SEND_SMS_ENABLED: 'true'
       GOTRUE_HOOK_SEND_SMS_URI: ${HOOK_SEND_SMS_URI}
       GOTRUE_HOOK_SEND_SMS_SECRETS: ${HOOK_SEND_SMS_SECRETS}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
 
   functions:
     environment:
