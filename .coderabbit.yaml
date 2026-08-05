@@ -22,8 +22,8 @@ reviews:
     - '!apps/docs/features/docs/generated/**'
     - '!apps/www/.generated/**'
     - '!apps/design-system/__registry__/**'
-    - '!apps/ui-library/__registry__/**'
-    - '!apps/ui-library/public/r/**' # registry output
+    - '!apps/library/__registry__/**'
+    - '!apps/library/public/r/**' # registry output
     - '!packages/icons/__registry__/**'
     - '!packages/icons/src/icons/**' # generated icon components
 

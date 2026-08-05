@@ -27,8 +27,8 @@
     "apps/studio/styles/fonts.css",
     // ignore studio evals used in GH action
     "apps/studio/evals/**",
-    // ignore registry blocks in ui-library
-    "apps/ui-library/registry/default/**",
-    "apps/ui-library/contentlayer.config.js",
+    // ignore registry blocks in library
+    "apps/library/registry/default/**",
+    "apps/library/contentlayer.config.js",
   ],
 }
