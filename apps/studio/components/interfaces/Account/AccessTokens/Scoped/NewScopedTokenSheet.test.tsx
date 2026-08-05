@@ -264,15 +264,20 @@ describe('NewScopedTokenSheet', () => {
     renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
     await screen.findByRole('dialog')
+    // Trigger a resource validation error before entering legacy mode
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await screen.findByText('Please select an organization to continue.')
     await user.click(await screen.findByText('Create legacy token'))
     // The classic warning replaces resource access and permissions
     await screen.findByText('Access tokens can be used to control your whole account')
     expect(screen.queryByRole('button', { name: 'Review access' })).toBeNull()
     await screen.findByRole('button', { name: 'Generate token' })
-    // Switching back restores the scoped form
+    // Switching back restores the scoped form, without resurfacing the stale resource error
     await user.click(await screen.findByText('Create scoped token'))
     await screen.findByRole('button', { name: 'Review access' })
     expect(screen.queryByText('Access tokens can be used to control your whole account')).toBeNull()
+    expect(screen.queryByText('Please select an organization to continue.')).toBeNull()
   })
   test('creates a classic token via the legacy link', async () => {
     renderSheet()

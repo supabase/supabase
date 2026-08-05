@@ -72,6 +72,8 @@ export const NewScopedTokenForm = ({
     form.setValue('resourceAccess', 'account', { shouldValidate: true })
     form.setValue('organizationSlugs', [])
     form.setValue('projectRefs', [])
+    // The fields unmount in legacy mode, so drop any validation errors they were holding.
+    form.clearErrors(['organizationSlugs', 'projectRefs'])
   }
 
   const handleReviewAccess = async (values: TokenFormValues) => {
