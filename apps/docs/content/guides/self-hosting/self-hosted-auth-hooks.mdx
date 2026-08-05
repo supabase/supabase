@@ -194,7 +194,7 @@ services:
       GOTRUE_HOOK_SEND_SMS_ENABLED: 'true'
       GOTRUE_HOOK_SEND_SMS_URI: ${HOOK_SEND_SMS_URI}
       GOTRUE_HOOK_SEND_SMS_SECRETS: ${HOOK_SEND_SMS_SECRETS}
-    extra_hosts:
+    extra_hosts: # 👈 required so the container can resolve host.docker.internal
       - 'host.docker.internal:host-gateway'
 
   functions:
@@ -232,7 +232,7 @@ echo "v1,whsec_$(openssl rand -base64 32)"
 ### Secret format
 
 - **Symmetric**: `v1,whsec_[base64]{32-88 characters}`
-- **Asymmetric**: `v1a,whpk_[base64]:whsk_[base64]`
+- **Asymmetric**: `v1a,whpk_[base64]:v1a,whsk_[base64]`
 
 ### Key rotation
 
@@ -271,7 +271,7 @@ The URI format must be exactly `pg-functions://postgres/<schema>/<function_name>
 Check auth logs for details:
 
 ```sh
-docker compose logs auth --tail 50
+docker compose logs auth --tail 20
 ```
 
 Common causes:
