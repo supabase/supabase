@@ -128,7 +128,7 @@ docker compose logs auth --tail 20
 
 ## Step-by-step: HTTP endpoint hook
 
-This example enables the **Send Sms** hook using an Edge Function.
+This example enables the **Send SMS** hook using an Edge Function.
 
 ### Step 1: Create the Edge Function
 
@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
   const wh = new Webhook(hookSecret)
   const { user, sms } = wh.verify(payload, headers)
 
-  // Send sms using your provider
+  // Send SMS using your provider
   // ... your sms sending logic here ...
 
   return new Response(JSON.stringify({}), {
@@ -185,7 +185,7 @@ HOOK_SEND_SMS_SECRETS=YOUR_GENERATED_SECRET_HERE # Paste the secret generated in
 
 ### Step 4: Update `docker-compose.yml`
 
-Add/uncomment the following environment variables to the auth & functions services. For brevity, only the updated fields are shown.
+Add the following environment variables to the auth and functions services. For brevity, only the updated fields are shown.
 
 ```yaml name=docker-compose.yml
 services:
@@ -206,64 +206,16 @@ services:
 docker compose up -d --force-recreate --no-deps auth functions
 ```
 
-## Hook-specific setup
+### Step 6: Verify
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="custom-access-token"
->
+Trigger an SMS authentication event and confirm that the hook executes successfully.
 
-<TabPanel id="custom-access-token" label="Custom Access Token">
+If something doesn't work, check the auth and functions logs:
 
-Runs before a token is issued. Use it to add custom claims to the JWT.
-
-See [Custom Access Token Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook) for full input/output schemas and examples.
-
-</TabPanel>
-
-<TabPanel id="send-sms" label="Send SMS">
-
-Replaces built-in SMS sending. Use it to send OTPs through a custom provider (e.g., regional SMS gateways, WhatsApp).
-
-See [Send SMS Hook](/docs/guides/auth/auth-hooks/send-sms-hook) for full input/output schemas and examples.
-
-</TabPanel>
-
-<TabPanel id="send-email" label="Send Email">
-
-Replaces built-in email sending. Use it to send emails through a custom provider (e.g., Resend, SendGrid) or customize templates.
-
-See [Send Email Hook](/docs/guides/auth/auth-hooks/send-email-hook) for full input/output schemas and examples.
-
-</TabPanel>
-
-<TabPanel id="before-user-created" label="Before User Created">
-
-Runs before a new user is created. Use it to restrict signups by domain, block specific OAuth providers, or enforce IP-based access control.
-
-See [Before User Created Hook](/docs/guides/auth/auth-hooks/before-user-created-hook) for full input/output schemas and examples.
-
-</TabPanel>
-
-<TabPanel id="mfa-verification" label="MFA Verification">
-
-Runs when a user attempts MFA verification. Use it to implement rate limiting or brute-force protection.
-
-See [MFA Verification Hook](/docs/guides/auth/auth-hooks/mfa-verification-hook) for full input/output schemas.
-
-</TabPanel>
-
-<TabPanel id="password-verification" label="Password Verification">
-
-Runs when a user attempts password verification. Use it to track failed attempts and lock accounts after too many failures.
-
-See [Password Verification Hook](/docs/guides/auth/auth-hooks/password-verification-hook) for full input/output schemas.
-
-</TabPanel>
-
-</Tabs>
+```sh
+docker compose logs auth --tail 20
+docker compose logs functions --tail 20
+```
 
 ## Webhook secrets
 
@@ -342,6 +294,6 @@ grant execute on function public.your_hook_function
   to supabase_auth_admin;
 ```
 
-### Sms OTP expires too quickly
+### SMS OTP expires too quickly
 
 Refer to [OTP Settings Docs](/docs/guides/self-hosting/self-hosted-phone-mfa#otp-settings)
