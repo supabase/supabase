@@ -45,6 +45,7 @@ import { useStartPipelineMutation } from '@/data/replication/start-pipeline-muta
 import { useReplicationTablesQuery } from '@/data/replication/tables-query'
 import { useIcebergNamespaceTableDeleteMutation } from '@/data/storage/iceberg-namespace-table-delete-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildStudioLink, studioLinks } from '@/lib/studio-links'
 
 interface TableRowComponentProps {
   table: { id: number; name: string; isConnected: boolean }
@@ -342,7 +343,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                       {!!inferredPostgresTable && (
                         <DropdownMenuItem asChild className="flex items-center gap-x-2">
                           <Link
-                            href={`/project/${projectRef}/database/replication/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
+                            href={studioLinks.databaseReplication(projectRef, pipeline?.id ?? '', `${inferredPostgresTable.schema}.${inferredPostgresTable.name}`)}
                           >
                             <Eye size={12} className="text-foreground-lighter" />
                             <p>View pipeline</p>

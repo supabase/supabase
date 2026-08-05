@@ -35,6 +35,7 @@ import {
   type RoleImpersonationState,
 } from '@/state/role-impersonation-state'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
+import { buildStudioLink, studioLinks } from '@/lib/studio-links'
 
 export interface SortPopoverPrimitiveProps {
   buttonText?: string
@@ -351,7 +352,7 @@ export const SortPopoverPrimitive = ({
         <p className="text-foreground-light text-sm">
           We highly recommend only sorting on columns which are{' '}
           <InlineLink
-            href={`/project/${ref}/database/indexes?search=${tableName}&schema=${tableSchema}`}
+            href={studioLinks.databaseIndexes(ref, tableSchema, tableName)}
           >
             indexed
           </InlineLink>

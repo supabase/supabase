@@ -14,6 +14,7 @@ import { proxy, subscribe, useSnapshot } from 'valtio'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { buildStudioLink, studioLinks } from '@/lib/studio-links'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
@@ -382,7 +383,7 @@ export function createTabsState(projectRef: string) {
       switch (tab.type) {
         case 'sql':
           const schema = (router.query.schema as string) || 'public'
-          router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
+          router.push(buildStudioLink(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}`, { schema }))
           break
         case 'r':
         case 'v':
