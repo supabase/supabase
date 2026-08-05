@@ -130,9 +130,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       return (
         <VercelConnectionError
           projectRef={newProjectRef}
-          message={
-            projectSettingsError?.message ?? 'Unable to check whether the project is ready.'
-          }
+          message={projectSettingsError?.message ?? 'Unable to check whether the project is ready.'}
           onRetry={() => void refetchProjectSettings()}
         />
       )
