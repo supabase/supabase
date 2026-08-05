@@ -16,6 +16,10 @@ export const CLASSIC_TOKEN_WARNING = {
 export const MCP_UNSUPPORTED_TITLE = "This token doesn't work with the Supabase MCP server yet"
 export const MCP_UNSUPPORTED_DESCRIPTION = 'Support for scoped tokens is coming soon.'
 
+/** Shared tail for every "this token can no longer be used" message. */
+export const TOKEN_DENIED_REMEDIATION =
+  'Requests with this token will be denied. Delete this token and create a new one with the resources and permissions you need.'
+
 export const EXPIRES_AT_OPTIONS = {
   hour: { value: 'hour', label: '1 hour' },
   day: { value: 'day', label: '1 day' },

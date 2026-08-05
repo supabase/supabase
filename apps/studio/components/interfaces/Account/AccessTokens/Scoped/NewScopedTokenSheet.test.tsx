@@ -4,86 +4,18 @@ import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test } from 'vitest'
 
+import { mockScopedTokenEnvironment } from '../AccessToken.fixtures'
 import { NewScopedTokenSheet } from './NewScopedTokenSheet'
-import type { ProfileContextType } from '@/lib/profile'
-import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
 type CreateTokenResponse = components['schemas']['CreateScopedAccessTokenResponse']
 type CreateClassicTokenResponse = components['schemas']['CreateAccessTokenResponse']
 
 const user = userEvent.setup({
   writeToClipboard: true,
 })
-
-const PROFILE_CONTEXT: ProfileContextType = {
-  profile: {
-    id: 1,
-    auth0_id: 'auth0|test',
-    gotrue_id: 'gotrue-test',
-    username: 'testuser',
-    primary_email: 'test@example.com',
-    first_name: null,
-    last_name: null,
-    mobile: null,
-    is_alpha_user: false,
-    is_sso_user: false,
-    disabled_features: [],
-    free_project_limit: null,
-  },
-  error: null,
-  isLoading: false,
-  isError: false,
-  isSuccess: true,
-}
-
-const mockOrganizations = () =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/organizations',
-    response: () =>
-      HttpResponse.json<OrganizationResponse[]>([
-        createMockOrganizationResponse({ slug: 'acme-prod', name: 'Acme Production' }),
-      ]),
-  })
-
-const mockProjects = () =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/projects',
-    response: () =>
-      HttpResponse.json<ProjectsResponse>({
-        pagination: { count: 1, limit: 100, offset: 0 },
-        projects: [
-          {
-            ...createMockProject({
-              id: 1,
-              ref: 'project-1',
-              name: 'Project 1',
-              organization_id: 1,
-            }),
-            organization_slug: 'acme-prod',
-            preview_branch_refs: [],
-          },
-        ],
-      }),
-  })
-
-const mockPermissionsMap = () =>
-  addAPIMock({
-    method: 'get',
-    // @ts-expect-error Studio API is missing from types
-    path: '/scoped-access-token-permissions',
-    response: () =>
-      HttpResponse.json({
-        scopes: {},
-        endpoints: {},
-        mcp_tools: {},
-      }),
-  })
 
 const mockCreateToken = () =>
   addAPIMock({
@@ -121,13 +53,11 @@ const mockCreateClassicToken = () =>
 describe('NewScopedTokenSheet', () => {
   const renderSheet = () =>
     customRender(<NewScopedTokenSheet onCreateExperimentalToken={() => {}} />, {
-      profileContext: PROFILE_CONTEXT,
+      profileContext: createMockProfileContext(),
     })
 
   beforeEach(() => {
-    mockPermissionsMap()
-    mockOrganizations()
-    mockProjects()
+    mockScopedTokenEnvironment()
     mockCreateToken()
     mockCreateClassicToken()
   })
