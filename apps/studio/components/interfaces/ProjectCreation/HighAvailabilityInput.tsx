@@ -7,6 +7,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface HighAvailabilityInputProps {
   form: UseFormReturn<CreateProjectForm>
@@ -21,6 +22,8 @@ export const HighAvailabilityInput = ({
 }: HighAvailabilityInputProps) => {
   const { getValues, setValue } = form
   const { hasAccess } = useCheckEntitlements('instances.high_availability')
+  const { data: organization } = useSelectedOrganizationQuery()
+  const isFreePlan = organization?.plan?.id === 'free'
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
 
   // Fields to revert to when toggling off HA, so previously selected values aren't lost.
@@ -91,7 +94,7 @@ export const HighAvailabilityInput = ({
     setValue('dbRegion', highAvailabilityRegionName)
   }, [highAvailability, highAvailabilityRegionName, getValues, setValue])
 
-  if (!hasAccess) return null
+  if (!hasAccess || isFreePlan) return null
 
   return (
     <Panel.Content>

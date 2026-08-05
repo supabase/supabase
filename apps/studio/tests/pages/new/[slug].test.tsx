@@ -733,6 +733,17 @@ describe('project creation wizard', () => {
       expect(screen.queryByText('High availability')).not.toBeInTheDocument()
     })
 
+    test('hides the high availability toggle when the org is on the free plan', async () => {
+      mockWizardEndpoints({
+        organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+      })
+
+      await renderWizard()
+
+      await screen.findByPlaceholderText('Project name')
+      expect(screen.queryByText('High availability')).not.toBeInTheDocument()
+    })
+
     test('removes the custom Postgres version field while high availability is enabled', async () => {
       mockWizardEndpoints()
 
