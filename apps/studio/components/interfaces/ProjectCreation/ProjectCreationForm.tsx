@@ -410,7 +410,7 @@ export const ProjectCreationForm = ({
 
     if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
       const message =
-        'Invalid Postgres version. It should start with a number between 12–19, a dot, and additional characters, for example 15.2 or 15.2.0-3.'
+        'Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3'
       if (isVercelIntegrationFlow) {
         setProjectCreationError(message)
         return
@@ -419,7 +419,7 @@ export const ProjectCreationForm = ({
     }
 
     if (useOrioleDb && !availableOrioleVersion) {
-      const message = 'No available OrioleDB image found. Only Postgres is available.'
+      const message = 'No available OrioleDB image found, only Postgres is available'
       if (isVercelIntegrationFlow) {
         setProjectCreationError(message)
         trackFunnelError(
