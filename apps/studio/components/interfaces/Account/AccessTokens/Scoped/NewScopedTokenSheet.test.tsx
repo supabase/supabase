@@ -279,6 +279,27 @@ describe('NewScopedTokenSheet', () => {
     expect(screen.queryByText('Access tokens can be used to control your whole account')).toBeNull()
     expect(screen.queryByText('Please select an organization to continue.')).toBeNull()
   })
+  test('switches to the classic token form from the review step MCP notice', async () => {
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Organization' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Project 1' }))
+    // Permission categories start collapsed; expand "Project" to reach its rows
+    fireEvent.click(await screen.findByRole('button', { name: /Core project visibility/ }))
+    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    // The MCP-unsupported notice on the review step links back into legacy mode
+    await user.click(await screen.findByText('create a legacy token'))
+    await screen.findByText('Access tokens can be used to control your whole account')
+    await screen.findByRole('button', { name: 'Generate token' })
+    expect(screen.queryByRole('button', { name: 'Review access' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Create token' })).toBeNull()
+  })
   test('creates a classic token via the legacy link', async () => {
     renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
