@@ -174,11 +174,11 @@ function dotScenarioSuggestions(
   }
 
   const table = pgInfo.tableColumns.find((tbl: TableColumn) => {
+    if (tbl.schemaname !== schema.name) return false
     const _ident = idents.length > pos ? idents[pos] : EMPTY_IDENT
-    return (
-      (tbl.schemaname == schema.name && _ident.isQuoted && tbl.tablename === _ident.name) ||
-      (!_ident.isQuoted && tbl.tablename.toLocaleLowerCase() == _ident.name.toLocaleLowerCase())
-    )
+    return _ident.isQuoted
+      ? tbl.tablename === _ident.name
+      : tbl.tablename.toLocaleLowerCase() == _ident.name.toLocaleLowerCase()
   })
 
   if (table) {
