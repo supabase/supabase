@@ -16,7 +16,7 @@ describe('High Availability project creation constraints', () => {
   })
 
   it.each([
-    ['local', undefined],
+    ['local', 'eu-central-1'],
     ['staging', 'us-east-1'],
     ['prod', undefined],
   ])('resolves the %s region restriction', (environment, expectedRegion) => {
