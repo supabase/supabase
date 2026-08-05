@@ -30,6 +30,7 @@ import {
 
 import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
+import { LogsSnippetIcon } from '@/components/ui/EntityTypeIcon'
 import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
@@ -43,7 +44,6 @@ import {
   type FolderStatus,
 } from '@/state/sql-editor/sql-editor-lifecycle'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
-import { LogsSnippetIcon } from '@/state/tabs/kinds.icons'
 
 interface SQLEditorTreeViewItemProps extends Omit<
   ComponentProps<typeof TreeViewItem>,
