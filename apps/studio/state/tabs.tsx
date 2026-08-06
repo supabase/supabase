@@ -13,11 +13,13 @@ import { proxy, subscribe, useSnapshot } from 'valtio'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
-import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { EditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
+import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
+  explorer: ['notebook'],
 }
 
 export type TabType = ENTITY_TYPE | 'sql'
@@ -469,7 +471,7 @@ export function createTabsState(projectRef: string) {
     }: {
       id: string
       router: NextRouter
-      editor?: 'sql' | 'table'
+      editor?: EditorType
       onClose?: (id: string) => void
       onClearDashboardHistory: () => void
     }) => {

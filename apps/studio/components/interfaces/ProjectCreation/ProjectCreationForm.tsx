@@ -150,6 +150,7 @@ export const ProjectCreationForm = ({
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
+  const [projectCreationError, setProjectCreationError] = useState<string>()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -327,6 +328,7 @@ export const ProjectCreationForm = ({
     isSuccess: isSuccessNewProject,
   } = useProjectCreateMutation({
     onSuccess: (res) => {
+      setProjectCreationError(undefined)
       track(
         'project_creation_simple_version_submitted',
         {
@@ -349,6 +351,11 @@ export const ProjectCreationForm = ({
       if (surface === 'main') router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(`Failed to create new project: ${error.message}`)
+        trackFunnelError('project_creation', classifyApiError('project_creation', error), 'form')
+        return
+      }
       const toastId = toast.error(`Failed to create new project: ${error.message}`)
       trackFunnelError(
         'project_creation',
@@ -376,6 +383,7 @@ export const ProjectCreationForm = ({
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
     if (!currentOrg) return console.error('Unable to retrieve current organization')
+    setProjectCreationError(undefined)
 
     const {
       cloudProvider,
@@ -401,13 +409,27 @@ export const ProjectCreationForm = ({
     const customPostgresVersion = highAvailability ? undefined : postgresVersion
 
     if (customPostgresVersion && !customPostgresVersion.match(/1[2-9]\..*/)) {
-      return toast.error(
-        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-      )
+      const message =
+        'Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        return
+      }
+      return toast.error(message)
     }
 
     if (useOrioleDb && !availableOrioleVersion) {
-      const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
+      const message = 'No available OrioleDB image found, only Postgres is available'
+      if (isVercelIntegrationFlow) {
+        setProjectCreationError(message)
+        trackFunnelError(
+          'project_creation',
+          { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+          'form'
+        )
+        return
+      }
+      const toastId = toast.error(message)
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
@@ -753,6 +775,13 @@ export const ProjectCreationForm = ({
                   </Panel.Content>
                 ) : null}
               </div>
+            )}
+            {projectCreationError && (
+              <Panel.Content>
+                <p role="alert" className="text-sm text-destructive">
+                  {projectCreationError}
+                </p>
+              </Panel.Content>
             )}
           </>
         </Panel>
