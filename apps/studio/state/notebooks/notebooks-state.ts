@@ -27,6 +27,10 @@ export const notebooksState = proxy({
    * Load notebook content into the store. Notebooks fetched from the list
    * endpoint don't have `content` loaded (to keep that response small), so
    * content is fetched separately and merged in here on demand.
+   *
+   * Unlike `addNotebook` (for locally-created notebooks, status 'new'), a
+   * notebook reaching this function was already persisted, so it's inserted
+   * with status 'saved'.
    */
   setNotebook: ({ projectRef, notebook }: { projectRef: string; notebook: Notebook }) => {
     const stateNotebook = notebooksState.notebooks[notebook.id]
@@ -35,7 +39,7 @@ export const notebooksState = proxy({
         stateNotebook.notebook.content = notebook.content
       }
     } else {
-      notebooksState.addNotebook({ projectRef, notebook })
+      notebooksState.notebooks[notebook.id] = { projectRef, notebook, status: 'saved' }
     }
   },
 

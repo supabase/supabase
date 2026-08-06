@@ -521,6 +521,9 @@ export function createTabsState(projectRef: string) {
             case 'sql':
               router.push(`/project/${router.query.ref}/sql`)
               break
+            case 'notebook':
+              router.push(`/project/${router.query.ref}/explorer`)
+              break
             case 'r':
             case 'v':
             case 'm':
