@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { isEqual } from 'lodash'
 import { useState } from 'react'
 
@@ -318,6 +318,7 @@ export const useSharedAPIReport = ({
   const queryClient = useQueryClient()
 
   const useOtel = useFlag('otelReports')
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const buildSql = (entry: (typeof SHARED_API_REPORT_SQL)[SharedAPIReportKey]) =>
     useOtel ? entry.safeSqlOtel : entry.safeSql
 
@@ -360,7 +361,7 @@ export const useSharedAPIReport = ({
         ref,
         { otel: useOtel },
       ],
-      enabled: enabled && !!ref && !!filterBy,
+      enabled: enabled && !!ref && !!filterBy && flagsLoaded,
       queryFn: async () => {
         try {
           const data = await executeAnalyticsSql({
