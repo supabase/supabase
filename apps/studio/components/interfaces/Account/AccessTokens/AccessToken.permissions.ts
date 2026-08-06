@@ -447,9 +447,13 @@ const RESOURCE_METADATA_FALLBACK = (
     : 'Read-only access to this resource.',
 })
 
+export type PermissionLevel = 'user' | 'organization' | 'project'
+
 export interface PermissionCatalogEntry {
   /** Derived resource key, e.g. "project:database" */
   key: string
+  /** Which FGA namespace the resource lives in — decides which role (org vs project) governs it. */
+  level: PermissionLevel
   category: PermissionCategoryKey
   name: string
   description: string
@@ -482,15 +486,16 @@ const getResource = (key: string): string =>
 const buildCatalog = (): PermissionCatalogEntry[] => {
   const byResource = new Map<
     string,
-    { title: string; readScopes: string[]; writeScopes: string[] }
+    { level: PermissionLevel; title: string; readScopes: string[]; writeScopes: string[] }
   >()
 
   for (const [scope, scopePerms] of Object.entries(FGA)) {
+    const level = scope.toLowerCase() as PermissionLevel
     for (const [permKey, perm] of Object.entries(scopePerms)) {
-      const resourceKey = `${scope.toLowerCase()}:${getResource(permKey)}`
+      const resourceKey = `${level}:${getResource(permKey)}`
       const action = getAction(permKey)
       if (!byResource.has(resourceKey)) {
-        byResource.set(resourceKey, { title: perm.title, readScopes: [], writeScopes: [] })
+        byResource.set(resourceKey, { level, title: perm.title, readScopes: [], writeScopes: [] })
       }
       const entry = byResource.get(resourceKey)!
       if (action === 'read') entry.readScopes.push(perm.id)
@@ -499,11 +504,12 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
   }
 
   const catalog: PermissionCatalogEntry[] = []
-  for (const [key, { title, readScopes, writeScopes }] of byResource.entries()) {
+  for (const [key, { level, title, readScopes, writeScopes }] of byResource.entries()) {
     const meta =
       RESOURCE_METADATA[key] ?? RESOURCE_METADATA_FALLBACK(key, title, writeScopes.length > 0)
     catalog.push({
       key,
+      level,
       category: meta.category,
       name: meta.name,
       description: meta.description,
@@ -541,17 +547,25 @@ export const PERMISSION_CATALOG_BY_CATEGORY: CategoryWithEntries[] = PERMISSION_
 /** Map of resource key -> selected mode. Absent keys are treated as 'none'. */
 export type PermissionSelection = Record<string, PermissionMode>
 
+/** FGA scope ids a catalog entry grants at the given mode. */
+export const getEntryScopes = (
+  entry: PermissionCatalogEntry,
+  mode: PermissionMode
+): ScopedAccessTokenPermission[] => {
+  if (mode === 'none') return []
+  if (mode === 'readwrite') return [...entry.readScopes, ...entry.writeScopes]
+  return entry.readScopes
+}
+
 /** Flattens a selection into the concrete FGA scope ids to send to the API. */
 export const selectionToScopes = (
   selection: PermissionSelection
 ): ScopedAccessTokenPermission[] => {
   const scopes: ScopedAccessTokenPermission[] = []
   for (const [key, mode] of Object.entries(selection)) {
-    if (mode === 'none') continue
     const entry = CATALOG_BY_KEY.get(key)
     if (!entry) continue
-    scopes.push(...entry.readScopes)
-    if (mode === 'readwrite') scopes.push(...entry.writeScopes)
+    scopes.push(...getEntryScopes(entry, mode))
   }
   return Array.from(new Set(scopes))
 }
