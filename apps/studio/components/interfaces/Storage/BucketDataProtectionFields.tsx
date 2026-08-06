@@ -85,7 +85,7 @@ export const BucketDataProtectionFields = () => {
         )}
 
         {!!planLimits && isVersioningEnabled && (
-          <div className="flex flex-col gap-y-3 border-l border-border pl-4">
+          <div className="flex flex-col gap-y-3">
             <FormField
               name="version_expiry_days"
               control={control}
