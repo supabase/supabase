@@ -120,23 +120,29 @@ describe('permission scope map (group enforcement)', () => {
     ).not.toContain('execute_sql')
   })
 
-  it('reports ungated tools (no groups) as enabled for any token, including one with no scopes', () => {
-    // search_docs hits the content API and get_project_url builds a hostname string, so no
+  it('reports ungated tools (one empty group) as enabled for any token, including one with no scopes', () => {
+    // search_docs hits the public content API and confirm_cost computes a local hash, so no
     // permission gates either — the review step should say so rather than hide them.
     const permissionScopeMap = scopeMap({
-      mcp_tools: { search_docs: [[]], get_project_url: [[]], get_cost: [[]] },
+      mcp_tools: { search_docs: [[]], confirm_cost: [[]] },
     })
 
     expect(getEnabledMcpTools({ grantedScopes: ['database_read'], permissionScopeMap })).toEqual([
       'search_docs',
-      'get_project_url',
-      'get_cost',
+      'confirm_cost',
     ])
     expect(getEnabledMcpTools({ grantedScopes: [], permissionScopeMap })).toEqual([
       'search_docs',
-      'get_project_url',
-      'get_cost',
+      'confirm_cost',
     ])
+  })
+
+  it('never enables a tool whose alternatives were all dropped ([])', () => {
+    const permissionScopeMap = scopeMap({ mcp_tools: { broken_tool: [] } })
+
+    expect(
+      getEnabledMcpTools({ grantedScopes: ['database_read'], permissionScopeMap })
+    ).not.toContain('broken_tool')
   })
 
   it('lists endpoints when at least one alternative group is fully granted', () => {

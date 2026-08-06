@@ -102,7 +102,9 @@ export const getEnabledEndpoints = ({
 
 /**
  * Given the set of granted scope ids, returns the MCP tools the token can call: those with at least
- * one fully-granted scope group, plus the ungated tools (no alternatives) that any token can call.
+ * one fully-granted scope group. Ungated tools — recorded as one empty group (`[[]]`), see
+ * ScopeGroupAlternatives — are vacuously satisfied and so reported for every token. A tool with no
+ * alternatives at all (`[]`) is reported for nobody.
  */
 export const getEnabledMcpTools = ({
   grantedScopes,
