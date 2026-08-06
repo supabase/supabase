@@ -138,6 +138,7 @@ describe('Admonition', () => {
     const description = within(note).getByText('Body copy.')
 
     expect(description.tagName).toBe('P')
+    expect(description.parentElement).toHaveClass('!mb-0')
     expect(description.parentElement?.parentElement).toHaveClass('my-0.5')
   })
 
@@ -152,9 +153,9 @@ describe('Admonition', () => {
     const paragraph = within(note).getByText('Children body copy.')
 
     expect(paragraph.tagName).toBe('P')
-    expect(paragraph.parentElement).toHaveClass('text-sm')
+    expect(paragraph.parentElement).toHaveClass('text-sm', '!mb-0')
     expect(paragraph.parentElement).toHaveAttribute('data-slot', 'alert-description')
-    expect(paragraph.parentElement?.parentElement).toHaveClass('my-0.5')
+    expect(paragraph.parentElement?.parentElement).not.toHaveClass('my-0.5')
   })
 
   it('does not offset titled content', () => {
