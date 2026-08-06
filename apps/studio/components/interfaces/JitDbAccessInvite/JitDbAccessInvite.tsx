@@ -4,7 +4,8 @@ import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   InterstitialAccountRow,
@@ -133,11 +134,11 @@ export const JitDbAccessInvite = () => {
   if (!isLoggedIn) {
     return withLayout(
       <div className="flex flex-col gap-2">
-        <Button asChild type="primary" block>
+        <Button asChild variant="primary" block>
           <Link href={loginRedirectLink}>Sign in</Link>
         </Button>
         {isSignUpEnabled && (
-          <Button asChild type="default" block>
+          <Button asChild variant="default" block>
             <Link href={signupRedirectLink}>Create an account</Link>
           </Button>
         )}
@@ -166,7 +167,7 @@ export const JitDbAccessInvite = () => {
                     >
                       {connectionString}
                     </code>
-                    <CopyButton text={connectionString} type="default" iconOnly />
+                    <CopyButton text={connectionString} variant="default" iconOnly />
                   </div>
                 </div>
               )
@@ -183,7 +184,7 @@ export const JitDbAccessInvite = () => {
           />
         )}
 
-        <Button asChild type="default" block>
+        <Button asChild variant="default" block>
           <Link href="/">Back to home</Link>
         </Button>
       </div>
@@ -198,7 +199,7 @@ export const JitDbAccessInvite = () => {
 
       <div className="flex flex-col gap-2">
         <Button
-          type="primary"
+          variant="primary"
           block
           loading={isAccepting}
           disabled={isAccepting}
@@ -206,7 +207,7 @@ export const JitDbAccessInvite = () => {
         >
           Accept invite
         </Button>
-        <Button asChild type="text" block>
+        <Button asChild variant="text" block>
           <Link href="/projects">Decline</Link>
         </Button>
       </div>
