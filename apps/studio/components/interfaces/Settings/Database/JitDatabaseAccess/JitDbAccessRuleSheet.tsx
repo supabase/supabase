@@ -298,6 +298,7 @@ export function JitDbAccessRuleSheet({
                           mode === 'add' ? (
                             <button
                               type="button"
+                              tabIndex={0}
                               className="text-foreground underline underline-offset-2"
                               onClick={() => {
                                 setIsInvite(false)
@@ -334,6 +335,7 @@ export function JitDbAccessRuleSheet({
                           mode === 'add' ? (
                             <button
                               type="button"
+                              tabIndex={0}
                               className="text-foreground underline underline-offset-2"
                               onClick={() => {
                                 setIsInvite(true)
