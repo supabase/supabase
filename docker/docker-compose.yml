@@ -71,11 +71,11 @@ services:
     restart: unless-stopped
     networks:
       default:
-        # Expose `kong` and `envoy` as network aliases, so internal configs
+        # Expose `envoy` and `kong` as network aliases, so internal configs
         # that reference either hostname resolve to whichever gateway is active.
         aliases:
-          - kong
           - envoy
+          - kong
     healthcheck:
       # Using a TCP port check because this image does not include curl or wget.
       test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/8000'"]
