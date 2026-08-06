@@ -468,7 +468,12 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
               )}
             </DialogSection>
 
-            {showProtection && <BucketDataProtectionFields />}
+            {showProtection && (
+              <BucketDataProtectionFields
+                bucketName={bucket?.name}
+                initialVersioningEnabled={bucketProtection.versioning === 'enabled'}
+              />
+            )}
           </form>
         </Form>
 

@@ -61,6 +61,8 @@ export const storageKeys = {
   ) => ['projects', projectRef, 'buckets', bucketId, 'object-versions', objectName] as const,
   trash: (projectRef: string | undefined, bucketId: string | undefined) =>
     ['projects', projectRef, 'buckets', bucketId, 'trash'] as const,
+  retentionUsage: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'storage-retention-usage'] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({

@@ -48,6 +48,19 @@ const daysAgo = (days: number, time = '02:00:00') => {
 
 const daysAhead = (days: number) => daysAgo(-days)
 
+/**
+ * Unlike `daysAgo` (anchored to the fixed `BASE_DATE` so relative labels stay
+ * stable across the versions/trash mocks), the usage chart needs to look
+ * current whenever "today" actually is for whoever is viewing the prototype —
+ * anchored to the real clock, evaluated each time the query runs.
+ */
+const daysAgoFromNow = (days: number) => {
+  const date = new Date()
+  date.setUTCDate(date.getUTCDate() - days)
+  date.setUTCHours(2, 0, 0, 0)
+  return date.toISOString()
+}
+
 export const getMockObjectVersions = (_objectName: string): ObjectVersion[] => [
   {
     versionId: '8f3a2c9b41c1',
@@ -175,6 +188,59 @@ export const restoreMockTrashObjects = (objectIds: string[]): TrashObject[] => {
 export const deleteMockTrashObjectsPermanently = (objectIds?: string[]): TrashObject[] => {
   trashObjects = objectIds ? trashObjects.filter((object) => !objectIds.includes(object.id)) : []
   return [...trashObjects]
+}
+
+export interface BucketRetentionSummary {
+  bucket: string
+  live: number
+  versions: number
+  isVersioned: boolean
+}
+
+export interface StorageRetentionUsage {
+  totals: { live: number; versions: number }
+  daily: Array<{ date: string; live: number; versions: number }>
+  byBucket: BucketRetentionSummary[]
+}
+
+const GB = 1024 * MB
+
+/**
+ * Day-over-day growth for the Storage Size usage chart, oldest first, ending
+ * "today". `versions` is data retained purely because of noncurrent object
+ * versions and soft-deleted files past their live lifetime — the part of
+ * Storage Size that versioning is responsible for.
+ */
+const RETENTION_DAILY_GROWTH = [
+  { daysAgo: 6, live: 4.1 * GB, versions: 1.4 * GB },
+  { daysAgo: 5, live: 4.3 * GB, versions: 1.5 * GB },
+  { daysAgo: 4, live: 4.4 * GB, versions: 1.6 * GB },
+  { daysAgo: 3, live: 4.6 * GB, versions: 1.7 * GB },
+  { daysAgo: 2, live: 4.7 * GB, versions: 1.8 * GB },
+  { daysAgo: 1, live: 5.4 * GB, versions: 2.1 * GB },
+  { daysAgo: 0, live: 6.1 * GB, versions: 2.4 * GB },
+]
+
+export const getMockRetentionUsage = (): StorageRetentionUsage => {
+  const daily = RETENTION_DAILY_GROWTH.map(({ daysAgo: offset, live, versions }) => ({
+    date: daysAgoFromNow(offset),
+    live,
+    versions,
+  }))
+
+  // Derive totals from today's entry (the last day) so the breakdown and the
+  // chart's most recent bar can never drift out of sync with each other.
+  const today = daily[daily.length - 1]
+
+  return {
+    totals: { live: today.live, versions: today.versions },
+    daily,
+    byBucket: [
+      { bucket: 'match-media', live: 4.1 * GB, versions: 1.9 * GB, isVersioned: true },
+      { bucket: 'avatars', live: 1.4 * GB, versions: 0.5 * GB, isVersioned: true },
+      { bucket: 'exports', live: 0.6 * GB, versions: 0, isVersioned: false },
+    ],
+  }
 }
 
 export const mockDelay = <T>(value: T, ms = 350): Promise<T> =>
