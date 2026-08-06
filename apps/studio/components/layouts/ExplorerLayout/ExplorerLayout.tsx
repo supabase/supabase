@@ -31,12 +31,12 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
       productMenu={
         <div className="relative h-full overflow-hidden">
           <AnimatePresence mode="wait">
-            {section === undefined ? (
-              <ExplorerNavHome onSelectSection={setSection} />
-            ) : section === 'notebook' ? (
-              <ExplorerNavNotebooks onBack={() => setSection(undefined)} />
-            ) : (
-              <ExplorerNavChats onBack={() => setSection(undefined)} />
+            {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
+            {section === 'notebook' && (
+              <ExplorerNavNotebooks key="notebooks" onBack={() => setSection(undefined)} />
+            )}
+            {section === 'chat' && (
+              <ExplorerNavChats key="chats" onBack={() => setSection(undefined)} />
             )}
           </AnimatePresence>
         </div>
