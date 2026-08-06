@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Card } from 'ui'
+import { Button, Card } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -10,7 +10,6 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import {
   useBucketTrashDeleteMutation,
@@ -85,13 +84,9 @@ export const Trash = ({ bucketId }: TrashProps) => {
                 them
               </p>
               {isSuccess && objects.length > 0 && (
-                <ButtonTooltip
-                  variant="danger"
-                  icon={<Trash2 />}
-                  onClick={() => setShowDeleteAll(true)}
-                >
+                <Button variant="danger" icon={<Trash2 />} onClick={() => setShowDeleteAll(true)}>
                   Delete all permanently
-                </ButtonTooltip>
+                </Button>
               )}
             </div>
 

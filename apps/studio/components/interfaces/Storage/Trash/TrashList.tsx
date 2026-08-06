@@ -14,7 +14,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { type TrashObject } from '@/data/storage/protection/protection-mocks'
 import { formatBytes } from '@/lib/helpers'
 
@@ -107,9 +106,9 @@ export const TrashList = ({
                   <Button variant="default" loading={isRestoring} onClick={() => onRestore(object)}>
                     Restore
                   </Button>
-                  <ButtonTooltip variant="danger" onClick={() => onDeleteForever(object)}>
+                  <Button variant="danger" onClick={() => onDeleteForever(object)}>
                     Delete permanently
-                  </ButtonTooltip>
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
