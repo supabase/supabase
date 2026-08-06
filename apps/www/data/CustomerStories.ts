@@ -26,6 +26,7 @@ export const data: CustomerStoryType[] = [
     organization: 'QA.tech',
     imgUrl: 'images/customers/logos/qa-tech.png',
     logo: '/images/customers/logos/qa-tech.png',
+    logo_inverse: '/images/customers/logos/light/qa-tech.png',
     url: '/customers/qa-tech',
     ctaText: 'View story',
   },
