@@ -37,7 +37,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
             globally distributed deployments.
           </p>
           <Link
-            href={`${DOCS_URL}/guides/deployment/high-availability`}
+            href={`${DOCS_URL}/guides/deployment`}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-1 inline-flex items-center gap-1 text-xs text-foreground-lighter transition-colors hover:text-foreground"
