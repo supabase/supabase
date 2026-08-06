@@ -84,8 +84,7 @@ describe('NewOrgForm', () => {
     await user.type(nameInput, EXISTING_ORG_NAME)
     await screen.findByText(/You are already a member of an organization named/)
 
-    await user.clear(nameInput)
-    await user.type(nameInput, 'A brand new org')
+    await user.type(nameInput, 'x')
 
     expect(
       screen.queryByText(/You are already a member of an organization named/)
