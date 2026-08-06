@@ -69,7 +69,7 @@ export const Admonition = forwardRef<
               ]
             )}
           >
-            <div className={cn(!title && description && 'my-0.5')}>
+            <div className={cn(showIcon && !title && description && 'my-0.5')}>
               {title && (
                 <AlertTitle
                   {...childProps?.title}

@@ -166,4 +166,13 @@ describe('Admonition', () => {
 
     expect(title.parentElement).not.toHaveClass('my-0.5')
   })
+
+  it('does not offset titleless content when the icon is hidden', () => {
+    render(<Admonition type="note" showIcon={false} description="Body copy." />)
+
+    const note = screen.getByRole('alert', { name: 'Note' })
+    const description = within(note).getByText('Body copy.')
+
+    expect(description.parentElement?.parentElement).not.toHaveClass('my-0.5')
+  })
 })
