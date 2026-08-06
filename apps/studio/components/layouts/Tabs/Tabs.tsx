@@ -40,12 +40,16 @@ import {
 interface EditorTabsProps {
   customTabs?: ReactNode
   newTabButton?: ReactNode
-  hideCollapseButton?: boolean
+  isCollapseButtonHidden?: boolean
 }
 
 // [Joshen] Will be adjusting this component to support Explorer
 // Will require quite a bit of cleaning up once Explorer supercedes SQL Editor
-export const EditorTabs = ({ customTabs, newTabButton, hideCollapseButton }: EditorTabsProps) => {
+export const EditorTabs = ({
+  customTabs,
+  newTabButton,
+  isCollapseButtonHidden,
+}: EditorTabsProps) => {
   const { ref, id } = useParams()
   const router = useRouter()
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
@@ -183,7 +187,7 @@ export const EditorTabs = ({ customTabs, newTabButton, hideCollapseButton }: Edi
           value={hasNewTab ? 'new' : (tabs.activeTab ?? undefined)}
           onValueChange={handleTabChange}
         >
-          {!hideCollapseButton && <CollapseButton hideTabs={false} />}
+          {!isCollapseButtonHidden && <CollapseButton hideTabs={false} />}
 
           {customTabs}
 

@@ -1,13 +1,6 @@
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Home,
-  MessageCirclePlus,
-  Notebook,
-  NotebookTabsIcon,
-  NotebookText,
-  Plus,
-} from 'lucide-react'
+import { Home, MessageCirclePlus, NotebookText, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ReactNode, useState } from 'react'
@@ -58,7 +51,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
       <div className="flex flex-col h-full">
         <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
           <EditorTabs
-            hideCollapseButton
+            isCollapseButtonHidden
             customTabs={<HomeTabButton />}
             newTabButton={<NewTabButton />}
           />
@@ -86,7 +79,7 @@ const HomeTabButton = () => {
           isActive ? 'text-foreground' : 'text-foreground-lighter hover:text-foreground-light'
         )}
       />
-      <span className="sr-only">Expand sidebar</span>
+      <span className="sr-only">Open Explorer home</span>
     </Link>
   )
 }
