@@ -61,10 +61,13 @@ const page: GoPageInput = {
         <div className="flex flex-col items-center gap-2 text-foreground-light">
           <p className="text-lg font-medium text-foreground">Date</p>
           <p>October 1, 2026</p>
+          <p className="text-sm text-foreground-lighter italic">
+            The day before Supabase Select 2026
+          </p>
           <p className="mt-4 text-lg font-medium text-foreground">Location</p>
           <p>San Francisco, CA</p>
           <p className="text-sm text-foreground-lighter italic">
-            venue details will be shared soon
+            Venue details will be shared soon
           </p>
           <p className="mt-4 text-lg font-medium text-foreground">Time</p>
           <p>Doors open at 2:30 PM</p>
@@ -150,7 +153,8 @@ const page: GoPageInput = {
         {
           type: 'select',
           name: 'attending',
-          label: 'Are you attending Select 2026?',
+          label:
+            'Are you attending Supabase Select on October 2? (your Partner Day invite covers it)',
           placeholder: 'Select an option',
           required: true,
           options: [
