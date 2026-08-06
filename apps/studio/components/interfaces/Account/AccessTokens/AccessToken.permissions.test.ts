@@ -11,6 +11,7 @@ import {
   getEnabledEndpoints,
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
+  normalizePermissionScopeMap,
   type PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
@@ -19,6 +20,46 @@ const scopeMap = (partial: Partial<PermissionScopeMap>): PermissionScopeMap => (
   endpoints: {},
   mcp_tools: {},
   ...partial,
+})
+
+describe('normalizePermissionScopeMap', () => {
+  // A stale CDN entry can serve the pre-groups payload (flat conjunctive string[] per endpoint)
+  // to a client whose evaluators expect string[][]; without normalization group.every crashes.
+  it('interprets a stale flat payload as single conjunctive groups', () => {
+    const normalized = normalizePermissionScopeMap({
+      scopes: {},
+      endpoints: {
+        'GET /v1/projects': ['projects_read', 'organization_projects_read'],
+      },
+      mcp_tools: { execute_sql: ['database_read', 'database_write'] },
+    } as unknown as PermissionScopeMap)
+
+    expect(normalized.endpoints['GET /v1/projects']).toEqual([
+      ['projects_read', 'organization_projects_read'],
+    ])
+    expect(normalized.mcp_tools.execute_sql).toEqual([['database_read', 'database_write']])
+    // The normalized shape evaluates without throwing
+    expect(
+      getEnabledMcpTools({ grantedScopes: ['database_read'], permissionScopeMap: normalized })
+    ).toEqual([])
+  })
+
+  it('passes the current grouped payload through unchanged', () => {
+    const grouped: PermissionScopeMap = {
+      scopes: {},
+      endpoints: { 'GET /v1/branches': [['branching_development_read']] },
+      mcp_tools: { search_docs: [[]], broken_tool: [] },
+    }
+
+    expect(normalizePermissionScopeMap(grouped)).toEqual(grouped)
+  })
+
+  it('tolerates payloads missing the endpoint or tool maps entirely', () => {
+    const normalized = normalizePermissionScopeMap({ scopes: {} } as PermissionScopeMap)
+
+    expect(normalized.endpoints).toEqual({})
+    expect(normalized.mcp_tools).toEqual({})
+  })
 })
 
 describe('selectionToScopes', () => {

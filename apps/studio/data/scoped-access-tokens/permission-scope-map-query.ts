@@ -174,6 +174,31 @@ export const getMcpToolsForScopes = ({
   return Array.from(tools)
 }
 
+/**
+ * The endpoint's payload changed endpoint/tool requirements from a flat conjunctive scope list
+ * (string[]) to alternative groups (string[][], ScopeGroupAlternatives) at the same URL, and the
+ * response is CDN-cached (s-maxage + stale-while-revalidate). Right after a deploy a new client
+ * can still receive a stale flat payload; evaluating it as groups would call group.every on a
+ * string and crash the render. Interpret a flat list as what it was — a single conjunctive group.
+ */
+const normalizeGroups = (groups: string[] | ScopeGroupAlternatives): ScopeGroupAlternatives =>
+  groups.every((group): group is ScopeGroup => Array.isArray(group))
+    ? groups
+    : [groups as ScopeGroup]
+
+export const normalizePermissionScopeMap = (raw: PermissionScopeMap): PermissionScopeMap => ({
+  ...raw,
+  endpoints: Object.fromEntries(
+    Object.entries(raw.endpoints ?? {}).map(([endpoint, groups]) => [
+      endpoint,
+      normalizeGroups(groups),
+    ])
+  ),
+  mcp_tools: Object.fromEntries(
+    Object.entries(raw.mcp_tools ?? {}).map(([tool, groups]) => [tool, normalizeGroups(groups)])
+  ),
+})
+
 export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal) {
   const response = await fetch(`${BASE_PATH}/api/scoped-access-token-permissions`, {
     signal,
@@ -203,7 +228,8 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
     )
   }
 
-  return await response.json()
+  const payload: PermissionScopeMap = await response.json()
+  return normalizePermissionScopeMap(payload)
 }
 
 export type ScopedAccessTokenPermissionsForScopeError = ResponseError
