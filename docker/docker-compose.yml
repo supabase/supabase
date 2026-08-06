@@ -65,16 +65,14 @@ services:
       - ./volumes/snippets:/app/snippets:z
       - ./volumes/functions:/app/edge-functions:ro,z
 
-  # API gateway (Envoy). Kong is available as an optional override:
-  #   sh run.sh config add kong
-  # Envoy exposes `kong` and `envoy` as network aliases, so internal configs
-  # that reference either hostname resolve to whichever gateway is active.
   api-gw:
     container_name: supabase-envoy
     image: envoyproxy/envoy:v1.38.0
     restart: unless-stopped
     networks:
       default:
+        # Expose `kong` and `envoy` as network aliases, so internal configs
+        # that reference either hostname resolve to whichever gateway is active.
         aliases:
           - kong
           - envoy
