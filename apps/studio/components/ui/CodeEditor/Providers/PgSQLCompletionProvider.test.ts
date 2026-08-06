@@ -76,7 +76,10 @@ function getSuggestions(pgInfoRef: { current: PgInfo }, sql: string): languages.
   return provideSuggestions(pgInfoRef, sql, ' ')
 }
 
-function getDotSuggestions(pgInfoRef: { current: PgInfo }, sql: string): languages.CompletionItem[] {
+function getDotSuggestions(
+  pgInfoRef: { current: PgInfo },
+  sql: string
+): languages.CompletionItem[] {
   return provideSuggestions(pgInfoRef, sql, '.')
 }
 
