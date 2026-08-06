@@ -77,7 +77,6 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
     onSuccess: (_, variables) => {
       setLinkedOrgSlug(variables.slug)
     },
-    onError: () => undefined,
   })
   const linkError = linkOrganizationError
     ? `Failed to link organization: ${linkOrganizationError.message}`
