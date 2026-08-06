@@ -39,6 +39,7 @@ import {
   useDeletedFilesContext,
 } from '@/components/interfaces/Storage/StorageExplorer/DeletedFilesContext'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
+import { isBucketVersioned } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
@@ -79,6 +80,7 @@ const BucketPageInner = () => {
 
   const { getPolicyCount } = useBucketPolicyCount()
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
+  const isVersioned = isBucketVersioned(bucket?.id)
 
   useEffect(() => {
     if (isSuccess && !bucket) {
@@ -98,17 +100,19 @@ const BucketPageInner = () => {
         <PageBreadcrumbs
           actions={
             <PageBreadcrumbsActions>
-              <div className="flex items-center gap-2">
-                <Switch
-                  id="show-deleted"
-                  size="small"
-                  checked={isShowingDeleted}
-                  onCheckedChange={setIsShowingDeleted}
-                />
-                <Label htmlFor="show-deleted" className="text-xs cursor-pointer">
-                  Show deleted files
-                </Label>
-              </div>
+              {isVersioned && (
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="show-deleted" className="text-xs cursor-pointer">
+                    Show deleted files
+                  </Label>
+                  <Switch
+                    id="show-deleted"
+                    size="small"
+                    checked={isShowingDeleted}
+                    onCheckedChange={setIsShowingDeleted}
+                  />
+                </div>
+              )}
               <Button
                 asChild
                 variant="outline"

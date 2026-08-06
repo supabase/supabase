@@ -1,3 +1,4 @@
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
 
 import { type TrashObject } from '@/data/storage/protection/protection-mocks'
@@ -36,7 +37,10 @@ interface DeletedFilesProviderProps {
 }
 
 export const DeletedFilesProvider = ({ enabled, children }: DeletedFilesProviderProps) => {
-  const [isShowingDeleted, setIsShowingDeleted] = useState(false)
+  const [isShowingDeleted, setIsShowingDeleted] = useQueryState(
+    'deletedFiles',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
   const [selectedDeletedFile, setSelectedDeletedFile] = useState<TrashObject>()
   const [selectedDeletedIds, setSelectedDeletedIds] = useState<string[]>([])
   const [lastToggledId, setLastToggledId] = useState<string | null>(null)

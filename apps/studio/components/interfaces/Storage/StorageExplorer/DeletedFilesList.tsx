@@ -185,7 +185,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                 )}
                 onClick={() => setSelectedDeletedFile(object)}
               >
-                <TableCell onClick={(e) => e.stopPropagation()}>
+                <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
                   <Checkbox
                     checked={isChecked}
                     className={cn(
@@ -197,11 +197,11 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                     aria-label={`Select ${object.name}`}
                   />
                 </TableCell>
-                <TableCell className="text-foreground">{object.name}</TableCell>
-                <TableCell className="font-mono text-xs text-foreground-lighter">
+                <TableCell className="px-4 py-2 text-foreground">{object.name}</TableCell>
+                <TableCell className="px-4 py-2 font-mono text-xs text-foreground-lighter">
                   {object.originalPath}
                 </TableCell>
-                <TableCell className="text-foreground-light">
+                <TableCell className="px-4 py-2 text-foreground-light">
                   <Tooltip>
                     <TooltipTrigger>{dayjs(object.deletedAt).fromNow()}</TooltipTrigger>
                     <TooltipContent>
@@ -209,17 +209,17 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                     </TooltipContent>
                   </Tooltip>
                 </TableCell>
-                <TableCell className="text-right text-foreground-light tabular-nums">
+                <TableCell className="px-4 py-2 text-right text-foreground-light tabular-nums">
                   {formatBytes(object.size)}
                 </TableCell>
-                <TableCell>
+                <TableCell className="px-4 py-2">
                   {object.expiresAt ? (
                     <span className="text-warning-600">{dayjs(object.expiresAt).fromNow()}</span>
                   ) : (
                     <span className="text-foreground-lighter">Never</span>
                   )}
                 </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
+                <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                     <ButtonTooltip
                       variant="default"

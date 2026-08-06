@@ -157,13 +157,11 @@ export const BucketTableRow = ({
       </BucketTableCell>
 
       <BucketTableCell>
-        <p
-          className={
-            isBucketVersioned(bucket.id) ? 'text-foreground-light' : 'text-foreground-muted'
-          }
-        >
-          {isBucketVersioned(bucket.id) ? 'object-level' : '-'}
-        </p>
+        {isBucketVersioned(bucket.id) ? (
+          <Badge variant="success">Enabled</Badge>
+        ) : (
+          <span className="text-foreground-muted">-</span>
+        )}
       </BucketTableCell>
 
       <BucketTableCell>
