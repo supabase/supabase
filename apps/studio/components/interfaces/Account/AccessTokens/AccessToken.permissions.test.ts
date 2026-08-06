@@ -4,6 +4,7 @@ import {
   computeOverallRisk,
   countConfigured,
   getCatalogEntry,
+  scopesToSelection,
   selectionToScopes,
   type PermissionSelection,
 } from './AccessToken.permissions'
@@ -20,6 +21,27 @@ const scopeMap = (partial: Partial<PermissionScopeMap>): PermissionScopeMap => (
   endpoints: {},
   mcp_tools: {},
   ...partial,
+})
+
+describe('scopesToSelection', () => {
+  it('round-trips studio-created grants (full read/write sets)', () => {
+    expect(scopesToSelection(['database_read', 'database_write'])).toEqual({
+      'project:database': 'readwrite',
+    })
+    expect(scopesToSelection(['database_read'])).toEqual({ 'project:database': 'read' })
+    expect(scopesToSelection([])).toEqual({})
+  })
+
+  // API-created tokens can hold partial scope sets; the derived mode is an upper bound so the
+  // review UI never claims 'Minimal — no capabilities' for a token with real authority.
+  it('never drops partial grants from API-created tokens', () => {
+    // A lone create scope (one of the entry's three write scopes) still surfaces as readwrite.
+    expect(scopesToSelection(['branching_development_create'])).toEqual({
+      'project:branching_development': 'readwrite',
+    })
+    // A write grant without the read scopes still surfaces (upper-bound readwrite).
+    expect(scopesToSelection(['project_admin_write'])).toEqual({ 'project:admin': 'readwrite' })
+  })
 })
 
 describe('normalizePermissionScopeMap', () => {

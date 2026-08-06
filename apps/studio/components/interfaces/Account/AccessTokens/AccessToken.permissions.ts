@@ -570,15 +570,22 @@ export const selectionToScopes = (
   return Array.from(new Set(scopes))
 }
 
-/** Reverses `selectionToScopes`: derives a selection from a token's granted FGA scope ids. */
+/**
+ * Reverses `selectionToScopes`: derives a selection from a token's granted FGA scope ids.
+ *
+ * Tokens created through the Management API can hold arbitrary scope subsets that the
+ * none/read/readwrite modes cannot represent exactly (e.g. a lone branching_development_create).
+ * Any granted scope of an entry marks it at the corresponding mode, so a partial grant is never
+ * dropped — the mode is an upper bound and may name specific operations the token lacks, but it
+ * never understates the token's authority or risk. The endpoint and MCP-tool lists, computed
+ * from the actual granted scopes, remain the precise view.
+ */
 export const scopesToSelection = (grantedScopes: string[]): PermissionSelection => {
   const granted = new Set(grantedScopes)
   const selection: PermissionSelection = {}
   for (const entry of PERMISSION_CATALOG) {
-    const hasWrite =
-      entry.writeScopes.length > 0 && entry.writeScopes.every((scope) => granted.has(scope))
-    const hasRead =
-      entry.readScopes.length > 0 && entry.readScopes.every((scope) => granted.has(scope))
+    const hasWrite = entry.writeScopes.some((scope) => granted.has(scope))
+    const hasRead = entry.readScopes.some((scope) => granted.has(scope))
     if (hasWrite) selection[entry.key] = 'readwrite'
     else if (hasRead) selection[entry.key] = 'read'
   }
