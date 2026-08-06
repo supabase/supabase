@@ -14,7 +14,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.07.07-sha-a6a04f2
+    image: supabase/studio:2026.08.03-sha-022b374
     restart: unless-stopped
     healthcheck:
       test:
@@ -67,7 +67,7 @@ services:
 
   kong:
     container_name: supabase-kong
-    image: kong/kong:3.9.1
+    image: kong/kong:3.9.3
     restart: unless-stopped
     networks:
       default:

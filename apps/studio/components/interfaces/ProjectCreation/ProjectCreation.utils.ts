@@ -1,5 +1,5 @@
 import type { CloudProvider, Region } from 'shared-data'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
@@ -25,8 +25,6 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
       return {
         EAST_US: AWS_REGIONS.EAST_US,
       }
-    case 'FLY':
-      return FLY_REGIONS
     default:
       throw new Error('Invalid cloud provider')
   }
@@ -49,8 +47,9 @@ export const instanceLabel = (instance: string | undefined): string => {
 export const getHighAvailabilityRegionCode = (
   environment = process.env.NEXT_PUBLIC_ENVIRONMENT
 ) => {
-  if (environment === 'local') return 'eu-central-1'
+  // Local dev stacks can run in any of the supported regions, so they're left unrestricted
   if (environment === 'staging') return 'us-east-1'
+  if (environment === 'local') return 'eu-central-1'
   return undefined
 }
 
@@ -59,8 +58,9 @@ export const filterHighAvailabilityRegions = <T extends { code: string }>(
   highAvailability: boolean,
   environment = process.env.NEXT_PUBLIC_ENVIRONMENT
 ) => {
+  const isLocal = environment === 'local'
   const regionCode = getHighAvailabilityRegionCode(environment)
-  return highAvailability && regionCode !== undefined
+  return highAvailability && !isLocal && regionCode !== undefined
     ? regions.filter((region) => region.code === regionCode)
     : regions
 }

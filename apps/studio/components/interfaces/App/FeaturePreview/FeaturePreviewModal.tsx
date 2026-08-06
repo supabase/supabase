@@ -5,6 +5,10 @@ import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Badge,
   Button,
   cn,
@@ -29,6 +33,7 @@ import {
 
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
+import { DatabaseConnectionsPreview } from './DatabaseConnectionsPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
@@ -37,6 +42,8 @@ import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -51,11 +58,13 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]: <DatabaseConnectionsPreview />,
 }
 
 export const FeaturePreviewModal = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const { dismissBanner } = useBannerStack()
   const featurePreviews = useFeaturePreviews()
   const {
     showFeaturePreviewModal,
@@ -75,9 +84,14 @@ export const FeaturePreviewModal = () => {
     allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
     allFeaturePreviews[0]
   const isSelectedFeatureEnabled = flags[selectedFeature?.key]
+  const canDisableSelectedFeature = selectedFeature?.isForced !== true
 
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
+
+  const categories = (
+    [...new Set(allFeaturePreviews.map((preview) => preview.category).filter(Boolean))] as string[]
+  ).concat(['others'])
 
   const toggleFeature = () => {
     if (!selectedFeature) return
@@ -94,13 +108,18 @@ export const FeaturePreviewModal = () => {
       return
     }
 
-    toggleFeaturePreviewModal(false)
     if (hasRoute) {
+      // Navigating away drops the `featurePreviewModal` query param, which is
+      // what closes the modal. Don't also close it via
+      // toggleFeaturePreviewModal — its queued nuqs URL update races the push
+      // and can navigate back to the current page, swallowing the redirect.
       router.push(selectedFeatureRoute)
       toast.success(`${selectedFeature.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })
+      if (selectedFeature.bannerId) dismissBanner(selectedFeature.bannerId)
     } else {
+      toggleFeaturePreviewModal(false)
       toast.success(`${selectedFeature.name} enabled`, {
         description: "It's now active across the dashboard.",
       })
@@ -122,14 +141,44 @@ export const FeaturePreviewModal = () => {
             <div className="max-h-full flex-1 min-h-0 h-full flex flex-col gap-y-1 md:gap-y-4 md:flex-row">
               <div>
                 <ScrollArea className="hidden md:block h-[550px] w-[280px] border-r">
-                  {allFeaturePreviews.map((feature) => (
+                  <Accordion type="multiple" defaultValue={categories}>
+                    {categories.map((category) => {
+                      const items =
+                        category === 'others'
+                          ? allFeaturePreviews.filter((x) => x.category === undefined)
+                          : allFeaturePreviews.filter((x) => x.category === category)
+                      return (
+                        <AccordionItem
+                          key={category}
+                          value={category}
+                          className="data-[state=open]:border-b-0"
+                        >
+                          <AccordionTrigger className="text-xs font-mono uppercase tracking-tight px-4 text-foreground-lighter py-2">
+                            {category}
+                          </AccordionTrigger>
+                          <AccordionContent className="[&>div]:pb-0">
+                            {items.map((feature) => (
+                              <FeaturePreviewItem
+                                key={feature.key}
+                                feature={feature}
+                                selectedFeature={selectedFeature}
+                                selectFeaturePreview={selectFeaturePreview}
+                              />
+                            ))}
+                          </AccordionContent>
+                        </AccordionItem>
+                      )
+                    })}
+                  </Accordion>
+
+                  {/* {allFeaturePreviews.map((feature) => (
                     <FeaturePreviewItem
                       key={feature.key}
                       feature={feature}
                       selectedFeature={selectedFeature}
                       selectFeaturePreview={selectFeaturePreview}
                     />
-                  ))}
+                  ))} */}
                 </ScrollArea>
               </div>
               <div className="block md:hidden px-4 pt-4">
@@ -182,11 +231,25 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    {isSelectedFeatureEnabled ? (
-                      <Button variant="default" onClick={() => toggleFeature()}>
+                    {isSelectedFeatureEnabled && (
+                      <ButtonTooltip
+                        variant="default"
+                        disabled={!canDisableSelectedFeature}
+                        onClick={() => toggleFeature()}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            className: 'max-w-64 text-center',
+                            text: canDisableSelectedFeature
+                              ? undefined
+                              : 'This feature is now the default and can no longer be turned off',
+                          },
+                        }}
+                      >
                         Disable feature
-                      </Button>
-                    ) : (
+                      </ButtonTooltip>
+                    )}
+                    {!isSelectedFeatureEnabled && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button variant="default" onClick={() => toggleFeature()}>

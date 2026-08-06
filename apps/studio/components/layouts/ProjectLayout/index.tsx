@@ -27,7 +27,7 @@ import {
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { useMainScrollContainer, useSetMainScrollContainer } from '../MainScrollContainerContext'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
-import ProductMenuBar from '../Navigation/ProductMenuBar'
+import { ProductMenuBar } from '../Navigation/ProductMenuBar'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { getSectionKeyFromPathname, MobileMenuContent } from './LayoutHeader/MobileMenuContent'

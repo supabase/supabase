@@ -65,46 +65,69 @@ export function useSqlEditorTabsCleanup() {
   const tabMapRef = useLatest(tabs.tabsMap)
   const openTabsRef = useLatest(tabs.openTabs)
 
-  return useCallback(({ snippets }: { snippets: { id: string; type: string; name: string }[] }) => {
-    // these are tabs that are static content
-    // these canot be removed from localstorage based on this query request
-    const IGNORED_TAB_IDS = ['sql-templates', 'sql-quickstarts']
+  return useCallback(
+    ({
+      snippets,
+      canPruneLogsTabs = true,
+    }: {
+      snippets: { id: string; type: string; name: string }[]
+      // Whether `log_sql` snippets in `snippets` are authoritative. When false (the
+      // logs section is disabled or its query errored) we can't know which logs
+      // snippets exist, so logs tabs are preserved rather than pruned as stale.
+      canPruneLogsTabs?: boolean
+    }) => {
+      // these are tabs that are static content
+      // these canot be removed from localstorage based on this query request
+      const IGNORED_TAB_IDS = ['sql-templates', 'sql-quickstarts']
 
-    // Identify all SQL snippets / content by their tab ids
-    const currentContentIds = [
-      ...snippets
-        .filter((content) => content.type === 'sql')
-        .map((content) => createTabId('sql', { id: content.id })),
-      // append ignored tab IDs
-      ...IGNORED_TAB_IDS,
-    ]
+      // Identify all SQL snippets / content by their tab ids. Both database (`sql`) and
+      // logs (`log_sql`) snippets live in the `sql-` tab id space, so both are counted as
+      // live. Anything not in this set is treated as removed outside the session and pruned.
+      const currentContentIds = [
+        ...snippets
+          .filter((content) => content.type === 'sql' || content.type === 'log_sql')
+          .map((content) => createTabId('sql', { id: content.id })),
+        // append ignored tab IDs
+        ...IGNORED_TAB_IDS,
+      ]
 
-    // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session)
-    const snippetTabsToBeCleaned = openTabsRef.current.filter(
-      (id: string) => id.startsWith('sql') && !currentContentIds.includes(id)
-    )
-    tabs.removeTabs(snippetTabsToBeCleaned)
+      const isPrunable = (id: string) =>
+        id.startsWith('sql') &&
+        !currentContentIds.includes(id) &&
+        (canPruneLogsTabs || tabMapRef.current[id]?.metadata?.sqlSource !== 'logs')
 
-    // Remove any recent items that might no longer be existing (removed outside of the dashboard session)
-    const recentItems = tabs.getRecentItemsByType('sql')
-    tabs.removeRecentItems(
-      recentItems
-        ? recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
-        : []
-    )
+      // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session)
+      const snippetTabsToBeCleaned = openTabsRef.current.filter(isPrunable)
+      tabs.removeTabs(snippetTabsToBeCleaned)
 
-    // [Joshen] Validate for opened tabs, if their label matches the snippet's name - update label if not
-    // As the snippets name could've been updated outside of the SQL Editor session
-    // e.g for a shared snippet, the owner could've updated the name of the snippet
-    const openSqlTabs = openTabsRef.current
-      .map((id) => tabMapRef.current[id])
-      .filter((tab) => !!tab && editorEntityTypes['sql']?.includes(tab.type))
+      // Remove any recent items that might no longer be existing (removed outside of the dashboard session)
+      const recentItems = tabs.getRecentItemsByType('sql')
+      tabs.removeRecentItems(
+        recentItems
+          ? recentItems
+              .filter(
+                (item) =>
+                  !currentContentIds.includes(item.id) &&
+                  (canPruneLogsTabs || item.metadata?.sqlSource !== 'logs')
+              )
+              .map((item) => item.id)
+          : []
+      )
 
-    openSqlTabs.forEach((tab) => {
-      const snippet = snippets?.find((x) => tab.metadata?.sqlId === x.id)
-      if (!!snippet && snippet.name !== tab.label) tabs.updateTab(tab.id, { label: snippet.name })
-    })
-  }, [])
+      // [Joshen] Validate for opened tabs, if their label matches the snippet's name - update label if not
+      // As the snippets name could've been updated outside of the SQL Editor session
+      // e.g for a shared snippet, the owner could've updated the name of the snippet
+      const openSqlTabs = openTabsRef.current
+        .map((id) => tabMapRef.current[id])
+        .filter((tab) => !!tab && editorEntityTypes['sql']?.includes(tab.type))
+
+      openSqlTabs.forEach((tab) => {
+        const snippet = snippets?.find((x) => tab.metadata?.sqlId === x.id)
+        if (!!snippet && snippet.name !== tab.label) tabs.updateTab(tab.id, { label: snippet.name })
+      })
+    },
+    []
+  )
 }
 
 interface UseTabsScrollOptions {

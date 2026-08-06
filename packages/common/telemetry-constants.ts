@@ -1401,30 +1401,6 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on Metrics API banner CTA button in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface MetricsApiBannerCtaButtonClickedEvent {
-  action: 'metrics_api_banner_cta_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the dismiss button on a banner in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface MetricsApiBannerDismissButtonClickedEvent {
-  action: 'metrics_api_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
  * User clicks on the Unified Logs banner CTA button in studio project pages.
  *
  * @group Events
@@ -1505,6 +1481,33 @@ export interface DatabaseConnectionsLiveModeClickedEvent {
   action: 'database_connections_live_mode_clicked'
   properties: {
     newState: 'enabled' | 'disabled'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Database Connections banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBannerDismissButtonClickedEvent {
+  action: 'database_connections_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA button on the Database Connections banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
+  action: 'database_connections_banner_cta_button_clicked'
+  properties: {
+    isEnabled: boolean
   }
   groups: TelemetryGroups
 }
@@ -3754,8 +3757,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | MetricsApiBannerCtaButtonClickedEvent
-  | MetricsApiBannerDismissButtonClickedEvent
   | UnifiedLogsBannerCtaButtonClickedEvent
   | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
@@ -3765,6 +3766,8 @@ export type TelemetryEvent =
   | DatabaseConnectionsOverviewMetricCardClickedEvent
   | DatabaseConnectionsFilterUpdatedEvent
   | DatabaseConnectionsBlockerViewClickedEvent
+  | DatabaseConnectionsBannerDismissButtonClickedEvent
+  | DatabaseConnectionsBannerCtaButtonClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent

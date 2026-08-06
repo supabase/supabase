@@ -411,12 +411,7 @@ export function LogDrainDestinationSheetForm({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        tabIndex={undefined}
-        showClose={false}
-        size="lg"
-        className="overflow-y-auto flex flex-col"
-      >
+      <SheetContent showClose={false} size="lg" className="overflow-y-auto flex flex-col">
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
