@@ -234,8 +234,8 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
 
 export type ScopedAccessTokenPermissionsForScopeError = ResponseError
 
-export const useGetEnabledEndpointsForCapability = <TData = PermissionScopeMap>() => {
-  return useQuery<TData, ScopedAccessTokenPermissionsForScopeError, TData>({
+export const useGetEnabledEndpointsForCapability = () => {
+  return useQuery<PermissionScopeMap, ScopedAccessTokenPermissionsForScopeError>({
     queryKey: scopedAccessTokenKeys.permissions(),
     queryFn: ({ signal }) => getGetScopedTokenPermissionsForScope(signal),
   })
