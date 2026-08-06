@@ -161,10 +161,11 @@ export const getTableEditorSql = ({
         from pg_constraint c
         join pg_class csa on c.conrelid = csa.oid
         join pg_namespace nsa on csa.relnamespace = nsa.oid
-        join pg_attribute sa on (sa.attrelid = c.conrelid and sa.attnum = any(c.conkey))
+        join lateral unnest(c.conkey, c.confkey) as fk(src_attnum, tgt_attnum) on true
+        join pg_attribute sa on (sa.attrelid = c.conrelid and sa.attnum = fk.src_attnum)
         join pg_class cta on c.confrelid = cta.oid
         join pg_namespace nta on cta.relnamespace = nta.oid
-        join pg_attribute ta on (ta.attrelid = c.confrelid and ta.attnum = any(c.confkey))
+        join pg_attribute ta on (ta.attrelid = c.confrelid and ta.attnum = fk.tgt_attnum)
         where c.contype = 'f'
             and (c.conrelid = ${literal(id)} or c.confrelid = ${literal(id)})
     ),
@@ -464,10 +465,11 @@ export const getTableEditorSql = ({
         from pg_constraint c
         join pg_class csa on c.conrelid = csa.oid
         join pg_namespace nsa on csa.relnamespace = nsa.oid
-        join pg_attribute sa on (sa.attrelid = c.conrelid and sa.attnum = any(c.conkey))
+        join lateral unnest(c.conkey, c.confkey) as fk(src_attnum, tgt_attnum) on true
+        join pg_attribute sa on (sa.attrelid = c.conrelid and sa.attnum = fk.src_attnum)
         join pg_class cta on c.confrelid = cta.oid
         join pg_namespace nta on cta.relnamespace = nta.oid
-        join pg_attribute ta on (ta.attrelid = c.confrelid and ta.attnum = any(c.confkey))
+        join pg_attribute ta on (ta.attrelid = c.confrelid and ta.attnum = fk.tgt_attnum)
         where c.contype = 'f'
     ),
     columns as (
