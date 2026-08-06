@@ -65,6 +65,8 @@ services:
       - ./volumes/snippets:/app/snippets:z
       - ./volumes/functions:/app/edge-functions:ro,z
 
+  # Envoy is the default API gateway
+  # See: https://github.com/orgs/supabase/discussions/48048
   api-gw:
     container_name: supabase-envoy
     image: envoyproxy/envoy:v1.39.0
