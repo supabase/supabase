@@ -47,7 +47,8 @@ type PresetHooks = Record<keyof PresetConfig['queries'], () => PresetHookResult>
  */
 export const queriesFactory = <T extends string>(
   queries: BaseQueries<T>,
-  projectRef: string
+  projectRef: string,
+  useOtel = false
 ): PresetHooks => {
   const hooks: PresetHooks = Object.entries<ReportQuery>(queries).reduce((acc, [k, query]) => {
     if (query.queryType === 'db') {
@@ -58,16 +59,23 @@ export const queriesFactory = <T extends string>(
     } else {
       return {
         ...acc,
-        [k]: () => useLogsQuery({ projectRef }),
+        [k]: () => useLogsQuery({ projectRef, options: { useOtel } }),
       }
     }
   }, {})
   return hooks
 }
 
-export function getLogsSql(query: ReportQuery, filters: ReportFilterItem[]): SafeLogSqlFragment {
+export function getLogsSql(
+  query: ReportQuery,
+  filters: ReportFilterItem[],
+  useOtel = false
+): SafeLogSqlFragment {
   if (query.queryType !== 'logs') {
     throw new Error(`Expected logs query, got ${query.queryType}`)
+  }
+  if (useOtel && query.safeSqlOtel) {
+    return query.safeSqlOtel(filters)
   }
   return query.safeSql(filters)
 }
