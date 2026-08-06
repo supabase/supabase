@@ -22,7 +22,10 @@ import {
 
 type EvaluateTokenAccessArgs = TokenRoleContextArgs & { selection: PermissionSelection }
 
-/** Composes the two production entry points the way `useTokenAccessEvaluation` does. */
+/**
+ * Composes the two production entry points the way a consumer should: resolve the (expensive)
+ * role context once from its inputs, then apply the (cheap) selection to it on every change.
+ */
 const evaluateTokenAccess = ({ selection, ...contextArgs }: EvaluateTokenAccessArgs) =>
   applySelectionToRoleContext(computeTokenRoleContext(contextArgs), selection)
 
@@ -129,6 +132,35 @@ describe('evaluateTokenAccess', () => {
     expect(result.status).toBe('unknown')
     expect(result.exceedingEntryKeys).toEqual([])
     expect(result.entries['project:database'].status).toBe('unknown')
+  })
+
+  it('normalizes effectiveSelection on every path, not just the evaluated one', () => {
+    const selection: PermissionSelection = {
+      'project:database': 'readwrite',
+      'project:backups': 'none',
+      'not:a-real-key': 'read',
+    }
+    const expected = { 'project:database': 'readwrite' }
+
+    // Unknown path (permissions still loading)
+    expect(
+      evaluateTokenAccess({ ...baseArgs, selection, permissions: undefined }).effectiveSelection
+    ).toEqual(expected)
+    // Account path (selection tracks the owner by definition)
+    expect(
+      evaluateTokenAccess({
+        ...baseArgs,
+        selection,
+        resourceAccess: 'account',
+        organizationSlugs: [],
+        permissions: ownerRows(ORG.slug),
+      }).effectiveSelection
+    ).toEqual(expected)
+    // Evaluated path
+    expect(
+      evaluateTokenAccess({ ...baseArgs, selection, permissions: ownerRows(ORG.slug) })
+        .effectiveSelection
+    ).toEqual(expected)
   })
 
   it('passes everything the user’s role covers', () => {

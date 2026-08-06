@@ -285,7 +285,11 @@ export interface TokenAccessEvaluation {
   exceedingEntryKeys: string[]
   /** Entry keys the token's resource binding can never exercise (org entries on project tokens). */
   unavailableEntryKeys: string[]
-  /** Selection reduced to what the user's current role can exercise. */
+  /**
+   * Selection reduced to what the user's current role can exercise. Always normalized to
+   * catalog-known, non-'none' entries — including on the 'unknown' and account paths, where no
+   * reduction applies.
+   */
   effectiveSelection: PermissionSelection
 }
 
@@ -494,6 +498,15 @@ export const applySelectionToRoleContext = (
   context: TokenRoleContext,
   selection: PermissionSelection
 ): TokenAccessEvaluation => {
+  // Every path reports entries and effectiveSelection over the same normalized key set, so
+  // consumers can iterate either without special-casing 'none' modes or unknown catalog keys.
+  const selectedKeys = Object.keys(selection).filter(
+    (key) => selection[key] !== 'none' && getCatalogEntry(key) !== undefined
+  )
+  const normalizedSelection: PermissionSelection = Object.fromEntries(
+    selectedKeys.map((key) => [key, selection[key]])
+  )
+
   const base = {
     status: context.status,
     inaccessibleOrgSlugs: context.inaccessibleOrgSlugs,
@@ -502,10 +515,8 @@ export const applySelectionToRoleContext = (
     hasNoAccessibleResource: context.hasNoAccessibleResource,
     exceedingEntryKeys: [] as string[],
     unavailableEntryKeys: [] as string[],
-    effectiveSelection: selection,
+    effectiveSelection: normalizedSelection,
   }
-
-  const selectedKeys = Object.keys(selection).filter((key) => selection[key] !== 'none')
 
   // Account-scoped (legacy/user) tokens track the owner's access by definition — every entry is
   // exercisable, so requiredRole/failingResources (only read for 'exceeds-role' entries) stay inert.
