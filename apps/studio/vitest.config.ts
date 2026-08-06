@@ -18,7 +18,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@ui': resolve(__dirname, './../../packages/ui/src'),
+      '@ui': resolve(dirname, './../../packages/ui/src'),
     },
   },
   test: {
