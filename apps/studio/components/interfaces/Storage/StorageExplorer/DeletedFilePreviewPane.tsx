@@ -60,7 +60,7 @@ export const DeletedFilePreviewPane = () => {
     <>
       <div
         key={file.id}
-        className="flex h-full flex-col border-l border-overlay bg-surface-100"
+        className="absolute inset-y-0 right-0 z-10 flex flex-col border-l border-overlay bg-surface-100 shadow-lg"
         style={{ width }}
       >
         <div className="flex-1 overflow-y-auto p-4">

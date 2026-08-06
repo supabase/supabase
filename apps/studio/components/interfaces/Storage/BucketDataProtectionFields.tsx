@@ -19,13 +19,33 @@ import { type BucketProtectionFormValues } from './BucketDataProtectionFields.sc
 import { getVersioningPlanLimits } from './StorageProtection.constants'
 
 export const BucketDataProtectionFields = () => {
-  const { control } = useFormContext<BucketProtectionFormValues>()
+  const { control, getValues, setValue } = useFormContext<BucketProtectionFormValues>()
   const { data: organization, isSuccess: isOrganizationLoaded } = useSelectedOrganizationQuery()
 
   const planLimits = getVersioningPlanLimits(organization?.plan.id)
   const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
   // Avoid flashing the "upgrade" prompt before we actually know the org's plan
   const showUpgradePrompt = isOrganizationLoaded && !planLimits
+
+  // Prefill the retention fields with the plan's defaults when versioning is
+  // switched on, so the user doesn't have to fill in an empty input to proceed.
+  const handleVersioningToggle = (checked: boolean, onChange: (value: boolean) => void) => {
+    onChange(checked)
+    if (checked && planLimits) {
+      if (getValues('version_expiry_days') === '') {
+        setValue('version_expiry_days', planLimits.defaultRetentionDays, {
+          shouldDirty: true,
+          shouldValidate: true,
+        })
+      }
+      if (getValues('max_noncurrent_versions') === '') {
+        setValue('max_noncurrent_versions', planLimits.defaultVersions, {
+          shouldDirty: true,
+          shouldValidate: true,
+        })
+      }
+    }
+  }
 
   return (
     <>
@@ -49,7 +69,7 @@ export const BucketDataProtectionFields = () => {
                   size="large"
                   checked={field.value}
                   disabled={!planLimits}
-                  onCheckedChange={field.onChange}
+                  onCheckedChange={(checked) => handleVersioningToggle(checked, field.onChange)}
                 />
               </FormControl>
             </FormItemLayout>
