@@ -49,9 +49,9 @@ export const data: CustomerStoryType[] = [
     description:
       "Brevo's Revenue Operations team built three production AI workflows connecting their CRM to Dust's AI agents via Supabase MCP—without a single engineering ticket.",
     organization: 'Brevo',
-    imgUrl: 'images/customers/logos/brevo.svg',
-    logo: '/images/customers/logos/brevo.svg',
-    logo_inverse: '/images/customers/logos/light/brevo.svg',
+    imgUrl: 'images/customers/logos/brevo.png',
+    logo: '/images/customers/logos/brevo.png',
+    logo_inverse: '/images/customers/logos/light/brevo.png',
     url: '/customers/brevo',
     ctaText: 'View story',
   },
