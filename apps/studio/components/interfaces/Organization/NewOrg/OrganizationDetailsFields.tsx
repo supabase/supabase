@@ -65,6 +65,7 @@ interface OrganizationDetailsFieldsProps<TFieldValues extends FieldValues> {
   nameField?: FieldPath<TFieldValues>
   kindField?: FieldPath<TFieldValues>
   sizeField?: FieldPath<TFieldValues>
+  nameWarning?: ReactNode
   renderFieldWrapper?: (children: ReactNode, field: 'name' | 'kind' | 'size') => ReactNode
 }
 
@@ -74,6 +75,7 @@ export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
   nameField = 'name' as FieldPath<TFieldValues>,
   kindField = 'kind' as FieldPath<TFieldValues>,
   sizeField = 'size' as FieldPath<TFieldValues>,
+  nameWarning,
   renderFieldWrapper = (children) => children,
 }: OrganizationDetailsFieldsProps<TFieldValues>) => (
   <>
@@ -85,7 +87,12 @@ export const OrganizationDetailsFields = <TFieldValues extends FieldValues>({
           <FormItemLayout
             label="Name"
             layout="horizontal"
-            description="What's the name of your company or team? You can change this later."
+            description={
+              <>
+                What's the name of your company or team? You can change this later.
+                {nameWarning && <span className="block mt-1 text-warning">{nameWarning}</span>}
+              </>
+            }
           >
             <FormControl>
               <Input
