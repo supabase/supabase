@@ -24,8 +24,8 @@ export const data: CustomerStoryType[] = [
     description:
       'QA.tech is an autonomous AI testing platform whose QA agents run end-to-end testing of web and mobile products by goal and intent. Three years on Supabase took QA.tech from three founders to a global customer base, enterprise-scale daily test volume, and SOC 2 compliance.',
     organization: 'QA.tech',
-    imgUrl: 'images/customers/logos/qa-tech.svg',
-    logo: '/images/customers/logos/qa-tech.svg',
+    imgUrl: 'images/customers/logos/qa-tech.png',
+    logo: '/images/customers/logos/qa-tech.png',
     url: '/customers/qa-tech',
     ctaText: 'View story',
   },
