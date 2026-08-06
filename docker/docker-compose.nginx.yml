@@ -5,8 +5,7 @@ services:
   # either gateway, since the service is named api-gw in both cases.
   api-gw:
     ports: !reset []
-    # When using the Kong gateway override (sh run.sh config add kong),
-    # uncomment the following so Kong builds correct redirect URLs behind TLS:
+    # When using the Kong override, uncomment the following:
     #environment:
     #  KONG_PORT_MAPS: "443:8000,443:8443"
 
