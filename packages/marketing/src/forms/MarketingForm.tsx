@@ -17,6 +17,7 @@ import type { z } from 'zod'
 
 import { submitFormAction } from '../go/actions/submitForm'
 import { formFieldSchema, type GoFormFieldShowWhen } from '../go/schemas'
+import { validateCheckboxes } from './validateCheckboxes'
 
 /** Input-shape field type — fields with Zod defaults (`half`, `required`) are optional here. */
 export type MarketingFormField = z.input<typeof formFieldSchema>
@@ -214,36 +215,10 @@ export default function MarketingForm({
     e.preventDefault()
 
     // Required checkboxes aren't covered by HTML5 validation; check them manually.
-    const uncheckedRequired = visibleFields.filter(
-      (f) => f.type === 'checkbox' && f.required && !f.group && values[f.name] !== 'true'
-    )
-    if (uncheckedRequired.length > 0) {
+    const checkboxErrors = validateCheckboxes(visibleFields, values)
+    if (checkboxErrors.length > 0) {
       setSubmitState('error')
-      setErrorMessages(
-        uncheckedRequired.map((f) => `Please confirm: ${f.label.replace(/\*$/, '').trim()}`)
-      )
-      return
-    }
-
-    const requiredCheckboxGroups = new Map<string, MarketingFormField[]>()
-    visibleFields.forEach((field) => {
-      if (field.type !== 'checkbox' || !field.group || !field.groupRequired) return
-      const groupFields = requiredCheckboxGroups.get(field.group) ?? []
-      groupFields.push(field)
-      requiredCheckboxGroups.set(field.group, groupFields)
-    })
-
-    const missingRequiredGroups = Array.from(requiredCheckboxGroups.values()).filter((group) =>
-      group.every((field) => values[field.name] !== 'true')
-    )
-    if (missingRequiredGroups.length > 0) {
-      setSubmitState('error')
-      setErrorMessages(
-        missingRequiredGroups.map((group) => {
-          const labels = group.map((field) => field.label).join(', ')
-          return `Please select at least one option: ${labels}`
-        })
-      )
+      setErrorMessages(checkboxErrors)
       return
     }
     // Strip values for fields that are currently hidden so stale data doesn't leak.

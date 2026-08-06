@@ -10,7 +10,9 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@types/react": "catalog:",
@@ -26,7 +28,8 @@
     "tailwindcss": "^4.2.4",
     "tsconfig": "workspace:",
     "@typescript/native": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "license": "MIT"
 }
