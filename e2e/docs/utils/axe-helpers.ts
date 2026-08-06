@@ -4,13 +4,8 @@ import type { Result } from 'axe-core'
 
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
-/** Rules that fail the test. Everything else in WCAG_TAGS is reported only. */
 export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
 
-/**
- * `color-contrast` is 55-60% of scan time and only fires outside the article; the
- * rest target `<html>`, `<head>`, or `<body>`, which an article scan can't reach.
- */
 export const EXCLUDED_RULES = [
   'color-contrast',
   'html-has-lang',
@@ -38,7 +33,6 @@ export function shouldEnforceAll(): boolean {
   return !!process.env.A11Y_ENFORCE_ALL
 }
 
-/** Widgets that render after first paint make mid-hydration scans non-deterministic. */
 export async function settleForAxe(page: Page): Promise<void> {
   await page.waitForLoadState('domcontentloaded')
   await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
@@ -74,15 +68,10 @@ export async function scanArticle(
   surface: string,
   include: string
 ): Promise<A11yScanResult> {
-  // Legacy mode excludes cross-origin frames, so third-party embeds aren't
-  // reported as ours. Axe's `iframes: false` option does not do this.
   const scan = () => new AxeBuilder({ page }).setLegacyMode(true).include(include)
 
   const reported = await scan().withTags(WCAG_TAGS).disableRules(EXCLUDED_RULES).analyze()
 
-  // Separate pass because every rule in ENFORCED_RULES is tagged `best-practice`
-  // rather than WCAG, so the tag-based run above can never reach them. Selecting
-  // by rule and by tag are mutually exclusive in one AxeBuilder call.
   const enforced = await scan().withRules(ENFORCED_RULES).analyze()
 
   const byRule = new Map(
@@ -126,10 +115,6 @@ export function unloadedResult(
 
 export const MIN_MEANINGFUL_ELEMENTS = 20
 
-/**
- * An article this thin means the page hadn't rendered, so a clean result proves
- * nothing. Warn rather than fail, because the cause is timing, not the author.
- */
 export function scanLooksEmpty(
   result: A11yScanResult,
   minElements: number = MIN_MEANINGFUL_ELEMENTS
