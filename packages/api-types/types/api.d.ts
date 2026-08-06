@@ -3223,6 +3223,7 @@ export interface components {
           unavailableReason:
             | 'manual_migration_required'
             | 'postgres_upgrade_required'
+            | 'ssl_enforcement_required'
             | 'temporarily_unavailable'
         }
     LegacyApiKeysResponse: {

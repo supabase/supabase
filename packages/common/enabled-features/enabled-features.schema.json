@@ -117,7 +117,7 @@
     },
     "dashboard_auth:sign_in_with_chatgpt": {
       "type": "boolean",
-      "description": "Enable the sign in with chatgpt provider"
+      "description": "Enable the sign in with ChatGPT provider"
     },
     "dashboard_auth:sign_in_with_sso": {
       "type": "boolean",

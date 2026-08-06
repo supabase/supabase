@@ -193,6 +193,7 @@ const FunctionsHero = () => {
       >
         <CopyToClipboard text="supabase functions new <function-name> && supabase functions deploy <function-name>">
           <button
+            tabIndex={0}
             onClick={handleCopy}
             className="w-full px-3 py-2 group hover:border-strong flex gap-1 sm:gap-2 items-center bg-alternative rounded-xl border"
           >

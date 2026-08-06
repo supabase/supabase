@@ -124,6 +124,7 @@ export const ProjectStatusTab = () => {
         <button
           onClick={handleReset}
           disabled={isDisabled || !hasOverride}
+          tabIndex={isDisabled || !hasOverride ? -1 : 0}
           className="text-xs text-foreground-lighter hover:text-foreground transition underline disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Reset to real data

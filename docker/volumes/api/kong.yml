@@ -305,7 +305,7 @@ services:
             - anon
 
   ## Storage API endpoint (with Authorization header transformation).
-  ## No key-auth — S3 protocol requests don't carry an apikey header.
+  ## No key-auth - S3 protocol requests don't carry an apikey header.
   ##
   ## The request-transformer translates opaque API keys to asymmetric JWTs
   ## and passes through existing Authorization headers (user JWTs, AWS SigV4).

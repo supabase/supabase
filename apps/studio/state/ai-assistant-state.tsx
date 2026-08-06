@@ -7,6 +7,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -22,7 +23,12 @@ type SuggestionsType = {
 
 export type AssistantMessageType = MessageType
 
-export type SqlSnippet = string | { label: string; content: string }
+/**
+ * A query attached to the composer (the "Current Query" chip). `source` records which
+ * backend the attached query runs against, so the dialect travels with the query it
+ * describes.
+ */
+export type SqlSnippet = string | { label: string; content: string; source?: SqlSnippetSource }
 
 export type AssistantModel = AssistantModelId
 
@@ -61,6 +67,7 @@ type ChatSession = {
   createdAt: Date
   updatedAt: Date
   supportMetadata?: SupportChatMetadata
+  branchedFrom?: { chatId: string; messageId: string }
 }
 
 export type AiAssistantContext = {
@@ -152,7 +159,7 @@ async function clearStorage(): Promise<void> {
 
 // Helper function to sanitize objects to ensure they're cloneable
 // Issue due to addToolResult
-function sanitizeForCloning(obj: any): any {
+export function sanitizeForCloning(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (typeof obj !== 'object') return obj
   return JSON.parse(JSON.stringify(obj))
@@ -329,7 +336,8 @@ function createChatInstance(
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages
+          // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
+          chat.messages = messages.map((message) => sanitizeForCloning(message))
           chat.updatedAt = new Date()
         }
 
@@ -423,6 +431,46 @@ export const createAiAssistantState = (): AiAssistantState => {
       return chatId
     },
 
+    branchChat: (messageId: string) => {
+      const sourceChat = state.activeChat
+      if (!sourceChat) return
+
+      const messageIndex = sourceChat.messages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      const branchedMessages = sourceChat.messages
+        .slice(0, messageIndex + 1)
+        .map((message) => sanitizeForCloning(message))
+
+      const chatId = uuidv4()
+      const newChat: ChatSession = {
+        id: chatId,
+        name: `Branch - ${sourceChat.name}`,
+        messages: branchedMessages,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        branchedFrom: { chatId: sourceChat.id, messageId },
+      }
+
+      state.chats = {
+        ...state.chats,
+        [chatId]: newChat,
+      }
+      state.activeChatId = chatId
+
+      state.chatInstances[chatId] = ref(
+        createChatInstance(state, { id: chatId, initialMessages: branchedMessages })
+      )
+
+      const initialAiAssistantData = createInitialAiAssistantData()
+      state.initialInput = initialAiAssistantData.initialInput
+      state.sqlSnippets = initialAiAssistantData.sqlSnippets
+      state.suggestions = initialAiAssistantData.suggestions
+      state.tables = initialAiAssistantData.tables
+
+      return chatId
+    },
+
     setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => {
       const chat = state.chats[chatId]
       if (!chat?.supportMetadata) return
@@ -510,37 +558,14 @@ export const createAiAssistantState = (): AiAssistantState => {
       chat.updatedAt = new Date()
     },
 
-    saveMessage: (message: MessageType | MessageType[]) => {
-      const chat = state.activeChat
-      if (!chat) return
-
-      const incomingMessages = Array.isArray(message) ? message : [message]
-
-      const messagesToAdd: AssistantMessageType[] = []
-
-      incomingMessages.forEach((msg) => {
-        const index = chat.messages.findIndex((existing) => existing.id === msg.id)
-
-        if (index !== -1) {
-          state.updateMessage(msg)
-        } else {
-          messagesToAdd.push(msg)
-        }
-      })
-
-      if (messagesToAdd.length > 0) {
-        chat.messages.push(...messagesToAdd)
-        chat.updatedAt = new Date()
-      }
-    },
-
     updateMessage: (updatedMessage: MessageType) => {
       const chat = state.activeChat
       if (!chat) return
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage
+        // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
+        chat.messages[messageIndex] = sanitizeForCloning(updatedMessage)
         chat.updatedAt = new Date()
       }
     },
@@ -630,13 +655,13 @@ export type AiAssistantState = AiAssistantData & {
       Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
+  branchChat: (messageId: string) => string | undefined
   setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => void
   selectChat: (id: string) => void
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
   clearMessages: () => void
   deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
-  saveMessage: (message: MessageType | MessageType[]) => void
   updateMessage: (message: MessageType) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void

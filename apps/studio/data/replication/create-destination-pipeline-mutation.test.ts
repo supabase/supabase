@@ -1,6 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildDucklakeApiConfig } from './create-destination-pipeline-mutation'
+import {
+  buildDucklakeApiConfig,
+  buildPipelineApiConfig,
+} from './create-destination-pipeline-mutation'
+
+describe('buildPipelineApiConfig', () => {
+  it('maps selective initial-copy configuration to the ETL API shape', () => {
+    expect(
+      buildPipelineApiConfig({
+        publicationName: 'analytics',
+        batch: { maxFillMs: 500, maxBytes: 8_388_608, memoryBudgetRatio: 0.2 },
+        maxTableSyncWorkers: 4,
+        maxCopyConnectionsPerTable: 2,
+        invalidatedSlotBehavior: 'recreate',
+        tableSyncCopy: { type: 'skip_tables', table_ids: [101, 202] },
+      })
+    ).toEqual({
+      publication_name: 'analytics',
+      batch: { max_fill_ms: 500, max_bytes: 8_388_608, memory_budget_ratio: 0.2 },
+      max_table_sync_workers: 4,
+      max_copy_connections_per_table: 2,
+      invalidated_slot_behavior: 'recreate',
+      table_sync_copy: { type: 'skip_tables', table_ids: [101, 202] },
+    })
+  })
+})
 
 describe('buildDucklakeApiConfig', () => {
   it('maps a "Use Supabase" config with catalog-level pool size + metadata schema', () => {

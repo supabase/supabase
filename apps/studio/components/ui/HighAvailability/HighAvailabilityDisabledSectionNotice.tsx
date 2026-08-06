@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 

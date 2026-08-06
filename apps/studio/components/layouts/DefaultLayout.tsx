@@ -2,6 +2,7 @@ import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider, usePanelRef } from 'ui'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
@@ -16,6 +17,7 @@ import {
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
+import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -42,6 +44,7 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
+  useSyncScopedIntrospection()
   useCheckLatestDeploy()
 
   const { ref } = useParams()
@@ -72,13 +75,13 @@ export const DefaultLayout = ({
   }, [])
 
   useEffect(() => {
-    if (!isMounted || !panelRef.current || !activeSidebar) return
+    if (!isMounted || !panelRef.current || !activeSidebar || isMobile) return
     if (isMaximised) {
       panelRef.current.collapse()
     } else {
       panelRef.current.resize(`${contentMaxSizePercentage}%`)
     }
-  }, [isMounted, isMaximised, panelRef, activeSidebar])
+  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).
@@ -92,9 +95,7 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <a className="sr-only" href="#main" tabIndex={0}>
-                Skip to content
-              </a>
+              <SkipToContent href="#main" />
               {/* Top Banner */}
               <AppBannerWrapper />
               <div className="shrink-0">
@@ -125,7 +126,7 @@ export const DefaultLayout = ({
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <main id="main" className="h-full overflow-y-auto">
+                    <main id="main" tabIndex={-1} className="h-full overflow-y-auto outline-hidden">
                       {children}
                     </main>
                   </ResizablePanel>

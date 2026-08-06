@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useState } from 'react'
+import { RefObject, useEffect, useState, type ReactNode } from 'react'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import { toast } from 'sonner'
 import {
@@ -24,11 +24,20 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
+  typeSelection?: ReactNode
+  checkIsDirtyRef?: RefObject<() => boolean>
   onSuccess: () => void
   onClose: () => void
+  onCancel?: () => void
 }
 
-export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) => {
+export const ReadReplicaForm = ({
+  typeSelection,
+  checkIsDirtyRef,
+  onSuccess,
+  onClose,
+  onCancel = onClose,
+}: ReadReplicaFormProps) => {
   const { ref: projectRef } = useParams()
   const { data } = useReadReplicasQuery({ projectRef })
 
@@ -38,6 +47,16 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
   const { can: canDeployReplica } = useCheckEligibilityDeployReplica()
 
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
+  const isDirty = selectedRegion !== defaultRegion
+
+  useEffect(() => {
+    if (!checkIsDirtyRef) return
+
+    checkIsDirtyRef.current = () => isDirty
+    return () => {
+      checkIsDirtyRef.current = () => false
+    }
+  }, [checkIsDirtyRef, isDirty])
 
   const { mutate: setUpReplica, isPending: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
@@ -66,13 +85,13 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
 
   return (
     <>
-      {!canDeployReplica && (
-        <SheetSection>
-          <ReadReplicaEligibilityWarnings />
-        </SheetSection>
-      )}
-
       <SheetSection className="grow overflow-auto px-0 py-0">
+        {typeSelection}
+        {!canDeployReplica && (
+          <SheetSection>
+            <ReadReplicaEligibilityWarnings />
+          </SheetSection>
+        )}
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"
@@ -117,7 +136,7 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
         </div>
 
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSettingUp} variant="default" onClick={onClose}>
+          <Button disabled={isSettingUp} variant="default" onClick={onCancel}>
             Cancel
           </Button>
           <Button disabled={!canDeployReplica} loading={isSettingUp} onClick={onSubmit}>

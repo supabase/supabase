@@ -175,6 +175,19 @@ export interface CopilotMcpConfig extends McpClientBaseConfig {
   }
 }
 
+/**
+ * Configuration format for Kimi Code CLI MCP client.
+ * Kimi keys the server transport with `transport` (not `type`).
+ */
+export interface KimiMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      transport: 'http'
+      url: string
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
   | AntigravityMcpConfig
@@ -186,6 +199,7 @@ export type McpClientConfig =
   | FactoryMcpConfig
   | GeminiMcpConfig
   | GooseMcpConfig
+  | KimiMcpConfig
   | McpClientBaseConfig
   | OpenCodeMcpConfig
   | OtherMcpConfig

@@ -34,7 +34,7 @@ Docs: `apps/design-system/content/docs/ui-patterns/forms.mdx`
 
 - Use `react-hook-form` + `zod`
 - Use `FormItemLayout` instead of manually composing `FormItem`/`FormLabel`/`FormMessage`/`FormDescription`
-- Wrap inputs with `FormControl`; use `_Shadcn_` imports from `ui` for primitives
+- Wrap inputs with `FormControl`; import primitives from `ui`
 
 Layout selection:
 
@@ -125,6 +125,10 @@ Forms in sheets:
 
 - `layout="horizontal"` for wider sheets
 - `layout="vertical"` for narrow sheets (`size="sm"` or below)
+- When the sheet contains a form, wire dirty dismissal with `useConfirmOnClose` +
+  `DiscardChangesConfirmationDialog` (Cancel, Escape, and backdrop). Source of
+  truth: `apps/design-system/content/docs/ui-patterns/modality.mdx` (Dirty form
+  dismissal). Also see the react-hook-form skill for `isDirty` destructuring.
 
 ## Copy
 

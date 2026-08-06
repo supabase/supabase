@@ -3,8 +3,11 @@
   "main": "./src/icons/index.ts",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts",
-    "clean": "rimraf node_modules .turbo"
+    "build:icons": "node ./scripts/validateIcons.mjs && build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts",
+    "test": "node --test ./scripts/validateIcons.test.mjs",
+    "typecheck": "tsc --noEmit",
+    "validate:icons": "node ./scripts/validateIcons.mjs",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@typescript/native": "catalog:",
@@ -12,7 +15,8 @@
     "@supabase/build-icons": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "catalog:"
+    "@types/react": "catalog:",
+    "tsconfig": "workspace:*"
   },
   "peerDependencies": {
     "react": "catalog:"
