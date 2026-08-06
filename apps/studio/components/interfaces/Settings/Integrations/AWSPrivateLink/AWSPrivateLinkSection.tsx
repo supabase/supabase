@@ -19,6 +19,7 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAWSAccountDeleteMutation } from '@/data/aws-accounts/aws-account-delete-mutation'
 import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
 import { useAWSAccountsQuery } from '@/data/aws-accounts/aws-accounts-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -59,7 +60,14 @@ export const AWSPrivateLinkSection = () => {
 
   const onConfirmDelete = () => {
     if (selectedAccount && project) {
-      deleteAccount({ projectRef: project.ref, awsAccountId: selectedAccount.aws_account_id })
+      deleteAccount({
+        projectRef: project.ref,
+        awsAccountId: selectedAccount.aws_account_id,
+        databaseIdentifier:
+          selectedAccount.database_type === 'READ_REPLICA'
+            ? selectedAccount.database_identifier
+            : undefined,
+      })
     }
   }
 
@@ -101,7 +109,7 @@ export const AWSPrivateLinkSection = () => {
                 <ResourceList>
                   {accounts?.map((account) => (
                     <AWSPrivateLinkAccountItem
-                      key={account.aws_account_id}
+                      key={`${account.aws_account_id}-${account.database_identifier ?? 'primary'}`}
                       {...account}
                       onEdit={() => onEditAccount(account)}
                       onDelete={() => onDeleteAccount(account)}
@@ -134,6 +142,15 @@ export const AWSPrivateLinkSection = () => {
         <p className="text-sm text-foreground-light">
           Are you sure you want to delete the AWS account connection for{' '}
           {selectedAccount?.aws_account_id}?
+        </p>
+        <p className="text-sm text-foreground-lighter mt-1">
+          Database:{' '}
+          {selectedAccount &&
+            ` ${
+              selectedAccount.database_type === 'READ_REPLICA'
+                ? `Read replica (ID: ${selectedAccount.database_identifier ? formatDatabaseID(selectedAccount.database_identifier) : 'Unknown identifier'})`
+                : 'Primary database'
+            }`}
         </p>
       </ConfirmationModal>
     </>

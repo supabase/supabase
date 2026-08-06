@@ -3048,6 +3048,10 @@ export const telemetry: NavMenuConstant = {
               url: 'https://docs.datadoghq.com/integrations/supabase/' as `/${string}`,
             },
             {
+              name: 'Elastic',
+              url: 'https://www.elastic.co/docs/reference/integrations/supabase' as `/${string}`,
+            },
+            {
               name: 'Vendor-agnostic setup',
               url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
             },
@@ -3058,7 +3062,7 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
         },
         {
-          name: 'Tracing with the JS SDK',
+          name: 'Tracing with the client SDKs',
           url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
       ],
@@ -3626,7 +3630,7 @@ export const references = [
         label: 'Management API',
         description: 'something about the reference',
         icon: '/docs/img/icons/api-icon.svg',
-        url: '/reference/management-api/start',
+        url: '/reference/api/introduction',
       },
     ],
   },

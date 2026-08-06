@@ -104,6 +104,7 @@ Fady A
 Fatuma Abdullahi
 Felipe Stival
 Ferhat Elmas
+Filipe Cabaco
 Firas El Rachidi
 Francesco Sansalvadore
 Gabriel Claudino
@@ -203,6 +204,7 @@ Matthew Hambright
 Matt Hudson
 Matt Johnston
 Matt Rossman
+Matt Smiley
 Matthias Luft
 Mats Kindahl
 Mert Yerekapan
@@ -271,6 +273,7 @@ Shaii O
 Shane Adams
 Shane E
 Shaun Newman
+Shardul Borhade
 Shreekar Shetty
 Sreyas Udayavarman
 Stephanie Jackson (stejacks)
@@ -294,6 +297,7 @@ Tim Frietas
 Tim Palmer
 Timothy Lim
 Tina Ha
+Tobias Pfeiffer
 Tom Ashley
 Tom G
 Tomás Pozo

@@ -15,6 +15,14 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
+## [0.7.2](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.7.2) - 2026-08-04
+
+### Utils and tests
+- Fixed `update.sh` overwriting itself during an update; the new `update.sh` is now staged as `update.sh.new` for review instead of replacing the running script - PR [#48690](https://github.com/supabase/supabase/pull/48690)
+- `update.sh` now fetches only the `docker/` directory (partial clone), making updates substantially faster and lighter - PR [#48690](https://github.com/supabase/supabase/pull/48690)
+
+---
+
 ## [0.7.1](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.7.1) - 2026-08-03
 
 ### Configuration
