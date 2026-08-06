@@ -22,7 +22,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { analyticsKeys } from '@/data/analytics/keys'
-import { useContentQuery } from '@/data/content/content-query'
+import { ContentOfType, useContentQuery } from '@/data/content/content-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -73,7 +73,9 @@ const Reports = () => {
   })
   const track = useTrack()
 
-  const currentReport = userContents?.content.find((report) => report.id === reportId)
+  const currentReport = userContents?.content.find(
+    (report): report is ContentOfType<'report'> => report.id === reportId
+  )
   const currentReportContent = currentReport?.content as Dashboards.Content
 
   const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(

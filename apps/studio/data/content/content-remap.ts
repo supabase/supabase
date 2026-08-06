@@ -5,8 +5,18 @@
 // Both database (`type: 'sql'`) and logs (`type: 'log_sql'`) snippets carry user-authored SQL
 // under the same wire field, but each is branded with its own untrusted brand so Postgres SQL
 // and logs SQL can never cross execution paths. Branding is per-type and never mixed.
+//
+// Notebooks (`type: 'notebook'`) carry the same kind of untrusted SQL, but nested per-cell
+// rather than as a single top-level field, so they go through the dedicated notebook schemas
+// (data/content/notebooks/notebook-schema.ts) instead of the single-field swap below.
 import { untrustedSql } from '@supabase/pg-meta'
 
+import {
+  notebookDomainSchema,
+  type Cell,
+  type CellWire,
+  type NotebookContent,
+} from './notebooks/notebook-schema'
 import type { SnippetStatus } from './snippet-status'
 import type { SnippetWithContent } from './sql-folders-query'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
@@ -15,7 +25,30 @@ function isSqlContentType(type: string): type is 'sql' | 'log_sql' {
   return type === 'sql' || type === 'log_sql'
 }
 
+function isNotebookContentType(type: string): type is 'notebook' {
+  return type === 'notebook'
+}
+
+// Reverse of the per-cell branding `notebookDomainSchema` applies on the way in: strips
+// `unchecked_sql` back to a plain `sql` field for the wire.
+function unmapNotebookCell(cell: Cell): CellWire {
+  switch (cell._tag) {
+    case 'markdown_cell':
+      return cell
+    case 'database_cell':
+    case 'log_cell': {
+      const { unchecked_sql, ...rest } = cell
+      return { ...rest, sql: unchecked_sql }
+    }
+  }
+}
+
 export function remapSqlContentField<T extends { type: string }>(item: T): T {
+  if (isNotebookContentType(item.type)) {
+    if (!('content' in item)) return item
+    const content = notebookDomainSchema.parse(item.content)
+    return { ...item, content } as T
+  }
   if (!isSqlContentType(item.type)) return item
   if (!('content' in item)) return item
   const content = item.content as Record<string, unknown>
@@ -43,6 +76,11 @@ export function remapWireSnippet(row: unknown, status: SnippetStatus): SnippetWi
 
 // Reverse remap: `unchecked_sql` → `sql` before sending to the API.
 export function unmapSqlContentField<T extends { type: string }>(item: T): T {
+  if (isNotebookContentType(item.type)) {
+    if (!('content' in item)) return item
+    const content = item.content as NotebookContent
+    return { ...item, content: { ...content, cells: content.cells.map(unmapNotebookCell) } } as T
+  }
   if (!isSqlContentType(item.type)) return item
   if (!('content' in item)) return item
   const content = item.content as Record<string, unknown>
