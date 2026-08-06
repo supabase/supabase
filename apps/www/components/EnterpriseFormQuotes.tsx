@@ -10,6 +10,7 @@ interface TabProps {
 
 const Tab = ({ isActive, label, onClick }: TabProps) => (
   <button
+    tabIndex={0}
     onClick={onClick}
     className={`text-left text-lg flex flex-col group gap-1 transition-opacity flex-1 ${
       isActive ? 'opacity-100' : 'opacity-50'

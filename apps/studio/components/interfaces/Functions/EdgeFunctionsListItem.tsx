@@ -62,7 +62,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       onAuxClick={handleNavigation}
       onKeyDown={handleNavigation}
       tabIndex={0}
-      className="cursor-pointer inset-focus"
+      className="cursor-pointer focus-inset"
     >
       <TableCell>
         <p className="text-sm text-foreground whitespace-nowrap py-2">{item.name}</p>

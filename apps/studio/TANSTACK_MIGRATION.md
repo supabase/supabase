@@ -156,6 +156,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
 - [x] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
+- [x] A `routes/project/$ref/explorer.tsx` ← `pages/project/[ref]/explorer/index.tsx` (new placeholder page; leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
 
 ### Project shell — `/api/*`
 
@@ -289,7 +290,6 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/settings/general.tsx` ← `pages/project/[ref]/settings/general.tsx`
 - [x] A `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
 - [x] A `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx` (sets `skipSettingsLayout: true` — page is a useEffect redirect)
-- [x] A `routes/project/$ref/settings/compute-and-disk.tsx` ← `pages/project/[ref]/settings/compute-and-disk.tsx`
 - [x] A `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
 - [x] A `routes/project/$ref/settings/infrastructure.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
 - [x] A `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
@@ -599,4 +599,5 @@ for the Vite pipeline:
 - Delete `pages/_app.tsx`, `pages/_document.tsx`, `pages/_error.jsx`, `pages/500.tsx`, `pages/404.tsx` (Next-only catch-alls; TanStack equivalents on `__root.tsx`).
 - Drop the `dev:next` / `build:next` / `start:next` scripts from `apps/studio/package.json` once we're committed to TanStack.
 - Remove the `apps/studio/pages/**` `path_instructions` guardrail entry from `.coderabbit.yaml` (added in FE-3423; remove it as part of this FE-3106 cleanup) — it's only useful while both runtimes coexist.
+- Remove the "TanStack Start migration" section from `apps/studio/CLAUDE.md` — it only applies while both runtimes coexist.
 - Delete this file.

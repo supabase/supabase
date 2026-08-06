@@ -434,6 +434,7 @@ export default function FormPatternsPageLayout() {
                               <p className="text-xs text-foreground-lighter">
                                 Drag and drop or{' '}
                                 <button
+                                  tabIndex={0}
                                   type="button"
                                   onClick={() => fileUploadRef.current?.click()}
                                   className="underline cursor-pointer hover:text-foreground-light"

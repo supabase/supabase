@@ -71,7 +71,7 @@ export const QueryPerformanceMetrics = () => {
                           type="button"
                           tabIndex={0}
                           aria-label="How are slow queries calculated?"
-                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-ring"
                           onClick={(e) => {
                             e.stopPropagation()
                           }}
@@ -92,7 +92,7 @@ export const QueryPerformanceMetrics = () => {
                           type="button"
                           tabIndex={0}
                           aria-label={`What is ${card.title}?`}
-                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-foreground-lighter"
+                          className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-ring"
                           onClick={(e) => {
                             e.stopPropagation()
                           }}

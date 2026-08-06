@@ -1352,6 +1352,11 @@ export const examples: Registry = [
     files: ['example/info-tooltip-demo.tsx'],
   },
   {
+    name: 'skip-to-content-demo',
+    type: 'components:example',
+    files: ['example/skip-to-content-demo.tsx'],
+  },
+  {
     name: 'page-container-demo',
     type: 'components:example',
     files: ['example/page-container-demo.tsx'],
@@ -1404,6 +1409,11 @@ export const examples: Registry = [
     files: ['example/connect-interstitial-demo.tsx'],
   },
   {
+    name: 'connect-interstitial-action-error',
+    type: 'components:example',
+    files: ['example/connect-interstitial-action-error.tsx'],
+  },
+  {
     name: 'connect-interstitial-logo-pair',
     type: 'components:example',
     files: ['example/connect-interstitial-logo-pair.tsx'],
@@ -1412,6 +1422,16 @@ export const examples: Registry = [
     name: 'connect-interstitial-logo-single',
     type: 'components:example',
     files: ['example/connect-interstitial-logo-single.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-unknown',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-unknown.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-uploaded',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-uploaded.tsx'],
   },
   {
     name: 'page-layout-auth-emails',

@@ -1,7 +1,6 @@
 import { useParams } from 'common'
 import { Check, KeyRound } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Badge } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -21,6 +20,8 @@ import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/Conne
 import {
   buildConnectionParameters,
   buildConnectionStringWithPassword,
+  buildJdbcString,
+  buildPsqlCommand,
   buildSafeConnectionString,
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
@@ -39,12 +40,6 @@ import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
-const buildPsqlCommand = (params: { host: string; port: string; database: string; user: string }) =>
-  `psql -h ${params.host} -p ${params.port} -d ${params.database} -U ${params.user}`
-
-const buildJdbcString = (params: { host: string; port: string; database: string; user: string }) =>
-  `jdbc:postgresql://${params.host}:${params.port}/${params.database}?user=${params.user}&password=${PASSWORD_PLACEHOLDER}`
-
 /**
  * [Joshen] ConnectStepsSection does something similar but since only this page needs to consider connection strings
  * from all databases (including read replicas), am opting to separate the logic for retrieving connection strings here
@@ -55,10 +50,18 @@ const buildJdbcString = (params: { host: string; port: string; database: string;
 const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
-  const { data: pgbouncerConfig } = usePgbouncerConfigQuery({ projectRef })
-  const { data: supavisorConfig } = useSupavisorConfigurationQuery({ projectRef })
+  // Multigres has no pooler, so the pooler config endpoints don't apply
+  const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
+  const { data: supavisorConfig } = useSupavisorConfigurationQuery(
+    { projectRef },
+    { enabled: !isHighAvailability }
+  )
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
@@ -116,6 +119,7 @@ const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
             connectionStringsShared,
             connectionStringsDedicated,
             ipv4Addon: !!ipv4Addon,
+            isHighAvailability,
           }),
         ]
       })
@@ -128,6 +132,7 @@ const useConnectionStringDatabases = (deploymentMode: DeploymentMode) => {
     ipv4Addon,
     projectRef,
     deploymentMode,
+    isHighAvailability,
   ])
 }
 
@@ -225,23 +230,38 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const poolerBadge =
     connectionMethod === 'transaction'
       ? useSharedPooler || !hasDedicatedPooler
-        ? 'Shared Pooler'
-        : 'Dedicated Pooler'
+        ? 'Shared pooler'
+        : 'Dedicated pooler'
       : connectionMethod === 'session'
-        ? 'Shared Pooler'
+        ? 'Shared pooler'
         : null
 
+  const showPasswordPlaceholder = connectionString.includes(PASSWORD_PLACEHOLDER)
   const showSelfHostedDirectNotice = deploymentMode.isSelfHosted && connectionMethod === 'direct'
+  const showPoolerTitle = deploymentMode.isPlatform && !!poolerBadge && !isHighAvailability
+  const showResetInTitle =
+    deploymentMode.isPlatform && showPasswordPlaceholder && !temporaryDatabasePassword
+  const showStringTitleRow = showPoolerTitle || showResetInTitle
 
   return (
-    <div className="flex flex-col gap-2">
-      {deploymentMode.isPlatform && poolerBadge && !isHighAvailability && (
-        <div className="flex items-center gap-x-2">
-          <Badge>{poolerBadge}</Badge>
-        </div>
-      )}
-      {connectionString.includes(PASSWORD_PLACEHOLDER) && <PasswordEncodingNote />}
+    <div className="flex flex-col gap-3">
       <div className="overflow-hidden rounded-lg border bg-surface-75">
+        {showStringTitleRow && (
+          <div className="flex items-center justify-between gap-2 border-b bg-surface-100 py-2 pl-4 pr-2">
+            {showPoolerTitle ? (
+              <span className="text-xs text-foreground-light">{poolerBadge}</span>
+            ) : (
+              <span />
+            )}
+            {showResetInTitle && (
+              <ResetDbPasswordDialog
+                triggerLabel="Reset database password"
+                triggerIcon={<KeyRound />}
+                onPasswordReset={setTemporaryDatabasePassword}
+              />
+            )}
+          </div>
+        )}
         <div data-connect-copy-value={redactedConnectionString}>
           <CodeBlock
             className="rounded-none border-0 [&_code]:text-foreground"
@@ -254,28 +274,16 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
             {connectionString}
           </CodeBlock>
         </div>
-        {deploymentMode.isPlatform && (
-          <div className="flex flex-col gap-2 border-t px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm text-foreground-light">
-              {temporaryDatabasePassword ? (
-                <span className="flex items-center gap-2">
-                  <Check size={16} className="text-brand shrink-0" />
-                  <span>New password shown until refresh.</span>
-                </span>
-              ) : (
-                'Forgot your database password?'
-              )}
-            </div>
-            <ResetDbPasswordDialog
-              triggerLabel="Reset password"
-              triggerIcon={<KeyRound />}
-              onPasswordReset={setTemporaryDatabasePassword}
-            />
+        {deploymentMode.isPlatform && temporaryDatabasePassword && (
+          <div className="flex items-center gap-2 border-t px-4 py-3 text-sm text-foreground-light">
+            <Check size={16} className="text-brand shrink-0" />
+            <span>New password shown until refresh.</span>
           </div>
         )}
       </div>
+      {showPasswordPlaceholder && <PasswordEncodingNote />}
       {showSelfHostedDirectNotice && (
-        <p className="text-sm text-foreground-light">
+        <p className="text-sm text-foreground-lighter">
           Manually{' '}
           <InlineLink
             href={`${DOCS_URL}/guides/self-hosting/docker#exposing-your-postgres-database`}

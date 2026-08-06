@@ -2502,6 +2502,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "skip-to-content-demo": {
+      name: "skip-to-content-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/skip-to-content-demo")),
+      source: "",
+      files: ["registry/default/example/skip-to-content-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "page-container-demo": {
       name: "page-container-demo",
       type: "components:example",
@@ -2612,6 +2623,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "connect-interstitial-action-error": {
+      name: "connect-interstitial-action-error",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-action-error")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-action-error.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "connect-interstitial-logo-pair": {
       name: "connect-interstitial-logo-pair",
       type: "components:example",
@@ -2630,6 +2652,28 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logo-single")),
       source: "",
       files: ["registry/default/example/connect-interstitial-logo-single.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "connect-interstitial-logo-unknown": {
+      name: "connect-interstitial-logo-unknown",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logo-unknown")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-logo-unknown.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "connect-interstitial-logo-uploaded": {
+      name: "connect-interstitial-logo-uploaded",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logo-uploaded")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-logo-uploaded.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

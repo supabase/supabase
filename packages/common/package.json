@@ -26,16 +26,16 @@
     "valtio": "catalog:"
   },
   "devDependencies": {
-    "lucide-react": "*",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
+    "lucide-react": "*",
     "tsconfig": "workspace:*",
     "type-fest": "5.6.0",
-    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

@@ -10,6 +10,12 @@ export function isVercelUrl(url: string): boolean {
   }
 }
 
+/** Returns `next` when it is a safe Vercel return URL; otherwise undefined. */
+export function getValidVercelReturnUrl(next: string | undefined): string | undefined {
+  if (typeof next === 'string' && isVercelUrl(next)) return next
+  return undefined
+}
+
 export function findVercelIntegrationByConfigurationId(
   integrations: Integration[] | undefined,
   configurationId: string | undefined

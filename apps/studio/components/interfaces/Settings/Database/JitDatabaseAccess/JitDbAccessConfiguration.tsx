@@ -23,7 +23,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
@@ -42,6 +42,7 @@ import {
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
 import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -379,7 +380,7 @@ export const JitDbAccessConfiguration = () => {
               actions={
                 unavailableReason === 'postgres_upgrade_required' && ref ? (
                   <Button variant="default" asChild>
-                    <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres</Link>
+                    <Link href={getServiceVersionsPath(ref)}>Upgrade Postgres</Link>
                   </Button>
                 ) : unavailableReason === 'ssl_enforcement_required' && ref ? (
                   <Button variant="default" asChild>
