@@ -159,15 +159,18 @@ export const legacyOauthScopeToFgaPermissionMap: Record<string, string[]> = {
 /*
  * Build a map of MCP tools/FGA permissions by mapping their OAuth Scopes to the FGA permissions:
  * {
- *    apply_migration: ["project_admin_write", ...]
+ *    apply_migration: [["project_admin_write", ...]]
  * }
+ * The derivation yields a single conjunctive group per tool, so each becomes one alternative. A
+ * tool whose bundles expand to nothing stays gated rather than becoming ungated (`[]`, not `[[]]`).
  * The code is duplicated from platform until we find a better way to share those mappings
  */
 export const MCPToolScopeMappings = Object.entries(MCPToolOAuthScopeMapping).reduce(
   (acc, [mcpTool, oAuthScopes]) => {
-    acc[mcpTool] = oAuthScopes.flatMap(
+    const scopes = oAuthScopes.flatMap(
       (oAuthScope) => legacyOauthScopeToFgaPermissionMap[oAuthScope]
     )
+    acc[mcpTool] = scopes.length > 0 ? [scopes] : []
     return acc
   },
   {} as McpMap
