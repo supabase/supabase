@@ -12,11 +12,14 @@ import {
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import type { EditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
+import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
+  explorer: ['notebook'],
 }
 
 export type TabType = ENTITY_TYPE | 'sql'
@@ -44,6 +47,14 @@ export interface Tab {
     tableId?: number
     sqlId?: string
     scrollTop?: number
+    /**
+     * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
+     * so the tab can show the matching icon without re-fetching the snippet.
+     * Absent on tabs persisted before this field existed — treat absent as
+     * `'database'` and backfill from the loaded snippet (source is immutable, so
+     * it never goes stale once set).
+     */
+    sqlSource?: SqlSnippetSource
   }
   isPreview?: boolean
   createdAt?: Date
@@ -98,6 +109,7 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    sqlSource?: SqlSnippetSource
   }
 }
 
@@ -270,22 +282,35 @@ export function createTabsState(projectRef: string) {
       store.previewTabId = tab.id
       store.activeTab = tab.id
     },
-    updateTab: (id: string, updates: { label?: string; scrollTop?: number }) => {
-      if (!!store.tabsMap[id]) {
-        if ('label' in updates) {
-          store.tabsMap[id].label = updates.label
-          // Keep the persisted name aligned with the visible label so browser titles
-          // and tab state recover cleanly after entity renames.
-          if (typeof updates.label === 'string' && store.tabsMap[id].metadata) {
-            store.tabsMap[id].metadata.name = updates.label
-          }
+    updateTab: (
+      id: string,
+      updates: { label?: string; scrollTop?: number; sqlSource?: SqlSnippetSource }
+    ) => {
+      const tab = store.tabsMap[id]
+      if (!tab) return
 
-          const recentItem = store.recentItems.find((item) => item.id === id)
-          if (recentItem) syncRecentItemWithTab(recentItem, store.tabsMap[id])
+      if ('label' in updates) {
+        tab.label = updates.label
+        // Keep the persisted name aligned with the visible label so browser titles
+        // and tab state recover cleanly after entity renames.
+        if (typeof updates.label === 'string' && tab.metadata) {
+          tab.metadata.name = updates.label
         }
-        if ('scrollTop' in updates && store.tabsMap[id].metadata) {
-          store.tabsMap[id].metadata.scrollTop = updates.scrollTop
-        }
+
+        const recentItem = store.recentItems.find((item) => item.id === id)
+        if (recentItem) syncRecentItemWithTab(recentItem, tab)
+      }
+      if ('scrollTop' in updates && tab.metadata) {
+        tab.metadata.scrollTop = updates.scrollTop
+      }
+      // Backfill the immutable source onto a tab (and its recent item) that
+      // predates the field, so its icon resolves correctly once the snippet loads.
+      if (updates.sqlSource !== undefined) {
+        if (tab.metadata) tab.metadata.sqlSource = updates.sqlSource
+        else tab.metadata = { sqlSource: updates.sqlSource }
+
+        const recentItem = store.recentItems.find((item) => item.id === id)
+        if (recentItem) syncRecentItemWithTab(recentItem, tab)
       }
     },
     // Function to remove a tab from the store
@@ -446,7 +471,7 @@ export function createTabsState(projectRef: string) {
     }: {
       id: string
       router: NextRouter
-      editor?: 'sql' | 'table'
+      editor?: EditorType
       onClose?: (id: string) => void
       onClearDashboardHistory: () => void
     }) => {

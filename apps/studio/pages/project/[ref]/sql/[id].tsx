@@ -2,11 +2,12 @@ import { usePrevious } from '@uidotdev/usehooks'
 import { useParams } from 'common/hooks/useParams'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
+import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -107,10 +108,32 @@ const SqlEditor: NextPageWithLayout = () => {
       metadata: {
         sqlId: id,
         name: snippet?.name,
+        // The snippet may not be loaded yet at tab-creation time; the effect
+        // below backfills the source once it is. Source is immutable, so once
+        // set it never needs updating again.
+        ...(snippet !== undefined && { sqlSource: getSnippetSource(snippet) }),
       },
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, id])
+
+  // Backfill the tab's source once the snippet loads. Covers both a freshly
+  // created tab whose snippet arrived after creation and tabs persisted before
+  // `sqlSource` existed (absent → filled from the loaded snippet type). Reads the
+  // latest tabs snapshot via useEffectEvent so the effect only re-runs on id/snippet.
+  const backfillTabSource = useEffectEvent(() => {
+    if (!id || id === 'new' || snippet === undefined) return
+
+    const tabId = createTabId('sql', { id })
+    const tab = tabs.tabsMap[tabId]
+    if (tab !== undefined && tab.metadata?.sqlSource === undefined) {
+      tabs.updateTab(tabId, { sqlSource: getSnippetSource(snippet) })
+    }
+  })
+  useEffect(() => {
+    backfillTabSource()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't correctly ignore useEffectEvent yet)
+  }, [id, snippet])
 
   // The snippet no longer exists (e.g. deleted from another tab or session): clean up
   // any stale tab and dashboard history references so navigation doesn't resurrect it,

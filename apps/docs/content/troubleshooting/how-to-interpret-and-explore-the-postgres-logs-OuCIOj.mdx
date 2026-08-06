@@ -191,7 +191,7 @@ Queries can use complex syntax, so it is often helpful to isolate by referenced 
 
 All failed queries, including those from PostgREST, Auth, and external libraries (e.g., Prisma) are logged with helpful error messages for debugging.
 
-##### Server/Role mapping
+#### Server/Role mapping
 
 API servers have assigned database roles for connecting to the database:
 
@@ -257,7 +257,7 @@ limit 100;
 
 ## Logging for compliance and security
 
-#### Customized object and role activity logging
+### Customized object and role activity logging
 
 > ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](/docs/guides/database/postgres/roles) to interact with their database. Those using the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
 
@@ -279,7 +279,7 @@ where
  parsed.user_name = 'API_role'
 ```
 
-#### Filtering by IP
+### Filtering by IP
 
 > If you are connecting from a known, limited range of IP addresses, you should enable [network restrictions](/docs/guides/platform/network-restrictions).
 
@@ -341,7 +341,7 @@ where
 
 > WARNING: lenient settings can lead to over-logging, impacting database performance while creating noise in the logs.
 
-##### Severity levels
+#### Severity levels
 
 The `log_min_messages` variable determines what is severe enough to log. Here are the severity thresholds from the [Postgres docs](https://www.postgresql.org/docs/current/runtime-config-logging.html).
 
@@ -365,7 +365,7 @@ alter role postgres set log_min_messages = '<NEW VALUE>';
 show log_min_messages; -- default WARNING
 ```
 
-##### Configuring queries logged
+#### Configuring queries logged
 
 By default, only failed queries are logged. The [PGAudit extension](/docs/guides/database/extensions/pgaudit) extends Postgres's built-in logging abilities. It can be used to selectively track all queries in your database by:
 
@@ -374,29 +374,29 @@ By default, only failed queries are logged. The [PGAudit extension](/docs/guides
 - database object
 - entire database
 
-##### Logging within database functions
+#### Logging within database functions
 
 To track or debug functions, logging can be configured by following the [function debugging guide](/docs/guides/database/functions#general-logging)
 
 ## Frequently Asked Questions
 
-##### How to join different log tables
+### How to join different log tables
 
 No, log tables are independent from each other and do not share any primary/foreign key relations for joining.
 
-##### How to download logs
+### How to download logs
 
 At the moment, the way to download logs is through the Log Dashboard as a CSV
 
-##### What is logged?
+### What is logged?
 
 To see the default types of events that are logged, you can check this [guide](https://gist.github.com/TheOtherBrian1/991d32c2b00dbc75d29b80d4cdf41aa7).
 
-#### Other resources:
+### Other resources:
 
 - [Regex for filtering logs](https://github.com/orgs/supabase/discussions/22640)
 - [Debugging with the DB API logs](https://github.com/orgs/supabase/discussions/22849)
 - [Debugging Database Functions](/docs/guides/database/functions#debugging-functions)
 - [pg_audit](/docs/guides/database/extensions/pgaudit)
-- [Supabase Logging](/docs/guides/telemetry/logs)
+- [Supabase Logging](/docs/guides/monitoring-and-debugging/logs)
 - [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)

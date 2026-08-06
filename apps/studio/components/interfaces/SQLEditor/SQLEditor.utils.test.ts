@@ -16,6 +16,7 @@ import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   computeErrorHighlightLine,
+  createSqlSnippetSkeletonV2,
   deriveSnippetIdentity,
   extractDebugContext,
   filterTablesCoveredByEnsureRLSTrigger,
@@ -28,6 +29,7 @@ import {
   resolveConnectionString,
   resolveDiffKeyAction,
   shouldAutoGenerateTitle,
+  sqlSourceToDialect,
   trimTrailingSemicolons,
 } from './SQLEditor.utils'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
@@ -391,12 +393,25 @@ describe('SQLEditor.utils.ts:buildDebugChatArgs', () => {
   test('builds the newChat payload from the snippet sql and error message', () => {
     const snippet = buildDebugSnippet('select 1;')
     const result = { error: { message: 'relation does not exist' } }
-    expect(buildDebugChatArgs(snippet, result)).toEqual({
+    expect(buildDebugChatArgs(snippet, result, 'database')).toEqual({
       name: 'Debug SQL snippet',
-      sqlSnippets: ['select 1;'],
+      sqlSnippets: [{ label: 'Current Query', content: 'select 1;', source: 'database' }],
       initialInput:
         'Help me to debug the attached sql snippet which gives the following error: \n\nrelation does not exist',
     })
+  })
+
+  // The attachment is what puts sqlSource on the message the user then submits, so
+  // the debug flow has to attach a sourced snippet, not a bare string.
+  test('attaches the query with its source and names the dialect', () => {
+    const snippet = buildDebugSnippet('select count(*) from logs;')
+    const result = { error: { message: 'Unknown expression identifier' } }
+    expect(buildDebugChatArgs(snippet, result, 'logs').sqlSnippets).toEqual([
+      { label: 'Current Query', content: 'select count(*) from logs;', source: 'logs' },
+    ])
+    expect(buildDebugChatArgs(snippet, result, 'logs').initialInput).toEqual(
+      'Help me to debug the attached sql snippet which gives the following error: \n\nUnknown expression identifier\n\nThis query runs against the Supabase logs table on a ClickHouse-backed engine, not Postgres.'
+    )
   })
 })
 
@@ -430,6 +445,60 @@ describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
       orgSlug: 'acme',
       completionMetadata: { prompt: 'add a where clause' },
     })
+  })
+  test('omits dialect when not provided, so the route keeps its Postgres default', () => {
+    const body = buildCompletionRequestBody({
+      projectRef: 'default',
+      connectionString: null,
+      orgSlug: 'acme',
+    })
+    expect(body).not.toHaveProperty('dialect')
+  })
+  test('includes the dialect when provided', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: null,
+        orgSlug: 'acme',
+        dialect: 'clickhouse',
+      }).dialect
+    ).toBe('clickhouse')
+  })
+})
+
+describe('SQLEditor.utils.ts:sqlSourceToDialect', () => {
+  test('logs snippets get ClickHouse, database snippets get Postgres', () => {
+    expect(sqlSourceToDialect('logs')).toBe('clickhouse')
+    expect(sqlSourceToDialect('database')).toBe('postgres')
+  })
+})
+
+describe('SQLEditor.utils.ts:createSqlSnippetSkeletonV2', () => {
+  const baseArgs = { name: 'Untitled', sql: 'select 1', owner_id: 1, project_id: 1 }
+
+  test('defaults to a database (sql) snippet', () => {
+    const snippet = createSqlSnippetSkeletonV2(baseArgs)
+    expect(snippet.type).toBe('sql')
+    expect(snippet.content?.unchecked_sql).toBe('select 1')
+    expect(snippet.status).toBe('new')
+  })
+
+  test('builds a database snippet when source is explicitly "database"', () => {
+    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'database' })
+    expect(snippet.type).toBe('sql')
+  })
+
+  test('builds a logs (log_sql) snippet when source is "logs"', () => {
+    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'logs' })
+    expect(snippet.type).toBe('log_sql')
+    expect(snippet.content?.unchecked_sql).toBe('select 1')
+  })
+
+  test('sets content_id to the snippet id for both sources', () => {
+    const db = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'db-id' })
+    const logs = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'logs-id', source: 'logs' })
+    expect(db.content?.content_id).toBe('db-id')
+    expect(logs.content?.content_id).toBe('logs-id')
   })
 })
 
@@ -1408,9 +1477,21 @@ describe('SQLEditor.utils:assembleCompletionDiff', () => {
 
 describe('SQLEditor.utils:buildDebugPromptText', () => {
   it('builds the debug prompt with the error message and SQL block', () => {
-    const result = buildDebugPromptText('select 1;', 'relation does not exist')
+    const result = buildDebugPromptText('select 1;', 'relation does not exist', 'database')
     expect(result).toContain('relation does not exist')
     expect(result).toContain('```sql\nselect 1;\n```')
+    expect(result).not.toContain('ClickHouse')
+  })
+
+  // This text is copyable and gets pasted into external models, so it has to name
+  // the dialect itself rather than relying on the message metadata.
+  it('names the dialect for a logs snippet', () => {
+    const sql = "select count() from logs where source = 'edge_logs'"
+    const result = buildDebugPromptText(sql, 'Unknown expression identifier', 'logs')
+    expect(result).toContain('Unknown expression identifier')
+    expect(result).toContain('ClickHouse')
+    expect(result).toContain('not Postgres')
+    expect(result).toContain('```clickhouse\n' + sql + '\n```')
   })
 })
 
