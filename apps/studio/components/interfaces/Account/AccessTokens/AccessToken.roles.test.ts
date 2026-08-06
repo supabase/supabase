@@ -83,6 +83,19 @@ describe('project-scoped membership helpers', () => {
     expect(getIsProjectScopedOnly(developerRows(ORG.slug), ORG.slug)).toBe(false)
     expect(getIsProjectScopedOnly([], ORG.slug)).toBe(false)
   })
+
+  it('treats project_refs: null rows as org-wide, in any row order', () => {
+    // The real /platform/profile/permissions response serializes the view-synthesized
+    // Administrator/Owner rows (auth.subject_roles, user_invites) with project_refs: null, and
+    // the response carries no ordering guarantee.
+    const nullRow = row(ORG.slug, ['write:Create', 'write:Delete'], ['auth.subject_roles'])
+    nullRow.project_refs = null
+
+    expect(getIsProjectScopedOnly([nullRow, ...administratorRows(ORG.slug)], ORG.slug)).toBe(false)
+    expect(getIsProjectScopedOnly([...administratorRows(ORG.slug), nullRow], ORG.slug)).toBe(false)
+    // A lone null row is org-wide too, not project-scoped.
+    expect(getIsProjectScopedOnly([nullRow], ORG.slug)).toBe(false)
+  })
 })
 
 describe('requiredRoleForEntry', () => {

@@ -201,7 +201,10 @@ export const estimateRoleLevel = (
   return isMember ? 'member' : 'none'
 }
 
-/** True when every permission row the user holds in the org is limited to specific projects. */
+/**
+ * True when every permission row the user holds in the org is limited to specific projects.
+ * Org-wide rows arrive as [] or null (the API contract is nullable) — both mean not scoped.
+ */
 export const getIsProjectScopedOnly = (
   permissions: Permission[],
   organizationSlug: string
@@ -211,7 +214,7 @@ export const getIsProjectScopedOnly = (
   )
   if (orgRows.length === 0) return false
   return orgRows.every(
-    (permission) => permission.project_refs !== undefined && permission.project_refs.length > 0
+    (permission) => Array.isArray(permission.project_refs) && permission.project_refs.length > 0
   )
 }
 
