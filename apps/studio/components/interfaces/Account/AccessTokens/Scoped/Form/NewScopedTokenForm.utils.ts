@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 import { z } from 'zod'
 
 import type { PermissionMode } from '../../AccessToken.permissions'
+import { getMaxCustomExpiryDate } from '../../AccessToken.utils'
 
 export const EXPIRY_PRESETS = ['24h', '7d', '30d', '90d', 'custom'] as const
 export type ExpiryPreset = (typeof EXPIRY_PRESETS)[number]
@@ -65,6 +66,18 @@ export const TokenFormSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Required',
+        path: ['customExpiryDate'],
+      })
+    }
+
+    if (
+      data.expiresAt === 'custom' &&
+      data.customExpiryDate &&
+      dayjs(data.customExpiryDate).isAfter(getMaxCustomExpiryDate())
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Expiry date must be within one year from today',
         path: ['customExpiryDate'],
       })
     }

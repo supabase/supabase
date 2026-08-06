@@ -27,11 +27,8 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import {
-  CUSTOM_EXPIRY_VALUE,
-  EXPIRES_AT_OPTIONS,
-} from '../AccessToken.constants'
-import { getExpirationDate } from '../AccessToken.utils'
+import { CUSTOM_EXPIRY_VALUE, EXPIRES_AT_OPTIONS } from '../AccessToken.constants'
+import { getExpirationDate, getMaxCustomExpiryDate } from '../AccessToken.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import {
   useAccessTokenCreateMutation,
@@ -223,7 +220,7 @@ export const NewTokenDialog = ({
                           contentSide="top"
                           to={customExpiryDate?.date}
                           minDate={new Date()}
-                          maxDate={dayjs().add(1, 'year').toDate()}
+                          maxDate={getMaxCustomExpiryDate().toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}
