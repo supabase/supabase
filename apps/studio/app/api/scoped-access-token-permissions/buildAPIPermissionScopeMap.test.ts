@@ -244,6 +244,28 @@ describe('buildAPIPermissionScopeMap', () => {
     expect(tools).toContain('execute_sql')
   })
 
+  // Path items may legally carry non-operation members; the specs are fetched live, so a benign
+  // upstream swagger change must not start 500ing this route.
+  test('tolerates path items with non-method OpenAPI members', async () => {
+    stubSpecs(
+      {
+        paths: {
+          '/v1/projects/{ref}': {
+            parameters: [{ name: 'ref', in: 'path', required: true }],
+            summary: 'Project detail',
+            get: { 'x-fga-permissions': [['project_admin_read']] },
+          },
+        },
+      },
+      { paths: {} }
+    )
+
+    const map = await buildAPIPermissionScopeMap()
+
+    expect(map.endpoints['GET /v1/projects/{ref}']).toEqual([['project_admin_read']])
+    expect(Object.keys(map.endpoints)).toHaveLength(1)
+  })
+
   test('returns a copy of the tool mapping so callers cannot corrupt the module singleton', async () => {
     stubSpecs({ paths: {} }, { paths: {} })
 
