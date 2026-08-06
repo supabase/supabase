@@ -447,7 +447,21 @@ const RESOURCE_METADATA_FALLBACK = (
     : 'Read-only access to this resource.',
 })
 
-export type PermissionLevel = 'user' | 'organization' | 'project'
+const PERMISSION_LEVELS = ['user', 'organization', 'project'] as const
+
+export type PermissionLevel = (typeof PERMISSION_LEVELS)[number]
+
+/**
+ * Runtime guard for the FGA namespaces: role evaluation branches on the level, so an unrecognized
+ * namespace must fail loudly (at module load, caught by any test importing the catalog) rather
+ * than silently evaluate as project-level.
+ */
+const toPermissionLevel = (scope: string): PermissionLevel => {
+  const level = scope.toLowerCase()
+  const match = PERMISSION_LEVELS.find((candidate) => candidate === level)
+  if (match === undefined) throw new Error(`Unknown FGA namespace: ${scope}`)
+  return match
+}
 
 export interface PermissionCatalogEntry {
   /** Derived resource key, e.g. "project:database" */
@@ -490,7 +504,7 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
   >()
 
   for (const [scope, scopePerms] of Object.entries(FGA)) {
-    const level = scope.toLowerCase() as PermissionLevel
+    const level = toPermissionLevel(scope)
     for (const [permKey, perm] of Object.entries(scopePerms)) {
       const resourceKey = `${level}:${getResource(permKey)}`
       const action = getAction(permKey)
