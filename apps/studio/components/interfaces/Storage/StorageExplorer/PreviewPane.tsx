@@ -25,7 +25,7 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { useIsStorageProtectionEnabled } from '../StorageProtection.constants'
+import { isBucketVersioned } from '../StorageProtection.constants'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
@@ -138,7 +138,7 @@ export const PreviewPane = () => {
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const showVersions = useIsStorageProtectionEnabled()
+  const showVersions = isBucketVersioned(selectedBucket?.id)
   const { data: versionsData } = useObjectVersionsQuery({
     projectRef,
     bucketId: selectedBucket?.id,
@@ -169,8 +169,9 @@ export const PreviewPane = () => {
             Previewing version{' '}
             <span className="font-mono text-foreground">
               {previewedVersion.versionId.slice(0, 6)}…
-            </span>{' '}
-            · {dayjs(previewedVersion.createdAt).format('MMM D, HH:mm')}
+            </span>
+            <br />
+            {dayjs(previewedVersion.createdAt).format('MMM D, HH:mm')}
           </p>
           <button
             className="text-xs text-brand hover:underline"

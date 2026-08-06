@@ -108,14 +108,14 @@ export const VersionHistory = ({
         <ol className="relative flex flex-col">
           {versions.map((version, index) => {
             const isLast = index === versions.length - 1
+            const isSelected = previewedVersionId === version.versionId
             return (
               <li key={version.versionId} className="group flex gap-x-3">
                 <div className="flex flex-col items-center pt-1.5">
                   <span
                     className={cn(
                       'h-2.5 w-2.5 rounded-full',
-                      version.isCurrent ? 'bg-brand' : 'bg-foreground-muted',
-                      onPreview && 'group-hover:underline'
+                      version.isCurrent || isSelected ? 'bg-brand' : 'bg-foreground-muted'
                     )}
                   />
                   {!isLast && <span className="w-px flex-1 bg-border" />}
@@ -132,10 +132,16 @@ export const VersionHistory = ({
                 >
                   <div className="flex items-center justify-between gap-x-2">
                     <div className="flex items-center gap-x-2">
-                      <span className="text-sm text-foreground">
+                      <span
+                        className={cn(
+                          'text-sm',
+                          isSelected ? 'text-brand' : 'text-foreground',
+                          onPreview && 'group-hover:underline'
+                        )}
+                      >
                         {dayjs(version.createdAt).format('MMM D, HH:mm')}
                       </span>
-                      {version.isCurrent && <Badge variant="success">Latest</Badge>}
+                      {version.isCurrent && <Badge variant="success">Current</Badge>}
                     </div>
 
                     <div className="flex items-center gap-x-1" onClick={(e) => e.stopPropagation()}>
@@ -154,15 +160,16 @@ export const VersionHistory = ({
                       {!version.isCurrent && (
                         <>
                           <ButtonTooltip
-                            variant="text"
+                            variant="default"
                             size="tiny"
-                            className="px-1.5"
                             icon={<RotateCcw size={14} />}
                             loading={isRestoring}
                             aria-label={`Restore version ${shortVersion(version.versionId)}`}
                             onClick={() => handleRestore(version)}
                             tooltip={{ content: { side: 'bottom', text: 'Restore as current' } }}
-                          />
+                          >
+                            Restore
+                          </ButtonTooltip>
                           <ButtonTooltip
                             variant="text"
                             size="tiny"
