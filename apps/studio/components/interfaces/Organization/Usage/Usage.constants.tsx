@@ -217,7 +217,11 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
   databaseAndStorageSizeAttributes.push({
     anchor: 'storageSize',
     key: PricingMetric.STORAGE_SIZE,
-    attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
+    attributes: [
+      { key: 'live', name: 'Live objects', color: 'white' },
+      { key: 'noncurrent_versions', name: 'Noncurrent versions', color: 'yellow' },
+      { key: 'soft_deleted', name: 'Soft-deleted files', color: 'orange' },
+    ],
     name: 'Storage Size',
     chartPrefix: 'Average',
     unit: 'bytes',

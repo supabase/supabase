@@ -437,7 +437,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
               )}
             </DialogSection>
 
-            {showProtection && <BucketDataProtectionFields />}
+            {showProtection && <BucketDataProtectionFields isPublicBucket={isPublicBucket} />}
           </form>
         </Form>
 

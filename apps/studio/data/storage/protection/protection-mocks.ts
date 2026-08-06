@@ -193,13 +193,21 @@ export const deleteMockTrashObjectsPermanently = (objectIds?: string[]): TrashOb
 export interface BucketRetentionSummary {
   bucket: string
   live: number
-  versions: number
+  noncurrentVersions: number
+  softDeleted: number
   isVersioned: boolean
 }
 
+export interface RetentionDayPoint {
+  date: string
+  live: number
+  noncurrentVersions: number
+  softDeleted: number
+}
+
 export interface StorageRetentionUsage {
-  totals: { live: number; versions: number }
-  daily: Array<{ date: string; live: number; versions: number }>
+  totals: { live: number; noncurrentVersions: number; softDeleted: number }
+  daily: RetentionDayPoint[]
   byBucket: BucketRetentionSummary[]
 }
 
@@ -207,38 +215,63 @@ const GB = 1024 * MB
 
 /**
  * Day-over-day growth for the Storage Size usage chart, oldest first, ending
- * "today". `versions` is data retained purely because of noncurrent object
- * versions and soft-deleted files past their live lifetime — the part of
- * Storage Size that versioning is responsible for.
+ * "today". `noncurrentVersions` and `softDeleted` are both the "retained
+ * recovery data" driven by versioning — kept separate so the breakdown can
+ * show which one is dominating.
  */
 const RETENTION_DAILY_GROWTH = [
-  { daysAgo: 6, live: 4.1 * GB, versions: 1.4 * GB },
-  { daysAgo: 5, live: 4.3 * GB, versions: 1.5 * GB },
-  { daysAgo: 4, live: 4.4 * GB, versions: 1.6 * GB },
-  { daysAgo: 3, live: 4.6 * GB, versions: 1.7 * GB },
-  { daysAgo: 2, live: 4.7 * GB, versions: 1.8 * GB },
-  { daysAgo: 1, live: 5.4 * GB, versions: 2.1 * GB },
-  { daysAgo: 0, live: 6.1 * GB, versions: 2.4 * GB },
+  { daysAgo: 6, live: 4.1 * GB, noncurrentVersions: 0.9 * GB, softDeleted: 0.5 * GB },
+  { daysAgo: 5, live: 4.3 * GB, noncurrentVersions: 1.0 * GB, softDeleted: 0.5 * GB },
+  { daysAgo: 4, live: 4.4 * GB, noncurrentVersions: 1.05 * GB, softDeleted: 0.55 * GB },
+  { daysAgo: 3, live: 4.6 * GB, noncurrentVersions: 1.1 * GB, softDeleted: 0.6 * GB },
+  { daysAgo: 2, live: 4.7 * GB, noncurrentVersions: 1.15 * GB, softDeleted: 0.65 * GB },
+  { daysAgo: 1, live: 5.4 * GB, noncurrentVersions: 1.35 * GB, softDeleted: 0.75 * GB },
+  { daysAgo: 0, live: 6.1 * GB, noncurrentVersions: 1.55 * GB, softDeleted: 0.85 * GB },
 ]
 
 export const getMockRetentionUsage = (): StorageRetentionUsage => {
-  const daily = RETENTION_DAILY_GROWTH.map(({ daysAgo: offset, live, versions }) => ({
-    date: daysAgoFromNow(offset),
-    live,
-    versions,
-  }))
+  const daily = RETENTION_DAILY_GROWTH.map(
+    ({ daysAgo: offset, live, noncurrentVersions, softDeleted }) => ({
+      date: daysAgoFromNow(offset),
+      live,
+      noncurrentVersions,
+      softDeleted,
+    })
+  )
 
   // Derive totals from today's entry (the last day) so the breakdown and the
   // chart's most recent bar can never drift out of sync with each other.
   const today = daily[daily.length - 1]
 
   return {
-    totals: { live: today.live, versions: today.versions },
+    totals: {
+      live: today.live,
+      noncurrentVersions: today.noncurrentVersions,
+      softDeleted: today.softDeleted,
+    },
     daily,
     byBucket: [
-      { bucket: 'match-media', live: 4.1 * GB, versions: 1.9 * GB, isVersioned: true },
-      { bucket: 'avatars', live: 1.4 * GB, versions: 0.5 * GB, isVersioned: true },
-      { bucket: 'exports', live: 0.6 * GB, versions: 0, isVersioned: false },
+      {
+        bucket: 'match-media',
+        live: 4.1 * GB,
+        noncurrentVersions: 1.2 * GB,
+        softDeleted: 0.7 * GB,
+        isVersioned: true,
+      },
+      {
+        bucket: 'avatars',
+        live: 1.4 * GB,
+        noncurrentVersions: 0.35 * GB,
+        softDeleted: 0.15 * GB,
+        isVersioned: true,
+      },
+      {
+        bucket: 'exports',
+        live: 0.6 * GB,
+        noncurrentVersions: 0,
+        softDeleted: 0,
+        isVersioned: false,
+      },
     ],
   }
 }

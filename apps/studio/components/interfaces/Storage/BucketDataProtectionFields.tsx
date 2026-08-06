@@ -25,11 +25,20 @@ interface BucketDataProtectionFieldsProps {
   bucketName?: string
   /** Whether versioning is currently enabled on the bucket being edited (unset when creating a new bucket). */
   initialVersioningEnabled?: boolean
+  /** The bucket's current retention-days setting when the modal opened, for tightening detection. */
+  initialRetentionDays?: number | null
+  /** The bucket's current max-versions setting when the modal opened, for tightening detection. */
+  initialMaxVersions?: number | null
+  /** Whether the bucket is public — public + versioned surfaces every version by default. */
+  isPublicBucket?: boolean
 }
 
 export const BucketDataProtectionFields = ({
   bucketName,
   initialVersioningEnabled = false,
+  initialRetentionDays,
+  initialMaxVersions,
+  isPublicBucket = false,
 }: BucketDataProtectionFieldsProps) => {
   const { control, getValues, setValue } = useFormContext<BucketProtectionFormValues>()
   const { data: organization, isSuccess: isOrganizationLoaded } = useSelectedOrganizationQuery()
@@ -38,8 +47,32 @@ export const BucketDataProtectionFields = ({
 
   const planLimits = getVersioningPlanLimits(organization?.plan.id)
   const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
+  const retentionDaysRaw = useWatch({ control, name: 'version_expiry_days' })
+  const maxVersionsRaw = useWatch({ control, name: 'max_noncurrent_versions' })
   // Avoid flashing the "upgrade" prompt before we actually know the org's plan
   const showUpgradePrompt = isOrganizationLoaded && !planLimits
+
+  // Detect a tightening of retention (fewer days OR fewer versions than before)
+  // while versioning was already enabled and still is. That's not destructive
+  // enough for a typed confirmation, but users should know it can immediately
+  // expire retained versions that no longer fit within the new bounds.
+  const nextRetentionDays = typeof retentionDaysRaw === 'number' ? retentionDaysRaw : null
+  const nextMaxVersions = typeof maxVersionsRaw === 'number' ? maxVersionsRaw : null
+  const isTighteningRetention =
+    initialVersioningEnabled &&
+    isVersioningEnabled &&
+    initialRetentionDays !== null &&
+    initialRetentionDays !== undefined &&
+    nextRetentionDays !== null &&
+    nextRetentionDays < initialRetentionDays
+  const isTighteningMaxVersions =
+    initialVersioningEnabled &&
+    isVersioningEnabled &&
+    initialMaxVersions !== null &&
+    initialMaxVersions !== undefined &&
+    nextMaxVersions !== null &&
+    nextMaxVersions < initialMaxVersions
+  const isTightening = isTighteningRetention || isTighteningMaxVersions
 
   // Prefill the retention fields with the plan's defaults when versioning is
   // switched on, so the user doesn't have to fill in an empty input to proceed.
@@ -149,6 +182,28 @@ export const BucketDataProtectionFields = ({
           />
         )}
 
+        {!!planLimits && isVersioningEnabled && isPublicBucket && (
+          <Admonition
+            type="warning"
+            title="Public bucket exposes every version"
+            description="Anyone with a version ID can fetch a noncurrent version of a public object. To hide noncurrent versions, add an RLS policy on storage.objects that filters where metadata->>'isCurrent' = 'true'."
+          />
+        )}
+
+        {!!planLimits && isVersioningEnabled && isTightening && (
+          <Admonition
+            type="warning"
+            title="Tightening retention will expire some data"
+            description={
+              isTighteningRetention && isTighteningMaxVersions
+                ? 'Noncurrent versions past the shorter retention window, and any beyond the lower per-object cap, will be permanently deleted once saved.'
+                : isTighteningRetention
+                  ? 'Noncurrent versions past the shorter retention window will be permanently deleted once saved.'
+                  : 'Noncurrent versions beyond the lower per-object cap will be permanently deleted once saved.'
+            }
+          />
+        )}
+
         {!!planLimits && isVersioningEnabled && (
           <div className="flex flex-col gap-y-3">
             <FormField
@@ -158,7 +213,7 @@ export const BucketDataProtectionFields = ({
                 <FormItemLayout
                   name="version_expiry_days"
                   label="Noncurrent version retention"
-                  description="Automatically expire noncurrent versions after this many days"
+                  description="Days a noncurrent version is kept before it's automatically expired."
                   layout="flex-row-reverse"
                 >
                   <FormControl>
@@ -187,7 +242,7 @@ export const BucketDataProtectionFields = ({
                 <FormItemLayout
                   name="max_noncurrent_versions"
                   label="Max noncurrent versions"
-                  description="Keep at most this many noncurrent versions per object"
+                  description="Maximum number of noncurrent versions kept per object. The oldest version is automatically removed once the limit is reached."
                   layout="flex-row-reverse"
                 >
                   <FormControl>

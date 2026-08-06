@@ -472,6 +472,9 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
               <BucketDataProtectionFields
                 bucketName={bucket?.name}
                 initialVersioningEnabled={bucketProtection.versioning === 'enabled'}
+                initialRetentionDays={bucketProtection.versionExpiryDays}
+                initialMaxVersions={bucketProtection.maxNoncurrentVersions}
+                isPublicBucket={isPublicBucket}
               />
             )}
           </form>

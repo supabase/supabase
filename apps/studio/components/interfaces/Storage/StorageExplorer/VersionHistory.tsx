@@ -17,6 +17,8 @@ import {
 import { type ObjectVersion } from '@/data/storage/protection/protection-mocks'
 import { formatBytes } from '@/lib/helpers'
 
+import { getMockBucketProtection } from '../StorageProtection.constants'
+
 interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
@@ -66,6 +68,13 @@ export const VersionHistory = ({
   if (isError) return <AlertError error={error} subject="Failed to retrieve versions" />
 
   const totalSize = versions.reduce((sum, version) => sum + version.size, 0)
+  const noncurrentCount = versions.filter((v) => !v.isCurrent).length
+
+  const bucketProtection = getMockBucketProtection(bucketId)
+  const cap = bucketProtection.maxNoncurrentVersions
+  const usageRatio = cap && cap > 0 ? noncurrentCount / cap : 0
+  const isNearingCap = cap !== null && cap > 0 && usageRatio >= 0.8
+  const isAtCap = cap !== null && cap > 0 && noncurrentCount >= cap
 
   return (
     <div className="space-y-4">
@@ -76,6 +85,23 @@ export const VersionHistory = ({
             .filter(Boolean)
             .join(' · ')}
         </p>
+        {cap !== null && cap > 0 && (
+          <div className="flex items-center gap-x-2 pt-1">
+            <Badge variant={isAtCap ? 'warning' : 'default'}>
+              {noncurrentCount} / {cap} noncurrent
+            </Badge>
+            {isAtCap && (
+              <span className="text-xs text-warning-600">
+                At cap — the next overwrite will auto-expire the oldest version.
+              </span>
+            )}
+            {!isAtCap && isNearingCap && (
+              <span className="text-xs text-foreground-lighter">
+                Nearing cap. Older versions auto-expire once the limit is reached.
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {isSuccess && (

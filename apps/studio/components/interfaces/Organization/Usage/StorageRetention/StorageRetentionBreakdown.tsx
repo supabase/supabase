@@ -9,7 +9,12 @@ import { COLOR_MAP } from '../Usage.constants'
 
 const SEGMENTS = [
   { key: 'live' as const, label: 'Live objects', color: 'white' as const },
-  { key: 'versions' as const, label: 'Object versions', color: 'yellow' as const },
+  {
+    key: 'noncurrentVersions' as const,
+    label: 'Noncurrent versions',
+    color: 'yellow' as const,
+  },
+  { key: 'softDeleted' as const, label: 'Soft-deleted files', color: 'orange' as const },
 ]
 
 /**
@@ -35,7 +40,10 @@ export const StorageRetentionBreakdown = () => {
   if (!isSuccess) return null
 
   const { totals, byBucket } = data
-  const versionedBuckets = byBucket.filter((bucket) => bucket.versions > 0)
+  const retained = totals.noncurrentVersions + totals.softDeleted
+  const versionedBuckets = byBucket.filter(
+    (bucket) => bucket.noncurrentVersions + bucket.softDeleted > 0
+  )
 
   return (
     <div className="space-y-4">
@@ -52,19 +60,16 @@ export const StorageRetentionBreakdown = () => {
         ))}
         <div className="flex items-center justify-between py-1">
           <p className="text-xs text-foreground-light">Total</p>
-          <p className="text-xs">{formatBytes(totals.live + totals.versions)}</p>
+          <p className="text-xs">{formatBytes(totals.live + retained)}</p>
         </div>
       </div>
 
-      {totals.versions > 0 && (
-        <Admonition
-          type="warning"
-          title={`${formatBytes(totals.versions)} is retained recovery data`}
-        >
+      {retained > 0 && (
+        <Admonition type="warning" title={`${formatBytes(retained)} is retained recovery data`}>
           <p className="text-xs">
             Noncurrent object versions and soft-deleted files keep data billable after a delete or
-            overwrite. It&apos;s freed when a lifecycle policy expires it, when the retention limit
-            is reached, or when you delete the version.
+            overwrite. Data is freed when a lifecycle policy expires it, when the retention limit is
+            reached, or when you delete the version.
           </p>
         </Admonition>
       )}
@@ -77,9 +82,12 @@ export const StorageRetentionBreakdown = () => {
               <p className="text-xs text-foreground-light font-mono">{bucket.bucket}</p>
               <div className="flex items-center gap-x-3">
                 <p className="text-xs text-foreground-lighter">
-                  {formatBytes(bucket.versions)} versions
+                  {formatBytes(bucket.noncurrentVersions)} versions ·{' '}
+                  {formatBytes(bucket.softDeleted)} deleted
                 </p>
-                <p className="text-xs w-16 text-right">{formatBytes(bucket.versions)}</p>
+                <p className="text-xs w-16 text-right">
+                  {formatBytes(bucket.noncurrentVersions + bucket.softDeleted)}
+                </p>
               </div>
             </div>
           ))}

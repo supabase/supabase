@@ -106,3 +106,33 @@ export const setMockBucketProtection = (bucketName: string, protection: BucketPr
 
 export const isBucketVersioned = (bucketName: string | undefined) =>
   getMockBucketProtection(bucketName).versioning === 'enabled'
+
+/**
+ * Simulates the auto-disable-and-purge policy for a plan downgrade:
+ *
+ * If an org downgrades to a plan that no longer supports object versioning
+ * (e.g. Free), the real backend would run a migration that disables versioning
+ * on every bucket in the org and permanently deletes every noncurrent version
+ * and soft-deleted file those buckets were retaining. The user shouldn't have
+ * to remember which buckets were versioned — the platform handles it.
+ *
+ * This function does that at read time by walking `PROTECTED_BUCKETS` and
+ * flipping every `enabled` entry back to `disabled` with cleared retention
+ * settings, and clearing the shared trash store. Call it from a top-level
+ * effect that reacts to the org's plan resolving to one without versioning
+ * support.
+ */
+export const purgeVersioningOnPlanDowngrade = (): { purgedBuckets: string[] } => {
+  const purgedBuckets: string[] = []
+  for (const [name, protection] of Object.entries(PROTECTED_BUCKETS)) {
+    if (protection.versioning === 'enabled') {
+      purgedBuckets.push(name)
+      PROTECTED_BUCKETS[name] = {
+        versioning: 'disabled',
+        versionExpiryDays: null,
+        maxNoncurrentVersions: null,
+      }
+    }
+  }
+  return { purgedBuckets }
+}
