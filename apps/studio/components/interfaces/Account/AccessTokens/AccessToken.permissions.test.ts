@@ -54,7 +54,7 @@ describe('normalizePermissionScopeMap', () => {
         'GET /v1/projects': ['projects_read', 'organization_projects_read'],
       },
       mcp_tools: { execute_sql: ['database_read', 'database_write'] },
-    } as unknown as PermissionScopeMap)
+    })
 
     expect(normalized.endpoints['GET /v1/projects']).toEqual([
       ['projects_read', 'organization_projects_read'],
@@ -77,7 +77,7 @@ describe('normalizePermissionScopeMap', () => {
   })
 
   it('tolerates payloads missing any of the three maps entirely', () => {
-    const normalized = normalizePermissionScopeMap({} as PermissionScopeMap)
+    const normalized = normalizePermissionScopeMap({})
 
     expect(normalized.scopes).toEqual({})
     expect(normalized.endpoints).toEqual({})
@@ -89,10 +89,33 @@ describe('normalizePermissionScopeMap', () => {
       scopes: {},
       endpoints: { 'GET /v1/projects': null },
       mcp_tools: { execute_sql: 'database_read' },
-    } as unknown as PermissionScopeMap)
+    })
 
     expect(normalized.endpoints['GET /v1/projects']).toEqual([])
     expect(normalized.mcp_tools.execute_sql).toEqual([])
+  })
+
+  // response.json() can legally produce any of these (a null body, an error string); the
+  // normalizer is the boundary and must return the fail-closed empty map, not throw.
+  it('fails closed on a top-level payload that is not an object', () => {
+    const empty = { scopes: {}, endpoints: {}, mcp_tools: {} }
+
+    expect(normalizePermissionScopeMap(null)).toEqual(empty)
+    expect(normalizePermissionScopeMap(undefined)).toEqual(empty)
+    expect(normalizePermissionScopeMap('internal server error')).toEqual(empty)
+    expect(normalizePermissionScopeMap([])).toEqual(empty)
+  })
+
+  it('empties a field whose record shape is wrong without discarding the rest', () => {
+    const normalized = normalizePermissionScopeMap({
+      scopes: { database_read: { endpoints: 'not-an-array', mcp_tools: [] } },
+      endpoints: { 'GET /v1/projects': [['projects_read']] },
+      mcp_tools: null,
+    })
+
+    expect(normalized.scopes).toEqual({})
+    expect(normalized.endpoints['GET /v1/projects']).toEqual([['projects_read']])
+    expect(normalized.mcp_tools).toEqual({})
   })
 })
 
