@@ -6,7 +6,7 @@ import {
   buildAPIPermissionScopeMap,
   getScopesAndEndpointsForAPI,
 } from './buildAPIPermissionScopeMap'
-import { MCPToolScopeMappings } from './MCPToolScopeMappings'
+import { expandOAuthScopeGroups, MCPToolScopeMappings } from './MCPToolScopeMappings'
 import { type ScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { mswServer } from '@/tests/lib/msw'
 
@@ -155,6 +155,20 @@ describe('MCPToolScopeMappings', () => {
   test('tools without a platform scope gate stay ungated ([[]]), not disabled ([])', () => {
     expect(MCPToolScopeMappings.confirm_cost).toEqual([[]])
     expect(MCPToolScopeMappings.search_docs).toEqual([[]])
+  })
+
+  // A group is an AND: expanding only its mapped scopes would weaken the requirement (e.g.
+  // [organizations:read, projects:read] shrinking to projects_read alone) and report the tool
+  // enabled for an incomplete grant.
+  test('a group with any unmapped scope is dropped whole, not partially expanded', () => {
+    const map = { 'projects:read': ['projects_read'] }
+
+    expect(expandOAuthScopeGroups([['organizations:read', 'projects:read']], map)).toEqual([])
+    // Other alternatives and the ungated marker survive the drop untouched.
+    expect(expandOAuthScopeGroups([['organizations:read'], ['projects:read'], []], map)).toEqual([
+      ['projects_read'],
+      [],
+    ])
   })
 
   // Guards the OAuth-scope -> legacy-map join: a scope key drifting out of the legacy map must

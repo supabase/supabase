@@ -179,20 +179,25 @@ export const legacyOauthScopeToFgaPermissionMap: Record<string, string[]> = {
  * {
  *    execute_sql: [["snippets_read", "database_read", ...], ["project_admin_write", ...]]
  * }
- * Groups are expanded independently, preserving the OR-of-AND structure. A group whose scopes all
- * expand to nothing is dropped so the tool stays gated rather than becoming ungated; an explicitly
- * empty group ([]) is the deliberate ungated marker and is kept as-is.
+ * Groups are expanded independently, preserving the OR-of-AND structure. A group is an AND, so it
+ * is kept only when every one of its scopes maps to at least one FGA permission — a partial
+ * expansion would weaken the requirement (e.g. [ORGANIZATIONS_READ, PROJECTS_READ] shrinking to
+ * projects_read alone). A group with any unmapped scope is dropped whole, so the tool stays gated
+ * rather than becoming ungated; an explicitly empty group ([]) is the deliberate ungated marker
+ * and is vacuously kept.
  * The code is duplicated from platform until we find a better way to share those mappings
  */
+export const expandOAuthScopeGroups = (
+  oAuthScopeGroups: string[][],
+  fgaPermissionMap: Record<string, string[]>
+): string[][] =>
+  oAuthScopeGroups
+    .filter((group) => group.every((oAuthScope) => (fgaPermissionMap[oAuthScope] ?? []).length > 0))
+    .map((group) => group.flatMap((oAuthScope) => fgaPermissionMap[oAuthScope] ?? []))
+
 export const MCPToolScopeMappings = Object.entries(MCPToolOAuthScopeMapping).reduce(
   (acc, [mcpTool, oAuthScopeGroups]) => {
-    acc[mcpTool] = oAuthScopeGroups
-      // `?? []` so a scope missing from the legacy map degrades to an empty expansion (group
-      // dropped by the filter below) instead of injecting undefined into the payload.
-      .map((group) =>
-        group.flatMap((oAuthScope) => legacyOauthScopeToFgaPermissionMap[oAuthScope] ?? [])
-      )
-      .filter((expanded, index) => oAuthScopeGroups[index].length === 0 || expanded.length > 0)
+    acc[mcpTool] = expandOAuthScopeGroups(oAuthScopeGroups, legacyOauthScopeToFgaPermissionMap)
     return acc
   },
   {} as McpMap
