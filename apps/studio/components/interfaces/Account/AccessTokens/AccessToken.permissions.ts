@@ -26,7 +26,7 @@ export interface PermissionCategory {
   description: string
 }
 
-/** Display order matches the accordion. The first category is open by default. */
+/** Display order matches the accordion, where every category starts collapsed. */
 export const PERMISSION_CATEGORIES: PermissionCategory[] = [
   {
     key: 'project',

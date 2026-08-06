@@ -101,6 +101,13 @@ const mockCreateToken = () =>
       }),
   })
 
+/**
+ * Permission categories render collapsed, so a category has to be expanded before its
+ * rows are in the DOM.
+ */
+const expandPermissionCategory = async (name: string) =>
+  fireEvent.click(await screen.findByRole('button', { name: new RegExp(`^${name}`) }))
+
 describe('NewScopedTokenSheet', () => {
   beforeEach(() => {
     mockPermissionsMap()
@@ -155,14 +162,18 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
     fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
     fireEvent.click(await screen.findByRole('option', { name: 'Project 1' }))
+    await expandPermissionCategory('Project')
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     // Review screen
-    await screen.findByText('Low — single-project read-only access')
+    await screen.findByText('Low Risk')
+    await screen.findByText('single-project read-only access')
     fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
     // If we can click this checkbox, the token was created
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
+    // Must be a real click, which focuses the button: nothing holds focus once the form
+    // unmounts, and copyToClipboard bails out when the document has no focus
+    await user.click(await screen.findByRole('button', { name: 'Copy' }))
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
     )
@@ -201,14 +212,18 @@ describe('NewScopedTokenSheet', () => {
     await user.click(await screen.findByRole('radio', { name: /Organization/ }))
     fireEvent.click(await screen.findByRole('combobox', { name: 'Organizations' }))
     fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    await expandPermissionCategory('Project')
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     // Review screen
-    await screen.findByText('Low — organization-wide read-only access')
+    await screen.findByText('Low Risk')
+    await screen.findByText('organization-wide read-only access')
     fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
     // If we can click this checkbox, the token was created
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
+    // Must be a real click, which focuses the button: nothing holds focus once the form
+    // unmounts, and copyToClipboard bails out when the document has no focus
+    await user.click(await screen.findByRole('button', { name: 'Copy' }))
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
     )
@@ -244,14 +259,18 @@ describe('NewScopedTokenSheet', () => {
         'I understand this token is not limited to one project or organization.'
       )
     )
+    await expandPermissionCategory('Project')
     fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     // Review screen
-    await screen.findByText('Elevated — account-wide read-only access')
+    await screen.findByText('Elevated Risk')
+    await screen.findByText('account-wide read-only access')
     fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
     // If we can click this checkbox, the token was created
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
+    // Must be a real click, which focuses the button: nothing holds focus once the form
+    // unmounts, and copyToClipboard bails out when the document has no focus
+    await user.click(await screen.findByRole('button', { name: 'Copy' }))
     await waitFor(async () =>
       expect(await window.navigator.clipboard.readText()).toEqual('a_token_value')
     )
