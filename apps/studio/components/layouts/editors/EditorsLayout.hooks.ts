@@ -1,7 +1,9 @@
 import { useParams } from 'common'
 import { usePathname } from 'next/navigation'
 
-export function useEditorType(): 'table' | 'sql' | undefined {
+export type EditorType = 'table' | 'sql' | 'explorer' | undefined
+
+export function useEditorType(): EditorType {
   const pathname = usePathname()
   const { ref } = useParams()
 
@@ -9,5 +11,7 @@ export function useEditorType(): 'table' | 'sql' | undefined {
     ? 'table'
     : pathname?.includes(`/project/${ref}/sql`)
       ? 'sql'
-      : undefined
+      : pathname?.includes(`/project/${ref}/explorer`)
+        ? 'explorer'
+        : undefined
 }
