@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatDuration } from './QueryPerformance.utils'
+import { formatDuration, getColumnName, getTableName } from './QueryPerformance.utils'
 
 describe('formatDuration', () => {
   it('should format seconds', () => {
@@ -21,5 +21,84 @@ describe('formatDuration', () => {
   it('should format days, hours, minutes and seconds', () => {
     expect(formatDuration(86400000)).toBe('1d')
     expect(formatDuration(90061000)).toBe('1d 1h 1m 1s')
+  })
+})
+
+describe('getTableName', () => {
+  it('returns null for empty/null/undefined input', () => {
+    expect(getTableName(null)).toBeNull()
+    expect(getTableName(undefined)).toBeNull()
+    expect(getTableName('')).toBeNull()
+  })
+
+  it('extracts table from SELECT FROM', () => {
+    expect(getTableName('SELECT * FROM users')).toBe('users')
+    expect(getTableName('SELECT id FROM public.orders WHERE id = 1')).toBe('orders')
+  })
+
+  it('extracts table from INSERT INTO', () => {
+    expect(getTableName('INSERT INTO orders (id) VALUES (1)')).toBe('orders')
+  })
+
+  it('extracts table from UPDATE', () => {
+    expect(getTableName('UPDATE users SET name = $1 WHERE id = 1')).toBe('users')
+  })
+
+  it('extracts table from DELETE FROM', () => {
+    expect(getTableName('DELETE FROM logs WHERE id = 1')).toBe('logs')
+  })
+
+  it('extracts table from CREATE TABLE', () => {
+    expect(getTableName('CREATE TABLE foo (id int)')).toBe('foo')
+    expect(getTableName('CREATE TABLE IF NOT EXISTS bar (id int)')).toBe('bar')
+  })
+
+  it('extracts table from ALTER TABLE', () => {
+    expect(getTableName('ALTER TABLE users ADD COLUMN email text')).toBe('users')
+  })
+
+  it('extracts table from DROP TABLE', () => {
+    expect(getTableName('DROP TABLE IF EXISTS old_table')).toBe('old_table')
+  })
+
+  it('extracts table from TRUNCATE', () => {
+    expect(getTableName('TRUNCATE TABLE logs')).toBe('logs')
+    expect(getTableName('TRUNCATE logs')).toBe('logs')
+  })
+
+  it('strips schema prefix', () => {
+    expect(getTableName('SELECT * FROM public.users')).toBe('users')
+  })
+
+  it('strips quotes', () => {
+    expect(getTableName('SELECT * FROM "my_table"')).toBe('my_table')
+  })
+})
+
+describe('getColumnName', () => {
+  it('returns null for empty/null/undefined input', () => {
+    expect(getColumnName(null)).toBeNull()
+    expect(getColumnName(undefined)).toBeNull()
+    expect(getColumnName('')).toBeNull()
+  })
+
+  it('extracts column from WHERE clause', () => {
+    expect(getColumnName('SELECT * FROM users WHERE id = 1')).toBe('id')
+  })
+
+  it('extracts column from ORDER BY when no WHERE clause', () => {
+    expect(getColumnName('SELECT * FROM users ORDER BY created_at')).toBe('created_at')
+  })
+
+  it('extracts column from GROUP BY', () => {
+    expect(getColumnName('SELECT status, count(*) FROM orders GROUP BY status')).toBe('status')
+  })
+
+  it('extracts column from UPDATE SET when no WHERE clause', () => {
+    expect(getColumnName('UPDATE users SET email = $1')).toBe('email')
+  })
+
+  it('extracts first column from INSERT INTO', () => {
+    expect(getColumnName('INSERT INTO users (id, name) VALUES ($1, $2)')).toBe('id')
   })
 })

@@ -5,6 +5,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from '@/components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
+import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { QueryPerformance } from '@/components/interfaces/QueryPerformance/QueryPerformance'
 import { type QuerySource } from '@/components/interfaces/QueryPerformance/QueryPerformance.types'
 import { useQueryPerformanceInfiniteQuery } from '@/components/interfaces/QueryPerformance/useQueryPerformanceQuery'
@@ -26,6 +27,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
   const { isIndexAdvisorEnabled } = useIndexAdvisorStatus()
   const { sort: sortConfig } = useQueryPerformanceSort()
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   const [
     {
@@ -96,6 +98,15 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           {IS_PLATFORM && <DatabaseSelector />}
         </div>
       </div>
+      {isSupamonitorEnabled && (
+        <div className="px-6 pb-4">
+          <Admonition
+            type="warning"
+            title="Supamonitor is deprecated"
+            description="This project still has the deprecated supamonitor extension enabled. It's no longer supported, so query metrics below come from pg_stat_statements instead."
+          />
+        </div>
+      )}
       <QueryPerformance
         queryHitRate={queryHitRate}
         queryPerformanceQuery={queryPerformanceQuery}

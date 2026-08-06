@@ -47,6 +47,12 @@ export type QueryPerformanceSort = {
 
 export type QuerySource = 'dashboard' | 'non-dashboard'
 
+export interface ClassifiedQuery extends QueryPerformanceRow {
+  issueType: 'error' | 'index' | 'slow' | null
+  hint: string
+  queryType: string | null
+}
+
 export type QueryPerformanceSQLParams = {
   preset: QueryPerformancePreset
   orderBy?: QueryPerformanceSort

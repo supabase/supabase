@@ -254,6 +254,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/observability/query-insights',
+    destination: '/project/:ref/observability/query-performance',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/auth/column-privileges',
     destination: '/project/:ref/database/column-privileges',
     permanent: true,
