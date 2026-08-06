@@ -595,7 +595,6 @@
       "data/profile/profile-identities-query.ts": 1,
       "data/profile/profile-unlink-identity-mutation.ts": 2,
       "data/projects/project-create-mutation.ts": 1,
-      "data/replication/restart-pipeline-helper.ts": 2,
       "data/replication/rollback-tables-mutation.ts": 1,
       "data/reports/v2/auth.config.ts": 15,
       "data/reports/v2/edge-functions.config.ts": 9,
