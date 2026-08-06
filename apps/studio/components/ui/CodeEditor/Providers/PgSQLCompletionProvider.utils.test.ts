@@ -4,6 +4,8 @@ import {
   filterTablesByReferences,
   getFromClauseTables,
   getStatementAtOffset,
+  parseTrailingDotIdent,
+  resolveTablesForIdent,
 } from './PgSQLCompletionProvider.utils'
 
 describe('getFromClauseTables', () => {
@@ -188,5 +190,68 @@ describe('filterTablesByReferences', () => {
 
   it('returns an empty array when no table matches', () => {
     expect(filterTablesByReferences(tables, [{ name: 'nonexistent' }])).toStrictEqual([])
+  })
+})
+
+describe('parseTrailingDotIdent', () => {
+  it('returns null when the text does not end with an identifier and a dot', () => {
+    expect(parseTrailingDotIdent('select * from colors where ')).toBeNull()
+  })
+
+  it('extracts an unquoted identifier immediately before a trailing dot', () => {
+    expect(parseTrailingDotIdent('select * from colors c where c.')).toStrictEqual({
+      isQuoted: false,
+      name: 'c',
+    })
+  })
+
+  it('extracts and unquotes a quoted identifier before a trailing dot', () => {
+    expect(parseTrailingDotIdent('select * from "Colors" "C" where "C".')).toStrictEqual({
+      isQuoted: true,
+      name: 'C',
+    })
+  })
+
+  it('allows whitespace between the identifier and the dot', () => {
+    expect(parseTrailingDotIdent('select * from colors c where c .')).toStrictEqual({
+      isQuoted: false,
+      name: 'c',
+    })
+  })
+})
+
+describe('resolveTablesForIdent', () => {
+  const tables = [
+    { schemaname: 'public', tablename: 'orders' },
+    { schemaname: 'public', tablename: 'customers' },
+  ]
+
+  it('resolves an alias to its table, ignoring other referenced tables', () => {
+    const refs = [
+      { name: 'orders', alias: 'o' },
+      { name: 'customers', alias: 'c' },
+    ]
+    expect(resolveTablesForIdent(tables, refs, { isQuoted: false, name: 'c' })).toStrictEqual([
+      { schemaname: 'public', tablename: 'customers' },
+    ])
+  })
+
+  it('resolves a plain table name when there is no alias', () => {
+    const refs = [{ name: 'customers', alias: undefined }]
+    expect(
+      resolveTablesForIdent(tables, refs, { isQuoted: false, name: 'customers' })
+    ).toStrictEqual([{ schemaname: 'public', tablename: 'customers' }])
+  })
+
+  it('does not fall back to the table name once it has an alias', () => {
+    const refs = [{ name: 'customers', alias: 'c' }]
+    expect(
+      resolveTablesForIdent(tables, refs, { isQuoted: false, name: 'customers' })
+    ).toStrictEqual([])
+  })
+
+  it('returns an empty array when the ident matches nothing', () => {
+    const refs = [{ name: 'customers', alias: 'c' }]
+    expect(resolveTablesForIdent(tables, refs, { isQuoted: false, name: 'x' })).toStrictEqual([])
   })
 })

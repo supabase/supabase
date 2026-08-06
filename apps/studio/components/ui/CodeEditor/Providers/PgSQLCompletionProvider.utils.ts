@@ -8,6 +8,11 @@ export type SqlTableReference = {
   alias?: string
 }
 
+export type SqlIdent = {
+  isQuoted: boolean
+  name: string
+}
+
 const CLAUSE_STOP_KEYWORDS =
   'where|group|order|having|limit|offset|union|intersect|except|join|inner|left|right|full|cross|lateral|natural|window|for|returning|set|on|using'
 
@@ -184,6 +189,47 @@ export function filterTablesByReferences<T extends { schemaname: string; tablena
 
   return tables.filter((table) =>
     refs.some((ref) => {
+      if (table.tablename.toLowerCase() !== ref.name.toLowerCase()) return false
+      if (ref.schema) return table.schemaname.toLowerCase() === ref.schema.toLowerCase()
+      return true
+    })
+  )
+}
+
+// Matches a trailing `ident.` (quoted or unquoted), capturing the identifier.
+const TRAILING_DOT_IDENT_PATTERN = new RegExp(`(${IDENT})\\s*\\.\\s*$`)
+
+// Detects an identifier immediately followed by a dot at the very end of the
+// text (e.g. `... where c.`), so completion can be scoped to that specific
+// alias/table rather than every table referenced in the statement.
+export function parseTrailingDotIdent(text: string): SqlIdent | null {
+  const match = text.match(TRAILING_DOT_IDENT_PATTERN)
+  if (!match) return null
+
+  const raw = match[1]
+  return { isQuoted: raw.startsWith('"'), name: unquoteIdent(raw) }
+}
+
+// Resolves `ident` (typically the identifier typed right before a dot)
+// against `refs`, matching on alias first and falling back to the table's own
+// name for un-aliased references — so `c.` after `... customers c` (or
+// `customers.` with no alias) both resolve to the `customers` table, but a
+// join's other table doesn't leak in.
+export function resolveTablesForIdent<T extends { schemaname: string; tablename: string }>(
+  tables: T[],
+  refs: SqlTableReference[],
+  ident: SqlIdent
+): T[] {
+  const matchingRefs = refs.filter((ref) => {
+    const candidate = ref.alias ?? ref.name
+    return ident.isQuoted
+      ? candidate === ident.name
+      : candidate.toLocaleLowerCase() === ident.name.toLocaleLowerCase()
+  })
+  if (matchingRefs.length === 0) return []
+
+  return tables.filter((table) =>
+    matchingRefs.some((ref) => {
       if (table.tablename.toLowerCase() !== ref.name.toLowerCase()) return false
       if (ref.schema) return table.schemaname.toLowerCase() === ref.schema.toLowerCase()
       return true

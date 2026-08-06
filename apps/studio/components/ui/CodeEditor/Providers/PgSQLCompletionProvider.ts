@@ -7,6 +7,8 @@ import {
   filterTablesByReferences,
   getFromClauseTables,
   getStatementAtOffset,
+  parseTrailingDotIdent,
+  resolveTablesForIdent,
 } from './PgSQLCompletionProvider.utils'
 import type { PgInfo } from './Providers.types'
 import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
@@ -44,13 +46,13 @@ export function getPgsqlCompletionProvider(
         // position.lineNumber should minus 1
         const iterator = new BackwardIterator(model, position.column - 2, position.lineNumber - 1)
         const range = getReplacementRange(model, position)
+        const statement = getStatementAtOffset(model.getValue(), model.getOffsetAt(position))
 
         if (context.triggerCharacter === '"') {
           return startingQuoteScenarioSuggestions(monaco, pgInfo, iterator, range)
         } else if (context.triggerCharacter === '.') {
-          return dotScenarioSuggestions(monaco, pgInfo, iterator, range)
+          return dotScenarioSuggestions(monaco, pgInfo, iterator, range, statement)
         } else {
-          const statement = getStatementAtOffset(model.getValue(), model.getOffsetAt(position))
           return defaultScenarioSuggestions(monaco, pgInfo, statement, range)
         }
       } catch (_) {
@@ -133,7 +135,8 @@ function dotScenarioSuggestions(
   monaco: Monaco,
   pgInfo: PgInfo,
   iterator: BackwardIterator,
-  range: languages.CompletionItem['range']
+  range: languages.CompletionItem['range'],
+  statement: string
 ) {
   const items: languages.CompletionItem[] = []
 
@@ -173,13 +176,24 @@ function dotScenarioSuggestions(
     return { suggestions: items }
   }
 
-  const table = pgInfo.tableColumns.find((tbl: TableColumn) => {
-    if (tbl.schemaname !== schema.name) return false
-    const _ident = idents.length > pos ? idents[pos] : EMPTY_IDENT
-    return _ident.isQuoted
-      ? tbl.tablename === _ident.name
-      : tbl.tablename.toLocaleLowerCase() == _ident.name.toLocaleLowerCase()
-  })
+  const tableIdent = idents.length > pos ? idents[pos] : EMPTY_IDENT
+
+  // A schema can't be part of an alias (`myschema.c.id` isn't valid SQL), so only
+  // attempt alias resolution when nothing before this ident was consumed as a schema.
+  // This is what scopes `c.` to just `customers` instead of every FROM/JOIN table.
+  const aliasedTables =
+    pos === 0
+      ? resolveTablesForIdent(pgInfo.tableColumns, getFromClauseTables(statement), tableIdent)
+      : []
+
+  const table =
+    aliasedTables[0] ??
+    pgInfo.tableColumns.find((tbl: TableColumn) => {
+      if (tbl.schemaname !== schema.name) return false
+      return tableIdent.isQuoted
+        ? tbl.tablename === tableIdent.name
+        : tbl.tablename.toLocaleLowerCase() == tableIdent.name.toLocaleLowerCase()
+    })
 
   if (table) {
     table.columns.forEach((field: TableColumnField | null) => {
@@ -243,7 +257,20 @@ function defaultScenarioSuggestions(
   // only suggest colors' columns). Falls back to every table's columns when
   // none can be resolved, e.g. before a FROM clause has been typed.
   const fromClauseTables = getFromClauseTables(statement)
-  const inScopeTableColumns = filterTablesByReferences(allTableColumns, fromClauseTables)
+
+  // If the statement ends with `alias.` (Monaco can re-request suggestions this way
+  // right after the dot, without going through the dot-trigger scenario), scope
+  // strictly to that one alias/table instead of every FROM/JOIN table — otherwise
+  // e.g. `c.` after `orders o join customers c` would suggest orders' columns too.
+  const trailingDotIdent = parseTrailingDotIdent(statement)
+  const aliasScopedTableColumns = trailingDotIdent
+    ? resolveTablesForIdent(allTableColumns, fromClauseTables, trailingDotIdent)
+    : []
+
+  const inScopeTableColumns =
+    aliasScopedTableColumns.length > 0
+      ? aliasScopedTableColumns
+      : filterTablesByReferences(allTableColumns, fromClauseTables)
   const hasResolvedFromTables = inScopeTableColumns.length > 0
   const relevantTableColumns = hasResolvedFromTables ? inScopeTableColumns : allTableColumns
 

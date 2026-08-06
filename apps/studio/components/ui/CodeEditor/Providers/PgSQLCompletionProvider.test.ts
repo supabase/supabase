@@ -73,8 +73,20 @@ function createPgInfoRef(): { current: PgInfo } {
 }
 
 function getSuggestions(pgInfoRef: { current: PgInfo }, sql: string): languages.CompletionItem[] {
+  return provideSuggestions(pgInfoRef, sql, ' ')
+}
+
+function getDotSuggestions(pgInfoRef: { current: PgInfo }, sql: string): languages.CompletionItem[] {
+  return provideSuggestions(pgInfoRef, sql, '.')
+}
+
+function provideSuggestions(
+  pgInfoRef: { current: PgInfo },
+  sql: string,
+  triggerCharacter: string
+): languages.CompletionItem[] {
   const provider = getPgsqlCompletionProvider(monaco, pgInfoRef)
-  const context = { triggerCharacter: ' ' } as unknown as ProvideCompletionItemsParams[2]
+  const context = { triggerCharacter } as unknown as ProvideCompletionItemsParams[2]
   const token = {} as ProvideCompletionItemsParams[3]
 
   const result = provider.provideCompletionItems(
@@ -127,5 +139,44 @@ describe('getPgsqlCompletionProvider - default scenario', () => {
       (s) => s.kind === monaco.languages.CompletionItemKind.Field
     )
     expect(columnSuggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id', 'sides'])
+  })
+
+  it('scopes to a single alias when the statement ends with `alias.`', () => {
+    const pgInfoRef = createPgInfoRef()
+    const suggestions = getSuggestions(
+      pgInfoRef,
+      'select * from colors c join shapes s on s.id = c.id where c.'
+    )
+
+    const columnSuggestions = suggestions.filter(
+      (s) => s.kind === monaco.languages.CompletionItemKind.Field
+    )
+    expect(columnSuggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id'])
+  })
+})
+
+describe('getPgsqlCompletionProvider - dot scenario', () => {
+  it('scopes to a table alias in a single-table query', () => {
+    const pgInfoRef = createPgInfoRef()
+    const suggestions = getDotSuggestions(pgInfoRef, 'select * from colors c where c.')
+    expect(suggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id'])
+  })
+
+  it('scopes to the aliased table only, not every table joined in', () => {
+    const pgInfoRef = createPgInfoRef()
+    const suggestions = getDotSuggestions(
+      pgInfoRef,
+      'select * from colors c join shapes s on s.id = c.id where c.'
+    )
+    expect(suggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id'])
+  })
+
+  it('still resolves a plain (un-aliased) table name', () => {
+    const pgInfoRef = createPgInfoRef()
+    const suggestions = getDotSuggestions(
+      pgInfoRef,
+      'select * from colors join shapes s on s.id = colors.id where colors.'
+    )
+    expect(suggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id'])
   })
 })
