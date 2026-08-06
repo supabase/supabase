@@ -247,11 +247,7 @@ rm -f "$range_download"
 # ---------------------------------------------
 # 11. Presigned URLs
 # ---------------------------------------------
-# Storage supports S3 presigned URLs (query-parameter auth). Known caveat with
-# the Kong gateway override: Kong's request-transformer adds an empty
-# Authorization header when the Lua expression evaluates to nil, so Storage sees
-# typeof "" === "string" and enters parseAuthorizationHeader instead of
-# parseQuerySignature. If this fails, check whether the Kong override is active.
+# Storage supports S3 presigned URLs (query-parameter auth).
 
 echo ""
 echo "--- Presigned URLs ---"

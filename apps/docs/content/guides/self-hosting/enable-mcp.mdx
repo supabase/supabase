@@ -183,32 +183,9 @@ Add the IP address you discovered to the Kong configuration by editing the follo
 
 After you've added the local IP address as above, restart your gateway:
 
-<Tabs
-scrollable
-size="small"
-type="underlined"
-defaultActiveId="envoy"
->
-
-<TabPanel id="envoy" label="Envoy">
-
 ```sh
 sh run.sh restart api-gw
 ```
-
-</TabPanel>
-
-<TabPanel id="kong" label="Kong">
-
-```sh
-sh run.sh restart api-gw
-```
-
-This assumes the Kong gateway override is active (`sh run.sh config add kong`).
-
-</TabPanel>
-
-</Tabs>
 
 ### Step 4: Create the SSH tunnel
 
@@ -268,7 +245,6 @@ Start your MCP client (Claude Code, Cursor, etc.) and verify access to the MCP t
 
 If you are unable to connect to the MCP server:
 
-1. Update Kong configuration file to the [latest version](https://github.com/supabase/supabase/blob/master/docker/volumes/api/kong.yml) and edit carefully
-2. Confirm the Docker bridge gateway IP is correctly added in `./volumes/api/kong.yml`
-3. Check the gateway's logs for errors: `docker compose logs api-gw`
-4. Make sure your SSH tunnel is active
+1. Confirm the Docker bridge gateway IP is correctly added to the API gateway configuration
+2. Check the API gateway's logs for errors: `docker compose logs api-gw`
+3. Make sure your SSH tunnel is active

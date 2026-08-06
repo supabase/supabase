@@ -8,31 +8,15 @@ Self-hosted Supabase uses an [Envoy](https://www.envoyproxy.io/)-based API gatew
 
 This guide explains the architecture, configuration layout, and security posture of the Envoy gateway for operators who want to understand or customize it. It is not an Envoy tutorial - for reference on filters, routes, and clusters, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/).
 
-## Before you begin
-
-- Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
-- To enable opaque `sb_` key translation, see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys)
-
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Using the gateway
 
 Envoy is the default API gateway and runs automatically when you start the stack - no extra configuration is required.
 
-Envoy is registered as the `api-gw` service and also exposes `kong` and `envoy` as network aliases. Either hostname resolves to whichever gateway is active, so internal configs that reference `api-gw:8000` or `kong:8000` (for example, in Edge Functions or Studio) keep working without changes.
+Envoy is registered as the `api-gw` service and also exposes `envoy` and `kong` as network aliases to help transition from legacy configurations.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
-### Reverting to Kong
-
-Kong is available as an optional override. If your stack is already running, bring it down first with `sh run.sh stop`, then enable the Kong override and start the stack:
-
-```sh
-sh run.sh config add kong
-sh run.sh start
-```
-
-This replaces Envoy with Kong on the same port (default `8000`) and re-adds Kong's built-in HTTPS listener on `8443`. The `api-gw` service name and the `kong` alias are unchanged, so dependent services keep working.
 
 ### Verify
 
@@ -321,3 +305,4 @@ The access log format is a standard combined log with the request method, origin
 - [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys) - Background on opaque keys and asymmetric JWTs
 - [Configure Reverse Proxy and HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) - Caddy or Nginx in front of the gateway
 - [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/) - Filter, route, and cluster reference
+- [Self-hosted Supabase: Envoy becomes the default API gateway (Discussion #48048)](https://github.com/orgs/supabase/discussions/48048)

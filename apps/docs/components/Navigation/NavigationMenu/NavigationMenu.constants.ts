@@ -3085,7 +3085,7 @@ export const self_hosting: NavMenuConstant = {
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
     { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
-    { name: 'Enable Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
+    { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
     {
       name: 'Add Reverse Proxy with HTTPS',
       url: '/guides/self-hosting/self-hosted-proxy-https',
