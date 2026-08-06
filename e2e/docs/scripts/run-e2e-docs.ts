@@ -122,7 +122,6 @@ async function resolvePagePaths(): Promise<string[] | null> {
 async function main() {
   const rawArgs = process.argv.slice(2)
   const runAll = rawArgs.includes('--all')
-  // Playwright reads a passed-through `--` as a test-file filter and finds no tests.
   const playwrightArgs = rawArgs.filter((arg) => arg !== '--all' && arg !== '--')
 
   const pages = runAll ? await resolveAllPagePaths() : await resolvePagePaths()
