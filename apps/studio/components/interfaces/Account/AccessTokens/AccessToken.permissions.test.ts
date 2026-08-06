@@ -76,11 +76,23 @@ describe('normalizePermissionScopeMap', () => {
     expect(normalizePermissionScopeMap(grouped)).toEqual(grouped)
   })
 
-  it('tolerates payloads missing the endpoint or tool maps entirely', () => {
-    const normalized = normalizePermissionScopeMap({ scopes: {} } as PermissionScopeMap)
+  it('tolerates payloads missing any of the three maps entirely', () => {
+    const normalized = normalizePermissionScopeMap({} as PermissionScopeMap)
 
+    expect(normalized.scopes).toEqual({})
     expect(normalized.endpoints).toEqual({})
     expect(normalized.mcp_tools).toEqual({})
+  })
+
+  it('fails closed (nobody) on values that are not arrays at all', () => {
+    const normalized = normalizePermissionScopeMap({
+      scopes: {},
+      endpoints: { 'GET /v1/projects': null },
+      mcp_tools: { execute_sql: 'database_read' },
+    } as unknown as PermissionScopeMap)
+
+    expect(normalized.endpoints['GET /v1/projects']).toEqual([])
+    expect(normalized.mcp_tools.execute_sql).toEqual([])
   })
 })
 

@@ -157,6 +157,22 @@ describe('MCPToolScopeMappings', () => {
     expect(MCPToolScopeMappings.search_docs).toEqual([[]])
   })
 
+  // Guards the OAuth-scope -> legacy-map join: a scope key drifting out of the legacy map must
+  // not inject undefined into the payload (flatMap doesn't flatten it) or silently disable a
+  // gated tool by dropping all its groups.
+  test('every derived group is non-empty strings, and only the ungated tools lack scopes', () => {
+    const ungated = ['confirm_cost', 'search_docs']
+    for (const [tool, groups] of Object.entries(MCPToolScopeMappings)) {
+      expect(groups.length, `${tool} lost all its alternatives`).toBeGreaterThan(0)
+      for (const group of groups) {
+        if (!ungated.includes(tool))
+          expect(group.length, `${tool} has an empty group`).toBeGreaterThan(0)
+        for (const scope of group)
+          expect(typeof scope, `${tool} leaked a non-string scope`).toBe('string')
+      }
+    }
+  })
+
   test('get_cost requires both organization and project read bundles together', () => {
     expect(MCPToolScopeMappings.get_cost).toHaveLength(1)
     expect(MCPToolScopeMappings.get_cost[0]).toEqual(

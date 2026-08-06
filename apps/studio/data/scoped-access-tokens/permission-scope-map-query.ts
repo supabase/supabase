@@ -181,13 +181,18 @@ export const getMcpToolsForScopes = ({
  * can still receive a stale flat payload; evaluating it as groups would call group.every on a
  * string and crash the render. Interpret a flat list as what it was — a single conjunctive group.
  */
-const normalizeGroups = (groups: string[] | ScopeGroupAlternatives): ScopeGroupAlternatives =>
-  groups.every((group): group is ScopeGroup => Array.isArray(group))
+const normalizeGroups = (groups: string[] | ScopeGroupAlternatives): ScopeGroupAlternatives => {
+  // A non-array value is not a shape any server ever emitted — fail closed (nobody) rather
+  // than crash the defense itself.
+  if (!Array.isArray(groups)) return []
+  return groups.every((group): group is ScopeGroup => Array.isArray(group))
     ? groups
     : [groups as ScopeGroup]
+}
 
 export const normalizePermissionScopeMap = (raw: PermissionScopeMap): PermissionScopeMap => ({
   ...raw,
+  scopes: raw.scopes ?? {},
   endpoints: Object.fromEntries(
     Object.entries(raw.endpoints ?? {}).map(([endpoint, groups]) => [
       endpoint,

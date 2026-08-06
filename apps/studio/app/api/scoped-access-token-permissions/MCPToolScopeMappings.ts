@@ -22,7 +22,9 @@ const MCPToolOAuthScopeMapping: Record<string, OAuthScopeValue[][]> = {
   execute_sql: [[OAuthScope.DATABASE_READ], [OAuthScope.DATABASE_WRITE]],
   generate_typescript_types: [[OAuthScope.DATABASE_READ]],
   get_advisors: [[OAuthScope.DATABASE_READ]],
-  // Calls getOrganization + listProjects to price the project, so it needs both read scopes.
+  // Calls getOrganization + listProjects to price a project, so it needs both read scopes.
+  // (The type=branch path returns a constant with no platform call; gating on the project
+  // path's scopes fails closed for branch-only pricing, which is fine for advisory display.)
   get_cost: [[OAuthScope.ORGANIZATIONS_READ, OAuthScope.PROJECTS_READ]],
   get_edge_function: [[OAuthScope.EDGE_FUNCTIONS_READ]],
   get_logs: [[OAuthScope.ANALYTICS_READ]],
@@ -185,7 +187,11 @@ export const legacyOauthScopeToFgaPermissionMap: Record<string, string[]> = {
 export const MCPToolScopeMappings = Object.entries(MCPToolOAuthScopeMapping).reduce(
   (acc, [mcpTool, oAuthScopeGroups]) => {
     acc[mcpTool] = oAuthScopeGroups
-      .map((group) => group.flatMap((oAuthScope) => legacyOauthScopeToFgaPermissionMap[oAuthScope]))
+      // `?? []` so a scope missing from the legacy map degrades to an empty expansion (group
+      // dropped by the filter below) instead of injecting undefined into the payload.
+      .map((group) =>
+        group.flatMap((oAuthScope) => legacyOauthScopeToFgaPermissionMap[oAuthScope] ?? [])
+      )
       .filter((expanded, index) => oAuthScopeGroups[index].length === 0 || expanded.length > 0)
     return acc
   },
