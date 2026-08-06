@@ -920,7 +920,8 @@ struct Shift: Codable {
   let userId: Int
   let attendanceStatus: String?
 
-  let scans: [Scan]
+  let startScan: Scan
+  let endScan: Scan
 
   struct Scan: Codable {
     let id: Int
@@ -938,6 +939,8 @@ struct Shift: Codable {
     case id
     case userId = "user_id"
     case attendanceStatus = "attendance_status"
+    case startScan = "start_scan"
+    case endScan = "end_scan"
   }
 }
 
@@ -951,11 +954,11 @@ let shifts: [Shift] = try await supabase
         user_id,
         badge_scan_time
       ),
-     scans: scan_id_end (
+      end_scan:scans!scan_id_end (
         id,
         user_id,
         badge_scan_time
-     )
+      )
     """
   )
   .execute()

@@ -1,0 +1,41 @@
+---
+title = "Supabase CLI fails with 'Transport error' (antivirus/proxy TLS interception)"
+topics = [ "cli", "platform" ]
+keywords = [ "windows", "norton", "tls interception", "certificate", "transport error", "ssl inspection", "firewall", "web and mail shield", "zscaler", "netskope" ]
+
+[[errors]]
+message = "Transport error"
+
+[[errors]]
+message = "UNABLE_TO_VERIFY_LEAF_SIGNATURE"
+---
+
+This typically affects CLI commands that call the Management API, such as `supabase projects list` and `supabase link`:
+
+```
+failed to list projects: HttpClientError: Transport error (GET https://api.supabase.com/v1/projects)
+```
+
+## Why this happens
+
+The CLI's HTTP client buckets any failure that happens before it receives an HTTP response — timeouts, connection resets, certificate rejections — under one generic `TransportError` label. The message alone doesn't tell you which of these occurred, which makes this error hard to diagnose from the output alone.
+
+One confirmed cause: antivirus software or corporate SSL-inspecting proxies that intercept HTTPS traffic to scan it. These install a local root certificate and re-sign connections so they can decrypt, inspect, and re-encrypt traffic in transit — a documented feature of products like Norton (under names like "Web and Mail Shield" or "Safe Web") and of enterprise network security proxies. The CLI receives the substituted certificate instead of Supabase's real one and rejects it, surfacing as the generic transport error above rather than a certificate-specific one.
+
+Other HTTP clients on the same machine can behave differently, which is a useful diagnostic signal. In one confirmed case (Norton 360 on Windows), `curl` connected successfully while the CLI failed, and Node's `fetch()` surfaced a more specific `UNABLE_TO_VERIFY_LEAF_SIGNATURE` error for the same request.
+
+## How to diagnose
+
+- Compare behavior across HTTP clients on the same machine. If `curl -v https://api.supabase.com` or a browser succeeds while the CLI fails, the network path itself is fine and something local to the machine is the difference.
+- Check the certificate being served for `api.supabase.com`. In a browser, click the padlock icon next to the address bar and check the certificate's **Issuer** field. It should be a public CA (e.g. Google Trust Services). If it's your antivirus vendor or a corporate proxy CA instead, that's what's intercepting the connection.
+- If you're on a corporate network, check whether your organization uses an SSL-inspecting proxy and whether its root CA is installed and trusted on your machine.
+
+## How to resolve
+
+Only disable HTTPS/TLS inspection after the diagnostic step above confirms it's the cause — a `Transport error` can also come from an unrelated timeout or connection reset, and disabling scanning you don't need reduces your protection unnecessarily.
+
+Once confirmed, identify and disable the specific feature doing the inspection. This is often a separate setting from the general firewall or "protection" toggle, so disabling the main antivirus switch alone may not be enough. Treat this as temporary while you resolve connectivity — prefer a narrower host-specific exclusion for `api.supabase.com` over disabling scanning outright, if your software supports one.
+
+For **Norton 360 on Windows**, the responsible feature is **Safe Web / Web & Mail Shield**, not Smart Firewall — disabling Smart Firewall alone does not stop the interception. After disabling it, confirm the certificate reverts to the expected issuer before retrying.
+
+If you're behind a corporate SSL-inspecting proxy, this is managed by your IT/security team rather than something you can change locally — they can add an exclusion for `api.supabase.com` on the proxy side if needed.
