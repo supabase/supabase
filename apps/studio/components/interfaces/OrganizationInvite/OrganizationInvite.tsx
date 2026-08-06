@@ -78,8 +78,6 @@ export const OrganizationInvite = () => {
     onSuccess: () => {
       router.push('/organizations')
     },
-    // [Joshen] Silence the default toast handler
-    onError: () => {},
   })
 
   async function handleJoinOrganization() {

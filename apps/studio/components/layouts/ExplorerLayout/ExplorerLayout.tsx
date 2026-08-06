@@ -56,7 +56,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
             newTabButton={<NewTabButton />}
           />
         </div>
-        <div>{children}</div>
+        <div className="h-full">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
   )
