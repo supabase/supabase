@@ -135,7 +135,10 @@ describe('Admonition', () => {
     render(<Admonition type="note" description="Body copy." />)
 
     const note = screen.getByRole('alert', { name: 'Note' })
-    expect(within(note).getByText('Body copy.').tagName).toBe('P')
+    const description = within(note).getByText('Body copy.')
+
+    expect(description.tagName).toBe('P')
+    expect(description.parentElement?.parentElement).toHaveClass('my-0.5')
   })
 
   it('wraps MDX children in AlertDescription', () => {
@@ -151,5 +154,15 @@ describe('Admonition', () => {
     expect(paragraph.tagName).toBe('P')
     expect(paragraph.parentElement).toHaveClass('text-sm')
     expect(paragraph.parentElement).toHaveAttribute('data-slot', 'alert-description')
+    expect(paragraph.parentElement?.parentElement).toHaveClass('my-0.5')
+  })
+
+  it('does not offset titled content', () => {
+    render(<Admonition type="note" title="Manual approval required" description="Body copy." />)
+
+    const note = screen.getByRole('alert', { name: 'Note' })
+    const title = within(note).getByText('Manual approval required')
+
+    expect(title.parentElement).not.toHaveClass('my-0.5')
   })
 })
