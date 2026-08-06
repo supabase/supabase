@@ -13,6 +13,8 @@ type OAuthScopeValue = (typeof OAuthScope)[keyof typeof OAuthScope]
 // session's read_only mode (mcp.controller.ts), so it carries two alternatives.
 const MCPToolOAuthScopeMapping: Record<string, OAuthScopeValue[][]> = {
   apply_migration: [[OAuthScope.DATABASE_WRITE]],
+  // Computes a local confirmation hash without calling the platform — no scope gates it.
+  confirm_cost: [[]],
   create_branch: [[OAuthScope.ENVIRONMENT_WRITE]],
   create_project: [[OAuthScope.PROJECTS_WRITE]],
   delete_branch: [[OAuthScope.ENVIRONMENT_WRITE]],
@@ -20,6 +22,8 @@ const MCPToolOAuthScopeMapping: Record<string, OAuthScopeValue[][]> = {
   execute_sql: [[OAuthScope.DATABASE_READ], [OAuthScope.DATABASE_WRITE]],
   generate_typescript_types: [[OAuthScope.DATABASE_READ]],
   get_advisors: [[OAuthScope.DATABASE_READ]],
+  // Calls getOrganization + listProjects to price the project, so it needs both read scopes.
+  get_cost: [[OAuthScope.ORGANIZATIONS_READ, OAuthScope.PROJECTS_READ]],
   get_edge_function: [[OAuthScope.EDGE_FUNCTIONS_READ]],
   get_logs: [[OAuthScope.ANALYTICS_READ]],
   get_organization: [[OAuthScope.ORGANIZATIONS_READ]],
@@ -29,15 +33,21 @@ const MCPToolOAuthScopeMapping: Record<string, OAuthScopeValue[][]> = {
   get_storage_config: [[OAuthScope.STORAGE_READ]],
   list_branches: [[OAuthScope.ENVIRONMENT_READ]],
   list_edge_functions: [[OAuthScope.EDGE_FUNCTIONS_READ]],
+  // Runs through executeSql with read_only forced true.
+  list_extensions: [[OAuthScope.DATABASE_READ]],
   list_migrations: [[OAuthScope.DATABASE_READ]],
   list_organizations: [[OAuthScope.ORGANIZATIONS_READ]],
   list_projects: [[OAuthScope.PROJECTS_READ]],
   list_storage_buckets: [[OAuthScope.STORAGE_READ]],
+  // Runs through executeSql with read_only forced true.
+  list_tables: [[OAuthScope.DATABASE_READ]],
   merge_branch: [[OAuthScope.ENVIRONMENT_WRITE]],
   pause_project: [[OAuthScope.PROJECTS_WRITE]],
   rebase_branch: [[OAuthScope.ENVIRONMENT_WRITE]],
   reset_branch: [[OAuthScope.ENVIRONMENT_WRITE]],
   restore_project: [[OAuthScope.PROJECTS_WRITE]],
+  // Queries the public content API — no scope gates it.
+  search_docs: [[]],
   update_storage_config: [[OAuthScope.STORAGE_WRITE]],
 }
 

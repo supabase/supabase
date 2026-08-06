@@ -151,6 +151,58 @@ describe('MCPToolScopeMappings', () => {
     expect(MCPToolScopeMappings.apply_migration).toHaveLength(1)
     expect(MCPToolScopeMappings.apply_migration[0]).toContain('database_write')
   })
+
+  test('tools without a platform scope gate stay ungated ([[]]), not disabled ([])', () => {
+    expect(MCPToolScopeMappings.confirm_cost).toEqual([[]])
+    expect(MCPToolScopeMappings.search_docs).toEqual([[]])
+  })
+
+  test('get_cost requires both organization and project read bundles together', () => {
+    expect(MCPToolScopeMappings.get_cost).toHaveLength(1)
+    expect(MCPToolScopeMappings.get_cost[0]).toEqual(
+      expect.arrayContaining(['organizations_read', 'projects_read'])
+    )
+  })
+
+  // Drift guard: the exact tool registry of @supabase/mcp-server-supabase@0.8.1, the version the
+  // platform pins. When the platform bumps the MCP server, this list (and the mapping) must be
+  // re-derived from the controller's assertMcpOAuthScope calls.
+  test('covers exactly the tool registry of the deployed MCP server', () => {
+    expect(Object.keys(MCPToolScopeMappings).sort()).toEqual([
+      'apply_migration',
+      'confirm_cost',
+      'create_branch',
+      'create_project',
+      'delete_branch',
+      'deploy_edge_function',
+      'execute_sql',
+      'generate_typescript_types',
+      'get_advisors',
+      'get_cost',
+      'get_edge_function',
+      'get_logs',
+      'get_organization',
+      'get_project',
+      'get_project_url',
+      'get_publishable_keys',
+      'get_storage_config',
+      'list_branches',
+      'list_edge_functions',
+      'list_extensions',
+      'list_migrations',
+      'list_organizations',
+      'list_projects',
+      'list_storage_buckets',
+      'list_tables',
+      'merge_branch',
+      'pause_project',
+      'rebase_branch',
+      'reset_branch',
+      'restore_project',
+      'search_docs',
+      'update_storage_config',
+    ])
+  })
 })
 
 describe('buildAPIPermissionScopeMap', () => {
