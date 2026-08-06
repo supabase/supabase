@@ -151,10 +151,36 @@ function dotScenarioSuggestions(
     )
   })
 
+  // A schema can't be part of an alias (`myschema.c.id` isn't valid SQL), so only
+  // attempt alias resolution when nothing before this ident was consumed as a schema.
+  // This must happen before the `public`-schema fallback/early-return below, so `c.`
+  // resolves via the FROM/JOIN alias even in a database with no `public` schema.
   if (!schema) {
-    schema = pgInfo.schemas.find((sch: Schema) => sch.name == 'public')
+    const tableIdent = idents.length > pos ? idents[pos] : EMPTY_IDENT
+    const aliasedTables = resolveTablesForIdent(
+      pgInfo.tableColumns,
+      getFromClauseTables(statement),
+      tableIdent
+    )
+    if (aliasedTables.length > 0) {
+      aliasedTables[0].columns.forEach((field: TableColumnField | null) => {
+        if (!field) return
+        items.push({
+          label: field.attname,
+          kind: monaco.languages.CompletionItemKind.Property,
+          detail: field.data_type,
+          insertText: formatInsertText(field.attname),
+          range,
+        })
+      })
+      return { suggestions: items }
+    }
   } else {
     pos++
+  }
+
+  if (!schema) {
+    schema = pgInfo.schemas.find((sch: Schema) => sch.name == 'public')
   }
 
   // No custom schema and no `public` schema either — nothing sensible to suggest.
@@ -178,22 +204,12 @@ function dotScenarioSuggestions(
 
   const tableIdent = idents.length > pos ? idents[pos] : EMPTY_IDENT
 
-  // A schema can't be part of an alias (`myschema.c.id` isn't valid SQL), so only
-  // attempt alias resolution when nothing before this ident was consumed as a schema.
-  // This is what scopes `c.` to just `customers` instead of every FROM/JOIN table.
-  const aliasedTables =
-    pos === 0
-      ? resolveTablesForIdent(pgInfo.tableColumns, getFromClauseTables(statement), tableIdent)
-      : []
-
-  const table =
-    aliasedTables[0] ??
-    pgInfo.tableColumns.find((tbl: TableColumn) => {
-      if (tbl.schemaname !== schema.name) return false
-      return tableIdent.isQuoted
-        ? tbl.tablename === tableIdent.name
-        : tbl.tablename.toLocaleLowerCase() == tableIdent.name.toLocaleLowerCase()
-    })
+  const table = pgInfo.tableColumns.find((tbl: TableColumn) => {
+    if (tbl.schemaname !== schema.name) return false
+    return tableIdent.isQuoted
+      ? tbl.tablename === tableIdent.name
+      : tbl.tablename.toLocaleLowerCase() == tableIdent.name.toLocaleLowerCase()
+  })
 
   if (table) {
     table.columns.forEach((field: TableColumnField | null) => {

@@ -182,4 +182,28 @@ describe('getPgsqlCompletionProvider - dot scenario', () => {
     )
     expect(suggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id'])
   })
+
+  it('resolves an alias when there is no `public` schema at all', () => {
+    const pgInfoRef: { current: PgInfo } = {
+      current: {
+        keywords: [],
+        schemas: [{ name: 'app' }] as unknown as PgInfo['schemas'],
+        functions: [] as unknown as PgInfo['functions'],
+        tableColumns: [
+          {
+            schemaname: 'app',
+            tablename: 'colors',
+            quoted_name: 'colors',
+            is_table: true,
+            columns: [
+              { attname: 'id', data_type: 'bigint' },
+              { attname: 'hex', data_type: 'text' },
+            ],
+          },
+        ],
+      },
+    }
+    const suggestions = getDotSuggestions(pgInfoRef, 'select * from app.colors c where c.')
+    expect(suggestions.map((s) => s.label).sort()).toStrictEqual(['hex', 'id'])
+  })
 })
