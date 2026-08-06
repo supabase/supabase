@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { Lock } from 'lucide-react'
 import {
   Button,
   Checkbox,
@@ -97,11 +96,7 @@ export const TrashList = ({
                 {formatBytes(object.size)}
               </TableCell>
               <TableCell>
-                {object.heldBySnapshot ? (
-                  <span className="flex items-center gap-x-1.5 text-destructive">
-                    <Lock size={12} /> Held by snapshot
-                  </span>
-                ) : object.expiresAt ? (
+                {object.expiresAt ? (
                   <span className="text-warning-600">{dayjs(object.expiresAt).fromNow()}</span>
                 ) : (
                   <span className="text-foreground-lighter">Never</span>
@@ -112,19 +107,7 @@ export const TrashList = ({
                   <Button variant="default" loading={isRestoring} onClick={() => onRestore(object)}>
                     Restore
                   </Button>
-                  <ButtonTooltip
-                    variant="danger"
-                    disabled={object.heldBySnapshot}
-                    onClick={() => onDeleteForever(object)}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: object.heldBySnapshot
-                          ? 'Held by a snapshot — delete the snapshot first'
-                          : 'Delete permanently',
-                      },
-                    }}
-                  >
+                  <ButtonTooltip variant="danger" onClick={() => onDeleteForever(object)}>
                     Delete permanently
                   </ButtonTooltip>
                 </div>

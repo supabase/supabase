@@ -142,18 +142,9 @@ export const VersionHistory = ({
                             size="tiny"
                             className="px-1.5 hover:text-destructive"
                             icon={<Trash2 size={14} />}
-                            disabled={version.heldBySnapshot !== null}
                             aria-label={`Delete version ${shortVersion(version.versionId)}`}
                             onClick={() => setVersionToDelete(version)}
-                            tooltip={{
-                              content: {
-                                side: 'bottom',
-                                text:
-                                  version.heldBySnapshot !== null
-                                    ? 'Held by a snapshot — delete the snapshot first'
-                                    : 'Delete permanently',
-                              },
-                            }}
+                            tooltip={{ content: { side: 'bottom', text: 'Delete permanently' } }}
                           />
                         </>
                       )}
@@ -164,7 +155,6 @@ export const VersionHistory = ({
                   </p>
                   <p className="mt-1 font-mono text-xs text-foreground-muted">
                     v: {shortVersion(version.versionId)}
-                    {version.heldBySnapshot && ` · held by ${version.heldBySnapshot}`}
                   </p>
                 </div>
               </li>

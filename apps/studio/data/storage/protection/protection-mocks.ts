@@ -21,7 +21,6 @@ export interface ObjectVersion {
   createdAt: string
   isCurrent: boolean
   action: ObjectVersionAction
-  heldBySnapshot: string | null
 }
 
 export interface TrashObject {
@@ -32,7 +31,6 @@ export interface TrashObject {
   deletedBy: string
   size: number
   expiresAt: string | null
-  heldBySnapshot: boolean
 }
 
 const MB = 1024 * 1024
@@ -57,7 +55,6 @@ export const getMockObjectVersions = (_objectName: string): ObjectVersion[] => [
     createdAt: BASE_DATE,
     isCurrent: true,
     action: 'overwrite',
-    heldBySnapshot: null,
   },
   {
     versionId: '2b7d9153aa9e',
@@ -65,7 +62,6 @@ export const getMockObjectVersions = (_objectName: string): ObjectVersion[] => [
     createdAt: daysAgo(4, '18:02:00'),
     isCurrent: false,
     action: 'overwrite',
-    heldBySnapshot: 'snap_8f3a…c1',
   },
   {
     versionId: 'a19c04f7de40',
@@ -73,7 +69,6 @@ export const getMockObjectVersions = (_objectName: string): ObjectVersion[] => [
     createdAt: daysAgo(10, '11:40:00'),
     isCurrent: false,
     action: 'overwrite',
-    heldBySnapshot: null,
   },
   {
     versionId: '5c0278b3ac7a',
@@ -81,7 +76,6 @@ export const getMockObjectVersions = (_objectName: string): ObjectVersion[] => [
     createdAt: daysAgo(22, '08:20:00'),
     isCurrent: false,
     action: 'initial upload',
-    heldBySnapshot: 'snap_a19c…40',
   },
 ]
 
@@ -99,7 +93,6 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'jane@acme.co',
     size: 1.1 * MB,
     expiresAt: daysAhead(30),
-    heldBySnapshot: false,
   },
   {
     id: 'trash-2',
@@ -109,7 +102,6 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'api key ····a91',
     size: 44 * KB,
     expiresAt: daysAhead(29),
-    heldBySnapshot: false,
   },
   {
     id: 'trash-3',
@@ -118,8 +110,7 @@ let trashObjects: TrashObject[] = [
     deletedAt: daysAgo(3, '09:02:00'),
     deletedBy: 'jane@acme.co',
     size: 820 * KB,
-    expiresAt: null,
-    heldBySnapshot: true,
+    expiresAt: daysAhead(27),
   },
   {
     id: 'trash-4',
@@ -129,7 +120,6 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'mark@acme.co',
     size: 2.3 * MB,
     expiresAt: daysAhead(25),
-    heldBySnapshot: false,
   },
   {
     id: 'trash-5',
@@ -139,7 +129,6 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'api key ····f21',
     size: 512 * KB,
     expiresAt: daysAhead(23),
-    heldBySnapshot: false,
   },
   {
     id: 'trash-6',
@@ -148,8 +137,7 @@ let trashObjects: TrashObject[] = [
     deletedAt: daysAgo(2, '19:30:00'),
     deletedBy: 'jane@acme.co',
     size: 96 * KB,
-    expiresAt: null,
-    heldBySnapshot: true,
+    expiresAt: daysAhead(28),
   },
   {
     id: 'trash-7',
@@ -159,7 +147,6 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'system',
     size: 3.4 * MB,
     expiresAt: daysAhead(16),
-    heldBySnapshot: false,
   },
   {
     id: 'trash-8',
@@ -169,7 +156,6 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'jane@acme.co',
     size: 18 * MB,
     expiresAt: daysAhead(1),
-    heldBySnapshot: false,
   },
 ]
 
@@ -183,13 +169,11 @@ export const restoreMockTrashObjects = (objectIds: string[]): TrashObject[] => {
 
 /**
  * Removes the given ids from the trash store, simulating a permanent delete.
- * When `objectIds` is omitted, deletes every object that isn't held by a
- * snapshot (mirrors the "Delete all permanently" action).
+ * When `objectIds` is omitted, deletes every object (mirrors the "Delete all
+ * permanently" action).
  */
 export const deleteMockTrashObjectsPermanently = (objectIds?: string[]): TrashObject[] => {
-  trashObjects = objectIds
-    ? trashObjects.filter((object) => !objectIds.includes(object.id))
-    : trashObjects.filter((object) => object.heldBySnapshot)
+  trashObjects = objectIds ? trashObjects.filter((object) => !objectIds.includes(object.id)) : []
   return [...trashObjects]
 }
 

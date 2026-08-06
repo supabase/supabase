@@ -63,12 +63,6 @@ export const Trash = ({ bucketId }: TrashProps) => {
   })
 
   const orderedIds = (objects ?? []).map((object) => object.id)
-  const selectedObjects = (objects ?? []).filter((object) => selectedIds.includes(object.id))
-  const heldCount = selectedObjects.filter((object) => object.heldBySnapshot).length
-  const deletableIds = selectedObjects
-    .filter((object) => !object.heldBySnapshot)
-    .map((object) => object.id)
-  const heldInBucketCount = (objects ?? []).filter((object) => object.heldBySnapshot).length
 
   const handleToggleSelect = (id: string, isShiftHeld: boolean) => {
     setSelectedIds(toggleSelection({ selectedIds, orderedIds, id, lastToggledId, isShiftHeld }))
@@ -94,17 +88,7 @@ export const Trash = ({ bucketId }: TrashProps) => {
                 <ButtonTooltip
                   variant="danger"
                   icon={<Trash2 />}
-                  disabled={objects.length === heldInBucketCount}
                   onClick={() => setShowDeleteAll(true)}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text:
-                        objects.length === heldInBucketCount
-                          ? 'Every deleted file is held by a snapshot'
-                          : undefined,
-                    },
-                  }}
                 >
                   Delete all permanently
                 </ButtonTooltip>
@@ -121,35 +105,26 @@ export const Trash = ({ bucketId }: TrashProps) => {
               />
             )}
             {isSuccess && objects.length > 0 && (
-              <>
-                <Card className="overflow-hidden">
-                  {selectedIds.length > 0 && (
-                    <TrashSelectionBar
-                      count={selectedIds.length}
-                      heldCount={heldCount}
-                      isRestoring={isRestoring}
-                      onRestore={() => handleRestore(selectedIds)}
-                      onDelete={() => setShowBulkDelete(true)}
-                      onClear={() => setSelectedIds([])}
-                    />
-                  )}
-                  <TrashList
-                    objects={objects}
-                    selectedIds={selectedIds}
+              <Card className="overflow-hidden">
+                {selectedIds.length > 0 && (
+                  <TrashSelectionBar
+                    count={selectedIds.length}
                     isRestoring={isRestoring}
-                    onToggleSelect={handleToggleSelect}
-                    onToggleSelectAll={() =>
-                      setSelectedIds(toggleSelectAll(selectedIds, orderedIds))
-                    }
-                    onRestore={(object) => handleRestore([object.id])}
-                    onDeleteForever={setObjectToDelete}
+                    onRestore={() => handleRestore(selectedIds)}
+                    onDelete={() => setShowBulkDelete(true)}
+                    onClear={() => setSelectedIds([])}
                   />
-                </Card>
-                <p className="text-sm text-foreground-lighter">
-                  Items held by a snapshot stay recoverable — and billable — until every snapshot
-                  referencing them is deleted, even past their retention period.
-                </p>
-              </>
+                )}
+                <TrashList
+                  objects={objects}
+                  selectedIds={selectedIds}
+                  isRestoring={isRestoring}
+                  onToggleSelect={handleToggleSelect}
+                  onToggleSelectAll={() => setSelectedIds(toggleSelectAll(selectedIds, orderedIds))}
+                  onRestore={(object) => handleRestore([object.id])}
+                  onDeleteForever={setObjectToDelete}
+                />
+              </Card>
             )}
           </PageSectionContent>
         </PageSection>
@@ -181,29 +156,20 @@ export const Trash = ({ bucketId }: TrashProps) => {
       <ConfirmationModal
         variant="destructive"
         visible={showBulkDelete}
-        title={`Permanently delete ${deletableIds.length} file${deletableIds.length === 1 ? '' : 's'}`}
+        title={`Permanently delete ${selectedIds.length} file${selectedIds.length === 1 ? '' : 's'}`}
         confirmLabel="Delete permanently"
         confirmLabelLoading="Deleting..."
         loading={isDeleting}
         onCancel={() => setShowBulkDelete(false)}
         onConfirm={() => {
           if (!ref) return
-          deleteObjects({ projectRef: ref, bucketId, objectIds: deletableIds })
+          deleteObjects({ projectRef: ref, bucketId, objectIds: selectedIds })
         }}
       >
         <p className="text-sm text-foreground-light">
           These files will be permanently deleted and can no longer be restored. This action cannot
           be undone.
         </p>
-        {heldCount > 0 && (
-          <Admonition
-            className="mt-3"
-            type="warning"
-            showIcon={false}
-            title={`${heldCount} selected file${heldCount === 1 ? '' : 's'} will be kept`}
-            description="Files held by a snapshot can't be deleted until every snapshot referencing them is deleted."
-          />
-        )}
       </ConfirmationModal>
 
       <TextConfirmModal
@@ -228,8 +194,6 @@ export const Trash = ({ bucketId }: TrashProps) => {
         <p className="text-sm">
           Every soft-deleted file in <span className="font-bold text-foreground">{bucketId}</span>{' '}
           will be permanently deleted.
-          {heldInBucketCount > 0 &&
-            ` ${heldInBucketCount} file${heldInBucketCount === 1 ? '' : 's'} held by a snapshot will be kept.`}
         </p>
       </TextConfirmModal>
     </>

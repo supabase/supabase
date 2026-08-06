@@ -9,7 +9,6 @@ import { bulkActionBarClassName } from '../StorageExplorer/storageExplorerChrome
 
 interface TrashSelectionBarProps {
   count: number
-  heldCount: number
   isRestoring: boolean
   onRestore: () => void
   onDelete: () => void
@@ -18,24 +17,18 @@ interface TrashSelectionBarProps {
 
 export const TrashSelectionBar = ({
   count,
-  heldCount,
   isRestoring,
   onRestore,
   onDelete,
   onClear,
 }: TrashSelectionBarProps) => {
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
-  const isEveryItemHeld = heldCount === count
 
   return (
     <div className={bulkActionBarClassName}>
       <span className="font-mono text-xs text-foreground-light">
         <span className="tabular-nums">{count}</span> item{count !== 1 ? 's' : ''} selected
       </span>
-
-      {heldCount > 0 && (
-        <span className="text-xs text-foreground-lighter">{heldCount} held by a snapshot</span>
-      )}
 
       <div className="ml-auto flex items-center gap-1">
         <ButtonTooltip
@@ -61,16 +54,12 @@ export const TrashSelectionBar = ({
           variant="danger"
           size="tiny"
           icon={<Trash2 size={12} />}
-          disabled={!canUpdateFiles || isEveryItemHeld}
+          disabled={!canUpdateFiles}
           onClick={onDelete}
           tooltip={{
             content: {
               side: 'bottom',
-              text: !canUpdateFiles
-                ? 'You need additional permissions to delete files'
-                : isEveryItemHeld
-                  ? 'Every selected file is held by a snapshot'
-                  : undefined,
+              text: !canUpdateFiles ? 'You need additional permissions to delete files' : undefined,
             },
           }}
         >

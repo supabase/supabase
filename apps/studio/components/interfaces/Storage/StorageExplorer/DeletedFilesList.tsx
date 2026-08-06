@@ -169,9 +169,6 @@ const DeletedFileRow = ({
           from {object.originalPath}
         </p>
       </div>
-      {object.heldBySnapshot && (
-        <span className="text-xs text-foreground-lighter shrink-0">held</span>
-      )}
     </div>
   )
 }

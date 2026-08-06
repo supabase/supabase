@@ -91,13 +91,6 @@ export const DeletedFilePreviewPane = () => {
               label="Expires"
               value={file.expiresAt ? dayjs(file.expiresAt).format('MMM D, YYYY') : 'Never'}
             />
-
-            {file.heldBySnapshot && (
-              <p className="text-xs text-foreground-lighter">
-                Held by a snapshot — this file cannot be permanently deleted until the snapshot is
-                removed.
-              </p>
-            )}
           </div>
         </div>
 
@@ -122,16 +115,14 @@ export const DeletedFilePreviewPane = () => {
           <ButtonTooltip
             variant="danger"
             icon={<Trash2 size={14} />}
-            disabled={!canUpdateFiles || file.heldBySnapshot}
+            disabled={!canUpdateFiles}
             onClick={() => setShowDeleteConfirm(true)}
             tooltip={{
               content: {
                 side: 'bottom',
                 text: !canUpdateFiles
                   ? 'You need additional permissions to delete files'
-                  : file.heldBySnapshot
-                    ? 'Held by a snapshot — delete the snapshot first'
-                    : undefined,
+                  : undefined,
               },
             }}
           >
