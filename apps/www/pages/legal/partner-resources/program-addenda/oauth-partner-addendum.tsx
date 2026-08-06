@@ -34,7 +34,7 @@ export default function OAuthPartnerAddendumPage() {
         subheader="An addendum to the Master Partner Program Agreement governing OAuth integrations."
       />
       <MDXProvider components={mdxComponents()}>
-        <SectionContainer className="prose">
+        <SectionContainer className="prose legal-prose">
           <LegalDocVersions versions={versions} />
         </SectionContainer>
       </MDXProvider>
