@@ -39,7 +39,7 @@ import {
   useDeletedFilesContext,
 } from '@/components/interfaces/Storage/StorageExplorer/DeletedFilesContext'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { isBucketVersioned } from '@/components/interfaces/Storage/StorageProtection.constants'
+import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
@@ -80,7 +80,7 @@ const BucketPageInner = () => {
 
   const { getPolicyCount } = useBucketPolicyCount()
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
-  const isVersioned = isBucketVersioned(bucket?.id)
+  const isVersioned = hasVersioningHistory(bucket?.id)
 
   useEffect(() => {
     if (isSuccess && !bucket) {

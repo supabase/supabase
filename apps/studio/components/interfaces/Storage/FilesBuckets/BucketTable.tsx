@@ -13,7 +13,7 @@ import {
 } from 'ui'
 
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
-import { isBucketVersioned } from '@/components/interfaces/Storage/StorageProtection.constants'
+import { getMockBucketProtection } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
@@ -100,6 +100,8 @@ export const BucketTableRow = ({
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
 
+  const versioningState = getMockBucketProtection(bucket.id).versioning
+
   const handleBucketNavigation = createNavigationHandler(
     `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`,
     router
@@ -157,11 +159,9 @@ export const BucketTableRow = ({
       </BucketTableCell>
 
       <BucketTableCell>
-        {isBucketVersioned(bucket.id) ? (
-          <Badge variant="success">Enabled</Badge>
-        ) : (
-          <span className="text-foreground-muted">-</span>
-        )}
+        {versioningState === 'enabled' && <Badge variant="success">Enabled</Badge>}
+        {versioningState === 'suspended' && <Badge variant="warning">Suspended</Badge>}
+        {versioningState === 'disabled' && <span className="text-foreground-muted">-</span>}
       </BucketTableCell>
 
       <BucketTableCell>

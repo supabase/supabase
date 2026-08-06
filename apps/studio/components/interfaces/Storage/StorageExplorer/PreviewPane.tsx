@@ -1,8 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { AlertCircle, ChevronDown, Copy, Download, LoaderCircle, Trash2, X } from 'lucide-react'
+import {
+  AlertCircle,
+  ChevronDown,
+  Copy,
+  Download,
+  LoaderCircle,
+  RotateCcw,
+  Trash2,
+  X,
+} from 'lucide-react'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
+import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
@@ -16,7 +26,10 @@ import {
 } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useObjectVersionsQuery } from '@/data/storage/protection/object-versions-query'
+import {
+  useObjectVersionRestoreMutation,
+  useObjectVersionsQuery,
+} from '@/data/storage/protection/object-versions-query'
 import type { ObjectVersion } from '@/data/storage/protection/protection-mocks'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { BASE_PATH } from '@/lib/constants'
@@ -25,7 +38,7 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { isBucketVersioned } from '../StorageProtection.constants'
+import { hasVersioningHistory } from '../StorageProtection.constants'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
@@ -138,7 +151,7 @@ export const PreviewPane = () => {
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const showVersions = isBucketVersioned(selectedBucket?.id)
+  const showVersions = hasVersioningHistory(selectedBucket?.id)
   const { data: versionsData } = useObjectVersionsQuery({
     projectRef,
     bucketId: selectedBucket?.id,
@@ -147,6 +160,13 @@ export const PreviewPane = () => {
   const versionCount = versionsData?.length
 
   const [previewedVersion, setPreviewedVersion] = useState<ObjectVersion>()
+
+  const { mutate: restoreVersion, isPending: isRestoring } = useObjectVersionRestoreMutation({
+    onSuccess: () => {
+      toast.success('Version restored as the current version')
+      setPreviewedVersion(undefined)
+    },
+  })
 
   if (!file) return null
 
@@ -157,6 +177,16 @@ export const PreviewPane = () => {
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
   const isPreviewingOlderVersion = previewedVersion !== undefined && !previewedVersion.isCurrent
+
+  const handleRestore = () => {
+    if (!projectRef || !selectedBucket?.id || !previewedVersion) return
+    restoreVersion({
+      projectRef,
+      bucketId: selectedBucket.id,
+      objectName: file.name,
+      versionId: previewedVersion.versionId,
+    })
+  }
 
   const previewThumbnail = (
     <div className="relative my-4 border border-overlay">
@@ -173,12 +203,15 @@ export const PreviewPane = () => {
             <br />
             {dayjs(previewedVersion.createdAt).format('MMM D, HH:mm')}
           </p>
-          <button
-            className="text-xs text-brand hover:underline"
-            onClick={() => setPreviewedVersion(undefined)}
+          <Button
+            variant="default"
+            size="tiny"
+            icon={<RotateCcw size={14} />}
+            loading={isRestoring}
+            onClick={handleRestore}
           >
-            Back to latest
-          </button>
+            Restore
+          </Button>
         </div>
       )}
     </div>

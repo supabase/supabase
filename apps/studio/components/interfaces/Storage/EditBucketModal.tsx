@@ -191,16 +191,29 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
     // [Prototype] Object versioning has no platform API yet — persist it to
     // the in-memory mock store so the buckets list reflects it right away.
+    // Versioning can't go back to a plain "disabled" state once it's ever
+    // been turned on — turning the switch off here suspends it instead.
     setMockBucketProtection(bucket.id, {
-      versioning: values.enable_versioning ? 'enabled' : 'disabled',
+      versioning: values.enable_versioning
+        ? 'enabled'
+        : bucketProtection.versioning !== 'disabled'
+          ? 'suspended'
+          : 'disabled',
+      // Suspending keeps the last retention settings around (rather than
+      // nulling them) so the versions already retained keep expiring on the
+      // same schedule they were created under.
       versionExpiryDays:
         values.enable_versioning && typeof values.version_expiry_days === 'number'
           ? values.version_expiry_days
-          : null,
+          : bucketProtection.versioning !== 'disabled'
+            ? bucketProtection.versionExpiryDays
+            : null,
       maxNoncurrentVersions:
         values.enable_versioning && typeof values.max_noncurrent_versions === 'number'
           ? values.max_noncurrent_versions
-          : null,
+          : bucketProtection.versioning !== 'disabled'
+            ? bucketProtection.maxNoncurrentVersions
+            : null,
     })
 
     updateBucket({
@@ -470,8 +483,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
             {showProtection && (
               <BucketDataProtectionFields
-                bucketName={bucket?.name}
-                initialVersioningEnabled={bucketProtection.versioning === 'enabled'}
+                initialVersioningState={bucketProtection.versioning}
                 initialRetentionDays={bucketProtection.versionExpiryDays}
                 initialMaxVersions={bucketProtection.maxNoncurrentVersions}
                 isPublicBucket={isPublicBucket}

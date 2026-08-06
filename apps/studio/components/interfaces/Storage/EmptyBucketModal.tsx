@@ -16,7 +16,7 @@ import { useBucketEmptyMutation } from '@/data/storage/bucket-empty-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
-import { isBucketVersioned } from './StorageProtection.constants'
+import { hasVersioningHistory } from './StorageProtection.constants'
 
 export interface EmptyBucketModalProps {
   visible: boolean
@@ -27,7 +27,7 @@ export interface EmptyBucketModalProps {
 export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalProps) => {
   const { ref: projectRef } = useParams()
   const { fetchFolderContents } = useStorageExplorerStateSnapshot()
-  const isVersioned = isBucketVersioned(bucket?.id)
+  const isVersioned = hasVersioningHistory(bucket?.id)
 
   const { mutate: emptyBucket, isPending } = useBucketEmptyMutation({
     onSuccess: async () => {
@@ -78,8 +78,8 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           {isVersioned && (
             <Admonition
               type="warning"
-              title="Versioning is enabled on this bucket"
-              description="Emptying will also permanently delete every noncurrent version and every file currently in the deleted files trash. Nothing will be recoverable."
+              title="This bucket has retained versions"
+              description="Emptying will also permanently delete every noncurrent version and every file currently in the deleted files trash, whether or not versioning is still active. Nothing will be recoverable."
             />
           )}
         </DialogSection>

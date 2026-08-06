@@ -131,8 +131,8 @@ export const FilesBuckets = () => {
             {purgedBuckets.length > 0 && (
               <Admonition
                 type="warning"
-                title="Object versioning was disabled on downgrade"
-                description={`Your plan no longer supports object versioning. Versioning was automatically disabled on ${purgedBuckets.length} bucket${purgedBuckets.length === 1 ? '' : 's'} (${purgedBuckets.join(', ')}) and every noncurrent version and soft-deleted file has been permanently deleted.`}
+                title="Object versioning was suspended on downgrade"
+                description={`Your plan no longer supports object versioning. Versioning was automatically suspended on ${purgedBuckets.length} bucket${purgedBuckets.length === 1 ? '' : 's'} (${purgedBuckets.join(', ')}) and every noncurrent version and soft-deleted file has been permanently deleted.`}
               />
             )}
             {isLoadingBuckets && <GenericSkeletonLoader />}

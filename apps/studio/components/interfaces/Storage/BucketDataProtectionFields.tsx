@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import {
   DialogSection,
@@ -14,17 +13,15 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 import { type BucketProtectionFormValues } from './BucketDataProtectionFields.schema'
-import { getVersioningPlanLimits } from './StorageProtection.constants'
+import { getVersioningPlanLimits, type BucketVersioningState } from './StorageProtection.constants'
 
 interface BucketDataProtectionFieldsProps {
-  bucketName?: string
-  /** Whether versioning is currently enabled on the bucket being edited (unset when creating a new bucket). */
-  initialVersioningEnabled?: boolean
+  /** The bucket's versioning state when the modal opened (unset when creating a new bucket, which is always `disabled`). */
+  initialVersioningState?: BucketVersioningState
   /** The bucket's current retention-days setting when the modal opened, for tightening detection. */
   initialRetentionDays?: number | null
   /** The bucket's current max-versions setting when the modal opened, for tightening detection. */
@@ -34,8 +31,7 @@ interface BucketDataProtectionFieldsProps {
 }
 
 export const BucketDataProtectionFields = ({
-  bucketName,
-  initialVersioningEnabled = false,
+  initialVersioningState = 'disabled',
   initialRetentionDays,
   initialMaxVersions,
   isPublicBucket = false,
@@ -43,7 +39,13 @@ export const BucketDataProtectionFields = ({
   const { control, getValues, setValue } = useFormContext<BucketProtectionFormValues>()
   const { data: organization, isSuccess: isOrganizationLoaded } = useSelectedOrganizationQuery()
 
-  const [showDisableConfirm, setShowDisableConfirm] = useState(false)
+  const initialVersioningEnabled = initialVersioningState === 'enabled'
+  // Versioning can't go back to a plain "disabled" state once it's ever been
+  // turned on — turning the switch off on a bucket like this suspends it
+  // instead, which only stops new noncurrent versions from being created.
+  // Nothing already retained is affected, so unlike enabling for the first
+  // time, this doesn't need a destructive confirmation.
+  const wasEverVersioned = initialVersioningState !== 'disabled'
 
   const planLimits = getVersioningPlanLimits(organization?.plan.id)
   const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
@@ -94,14 +96,10 @@ export const BucketDataProtectionFields = ({
     }
   }
 
-  // Disabling versioning on a bucket that already has it enabled permanently
-  // deletes every noncurrent version and soft-deleted file it's retaining —
-  // require an explicit, typed confirmation before flipping the switch off.
+  // Turning versioning off never deletes anything by itself — a bucket that's
+  // ever had it enabled can only be suspended, not returned to a plain
+  // "disabled" state, so nothing needs a destructive confirmation here.
   const handleVersioningToggle = (checked: boolean, onChange: (value: boolean) => void) => {
-    if (!checked && initialVersioningEnabled) {
-      setShowDisableConfirm(true)
-      return
-    }
     if (checked) {
       enableVersioning(onChange)
     } else {
@@ -118,59 +116,35 @@ export const BucketDataProtectionFields = ({
           name="enable_versioning"
           control={control}
           render={({ field }) => (
-            <>
-              <FormItemLayout
-                hideMessage
-                name="enable_versioning"
-                label="Object versioning"
-                description="Keep previous versions of objects when they are overwritten or deleted"
-                layout="flex"
-              >
-                <FormControl>
-                  <Switch
-                    id="enable-versioning"
-                    size="large"
-                    checked={field.value}
-                    disabled={!planLimits}
-                    onCheckedChange={(checked) => handleVersioningToggle(checked, field.onChange)}
-                  />
-                </FormControl>
-              </FormItemLayout>
-
-              <TextConfirmModal
-                variant="destructive"
-                visible={showDisableConfirm}
-                loading={false}
-                title="Disable object versioning"
-                confirmLabel="Disable versioning"
-                confirmPlaceholder="Type bucket name"
-                confirmString={bucketName ?? ''}
-                onCancel={() => setShowDisableConfirm(false)}
-                onConfirm={() => {
-                  field.onChange(false)
-                  setShowDisableConfirm(false)
-                }}
-                alert={{
-                  title: 'This cannot be undone',
-                  description:
-                    'Every noncurrent object version and soft-deleted file this bucket is retaining will be permanently deleted once you save.',
-                }}
-              >
-                <p className="text-sm text-foreground-light">
-                  Disabling versioning on <span className="font-mono">{bucketName}</span> will
-                  permanently delete all noncurrent versions and soft-deleted files once saved. This
-                  action cannot be undone.
-                </p>
-              </TextConfirmModal>
-            </>
+            <FormItemLayout
+              hideMessage
+              name="enable_versioning"
+              label="Object versioning"
+              description="Keep previous versions of objects when they are overwritten or deleted"
+              layout="flex"
+            >
+              <FormControl>
+                <Switch
+                  id="enable-versioning"
+                  size="large"
+                  checked={field.value}
+                  disabled={!planLimits}
+                  onCheckedChange={(checked) => handleVersioningToggle(checked, field.onChange)}
+                />
+              </FormControl>
+            </FormItemLayout>
           )}
         />
 
-        {!isVersioningEnabled && initialVersioningEnabled && (
+        {!isVersioningEnabled && wasEverVersioned && (
           <Admonition
-            type="warning"
-            title="Object versioning will be disabled once saved"
-            description="Every noncurrent version and soft-deleted file this bucket is retaining will be permanently deleted. This cannot be undone."
+            type="default"
+            title={
+              initialVersioningEnabled
+                ? 'Versioning will be suspended once saved'
+                : 'Versioning is suspended on this bucket'
+            }
+            description="New noncurrent versions won't be created, but every version and soft-deleted file this bucket is already retaining stays exactly where it is until it's deleted or a lifecycle policy expires it. You can re-enable versioning at any time."
           />
         )}
 

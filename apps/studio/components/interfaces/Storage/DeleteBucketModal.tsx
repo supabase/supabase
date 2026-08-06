@@ -10,7 +10,7 @@ import { Bucket } from '@/data/storage/buckets-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 import { extractBucketNameFromDefinition } from './Storage.utils'
-import { isBucketVersioned } from './StorageProtection.constants'
+import { hasVersioningHistory } from './StorageProtection.constants'
 
 export interface DeleteBucketModalProps {
   visible: boolean
@@ -76,7 +76,7 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     deleteBucket({ projectRef, id: bucket.id })
   }
 
-  const isVersioned = isBucketVersioned(bucket?.id)
+  const isVersioned = hasVersioningHistory(bucket?.id)
 
   return (
     <TextConfirmModal

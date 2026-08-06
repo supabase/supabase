@@ -104,20 +104,42 @@ export const setMockBucketProtection = (bucketName: string, protection: BucketPr
   PROTECTED_BUCKETS[bucketName] = protection
 }
 
+/**
+ * True only while a bucket is actively versioning — i.e. an overwrite or
+ * delete creates a new noncurrent version or soft-deleted marker right now.
+ * `disabled` (never turned on) and `suspended` (turned off after being on)
+ * are both false here, even though a suspended bucket can still be sitting
+ * on plenty of retained versions from before it was suspended.
+ */
 export const isBucketVersioned = (bucketName: string | undefined) =>
   getMockBucketProtection(bucketName).versioning === 'enabled'
 
 /**
- * Simulates the auto-disable-and-purge policy for a plan downgrade:
+ * True once a bucket has ever had versioning turned on — covers both the
+ * active `enabled` state and `suspended`. Versioning can't go back to
+ * `disabled` once enabled (matching S3: suspending stops new noncurrent
+ * versions from being created, but every version and soft-deleted file
+ * already retained stays exactly where it is until it's individually
+ * deleted or a lifecycle policy expires it). Surfaces that show or warn
+ * about that retained data should key off this, not `isBucketVersioned`.
+ */
+export const hasVersioningHistory = (bucketName: string | undefined) =>
+  getMockBucketProtection(bucketName).versioning !== 'disabled'
+
+/**
+ * Simulates the auto-suspend-and-purge policy for a plan downgrade:
  *
  * If an org downgrades to a plan that no longer supports object versioning
- * (e.g. Free), the real backend would run a migration that disables versioning
- * on every bucket in the org and permanently deletes every noncurrent version
- * and soft-deleted file those buckets were retaining. The user shouldn't have
- * to remember which buckets were versioned — the platform handles it.
+ * (e.g. Free), the real backend would run a migration that suspends
+ * versioning on every bucket in the org — since a once-versioned bucket can
+ * never go back to a plain `disabled` state — and permanently deletes every
+ * noncurrent version and soft-deleted file those buckets were retaining,
+ * since the new plan doesn't support paying to retain them either. The user
+ * shouldn't have to remember which buckets were versioned — the platform
+ * handles it.
  *
  * This function does that at read time by walking `PROTECTED_BUCKETS` and
- * flipping every `enabled` entry back to `disabled` with cleared retention
+ * flipping every `enabled` entry to `suspended` with cleared retention
  * settings, and clearing the shared trash store. Call it from a top-level
  * effect that reacts to the org's plan resolving to one without versioning
  * support.
@@ -128,7 +150,7 @@ export const purgeVersioningOnPlanDowngrade = (): { purgedBuckets: string[] } =>
     if (protection.versioning === 'enabled') {
       purgedBuckets.push(name)
       PROTECTED_BUCKETS[name] = {
-        versioning: 'disabled',
+        versioning: 'suspended',
         versionExpiryDays: null,
         maxNoncurrentVersions: null,
       }

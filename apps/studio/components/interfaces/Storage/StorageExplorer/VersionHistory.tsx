@@ -104,6 +104,14 @@ export const VersionHistory = ({
         )}
       </div>
 
+      {bucketProtection.versioning === 'suspended' && (
+        <Admonition
+          type="default"
+          title="Versioning is suspended for this bucket"
+          description="No new noncurrent versions will be created until you re-enable it. Everything already retained here stays exactly as it is until you delete it or a lifecycle policy expires it."
+        />
+      )}
+
       {isSuccess && (
         <ol className="relative flex flex-col">
           {versions.map((version, index) => {
@@ -160,16 +168,15 @@ export const VersionHistory = ({
                       {!version.isCurrent && (
                         <>
                           <ButtonTooltip
-                            variant="default"
+                            variant="text"
                             size="tiny"
+                            className="px-1.5"
                             icon={<RotateCcw size={14} />}
                             loading={isRestoring}
                             aria-label={`Restore version ${shortVersion(version.versionId)}`}
                             onClick={() => handleRestore(version)}
                             tooltip={{ content: { side: 'bottom', text: 'Restore as current' } }}
-                          >
-                            Restore
-                          </ButtonTooltip>
+                          />
                           <ButtonTooltip
                             variant="text"
                             size="tiny"
