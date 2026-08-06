@@ -1,4 +1,5 @@
 import { UIEvent } from 'react'
+import { ident } from '@supabase/pg-meta'
 import { v4 as _uuidV4 } from 'uuid'
 
 import type { TablesData } from '../data/tables/tables-query'
@@ -209,7 +210,7 @@ export function tablesToSQL(t: TablesData) {
 
       const columns = (table as { columns?: any[] }).columns ?? []
       const columnLines = columns.map((c) => {
-        let line = `  ${c.name} ${c.data_type}`
+        let line = `  ${ident(c.name)} ${c.data_type}`
         if (c.is_identity) {
           line += ' GENERATED ALWAYS AS IDENTITY'
         }
@@ -231,22 +232,22 @@ export function tablesToSQL(t: TablesData) {
       const constraints: string[] = []
 
       if (Array.isArray(table.primary_keys) && table.primary_keys.length > 0) {
-        const pkCols = table.primary_keys.map((pk: any) => pk.name).join(', ')
-        constraints.push(`  CONSTRAINT ${table.name}_pkey PRIMARY KEY (${pkCols})`)
+        const pkCols = table.primary_keys.map((pk: any) => ident(pk.name)).join(', ')
+        constraints.push(`  CONSTRAINT ${ident(table.name + '_pkey')} PRIMARY KEY (${pkCols})`)
       }
 
       if (Array.isArray(table.relationships)) {
         table.relationships.forEach((rel: any) => {
           if (rel && rel.source_table_name === table.name) {
             constraints.push(
-              `  CONSTRAINT ${rel.constraint_name} FOREIGN KEY (${rel.source_column_name}) REFERENCES ${rel.target_table_schema}.${rel.target_table_name}(${rel.target_column_name})`
+              `  CONSTRAINT ${ident(rel.constraint_name)} FOREIGN KEY (${ident(rel.source_column_name)}) REFERENCES ${ident(rel.target_table_schema)}.${ident(rel.target_table_name)}(${ident(rel.target_column_name)})`
             )
           }
         })
       }
 
       const allLines = [...columnLines, ...constraints]
-      return `CREATE TABLE ${table.schema}.${table.name} (\n${allLines.join(',\n')}\n);`
+      return `CREATE TABLE ${ident(table.schema)}.${ident(table.name)} (\n${allLines.join(',\n')}\n);`
     })
     .join('\n')
   return warning + sql

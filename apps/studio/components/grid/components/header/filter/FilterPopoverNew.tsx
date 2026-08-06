@@ -14,6 +14,7 @@ import {
   updateGroupAtPath,
 } from 'ui-patterns/FilterBar'
 
+import { VALID_FILTER_OPERATORS } from '@supabase/pg-meta'
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { Filter } from '@/components/grid/types'
@@ -49,6 +50,10 @@ function filterGroupToFilters(group: FilterGroup): Filter[] {
     if (isGroup(condition)) {
       filters.push(...filterGroupToFilters(condition))
     } else {
+      if (!VALID_FILTER_OPERATORS.has(condition.operator)) {
+        console.warn(`[filterGroupToFilters] Skipping unknown operator: "${condition.operator}"`)
+        continue
+      }
       filters.push({
         column: condition.propertyName,
         operator: condition.operator as Filter['operator'],

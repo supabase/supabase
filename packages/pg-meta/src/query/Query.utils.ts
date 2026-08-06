@@ -6,7 +6,42 @@ import {
   safeSql,
   type SafeSqlFragment,
 } from '../pg-format'
-import type { Dictionary, Filter, QueryPagination, QueryTable, Sort } from './types'
+import type { Dictionary, Filter, FilterOperator, QueryPagination, QueryTable, Sort } from './types'
+
+/**
+ * Runtime-validated set of allowed SQL filter operators.
+ * Mirrors the FilterOperator union type so that any string reaching
+ * the SQL builder is checked at runtime, not just at compile time.
+ * Callers (e.g. AI-generated filters) can supply any string at
+ * runtime regardless of TypeScript types — this set is the real gate.
+ */
+export const VALID_FILTER_OPERATORS: ReadonlySet<string> = new Set<FilterOperator>([
+  '=',
+  '<>',
+  '>',
+  '<',
+  '>=',
+  '<=',
+  '~~',
+  '~~*',
+  '!~~',
+  '!~~*',
+  'in',
+  'is',
+])
+
+/**
+ * Promotes a raw operator string to SafeSqlFragment after runtime
+ * allowlist validation. Throws if the value is not one of the 12
+ * valid FilterOperator values, preventing injection via the default
+ * applyFilters branch.
+ */
+function toSafeOperator(op: string): SafeSqlFragment {
+  if (!VALID_FILTER_OPERATORS.has(op)) {
+    throw new Error(`Invalid SQL filter operator: "${op}"`)
+  }
+  return op as SafeSqlFragment
+}
 
 export function countQuery(
   table: QueryTable,
@@ -215,7 +250,7 @@ function applyFilters(query: SafeSqlFragment, filters: Filter[]) {
         case '!~~*':
           return castColumnToText(filter)
         default:
-          return safeSql`${ident(filter.column)} ${filter.operator as SafeSqlFragment} ${filterLiteral(filter.value)}`
+          return safeSql`${ident(filter.column)} ${toSafeOperator(filter.operator)} ${filterLiteral(filter.value)}`
       }
     }),
     ' and '
@@ -231,7 +266,7 @@ function inFilterSql(filter: Filter) {
     const filterValueTxt = String(filter.value)
     values = filterValueTxt.split(',').map((x) => filterLiteral(x))
   }
-  return safeSql`${ident(filter.column)} ${filter.operator as SafeSqlFragment} (${joinSqlFragments(values, ',')})`
+  return safeSql`${ident(filter.column)} ${toSafeOperator(filter.operator)} (${joinSqlFragments(values, ',')})`
 }
 
 function defaultTupleFilterSql(filter: Filter) {
@@ -253,7 +288,7 @@ function defaultTupleFilterSql(filter: Filter) {
     filter.value.map((v) => filterLiteral(v)),
     ', '
   )})`
-  return safeSql`${columns} ${filter.operator as SafeSqlFragment} ${values}`
+  return safeSql`${columns} ${toSafeOperator(filter.operator)} ${values}`
 }
 
 function inTupleFilterSql(filter: Filter) {
@@ -291,7 +326,7 @@ function inTupleFilterSql(filter: Filter) {
     }
   })
 
-  return safeSql`${columns} ${filter.operator as SafeSqlFragment} (${joinSqlFragments(values, ', ')})`
+  return safeSql`${columns} ${toSafeOperator(filter.operator)} (${joinSqlFragments(values, ', ')})`
 }
 
 function isFilterSql(filter: Filter) {
@@ -301,14 +336,15 @@ function isFilterSql(filter: Filter) {
     case 'false':
     case 'true':
     case 'not null':
-      return safeSql`${ident(filter.column)} ${filter.operator as SafeSqlFragment} ${filterValueTxt as SafeSqlFragment}`
+      // filterValueTxt is safe: validated by the switch case labels above
+      return safeSql`${ident(filter.column)} ${toSafeOperator(filter.operator)} ${filterValueTxt as SafeSqlFragment}`
     default:
-      return safeSql`${ident(filter.column)} ${filter.operator as SafeSqlFragment} ${filterLiteral(filter.value)}`
+      return safeSql`${ident(filter.column)} ${toSafeOperator(filter.operator)} ${filterLiteral(filter.value)}`
   }
 }
 
 function castColumnToText(filter: Filter) {
-  return safeSql`${ident(filter.column)}::text ${filter.operator as SafeSqlFragment} ${filterLiteral(filter.value)}`
+  return safeSql`${ident(filter.column)}::text ${toSafeOperator(filter.operator)} ${filterLiteral(filter.value)}`
 }
 
 function parseArrayLiteral(value: string): SafeSqlFragment | null {

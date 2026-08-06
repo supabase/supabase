@@ -10,6 +10,7 @@ const NEXT_PLUGIN_FILES = ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}']
 // Custom Supabase rules
 const noAwaitBeforeCopyToClipboard = require('./rules/no-await-before-copy-to-clipboard')
 const requireExplicitTabIndex = require('./rules/require-explicit-tabindex')
+const noUnsafeSqlCast = require('./rules/no-unsafe-sql-cast')
 
 // Transitional config that turns off all the React Compiler hook rules that come bundled
 // with core-web-vitals@16. We want to upgrade to get exhaustive-deps updates without
@@ -32,6 +33,7 @@ const supabasePlugin = {
   rules: {
     'no-await-before-copy-to-clipboard': noAwaitBeforeCopyToClipboard,
     'require-explicit-tabindex': requireExplicitTabIndex,
+    'no-unsafe-sql-cast': noUnsafeSqlCast,
   },
 }
 
@@ -53,6 +55,7 @@ const typescriptConfig = {
     '@typescript-eslint/no-explicit-any': 'warn',
     'supabase/no-await-before-copy-to-clipboard': 'error',
     'supabase/require-explicit-tabindex': 'error',
+    'supabase/no-unsafe-sql-cast': 'error',
   },
 }
 
@@ -116,6 +119,20 @@ module.exports = defineConfig([
           },
         },
       ],
+    },
+  },
+
+  {
+    // Safe-SQL promotion files are the only legitimate source of as SafeSqlFragment
+    // / as SafeLogSqlFragment casts. All other files must use the runtime-validated
+    // helpers (ident, literal, toSafeOperator, acceptUntrustedSql).
+    files: [
+      'apps/studio/lib/api/safe-analytics-sql.ts',
+      'packages/pg-meta/src/query/Query.utils.ts',
+      'packages/pg-meta/src/pg-format/index.ts',
+    ],
+    rules: {
+      'supabase/no-unsafe-sql-cast': 'off',
     },
   },
 ])

@@ -8,6 +8,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildStudioLink, studioLinks } from '@/lib/studio-links'
 
 export const DecryptedReadOnlyInput = ({
   value,
@@ -56,7 +57,7 @@ export const DecryptedReadOnlyInput = ({
                   <Link
                     target="_blank"
                     rel="noreferrer noopener"
-                    href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
+                    href={ref ? studioLinks.vaultSecrets(ref, value) : undefined}
                   >
                     <ExternalLink
                       size={14}
