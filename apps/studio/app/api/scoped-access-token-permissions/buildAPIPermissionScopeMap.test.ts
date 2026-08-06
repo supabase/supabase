@@ -135,6 +135,24 @@ describe('addMCPToolsToScopes', () => {
   })
 })
 
+describe('MCPToolScopeMappings', () => {
+  // Platform gates execute_sql on database:read OR database:write depending on the MCP session's
+  // read_only mode (mcp.controller.ts), so the derived requirement must be two alternatives — a
+  // single conjunctive group would hide the tool from read-only tokens the platform accepts.
+  test('execute_sql derives the database:read bundle OR the database:write bundle', () => {
+    expect(MCPToolScopeMappings.execute_sql).toHaveLength(2)
+    const [readGroup, writeGroup] = MCPToolScopeMappings.execute_sql
+    expect(readGroup).toContain('database_read')
+    expect(readGroup).not.toContain('database_write')
+    expect(writeGroup).toContain('database_write')
+  })
+
+  test('single-scope tools derive a single conjunctive group', () => {
+    expect(MCPToolScopeMappings.apply_migration).toHaveLength(1)
+    expect(MCPToolScopeMappings.apply_migration[0]).toContain('database_write')
+  })
+})
+
 describe('buildAPIPermissionScopeMap', () => {
   // vitestSetup starts mswServer with `onUnhandledRequest: 'error'` and resets handlers between
   // tests, so mocking here keeps that guard instead of replacing global fetch.
