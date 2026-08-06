@@ -140,6 +140,17 @@ withTestDatabase('list parses procedures, which have no return type', async ({ e
 
   // Functions in the same list keep a return type.
   expect(res.find(({ name }) => name === 'add')?.return_type).toBe('integer')
+
+  // `retrieve()` parses one row instead of an array, so it rejected the
+  // procedure outright rather than failing the whole result set.
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+    name: 'test_proc',
+    schema: 'public',
+    args: ['a int2'],
+  })
+  const retrieved = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+  expect(retrieved?.type).toBe('procedure')
+  expect(retrieved?.return_type).toBeNull()
 })
 
 withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) => {
