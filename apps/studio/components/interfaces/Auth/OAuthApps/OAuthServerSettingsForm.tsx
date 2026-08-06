@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -187,6 +187,12 @@ export const OAuthServerSettingsForm = () => {
     setShowDisableOAuthServerConfirmation(false)
   }
 
+  const oauthServerEnabled = useWatch({ control: form.control, name: 'OAUTH_SERVER_ENABLED' })
+  const authorizationPath = useWatch({
+    control: form.control,
+    name: 'OAUTH_SERVER_AUTHORIZATION_PATH',
+  })
+
   if (isPermissionsLoaded && !canReadConfig) {
     return <NoPermission resourceText="view OAuth server settings" />
   }
@@ -234,7 +240,7 @@ export const OAuthServerSettingsForm = () => {
                     )}
                   />
                 </CardContent>
-                {form.watch('OAUTH_SERVER_ENABLED') && (
+                {oauthServerEnabled && (
                   <>
                     <CardContent>
                       <FormItemLayout
@@ -279,13 +285,15 @@ export const OAuthServerSettingsForm = () => {
                       />
                       {(() => {
                         const siteUrl = authConfig?.SITE_URL?.trim()
-                        const authorizationPath =
-                          form.watch('OAUTH_SERVER_AUTHORIZATION_PATH')?.trim() || '/oauth/consent'
-                        const authorizationUrl = siteUrl ? `${siteUrl}${authorizationPath}` : ''
+                        const resolvedAuthorizationPath =
+                          authorizationPath?.trim() || '/oauth/consent'
+                        const authorizationUrl = siteUrl
+                          ? `${siteUrl}${resolvedAuthorizationPath}`
+                          : ''
 
                         return (
                           <Admonition
-                            type="tip"
+                            type="note"
                             title="Make sure this path is implemented in your application."
                             description={
                               <>
@@ -362,7 +370,7 @@ export const OAuthServerSettingsForm = () => {
           </Form>
         </PageSectionContent>
       </PageSection>
-      {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && form.watch('OAUTH_SERVER_ENABLED') && (
+      {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && oauthServerEnabled && (
         <OAuthEndpointsTable isLoading={isPending} />
       )}
 

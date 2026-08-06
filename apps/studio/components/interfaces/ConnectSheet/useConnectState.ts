@@ -359,8 +359,17 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
     [projectRef, deploymentMode.isSelfHosted, deploymentMode.isPlatform]
   )
 
+  // Multigres has no pooler, so pooler-flavored selections restored from the
+  // URL or localStorage (shared across projects) must never leak into an HA
+  // project — every consumer sees the direct connection method.
+  const resolvedState = useMemo(
+    () =>
+      isHighAvailability ? { ...state, connectionMethod: 'direct', useSharedPooler: false } : state,
+    [state, isHighAvailability]
+  )
+
   const activeFields = useMemo(() => {
-    let fields = getActiveFields(connectSchema, state)
+    let fields = getActiveFields(connectSchema, resolvedState)
     if (!hasDedicatedPooler || !deploymentMode.isPlatform) {
       // useSharedPooler is a platform-only toggle (CLI has no pooler; self-hosted
       // already uses Supavisor shared)
@@ -372,21 +381,26 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         .map((f) => (f.id === 'connectionType' ? { ...f, label: 'Connection Type' } : f))
     }
     return fields
-  }, [state, hasDedicatedPooler, isHighAvailability, deploymentMode.isPlatform])
+  }, [resolvedState, hasDedicatedPooler, isHighAvailability, deploymentMode.isPlatform])
 
-  const resolvedSteps = useMemo(() => resolveSteps(connectSchema, state), [state])
+  const resolvedSteps = useMemo(() => resolveSteps(connectSchema, resolvedState), [resolvedState])
 
   const getFieldOptions = useCallback(
     (fieldId: string): FieldOption[] => {
       const field = activeFields.find((f) => f.id === fieldId)
       if (!field) return []
-      return resolveFieldOptionsWithSource({ field, state, databases, deploymentMode })
+      return resolveFieldOptionsWithSource({
+        field,
+        state: resolvedState,
+        databases,
+        deploymentMode,
+      })
     },
-    [activeFields, state, databases, deploymentMode]
+    [activeFields, resolvedState, databases, deploymentMode]
   )
 
   return {
-    state,
+    state: resolvedState,
     updateField,
     setMode,
     activeFields,

@@ -3879,6 +3879,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/restart': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Restart pipeline
+     * @description Restart the pipeline. Requires bearer auth and an active, healthy project. Fails with a conflict if the pipeline is not currently running.
+     */
+    post: operations['ReplicationPipelinesController_restartPipeline']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/pipelines/{pipeline_id}/rollback-tables': {
     parameters: {
       query?: never
@@ -5155,7 +5175,10 @@ export interface components {
         reasons: (
           | 'AWS_ACTIVATE_CREDITS_DEAL'
           | 'AGREEMENT_BASED_OFFER'
-          | 'NO_ACTIVE_CONTRACT_FOUND'
+          | 'NO_CONTRACT_FOUND'
+          | 'CONTRACT_INACTIVE'
+          | 'CONTRACT_TERMINATED_EARLY'
+          | 'CONTRACT_IN_SETTLING_WINDOW'
         )[]
       }
     }
@@ -28278,6 +28301,64 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while starting pipeline. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationPipelinesController_restartPipeline: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Pipeline id */
+        pipeline_id: number
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Pipeline restart accepted. */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Pipeline is not running. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while restarting pipeline. */
       500: {
         headers: {
           [name: string]: unknown
