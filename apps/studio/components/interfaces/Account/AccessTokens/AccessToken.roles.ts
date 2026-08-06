@@ -234,7 +234,12 @@ export const requiredRoleForEntry = (
 ): TokenRoleLevel =>
   mode === 'none' ? 'member' : requiredRoleForScopes(getEntryScopes(entry, mode))
 
-export type EntryAccessStatus = 'ok' | 'exceeds-role' | 'unknown'
+/**
+ * 'unavailable-for-scope': the entry's permission level can never be exercised through this
+ * token's resource binding, regardless of the owner's role — platform rejects project-scoped
+ * tokens outright on organization endpoints.
+ */
+export type EntryAccessStatus = 'ok' | 'exceeds-role' | 'unavailable-for-scope' | 'unknown'
 
 /** A token-bound resource where the user's current role can't exercise the selected mode. */
 export interface FailingResource {
@@ -278,6 +283,8 @@ export interface TokenAccessEvaluation {
   entries: Record<string, EntryAccess>
   /** Entry keys whose selected mode exceeds the user's current role. */
   exceedingEntryKeys: string[]
+  /** Entry keys the token's resource binding can never exercise (org entries on project tokens). */
+  unavailableEntryKeys: string[]
   /** Selection reduced to what the user's current role can exercise. */
   effectiveSelection: PermissionSelection
 }
@@ -478,6 +485,7 @@ export const applySelectionToRoleContext = (
     hasNoBoundResources: context.hasNoBoundResources,
     hasNoAccessibleResource: context.hasNoAccessibleResource,
     exceedingEntryKeys: [] as string[],
+    unavailableEntryKeys: [] as string[],
     effectiveSelection: selection,
   }
 
@@ -512,12 +520,30 @@ export const applySelectionToRoleContext = (
   const { orgLevel, projectLevel, orgLevels, projectLevels } = context
   const entries: Record<string, EntryAccess> = {}
   const exceedingEntryKeys: string[] = []
+  const unavailableEntryKeys: string[] = []
   const effectiveSelection: PermissionSelection = {}
 
   for (const key of selectedKeys) {
     const mode = selection[key]
     const entry = getCatalogEntry(key)
     if (!entry) continue
+
+    // Platform rejects project-scoped tokens outright on organization endpoints (getChecks
+    // throws before any FGA evaluation), so the owner's org role is irrelevant there and
+    // role-based evaluation would wrongly report these entries as exercisable. The one
+    // exception — organization_admin_write is additionally enforced on a few project-ref
+    // routes via the model's `from parent_organization` indirection — is deliberately
+    // ignored: this advisory UI fails closed.
+    if (context.resourceAccess === 'project' && entry.level === 'organization') {
+      entries[key] = {
+        status: 'unavailable-for-scope',
+        effectiveMode: 'none',
+        requiredRole: requiredRoleForEntry(entry, mode),
+        failingResources: [],
+      }
+      unavailableEntryKeys.push(key)
+      continue
+    }
 
     const availableLevel =
       entry.level === 'user' ? 'owner' : entry.level === 'organization' ? orgLevel : projectLevel
@@ -547,7 +573,7 @@ export const applySelectionToRoleContext = (
     if (effectiveMode !== 'none') effectiveSelection[key] = effectiveMode
   }
 
-  return { ...base, entries, exceedingEntryKeys, effectiveSelection }
+  return { ...base, entries, exceedingEntryKeys, unavailableEntryKeys, effectiveSelection }
 }
 
 export interface FailingResourceGroup {

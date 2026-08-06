@@ -209,26 +209,40 @@ describe('evaluateTokenAccess', () => {
     })
     // Developer on the bound project: database readwrite is fine.
     expect(result.entries['project:database'].status).toBe('ok')
-    // But org-level scopes check the org-wide role, which is only member — and the failure
-    // carries their real per-project role so the UI can explain the distinction.
-    expect(result.entries['organization:members'].status).toBe('exceeds-role')
-    expect(result.entries['organization:members'].failingResources).toEqual([
-      {
-        type: 'organization',
-        id: ORG.slug,
-        label: ORG.slug,
-        role: 'member',
-        projectScopedRoles: [{ label: PROJECT.ref, role: 'developer' }],
-      },
-    ])
+    // Org-level scopes can never be exercised through a project-scoped token — platform rejects
+    // them outright regardless of the owner's role, so no role evaluation applies.
+    expect(result.entries['organization:members'].status).toBe('unavailable-for-scope')
+    expect(result.entries['organization:members'].effectiveMode).toBe('none')
+    expect(result.entries['organization:members'].failingResources).toEqual([])
+    expect(result.unavailableEntryKeys).toEqual(['organization:members'])
+    expect(result.exceedingEntryKeys).toEqual([])
+    expect(result.effectiveSelection).toEqual({ 'project:database': 'readwrite' })
   })
 
-  it('explains org-level failures for members invited only to a project', () => {
-    // Read-only on one project, selecting Organization Settings read-write (requires Owner).
+  it('marks org-level entries unavailable on project-scoped tokens even for org owners', () => {
+    // Platform's getChecks throws for project-scoped tokens on organization endpoints before
+    // any FGA evaluation, so even an org owner's project token can never call them.
     const result = evaluateTokenAccess({
       ...baseArgs,
       resourceAccess: 'project',
       projectRefs: [PROJECT.ref],
+      selection: { 'organization:members': 'readwrite', 'user:organizations': 'read' },
+      permissions: ownerRows(ORG.slug),
+    })
+    expect(result.entries['organization:members'].status).toBe('unavailable-for-scope')
+    // User-level scopes are granted by the token grant alone (token -> scope tuple checks), so
+    // they stay exercisable for any resource binding.
+    expect(result.entries['user:organizations'].status).toBe('ok')
+    expect(result.effectiveSelection).toEqual({ 'user:organizations': 'read' })
+  })
+
+  it('explains org-level failures for members invited only to a project', () => {
+    // Read-only on one project, selecting Organization Settings read-write (requires Owner) on
+    // an organization-scoped token — the failure carries their real per-project role so the UI
+    // can explain the distinction.
+    const result = evaluateTokenAccess({
+      ...baseArgs,
+      resourceAccess: 'organization',
       selection: { 'organization:admin': 'readwrite' },
       permissions: readonlyRows(ORG.slug, [PROJECT.ref]),
       organizations: [{ ...ORG, name: 'Acme Corp' }],
@@ -255,8 +269,7 @@ describe('evaluateTokenAccess', () => {
     const strayOrgRow = row(ORG.slug, ['read:Read'], ['notifications'])
     const result = evaluateTokenAccess({
       ...baseArgs,
-      resourceAccess: 'project',
-      projectRefs: [PROJECT.ref],
+      resourceAccess: 'organization',
       selection: { 'organization:admin': 'readwrite' },
       permissions: [...readonlyRows(ORG.slug, [PROJECT.ref]), strayOrgRow],
       projects: [{ ...PROJECT, name: 'Acme production' }],
