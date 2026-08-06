@@ -219,6 +219,54 @@ describe('evaluateTokenAccess', () => {
     expect(result.effectiveSelection).toEqual({ 'project:database': 'readwrite' })
   })
 
+  it('honors project-scoped roles for project entries on organization-scoped tokens', () => {
+    // An org member invited as Developer to one project: platform checks the owner's permission
+    // against the project object, so an org-bound token really can database_write there. Only the
+    // projects where the role is insufficient may be reported as failing.
+    const result = evaluateTokenAccess({
+      ...baseArgs,
+      selection: { 'project:database': 'readwrite' },
+      permissions: developerRows(ORG.slug, [PROJECT.ref]),
+      organizations: [ORG],
+      projects: [PROJECT, OTHER_PROJECT],
+    })
+    expect(result.entries['project:database'].status).toBe('exceeds-role')
+    expect(result.entries['project:database'].failingResources).toEqual([
+      { type: 'project', id: OTHER_PROJECT.ref, label: OTHER_PROJECT.ref, role: 'member' },
+    ])
+
+    // Developer on every project of the org: nothing fails, despite the org role being member.
+    const allProjects = evaluateTokenAccess({
+      ...baseArgs,
+      selection: { 'project:database': 'readwrite' },
+      permissions: developerRows(ORG.slug, [PROJECT.ref, OTHER_PROJECT.ref]),
+      organizations: [ORG],
+      projects: [PROJECT, OTHER_PROJECT],
+    })
+    expect(allProjects.entries['project:database'].status).toBe('ok')
+    expect(allProjects.effectiveSelection).toEqual({ 'project:database': 'readwrite' })
+  })
+
+  it('falls back to the org level for bound orgs with no accessible projects', () => {
+    const result = evaluateTokenAccess({
+      ...baseArgs,
+      selection: { 'project:database': 'readwrite' },
+      permissions: readonlyRows(ORG.slug),
+      organizations: [ORG],
+      projects: [],
+    })
+    expect(result.entries['project:database'].status).toBe('exceeds-role')
+    expect(result.entries['project:database'].failingResources).toEqual([
+      {
+        type: 'organization',
+        id: ORG.slug,
+        label: ORG.slug,
+        role: 'readonly',
+        projectScopedRoles: undefined,
+      },
+    ])
+  })
+
   it('marks org-level entries unavailable on project-scoped tokens even for org owners', () => {
     // Platform's getChecks throws for project-scoped tokens on organization endpoints before
     // any FGA evaluation, so even an org owner's project token can never call them.

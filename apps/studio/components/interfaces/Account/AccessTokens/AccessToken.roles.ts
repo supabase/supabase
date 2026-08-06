@@ -317,7 +317,11 @@ export interface TokenRoleContext {
   hasNoAccessibleResource: boolean
   /** Per bound organization (or parent org in project mode). */
   orgLevels: FailingResource[]
-  /** Per bound project in project mode; mirrors orgLevels otherwise (org roles cascade). */
+  /**
+   * Per bound project in project mode; per accessible project of the bound orgs in organization
+   * mode (platform checks project permissions against the project object, so project-scoped
+   * roles count). Orgs with no accessible projects contribute their org level instead.
+   */
   projectLevels: FailingResource[]
   /** Weakest role across orgLevels / projectLevels. */
   orgLevel: TokenRoleLevel
@@ -445,15 +449,27 @@ export const computeTokenRoleContext = ({
     }
   })
 
+  const toProjectLevel = (project: { ref: string; organization_slug: string; name?: string }) => ({
+    type: 'project' as const,
+    id: project.ref,
+    label: project.name ?? project.ref,
+    role: roleFor(project.organization_slug, project.ref),
+  })
+
+  // In organization mode the token's scope cascades to every project of the bound orgs, and
+  // platform checks the owner's permission against the project object — so a project-scoped
+  // Developer really can exercise e.g. database_write on their project through an org-bound
+  // token. Evaluate project-level entries per accessible project rather than by the org-level
+  // role, falling back to the org level for orgs with no accessible projects. Future projects
+  // only ever inherit the org-level role; the per-project view can't warn about those.
   const projectLevels: FailingResource[] =
     resourceAccess === 'project'
-      ? accessibleProjects.map((project) => ({
-          type: 'project' as const,
-          id: project.ref,
-          label: project.name ?? project.ref,
-          role: roleFor(project.organization_slug, project.ref),
-        }))
-      : orgLevels
+      ? accessibleProjects.map(toProjectLevel)
+      : orgSlugsForLevels.flatMap((slug) => {
+          const orgProjects = projects.filter((project) => project.organization_slug === slug)
+          if (orgProjects.length === 0) return orgLevels.filter((level) => level.id === slug)
+          return orgProjects.map(toProjectLevel)
+        })
 
   return {
     status: 'evaluated',
