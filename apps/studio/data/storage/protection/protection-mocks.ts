@@ -6,6 +6,11 @@
  * designed and demoed end-to-end. The query and mutation hooks in this folder
  * are shaped exactly like the real ones so swapping in a real fetcher later is
  * a localized change.
+ *
+ * The trash store below lives in a plain module-level variable (not
+ * persisted), so restoring/permanently deleting a file during a session is
+ * visible immediately across the app, and resets the moment the page is
+ * refreshed.
  */
 
 export type ObjectVersionAction = 'initial upload' | 'overwrite' | 'restore'
@@ -80,7 +85,12 @@ export const getMockObjectVersions = (_objectName: string): ObjectVersion[] => [
   },
 ]
 
-export const getMockTrashObjects = (_bucketId: string): TrashObject[] => [
+/**
+ * Mutable in-memory "deleted files" store. Shared across buckets, mirroring
+ * the previous stateless mock's behavior of returning the same list
+ * regardless of bucketId — only mutated via restore/delete below.
+ */
+let trashObjects: TrashObject[] = [
   {
     id: 'trash-1',
     name: 'round-3/final.png',
@@ -111,7 +121,77 @@ export const getMockTrashObjects = (_bucketId: string): TrashObject[] => [
     expiresAt: null,
     heldBySnapshot: true,
   },
+  {
+    id: 'trash-4',
+    name: 'avatars/user-42.jpg',
+    originalPath: 'avatars/',
+    deletedAt: daysAgo(5, '16:45:00'),
+    deletedBy: 'mark@acme.co',
+    size: 2.3 * MB,
+    expiresAt: daysAhead(25),
+    heldBySnapshot: false,
+  },
+  {
+    id: 'trash-5',
+    name: '2026-06-report.pdf',
+    originalPath: 'exports/',
+    deletedAt: daysAgo(7, '10:00:00'),
+    deletedBy: 'api key ····f21',
+    size: 512 * KB,
+    expiresAt: daysAhead(23),
+    heldBySnapshot: false,
+  },
+  {
+    id: 'trash-6',
+    name: 'round-2/preview.webp',
+    originalPath: 'matches/round-2/thumbnails/',
+    deletedAt: daysAgo(2, '19:30:00'),
+    deletedBy: 'jane@acme.co',
+    size: 96 * KB,
+    expiresAt: null,
+    heldBySnapshot: true,
+  },
+  {
+    id: 'trash-7',
+    name: 'debug-2026-07-01.log',
+    originalPath: 'logs/',
+    deletedAt: daysAgo(14, '03:12:00'),
+    deletedBy: 'system',
+    size: 3.4 * MB,
+    expiresAt: daysAhead(16),
+    heldBySnapshot: false,
+  },
+  {
+    id: 'trash-8',
+    name: 'old-assets.zip',
+    originalPath: 'archive/',
+    deletedAt: daysAgo(29, '23:55:00'),
+    deletedBy: 'jane@acme.co',
+    size: 18 * MB,
+    expiresAt: daysAhead(1),
+    heldBySnapshot: false,
+  },
 ]
+
+export const getMockTrashObjects = (_bucketId: string): TrashObject[] => [...trashObjects]
+
+/** Removes the given ids from the trash store, simulating a restore. */
+export const restoreMockTrashObjects = (objectIds: string[]): TrashObject[] => {
+  trashObjects = trashObjects.filter((object) => !objectIds.includes(object.id))
+  return [...trashObjects]
+}
+
+/**
+ * Removes the given ids from the trash store, simulating a permanent delete.
+ * When `objectIds` is omitted, deletes every object that isn't held by a
+ * snapshot (mirrors the "Delete all permanently" action).
+ */
+export const deleteMockTrashObjectsPermanently = (objectIds?: string[]): TrashObject[] => {
+  trashObjects = objectIds
+    ? trashObjects.filter((object) => !objectIds.includes(object.id))
+    : trashObjects.filter((object) => object.heldBySnapshot)
+  return [...trashObjects]
+}
 
 export const mockDelay = <T>(value: T, ms = 350): Promise<T> =>
   new Promise((resolve) => setTimeout(() => resolve(value), ms))

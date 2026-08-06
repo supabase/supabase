@@ -120,7 +120,7 @@ export const DeletedFilePreviewPane = () => {
             Restore
           </ButtonTooltip>
           <ButtonTooltip
-            variant="default"
+            variant="danger"
             icon={<Trash2 size={14} />}
             disabled={!canUpdateFiles || file.heldBySnapshot}
             onClick={() => setShowDeleteConfirm(true)}

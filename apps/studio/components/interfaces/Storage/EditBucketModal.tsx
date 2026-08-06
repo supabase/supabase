@@ -36,6 +36,7 @@ import {
 import {
   getMockBucketProtection,
   getVersioningPlanLimits,
+  setMockBucketProtection,
   useIsStorageProtectionEnabled,
   type VersioningPlanLimits,
 } from '@/components/interfaces/Storage/StorageProtection.constants'
@@ -187,6 +188,20 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         })
       }
     }
+
+    // [Prototype] Object versioning has no platform API yet — persist it to
+    // the in-memory mock store so the buckets list reflects it right away.
+    setMockBucketProtection(bucket.id, {
+      versioning: values.enable_versioning ? 'enabled' : 'disabled',
+      versionExpiryDays:
+        values.enable_versioning && typeof values.version_expiry_days === 'number'
+          ? values.version_expiry_days
+          : null,
+      maxNoncurrentVersions:
+        values.enable_versioning && typeof values.max_noncurrent_versions === 'number'
+          ? values.max_noncurrent_versions
+          : null,
+    })
 
     updateBucket({
       projectRef: ref,

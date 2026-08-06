@@ -94,5 +94,15 @@ const DEFAULT_PROTECTION: BucketProtection = {
 export const getMockBucketProtection = (bucketName: string | undefined): BucketProtection =>
   (bucketName && PROTECTED_BUCKETS[bucketName]) || DEFAULT_PROTECTION
 
+/**
+ * Writes a bucket's versioning settings into the in-memory mock store, so
+ * changes made via the create/edit bucket modals are reflected immediately
+ * elsewhere (e.g. the buckets list "Versioning" column) without a real API.
+ * Resets on page refresh, since it's plain module state.
+ */
+export const setMockBucketProtection = (bucketName: string, protection: BucketProtection): void => {
+  PROTECTED_BUCKETS[bucketName] = protection
+}
+
 export const isBucketVersioned = (bucketName: string | undefined) =>
   getMockBucketProtection(bucketName).versioning === 'enabled'

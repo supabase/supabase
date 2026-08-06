@@ -44,6 +44,7 @@ import {
 import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
 import {
   getVersioningPlanLimits,
+  setMockBucketProtection,
   useIsStorageProtectionEnabled,
   type VersioningPlanLimits,
 } from './StorageProtection.constants'
@@ -168,6 +169,20 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
         allowed_mime_types: allowedMimeTypes,
       })
       track('storage_bucket_created', { bucketType: 'STANDARD' })
+
+      // [Prototype] Object versioning has no platform API yet — persist it to
+      // the in-memory mock store so the buckets list reflects it right away.
+      setMockBucketProtection(values.name, {
+        versioning: values.enable_versioning ? 'enabled' : 'disabled',
+        versionExpiryDays:
+          values.enable_versioning && typeof values.version_expiry_days === 'number'
+            ? values.version_expiry_days
+            : null,
+        maxNoncurrentVersions:
+          values.enable_versioning && typeof values.max_noncurrent_versions === 'number'
+            ? values.max_noncurrent_versions
+            : null,
+      })
 
       toast.success(`Successfully created bucket ${values.name}`)
       form.reset()

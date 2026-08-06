@@ -2,7 +2,13 @@ import { useMutation, UseMutationOptions, useQuery, useQueryClient } from '@tans
 import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
-import { getMockTrashObjects, mockDelay, type TrashObject } from './protection-mocks'
+import {
+  deleteMockTrashObjectsPermanently,
+  getMockTrashObjects,
+  mockDelay,
+  restoreMockTrashObjects,
+  type TrashObject,
+} from './protection-mocks'
 
 export type BucketTrashVariables = {
   projectRef?: string
@@ -29,7 +35,10 @@ export const useBucketTrashRestoreMutation = ({
 }: UseMutationOptions<void, Error, TrashRestoreVariables> = {}) => {
   const queryClient = useQueryClient()
   return useMutation<void, Error, TrashRestoreVariables>({
-    mutationFn: () => mockDelay(undefined, 500),
+    mutationFn: async (variables) => {
+      restoreMockTrashObjects(variables.objectIds)
+      await mockDelay(undefined, 500)
+    },
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.trash(variables.projectRef, variables.bucketId),
@@ -57,7 +66,10 @@ export const useBucketTrashDeleteMutation = ({
 }: UseMutationOptions<void, Error, TrashDeleteVariables> = {}) => {
   const queryClient = useQueryClient()
   return useMutation<void, Error, TrashDeleteVariables>({
-    mutationFn: () => mockDelay(undefined, 600),
+    mutationFn: async (variables) => {
+      deleteMockTrashObjectsPermanently(variables.objectIds)
+      await mockDelay(undefined, 600)
+    },
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.trash(variables.projectRef, variables.bucketId),

@@ -113,7 +113,7 @@ export const TrashList = ({
                     Restore
                   </Button>
                   <ButtonTooltip
-                    variant="outline"
+                    variant="danger"
                     disabled={object.heldBySnapshot}
                     onClick={() => onDeleteForever(object)}
                     tooltip={{

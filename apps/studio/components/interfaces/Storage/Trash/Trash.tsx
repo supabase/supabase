@@ -92,7 +92,7 @@ export const Trash = ({ bucketId }: TrashProps) => {
               </p>
               {isSuccess && objects.length > 0 && (
                 <ButtonTooltip
-                  variant="default"
+                  variant="danger"
                   icon={<Trash2 />}
                   disabled={objects.length === heldInBucketCount}
                   onClick={() => setShowDeleteAll(true)}

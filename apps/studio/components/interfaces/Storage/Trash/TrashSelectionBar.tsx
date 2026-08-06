@@ -58,7 +58,7 @@ export const TrashSelectionBar = ({
         </ButtonTooltip>
 
         <ButtonTooltip
-          variant="default"
+          variant="danger"
           size="tiny"
           icon={<Trash2 size={12} />}
           disabled={!canUpdateFiles || isEveryItemHeld}
