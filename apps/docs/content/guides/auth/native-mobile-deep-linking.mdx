@@ -345,11 +345,13 @@ With Deep Linking, you can configure this redirect to open a specific page. This
       </plist>
     ```
 
-    ### Handling the incoming URL
+### Handling the incoming URL
 
     Once the OS opens your app via the redirect URL, pass that URL to `supabase.auth.handle(_:)` to complete the sign-in.
 
-    For a SwiftUI app, use the `onOpenURL` view modifier on your root view:
+    #### SwiftUI
+
+    Use the `onOpenURL` view modifier on your root view:
 
     ```swift
     SomeView()
@@ -358,7 +360,9 @@ With Deep Linking, you can configure this redirect to open a specific page. This
       }
     ```
 
-    For a UIKit app using the app delegate lifecycle, forward the URL from `application(_:open:options:)` (and from `didFinishLaunchingWithOptions` if the app was launched cold via the link):
+    #### UIKit: App delegate
+
+    Forward the URL from `application(_:open:options:)`, and from `didFinishLaunchingWithOptions` if the app was launched cold via the link:
 
     ```swift
     func application(
@@ -382,9 +386,21 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     }
     ```
 
-    For a UIKit app using the scene delegate lifecycle, forward the URL from `SceneDelegate.swift`:
+    #### UIKit: Scene delegate
+
+    Forward the URL from `SceneDelegate.swift`, handling both a cold launch (via `scene(_:willConnectTo:options:)`) and a URL received while the scene is already running (via `scene(_:openURLContexts:)`):
 
     ```swift
+    func scene(
+      _ scene: UIScene,
+      willConnectTo session: UISceneSession,
+      options connectionOptions: UIScene.ConnectionOptions
+    ) {
+      for context in connectionOptions.urlContexts {
+        supabase.auth.handle(context.url)
+      }
+    }
+
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
       guard let url = URLContexts.first?.url else { return }
       supabase.auth.handle(url)
