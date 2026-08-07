@@ -3,6 +3,8 @@ import { compact, isEqual, noop } from 'lodash'
 import {
   ArrowLeft,
   Check,
+  ChevronsDownUp,
+  ChevronsUpDown,
   Columns,
   Edit2,
   FolderPlus,
@@ -49,6 +51,8 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
+import { useBucketTrashQuery } from '@/data/storage/protection/bucket-trash-query'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
@@ -293,7 +297,19 @@ export const FileExplorerHeader = ({
 
   const { data: bucket } = useSelectedBucket()
   const isVersioned = hasVersioningHistory(bucket?.id)
-  const { isShowingDeleted, setIsShowingDeleted } = useDeletedFilesContext()
+  const { isShowingDeleted, setIsShowingDeleted, expandedVersionIds, setExpandedVersionIds } =
+    useDeletedFilesContext()
+
+  const { data: trashObjects } = useBucketTrashQuery({
+    projectRef: projectRef ?? undefined,
+    bucketId: bucket?.id,
+  })
+  const expandableIds = (trashObjects ?? [])
+    .filter((o) => o.noncurrentVersions && o.noncurrentVersions.length > 0)
+    .map((o) => o.id)
+  const hasExpandableVersions = expandableIds.length > 0
+  const isAllExpanded =
+    hasExpandableVersions && expandableIds.every((id) => expandedVersionIds.has(id))
 
   const refreshData = async () => {
     await refreshAll()
@@ -453,6 +469,29 @@ export const FileExplorerHeader = ({
                 </>
               )}
             </div>
+
+            {isShowingDeleted && hasExpandableVersions && (
+              <div className="flex shrink-0 items-center gap-1">
+                <Button
+                  size="tiny"
+                  variant="outline"
+                  icon={<ChevronsUpDown size={14} />}
+                  onClick={() => setExpandedVersionIds(new Set(expandableIds))}
+                  disabled={isAllExpanded}
+                >
+                  Expand all
+                </Button>
+                <Button
+                  size="tiny"
+                  variant="outline"
+                  icon={<ChevronsDownUp size={14} />}
+                  onClick={() => setExpandedVersionIds(new Set())}
+                  disabled={expandedVersionIds.size === 0}
+                >
+                  Collapse all
+                </Button>
+              </div>
+            )}
 
             {!isShowingDeleted && (
               <div className="flex shrink-0 items-center gap-1">

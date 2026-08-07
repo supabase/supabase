@@ -231,14 +231,14 @@ const NoncurrentVersionRow = ({
         {/* Tree connector: vertical line */}
         <div
           className={cn(
-            'absolute left-[23px] w-px bg-foreground-muted pointer-events-none',
+            'absolute left-[23px] w-px bg-border-stronger pointer-events-none',
             isLast ? 'top-0 h-1/2' : 'inset-y-0'
           )}
         />
         {/* Tree connector: horizontal branch */}
-        <div className="absolute left-[23px] top-1/2 h-px w-[11px] -translate-y-px bg-foreground-muted pointer-events-none" />
+        <div className="absolute left-[23px] top-1/2 h-px w-[8px] -translate-y-px bg-border-stronger pointer-events-none" />
         {/* Content aligned with parent row text */}
-        <div className="flex items-center gap-x-2 pl-[22px]">
+        <div className="flex items-center gap-x-2 pl-[36px]">
           <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
           <span className="text-foreground-muted text-xs">({version.action})</span>
         </div>

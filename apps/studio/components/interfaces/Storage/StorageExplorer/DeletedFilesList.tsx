@@ -59,6 +59,8 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     setSelectedDeletedIds,
     lastToggledId,
     setLastToggledId,
+    expandedVersionIds,
+    setExpandedVersionIds,
   } = useDeletedFilesContext()
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
@@ -67,8 +69,6 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     parentObject: TrashObject
     version: DeletedObjectVersion
   }>()
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
-
   const {
     data: objects,
     isPending,
@@ -173,7 +173,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
 
   const orderedIds = filtered.flatMap((o) => {
     const ids = [o.id]
-    if (expandedIds.has(o.id) && o.noncurrentVersions) {
+    if (expandedVersionIds.has(o.id) && o.noncurrentVersions) {
       for (const v of o.noncurrentVersions) {
         ids.push(versionKey(o.id, v.versionId))
       }
@@ -223,15 +223,8 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     setVersionToDelete({ parentObject: parent, version })
   }
 
-  // ── Expand / collapse all ───────────────────────────────────────────
-
-  const expandableIds = filtered
-    .filter((o) => o.noncurrentVersions && o.noncurrentVersions.length > 0)
-    .map((o) => o.id)
-  const isAllExpanded = expandableIds.length > 0 && expandableIds.every((id) => expandedIds.has(id))
-
   const toggleExpanded = (id: string) => {
-    setExpandedIds((prev) => {
+    setExpandedVersionIds((prev) => {
       const next = new Set(prev)
       if (next.has(id)) {
         next.delete(id)
@@ -241,9 +234,6 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
       return next
     })
   }
-
-  const expandAll = () => setExpandedIds(new Set(expandableIds))
-  const collapseAll = () => setExpandedIds(new Set())
 
   const totalVersionCount = (object: TrashObject) => {
     return 1 + (object.noncurrentVersions?.length ?? 0)
@@ -278,25 +268,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
             <TableHead>Original location</TableHead>
             <TableHead>Deleted</TableHead>
             <TableHead className="text-right">Size</TableHead>
-            <TableHead className="text-right">
-              {expandableIds.length > 0 && (
-                <div className="flex items-center justify-end gap-x-2 text-xs font-normal">
-                  <button
-                    className="text-foreground-lighter hover:text-foreground transition-colors"
-                    onClick={expandAll}
-                  >
-                    Expand all
-                  </button>
-                  <span className="text-border-stronger">·</span>
-                  <button
-                    className="text-foreground-lighter hover:text-foreground transition-colors"
-                    onClick={collapseAll}
-                  >
-                    Collapse all
-                  </button>
-                </div>
-              )}
-            </TableHead>
+            <TableHead />
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -306,7 +278,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
               selectedDeletedFile?.id === object.id && selectedDeletedVersion === undefined
             const hasVersions =
               object.noncurrentVersions !== undefined && object.noncurrentVersions.length > 0
-            const isExpanded = expandedIds.has(object.id)
+            const isExpanded = expandedVersionIds.has(object.id)
 
             return (
               <Fragment key={object.id}>
@@ -540,14 +512,14 @@ const NoncurrentVersionRow = ({
         {/* Tree connector: vertical line */}
         <div
           className={cn(
-            'absolute left-[23px] w-px bg-foreground-muted pointer-events-none',
+            'absolute left-[23px] w-px bg-border-stronger pointer-events-none',
             isLast ? 'top-0 h-1/2' : 'inset-y-0'
           )}
         />
         {/* Tree connector: horizontal branch */}
-        <div className="absolute left-[23px] top-1/2 h-px w-[11px] -translate-y-px bg-foreground-muted pointer-events-none" />
-        {/* Content aligned with parent row text */}
-        <div className="flex items-center gap-x-2 pl-[22px]">
+        <div className="absolute left-[23px] top-1/2 h-px w-[8px] -translate-y-px bg-border-stronger pointer-events-none" />
+        {/* Content aligned after horizontal branch with gap */}
+        <div className="flex items-center gap-x-2 pl-[36px]">
           <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
           <span className="text-foreground-muted text-xs">({version.action})</span>
         </div>

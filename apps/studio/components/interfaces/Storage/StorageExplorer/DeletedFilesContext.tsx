@@ -1,5 +1,13 @@
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+} from 'react'
 
 import {
   type DeletedObjectVersion,
@@ -24,6 +32,8 @@ interface DeletedFilesContextValue {
   lastToggledId: string | null
   setLastToggledId: (id: string | null) => void
   clearDeletedSelection: () => void
+  expandedVersionIds: Set<string>
+  setExpandedVersionIds: Dispatch<SetStateAction<Set<string>>>
 }
 
 const DeletedFilesContext = createContext<DeletedFilesContextValue>({
@@ -39,6 +49,8 @@ const DeletedFilesContext = createContext<DeletedFilesContextValue>({
   lastToggledId: null,
   setLastToggledId: () => {},
   clearDeletedSelection: () => {},
+  expandedVersionIds: new Set(),
+  setExpandedVersionIds: () => {},
 })
 
 export const useDeletedFilesContext = () => useContext(DeletedFilesContext)
@@ -59,6 +71,7 @@ export const DeletedFilesProvider = ({ enabled, children }: DeletedFilesProvider
   >()
   const [selectedDeletedIds, setSelectedDeletedIds] = useState<string[]>([])
   const [lastToggledId, setLastToggledId] = useState<string | null>(null)
+  const [expandedVersionIds, setExpandedVersionIds] = useState<Set<string>>(new Set())
 
   const clearDeletedSelection = useCallback(() => {
     setSelectedDeletedIds([])
@@ -80,6 +93,8 @@ export const DeletedFilesProvider = ({ enabled, children }: DeletedFilesProvider
         lastToggledId,
         setLastToggledId,
         clearDeletedSelection,
+        expandedVersionIds,
+        setExpandedVersionIds,
       }}
     >
       {children}
