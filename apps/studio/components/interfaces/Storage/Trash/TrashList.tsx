@@ -1,7 +1,14 @@
 import dayjs from 'dayjs'
-import { ChevronDown, ChevronRight, CornerDownRight, RotateCcw, Trash2 } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  CornerDownRight,
+  RotateCcw,
+  Trash2,
+} from 'lucide-react'
 import { Fragment, useState } from 'react'
-import { toast } from 'sonner'
 import {
   Button,
   Checkbox,
@@ -32,6 +39,8 @@ interface TrashListProps {
   onToggleSelectAll: () => void
   onRestore: (object: TrashObject) => void
   onDeleteForever: (object: TrashObject) => void
+  onRestoreVersion?: (parent: TrashObject, version: DeletedObjectVersion) => void
+  onDeleteVersionForever?: (parent: TrashObject, version: DeletedObjectVersion) => void
 }
 
 export const TrashList = ({
@@ -42,6 +51,8 @@ export const TrashList = ({
   onToggleSelectAll,
   onRestore,
   onDeleteForever,
+  onRestoreVersion,
+  onDeleteVersionForever,
 }: TrashListProps) => {
   const isAllSelected = objects.length > 0 && objects.every((o) => selectedIds.includes(o.id))
   const isSomeSelected = selectedIds.length > 0 && !isAllSelected
@@ -59,6 +70,14 @@ export const TrashList = ({
       return next
     })
   }
+
+  const expandableIds = objects
+    .filter((o) => o.noncurrentVersions && o.noncurrentVersions.length > 0)
+    .map((o) => o.id)
+  const isAllExpanded = expandableIds.length > 0 && expandableIds.every((id) => expandedIds.has(id))
+
+  const expandAll = () => setExpandedIds(new Set(expandableIds))
+  const collapseAll = () => setExpandedIds(new Set())
 
   const totalVersionCount = (object: TrashObject) => {
     return 1 + (object.noncurrentVersions?.length ?? 0)
@@ -80,8 +99,25 @@ export const TrashList = ({
           <TableHead>Original location</TableHead>
           <TableHead>Deleted</TableHead>
           <TableHead className="text-right">Size</TableHead>
-          <TableHead>Expires</TableHead>
-          <TableHead />
+          <TableHead className="text-right">
+            {expandableIds.length > 0 && (
+              <div className="flex items-center justify-end gap-x-1">
+                <ButtonTooltip
+                  variant="text"
+                  size="tiny"
+                  className="px-1"
+                  icon={isAllExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />}
+                  onClick={isAllExpanded ? collapseAll : expandAll}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: isAllExpanded ? 'Collapse all versions' : 'Expand all versions',
+                    },
+                  }}
+                />
+              </div>
+            )}
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -140,13 +176,6 @@ export const TrashList = ({
                   {formatBytes(object.size)}
                 </TableCell>
                 <TableCell>
-                  {object.expiresAt ? (
-                    <span className="text-warning-600">{dayjs(object.expiresAt).fromNow()}</span>
-                  ) : (
-                    <span className="text-foreground-lighter">Never</span>
-                  )}
-                </TableCell>
-                <TableCell>
                   <div className="flex items-center justify-end gap-x-2">
                     <Button
                       variant="default"
@@ -168,12 +197,8 @@ export const TrashList = ({
                   <NoncurrentVersionRow
                     key={version.versionId}
                     version={version}
-                    onRestore={() => {
-                      toast.success(`Restoring version ${version.versionId.slice(0, 8)} to current`)
-                    }}
-                    onDelete={() => {
-                      toast.success(`Permanently deleted version ${version.versionId.slice(0, 8)}`)
-                    }}
+                    onRestore={() => onRestoreVersion?.(object, version)}
+                    onDelete={() => onDeleteVersionForever?.(object, version)}
                   />
                 ))}
             </Fragment>
@@ -197,8 +222,8 @@ const NoncurrentVersionRow = ({ version, onRestore, onDelete }: NoncurrentVersio
     <TableRow className="bg-surface-100/50 group">
       <TableCell />
       <TableCell colSpan={2}>
-        <div className="flex items-center gap-1.5 pl-6">
-          <CornerDownRight size={12} className="text-foreground-muted shrink-0" />
+        <div className="flex items-center gap-x-2">
+          <CornerDownRight size={14} className="text-foreground-muted shrink-0" />
           <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
           <span className="text-foreground-muted text-xs">({version.action})</span>
         </div>
@@ -209,7 +234,6 @@ const NoncurrentVersionRow = ({ version, onRestore, onDelete }: NoncurrentVersio
       <TableCell className="text-right text-foreground-lighter tabular-nums text-xs">
         {formatBytes(version.size)}
       </TableCell>
-      <TableCell />
       <TableCell>
         <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
           <ButtonTooltip

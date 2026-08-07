@@ -390,6 +390,30 @@ export const deleteMockTrashObjectsPermanently = (objectIds?: string[]): TrashOb
   return [...trashObjects]
 }
 
+/** Permanently deletes a single noncurrent version from a trash object. */
+export const deleteNoncurrentVersionPermanently = (
+  objectId: string,
+  versionId: string
+): TrashObject[] => {
+  trashObjects = trashObjects.map((obj) => {
+    if (obj.id !== objectId) return obj
+    return {
+      ...obj,
+      noncurrentVersions: (obj.noncurrentVersions ?? []).filter((v) => v.versionId !== versionId),
+    }
+  })
+  return [...trashObjects]
+}
+
+/**
+ * Restores a noncurrent version from trash. In a real implementation this
+ * would promote it to the current version of the live object. For the
+ * prototype we simply remove it from the trash entry.
+ */
+export const restoreNoncurrentVersion = (objectId: string, versionId: string): TrashObject[] => {
+  return deleteNoncurrentVersionPermanently(objectId, versionId)
+}
+
 export interface BucketRetentionSummary {
   bucket: string
   live: number

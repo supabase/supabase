@@ -1,7 +1,15 @@
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { createContext, useCallback, useContext, useState, type ReactNode } from 'react'
 
-import { type TrashObject } from '@/data/storage/protection/protection-mocks'
+import {
+  type DeletedObjectVersion,
+  type TrashObject,
+} from '@/data/storage/protection/protection-mocks'
+
+export interface SelectedDeletedVersion {
+  parentObject: TrashObject
+  version: DeletedObjectVersion
+}
 
 interface DeletedFilesContextValue {
   isEnabled: boolean
@@ -9,6 +17,8 @@ interface DeletedFilesContextValue {
   setIsShowingDeleted: (value: boolean) => void
   selectedDeletedFile: TrashObject | undefined
   setSelectedDeletedFile: (file: TrashObject | undefined) => void
+  selectedDeletedVersion: SelectedDeletedVersion | undefined
+  setSelectedDeletedVersion: (version: SelectedDeletedVersion | undefined) => void
   selectedDeletedIds: string[]
   setSelectedDeletedIds: (ids: string[]) => void
   lastToggledId: string | null
@@ -22,6 +32,8 @@ const DeletedFilesContext = createContext<DeletedFilesContextValue>({
   setIsShowingDeleted: () => {},
   selectedDeletedFile: undefined,
   setSelectedDeletedFile: () => {},
+  selectedDeletedVersion: undefined,
+  setSelectedDeletedVersion: () => {},
   selectedDeletedIds: [],
   setSelectedDeletedIds: () => {},
   lastToggledId: null,
@@ -42,6 +54,9 @@ export const DeletedFilesProvider = ({ enabled, children }: DeletedFilesProvider
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
   const [selectedDeletedFile, setSelectedDeletedFile] = useState<TrashObject>()
+  const [selectedDeletedVersion, setSelectedDeletedVersion] = useState<
+    SelectedDeletedVersion | undefined
+  >()
   const [selectedDeletedIds, setSelectedDeletedIds] = useState<string[]>([])
   const [lastToggledId, setLastToggledId] = useState<string | null>(null)
 
@@ -58,6 +73,8 @@ export const DeletedFilesProvider = ({ enabled, children }: DeletedFilesProvider
         setIsShowingDeleted,
         selectedDeletedFile,
         setSelectedDeletedFile,
+        selectedDeletedVersion,
+        setSelectedDeletedVersion,
         selectedDeletedIds,
         setSelectedDeletedIds,
         lastToggledId,

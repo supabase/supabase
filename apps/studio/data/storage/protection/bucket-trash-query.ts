@@ -3,9 +3,11 @@ import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
 import {
+  deleteNoncurrentVersionPermanently,
   deleteMockTrashObjectsPermanently,
   getMockTrashObjects,
   mockDelay,
+  restoreNoncurrentVersion,
   restoreMockTrashObjects,
   type TrashObject,
 } from './protection-mocks'
@@ -78,6 +80,63 @@ export const useBucketTrashDeleteMutation = ({
     },
     onError(error, variables, context) {
       if (onError === undefined) toast.error(`Failed to delete objects: ${error.message}`)
+      else onError(error, variables, context)
+    },
+    ...options,
+  })
+}
+
+type TrashVersionVariables = {
+  projectRef: string
+  bucketId: string
+  objectId: string
+  versionId: string
+}
+
+export const useTrashVersionRestoreMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<void, Error, TrashVersionVariables> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<void, Error, TrashVersionVariables>({
+    mutationFn: async (variables) => {
+      restoreNoncurrentVersion(variables.objectId, variables.versionId)
+      await mockDelay(undefined, 400)
+    },
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.trash(variables.projectRef, variables.bucketId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    onError(error, variables, context) {
+      if (onError === undefined) toast.error(`Failed to restore version: ${error.message}`)
+      else onError(error, variables, context)
+    },
+    ...options,
+  })
+}
+
+export const useTrashVersionDeleteMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<void, Error, TrashVersionVariables> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<void, Error, TrashVersionVariables>({
+    mutationFn: async (variables) => {
+      deleteNoncurrentVersionPermanently(variables.objectId, variables.versionId)
+      await mockDelay(undefined, 400)
+    },
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.trash(variables.projectRef, variables.bucketId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    onError(error, variables, context) {
+      if (onError === undefined) toast.error(`Failed to delete version: ${error.message}`)
       else onError(error, variables, context)
     },
     ...options,

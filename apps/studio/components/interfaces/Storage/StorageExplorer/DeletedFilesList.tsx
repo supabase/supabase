@@ -1,7 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ChevronDown, ChevronRight, CornerDownRight, RotateCcw, Trash2 } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronRight,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  CornerDownRight,
+  RotateCcw,
+  Trash2,
+} from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -27,6 +35,8 @@ import {
   useBucketTrashDeleteMutation,
   useBucketTrashQuery,
   useBucketTrashRestoreMutation,
+  useTrashVersionDeleteMutation,
+  useTrashVersionRestoreMutation,
 } from '@/data/storage/protection/bucket-trash-query'
 import {
   type DeletedObjectVersion,
@@ -38,6 +48,9 @@ import { formatBytes } from '@/lib/helpers'
 import { toggleSelectAll, toggleSelection } from '../Trash/Trash.utils'
 import { useDeletedFilesContext } from './DeletedFilesContext'
 
+/** Composite key for a version row — unambiguous vs. top-level object ids. */
+const versionKey = (objectId: string, versionId: string) => `${objectId}::${versionId}`
+
 interface DeletedFilesListProps {
   bucketId: string
   searchString: string
@@ -48,6 +61,8 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
   const {
     selectedDeletedFile,
     setSelectedDeletedFile,
+    selectedDeletedVersion,
+    setSelectedDeletedVersion,
     selectedDeletedIds,
     setSelectedDeletedIds,
     lastToggledId,
@@ -56,6 +71,10 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const [fileToDelete, setFileToDelete] = useState<TrashObject>()
+  const [versionToDelete, setVersionToDelete] = useState<{
+    parentObject: TrashObject
+    version: DeletedObjectVersion
+  }>()
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
   const {
@@ -65,6 +84,8 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     error,
     isSuccess,
   } = useBucketTrashQuery({ projectRef: ref, bucketId })
+
+  // ── Object-level mutations ──────────────────────────────────────────
 
   const { mutate: restoreObjects, isPending: isRestoring } = useBucketTrashRestoreMutation({
     onSuccess: (_data, variables) => {
@@ -88,6 +109,36 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
       setSelectedDeletedIds(selectedDeletedIds.filter((id) => !deletedIds.includes(id)))
     },
   })
+
+  // ── Version-level mutations ─────────────────────────────────────────
+
+  const { mutate: restoreVersion, isPending: isRestoringVersion } = useTrashVersionRestoreMutation({
+    onSuccess: (_data, variables) => {
+      toast.success(`Version ${variables.versionId.slice(0, 8)} restored`)
+      // Clear version preview if we just restored the previewed version
+      if (selectedDeletedVersion?.version.versionId === variables.versionId) {
+        setSelectedDeletedVersion(undefined)
+      }
+      // Remove from selection
+      const key = versionKey(variables.objectId, variables.versionId)
+      setSelectedDeletedIds(selectedDeletedIds.filter((id) => id !== key))
+    },
+  })
+
+  const { mutate: deleteVersionPermanently, isPending: isDeletingVersion } =
+    useTrashVersionDeleteMutation({
+      onSuccess: (_data, variables) => {
+        toast.success(`Version ${variables.versionId.slice(0, 8)} permanently deleted`)
+        setVersionToDelete(undefined)
+        if (selectedDeletedVersion?.version.versionId === variables.versionId) {
+          setSelectedDeletedVersion(undefined)
+        }
+        const key = versionKey(variables.objectId, variables.versionId)
+        setSelectedDeletedIds(selectedDeletedIds.filter((id) => id !== key))
+      },
+    })
+
+  // ── Loading / error states ──────────────────────────────────────────
 
   if (isPending) {
     return (
@@ -126,9 +177,21 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     )
   }
 
-  const orderedIds = filtered.map((o) => o.id)
+  // ── Flat ordered ID list (objects + expanded versions) for shift-select ──
+
+  const orderedIds = filtered.flatMap((o) => {
+    const ids = [o.id]
+    if (expandedIds.has(o.id) && o.noncurrentVersions) {
+      for (const v of o.noncurrentVersions) {
+        ids.push(versionKey(o.id, v.versionId))
+      }
+    }
+    return ids
+  })
+
+  const topLevelIds = filtered.map((o) => o.id)
   const isAllSelected =
-    orderedIds.length > 0 && orderedIds.every((id) => selectedDeletedIds.includes(id))
+    topLevelIds.length > 0 && topLevelIds.every((id) => selectedDeletedIds.includes(id))
   const isSomeSelected = selectedDeletedIds.length > 0 && !isAllSelected
 
   const handleToggle = (id: string, isShiftHeld: boolean) => {
@@ -144,7 +207,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
   }
 
   const handleToggleAll = () => {
-    const newIds = toggleSelectAll(selectedDeletedIds, orderedIds)
+    const newIds = toggleSelectAll(selectedDeletedIds, topLevelIds)
     setSelectedDeletedIds(newIds)
     setLastToggledId(null)
   }
@@ -153,6 +216,27 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     if (!ref) return
     restoreObjects({ projectRef: ref, bucketId, objectIds: [object.id] })
   }
+
+  const handleVersionRestore = (parent: TrashObject, version: DeletedObjectVersion) => {
+    if (!ref) return
+    restoreVersion({
+      projectRef: ref,
+      bucketId,
+      objectId: parent.id,
+      versionId: version.versionId,
+    })
+  }
+
+  const handleVersionDelete = (parent: TrashObject, version: DeletedObjectVersion) => {
+    setVersionToDelete({ parentObject: parent, version })
+  }
+
+  // ── Expand / collapse all ───────────────────────────────────────────
+
+  const expandableIds = filtered
+    .filter((o) => o.noncurrentVersions && o.noncurrentVersions.length > 0)
+    .map((o) => o.id)
+  const isAllExpanded = expandableIds.length > 0 && expandableIds.every((id) => expandedIds.has(id))
 
   const toggleExpanded = (id: string) => {
     setExpandedIds((prev) => {
@@ -166,8 +250,23 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     })
   }
 
+  const expandAll = () => setExpandedIds(new Set(expandableIds))
+  const collapseAll = () => setExpandedIds(new Set())
+
   const totalVersionCount = (object: TrashObject) => {
     return 1 + (object.noncurrentVersions?.length ?? 0)
+  }
+
+  // ── Preview handlers ────────────────────────────────────────────────
+
+  const handleSelectObject = (object: TrashObject) => {
+    setSelectedDeletedFile(object)
+    setSelectedDeletedVersion(undefined)
+  }
+
+  const handleSelectVersion = (parent: TrashObject, version: DeletedObjectVersion) => {
+    setSelectedDeletedVersion({ parentObject: parent, version })
+    setSelectedDeletedFile(undefined)
   }
 
   return (
@@ -187,14 +286,34 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
             <TableHead>Original location</TableHead>
             <TableHead>Deleted</TableHead>
             <TableHead className="text-right">Size</TableHead>
-            <TableHead>Expires</TableHead>
-            <TableHead />
+            <TableHead className="text-right">
+              {expandableIds.length > 0 && (
+                <div className="flex items-center justify-end gap-x-1">
+                  <ButtonTooltip
+                    variant="text"
+                    size="tiny"
+                    className="px-1"
+                    icon={
+                      isAllExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />
+                    }
+                    onClick={isAllExpanded ? collapseAll : expandAll}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: isAllExpanded ? 'Collapse all versions' : 'Expand all versions',
+                      },
+                    }}
+                  />
+                </div>
+              )}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filtered.map((object) => {
             const isChecked = selectedDeletedIds.includes(object.id)
-            const isPreviewed = selectedDeletedFile?.id === object.id
+            const isPreviewed =
+              selectedDeletedFile?.id === object.id && selectedDeletedVersion === undefined
             const hasVersions =
               object.noncurrentVersions !== undefined && object.noncurrentVersions.length > 0
             const isExpanded = expandedIds.has(object.id)
@@ -206,7 +325,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                     'group cursor-pointer',
                     isPreviewed && 'bg-selection hover:bg-selection'
                   )}
-                  onClick={() => setSelectedDeletedFile(object)}
+                  onClick={() => handleSelectObject(object)}
                 >
                   <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
@@ -256,13 +375,6 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                   <TableCell className="px-4 py-2 text-right text-foreground-light tabular-nums">
                     {formatBytes(object.size)}
                   </TableCell>
-                  <TableCell className="px-4 py-2">
-                    {object.expiresAt ? (
-                      <span className="text-warning-600">{dayjs(object.expiresAt).fromNow()}</span>
-                    ) : (
-                      <span className="text-foreground-lighter">Never</span>
-                    )}
-                  </TableCell>
                   <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                       <ButtonTooltip
@@ -302,30 +414,36 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
 
                 {hasVersions &&
                   isExpanded &&
-                  object.noncurrentVersions!.map((version) => (
-                    <NoncurrentVersionRow
-                      key={version.versionId}
-                      version={version}
-                      parentObject={object}
-                      canUpdateFiles={canUpdateFiles}
-                      onRestore={() => {
-                        toast.success(
-                          `Restoring version ${version.versionId.slice(0, 8)} to current`
-                        )
-                      }}
-                      onDelete={() => {
-                        toast.success(
-                          `Permanently deleted version ${version.versionId.slice(0, 8)}`
-                        )
-                      }}
-                    />
-                  ))}
+                  object.noncurrentVersions!.map((version) => {
+                    const key = versionKey(object.id, version.versionId)
+                    const isVersionChecked = selectedDeletedIds.includes(key)
+                    const isVersionPreviewed =
+                      selectedDeletedVersion?.version.versionId === version.versionId &&
+                      selectedDeletedVersion?.parentObject.id === object.id
+
+                    return (
+                      <NoncurrentVersionRow
+                        key={version.versionId}
+                        version={version}
+                        parentObject={object}
+                        isChecked={isVersionChecked}
+                        isPreviewed={isVersionPreviewed}
+                        canUpdateFiles={canUpdateFiles}
+                        isRestoring={isRestoringVersion}
+                        onToggleSelect={(isShiftHeld) => handleToggle(key, isShiftHeld)}
+                        onClick={() => handleSelectVersion(object, version)}
+                        onRestore={() => handleVersionRestore(object, version)}
+                        onDelete={() => handleVersionDelete(object, version)}
+                      />
+                    )
+                  })}
               </Fragment>
             )
           })}
         </TableBody>
       </Table>
 
+      {/* Confirm delete for top-level object */}
       <ConfirmationModal
         variant="destructive"
         visible={fileToDelete !== undefined}
@@ -347,6 +465,35 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
           will be permanently deleted and can no longer be restored. This action cannot be undone.
         </p>
       </ConfirmationModal>
+
+      {/* Confirm delete for individual version */}
+      <ConfirmationModal
+        variant="destructive"
+        visible={versionToDelete !== undefined}
+        title="Permanently delete version"
+        confirmLabel="Delete permanently"
+        confirmLabelLoading="Deleting..."
+        loading={isDeletingVersion}
+        onCancel={() => setVersionToDelete(undefined)}
+        onConfirm={() => {
+          if (!ref || !versionToDelete) return
+          deleteVersionPermanently({
+            projectRef: ref,
+            bucketId,
+            objectId: versionToDelete.parentObject.id,
+            versionId: versionToDelete.version.versionId,
+          })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Version{' '}
+          <span className="font-mono text-foreground">
+            {versionToDelete?.version.versionId.slice(0, 8)}
+          </span>{' '}
+          of {versionToDelete?.parentObject.name} will be permanently deleted. This action cannot be
+          undone.
+        </p>
+      </ConfirmationModal>
     </>
   )
 }
@@ -354,7 +501,12 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
 interface NoncurrentVersionRowProps {
   version: DeletedObjectVersion
   parentObject: TrashObject
+  isChecked: boolean
+  isPreviewed: boolean
   canUpdateFiles: boolean
+  isRestoring: boolean
+  onToggleSelect: (isShiftHeld: boolean) => void
+  onClick: () => void
   onRestore: () => void
   onDelete: () => void
 }
@@ -362,17 +514,37 @@ interface NoncurrentVersionRowProps {
 const NoncurrentVersionRow = ({
   version,
   canUpdateFiles,
+  isChecked,
+  isPreviewed,
+  isRestoring,
+  onToggleSelect,
+  onClick,
   onRestore,
   onDelete,
 }: NoncurrentVersionRowProps) => {
   const shortId = `${version.versionId.slice(0, 8)}`
 
   return (
-    <TableRow className="bg-surface-100/50 group">
-      <TableCell />
+    <TableRow
+      className={cn(
+        'bg-surface-100/50 group cursor-pointer',
+        isPreviewed && 'bg-selection hover:bg-selection'
+      )}
+      onClick={onClick}
+    >
+      <TableCell className="px-4 py-1.5" onClick={(e) => e.stopPropagation()}>
+        <Checkbox
+          checked={isChecked}
+          className={cn(
+            isChecked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus:opacity-100'
+          )}
+          onClick={(event) => onToggleSelect(event.nativeEvent.shiftKey)}
+          aria-label={`Select version ${shortId}`}
+        />
+      </TableCell>
       <TableCell className="px-4 py-1.5" colSpan={2}>
-        <div className="flex items-center gap-1.5 pl-6">
-          <CornerDownRight size={12} className="text-foreground-muted shrink-0" />
+        <div className="flex items-center gap-x-2">
+          <CornerDownRight size={14} className="text-foreground-muted shrink-0" />
           <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
           <span className="text-foreground-muted text-xs">({version.action})</span>
         </div>
@@ -383,13 +555,13 @@ const NoncurrentVersionRow = ({
       <TableCell className="px-4 py-1.5 text-right text-foreground-lighter tabular-nums text-xs">
         {formatBytes(version.size)}
       </TableCell>
-      <TableCell />
       <TableCell className="px-4 py-1.5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
           <ButtonTooltip
             variant="default"
             size="tiny"
             icon={<RotateCcw size={12} />}
+            loading={isRestoring}
             disabled={!canUpdateFiles}
             onClick={onRestore}
             tooltip={{

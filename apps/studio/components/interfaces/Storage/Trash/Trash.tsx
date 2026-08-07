@@ -15,8 +15,13 @@ import {
   useBucketTrashDeleteMutation,
   useBucketTrashQuery,
   useBucketTrashRestoreMutation,
+  useTrashVersionDeleteMutation,
+  useTrashVersionRestoreMutation,
 } from '@/data/storage/protection/bucket-trash-query'
-import { type TrashObject } from '@/data/storage/protection/protection-mocks'
+import {
+  type DeletedObjectVersion,
+  type TrashObject,
+} from '@/data/storage/protection/protection-mocks'
 
 import { toggleSelectAll, toggleSelection } from './Trash.utils'
 import { TrashList } from './TrashList'
@@ -32,6 +37,10 @@ export const Trash = ({ bucketId }: TrashProps) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [lastToggledId, setLastToggledId] = useState<string | null>(null)
   const [objectToDelete, setObjectToDelete] = useState<TrashObject>()
+  const [versionToDelete, setVersionToDelete] = useState<{
+    parent: TrashObject
+    version: DeletedObjectVersion
+  }>()
   const [showBulkDelete, setShowBulkDelete] = useState(false)
   const [showDeleteAll, setShowDeleteAll] = useState(false)
 
@@ -60,6 +69,20 @@ export const Trash = ({ bucketId }: TrashProps) => {
       setShowDeleteAll(false)
     },
   })
+
+  const { mutate: restoreVersion } = useTrashVersionRestoreMutation({
+    onSuccess: (_data, variables) => {
+      toast.success(`Version ${variables.versionId.slice(0, 8)} restored`)
+    },
+  })
+
+  const { mutate: deleteVersionPermanently, isPending: isDeletingVersion } =
+    useTrashVersionDeleteMutation({
+      onSuccess: () => {
+        toast.success('Version permanently deleted')
+        setVersionToDelete(undefined)
+      },
+    })
 
   const orderedIds = (objects ?? []).map((object) => object.id)
 
@@ -118,6 +141,18 @@ export const Trash = ({ bucketId }: TrashProps) => {
                   onToggleSelectAll={() => setSelectedIds(toggleSelectAll(selectedIds, orderedIds))}
                   onRestore={(object) => handleRestore([object.id])}
                   onDeleteForever={setObjectToDelete}
+                  onRestoreVersion={(parent, version) => {
+                    if (!ref) return
+                    restoreVersion({
+                      projectRef: ref,
+                      bucketId,
+                      objectId: parent.id,
+                      versionId: version.versionId,
+                    })
+                  }}
+                  onDeleteVersionForever={(parent, version) =>
+                    setVersionToDelete({ parent, version })
+                  }
                 />
               </Card>
             )}
@@ -164,6 +199,34 @@ export const Trash = ({ bucketId }: TrashProps) => {
         <p className="text-sm text-foreground-light">
           These versions will be permanently deleted and can no longer be restored. This action
           cannot be undone.
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        variant="destructive"
+        visible={versionToDelete !== undefined}
+        title="Permanently delete version"
+        confirmLabel="Delete permanently"
+        confirmLabelLoading="Deleting..."
+        loading={isDeletingVersion}
+        onCancel={() => setVersionToDelete(undefined)}
+        onConfirm={() => {
+          if (!ref || !versionToDelete) return
+          deleteVersionPermanently({
+            projectRef: ref,
+            bucketId,
+            objectId: versionToDelete.parent.id,
+            versionId: versionToDelete.version.versionId,
+          })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Version{' '}
+          <span className="font-mono text-foreground">
+            {versionToDelete?.version.versionId.slice(0, 8)}
+          </span>{' '}
+          of {versionToDelete?.parent.name} will be permanently deleted. This action cannot be
+          undone.
         </p>
       </ConfirmationModal>
 
