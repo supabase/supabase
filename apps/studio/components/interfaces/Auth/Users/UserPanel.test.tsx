@@ -83,11 +83,9 @@ describe('UserPanel', () => {
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
   })
 
-  it('uses the full-width Table Editor side panel', async () => {
+  it('provides an accessible close button', async () => {
     renderPanel([])
 
-    const dialog = await screen.findByRole('dialog', { name: 'User details' })
-    expect(dialog).toHaveClass('w-screen', 'max-w-2xl')
-    expect(screen.getByRole('button', { name: 'Close user details' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Close user details' })).toBeInTheDocument()
   })
 })

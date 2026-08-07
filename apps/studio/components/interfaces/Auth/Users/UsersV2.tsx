@@ -25,8 +25,6 @@ import {
   Button,
   cn,
   LoadingLine,
-  ResizablePanel,
-  ResizablePanelGroup,
   Select,
   SelectContent,
   SelectGroup,
@@ -62,6 +60,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { ResizableInspectorLayout } from '@/components/ui/ResizableInspectorLayout'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useIndexWorkerStatusQuery } from '@/data/auth/index-worker-status-query'
@@ -770,111 +769,114 @@ export const UsersV2 = () => {
           )}
         </div>
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
-        <ResizablePanelGroup
-          orientation="horizontal"
+        <ResizableInspectorLayout
           className="relative flex grow bg-alternative min-h-0"
-          autoSaveId="query-performance-layout-v1"
+          mainPanelId="auth-users-table"
+          inspectorPanelId="auth-user-details"
+          inspectorLabel="User details"
+          mainMinSize={300}
+          inspectorDefaultSize={400}
+          inspectorMinSize={320}
+          inspectorMaxSize="60%"
+          inspector={selectedId ? <UserPanel /> : undefined}
         >
-          <ResizablePanel>
-            <div className="flex flex-col w-full h-full">
-              <DataGrid
-                ref={gridRef}
-                className="grow border-t-0! border-b-0!"
-                rowHeight={44}
-                headerRowHeight={36}
-                columns={columns}
-                rows={formatUsersData(users ?? [])}
-                rowClass={(row) => {
-                  const isSelected = row.id === selectedUser
-                  return [
-                    `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
-                    '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
-                    '[&>.rdg-cell:first-child>div]:ml-4',
-                  ].join(' ')
-                }}
-                rowKeyGetter={(row) => row.id}
-                selectedRows={selectedUsers}
-                onScroll={handleScroll}
-                onSelectedRowsChange={(rows) => {
-                  if (rows.size > MAX_BULK_DELETE) {
-                    toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
-                  } else setSelectedUsers(rows)
-                }}
-                onCellKeyDown={onCellKeyDown}
-                onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
-                onColumnsReorder={(source, target) => {
-                  const sourceIdx = columns.findIndex((col) => col.key === source)
-                  const targetIdx = columns.findIndex((col) => col.key === target)
+          <div className="flex flex-col w-full h-full">
+            <DataGrid
+              ref={gridRef}
+              className="grow border-t-0! border-b-0!"
+              rowHeight={44}
+              headerRowHeight={36}
+              columns={columns}
+              rows={formatUsersData(users ?? [])}
+              rowClass={(row) => {
+                const isSelected = row.id === selectedUser
+                return [
+                  `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
+                  '[&>.rdg-cell:first-child>div]:ml-4',
+                ].join(' ')
+              }}
+              rowKeyGetter={(row) => row.id}
+              selectedRows={selectedUsers}
+              onScroll={handleScroll}
+              onSelectedRowsChange={(rows) => {
+                if (rows.size > MAX_BULK_DELETE) {
+                  toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
+                } else setSelectedUsers(rows)
+              }}
+              onCellKeyDown={onCellKeyDown}
+              onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
+              onColumnsReorder={(source, target) => {
+                const sourceIdx = columns.findIndex((col) => col.key === source)
+                const targetIdx = columns.findIndex((col) => col.key === target)
 
-                  const updatedColumns = swapColumns(columns, sourceIdx, targetIdx)
-                  setColumns(updatedColumns)
+                const updatedColumns = swapColumns(columns, sourceIdx, targetIdx)
+                setColumns(updatedColumns)
 
-                  saveColumnConfiguration('reorder', { columns: updatedColumns })
-                }}
-                renderers={{
-                  renderRow(id, props) {
-                    return (
-                      <Row
-                        key={id}
-                        {...props}
-                        onClick={() => {
-                          const user = users.find((u) => u.id === id)
-                          if (user) {
-                            const idx = users.indexOf(user)
-                            if (props.row.id) {
-                              setSelectedId(props.row.id)
-                              gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                            }
+                saveColumnConfiguration('reorder', { columns: updatedColumns })
+              }}
+              renderers={{
+                renderRow(id, props) {
+                  return (
+                    <Row
+                      key={id}
+                      {...props}
+                      onClick={() => {
+                        const user = users.find((u) => u.id === id)
+                        if (user) {
+                          const idx = users.indexOf(user)
+                          if (props.row.id) {
+                            setSelectedId(props.row.id)
+                            gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                           }
-                        }}
-                      />
-                    )
-                  },
-                  noRowsFallback: isPendingProject ? (
-                    <div className="absolute top-14 px-6 w-full">
-                      <GenericSkeletonLoader />
+                        }
+                      }}
+                    />
+                  )
+                },
+                noRowsFallback: isPendingProject ? (
+                  <div className="absolute top-14 px-6 w-full">
+                    <GenericSkeletonLoader />
+                  </div>
+                ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY || isProjectError ? (
+                  <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                    <AlertError
+                      subject="Unable to load users"
+                      error={{
+                        message:
+                          'Could not connect to the database. Please check your project status.',
+                      }}
+                    />
+                  </div>
+                ) : isPending ? (
+                  <div className="absolute top-14 px-6 w-full">
+                    <GenericSkeletonLoader />
+                  </div>
+                ) : isError ? (
+                  <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
+                    <AlertError subject="Failed to retrieve users" error={error} />
+                  </div>
+                ) : isSuccess ? (
+                  <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+                    <Users className="text-foreground-lighter" strokeWidth={1} />
+                    <div className="text-center">
+                      <p className="text-foreground">
+                        {filterUserType !== 'all' || filterKeywords.length > 0
+                          ? 'No users found'
+                          : 'No users in your project'}
+                      </p>
+                      <p className="text-foreground-light">
+                        {filterUserType !== 'all' || filterKeywords.length > 0
+                          ? 'There are currently no users based on the filters applied'
+                          : 'There are currently no users who signed up to your project'}
+                      </p>
                     </div>
-                  ) : project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY || isProjectError ? (
-                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
-                      <AlertError
-                        subject="Unable to load users"
-                        error={{
-                          message:
-                            'Could not connect to the database. Please check your project status.',
-                        }}
-                      />
-                    </div>
-                  ) : isPending ? (
-                    <div className="absolute top-14 px-6 w-full">
-                      <GenericSkeletonLoader />
-                    </div>
-                  ) : isError ? (
-                    <div className="absolute top-14 px-6 flex flex-col items-center justify-center w-full">
-                      <AlertError subject="Failed to retrieve users" error={error} />
-                    </div>
-                  ) : isSuccess ? (
-                    <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                      <Users className="text-foreground-lighter" strokeWidth={1} />
-                      <div className="text-center">
-                        <p className="text-foreground">
-                          {filterUserType !== 'all' || filterKeywords.length > 0
-                            ? 'No users found'
-                            : 'No users in your project'}
-                        </p>
-                        <p className="text-foreground-light">
-                          {filterUserType !== 'all' || filterKeywords.length > 0
-                            ? 'There are currently no users based on the filters applied'
-                            : 'There are currently no users who signed up to your project'}
-                        </p>
-                      </div>
-                    </div>
-                  ) : null,
-                }}
-              />
-            </div>
-          </ResizablePanel>
-          {!!selectedId && <UserPanel />}
-        </ResizablePanelGroup>
+                  </div>
+                ) : null,
+              }}
+            />
+          </div>
+        </ResizableInspectorLayout>
 
         <UsersFooter
           filter={filterUserType}
