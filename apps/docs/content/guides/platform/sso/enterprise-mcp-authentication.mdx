@@ -1,0 +1,85 @@
+---
+title: 'Enterprise-Managed Authentication for MCP'
+description: "Let your identity provider automatically authorize your organization's use of the Supabase MCP Server, without per-user OAuth prompts."
+---
+
+<Admonition type="note">
+
+This feature is only available on the [Team and Enterprise Plans](/pricing), and requires [SSO](/docs/guides/platform/sso) to already be configured for your organization.
+
+</Admonition>
+
+<Admonition type="tip">
+
+This page covers using the [Supabase MCP Server](/docs/guides/ai-tools/mcp): connecting AI tools like Cursor or Claude to your Supabase organization and projects. If you're building your own MCP server backed by Supabase Auth, see [Model Context Protocol (MCP) Authentication](/docs/guides/auth/oauth-server/mcp-authentication) instead.
+
+</Admonition>
+
+Normally, each member of your organization has to individually sign in and approve their AI tool's connection to the [Supabase MCP Server](/docs/guides/ai-tools/mcp). Enterprise-managed authentication removes that per-user step: once your identity provider (IdP) and MCP client both trust each other for single sign-on, members get access to the Supabase MCP Server automatically, without a separate approval prompt.
+
+This is Supabase's implementation of the MCP [Enterprise-Managed Authorization](https://github.com/modelcontextprotocol/ext-auth/blob/main/specification/stable/enterprise-managed-authorization.mdx) extension, which relies on an **ID-JAG** (Identity Assertion JWT Authorization Grant) issued by your IdP.
+
+## Who's involved
+
+| Party                                   | Role                                                                                                                                         |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Identity provider (IdP)** (e.g. Okta) | Signs your members in via SSO, and issues the MCP client an ID-JAG scoped for Supabase when asked                                            |
+| **MCP client** (e.g. Claude, Cursor)    | The AI tool your members use. It signs the member in to the IdP, requests the ID-JAG, then presents it to Supabase                           |
+| **Supabase**                            | Runs the MCP Server your client ultimately calls, and the OAuth server that validates the ID-JAG and issues the access token used to call it |
+
+## How it works
+
+1. **Member signs in to the MCP client via your IdP**, using the same SSO login your members already use, over OpenID Connect or SAML. The IdP returns an identity token to the MCP client.
+2. **MCP client exchanges that identity token for an ID-JAG, at the IdP.** This is a separate request the client makes to the IdP (an [RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693) token exchange), asking for a token scoped specifically to Supabase. The IdP checks its own policy before issuing one.
+3. **IdP returns the ID-JAG to the MCP client.**
+4. **MCP client presents the ID-JAG to Supabase's OAuth server**, using it as a [JWT authorization grant](https://datatracker.ietf.org/doc/html/rfc7523), with no interactive consent screen.
+5. **Supabase validates the ID-JAG**, checking it against your IdP's public keys, confirming the member belongs to your organization with a matching SSO identity, and confirming an organization owner has authorized this MCP client. If everything checks out, Supabase issues a short-lived access token.
+6. **MCP client calls the Supabase MCP Server** using that access token, same as any other authenticated request.
+
+The access token from step 5 can't be refreshed. The MCP client repeats steps 2 through 5 whenever it needs a new one, and its access is always limited to what your organization's existing permissions already allow.
+
+## Why use enterprise-managed authentication
+
+Without it, every member has to manually connect and authorize the MCP client against Supabase, and do it again whenever access expires. At the scale of an organization, this creates:
+
+- **Onboarding friction**: new members have to discover and go through the approval flow themselves.
+- **No central control**: admins can't see or revoke the MCP client's access at the organization level; it's spread across individual user approvals.
+- **Inconsistent access**: a member's access through the MCP client isn't guaranteed to stay in sync with the role your IdP already assigns them.
+
+With enterprise-managed authentication, an organization owner authorizes the MCP client once for the whole organization. From then on, access follows your existing SSO login, with no separate approval and no manual reconnection when a token expires.
+
+## Prerequisites
+
+Before members can use enterprise-managed authentication:
+
+1. **SSO must be configured** for your organization. See [Enable SSO for your organization](/docs/guides/platform/sso) if you haven't set this up yet.
+2. **Your identity provider must support issuing ID-JAGs** for MCP's Enterprise-Managed Authorization extension. Check with your IdP whether this is available and how to enable it.
+3. **The MCP client must be authorized for your organization.** An organization owner does this from [Authorized Apps](/dashboard/org/_/apps) in your organization settings, the same place you manage other third-party integrations.
+
+## Configuring your IDJAG issuer
+
+Once SSO is set up, an organization owner can add the IDJAG issuer URL from your identity provider:
+
+1. Go to the [**SSO**](/dashboard/org/_/sso) page of your organization settings.
+2. Open **Advanced settings**.
+3. Enter your identity provider's **IDJAG Issuer** URL.
+
+<Admonition type="note">
+
+Unlike your SAML metadata, the issuer URL isn't something Supabase can derive automatically: SAML assertions don't carry an equivalent value. Your IdP's documentation for ID-JAG or OIDC will list this as the `iss` claim on the tokens it issues, usually the same base URL used for OIDC discovery.
+
+</Admonition>
+
+Once saved, Supabase uses this URL to fetch your IdP's public keys and verify ID-JAGs presented by your MCP client on behalf of your members.
+
+## Security considerations
+
+- **Access is always scoped to user.** An ID-JAG can never grant access beyond what the authenticated member already has permission to see.
+- **The MCP client must be explicitly authorized.** Adding an IDJAG issuer alone doesn't grant it access; an organization owner still has to authorize it from [Authorized Apps](/dashboard/org/_/apps).
+- **Access tokens are short-lived and non-renewable.** There's no refresh token.
+- **Revoke access at the source.** To cut off the MCP client for your whole organization, remove its authorization from [Authorized Apps](/dashboard/org/_/apps). To cut off a single member, remove them in Supabase dashboard.
+
+## Next steps
+
+- [Enable SSO for your organization](/docs/guides/platform/sso)
+- [Enterprise-Managed Authorization for MCP (blog post)](https://blog.modelcontextprotocol.io/posts/enterprise-managed-auth/)
