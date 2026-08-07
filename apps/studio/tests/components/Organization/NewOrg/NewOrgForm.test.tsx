@@ -68,7 +68,7 @@ describe('NewOrgForm', () => {
 
     expect(
       await screen.findByText(
-        `You are already a member of an organization named "${EXISTING_ORG_NAME}" — this may cause confusion with upgrades and billing.`
+        `You are already a member of an organization named "${EXISTING_ORG_NAME}". Please choose a different name.`
       )
     ).toBeInTheDocument()
 

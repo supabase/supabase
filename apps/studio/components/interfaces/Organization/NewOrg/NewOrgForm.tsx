@@ -451,7 +451,7 @@ export const NewOrgForm = ({
               kind={useWatch({ control: form.control, name: 'kind' })}
               nameWarning={
                 duplicateOrgName &&
-                `You are already a member of an organization named "${duplicateOrgName.name}" — this may cause confusion with upgrades and billing.`
+                `You are already a member of an organization named "${duplicateOrgName.name}". Please choose a different name.`
               }
               renderFieldWrapper={(children, field) => (
                 <Panel.Content key={field}>{children}</Panel.Content>
