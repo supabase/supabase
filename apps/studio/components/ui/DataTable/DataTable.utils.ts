@@ -44,7 +44,9 @@ export const inDateRange: FilterFn<any> = (row, columnId, value) => {
   // if no end date, check if it's the same day
   if (!end) return isSameDay(date, start)
 
-  return isAfter(date, start) && isBefore(date, end)
+  // inclusive range: a row whose timestamp lands exactly on the start or end
+  // boundary belongs in the range (isAfter/isBefore are strict comparisons)
+  return !isBefore(date, start) && !isAfter(date, end)
 }
 
 inDateRange.autoRemove = (val: any) => !Array.isArray(val) || !val.length || !isArrayOfDates(val)
