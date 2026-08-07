@@ -302,7 +302,8 @@ describe('NewScopedTokenSheet', () => {
     fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
     // The review step's own legacy-token link switches back into legacy mode
-    await user.click(await screen.findByText('Create a legacy token'))
+    await screen.findByText("Scoped tokens don't currently work with the Supabase MCP server")
+    await user.click(await screen.findByText('create a legacy token'))
     await screen.findByText('Access tokens can be used to control your whole account')
     await screen.findByRole('button', { name: 'Generate token' })
     expect(screen.queryByRole('button', { name: 'Review access' })).toBeNull()

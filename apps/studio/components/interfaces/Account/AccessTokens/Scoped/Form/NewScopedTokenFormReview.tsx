@@ -13,8 +13,8 @@ import {
   type RiskLevel,
 } from '../../AccessToken.permissions'
 import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
+import { McpUnsupportedWarning } from '../McpUnsupportedWarning'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import {
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
@@ -257,18 +257,7 @@ export const NewScopedTokenFormReview = ({
 
           <div className="flex flex-col gap-3">
             <h3 className="text-sm">MCP tools</h3>
-            <p className="text-xs text-foreground-light">
-              Need a token for the Supabase MCP server or full access to your account?{' '}
-              <button
-                type="button"
-                className={InlineLinkClassName}
-                onClick={onSelectLegacyToken}
-                tabIndex={0}
-              >
-                Create a legacy token
-              </button>
-              .
-            </p>
+            <McpUnsupportedWarning onSelectLegacyToken={onSelectLegacyToken} />
             {mcpTools.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No MCP tools are enabled by the selected capabilities.
