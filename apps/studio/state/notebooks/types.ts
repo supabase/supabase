@@ -20,7 +20,7 @@ export interface Notebook {
   type: 'notebook'
   name: string
   description?: string
-  visibility: 'user' | 'project'
+  visibility: 'project'
   favorite: boolean
   owner_id: number
   project_id: number
