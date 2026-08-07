@@ -1,3 +1,17 @@
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
 import { useParams } from 'common'
 import { Edit, Notebook, NotebookText, Play, Save } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
@@ -5,6 +19,7 @@ import { AiIconAnimation, Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
+import { MarkdownCell } from './MarkdownCell'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -20,14 +35,38 @@ export const NotebookEditor = () => {
   const [titleValue, setTitleValue] = useState<string>(name ?? '')
   const [isEditingTitle, setIsEditingTitle] = useState(false)
 
+  const cells = content?.cells ?? []
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
   const handleSaveTitle = () => {
     const trimmedName = titleValue.trim()
     if (id && trimmedName && trimmedName !== name) {
       snap.renameNotebook({ id, name: trimmedName })
       tabs.updateTab(createTabId('notebook', { id }), { label: trimmedName })
     }
-
     setIsEditingTitle(false)
+  }
+
+  const handleUpdateCellText = (cellId: string, text: string) => {
+    if (!id) return
+
+    const nextCells = cells.map((cell) => (cell.id === cellId ? { ...cell, text } : cell))
+    snap.updateCells({ id, cells: nextCells })
+  }
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!id || !over || active.id === over.id) return
+
+    const oldIndex = cells.findIndex((cell) => cell.id === active.id)
+    const newIndex = cells.findIndex((cell) => cell.id === over.id)
+    if (oldIndex === -1 || newIndex === -1) return
+
+    snap.updateCells({ id, cells: arrayMove([...cells], oldIndex, newIndex) })
   }
 
   const registerTab = useEffectEvent(() => {
@@ -105,7 +144,7 @@ export const NotebookEditor = () => {
 
       <div className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
         <div className="p-4">
-          {content?.cells.length === 0 && (
+          {cells.length === 0 && (
             <EmptyStatePresentational
               icon={<Notebook className="text-foreground-lighter" />}
               title="This notebook is empty"
@@ -117,6 +156,33 @@ export const NotebookEditor = () => {
                 <Button variant="default">Add markdown cell</Button>
               </div>
             </EmptyStatePresentational>
+          )}
+          {cells.length > 0 && (
+            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+              <SortableContext
+                items={cells.map((cell) => cell.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="flex flex-col gap-y-2">
+                  {cells.map((cell) => {
+                    switch (cell._tag) {
+                      case 'markdown_cell':
+                        return (
+                          <MarkdownCell
+                            key={cell.id}
+                            cell={cell}
+                            onCommitChanges={(text) => handleUpdateCellText(cell.id, text)}
+                          />
+                        )
+                      case 'database_cell':
+                      case 'log_cell':
+                        // [Joshen] Will eventually hook it up
+                        return null
+                    }
+                  })}
+                </div>
+              </SortableContext>
+            </DndContext>
           )}
         </div>
       </div>
