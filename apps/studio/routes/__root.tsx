@@ -325,11 +325,19 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   // edge layer already handles these for the platform deploy; this is the
   // self-hosted (Node-server) fallback and the client-side safety net.
   beforeLoad: ({ location }) => {
+    let isMaintenanceMode = false
+    if (typeof process !== 'undefined') {
+      isMaintenanceMode = process.env.MAINTENANCE_MODE === 'true'
+    } else if (typeof window !== 'undefined') {
+      isMaintenanceMode = (window as any).__MAINTENANCE_MODE__ === true
+    }
+
     const match = matchRedirect({
       pathname: location.pathname,
       search: location.search as Record<string, string | string[] | undefined>,
       isPlatform: IS_PLATFORM,
       hash: location.hash,
+      maintenanceMode: isMaintenanceMode,
     })
     if (!match) return
     // `to`/`search`/`hash`, never `href`: the router treats `href` as an
@@ -420,6 +428,13 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.__MAINTENANCE_MODE__ = ${
+              typeof process !== 'undefined' ? process.env.MAINTENANCE_MODE === 'true' : false
+            };`,
+          }}
+        />
       </head>
       <body>
         {children}
