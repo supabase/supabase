@@ -15,15 +15,25 @@ Supabase allows convenient and secure data access from the browser, as long as y
 
 RLS _must_ always be enabled on any tables stored in an exposed schema. By default, this is the `public` schema.
 
-RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself and grant only the permissions each Postgres role needs.
+RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself and explicitly manage table privileges.
+
+On many projects, tables in the `public` schema already receive broad default grants for `anon`, `authenticated`, and `service_role`. Running `GRANT` alone is often a no-op. Revoke first, then grant only what each role needs.
+
+Also note that Postgres RLS policies apply to `SELECT`, `INSERT`, `UPDATE`, and `DELETE` only. **`TRUNCATE` is not covered by RLS** — a role with `TRUNCATE` privilege can wipe a table regardless of policies. Keep `TRUNCATE` revoked unless you intentionally need it.
 
 ```sql
+-- Tables in public often already have broad default grants.
+-- Revoke first, then grant only what each role should have.
+REVOKE ALL ON TABLE <schema_name>.<table_name> FROM anon, authenticated, service_role;
+
 GRANT SELECT ON <schema_name>.<table_name> TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO service_role;
 
-alter table <schema_name>.<table_name>
-enable row level security;
+-- TRUNCATE is not controlled by RLS policies.
+-- Leave it revoked unless you intentionally need it for a role.
+
+ALTER TABLE <schema_name>.<table_name> ENABLE ROW LEVEL SECURITY;
 ```
 
 </Admonition>

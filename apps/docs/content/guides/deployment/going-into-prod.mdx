@@ -21,6 +21,10 @@ Check and review issues in your database using [Security Advisor](/dashboard/pro
 - Ensure you have enabled row level security (RLS) on all tables from the [**Database > Tables**](/dashboard/project/_/database/tables) section of the Supabase Dashboard.
   - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is usually not what you want.
   - [Learn more about RLS](/docs/guides/database/postgres/row-level-security).
+- Review table privileges in addition to RLS policies.
+  - On many projects, tables in `public` already receive broad default grants. Bare `GRANT` statements are often a no-op — revoke first, then grant only what each role needs.
+  - Postgres RLS policies cover `SELECT`, `INSERT`, `UPDATE`, and `DELETE` only. **`TRUNCATE` is not protected by RLS**, so keep it revoked unless you intentionally need it.
+  - See the [RLS guide](/docs/guides/database/postgres/row-level-security) for the recommended revoke-then-grant pattern.
 - Enable replication on tables containing sensitive data by enabling RLS and setting row security policies:
   - Go to the [**Database > Policies**](/dashboard/project/_/database/policies) section of the Supabase Dashboard to enable RLS and create security policies.
   - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Supabase Dashboard to manage replication tables.
