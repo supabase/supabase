@@ -18,7 +18,13 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { getDispatchScript, getPnpmSpawnInvocation } from './lib/dispatch.js'
+import {
+  getChildEnv,
+  getDevServerArgs,
+  getDispatchScript,
+  getPnpmSpawnInvocation,
+  resolveStudioPort,
+} from './lib/dispatch.js'
 import { readEnvFiles } from './lib/env.js'
 
 const target = process.argv[2]
@@ -36,6 +42,21 @@ if (!script) {
   process.exit(2)
 }
 
+// The dev scripts used to carry `-p ${STUDIO_PORT:-8082}`. That is POSIX shell
+// parameter expansion: cmd.exe passes it through verbatim, so on Windows the
+// dev server received the literal `${STUDIO_PORT:-8082}` and refused to start.
+// Resolving it here gives both platforms one implementation, and keeps the
+// value out of the shell string entirely on the Windows path.
+const port = resolveStudioPort(process.env.STUDIO_PORT, fileEnv.STUDIO_PORT)
+
+if (port === null) {
+  console.error(
+    `dispatch.js: STUDIO_PORT must be a port number between 0 and 65535 ` +
+      `(got "${process.env.STUDIO_PORT ?? fileEnv.STUDIO_PORT}")`
+  )
+  process.exit(2)
+}
+
 // Use async `spawn` rather than `spawnSync` — long-running dev servers
 // (vite dev / next dev) wedge under `spawnSync` because Node holds the
 // event loop and stdin doesn't flow through cleanly. The dev server says
@@ -43,10 +64,10 @@ if (!script) {
 // child interactive and lets the parent exit cleanly when the child does.
 // Windows needs a shell to resolve pnpm.cmd; spawning `pnpm` directly
 // otherwise fails with ENOENT even when pnpm is available in PowerShell.
-const pnpm = getPnpmSpawnInvocation(script)
+const pnpm = getPnpmSpawnInvocation(script, process.platform, getDevServerArgs(script, port))
 const child = spawn(pnpm.command, pnpm.args, {
   stdio: 'inherit',
-  env: process.env,
+  env: getChildEnv(script, process.env),
   ...pnpm.options,
 })
 
