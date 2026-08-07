@@ -6,7 +6,6 @@ import {
   DEFAULT_LOG_DATE_RANGE,
   getSnippetSource,
   isLogsSource,
-  isoDateTimeString,
   logDateRangesEqual,
   logDateRangeToDatePickerValue,
   resolveLogRunRange,
@@ -21,6 +20,7 @@ import {
 import { generateHelpersFromInput } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import type { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { isoDateTimeString } from '@/lib/iso-datetime'
 
 /** Build the `DatePickerValue` the Logs picker submits when a helper is selected. */
 const valueFromHelper = (helper: DatetimeHelper): DatePickerValue => ({
@@ -89,22 +89,6 @@ describe('querySource.ts:resolveSnippetSource', () => {
     expect(resolveSnippetSource(undefined, 'logs')).toBe('logs')
     expect(resolveSnippetSource(undefined, undefined)).toBe('database')
     expect(resolveSnippetSource(undefined, 'nonsense')).toBe('database')
-  })
-})
-
-describe('querySource.ts:isoDateTimeString', () => {
-  it('accepts a valid ISO datetime', () => {
-    const raw = '2025-01-01T12:00:00.000Z'
-    expect(isoDateTimeString(raw)).toBe(raw)
-  })
-
-  it('rejects an empty string', () => {
-    expect(isoDateTimeString('')).toBeNull()
-  })
-
-  it('rejects junk', () => {
-    expect(isoDateTimeString('not-a-date')).toBeNull()
-    expect(isoDateTimeString('2025-13-45T99:99:99Z')).toBeNull()
   })
 })
 
