@@ -5,6 +5,7 @@ import {
   ChevronDown,
   Copy,
   Download,
+  Info,
   LoaderCircle,
   RotateCcw,
   Trash2,
@@ -38,7 +39,7 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { hasVersioningHistory } from '../StorageProtection.constants'
+import { hasVersioningHistory, isBucketVersioned } from '../StorageProtection.constants'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
@@ -151,6 +152,7 @@ export const PreviewPane = () => {
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
+  const isVersioningActive = isBucketVersioned(selectedBucket?.id)
   const showVersions = hasVersioningHistory(selectedBucket?.id)
   const { data: versionsData } = useObjectVersionsQuery({
     projectRef,
@@ -307,23 +309,34 @@ export const PreviewPane = () => {
           </DropdownMenu>
         )}
       </div>
-      <ButtonTooltip
-        variant="outline"
-        disabled={!canUpdateFiles}
-        size="tiny"
-        icon={<Trash2 />}
-        onClick={() => setSelectedItemsToDelete([file])}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: !canUpdateFiles
-              ? 'You need additional permissions to delete this file'
-              : undefined,
-          },
-        }}
-      >
-        Delete file
-      </ButtonTooltip>
+      <div className="space-y-2">
+        <ButtonTooltip
+          variant="outline"
+          disabled={!canUpdateFiles}
+          size="tiny"
+          icon={<Trash2 />}
+          onClick={() => setSelectedItemsToDelete([file])}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canUpdateFiles
+                ? 'You need additional permissions to delete this file'
+                : undefined,
+            },
+          }}
+        >
+          Delete file
+        </ButtonTooltip>
+        {isVersioningActive && (
+          <p className="flex items-start gap-1.5 text-xs text-foreground-lighter">
+            <Info size={14} className="mt-0.5 shrink-0" />
+            <span>
+              Deleting this file will soft-delete the object and all its versions. You can restore
+              them from the deleted versions view.
+            </span>
+          </p>
+        )}
+      </div>
     </div>
   )
 

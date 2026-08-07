@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Download, RotateCcw, Trash2 } from 'lucide-react'
+import { Copy, Download, RotateCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, cn } from 'ui'
@@ -163,6 +163,17 @@ export const VersionHistory = ({
                           toast.success(`Downloading ${shortVersion(version.versionId)}`)
                         }
                         tooltip={{ content: { side: 'bottom', text: 'Download' } }}
+                      />
+                      <ButtonTooltip
+                        variant="text"
+                        size="tiny"
+                        className="px-1.5"
+                        icon={<Copy size={14} />}
+                        aria-label={`Get URL for version ${shortVersion(version.versionId)}`}
+                        onClick={() =>
+                          toast.success(`Copied URL for version ${shortVersion(version.versionId)}`)
+                        }
+                        tooltip={{ content: { side: 'bottom', text: 'Get URL' } }}
                       />
 
                       {!version.isCurrent && (

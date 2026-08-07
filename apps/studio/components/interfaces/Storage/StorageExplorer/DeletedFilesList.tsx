@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { RotateCcw, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { ChevronDown, ChevronRight, CornerDownRight, RotateCcw, Trash2 } from 'lucide-react'
+import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Checkbox,
@@ -28,7 +28,10 @@ import {
   useBucketTrashQuery,
   useBucketTrashRestoreMutation,
 } from '@/data/storage/protection/bucket-trash-query'
-import { type TrashObject } from '@/data/storage/protection/protection-mocks'
+import {
+  type DeletedObjectVersion,
+  type TrashObject,
+} from '@/data/storage/protection/protection-mocks'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 
@@ -53,6 +56,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const [fileToDelete, setFileToDelete] = useState<TrashObject>()
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
 
   const {
     data: objects,
@@ -150,6 +154,22 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     restoreObjects({ projectRef: ref, bucketId, objectIds: [object.id] })
   }
 
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const totalVersionCount = (object: TrashObject) => {
+    return 1 + (object.noncurrentVersions?.length ?? 0)
+  }
+
   return (
     <>
       <Table>
@@ -175,86 +195,132 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
           {filtered.map((object) => {
             const isChecked = selectedDeletedIds.includes(object.id)
             const isPreviewed = selectedDeletedFile?.id === object.id
+            const hasVersions =
+              object.noncurrentVersions !== undefined && object.noncurrentVersions.length > 0
+            const isExpanded = expandedIds.has(object.id)
 
             return (
-              <TableRow
-                key={object.id}
-                className={cn(
-                  'group cursor-pointer',
-                  isPreviewed && 'bg-selection hover:bg-selection'
-                )}
-                onClick={() => setSelectedDeletedFile(object)}
-              >
-                <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
-                  <Checkbox
-                    checked={isChecked}
-                    className={cn(
-                      isChecked
-                        ? 'opacity-100'
-                        : 'opacity-0 group-hover:opacity-100 focus:opacity-100'
-                    )}
-                    onClick={(event) => handleToggle(object.id, event.nativeEvent.shiftKey)}
-                    aria-label={`Select ${object.name}`}
-                  />
-                </TableCell>
-                <TableCell className="px-4 py-2 text-foreground">{object.name}</TableCell>
-                <TableCell className="px-4 py-2 font-mono text-xs text-foreground-lighter">
-                  {object.originalPath}
-                </TableCell>
-                <TableCell className="px-4 py-2 text-foreground-light">
-                  <Tooltip>
-                    <TooltipTrigger>{dayjs(object.deletedAt).fromNow()}</TooltipTrigger>
-                    <TooltipContent>
-                      {dayjs(object.deletedAt).format('MMM D, YYYY · HH:mm')} · {object.deletedBy}
-                    </TooltipContent>
-                  </Tooltip>
-                </TableCell>
-                <TableCell className="px-4 py-2 text-right text-foreground-light tabular-nums">
-                  {formatBytes(object.size)}
-                </TableCell>
-                <TableCell className="px-4 py-2">
-                  {object.expiresAt ? (
-                    <span className="text-warning-600">{dayjs(object.expiresAt).fromNow()}</span>
-                  ) : (
-                    <span className="text-foreground-lighter">Never</span>
+              <Fragment key={object.id}>
+                <TableRow
+                  className={cn(
+                    'group cursor-pointer',
+                    isPreviewed && 'bg-selection hover:bg-selection'
                   )}
-                </TableCell>
-                <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-                    <ButtonTooltip
-                      variant="default"
-                      size="tiny"
-                      icon={<RotateCcw size={14} />}
-                      loading={isRestoring}
-                      disabled={!canUpdateFiles}
-                      onClick={() => handleRestore(object)}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canUpdateFiles
-                            ? 'You need additional permissions to restore files'
-                            : 'Restore',
-                        },
+                  onClick={() => setSelectedDeletedFile(object)}
+                >
+                  <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={isChecked}
+                      className={cn(
+                        isChecked
+                          ? 'opacity-100'
+                          : 'opacity-0 group-hover:opacity-100 focus:opacity-100'
+                      )}
+                      onClick={(event) => handleToggle(object.id, event.nativeEvent.shiftKey)}
+                      aria-label={`Select ${object.name}`}
+                    />
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    <div className="flex items-center gap-x-2">
+                      {hasVersions && (
+                        <button
+                          className="flex items-center text-foreground-lighter hover:text-foreground transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleExpanded(object.id)
+                          }}
+                          aria-label={isExpanded ? 'Collapse versions' : 'Expand versions'}
+                        >
+                          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                        </button>
+                      )}
+                      <span className="text-foreground">{object.name}</span>
+                      {hasVersions && (
+                        <span className="text-xs text-foreground-muted">
+                          {totalVersionCount(object)} versions
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="px-4 py-2 font-mono text-xs text-foreground-lighter">
+                    {object.originalPath}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 text-foreground-light">
+                    <Tooltip>
+                      <TooltipTrigger>{dayjs(object.deletedAt).fromNow()}</TooltipTrigger>
+                      <TooltipContent>
+                        {dayjs(object.deletedAt).format('MMM D, YYYY · HH:mm')} · {object.deletedBy}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell className="px-4 py-2 text-right text-foreground-light tabular-nums">
+                    {formatBytes(object.size)}
+                  </TableCell>
+                  <TableCell className="px-4 py-2">
+                    {object.expiresAt ? (
+                      <span className="text-warning-600">{dayjs(object.expiresAt).fromNow()}</span>
+                    ) : (
+                      <span className="text-foreground-lighter">Never</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                      <ButtonTooltip
+                        variant="default"
+                        size="tiny"
+                        icon={<RotateCcw size={14} />}
+                        loading={isRestoring}
+                        disabled={!canUpdateFiles}
+                        onClick={() => handleRestore(object)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canUpdateFiles
+                              ? 'You need additional permissions to restore files'
+                              : 'Restore all versions',
+                          },
+                        }}
+                      />
+                      <ButtonTooltip
+                        variant="danger"
+                        size="tiny"
+                        icon={<Trash2 size={14} />}
+                        disabled={!canUpdateFiles}
+                        onClick={() => setFileToDelete(object)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canUpdateFiles
+                              ? 'You need additional permissions to delete files'
+                              : 'Delete permanently',
+                          },
+                        }}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+
+                {hasVersions &&
+                  isExpanded &&
+                  object.noncurrentVersions!.map((version) => (
+                    <NoncurrentVersionRow
+                      key={version.versionId}
+                      version={version}
+                      parentObject={object}
+                      canUpdateFiles={canUpdateFiles}
+                      onRestore={() => {
+                        toast.success(
+                          `Restoring version ${version.versionId.slice(0, 8)} to current`
+                        )
+                      }}
+                      onDelete={() => {
+                        toast.success(
+                          `Permanently deleted version ${version.versionId.slice(0, 8)}`
+                        )
                       }}
                     />
-                    <ButtonTooltip
-                      variant="danger"
-                      size="tiny"
-                      icon={<Trash2 size={14} />}
-                      disabled={!canUpdateFiles}
-                      onClick={() => setFileToDelete(object)}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canUpdateFiles
-                            ? 'You need additional permissions to delete files'
-                            : 'Delete permanently',
-                        },
-                      }}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
+                  ))}
+              </Fragment>
             )
           })}
         </TableBody>
@@ -274,10 +340,84 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
         }}
       >
         <p className="text-sm text-foreground-light">
-          {fileToDelete?.name} will be permanently deleted and can no longer be restored. This
-          action cannot be undone.
+          {fileToDelete?.name}
+          {fileToDelete?.noncurrentVersions && fileToDelete.noncurrentVersions.length > 0
+            ? ` and its ${fileToDelete.noncurrentVersions.length} noncurrent version${fileToDelete.noncurrentVersions.length === 1 ? '' : 's'}`
+            : ''}{' '}
+          will be permanently deleted and can no longer be restored. This action cannot be undone.
         </p>
       </ConfirmationModal>
     </>
+  )
+}
+
+interface NoncurrentVersionRowProps {
+  version: DeletedObjectVersion
+  parentObject: TrashObject
+  canUpdateFiles: boolean
+  onRestore: () => void
+  onDelete: () => void
+}
+
+const NoncurrentVersionRow = ({
+  version,
+  canUpdateFiles,
+  onRestore,
+  onDelete,
+}: NoncurrentVersionRowProps) => {
+  const shortId = `${version.versionId.slice(0, 8)}`
+
+  return (
+    <TableRow className="bg-surface-100/50 group">
+      <TableCell />
+      <TableCell className="px-4 py-1.5" colSpan={2}>
+        <div className="flex items-center gap-1.5 pl-6">
+          <CornerDownRight size={12} className="text-foreground-muted shrink-0" />
+          <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
+          <span className="text-foreground-muted text-xs">({version.action})</span>
+        </div>
+      </TableCell>
+      <TableCell className="px-4 py-1.5 text-foreground-lighter text-xs">
+        {dayjs(version.createdAt).format('MMM D, YYYY · HH:mm')}
+      </TableCell>
+      <TableCell className="px-4 py-1.5 text-right text-foreground-lighter tabular-nums text-xs">
+        {formatBytes(version.size)}
+      </TableCell>
+      <TableCell />
+      <TableCell className="px-4 py-1.5" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+          <ButtonTooltip
+            variant="default"
+            size="tiny"
+            icon={<RotateCcw size={12} />}
+            disabled={!canUpdateFiles}
+            onClick={onRestore}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to restore files'
+                  : 'Restore to current',
+              },
+            }}
+          />
+          <ButtonTooltip
+            variant="danger"
+            size="tiny"
+            icon={<Trash2 size={12} />}
+            disabled={!canUpdateFiles}
+            onClick={onDelete}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to delete files'
+                  : 'Delete permanently',
+              },
+            }}
+          />
+        </div>
+      </TableCell>
+    </TableRow>
   )
 }

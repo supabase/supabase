@@ -126,6 +126,12 @@ let trashObjects: TrashObject[] = [
       {
         versionId: 'v-t1-b',
         size: 980 * KB,
+        createdAt: daysAgo(5, '11:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t1-c',
+        size: 940 * KB,
         createdAt: daysAgo(8, '09:30:00'),
         action: 'initial upload',
       },
@@ -152,18 +158,30 @@ let trashObjects: TrashObject[] = [
       {
         versionId: 'v-t3-a',
         size: 790 * KB,
-        createdAt: daysAgo(12, '16:00:00'),
+        createdAt: daysAgo(6, '16:00:00'),
         action: 'overwrite',
       },
       {
         versionId: 'v-t3-b',
         size: 750 * KB,
-        createdAt: daysAgo(20, '10:15:00'),
+        createdAt: daysAgo(12, '10:15:00'),
         action: 'overwrite',
       },
       {
         versionId: 'v-t3-c',
+        size: 720 * KB,
+        createdAt: daysAgo(18, '14:30:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t3-d',
         size: 710 * KB,
+        createdAt: daysAgo(25, '08:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t3-e',
+        size: 680 * KB,
         createdAt: daysAgo(28, '08:00:00'),
         action: 'initial upload',
       },
@@ -181,7 +199,13 @@ let trashObjects: TrashObject[] = [
       {
         versionId: 'v-t4-a',
         size: 2.1 * MB,
-        createdAt: daysAgo(15, '11:20:00'),
+        createdAt: daysAgo(10, '11:20:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t4-b',
+        size: 1.95 * MB,
+        createdAt: daysAgo(15, '09:10:00'),
         action: 'overwrite',
       },
     ],
@@ -194,6 +218,20 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'api key ····f21',
     size: 512 * KB,
     expiresAt: daysAhead(23),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t5-a',
+        size: 498 * KB,
+        createdAt: daysAgo(14, '15:30:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t5-b',
+        size: 480 * KB,
+        createdAt: daysAgo(21, '09:00:00'),
+        action: 'initial upload',
+      },
+    ],
   },
   {
     id: 'trash-6',
@@ -203,6 +241,14 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'jane@acme.co',
     size: 96 * KB,
     expiresAt: daysAhead(28),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t6-a',
+        size: 88 * KB,
+        createdAt: daysAgo(7, '12:00:00'),
+        action: 'overwrite',
+      },
+    ],
   },
   {
     id: 'trash-7',
@@ -221,6 +267,108 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'jane@acme.co',
     size: 18 * MB,
     expiresAt: daysAhead(1),
+  },
+  {
+    id: 'trash-9',
+    name: 'hero-v2.mp4',
+    originalPath: 'marketing/videos/',
+    deletedAt: daysAgo(1, '08:15:00'),
+    deletedBy: 'mark@acme.co',
+    size: 24.5 * MB,
+    expiresAt: daysAhead(29),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t9-a',
+        size: 22.1 * MB,
+        createdAt: daysAgo(4, '17:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t9-b',
+        size: 20.8 * MB,
+        createdAt: daysAgo(9, '10:45:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t9-c',
+        size: 19.2 * MB,
+        createdAt: daysAgo(16, '14:20:00'),
+        action: 'initial upload',
+      },
+    ],
+  },
+  {
+    id: 'trash-10',
+    name: 'config.json',
+    originalPath: 'settings/',
+    deletedAt: daysAgo(0, '11:05:00'),
+    deletedBy: 'api key ····b72',
+    size: 2.4 * KB,
+    expiresAt: daysAhead(30),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t10-a',
+        size: 2.2 * KB,
+        createdAt: daysAgo(1, '09:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t10-b',
+        size: 2.0 * KB,
+        createdAt: daysAgo(3, '16:30:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t10-c',
+        size: 1.8 * KB,
+        createdAt: daysAgo(5, '12:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t10-d',
+        size: 1.5 * KB,
+        createdAt: daysAgo(8, '08:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t10-e',
+        size: 1.2 * KB,
+        createdAt: daysAgo(12, '14:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t10-f',
+        size: 1.0 * KB,
+        createdAt: daysAgo(18, '10:00:00'),
+        action: 'initial upload',
+      },
+    ],
+  },
+  {
+    id: 'trash-11',
+    name: 'team-photo.heic',
+    originalPath: 'gallery/',
+    deletedAt: daysAgo(4, '13:40:00'),
+    deletedBy: 'jane@acme.co',
+    size: 5.8 * MB,
+    expiresAt: daysAhead(26),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t11-a',
+        size: 5.5 * MB,
+        createdAt: daysAgo(10, '11:00:00'),
+        action: 'overwrite',
+      },
+    ],
+  },
+  {
+    id: 'trash-12',
+    name: 'invoice-0042.pdf',
+    originalPath: 'billing/',
+    deletedAt: daysAgo(6, '22:10:00'),
+    deletedBy: 'api key ····a91',
+    size: 128 * KB,
+    expiresAt: daysAhead(24),
   },
 ]
 

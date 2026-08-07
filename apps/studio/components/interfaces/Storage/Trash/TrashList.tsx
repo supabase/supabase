@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
-import { CornerDownRight } from 'lucide-react'
-import { Fragment } from 'react'
+import { ChevronDown, ChevronRight, CornerDownRight, RotateCcw, Trash2 } from 'lucide-react'
+import { Fragment, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   Checkbox,
@@ -16,6 +17,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import {
   type DeletedObjectVersion,
   type TrashObject,
@@ -44,6 +46,24 @@ export const TrashList = ({
   const isAllSelected = objects.length > 0 && objects.every((o) => selectedIds.includes(o.id))
   const isSomeSelected = selectedIds.length > 0 && !isAllSelected
 
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+
+  const toggleExpanded = (id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const totalVersionCount = (object: TrashObject) => {
+    return 1 + (object.noncurrentVersions?.length ?? 0)
+  }
+
   return (
     <Table>
       <TableHeader>
@@ -67,7 +87,9 @@ export const TrashList = ({
       <TableBody>
         {objects.map((object) => {
           const isSelected = selectedIds.includes(object.id)
-          const versions = object.noncurrentVersions ?? []
+          const hasVersions =
+            object.noncurrentVersions !== undefined && object.noncurrentVersions.length > 0
+          const isExpanded = expandedIds.has(object.id)
 
           return (
             <Fragment key={object.id}>
@@ -84,7 +106,25 @@ export const TrashList = ({
                     aria-label={`Select ${object.name}`}
                   />
                 </TableCell>
-                <TableCell className="text-foreground">{object.name}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-x-2">
+                    {hasVersions && (
+                      <button
+                        className="flex items-center text-foreground-lighter hover:text-foreground transition-colors"
+                        onClick={() => toggleExpanded(object.id)}
+                        aria-label={isExpanded ? 'Collapse versions' : 'Expand versions'}
+                      >
+                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      </button>
+                    )}
+                    <span className="text-foreground">{object.name}</span>
+                    {hasVersions && (
+                      <span className="text-xs text-foreground-muted">
+                        {totalVersionCount(object)} versions
+                      </span>
+                    )}
+                  </div>
+                </TableCell>
                 <TableCell className="font-mono text-xs text-foreground-lighter">
                   {object.originalPath}
                 </TableCell>
@@ -122,9 +162,20 @@ export const TrashList = ({
                 </TableCell>
               </TableRow>
 
-              {versions.map((version) => (
-                <NoncurrentVersionRow key={version.versionId} version={version} />
-              ))}
+              {hasVersions &&
+                isExpanded &&
+                object.noncurrentVersions!.map((version) => (
+                  <NoncurrentVersionRow
+                    key={version.versionId}
+                    version={version}
+                    onRestore={() => {
+                      toast.success(`Restoring version ${version.versionId.slice(0, 8)} to current`)
+                    }}
+                    onDelete={() => {
+                      toast.success(`Permanently deleted version ${version.versionId.slice(0, 8)}`)
+                    }}
+                  />
+                ))}
             </Fragment>
           )
         })}
@@ -135,20 +186,23 @@ export const TrashList = ({
 
 interface NoncurrentVersionRowProps {
   version: DeletedObjectVersion
+  onRestore: () => void
+  onDelete: () => void
 }
 
-const NoncurrentVersionRow = ({ version }: NoncurrentVersionRowProps) => {
+const NoncurrentVersionRow = ({ version, onRestore, onDelete }: NoncurrentVersionRowProps) => {
+  const shortId = version.versionId.slice(0, 8)
+
   return (
-    <TableRow className="bg-surface-100/50">
+    <TableRow className="bg-surface-100/50 group">
       <TableCell />
-      <TableCell>
-        <div className="flex items-center gap-1.5 pl-4">
+      <TableCell colSpan={2}>
+        <div className="flex items-center gap-1.5 pl-6">
           <CornerDownRight size={12} className="text-foreground-muted shrink-0" />
-          <span className="text-foreground-lighter font-mono text-xs">{version.versionId}</span>
+          <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
           <span className="text-foreground-muted text-xs">({version.action})</span>
         </div>
       </TableCell>
-      <TableCell />
       <TableCell className="text-foreground-lighter text-xs">
         {dayjs(version.createdAt).format('MMM D, YYYY · HH:mm')}
       </TableCell>
@@ -156,7 +210,24 @@ const NoncurrentVersionRow = ({ version }: NoncurrentVersionRowProps) => {
         {formatBytes(version.size)}
       </TableCell>
       <TableCell />
-      <TableCell />
+      <TableCell>
+        <div className="flex items-center justify-end gap-x-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+          <ButtonTooltip
+            variant="default"
+            size="tiny"
+            icon={<RotateCcw size={12} />}
+            onClick={onRestore}
+            tooltip={{ content: { side: 'bottom', text: 'Restore to current' } }}
+          />
+          <ButtonTooltip
+            variant="danger"
+            size="tiny"
+            icon={<Trash2 size={12} />}
+            onClick={onDelete}
+            tooltip={{ content: { side: 'bottom', text: 'Delete permanently' } }}
+          />
+        </div>
+      </TableCell>
     </TableRow>
   )
 }
