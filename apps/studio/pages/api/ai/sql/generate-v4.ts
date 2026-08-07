@@ -7,7 +7,7 @@ import z from 'zod'
 
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
 import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import {
   assistantMessageMetadataSchema,
@@ -120,7 +120,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
   let orgHasHipaaAddon: boolean | undefined
-  let projectIsSensitive: boolean | undefined
+  let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
   let orgId: number | undefined
   let planId: string | undefined
@@ -132,18 +132,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
-      const [orgDetails, projectDetails] = await Promise.all([
-        getOrgAIDetails({ orgSlug, authorization }),
-        getProjectAIDetails({ projectRef, authorization }),
-      ])
+      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
-      aiOptInLevel = orgDetails.aiOptInLevel
-      hasAccessToAdvanceModel = orgDetails.hasAccessToAdvanceModel
-      orgHasHipaaAddon = orgDetails.hasHipaaAddon
-      orgId = orgDetails.orgId
-      planId = orgDetails.planId
-      projectIsSensitive = projectDetails.isSensitive
-      projectRegion = projectDetails.region
+      aiOptInLevel = aiDetails.aiOptInLevel
+      hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
+      orgHasHipaaAddon = aiDetails.hasHipaaAddon
+      orgId = aiDetails.orgId
+      planId = aiDetails.planId
+      projectIsSensitive = aiDetails.isSensitive
+      projectRegion = aiDetails.region
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
