@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 
+import { type MarkdownCell } from '@/data/content/notebooks/notebook-schema'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
@@ -27,7 +28,18 @@ export const useCreateNotebook = () => {
       favorite: false,
       content: {
         schema_version: '1.0',
-        cells: [],
+        // [Joshen] Just adding sample data to play around with
+        cells: [
+          {
+            _tag: 'markdown_cell',
+            id: '1',
+            text: `
+## Title
+Paragraph
+        `.trim(),
+          } as MarkdownCell,
+          { _tag: 'markdown_cell', id: '2', text: 'World' } as MarkdownCell,
+        ],
       },
       owner_id: profile.id,
       project_id: project.id,
