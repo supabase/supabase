@@ -22,18 +22,13 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import {
-  CUSTOM_EXPIRY_VALUE,
-  EXPIRES_AT_OPTIONS,
-  NON_EXPIRING_TOKEN_VALUE,
-} from '../AccessToken.constants'
-import { getExpirationDate } from '../AccessToken.utils'
+import { CUSTOM_EXPIRY_VALUE, EXPIRES_AT_OPTIONS } from '../AccessToken.constants'
+import { getExpirationDate, getMaxCustomExpiryDate } from '../AccessToken.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import {
   useAccessTokenCreateMutation,
@@ -45,10 +40,7 @@ const formId = 'new-access-token-form'
 
 const TokenSchema = z.object({
   tokenName: z.string().min(1, 'Please enter a name for the token'),
-  expiresAt: z.preprocess(
-    (val) => (val === NON_EXPIRING_TOKEN_VALUE ? undefined : val),
-    z.string().optional()
-  ),
+  expiresAt: z.string().min(1, 'Please select an expiry'),
 })
 
 export interface NewAccessTokenDialogProps {
@@ -81,7 +73,7 @@ export const NewTokenDialog = ({
     if (isCustomExpiry && customExpiryDate) {
       expiresAt = customExpiryDate.date
     } else {
-      expiresAt = getExpirationDate(values.expiresAt || '')
+      expiresAt = getExpirationDate(values.expiresAt)
     }
 
     createAccessToken(
@@ -90,7 +82,7 @@ export const NewTokenDialog = ({
         onSuccess: (data) => {
           track('access_token_created', {
             tokenType: 'classic',
-            expiryPreset: values.expiresAt || 'never',
+            expiryPreset: values.expiresAt,
           })
           toast.success('Access token created successfully')
           onCreateToken(data)
@@ -101,7 +93,7 @@ export const NewTokenDialog = ({
   }
 
   const handleClose = () => {
-    form.reset({ tokenName: '' })
+    form.reset()
     setCustomExpiryDate(undefined)
     setIsCustomExpiry(false)
     onOpenChange(false)
@@ -228,21 +220,13 @@ export const NewTokenDialog = ({
                           contentSide="top"
                           to={customExpiryDate?.date}
                           minDate={new Date()}
-                          maxDate={dayjs().add(1, 'year').toDate()}
+                          maxDate={getMaxCustomExpiryDate().toDate()}
                           onChange={(date) => {
                             if (date.to) handleCustomDateChange({ date: date.to })
                           }}
                         />
                       )}
                     </div>
-                    {field.value === NON_EXPIRING_TOKEN_VALUE && (
-                      <div className="w-full flex gap-x-2 items-center mt-3 mx-0.5">
-                        <WarningIcon />
-                        <span className="text-xs text-left text-foreground-lighter">
-                          Make sure to keep your non-expiring token safe and secure.
-                        </span>
-                      </div>
-                    )}
                   </FormItemLayout>
                 )}
               />
