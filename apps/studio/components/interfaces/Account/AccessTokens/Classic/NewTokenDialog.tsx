@@ -49,7 +49,7 @@ const TokenSchema = z.object({
 
 export interface NewAccessTokenDialogProps {
   open: boolean
-  tokenScope: 'V0' | undefined
+  tokenScope?: 'V0' | undefined
   onOpenChange: (open: boolean) => void
   onCreateToken: (token: NewAccessToken) => void
 }

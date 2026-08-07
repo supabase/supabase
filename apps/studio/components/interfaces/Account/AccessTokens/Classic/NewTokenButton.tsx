@@ -21,12 +21,7 @@ export const NewTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => 
         <ExperimentalTokenDropdown onCreateToken={onCreateToken} />
       </div>
 
-      <NewTokenDialog
-        open={visible}
-        onOpenChange={setVisible}
-        tokenScope={undefined}
-        onCreateToken={onCreateToken}
-      />
+      <NewTokenDialog open={visible} onOpenChange={setVisible} onCreateToken={onCreateToken} />
     </>
   )
 }
