@@ -267,7 +267,7 @@ describe('CreateDiskStorageSchema', () => {
     )
   })
 
-  test.each(['FLY', 'AWS_NIMBUS', 'AWS_K8S'] as const)(
+  test.each(['AWS_NIMBUS', 'AWS_K8S'] as const)(
     'skips platform disk constraints for %s projects',
     (cloudProvider) => {
       const schema = CreateDiskStorageSchema({

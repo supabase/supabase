@@ -199,7 +199,6 @@ const SCHEMA: ComponentSchema = {
   Price,
   ...PromptPanel,
   GlassPanel: Panel,
-  IconPanel: Panel,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,

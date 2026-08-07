@@ -18,7 +18,7 @@ export const TOTPFactors = () => {
     <>
       <section className="space-y-3">
         <p className="text-sm text-foreground-light">
-          Use an authenticator app (like 1Password or Authy) to verify your identity at sign-in.
+          Use an authenticator app (like Google Authenticator or 1Password) to protect your account.
         </p>
         <div>
           {isLoading && <GenericSkeletonLoader />}

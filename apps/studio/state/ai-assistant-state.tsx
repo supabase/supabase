@@ -7,6 +7,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -22,7 +23,12 @@ type SuggestionsType = {
 
 export type AssistantMessageType = MessageType
 
-export type SqlSnippet = string | { label: string; content: string }
+/**
+ * A query attached to the composer (the "Current Query" chip). `source` records which
+ * backend the attached query runs against, so the dialect travels with the query it
+ * describes.
+ */
+export type SqlSnippet = string | { label: string; content: string; source?: SqlSnippetSource }
 
 export type AssistantModel = AssistantModelId
 
@@ -61,6 +67,7 @@ type ChatSession = {
   createdAt: Date
   updatedAt: Date
   supportMetadata?: SupportChatMetadata
+  branchedFrom?: { chatId: string; messageId: string }
 }
 
 export type AiAssistantContext = {
@@ -424,6 +431,46 @@ export const createAiAssistantState = (): AiAssistantState => {
       return chatId
     },
 
+    branchChat: (messageId: string) => {
+      const sourceChat = state.activeChat
+      if (!sourceChat) return
+
+      const messageIndex = sourceChat.messages.findIndex((msg) => msg.id === messageId)
+      if (messageIndex === -1) return
+
+      const branchedMessages = sourceChat.messages
+        .slice(0, messageIndex + 1)
+        .map((message) => sanitizeForCloning(message))
+
+      const chatId = uuidv4()
+      const newChat: ChatSession = {
+        id: chatId,
+        name: `Branch - ${sourceChat.name}`,
+        messages: branchedMessages,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        branchedFrom: { chatId: sourceChat.id, messageId },
+      }
+
+      state.chats = {
+        ...state.chats,
+        [chatId]: newChat,
+      }
+      state.activeChatId = chatId
+
+      state.chatInstances[chatId] = ref(
+        createChatInstance(state, { id: chatId, initialMessages: branchedMessages })
+      )
+
+      const initialAiAssistantData = createInitialAiAssistantData()
+      state.initialInput = initialAiAssistantData.initialInput
+      state.sqlSnippets = initialAiAssistantData.sqlSnippets
+      state.suggestions = initialAiAssistantData.suggestions
+      state.tables = initialAiAssistantData.tables
+
+      return chatId
+    },
+
     setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => {
       const chat = state.chats[chatId]
       if (!chat?.supportMetadata) return
@@ -608,6 +655,7 @@ export type AiAssistantState = AiAssistantData & {
       Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
+  branchChat: (messageId: string) => string | undefined
   setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => void
   selectChat: (id: string) => void
   deleteChat: (id: string) => void

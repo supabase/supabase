@@ -1,8 +1,6 @@
 // End of third-party imports
 
 import { isFeatureEnabled } from 'common/enabled-features'
-import type { ComponentProps } from 'react'
-import type { IconPanel } from 'ui-patterns/IconPanel'
 
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
@@ -422,6 +420,11 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Ruby on Rails',
           url: '/guides/getting-started/quickstarts/ruby-on-rails' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
+          name: 'Spring Boot',
+          url: '/guides/getting-started/quickstarts/spring-boot' as `/${string}`,
           enabled: !jsOnly,
         },
         {
@@ -2527,7 +2530,9 @@ export const contributing: NavMenuConstant = {
   items: [{ name: 'Overview', url: '/contributing' }],
 }
 
-export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
+export const MIGRATION_PAGES: Partial<
+  NavMenuSection & { icon?: string; hasLightIcon?: boolean }
+>[] = [
   {
     name: 'Auth0',
     icon: '/docs/img/icons/auth0-icon',
@@ -2616,6 +2621,7 @@ export const security: NavMenuConstant = {
       items: [
         { name: 'SOC 2', url: '/guides/security/soc-2-compliance' },
         { name: 'HIPAA', url: '/guides/security/hipaa-compliance' },
+        { name: 'GDPR', url: '/guides/security/gdpr-compliance' },
       ],
     },
     {
@@ -3042,6 +3048,10 @@ export const telemetry: NavMenuConstant = {
               url: 'https://docs.datadoghq.com/integrations/supabase/' as `/${string}`,
             },
             {
+              name: 'Elastic',
+              url: 'https://www.elastic.co/docs/reference/integrations/supabase' as `/${string}`,
+            },
+            {
               name: 'Vendor-agnostic setup',
               url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
             },
@@ -3052,7 +3062,7 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
         },
         {
-          name: 'Tracing with the JS SDK',
+          name: 'Tracing with the client SDKs',
           url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
       ],
@@ -3073,34 +3083,35 @@ export const self_hosting: NavMenuConstant = {
   url: '/guides/self-hosting',
   items: [
     { name: 'Overview', url: '/guides/self-hosting' },
-    { name: 'Self-Hosting with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
+    { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
+    { name: 'Enable Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
+    {
+      name: 'Add Reverse Proxy with HTTPS',
+      url: '/guides/self-hosting/self-hosted-proxy-https',
+    },
+    { name: 'Update your deployment', url: '/guides/self-hosting/updating' },
     {
       name: 'How-to Guides',
       items: [
-        { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
-        { name: 'Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
-        {
-          name: 'Add Reverse Proxy with HTTPS',
-          url: '/guides/self-hosting/self-hosted-proxy-https',
-        },
-        { name: 'Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
         { name: 'Upgrade to Postgres 17', url: '/guides/self-hosting/postgres-upgrade-17' },
-        {
-          name: 'Restore Project from Platform',
-          url: '/guides/self-hosting/restore-from-platform',
-        },
+        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
+        { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
-        { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
-        { name: 'Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
+        { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Configure SAML 2.0 SSO', url: '/guides/self-hosting/self-hosted-saml-sso' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
-        { name: 'Remove superuser access', url: '/guides/self-hosting/remove-superuser-access' },
         {
-          name: 'Custom Postgres Extensions',
+          name: 'Build Custom Extensions',
           url: '/guides/self-hosting/custom-postgres-extensions',
         },
+        {
+          name: 'Restore Project from Platform',
+          url: '/guides/self-hosting/restore-from-platform',
+        },
+        { name: 'Copy Storage from Platform', url: '/guides/self-hosting/copy-from-platform-s3' },
       ],
     },
     {
@@ -3619,7 +3630,7 @@ export const references = [
         label: 'Management API',
         description: 'something about the reference',
         icon: '/docs/img/icons/api-icon.svg',
-        url: '/reference/management-api/start',
+        url: '/reference/api/introduction',
       },
     ],
   },

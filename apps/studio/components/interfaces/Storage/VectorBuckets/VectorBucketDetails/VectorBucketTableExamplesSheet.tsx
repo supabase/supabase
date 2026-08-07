@@ -62,7 +62,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
           Insert vectors
         </Button>
       </SheetTrigger>
-      <SheetContent tabIndex={undefined}>
+      <SheetContent>
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>

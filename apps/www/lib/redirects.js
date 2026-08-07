@@ -1749,6 +1749,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/legal/dpa',
+    destination: '/legal/customer-resources/data-processing-addendum',
+  },
+  {
+    permanent: true,
     source: '/docs/company/sla',
     destination: '/sla',
   },
@@ -2076,7 +2081,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/api',
-    destination: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
+  },
+  // 'start' was never a real API reference slug — it only ever worked because
+  // the old /reference/api/* routing collapsed every sub-path to the same
+  // monolith, and the bare /docs/reference/api redirect pointed here for years.
+  // Keep redirecting so external links and bookmarks don't 404 now that only
+  // real slugs resolve.
+  {
+    permanent: true,
+    source: '/docs/reference/api/start',
+    destination: '/docs/reference/api/introduction',
   },
   {
     permanent: true,

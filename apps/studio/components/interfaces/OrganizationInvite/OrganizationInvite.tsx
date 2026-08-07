@@ -1,8 +1,7 @@
 import { useIsLoggedIn, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import type { ReactNode } from 'react'
-import { toast } from 'sonner'
+import { type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -14,6 +13,7 @@ import {
 import { OrganizationInviteError } from './OrganizationInviteError'
 import {
   InterstitialAccountRow,
+  InterstitialActionError,
   InterstitialLayout,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
@@ -25,9 +25,9 @@ import { useProfile, useProfileNameAndPicture } from '@/lib/profile'
 export const OrganizationInvite = () => {
   const router = useRouter()
   const isLoggedIn = useIsLoggedIn()
+  const { slug, token } = useParams()
   const { profile, isLoading: isLoadingProfile } = useProfile()
   const { username, avatarUrl, primaryEmail } = useProfileNameAndPicture()
-  const { slug, token } = useParams()
 
   const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
 
@@ -70,15 +70,15 @@ export const OrganizationInvite = () => {
 
   const mfaRequiredError = error?.message.includes('MFA required')
 
-  const { mutate: joinOrganization, isPending: isJoining } =
-    useOrganizationAcceptInvitationMutation({
-      onSuccess: () => {
-        router.push('/organizations')
-      },
-      onError: (error) => {
-        toast.error(`Failed to join organization: ${error.message}`)
-      },
-    })
+  const {
+    mutate: joinOrganization,
+    isPending: isJoining,
+    error: joinError,
+  } = useOrganizationAcceptInvitationMutation({
+    onSuccess: () => {
+      router.push('/organizations')
+    },
+  })
 
   async function handleJoinOrganization() {
     if (!slug) return console.error('Slug is required')
@@ -196,6 +196,9 @@ export const OrganizationInvite = () => {
         <Button asChild variant="text" block>
           <Link href="/organizations">Decline</Link>
         </Button>
+        <InterstitialActionError
+          error={joinError && `Failed to join organization: ${joinError.message}`}
+        />
       </div>
     </div>
   )
