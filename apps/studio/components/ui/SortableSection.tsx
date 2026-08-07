@@ -1,10 +1,13 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { GripVertical } from 'lucide-react'
-import { CSSProperties, PropsWithChildren } from 'react'
+import type { CSSProperties, PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
-// [Joshen] Might very well de-duplicate with SortableSection since its the exact same behaviour
-export const CellWrapper = ({ id, children }: PropsWithChildren<{ id: string }>) => {
+export const SortableSection = ({
+  id,
+  children,
+  gripClassName,
+}: PropsWithChildren<{ id: string; gripClassName?: string }>) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   })
@@ -15,6 +18,7 @@ export const CellWrapper = ({ id, children }: PropsWithChildren<{ id: string }>)
       : undefined,
     transition,
   }
+
   return (
     <div
       ref={setNodeRef}
@@ -26,7 +30,8 @@ export const CellWrapper = ({ id, children }: PropsWithChildren<{ id: string }>)
         aria-label="Drag to reorder section"
         className={cn(
           'text-foreground-muted hover:text-foreground cursor-grab active:cursor-grabbing',
-          'mt-2.5 rounded-sm focus-ring'
+          'rounded-sm focus-ring',
+          gripClassName
         )}
         {...attributes}
         {...listeners}

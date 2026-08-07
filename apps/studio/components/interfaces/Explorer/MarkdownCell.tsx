@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Button, cn } from 'ui'
 
 import { Markdown } from '../Markdown'
-import { CellWrapper } from './CellWrapper'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { SortableSection } from '@/components/ui/SortableSection'
 import { type MarkdownCell as MarkdownCellSchema } from '@/data/content/notebooks/notebook-schema'
 import { useLatest } from '@/hooks/misc/useLatest'
 
@@ -25,7 +25,7 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
   }
 
   return (
-    <CellWrapper id={cell.id}>
+    <SortableSection gripClassName="mt-2.5" id={cell.id}>
       {isEditing ? (
         <div
           className={cn('w-full max-w-2xl mx-auto transition', 'overflow-hidden border rounded-md')}
@@ -97,6 +97,6 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
           </Markdown>
         </div>
       )}
-    </CellWrapper>
+    </SortableSection>
   )
 }
