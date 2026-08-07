@@ -388,6 +388,9 @@ export function createTabsState(projectRef: string) {
           const schema = (router.query.schema as string) || 'public'
           router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
           break
+        case 'notebook':
+          router.push(`/project/${router.query.ref}/explorer/notebook/${tab.metadata?.notebookId}`)
+          break
         case 'r':
         case 'v':
         case 'm':

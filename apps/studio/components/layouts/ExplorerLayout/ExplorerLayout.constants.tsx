@@ -1,8 +1,11 @@
 import { motion } from 'framer-motion'
-import { ChevronLeft, MessageSquare, NotebookText } from 'lucide-react'
+import { ChevronLeft, MessageSquare, NotebookText, Plus } from 'lucide-react'
 import { type ComponentType, type PropsWithChildren } from 'react'
 import { Button, cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
+
+import { useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export type ExplorerResourceType = 'notebook' | 'chat'
 
@@ -48,6 +51,7 @@ export const ExplorerNavResourceWrapper = ({
   setSearch: (value: string) => void
   onBack: () => void
 }>) => {
+  const { createNotebook } = useCreateNotebook()
   const searchPlaceholder = EXPLORER_SECTIONS.find((x) => x.type === type)?.searchPlaceholder
 
   return (
@@ -60,14 +64,14 @@ export const ExplorerNavResourceWrapper = ({
       transition={LEVEL_TRANSITION}
       className={cn('absolute inset-0 flex flex-col', className)}
     >
-      <div className="flex items-center gap-1 p-3 pb-2">
+      <div className="flex items-center gap-2 p-3 pb-2">
         <Button
-          variant="outline"
           size="tiny"
-          aria-label="Back to all resources"
+          variant="outline"
+          aria-label="Back"
           onClick={onBack}
           className="size-7 shrink-0 px-0"
-          icon={<ChevronLeft size={16} />}
+          icon={<ChevronLeft />}
         />
         <span id="explorer-sidebar-search-label" className="sr-only">
           {searchPlaceholder}
@@ -81,6 +85,17 @@ export const ExplorerNavResourceWrapper = ({
             onChange={(event) => setSearch(event.target.value)}
           />
         </InnerSideBarFilters>
+        <ButtonTooltip
+          size="tiny"
+          variant="outline"
+          aria-label={`New ${type}`}
+          className="size-7 shrink-0 px-0"
+          icon={<Plus />}
+          tooltip={{ content: { side: 'bottom', text: `New ${type}` } }}
+          onClick={() => {
+            if (type === 'notebook') createNotebook()
+          }}
+        />
       </div>
       {children}
     </motion.div>
