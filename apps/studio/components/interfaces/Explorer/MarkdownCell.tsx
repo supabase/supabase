@@ -86,6 +86,7 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
             className={cn(
               'prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground',
               '[&>h1]:mb-2 [&>h2]:mb-2',
+              '[&_ol>li]:pl-3',
               '[--tw-prose-body:var(--foreground-muted)]',
               '[--tw-prose-headings:var(--foreground-default)]',
               '[--tw-prose-links:var(--foreground-muted)]',
