@@ -215,7 +215,7 @@ export default function MarketingForm({
 
     // Required checkboxes aren't covered by HTML5 validation; check them manually.
     const uncheckedRequired = visibleFields.filter(
-      (f) => f.type === 'checkbox' && f.required && !f.group && values[f.name] !== 'true'
+      (f) => f.type === 'checkbox' && f.required && values[f.name] !== 'true'
     )
     if (uncheckedRequired.length > 0) {
       setSubmitState('error')
@@ -225,22 +225,26 @@ export default function MarketingForm({
       return
     }
 
-    const requiredCheckboxGroups = new Map<string, MarketingFormField[]>()
-    visibleFields.forEach((field) => {
-      if (field.type !== 'checkbox' || !field.group || !field.groupRequired) return
-      const groupFields = requiredCheckboxGroups.get(field.group) ?? []
-      groupFields.push(field)
-      requiredCheckboxGroups.set(field.group, groupFields)
-    })
-
-    const missingRequiredGroups = Array.from(requiredCheckboxGroups.values()).filter((group) =>
-      group.every((field) => values[field.name] !== 'true')
+    const requiredGroupIds = new Set(
+      visibleFields.filter((f) => f.group && f.groupRequired).map((f) => f.group)
     )
+
+    const missingRequiredGroups = Array.from(requiredGroupIds)
+      .map((groupId) => {
+        const groupFields = visibleFields.filter((f) => f.group === groupId && f.type === 'checkbox')
+        const isAnyChecked = groupFields.some((f) => values[f.name] === 'true')
+        return isAnyChecked ? null : groupFields
+      })
+      .filter((group): group is MarketingFormField[] => group !== null)
+
     if (missingRequiredGroups.length > 0) {
       setSubmitState('error')
       setErrorMessages(
         missingRequiredGroups.map((group) => {
-          const labels = group.map((field) => field.label).join(', ')
+          const labels = group
+            .filter((f) => f.groupRequired)
+            .map((f) => f.label)
+            .join(', ')
           return `Please select at least one option: ${labels}`
         })
       )
