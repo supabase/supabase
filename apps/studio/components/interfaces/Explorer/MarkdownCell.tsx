@@ -19,6 +19,15 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
   const valueRef = useLatest(value)
   const onCommitChangesRef = useLatest(onCommitChanges)
 
+  const handleStartEditing = () => {
+    setValue(cell.text)
+    setIsEditing(true)
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+  }
+
   const handleCommit = () => {
     onCommitChangesRef.current(valueRef.current)
     setIsEditing(false)
@@ -40,7 +49,7 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
             onMount={(editor, monaco) => {
               editor.addCommand(
                 monaco.KeyCode.Escape,
-                () => setIsEditing(false),
+                handleCancel,
                 [
                   'editorTextFocus',
                   '!editorHasSelection',
@@ -61,10 +70,10 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
           <div className="border-t flex items-center justify-between pl-3 pr-1 py-1">
             <p className="text-xs text-foreground-lighter">Markdown</p>
             <div className="flex items-center gap-x-1">
-              <Button variant="text" onClick={() => setIsEditing(false)}>
+              <Button variant="text" onMouseDown={(e) => e.preventDefault()} onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button variant="text" onClick={handleCommit}>
+              <Button variant="text" onMouseDown={(e) => e.preventDefault()} onClick={handleCommit}>
                 Save
               </Button>
             </div>
@@ -72,10 +81,7 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
         </div>
       ) : (
         <div
-          onDoubleClick={() => {
-            setValue(cell.text)
-            setIsEditing(true)
-          }}
+          onDoubleClick={handleStartEditing}
           className={cn(
             'w-full max-w-2xl mx-auto px-3 py-2 transition',
             'hover:bg-alternative/50',

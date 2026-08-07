@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 
-import { type MarkdownCell } from '@/data/content/notebooks/notebook-schema'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
@@ -37,7 +36,7 @@ export const useCreateNotebook = () => {
 # Title
 A brief description on what this notebook is about
         `.trim(),
-          } as MarkdownCell,
+          },
           {
             _tag: 'markdown_cell',
             id: '2',
@@ -48,7 +47,7 @@ This is a sample paragraph to demonstrate the Markdown cells
 2. List item 2
 3. List item 3
             `,
-          } as MarkdownCell,
+          },
         ],
       },
       owner_id: profile.id,
