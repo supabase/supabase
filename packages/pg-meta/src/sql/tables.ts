@@ -112,7 +112,7 @@ FROM
       pg_attribute ta
       join pg_class cta on ta.attrelid = cta.oid
       join pg_namespace nta on cta.relnamespace = nta.oid
-    ) on ta.attrelid = c.confrelid and ta.attnum = any (c.confkey)
+    ) on ta.attrelid = c.confrelid and ta.attnum = any (c.confkey) and array_position(c.conkey, sa.attnum) = array_position(c.confkey, ta.attnum)
     where
       c.contype = 'f'${relScope}
   ) as relationships
