@@ -4,8 +4,8 @@ import { ident, joinSqlFragments, safeSql } from '../../src/pg-format'
 import { Query } from '../../src/query/Query'
 import * as QueryUtils from '../../src/query/Query.utils'
 import { QueryAction } from '../../src/query/QueryAction'
-import { QueryFilter } from '../../src/query/QueryFilter'
-import { QueryModifier } from '../../src/query/QueryModifier'
+import { QueryFilter, type IQueryFilter } from '../../src/query/QueryFilter'
+import { QueryModifier, type IQueryModifier } from '../../src/query/QueryModifier'
 import type { Filter, QueryTable, Sort } from '../../src/query/types'
 
 describe('Query', () => {
@@ -818,5 +818,14 @@ describe('End-to-end query chaining', () => {
     const sql = query.from('users', 'public').truncate().toSql()
 
     expect(sql).toBe('truncate public.users;')
+  })
+
+  test('IQueryFilter and IQueryModifier interface compliance', () => {
+    const filter: IQueryFilter = new QueryFilter({ name: 'users', schema: 'public' }, { action: 'select' })
+    filter.filter(['col1', 'col2'], 'in', [1, 2, 3])
+
+    const modifier: IQueryModifier = new QueryModifier({ name: 'users', schema: 'public' }, { action: 'select' })
+    const sql = modifier.toSql({ isCTE: true, isFinal: false })
+    expect(sql).toBeDefined()
   })
 })
