@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 
+import { parsePagePaths } from '../../shared/paths.ts'
 import {
   attachScanReport,
   blockingViolations,
@@ -16,10 +17,9 @@ import {
   articleSelectorForPagePath,
   browserLikeUserAgent,
   collectDocsOwnedLinks,
-  parseDocsE2EPagePaths,
 } from '../utils/docs-links.js'
 
-const pagePaths = parseDocsE2EPagePaths(process.env.DOCS_E2E_PAGE_PATHS)
+const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
 
 function annotate(testInfo: TestInfo, description: string) {
   testInfo.annotations.push({ type: 'warning', description })

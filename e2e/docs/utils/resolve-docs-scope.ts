@@ -1,5 +1,7 @@
 import { readdir, readFile } from 'node:fs/promises'
-import { basename, join, relative, sep } from 'node:path'
+import { basename, join, relative } from 'node:path'
+
+import { normalizeRepoPath } from '../../shared/paths.ts'
 
 /**
  * Federated guide section prefixes — mirrors
@@ -81,10 +83,6 @@ export type ResolveDocsScopeOptions = {
 export type ResolveDocsScopeResult = {
   pages: string[]
   skip: boolean
-}
-
-function normalizeRepoPath(filePath: string): string {
-  return filePath.replaceAll('\\', '/')
 }
 
 function isFederatedGuideSlug(slug: string): boolean {
@@ -341,13 +339,4 @@ export async function resolveAllDocsPages(repoRoot: string): Promise<string[]> {
   }
 
   return [...pages].sort()
-}
-
-/** Parse changed-file list from stdin or newline/comma-separated string. */
-export function parseChangedFilesList(input: string): string[] {
-  return input
-    .split(/[\n,]/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => normalizeRepoPath(line.split(sep).join('/')))
 }
