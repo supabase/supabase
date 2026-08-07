@@ -140,11 +140,11 @@ export function JitDbAccessRoleGrantFields({
               isReactForm={false}
               label="Applies to"
               description={
-                <p className="text-xs text-foreground-lighter">
+                <span className="text-xs text-foreground-lighter">
                   {grant.branchesOnly
                     ? 'Can only be requested from preview branch databases.'
                     : 'Can be requested from production and preview branch databases.'}
-                </p>
+                </span>
               }
             >
               <Select
@@ -169,21 +169,21 @@ export function JitDbAccessRoleGrantFields({
               label="Expires in"
               description={
                 grant.hasExpiry && grant.expiry ? (
-                  <p className="text-xs text-foreground-lighter">
+                  <span className="text-xs text-foreground-lighter">
                     Expires at{' '}
                     <TimestampInfo
                       utcTimestamp={grant.expiry}
                       className="text-foreground-lighter"
                       labelFormat="DD MMM, HH:mm"
                     />
-                  </p>
+                  </span>
                 ) : grant.expiryMode === 'never' ? (
-                  <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
+                  <span className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
                     <WarningIcon />
                     <span className="text-left text-xs text-foreground-lighter">
                       No expiry means ongoing database access until manually revoked.
                     </span>
-                  </div>
+                  </span>
                 ) : undefined
               }
             >

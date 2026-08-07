@@ -3,6 +3,7 @@ import { IPv4CidrRange, IPv6CidrRange } from 'ip-num'
 
 import type {
   JitExpiryMode,
+  JitInviteState,
   JitIpRangeDraft,
   JitMemberOption,
   JitRoleGrantDraft,
@@ -59,7 +60,11 @@ function cloneGrants(grants: JitRoleGrantDraft[]) {
 }
 
 export function createDraft(roleIds: string[]): JitUserRuleDraft {
-  return { memberId: '', grants: roleIds.map((roleId) => createEmptyGrant(roleId)) }
+  return {
+    memberId: '',
+    inviteEmail: '',
+    grants: roleIds.map((roleId) => createEmptyGrant(roleId)),
+  }
 }
 
 function mergeRoleIds(baseRoleIds: string[], extraRoleIds: string[]) {
@@ -84,6 +89,7 @@ export function draftFromRule(rule: JitUserRule, baseRoleIds: string[]): JitUser
 
   return {
     memberId: rule.memberId,
+    inviteEmail: '',
     grants: mergedRoleIds.map((roleId) => {
       const nextGrant = {
         ...createEmptyGrant(roleId),
@@ -291,8 +297,28 @@ export function mapJitMembersToUserRules(
       roleId,
     }))
 
-    const email = mappedMember?.primary_email ?? item.user_id
+    // [SEC-859] Access list now also includes pending invitations and surfaces
+    // primary_email + user_id (and expires_at + invite_id on invites). Some
+    // fields aren't in the typed OpenAPI response yet — widen locally.
+    const itemWithInvite = item as typeof item & {
+      primary_email?: string
+      expires_at?: string
+      invite_id?: string
+    }
+
+    const email = itemWithInvite.primary_email ?? mappedMember?.primary_email ?? item.user_id
     const name = mappedMember?.username ?? undefined
+    const inviteExpiresAt = itemWithInvite.expires_at
+    const parsedInviteExpiry =
+      typeof inviteExpiresAt === 'string' ? dayjs(inviteExpiresAt) : undefined
+    const inviteState: JitInviteState | undefined =
+      parsedInviteExpiry && parsedInviteExpiry.isValid()
+        ? parsedInviteExpiry.isAfter(dayjs())
+          ? 'pending'
+          : 'expired'
+        : undefined
+    const inviteId = inviteState ? itemWithInvite.invite_id : undefined
+    const isExternal = !mappedMember
 
     return {
       id: item.user_id,
@@ -301,6 +327,9 @@ export function mapJitMembersToUserRules(
       name,
       grants: cloneGrants(grants),
       status: computeStatusFromGrants(grants),
+      inviteState,
+      inviteId,
+      isExternal,
     }
   })
 }

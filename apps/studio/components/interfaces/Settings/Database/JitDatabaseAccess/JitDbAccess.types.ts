@@ -39,8 +39,11 @@ export type JitRoleGrantDraft = {
 
 export type JitUserRuleDraft = {
   memberId: string
+  inviteEmail: string
   grants: JitRoleGrantDraft[]
 }
+
+export type JitInviteState = 'pending' | 'expired'
 
 export type JitUserRule = {
   id: string
@@ -49,6 +52,9 @@ export type JitUserRule = {
   name?: string
   grants: JitRoleGrantDraft[]
   status: JitStatus
+  inviteState?: JitInviteState
+  inviteId?: string
+  isExternal: boolean
 }
 
 export type SheetMode = 'add' | 'edit'
