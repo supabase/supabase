@@ -18,7 +18,9 @@ export const permissionRow = (
   organization_slug: string,
   actions: string[],
   resources: string[],
-  project_refs: string[] = []
+  // Org-wide rows serialize as [] or null on the wire (nullable in the API contract; the
+  // view-synthesized admin rows for auth.subject_roles/user_invites are null).
+  project_refs: string[] | null = []
 ): PermissionRowFixture => ({
   actions: actions as Permission['actions'],
   condition: null as unknown as Permission['condition'],
