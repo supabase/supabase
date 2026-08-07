@@ -130,7 +130,12 @@ describe('pg-format', () => {
     })
 
     test('should handle nested arrays without leading space on first emitted nested array', () => {
-      expect(literal([[1, 2], [3, 4]])).toBe('(1, 2), (3, 4)')
+      expect(
+        literal([
+          [1, 2],
+          [3, 4],
+        ])
+      ).toBe('(1, 2), (3, 4)')
       expect(literal([null, [1, 2]])).toBe('NULL, (1, 2)')
     })
 
@@ -151,7 +156,12 @@ describe('pg-format', () => {
     })
 
     test('should handle nested arrays without leading space on first emitted nested array', () => {
-      expect(string([[1, 2], [3, 4]])).toBe('(1, 2), (3, 4)')
+      expect(
+        string([
+          [1, 2],
+          [3, 4],
+        ])
+      ).toBe('(1, 2), (3, 4)')
       expect(string([null, [1, 2]])).toBe('(1, 2)')
       expect(string([undefined, [1, 2]])).toBe('(1, 2)')
     })
