@@ -1,7 +1,7 @@
 import { ArrowUpRight, BookOpen, Gauge, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'
@@ -36,6 +36,7 @@ export const MarketplaceDetail = () => {
     isAvailableLoading,
     isInstalledLoading,
     isIntegrationStatusLoading,
+    oauthIntegrationData,
     Component,
   } = useIntegrationDetail()
 
@@ -75,7 +76,13 @@ export const MarketplaceDetail = () => {
   const renderInstallAction = () => {
     switch (installActionType) {
       case 'oauth':
-        return <InstallOAuthIntegrationButton integration={integration} />
+        return (
+          <InstallOAuthIntegrationButton
+            integration={integration}
+            data={oauthIntegrationData}
+            isLoading={isIntegrationStatusLoading}
+          />
+        )
       case 'add-wrapper':
         return (
           <AddWrapperButton

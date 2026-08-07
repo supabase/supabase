@@ -80,6 +80,9 @@ describe('invalidateTableMetadata', () => {
         tableRowKeys.tableRowsAndCount('project-ref', 1),
       ])
     )
+    expect(queryKeys[queryKeys.length - 1]).toEqual(
+      tableRowKeys.tableRowsAndCount('project-ref', 1)
+    )
   })
 
   test('only invalidates row keys when rows are requested and a table id is available', async () => {

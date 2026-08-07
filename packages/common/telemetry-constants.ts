@@ -5,7 +5,7 @@
  *
  * ## Naming conventions
  * Event names and actions should use standardized past-tense verbs for data quality and consistency.
- * Only use verbs already established in this file or in https://github.com/supabase/platform/blob/develop/shared/src/telemetry.ts
+ * Only use verbs already established in this file or in https://github.com/supabase/platform/blob/develop/packages/api-core/src/shared/telemetry.ts
  * Adding new verbs requires @growth-eng review to prevent data pollution.
  *
  * @module telemetry-frontend
@@ -231,6 +231,38 @@ export interface CronJobDeleteClickedEvent {
  */
 export interface CronJobHistoryClickedEvent {
   action: 'cron_job_history_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * Fired when the user clicks the header 'Enable cleanup' button to open the
+ * confirmation dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCleanupDialogOpenedEvent {
+  action: 'cron_job_cleanup_dialog_opened'
+  groups: TelemetryGroups
+}
+
+/**
+ * Fired when the user confirms the cleanup dialog, initiating the request to
+ * schedule the daily cleanup job (deletes old rows from cron.job_run_details).
+ * Emitted on confirm, before the scheduling request resolves, so it does not
+ * indicate the job was scheduled successfully.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCleanupEnableButtonClickedEvent {
+  action: 'cron_job_cleanup_enable_button_clicked'
+  properties: {
+    /** Retention period chosen for the cleanup job, e.g. 7 days. */
+    retentionInterval?: string
+  }
   groups: TelemetryGroups
 }
 
@@ -695,6 +727,19 @@ export interface SqlEditorTemplateClickedEvent {
 }
 
 /**
+ * User clicked the "Disable" button next to the autosave status text in the
+ * SQL Editor, to open the feature preview modal for manual snippet saving.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorAutosaveDisableClickedEvent {
+  action: 'sql_editor_autosave_disable_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the "Result download CSV" button in the SQL editor.
  *
  * @group Events
@@ -886,6 +931,16 @@ export interface CopyAsMarkdownClickedEvent {
 }
 
 /**
+ * User clicked the sidebar link to set up an AI coding agent with Supabase.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface AgentSetupClickedEvent {
+  action: 'agent_setup_clicked'
+}
+
+/**
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
@@ -931,6 +986,19 @@ export interface Docs404RecommendationClickedEvent {
      * The path of the "not found" page where the recommendation was shown.
      */
     sourcePath: string
+  }
+}
+
+/**
+ * User clicked the copy button on a project config variable in the docs.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsProjectConfigVariablesCopyButtonClickedEvent {
+  action: 'docs_project_config_variables_copy_button_clicked'
+  properties: {
+    variable: 'url' | 'publishable' | 'anon' | 'sessionPooler'
   }
 }
 
@@ -1009,6 +1077,17 @@ export interface WwwEventPageCtaClickedEvent {
      */
     eventTitle: string
   }
+}
+
+/**
+ * User successfully subscribed to subprocessor list update notifications.
+ *
+ * @group Events
+ * @source www
+ * @page /legal/customer-resources/subprocessor-list
+ */
+export interface WwwSubprocessorUpdatesSubscribedEvent {
+  action: 'www_subprocessor_updates_subscribed'
 }
 
 /**
@@ -1243,6 +1322,10 @@ export interface ImportDataAddedEvent {
  */
 export interface SqlEditorQueryRunButtonClickedEvent {
   action: 'sql_editor_query_run_button_clicked'
+  properties: {
+    /** Which backend the query ran against. */
+    source: 'database' | 'logs'
+  }
   groups: TelemetryGroups
 }
 
@@ -1318,30 +1401,6 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on Metrics API banner CTA button in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface MetricsApiBannerCtaButtonClickedEvent {
-  action: 'metrics_api_banner_cta_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the dismiss button on a banner in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface MetricsApiBannerDismissButtonClickedEvent {
-  action: 'metrics_api_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
  * User clicks on the Unified Logs banner CTA button in studio project pages.
  *
  * @group Events
@@ -1407,6 +1466,140 @@ export interface IndexAdvisorTabClickedEvent {
   properties: {
     hasRecommendations: boolean
     isIndexAdvisorEnabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User toggled live mode on the Database Connections observability page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsLiveModeClickedEvent {
+  action: 'database_connections_live_mode_clicked'
+  properties: {
+    newState: 'enabled' | 'disabled'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Database Connections banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBannerDismissButtonClickedEvent {
+  action: 'database_connections_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA button on the Database Connections banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
+  action: 'database_connections_banner_cta_button_clicked'
+  properties: {
+    isEnabled: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked a metric card PID in the Overview panel of the Database Connections observability page, selecting it in the activity table below.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsOverviewMetricCardClickedEvent {
+  action: 'database_connections_overview_metric_card_clicked'
+  properties: {
+    type: 'longest_blocked' | 'top_blocker' | 'longest_running'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User updated a filter on the Sessions table of the Database Connections observability page.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsFilterUpdatedEvent {
+  action: 'database_connections_filter_updated'
+  properties: {
+    type: 'state' | 'roles' | 'application' | 'reset'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Root blockers filter button on the Database Connections activity table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBlockerViewClickedEvent {
+  action: 'database_connections_blocker_view_clicked'
+  properties: {
+    newState: 'enabled' | 'disabled'
+  }
+  groups: TelemetryGroups
+}
+
+type DatabaseActivityState =
+  | 'idle'
+  | 'active'
+  | 'idle in transaction'
+  | 'idle in transaction (aborted)'
+  | 'fastpath function call'
+  | 'disabled'
+  | null
+
+/**
+ * User clicked the Terminate menu item for a database session in the Database Connections activity table, opening the confirmation dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface SessionTerminateButtonClickedEvent {
+  action: 'session_terminate_button_clicked'
+  properties: {
+    activityState: DatabaseActivityState
+    /**
+     * Whether the session being terminated was itself blocking one or more other sessions.
+     */
+    isBlocking: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User confirmed terminating a database session in the Database Connections activity table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface SessionTerminateSubmittedEvent {
+  action: 'session_terminate_submitted'
+  properties: {
+    activityState: DatabaseActivityState
+    /**
+     * Whether the terminated session was itself blocking one or more other sessions.
+     */
+    isBlocking: boolean
   }
   groups: TelemetryGroups
 }
@@ -1750,7 +1943,7 @@ export interface BranchCreateButtonClickedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/branches
+ * @page /dashboard/project/{ref}/branches, /dashboard/project/{ref}/merge or /dashboard/project/{ref}/settings/general
  */
 export interface BranchDeleteButtonClickedEvent {
   action: 'branch_delete_button_clicked'
@@ -1762,7 +1955,7 @@ export interface BranchDeleteButtonClickedEvent {
     /**
      * Where the delete action was initiated from
      */
-    origin: 'branches_page' | 'merge_page'
+    origin: 'branches_page' | 'merge_page' | 'settings_page'
   }
   groups: TelemetryGroups
 }
@@ -1920,22 +2113,6 @@ export interface BranchSelectorCreateClickedEvent {
 export interface BranchSelectorManageClickedEvent {
   action: 'branch_selector_manage_clicked'
   groups: TelemetryGroups
-}
-
-/**
- * User clicked on a DPA PDF link to open it.
- *
- * @group Events
- * @source www, studio
- */
-export interface DpaPdfOpenedEvent {
-  action: 'dpa_pdf_opened'
-  properties: {
-    /**
-     * The source of the click, e.g. www, studio
-     */
-    source: 'www' | 'studio'
-  }
 }
 
 /**
@@ -2125,18 +2302,6 @@ export interface HomeSectionRowsMovedEvent {
 }
 
 /**
- * User clicked the Request DPA button to open the confirmation modal.
- *
- * @group Events
- * @source studio
- * @page /dashboard/org/{slug}/documents
- */
-export interface DpaRequestButtonClickedEvent {
-  action: 'dpa_request_button_clicked'
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked a document view/download button to access a document.
  *
  * @group Events
@@ -2149,7 +2314,7 @@ export interface DocumentViewButtonClickedEvent {
     /**
      * The name of the document being viewed, e.g. TIA, SOC2, Standard Security Questionnaire
      */
-    documentName: 'TIA' | 'SOC2' | 'ISO27001' | 'Standard Security Questionnaire'
+    documentName: 'TIA' | 'SOC2' | 'ISO27001' | 'Standard Security Questionnaire' | 'DPA'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -2791,7 +2956,7 @@ export type AiAssistantSource =
   | 'log_explorer'
   | 'error_code'
   | 'advisor_signal_detail'
-  | 'rls_tester'
+  | 'database_connections'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3236,7 +3401,7 @@ export interface AccessTokenCreatedEvent {
   properties: {
     tokenType: 'classic' | 'scoped'
     expiryPreset: string
-    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    resourceAccess?: 'project' | 'organization' | 'account'
     permissionCount?: number
   }
   groups: Omit<TelemetryGroups, 'project'>
@@ -3258,8 +3423,8 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
- * User clicked the "Upgrade to Pro" CTA in one of the experiment placement surfaces.
- * GROWTH experiment: `upgradeCtaPlacement` (user_dropdown / org_projects_list).
+ * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
+ * `placement` identifying which one (the user dropdown or the org project-list usage card).
  *
  * @group Events
  * @source studio
@@ -3268,25 +3433,6 @@ export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
     placement: 'user_dropdown' | 'org_projects_list'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
- * User was exposed to the upgrade CTA placement experiment.
- * Fires once per session per free-plan user enrolled in any variant (including control),
- * so the conversion analysis has a baseline cohort.
- *
- * @group Events
- * @source studio
- */
-export interface UpgradeCtaPlacementExperimentExposedEvent {
-  action: 'upgrade_cta_placement_experiment_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: 'control' | 'user_dropdown' | 'org_projects_list'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3344,6 +3490,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
+      | 'multigres'
   }
   groups: TelemetryGroups
 }
@@ -3520,18 +3667,6 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
- * User ran a query in the RLS tester feature preview.
- *
- * @group Events
- * @source studio
- */
-export interface RlsTesterRunQueryClickedEvent {
-  action: 'rls_tester_run_query_clicked'
-  properties: { type: 'raw' | 'inferred' }
-  groups: Partial<TelemetryGroups>
-}
-
-/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3548,6 +3683,8 @@ export type TelemetryEvent =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
+  | CronJobCleanupDialogOpenedEvent
+  | CronJobCleanupEnableButtonClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
   | TimezonePickerClickedEvent
@@ -3570,6 +3707,7 @@ export type TelemetryEvent =
   | TableRealtimeDisabledEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
+  | SqlEditorAutosaveDisableClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
@@ -3582,13 +3720,16 @@ export type TelemetryEvent =
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
+  | AgentSetupClickedEvent
   | AskAiClickedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
+  | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
   | WwwEventPageCtaClickedEvent
+  | WwwSubprocessorUpdatesSubscribedEvent
   | HomepageGithubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
@@ -3616,13 +3757,19 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | MetricsApiBannerCtaButtonClickedEvent
-  | MetricsApiBannerDismissButtonClickedEvent
   | UnifiedLogsBannerCtaButtonClickedEvent
   | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent
+  | DatabaseConnectionsLiveModeClickedEvent
+  | DatabaseConnectionsOverviewMetricCardClickedEvent
+  | DatabaseConnectionsFilterUpdatedEvent
+  | DatabaseConnectionsBlockerViewClickedEvent
+  | DatabaseConnectionsBannerDismissButtonClickedEvent
+  | DatabaseConnectionsBannerCtaButtonClickedEvent
+  | SessionTerminateButtonClickedEvent
+  | SessionTerminateSubmittedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent
@@ -3652,7 +3799,6 @@ export type TelemetryEvent =
   | BranchSelectorBranchClickedEvent
   | BranchSelectorCreateClickedEvent
   | BranchSelectorManageClickedEvent
-  | DpaPdfOpenedEvent
   | HomeConnectSectionExposedEvent
   | HomeConnectActionClickedEvent
   | ConnectSheetOpenedEvent
@@ -3662,7 +3808,6 @@ export type TelemetryEvent =
   | HomeProjectUsageChartClickedEvent
   | HomeCustomReportBlockAddedEvent
   | HomeCustomReportBlockRemovedEvent
-  | DpaRequestButtonClickedEvent
   | DocumentViewButtonClickedEvent
   | HipaaRequestButtonClickedEvent
   | TableCreatedEvent
@@ -3709,7 +3854,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
@@ -3730,4 +3874,3 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
-  | RlsTesterRunQueryClickedEvent

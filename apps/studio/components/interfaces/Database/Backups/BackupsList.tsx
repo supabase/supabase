@@ -4,7 +4,7 @@ import { Clock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 

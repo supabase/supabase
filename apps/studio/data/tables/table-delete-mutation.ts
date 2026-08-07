@@ -61,7 +61,7 @@ export const useTableDeleteMutation = ({
           includeLint: true,
         }),
         // invalidate all views from this schema
-        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, schema) }),
+        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, [schema]) }),
       ])
 
       await onSuccess?.(data, variables, context)

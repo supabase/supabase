@@ -20,6 +20,18 @@ export type CustomerStoryType = {
 export const data: CustomerStoryType[] = [
   {
     type: 'Customer Story',
+    title: 'How QA.tech built enterprise-ready AI testing agents on Supabase',
+    description:
+      'QA.tech is an autonomous AI testing platform whose QA agents run end-to-end testing of web and mobile products by goal and intent. Three years on Supabase took QA.tech from three founders to a global customer base, enterprise-scale daily test volume, and SOC 2 compliance.',
+    organization: 'QA.tech',
+    imgUrl: 'images/customers/logos/qa-tech.png',
+    logo: '/images/customers/logos/qa-tech.png',
+    logo_inverse: '/images/customers/logos/light/qa-tech.png',
+    url: '/customers/qa-tech',
+    ctaText: 'View story',
+  },
+  {
+    type: 'Customer Story',
     title: 'Cofounder builds autonomous companies on Supabase',
     description:
       "Cofounder gives every customer an entire engineering, sales, marketing, support, and product team made of agents. Supabase for Platforms gives Cofounder the database platform to run an entire software company on every customer's behalf, from day one.",
@@ -36,9 +48,9 @@ export const data: CustomerStoryType[] = [
     description:
       'Hyper is an AI-native marketing platform with agents that operate across the entire marketing workflow. Supabase gives their three-person team the database platform to do it at enterprise scale.',
     organization: 'Hyper',
-    imgUrl: 'images/customers/logos/hyper.svg',
-    logo: '/images/customers/logos/hyper.svg',
-    logo_inverse: '/images/customers/logos/light/hyper.svg',
+    imgUrl: 'images/customers/logos/hyper.png',
+    logo: '/images/customers/logos/hyper.png',
+    logo_inverse: '/images/customers/logos/light/hyper.png',
     url: '/customers/hyper',
     ctaText: 'View story',
   },

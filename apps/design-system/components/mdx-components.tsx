@@ -16,12 +16,12 @@ import {
   AlertTitle,
   AspectRatio,
   cn,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'

@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { components } from 'api-types'
 
+import type { TableSyncCopyConfig } from './create-destination-pipeline-mutation'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -12,6 +13,7 @@ type ValidatePipelineParams = {
   maxTableSyncWorkers?: number
   maxCopyConnectionsPerTable?: number
   invalidatedSlotBehavior?: 'error' | 'recreate'
+  tableSyncCopy: TableSyncCopyConfig
 }
 type ValidatePipelineResponse = components['schemas']['ValidatePipelineResponse']
 
@@ -24,6 +26,7 @@ async function validatePipeline(
     maxTableSyncWorkers,
     maxCopyConnectionsPerTable,
     invalidatedSlotBehavior,
+    tableSyncCopy,
   }: ValidatePipelineParams,
   signal?: AbortSignal
 ): Promise<ValidatePipelineResponse> {
@@ -37,6 +40,7 @@ async function validatePipeline(
     max_table_sync_workers: maxTableSyncWorkers,
     max_copy_connections_per_table: maxCopyConnectionsPerTable,
     invalidated_slot_behavior: invalidatedSlotBehavior,
+    table_sync_copy: tableSyncCopy,
     batch: batchConfig,
   }
 

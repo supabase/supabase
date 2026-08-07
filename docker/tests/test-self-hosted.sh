@@ -167,7 +167,7 @@ else
     check "Create user (admin)" "true" "false"
 fi
 
-# Public signup (optional — depends on email autoconfirm setting)
+# Public signup (optional - depends on email autoconfirm setting)
 signup_email="smoke-signup-$$@example.com"
 signup_resp=$(http_body "$BASE_URL/auth/v1/signup" \
     -H "apikey: $ANON_KEY" \
@@ -197,9 +197,15 @@ fi
 
 echo ""
 echo "--- PostgREST ---"
-check "REST API query" "200" \
+check "REST API route with anon key" "403" \
     "$(http_status "$BASE_URL/rest/v1/" \
         -H "apikey: $ANON_KEY")"
+
+echo ""
+echo "--- PostgREST ---"
+check "REST API route with service role key" "200" \
+    "$(http_status "$BASE_URL/rest/v1/" \
+        -H "apikey: $SERVICE_ROLE_KEY")"
 
 # ---------------------------------------------
 # 5. GraphQL

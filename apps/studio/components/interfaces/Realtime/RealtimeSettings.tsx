@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -20,7 +20,7 @@ import {
   InputGroupText,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -63,7 +63,7 @@ export const RealtimeSettings = () => {
   const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
     projectRef,
     connectionString: project?.connectionString,
-    schema: 'realtime',
+    schemas: ['realtime'],
   })
 
   const isFreePlan = organization?.plan.id === 'free'
@@ -94,9 +94,9 @@ export const RealtimeSettings = () => {
         .max(maxConn?.maxConnections ?? 100)
         .optional(),
       max_concurrent_users: z.coerce.number().min(1).max(50000).optional(),
-      max_events_per_second: z.coerce.number().min(1).max(10000).optional(),
-      max_presence_events_per_second: z.coerce.number().min(1).max(10000).optional(),
-      max_payload_size_in_kb: z.coerce.number().min(1).max(3000).optional(),
+      max_events_per_second: z.coerce.number().min(1).max(50000).optional(),
+      max_presence_events_per_second: z.coerce.number().min(1).max(5000).optional(),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(10000).optional(),
       // [Joshen] These fields are temporarily hidden from the UI
       // max_bytes_per_second: z.coerce.number().min(1).max(10000000).optional(),
       // max_channels_per_client: z.coerce.number().min(1).max(10000).optional(),
@@ -111,9 +111,9 @@ export const RealtimeSettings = () => {
         .min(1)
         .max(maxConn?.maxConnections ?? 100),
       max_concurrent_users: z.coerce.number().min(1).max(50000),
-      max_events_per_second: z.coerce.number().min(1).max(10000),
-      max_presence_events_per_second: z.coerce.number().min(1).max(10000),
-      max_payload_size_in_kb: z.coerce.number().min(1).max(3000),
+      max_events_per_second: z.coerce.number().min(1).max(50000),
+      max_presence_events_per_second: z.coerce.number().min(1).max(5000),
+      max_payload_size_in_kb: z.coerce.number().min(1).max(10000),
       // [Joshen] These fields are temporarily hidden from the UI
       // max_bytes_per_second: z.coerce.number().min(1).max(10000000),
       // max_channels_per_client: z.coerce.number().min(1).max(10000),
@@ -135,7 +135,10 @@ export const RealtimeSettings = () => {
     } as any,
   })
 
-  const { allow_public, suspend } = form.watch()
+  const [allow_public, suspend] = useWatch({
+    control: form.control,
+    name: ['allow_public', 'suspend'],
+  })
   const isSettingToPrivate = !data?.private_only && !allow_public
   const isDisablingRealtime = !isRealtimeDisabled && suspend
   const isEnablingRealtime = isRealtimeDisabled && !suspend

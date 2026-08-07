@@ -1,5 +1,5 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useLocalStorage } from '@uidotdev/usehooks'
+import { useDebounce, useLocalStorage } from '@uidotdev/usehooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import type { editor } from 'monaco-editor'
@@ -8,11 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
-import {
-  detectLogSource,
-  looksLikeLegacyLogsQuery,
-  rewriteLogsSqlWithAI,
-} from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
+import { LegacyLogsRewriteAdmonition } from '@/components/interfaces/Settings/Logs/LegacyLogsRewriteAdmonition'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
@@ -20,9 +16,15 @@ import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
 } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
-import { LogData, LogsWarning, LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
+import {
+  LogData,
+  LogQueryError,
+  LogsWarning,
+  LogTemplate,
+} from '@/components/interfaces/Settings/Logs/Logs.types'
 import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
 import {
+  checkForLimitClause,
   maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
@@ -30,10 +32,10 @@ import {
   buildLogQueryParams,
   resolveLogDateRange,
 } from '@/components/interfaces/Settings/Logs/logsDateRange'
-import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/LogsExplorerOtelBanner'
 import { LogsQueryPanel } from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { useRecentLogSqlSnippets } from '@/components/interfaces/Settings/Logs/useRecentLogSqlSnippets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -45,15 +47,20 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { constructHeaders } from '@/data/fetchers'
-import { fetchOtelLogKeys } from '@/data/logs/otel-log-keys-query'
+import {
+  LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS,
+  shouldOfferLegacyLogsRewrite,
+} from '@/data/logs/logs-sql-rewrite'
+import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import {
+  useLegacyLogsRewrite,
+  type LegacyLogsRewriteProposal,
+} from '@/hooks/analytics/useLegacyLogsRewrite'
 import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -74,18 +81,24 @@ const OTEL_PLACEHOLDER_QUERY =
 const otelSourceQuery = (source: string) =>
   `select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = '${source}'\norder by timestamp desc\nlimit 100`
 
+const MISSING_LIMIT_ERROR: LogQueryError = {
+  error: {
+    code: 400,
+    status: 'INVALID_ARGUMENT',
+    message: 'A LIMIT clause is required.',
+    errors: [{ domain: 'logs', reason: 'missingLimit', message: 'A LIMIT clause is required.' }],
+  },
+}
+
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
+  const track = useTrack()
   const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { ref, q, queryId } = useParams()
-  const track = useTrack()
-  const projectRef = ref as string
-  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
+  const { ref: projectRef, q, queryId } = useParams()
   const useOtelEndpoint = useFlag('otelLegacyLogs')
+  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
 
   const allTemplates = useMemo(() => {
     const templates = getLogsTemplates(useOtelEndpoint)
@@ -123,29 +136,20 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
+  const [showMissingLimitError, setShowMissingLimitError] = useState<boolean>(false)
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
-  const [rewriteProposal, setRewriteProposal] = useState<{
-    original: string
-    modified: string
-  } | null>(null)
-  const [isRewriting, setIsRewriting] = useState<boolean>(false)
+  const [rewriteProposal, setRewriteProposal] = useState<LegacyLogsRewriteProposal | null>(null)
   const [rewriteBannerDismissed, setRewriteBannerDismissed] = useLocalStorage<boolean>(
     `project-${projectRef}-logs-rewrite-banner-dismissed`,
     false
   )
 
-  const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
-    `project-content-${projectRef}-recent-log-sql`,
-    []
-  )
+  const [recentLogs, setRecentLogs] = useRecentLogSqlSnippets(projectRef)
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
-  const { data: content } = useContentQuery({
-    projectRef: ref,
-    type: 'log_sql',
-  })
+  const { data: content } = useContentQuery({ projectRef, type: 'log_sql' })
   const query = content?.content.find((x) => x.id === queryId)
 
   const resolvedRange = useMemo(() => {
@@ -164,20 +168,45 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     error,
     isLoading: logsLoading,
     setParams,
-  } = useLogsQuery(
+  } = useLogsQuery({
     projectRef,
-    {
+    initialParams: {
       iso_timestamp_start: resolvedRange.from,
       iso_timestamp_end: resolvedRange.to,
     },
-    true,
-    { useOtel: useOtelEndpoint }
-  )
+    enabled: true,
+    options: { useOtel: useOtelEndpoint },
+  })
 
   const results = logData
   const isLoading = logsLoading
 
-  const showRewriteCTA = useOtelEndpoint && looksLikeLegacyLogsQuery(editorValue)
+  // Debounced so the dialect heuristics don't run on every keystroke, matching the
+  // SQL editor's rewrite banner.
+  const settledEditorValue = useDebounce(editorValue, LEGACY_LOGS_DIALECT_CHECK_DEBOUNCE_MS)
+  const shouldShowRewriteCTA = useMemo(
+    () =>
+      shouldOfferLegacyLogsRewrite({
+        sql: settledEditorValue,
+        isClickhouseLogsEnabled: useOtelEndpoint,
+      }),
+    [settledEditorValue, useOtelEndpoint]
+  )
+
+  const {
+    state: rewriteState,
+    requestRewrite,
+    dismiss: dismissRewriteBanner,
+  } = useLegacyLogsRewrite({
+    // Read straight from the editor instance — `editorValue` state can lag the
+    // most recent keystroke.
+    readSql: () => editorRef.current?.getValue() ?? editorValue,
+    onProposal: setRewriteProposal,
+    onDismissed: () => setRewriteBannerDismissed(true),
+  })
+  const isRewriting = rewriteState.status === 'rewriting'
+  const hasUnacknowledgedRewriteOutcome =
+    rewriteState.status === 'failed' || rewriteState.status === 'noRewriteNeeded'
 
   const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
@@ -203,7 +232,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const addRecentLogSqlSnippet = (snippet: Partial<LogSqlSnippets.Content>) => {
     const defaults: LogSqlSnippets.Content = {
       schema_version: '1',
-      sql: '',
+      unchecked_sql: untrustedLogSql(''),
       content_id: '',
     }
     setRecentLogs([...recentLogs, { ...defaults, ...snippet }])
@@ -228,43 +257,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       editorRef.current.focus()
     }
 
-    addRecentLogSqlSnippet({ sql: template.searchString })
-  }
-
-  const handleRewrite = async () => {
-    const currentSql = editorRef.current?.getValue() ?? editorValue
-    if (!currentSql.trim()) {
-      toast.info('Write a query to rewrite first')
-      return
-    }
-    setIsRewriting(true)
-    try {
-      const headerData = await constructHeaders()
-      const source = detectLogSource(currentSql)
-      const availableKeys = source
-        ? await fetchOtelLogKeys({ projectRef, source }).catch(() => undefined)
-        : undefined
-      const rewritten = await rewriteLogsSqlWithAI({
-        sql: currentSql,
-        projectRef,
-        connectionString: project?.connectionString,
-        orgSlug: organization?.slug,
-        authorizationHeader: headerData.get('Authorization'),
-        availableKeys,
-      })
-      // The editor may have changed while awaiting key discovery and the AI call;
-      // don't offer a proposal that would clobber intervening edits.
-      const latestSql = editorRef.current?.getValue() ?? editorValue
-      if (latestSql !== currentSql) {
-        toast.info('The query changed while rewriting. Please try again.')
-        return
-      }
-      setRewriteProposal({ original: currentSql, modified: rewritten })
-    } catch (error) {
-      toast.error(`Couldn't rewrite the query: ${(error as Error).message}`)
-    } finally {
-      setIsRewriting(false)
-    }
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(template.searchString) })
   }
 
   const acceptRewrite = () => {
@@ -285,6 +278,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     // keeps the Run button consistent with the Cmd+Enter keybinding.
     const liveValue = editorRef.current?.getValue()
     const query = typeof value === 'string' ? value || editorValue : (liveValue ?? editorValue)
+
+    if (!checkForLimitClause(query)) {
+      setShowMissingLimitError(true)
+      setSelectedLog(null)
+      return
+    }
+    setShowMissingLimitError(false)
+
     const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
     setSelectedLog(null)
@@ -300,7 +301,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setTimeRange('', '')
     }
     setSearch(query)
-    addRecentLogSqlSnippet({ sql: query })
+    addRecentLogSqlSnippet({ unchecked_sql: untrustedLogSql(query) })
   }
 
   const handleInsertSource = (source: string) => {
@@ -346,7 +347,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       type: 'log_sql' as const,
       content: {
         content_id: editorId,
-        sql: editorValue,
+        unchecked_sql: untrustedLogSql(editorValue),
         schema_version: '1',
         favorite: false,
       } as LogSqlSnippets.Content,
@@ -372,7 +373,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         projectRef: projectRef!,
         payload: {
           ...query,
-          content: { ...(query.content as LogSqlSnippets.Content), sql: currentSql },
+          content: {
+            ...(query.content as LogSqlSnippets.Content),
+            unchecked_sql: untrustedLogSql(currentSql),
+          },
         },
       })
 
@@ -408,7 +412,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }))
   }
 
-  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.sql
+  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.unchecked_sql
   useEffect(() => {
     if (search) {
       setEditorValue(search)
@@ -444,11 +448,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         text: 'Querying large date ranges can be slow. Consider selecting a smaller date range.',
       })
     }
-    if (editorValue && !editorValue.toLowerCase().includes('limit')) {
-      newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
-    }
     setWarnings(newWarnings)
-  }, [editorValue, timestampStart, timestampEnd])
+  }, [timestampStart, timestampEnd])
+
+  useEffect(() => {
+    if (showMissingLimitError && checkForLimitClause(editorValue)) {
+      setShowMissingLimitError(false)
+    }
+  }, [editorValue, showMissingLimitError])
 
   // Show the prompt on page load based on query params
   useEffect(() => {
@@ -478,15 +485,16 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
-            showRewriteAction={showRewriteCTA && rewriteBannerDismissed}
+            showRewriteAction={shouldShowRewriteCTA && rewriteBannerDismissed}
             isRewriting={isRewriting}
-            onRewrite={handleRewrite}
+            onRewrite={requestRewrite}
           />
-          {showRewriteCTA && !rewriteBannerDismissed && (
-            <LogsExplorerOtelBanner
-              isRewriting={isRewriting}
-              onRewrite={handleRewrite}
-              onDismiss={() => setRewriteBannerDismissed(true)}
+          {(hasUnacknowledgedRewriteOutcome ||
+            (shouldShowRewriteCTA && !rewriteBannerDismissed)) && (
+            <LegacyLogsRewriteAdmonition
+              state={rewriteState}
+              onRewrite={requestRewrite}
+              onDismiss={dismissRewriteBanner}
             />
           )}
           <ShimmerLine active={isLoading} />
@@ -537,9 +545,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               onRun={handleRun}
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}
-              data={results}
-              error={error}
-              projectRef={projectRef}
+              data={showMissingLimitError ? [] : results}
+              error={showMissingLimitError ? MISSING_LIMIT_ERROR : error}
+              projectRef={projectRef!}
               onSelectedLogChange={setSelectedLog}
               selectedLog={selectedLog || undefined}
               sqlQuery={editorValue}

@@ -4,15 +4,19 @@ import { components } from 'api-types'
 export type ScopedAccessTokenPermission =
   components['schemas']['CreateScopedAccessTokenBody']['permissions'][number]
 
-export const NON_EXPIRING_TOKEN_VALUE = 'never'
 export const CUSTOM_EXPIRY_VALUE = 'custom'
+
+/** Warning shown on both entry points that create a classic (account-wide) token. */
+export const CLASSIC_TOKEN_WARNING = {
+  title: 'Access tokens can be used to control your whole account',
+  description: 'Be careful when sharing your tokens',
+} as const
 
 export const EXPIRES_AT_OPTIONS = {
   hour: { value: 'hour', label: '1 hour' },
   day: { value: 'day', label: '1 day' },
   week: { value: 'week', label: '7 days' },
   month: { value: 'month', label: '30 days' },
-  never: { value: NON_EXPIRING_TOKEN_VALUE, label: 'Never' },
   custom: { value: CUSTOM_EXPIRY_VALUE, label: 'Custom' },
 } as const
 

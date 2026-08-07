@@ -1,5 +1,17 @@
-import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
@@ -42,7 +54,10 @@ export const ProjectHome = () => {
 
   const UsageSection = showHomepageUsageDeltas ? ProjectUsageSectionDeltas : ProjectUsageSection
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event

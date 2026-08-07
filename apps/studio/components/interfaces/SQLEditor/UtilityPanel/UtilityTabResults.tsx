@@ -139,7 +139,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                   variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
-                    sessionSnap.resetResults(id)
+                    sessionSnap.resetResult(id)
                   }}
                 >
                   Switch to primary database

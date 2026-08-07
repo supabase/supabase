@@ -1,14 +1,15 @@
-import { acceptUntrustedSql } from '@supabase/pg-meta'
+import { acceptUntrustedSql, safeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
+import { applyAutoLimit } from '../../SQLEditor/SQLEditor.utils'
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
+import { LogsSnippetReportBlock } from './LogsSnippetReportBlock'
 import { UnavailableChartBlock } from './UnavailableChartBlock'
 import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -79,9 +80,16 @@ export const ReportBlock = ({
     }
   )
 
+  const isLogsSnippet = data?.type === 'log_sql'
+
   const autoLimit = 100
-  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
-  const { appendAutoLimit } = checkIfAppendLimitRequired(sql ?? '', autoLimit)
+  const sql =
+    isSnippet && !isLogsSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  // acceptUntrustedSql is usually not allowed outside a user-action event
+  // handler, but it's explicitly fine here: adding this block to a report is
+  // itself the user action that approves running its SQL.
+  const acceptedSql = sql !== undefined ? acceptUntrustedSql(sql) : safeSql``
+  const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(acceptedSql, autoLimit)
 
   const chartConfig = { ...DEFAULT_CHART_CONFIG, ...(item.chartConfig ?? {}) }
   const isDeprecatedChart = DEPRECATED_REPORTS.includes(item.attribute)
@@ -97,6 +105,7 @@ export const ReportBlock = ({
     isPending: executeSqlLoading,
     refetch,
   } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- formattedSql/appendAutoLimit are fully derived from sql/autoLimit, both already in the key
     queryKey: sqlKeys.query(projectRef, [
       item.id,
       sql,
@@ -114,18 +123,13 @@ export const ReportBlock = ({
         return null
       }
 
-      const formattedSql = suffixWithLimit(acceptUntrustedSql(sql), autoLimit)
-
       return executeSql({
         projectRef,
         connectionString,
-        // acceptUntrustedSql is usually not allowed in an auto-run position,
-        // but in this case we are explicitly allowing it because adding a block
-        // to a report is an explicit user action.
         sql: formattedSql,
       })
     },
-    enabled: !isLoadingContent && contentError == null,
+    enabled: !isLoadingContent && contentError == null && !isLogsSnippet,
     refetchOnWindowFocus: false,
   })
 
@@ -150,6 +154,25 @@ export const ReportBlock = ({
       refetch()
     }
   }, [isRefreshing, refetch])
+
+  if (isLogsSnippet) {
+    return (
+      <LogsSnippetReportBlock
+        label={item.label}
+        actions={
+          !disableUpdate ? (
+            <ButtonTooltip
+              variant="text"
+              icon={<X />}
+              className="w-7 h-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
+          ) : null
+        }
+      />
+    )
+  }
 
   return (
     <>

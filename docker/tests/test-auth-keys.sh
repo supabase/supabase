@@ -68,13 +68,13 @@ echo ""
 # ---------------------------------------------
 
 echo "--- REST API (/rest/v1/) ---"
-check "Legacy ANON_KEY" "200" \
+check "Legacy ANON_KEY -> 403" "403" \
     "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $ANON_KEY")"
 check "Legacy SERVICE_ROLE_KEY" "200" \
     "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SERVICE_ROLE_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "New PUBLISHABLE_KEY" "200" \
+    check "New PUBLISHABLE_KEY -> 403" "403" \
         "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
     check "New SECRET_KEY" "200" \
         "$(http_status "$BASE_URL/rest/v1/" -H "apikey: $SUPABASE_SECRET_KEY")"
@@ -166,16 +166,26 @@ echo ""
 echo "--- supabase-js style requests (apikey + Authorization) ---"
 # supabase-js sends both apikey header AND Authorization: Bearer <apikey>
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    check "apikey + Authorization: Bearer sb_ (replace path)" "200" \
+    check "apikey + Authorization: Bearer sb_ (replace path)" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
             -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY")"
+
+    check "secret apikey + Authorization: Bearer sb_secret" "200" \
+        "$(http_status "$BASE_URL/rest/v1/" \
+            -H "apikey: $SUPABASE_SECRET_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SECRET_KEY")"
 fi
 
-check "Legacy apikey + Authorization: Bearer <legacy jwt>" "200" \
+check "Legacy apikey + Authorization: Bearer <legacy jwt>" "403" \
     "$(http_status "$BASE_URL/rest/v1/" \
         -H "apikey: $ANON_KEY" \
         -H "Authorization: Bearer $ANON_KEY")"
+
+check "Service role apikey + Authorization: Bearer <legacy jwt>" "200" \
+    "$(http_status "$BASE_URL/rest/v1/" \
+        -H "apikey: $SERVICE_ROLE_KEY" \
+        -H "Authorization: Bearer $SERVICE_ROLE_KEY")"
 
 echo ""
 echo "--- Edge cases ---"
@@ -271,9 +281,14 @@ if [ -n "$access_token" ]; then
     fi
 
     # Use the session JWT with PostgREST
-    check "Session JWT with PostgREST" "200" \
+    check "Session JWT with PostgREST" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $access_token")"
+
+    check "Session JWT with PostgREST + service role key" "200" \
+        "$(http_status "$BASE_URL/rest/v1/" \
+            -H "apikey: $SERVICE_ROLE_KEY" \
             -H "Authorization: Bearer $access_token")"
 
     # Use the session JWT with Storage
@@ -288,9 +303,13 @@ if [ -n "$access_token" ]; then
     if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
         echo ""
         echo "--- Authenticated user + opaque key (critical path) ---"
-        check "Opaque apikey + user JWT -> PostgREST uses user JWT" "200" \
+        check "Opaque apikey + user JWT -> PostgREST uses user JWT" "403" \
             "$(http_status "$BASE_URL/rest/v1/" \
                 -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+                -H "Authorization: Bearer $access_token")"
+        check "Secret apikey + user JWT -> PostgREST allowed" "200" \
+            "$(http_status "$BASE_URL/rest/v1/" \
+                -H "apikey: $SUPABASE_SECRET_KEY" \
                 -H "Authorization: Bearer $access_token")"
         check "Opaque apikey + user JWT -> Storage uses user JWT" "200" \
             "$(http_status "$BASE_URL/storage/v1/bucket" \
@@ -335,9 +354,13 @@ console.log(header+'.'+payload+'.'+sig);
 " 2>/dev/null)
 
 if [ -n "$hs256_token" ]; then
-    check "HS256 token with PostgREST (backward compat)" "200" \
+    check "HS256 token with PostgREST (backward compat)" "403" \
         "$(http_status "$BASE_URL/rest/v1/" \
             -H "apikey: $ANON_KEY" \
+            -H "Authorization: Bearer $hs256_token")"
+    check "HS256 token with PostgREST + service role key" "200" \
+        "$(http_status "$BASE_URL/rest/v1/" \
+            -H "apikey: $SERVICE_ROLE_KEY" \
             -H "Authorization: Bearer $hs256_token")"
 else
     echo "  SKIP: Could not mint HS256 token (node required)"

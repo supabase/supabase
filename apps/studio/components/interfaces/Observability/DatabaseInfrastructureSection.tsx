@@ -39,7 +39,6 @@ export const DatabaseInfrastructureSection = ({
   const { data: project } = useSelectedProjectQuery()
 
   // refreshKey forces date recalculation when user clicks refresh button
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const { startDate, endDate, infraInterval } = useMemo(() => {
     const now = dayjs()
     const end = now.toISOString()
@@ -152,10 +151,7 @@ export const DatabaseInfrastructureSection = ({
           className="block group"
         >
           <MetricCard isLoading={slowQueriesLoading}>
-            <MetricCardHeader
-              href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
-              linkTooltip="Go to query performance"
-            >
+            <MetricCardHeader linkTooltip="Go to query performance">
               <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
                 Slow Queries
               </MetricCardLabel>
@@ -168,7 +164,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Highest concurrent database connections observed in the selected window, against the connection limit. Monitor to avoid connection exhaustion.">
                 Peak Connections
               </MetricCardLabel>
@@ -189,7 +185,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Disk usage percentage of total disk space used">
                 Disk Usage
               </MetricCardLabel>
@@ -208,7 +204,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
                 Disk IO
               </MetricCardLabel>
@@ -227,7 +223,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
                 Memory
               </MetricCardLabel>
@@ -246,7 +242,7 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
                 CPU
               </MetricCardLabel>

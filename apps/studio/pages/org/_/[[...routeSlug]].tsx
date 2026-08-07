@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 
+import { parseCatchAllRoute } from '@/compat/next/router'
 import {
   Header,
   LoadingCardView,
@@ -20,7 +21,10 @@ import { buildStudioPageTitle } from '@/lib/page-title'
 const GenericOrganizationPage: NextPage = () => {
   const router = useRouter()
   const { appTitle } = useCustomContent(['app:title'])
-  const { routeSlug, ...queryParams } = router.query
+  // Normalise the catch-all path across Next (`routeSlug: string[]`) and
+  // TanStack (`_splat: string`) so downstream URL building (buildOrgUrl)
+  // keeps working — see parseCatchAllRoute.
+  const { segments: routeSlug, queryParams } = parseCatchAllRoute(router.query, 'routeSlug')
   const queryString =
     Object.keys(queryParams).length > 0
       ? new URLSearchParams(queryParams as Record<string, string>).toString()

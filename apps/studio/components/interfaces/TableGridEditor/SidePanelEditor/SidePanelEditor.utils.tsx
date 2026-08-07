@@ -438,6 +438,7 @@ export const createTable = async ({
   isRLSEnabled,
   importContent,
   track,
+  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -452,6 +453,7 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
   track: Track
+  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -670,6 +672,7 @@ export const createTable = async ({
         projectRef,
         connectionString,
         id: table.id,
+        scoped,
       })
     }
   )
@@ -690,6 +693,7 @@ export const updateTable = async ({
   existingForeignKeyRelations,
   primaryKey,
   track,
+  scoped,
 }: {
   projectRef: string
   connectionString?: string | null
@@ -701,6 +705,7 @@ export const updateTable = async ({
   existingForeignKeyRelations: ForeignKeyConstraint[]
   primaryKey?: Constraint
   track: Track
+  scoped?: boolean
 }) => {
   const queryClient = getQueryClient()
 
@@ -855,8 +860,8 @@ export const updateTable = async ({
     schema: table.schema,
     tableId: table.id,
     tableName: table.name,
-    newSchema: payload.schema,
-    newTableName: payload.name,
+    newSchema: updatedTable.schema,
+    newTableName: updatedTable.name,
     includeRows: true,
     includeLint: true,
   })
@@ -866,6 +871,7 @@ export const updateTable = async ({
       projectRef,
       connectionString,
       id: table.id,
+      scoped,
     }),
     hasError,
   }

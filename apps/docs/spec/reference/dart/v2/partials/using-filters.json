@@ -1,0 +1,44 @@
+{
+  "id": "using-filters",
+  "title": "Using filters",
+  "description": "Filters allow you to only return rows that match certain conditions.\n\nFilters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.\n\nIf a Database function returns a table response, you can also apply filters.\n",
+  "examples": [
+    {
+      "id": "applying-filters",
+      "name": "Applying Filters",
+      "description": "Filters must be applied after any of `select()`, `update()`, `upsert()`,\n`delete()`, and `rpc()` and before\n[modifiers](/docs/reference/dart/using-modifiers).\n",
+      "code": "```dart\nfinal data = await supabase\n  .from('cities')\n  .select('name, country_id')\n  .eq('name', 'The Shire');  // Correct\n\nfinal data = await supabase\n  .from('cities')\n  .eq('name', 'The Shire')  // Incorrect\n  .select('name, country_id');\n```\n"
+    },
+    {
+      "id": "chaining-filters",
+      "name": "Chaining Filters",
+      "description": "Filters can be chained together to produce advanced queries as shown in the example code.\n",
+      "code": "```dart\nfinal data = await supabase\n  .from('cities')\n  .select('name, country_id')\n  .gte('population', 1000)\n  .lt('population', 10000)\n```\n"
+    },
+    {
+      "id": "conditional-chaining",
+      "name": "Conditional Chaining",
+      "description": "Filters can be built up one step at a time and then executed as shown in the example code.\n",
+      "code": "```dart\nfinal filterByName = null;\nfinal filterPopLow = 1000;\nfinal filterPopHigh = 10000;\n\nvar query = supabase\n  .from('cities')\n  .select('name, country_id');\n\nif (filterByName != null) query = query.eq('name', filterByName);\nif (filterPopLow != null) query = query.gte('population', filterPopLow);\nif (filterPopHigh != null) query = query.lt('population', filterPopHigh);\n\nfinal data = await query;\n```\n"
+    },
+    {
+      "id": "filter-by-value-within-json-column",
+      "name": "Filter by values within a JSON column",
+      "data": {
+        "sql": "```sql\ncreate table\n  users (\n    id int8 primary key,\n    name text,\n    address jsonb\n  );\n\ninsert into\n  users (id, name, address)\nvalues\n  (1, 'Michael', '{ \"postcode\": 90210 }'),\n  (2, 'Jane', null);\n```\n"
+      },
+      "response": "```json\n[\n  {\n    'id': 1,\n    'name': 'Michael',\n    'address': {\n      'postcode': 90210\n    }\n  },\n]\n```\n",
+      "code": "```dart\nfinal data = await supabase\n  .from('users')\n  .select()\n  .eq('address->postcode', 90210);\n```\n"
+    },
+    {
+      "id": "filter-referenced-tables",
+      "name": "Filter Referenced Tables",
+      "code": "```dart\nfinal data = await supabase\n  .from('orchestral_sections')\n  .select('''\n    name,\n    instruments!inner (\n      name\n    )\n  ''')\n  .eq('instruments.name', 'flute');\n```\n",
+      "data": {
+        "sql": "```sql\ncreate table\n  orchestral_sections (id int8 primary key, name text);\ncreate table\n  instruments (\n    id int8 primary key,\n    section_id int8 not null references orchestral_sections,\n    name text\n  );\n\ninsert into\n  orchestral_sections (id, name)\nvalues\n  (1, 'strings'),\n  (2, 'woodwinds');\ninsert into\n  instruments (id, section_id, name)\nvalues\n  (1, 2, 'flute'),\n  (2, 1, 'violin');\n```\n"
+      },
+      "response": "```json\n[\n  {\n    'name': 'strings',\n    'instruments': [\n      {\n        'name': 'flute'\n      }\n    ]\n  },\n]\n```\n",
+      "description": "You can filter on referenced tables in your `select()` query using dot\nnotation.\n"
+    }
+  ]
+}

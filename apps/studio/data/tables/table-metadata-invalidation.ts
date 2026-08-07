@@ -51,13 +51,6 @@ export const invalidateTableMetadata = async (
     ...(includeLint
       ? [queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) })]
       : []),
-    ...(includeRows && tableId !== undefined
-      ? [
-          queryClient.invalidateQueries({
-            queryKey: tableRowKeys.tableRowsAndCount(projectRef, tableId),
-          }),
-        ]
-      : []),
     ...(tableId === undefined
       ? []
       : [
@@ -84,4 +77,10 @@ export const invalidateTableMetadata = async (
       queryClient.invalidateQueries({ queryKey: tableKeys.retrieve(projectRef, name, schema) }),
     ]),
   ])
+
+  if (includeRows && tableId !== undefined) {
+    await queryClient.invalidateQueries({
+      queryKey: tableRowKeys.tableRowsAndCount(projectRef, tableId),
+    })
+  }
 }

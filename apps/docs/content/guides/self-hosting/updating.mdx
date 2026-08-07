@@ -1,0 +1,203 @@
+---
+title: 'Update Your Self-Hosted Deployment'
+description: 'Update an existing self-hosted Supabase deployment to a newer release.'
+subtitle: 'Update an existing self-hosted Supabase deployment to a newer release.'
+---
+
+A supplemental script (`update.sh`) pulls a newer version of the self-hosted Supabase configuration on top of your existing deployment. It uses a three-way merge, so your secrets, overrides, and local edits survive, while merge conflicts are surfaced.
+
+It is the supported way to keep a self-hosted deployment current with upstream releases. Each run is incremental and gated: it preserves your `.env` and data, backs up your configuration, and stops to flag breaking changes before applying anything. New installs are version-tracked automatically. It is not a one-click upgrade from an arbitrary state - catching up an older, untracked deployment requires manual intervention (read below).
+
+<Admonition type="note" title="No recorded version yet?">
+
+`update.sh` needs to know the release your deployment started from, recorded in a `.supabase-version` file. A recent `setup.sh` writes it, but older or manually-set-up deployments will not have it. If yours doesn't, start with [Coming from an old, untracked install](#coming-from-an-old-untracked-install) - it is a one-time step.
+
+</Admonition>
+
+If you are comfortable with git and keep a clone of the repository, you can also bring upstream changes in with `git`'s own tools instead of `update.sh` - a more hands-on version of the same three-way merge.
+
+## How it works
+
+`update.sh` compares three versions of every vendor file:
+
+- base - the release your deployment is currently on, recorded in `.supabase-version` (written by `setup.sh`, then advanced to the new release after each successful update)
+- new - the release you are updating to (the latest `self-hosted/v*` tag by default)
+- yours - the files in your deployment directory
+
+It applies the changes between base and new to your files. Where you never edited a file, it updates cleanly. Where you edited a file but the release did not touch the same lines, your edit is kept. Only when both changed the same lines do you have a conflict to resolve.
+
+Your secrets and data are never merged. The values in the `.env` file you set are kept and the new keys from `.env.example` are appended. Paths listed in `.gitignore` are left untouched.
+
+## Before you start
+
+<Admonition type="danger" title="Back up your database">
+
+`update.sh` backs up your configuration files to `backups/`, but it does not back up Postgres or Storage data. Back those up separately first.
+
+</Admonition>
+
+- Run from your deployment directory (where `docker-compose.yml` and `.env` live).
+- `update.sh` needs `git` and `jq` on the host.
+- Deployments created with `setup.sh` record their version in `.supabase-version`, and `update.sh` advances it after each successful update. If that file is missing, refer to [Setting a recorded version](#setting-a-recorded-version).
+
+If your deployment predates `update.sh` - it ships with the self-hosted configuration from v0.7.1 onward - download it into your deployment directory first. You only need to do this once; later updates keep the script current for you.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/supabase/supabase/master/docker/update.sh -o update.sh
+```
+
+## How to update
+
+Preview what would change, without affecting anything:
+
+```sh
+sh update.sh --dry-run
+```
+
+A meaningful preview needs a recorded base version. `--dry-run` on a deployment with no `.supabase-version` (and no `--from`) falls back to the same limited [report-only](#setting-a-recorded-version) output as a plain run. It can only list brand-new files, not what would change or conflict.
+
+Apply the update - it targets the latest `self-hosted/v*` release:
+
+```sh
+sh update.sh
+```
+
+Review the output from `update.sh` - especially any conflicts, new `.env` keys, and breaking-change notices.
+
+Then pull the new images and recreate the containers:
+
+```sh
+sh run.sh pull
+sh run.sh recreate
+```
+
+### What it changes
+
+Updated:
+
+- `docker-compose.yml`, override templates, `volumes/*`, scripts, `.env.example`
+- `volumes/functions/main/index.ts`
+
+Excluded:
+
+- Current `.env` configuration
+- Paths in `.gitignore`: data directories, snippets, your edge functions
+
+## Breaking changes
+
+Some releases need a manual step before their files can be applied - for example, a Postgres major upgrade. `update.sh` reads these from the [release manifest](https://github.com/supabase/supabase/blob/master/docker/upgrades.json) and, before changing any files, prints the required steps and asks you to confirm. If you are not ready, decline the prompt - nothing has been modified yet.
+
+Complete the listed steps, then re-run `sh update.sh`.
+
+## Resolving conflicts
+
+If the summary lists conflicts, `update.sh` writes standard merge markers into those files and exits with status `2`. Open each file, pick the correct content, and remove the `<<<<<<<`, `=======`, and `>>>>>>>` markers:
+
+```yaml
+<<<<<<< yours (docker-compose.yml)
+      image: supabase/studio:your-pinned-tag
+=======
+      image: supabase/studio:new-tag
+>>>>>>> new (self-hosted/v0.7.0)
+```
+
+Keep editing the files where you want to preserve your own changes. When a file contains many conflicts and you have no edits worth keeping - overwriting it with the file from the target release is often easier. For example:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/supabase/supabase/self-hosted/v0.7.0/docker/run.sh > run.sh
+```
+
+Alternatively, if you kept a clone in `./supabase`:
+
+```sh
+git -C ./supabase show self-hosted/v0.7.0:docker/run.sh > run.sh
+```
+
+Then start the stack:
+
+```sh
+sh run.sh pull
+sh run.sh recreate
+```
+
+A conflict means you edited a [self-hosted Supabase configuration](https://github.com/supabase/supabase/tree/master/docker) file and the release changed the same lines.
+
+While conflicts remain, `update.sh` does not advance `.supabase-version` - it records the new release only on a clean run. After you resolve the markers, re-run `sh update.sh` to finalize the version stamp.
+
+## Update to a specific release
+
+```sh
+sh update.sh --to self-hosted/v0.7.0
+```
+
+Check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) for available releases.
+
+## Setting a recorded version
+
+Without `.supabase-version`, `update.sh` cannot merge safely and runs in a limited report mode. Only files and `.env` keys that are entirely new to you can be listed. However, because the full comparison needs a base, it is not possible to detect which existing files would change or have conflicts. Record the version your files came from once, then re-run.
+
+Prefer the exact commit your `./docker` files came from. It gives the cleanest merge and conflicts only where you edited a file that the release also changed. Use the full 40-character commit SHA: `update.sh` fetches the base from GitHub.
+
+To find it, clone the repository, find the commit whose date matches your files, and expand it to a full SHA:
+
+```sh
+git clone --filter=blob:none https://github.com/supabase/supabase
+cd supabase
+
+# Browse docker/ history, newest first, as "date short-hash subject":
+git log --date=short --format='%ad %h %s' -- docker
+
+# Expand the short hash you picked into the full SHA update.sh needs:
+git rev-parse <short-hash>
+```
+
+In the deployment directory, record it (or pass it once with `--from`):
+
+```sh
+printf 'ref=<full-40-char-sha>\n' > .supabase-version
+```
+
+The right commit is not always the one from the day you first deployed. If you have refreshed any files since, choose the commit closest to your newest `docker/` files. A base older than your files turns everything newer into a conflict (refer to [Coming from an old, untracked install](#coming-from-an-old-untracked-install)).
+
+If you cannot find the commit, use the closest release tag instead - compare the image tags in `docker-compose.yml` / `.env` against [versions.md](https://github.com/supabase/supabase/blob/master/docker/versions.md). This is an approximation, so expect conflicts proportional to how far your files have drifted:
+
+```sh
+printf 'ref=self-hosted/v0.7.0\n' > .supabase-version
+```
+
+<Admonition type="note" title="Keeping a reference clone (optional)">
+
+The clone above is only needed to look up a commit - you can delete it once you have the SHA. `setup.sh` deliberately does not leave one behind. If you prefer to keep a clone around to inspect history or diff against upstream, treat it as a read-only reference: do not run your stack from it, and do not rely on it as your base version. Your recorded base lives outside the clone in `.supabase-version` - a clone you later `git pull` or edit no longer reflects what you installed.
+
+</Admonition>
+
+## Coming from an old, untracked install
+
+Long-running deployments are usually assembled from several upstream points over time, rather than frozen at one commit. For instance, a newer `docker-compose.yml` copied in a month ago, or `run.sh` added manually later. A three-way merge (this tool, or `git` itself) assumes a single common ancestor, so no base will match every file, and files newer than your chosen base show up as conflicts. Expect conflicts roughly proportional to the deployment's age. This is normal, and this first catch-up is a one-time cost: after it succeeds, the version is recorded and every future update is a clean, gated merge.
+
+1. Run `sh update.sh` once. With no recorded version it stays in report-only mode and lists the new files and `.env` keys without changing anything.
+2. Record your base (learn more in [Setting a recorded version](#setting-a-recorded-version)) - the commit closest to your newest files, or the closest release tag.
+3. Preview. Run `sh update.sh --dry-run` and check the conflict count. If it is high, try a newer base - too old a base turns every file added since then into a conflict.
+4. Back up your database separately - `update.sh` backs up configuration only.
+5. Apply the update, then resolve conflicts. Most conflicts will be in "vendor files" you never meant to own - `run.sh`, `setup.sh`, `tests/*`, the override templates. For those, copy the new version as-is. The conflicts that need manual editing are usually in the compose configuration you deliberately changed. Your `.env` is never conflicted - `update.sh` appends new keys for you to review separately. The tool surfaces everything for you to triage. Refer to [Resolving conflicts](#resolving-conflicts) for more details.
+6. Handle Postgres. Postgres 17 became the default in v0.6.0. If you are still on Postgres 15, do not recreate straight onto 17 - follow [Upgrade to Postgres 17](/docs/guides/self-hosting/postgres-upgrade-17), or pin Postgres 15 with the `docker-compose.pg15.yml` override. Read the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) for the breaking changes across the range you are crossing.
+7. Run `sh run.sh pull`, then `sh run.sh recreate`.
+
+<Admonition type="note">
+
+If you only ever customized `.env` and never edited compose configuration or scripts, taking the new version for every conflict is exactly right - your real configuration lives in `.env`, which `update.sh` never merges. If instead the deployment has drifted heavily and the dry run shows an unmanageable number of conflicts, a clean reinstall at the latest release with `setup.sh` (reusing your `.env` and data volumes) can be less work than resolving them all.
+
+</Admonition>
+
+## Restore from backup
+
+Configuration backups are written to `backups/pre-update-*.tgz` before each update. If something goes wrong, extract or compare against that archive.
+
+## Command-line options
+
+| Flag           | Purpose                                                     |
+| -------------- | ----------------------------------------------------------- |
+| `--dry-run`    | Show the plan; write nothing                                |
+| `--to <tag>`   | Update to a specific release                                |
+| `--from <ref>` | Supply the base version when `.supabase-version` is missing |
+| `--yes`        | Skip the breaking-change confirmation prompt                |

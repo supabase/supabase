@@ -8,6 +8,11 @@ import { ChartEmptyState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { Row } from 'ui-patterns/Row'
 
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  buildUnifiedLogsUrl,
+  type UnifiedLogType,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
@@ -34,6 +39,7 @@ type ServiceEntry = {
   title: string
   href?: string
   route: string
+  logType: UnifiedLogType
   enabled: boolean
 }
 
@@ -55,6 +61,7 @@ export const ProjectUsageSection = () => {
   ])
   const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const DEFAULT_INTERVAL: ChartIntervalKey =
     retentionDays !== undefined && retentionDays < 7 ? '1hr' : '1day'
@@ -116,6 +123,7 @@ export const ProjectUsageSection = () => {
         title: 'Database requests',
         href: `/project/${projectRef}/editor`,
         route: '/logs/postgres-logs',
+        logType: 'postgres',
         enabled: true,
       },
       {
@@ -123,6 +131,7 @@ export const ProjectUsageSection = () => {
         title: 'Auth requests',
         href: `/project/${projectRef}/auth/users`,
         route: '/logs/auth-logs',
+        logType: 'auth',
         enabled: authEnabled,
       },
       {
@@ -130,6 +139,7 @@ export const ProjectUsageSection = () => {
         title: 'Storage requests',
         href: `/project/${projectRef}/storage/buckets`,
         route: '/logs/storage-logs',
+        logType: 'storage',
         enabled: storageEnabled,
       },
       {
@@ -137,6 +147,7 @@ export const ProjectUsageSection = () => {
         title: 'Realtime requests',
         href: `/project/${projectRef}/realtime/inspector`,
         route: '/logs/realtime-logs',
+        logType: 'realtime',
         enabled: true,
       },
     ],
@@ -179,26 +190,30 @@ export const ProjectUsageSection = () => {
     [serviceBase, filledCharts, isLoading, error]
   )
 
-  const handleBarClick =
-    (logRoute: string, serviceKey: ServiceKey) => (datum: LogsBarChartDatum) => {
-      if (!datum?.timestamp) return
+  const handleBarClick = (service: ServiceEntry) => (datum: LogsBarChartDatum) => {
+    if (!datum?.timestamp) return
 
-      const datumTimestamp = dayjs(datum.timestamp).toISOString()
-      const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
-      const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
+    const datumTimestamp = dayjs(datum.timestamp).toISOString()
+    const start = dayjs(datumTimestamp).subtract(1, 'minute').toISOString()
+    const end = dayjs(datumTimestamp).add(1, 'minute').toISOString()
 
+    if (isUnifiedLogsEnabled) {
+      router.push(
+        buildUnifiedLogsUrl({ projectRef: projectRef!, logType: service.logType, start, end })
+      )
+    } else {
       const queryParams = new URLSearchParams({
         iso_timestamp_start: start,
         iso_timestamp_end: end,
       })
-
-      router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
-
-      track('home_project_usage_chart_clicked', {
-        service_type: serviceKey,
-        bar_timestamp: datum.timestamp,
-      })
+      router.push(`/project/${projectRef}${service.route}?${queryParams.toString()}`)
     }
+
+    track('home_project_usage_chart_clicked', {
+      service_type: service.key,
+      bar_timestamp: datum.timestamp,
+    })
+  }
 
   const enabledServices = services.filter((s) => s.enabled)
   const totalRequests = enabledServices.reduce((sum, s) => sum + (s.total || 0), 0)
@@ -252,7 +267,7 @@ export const ProjectUsageSection = () => {
                   data={s.data}
                   error={s.error}
                   DateTimeFormat={datetimeFormat}
-                  onBarClick={handleBarClick(s.route, s.key)}
+                  onBarClick={handleBarClick(s)}
                   hideZeroValues={true}
                   chartConfig={{
                     error_count: {

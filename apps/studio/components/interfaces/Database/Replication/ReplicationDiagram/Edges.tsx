@@ -5,8 +5,7 @@ import { useMemo } from 'react'
 import { cn } from 'ui'
 
 import { getStatusName } from '../Pipeline.utils'
-import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
+import { REPLICA_STATUS, STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
@@ -56,7 +55,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   if (isComingUp) {
     return {
       Icon: Loader2,
-      color: 'hsl(var(--foreground-light))',
+      color: 'var(--foreground-light)',
       opacity: 1,
       dashArray: '5',
       shouldAnimate: true,
@@ -74,7 +73,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   }
   return {
     Icon: Square,
-    color: 'hsl(var(--foreground-lighter))',
+    color: 'var(--foreground-lighter)',
     opacity: 0.5,
     dashArray: '5 5',
     shouldAnimate: false,
