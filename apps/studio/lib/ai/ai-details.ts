@@ -38,7 +38,8 @@ export const getAIDetails = async ({
       getOrganizations({ headers }),
       getOrgSubscription({ orgSlug }, undefined, headers),
       checkEntitlement(orgSlug, 'assistant.advance_model', undefined, headers),
-      getProjectDetail({ ref: projectRef }, undefined, headers),
+      // skipWake: only organization_id and region are needed, neither requires a running project
+      getProjectDetail({ ref: projectRef, skipWake: true }, undefined, headers),
       getProjectSettings({ projectRef }, undefined, headers),
     ])
 

@@ -146,7 +146,17 @@ describe('getAIDetails', () => {
 
     expect(mockGetOrganizations).toHaveBeenCalledWith({ headers: HEADERS })
     expect(mockGetOrgSubscription).toHaveBeenCalledWith({ orgSlug: ORG_SLUG }, undefined, HEADERS)
-    expect(mockGetProjectDetail).toHaveBeenCalledWith({ ref: PROJECT_REF }, undefined, HEADERS)
+    expect(mockCheckEntitlement).toHaveBeenCalledWith(
+      ORG_SLUG,
+      'assistant.advance_model',
+      undefined,
+      HEADERS
+    )
+    expect(mockGetProjectDetail).toHaveBeenCalledWith(
+      { ref: PROJECT_REF, skipWake: true },
+      undefined,
+      HEADERS
+    )
     expect(mockGetProjectSettings).toHaveBeenCalledWith(
       { projectRef: PROJECT_REF },
       undefined,
