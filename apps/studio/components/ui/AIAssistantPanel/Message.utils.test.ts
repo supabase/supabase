@@ -101,6 +101,12 @@ describe('defaultUrlTransform', () => {
     )
   })
 
+  it('passes through irc URLs unchanged', () => {
+    expect(defaultUrlTransform('irc://irc.example.com/channel')).toBe(
+      'irc://irc.example.com/channel'
+    )
+  })
+
   it('passes through relative paths unchanged', () => {
     expect(defaultUrlTransform('/path/to/resource')).toBe('/path/to/resource')
   })

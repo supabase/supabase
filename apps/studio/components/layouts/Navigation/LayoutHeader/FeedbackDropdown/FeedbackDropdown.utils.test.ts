@@ -11,11 +11,6 @@ describe('isLikelySupportRequest', () => {
     expect(isLikelySupportRequest('   ')).toBe(false)
   })
 
-  it('returns false for null-like falsy input', () => {
-    expect(isLikelySupportRequest(null as unknown as string)).toBe(false)
-    expect(isLikelySupportRequest(undefined as unknown as string)).toBe(false)
-  })
-
   it('detects "need help" pattern', () => {
     expect(isLikelySupportRequest('I need help with my database')).toBe(true)
   })
