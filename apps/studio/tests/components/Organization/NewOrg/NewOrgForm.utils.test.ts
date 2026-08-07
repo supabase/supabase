@@ -3,11 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { findDuplicateOrganizationByName } from '@/components/interfaces/Organization/NewOrg/NewOrgForm.utils'
 
 describe('findDuplicateOrganizationByName', () => {
-  const organizations = [
-    { name: 'Acme Inc.' },
-    { name: 'Personal' },
-    { name: 'my org' },
-  ]
+  const organizations = [{ name: 'Acme Inc.' }, { name: 'Personal' }, { name: 'my org' }]
 
   test('finds an exact name match', () => {
     expect(findDuplicateOrganizationByName(organizations, 'Acme Inc.')).toBe(organizations[0])

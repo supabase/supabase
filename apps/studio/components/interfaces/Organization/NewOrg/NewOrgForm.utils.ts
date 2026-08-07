@@ -1,7 +1,11 @@
-import { Organization } from "@/types"
-import { useMemo } from "react"
+import { useMemo } from 'react'
 
-export function useFindDuplicatedOrganizationByName(name: string, organizations: Organization[] | undefined) {
+import { Organization } from '@/types'
+
+export function useFindDuplicatedOrganizationByName(
+  name: string,
+  organizations: Organization[] | undefined
+) {
   return useMemo(
     () => findDuplicateOrganizationByName(organizations, name ?? ''),
     [organizations, name]

@@ -72,7 +72,6 @@ describe('NewOrgForm', () => {
       )
     ).toBeInTheDocument()
 
-
     expect(screen.getByRole('button', { name: 'Create organization' })).toBeEnabled()
   })
 
