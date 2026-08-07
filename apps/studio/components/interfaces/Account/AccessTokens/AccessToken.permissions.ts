@@ -623,6 +623,18 @@ export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
   high: 'High risk',
 }
 
+export const PERMISSION_MODE_LABEL: Record<PermissionMode, string> = {
+  none: 'None',
+  read: 'Read',
+  readwrite: 'Read-write',
+}
+
+export const RISK_DOT_CLASS: Record<RiskLevel, string> = {
+  low: 'bg-brand-600',
+  medium: 'bg-warning-600',
+  high: 'bg-destructive-600',
+}
+
 export type ResourceAccessMode = 'project' | 'organization' | 'account'
 
 export interface OverallRisk {
@@ -630,6 +642,16 @@ export interface OverallRisk {
   level: string
   text: string
   tone: 'default' | 'low' | 'medium' | 'high'
+}
+
+export const RISK_TONE_VARIANT: Record<
+  OverallRisk['tone'],
+  'default' | 'success' | 'warning' | 'destructive'
+> = {
+  default: 'default',
+  low: 'success',
+  medium: 'warning',
+  high: 'destructive',
 }
 
 /**
