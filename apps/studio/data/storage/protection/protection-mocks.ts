@@ -39,6 +39,14 @@ export interface BucketSnapshot {
   expiresAt: string | null
 }
 
+/** A noncurrent version attached to a deleted object (not a top-level trash row). */
+export interface DeletedObjectVersion {
+  versionId: string
+  size: number
+  createdAt: string
+  action: ObjectVersionAction
+}
+
 export interface TrashObject {
   id: string
   name: string
@@ -50,6 +58,8 @@ export interface TrashObject {
   expiresAt: string | null
   /** True when a snapshot still references this object (blocks hard-delete). */
   heldBySnapshot: boolean
+  /** Noncurrent versions retained behind the delete marker, if any. */
+  noncurrentVersions?: DeletedObjectVersion[]
 }
 
 export interface BucketRetentionSummary {
@@ -194,6 +204,20 @@ export const getMockTrashObjects = (_bucketId: string): TrashObject[] => [
     size: 1.1 * MB,
     expiresAt: daysAhead(30),
     heldBySnapshot: false,
+    noncurrentVersions: [
+      {
+        versionId: 'v-t1-a',
+        size: 1.05 * MB,
+        createdAt: daysAgo(3, '12:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t1-b',
+        size: 0.98 * MB,
+        createdAt: daysAgo(8, '09:30:00'),
+        action: 'initial upload',
+      },
+    ],
   },
   {
     id: 'trash-2',
@@ -214,6 +238,26 @@ export const getMockTrashObjects = (_bucketId: string): TrashObject[] => [
     size: 820 * KB,
     expiresAt: null,
     heldBySnapshot: true,
+    noncurrentVersions: [
+      {
+        versionId: 'v-t3-a',
+        size: 800 * KB,
+        createdAt: daysAgo(7, '15:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t3-b',
+        size: 750 * KB,
+        createdAt: daysAgo(14, '10:20:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t3-c',
+        size: 680 * KB,
+        createdAt: daysAgo(21, '08:45:00'),
+        action: 'initial upload',
+      },
+    ],
   },
 ]
 

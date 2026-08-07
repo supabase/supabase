@@ -34,7 +34,7 @@ export const TrashSelectionBar = ({
   return (
     <div className={bulkActionBarClassName}>
       <span className="font-mono text-xs text-foreground-light">
-        <span className="tabular-nums">{count}</span> item{count !== 1 ? 's' : ''} selected
+        <span className="tabular-nums">{count}</span> version{count !== 1 ? 's' : ''} selected
       </span>
 
       {heldCount > 0 && (
@@ -53,7 +53,7 @@ export const TrashSelectionBar = ({
             content: {
               side: 'bottom',
               text: !canUpdateFiles
-                ? 'You need additional permissions to restore files'
+                ? 'You need additional permissions to restore versions'
                 : undefined,
             },
           }}
@@ -71,9 +71,9 @@ export const TrashSelectionBar = ({
             content: {
               side: 'bottom',
               text: !canUpdateFiles
-                ? 'You need additional permissions to delete files'
+                ? 'You need additional permissions to delete versions'
                 : isEveryItemHeld
-                  ? 'Every selected file is held by a snapshot'
+                  ? 'Every selected version is held by a snapshot'
                   : undefined,
             },
           }}

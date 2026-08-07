@@ -39,10 +39,12 @@ import {
   DropdownMenuTrigger,
   FieldDescription,
   Label,
+  Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { hasVersioningHistory } from '../StorageProtection.constants'
 import { pageChromeRowClassName } from './storageExplorerChrome'
 import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
 import { useStoragePreference } from './useStoragePreference'
@@ -176,13 +178,18 @@ export const FileExplorerHeader = ({
     setSortByOrder: setPreferenceSortByOrder,
   } = useStoragePreference(projectRef)
 
+  const isVersioned = hasVersioningHistory(snap.selectedBucket?.name)
+  const isShowingDeleted = snap.isShowingDeletedVersions
+
   const breadcrumbs = columns.map((column) => column.name)
   const isListView = view === STORAGE_VIEWS.LIST
   const isBucketRoot = breadcrumbs.length <= 1
   const currentFolderName = breadcrumbs[breadcrumbs.length - 1]
-  const searchPlaceholder = isBucketRoot
-    ? 'Search in root directory...'
-    : `Search in ${currentFolderName}...`
+  const searchPlaceholder = isShowingDeleted
+    ? 'Search deleted versions...'
+    : isBucketRoot
+      ? 'Search in root directory...'
+      : `Search in ${currentFolderName}...`
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   useFileExplorerHeaderShortcuts({
@@ -338,6 +345,22 @@ export const FileExplorerHeader = ({
               onChange={onSearchChange}
               onFocus={() => setIsPathDialogOpen(false)}
             />
+            {isVersioned && (
+              <div className="flex items-center gap-1.5">
+                <Switch
+                  id="show-deleted-versions"
+                  size="small"
+                  checked={isShowingDeleted}
+                  onCheckedChange={snap.setIsShowingDeletedVersions}
+                />
+                <Label
+                  htmlFor="show-deleted-versions"
+                  className="text-xs cursor-pointer whitespace-nowrap"
+                >
+                  Show deleted versions
+                </Label>
+              </div>
+            )}
           </div>
 
           <div className="flex shrink-0 items-center gap-2 whitespace-nowrap">

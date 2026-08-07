@@ -165,6 +165,9 @@ function createStorageExplorerState({
     isSearching: false,
     setIsSearching: (value: boolean) => (state.isSearching = value),
 
+    isShowingDeletedVersions: false,
+    setIsShowingDeletedVersions: (value: boolean) => (state.isShowingDeletedVersions = value),
+
     isRefreshing: false,
 
     selectedFilePreview: undefined as StorageItemWithColumn | undefined,

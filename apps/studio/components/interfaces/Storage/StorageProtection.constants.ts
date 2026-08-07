@@ -11,6 +11,14 @@ export const useIsStorageProtectionEnabled = () => STORAGE_PROTECTION_ENABLED
 export type BucketVersioningState = 'enabled' | 'suspended' | 'disabled'
 
 /**
+ * AND = a single S3 lifecycle policy — both expiry-days AND max-versions must
+ *       be satisfied before a noncurrent version expires.
+ * OR  = two separate S3 lifecycle rules — either condition independently
+ *       triggers expiration.
+ */
+export type ExpirationMode = 'and' | 'or'
+
+/**
  * Project-wide defaults for object versioning. New buckets inherit these so
  * enabling versioning doesn't require re-deciding retention every time; a bucket
  * can still override them when its churn genuinely differs.
@@ -33,6 +41,8 @@ export interface BucketProtection {
   maxNoncurrentVersions: number | null
   /** True when this bucket's version retention differs from the project default. */
   hasVersioningOverride: boolean
+  /** How the two lifecycle conditions combine — see `ExpirationMode`. */
+  expirationMode: ExpirationMode
 }
 
 const PROTECTED_BUCKETS: Record<string, BucketProtection> = {
@@ -42,6 +52,7 @@ const PROTECTED_BUCKETS: Record<string, BucketProtection> = {
     versionExpiryDays: PROJECT_VERSIONING_DEFAULTS.versionExpiryDays,
     maxNoncurrentVersions: PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions,
     hasVersioningOverride: false,
+    expirationMode: 'and',
   },
   avatars: {
     versioning: 'enabled',
@@ -50,6 +61,7 @@ const PROTECTED_BUCKETS: Record<string, BucketProtection> = {
     versionExpiryDays: 30,
     maxNoncurrentVersions: 10,
     hasVersioningOverride: true,
+    expirationMode: 'or',
   },
 }
 
@@ -61,6 +73,7 @@ const DEFAULT_PROTECTION: BucketProtection = {
   versionExpiryDays: null,
   maxNoncurrentVersions: null,
   hasVersioningOverride: false,
+  expirationMode: 'and',
 }
 
 /** Prototype: derive a bucket's protection config from its name. */
@@ -69,3 +82,22 @@ export const getMockBucketProtection = (bucketName: string | undefined): BucketP
 
 export const isBucketVersioned = (bucketName: string | undefined) =>
   getMockBucketProtection(bucketName).versioning === 'enabled'
+
+/**
+ * True when a bucket has (or previously had) versioning — i.e. it may still
+ * have noncurrent versions or soft-deleted objects to manage, even if
+ * versioning is currently suspended.
+ */
+export const hasVersioningHistory = (bucketName: string | undefined) => {
+  const state = getMockBucketProtection(bucketName).versioning
+  return state === 'enabled' || state === 'suspended'
+}
+
+/**
+ * Prototype: persist bucket protection changes to the in-memory mock store so
+ * the UI reflects them immediately during a session.
+ */
+export const setMockBucketProtection = (bucketName: string, patch: Partial<BucketProtection>) => {
+  const existing = PROTECTED_BUCKETS[bucketName] ?? { ...DEFAULT_PROTECTION }
+  PROTECTED_BUCKETS[bucketName] = { ...existing, ...patch }
+}

@@ -66,14 +66,14 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
   const { mutate: restoreObjects, isPending: isRestoring } = useBucketTrashRestoreMutation({
     onSuccess: (_data, variables) => {
       const count = variables.objectIds.length
-      toast.success(count === 1 ? 'File restored' : `${count} files restored`)
+      toast.success(count === 1 ? 'Version restored' : `${count} versions restored`)
       setSelectedIds([])
     },
   })
 
   const { mutate: deleteObjects, isPending: isDeleting } = useBucketTrashDeleteMutation({
     onSuccess: () => {
-      toast.success('Files permanently deleted')
+      toast.success('Versions permanently deleted')
       setSelectedIds([])
       setObjectToDelete(undefined)
       setShowBulkDelete(false)
@@ -119,8 +119,8 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
                 {selectedBucket && (
                   <p className="text-sm text-foreground-lighter">
                     {isBucketFixed
-                      ? 'Soft-deleted objects in this bucket, restorable until their retention policy expires them'
-                      : `Soft-deleted objects in ${selectedBucket}, restorable until their retention policy expires them`}
+                      ? 'Soft-deleted versions in this bucket, restorable until their expiration policy removes them'
+                      : `Soft-deleted versions in ${selectedBucket}, restorable until their expiration policy removes them`}
                   </p>
                 )}
               </div>
@@ -135,7 +135,7 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
                       side: 'bottom',
                       text:
                         objects.length === heldInBucketCount
-                          ? 'Every deleted file is held by a snapshot'
+                          ? 'Every deleted version is held by a snapshot'
                           : undefined,
                     },
                   }}
@@ -146,12 +146,12 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
             </div>
 
             {isPending && <GenericSkeletonLoader />}
-            {isError && <AlertError error={error} subject="Failed to retrieve deleted files" />}
+            {isError && <AlertError error={error} subject="Failed to retrieve deleted versions" />}
             {isSuccess && objects.length === 0 && (
               <Admonition
                 type="default"
-                title="No deleted files"
-                description="Deleted objects appear here and can be restored until a lifecycle policy removes them."
+                title="No deleted versions"
+                description="Deleted versions appear here and can be restored until their expiration policy removes them."
               />
             )}
             {isSuccess && objects.length > 0 && (
@@ -180,8 +180,8 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
                   />
                 </Card>
                 <p className="text-sm text-foreground-lighter">
-                  Items held by a snapshot stay recoverable — and billable — until every snapshot
-                  referencing them is deleted, even past their retention period.
+                  Versions held by a snapshot stay recoverable — and billable — until every snapshot
+                  referencing them is deleted, even past their expiration period.
                 </p>
               </>
             )}
@@ -193,7 +193,7 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
       <ConfirmationModal
         variant="destructive"
         visible={objectToDelete !== undefined}
-        title="Permanently delete file"
+        title="Permanently delete version"
         confirmLabel="Delete permanently"
         confirmLabelLoading="Deleting..."
         loading={isDeleting}
@@ -217,7 +217,7 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
       <ConfirmationModal
         variant="destructive"
         visible={showBulkDelete}
-        title={`Permanently delete ${deletableIds.length} file${deletableIds.length === 1 ? '' : 's'}`}
+        title={`Permanently delete ${deletableIds.length} version${deletableIds.length === 1 ? '' : 's'}`}
         confirmLabel="Delete permanently"
         confirmLabelLoading="Deleting..."
         loading={isDeleting}
@@ -228,16 +228,16 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
         }}
       >
         <p className="text-sm text-foreground-light">
-          These files will be permanently deleted and can no longer be restored. This action cannot
-          be undone.
+          These versions will be permanently deleted and can no longer be restored. This action
+          cannot be undone.
         </p>
         {heldCount > 0 && (
           <Admonition
             className="mt-3"
             type="warning"
             showIcon={false}
-            title={`${heldCount} selected file${heldCount === 1 ? '' : 's'} will be kept`}
-            description="Files held by a snapshot can't be deleted until every snapshot referencing them is deleted."
+            title={`${heldCount} selected version${heldCount === 1 ? '' : 's'} will be kept`}
+            description="Versions held by a snapshot can't be deleted until every snapshot referencing them is deleted."
           />
         )}
       </ConfirmationModal>
@@ -247,7 +247,7 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
         variant="destructive"
         visible={showDeleteAll}
         size="medium"
-        title={`Delete all deleted files in “${selectedBucket}”`}
+        title={`Delete all deleted versions in "${selectedBucket}"`}
         confirmLabel="Delete all permanently"
         confirmPlaceholder="Type bucket name"
         confirmString={selectedBucket ?? ''}
@@ -258,16 +258,16 @@ export const Trash = ({ bucketId }: TrashProps = {}) => {
           deleteObjects({ projectRef: ref, bucketId: selectedBucket })
         }}
         alert={{
-          title: 'You cannot recover these files once deleted',
+          title: 'You cannot recover these versions once deleted',
           description: 'This action cannot be undone',
         }}
       >
         <p className="text-sm">
-          Every soft-deleted file in{' '}
+          Every soft-deleted version in{' '}
           <span className="font-bold text-foreground">{selectedBucket}</span> will be permanently
           deleted.
           {heldInBucketCount > 0 &&
-            ` ${heldInBucketCount} file${heldInBucketCount === 1 ? '' : 's'} held by a snapshot will be kept.`}
+            ` ${heldInBucketCount} version${heldInBucketCount === 1 ? '' : 's'} held by a snapshot will be kept.`}
         </p>
       </TextConfirmModal>
     </>

@@ -192,7 +192,7 @@ const BucketPage: NextPageWithLayout = () => {
             </NavMenuItem>
             <NavMenuItem active={view === 'trash'}>
               <button type="button" onClick={() => setView('trash')}>
-                Deleted files
+                Deleted versions
               </button>
             </NavMenuItem>
           </NavMenu>
