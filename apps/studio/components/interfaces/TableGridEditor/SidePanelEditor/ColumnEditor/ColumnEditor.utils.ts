@@ -57,7 +57,14 @@ export const displayColumnType = (
 ): string => {
   const bareFormat = isArray && format.startsWith('_') ? format.slice(1) : format
   const normalized = normalizeFormatSchema(formatSchema)
-  const qualified = normalized ? `${normalized}.${bareFormat}` : bareFormat
+  if (!normalized) {
+    return isArray ? `${bareFormat}[]` : bareFormat
+  }
+
+  const escapedSchema = normalized.replace(/"/g, '""')
+  const escapedFormat = bareFormat.replace(/"/g, '""')
+  const qualified = `"${escapedSchema}"."${escapedFormat}"`
+
   return isArray ? `${qualified}[]` : qualified
 }
 
