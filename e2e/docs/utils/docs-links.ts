@@ -76,15 +76,3 @@ export async function browserLikeUserAgent(page: Page): Promise<string> {
   const userAgent = await page.evaluate(() => navigator.userAgent)
   return userAgent.replace('HeadlessChrome', 'Chrome')
 }
-
-/**
- * Parse DOCS_E2E_PAGE_PATHS (comma- or newline-separated /docs/... paths).
- */
-export function parseDocsE2EPagePaths(raw: string | undefined): string[] {
-  if (!raw?.trim()) return []
-  return raw
-    .split(/[\n,]/)
-    .map((path) => path.trim())
-    .filter(Boolean)
-    .map((path) => (path.startsWith('/') ? path : `/${path}`))
-}

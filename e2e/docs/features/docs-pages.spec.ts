@@ -1,14 +1,14 @@
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
+import { parsePagePaths } from '../../shared/paths.ts'
 import {
   articleSelectorForPagePath,
   browserLikeUserAgent,
   collectDocsOwnedLinks,
-  parseDocsE2EPagePaths,
 } from '../utils/docs-links.js'
 
-const pagePaths = parseDocsE2EPagePaths(process.env.DOCS_E2E_PAGE_PATHS)
+const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
 
 test.describe('Docs owned pages', () => {
   // playwright.config.ts sets fullyParallel: false, and Playwright shards

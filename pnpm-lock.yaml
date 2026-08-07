@@ -2028,6 +2028,12 @@ importers:
         specifier: 'catalog:'
         version: 22.13.14
 
+  e2e/shared:
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+
   e2e/studio:
     dependencies:
       '@playwright/test':
@@ -2055,6 +2061,22 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.22.4
+
+  e2e/www:
+    dependencies:
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
+    devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
 
   packages/ai-commands:
     dependencies:
@@ -10253,6 +10275,7 @@ packages:
   cron-parser@4.9.0:
     resolution: {integrity: sha512-p0SaNjrHOnQeR8/VnfGbmg9te2kfyYSQ7Sc/j/6DtPL3JQvKxmjO9TSjNFpujqV3vEYYBvNNvXSxzyksBWAx1Q==}
     engines: {node: '>=12.0.0'}
+    deprecated: v4 is no longer maintained, upgrade to v5
 
   croner@10.0.1:
     resolution: {integrity: sha512-ixNtAJndqh173VQ4KodSdJEI6nuioBWI0V1ITNKhZZsO0pEMoDxz539T4FTTbSZ/xIOSuDnzxLVRqBVSvPNE2g==}
@@ -10285,6 +10308,7 @@ packages:
 
   crypto-js@4.2.0:
     resolution: {integrity: sha512-KALDyEYgpY+Rlob/iriUtjV6d5Eq+Y191A5g4UqLAi8CyGP9N1+FdVbkc1SxKc2r4YAYqG8JzO2KGL+AizD70Q==}
+    deprecated: Active development of CryptoJS has been discontinued. This library is no longer maintained.
 
   css-background-parser@0.1.0:
     resolution: {integrity: sha512-2EZLisiZQ+7m4wwur/qiYJRniHX4K5Tc9w93MT3AS0WS1u5kaZ4FKXlOTBhOjc+CgEgPiGY+fX1yWD8UwpEqUA==}
