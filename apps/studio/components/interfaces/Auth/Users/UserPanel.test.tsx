@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { ResizablePanelGroup } from 'ui'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { UserPanel } from './UserPanel'
 import type { User } from '@/data/auth/users-infinite-query'
@@ -69,8 +69,14 @@ const renderPanel = (disabledFeatures: string[] = []) => {
 }
 
 describe('UserPanel', () => {
+  const desktopWidth = window.innerWidth
+
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: desktopWidth })
   })
 
   it('shows the Logs tab when logs:all is enabled', async () => {
@@ -87,5 +93,15 @@ describe('UserPanel', () => {
     expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
     expect(screen.queryByRole('tab', { name: 'Logs' })).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
+  })
+
+  it('uses a full-width dialog on mobile', async () => {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 })
+
+    renderPanel([])
+
+    const dialog = await screen.findByRole('dialog', { name: 'User details' })
+    expect(dialog).toHaveClass('w-screen')
+    expect(screen.getByRole('button', { name: 'Close user details' })).toBeInTheDocument()
   })
 })
