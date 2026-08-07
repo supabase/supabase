@@ -103,7 +103,7 @@ export const ObservabilityMenu = () => {
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : (
-        <div className="flex flex-col gap-y-6">
+        <div className="flex flex-col">
           <ProductMenu
             page={pageKey}
             menu={menuItems.map((item) => ({
@@ -115,7 +115,7 @@ export const ObservabilityMenu = () => {
           {IS_PLATFORM && (
             <>
               <div className="h-px w-full bg-border-overlay" />
-              <div className="mx-2">
+              <div className="mx-2 my-4">
                 <Menu type="pills">
                   <Menu.Group
                     title={
