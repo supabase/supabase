@@ -265,7 +265,7 @@ export const NewScopedTokenFormReview = ({
                 onClick={onSelectLegacyToken}
                 tabIndex={0}
               >
-                create a legacy token
+                Create a legacy token
               </button>
               .
             </p>
