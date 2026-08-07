@@ -156,7 +156,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
 - [x] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
-- [x] A `routes/project/$ref/explorer.tsx` ← `pages/project/[ref]/explorer/index.tsx` (new placeholder page; leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
+- [x] `routes/project/$ref/explorer.tsx` — converted from a leaf into a shell (`ExplorerLayout` + `Outlet`) to host the new `/explorer/notebook/$id` leaf; parent `project/$ref.tsx` shell still provides DefaultLayout.
 
 ### Project shell — `/api/*`
 
@@ -321,6 +321,11 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/editor/index.tsx` ← `pages/project/[ref]/editor/index.tsx`
 - [x] A `routes/project/$ref/editor/$id.tsx` ← `pages/project/[ref]/editor/[id].tsx`
 - [x] A `routes/project/$ref/editor/new.tsx` ← `pages/project/[ref]/editor/new.tsx`
+
+### Project shell — `/explorer/*`
+
+- [x] A `routes/project/$ref/explorer/index.tsx` ← `pages/project/[ref]/explorer/index.tsx`
+- [x] A `routes/project/$ref/explorer/notebook/$id.tsx` ← `pages/project/[ref]/explorer/notebook/[id].tsx`
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 
