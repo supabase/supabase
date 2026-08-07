@@ -58,7 +58,6 @@ export const TokenFormSchema = z
     resourceAccess: z.enum(RESOURCE_ACCESS_MODES),
     organizationSlugs: z.string().array().optional().default([]),
     projectRefs: z.string().array().optional().default([]),
-    accountConfirmed: z.boolean().optional(),
     permissions: z.record(z.string(), z.enum(['none', 'read', 'readwrite'])),
   })
   .superRefine((data, ctx) => {
