@@ -209,7 +209,7 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
         <paragraph>
           Warp supports remote MCP servers natively, so no local proxy is needed. You can also add
           the server from the UI: open the MCP servers page (<strong>Settings</strong> &gt;{' '}
-          <strong>AI</strong> &gt; <strong>MCP Servers</strong>, or search for MCP in the command
+          <strong>Agents</strong> &gt; <strong>MCP Servers</strong>, or search for MCP in the command
           palette), click <strong>+ Add</strong>, and paste the same JSON.
         </paragraph>
         <paragraph>
