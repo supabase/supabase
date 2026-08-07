@@ -74,7 +74,10 @@ export const NotebookEditor = () => {
             <Button
               variant="text"
               className="group"
-              onClick={() => setIsEditingTitle(true)}
+              onClick={() => {
+                setTitleValue(name ?? '')
+                setIsEditingTitle(true)
+              }}
               iconRight={<Edit className="opacity-0 group-hover:opacity-100" />}
             >
               {name}
