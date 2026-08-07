@@ -48,6 +48,8 @@ export const getReportAttributesV2: (
     {
       id: 'ram-usage',
       label: 'Memory usage',
+      titleTooltip:
+        'Watch for three hazardous patterns: (1) Used memory approaching or spiking past the Total RAM line - the database may go offline. (2) Steady linear growth over time - likely a memory leak or workload outgrowing the current compute size. (3) Shrinking Cache + Buffers under sustained load - Postgres has less buffer pool available, increasing disk reads and degrading query performance.',
       docsUrl: `${DOCS_URL}/guides/telemetry/reports#memory-usage`,
       hide: false,
       showTooltip: true,
