@@ -1,8 +1,7 @@
 import { X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { Dialog, VisuallyHidden } from 'radix-ui'
 import { useState } from 'react'
-import { Button, cn, Input, SidePanel, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { Button, cn, Input, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
@@ -47,8 +46,8 @@ export const UserPanel = () => {
         }, {} as Partial<User>)
     : {}
 
-  const content = (
-    <>
+  return (
+    <div className="relative h-full bg-studio">
       <Button
         variant="text"
         className="absolute top-3 right-3 z-10 px-1"
@@ -68,7 +67,7 @@ export const UserPanel = () => {
               <GenericSkeletonLoader />
             </div>
           </div>
-        ) : !!selectedUser ? (
+        ) : selectedUser ? (
           <>
             <TabsList className="flex min-h-[46px] gap-x-4 px-5 pr-12">
               <TabsTrigger
@@ -93,14 +92,12 @@ export const UserPanel = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="overview" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-              {selectedUser && (
-                <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
-              )}
+            <TabsContent value="overview" className="mt-0 grow min-h-0 overflow-y-auto">
+              <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
             </TabsContent>
             {showLogs && (
-              <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                {selectedUser && <UserLogs user={selectedUser} />}
+              <TabsContent value="logs" className="mt-0 grow min-h-0 overflow-y-auto">
+                <UserLogs user={selectedUser} />
               </TabsContent>
             )}
             <TabsContent
@@ -139,23 +136,6 @@ export const UserPanel = () => {
           </div>
         )}
       </Tabs>
-    </>
-  )
-
-  return (
-    <SidePanel
-      visible
-      hideFooter
-      size="large"
-      aria-label="User details"
-      aria-describedby={undefined}
-      className="shadow-none"
-      onCancel={() => setSelectedId(null)}
-    >
-      <VisuallyHidden.VisuallyHidden>
-        <Dialog.Title>User details</Dialog.Title>
-      </VisuallyHidden.VisuallyHidden>
-      {content}
-    </SidePanel>
+    </div>
   )
 }
