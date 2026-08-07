@@ -409,6 +409,11 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
         {
+          name: 'Django (Python)',
+          url: '/guides/getting-started/quickstarts/django' as `/${string}`,
+          enabled: !jsOnly,
+        },
+        {
           name: 'TanStack Start',
           url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
