@@ -6,7 +6,6 @@ import {
   ChevronRight,
   ChevronsDownUp,
   ChevronsUpDown,
-  CornerDownRight,
   RotateCcw,
   Trash2,
 } from 'lucide-react'
@@ -414,12 +413,13 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
 
                 {hasVersions &&
                   isExpanded &&
-                  object.noncurrentVersions!.map((version) => {
+                  object.noncurrentVersions!.map((version, index) => {
                     const key = versionKey(object.id, version.versionId)
                     const isVersionChecked = selectedDeletedIds.includes(key)
                     const isVersionPreviewed =
                       selectedDeletedVersion?.version.versionId === version.versionId &&
                       selectedDeletedVersion?.parentObject.id === object.id
+                    const isLastVersion = index === object.noncurrentVersions!.length - 1
 
                     return (
                       <NoncurrentVersionRow
@@ -428,6 +428,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                         parentObject={object}
                         isChecked={isVersionChecked}
                         isPreviewed={isVersionPreviewed}
+                        isLast={isLastVersion}
                         canUpdateFiles={canUpdateFiles}
                         isRestoring={isRestoringVersion}
                         onToggleSelect={(isShiftHeld) => handleToggle(key, isShiftHeld)}
@@ -503,6 +504,7 @@ interface NoncurrentVersionRowProps {
   parentObject: TrashObject
   isChecked: boolean
   isPreviewed: boolean
+  isLast: boolean
   canUpdateFiles: boolean
   isRestoring: boolean
   onToggleSelect: (isShiftHeld: boolean) => void
@@ -516,6 +518,7 @@ const NoncurrentVersionRow = ({
   canUpdateFiles,
   isChecked,
   isPreviewed,
+  isLast,
   isRestoring,
   onToggleSelect,
   onClick,
@@ -542,9 +545,18 @@ const NoncurrentVersionRow = ({
           aria-label={`Select version ${shortId}`}
         />
       </TableCell>
-      <TableCell className="px-4 py-1.5" colSpan={2}>
-        <div className="flex items-center gap-x-2">
-          <CornerDownRight size={14} className="text-foreground-muted shrink-0" />
+      <TableCell className="relative px-4 py-1.5" colSpan={2}>
+        {/* Tree connector: vertical line */}
+        <div
+          className={cn(
+            'absolute left-[23px] w-px bg-border pointer-events-none',
+            isLast ? 'top-0 h-1/2' : 'inset-y-0'
+          )}
+        />
+        {/* Tree connector: horizontal branch */}
+        <div className="absolute left-[23px] top-1/2 h-px w-[15px] -translate-y-px bg-border pointer-events-none" />
+        {/* Content aligned with parent row text */}
+        <div className="flex items-center gap-x-2 pl-[22px]">
           <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
           <span className="text-foreground-muted text-xs">({version.action})</span>
         </div>
