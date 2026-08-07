@@ -4,6 +4,7 @@ import {
   computeOverallRisk,
   countConfigured,
   getCatalogEntry,
+  scopesToSelection,
   selectionToScopes,
   type PermissionSelection,
 } from './AccessToken.permissions'
@@ -11,6 +12,7 @@ import {
   getEnabledEndpoints,
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
+  normalizePermissionScopeMap,
   type PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
@@ -19,6 +21,102 @@ const scopeMap = (partial: Partial<PermissionScopeMap>): PermissionScopeMap => (
   endpoints: {},
   mcp_tools: {},
   ...partial,
+})
+
+describe('scopesToSelection', () => {
+  it('round-trips studio-created grants (full read/write sets)', () => {
+    expect(scopesToSelection(['database_read', 'database_write'])).toEqual({
+      'project:database': 'readwrite',
+    })
+    expect(scopesToSelection(['database_read'])).toEqual({ 'project:database': 'read' })
+    expect(scopesToSelection([])).toEqual({})
+  })
+
+  // API-created tokens can hold partial scope sets; the derived mode is an upper bound so the
+  // review UI never claims 'Minimal — no capabilities' for a token with real authority.
+  it('never drops partial grants from API-created tokens', () => {
+    // A lone create scope (one of the entry's three write scopes) still surfaces as readwrite.
+    expect(scopesToSelection(['branching_development_create'])).toEqual({
+      'project:branching_development': 'readwrite',
+    })
+    // A write grant without the read scopes still surfaces (upper-bound readwrite).
+    expect(scopesToSelection(['project_admin_write'])).toEqual({ 'project:admin': 'readwrite' })
+  })
+})
+
+describe('normalizePermissionScopeMap', () => {
+  // A stale CDN entry can serve the pre-groups payload (flat conjunctive string[] per endpoint)
+  // to a client whose evaluators expect string[][]; without normalization group.every crashes.
+  it('interprets a stale flat payload as single conjunctive groups', () => {
+    const normalized = normalizePermissionScopeMap({
+      scopes: {},
+      endpoints: {
+        'GET /v1/projects': ['projects_read', 'organization_projects_read'],
+      },
+      mcp_tools: { execute_sql: ['database_read', 'database_write'] },
+    })
+
+    expect(normalized.endpoints['GET /v1/projects']).toEqual([
+      ['projects_read', 'organization_projects_read'],
+    ])
+    expect(normalized.mcp_tools.execute_sql).toEqual([['database_read', 'database_write']])
+    // The normalized shape evaluates without throwing
+    expect(
+      getEnabledMcpTools({ grantedScopes: ['database_read'], permissionScopeMap: normalized })
+    ).toEqual([])
+  })
+
+  it('passes the current grouped payload through unchanged', () => {
+    const grouped: PermissionScopeMap = {
+      scopes: {},
+      endpoints: { 'GET /v1/branches': [['branching_development_read']] },
+      mcp_tools: { search_docs: [[]], broken_tool: [] },
+    }
+
+    expect(normalizePermissionScopeMap(grouped)).toEqual(grouped)
+  })
+
+  it('tolerates payloads missing any of the three maps entirely', () => {
+    const normalized = normalizePermissionScopeMap({})
+
+    expect(normalized.scopes).toEqual({})
+    expect(normalized.endpoints).toEqual({})
+    expect(normalized.mcp_tools).toEqual({})
+  })
+
+  it('fails closed (nobody) on values that are not arrays at all', () => {
+    const normalized = normalizePermissionScopeMap({
+      scopes: {},
+      endpoints: { 'GET /v1/projects': null },
+      mcp_tools: { execute_sql: 'database_read' },
+    })
+
+    expect(normalized.endpoints['GET /v1/projects']).toEqual([])
+    expect(normalized.mcp_tools.execute_sql).toEqual([])
+  })
+
+  // response.json() can legally produce any of these (a null body, an error string); the
+  // normalizer is the boundary and must return the fail-closed empty map, not throw.
+  it('fails closed on a top-level payload that is not an object', () => {
+    const empty = { scopes: {}, endpoints: {}, mcp_tools: {} }
+
+    expect(normalizePermissionScopeMap(null)).toEqual(empty)
+    expect(normalizePermissionScopeMap(undefined)).toEqual(empty)
+    expect(normalizePermissionScopeMap('internal server error')).toEqual(empty)
+    expect(normalizePermissionScopeMap([])).toEqual(empty)
+  })
+
+  it('empties a field whose record shape is wrong without discarding the rest', () => {
+    const normalized = normalizePermissionScopeMap({
+      scopes: { database_read: { endpoints: 'not-an-array', mcp_tools: [] } },
+      endpoints: { 'GET /v1/projects': [['projects_read']] },
+      mcp_tools: null,
+    })
+
+    expect(normalized.scopes).toEqual({})
+    expect(normalized.endpoints['GET /v1/projects']).toEqual([['projects_read']])
+    expect(normalized.mcp_tools).toEqual({})
+  })
 })
 
 describe('selectionToScopes', () => {
@@ -120,23 +218,29 @@ describe('permission scope map (group enforcement)', () => {
     ).not.toContain('execute_sql')
   })
 
-  it('reports ungated tools (no groups) as enabled for any token, including one with no scopes', () => {
-    // search_docs hits the content API and get_project_url builds a hostname string, so no
+  it('reports ungated tools (one empty group) as enabled for any token, including one with no scopes', () => {
+    // search_docs hits the public content API and confirm_cost computes a local hash, so no
     // permission gates either — the review step should say so rather than hide them.
     const permissionScopeMap = scopeMap({
-      mcp_tools: { search_docs: [[]], get_project_url: [[]], get_cost: [[]] },
+      mcp_tools: { search_docs: [[]], confirm_cost: [[]] },
     })
 
     expect(getEnabledMcpTools({ grantedScopes: ['database_read'], permissionScopeMap })).toEqual([
       'search_docs',
-      'get_project_url',
-      'get_cost',
+      'confirm_cost',
     ])
     expect(getEnabledMcpTools({ grantedScopes: [], permissionScopeMap })).toEqual([
       'search_docs',
-      'get_project_url',
-      'get_cost',
+      'confirm_cost',
     ])
+  })
+
+  it('never enables a tool whose alternatives were all dropped ([])', () => {
+    const permissionScopeMap = scopeMap({ mcp_tools: { broken_tool: [] } })
+
+    expect(
+      getEnabledMcpTools({ grantedScopes: ['database_read'], permissionScopeMap })
+    ).not.toContain('broken_tool')
   })
 
   it('lists endpoints when at least one alternative group is fully granted', () => {

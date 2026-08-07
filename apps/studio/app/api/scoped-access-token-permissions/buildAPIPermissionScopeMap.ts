@@ -153,12 +153,22 @@ const OPEN_API_PATH_METHOD_SCHEMA = z.object({
   'x-fga-permissions': z.array(z.string().array().optional()).optional(),
 })
 
+const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace'] as const
+
+// OpenAPI path items may legally carry non-operation members (path-level `parameters`, `summary`,
+// `description`, `servers`, `$ref`). z.record with an enum key schema rejects unknown keys
+// outright, which would turn a benign upstream spec change into a 500 for this whole route —
+// strip them before validating the operations.
+const OPEN_API_PATH_ITEM_SCHEMA = z.preprocess(
+  (item) =>
+    item !== null && typeof item === 'object'
+      ? Object.fromEntries(
+          Object.entries(item).filter(([key]) => (HTTP_METHODS as readonly string[]).includes(key))
+        )
+      : item,
+  z.record(z.enum(HTTP_METHODS), OPEN_API_PATH_METHOD_SCHEMA)
+)
+
 const API_SPECS_SCHEMA = z.object({
-  paths: z.record(
-    z.string(),
-    z.record(
-      z.enum(['get', 'post', 'put', 'patch', 'delete', 'options', 'head', 'trace']),
-      OPEN_API_PATH_METHOD_SCHEMA
-    )
-  ),
+  paths: z.record(z.string(), OPEN_API_PATH_ITEM_SCHEMA),
 })

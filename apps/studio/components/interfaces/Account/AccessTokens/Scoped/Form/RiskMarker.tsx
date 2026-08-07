@@ -76,8 +76,12 @@ export const RiskMarker = ({
         )}
         {mcpTools.length > 0 && (
           <div className="space-y-1">
+            {/* getMcpToolsForScopes is associative, not conjunctive: these scopes contribute to
+                the listed tools, but a tool may need scopes from other capabilities too — the
+                review step's enabled-tools list is the authoritative view. Keep this heading
+                distinct from the review step's "MCP tools". */}
             <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              MCP tools
+              Related MCP tools
             </p>
             <p className="font-mono text-xs text-foreground-light">{mcpTools.join(', ')}</p>
           </div>
