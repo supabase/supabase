@@ -2,19 +2,7 @@ import { X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Dialog, VisuallyHidden } from 'radix-ui'
 import { useState } from 'react'
-import {
-  Button,
-  cn,
-  Input,
-  ResizableHandle,
-  ResizablePanel,
-  SidePanel,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  useIsMobile,
-} from 'ui'
+import { Button, cn, Input, SidePanel, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
@@ -29,7 +17,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
-  const isMobile = useIsMobile()
 
   const [selectedId, setSelectedId] = useQueryState(
     'show',
@@ -155,37 +142,20 @@ export const UserPanel = () => {
     </>
   )
 
-  if (isMobile) {
-    return (
-      <SidePanel
-        visible
-        hideFooter
-        size="large"
-        aria-label="User details"
-        aria-describedby={undefined}
-        className="shadow-none"
-        onCancel={() => setSelectedId(null)}
-      >
-        <VisuallyHidden.VisuallyHidden>
-          <Dialog.Title>User details</Dialog.Title>
-        </VisuallyHidden.VisuallyHidden>
-        {content}
-      </SidePanel>
-    )
-  }
-
   return (
-    <>
-      <ResizableHandle withHandle />
-      <ResizablePanel
-        defaultSize="35"
-        maxSize="45"
-        minSize="35"
-        aria-label="User details"
-        className="bg-studio border-t"
-      >
-        {content}
-      </ResizablePanel>
-    </>
+    <SidePanel
+      visible
+      hideFooter
+      size="large"
+      aria-label="User details"
+      aria-describedby={undefined}
+      className="shadow-none"
+      onCancel={() => setSelectedId(null)}
+    >
+      <VisuallyHidden.VisuallyHidden>
+        <Dialog.Title>User details</Dialog.Title>
+      </VisuallyHidden.VisuallyHidden>
+      {content}
+    </SidePanel>
   )
 }

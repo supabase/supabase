@@ -1,7 +1,6 @@
 import { screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
-import { ResizablePanelGroup } from 'ui'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { UserPanel } from './UserPanel'
 import type { User } from '@/data/auth/users-infinite-query'
@@ -53,30 +52,19 @@ const renderPanel = (disabledFeatures: string[] = []) => {
     )
   )
 
-  return customRender(
-    <ResizablePanelGroup orientation="horizontal">
-      <UserPanel />
-    </ResizablePanelGroup>,
-    {
-      nuqs: { searchParams: `?show=${mockUser.id}` },
-      profileContext: createMockProfileContext({
-        profile: {
-          disabled_features: disabledFeatures as any,
-        } as any,
-      }),
-    }
-  )
+  return customRender(<UserPanel />, {
+    nuqs: { searchParams: `?show=${mockUser.id}` },
+    profileContext: createMockProfileContext({
+      profile: {
+        disabled_features: disabledFeatures as any,
+      } as any,
+    }),
+  })
 }
 
 describe('UserPanel', () => {
-  const desktopWidth = window.innerWidth
-
   beforeEach(() => {
     vi.clearAllMocks()
-  })
-
-  afterEach(() => {
-    Object.defineProperty(window, 'innerWidth', { configurable: true, value: desktopWidth })
   })
 
   it('shows the Logs tab when logs:all is enabled', async () => {
@@ -95,13 +83,11 @@ describe('UserPanel', () => {
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
   })
 
-  it('uses a full-width dialog on mobile', async () => {
-    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 390 })
-
+  it('uses the full-width Table Editor side panel', async () => {
     renderPanel([])
 
     const dialog = await screen.findByRole('dialog', { name: 'User details' })
-    expect(dialog).toHaveClass('w-screen')
+    expect(dialog).toHaveClass('w-screen', 'max-w-2xl')
     expect(screen.getByRole('button', { name: 'Close user details' })).toBeInTheDocument()
   })
 })
