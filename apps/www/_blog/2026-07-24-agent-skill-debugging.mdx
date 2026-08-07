@@ -1,0 +1,96 @@
+---
+title: 'Introducing the Supabase debugging skills'
+description: 'The Supabase agent skill now includes a debugging workflow: isolate the failing layer, narrow log queries, and fix the root cause instead of scanning everything.'
+author: jordi,steven_eubank
+imgSocial: 2026-07-24-agent-skill-debugging/og.jpg
+imgThumb: 2026-07-24-agent-skill-debugging/thumb.jpg
+categories:
+  - product
+tags:
+  - ai
+  - skills
+  - debugging
+  - developer-tools
+date: '2026-07-24'
+toc_depth: 2
+---
+
+The [Supabase agent skill](https://github.com/supabase/agent-skills) now includes a debugging workflow. When your agent hits a Supabase error, it reproduces the error, isolates which service produced it, and runs one narrow log query against that exact source, instead of scanning every log source with no time bound.
+
+The skill is built from the same investigation approach Supabase's own engineers already use to debug production issues, adapted here for customer-safe use through the `query_logs` MCP tool.
+
+## Agents are a debugging surface now
+
+Claude Code, Cursor, and other coding agents connect to Supabase through the [Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp) or the CLI. Agents no longer only write your Supabase code. They also debug it when something breaks.
+
+Left on their own, agents default to the same failure mode: a broad, all-source log scan. `select *` across every service, no time bound, no filter. That buries the one line that matters under everything that doesn't, floods the agent's context, and on paid projects, runs up the data scanned. The result is an agent that reads a lot of logs and still can't tell you why the request failed.
+
+## Debug by evidence, not by guessing
+
+The skill teaches a loop instead of a shortcut.
+
+**Reproduce and read the exact error.** A `401` is not a `403`. `PGRST002` is not `PGRST106`. A Postgres `42501` points at a permission problem; `42P01` points at a missing relation. With `supabase-js`, errors are returned, not thrown, so the skill checks that the code actually reads `error` from `{ data, error }` before assuming nothing went wrong.
+
+**Isolate the failing layer.** A request from the client passes through several services before it reaches Postgres:
+
+```
+Client (supabase-js / SSR)
+  → Edge / API gateway            → edge_logs
+  → PostgREST (Data/REST API)     → postgrest_logs
+  → GoTrue (Auth)                 → auth_logs
+  → Storage API                   → storage_logs
+  → Realtime                      → realtime_logs
+  → Supavisor (connection pooler) → supavisor_logs
+  → Postgres (SQL, RLS, triggers) → postgres_logs
+```
+
+Errors propagate up, so the layer that reports the error is often not the layer that caused it. A permission error at the API layer is usually a Postgres RLS or privilege problem one layer down. The skill's job is to point the agent at the right layer before it starts pulling logs.
+
+**Gather evidence, one source at a time.** Supabase logs live in a single ClickHouse `logs` table, tagged by `source`. The skill's rule: pick the one most-specific source for the symptom, bound the time window, select only the columns you need, and widen only when a query comes up empty.
+
+```sql
+select timestamp,
+       log_attributes['parsed.user_name'] as role,
+       event_message
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] = '42501'
+order by timestamp desc
+limit 100;
+```
+
+That query answers "who hit a permission error, and on what statement" in one pass. The alternative, an all-source dump with no filter, answers nothing faster and costs more to run.
+
+**Apply the fix, then verify.** The loop isn't done until the agent re-runs the failing operation and confirms the log line is clean. A fix nobody re-ran is a guess with extra steps.
+
+## A symptom-to-fix map, from the docs you already trust
+
+Underneath the loop, the skill carries a routing table built from Supabase's own troubleshooting guides: RLS and access (empty arrays, `42501` permission denied), the Data API (`PGRST002`, schema cache misses), Auth (sessions, JWT claims, OAuth, OTP), the database (statement timeouts, sequences, locks), connections and the Supavisor pooler, Edge Functions (`401`/`404`/`500`/`503`/`504`/`546`), Realtime, and Storage.
+
+The same loop, request stack, and routing table are now documented in the [Debugging guide](https://supabase.com/docs/guides/telemetry/debugging), so you can follow the workflow yourself, not only through an agent.
+
+Take the classic case: a query returns an empty array even though the rows exist. The skill walks the agent through checking whether RLS is enabled on the table, testing the policy by impersonating the `authenticated` role in the SQL editor, and, if no policy matches, adding one scoped to the owner:
+
+```sql
+create policy "read own rows" on your_table for select
+to authenticated using ((select auth.uid()) = user_id);
+```
+
+Or take a `500` on a form submission. The agent finds it in `edge_logs`, follows the request id or timestamp into `postgrest_logs`, and from there into `postgres_logs`, where the actual SQL error is sitting in `event_message`. Same loop, different layer.
+
+## How to use it
+
+Install the skill, then ask your agent to debug:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+The agent uses `query_logs` and `get_advisors` through the Supabase MCP server when it's connected, or the Logs Explorer directly, to gather evidence before proposing a fix.
+
+- [Debugging Supabase issues](https://supabase.com/docs/guides/telemetry/debugging)
+- [Supabase Agent Skills on GitHub](https://github.com/supabase/agent-skills)
+- [Supabase MCP setup guide](https://supabase.com/docs/guides/getting-started/mcp)
+- [Agent Skills guide](https://supabase.com/docs/guides/ai-tools/ai-skills)
+
+Found a gap in the debugging workflow? [Open an issue](https://github.com/supabase/agent-skills/issues) on the repo.
