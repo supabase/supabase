@@ -1,14 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import {
-  ChevronDown,
-  ChevronRight,
-  ChevronsDownUp,
-  ChevronsUpDown,
-  RotateCcw,
-  Trash2,
-} from 'lucide-react'
+import { ChevronDown, ChevronRight, RotateCcw, Trash2 } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -287,22 +280,20 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
             <TableHead className="text-right">Size</TableHead>
             <TableHead className="text-right">
               {expandableIds.length > 0 && (
-                <div className="flex items-center justify-end gap-x-1">
-                  <ButtonTooltip
-                    variant="text"
-                    size="tiny"
-                    className="px-1"
-                    icon={
-                      isAllExpanded ? <ChevronsDownUp size={14} /> : <ChevronsUpDown size={14} />
-                    }
-                    onClick={isAllExpanded ? collapseAll : expandAll}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: isAllExpanded ? 'Collapse all versions' : 'Expand all versions',
-                      },
-                    }}
-                  />
+                <div className="flex items-center justify-end gap-x-2 text-xs font-normal">
+                  <button
+                    className="text-foreground-lighter hover:text-foreground transition-colors"
+                    onClick={expandAll}
+                  >
+                    Expand all
+                  </button>
+                  <span className="text-border-stronger">·</span>
+                  <button
+                    className="text-foreground-lighter hover:text-foreground transition-colors"
+                    onClick={collapseAll}
+                  >
+                    Collapse all
+                  </button>
                 </div>
               )}
             </TableHead>
@@ -549,12 +540,12 @@ const NoncurrentVersionRow = ({
         {/* Tree connector: vertical line */}
         <div
           className={cn(
-            'absolute left-[23px] w-px bg-border pointer-events-none',
+            'absolute left-[23px] w-px bg-foreground-muted pointer-events-none',
             isLast ? 'top-0 h-1/2' : 'inset-y-0'
           )}
         />
         {/* Tree connector: horizontal branch */}
-        <div className="absolute left-[23px] top-1/2 h-px w-[15px] -translate-y-px bg-border pointer-events-none" />
+        <div className="absolute left-[23px] top-1/2 h-px w-[11px] -translate-y-px bg-foreground-muted pointer-events-none" />
         {/* Content aligned with parent row text */}
         <div className="flex items-center gap-x-2 pl-[22px]">
           <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
