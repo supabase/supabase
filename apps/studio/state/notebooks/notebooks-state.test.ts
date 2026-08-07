@@ -44,7 +44,7 @@ describe('notebooksState', () => {
 
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ type: 'markdown', content: 'hello' }],
+      cells: [{ id: '1', _tag: 'markdown_cell', text: 'hello' }],
     })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
@@ -56,7 +56,7 @@ describe('notebooksState', () => {
 
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ type: 'markdown', content: 'hello' }],
+      cells: [{ id: '1', _tag: 'markdown_cell', text: 'hello' }],
     })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('new')
@@ -66,7 +66,7 @@ describe('notebooksState', () => {
     notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ type: 'markdown', content: 'hello' }],
+      cells: [{ id: '1', _tag: 'markdown_cell', text: 'hello' }],
     })
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
 
