@@ -14,6 +14,7 @@ import {
   type RiskLevel,
 } from '../AccessToken.permissions'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
+import { McpUnsupportedWarning } from './McpUnsupportedWarning'
 import { DocsButton } from '@/components/ui/DocsButton'
 import {
   getEnabledEndpointsForCapability,
@@ -322,6 +323,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
                     <div className="flex flex-col gap-3">
                       <h3 className="text-sm">MCP tools</h3>
+                      <McpUnsupportedWarning />
                       {mcpTools.length === 0 ? (
                         <p className="text-xs text-foreground-light">
                           No MCP tools are enabled by the selected capabilities.
