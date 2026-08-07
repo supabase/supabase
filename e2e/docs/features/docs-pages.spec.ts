@@ -11,10 +11,7 @@ import {
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
 
 test.describe('Docs owned pages', () => {
-  // playwright.config.ts sets fullyParallel: false, and Playwright shards
-  // work by file rather than by test in that mode — without this, every test
-  // in this single spec file runs on one worker no matter what --workers is
-  // passed. Opt this describe block into parallel scheduling explicitly.
+  // Without this, every test in this file runs on one worker.
   test.describe.configure({ mode: 'parallel' })
 
   test('resolved page list must not be empty', () => {
