@@ -13,6 +13,7 @@ import {
   type RiskLevel,
 } from '../../AccessToken.permissions'
 import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
+import { McpUnsupportedWarning } from '../McpUnsupportedWarning'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
 import {
   getEnabledEndpointsForCapability,
@@ -23,6 +24,8 @@ import {
 interface ReviewStepProps {
   values: TokenFormValues
   permissionScopeMap: PermissionScopeMap | undefined
+  /** Switches the form back to step one in legacy (account-wide) token mode. */
+  onSelectLegacyToken: () => void
 }
 
 const RISK_TONE_VARIANT: Record<
@@ -44,7 +47,11 @@ const RISK_DOT_CLASS: Record<RiskLevel, string> = {
   high: 'bg-destructive-600',
 }
 
-export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewStepProps) => {
+export const NewScopedTokenFormReview = ({
+  values,
+  permissionScopeMap,
+  onSelectLegacyToken,
+}: ReviewStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
   const selection = values.permissions
   const grantedScopes = useMemo(() => selectionToScopes(selection), [selection])
@@ -193,8 +200,8 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
       {hasCapabilities ? (
         <Admonition
           type="warning"
-          title="Token access can't be edited after creation"
-          description="Once created, a token's access can't be edited. To change it, revoke this token and create a new one."
+          title="Token access can't be updated after creation"
+          description="To change its access, delete this token and create a new one."
         />
       ) : (
         <Admonition
@@ -250,6 +257,7 @@ export const NewScopedTokenFormReview = ({ values, permissionScopeMap }: ReviewS
 
           <div className="flex flex-col gap-3">
             <h3 className="text-sm">MCP tools</h3>
+            <McpUnsupportedWarning onSelectLegacyToken={onSelectLegacyToken} />
             {mcpTools.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No MCP tools are enabled by the selected capabilities.

@@ -37,9 +37,9 @@ const buttonVariants = cva(
           `,
         default: `
           text-foreground
-          bg-alternative dark:bg-muted  hover:bg-selection
+          bg-background dark:bg-card hover:bg-popover
           border-strong hover:border-stronger
-          data-[state=open]:bg-selection
+          data-[state=open]:bg-popover
           data-[state=open]:border-button-hover
           `,
         secondary: `

@@ -447,9 +447,27 @@ const RESOURCE_METADATA_FALLBACK = (
     : 'Read-only access to this resource.',
 })
 
+const PERMISSION_LEVELS = ['user', 'organization', 'project'] as const
+
+export type PermissionLevel = (typeof PERMISSION_LEVELS)[number]
+
+/**
+ * Runtime guard for the FGA namespaces: role evaluation branches on the level, so an unrecognized
+ * namespace must fail loudly (at module load, caught by any test importing the catalog) rather
+ * than silently evaluate as project-level.
+ */
+const toPermissionLevel = (scope: string): PermissionLevel => {
+  const level = scope.toLowerCase()
+  const match = PERMISSION_LEVELS.find((candidate) => candidate === level)
+  if (match === undefined) throw new Error(`Unknown FGA namespace: ${scope}`)
+  return match
+}
+
 export interface PermissionCatalogEntry {
   /** Derived resource key, e.g. "project:database" */
   key: string
+  /** Which FGA namespace the resource lives in — decides which role (org vs project) governs it. */
+  level: PermissionLevel
   category: PermissionCategoryKey
   name: string
   description: string
@@ -482,15 +500,16 @@ const getResource = (key: string): string =>
 const buildCatalog = (): PermissionCatalogEntry[] => {
   const byResource = new Map<
     string,
-    { title: string; readScopes: string[]; writeScopes: string[] }
+    { level: PermissionLevel; title: string; readScopes: string[]; writeScopes: string[] }
   >()
 
   for (const [scope, scopePerms] of Object.entries(FGA)) {
+    const level = toPermissionLevel(scope)
     for (const [permKey, perm] of Object.entries(scopePerms)) {
-      const resourceKey = `${scope.toLowerCase()}:${getResource(permKey)}`
+      const resourceKey = `${level}:${getResource(permKey)}`
       const action = getAction(permKey)
       if (!byResource.has(resourceKey)) {
-        byResource.set(resourceKey, { title: perm.title, readScopes: [], writeScopes: [] })
+        byResource.set(resourceKey, { level, title: perm.title, readScopes: [], writeScopes: [] })
       }
       const entry = byResource.get(resourceKey)!
       if (action === 'read') entry.readScopes.push(perm.id)
@@ -499,11 +518,12 @@ const buildCatalog = (): PermissionCatalogEntry[] => {
   }
 
   const catalog: PermissionCatalogEntry[] = []
-  for (const [key, { title, readScopes, writeScopes }] of byResource.entries()) {
+  for (const [key, { level, title, readScopes, writeScopes }] of byResource.entries()) {
     const meta =
       RESOURCE_METADATA[key] ?? RESOURCE_METADATA_FALLBACK(key, title, writeScopes.length > 0)
     catalog.push({
       key,
+      level,
       category: meta.category,
       name: meta.name,
       description: meta.description,
@@ -541,30 +561,45 @@ export const PERMISSION_CATALOG_BY_CATEGORY: CategoryWithEntries[] = PERMISSION_
 /** Map of resource key -> selected mode. Absent keys are treated as 'none'. */
 export type PermissionSelection = Record<string, PermissionMode>
 
+/** FGA scope ids a catalog entry grants at the given mode. */
+export const getEntryScopes = (
+  entry: PermissionCatalogEntry,
+  mode: PermissionMode
+): ScopedAccessTokenPermission[] => {
+  if (mode === 'none') return []
+  if (mode === 'readwrite') return [...entry.readScopes, ...entry.writeScopes]
+  return entry.readScopes
+}
+
 /** Flattens a selection into the concrete FGA scope ids to send to the API. */
 export const selectionToScopes = (
   selection: PermissionSelection
 ): ScopedAccessTokenPermission[] => {
   const scopes: ScopedAccessTokenPermission[] = []
   for (const [key, mode] of Object.entries(selection)) {
-    if (mode === 'none') continue
     const entry = CATALOG_BY_KEY.get(key)
     if (!entry) continue
-    scopes.push(...entry.readScopes)
-    if (mode === 'readwrite') scopes.push(...entry.writeScopes)
+    scopes.push(...getEntryScopes(entry, mode))
   }
   return Array.from(new Set(scopes))
 }
 
-/** Reverses `selectionToScopes`: derives a selection from a token's granted FGA scope ids. */
+/**
+ * Reverses `selectionToScopes`: derives a selection from a token's granted FGA scope ids.
+ *
+ * Tokens created through the Management API can hold arbitrary scope subsets that the
+ * none/read/readwrite modes cannot represent exactly (e.g. a lone branching_development_create).
+ * Any granted scope of an entry marks it at the corresponding mode, so a partial grant is never
+ * dropped — the mode is an upper bound and may name specific operations the token lacks, but it
+ * never understates the token's authority or risk. The endpoint and MCP-tool lists, computed
+ * from the actual granted scopes, remain the precise view.
+ */
 export const scopesToSelection = (grantedScopes: string[]): PermissionSelection => {
   const granted = new Set(grantedScopes)
   const selection: PermissionSelection = {}
   for (const entry of PERMISSION_CATALOG) {
-    const hasWrite =
-      entry.writeScopes.length > 0 && entry.writeScopes.every((scope) => granted.has(scope))
-    const hasRead =
-      entry.readScopes.length > 0 && entry.readScopes.every((scope) => granted.has(scope))
+    const hasWrite = entry.writeScopes.some((scope) => granted.has(scope))
+    const hasRead = entry.readScopes.some((scope) => granted.has(scope))
     if (hasWrite) selection[entry.key] = 'readwrite'
     else if (hasRead) selection[entry.key] = 'read'
   }
@@ -588,6 +623,18 @@ export const RISK_LEVEL_LABEL: Record<RiskLevel, string> = {
   high: 'High risk',
 }
 
+export const PERMISSION_MODE_LABEL: Record<PermissionMode, string> = {
+  none: 'None',
+  read: 'Read',
+  readwrite: 'Read-write',
+}
+
+export const RISK_DOT_CLASS: Record<RiskLevel, string> = {
+  low: 'bg-brand-600',
+  medium: 'bg-warning-600',
+  high: 'bg-destructive-600',
+}
+
 export type ResourceAccessMode = 'project' | 'organization' | 'account'
 
 export interface OverallRisk {
@@ -595,6 +642,16 @@ export interface OverallRisk {
   level: string
   text: string
   tone: 'default' | 'low' | 'medium' | 'high'
+}
+
+export const RISK_TONE_VARIANT: Record<
+  OverallRisk['tone'],
+  'default' | 'success' | 'warning' | 'destructive'
+> = {
+  default: 'default',
+  low: 'success',
+  medium: 'warning',
+  high: 'destructive',
 }
 
 /**
@@ -607,7 +664,7 @@ export const computeOverallRisk = (
 ): OverallRisk => {
   const active = Object.entries(selection).filter(([, mode]) => mode !== 'none')
   if (active.length === 0) {
-    return { level: 'Minimal', text: 'Minimal — no capabilities', tone: 'default' }
+    return { level: 'Minimal', text: 'Minimal — No capabilities', tone: 'default' }
   }
 
   const anyWrite = active.some(([, mode]) => mode === 'readwrite')
@@ -617,10 +674,10 @@ export const computeOverallRisk = (
 
   const scopeWord =
     resourceAccess === 'account'
-      ? 'account-wide'
+      ? 'Account-wide'
       : resourceAccess === 'organization'
-        ? 'organization-wide'
-        : 'single-project'
+        ? 'Organization-wide'
+        : 'Single-project'
   const accessWord = anyWrite ? 'read-write' : 'read-only'
 
   let level: string
