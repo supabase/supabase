@@ -1,7 +1,9 @@
+import { Edit } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
 
 import { Markdown } from '../Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type MarkdownCell as MarkdownCellSchema } from '@/data/content/notebooks/notebook-schema'
@@ -83,11 +85,21 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
         <div
           onDoubleClick={handleStartEditing}
           className={cn(
-            'w-full max-w-2xl mx-auto px-3 py-2 transition',
+            'group relative w-full max-w-2xl mx-auto px-3 py-2 transition',
             'hover:bg-alternative/50',
             'border border-transparent rounded-md hover:border-default'
           )}
         >
+          <ButtonTooltip
+            variant="text"
+            className={cn(
+              'absolute right-1 top-1 px-1',
+              'opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+            )}
+            icon={<Edit size={14} />}
+            onClick={handleStartEditing}
+            tooltip={{ content: { side: 'bottom', text: 'Edit' } }}
+          />
           <Markdown
             className={cn(
               'prose prose-sm max-w-none text-muted-foreground prose-headings:text-foreground',
