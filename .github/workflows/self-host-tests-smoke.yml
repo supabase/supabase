@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        config: [default, logs, envoy, rustfs, envoy-rustfs]
+        config: [default, logs, kong, rustfs, kong-rustfs]
 
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -51,12 +51,12 @@ jobs:
           yq -i '.services.supavisor.environment.RLIMIT_NOFILE=1024' docker-compose.yml
           if [ "${{ matrix.config }}" = "logs" ]; then
             docker compose -f docker-compose.yml -f docker-compose.logs.yml up --quiet-pull --wait --wait-timeout 180
-          elif [ "${{ matrix.config }}" = "envoy" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.envoy.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "kong" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.kong.yml up --quiet-pull --wait --wait-timeout 180
           elif [ "${{ matrix.config }}" = "rustfs" ]; then
             docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
-          elif [ "${{ matrix.config }}" = "envoy-rustfs" ]; then
-            docker compose -f docker-compose.yml -f docker-compose.envoy.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
+          elif [ "${{ matrix.config }}" = "kong-rustfs" ]; then
+            docker compose -f docker-compose.yml -f docker-compose.kong.yml -f docker-compose.rustfs.yml up --quiet-pull --wait --wait-timeout 180
           else
             docker compose up --quiet-pull --wait --wait-timeout 180
           fi
