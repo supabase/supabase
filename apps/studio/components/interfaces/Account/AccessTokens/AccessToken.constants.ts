@@ -6,6 +6,10 @@ export type ScopedAccessTokenPermission =
 
 export const CUSTOM_EXPIRY_VALUE = 'custom'
 
+/** Shared tail for every "this token can no longer be used" message. */
+export const TOKEN_DENIED_REMEDIATION =
+  'Requests with this token will be denied. Delete this token and create a new one with the resources and permissions you need.'
+
 /** Warning shown on both entry points that create a classic (account-wide) token. */
 export const CLASSIC_TOKEN_WARNING = {
   title: 'Access tokens can be used to control your whole account',
