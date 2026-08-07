@@ -18,21 +18,31 @@
   --foreground-muted: var(--tertiary-foreground);
   /* --foreground-contrast lives in semantic.css — do not remap to --primary-foreground */
 
-  /* Legacy background aliases */
+  /* Legacy background aliases.
+   *
+   * Pre-color-system, these were opaque greys. Do not map fill tokens used by
+   * controls / overlapping surfaces onto the translucent overlay ramp
+   * (--muted / --accent / --tertiary): alpha fills punch through stacked
+   * content (buttons over table cells, sticky columns, skip links, etc.).
+   *
+   * Solid elevation twins: muted≈card (e1), accent/selection≈popover (e2),
+   * tertiary≈secondary (e3). Overlay-hover stays on --accent so menu item
+   * washes still composite on opaque bg-overlay panels.
+   */
   --background-default: var(--background);
   --background-200: var(--card);
   --background-alternative-default: var(--background);
   --background-alternative-200: var(--card);
-  --background-selection: var(--accent);
-  --background-control: var(--accent);
+  --background-selection: var(--popover);
+  --background-control: var(--card);
   --background-surface-75: var(--card);
   --background-surface-100: var(--card);
-  --background-surface-200: var(--muted);
+  --background-surface-200: var(--card);
   --background-surface-300: var(--secondary);
-  --background-surface-400: var(--tertiary);
+  --background-surface-400: var(--secondary);
   --background-overlay-default: var(--secondary);
   --background-overlay-hover: var(--accent);
-  --background-muted: var(--muted);
+  --background-muted: var(--card);
   --background-button-default: var(--secondary);
   --background-dialog-default: var(--popover);
   --background-dash-sidebar: var(--background);
