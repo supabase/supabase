@@ -16,9 +16,11 @@ Bootstrap the Hono example app from the Supabase Samples using the CLI.
 npx supabase@latest bootstrap hono
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
 
 To install, run the following command in the root of your project:
 
@@ -36,7 +38,7 @@ npm install
 
 ## 6. Set up the required environment variables
 
-Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&tab=frameworks).
+Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks).
 
 Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
 
@@ -44,8 +46,11 @@ Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the 
 cp .env.example .env
 ```
 
-{/* TODO: Not ideal for frameworks that have no entry in Connect */}
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+</Button>
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
 ## 7. Start the app
 

@@ -56,6 +56,17 @@ async function purgeCachedObject() {
 ```
 
 </TabPanel>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var response = await supabase.Storage
+  .From("bucket_name")
+  .PurgeCache("folder_name/file_name.png");
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash
@@ -101,6 +112,15 @@ async function purgeBucketCache() {
 ```
 
 </TabPanel>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var response = await supabase.Storage.PurgeBucketCache("bucket_name");
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash

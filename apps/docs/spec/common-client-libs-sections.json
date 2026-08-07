@@ -190,6 +190,14 @@
             "type": "function"
           },
           {
+            "id": "notin",
+            "title": "Column is not in an array",
+            "slug": "notin",
+            "product": "database",
+            "parent": "filters",
+            "type": "function"
+          },
+          {
             "id": "contains",
             "title": "Column contains every element in a value",
             "slug": "contains",
@@ -396,6 +404,14 @@
             "id": "explain",
             "title": "Using explain",
             "slug": "explain",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
+            "id": "dry-run",
+            "title": "Test a mutation without committing it",
+            "slug": "dryrun",
             "product": "database",
             "parent": "modifiers",
             "type": "function"
