@@ -389,6 +389,7 @@ allow_list = [
     "SQLite",
     "SecureStore",
     "SendGrid",
+    "SuperSend",
     "Session Timebox",
     "sigstore",
     "Snapchat",
