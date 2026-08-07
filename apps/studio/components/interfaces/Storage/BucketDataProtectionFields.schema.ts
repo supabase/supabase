@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { VersioningPlanLimits } from './StorageProtection.constants'
+import type { ExpirationMode, VersioningPlanLimits } from './StorageProtection.constants'
 
 /**
  * Shared zod fields for the object-versioning controls in the create/edit
@@ -14,12 +14,14 @@ export const bucketProtectionFormFields = {
   enable_versioning: z.boolean().default(false),
   version_expiry_days: versioningNumberField.default(''),
   max_noncurrent_versions: versioningNumberField.default(''),
+  expiration_mode: z.enum(['and', 'or']).default('and'),
 }
 
 export interface BucketProtectionFormValues {
   enable_versioning: boolean
   version_expiry_days: '' | number
   max_noncurrent_versions: '' | number
+  expiration_mode: ExpirationMode
 }
 
 /**

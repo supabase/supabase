@@ -23,6 +23,14 @@ export interface ObjectVersion {
   action: ObjectVersionAction
 }
 
+/** A noncurrent version attached to a deleted object (or a standalone noncurrent version). */
+export interface DeletedObjectVersion {
+  versionId: string
+  size: number
+  createdAt: string
+  action: ObjectVersionAction
+}
+
 export interface TrashObject {
   id: string
   name: string
@@ -31,6 +39,8 @@ export interface TrashObject {
   deletedBy: string
   size: number
   expiresAt: string | null
+  /** Noncurrent versions still retained for this object, oldest last. */
+  noncurrentVersions?: DeletedObjectVersion[]
 }
 
 const MB = 1024 * 1024
@@ -106,6 +116,20 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'jane@acme.co',
     size: 1.1 * MB,
     expiresAt: daysAhead(30),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t1-a',
+        size: 1.05 * MB,
+        createdAt: daysAgo(2, '14:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t1-b',
+        size: 980 * KB,
+        createdAt: daysAgo(8, '09:30:00'),
+        action: 'initial upload',
+      },
+    ],
   },
   {
     id: 'trash-2',
@@ -124,6 +148,26 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'jane@acme.co',
     size: 820 * KB,
     expiresAt: daysAhead(27),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t3-a',
+        size: 790 * KB,
+        createdAt: daysAgo(12, '16:00:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t3-b',
+        size: 750 * KB,
+        createdAt: daysAgo(20, '10:15:00'),
+        action: 'overwrite',
+      },
+      {
+        versionId: 'v-t3-c',
+        size: 710 * KB,
+        createdAt: daysAgo(28, '08:00:00'),
+        action: 'initial upload',
+      },
+    ],
   },
   {
     id: 'trash-4',
@@ -133,6 +177,14 @@ let trashObjects: TrashObject[] = [
     deletedBy: 'mark@acme.co',
     size: 2.3 * MB,
     expiresAt: daysAhead(25),
+    noncurrentVersions: [
+      {
+        versionId: 'v-t4-a',
+        size: 2.1 * MB,
+        createdAt: daysAgo(15, '11:20:00'),
+        action: 'overwrite',
+      },
+    ],
   },
   {
     id: 'trash-5',

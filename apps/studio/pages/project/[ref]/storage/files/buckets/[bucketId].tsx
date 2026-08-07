@@ -18,8 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Label,
-  Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -34,12 +32,8 @@ import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/
 import { PublicBucketWarning } from '@/components/interfaces/Storage/PublicBucketWarning'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
-import {
-  DeletedFilesProvider,
-  useDeletedFilesContext,
-} from '@/components/interfaces/Storage/StorageExplorer/DeletedFilesContext'
+import { DeletedFilesProvider } from '@/components/interfaces/Storage/StorageExplorer/DeletedFilesContext'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
-import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageProtection.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
@@ -63,8 +57,6 @@ const BucketPageInner = () => {
   const { bucketId, ref } = useParams()
   const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
 
-  const { isShowingDeleted, setIsShowingDeleted } = useDeletedFilesContext()
-
   const [showEditModal, setShowEditModal] = useQueryState(
     'edit',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
@@ -80,7 +72,6 @@ const BucketPageInner = () => {
 
   const { getPolicyCount } = useBucketPolicyCount()
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
-  const isVersioned = hasVersioningHistory(bucket?.id)
 
   useEffect(() => {
     if (isSuccess && !bucket) {
@@ -100,19 +91,6 @@ const BucketPageInner = () => {
         <PageBreadcrumbs
           actions={
             <PageBreadcrumbsActions>
-              {isVersioned && (
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="show-deleted" className="text-xs cursor-pointer">
-                    Show deleted files
-                  </Label>
-                  <Switch
-                    id="show-deleted"
-                    size="small"
-                    checked={isShowingDeleted}
-                    onCheckedChange={setIsShowingDeleted}
-                  />
-                </div>
-              )}
               <Button
                 asChild
                 variant="outline"

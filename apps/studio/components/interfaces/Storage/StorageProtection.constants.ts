@@ -10,6 +10,17 @@ export const useIsStorageProtectionEnabled = () => STORAGE_PROTECTION_ENABLED
 
 export type BucketVersioningState = 'enabled' | 'suspended' | 'disabled'
 
+/**
+ * Controls how the two lifecycle conditions (retention days and max versions)
+ * combine when evaluating whether to expire a noncurrent version:
+ *
+ * - `'and'` — a single S3 lifecycle policy with both conditions; a version is
+ *   only expired when **both** are true simultaneously.
+ * - `'or'` — two independent S3 lifecycle rules, one per condition; a version
+ *   is expired as soon as **either** condition is met.
+ */
+export type ExpirationMode = 'and' | 'or'
+
 export const PROJECT_VERSIONING_DEFAULTS = {
   versionExpiryDays: 30,
   maxNoncurrentVersions: 100,
@@ -70,6 +81,7 @@ export interface BucketProtection {
   versioning: BucketVersioningState
   versionExpiryDays: number | null
   maxNoncurrentVersions: number | null
+  expirationMode: ExpirationMode
 }
 
 const PROTECTED_BUCKETS: Record<string, BucketProtection> = {
@@ -77,11 +89,13 @@ const PROTECTED_BUCKETS: Record<string, BucketProtection> = {
     versioning: 'enabled',
     versionExpiryDays: PROJECT_VERSIONING_DEFAULTS.versionExpiryDays,
     maxNoncurrentVersions: PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions,
+    expirationMode: 'and',
   },
   avatars: {
     versioning: 'enabled',
     versionExpiryDays: 30,
     maxNoncurrentVersions: 10,
+    expirationMode: 'or',
   },
 }
 
@@ -89,6 +103,7 @@ const DEFAULT_PROTECTION: BucketProtection = {
   versioning: 'disabled',
   versionExpiryDays: null,
   maxNoncurrentVersions: null,
+  expirationMode: 'and',
 }
 
 export const getMockBucketProtection = (bucketName: string | undefined): BucketProtection =>
@@ -153,6 +168,7 @@ export const purgeVersioningOnPlanDowngrade = (): { purgedBuckets: string[] } =>
         versioning: 'suspended',
         versionExpiryDays: null,
         maxNoncurrentVersions: null,
+        expirationMode: protection.expirationMode,
       }
     }
   }

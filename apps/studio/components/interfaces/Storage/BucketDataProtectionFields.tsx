@@ -9,6 +9,7 @@ import {
   InputGroupInput,
   InputGroupText,
   Switch,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -17,7 +18,11 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 import { type BucketProtectionFormValues } from './BucketDataProtectionFields.schema'
-import { getVersioningPlanLimits, type BucketVersioningState } from './StorageProtection.constants'
+import {
+  getVersioningPlanLimits,
+  type BucketVersioningState,
+  type ExpirationMode,
+} from './StorageProtection.constants'
 
 interface BucketDataProtectionFieldsProps {
   /** The bucket's versioning state when the modal opened (unset when creating a new bucket, which is always `disabled`). */
@@ -186,8 +191,8 @@ export const BucketDataProtectionFields = ({
               render={({ field }) => (
                 <FormItemLayout
                   name="version_expiry_days"
-                  label="Noncurrent version retention"
-                  description="Days a noncurrent version is kept before it's automatically expired."
+                  label="Noncurrent version expiration"
+                  description="Days a noncurrent version is kept before it expires."
                   layout="flex-row-reverse"
                 >
                   <FormControl>
@@ -209,14 +214,16 @@ export const BucketDataProtectionFields = ({
               )}
             />
 
+            <ExpirationModeToggle control={control} />
+
             <FormField
               name="max_noncurrent_versions"
               control={control}
               render={({ field }) => (
                 <FormItemLayout
                   name="max_noncurrent_versions"
-                  label="Max noncurrent versions"
-                  description="Maximum number of noncurrent versions kept per object. The oldest version is automatically removed once the limit is reached."
+                  label="Retained noncurrent versions"
+                  description="Maximum noncurrent versions kept per object. The oldest expires once the cap is reached."
                   layout="flex-row-reverse"
                 >
                   <FormControl>
@@ -241,5 +248,63 @@ export const BucketDataProtectionFields = ({
         )}
       </DialogSection>
     </>
+  )
+}
+
+const EXPIRATION_MODE_OPTIONS: { value: ExpirationMode; label: string; description: string }[] = [
+  {
+    value: 'and',
+    label: 'AND',
+    description: 'Both conditions must be met before a version expires (single lifecycle policy)',
+  },
+  {
+    value: 'or',
+    label: 'OR',
+    description: 'Either condition independently triggers expiration (two lifecycle rules)',
+  },
+]
+
+interface ExpirationModeToggleProps {
+  control: ReturnType<typeof useFormContext<BucketProtectionFormValues>>['control']
+}
+
+const ExpirationModeToggle = ({ control }: ExpirationModeToggleProps) => {
+  return (
+    <FormField
+      name="expiration_mode"
+      control={control}
+      render={({ field }) => (
+        <FormItemLayout
+          name="expiration_mode"
+          label="Expiration policy evaluation"
+          description={
+            field.value === 'and'
+              ? 'A noncurrent version expires only when both the age and cap conditions are met simultaneously.'
+              : 'A noncurrent version expires as soon as either the age or cap condition is met independently.'
+          }
+          layout="flex-row-reverse"
+        >
+          <FormControl>
+            <div className="inline-flex rounded-md border border-default overflow-hidden">
+              {EXPIRATION_MODE_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={cn(
+                    'px-3 py-1 text-xs font-mono font-medium transition-colors',
+                    field.value === option.value
+                      ? 'bg-foreground text-background'
+                      : 'bg-surface-100 text-foreground-light hover:bg-surface-200'
+                  )}
+                  onClick={() => field.onChange(option.value)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </FormControl>
+        </FormItemLayout>
+      )}
+    />
   )
 }

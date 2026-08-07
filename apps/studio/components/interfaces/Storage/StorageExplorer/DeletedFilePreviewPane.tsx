@@ -36,7 +36,7 @@ export const DeletedFilePreviewPane = () => {
 
   const { mutate: deleteObjects, isPending: isDeleting } = useBucketTrashDeleteMutation({
     onSuccess: () => {
-      toast.success('File permanently deleted')
+      toast.success('Version permanently deleted')
       setShowDeleteConfirm(false)
       setSelectedDeletedFile(undefined)
     },
@@ -105,7 +105,7 @@ export const DeletedFilePreviewPane = () => {
               content: {
                 side: 'bottom',
                 text: !canUpdateFiles
-                  ? 'You need additional permissions to restore files'
+                  ? 'You need additional permissions to restore versions'
                   : undefined,
               },
             }}
@@ -121,7 +121,7 @@ export const DeletedFilePreviewPane = () => {
               content: {
                 side: 'bottom',
                 text: !canUpdateFiles
-                  ? 'You need additional permissions to delete files'
+                  ? 'You need additional permissions to delete versions'
                   : undefined,
               },
             }}
@@ -134,7 +134,7 @@ export const DeletedFilePreviewPane = () => {
       <ConfirmationModal
         variant="destructive"
         visible={showDeleteConfirm}
-        title="Permanently delete file"
+        title="Permanently delete version"
         confirmLabel="Delete permanently"
         confirmLabelLoading="Deleting..."
         loading={isDeleting}

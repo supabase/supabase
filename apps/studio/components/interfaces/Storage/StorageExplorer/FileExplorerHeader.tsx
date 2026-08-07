@@ -39,6 +39,7 @@ import {
   DropdownMenuTrigger,
   FieldDescription,
   Label,
+  Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -49,7 +50,9 @@ import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
+import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { hasVersioningHistory } from '../StorageProtection.constants'
 import { useDeletedFilesContext } from './DeletedFilesContext'
 import { pageChromeRowClassName } from './storageExplorerChrome'
 import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
@@ -288,7 +291,9 @@ export const FileExplorerHeader = ({
     snap.setIsSearching(value.length > 0)
   }
 
-  const { isShowingDeleted } = useDeletedFilesContext()
+  const { data: bucket } = useSelectedBucket()
+  const isVersioned = hasVersioningHistory(bucket?.id)
+  const { isShowingDeleted, setIsShowingDeleted } = useDeletedFilesContext()
 
   const refreshData = async () => {
     await refreshAll()
@@ -336,12 +341,28 @@ export const FileExplorerHeader = ({
                     ]
                   : undefined
               }
-              placeholder={isShowingDeleted ? 'Search deleted files...' : searchPlaceholder}
+              placeholder={isShowingDeleted ? 'Search deleted versions...' : searchPlaceholder}
               type="text"
               value={itemSearchString}
               onChange={onSearchChange}
               onFocus={() => setIsPathDialogOpen(false)}
             />
+            {isVersioned && (
+              <div className="flex items-center gap-1.5">
+                <Switch
+                  id="show-deleted-versions"
+                  size="small"
+                  checked={isShowingDeleted}
+                  onCheckedChange={setIsShowingDeleted}
+                />
+                <Label
+                  htmlFor="show-deleted-versions"
+                  className="text-xs cursor-pointer whitespace-nowrap text-foreground-light"
+                >
+                  Show deleted versions
+                </Label>
+              </div>
+            )}
           </div>
 
           <div className="flex shrink-0 items-center gap-2 whitespace-nowrap">

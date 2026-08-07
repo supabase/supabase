@@ -96,7 +96,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
   if (isError) {
     return (
       <div className="p-4">
-        <AlertError error={error} subject="Failed to retrieve deleted files" />
+        <AlertError error={error} subject="Failed to retrieve deleted versions" />
       </div>
     )
   }
@@ -111,11 +111,11 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
       <div className="p-4">
         <Admonition
           type="default"
-          title={searchString.length > 0 ? 'No matching deleted files' : 'No deleted files'}
+          title={searchString.length > 0 ? 'No matching deleted versions' : 'No deleted versions'}
           description={
             searchString.length > 0
-              ? 'No deleted files match your search.'
-              : 'Deleted objects appear here and can be restored until a lifecycle policy removes them.'
+              ? 'No deleted versions match your search.'
+              : 'Deleted versions appear here and can be restored until an expiration policy removes them.'
           }
         />
       </div>
@@ -160,7 +160,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                 checked={isAllSelected}
                 className={cn(isSomeSelected && 'opacity-60')}
                 onClick={handleToggleAll}
-                aria-label="Select all deleted files"
+                aria-label="Select all deleted versions"
               />
             </TableHead>
             <TableHead>Object</TableHead>

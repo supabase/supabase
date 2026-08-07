@@ -132,6 +132,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
       enable_versioning: false,
       version_expiry_days: '',
       max_noncurrent_versions: '',
+      expiration_mode: 'and',
     },
   })
   const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
@@ -182,6 +183,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
           values.enable_versioning && typeof values.max_noncurrent_versions === 'number'
             ? values.max_noncurrent_versions
             : null,
+        expirationMode: values.expiration_mode,
       })
 
       toast.success(`Successfully created bucket ${values.name}`)

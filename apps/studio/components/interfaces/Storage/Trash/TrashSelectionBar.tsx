@@ -27,7 +27,7 @@ export const TrashSelectionBar = ({
   return (
     <div className={bulkActionBarClassName}>
       <span className="font-mono text-xs text-foreground-light">
-        <span className="tabular-nums">{count}</span> item{count !== 1 ? 's' : ''} selected
+        <span className="tabular-nums">{count}</span> version{count !== 1 ? 's' : ''} selected
       </span>
 
       <div className="ml-auto flex items-center gap-1">
@@ -42,7 +42,7 @@ export const TrashSelectionBar = ({
             content: {
               side: 'bottom',
               text: !canUpdateFiles
-                ? 'You need additional permissions to restore files'
+                ? 'You need additional permissions to restore versions'
                 : undefined,
             },
           }}
@@ -59,7 +59,9 @@ export const TrashSelectionBar = ({
           tooltip={{
             content: {
               side: 'bottom',
-              text: !canUpdateFiles ? 'You need additional permissions to delete files' : undefined,
+              text: !canUpdateFiles
+                ? 'You need additional permissions to delete versions'
+                : undefined,
             },
           }}
         >

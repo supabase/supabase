@@ -135,6 +135,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     enable_versioning: !!planLimits && bucketProtection.versioning === 'enabled',
     version_expiry_days: bucketProtection.versionExpiryDays ?? ('' as const),
     max_noncurrent_versions: bucketProtection.maxNoncurrentVersions ?? ('' as const),
+    expiration_mode: bucketProtection.expirationMode,
   }
 
   // Depends on the org's plan, which loads asynchronously — rebuild the
@@ -214,6 +215,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           : bucketProtection.versioning !== 'disabled'
             ? bucketProtection.maxNoncurrentVersions
             : null,
+      expirationMode: values.expiration_mode,
     })
 
     updateBucket({

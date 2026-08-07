@@ -28,7 +28,7 @@ export const DeletedFilesHeaderSelection = () => {
 
   const { mutate: restoreObjects, isPending: isRestoring } = useBucketTrashRestoreMutation({
     onSuccess: () => {
-      toast.success(`Restored ${count} file${count !== 1 ? 's' : ''}`)
+      toast.success(`Restored ${count} version${count !== 1 ? 's' : ''}`)
       clearDeletedSelection()
       setSelectedDeletedFile(undefined)
     },
@@ -36,7 +36,7 @@ export const DeletedFilesHeaderSelection = () => {
 
   const { mutate: deleteObjects, isPending: isDeleting } = useBucketTrashDeleteMutation({
     onSuccess: () => {
-      toast.success(`Permanently deleted ${count} file${count !== 1 ? 's' : ''}`)
+      toast.success(`Permanently deleted ${count} version${count !== 1 ? 's' : ''}`)
       setShowDeleteConfirm(false)
       clearDeletedSelection()
       setSelectedDeletedFile(undefined)
@@ -60,7 +60,8 @@ export const DeletedFilesHeaderSelection = () => {
           <div className={pageChromeRowClassName}>
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <span className="font-mono text-xs text-foreground-light">
-                <span className="tabular-nums">{count}</span> item{count !== 1 ? 's' : ''} selected
+                <span className="tabular-nums">{count}</span> version{count !== 1 ? 's' : ''}{' '}
+                selected
               </span>
             </div>
 
@@ -76,7 +77,7 @@ export const DeletedFilesHeaderSelection = () => {
                   content: {
                     side: 'bottom',
                     text: !canUpdateFiles
-                      ? 'You need additional permissions to restore files'
+                      ? 'You need additional permissions to restore versions'
                       : undefined,
                   },
                 }}
@@ -94,7 +95,7 @@ export const DeletedFilesHeaderSelection = () => {
                   content: {
                     side: 'bottom',
                     text: !canUpdateFiles
-                      ? 'You need additional permissions to delete files'
+                      ? 'You need additional permissions to delete versions'
                       : undefined,
                   },
                 }}
@@ -118,7 +119,7 @@ export const DeletedFilesHeaderSelection = () => {
       <ConfirmationModal
         variant="destructive"
         visible={showDeleteConfirm}
-        title={`Permanently delete ${count} file${count !== 1 ? 's' : ''}`}
+        title={`Permanently delete ${count} version${count !== 1 ? 's' : ''}`}
         confirmLabel="Delete permanently"
         confirmLabelLoading="Deleting..."
         loading={isDeleting}
@@ -126,7 +127,7 @@ export const DeletedFilesHeaderSelection = () => {
         onConfirm={handleDelete}
       >
         <p className="text-sm text-foreground-light">
-          {count} file{count !== 1 ? 's' : ''} will be permanently deleted and can no longer be
+          {count} version{count !== 1 ? 's' : ''} will be permanently deleted and can no longer be
           restored. This action cannot be undone.
         </p>
       </ConfirmationModal>
