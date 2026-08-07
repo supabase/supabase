@@ -6,7 +6,12 @@ import { contentKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { Dashboards, LogSqlSnippets, SqlSnippets, UseCustomQueryOptions } from '@/types'
 
-export type ContentBase = components['schemas']['GetUserContentResponse']['data'][number]
+// TODO — Charis 2026-08-06
+// Temporary widening until we have API support for notebooks
+export type ContentBase = Omit<
+  components['schemas']['GetUserContentResponse']['data'][number],
+  'type'
+> & { type: components['schemas']['GetUserContentResponse']['data'][number]['type'] | 'notebook' }
 
 export type Content = Omit<ContentBase, 'content' | 'type'> &
   (

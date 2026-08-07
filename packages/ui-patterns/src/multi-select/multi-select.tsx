@@ -294,12 +294,12 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
           role="combobox"
           className={cn(
             'flex w-full min-w-[200px] min-h-[34px] items-center justify-between rounded-md border',
-            'border-strong bg-alternative dark:bg-muted px-3 py-1.5 text-sm',
+            'border-strong bg-background dark:bg-card px-3 py-1.5 text-sm',
             'placeholder:text-muted-foreground',
             'ring-border-control focus-ring',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            'hover:border-stronger hover:bg-selection transition-colors duration-200',
-            open && 'bg-selection border-stronger',
+            'hover:border-stronger hover:bg-popover transition-colors duration-200',
+            open && 'bg-popover border-stronger',
             className
           )}
           {...props}
