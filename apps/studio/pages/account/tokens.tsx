@@ -57,7 +57,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
               </a>
             </Button>
             {scopedTokensEnabled ? (
-              <NewScopedTokenSheet />
+              <NewScopedTokenSheet onCreateExperimentalToken={setNewToken} />
             ) : (
               <NewTokenButton onCreateToken={setNewToken} />
             )}

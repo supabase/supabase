@@ -10,6 +10,12 @@ export const CUSTOM_EXPIRY_VALUE = 'custom'
 export const TOKEN_DENIED_REMEDIATION =
   'Requests with this token will be denied. Delete this token and create a new one with the resources and permissions you need.'
 
+/** Warning shown on both entry points that create a classic (account-wide) token. */
+export const CLASSIC_TOKEN_WARNING = {
+  title: 'Access tokens can be used to control your whole account',
+  description: 'Be careful when sharing your tokens',
+} as const
+
 export const EXPIRES_AT_OPTIONS = {
   hour: { value: 'hour', label: '1 hour' },
   day: { value: 'day', label: '1 day' },

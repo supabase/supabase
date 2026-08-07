@@ -27,7 +27,11 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { CUSTOM_EXPIRY_VALUE, EXPIRES_AT_OPTIONS } from '../AccessToken.constants'
+import {
+  CLASSIC_TOKEN_WARNING,
+  CUSTOM_EXPIRY_VALUE,
+  EXPIRES_AT_OPTIONS,
+} from '../AccessToken.constants'
 import { getExpirationDate, getMaxCustomExpiryDate } from '../AccessToken.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import {
@@ -45,7 +49,7 @@ const TokenSchema = z.object({
 
 export interface NewAccessTokenDialogProps {
   open: boolean
-  tokenScope: 'V0' | undefined
+  tokenScope?: 'V0' | undefined
   onOpenChange: (open: boolean) => void
   onCreateToken: (token: NewAccessToken) => void
 }
@@ -163,8 +167,8 @@ export const NewTokenDialog = ({
           <Admonition
             type="warning"
             className="rounded-none border-t-0 border-x-0"
-            title="Access tokens can be used to control your whole account"
-            description="Be careful when sharing your tokens"
+            title={CLASSIC_TOKEN_WARNING.title}
+            description={CLASSIC_TOKEN_WARNING.description}
           />
         )}
         <DialogSection className="flex flex-col gap-4">

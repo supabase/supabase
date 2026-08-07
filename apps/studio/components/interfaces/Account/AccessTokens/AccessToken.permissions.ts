@@ -664,7 +664,7 @@ export const computeOverallRisk = (
 ): OverallRisk => {
   const active = Object.entries(selection).filter(([, mode]) => mode !== 'none')
   if (active.length === 0) {
-    return { level: 'Minimal', text: 'Minimal — no capabilities', tone: 'default' }
+    return { level: 'Minimal', text: 'Minimal — No capabilities', tone: 'default' }
   }
 
   const anyWrite = active.some(([, mode]) => mode === 'readwrite')
@@ -674,10 +674,10 @@ export const computeOverallRisk = (
 
   const scopeWord =
     resourceAccess === 'account'
-      ? 'account-wide'
+      ? 'Account-wide'
       : resourceAccess === 'organization'
-        ? 'organization-wide'
-        : 'single-project'
+        ? 'Organization-wide'
+        : 'Single-project'
   const accessWord = anyWrite ? 'read-write' : 'read-only'
 
   let level: string
