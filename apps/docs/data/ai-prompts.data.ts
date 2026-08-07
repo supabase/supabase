@@ -14,6 +14,21 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/astrojs.md`,
+  django: `Help me add Supabase to my Django project. Create a Supabase project at
+database.new and run the instruments table SQL. Then:
+1. Create a project directory and activate a virtual environment with
+   \`python3 -m venv venv && source venv/bin/activate\`.
+2. Install dependencies with \`pip install django supabase\`.
+3. Create a Django project and app with \`django-admin startproject myproject .\` and
+   \`python manage.py startapp instruments\`.
+4. Create \`.env\` and set \`SUPABASE_URL\` and \`SUPABASE_PUBLISHABLE_KEY\`.
+5. Update \`instruments/views.py\` to fetch and return data from your \`instruments\`
+   table using the Supabase client.
+6. Configure URL routing in \`instruments/urls.py\` and \`myproject/urls.py\`.
+7. Run \`python manage.py runserver\` and open http://localhost:8000.
+
+REFERENCE
+https://supabase.com/docs/guides/getting-started/quickstarts/django.md`,
   'expo-react-native': `Help me add Supabase to my Expo React Native project. Create a Supabase project
 at database.new and run the instruments table SQL. Then:
 1. Run \`npx create-expo-app my-app --template blank-typescript\` to scaffold the
