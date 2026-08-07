@@ -1,0 +1,9 @@
+{
+  "name": "e2e-shared",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "catalog:"
+  }
+}
