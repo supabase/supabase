@@ -248,7 +248,7 @@ export const ResourceAccessStep = ({
                   mode="combobox"
                   label="Select organizations"
                   badgeLimit="wrap"
-                  showIcon={false}
+                  showIcon={true}
                   deletableBadge
                   className="w-full"
                   ref={field.ref}
