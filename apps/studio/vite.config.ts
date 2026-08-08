@@ -670,6 +670,15 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: 3000,
     },
+    preview: {
+      // The prerender step (@tanstack/start-plugin-core) boots `vite preview`
+      // on an ephemeral port and crawls the first resolved URL. With the
+      // default host (`localhost`) the server can bind the IPv6 loopback
+      // while the crawler's fetch connects to 127.0.0.1 — split name
+      // resolution that ECONNREFUSEDs the whole prerender inside docker
+      // build containers. Pin both sides to IPv4 loopback.
+      host: '127.0.0.1',
+    },
     resolve: {
       tsconfigPaths: true,
       alias: [
@@ -783,11 +792,11 @@ export default defineConfig(({ command, mode }) => {
       postcss: { plugins: [] },
     },
     ssr: {
-      // `lodash` must stay inlined so its ids flow through the plugin
-      // pipeline, where ssrLodashEs (above) rewrites them to lodash-es.
-      // Externalized bare ids skip user plugins in the dev module runner, so
-      // dropping this entry resurfaces Node's CJS named-export failure
-      // ("Named export 'debounce' not found") on every `from 'lodash'` import.
+      optimizeDeps: {
+        include: ['lodash'],
+      },
+
+      // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and
       // Node resolves it to Next's real module.

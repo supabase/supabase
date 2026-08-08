@@ -310,8 +310,25 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "*",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("schema-db-changes");
+
+// Subscribes to the "public" schema in Postgres
+channel.Register(new PostgresChangesOptions("public"));
+channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -663,8 +680,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "INSERT",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -675,8 +691,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "UPDATE",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -687,8 +702,7 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "DELETE",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
 ```
 
 </TabPanel>
@@ -699,8 +713,83 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
   "*",
   schema="public",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+Pass the `ListenType` to select the event.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="insert"
+  queryGroup="pg-changes-event"
+>
+<TabPanel id="insert" label="Insert">
+
+```c#
+var channel = supabase.Realtime.Channel("schema-db-changes");
+
+channel.Register(new PostgresChangesOptions("public", eventType: ListenType.Inserts));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
+```
+
+</TabPanel>
+<TabPanel id="update" label="Update">
+
+```c#
+var channel = supabase.Realtime.Channel("schema-db-changes");
+
+channel.Register(new PostgresChangesOptions("public", eventType: ListenType.Updates));
+channel.AddPostgresChangeHandler(ListenType.Updates, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
+```
+
+</TabPanel>
+<TabPanel id="delete" label="Delete">
+
+```c#
+var channel = supabase.Realtime.Channel("schema-db-changes");
+
+channel.Register(new PostgresChangesOptions("public", eventType: ListenType.Deletes));
+channel.AddPostgresChangeHandler(ListenType.Deletes, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
+```
+
+</TabPanel>
+<TabPanel id="all" label="All events">
+
+```c#
+var channel = supabase.Realtime.Channel("schema-db-changes");
+
+channel.Register(new PostgresChangesOptions("public", eventType: ListenType.All));
+channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -809,8 +898,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   schema="public",
   table="todos",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("table-db-changes");
+
+channel.Register(new PostgresChangesOptions("public", "todos"));
+channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -915,7 +1020,7 @@ myChannel.subscribe()
 changes = supabase.channel('db-changes').on_postgres_changes(
   "*",
   schema="public",
-  table="messages"
+  table="messages",
   callback=lambda payload: print(payload)
 ).on_postgres_changes(
   "INSERT",
@@ -923,6 +1028,23 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="users",
   callback=lambda payload: print(payload)
 ).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("db-changes");
+
+channel.Register(new PostgresChangesOptions("public", "messages"));
+channel.Register(new PostgresChangesOptions("public", "users", eventType: ListenType.Inserts));
+
+channel.AddPostgresChangeHandler(ListenType.All, (sender, change) => Console.WriteLine(change.Payload));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) => Console.WriteLine(change.Payload));
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -1034,8 +1156,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="todos",
   filter="id=eq.1",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("table-filter-changes");
+
+channel.Register(new PostgresChangesOptions("public", "todos", ListenType.Inserts, "id=eq.1"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -1064,7 +1202,7 @@ You can also [negate any operator](#negating-a-filter-not) with `not.` and [comb
 
 <$Show if="sdk:js">
 
-<Admonition type="tip">
+<Admonition type="note">
 
 In JavaScript you can pass a raw filter string, or build one with the type-safe `postgresChangesFilter()` helper, which handles operator names, negation, `AND` composition, and escaping for you:
 
@@ -1215,8 +1353,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="messages",
   filter="body=eq.hey",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "messages", ListenType.Updates, "body=eq.hey"));
+channel.AddPostgresChangeHandler(ListenType.Updates, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -1362,8 +1516,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="messages",
   filter="body=neq.bye",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "messages", ListenType.Inserts, "body=neq.bye"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -1508,8 +1678,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="profiles",
   filter="age=lt.65",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "profiles", ListenType.Inserts, "age=lt.65"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -1654,8 +1840,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="profiles",
   filter="age=lte.65",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "profiles", ListenType.Updates, "age=lte.65"));
+channel.AddPostgresChangeHandler(ListenType.Updates, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -1800,8 +2002,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="quantity=gt.10",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "products", ListenType.Inserts, "quantity=gt.10"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -1946,8 +2164,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="quantity=gte.10",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "products", ListenType.Inserts, "quantity=gte.10"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -2092,8 +2326,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="name=in.(red,blue,yellow)",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "colors", ListenType.Inserts, "name=in.(red,blue,yellow)"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -2239,8 +2489,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="articles",
   filter="title=ilike.%breaking%",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "articles", ListenType.Inserts, "title=ilike.%breaking%"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -2386,8 +2652,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="posts",
   filter="slug=match.^post-\\d+$",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "posts", ListenType.Inserts, @"slug=match.^post-\d+$"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -2533,8 +2815,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="todos",
   filter="completed_at=is.null",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "todos", ListenType.Updates, "completed_at=is.null"));
+channel.AddPostgresChangeHandler(ListenType.Updates, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -2680,8 +2978,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="orders",
   filter="status=isdistinct.shipped",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "orders", ListenType.Updates, "status=isdistinct.shipped"));
+channel.AddPostgresChangeHandler(ListenType.Updates, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -2826,8 +3140,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="posts",
   filter="status=not.in.(draft,archived)",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "posts", ListenType.All, "status=not.in.(draft,archived)"));
+channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -2983,8 +3313,24 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="orders",
   filter="amount=gt.100,status=eq.open",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var channel = supabase.Realtime.Channel("changes");
+
+channel.Register(new PostgresChangesOptions("public", "orders", ListenType.Inserts, "amount=gt.100,status=eq.open"));
+channel.AddPostgresChangeHandler(ListenType.Inserts, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -3064,6 +3410,21 @@ await myChannel.subscribe()
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('changes').on_postgres_changes(
+  "*",
+  schema="public",
+  table="profiles",
+  select=["id", "username"],
+  callback=lambda payload: print(payload)
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Receiving `old` records
@@ -3077,7 +3438,7 @@ alter table
 
 <Admonition type="caution">
 
-RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record.
 
 </Admonition>
 
@@ -3229,8 +3590,27 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   table="products",
   filter="name=in.(red,blue,yellow)",
   callback=lambda payload: print(payload)
-)
-.subscribe()
+).subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Set your custom JWT after instantiating the client and before subscribing to a channel
+supabase.Realtime.SetAuth("your-custom-jwt");
+
+var channel = supabase.Realtime.Channel("db-changes");
+
+channel.Register(new PostgresChangesOptions("public", "messages", ListenType.All, "body=eq.bye"));
+channel.AddPostgresChangeHandler(ListenType.All, (sender, change) =>
+{
+    Console.WriteLine(change.Payload);
+});
+
+await channel.Subscribe();
 ```
 
 </TabPanel>
@@ -3239,9 +3619,9 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 ## Limitations
 
-### Delete events are not filterable
+### Delete events
 
-You can't filter Delete events when tracking Postgres Changes. This limitation is due to the way changes are pulled from Postgres.
+You can only filter Delete events when tracking Postgres Changes if the table has the `replica identity` set to `full`. See [Receiving old records](#receiving-old-records).
 
 ## Scaling Postgres Changes
 
@@ -3256,7 +3636,7 @@ Use the estimator below to gauge the maximum throughput for your instance, and r
 
 <RealtimeLimitsEstimator />
 
-<Admonition type="tip">
+<Admonition type="note">
 
 If you expect more than ~3,000 concurrent subscribers on the same changes, use [Broadcast to stream database changes](/docs/guides/realtime/subscribing-to-database-changes#using-broadcast) instead. Broadcast sends each change once and fans it out to all subscribers, so it scales to far higher connection counts than per-subscriber authorization allows.
 

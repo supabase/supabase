@@ -25,7 +25,8 @@ export const CollapsibleCardSection = ({
     </CollapsibleTrigger>
     <CollapsibleContent
       className={cn(
-        '[overflow-y:clip] pt-2 data-closed:animate-collapsible-up data-open:animate-collapsible-down'
+        // pb-px keeps child borders/shadows from being clipped by overflow-y: clip
+        '[overflow-y:clip] pt-2 pb-px data-closed:animate-collapsible-up data-open:animate-collapsible-down'
       )}
     >
       {description && <p className="text-xs text-foreground-lighter mb-6">{description}</p>}

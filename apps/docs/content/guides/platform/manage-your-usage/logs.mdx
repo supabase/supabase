@@ -5,7 +5,7 @@ title: 'Manage Logs usage'
 
 <Admonition type="caution" title="Coming soon">
 
-Logs pricing is being rolled out. Quotas and rates on this page are confirmed but billing enforcement is not yet live. This page will be updated when the rollout is complete.
+Logs pricing is being rolled out. Pricing details and included quotas on this page are subject to change. This page will be updated when billing enforcement goes live.
 
 </Admonition>
 
@@ -14,15 +14,9 @@ Logs usage is metered on two SKUs:
 - **Logs Ingest** — the total GB of log data Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, etc.) during the billing cycle.
 - **Logs Query** — the total GB of log data scanned when you read logs via the Studio UI, the Management API, the CLI, or any other interface.
 
-Each plan includes a free quota for both. Usage beyond the quota is billed per GB.
+Each plan includes a free quota for both. Usage beyond the quota is billed per GB. Pricing details and quotas will be published on the per-SKU pages below when billing enforcement goes live.
 
-| SKU         | Included (per month) | Over-Usage (Pro, Team)         |
-| ----------- | -------------------- | ------------------------------ |
-| Logs Ingest | 5 GB                 | <Price price="0.50" /> per GB  |
-| Logs Query  | 1,000 GB             | <Price price="0.002" /> per GB |
-| Enterprise  | Custom               | Custom                         |
-
-For full billing details, invoice examples, and optimization tips, see the per-SKU pages:
+For optimization tips and billing details, see the per-SKU pages:
 
 - [Manage Logs Ingest usage](/docs/guides/platform/manage-your-usage/logs-ingest)
 - [Manage Logs Query usage](/docs/guides/platform/manage-your-usage/logs-query)

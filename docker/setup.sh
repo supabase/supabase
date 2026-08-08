@@ -8,8 +8,9 @@
 #   3. Optionally installs the AWS CLI v2 (--with-aws)
 #   4. Sparse-clones the repo to extract the contents of ./docker
 #   5. Creates a project directory in CWD and copies docker/* into it
-#   6. Prompts for the main URLs and writes them to .env
-#   7. Generates secrets and asymmetric API keys via utils/*.sh
+#   6. Records the base version the deployment was set up from (.supabase-version)
+#   7. Prompts for the main URLs and writes them to .env
+#   8. Generates secrets and asymmetric API keys via utils/*.sh
 #
 # Usage:
 #   sh setup.sh                            # interactive
@@ -17,8 +18,13 @@
 #   sh setup.sh --project-dir my-supabase  # name the project directory
 #   sh setup.sh --skip-deps                # skip system-package installation
 #   sh setup.sh --with-aws                 # also install the AWS CLI v2
+#   sh setup.sh --ref self-hosted/v0.7.0   # clone docker/ from a specific git ref
+#   sh setup.sh --head                     # clone docker/ from HEAD (skip tags)
 #
 #   curl -fsSL <url-to-this-script> | sh   # bootstrap from scratch in CWD
+#
+# By default the docker/ sources are cloned from the latest self-hosted release
+# tag (self-hosted/v*), falling back to the default branch (HEAD) if none exist.
 #
 
 set -e
@@ -27,6 +33,8 @@ PROJECT_DIR="supabase-project"
 SKIP_DEPS=0
 WITH_AWS=0
 ASSUME_YES=0
+SOURCE_REF=""
+FORCE_HEAD=0
 
 print_help() {
     cat <<EOF
@@ -36,6 +44,10 @@ Options:
   -p, --project-dir <name>  Name of the project directory (default: supabase-project)
       --skip-deps           Skip installation of system packages
       --with-aws            Install the AWS CLI v2
+      --ref <tag|branch>    Clone docker/ from this git ref instead of the
+                            latest self-hosted tag (no HEAD fallback)
+      --head                Clone docker/ from the default branch (HEAD),
+                            skipping self-hosted tag detection
   -y, --yes                 Non-interactive: accept defaults, no prompts
   -h, --help                Show this help and exit
 EOF
@@ -46,11 +58,21 @@ while [ $# -gt 0 ]; do
         -p|--project-dir) PROJECT_DIR="$2"; shift 2 ;;
         --skip-deps) SKIP_DEPS=1; shift ;;
         --with-aws) WITH_AWS=1; shift ;;
+        --ref) SOURCE_REF="$2"; shift 2 ;;
+        --head) FORCE_HEAD=1; shift ;;
         -y|--yes) ASSUME_YES=1; shift ;;
         -h|--help) print_help; exit 0 ;;
         *) echo "Unknown option: $1" >&2; print_help; exit 1 ;;
     esac
 done
+
+# Interactive vs not: -y forces non-interactive; otherwise we're non-interactive
+# when there's no controlling terminal to prompt on (e.g. curl | sh in CI).
+if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
+    NON_INTERACTIVE=1
+else
+    NON_INTERACTIVE=0
+fi
 
 if [ "$(id -u)" = "0" ]; then
     SUDO=""
@@ -67,7 +89,7 @@ die()  { printf "ERROR: %s\n" "$*" >&2; exit 1; }
 # Falls back to the default with -y or when no controlling terminal exists.
 ask() {
     # ask <prompt> <default>  -> echoes chosen value
-    if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
+    if [ "$NON_INTERACTIVE" = "1" ]; then
         printf '%s' "$2"
         return
     fi
@@ -75,6 +97,28 @@ ask() {
     read -r reply < /dev/tty
     [ -z "$reply" ] && reply="$2"
     printf '%s' "$reply"
+}
+
+# True if the value looks like an http(s) URL (scheme check only, not validation).
+valid_url() {
+    case "$1" in
+        http://?*|https://?*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+# Like ask, but requires an http(s):// value. Re-prompts interactively; with no
+# usable terminal (-y or curl | sh) a bad value is fatal rather than silently kept.
+ask_url() {
+    # ask_url <prompt> <default>  -> echoes a validated URL
+    while :; do
+        _url=$(ask "$1" "$2")
+        valid_url "$_url" && { printf '%s' "$_url"; return 0; }
+        if [ "$NON_INTERACTIVE" = "1" ]; then
+            die "$1 must start with http:// or https:// (got: '$_url')"
+        fi
+        printf "  '%s' is not a URL - it must start with http:// or https://.\n" "$_url" > /dev/tty
+    done
 }
 
 OS_FAMILY=""
@@ -205,20 +249,72 @@ install_aws() {
 
 SRC_DIR=""
 SRC_TMP=""
+RESOLVED_REF=""
+REPO_URL="${SUPABASE_REPO_URL:-https://github.com/supabase/supabase}"
+STAMP_FILE=".supabase-version"
+
+# Highest self-hosted/v* tag on the remote, or empty when the remote has none.
+# Returns non-zero (printing nothing) when the remote can't be reached.
+latest_release_tag() {
+    _refs=$(git ls-remote --tags --refs "$REPO_URL" 2>/dev/null) || return 1
+    printf '%s\n' "$_refs" \
+        | sed 's#^.*refs/tags/##' \
+        | grep -E '^self-hosted/v[0-9]' \
+        | sort -V | tail -n1
+}
+
+# Clone only docker/ from <ref> (empty = default branch) into <dest>.
+sparse_clone() {
+    # sparse_clone <dest> [ref]
+    _dest="$1"
+    _ref="$2"
+    if [ -n "$_ref" ]; then
+        git clone --filter=blob:none --no-checkout --depth=1 --quiet \
+            --branch "$_ref" "$REPO_URL" "$_dest" 2>/dev/null || return 1
+    else
+        git clone --filter=blob:none --no-checkout --depth=1 --quiet \
+            "$REPO_URL" "$_dest" 2>/dev/null || return 1
+    fi
+    ( cd "$_dest" &&
+      git sparse-checkout init --cone &&
+      git sparse-checkout set docker &&
+      git checkout --quiet ) 2>/dev/null || return 1
+}
+
+# Echo the commit the clone resolved to (for stamping HEAD-based checkouts).
+resolved_sha() {
+    git -C "$1" rev-parse HEAD 2>/dev/null || true
+}
 
 prepare_source() {
-    log "Sparse-cloning supabase repo"
-    SRC_TMP=$(mktemp -d) || return 1
-    git clone --filter=blob:none --no-checkout --depth=1 --quiet \
-        https://github.com/supabase/supabase "$SRC_TMP/supabase" 2>/dev/null || \
-    { rm -rf "$SRC_TMP"; return 1; }
+    SRC_TMP=$(mktemp -d) || die "Could not create a temporary directory"
+    dest="$SRC_TMP/supabase"
 
-    cd "$SRC_TMP/supabase" || { rm -rf "$SRC_TMP"; return 1; }
-    git sparse-checkout init --cone && \
-    git sparse-checkout set docker && \
-    git checkout --quiet 2>/dev/null
-    SRC_DIR="$PWD/docker"
-    cd - > /dev/null
+    # Pick the ref to clone; empty means the default branch (HEAD), used only
+    # when no release tag exists yet (or --head). A resolved tag that fails to
+    # clone is an error, not a reason to silently install HEAD instead.
+    if [ -n "$SOURCE_REF" ]; then
+        ref="$SOURCE_REF"
+    elif [ "$FORCE_HEAD" = "1" ]; then
+        ref=""
+    else
+        if ref=$(latest_release_tag); then
+            [ -n "$ref" ] || log "No self-hosted release tag found; using the default branch (HEAD)"
+        else
+            die "Could not reach $REPO_URL to look up release tags. Check your network and retry, or pass --head (default branch) or --ref <tag>."
+        fi
+    fi
+
+    log "Sparse-cloning supabase repo at ${ref:-HEAD}"
+    sparse_clone "$dest" "$ref" || die "Could not clone '${ref:-HEAD}' from $REPO_URL"
+
+    # Stamp the tag name for a release tag, else the exact commit SHA.
+    case "$ref" in
+        self-hosted/v*) RESOLVED_REF="$ref" ;;
+        *)              RESOLVED_REF=$(resolved_sha "$dest") ;;
+    esac
+
+    SRC_DIR="$dest/docker"
 }
 
 cleanup_src_tmp() {
@@ -230,6 +326,20 @@ trap cleanup_src_tmp EXIT
 
 read_env() {
     grep "^$1=" .env 2>/dev/null | head -n1 | cut -d= -f2-
+}
+
+# Record the base version this deployment was set up from, so update.sh can
+# 3-way merge future upgrades against it: it fetches the snapshot at this ref
+# as the merge base, and derives the base version from the ref itself. Just the
+# ref - per-deployment state, not vendor content: gitignored.
+write_version_stamp() {
+    [ -n "$1" ] || { warn "Could not resolve a base ref; skipping $STAMP_FILE"; return 0; }
+    {
+        echo "# Supabase self-hosted version stamp. Managed by setup.sh / update.sh."
+        echo "# Do not commit or edit by hand. Records the ref this deployment was based on."
+        echo "ref=$1"
+    } > "$STAMP_FILE"
+    log "Recorded base version in $STAMP_FILE (ref=$1)"
 }
 
 # --- Main ---
@@ -274,14 +384,12 @@ fi
 cd "$target"
 
 current_public_url=$(read_env SUPABASE_PUBLIC_URL)
-current_api_url=$(read_env API_EXTERNAL_URL)
 current_site_url=$(read_env SITE_URL)
 
 [ -z "$current_public_url" ] && current_public_url="http://localhost:8000"
-[ -z "$current_api_url" ]    && current_api_url="$current_public_url"
 [ -z "$current_site_url" ]   && current_site_url="http://localhost:3000"
 
-if [ "$ASSUME_YES" = "1" ] || ! ( : < /dev/tty ) 2>/dev/null; then
+if [ "$NON_INTERACTIVE" = "1" ]; then
     log "Non-interactive: using default URLs (edit .env to change)"
 else
     echo ""
@@ -289,9 +397,9 @@ else
     echo ""
 fi
 
-public_url=$(ask "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
-api_url=$(ask   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url/auth/v1")
-site_url=$(ask  "SITE_URL (default Auth redirect)"    "$current_site_url")
+public_url=$(ask_url "SUPABASE_PUBLIC_URL (Studio + APIs)" "$current_public_url")
+api_url=$(ask_url   "API_EXTERNAL_URL (Auth callbacks)"   "$public_url/auth/v1")
+site_url=$(ask_url  "SITE_URL (default Auth redirect)"    "$current_site_url")
 
 # Suggest PROXY_DOMAIN from the public_url host (unless it's localhost-ish)
 public_host=$(printf '%s' "$public_url" | sed -e 's|^https*://||' -e 's|/.*$||' -e 's|:.*$||')
@@ -324,8 +432,14 @@ sh utils/generate-keys.sh --update-env
 log "Generating asymmetric key pair and opaque API keys"
 sh utils/add-new-auth-keys.sh --update-env
 
+write_version_stamp "$RESOLVED_REF"
+
 log "Pulling Docker images"
-docker compose pull || warn "docker compose pull failed; you can retry later."
+if [ "$NON_INTERACTIVE" = "1" ]; then
+    docker compose --progress quiet pull || warn "docker compose pull failed; you can retry later."
+else
+    docker compose pull || warn "docker compose pull failed; you can retry later."
+fi
 
 echo ""
 echo "Setup complete. Project ready at: $(pwd)"
@@ -336,6 +450,6 @@ echo "  sh run.sh config"
 echo "  sh run.sh secrets"
 echo "  sh run.sh start"
 echo ""
-echo "To enable docker-compose overrides (pg17, envoy, caddy, nginx, rustfs, s3, logs):"
-echo "  sh run.sh config add pg17"
+echo "To enable docker-compose overrides (envoy, caddy, nginx, rustfs, s3, logs):"
+echo "  sh run.sh config add envoy"
 echo ""

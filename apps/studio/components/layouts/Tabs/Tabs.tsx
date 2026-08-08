@@ -11,7 +11,7 @@ import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import {
   cn,
   ContextMenu,
@@ -37,7 +37,19 @@ import {
   type TabCloseConfirmation,
 } from '@/state/tabs'
 
-export const EditorTabs = () => {
+interface EditorTabsProps {
+  customTabs?: ReactNode
+  newTabButton?: ReactNode
+  isCollapseButtonHidden?: boolean
+}
+
+// [Joshen] Will be adjusting this component to support Explorer
+// Will require quite a bit of cleaning up once Explorer supercedes SQL Editor
+export const EditorTabs = ({
+  customTabs,
+  newTabButton,
+  isCollapseButtonHidden,
+}: EditorTabsProps) => {
   const { ref, id } = useParams()
   const router = useRouter()
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
@@ -175,7 +187,10 @@ export const EditorTabs = () => {
           value={hasNewTab ? 'new' : (tabs.activeTab ?? undefined)}
           onValueChange={handleTabChange}
         >
-          <CollapseButton hideTabs={false} />
+          {!isCollapseButtonHidden && <CollapseButton hideTabs={false} />}
+
+          {customTabs}
+
           <TabsList
             ref={tabsListRef}
             className={cn(
@@ -259,7 +274,7 @@ export const EditorTabs = () => {
                   className={cn(
                     'absolute top-1/2 right-3 z-10 flex -translate-y-1/2 items-center justify-center rounded-xs',
                     'opacity-0 group-hover/new-tab:opacity-100 group-focus-within/new-tab:opacity-100 focus-visible:opacity-100',
-                    'hover:bg-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                    'hover:bg-200 focus-ring',
                     'cursor-pointer'
                   )}
                 >
@@ -269,25 +284,26 @@ export const EditorTabs = () => {
             )}
 
             <AnimatePresence initial={false}>
-              {!hasNewTab && (
-                <motion.button
-                  className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
-                  onClick={() =>
-                    router.push(
-                      `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-                    )
-                  }
-                  initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Plus
-                    size={16}
-                    strokeWidth={1.5}
-                    className="text-foreground-lighter hover:text-foreground-light"
-                  />
-                </motion.button>
-              )}
+              {!hasNewTab &&
+                (newTabButton ?? (
+                  <motion.button
+                    className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
+                    onClick={() =>
+                      router.push(
+                        `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
+                      )
+                    }
+                    initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Plus
+                      size={16}
+                      strokeWidth={1.5}
+                      className="text-foreground-lighter hover:text-foreground-light"
+                    />
+                  </motion.button>
+                ))}
             </AnimatePresence>
             <div className="grow h-full border-b pr-6" />
           </TabsList>

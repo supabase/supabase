@@ -8,9 +8,14 @@ database_id = "a3cfff33-d640-4395-99bc-a110b7fb637c"
 http_status_code = 404
 code = "NOT_FOUND"
 message = "Requested function was not found"
+
+[[errors]]
+http_status_code = 404
+code = "NOT_FOUND_FUNCTION_BLOB"
+message = "Function deployment bundle not found"
 ---
 
-The edge function is not recognized by Supabase
+The edge function is not recognized by Supabase, or its deployed bundle cannot be found.
 
 ## Context for the error
 
@@ -51,9 +56,23 @@ When an edge function fails due to a platform 404 error, it will return the erro
 }
 ```
 
+A different platform 404 error, `NOT_FOUND_FUNCTION_BLOB`, can occur when the function name is recognized but the runtime cannot find the deployed bundle. This can happen even when the function appears as `ACTIVE` in the dashboard, because the status shows that the function record exists while the actual deployment bundle is missing or inaccessible:
+
+```json
+{
+  "code": "NOT_FOUND_FUNCTION_BLOB",
+  "message": "Function deployment bundle not found"
+}
+```
+
+The difference between the two errors is:
+
+- `NOT_FOUND`: The function name in the request URL is not recognized.
+- `NOT_FOUND_FUNCTION_BLOB`: The function name is recognized, but the runtime cannot find the deployed bundle.
+
 ### Inspecting the logs
 
-<Admonition type='tip'>
+<Admonition type='note'>
 
 Always configure an appropriate time frame when using the log explorer
 
@@ -99,20 +118,23 @@ If the call works, consider double checking your code for typos or to see if it 
 
 ### Step 4: Redeploy the function
 
-If step 3 fails, it may be a sign of an internal bug and it may be necessary to redeploy your function. This can be done within the [Function Dashboard](/dashboard/project/_/functions) under the respective function's code tab:
+If step 3 fails, it may be a sign of an internal bug and it may be necessary to redeploy your function. The same applies if you see the `NOT_FOUND_FUNCTION_BLOB` error, which means the function is recognized but its deployed bundle cannot be found. This can occur even when the function appears as `ACTIVE` in the dashboard.
+
+This can be done within the [Function Dashboard](/dashboard/project/_/functions) under the respective function's code tab:
 
 ![image](/docs/img/troubleshooting/edge_function_404_redeploy.png)
 
 Alternatively, if you develop locally, you can redeploy the function with the [Supabase CLI](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos):
 
 ```sh
+# Redeploy one affected function
 supabase functions deploy FUNCTION_NAME
 
-# If you want to deploy all functions, run the `deploy` command without specifying a function name:
+# Or redeploy all functions if several are affected
 supabase functions deploy
 ```
 
-Then write in a ticket to [Supabase Support](/dashboard/support/new)
+After redeploying, retry the request. If the error persists, write in a ticket to [Supabase Support](/dashboard/support/new).
 
 ## Additional resources
 

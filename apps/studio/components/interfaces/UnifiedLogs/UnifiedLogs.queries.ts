@@ -104,6 +104,13 @@ const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       ELSE 'success'
     END`
 
+// The `auth_user` column is derived from the source-specific fields that can be attributed to a user.
+const AUTH_USER_EXPR: SafeLogSqlFragment = safeSql`nullIf(CASE
+      WHEN source = 'auth_logs' THEN log_attributes['auth_event.actor_id']
+      WHEN source = 'edge_logs' THEN log_attributes['request.sb.jwt.authorization.payload.subject']
+      ELSE null
+    END, '')`
+
 const logTypeWhereCondition = (logTypes: string[]): SafeLogSqlFragment => {
   const effective = logTypes.filter((t) => t in LOG_TYPE_CONDITION)
   const types = effective.length ? effective : [...DEFAULT_LOG_TYPES]
@@ -248,7 +255,7 @@ const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY'): SafeLogSqlFragmen
  * inlined so the result can be referenced (or filtered) at the same query
  * level — the OTEL endpoint rejects subqueries.
  */
-const rowProjection = (): SafeLogSqlFragment => safeSql`
+const ROW_PROJECTION: SafeLogSqlFragment = safeSql`
     id,
     null AS source_id,
     timestamp,
@@ -258,6 +265,7 @@ const rowProjection = (): SafeLogSqlFragment => safeSql`
     ${ATTR.path} AS pathname,
     event_message,
     ${ATTR.method} AS method,
+    ${AUTH_USER_EXPR} AS auth_user,
     null AS log_count,
     null AS logs
 `
@@ -335,17 +343,14 @@ const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFrag
   const value = userFilterValue(search)
   if (!value) return null
   const exact = lit(value)
-  const contains = lit('%' + value + '%')
   return safeSql`(
-    (source = 'auth_logs' AND (
-      log_attributes['auth_event.actor_id'] = ${exact}
-      OR event_message ILIKE ${contains}
-    ))
-    OR (source = 'postgres_logs' AND event_message ILIKE ${contains})
+    (source = 'auth_logs' AND log_attributes['auth_event.actor_id'] = ${exact})
+    OR 
+    (source = 'edge_logs' AND log_attributes['request.sb.jwt.authorization.payload.subject'] = ${exact})
   )`
 }
 
-const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_SOURCE.postgres])
+const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_SOURCE.edge])
 
 /**
  * True when the user filter is active but an explicit log_type filter restricts the
@@ -411,7 +416,7 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildBaseWhere(search)
   return safeSql`-- unified logs: row list
-SELECT ${rowProjection()}
+SELECT ${ROW_PROJECTION}
 FROM logs
 ${whereClause(conditions)}
 `

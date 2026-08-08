@@ -18,25 +18,19 @@ Supabase auth audit logs automatically capture all authentication events includi
 
 ## Storage options
 
-By default, audit logs are stored in two places:
+Audit logs are stored in:
 
-1. **Your project's Postgres database** - Stored in the `auth.audit_log_entries` table, searchable via SQL but uses database storage
-2. **External log storage** - Cost-efficient storage accessible through the dashboard
+- **External log storage** - Cost-efficient storage accessible through the dashboard
+- **Postgres database** (optional) - Stored in the `auth.audit_log_entries` table, searchable via SQL, but uses additional database storage
 
-You can disable Postgres storage to reduce database storage costs while keeping the external log storage.
+You can enable or disable Postgres database storage to optimize your costs.
 
 ### Configuring audit log storage
 
 1. Navigate to your project’s dashboard
 2. Go to **Authentication**
-3. Find the **Audit Logs** under **Configuration** section
-4. Toggle on "Disable writing auth audit logs to project database" to disable database storage
-
-<Admonition type="tip">
-
-Disabling Postgres storage reduces your database storage costs. Audit logs will still be available through the dashboard.
-
-</Admonition>
+3. Find the **Audit Logs** under the **Configuration** section
+4. Toggle "Write audit logs to the database" on to enable or off to disable database storage
 
 ## Log format
 

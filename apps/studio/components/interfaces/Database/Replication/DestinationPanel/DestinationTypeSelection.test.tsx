@@ -132,7 +132,7 @@ describe('DestinationTypeSelection', () => {
     fireEvent.click(await screen.findByRole('combobox'))
     fireEvent.click(await screen.findByText('BigQuery'))
 
-    expect(await screen.findByText(/This destination type is in public alpha/)).toBeInTheDocument()
+    expect(await screen.findByText(/In public alpha and may change/)).toBeInTheDocument()
   })
 
   test('disables the selector in edit mode so the destination type cannot be changed', async () => {
@@ -155,7 +155,7 @@ describe('DestinationTypeSelection', () => {
             big_query: {
               project_id: 'gcp-proj',
               dataset_id: 'analytics',
-              service_account_key: '{}',
+              connection_pool_size: 5,
             },
           },
         }),

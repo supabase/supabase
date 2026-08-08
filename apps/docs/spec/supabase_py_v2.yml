@@ -112,7 +112,7 @@ functions:
     notes: |
       - The auth methods can be accessed via the `supabase.auth` namespace.
       - By default, the supabase client sets `persist_session` to true and attempts to store the session in memory.
-      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/platform/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
+      - Any email links and one-time passwords (OTPs) sent have a default expiry of 24 hours. We have the following [rate limits](/docs/guides/deployment/going-into-prod#auth-rate-limits) in place to guard against brute force attacks.
       - The expiry of an access token can be set in the "JWT expiry limit" field in [your project's auth settings](/dashboard/project/_/settings/jwt/legacy). A refresh token never expires and can only be used once.
   - id: sign-up
     title: 'sign_up()'
@@ -891,7 +891,7 @@ functions:
               - name: captcha_token
                 type: string
     notes: |
-      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/enterprise-sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `provider_id` property. For example:
           - Mapping specific user email addresses with an identity provider.
@@ -7517,14 +7517,36 @@ functions:
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        description: You can listen to individual rows using the format `{table}:{col}=op.{val}` - where `{col}` is the column name, `{op}` is the filter operator, and `{val}` is the value to match.
         notes: |
-          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
+          - Supported operators: ``eq``, ``neq``, ``lt``, ``lte``, ``gt``, ``gte``, ``in`` (e.g. ``"status=in.(active,pending)"``), ``like``, ``ilike``, ``is`` (e.g. ``"deleted_at=is.null"``), ``match``, ``imatch`` (POSIX regex), ``isdistinct`` (NULL-safe inequality). Prefix any operator with ``not.`` to negate it (e.g. ``"status=not.in.(draft,archived)"``). Combine multiple conditions with commas for an implicit ``AND`` (e.g. ``"amount=gt.100,status=in.(open,pending)"``).
         code: |
           ```python
           response = (
               await supabase.channel("room1")
               .on_postgres_changes("UPDATE", schema="public", table="countries", filter="id=eq.200", callback=handle_record_updated)
+              .subscribe()
+          )
+          ```
+      - id: listening-to-selected-columns
+        name: Listen to selected columns only
+        description: |
+          Use the `select` parameter to receive only specific columns instead of the full row.
+          This reduces payload size, which is especially useful for tables with large `bytea` or `jsonb` columns.
+        code: |
+          ```python
+          def handle_record_updated(payload):
+              print("Updated country:", payload)
+
+          response = (
+              await supabase.channel("room1")
+              .on_postgres_changes(
+                  "UPDATE",
+                  schema="public",
+                  table="countries",
+                  select=["id", "name"],
+                  callback=handle_record_updated,
+              )
               .subscribe()
           )
           ```

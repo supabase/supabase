@@ -672,7 +672,7 @@ Schema change support is currently in beta and limited to supported BigQuery cha
 Pipelines keeps the current destination table state synchronized. It does not automatically create a queryable history of every row version.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
     docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
     slug: 'supabase-pipelines',
     status: {
@@ -766,9 +766,10 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 ## Key features
 1. Event-based listening: Subscribe to INSERT, UPDATE, DELETE, or all (*) events.
 2. Schema and table targeting: Listen to changes in specific schemas or tables.
-3. Granular filtering: Apply filters to receive only relevant changes.
+3. Granular filtering: Apply filters on one or more columns to receive only relevant changes.
 4. Multiple subscriptions: Listen to different combinations of events, schemas, and tables in a single channel.
 5. Row-level security integration: Respect database permissions when broadcasting changes.
+6. Column selection: Opt in to receive only the columns you choose in the event payload, with the primary key always included.
 
 ## Benefits:
 - Real-time updates: Receive instant notifications when data changes, enabling live-updating UIs.
@@ -782,8 +783,6 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 - Real-time dashboards and analytics platforms
 - Live chat and messaging systems
 - Applications requiring instant updates based on database changes
-
-Supabase's Realtime Postgres Changes feature provides a powerful tool for creating responsive, real-time applications while leveraging the full capabilities of your Postgres database.
 `,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],

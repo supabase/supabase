@@ -92,7 +92,7 @@ export const ConnectSection = () => {
                 onClick={() => handleActionClick(action)}
                 className={cn(
                   'group flex items-center gap-3 p-4 text-left transition-colors min-h-[72px] w-full',
-                  'hover:bg-surface-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-brand',
+                  'hover:bg-surface-100 focus-ring',
                   'xl:min-h-32 xl:flex-col xl:justify-center xl:p-6 xl:text-center',
                   ((action.requiresActiveProject ?? true)
                     ? !isActiveHealthy
