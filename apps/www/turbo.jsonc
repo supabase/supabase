@@ -65,6 +65,8 @@
         "HUBSPOT_PORTAL_ID",
         "HUBSPOT_ENTERPRISE_FORM_GUID",
         "HUBSPOT_PARTNERSHIP_FORM_GUID",
+        "HUBSPOT_PARTNER_INTAKE_FORM_GUID",
+        "NOTION_FORMS_API_KEY",
         "OPENAI_API_KEY",
         "EMAIL_REPORT_SLACK_WEBHOOK",
         "npm_lifecycle_event",
