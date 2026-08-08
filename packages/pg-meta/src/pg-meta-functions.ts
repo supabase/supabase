@@ -217,7 +217,7 @@ export type PGSavedFunction = Omit<
 > & {
   argument_types: SafeSqlFragment
   identity_argument_types: SafeSqlFragment
-  return_type: SafeSqlFragment
+  return_type: SafeSqlFragment | null
   config_params: Record<string, SafeSqlFragment> | null
 }
 
@@ -339,6 +339,7 @@ export function update(
             args,
             config_params: currentFunc.config_params ?? {},
             type: currentFunc.type,
+            return_type: currentFunc.return_type ?? undefined,
           },
           { replace: true }
         )

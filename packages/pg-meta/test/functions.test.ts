@@ -442,7 +442,16 @@ withTestDatabase(
     expect(retrieveResult!.type).toBe('procedure')
     expect(retrieveResult!.return_type).toBeNull()
 
-    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(proc!))
+    const { sql: updateSql } = pgMeta.functions.update(asSavedFunction(retrieveResult!), {
+      definition: 'BEGIN NULL; END;',
+    })
+    await executeQuery(updateSql)
+
+    const updatedResult = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updatedResult!.definition).toBe('BEGIN NULL; END;')
+    expect(updatedResult!.return_type).toBeNull()
+
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(updatedResult!))
     await executeQuery(removeSql)
   }
 )
