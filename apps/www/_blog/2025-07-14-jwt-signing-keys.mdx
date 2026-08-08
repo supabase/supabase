@@ -117,7 +117,7 @@ const SUPABASE_JWT_KEYS = createRemoteJWKSet(
 )
 
 function verifySupabaseJWT(jwt: string) {
-  return jwtVerify(token, SUPABASE_JWT_KEYS, { issuer: SUPABASE_JWT_ISSUER })
+  return jwtVerify(jwt, SUPABASE_JWT_KEYS, { issuer: SUPABASE_JWT_ISSUER })
 }
 ```
 
