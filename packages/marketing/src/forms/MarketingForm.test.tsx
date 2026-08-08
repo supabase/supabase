@@ -23,10 +23,18 @@ describe('MarketingForm Grouped Checkbox Validation', () => {
         type: 'checkbox',
         label: 'Marketing emails',
         group: 'consents',
+        groupRequired: true,
       }
     ]
 
     render(<MarketingForm fields={fields} submitLabel="Submit" formRef={{ slug: 'test', formId: '1' }} />)
+    
+    const checkboxes = screen.getAllByRole('checkbox')
+    fireEvent.click(checkboxes[1])
+    await waitFor(() => {
+      expect(checkboxes[1]).toHaveAttribute('aria-checked', 'true')
+    })
+    
     fireEvent.click(screen.getByText('Submit'))
 
     // The individual requirement error should be shown, not the group error
@@ -55,7 +63,7 @@ describe('MarketingForm Grouped Checkbox Validation', () => {
     fireEvent.click(screen.getByText('Submit'))
 
     // It should demand at least one of the grouped fields since one member set groupRequired: true
-    expect(await screen.findByText('Please select at least one option: Newsletter')).toBeInTheDocument()
+    expect(await screen.findByText('Please select at least one option: Newsletter, Updates')).toBeInTheDocument()
     
     // Check the member without groupRequired
     // Radix UI checkboxes are buttons with role="checkbox"

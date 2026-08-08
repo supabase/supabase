@@ -242,7 +242,6 @@ export default function MarketingForm({
       setErrorMessages(
         missingRequiredGroups.map((group) => {
           const labels = group
-            .filter((f) => f.groupRequired)
             .map((f) => f.label)
             .join(', ')
           return `Please select at least one option: ${labels}`

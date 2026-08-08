@@ -100,6 +100,12 @@ interface RouterContext {
   queryClient: QueryClient
 }
 
+declare global {
+  interface Window {
+    __MAINTENANCE_MODE__?: boolean
+  }
+}
+
 const FeatureFlagProviderWithOrgContext = ({
   children,
   ...props
@@ -326,10 +332,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   // self-hosted (Node-server) fallback and the client-side safety net.
   beforeLoad: ({ location }) => {
     let isMaintenanceMode = false
-    if (typeof process !== 'undefined') {
+    if (typeof window !== 'undefined') {
+      isMaintenanceMode = window.__MAINTENANCE_MODE__ === true
+    } else if (typeof process !== 'undefined') {
       isMaintenanceMode = process.env.MAINTENANCE_MODE === 'true'
-    } else if (typeof window !== 'undefined') {
-      isMaintenanceMode = (window as any).__MAINTENANCE_MODE__ === true
     }
 
     const match = matchRedirect({
