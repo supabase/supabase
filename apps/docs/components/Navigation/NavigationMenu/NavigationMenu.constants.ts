@@ -352,6 +352,40 @@ export const gettingstarted: NavMenuConstant = {
     { name: 'Local Development', url: '/guides/local-development/cli/getting-started' },
     { name: 'Architecture', url: '/guides/getting-started/architecture' },
     {
+      name: 'Python Client Guide',
+      enabled: sdkPythonEnabled,
+      items: [
+        {
+          name: 'Getting Started',
+          url: '/guides/getting-started/python-client/start',
+        },
+        {
+          name: 'Client Options',
+          url: '/guides/getting-started/python-client/clients',
+        },
+        {
+          name: 'Async Lifecycle',
+          url: '/guides/getting-started/python-client/async-lifecycle',
+        },
+        {
+          name: 'Database Queries',
+          url: '/guides/getting-started/python-client/database-queries',
+        },
+        {
+          name: 'Authentication',
+          url: '/guides/getting-started/python-client/authentication',
+        },
+        {
+          name: 'Storage and Functions',
+          url: '/guides/getting-started/python-client/storage-functions',
+        },
+        {
+          name: 'Realtime and Testing',
+          url: '/guides/getting-started/python-client/realtime-testing',
+        },
+      ],
+    },
+    {
       name: 'Migrating to new API keys',
       url: '/guides/getting-started/migrating-to-new-api-keys',
     },
