@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { lintInfoMap } from './Linter.utils'
 import { Lint } from '@/data/lint/lint-query'
+import { DOCS_URL } from '@/lib/constants'
 
 const projectRef = 'abc'
 const trickySchema = 'a&b=c'
@@ -64,5 +65,18 @@ describe('Linter.utils lintInfoMap link encoding', () => {
       } as unknown as Lint['metadata'],
     })
     expect(url).toBe('/project/abc/storage/files/buckets/a%2Fb%20c')
+  })
+})
+
+describe('Linter.utils lintInfoMap pitr_archiving_stale entry', () => {
+  it('registers a security entry linking to the PITR settings page', () => {
+    const info = lintInfoMap.find((entry) => entry.name === 'pitr_archiving_stale')
+    expect(info, 'expected pitr_archiving_stale in lintInfoMap').toBeDefined()
+
+    expect(info!.category).toBe('security')
+    expect(info!.link({ projectRef, metadata: {} as unknown as Lint['metadata'] })).toBe(
+      '/project/abc/database/backups/pitr'
+    )
+    expect(info!.docsLink).toBe(`${DOCS_URL}/guides/platform/backups#point-in-time-recovery`)
   })
 })
