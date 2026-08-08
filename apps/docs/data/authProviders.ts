@@ -111,6 +111,16 @@ const authProviders = [
     authType: 'social',
   },
   {
+    name: 'LINE',
+    logo: '/docs/img/icons/line-icon',
+    href: '/guides/auth/social-login/auth-line',
+    official: true,
+    supporter: 'Supabase',
+    platform: true,
+    selfHosted: true,
+    authType: 'social',
+  },
+  {
     name: 'LinkedIn',
     logo: '/docs/img/icons/linkedin-icon',
     href: '/guides/auth/social-login/auth-linkedin',

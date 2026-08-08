@@ -1226,6 +1226,7 @@ parameters:
       - `google`
       - `kakao`
       - `keycloak`
+      - `line`
       - `linkedin_oidc`
       - `notion`
       - `twitch`
