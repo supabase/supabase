@@ -1,0 +1,46 @@
+---
+id: 'ai-agents'
+title: 'AI agents and MCP'
+description: 'Use the Supabase MCP server and debugging skill to let AI agents monitor and debug your project.'
+---
+
+AI agents can monitor and debug Supabase projects using the MCP server and the `supabase` skill. The skill uses a **docs-first architecture**: instead of embedding cause-and-fix content that becomes stale, it routes the agent to the current guide for the specific symptom.
+
+## Setup
+
+1. Install the [Supabase MCP server](/docs/guides/ai-tools/mcp).
+2. Add the `supabase` skill: `npx skills add supabase`.
+
+Once installed, the agent can debug failing requests, query logs, run advisors, and apply fixes — routing to the guides in this section for the source of truth on each issue.
+
+## MCP tools for observability
+
+The Supabase MCP server exposes several tools relevant to monitoring and debugging:
+
+| Tool           | Description                                                                                                                                    |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| `query_logs`   | Run a custom ClickHouse SQL query against a hosted project's unified logs stream. Use for field-level filtering, aggregation, and correlation. |
+| `get_logs`     | Query logs by service name, no SQL required. Works on local and self-hosted projects. Deprecated on hosted in favor of `query_logs`.           |
+| `get_advisors` | Run the Supabase security and performance advisors against a project.                                                                          |
+| `execute_sql`  | Run a SQL query directly against the database.                                                                                                 |
+| `search_docs`  | Search Supabase documentation by keyword or error string.                                                                                      |     |
+
+### Querying logs
+
+On **hosted** projects, use `query_logs` with a ClickHouse SQL query — the same syntax used in the Logs Explorer (see the [Logging guide](/docs/guides/monitoring-and-debugging/logs)). It supports field-level filtering, aggregation, and correlating across log fields.
+
+On **local** and **self-hosted** projects, use `get_logs` with a service name and optional time window — `query_logs` is not available there.
+
+When either tool returns an empty result, widen along an anchor — a timestamp, request ID, or error code — rather than broadening the query.
+
+## Using the debugging skill
+
+The `supabase` skill's debugging workflow follows the same loop as the [Debugging guide](/docs/guides/monitoring-and-debugging/debugging):
+
+1. Read the error precisely — status code, error code, full message.
+2. Locate the failing layer using the request-stack model.
+3. Query that layer's logs using `query_logs` (hosted) or `get_logs` (local/self-hosted) with a bounded time window.
+4. Fetch the troubleshooting guide for the specific symptom (append `.md` to the docs URL, or use `search_docs`).
+5. Apply the fix, then verify by re-running the failing operation.
+
+The skill routes to the [symptom-to-layer table](/docs/guides/monitoring-and-debugging/debugging#find-the-guide-for-your-symptom) rather than embedding cause-and-fix content. This means the agent uses current documentation and the skill stays stable as the docs evolve.

@@ -3065,6 +3065,16 @@ export const telemetry: NavMenuConstant = {
           name: 'Tracing with the client SDKs',
           url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
+        {
+          name: 'AI & automation',
+          url: undefined,
+          items: [
+            {
+              name: 'AI agents and MCP',
+              url: '/guides/monitoring-and-debugging/ai-agents' as `/${string}`,
+            },
+          ],
+        },
       ],
     },
   ],
