@@ -152,7 +152,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           [Joshen] The div child here and all these classes is to properly add a left border
           to make the sticky column more distinct
         */}
-        <TableCell className="w-20 sticky bg-surface-100 right-0 relative">
+        <TableCell className="w-20 sticky bg-card right-0 relative">
           <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l">
             {isDisabling ? (
               <Loader2 className="animate-spin" size={16} />
