@@ -184,6 +184,7 @@ export const EntityListItem = ({
       id={String(entity.id)}
       href={buildTableEditorUrl({ projectRef, tableId: entity.id, schema: entity.schema })}
       role="button"
+      tabIndex={0}
       aria-label={`View ${entity.name}`}
       className={cn(
         TreeViewItemVariant({

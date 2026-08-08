@@ -1,30 +1,12 @@
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { GENERATED_DIRECTORY } from '~/lib/docs'
 import { codeBlock } from 'common-tags'
 import { Check, PlusCircle } from 'lucide-react'
-import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import { Heading, Popover, PopoverContent, PopoverTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-
-import {
-  terraformDocsBranch,
-  terraformDocsDocsDir,
-  terraformDocsOrg,
-  terraformDocsRepo,
-} from '../terraformConstants'
-import { GuideTemplate, newEditLink } from '@/features/docs/GuidesMdx.template'
-import { genGuideMeta } from '@/features/docs/GuidesMdx.utils'
-import { TabPanel, Tabs } from '@/features/ui/Tabs'
-import { getGitHubFileContents } from '@/lib/octokit'
-
-const meta = {
-  title: 'Terraform Provider reference',
-  subtitle: 'Resources and data sources available through the Terraform Provider',
-}
-
-const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/deployment/terraform/reference',
-  meta,
-}))
 
 function ProviderSettings({ schema }: { schema: any }) {
   const attributes = schema.block.attributes
@@ -346,65 +328,16 @@ function DataSources({ schema }: { schema: any }) {
   )
 }
 
-const TerraformReferencePage = async () => {
-  const { schema } = await getSchema()
-
-  const editLink = newEditLink('supabase/terraform-provider-supabase')
+export async function TerraformProviderSchema() {
+  const raw = await readFile(join(GENERATED_DIRECTORY, 'terraform.schema.json'), 'utf-8')
+  const schema = JSON.parse(raw)
+  const providerSchema = schema.provider_schemas['registry.terraform.io/supabase/supabase']
 
   return (
-    <GuideTemplate
-      meta={meta}
-      editLink={editLink}
-      pathname="/guides/deployment/terraform/reference"
-    >
-      The Terraform Provider provides access to{' '}
-      <Link
-        href="https://developer.hashicorp.com/terraform/language/resources"
-        rel="noopener noreferrer"
-      >
-        resources
-      </Link>{' '}
-      and{' '}
-      <Link
-        href="https://developer.hashicorp.com/terraform/language/data-sources"
-        rel="noreferrer noopener"
-      >
-        data sources
-      </Link>
-      . Resources are infrastructure objects, such as a Supabase project, that you can declaratively
-      configure. Data sources are sources of information about your Supabase instances.
-      <ProviderSettings
-        schema={schema.provider_schemas['registry.terraform.io/supabase/supabase'].provider}
-      />
-      <Resources
-        schema={schema.provider_schemas['registry.terraform.io/supabase/supabase'].resource_schemas}
-      />
-      <DataSources
-        schema={
-          schema.provider_schemas['registry.terraform.io/supabase/supabase'].data_source_schemas
-        }
-      />
-    </GuideTemplate>
+    <>
+      <ProviderSettings schema={providerSchema.provider} />
+      <Resources schema={providerSchema.resource_schemas} />
+      <DataSources schema={providerSchema.data_source_schemas} />
+    </>
   )
 }
-
-/**
- * Fetch JSON schema from external repo
- */
-const getSchema = async () => {
-  const schema = JSON.parse(
-    await getGitHubFileContents({
-      org: terraformDocsOrg,
-      repo: terraformDocsRepo,
-      path: `${terraformDocsDocsDir}/schema.json`,
-      branch: terraformDocsBranch,
-    })
-  )
-
-  return {
-    schema,
-  }
-}
-
-export default TerraformReferencePage
-export { generateMetadata }

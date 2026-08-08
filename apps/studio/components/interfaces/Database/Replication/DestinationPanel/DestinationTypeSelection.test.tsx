@@ -20,12 +20,14 @@ const mockBigQueryEnabled = vi.fn()
 const mockIcebergEnabled = vi.fn()
 const mockDucklakeEnabled = vi.fn()
 const mockSnowflakeEnabled = vi.fn()
+const mockClickHouseEnabled = vi.fn()
 
 vi.mock('../useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => mockBigQueryEnabled(),
   useIsETLIcebergPrivateAlpha: () => mockIcebergEnabled(),
   useIsETLDucklakePrivateAlpha: () => mockDucklakeEnabled(),
   useIsETLSnowflakePrivateAlpha: () => mockSnowflakeEnabled(),
+  useIsETLClickHousePrivateAlpha: () => mockClickHouseEnabled(),
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
@@ -57,6 +59,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -69,6 +72,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -84,6 +88,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -99,6 +104,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -118,6 +124,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -133,6 +140,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
     // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
     addAPIMock({

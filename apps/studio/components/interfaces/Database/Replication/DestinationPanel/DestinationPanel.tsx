@@ -43,6 +43,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
       'Analytics Bucket',
       'DuckLake',
       'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,

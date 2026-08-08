@@ -29,6 +29,7 @@ export const StoragePolicyEditorModalTitle = ({
       <div>
         <div className="flex items-center space-x-3">
           <button
+            tabIndex={0}
             onClick={onSelectBackFromTemplates}
             className={cn(
               'cursor-pointer rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',

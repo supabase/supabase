@@ -201,18 +201,21 @@ export const MarketplaceFilterBar = ({
       </DropdownMenu>
 
       {showClear && (
-        <button
+        <Button
           type="button"
+          variant="text"
+          size="tiny"
           onClick={onClearFilters}
-          className="px-1 text-xs text-foreground-light underline-offset-2 hover:underline"
+          className="text-foreground-light"
         >
           Clear all
-        </button>
+        </Button>
       )}
 
       <div className="ml-auto flex rounded-md border">
         <button
           type="button"
+          tabIndex={0}
           aria-label="Grid view"
           onClick={() => onViewModeChange('grid')}
           className={cn(
@@ -227,6 +230,7 @@ export const MarketplaceFilterBar = ({
         </button>
         <button
           type="button"
+          tabIndex={0}
           aria-label="List view"
           onClick={() => onViewModeChange('list')}
           className={cn(

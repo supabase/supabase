@@ -19,5 +19,7 @@
   "jsx-a11y/anchor-is-valid",
   "jsx-a11y/heading-has-content",
   "jsx-a11y/no-distracting-elements",
-  "supabase/require-explicit-tabindex"
+  "supabase/require-explicit-tabindex",
+  "valtio/state-snapshot-rule",
+  "react-hook-form/no-use-watch"
 ]

@@ -1,42 +1,41 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Menu } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { generateObservabilityMenuItems } from './ObservabilityMenu.utils'
+import {
+  useGenerateCustomReportsMenu,
+  useGenerateObservabilityMenu,
+} from './ObservabilityMenu.utils'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
-import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
-import { Content, ContentBase, useContentQuery } from '@/data/content/content-query'
+import { Content } from '@/data/content/content-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import type { Dashboards } from '@/types'
 
 export const ObservabilityMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4] || 'observability') as string
-  const showOverview = useFlag('observabilityOverview')
-  const { isSupamonitorEnabled } = useSupamonitorStatus()
 
-  const storageSupported = useIsFeatureEnabled('project_storage:all')
+  const menuItems = useGenerateObservabilityMenu()
+  const { data: customReportItems, isLoading } = useGenerateCustomReportsMenu()
 
   const { can: canCreateCustomReport } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -47,24 +46,6 @@ export const ObservabilityMenu = () => {
     }
   )
 
-  // Preserve date range query parameters when navigating
-  const preservedQueryParams = useMemo(() => {
-    const { its, ite, isHelper, helperText } = router.query
-    const params = new URLSearchParams()
-
-    if (its && typeof its === 'string') params.set('its', its)
-    if (ite && typeof ite === 'string') params.set('ite', ite)
-    if (isHelper && typeof isHelper === 'string') params.set('isHelper', isHelper)
-    if (helperText && typeof helperText === 'string') params.set('helperText', helperText)
-
-    const queryString = params.toString()
-    return queryString ? `?${queryString}` : ''
-  }, [router.query])
-
-  const { data: content, isPending: isLoading } = useContentQuery({
-    projectRef: ref,
-    type: 'report',
-  })
   const { mutateAsync: deleteReport } = useContentDeleteMutation({
     // Toasts are driven by toast.promise in onConfirmDeleteReport. This no-op keeps the hook
     // from showing its own default error toast, while its optimistic rollback still runs.
@@ -104,52 +85,6 @@ export const ObservabilityMenu = () => {
       })
   }
 
-  function isReportContent(c: Content): c is ContentBase & {
-    type: 'report'
-    content: Dashboards.Content
-  } {
-    return c.type === 'report'
-  }
-
-  function getReportMenuItems() {
-    if (!content) return []
-
-    const reports = content?.content.filter(isReportContent)
-
-    const sortedReports = reports?.sort((a, b) => {
-      if (a.name < b.name) {
-        return -1
-      }
-      if (a.name > b.name) {
-        return 1
-      }
-      return 0
-    })
-
-    const reportMenuItems = sortedReports.map((r, idx) => ({
-      id: r.id,
-      name: r.name,
-      description: r.description || '',
-      key: r.id || idx + '-report',
-      url: `/project/${ref}/observability/${r.id}${preservedQueryParams}`,
-      hasDropdownActions: true,
-      report: r,
-    }))
-
-    return reportMenuItems
-  }
-
-  const reportMenuItems = getReportMenuItems()
-
-  const menuItems = generateObservabilityMenuItems({
-    ref,
-    preservedQueryParams,
-    showOverview,
-    isSupamonitorEnabled,
-    storageSupported,
-    isPlatform: IS_PLATFORM,
-  })
-
   useShortcut(
     SHORTCUT_IDS.OBSERVABILITY_NEW_REPORT,
     () => {
@@ -186,7 +121,7 @@ export const ObservabilityMenu = () => {
                     title={
                       <span className="flex w-full items-center justify-between relative h-6">
                         <span className="uppercase font-mono">Custom Reports</span>
-                        {reportMenuItems.length > 0 && (
+                        {customReportItems.length > 0 && (
                           <ButtonTooltip
                             variant="default"
                             size="tiny"
@@ -209,8 +144,8 @@ export const ObservabilityMenu = () => {
                       </span>
                     }
                   />
-                  {reportMenuItems.length > 0 &&
-                    reportMenuItems.map((item) => (
+                  {customReportItems.length > 0 &&
+                    customReportItems.map((item) => (
                       <ObservabilityMenuItem
                         key={item.id}
                         item={item}
@@ -225,7 +160,7 @@ export const ObservabilityMenu = () => {
                       />
                     ))}
                 </Menu>
-                {reportMenuItems.length === 0 ? (
+                {customReportItems.length === 0 ? (
                   <div className="px-2">
                     <InnerSideBarEmptyPanel
                       title="No custom reports yet"

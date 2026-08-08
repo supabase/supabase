@@ -74,6 +74,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
           </p>
           <button
             type="button"
+            tabIndex={0}
             className="text-foreground-lighter hover:text-foreground transition"
             onClick={(event: MouseEvent<HTMLButtonElement>) => {
               function onCopy(value: string) {
