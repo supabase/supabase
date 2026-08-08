@@ -15,7 +15,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
       break
 
     default:
-      console.log('Unrecognized specification version:', spec.sdkspec)
+      console.warn('Unrecognized specification version:', spec.sdkspec)
       break
   }
 }
