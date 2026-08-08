@@ -1,0 +1,312 @@
+---
+title: 'Configure Auth Hooks'
+description: 'Set up auth hooks for self-hosted Supabase with Docker.'
+subtitle: 'Set up auth hooks for self-hosted Supabase with Docker.'
+---
+
+This guide covers the **server-side configuration** required to enable auth hooks on a self-hosted Supabase instance running with Docker Compose. Auth hooks let you run custom logic at specific points in the authentication flow - for example, adding claims to JWTs, sending SMS through a custom provider, or restricting signups.
+
+For hook implementation details (input/output schemas, SQL and HTTP examples), see [Auth Hooks](/docs/guides/auth/auth-hooks).
+
+## Before you begin
+
+You need:
+
+- A working self-hosted Supabase installation. See [Self-Hosting with Docker](/docs/guides/self-hosting/docker).
+- For Postgres function hooks: access to the database service to create functions.
+- For HTTP endpoint hooks: a reachable HTTPS endpoint or a local Edge Function.
+
+## How hooks work
+
+The Auth service (GoTrue) can call a **hook** at specific lifecycle events during the auth flow. Each hook can be configured with the following environment variables:
+
+- `GOTRUE_HOOK_{HOOK_NAME}_ENABLED`: Enable the hook (`true`/`false`)
+- `GOTRUE_HOOK_{HOOK_NAME}_URI`: The hook endpoint
+- `GOTRUE_HOOK_{HOOK_NAME}_SECRETS`: Webhook signing secrets (for HTTP hooks)
+
+| Hook                                                                             | Hook Name                       | Description                                                |
+| -------------------------------------------------------------------------------- | ------------------------------- | ---------------------------------------------------------- |
+| [Custom Access Token](/docs/guides/auth/auth-hooks/custom-access-token-hook)     | `CUSTOM_ACCESS_TOKEN`           | Add claims to JWTs before they are issued                  |
+| [Send SMS](/docs/guides/auth/auth-hooks/send-sms-hook)                           | `SEND_SMS`                      | Replace built-in SMS sending with a custom provider        |
+| [Send Email](/docs/guides/auth/auth-hooks/send-email-hook)                       | `SEND_EMAIL`                    | Replace built-in email sending with a custom provider      |
+| [Before User Created](/docs/guides/auth/auth-hooks/before-user-created-hook)     | `BEFORE_USER_CREATED`           | Run checks or block signups before creating a user         |
+| [MFA Verification](/docs/guides/auth/auth-hooks/mfa-verification-hook)           | `MFA_VERIFICATION_ATTEMPT`      | Validate MFA attempts (rate limit, brute-force protection) |
+| [Password Verification](/docs/guides/auth/auth-hooks/password-verification-hook) | `PASSWORD_VERIFICATION_ATTEMPT` | Track and limit failed password attempts                   |
+
+### URI schemes
+
+Hooks support two URI schemes:
+
+| Scheme                  | Format                                             |
+| ----------------------- | -------------------------------------------------- |
+| `pg-functions://`       | `pg-functions://postgres/<schema>/<function_name>` |
+| `http://` or `https://` | `https://example.com/hook`                         |
+
+<Admonition type="tip">
+
+Postgres function hooks run inside your database - no network overhead, no secrets required.
+
+</Admonition>
+
+<Admonition type="note">
+
+`http://` URIs are only allowed for `localhost`, `127.0.0.1`, `::1`, and `host.docker.internal` hostnames.
+
+</Admonition>
+
+## Step-by-step: Postgres function hook
+
+This example enables the **Custom Access Token** hook using a Postgres function that adds a `user_role` claim to the JWT.
+
+### Step 1: Create the Postgres function
+
+You can execute the following SQL from the Supabase dashboard SQL editor, or by connecting to your database using a PostgreSQL client such as psql.
+
+```sql name=custom_access_token_hook.sql
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  claims jsonb;
+  user_role text;
+begin
+  claims := event->'claims';
+
+  -- Example: look up a custom role from a user_roles table
+  select role into user_role
+    from public.user_roles
+    where user_id = (event->>'user_id')::uuid;
+
+  if user_role is not null then
+    claims := jsonb_set(
+      claims, '{user_role}', to_jsonb(user_role)
+    );
+  end if;
+
+  -- Return the modified claims
+  return jsonb_build_object('claims', claims);
+end;
+$$;
+
+-- Grant execute permission to supabase_auth_admin
+grant execute on function public.custom_access_token_hook
+  to supabase_auth_admin;
+
+-- Revoke from public and other roles
+revoke execute on function public.custom_access_token_hook
+  from authenticated, anon, public;
+```
+
+### Step 2: Update `docker-compose.yml`
+
+Update the `auth` service `environment:` block:
+
+```yaml name=docker-compose.yml
+services:
+  auth:
+    environment:
+      GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: 'true' # 👈 enabling the hook is required
+      GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI: 'pg-functions://postgres/public/custom_access_token_hook'
+```
+
+### Step 3: Restart the auth service
+
+```sh
+docker compose up -d --force-recreate --no-deps auth
+```
+
+### Step 4: Verify
+
+Sign in and decode the JWT. If the hook ran successfully, your custom claim should be present. If something doesn't work, check the auth logs:
+
+```sh
+docker compose logs auth --tail 20
+```
+
+## Step-by-step: HTTP endpoint hook
+
+This example enables the **Send SMS** hook using an Edge Function.
+
+### Step 1: Create the Edge Function
+
+Create `volumes/functions/send_sms/index.ts`:
+
+```ts name=volumes/functions/send_sms/index.ts
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+
+// Note: this example assumes a single secret. If you use multiple secrets (e.g. "v1,whsec_new|v1,whsec_old"), split on '|'
+// and try each secret in turn until wh.verify() succeeds.
+const hookSecret = Deno.env.get('SEND_SMS_HOOK_SECRET')?.replace('v1,whsec_', '')
+
+Deno.serve(async (req) => {
+  if (req.method !== 'POST') {
+    return new Response('not allowed', { status: 400 })
+  }
+
+  if (!hookSecret) {
+    console.error('SEND_SMS_HOOK_SECRET environment variable not provided')
+    return new Response('{}', { status: 500 })
+  }
+
+  // Verify the webhook signature
+  const payload = await req.text()
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(hookSecret)
+  const { user, sms } = wh.verify(payload, headers)
+
+  // Send SMS using your provider
+  // ... your sms sending logic here ...
+
+  return new Response(JSON.stringify({}), {
+    headers: { 'Content-Type': 'application/json' },
+  })
+})
+```
+
+### Step 2: Generate a webhook secret
+
+Generate a secret using the following command:
+
+```sh
+echo "v1,whsec_$(openssl rand -base64 32)"
+```
+
+Copy the output of this command, for example: `v1,whsec_abc123...`.
+
+### Step 3: Update `.env` file
+
+Add the following environment variables to your `.env` file:
+
+```bash name=.env
+SEND_SMS_HOOK_URI=http://host.docker.internal:8000/functions/v1/send_sms
+SEND_SMS_HOOK_SECRET=YOUR_GENERATED_SECRET_HERE # Paste the secret generated in the last step here
+```
+
+### Step 4: Update `docker-compose.yml`
+
+Add the following environment variables to the auth and functions services. For brevity, only the updated fields are shown.
+
+```yaml name=docker-compose.yml
+services:
+  auth:
+    environment:
+      GOTRUE_HOOK_SEND_SMS_ENABLED: 'true'
+      GOTRUE_HOOK_SEND_SMS_URI: ${SEND_SMS_HOOK_URI}
+      GOTRUE_HOOK_SEND_SMS_SECRETS: ${SEND_SMS_HOOK_SECRET}
+    extra_hosts: # 👈 required so the container can resolve host.docker.internal
+      - 'host.docker.internal:host-gateway'
+
+  functions:
+    environment:
+      SEND_SMS_HOOK_SECRET: ${SEND_SMS_HOOK_SECRET}
+```
+
+### Step 5: Restart auth and functions services
+
+```sh
+docker compose up -d --force-recreate --no-deps auth functions
+```
+
+### Step 6: Verify
+
+Trigger an SMS authentication event and confirm that the hook executes successfully.
+
+If something doesn't work, check the auth and functions logs:
+
+```sh
+docker compose logs auth --tail 20
+docker compose logs functions --tail 20
+```
+
+## Webhook secrets
+
+HTTP hooks use the [Standard Webhooks](https://www.standardwebhooks.com/) specification for payload signing.
+
+### Generating a secret
+
+```sh
+echo "v1,whsec_$(openssl rand -base64 32)"
+```
+
+### Secret format
+
+- **Symmetric**: `v1,whsec_[base64]{32-88 characters}`
+- **Asymmetric**: `v1a,whpk_[base64]:v1a,whsk_[base64]`
+
+### Key rotation
+
+Separate multiple secrets with `|` to rotate keys without downtime. For example:
+
+```bash name=.env
+SEND_EMAIL_HOOK_SECRET=v1,whsec_new-secret|v1,whsec_old-secret
+```
+
+```yml name=docker-compose.yml
+services:
+  auth:
+    environment:
+      GOTRUE_HOOK_SEND_EMAIL_ENABLED: 'true'
+      GOTRUE_HOOK_SEND_EMAIL_URI: 'https://example.com'
+      GOTRUE_HOOK_SEND_EMAIL_SECRETS: ${SEND_EMAIL_HOOK_SECRET}
+```
+
+The Auth service tries each secret in order. Once all clients are using the new secret, remove the old one.
+
+<Admonition type="note">
+
+Postgres function hooks (`pg-functions://` URIs) do not require secrets - they run directly inside the database.
+
+</Admonition>
+
+## Troubleshooting
+
+### Hook not firing
+
+- Check that `GOTRUE_HOOK_{HOOK_NAME}_ENABLED` is set to `"true"` (as a string) in `docker-compose.yml`
+- Verify the variable reaches the container: `docker compose exec auth env | grep GOTRUE_HOOK`
+- Remember: `.env` variables do not reach the container unless passed through in `docker-compose.yml`
+
+### `pg-functions://` URI errors
+
+The URI format must be exactly `pg-functions://postgres/<schema>/<function_name>`:
+
+- The host must be `postgres`
+- Schema and function name must be valid PostgreSQL identifiers
+- The function must exist and be granted to `supabase_auth_admin`
+
+### HTTP hook returns errors
+
+Check auth logs for details:
+
+```sh
+docker compose logs auth --tail 20
+```
+
+Common causes:
+
+- The endpoint is not reachable from the auth container
+- `http://` is only allowed for `localhost`, `127.0.0.1`, `::1`, and `host.docker.internal`
+
+### Webhook secret format mismatch
+
+Secrets must match the Standard Webhooks format:
+
+- Symmetric: `v1,whsec_[base64]` (32-88 base64 characters after the prefix)
+- No spaces or newlines in the secret string
+- Generate with: `echo "v1,whsec_$(openssl rand -base64 32)"`
+
+### Permission denied on Postgres function
+
+Ensure the function is granted to `supabase_auth_admin`:
+
+```sql
+grant execute on function public.your_hook_function
+  to supabase_auth_admin;
+```
+
+### SMS OTP expires too quickly
+
+Refer to [OTP Settings Docs](/docs/guides/self-hosting/self-hosted-phone-mfa#otp-settings)
