@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "og-generator",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter=supaimage", "dev"],
+      "port": 3030
+    },
+    {
+      "name": "www",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev", "--filter=www"],
+      "port": 3000,
+      "autoPort": false
+    }
+  ]
+}
