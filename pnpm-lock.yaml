@@ -2424,12 +2424,27 @@ importers:
         specifier: 'catalog:'
         version: 3.25.76
     devDependencies:
+      '@testing-library/jest-dom':
+        specifier: ^6.6.0
+        version: 6.6.3
+      '@testing-library/react':
+        specifier: ^16.0.0
+        version: 16.0.0(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
+      '@vitejs/plugin-react':
+        specifier: 'catalog:'
+        version: 6.0.1(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
       config:
         specifier: workspace:*
         version: link:../config
+      jsdom:
+        specifier: ^28.1.0
+        version: 28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1)
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.2.6(react@19.2.6)
       tailwindcss:
         specifier: ^4.2.4
         version: 4.2.4
@@ -2439,6 +2454,9 @@ importers:
       typescript:
         specifier: 'catalog:'
         version: 6.0.2
+      vitest:
+        specifier: 'catalog:'
+        version: 4.1.4(@opentelemetry/api@1.9.1)(@types/node@22.13.14)(@vitest/coverage-v8@4.1.4)(@vitest/ui@4.1.4)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
 
   packages/pg-meta:
     dependencies:
@@ -3221,6 +3239,10 @@ packages:
 
   '@babel/helper-plugin-utils@7.28.6':
     resolution: {integrity: sha512-S9gzZ/bz83GRysI7gAD4wPT/AI3uCnY+9xn+Mx/KPs2JwHJIz1W8PZkg2cqyt3RNOBM8ejcXhV6y8Og7ly/Dug==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-plugin-utils@7.29.7':
+    resolution: {integrity: sha512-G7sHYigPY17oO5SYWnfD/0MTBwVR781S/JI643e/JhUYgVgWE/61SoW3NH9KWUKyKq5LVh3npif99Wkt6j86Jw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/helper-replace-supers@7.28.6':
@@ -18645,6 +18667,8 @@ snapshots:
 
   '@babel/helper-plugin-utils@7.28.6': {}
 
+  '@babel/helper-plugin-utils@7.29.7': {}
+
   '@babel/helper-replace-supers@7.28.6(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
     dependencies:
       '@babel/core': 7.29.7(supports-color@8.1.1)
@@ -18700,12 +18724,12 @@ snapshots:
   '@babel/plugin-syntax-jsx@7.27.1(@babel/core@7.29.7(supports-color@8.1.1))':
     dependencies:
       '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-plugin-utils': 7.28.6
+      '@babel/helper-plugin-utils': 7.29.7
 
   '@babel/plugin-syntax-typescript@7.28.6(@babel/core@7.29.7(supports-color@8.1.1))':
     dependencies:
       '@babel/core': 7.29.7(supports-color@8.1.1)
-      '@babel/helper-plugin-utils': 7.28.6
+      '@babel/helper-plugin-utils': 7.29.7
 
   '@babel/plugin-transform-modules-commonjs@7.27.1(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1)':
     dependencies:
