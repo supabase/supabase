@@ -1,13 +1,13 @@
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 
-import { allDocs } from 'contentlayer/generated'
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Balancer from 'react-wrap-balancer'
 import { ScrollArea } from 'ui'
 
+import { allDocs } from '@/.velite'
 import { metadata as mainMetadata } from '@/app/layout'
 import { FrameworkSelector } from '@/components/framework-selector'
 import { Mdx } from '@/components/mdx-components'
@@ -70,7 +70,7 @@ export default async function DocPage(props: DocPageProps) {
     notFound()
   }
 
-  const toc = await getTableOfContents(doc.body.raw)
+  const toc = await getTableOfContents(doc.raw)
 
   return (
     <main className="relative lg:gap-10 xl:grid xl:grid-cols-[1fr_200px] px-8 md:px-16 py-20">
@@ -93,7 +93,7 @@ export default async function DocPage(props: DocPageProps) {
         </div>
         <SourcePanel doc={doc} />
         <div className="pb-12">
-          <Mdx code={doc.body.code} />
+          <Mdx code={doc.code} />
         </div>
       </div>
       {doc.toc && (
