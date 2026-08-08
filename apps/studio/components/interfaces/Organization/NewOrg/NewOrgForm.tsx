@@ -27,6 +27,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { useFindDuplicatedOrganizationByName } from './NewOrgForm.utils'
 import {
   ORG_KIND_DEFAULT,
   ORG_SIZE_DEFAULT,
@@ -203,6 +204,8 @@ export const NewOrgForm = ({
 
   const selectedPlan = useWatch({ control: form.control, name: 'plan' })
   const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
+  const watchedName = useWatch({ control: form.control, name: 'name' })
+  const duplicateOrgName = useFindDuplicatedOrganizationByName(watchedName, organizations)
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -446,6 +449,10 @@ export const NewOrgForm = ({
             <OrganizationDetailsFields
               control={form.control}
               kind={useWatch({ control: form.control, name: 'kind' })}
+              nameWarning={
+                duplicateOrgName &&
+                `You are already a member of an organization named "${duplicateOrgName.name}". Please choose a different name.`
+              }
               renderFieldWrapper={(children, field) => (
                 <Panel.Content key={field}>{children}</Panel.Content>
               )}
