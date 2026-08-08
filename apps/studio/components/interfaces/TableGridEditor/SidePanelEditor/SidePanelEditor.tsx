@@ -44,17 +44,14 @@ import { useDatabasePublicationsQuery } from '@/data/database-publications/datab
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
-import { databaseKeys } from '@/data/database/keys'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
-import { tableEditorKeys } from '@/data/table-editor/keys'
 import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { getTables } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -426,34 +423,13 @@ export const SidePanelEditor = ({
         reAddRenamedColumnSortAndFilter(selectedColumnToEdit.name, payload.name)
       }
 
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: tableEditorKeys.tableEditor(project?.ref, selectedTable?.id),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: databaseKeys.foreignKeyConstraints(project?.ref, selectedTable?.schema),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: databaseKeys.tableDefinition(project?.ref, selectedTable?.id),
-        }),
-        queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, { includeColumns }),
-        }),
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.infiniteListPrefix(project?.ref, selectedTable?.schema),
-        }),
-        // useTableQuery (FK selectors/formatters) has a 5min staleTime -- without this,
-        // an edited column can serve stale data to any FK target cell pointing at this table.
-        queryClient.invalidateQueries({
-          queryKey: tableKeys.retrieve(project?.ref, selectedTable?.name, selectedTable?.schema),
-        }),
-      ])
-
-      // We need to invalidate tableRowsAndCount after tableEditor
-      // to ensure the query sent is correct
-      await queryClient.invalidateQueries({
-        queryKey: tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id),
+      await invalidateTableMetadata(queryClient, {
+        projectRef: project?.ref,
+        schema: selectedTable?.schema,
+        tableId: selectedTable?.id,
+        tableName: selectedTable?.name,
+        includeRows: true,
+        includeLint: true,
       })
 
       setIsEdited(false)
@@ -708,14 +684,12 @@ export const SidePanelEditor = ({
                 { name: 'create_table.cache_invalidation', op: 'cache.invalidate' },
                 async () => {
                   await Promise.all([
-                    queryClient.invalidateQueries({
-                      queryKey: tableKeys.list(project?.ref, table.schema, { includeColumns }),
-                    }),
-                    queryClient.invalidateQueries({
-                      queryKey: tableKeys.infiniteListPrefix(project?.ref, table.schema),
-                    }),
-                    queryClient.invalidateQueries({
-                      queryKey: entityTypeKeys.list(project?.ref),
+                    invalidateTableMetadata(queryClient, {
+                      projectRef: project?.ref,
+                      schema: table.schema,
+                      tableId: table.id,
+                      tableName: table.name,
+                      includeLint: true,
                     }),
                     queryClient.invalidateQueries({
                       queryKey: databasePoliciesKeys.list(project?.ref),
@@ -723,7 +697,6 @@ export const SidePanelEditor = ({
                     queryClient.invalidateQueries({
                       queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
                     }),
-                    queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
                   ])
                 }
               )
@@ -761,17 +734,16 @@ export const SidePanelEditor = ({
         }
 
         await Promise.all([
-          queryClient.invalidateQueries({
-            queryKey: tableKeys.list(project?.ref, table.schema, { includeColumns }),
+          invalidateTableMetadata(queryClient, {
+            projectRef: project?.ref,
+            schema: table.schema,
+            tableId: table.id,
+            tableName: table.name,
+            includeLint: true,
           }),
-          queryClient.invalidateQueries({
-            queryKey: tableKeys.infiniteListPrefix(project?.ref, table.schema),
-          }),
-          queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
           queryClient.invalidateQueries({
             queryKey: privilegeKeys.tablePrivilegesList(project?.ref),
           }),
-          queryClient.invalidateQueries({ queryKey: lintKeys.lint(project?.ref) }),
         ])
 
         toast.success(
