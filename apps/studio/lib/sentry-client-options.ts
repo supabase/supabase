@@ -55,6 +55,35 @@ export function isBrowserWalletExtensionError(event: Sentry.Event): boolean {
   })
 }
 
+// Filter valtio proxy tampering errors caused by browser extensions.
+// Extensions that wrap page objects break valtio's WeakMap identity, so
+// `snapshot()` destructures `proxyStateMap.get(proxyObject)` === undefined
+// (valtio esm/vanilla.mjs). Not an app bug — only the tampered browser is affected.
+// Examples: SUPABASE-APP-K36
+const VALTIO_PROXY_TAMPERING_PATTERNS = [
+  // Chrome/Edge
+  /Cannot use 'in' operator to search for '.+' in undefined/,
+  /is not iterable \(cannot read property Symbol\(Symbol\.iterator\)\)/,
+  // Firefox
+  /can't access property Symbol\.iterator/,
+]
+
+export function isValtioProxyTamperingError(event: Sentry.Event): boolean {
+  const errors = event.exception?.values ?? []
+  return errors.some((error) => {
+    if (!VALTIO_PROXY_TAMPERING_PATTERNS.some((pattern) => pattern.test(error.value ?? ''))) {
+      return false
+    }
+    // Frames are ordered oldest-first, so the crashing frame is the last one.
+    // Minified production frames are chunk URLs that cannot identify valtio,
+    // so only require the valtio module when the frame carries module paths.
+    const frames = error.stacktrace?.frames ?? []
+    const crashingFrame = frames[frames.length - 1]
+    const filename = crashingFrame?.filename || crashingFrame?.abs_path || ''
+    return !filename.includes('node_modules') || filename.includes('valtio')
+  })
+}
+
 // Filter user-aborted operations (intentional cancellations)
 // These are expected when users cancel requests or navigate away
 // Examples: SUPABASE-APP-BG6, SUPABASE-APP-BG7
@@ -265,6 +294,9 @@ export function buildSentryClientOptions({
       }
 
       if (isBrowserWalletExtensionError(event)) {
+        return null
+      }
+      if (isValtioProxyTamperingError(event)) {
         return null
       }
       if (isUserAbortedOperation(hint.originalException, event)) {
