@@ -1,8 +1,8 @@
 'use client'
 
-import { File } from 'lucide-react'
+import { ChevronLeft, ChevronRight, File } from 'lucide-react'
 import { useState } from 'react'
-import { flattenTree, TreeView, TreeViewItem } from 'ui'
+import { cn, flattenTree, TreeView, TreeViewItem } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { RegistryNode } from '@/lib/process-registry'
@@ -45,6 +45,7 @@ const findFirstFile = (nodes: RegistryNode[]): RegistryNode | null => {
 export function BlockItemCode({ files }: BlockItemCodeProps) {
   // Find the first file to select by default
   const [selectedFile, setSelectedFile] = useState<RegistryNode | null>(findFirstFile(files))
+  const [sidebarVisible, setSidebarVisible] = useState(true)
   const flattenedData = flattenTree({ name: '', children: flattenChildren(files) })
 
   // Handle file selection from the TreeView
@@ -75,29 +76,55 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
   return (
     <div className="flex mt-4 border rounded-lg overflow-hidden h-[652px] not-prose">
       {/* File browser sidebar */}
-      <div className="w-64 py-2 border-r bg-muted/30 overflow-y-auto">
-        <TreeView
-          data={flattenedData}
-          aria-label="file browser"
-          className="w-full"
-          defaultExpandedIds={flattenedData.filter((n) => n.children?.length).map((n) => n.id)}
-          defaultSelectedIds={flattenedData
-            .filter((n) => n.metadata?.path === selectedFile?.path)
-            .map((n) => n.id)}
-          onNodeSelect={({ element }) => handleNodeSelect(element)}
-          nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
-            <TreeViewItem
-              {...getNodeProps()}
-              isExpanded={isExpanded}
-              isBranch={isBranch}
-              isSelected={isSelected}
-              level={level}
-              icon={<File strokeWidth={1.5} size={16} className="shrink-0" />}
-              name={element.name}
-              className="gap-1.5"
+      <div
+        className={cn(
+          'relative border-r bg-muted/30 transition-[width] duration-300 ease-in-out',
+          sidebarVisible ? 'w-64' : 'w-6'
+        )}
+      >
+        <div className="py-2 h-full overflow-y-auto">
+          {sidebarVisible && (
+            <TreeView
+              data={flattenedData}
+              aria-label="file browser"
+              className="w-full"
+              defaultExpandedIds={flattenedData.filter((n) => n.children?.length).map((n) => n.id)}
+              defaultSelectedIds={flattenedData
+                .filter((n) => n.metadata?.path === selectedFile?.path)
+                .map((n) => n.id)}
+              onNodeSelect={({ element }) => handleNodeSelect(element)}
+              nodeRenderer={({
+                element,
+                isBranch,
+                isExpanded,
+                getNodeProps,
+                level,
+                isSelected,
+              }) => (
+                <TreeViewItem
+                  {...getNodeProps()}
+                  isExpanded={isExpanded}
+                  isBranch={isBranch}
+                  isSelected={isSelected}
+                  level={level}
+                  icon={<File strokeWidth={1.5} size={16} className="shrink-0" />}
+                  name={element.name}
+                  className="gap-1.5"
+                />
+              )}
             />
           )}
-        />
+        </div>
+        <button
+          onClick={() => setSidebarVisible(!sidebarVisible)}
+          className="absolute -right-3 top-2 z-10 bg-background border rounded-full p-0.5 hover:bg-muted"
+        >
+          {sidebarVisible ? (
+            <ChevronLeft className="h-4 w-4 text-foreground-muted" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-foreground-muted" />
+          )}
+        </button>
       </div>
 
       {/* Code display area */}
