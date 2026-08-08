@@ -226,12 +226,16 @@ export default function MarketingForm({
     }
 
     const requiredGroupIds = new Set(
-      visibleFields.filter((f) => f.group && f.groupRequired).map((f) => f.group)
+      visibleFields.flatMap((f) =>
+        f.type === 'checkbox' && f.group && f.groupRequired ? [f.group] : []
+      )
     )
 
     const missingRequiredGroups = Array.from(requiredGroupIds)
       .map((groupId) => {
-        const groupFields = visibleFields.filter((f) => f.group === groupId && f.type === 'checkbox')
+        const groupFields = visibleFields.filter(
+          (f) => f.type === 'checkbox' && f.group === groupId
+        )
         const isAnyChecked = groupFields.some((f) => values[f.name] === 'true')
         return isAnyChecked ? null : groupFields
       })
@@ -241,9 +245,7 @@ export default function MarketingForm({
       setSubmitState('error')
       setErrorMessages(
         missingRequiredGroups.map((group) => {
-          const labels = group
-            .map((f) => f.label)
-            .join(', ')
+          const labels = group.map((f) => f.label).join(', ')
           return `Please select at least one option: ${labels}`
         })
       )

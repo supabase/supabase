@@ -16,7 +16,6 @@
   "dependencies": {
     "@types/react": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:",
     "react-markdown": "^10.1.0",
     "server-only": "^0.0.1",
     "shiki": "^4.0.1",
@@ -25,13 +24,14 @@
   },
   "devDependencies": {
     "config": "workspace:*",
+    "react-dom": "catalog:",
     "tailwindcss": "^4.2.4",
     "tsconfig": "workspace:",
     "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "@vitejs/plugin-react": "^4.3.0",
-    "jsdom": "^24.1.0",
+    "@vitejs/plugin-react": "catalog:",
+    "jsdom": "^28.1.0",
     "@testing-library/react": "^16.0.0",
     "@testing-library/jest-dom": "^6.6.0"
   },
