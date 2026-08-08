@@ -138,7 +138,7 @@ Publications created from the Dashboard replication flow use `publish_via_partit
 
 On Postgres 15 and newer, row filters on partition publications apply during both the initial sync and ongoing replication. Pipelines uses the row filter attached to the effective publication table entry: the published partition root when `publish_via_partition_root = true`, and the published leaf relation when `publish_via_partition_root = false`.
 
-The publication setting controls which Postgres relation becomes a destination table. It does not copy the source table's physical partitioning configuration, partition key, or partition bounds to BigQuery.
+The publication setting controls which Postgres relation becomes a destination table. It does not copy the source table's physical partitioning configuration, partition key, or partition bounds to the destination.
 
 <Admonition type="note">
 
@@ -163,7 +163,7 @@ Before creating a managed replication pipeline, enable Pipelines for your projec
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** to show the replication side panel
-3. Select a Pipelines destination, such as **BigQuery**
+3. Select a Pipelines destination, such as **BigQuery** or **Snowflake** if your organization has Early Access
 4. Click **Enable Pipelines**
 
 ### Step 3: Configure a destination
@@ -173,7 +173,7 @@ Once Pipelines is enabled and you have a Postgres publication, configure a desti
 #### Choose and configure your destination
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-Follow these steps to configure your destination. Each destination has its own setup requirements and behavior. **BigQuery** is currently available. You can [request early access to ClickHouse, Snowflake, and DuckLake](/go/supabase-pipelines-new-destinations).
+Follow these steps to configure your destination. Each destination has its own setup requirements and data model. **BigQuery** is currently available. **Snowflake** is in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to Snowflake, ClickHouse, or DuckLake.
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** if the destination side panel isn't already open
@@ -183,10 +183,11 @@ Follow these steps to configure your destination. Each destination has its own s
 4. Configure the destination details:
    - **Destination name**: A name to identify this destination
    - **Publication**: Select an existing publication, or click **New publication** to create one by choosing a name and at least one table
-   - **Region**: Managed Pipelines run in the fixed **AWS `eu-central-1` (Frankfurt)** region. This can't be changed. In your destination provider, choose a nearby dataset, warehouse, or storage bucket region.
+   - **Region**: Managed Pipelines run in the fixed **AWS `eu-central-1` (Frankfurt)** region. This can't be changed. In your destination provider, choose nearby destination resources when possible.
 
 5. Configure the destination-specific settings. See the destination guide for required credentials, permissions, and limitations:
    - [BigQuery](/docs/guides/database/replication/bigquery)
+   - [Snowflake (Early Access)](/docs/guides/database/replication/snowflake)
 
 6. Optionally expand **Advanced settings** to tune pipeline behavior:
 
@@ -290,13 +291,13 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 <Admonition type="note">
 
-When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, stop the pipeline first or remove it from the publication before deleting. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
+Don't delete or modify a table managed by Pipelines while it remains in the publication. This can stop replication and require a new initial sync. To remove it permanently, first remove it from the publication and restart the pipeline, or delete the whole destination. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
 
 </Admonition>
 
 ### Schema change support
 
-Schema change support depends on the destination. BigQuery is currently the only destination with beta schema change support. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for supported and unsupported changes.
+Schema change support is destination-specific and limited. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) or [Snowflake schema change support](/docs/guides/database/replication/snowflake#schema-change-support) for the exact behavior.
 
 ### How it works
 
@@ -313,7 +314,7 @@ Pipelines automatically optimizes how changes are delivered to the destination. 
 If you encounter issues during setup:
 
 - **Publication not appearing**: Ensure you created the Postgres publication via SQL and refresh the dashboard
-- **Tables not showing in publication**: Verify your tables meet the requirements of the selected destination. BigQuery requires a source primary key and requires the publication to include its columns.
+- **Tables not showing in publication**: Verify your tables meet the requirements of the selected destination. BigQuery requires a source primary key. Snowflake requires `REPLICA IDENTITY FULL` when updates are published.
 - **Pipeline failed to start**: Check the error message in the status view for specific details
 - **No data being replicated**: Verify your Postgres publication includes the correct tables and event types
 
@@ -323,18 +324,19 @@ For more troubleshooting help, see the [Pipelines FAQ](/docs/guides/database/rep
 
 Pipelines has the following limitations:
 
-- **Primary keys**: Requirements are destination-specific. Postgres can publish inserts for a table without a primary key, but BigQuery Pipelines always requires a source primary key and requires the publication to include its columns.
+- **Row identity**: Requirements are destination-specific. BigQuery always requires a source primary key and its published columns. Snowflake insert-only tables don't require a key. Snowflake deletes require a published primary-key or replica-identity index unless full identity is used. Snowflake updates require `REPLICA IDENTITY FULL`.
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
 - **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
-- **Replica identity**: Requirements are destination-specific. Updates and deletes need enough row identity to apply safely. See [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements) for the supported modes.
-- **Schema changes**: Currently in beta and limited to BigQuery
+- **Replica identity**: Updates and deletes need the mode required by the destination. See the [BigQuery](/docs/guides/database/replication/bigquery#source-table-requirements) and [Snowflake](/docs/guides/database/replication/snowflake#source-table-requirements) requirements.
+- **Schema changes**: Support is destination-specific and limited.
 - **No user-defined transformations**: Pipelines performs destination-compatible type and name mapping, but doesn't run custom transformations
-- **At-least-once processing**: Failed destination write attempts that Pipelines retries are not counted. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count that batch again. BigQuery uses primary-key-based CDC to converge on the current table state. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
+- **At-least-once processing**: In rare recovery cases, an acknowledged batch can be processed and counted again. BigQuery uses primary-key-based CDC to converge on current state. Snowflake uses committed channel offsets to suppress ordinary replay. Because its tables are append-only, consumers must still tolerate repeated events. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
 
-Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
+Destination-specific limitations, such as row size and type mappings, are documented in each destination guide.
 
 ### Next steps
 
 - [Set up BigQuery](/docs/guides/database/replication/bigquery)
+- [Set up Snowflake](/docs/guides/database/replication/snowflake)
 - [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)
 - [View the Pipelines FAQ](/docs/guides/database/replication/pipelines-faq)
