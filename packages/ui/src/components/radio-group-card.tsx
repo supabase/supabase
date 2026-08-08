@@ -23,32 +23,39 @@ interface RadioGroupCardItemProps {
 const RadioGroupCardItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   RadioGroupCardItemProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ image, label, showIndicator = true, ...props }, ref) => {
-  return (
-    <RadioGroupPrimitive.Item
-      ref={ref}
-      {...props}
-      className={cn(
-        'flex flex-col gap-2',
-        'w-48',
-        'bg-overlay',
-        'rounded-md',
-        'border',
-        'p-2',
-        // 'hover:bg-selection',
-        'hover:border-foreground-muted',
-        'hover:z-1 focus-visible:z-1',
-        'outline-hidden',
-        'transition-colors',
-        'group',
-        props.className
-      )}
-    >
-      {props.children}
-      <label className="flex gap-2 w-full" id={props.id} htmlFor={props.value}>
-        {showIndicator && (
-          <div
-            className="
+>(
+  (
+    { id: idProp, value, children, className, image, label, showIndicator = true, ...props },
+    ref
+  ) => {
+    const id = idProp || value
+    return (
+      <RadioGroupPrimitive.Item
+        ref={ref}
+        id={id}
+        value={value}
+        {...props}
+        className={cn(
+          'flex flex-col gap-2',
+          'w-48',
+          'bg-overlay',
+          'rounded-md',
+          'border',
+          'p-2',
+          // 'hover:bg-selection',
+          'hover:border-foreground-muted',
+          'hover:z-1 focus-visible:z-1',
+          'outline-hidden',
+          'transition-colors',
+          'group',
+          className
+        )}
+      >
+        {children}
+        <label className="flex gap-2 w-full" htmlFor={id}>
+          {showIndicator && (
+            <div
+              className="
                 aspect-square h-4 w-4
                 rounded-full border group-data-[state=checked]:border-foreground-muted
                 group-focus:border-foreground-muted
@@ -60,28 +67,29 @@ const RadioGroupCardItem = React.forwardRef<
                 flex items-center justify-center
                 transition-colors
           "
-          >
-            <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-              <Circle className="h-2.5 w-2.5 fill-current text-current" />
-            </RadioGroupPrimitive.Indicator>
-          </div>
-        )}
-
-        <div
-          className={cn(
-            'w-full',
-            'text-xs transition-colors text-left',
-            'text-light',
-            'group-hover:text-foreground group-data-[state=checked]:text-foreground',
-            props.disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+            >
+              <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
+                <Circle className="h-2.5 w-2.5 fill-current text-current" />
+              </RadioGroupPrimitive.Indicator>
+            </div>
           )}
-        >
-          {label}
-        </div>
-      </label>
-    </RadioGroupPrimitive.Item>
-  )
-})
+
+          <div
+            className={cn(
+              'w-full',
+              'text-xs transition-colors text-left',
+              'text-light',
+              'group-hover:text-foreground group-data-[state=checked]:text-foreground',
+              props.disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+            )}
+          >
+            {label}
+          </div>
+        </label>
+      </RadioGroupPrimitive.Item>
+    )
+  }
+)
 
 RadioGroupCardItem.displayName = RadioGroupPrimitive.Item.displayName
 
