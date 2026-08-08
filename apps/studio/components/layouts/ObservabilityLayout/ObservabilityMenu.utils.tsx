@@ -3,7 +3,6 @@ import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
 import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery, type Content, type ContentBase } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -46,7 +45,6 @@ const usePreservedQueryParams = () => {
 export const useGenerateObservabilityMenu = () => {
   const { ref } = useParams()
   const preservedQueryParams = usePreservedQueryParams()
-  const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   const showOverview = useFlag('observabilityOverview')
   const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
@@ -65,23 +63,12 @@ export const useGenerateObservabilityMenu = () => {
           },
         ]
       : []),
-    ...(isSupamonitorEnabled
-      ? [
-          {
-            name: 'Query Insights',
-            key: 'query-insights',
-            url: `${baseUrl}/query-insights${preservedQueryParams}`,
-            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_QUERY_PERFORMANCE,
-          },
-        ]
-      : [
-          {
-            name: 'Query Performance',
-            key: 'query-performance',
-            url: `${baseUrl}/query-performance${preservedQueryParams}`,
-            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_QUERY_PERFORMANCE,
-          },
-        ]),
+    {
+      name: 'Query Performance',
+      key: 'query-performance',
+      url: `${baseUrl}/query-performance${preservedQueryParams}`,
+      shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_QUERY_PERFORMANCE,
+    },
     ...(IS_PLATFORM
       ? [
           {
