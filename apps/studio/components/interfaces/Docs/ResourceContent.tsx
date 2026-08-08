@@ -2,19 +2,24 @@ import { useParams } from 'common'
 import { Table2 } from 'lucide-react'
 
 import { DocSection } from './DocSection'
+import Snippets, { getSchemaQualifiedEntity } from './Snippets'
 import CodeSnippet from '@/components/interfaces/Docs/CodeSnippet'
 import Description from '@/components/interfaces/Docs/Description'
 import Param from '@/components/interfaces/Docs/Param'
-import Snippets from '@/components/interfaces/Docs/Snippets'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
+import {
+  ProjectJsonSchemaDefinitions,
+  ProjectJsonSchemaPaths,
+} from '@/data/docs/project-json-schema-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
 interface ResourceContentProps {
   resourceId: string
   resources: { [key: string]: { id: string; displayName: string; camelCase: string } }
+  definitions: ProjectJsonSchemaDefinitions
+  paths: ProjectJsonSchemaPaths
   selectedLang: 'bash' | 'js'
   showApiKey: string
   refreshDocs: () => void
@@ -23,6 +28,8 @@ interface ResourceContentProps {
 export const ResourceContent = ({
   resourceId,
   resources,
+  definitions,
+  paths,
   selectedLang,
   showApiKey,
   refreshDocs,
@@ -30,15 +37,13 @@ export const ResourceContent = ({
   const { ref } = useParams()
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
 
-  const { data: jsonSchema } = useProjectJsonSchemaQuery({ projectRef: ref })
-  const { paths, definitions } = jsonSchema || {}
-
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef: ref })
 
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
+  const resourceMeta = resources[resourceId]
+  const { name: resourceName, schema: resourceSchema } = getSchemaQualifiedEntity(resourceId)
   const resourcePaths = paths?.[`/${resourceId}`]
   const resourceDefinition = definitions?.[resourceId]
-  const resourceMeta = resources[resourceId]
   const description = resourceDefinition?.description || ''
 
   const methods = Object.keys(resourcePaths ?? {}).map((x) => x.toUpperCase())
@@ -47,9 +52,6 @@ export const ResourceContent = ({
     id,
     required: resourceDefinition?.required?.includes(id),
   }))
-
-  if (!paths || !definitions) return null
-
   return (
     <div className="flex flex-col flex-1">
       <DocSection
@@ -99,10 +101,11 @@ export const ResourceContent = ({
                   selectedLang={selectedLang}
                   snippet={Snippets.readColumns({
                     title: `Select ${x.id}`,
-                    resourceId,
+                    resourceId: resourceName,
                     endpoint: endpoint,
                     apiKey: keyToShow,
                     columnName: x.id,
+                    schema: resourceSchema,
                   })}
                 />
               }
@@ -135,27 +138,33 @@ export const ResourceContent = ({
             <>
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readAll(resourceId, endpoint, keyToShow)}
+                snippet={Snippets.readAll(resourceName, endpoint, keyToShow, resourceSchema)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
                 snippet={Snippets.readColumns({
-                  resourceId,
+                  resourceId: resourceName,
                   endpoint: endpoint,
                   apiKey: keyToShow,
+                  schema: resourceSchema,
                 })}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readForeignTables(resourceId, endpoint, keyToShow)}
+                snippet={Snippets.readForeignTables(
+                  resourceName,
+                  endpoint,
+                  keyToShow,
+                  resourceSchema
+                )}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readRange(resourceId, endpoint, keyToShow)}
+                snippet={Snippets.readRange(resourceName, endpoint, keyToShow, resourceSchema)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.readFilters(resourceId, endpoint, keyToShow)}
+                snippet={Snippets.readFilters(resourceName, endpoint, keyToShow, resourceSchema)}
               />
             </>
           }
@@ -183,15 +192,15 @@ export const ResourceContent = ({
             <>
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.insertSingle(resourceId, endpoint, keyToShow)}
+                snippet={Snippets.insertSingle(resourceName, endpoint, keyToShow, resourceSchema)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.insertMany(resourceId, endpoint, keyToShow)}
+                snippet={Snippets.insertMany(resourceName, endpoint, keyToShow, resourceSchema)}
               />
               <CodeSnippet
                 selectedLang={selectedLang}
-                snippet={Snippets.upsert(resourceId, endpoint, keyToShow)}
+                snippet={Snippets.upsert(resourceName, endpoint, keyToShow, resourceSchema)}
               />
             </>
           }
@@ -219,7 +228,7 @@ export const ResourceContent = ({
           snippets={
             <CodeSnippet
               selectedLang={selectedLang}
-              snippet={Snippets.update(resourceId, endpoint, keyToShow)}
+              snippet={Snippets.update(resourceName, endpoint, keyToShow, resourceSchema)}
             />
           }
         />
@@ -242,13 +251,14 @@ export const ResourceContent = ({
           snippets={
             <CodeSnippet
               selectedLang={selectedLang}
-              snippet={Snippets.delete(resourceId, endpoint, keyToShow)}
+              snippet={Snippets.delete(resourceName, endpoint, keyToShow, resourceSchema)}
             />
           }
         />
       )}
 
-      {realtimeEnabled &&
+      {resourceMeta &&
+        realtimeEnabled &&
         (methods.includes('DELETE') || methods.includes('POST') || methods.includes('PATCH')) && (
           <DocSection
             title="Subscribe to changes"
@@ -269,27 +279,44 @@ export const ResourceContent = ({
               <>
                 <CodeSnippet
                   selectedLang={selectedLang}
-                  snippet={Snippets.subscribeAll(resourceMeta.camelCase, resourceId)}
+                  snippet={Snippets.subscribeAll(
+                    resourceMeta.camelCase,
+                    resourceName,
+                    resourceSchema
+                  )}
                 />
                 <CodeSnippet
                   selectedLang={selectedLang}
-                  snippet={Snippets.subscribeInserts(resourceMeta.camelCase, resourceId)}
+                  snippet={Snippets.subscribeInserts(
+                    resourceMeta.camelCase,
+                    resourceName,
+                    resourceSchema
+                  )}
                 />
                 <CodeSnippet
                   selectedLang={selectedLang}
-                  snippet={Snippets.subscribeUpdates(resourceMeta.camelCase, resourceId)}
+                  snippet={Snippets.subscribeUpdates(
+                    resourceMeta.camelCase,
+                    resourceName,
+                    resourceSchema
+                  )}
                 />
                 <CodeSnippet
                   selectedLang={selectedLang}
-                  snippet={Snippets.subscribeDeletes(resourceMeta.camelCase, resourceId)}
+                  snippet={Snippets.subscribeDeletes(
+                    resourceMeta.camelCase,
+                    resourceName,
+                    resourceSchema
+                  )}
                 />
                 <CodeSnippet
                   selectedLang={selectedLang}
                   snippet={Snippets.subscribeEq(
                     resourceMeta.camelCase,
-                    resourceId,
+                    resourceName,
                     'column_name',
-                    'someValue'
+                    'someValue',
+                    resourceSchema
                   )}
                 />
               </>
