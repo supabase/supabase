@@ -52,10 +52,53 @@ export const prettifyJSON = (minifiedJSON: string) => {
 
 export const removeJSONTrailingComma = (jsonString: string) => {
   /**
-   * Remove trailing commas: Delete any comma immediately preceding the closing brace '}' or
-   * bracket ']' using a regular expression.
+   * Remove *structural* trailing commas: a comma that directly precedes a closing brace '}' or
+   * bracket ']' (ignoring whitespace in between).
+   *
+   * We can't do this with a naive regex such as `/,\s*(?=[\}\]])/g` because it also matches commas
+   * that live inside string values. For example `{"pattern": "[a-z,]"}` would be silently rewritten
+   * to `{"pattern": "[a-z]"}` — still valid JSON, but corrupted data. Instead we scan the string and
+   * only strip commas that are not inside a string literal.
    */
-  return jsonString.replace(/,\s*(?=[\}\]])/g, '')
+  let result = ''
+  let isInsideString = false
+  let isEscaped = false
+
+  for (let i = 0; i < jsonString.length; i++) {
+    const char = jsonString[i]
+
+    if (isInsideString) {
+      result += char
+      if (isEscaped) {
+        isEscaped = false
+      } else if (char === '\\') {
+        isEscaped = true
+      } else if (char === '"') {
+        isInsideString = false
+      }
+      continue
+    }
+
+    if (char === '"') {
+      isInsideString = true
+      result += char
+      continue
+    }
+
+    if (char === ',') {
+      // Look ahead past any whitespace to find the next meaningful character
+      let next = i + 1
+      while (next < jsonString.length && /\s/.test(jsonString[next])) next++
+      if (jsonString[next] === '}' || jsonString[next] === ']') {
+        // Structural trailing comma — drop it
+        continue
+      }
+    }
+
+    result += char
+  }
+
+  return result
 }
 
 export const timeout = (ms: number) => {
