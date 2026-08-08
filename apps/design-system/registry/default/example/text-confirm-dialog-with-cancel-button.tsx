@@ -29,14 +29,14 @@ const TextConfirmModalWithCancelButton = () => {
       </Button>
       <TextConfirmModal
         key="withCancelButton"
-        confirmString="project name"
+        confirmAction="delete"
+        confirmSubject="this project"
         visible={visible}
         variant="destructive"
         title="Are you sure you want to delete?"
         blockDeleteButton={false}
         onCancel={onVisibleChange}
         loading={loading}
-        confirmPlaceholder='Type "project name" to confirm'
         onConfirm={onSubmit}
       />
     </>

@@ -419,8 +419,8 @@ export const SSOConfig = () => {
               variant="destructive"
               title="Delete SSO Provider"
               loading={isDeleting}
-              confirmString={ssoConfig?.domains?.[0] || organization?.slug || ''}
-              confirmPlaceholder={`Type ${ssoConfig?.domains?.[0] ? 'the first domain' : 'the organization slug'} to confirm`}
+              confirmAction="delete"
+              confirmSubject="this SSO provider"
               confirmLabel="I understand, delete SSO provider and members"
               onConfirm={onDeleteSSOConfig}
               onCancel={() => setIsDeleteModalVisible(false)}

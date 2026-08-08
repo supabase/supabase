@@ -19,9 +19,9 @@ export default function TextConfirmDialogDemo() {
         size="small"
         variant="destructive"
         title="Delete bucket"
-        confirmPlaceholder={bucketName}
-        confirmString={bucketName}
-        confirmLabel="Delete bucket"
+        confirmString={`delete ${bucketName}`}
+        confirmPlaceholder={`delete ${bucketName}`}
+        confirmLabel="Delete bucket and all contents"
         loading={false}
         onConfirm={() => setVisible(false)}
         onCancel={() => setVisible(false)}

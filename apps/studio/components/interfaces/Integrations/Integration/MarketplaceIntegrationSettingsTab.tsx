@@ -202,9 +202,8 @@ export const MarketplaceIntegrationSettingsTab = () => {
         visible={apiKeyToDelete !== undefined}
         loading={isRemoving}
         title={`Delete secret API key: ${apiKeyToDelete?.apiKey.name ?? ''}`}
-        confirmString={apiKeyToDelete?.apiKey.name ?? ''}
-        confirmLabel="Yes, irreversibly delete this API key"
-        confirmPlaceholder="Type the name of the API key to confirm"
+        confirmAction="delete"
+        confirmSubject="this secret API key"
         onCancel={() => setApiKeyToDelete(undefined)}
         onConfirm={onConfirmDeleteApiKey}
         alert={{
@@ -212,7 +211,12 @@ export const MarketplaceIntegrationSettingsTab = () => {
           description:
             'Make sure all components using this key have been updated. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.',
         }}
-      />
+      >
+        <p className="text-sm">
+          This will permanently delete the secret API key{' '}
+          <span className="font-medium text-foreground">{apiKeyToDelete?.apiKey.name ?? ''}</span>.
+        </p>
+      </TextConfirmModal>
     </>
   )
 }
