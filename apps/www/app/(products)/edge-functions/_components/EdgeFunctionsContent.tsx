@@ -11,7 +11,7 @@ import { ObservabilitySection } from './ObservabilitySection'
 export function EdgeFunctionsContent() {
   return (
     <div className="overflow-x-clip">
-      <section className="border-t border-border" aria-label="Hero">
+      <section aria-label="Hero">
         <Hero />
         <Highlights />
       </section>
