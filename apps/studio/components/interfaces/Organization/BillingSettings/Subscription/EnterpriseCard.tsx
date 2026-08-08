@@ -54,7 +54,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
             })
           }
         >
-          <a href={plan.href} className="hidden md:block" target="_blank">
+          <a href={plan.href} className="hidden md:block" target="_blank" rel="noreferrer">
             {plan.cta}
           </a>
         </Button>
@@ -90,7 +90,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
             })
           }
         >
-          <a href={plan.href} className="visible md:hidden mt-8" target="_blank">
+          <a href={plan.href} className="visible md:hidden mt-8" target="_blank" rel="noreferrer">
             {plan.cta}
           </a>
         </Button>

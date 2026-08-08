@@ -30,7 +30,12 @@ const GitHubButton = () => {
       asChild
       onClick={() => sendTelemetryEvent({ action: 'homepage_github_button_clicked' })}
     >
-      <a type={undefined} href="https://github.com/supabase/supabase" target="_blank">
+      <a
+        type={undefined}
+        href="https://github.com/supabase/supabase"
+        target="_blank"
+        rel="noreferrer"
+      >
         <span className="flex items-center gap-1">
           <svg
             className="w-6 h-6"
