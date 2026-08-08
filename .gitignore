@@ -15,6 +15,10 @@ allure-report
 # turbo
 .turbo
 
+# Vinxi/SolidStart
+.vinxi
+.output
+
 # Logs
 *.log
 npm-debug.log*
