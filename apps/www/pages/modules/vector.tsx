@@ -1,6 +1,7 @@
 import 'swiper/css'
 
 import DefaultLayout from '~/components/Layouts/Default'
+import { MarkdownActions } from '~/components/MarkdownActions'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import vectorPageData from '~/data/products/modules/vector'
 import { useBreakpoint } from 'common'
@@ -71,7 +72,17 @@ function VectorPage() {
       </Head>
       <DefaultLayout className="bg-alternative!" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.VECTOR} docsUrl={pageData.docsUrl} />
-        <ProductModulesHeader {...pageData.heroSection} />
+        <ProductModulesHeader
+          {...pageData.heroSection}
+          footer={
+            <MarkdownActions
+              orientation="horizontal"
+              className="justify-center"
+              pagePath="/modules/vector"
+              pageType="modules"
+            />
+          }
+        />
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />

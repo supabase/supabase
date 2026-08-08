@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
+import { MarkdownActions } from '@/components/MarkdownActions'
 
 export function Hero() {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -50,6 +51,7 @@ export function Hero() {
             </Link>
           </Button>
         </div>
+        <MarkdownActions orientation="horizontal" pagePath="/" pageType="homepage" />
       </div>
     </SectionContainer>
   )

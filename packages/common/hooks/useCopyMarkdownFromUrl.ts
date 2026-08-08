@@ -24,7 +24,10 @@ export async function copyMarkdownFromUrl(
       text = await res.text()
     } else {
       text = options?.fallbackHtml?.() ?? ''
-      if (!text) return false
+      if (!text) {
+        console.error(`Failed to fetch markdown from ${mdUrl}: ${res.status}`)
+        return false
+      }
     }
     await navigator.clipboard.writeText(text)
     return true
