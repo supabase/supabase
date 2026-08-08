@@ -15,8 +15,8 @@ export const DevelopersDropdown = () => {
   const { jobsCount, latestBlogPosts } = staticContent
 
   return (
-    <div className="flex flex-col xl:flex-row">
-      <div className="w-[550px] xl:w-[470px] py-8 px-8 bg-background grid gap-3 grid-cols-2">
+    <div className="flex flex-col xl:w-[1040px] xl:flex-row">
+      <div className="w-[550px] xl:w-[580px] py-8 px-8 bg-background xl:bg-transparent grid gap-3 grid-cols-2">
         {DevelopersData['navigation'].map((column) => (
           <div key={column.label} className="p-0 flex flex-col gap-6">
             <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
@@ -47,7 +47,7 @@ export const DevelopersDropdown = () => {
           </div>
         ))}
       </div>
-      <div className="bg-surface-75 flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
+      <div className="bg-surface-75 xl:bg-transparent flex flex-col w-[550px] xl:w-[460px] border-t xl:border-t-0">
         <div className="flex-col gap-2 py-8 px-10">
           <Link
             href="/blog"
