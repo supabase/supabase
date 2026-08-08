@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -15,6 +16,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
+import { UserActivityTab } from './UserActivityTab'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
@@ -26,13 +28,14 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
+  const showActivity = useFlag('UserActivity')
 
   const [selectedId, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
 
-  const [view, setView] = useState<'overview' | 'raw' | 'logs'>('overview')
+  const [view, setView] = useState<'overview' | 'raw' | 'logs' | 'activity'>('overview')
   const [searchQuery, setSearchQuery] = useState('')
 
   const { data: selectedUser, isPending } = useUserQuery({
@@ -69,7 +72,7 @@ export const UserPanel = () => {
         <Tabs
           value={view}
           className="flex flex-col h-full"
-          onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs')}
+          onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs' | 'activity')}
         >
           {isPending ? (
             <div>
@@ -95,6 +98,14 @@ export const UserPanel = () => {
                     Logs
                   </TabsTrigger>
                 )}
+                {showActivity && (
+                  <TabsTrigger
+                    value="activity"
+                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
+                  >
+                    Activity
+                  </TabsTrigger>
+                )}
                 <TabsTrigger
                   value="raw"
                   className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
@@ -111,6 +122,11 @@ export const UserPanel = () => {
               {showLogs && (
                 <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                   {selectedUser && <UserLogs user={selectedUser} />}
+                </TabsContent>
+              )}
+              {showActivity && (
+                <TabsContent value="activity" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
+                  {selectedUser && <UserActivityTab user={selectedUser} />}
                 </TabsContent>
               )}
               <TabsContent
