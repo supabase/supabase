@@ -1,0 +1,390 @@
+version: 1
+metadata:
+  ota:
+    minimum_version: "1.6.18"
+project:
+  name: supabase
+  description: Supabase monorepo readiness slice focused on www/docs workflows
+  type: application
+execution:
+  default_context: host
+  contexts:
+    host:
+      backend: native
+      requirements:
+        runtimes:
+          node: "^22.12.0"
+        tools:
+          pnpm: "10.24.0"
+    app:
+      backend: container
+      lifecycle: persistent
+      requirements:
+        runtimes:
+          node: "^22.12.0"
+      attachments:
+        isolated_paths:
+          - node_modules
+          - apps/www/.next
+          - apps/docs/.next
+      container:
+        image: node:22-bookworm
+        engines:
+          - docker
+          - podman
+        resources:
+          memory:
+            minimum: 3GiB
+            default: 4GiB
+toolchains:
+  node:
+    provider: corepack
+    version: "^22.12.0"
+    package_managers:
+      pnpm: "10.24.0"
+surfaces:
+  www:
+    kind: http
+    port: 3000
+    path: /
+    readiness:
+      kind: http
+      method: GET
+      path: /
+      headers:
+        Accept: text/html
+      success:
+        status:
+          - 200
+      body:
+        contains: "<!DOCTYPE html>"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+  docs:
+    kind: http
+    port: 3001
+    path: /docs
+    readiness:
+      kind: http
+      method: GET
+      path: /docs
+      headers:
+        Accept: text/html
+      success:
+        status:
+          - 200
+      body:
+        contains: "<!DOCTYPE html>"
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+tasks:
+  setup:env-www:
+    context: host
+    description: Create the local www env file from the repository template when missing
+    notes: |
+      This action is idempotent and non-destructive.
+      It only copies `apps/www/.env.local.example` when `apps/www/.env.local` is absent.
+    category: setup
+    action:
+      kind: copy_if_missing
+      from: apps/www/.env.local.example
+      to: apps/www/.env.local
+    safe_for_agent: true
+  install:
+    context: host
+    description: Install monorepo dependencies with pnpm
+    notes: |
+      This is the canonical dependency hydration step for all workflows.
+      Run this first on fresh clones and after lockfile changes.
+    category: setup
+    run: corepack pnpm install --frozen-lockfile
+    execution:
+      default_mode: native
+      modes:
+        native:
+          context: host
+          run: corepack pnpm install --frozen-lockfile
+        container:
+          context: app
+          run: corepack pnpm install --frozen-lockfile
+    requirements:
+      toolchains:
+        - node
+    safe_for_agent: true
+  build:
+    context: host
+    description: Build all workspaces
+    notes: |
+      Use this for cross-workspace verification before CI-facing changes.
+    category: build
+    run: corepack pnpm build
+    requirements:
+      toolchains:
+        - node
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+  typecheck:
+    context: host
+    description: Run repository type checks
+    notes: |
+      Bounded verification task for code safety before CI-facing changes.
+    category: test
+    run: corepack pnpm typecheck
+    requirements:
+      toolchains:
+        - node
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+  format:check:
+    context: host
+    description: Verify repository formatting with prettier
+    notes: |
+      Bounded formatting verification task aligned with upstream checks.
+    category: test
+    run: corepack pnpm test:prettier
+    requirements:
+      toolchains:
+        - node
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: true
+  dev:www:
+    context: host
+    description: Run the main site development server
+    notes: |
+      Canonical local site frontend run task (`www` surface on port 3000).
+      Container mode publishes the service on an automatically selected host port to avoid local port collisions.
+    category: dev
+    run: corepack pnpm dev:www
+    execution:
+      default_mode: native
+      modes:
+        native:
+          context: host
+          run: corepack pnpm dev:www
+          runtime:
+            kind: service
+            surfaces:
+              - www
+        container:
+          context: app
+          run: corepack pnpm dev:www
+          runtime:
+            kind: service
+            surfaces:
+              www:
+                bind:
+                  address: 0.0.0.0
+                project:
+                  host:
+                    port:
+                      mode: auto
+                    primary: true
+    requirements:
+      toolchains:
+        - node
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: false
+    runtime:
+      kind: service
+      surfaces:
+        - www
+  dev:docs:
+    context: host
+    description: Run docs development server
+    notes: |
+      Focused docs run task (`docs` surface on port 3001).
+      Prefer this for docs-only edits to keep iteration tight.
+      Container mode publishes the service on an automatically selected host port to avoid local port collisions.
+    category: dev
+    run: corepack pnpm dev:docs
+    execution:
+      default_mode: native
+      modes:
+        native:
+          context: host
+          run: corepack pnpm dev:docs
+          runtime:
+            kind: service
+            surfaces:
+              - docs
+        container:
+          context: app
+          run: corepack pnpm dev:docs
+          runtime:
+            kind: service
+            surfaces:
+              docs:
+                bind:
+                  address: 0.0.0.0
+                project:
+                  host:
+                    port:
+                      mode: auto
+                    primary: true
+    requirements:
+      toolchains:
+        - node
+      checks:
+        - workspace-dependencies-installed
+    depends_on:
+      - install
+    safe_for_agent: false
+    runtime:
+      kind: service
+      surfaces:
+        - docs
+workflows:
+  default: app
+  app:
+    intent: local_development
+    description: Canonical local development workflow for supabase.com
+    notes: |
+      Use this as the primary front door.
+      It prepares local env state, installs dependencies, and runs the main site surface.
+    prepare:
+      task: setup:env-www
+    setup:
+      task: install
+    run:
+      task: dev:www
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+  docs:
+    intent: docs_development
+    description: Selective docs development workflow
+    notes: |
+      Use this for docs-only work when the full app workflow is unnecessary.
+    setup:
+      task: install
+    run:
+      task: dev:docs
+    readiness:
+      surfaces:
+        - docs
+    exposes:
+      - surface: docs
+  instant:
+    intent: quickstart
+    description: Fast local site startup through the web development server
+    notes: |
+      Optimized for quick readiness checks and smoke paths.
+      It targets fast startup by running `dev:www` directly.
+    run:
+      task: dev:www
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+  app:container:
+    intent: local_development
+    description: Container-backed canonical local development workflow for supabase.com
+    notes: |
+      Use this when you want the runtime path to execute inside the declared container image.
+      This keeps readiness and run behavior tied to one container execution context.
+    prepare:
+      task: setup:env-www
+    setup:
+      task: install
+    run:
+      task: dev:www
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+  docs:container:
+    intent: docs_development
+    description: Container-backed selective docs development workflow
+    notes: |
+      Use this for docs-focused container runs when host-native execution is not desired.
+    setup:
+      task: install
+    run:
+      task: dev:docs
+    readiness:
+      surfaces:
+        - docs
+    exposes:
+      - surface: docs
+  instant:container:
+    intent: quickstart
+    description: Fast container-backed site startup through the web development server
+    notes: |
+      Optimized container quickstart path for runtime proof and smoke verification.
+    run:
+      task: dev:www
+    readiness:
+      surfaces:
+        - www
+    exposes:
+      - surface: www
+checks:
+  - name: workspace-dependencies-installed
+    kind: file
+    severity: error
+    path: node_modules/.modules.yaml
+    expect: file
+    timeout: 10000
+agent:
+  entrypoint: install
+  default_task: build
+  safe_tasks:
+    - setup:env-www
+    - install
+    - build
+    - typecheck
+    - format:check
+  verify_after_changes:
+    - format:check
+    - typecheck
+    - build
+  writable_paths:
+    - apps
+    - packages
+    - blocks
+    - examples
+    - i18n
+    - scripts
+    - package.json
+  protected_paths:
+    - ota.yaml
+    - .github/workflows
+    - .env
+    - .env.local
+    - apps/www/.env.local
+    - apps/www/.env.local.example
+    - pnpm-lock.yaml
+    - pnpm-workspace.yaml
+    - turbo.jsonc
+  bootstrap:
+    ota:
+      note: Install ota when missing so contributors and agents can run the readiness workflows declared in this contract.
+      sh: curl -fsSL https://dist.ota.run/install.sh | OTA_VERSION=v1.6.18 sh
+      powershell: $env:OTA_VERSION='v1.6.18'; irm https://dist.ota.run/install.ps1 | iex
+  notes: |
+    This contract intentionally scopes to www/docs workflows for readiness pressure-testing.
+    Use `app` for the canonical site development loop and `docs` for docs-only changes.
+    Use `instant` for fast readiness/smoke validation when a full workflow path is unnecessary.
+    Use `--mode container` when you want the same workflows to run through the declared container context.
+    `apps/www/.env.local` remains protected for direct edits; only `setup:env-www` may create it via
+    idempotent `copy_if_missing`.
