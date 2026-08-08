@@ -58,6 +58,7 @@ const TROUBLESHOOTING_INDEX_PATH = path.join(
   'guides',
   'troubleshooting.md'
 )
+const DOCS_INDEX_PATH = path.join(process.cwd(), 'public', 'markdown', 'guides', 'index.md')
 
 type JsxNode = MdxJsxFlowElement | MdxJsxTextElement
 type Props = Record<string, unknown>
@@ -271,6 +272,60 @@ async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Pr
   await fs.writeFile(TROUBLESHOOTING_INDEX_PATH, content)
 }
 
+async function renderDocsIndex(guides: MarkdownSource[]): Promise<void> {
+  const guidesContentDir = path.join(process.cwd(), 'content', 'guides')
+  const dirents = await fs.readdir(guidesContentDir, { withFileTypes: true })
+  const sectionDirs = dirents.filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name)
+  const topLevelSlugs = guides.map(({ slug }) => slug).filter((slug) => !slug.includes('/'))
+  const sections = Array.from(new Set([...sectionDirs, ...topLevelSlugs])).sort()
+
+  const docsUrl = (pagePath: string) => `${getInternalLinkBaseUrl()}${withDocsBasePath(pagePath)}`
+
+  const entries = await Promise.all(
+    sections.map(async (section) => {
+      const url = docsUrl(`/guides/${section}`)
+      const landingPath = path.join(guidesContentDir, `${section}.mdx`)
+      let raw: string
+      try {
+        raw = await fs.readFile(landingPath, 'utf8')
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+          return `- [${section}](${url})`
+        }
+        throw err
+      }
+      const { data } = parseFrontmatter(raw, 'yaml')
+      const title = typeof data.title === 'string' && data.title.length > 0 ? data.title : section
+      const description =
+        typeof data.description === 'string' && data.description.length > 0
+          ? `: ${data.description}`
+          : ''
+      return `- [${title}](${url})${description}`
+    })
+  )
+
+  const content = [
+    '# Supabase Docs',
+    '',
+    'Documentation for [Supabase](https://supabase.com). Guide pages are also available as markdown: append `.md` to the page URL (content negotiation via the Accept header is also supported).',
+    '',
+    '## Guides',
+    '',
+    ...entries,
+    '',
+    '## More',
+    '',
+    `- [Troubleshooting](${docsUrl('/guides/troubleshooting')})`,
+    `- [API and SDK reference](${docsUrl('/reference')})`,
+    '- [llms.txt](https://supabase.com/llms.txt)',
+    '- [Full documentation in a single file](https://supabase.com/llms-full.txt)',
+    '',
+  ].join('\n')
+
+  await fs.mkdir(path.dirname(DOCS_INDEX_PATH), { recursive: true })
+  await fs.writeFile(DOCS_INDEX_PATH, content)
+}
+
 async function generate() {
   const { guides, troubleshooting } = await collectMarkdownSources()
   const sources = [...guides, ...troubleshooting]
@@ -292,11 +347,14 @@ async function generate() {
     })
   )
 
-  await renderManifest(sources, ['troubleshooting'])
-  await renderTroubleshootingIndex(troubleshooting)
+  await Promise.all([
+    renderManifest(sources, ['troubleshooting', 'index']),
+    renderTroubleshootingIndex(troubleshooting),
+    renderDocsIndex(guides),
+  ])
 
   console.log(
-    `Generated ${sources.length} markdown files under public/markdown/guides/, troubleshooting guides index at public/markdown/guides/troubleshooting.md and updated public/markdown/manifest.json`
+    `Generated ${sources.length} markdown files under public/markdown/guides/, troubleshooting guides index at public/markdown/guides/troubleshooting.md, docs index at public/markdown/guides/index.md and updated public/markdown/manifest.json`
   )
 }
 
