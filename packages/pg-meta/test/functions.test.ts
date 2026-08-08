@@ -412,3 +412,38 @@ withTestDatabase(
     await executeQuery(removeSql)
   }
 )
+
+withTestDatabase(
+  'create procedure and parse with functions.list() and functions.retrieve()',
+  async ({ executeQuery }) => {
+    const { sql: createSql } = pgMeta.functions.create({
+      type: 'procedure',
+      name: 'test_procedure_p1',
+      schema: 'public',
+      definition: 'BEGIN NULL; END',
+      language: 'plpgsql',
+    })
+    await executeQuery(createSql)
+
+    const { sql: listSql, zod: listZod } = pgMeta.functions.list()
+    const listResult = listZod.parse(await executeQuery(listSql))
+    const proc = listResult.find(({ name }) => name === 'test_procedure_p1')
+    expect(proc).toBeDefined()
+    expect(proc!.type).toBe('procedure')
+    expect(proc!.return_type).toBeNull()
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_procedure_p1',
+      schema: 'public',
+      args: [],
+    })
+    const retrieveResult = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(retrieveResult).toBeDefined()
+    expect(retrieveResult!.type).toBe('procedure')
+    expect(retrieveResult!.return_type).toBeNull()
+
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(proc!))
+    await executeQuery(removeSql)
+  }
+)
+
