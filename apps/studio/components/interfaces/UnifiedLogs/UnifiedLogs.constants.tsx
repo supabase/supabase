@@ -95,6 +95,9 @@ export const SEARCH_PARAMS_PARSER = {
   edge_storage: parseAsBoolean.withDefault(true),
   edge_postgrest: parseAsBoolean.withDefault(true),
 
+  // Groups edge/auth/storage rows into request_id bundles instead of one row per log line.
+  traced: parseAsBoolean.withDefault(false),
+
   // Support searching for user against user ID
   // See userAttributionCondition in UnifiedLogs.queries.ts.
   user: parseAsString,
