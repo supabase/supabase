@@ -5,7 +5,7 @@ import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from
 
 export default function CopyTooltips() {
   return (
-    <div className="flex flex-row gap-20">
+    <div className="flex flex-row flex-wrap gap-8 sm:gap-20">
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Bad Example</span>
         <div className="flex flex-row gap-8 items-center">
