@@ -1,0 +1,41 @@
+{
+  "id": "az.project.change_request.ar.v1",
+  "system": "project",
+  "agent": "az-agent-project",
+  "systemName": "المشروعات",
+  "event": "change_request",
+  "locale": "ar",
+  "version": 1,
+  "name": "طلب تغيير في الأعمال",
+  "subject": "{{brand_name}} | طلب تغيير في الأعمال{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "طلب تغيير في الأعمال — إشعار صادر من az-agent-project",
+  "senderEnv": "EMAIL_FROM_PROJECTS",
+  "defaultFrom": "projects@alazab.com",
+  "defaultBrandName": "Alazab Projects",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "فتح المشروع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

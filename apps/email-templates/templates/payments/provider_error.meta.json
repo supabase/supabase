@@ -1,0 +1,41 @@
+{
+  "id": "az.payments.provider_error.ar.v1",
+  "system": "payments",
+  "agent": "az-agent-payments",
+  "systemName": "المدفوعات",
+  "event": "provider_error",
+  "locale": "ar",
+  "version": 1,
+  "name": "خطأ في بوابة الدفع",
+  "subject": "{{brand_name}} | خطأ في بوابة الدفع{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "خطأ في بوابة الدفع — إشعار صادر من az-agent-payments",
+  "senderEnv": "EMAIL_FROM_PAYMENTS",
+  "defaultFrom": "billing@alazab.com",
+  "defaultBrandName": "Azab Payments",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "عرض تفاصيل الدفع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

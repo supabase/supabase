@@ -1,0 +1,164 @@
+<!-- template-id: az.maint.visit_reminder.ar.v1 | source-of-truth: supabase/templates -->
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+  <title>{{email_title}}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;color:#1f2937;font-family:'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;direction:rtl;text-align:right;-webkit-font-smoothing: antialiased;">
+  <style>
+body {
+  margin:0; padding:0; background-color:#f3f4f6 !important; color:#1f2937; font-family:'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; direction:rtl; text-align:right; -webkit-font-smoothing: antialiased;
+}
+.card {
+  width:100%; max-width:600px; background:transparent; border-radius:24px; border:1px solid #e5e7eb; overflow:hidden;
+}
+.header {
+  background: #030957; border-radius: 24px 24px 0 0; padding:32px 30px; color:#ffffff;
+}
+
+.content {
+  padding:40px 30px 20px 30px;
+}
+.title {
+  margin:10px 0 16px 0; font-size:24px; line-height:34px; color:#030957; font-weight:700; letter-spacing:-0.02em;
+}
+.greeting {
+  font-size:16px; line-height:24px; color:#6b7280; font-weight:500;
+}
+.message-text {
+  margin:20px 0 0 0; font-size:16px; line-height:28px; color:#374151;
+}
+.details-table-wrapper {
+  padding:24px 30px 0 30px;
+}
+.details-table {
+  border-collapse:collapse; width:100%; background:#f9fafb; border-radius:9999px; overflow:hidden; border:1px solid #f3f4f6;
+}
+.details-label {
+  padding:14px 16px; border-bottom:none; font-size:14px; line-height:21px; color:#6b7280; width:40%; font-weight:500;
+}
+.details-value {
+  padding:14px 16px; border-bottom:none; font-size:14px; line-height:21px; color:#111827; font-weight:600; background:transparent;
+}
+.footer {
+  padding:32px 30px; background:#f9fafb; text-align:center; font-size:12px; line-height:20px; color:#6b7280; border-top:1px solid #e5e7eb;
+}
+.button {
+  display:inline-block; background:#ffb900; color:#030957; text-decoration:none; font-size:15px; line-height:20px; font-weight:700; padding:14px 28px; border-radius:9999px; box-shadow:0 2px 4px rgba(255, 185, 0, 0.2);
+}
+.button-secondary {
+  display:inline-block; color:#4b5563; text-decoration:none; font-size:14px; line-height:20px; font-weight:600; border-bottom:1px solid #9ca3af;
+}
+.alert-box {
+  border-collapse:collapse; border-radius:9999px; overflow:hidden; width:100%;
+}
+.alert-td {
+  padding:16px 20px; font-size:15px; line-height:24px;
+}
+
+  </style>
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">{{preheader}}</div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#f3f4f6;border-collapse:collapse;">
+    <tr>
+      <td align="center" style="padding:28px 12px;">
+        <!--[if mso]><table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" align="center"><tr><td><![endif]-->
+        <table class="card" role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" align="center" style="width:100%;max-width:600px;background:transparent;border-collapse:collapse;border-radius:24px;border:1px solid #e5e7eb;margin:0 auto;">
+          
+          <tr>
+            <td class="header" style="background: #030957; border-radius: 24px 24px 0 0;padding:32px 30px;color:#ffffff;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
+                <tr>
+                  <td align="right" style="vertical-align:middle;">
+                    <img src="{{logo_url}}" width="150" alt="{{brand_name}}" style="display:block;max-width:150px;height:auto;border:0;">
+                    <div style="font-size:12px;line-height:20px;color:#cbd3ff;margin-top:4px;">{{system_name}}</div>
+                  </td>
+                  <td align="left" style="vertical-align:middle;color:#ffcf40;font-size:12px;line-height:18px;white-space:nowrap;">{{template_reference}}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="content" style="padding:40px 30px 20px 30px;">
+              <div class="greeting" style="font-size:16px;line-height:24px;color:#6b7280;font-weight:500;">مرحبًا {{recipient_name}}،</div>
+              <h1 class="title" style="margin:10px 0 16px 0;font-size:24px;line-height:34px;color:#030957;font-weight:700;letter-spacing:-0.02em;">{{email_title}}</h1>
+              {{#status_label}}<div style="display:inline-block;padding:6px 14px;background:{{status_background}};color:{{status_color}};border:1px solid {{status_border}};border-radius:9999px;font-size:12px;line-height:18px;font-weight:600;letter-spacing:0.02em;">{{status_label}}</div>{{/status_label}}
+              <p class="message-text" style="margin:20px 0 0 0;font-size:16px;line-height:28px;color:#374151;">{{message}}</p>
+            </td>
+          </tr>
+          {{#reference}}
+          <tr>
+            <td style="padding:24px 30px 0 30px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;background:#fffbeb;border-right:4px solid #ffb900;border-radius:4px 0 0 4px;">
+                <tr>
+                  <td style="padding:14px 16px;font-size:14px;line-height:22px;color:#92400e;font-weight:500;">المرجع</td>
+                  <td align="left" style="padding:14px 16px;font-size:15px;line-height:22px;color:#92400e;font-weight:700;direction:ltr;">{{reference}}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{/reference}}
+          {{#details}}
+          <tr>
+            <td class="details-table-wrapper" style="padding:24px 30px 0 30px;">
+              <table class="details-table" role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;width:100%;background:#f9fafb;border-radius:9999px;border:1px solid #e5e7eb;">
+                <tr>
+                  <td class="details-label" style="padding:14px 16px;border-bottom:none;font-size:14px;line-height:21px;color:#6b7280;width:40%;font-weight:500;">{{label}}</td>
+                  <td class="details-value" style="padding:14px 16px;border-bottom:none;font-size:14px;line-height:21px;color:#111827;font-weight:600;background:transparent;">{{value}}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{/details}}
+          {{#alert_message}}
+          <tr>
+            <td style="padding:20px 30px 0 30px;">
+              <table class="alert-box" role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;background:{{alert_background}};border:1px solid {{alert_border}};border-radius:9999px;overflow:hidden;">
+                <tr>
+                  <td class="alert-td" style="padding:16px 20px;color:{{alert_color}};font-size:15px;line-height:24px;">
+                    {{#alert_title}}<strong style="display:block;margin-bottom:4px;">{{alert_title}}</strong>{{/alert_title}}
+                    {{alert_message}}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{/alert_message}}
+          {{#action_url}}
+          <tr>
+            <td align="center" style="padding:28px 30px 4px 30px;">
+              <a href="{{action_url}}" target="_blank" rel="noopener noreferrer" class="button" style="display:inline-block;background:#ffb900;color:#030957;text-decoration:none;font-size:15px;line-height:20px;font-weight:700;padding:14px 28px;border-radius:9999px;box-shadow:0 2px 4px rgba(255, 185, 0, 0.2);">{{action_label}}</a>
+            </td>
+          </tr>
+          {{/action_url}}
+          {{#secondary_action_url}}
+          <tr>
+            <td align="center" style="padding:10px 30px 4px 30px;">
+              <a href="{{secondary_action_url}}" target="_blank" rel="noopener noreferrer" class="button-secondary" style="display:inline-block;color:#4b5563;text-decoration:none;font-size:14px;line-height:20px;font-weight:600;border-bottom:1px solid #9ca3af;">{{secondary_action_label}}</a>
+            </td>
+          </tr>
+          {{/secondary_action_url}}
+          <tr>
+            <td style="padding:28px 30px 30px 30px;">
+              <div style="height:1px;background:#e5e7eb;font-size:0;line-height:0;">&nbsp;</div>
+              <p style="margin:18px 0 0 0;font-size:12px;line-height:21px;color:#667085;">{{footer_note}}</p>
+              {{#support_email}}<p style="margin:7px 0 0 0;font-size:12px;line-height:20px;color:#667085;">للدعم: <a href="mailto:{{support_email}}" style="color:#030957;text-decoration:none;">{{support_email}}</a></p>{{/support_email}}
+            </td>
+          </tr>
+          <tr>
+            <td class="footer" style="background:#f9fafb;padding:32px 30px;text-align:center;font-size:12px;line-height:20px;color:#6b7280;border-top:1px solid #e5e7eb;">
+              © {{current_year}} {{company_name}}. جميع الحقوق محفوظة.
+              {{#website_url}}<br><a href="{{website_url}}" style="color:#030957;text-decoration:none;">{{website_url}}</a>{{/website_url}}
+              {{#preferences_url}}<br><a href="{{preferences_url}}" style="color:#5f6b7d;text-decoration:underline;">إدارة تفضيلات البريد</a>{{/preferences_url}}
+            </td>
+          </tr>
+        </table>
+        <!--[if mso]></td></tr></table><![endif]-->
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

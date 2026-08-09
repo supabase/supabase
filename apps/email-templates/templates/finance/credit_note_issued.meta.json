@@ -1,0 +1,41 @@
+{
+  "id": "az.finance.credit_note_issued.ar.v1",
+  "system": "finance",
+  "agent": "az-agent-finance",
+  "systemName": "الفواتير والمالية",
+  "event": "credit_note_issued",
+  "locale": "ar",
+  "version": 1,
+  "name": "إصدار إشعار دائن",
+  "subject": "{{brand_name}} | إصدار إشعار دائن{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "إصدار إشعار دائن — إشعار صادر من az-agent-finance",
+  "senderEnv": "EMAIL_FROM_FINANCE",
+  "defaultFrom": "finance@alazab.com",
+  "defaultBrandName": "Alazab",
+  "defaultMessage": "تم تسجيل هذا التحديث بنجاح. يرجى مراجعة البيانات الواردة أدناه والاحتفاظ بالرسالة للرجوع إليها عند الحاجة.",
+  "defaultStatusLabel": "مكتمل",
+  "defaultStatusTone": "success",
+  "defaultActionLabel": "فتح المستند المالي",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

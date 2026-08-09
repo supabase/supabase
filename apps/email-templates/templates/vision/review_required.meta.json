@@ -1,0 +1,41 @@
+{
+  "id": "az.vision.review_required.ar.v1",
+  "system": "vision",
+  "agent": "az-agent-vision",
+  "systemName": "الرؤية والمستندات",
+  "event": "review_required",
+  "locale": "ar",
+  "version": 1,
+  "name": "المستند يحتاج مراجعة بشرية",
+  "subject": "{{brand_name}} | المستند يحتاج مراجعة بشرية{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "المستند يحتاج مراجعة بشرية — إشعار صادر من az-agent-vision",
+  "senderEnv": "EMAIL_FROM_AI",
+  "defaultFrom": "ai@alazab.com",
+  "defaultBrandName": "Alazab Vision",
+  "defaultMessage": "يتطلب هذا الإشعار انتباهك. يرجى مراجعة التفاصيل واتخاذ الإجراء المناسب ضمن المدة المحددة.",
+  "defaultStatusLabel": "يتطلب الانتباه",
+  "defaultStatusTone": "warning",
+  "defaultActionLabel": "مراجعة المستند",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

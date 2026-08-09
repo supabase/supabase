@@ -1,0 +1,41 @@
+{
+  "id": "az.copilot.security_alert.ar.v1",
+  "system": "copilot",
+  "agent": "az-agent-copilot",
+  "systemName": "الأنظمة السحابية",
+  "event": "security_alert",
+  "locale": "ar",
+  "version": 1,
+  "name": "تنبيه أمني",
+  "subject": "{{brand_name}} | تنبيه أمني{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تنبيه أمني — إشعار صادر من az-agent-copilot",
+  "senderEnv": "EMAIL_FROM_DEVOPS",
+  "defaultFrom": "devops@alazab.com",
+  "defaultBrandName": "Alazab Cloud",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "فتح لوحة الأنظمة",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

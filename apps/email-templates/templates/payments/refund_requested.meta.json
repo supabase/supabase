@@ -1,0 +1,41 @@
+{
+  "id": "az.payments.refund_requested.ar.v1",
+  "system": "payments",
+  "agent": "az-agent-payments",
+  "systemName": "المدفوعات",
+  "event": "refund_requested",
+  "locale": "ar",
+  "version": 1,
+  "name": "استلام طلب استرداد",
+  "subject": "{{brand_name}} | استلام طلب استرداد{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "استلام طلب استرداد — إشعار صادر من az-agent-payments",
+  "senderEnv": "EMAIL_FROM_PAYMENTS",
+  "defaultFrom": "billing@alazab.com",
+  "defaultBrandName": "Azab Payments",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "عرض تفاصيل الدفع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

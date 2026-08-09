@@ -1,0 +1,20 @@
+{
+  "templateId": "az.copilot.service_down.ar.v1",
+  "to": "recipient@example.com",
+  "data": {
+    "recipient_name": "المهندس محمد",
+    "reference": "COPILOT-2026-001",
+    "details": [
+      {
+        "label": "النظام",
+        "value": "الأنظمة السحابية"
+      },
+      {
+        "label": "الحالة",
+        "value": "جاهز للمراجعة"
+      }
+    ],
+    "action_url": "https://al-azab.co/"
+  },
+  "idempotencyKey": "example-copilot-001"
+}

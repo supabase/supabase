@@ -1,0 +1,41 @@
+{
+  "id": "az.maint.request_classified.ar.v1",
+  "system": "maint",
+  "agent": "az-agent-maint",
+  "systemName": "الصيانات وأوبرفيكس",
+  "event": "request_classified",
+  "locale": "ar",
+  "version": 1,
+  "name": "تصنيف طلب الصيانة",
+  "subject": "{{brand_name}} | تصنيف طلب الصيانة{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تصنيف طلب الصيانة — إشعار صادر من az-agent-maint",
+  "senderEnv": "EMAIL_FROM_MAINT",
+  "defaultFrom": "maintenance@alazab.com",
+  "defaultBrandName": "UberFix",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "فتح طلب الصيانة",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

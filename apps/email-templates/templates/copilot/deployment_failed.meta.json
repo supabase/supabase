@@ -1,0 +1,41 @@
+{
+  "id": "az.copilot.deployment_failed.ar.v1",
+  "system": "copilot",
+  "agent": "az-agent-copilot",
+  "systemName": "الأنظمة السحابية",
+  "event": "deployment_failed",
+  "locale": "ar",
+  "version": 1,
+  "name": "فشل النشر",
+  "subject": "{{brand_name}} | فشل النشر{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "فشل النشر — إشعار صادر من az-agent-copilot",
+  "senderEnv": "EMAIL_FROM_DEVOPS",
+  "defaultFrom": "devops@alazab.com",
+  "defaultBrandName": "Alazab Cloud",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "فتح لوحة الأنظمة",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

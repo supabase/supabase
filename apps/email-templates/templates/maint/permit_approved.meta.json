@@ -1,0 +1,41 @@
+{
+  "id": "az.maint.permit_approved.ar.v1",
+  "system": "maint",
+  "agent": "az-agent-maint",
+  "systemName": "الصيانات وأوبرفيكس",
+  "event": "permit_approved",
+  "locale": "ar",
+  "version": 1,
+  "name": "الموافقة على تصريح الدخول",
+  "subject": "{{brand_name}} | الموافقة على تصريح الدخول{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "الموافقة على تصريح الدخول — إشعار صادر من az-agent-maint",
+  "senderEnv": "EMAIL_FROM_MAINT",
+  "defaultFrom": "maintenance@alazab.com",
+  "defaultBrandName": "UberFix",
+  "defaultMessage": "تم تسجيل هذا التحديث بنجاح. يرجى مراجعة البيانات الواردة أدناه والاحتفاظ بالرسالة للرجوع إليها عند الحاجة.",
+  "defaultStatusLabel": "مكتمل",
+  "defaultStatusTone": "success",
+  "defaultActionLabel": "فتح طلب الصيانة",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

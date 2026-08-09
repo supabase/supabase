@@ -1,0 +1,41 @@
+{
+  "id": "az.payments.pending.ar.v1",
+  "system": "payments",
+  "agent": "az-agent-payments",
+  "systemName": "المدفوعات",
+  "event": "pending",
+  "locale": "ar",
+  "version": 1,
+  "name": "عملية الدفع قيد الانتظار",
+  "subject": "{{brand_name}} | عملية الدفع قيد الانتظار{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "عملية الدفع قيد الانتظار — إشعار صادر من az-agent-payments",
+  "senderEnv": "EMAIL_FROM_PAYMENTS",
+  "defaultFrom": "billing@alazab.com",
+  "defaultBrandName": "Azab Payments",
+  "defaultMessage": "يتطلب هذا الإشعار انتباهك. يرجى مراجعة التفاصيل واتخاذ الإجراء المناسب ضمن المدة المحددة.",
+  "defaultStatusLabel": "يتطلب الانتباه",
+  "defaultStatusTone": "warning",
+  "defaultActionLabel": "عرض تفاصيل الدفع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

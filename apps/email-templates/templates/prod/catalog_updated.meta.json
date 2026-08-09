@@ -1,0 +1,41 @@
+{
+  "id": "az.prod.catalog_updated.ar.v1",
+  "system": "prod",
+  "agent": "az-agent-prod",
+  "systemName": "المنتجات",
+  "event": "catalog_updated",
+  "locale": "ar",
+  "version": 1,
+  "name": "تحديث بيانات الكتالوج",
+  "subject": "{{brand_name}} | تحديث بيانات الكتالوج{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تحديث بيانات الكتالوج — إشعار صادر من az-agent-prod",
+  "senderEnv": "EMAIL_FROM_PRODUCTS",
+  "defaultFrom": "products@alazab.com",
+  "defaultBrandName": "Alazab Products",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "عرض المنتج",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

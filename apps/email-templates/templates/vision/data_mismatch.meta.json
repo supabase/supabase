@@ -1,0 +1,41 @@
+{
+  "id": "az.vision.data_mismatch.ar.v1",
+  "system": "vision",
+  "agent": "az-agent-vision",
+  "systemName": "الرؤية والمستندات",
+  "event": "data_mismatch",
+  "locale": "ar",
+  "version": 1,
+  "name": "اختلاف البيانات المستخرجة",
+  "subject": "{{brand_name}} | اختلاف البيانات المستخرجة{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "اختلاف البيانات المستخرجة — إشعار صادر من az-agent-vision",
+  "senderEnv": "EMAIL_FROM_AI",
+  "defaultFrom": "ai@alazab.com",
+  "defaultBrandName": "Alazab Vision",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "مراجعة المستند",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

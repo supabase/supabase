@@ -1,0 +1,41 @@
+{
+  "id": "az.vision.duplicate_detected.ar.v1",
+  "system": "vision",
+  "agent": "az-agent-vision",
+  "systemName": "الرؤية والمستندات",
+  "event": "duplicate_detected",
+  "locale": "ar",
+  "version": 1,
+  "name": "اكتشاف مستند مكرر",
+  "subject": "{{brand_name}} | اكتشاف مستند مكرر{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "اكتشاف مستند مكرر — إشعار صادر من az-agent-vision",
+  "senderEnv": "EMAIL_FROM_AI",
+  "defaultFrom": "ai@alazab.com",
+  "defaultBrandName": "Alazab Vision",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "مراجعة المستند",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

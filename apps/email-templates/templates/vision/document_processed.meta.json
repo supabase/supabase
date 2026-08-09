@@ -1,0 +1,41 @@
+{
+  "id": "az.vision.document_processed.ar.v1",
+  "system": "vision",
+  "agent": "az-agent-vision",
+  "systemName": "الرؤية والمستندات",
+  "event": "document_processed",
+  "locale": "ar",
+  "version": 1,
+  "name": "اكتمال معالجة المستند",
+  "subject": "{{brand_name}} | اكتمال معالجة المستند{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "اكتمال معالجة المستند — إشعار صادر من az-agent-vision",
+  "senderEnv": "EMAIL_FROM_AI",
+  "defaultFrom": "ai@alazab.com",
+  "defaultBrandName": "Alazab Vision",
+  "defaultMessage": "تم تسجيل هذا التحديث بنجاح. يرجى مراجعة البيانات الواردة أدناه والاحتفاظ بالرسالة للرجوع إليها عند الحاجة.",
+  "defaultStatusLabel": "مكتمل",
+  "defaultStatusTone": "success",
+  "defaultActionLabel": "مراجعة المستند",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

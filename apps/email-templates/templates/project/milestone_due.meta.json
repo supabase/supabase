@@ -1,0 +1,41 @@
+{
+  "id": "az.project.milestone_due.ar.v1",
+  "system": "project",
+  "agent": "az-agent-project",
+  "systemName": "المشروعات",
+  "event": "milestone_due",
+  "locale": "ar",
+  "version": 1,
+  "name": "موعد استحقاق مرحلة",
+  "subject": "{{brand_name}} | موعد استحقاق مرحلة{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "موعد استحقاق مرحلة — إشعار صادر من az-agent-project",
+  "senderEnv": "EMAIL_FROM_PROJECTS",
+  "defaultFrom": "projects@alazab.com",
+  "defaultBrandName": "Alazab Projects",
+  "defaultMessage": "يتطلب هذا الإشعار انتباهك. يرجى مراجعة التفاصيل واتخاذ الإجراء المناسب ضمن المدة المحددة.",
+  "defaultStatusLabel": "يتطلب الانتباه",
+  "defaultStatusTone": "warning",
+  "defaultActionLabel": "فتح المشروع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "alazab-email-templates",
+  "version": "1.0.0",
+  "preparedAt": "2026-08-03T06:55:00+03:00",
+  "templateCount": 144,
+  "systems": [
+    "auth",
+    "azabot",
+    "copilot",
+    "core",
+    "finance",
+    "maint",
+    "payments",
+    "prod",
+    "project",
+    "vision"
+  ],
+  "catalogSha256": "3dc9275c61f8119ce32923e59ff8e157092376549c3925100ccd4b4ac14f120f",
+  "runtime": "Deno compiled executable",
+  "containerPort": 8080,
+  "sendEnabledByDefault": false,
+  "protectedEndpoints": [
+    "/v1/templates",
+    "/v1/templates/{id}",
+    "/v1/render",
+    "/v1/send"
+  ],
+  "publicEndpoints": [
+    "/",
+    "/healthz",
+    "/readyz"
+  ]
+}

@@ -1,0 +1,80 @@
+services:
+  templates:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DENO_VERSION: ${DENO_VERSION:-2.4.3}
+    image: ${TEMPLATES_IMAGE:-ghcr.io/alazabdev/email-templates}:${TEMPLATES_IMAGE_TAG:-local}
+    container_name: alazab-email-templates
+    restart: unless-stopped
+    init: true
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    ports:
+      - "127.0.0.1:${TEMPLATES_HOST_PORT:-8080}:8080"
+    environment:
+      TEMPLATES_BIND: 0.0.0.0
+      TEMPLATES_PORT: 8080
+      TEMPLATES_API_TOKEN_FILE: /run/secrets/templates_api_token
+      MAX_BODY_BYTES: ${MAX_BODY_BYTES:-262144}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+      ENABLE_SEND: ${ENABLE_SEND:-false}
+      ALLOW_HTTP_LOCALHOST: ${ALLOW_HTTP_LOCALHOST:-false}
+
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+      RESEND_API_KEY_FILE: ${RESEND_API_KEY_FILE:-/run/secrets/resend_api_key}
+      RESEND_API_URL: ${RESEND_API_URL:-}
+      EMAIL_WEBHOOK_URL: ${EMAIL_WEBHOOK_URL:-}
+      EMAIL_WEBHOOK_SECRET_FILE: ${EMAIL_WEBHOOK_SECRET_FILE:-/run/secrets/email_webhook_secret}
+
+      EMAIL_BRAND_NAME: ${EMAIL_BRAND_NAME:-Alazab}
+      EMAIL_COMPANY_NAME: ${EMAIL_COMPANY_NAME:-شركة العزب}
+      EMAIL_LOGO_URL: ${EMAIL_LOGO_URL:-https://alazab.com/w.gif}
+      EMAIL_SUPPORT_EMAIL: ${EMAIL_SUPPORT_EMAIL:-support@alazab.com}
+      EMAIL_WEBSITE_URL: ${EMAIL_WEBSITE_URL:-https://alazab.com}
+
+      EMAIL_FROM_AUTH: ${EMAIL_FROM_AUTH:-auth@alazab.com}
+      EMAIL_FROM_SUPPORT: ${EMAIL_FROM_SUPPORT:-support@alazab.com}
+      EMAIL_FROM_DEVOPS: ${EMAIL_FROM_DEVOPS:-devops@alazab.com}
+      EMAIL_FROM_CORE: ${EMAIL_FROM_CORE:-noreply@alazab.com}
+      EMAIL_FROM_FINANCE: ${EMAIL_FROM_FINANCE:-finance@alazab.com}
+      EMAIL_FROM_MAINT: ${EMAIL_FROM_MAINT:-maintenance@alazab.com}
+      EMAIL_FROM_PAYMENTS: ${EMAIL_FROM_PAYMENTS:-billing@alazab.com}
+      EMAIL_FROM_PRODUCTS: ${EMAIL_FROM_PRODUCTS:-products@alazab.com}
+      EMAIL_FROM_PROJECTS: ${EMAIL_FROM_PROJECTS:-projects@alazab.com}
+      EMAIL_FROM_AI: ${EMAIL_FROM_AI:-ai@alazab.com}
+    secrets:
+      - templates_api_token
+      - resend_api_key
+      - email_webhook_secret
+    healthcheck:
+      test:
+        - CMD
+        - deno
+        - eval
+        - --allow-net=127.0.0.1:8080
+        - "const r=await fetch('http://127.0.0.1:8080/healthz');if(!r.ok)Deno.exit(1)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - templates_internal
+
+networks:
+  templates_internal:
+    name: alazab-templates-internal
+
+secrets:
+  templates_api_token:
+    file: ./secrets/templates_api_token
+  resend_api_key:
+    file: ./secrets/resend_api_key
+  email_webhook_secret:
+    file: ./secrets/email_webhook_secret

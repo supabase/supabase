@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>UberFix | Authentication Templates</title>
+  <style>
+    /* RESET & BASE */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #F1F5F9;  /* Very light gray-blue, clean background */
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      padding: 2rem 1rem;
+      color: #0F172A;
+    }
+
+    /* Container for all templates preview */
+    .templates-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+
+    /* Individual card style (each template) */
+    .template-card {
+      background: #FFFFFF;
+      border-radius: 32px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05), 0 4px 8px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .card-header {
+      padding: 1.2rem 1.5rem;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E9EDF2;
+    }
+
+    .card-header h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #030957;
+      letter-spacing: -0.2px;
+    }
+
+    .card-header p {
+      color: #475569;
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+
+    /* main content area (the actual email-like template) */
+    .template-preview {
+      background: #F8FAFE;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* ----- EMAIL CARD STYLES (the real template look) ----- */
+    .email-container {
+      max-width: 560px;
+      width: 100%;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Header with approved Alazab logo */
+    .email-header {
+      background: #030957;  /* dark blue */
+      padding: 20px 28px;
+      text-align: center;
+    }
+    .brand-logo {
+      display: block;
+      width: 150px;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto;
+      border: 0;
+    }
+
+    /* Body content */
+    .email-body {
+      padding: 32px 28px 28px 28px;
+      background: #FFFFFF;
+    }
+
+    .email-greeting {
+      font-size: 22px;
+      font-weight: 600;
+      color: #030957;
+      margin-bottom: 12px;
+    }
+
+    .email-message {
+      color: #1E293B;
+      line-height: 1.5;
+      font-size: 16px;
+      margin: 16px 0;
+    }
+
+    .highlight-code {
+      background: #F1F5F9;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 2px;
+      color: #030957;
+      margin: 20px 0;
+      border: 1px solid #E2E8F0;
+    }
+
+    .btn {
+      display: inline-block;
+      background-color: #FFB900;
+      color: #030957;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-size: 15px;
+      transition: 0.2s;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .btn:hover {
+      background-color: #e0a500;
+      transform: translateY(-1px);
+    }
+
+    .divider {
+      height: 1px;
+      background: #E9EDF2;
+      margin: 24px 0 16px;
+    }
+
+    .footer-note {
+      font-size: 12px;
+      color: #64748B;
+      text-align: center;
+      padding: 16px 28px 24px;
+      background: #FFFFFF;
+      border-top: 1px solid #EEF2F6;
+    }
+
+    .footer-note a {
+      color: #030957;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .footer-note a:hover {
+      text-decoration: underline;
+    }
+
+    /* otp small style */
+    .otp-digits {
+      font-size: 32px;
+      letter-spacing: 8px;
+      font-weight: 700;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #E2E8F0;
+    }
+
+    @media (max-width: 550px) {
+      .template-preview { padding: 1rem; }
+      .email-body { padding: 24px 20px; }
+      .brand-logo { width: 132px; }
+    }
+  </style>
+</head>
+<body>
+<div class="templates-container">
+  <!-- ========================================================= -->
+  <!-- 1. CONFIRM SIGN UP                                       -->
+  <!-- ========================================================= -->
+  <div class="template-card">
+    <div class="card-header">
+      <h2>✅ Confirm sign up</h2>
+      <p>Ask users to confirm their email address after signing up</p>
+    </div>
+    <div class="template-preview">
+      <div class="email-container">
+        <div class="email-header">
+          <img class="brand-logo" src="https://alazab.com/w.gif" width="150" alt="Alazab">
+        </div>
+        <div class="email-body">
+          <div class="email-greeting">Welcome to UberFix!</div>
+          <div class="email-message">
+            You're almost ready to start managing and maintaining your facilities with ease. Please verify your email address to activate your account.
+          </div>
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="#" class="btn">Confirm your email</a>
+          </div>
+          <div class="email-message" style="font-size: 14px; color: #475569;">
+            Or copy and paste this link: <br>
+            <span style="color:#030957;">https://uberfix.app/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</span>
+          </div>
+          <div class="divider"></div>
+          <div class="email-message" style="font-size: 13px; color: #5B6E8C;">
+            This link expires in 24 hours. If you didn’t create an account, you can safely ignore this email.
+          </div>
+        </div>
+        <div class="footer-note">
+          © 2025 Al-Azab Construction Company — <a href="https://al-azab.co/policy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. INVITE USER                                           -->
+  <!-- ========================================================= -->
+  <div class="template-card">
+    <div class="card-header">
+      <h2>✉️ Invite user</h2>
+      <p>Invite someone to create an account (team member / collaborator)</p>
+    </div>
+    <div class="template-preview">
+      <div class="email-container">
+        <div class="email-header">
+          <img class="brand-logo" src="https://alazab.com/w.gif" width="150" alt="Alazab">
+        </div>
+        <div class="email-body">
+          <div class="email-greeting">You're invited to join UberFix</div>
+          <div class="email-message">
+            <strong>Alex Morgan</strong> has invited you to join their facility management team on <strong>UberFix</strong>.
+            With UberFix you can track maintenance requests, manage assets, and collaborate in real time.
+          </div>
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="#" class="btn">Accept invitation</a>
+          </div>
+          <div class="email-message" style="font-size: 14px;">
+            This invitation is intended for <span style="color:#030957;">{{ user_email }}</span>. If you were not expecting this, please disregard this email.
+          </div>
+        </div>
+        <div class="footer-note">
+          © 2025 Al-Azab Construction Company — <a href="https://al-azab.co/policy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 3. MAGIC LINK or OTP                                    -->
+  <!-- ========================================================= -->
+  <div class="template-card">
+    <div class="card-header">
+      <h2>🔑 Magic link / OTP</h2>
+      <p>Send a one-time sign-in link or one-time password</p>
+    </div>
+    <div class="template-preview">
+      <div class="email-container">
+        <div class="email-header">
+          <img class="brand-logo" src="https://alazab.com/w.gif" width="150" alt="Alazab">
+        </div>
+        <div class="email-body">
+          <div class="email-greeting">Your secure sign-in code</div>
+          <div class="email-message">
+            Use the one-time password below to log into UberFix. This code is valid for 10 minutes.
+          </div>
+          <div class="highlight-code" style="font-size: 28px; letter-spacing: 6px;">872 315</div>
+          <div class="email-message" style="font-size: 14px;">
+            Or click the magic link: <br>
+            <a href="#" style="color:#030957; word-break:break-all;">https://uberfix.app/magic?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9</a>
+          </div>
+          <div class="divider"></div>
+          <div class="email-message" style="font-size: 13px;">If you didn’t request this, you can safely ignore this email. Your account is secure.</div>
+        </div>
+        <div class="footer-note">
+          © 2025 Al-Azab Construction Company — <a href="https://al-azab.co/policy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 4. CHANGE EMAIL ADDRESS                                  -->
+  <!-- ========================================================= -->
+  <div class="template-card">
+    <div class="card-header">
+      <h2>📧 Change email address</h2>
+      <p>Ask users to verify their new email address after changing it</p>
+    </div>
+    <div class="template-preview">
+      <div class="email-container">
+        <div class="email-header">
+          <img class="brand-logo" src="https://alazab.com/w.gif" width="150" alt="Alazab">
+        </div>
+        <div class="email-body">
+          <div class="email-greeting">Verify your new email address</div>
+          <div class="email-message">
+            You recently requested to change your UberFix account email to <strong>{{ new_email }}</strong>. Please verify this address to complete the update.
+          </div>
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="#" class="btn">Verify new email</a>
+          </div>
+          <div class="email-message" style="font-size: 14px; background: #F8FAFE; padding: 12px; border-radius: 14px;">
+            Your previous email <strong>{{ old_email }}</strong> will be removed after verification.
+          </div>
+          <div class="divider"></div>
+          <div class="email-message" style="font-size: 13px;">If you didn’t make this change, please <a href="#" style="color:#030957;">contact support</a> immediately.</div>
+        </div>
+        <div class="footer-note">
+          © 2025 Al-Azab Construction Company — <a href="https://al-azab.co/policy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 5. RESET PASSWORD                                        -->
+  <!-- ========================================================= -->
+  <div class="template-card">
+    <div class="card-header">
+      <h2>🔐 Reset password</h2>
+      <p>Send a password reset link or code</p>
+    </div>
+    <div class="template-preview">
+      <div class="email-container">
+        <div class="email-header">
+          <img class="brand-logo" src="https://alazab.com/w.gif" width="150" alt="Alazab">
+        </div>
+        <div class="email-body">
+          <div class="email-greeting">Reset your password</div>
+          <div class="email-message">
+            We received a request to reset the password for your UberFix account. Click the button below to create a new password.
+          </div>
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="#" class="btn">Reset password</a>
+          </div>
+          <div class="highlight-code" style="background:transparent; font-size:14px; padding:0;">
+            If the button doesn’t work, copy this link: <br>
+            <span style="color:#030957;">https://uberfix.app/reset?code=r4nd0mS3cur3</span>
+          </div>
+          <div class="divider"></div>
+          <div class="email-message" style="font-size: 13px;">This link expires in 1 hour. For security, do not share this email with anyone.</div>
+        </div>
+        <div class="footer-note">
+          © 2025 Al-Azab Construction Company — <a href="https://al-azab.co/policy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 6. REAUTHENTICATION                                      -->
+  <!-- ========================================================= -->
+  <div class="template-card">
+    <div class="card-header">
+      <h2>🛡️ Reauthentication</h2>
+      <p>Ask users to verify their identity before a sensitive operation (e.g., delete account, change security settings)</p>
+    </div>
+    <div class="template-preview">
+      <div class="email-container">
+        <div class="email-header">
+          <img class="brand-logo" src="https://alazab.com/w.gif" width="150" alt="Alazab">
+        </div>
+        <div class="email-body">
+          <div class="email-greeting">Verify your identity</div>
+          <div class="email-message">
+            You are about to perform a sensitive action (delete account / change primary contact). To protect your account, please confirm your identity.
+          </div>
+          <div class="highlight-code" style="background:#F1F5F9; font-size: 22px; letter-spacing: 6px;">649 282</div>
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="#" class="btn">Verify & continue</a>
+          </div>
+          <div class="email-message" style="font-size: 13px;">If you did not attempt this action, <a href="#" style="color:#030957;">secure your account now</a>.</div>
+        </div>
+        <div class="footer-note">
+          © 2025 Al-Azab Construction Company — <a href="https://al-azab.co/policy.html">Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "id": "az.prod.stock_low.ar.v1",
+  "system": "prod",
+  "agent": "az-agent-prod",
+  "systemName": "المنتجات",
+  "event": "stock_low",
+  "locale": "ar",
+  "version": 1,
+  "name": "انخفاض المخزون",
+  "subject": "{{brand_name}} | انخفاض المخزون{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "انخفاض المخزون — إشعار صادر من az-agent-prod",
+  "senderEnv": "EMAIL_FROM_PRODUCTS",
+  "defaultFrom": "products@alazab.com",
+  "defaultBrandName": "Alazab Products",
+  "defaultMessage": "يتطلب هذا الإشعار انتباهك. يرجى مراجعة التفاصيل واتخاذ الإجراء المناسب ضمن المدة المحددة.",
+  "defaultStatusLabel": "يتطلب الانتباه",
+  "defaultStatusTone": "warning",
+  "defaultActionLabel": "عرض المنتج",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

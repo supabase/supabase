@@ -1,0 +1,28 @@
+# template-id: az.core.daily_digest.ar.v1
+{{brand_name}} — {{system_name}}
+{{email_title}}
+
+مرحبًا {{recipient_name}}،
+
+{{message}}
+{{#reference}}
+المرجع: {{reference}}
+{{/reference}}
+{{#details}}
+{{label}}: {{value}}
+{{/details}}
+{{#alert_message}}
+{{alert_title}}
+{{alert_message}}
+{{/alert_message}}
+{{#action_url}}
+{{action_label}}: {{action_url}}
+{{/action_url}}
+{{#secondary_action_url}}
+{{secondary_action_label}}: {{secondary_action_url}}
+{{/secondary_action_url}}
+
+{{footer_note}}
+{{#support_email}}الدعم: {{support_email}}{{/support_email}}
+{{#website_url}}{{website_url}}{{/website_url}}
+© {{current_year}} {{company_name}}

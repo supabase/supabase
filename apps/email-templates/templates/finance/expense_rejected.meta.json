@@ -1,0 +1,41 @@
+{
+  "id": "az.finance.expense_rejected.ar.v1",
+  "system": "finance",
+  "agent": "az-agent-finance",
+  "systemName": "الفواتير والمالية",
+  "event": "expense_rejected",
+  "locale": "ar",
+  "version": 1,
+  "name": "رفض المصروف",
+  "subject": "{{brand_name}} | رفض المصروف{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "رفض المصروف — إشعار صادر من az-agent-finance",
+  "senderEnv": "EMAIL_FROM_FINANCE",
+  "defaultFrom": "finance@alazab.com",
+  "defaultBrandName": "Alazab",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "فتح المستند المالي",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "templateId": "az.azabot.ticket_created.ar.v1",
+  "to": "recipient@example.com",
+  "data": {
+    "recipient_name": "المهندس محمد",
+    "reference": "AZABOT-2026-001",
+    "details": [
+      {
+        "label": "النظام",
+        "value": "دعم العملاء"
+      },
+      {
+        "label": "الحالة",
+        "value": "جاهز للمراجعة"
+      }
+    ],
+    "action_url": "https://al-azab.co/"
+  },
+  "idempotencyKey": "example-azabot-001"
+}

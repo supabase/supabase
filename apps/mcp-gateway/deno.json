@@ -1,0 +1,16 @@
+{
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  },
+  "imports": {
+    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.30.0",
+    "@std/assert": "jsr:@std/assert@1",
+    "@types/express": "npm:@types/express@^5.0.6",
+    "@types/mustache": "npm:@types/mustache@^4.2.6",
+    "@types/nodemailer": "npm:@types/nodemailer@^8.0.1",
+    "express": "npm:express@^5.2.1",
+    "hono": "npm:hono@^4.12.34",
+    "mustache": "npm:mustache@^4.2.0",
+    "nodemailer": "npm:nodemailer@^9.0.3"
+  }
+}

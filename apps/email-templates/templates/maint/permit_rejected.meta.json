@@ -1,0 +1,41 @@
+{
+  "id": "az.maint.permit_rejected.ar.v1",
+  "system": "maint",
+  "agent": "az-agent-maint",
+  "systemName": "الصيانات وأوبرفيكس",
+  "event": "permit_rejected",
+  "locale": "ar",
+  "version": 1,
+  "name": "رفض أو تعليق التصريح",
+  "subject": "{{brand_name}} | رفض أو تعليق التصريح{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "رفض أو تعليق التصريح — إشعار صادر من az-agent-maint",
+  "senderEnv": "EMAIL_FROM_MAINT",
+  "defaultFrom": "maintenance@alazab.com",
+  "defaultBrandName": "UberFix",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "فتح طلب الصيانة",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "az.core.agent_handoff.ar.v1",
+  "system": "core",
+  "agent": "az-agent-core",
+  "systemName": "الوكيل الأساسي",
+  "event": "agent_handoff",
+  "locale": "ar",
+  "version": 1,
+  "name": "تحويل المهمة إلى وكيل متخصص",
+  "subject": "{{brand_name}} | تحويل المهمة إلى وكيل متخصص{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تحويل المهمة إلى وكيل متخصص — إشعار صادر من az-agent-core",
+  "senderEnv": "EMAIL_FROM_CORE",
+  "defaultFrom": "noreply@alazab.com",
+  "defaultBrandName": "Alazab",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "فتح مركز العمليات",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.container.example
+secrets/*
+!secrets/README.md
+.DS_Store
+coverage/
+*.log

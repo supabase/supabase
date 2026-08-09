@@ -1,0 +1,41 @@
+{
+  "id": "az.maint.sla_warning.ar.v1",
+  "system": "maint",
+  "agent": "az-agent-maint",
+  "systemName": "الصيانات وأوبرفيكس",
+  "event": "sla_warning",
+  "locale": "ar",
+  "version": 1,
+  "name": "تحذير بقرب انتهاء مدة التنفيذ",
+  "subject": "{{brand_name}} | تحذير بقرب انتهاء مدة التنفيذ{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تحذير بقرب انتهاء مدة التنفيذ — إشعار صادر من az-agent-maint",
+  "senderEnv": "EMAIL_FROM_MAINT",
+  "defaultFrom": "maintenance@alazab.com",
+  "defaultBrandName": "UberFix",
+  "defaultMessage": "يتطلب هذا الإشعار انتباهك. يرجى مراجعة التفاصيل واتخاذ الإجراء المناسب ضمن المدة المحددة.",
+  "defaultStatusLabel": "يتطلب الانتباه",
+  "defaultStatusTone": "warning",
+  "defaultActionLabel": "فتح طلب الصيانة",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

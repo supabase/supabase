@@ -1,0 +1,20 @@
+{
+  "templateId": "az.project.created.ar.v1",
+  "to": "recipient@example.com",
+  "data": {
+    "recipient_name": "المهندس محمد",
+    "reference": "PROJECT-2026-001",
+    "details": [
+      {
+        "label": "النظام",
+        "value": "المشروعات"
+      },
+      {
+        "label": "الحالة",
+        "value": "جاهز للمراجعة"
+      }
+    ],
+    "action_url": "https://al-azab.co/"
+  },
+  "idempotencyKey": "example-project-001"
+}

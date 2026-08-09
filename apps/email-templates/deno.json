@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true
+  },
+  "tasks": {
+    "build": "deno run --allow-read --allow-write scripts/build.ts",
+    "validate": "deno run --allow-read scripts/validate.ts",
+    "sync-runtime": "deno run --allow-read --allow-write scripts/sync-runtime.ts",
+    "check": "deno task build && deno check mod.ts && deno task validate && deno task sync-runtime",
+    "test": "deno test tests/",
+    "container:check": "deno task build && deno check mod.ts src/server.ts && deno task validate && deno task test",
+    "serve": "deno run --cached-only --allow-net --allow-env --allow-read=/run/secrets src/server.ts"
+  }
+}

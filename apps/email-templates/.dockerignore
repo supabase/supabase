@@ -1,0 +1,14 @@
+.git
+.github
+.env
+.env.*
+!.env.container.example
+secrets/*
+!secrets/README.md
+node_modules
+coverage
+.DS_Store
+*.log
+html_*.html
+preview
+examples

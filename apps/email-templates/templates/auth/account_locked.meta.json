@@ -1,0 +1,41 @@
+{
+  "id": "az.auth.account_locked.ar.v1",
+  "system": "auth",
+  "agent": "az-agent-auth",
+  "systemName": "المصادقة",
+  "event": "account_locked",
+  "locale": "ar",
+  "version": 1,
+  "name": "تم إيقاف الحساب مؤقتًا",
+  "subject": "{{brand_name}} | تم إيقاف الحساب مؤقتًا{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تم إيقاف الحساب مؤقتًا — إشعار صادر من az-agent-auth",
+  "senderEnv": "EMAIL_FROM_AUTH",
+  "defaultFrom": "auth@alazab.com",
+  "defaultBrandName": "Alazab",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "متابعة الإجراء",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "az.project.progress_payment.ar.v1",
+  "system": "project",
+  "agent": "az-agent-project",
+  "systemName": "المشروعات",
+  "event": "progress_payment",
+  "locale": "ar",
+  "version": 1,
+  "name": "مستخلص مشروع للمراجعة",
+  "subject": "{{brand_name}} | مستخلص مشروع للمراجعة{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "مستخلص مشروع للمراجعة — إشعار صادر من az-agent-project",
+  "senderEnv": "EMAIL_FROM_PROJECTS",
+  "defaultFrom": "projects@alazab.com",
+  "defaultBrandName": "Alazab Projects",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "فتح المشروع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

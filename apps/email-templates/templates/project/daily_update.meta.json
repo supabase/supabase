@@ -1,0 +1,41 @@
+{
+  "id": "az.project.daily_update.ar.v1",
+  "system": "project",
+  "agent": "az-agent-project",
+  "systemName": "المشروعات",
+  "event": "daily_update",
+  "locale": "ar",
+  "version": 1,
+  "name": "تقرير الحركة اليومية",
+  "subject": "{{brand_name}} | تقرير الحركة اليومية{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تقرير الحركة اليومية — إشعار صادر من az-agent-project",
+  "senderEnv": "EMAIL_FROM_PROJECTS",
+  "defaultFrom": "projects@alazab.com",
+  "defaultBrandName": "Alazab Projects",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "فتح المشروع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

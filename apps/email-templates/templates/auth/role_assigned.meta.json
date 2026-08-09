@@ -1,0 +1,41 @@
+{
+  "id": "az.auth.role_assigned.ar.v1",
+  "system": "auth",
+  "agent": "az-agent-auth",
+  "systemName": "المصادقة",
+  "event": "role_assigned",
+  "locale": "ar",
+  "version": 1,
+  "name": "تعيين صلاحية أو دور للمستخدم",
+  "subject": "{{brand_name}} | تعيين صلاحية أو دور للمستخدم{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تعيين صلاحية أو دور للمستخدم — إشعار صادر من az-agent-auth",
+  "senderEnv": "EMAIL_FROM_AUTH",
+  "defaultFrom": "auth@alazab.com",
+  "defaultBrandName": "Alazab",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "متابعة الإجراء",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

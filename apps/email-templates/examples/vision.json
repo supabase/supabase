@@ -1,0 +1,20 @@
+{
+  "templateId": "az.vision.document_received.ar.v1",
+  "to": "recipient@example.com",
+  "data": {
+    "recipient_name": "المهندس محمد",
+    "reference": "VISION-2026-001",
+    "details": [
+      {
+        "label": "النظام",
+        "value": "الرؤية والمستندات"
+      },
+      {
+        "label": "الحالة",
+        "value": "جاهز للمراجعة"
+      }
+    ],
+    "action_url": "https://al-azab.co/"
+  },
+  "idempotencyKey": "example-vision-001"
+}

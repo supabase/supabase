@@ -1,0 +1,41 @@
+{
+  "id": "az.core.task_failed.ar.v1",
+  "system": "core",
+  "agent": "az-agent-core",
+  "systemName": "الوكيل الأساسي",
+  "event": "task_failed",
+  "locale": "ar",
+  "version": 1,
+  "name": "فشل تنفيذ مهمة",
+  "subject": "{{brand_name}} | فشل تنفيذ مهمة{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "فشل تنفيذ مهمة — إشعار صادر من az-agent-core",
+  "senderEnv": "EMAIL_FROM_CORE",
+  "defaultFrom": "noreply@alazab.com",
+  "defaultBrandName": "Alazab",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "فتح مركز العمليات",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

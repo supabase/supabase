@@ -1,0 +1,41 @@
+{
+  "id": "az.prod.back_in_stock.ar.v1",
+  "system": "prod",
+  "agent": "az-agent-prod",
+  "systemName": "المنتجات",
+  "event": "back_in_stock",
+  "locale": "ar",
+  "version": 1,
+  "name": "المنتج متاح مرة أخرى",
+  "subject": "{{brand_name}} | المنتج متاح مرة أخرى{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "المنتج متاح مرة أخرى — إشعار صادر من az-agent-prod",
+  "senderEnv": "EMAIL_FROM_PRODUCTS",
+  "defaultFrom": "products@alazab.com",
+  "defaultBrandName": "Alazab Products",
+  "defaultMessage": "تم تسجيل تحديث جديد على النظام. يمكنك مراجعة التفاصيل واتخاذ الإجراء المطلوب من خلال الرابط المرفق.",
+  "defaultStatusLabel": "تحديث جديد",
+  "defaultStatusTone": "info",
+  "defaultActionLabel": "عرض المنتج",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

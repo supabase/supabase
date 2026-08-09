@@ -1,0 +1,20 @@
+{
+  "templateId": "az.maint.request_received.ar.v1",
+  "to": "recipient@example.com",
+  "data": {
+    "recipient_name": "المهندس محمد",
+    "reference": "MAINT-2026-001",
+    "details": [
+      {
+        "label": "النظام",
+        "value": "الصيانات وأوبرفيكس"
+      },
+      {
+        "label": "الحالة",
+        "value": "جاهز للمراجعة"
+      }
+    ],
+    "action_url": "https://al-azab.co/"
+  },
+  "idempotencyKey": "example-maint-001"
+}

@@ -1,0 +1,41 @@
+{
+  "id": "az.azabot.complaint_escalated.ar.v1",
+  "system": "azabot",
+  "agent": "az-agent-azabot",
+  "systemName": "دعم العملاء",
+  "event": "complaint_escalated",
+  "locale": "ar",
+  "version": 1,
+  "name": "تصعيد شكوى",
+  "subject": "{{brand_name}} | تصعيد شكوى{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "تصعيد شكوى — إشعار صادر من az-agent-azabot",
+  "senderEnv": "EMAIL_FROM_SUPPORT",
+  "defaultFrom": "support@alazab.com",
+  "defaultBrandName": "AzaBot",
+  "defaultMessage": "يتطلب هذا الإشعار انتباهك. يرجى مراجعة التفاصيل واتخاذ الإجراء المناسب ضمن المدة المحددة.",
+  "defaultStatusLabel": "يتطلب الانتباه",
+  "defaultStatusTone": "warning",
+  "defaultActionLabel": "فتح تذكرة الدعم",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

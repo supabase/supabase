@@ -1,0 +1,20 @@
+{
+  "templateId": "az.payments.link_created.ar.v1",
+  "to": "recipient@example.com",
+  "data": {
+    "recipient_name": "المهندس محمد",
+    "reference": "PAYMENTS-2026-001",
+    "details": [
+      {
+        "label": "النظام",
+        "value": "المدفوعات"
+      },
+      {
+        "label": "الحالة",
+        "value": "جاهز للمراجعة"
+      }
+    ],
+    "action_url": "https://al-azab.co/"
+  },
+  "idempotencyKey": "example-payments-001"
+}

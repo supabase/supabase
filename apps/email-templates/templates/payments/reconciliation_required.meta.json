@@ -1,0 +1,41 @@
+{
+  "id": "az.payments.reconciliation_required.ar.v1",
+  "system": "payments",
+  "agent": "az-agent-payments",
+  "systemName": "المدفوعات",
+  "event": "reconciliation_required",
+  "locale": "ar",
+  "version": 1,
+  "name": "طلب مراجعة تسوية مالية",
+  "subject": "{{brand_name}} | طلب مراجعة تسوية مالية{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "طلب مراجعة تسوية مالية — إشعار صادر من az-agent-payments",
+  "senderEnv": "EMAIL_FROM_PAYMENTS",
+  "defaultFrom": "billing@alazab.com",
+  "defaultBrandName": "Azab Payments",
+  "defaultMessage": "يتطلب هذا الإشعار انتباهك. يرجى مراجعة التفاصيل واتخاذ الإجراء المناسب ضمن المدة المحددة.",
+  "defaultStatusLabel": "يتطلب الانتباه",
+  "defaultStatusTone": "warning",
+  "defaultActionLabel": "عرض تفاصيل الدفع",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}

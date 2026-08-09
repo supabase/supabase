@@ -1,0 +1,41 @@
+{
+  "id": "az.copilot.service_down.ar.v1",
+  "system": "copilot",
+  "agent": "az-agent-copilot",
+  "systemName": "الأنظمة السحابية",
+  "event": "service_down",
+  "locale": "ar",
+  "version": 1,
+  "name": "توقف خدمة",
+  "subject": "{{brand_name}} | توقف خدمة{{#reference}} - {{reference}}{{/reference}}",
+  "preheader": "توقف خدمة — إشعار صادر من az-agent-copilot",
+  "senderEnv": "EMAIL_FROM_DEVOPS",
+  "defaultFrom": "devops@alazab.com",
+  "defaultBrandName": "Alazab Cloud",
+  "defaultMessage": "تم تسجيل حالة تحتاج إلى معالجة. راجع التفاصيل فورًا واتخذ الإجراء التصحيحي المناسب.",
+  "defaultStatusLabel": "يحتاج معالجة",
+  "defaultStatusTone": "error",
+  "defaultActionLabel": "فتح لوحة الأنظمة",
+  "required": [
+    "recipient_name"
+  ],
+  "optional": [
+    "reference",
+    "message",
+    "status_label",
+    "status_tone",
+    "details",
+    "action_url",
+    "action_label",
+    "secondary_action_url",
+    "secondary_action_label",
+    "alert_title",
+    "alert_message",
+    "alert_tone",
+    "logo_url",
+    "support_email",
+    "website_url",
+    "preferences_url",
+    "footer_note"
+  ]
+}
