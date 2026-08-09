@@ -419,6 +419,7 @@ allow_list = [
     "Transformers.js",
     "tsquery",
     "Twilio",
+    "UIKit",
     "Undici",
     "UnionPay",
     "Unsplash",

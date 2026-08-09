@@ -1,7 +1,18 @@
 import type { UntrustedSqlFragment } from '@supabase/pg-meta'
 
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import type * as NotebookSchema from '@/data/content/notebooks/notebook-schema'
 import type { UntrustedLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+
+export namespace Notebooks {
+  export type Content = NotebookSchema.NotebookContent
+  export type Cell = NotebookSchema.Cell
+  export type MarkdownCell = NotebookSchema.MarkdownCell
+  export type DatabaseCell = NotebookSchema.DatabaseCell
+  export type LogCell = NotebookSchema.LogCell
+  export type TimeRange = NotebookSchema.TimeRange
+  export type ChartConfig = NotebookSchema.ChartConfig
+}
 
 export interface UserContent<
   T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,

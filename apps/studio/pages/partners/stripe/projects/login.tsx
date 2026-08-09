@@ -51,9 +51,7 @@ export const StripeProjectsLoginPage: NextPageWithLayout = () => {
     isSuccess: isConfirmationSuccess,
     error: confirmationMutationError,
     reset: resetConfirmationError,
-  } = useConfirmAccountRequestMutation({
-    onError: () => undefined,
-  })
+  } = useConfirmAccountRequestMutation()
   const confirmationError = confirmationMutationError
     ? `Failed to authorize Stripe Projects: ${confirmationMutationError.message}`
     : undefined

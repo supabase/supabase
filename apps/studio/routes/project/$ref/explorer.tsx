@@ -1,16 +1,15 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 
-import { ExplorerPage } from '@/components/interfaces/Explorer/ExplorerPage'
 import { ExplorerLayout } from '@/components/layouts/ExplorerLayout/ExplorerLayout'
 
 export const Route = createFileRoute('/project/$ref/explorer')({
-  component: ProjectExplorerRoute,
+  component: ExplorerShell,
 })
 
-function ProjectExplorerRoute() {
+function ExplorerShell() {
   return (
     <ExplorerLayout>
-      <ExplorerPage />
+      <Outlet />
     </ExplorerLayout>
   )
 }
