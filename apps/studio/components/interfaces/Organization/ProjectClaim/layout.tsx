@@ -35,7 +35,7 @@ export const ProjectClaimLayout = ({
       <Separator />
       <div
         className={cn(
-          'overflow-y-auto max-h-[calc(100vh-70px)] flex justify-center flex-grow',
+          'overflow-y-auto max-h-[calc(100vh-70px)] flex justify-center grow',
           className
         )}
       >

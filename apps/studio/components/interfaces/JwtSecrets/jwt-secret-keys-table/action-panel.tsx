@@ -1,18 +1,31 @@
 import { ComponentProps, forwardRef } from 'react'
 import { Button, Card, CardDescription, CardHeader, CardTitle } from 'ui'
 
+import { Shortcut } from '@/components/ui/Shortcut'
+import type { ShortcutId } from '@/state/shortcuts/registry'
+
 interface ActionPanelProps extends Omit<React.ComponentProps<typeof Card>, 'onClick' | 'type'> {
   title: string
   description: string
   buttonLabel: ComponentProps<typeof Button>['children']
-  onClick: ComponentProps<typeof Button>['onClick']
+  onClick: () => void
   loading: ComponentProps<typeof Button>['loading']
   icon?: ComponentProps<typeof Button>['icon']
-  type?: ComponentProps<typeof Button>['type']
+  variant?: ComponentProps<typeof Button>['variant']
+  shortcutId?: ShortcutId
 }
 
 export const ActionPanel = forwardRef<HTMLDivElement, ActionPanelProps>(
-  ({ title, description, buttonLabel, onClick, loading, icon, type, ...props }, ref) => {
+  (
+    { title, description, buttonLabel, onClick, loading, icon, variant, shortcutId, ...props },
+    ref
+  ) => {
+    const button = (
+      <Button onClick={onClick} loading={loading} icon={icon} variant={variant}>
+        {buttonLabel}
+      </Button>
+    )
+
     return (
       <Card
         className="first:rounded-b-none last:rounded-t-none shadow-none only:rounded-lg"
@@ -25,9 +38,18 @@ export const ActionPanel = forwardRef<HTMLDivElement, ActionPanelProps>(
             <CardDescription className="max-w-xl">{description}</CardDescription>
           </div>
           <div className="flex lg:justify-end flex-">
-            <Button onClick={onClick} loading={loading} icon={icon} type={type}>
-              {buttonLabel}
-            </Button>
+            {shortcutId ? (
+              <Shortcut
+                id={shortcutId}
+                onTrigger={onClick}
+                side="bottom"
+                options={{ enabled: !loading }}
+              >
+                {button}
+              </Shortcut>
+            ) : (
+              button
+            )}
           </div>
         </CardHeader>
       </Card>

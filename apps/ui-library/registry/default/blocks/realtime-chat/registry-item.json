@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-chat",
+  "type": "registry:component",
+  "title": "Realtime Chat",
+  "description": "Component which renders realtime chat messages from other users in a room.",
+  "registryDependencies": ["input", "button"],
+  "dependencies": ["lucide-react"],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-chat/components/chat-message.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-chat/components/realtime-chat.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-chat/hooks/use-realtime-chat.tsx",
+      "type": "registry:hook"
+    },
+    {
+      "path": "registry/default/blocks/realtime-chat/hooks/use-chat-scroll.tsx",
+      "type": "registry:hook"
+    }
+  ]
+}

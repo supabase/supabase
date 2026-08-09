@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -29,7 +29,7 @@ import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { getAppStateSnapshot } from '@/state/app-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()
@@ -37,6 +37,8 @@ export const SQLEditorMenu = () => {
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
+
+  const topForPostgres = useFlag('topForPostgres')
 
   const [search, setSearch] = useState('')
   const [showSearch, setShowSearch] = useState(false)
@@ -86,7 +88,7 @@ export const SQLEditorMenu = () => {
 
   return (
     <div className="h-full flex flex-col justify-between">
-      <div className="flex flex-col gap-y-4 flex-grow">
+      <div className="flex flex-col gap-y-4 grow">
         <div className="mt-4 mx-4 flex items-center justify-between gap-x-2">
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
@@ -135,14 +137,20 @@ export const SQLEditorMenu = () => {
             </InnerSideBarFilterSearchInput>
           </InnerSideBarFilters>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                data-testid="sql-editor-new-query-button"
-                type="default"
-                icon={<Plus className="text-foreground" />}
-                className="w-[26px]"
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    data-testid="sql-editor-new-query-button"
+                    variant="default"
+                    icon={<Plus className="text-foreground" />}
+                    className="w-[26px]"
+                    aria-label="Create a new query"
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Create a new query</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-48">
               <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
                 <FilePlus size={14} />
@@ -159,11 +167,13 @@ export const SQLEditorMenu = () => {
         {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
       </div>
 
-      <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block type="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
-          View running queries
-        </Button>
-      </div>
+      {!topForPostgres && (
+        <div className="p-4 border-t sticky bottom-0 bg-studio">
+          <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
+            View running queries
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

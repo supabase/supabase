@@ -4,7 +4,9 @@ import { Button, Input } from 'ui'
 
 import { FilterOperatorOptions } from './Filter.constants'
 import { DropdownControl } from '@/components/grid/components/common/DropdownControl'
+import { getColumnFormat } from '@/components/grid/components/grid/ColumnHeader.utils'
 import type { Filter, FilterOperator } from '@/components/grid/types'
+import { getColumnType } from '@/components/grid/utils/gridColumns'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface FilterRowProps {
@@ -18,9 +20,15 @@ export interface FilterRowProps {
 const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterRowProps) => {
   const snap = useTableEditorTableStateSnapshot()
   const column = snap.table.columns.find((x) => x.name === filter.column)
+  // Prefer display labels that match column headers (format, with arrays as int4[]).
+  // Avoid raw dataType, which is "USER-DEFINED" for extension types like geography.
   const columnOptions =
     snap.table.columns?.map((x) => {
-      return { value: x.name, label: x.name, postLabel: x.dataType }
+      return {
+        value: x.name,
+        label: x.name,
+        postLabel: getColumnFormat(getColumnType(x), x.format),
+      }
     }) || []
 
   const placeholder =
@@ -39,7 +47,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
               <ChevronDown strokeWidth={1.5} />
@@ -62,7 +70,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       >
         <Button
           asChild
-          type="outline"
+          variant="outline"
           icon={
             <div className="text-foreground-lighter">
               <ChevronDown strokeWidth={1.5} />
@@ -74,7 +82,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
       </DropdownControl>
       <Input
         size="tiny"
-        className="w-full"
+        className="bg-control w-full"
         placeholder={placeholder}
         value={filter.value}
         onChange={(event) =>
@@ -86,7 +94,7 @@ const FilterRow = ({ filter, filterIdx, onChange, onDelete, onKeyDown }: FilterR
         onKeyDown={onKeyDown}
       />
       <Button
-        type="text"
+        variant="text"
         className="px-1"
         icon={<X strokeWidth={1.5} />}
         onClick={() => onDelete(filterIdx)}

@@ -3,38 +3,57 @@ import { useMemo, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { getExposedSchemaCounts } from './ExposedSchemaSelector.utils'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import {
+  MULTIGRES_SCHEMA_NAME,
+  useHighAvailability,
+  useSchemasFilteredForHighAvailability,
+} from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { pluralize } from '@/lib/helpers'
 
+/**
+ * [Joshen] This would only affect graphql_public and pgmq_public, given that they're intended
+ * to be public, we can let users expose them via the API, but not let them adjust the schema via the dashboard
+ * */
+export const internalSchemasCannotExpose = new Set(
+  INTERNAL_SCHEMAS.filter((x) => !x.endsWith('_public'))
+)
+
 interface ExposedSchemaSelectorProps {
-  disabled?: boolean
+  /**
+   * When true the dropdown can still be opened to inspect which schemas are exposed (e.g.
+   * self-hosted, where schemas are managed via PGRST_DB_SCHEMAS), but schemas can't be toggled.
+   */
+  readOnly?: boolean
   selectedSchemas: string[]
   onToggleSchema: (schema: string) => void
 }
 
 export const ExposedSchemaSelector = ({
-  disabled = false,
+  readOnly = false,
   selectedSchemas,
   onToggleSchema,
 }: ExposedSchemaSelectorProps) => {
   const [open, setOpen] = useState(false)
 
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
 
   const {
     data: allSchemas,
@@ -46,49 +65,65 @@ export const ExposedSchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
+  const visibleSchemas = useSchemasFilteredForHighAvailability(allSchemas)
   const schemas = useMemo(
     () =>
-      (allSchemas ?? [])
-        .filter((s) => {
-          if (s.name === 'graphql_public') return true
-          return !INTERNAL_SCHEMAS.includes(s.name)
-        })
+      visibleSchemas
+        .filter((s) => !internalSchemasCannotExpose.has(s.name))
         .sort((a, b) => a.name.localeCompare(b.name)),
-    [allSchemas]
+    [visibleSchemas]
   )
 
-  const selectedSet = useMemo(() => new Set(selectedSchemas), [selectedSchemas])
-  const selectedCount = schemas.filter((s) => selectedSet.has(s.name)).length
+  // Persisted selections go through the same HA filtering as the schema list, so a
+  // multigres schema exposed in the config doesn't render as a "missing" schema row.
+  const visibleSelectedSchemas = useMemo(
+    () =>
+      isHighAvailability
+        ? selectedSchemas.filter((schema) => schema !== MULTIGRES_SCHEMA_NAME)
+        : selectedSchemas,
+    [selectedSchemas, isHighAvailability]
+  )
+
+  const missingExposedSchema = useMemo(
+    () => visibleSelectedSchemas.filter((schema) => !schemas.some((s) => s.name === schema)),
+    [schemas, visibleSelectedSchemas]
+  )
+
+  const selectedSet = useMemo(() => new Set(visibleSelectedSchemas), [visibleSelectedSchemas])
+  const { selectedCount, totalCount } = getExposedSchemaCounts({
+    visibleSchemas: schemas.map((s) => s.name),
+    selectedSchemas: visibleSelectedSchemas,
+    protectedSchemas: internalSchemasCannotExpose,
+  })
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
           size="small"
-          disabled={disabled}
-          type="default"
-          className="w-full [&>span]:w-full !pr-1 space-x-1"
+          variant="default"
+          className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
           <div className="w-full flex gap-1">
             <p className="text-foreground-lighter">
               {isSuccess
-                ? `${selectedCount} of ${schemas.length} ${pluralize(schemas.length, 'schema')} exposed`
+                ? `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
                 : 'Loading schemas...'}
             </p>
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
         align="start"
         sameWidthAsTrigger
       >
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ className="text-xs" placeholder="Find schema..." />
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+        <Command>
+          <CommandInput className="text-xs" placeholder="Find schema..." />
+          <CommandList>
+            <CommandGroup>
               {isPending ? (
                 <>
                   <div className="px-2 py-1">
@@ -104,21 +139,49 @@ export const ExposedSchemaSelector = ({
                 </div>
               ) : (
                 <>
-                  <CommandEmpty_Shadcn_>
+                  <CommandEmpty>
                     <p className="text-xs text-center text-foreground-lighter py-3">
                       No schemas found
                     </p>
-                  </CommandEmpty_Shadcn_>
+                  </CommandEmpty>
                   <ScrollArea className={schemas.length > 7 ? 'h-[210px]' : ''}>
+                    {missingExposedSchema.map((schema) => (
+                      <CommandItem
+                        key={schema}
+                        value={schema}
+                        className={cn('w-full', readOnly ? 'cursor-default' : 'cursor-pointer')}
+                        onSelect={() => {
+                          if (readOnly) return
+                          onToggleSchema(schema)
+                        }}
+                      >
+                        <div className="w-full flex flex-col">
+                          <div className="w-full flex items-center gap-x-2">
+                            <Check size={16} className="text-brand shrink-0" />
+                            <span className="truncate">{schema}</span>
+                          </div>
+                          {internalSchemasCannotExpose.has(schema) ? (
+                            <span className="pl-6 text-warning text-xs tracking-tight">
+                              This schema is protected and should not be exposed
+                            </span>
+                          ) : (
+                            <span className="pl-6 text-foreground-lighter text-xs tracking-tight">
+                              This schema does not exist and can be safely removed
+                            </span>
+                          )}
+                        </div>
+                      </CommandItem>
+                    ))}
                     {schemas.map((schema) => {
                       const isExposed = selectedSet.has(schema.name)
 
                       return (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={schema.id}
                           value={schema.name}
-                          className="cursor-pointer w-full"
+                          className={cn('w-full', readOnly ? 'cursor-default' : 'cursor-pointer')}
                           onSelect={() => {
+                            if (readOnly) return
                             onToggleSchema(schema.name)
                           }}
                         >
@@ -128,16 +191,16 @@ export const ExposedSchemaSelector = ({
                             {isExposed && <Check size={16} className="text-brand shrink-0" />}
                             <span className="truncate">{schema.name}</span>
                           </div>
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )
                     })}
                   </ScrollArea>
                 </>
               )}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

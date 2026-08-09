@@ -61,7 +61,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
 
             <DialogFooter
               padding="small"
-              className={cn(!canUpdateOrganization && '!justify-between')}
+              className={cn(!canUpdateOrganization && 'justify-between!')}
             >
               {!canUpdateOrganization && (
                 <p className="text-sm text-foreground-lighter">
@@ -69,12 +69,12 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
                 </p>
               )}
               <div className="flex items-center gap-x-2">
-                <Button type="default" disabled={isUpdating} onClick={onCancel}>
+                <Button variant="default" disabled={isUpdating} onClick={onCancel}>
                   Cancel
                 </Button>
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   form="ai-opt-in-form"
                   loading={isUpdating}
                   disabled={isUpdating || !canUpdateOrganization || !form.formState.isDirty}

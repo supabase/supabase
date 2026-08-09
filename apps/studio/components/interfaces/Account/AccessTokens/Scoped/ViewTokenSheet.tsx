@@ -22,6 +22,7 @@ import { formatAccessText, getRealAccess } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -102,7 +103,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         <SheetContent
           showClose={false}
           size="default"
-          className="!min-w-[600px] flex flex-col h-full gap-0"
+          className="min-w-[600px]! flex flex-col h-full gap-0"
         >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}
@@ -110,7 +111,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             <p className="truncate" title={`Manage access for ${token?.name}`}>
               View access for {token?.name}
             </p>
-            <DocsButton href="https://supabase.com/docs/reference/api/introduction" />
+            <DocsButton href={`${DOCS_URL}/reference/api/introduction`} />
           </SheetHeader>
           <ScrollArea className="flex-1 max-h-[calc(100vh-60px)]">
             <div className="space-y-8 px-5 sm:px-6 py-6">
@@ -231,11 +232,16 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                               <TableRow>
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
-                                    {(token?.organization_slugs &&
-                                      token.organization_slugs.length > 0) ||
-                                    (token?.project_refs && token.project_refs.length > 0)
-                                      ? 'This token has access to specific organizations and projects.'
-                                      : 'This token has access to all resources.'}
+                                    {token?.scope === 'organization'
+                                      ? token.organization_slugs &&
+                                        token.organization_slugs.length > 0
+                                        ? 'This token has access to specific organizations.'
+                                        : 'This token has no accessible organizations.'
+                                      : token?.scope === 'project'
+                                        ? token.project_refs && token.project_refs.length > 0
+                                          ? 'This token has access to specific projects.'
+                                          : 'This token has no accessible projects.'
+                                        : 'This token has access to all resources.'}
                                   </p>
                                 </TableCell>
                               </TableRow>

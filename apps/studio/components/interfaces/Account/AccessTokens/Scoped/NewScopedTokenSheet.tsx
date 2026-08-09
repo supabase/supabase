@@ -17,7 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import {
   CUSTOM_EXPIRY_VALUE,
@@ -66,6 +66,7 @@ export const NewScopedTokenSheet = ({
     },
     mode: 'onChange',
   })
+
   const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
@@ -247,7 +248,7 @@ export const NewScopedTokenSheet = ({
       <SheetContent
         showClose={false}
         size="default"
-        className="!min-w-[600px] flex flex-col h-full gap-0"
+        className="min-w-[600px]! flex flex-col h-full gap-0"
       >
         <SheetHeader>
           <SheetTitle>
@@ -271,7 +272,7 @@ export const NewScopedTokenSheet = ({
                         such, be very careful when using this API.
                       </p>
                       <div className="mt-4">
-                        <Button asChild type="default" icon={<ExternalLink />}>
+                        <Button asChild variant="default" icon={<ExternalLink />}>
                           <Link
                             href="https://api.supabase.com/api/v0"
                             target="_blank"
@@ -303,8 +304,7 @@ export const NewScopedTokenSheet = ({
                 />
                 <Separator />
                 <Permissions
-                  setValue={form.setValue}
-                  watch={form.watch}
+                  control={form.control}
                   resourceSearchOpen={resourceSearchOpen}
                   setResourceSearchOpen={setResourceSearchOpen}
                 />
@@ -312,9 +312,9 @@ export const NewScopedTokenSheet = ({
             </Form>
           </div>
         </ScrollArea>
-        <SheetFooter className="!justify-end w-full mt-auto py-4 border-t">
+        <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
           <div className="flex gap-2">
-            <Button type="default" disabled={isPending} onClick={handleClose}>
+            <Button variant="default" disabled={isPending} onClick={handleClose}>
               Cancel
             </Button>
             <Button onClick={form.handleSubmit(onSubmit)} loading={isPending}>

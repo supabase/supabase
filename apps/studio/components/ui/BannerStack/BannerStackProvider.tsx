@@ -6,6 +6,8 @@ export const BANNER_ID = {
   TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
+  TOS_UPDATE: 'tos-update-banner',
+  UNIFIED_LOGS: 'unified-logs-banner',
 } as const
 
 export type BannerId = (typeof BANNER_ID)[keyof typeof BANNER_ID]

@@ -1,7 +1,7 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import { SidePanel, Toggle } from 'ui'
+import { Label, SidePanel, Switch } from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -18,6 +18,7 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -25,7 +26,7 @@ import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
-  selectedTable: PostgresTable
+  selectedTable: PGTable
   visible: boolean
   editable?: boolean
   closePanel: () => void
@@ -64,8 +65,10 @@ export const RowEditor = ({
   const [loading, setLoading] = useState(false)
   const [createMore, setCreateMore] = useState(false)
 
+  // Generated columns are always computed by the database, so they are excluded from the form.
+  // They remain in rowFields as primary key identifiers may rely on them.
   const [requiredFields, optionalFields] = partition(
-    rowFields,
+    rowFields.filter((rowField) => !rowField.isGenerated),
     (rowField: any) => !rowField.isNullable
   )
 
@@ -133,7 +136,7 @@ export const RowEditor = ({
       updateEditorDirty()
 
       const payload = isNewRecord
-        ? generateRowObjectFromFields({ fields: rowFields })
+        ? generateRowObjectFromFields({ fields: rowFields, useDefaultForEmptyValues: true })
         : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }
@@ -144,7 +147,7 @@ export const RowEditor = ({
           identifiers[column.name] =
             column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
         })
-        configuration.identifiers = identifiers
+        configuration.identifiers = getStableRowIdentifiers(row!, identifiers)
         configuration.rowIdx = row!.idx
       }
 
@@ -192,18 +195,14 @@ export const RowEditor = ({
           visible={visible}
         >
           {isNewRecord && editable && (
-            <div className="flex items-center gap-x-2">
-              <Toggle
-                size="tiny"
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="create-more"
+                size="small"
                 checked={createMore}
-                onChange={() => setCreateMore(!createMore)}
+                onCheckedChange={(checked) => setCreateMore(checked)}
               />
-              <label
-                className="text-foreground-light text-sm cursor-pointer select-none"
-                onClick={() => setCreateMore(!createMore)}
-              >
-                Create more
-              </label>
+              <Label htmlFor="create-more">Create more</Label>
             </div>
           )}
         </ActionBar>
@@ -211,7 +210,7 @@ export const RowEditor = ({
     >
       <form id={formId} onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
-          <div className="flex flex-grow flex-col">
+          <div className="flex grow flex-col">
             {requiredFields.length > 0 && (
               <SidePanel.Content>
                 <div className="space-y-10 py-6">

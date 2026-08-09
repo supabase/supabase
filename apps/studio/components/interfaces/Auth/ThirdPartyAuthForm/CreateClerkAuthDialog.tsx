@@ -14,7 +14,7 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -122,7 +122,7 @@ export const CreateClerkAuthIntegrationDialog = ({
                 render={({ field }) => (
                   <FormItemLayout label="Clerk Domain">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder={
                           'https://clerk.example.com or https://example.clerk.accounts.dev'
@@ -136,10 +136,10 @@ export const CreateClerkAuthIntegrationDialog = ({
           </Form>
         </DialogSection>
         <DialogFooter>
-          <Button disabled={isPending} type="default" onClick={() => onClose()}>
+          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={isPending} loading={isPending}>
+          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
             Create connection
           </Button>
         </DialogFooter>

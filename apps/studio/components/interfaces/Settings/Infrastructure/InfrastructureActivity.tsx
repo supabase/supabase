@@ -1,9 +1,10 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { capitalize } from 'lodash'
-import { BarChart2, ExternalLink } from 'lucide-react'
+import { BarChart2, ChartLine, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -25,7 +26,7 @@ import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { DocsButton } from '@/components/ui/DocsButton'
 import Panel from '@/components/ui/Panel'
 import { DataPoint } from '@/data/analytics/constants'
-import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
+import { mapResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
@@ -165,7 +166,7 @@ export const InfrastructureActivity = () => {
 
   const transformedData = useMemo(() => {
     if (!infraMonitoringData) return undefined
-    return mapMultiResponseToAnalyticsData(infraMonitoringData, INFRA_ATTRIBUTES, dateFormat)
+    return mapResponseToAnalyticsData(infraMonitoringData, INFRA_ATTRIBUTES, dateFormat)
   }, [infraMonitoringData, dateFormat])
 
   const cpuUsageData = transformedData?.max_cpu_usage
@@ -430,6 +431,24 @@ export const InfrastructureActivity = () => {
                         </div>
                       </Panel.Content>
                     </Panel>
+                  )}
+                  {attribute.key === 'disk_io_consumption' && !hasDedicatedIOResources && (
+                    <Admonition
+                      type="default"
+                      title="Looking for actual disk activity?"
+                      description="The chart above shows your remaining burst budget, not real disk throughput. For detailed read/write IOPS and throughput charts, head to the Database Observability page."
+                    >
+                      <Button
+                        asChild
+                        variant="default"
+                        className="mt-2"
+                        icon={<ChartLine size={14} />}
+                      >
+                        <Link href={`/project/${projectRef}/observability/database`}>
+                          View detailed IOPS and throughput
+                        </Link>
+                      </Button>
+                    </Admonition>
                   )}
                 </ScaffoldSectionContent>
               </ScaffoldSection>

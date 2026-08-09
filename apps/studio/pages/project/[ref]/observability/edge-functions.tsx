@@ -4,7 +4,9 @@ import dayjs from 'dayjs'
 import { ArrowRight, RefreshCw } from 'lucide-react'
 import { parseAsJson, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
+import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import {
@@ -23,16 +25,19 @@ import {
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { useChartHoverState } from '@/components/ui/Charts/useChartHoverState'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { edgeFunctionReports } from '@/data/reports/v2/edge-functions.config'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { BASE_PATH } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 const EdgeFunctionsReportV2: NextPageWithLayout = () => {
@@ -50,6 +55,8 @@ EdgeFunctionsReportV2.getLayout = (page) => (
 )
 
 export default EdgeFunctionsReportV2
+
+const REPORT_TITLE = 'Edge Functions'
 
 const EdgeFunctionsUsage = () => {
   const { ref } = useParams()
@@ -92,6 +99,7 @@ const EdgeFunctionsUsage = () => {
 
   const queryClient = useQueryClient()
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   const reportConfig = useMemo(() => {
     return edgeFunctionReports({
@@ -130,21 +138,34 @@ const EdgeFunctionsUsage = () => {
     }
   )
 
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !isRefreshing,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
   return (
     <>
-      <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <ButtonTooltip
-                type="default"
-                disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={onRefreshReport}
-              />
+          <div className="flex flex-col gap-2 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.edgeFunctions} topic={REPORT_TITLE} />
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+                label="Refresh report"
+                side="bottom"
+              >
+                <Button
+                  variant="default"
+                  disabled={isRefreshing}
+                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  className="w-7"
+                  onClick={onRefreshReport}
+                />
+              </ShortcutTooltip>
 
               <ReportSettings chartId="edge-functions-charts" />
 
@@ -153,6 +174,9 @@ const EdgeFunctionsUsage = () => {
                 value={datePickerValue}
                 helpers={datePickerHelpers}
                 onSubmit={handleDatePickerChange}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}

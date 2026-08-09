@@ -1,16 +1,24 @@
+import dayjs from 'dayjs'
 import { type ReactNode } from 'react'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 
 export const RESTRICTION_MESSAGES = {
   GRACE_PERIOD: {
-    title: 'Organization plan has exceeded its quota',
-    description: (date: string, slug: string): ReactNode => (
-      <>
-        You have been given a grace period until {date}.{' '}
-        <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink>
-      </>
-    ),
+    title: 'Organization exceeded its quota in the previous billing cycle',
+    description: (date: string, slug: string): ReactNode => {
+      const label = dayjs(date).format('DD MMM, YYYY')
+      return (
+        <>
+          Projects will be restricted from{' '}
+          <TimestampInfo className="text-sm" utcTimestamp={date} label={label} /> if your
+          organization remains over quota.{' '}
+          <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink> or{' '}
+          <InlineLink href={`/org/${slug}/billing`}>billing</InlineLink>.
+        </>
+      )
+    },
   },
   GRACE_PERIOD_OVER: {
     title: 'Grace period is over',

@@ -11,19 +11,19 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { getDocument } from '@/data/documents/document-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const SOC2 = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = organization?.slug
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
@@ -47,11 +47,7 @@ export const SOC2 = () => {
   const handleDownloadClick = () => {
     if (!slug) return
 
-    sendEvent({
-      action: 'document_view_button_clicked',
-      properties: { documentName: 'SOC2' },
-      groups: { organization: slug },
-    })
+    track('document_view_button_clicked', { documentName: 'SOC2' })
     setIsOpen(true)
   }
 
@@ -84,7 +80,7 @@ export const SOC2 = () => {
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
             <Button
-              type="default"
+              variant="default"
               icon={<Download />}
               onClick={handleDownloadClick}
               disabled={!slug}

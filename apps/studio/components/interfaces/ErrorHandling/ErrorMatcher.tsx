@@ -3,6 +3,7 @@
 import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 
 import { getMappingForError } from './ErrorMatcher.utils'
+import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
 import { useTrack } from '@/lib/telemetry/track'
 
 interface ErrorMatcherProps {
@@ -26,11 +27,13 @@ export function ErrorMatcher({ title, error, supportFormParams, className }: Err
       supportFormParams={supportFormParams}
       className={className}
       onRender={() => {
-        track('dashboard_error_created', {
-          source: 'error_display',
-          errorType: mapping?.id,
-          hasTroubleshooting: !!mapping,
-        })
+        if (isDashboardErrorSampled()) {
+          track('dashboard_error_created', {
+            source: 'error_display',
+            errorType: mapping?.id,
+            hasTroubleshooting: !!mapping,
+          })
+        }
         if (mapping) {
           track('inline_error_troubleshooter_exposed', { errorType: mapping.id })
         }

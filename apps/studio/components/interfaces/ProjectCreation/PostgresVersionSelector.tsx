@@ -3,12 +3,12 @@ import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -102,8 +102,8 @@ export const PostgresVersionSelector = ({
   }, [isSuccess, availableVersions, form])
 
   return (
-    <FormItemLayout label={label} layout={layout}>
-      <Select_Shadcn_
+    <FormItemLayout id={field.name} label={label} layout={layout}>
+      <Select
         value={postgresVersionSelection}
         onValueChange={field.onChange}
         disabled={
@@ -112,17 +112,20 @@ export const PostgresVersionSelector = ({
           (type === 'unpause' && isLoadingProjectUnpauseVersions)
         }
       >
-        <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-          <SelectValue_Shadcn_ placeholder="Select a Postgres version for your project" />
-        </SelectTrigger_Shadcn_>
-        <SelectContent_Shadcn_>
-          <SelectGroup_Shadcn_>
+        <SelectTrigger
+          id={field.name}
+          className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
+        >
+          <SelectValue placeholder="Select a Postgres version for your project" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
             {availableVersions.map((value) => {
               const postgresVersion = value.version
                 .split('supabase-postgres-')[1]
                 .replace('-orioledb', '')
               return (
-                <SelectItem_Shadcn_
+                <SelectItem
                   key={formatValue(value)}
                   value={formatValue(value)}
                   className="w-full [&>:nth-child(2)]:w-full"
@@ -138,12 +141,12 @@ export const PostgresVersionSelector = ({
                       )}
                     </div>
                   </div>
-                </SelectItem_Shadcn_>
+                </SelectItem>
               )
             })}
-          </SelectGroup_Shadcn_>
-        </SelectContent_Shadcn_>
-      </Select_Shadcn_>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
     </FormItemLayout>
   )
 }

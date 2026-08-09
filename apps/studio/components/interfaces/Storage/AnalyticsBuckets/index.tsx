@@ -16,16 +16,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
@@ -103,10 +103,10 @@ export const AnalyticsBuckets = () => {
                         </Tooltip>
                       )}
                     </div>
-                    <div className="flex flex-grow justify-between gap-x-2 items-center">
+                    <div className="flex grow justify-between gap-x-2 items-center">
                       <Input
                         size="tiny"
-                        className="flex-grow lg:flex-grow-0 w-52"
+                        className="grow lg:grow-0 w-52"
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}
@@ -154,7 +154,7 @@ export const AnalyticsBuckets = () => {
                               return (
                                 <TableRow
                                   key={bucket.name}
-                                  className="relative cursor-pointer h-16 inset-focus"
+                                  className="relative cursor-pointer h-16 focus-inset"
                                   onClick={handleBucketNavigation}
                                   onAuxClick={handleBucketNavigation}
                                   onKeyDown={handleBucketNavigation}

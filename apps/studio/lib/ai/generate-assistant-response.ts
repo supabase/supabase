@@ -5,14 +5,14 @@ import {
   stepCountIs,
   type LanguageModel,
   type ModelMessage,
+  type SystemModelMessage,
   type ToolSet,
   type UIMessage,
 } from 'ai'
 import { startSpan, traced, withCurrent, wrapAISDK, type Span } from 'braintrust'
 import { source } from 'common-tags'
 
-import { buildAssistantEvalOutput } from '@/evals/output'
-import type { AssistantEvalInput, AssistantEvalOutput } from '@/evals/scorer'
+import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
 import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
@@ -30,10 +30,11 @@ export async function generateAssistantResponse({
   chatId,
   chatName,
   allowTracing,
+  supportMode,
   userId,
   orgId,
   planId,
-  promptProviderOptions,
+  systemProviderOptions,
   providerOptions,
   requestedModel,
   abortSignal,
@@ -48,11 +49,12 @@ export async function generateAssistantResponse({
   chatId?: string
   chatName?: string
   allowTracing?: boolean
+  supportMode?: boolean
   userId?: string
   orgId?: number
   planId?: string
   requestedModel?: string
-  promptProviderOptions?: Record<string, any>
+  systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
   onSpanCreated?: (spanId: string) => void
@@ -73,7 +75,12 @@ export async function generateAssistantResponse({
         const cleanedParts = msg.parts
           .filter((part) => {
             if (isToolUIPart(part)) {
-              const invalidStates = ['input-streaming', 'input-available', 'output-error']
+              const invalidStates = [
+                'input-streaming',
+                'input-available',
+                'approval-requested',
+                'output-error',
+              ]
               return !invalidStates.includes(part.state)
             }
             return true
@@ -104,34 +111,42 @@ export async function generateAssistantResponse({
 
       Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
       - \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
-      - \`rls\` — Row Level Security policies
+      - \`rls\` — Row Level Security policies for database tables.
+      - \`storage\` — Supabase Storage buckets, public/private bucket access, and \`storage.objects\` policies. Always load before creating Storage buckets or \`storage.objects\` policies.
       - \`edge_functions\` — Supabase Edge Functions
       - \`realtime\` — Supabase Realtime
     `
 
-    // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
-    // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
     const hasProjectContext =
       projectRef || chatName || schemasString !== "You don't have access to any schemas."
 
     const assistantContent = hasProjectContext
       ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
       : undefined
+    const supportAssistantContent = supportMode
+      ? `This is an active support chat. Help the user while they wait for a human agent. Keep guidance practical and concise. If the user asks for a human, or if the issue cannot be safely resolved, call escalate_to_human with a short reason. Only call resolve_support_conversation after the user explicitly confirms the issue is resolved; otherwise keep helping.`
+      : undefined
+
+    const systemMessage: SystemModelMessage = {
+      role: 'system',
+      content: system,
+      ...(systemProviderOptions && { providerOptions: systemProviderOptions }),
+    }
 
     const coreMessages: ModelMessage[] = [
-      {
-        role: 'system',
-        content: system,
-        ...(promptProviderOptions && {
-          providerOptions: promptProviderOptions,
-        }),
-      },
       ...(assistantContent
         ? [
             {
               role: 'assistant' as const,
-              // Add any dynamic context here
               content: assistantContent,
+            },
+          ]
+        : []),
+      ...(supportAssistantContent
+        ? [
+            {
+              role: 'assistant' as const,
+              content: supportAssistantContent,
             },
           ]
         : []),
@@ -142,24 +157,26 @@ export async function generateAssistantResponse({
 
     return streamTextFn({
       model,
-      stopWhen: stepCountIs(5),
+      system: systemMessage,
+      stopWhen: stepCountIs(10),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
       ...(span && {
         onFinish: ({ steps, finishReason }) => {
+          const metadata: Record<string, unknown> = {
+            isFinalStep: finishReason === 'stop',
+          }
           for (const step of steps) {
             for (const toolCall of step.toolCalls) {
               if (toolCall.toolName === 'rename_chat') {
                 const { newName } = toolCall.input as { newName: string }
-                span.log({ metadata: { chatName: newName } })
+                metadata.chatName = newName
               }
             }
           }
-          span.log({
-            output: buildAssistantEvalOutput(finishReason, steps) satisfies AssistantEvalOutput,
-          })
+          span.log({ metadata })
           span.end()
         },
       }),
@@ -167,8 +184,8 @@ export async function generateAssistantResponse({
   }
 
   if (shouldTrace) {
-    // startSpan instead of traced() so we control when the span closes — onFinish logs
-    // output to the span before we call span.end(), ensuring online scoring sees the output.
+    // startSpan instead of traced() so we control when the span closes via onFinish.
+    // Scorers read from child spans (LLM + tool) in the trace rather than a root span output field.
     const span = startSpan({ name: 'generateAssistantResponse', type: 'function' })
     onSpanCreated?.(span.id)
 

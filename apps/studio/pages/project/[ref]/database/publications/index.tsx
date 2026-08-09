@@ -1,17 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import {
-  PageHeader,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { PageSection } from 'ui-patterns/PageSection'
 
 import { PublicationsList } from '@/components/interfaces/Database/Publications/PublicationsList'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from '@/types'
 
@@ -26,22 +21,13 @@ const DatabasePublications: NextPageWithLayout = () => {
   }
 
   return (
-    <>
-      <PageHeader size="large">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Database Publications</PageHeaderTitle>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
+    <PageLayout title="Database Publications" size="large">
       <PageContainer size="large">
-        <PageSection>
-          <PageSectionContent>
-            <PublicationsList />
-          </PageSectionContent>
+        <PageSection className="gap-y-4">
+          <PublicationsList />
         </PageSection>
       </PageContainer>
-    </>
+    </PageLayout>
   )
 }
 

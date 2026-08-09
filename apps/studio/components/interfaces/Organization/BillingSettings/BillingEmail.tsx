@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { FormMessage, Input_Shadcn_ } from 'ui'
+import { FormMessage, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import {
@@ -24,7 +24,7 @@ import {
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -133,7 +133,7 @@ const BillingEmail = () => {
                   </div>
                 }
               >
-                <FormSection className="!px-8">
+                <FormSection className="px-8!">
                   <FormSectionContent fullWidth loading={loadingBillingCustomer}>
                     <FormField
                       control={form.control}
@@ -141,7 +141,7 @@ const BillingEmail = () => {
                       render={({ field }) => (
                         <FormItemLayout label="Email address">
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               type="email"
                               {...field}
                               placeholder="Email"

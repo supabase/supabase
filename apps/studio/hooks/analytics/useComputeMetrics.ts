@@ -13,7 +13,7 @@ export type ComputeMetrics = {
   cpu: number
   disk: number
   memory: number
-  connections: { current: number; max: number }
+  connections: { peak: number; max: number }
   isLoading: boolean
   isError: boolean
 }

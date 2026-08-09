@@ -1,0 +1,165 @@
+@import 'config/tailwind.config.css';
+@import './../../../packages/ui/build/css/themes/classic-dark.css';
+
+@source '../app/**/*.{js,ts,jsx,tsx}';
+@source '../components/**/*.{js,ts,jsx,tsx}';
+@source '../registry/**/*.{js,ts,jsx,tsx}';
+@source '../content/**/*.mdx';
+@source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+
+@theme {
+  /* added to get max-w-site */
+  --container-site: 128rem;
+
+  /* The following are needed to render the examples, since they use regular shadcn variables. Some classes are 
+   * commented out classes because they clashed with Supabase defined classes 
+   */
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+  /* --color-background: var(--background); */
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  /* --color-border: var(--border); */
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+}
+
+@layer base {
+  :root {
+    --background: hsl(0 0% 100%);
+    --foreground: hsl(0 0% 14.5%);
+    --card: hsl(0 0% 100%);
+    --card-foreground: hsl(0 0% 14.5%);
+    --popover: hsl(0 0% 100%);
+    --popover-foreground: hsl(0 0% 14.5%);
+    --primary: hsl(0 0% 20.5%);
+    --primary-foreground: hsl(0 0% 98.5%);
+    --secondary: hsl(0 0% 97%);
+    --secondary-foreground: hsl(0 0% 20.5%);
+    --muted: hsl(0 0% 97%);
+    --muted-foreground: hsl(0 0% 55.6%);
+    --accent: hsl(0 0% 97%);
+    --accent-foreground: hsl(0 0% 20.5%);
+    --destructive: hsl(27.3 24.5% 57.7%);
+    --destructive-foreground: hsl(27.3 24.5% 57.7%);
+    --border: hsl(0 0% 92.2%);
+    --input: hsl(0 0% 92.2%);
+    --ring: hsl(0 0% 70.8%);
+    --chart-1: 41.1 22.2% 64.6%;
+    --chart-2: 184.7 11.8% 60%;
+    --chart-3: 227.4 7% 39.8%;
+    --chart-4: 84.4 18.9% 82.8%;
+    --chart-5: 70.1 18.8% 76.9%;
+    --radius: 0.625rem;
+    --sidebar: hsl(0 0% 98.5%);
+    --sidebar-foreground: hsl(0 0% 14.5%);
+    --sidebar-primary: hsl(0 0% 20.5%);
+    --sidebar-primary-foreground: hsl(0 0% 98.5%);
+    --sidebar-accent: hsl(0 0% 97%);
+    --sidebar-accent-foreground: hsl(0 0% 20.5%);
+    --sidebar-border: hsl(0 0% 92.2%);
+    --sidebar-ring: hsl(0 0% 70.8%);
+  }
+
+  [data-theme='dark'],
+  [data-theme='classic-dark'] {
+    --background: hsl(0 0% 14.5%);
+    --foreground: hsl(0 0% 98.5%);
+    --card: hsl(0 0% 0%);
+    --card-foreground: hsl(0 0% 98.5%);
+    --popover: hsl(0 0% 14.5%);
+    --popover-foreground: hsl(0 0% 98.5%);
+    --primary: hsl(0 0% 98.5%);
+    --primary-foreground: hsl(0 0% 20.5%);
+    --secondary: hsl(0 0% 26.9%);
+    --secondary-foreground: hsl(0 0% 98.5%);
+    --muted: hsl(0 0% 26.9%);
+    --muted-foreground: hsl(0 0% 70.8%);
+    --accent: hsl(0 0% 26.9%);
+    --accent-foreground: hsl(0 0% 98.5%);
+    --destructive: hsl(25.7 14.1% 39.6%);
+    --destructive-foreground: hsl(25.3 23.7% 63.7%);
+    --border: hsl(0 0% 26.9%);
+    --input: hsl(0 0% 26.9%);
+    --ring: hsl(0 0% 55.6%);
+    --chart-1: 264.4 24.3% 48.8%;
+    --chart-2: 162.5 17% 69.6%;
+    --chart-3: 70.1 18.8% 76.9%;
+    --chart-4: 303.9 26.5% 62.7%;
+    --chart-5: 16.4 24.6% 64.5%;
+    --sidebar: hsl(0 0% 20.5%);
+    --sidebar-foreground: hsl(0 0% 98.5%);
+    --sidebar-primary: hsl(264.4 24.3% 48.8%);
+    --sidebar-primary-foreground: hsl(0 0% 98.5%);
+    --sidebar-accent: hsl(0 0% 26.9%);
+    --sidebar-accent-foreground: hsl(0 0% 98.5%);
+    --sidebar-border: hsl(0 0% 26.9%);
+    --sidebar-ring: hsl(0 0% 43.9%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+  body {
+    @apply bg-default text-foreground;
+    /* font-feature-settings: "rlig" 1, "calt" 1; */
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer utilities {
+  .step {
+    counter-increment: step;
+  }
+
+  .step:before {
+    @apply absolute w-9 h-9 bg-muted rounded-full font-mono font-medium text-center text-base inline-flex items-center justify-center -indent-px border-4 border-background;
+    @apply ml-[-50px] mt-[-4px];
+    content: counter(step);
+  }
+
+  .chunk-container {
+    @apply shadow-none;
+  }
+
+  .chunk-container::after {
+    content: '';
+    @apply absolute -inset-4 shadow-xl rounded-xl border;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    @apply px-4;
+  }
+}
+
+.preview * {
+  @apply border-border outline-ring/50;
+}

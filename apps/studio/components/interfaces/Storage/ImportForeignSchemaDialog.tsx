@@ -4,7 +4,20 @@ import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormField, Input_Shadcn_, Modal, Separator } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormField,
+  Input,
+  Separator,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -158,56 +171,55 @@ export const ImportForeignSchemaDialog = ({
   }, [visible, form, bucketName, namespace])
 
   return (
-    <Modal
-      hideFooter
-      visible={visible}
-      size="medium"
-      header={<span>Create target schema</span>}
-      onCancel={() => onClose()}
-    >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Modal.Content className="flex flex-col gap-y-4">
-            <p className="text-sm">
-              Namespace “<strong>{namespace}</strong>”{' '}
-              {circumstance === 'fresh'
-                ? 'must be linked to a new schema before tables can be paired.'
-                : 'clashes with an existing database schema. Create a new schema to use as the destination for this data.'}
-            </p>
-            <Separator />
-            <FormField
-              control={form.control}
-              name="targetSchema"
-              render={({ field }) => (
-                <FormItemLayout
-                  layout="vertical"
-                  label="Target schema"
-                  description="Where your analytics tables will be stored."
-                >
-                  <Input_Shadcn_ {...field} placeholder="Enter schema name" />
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content className="flex items-center space-x-2 justify-end">
-            <Button type="default" htmlType="button" disabled={loading} onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit" loading={loading}>
-              Create
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form>
-      <SchemaEditor
-        visible={createSchemaSheetOpen}
-        closePanel={() => setCreateSchemaSheetOpen(false)}
-        onSuccess={(schema) => {
-          form.setValue('targetSchema', schema)
-          setCreateSchemaSheetOpen(false)
-        }}
-      />
-    </Modal>
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>Create target schema</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-4">
+              <p className="text-sm">
+                Namespace “<strong>{namespace}</strong>”{' '}
+                {circumstance === 'fresh'
+                  ? 'must be linked to a new schema before tables can be paired.'
+                  : 'clashes with an existing database schema. Create a new schema to use as the destination for this data.'}
+              </p>
+              <Separator />
+              <FormField
+                control={form.control}
+                name="targetSchema"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="vertical"
+                    label="Target schema"
+                    description="Where your analytics tables will be stored."
+                  >
+                    <Input {...field} placeholder="Enter schema name" />
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter className="flex items-center space-x-2 justify-end">
+              <Button variant="default" type="button" disabled={loading} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit" loading={loading}>
+                Create
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+        <SchemaEditor
+          visible={createSchemaSheetOpen}
+          closePanel={() => setCreateSchemaSheetOpen(false)}
+          onSuccess={(schema) => {
+            form.setValue('targetSchema', schema)
+            setCreateSchemaSheetOpen(false)
+          }}
+        />
+      </DialogContent>
+    </Dialog>
   )
 }

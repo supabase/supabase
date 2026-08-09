@@ -5,19 +5,14 @@ import { API_DOCS_CATEGORIES } from './ProjectAPIDocs.constants'
 import { SecondLevelNavLayout, type MenuItemFilter } from './SecondLevelNav.Layout'
 import { ResourcePickerList } from './SecondLevelNav.ResourcePicker'
 import { StorageResourceList } from './SecondLevelNav.StoragePicker'
+import { useApiDocsFunctions, useApiDocsTables } from './useApiDocsEntities'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
-import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { useBucketInfoQueryPreferCached } from '@/data/storage/buckets-query'
 import { DOCS_URL } from '@/lib/constants'
 import { useAppStateSnapshot } from '@/state/app-state'
 
-const OPEN_API_SPEC_STALE_TIME = 1000 * 60 * 10
-
 const EntitiesSecondLevelNav = () => {
-  const { ref } = useParams()
-
-  const { data } = useOpenAPISpecQuery({ projectRef: ref }, { staleTime: OPEN_API_SPEC_STALE_TIME })
-  const tables = data?.tables ?? []
+  const { visibleEntities: tables } = useApiDocsTables()
 
   return (
     <SecondLevelNavLayout
@@ -32,10 +27,7 @@ const EntitiesSecondLevelNav = () => {
 }
 
 const StoredProceduresSecondLevelNav = () => {
-  const { ref } = useParams()
-
-  const { data } = useOpenAPISpecQuery({ projectRef: ref }, { staleTime: OPEN_API_SPEC_STALE_TIME })
-  const functions = data?.functions ?? []
+  const { visibleEntities: functions } = useApiDocsFunctions()
 
   return (
     <SecondLevelNavLayout

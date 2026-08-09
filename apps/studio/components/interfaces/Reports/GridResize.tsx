@@ -16,10 +16,9 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import type { Dashboards } from '@/types'
 
 const ReactGridLayout = WidthProvider(RGL)
@@ -56,9 +55,8 @@ export const GridResize = ({
   const { ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: upsertContent } = useContentUpsertMutation()
 
   const onUpdateLayout = (layout: RGL.Layout[]) => {
@@ -135,10 +133,7 @@ export const GridResize = ({
         },
       }
     )
-    sendEvent({
-      action: 'custom_report_assistant_sql_block_added',
-      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
-    })
+    track('custom_report_assistant_sql_block_added')
   }
 
   if (!editableReport) return null

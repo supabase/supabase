@@ -5,7 +5,6 @@ import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { StatusCode } from 'ui-patterns'
 import {
   Chart,
   ChartActions,
@@ -24,6 +23,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { StatusCode } from 'ui-patterns/StatusCode'
 
 import {
   AuthErrorCodeRow,
@@ -40,7 +40,7 @@ import {
   getMetricValues,
 } from './OverviewUsage.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import { Service } from '@/data/graphql/graphql'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -103,7 +103,7 @@ const LogsLink = ({ href }: { href: string }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         className="p-1.5 text-foreground-lighter hover:text-foreground"
         asChild
@@ -288,7 +288,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartTitle>Auth API Errors</ChartTitle>
                 </ChartHeader>
                 <ChartContent
-                  className="!p-0"
+                  className="p-0!"
                   isEmpty={responseErrors.length === 0}
                   emptyState={
                     <div className="p-6">
@@ -312,7 +312,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'request',
                         header: 'Request',
-                        className: 'w-auto !pr-0',
+                        className: 'w-auto pr-0!',
                         render: (row) => {
                           return <StatusCode method={row.method} statusCode={row.status_code} />
                         },
@@ -330,7 +330,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                       {
                         key: 'count',
                         header: 'Count',
-                        className: 'text-right flex-shrink-0 ml-auto justify-end',
+                        className: 'text-right shrink-0 ml-auto justify-end',
                         render: (row) => (
                           <div className="flex justify-end items-center gap-2">
                             <div className="text-right text-xs tabular-nums">{row.count}</div>
@@ -351,7 +351,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   <ChartActions actions={errorCodesActions} />
                 </ChartHeader>
                 <ChartContent
-                  className="!p-0"
+                  className="p-0!"
                   isEmpty={errorCodes.length === 0}
                   emptyState={
                     <div className="p-6">

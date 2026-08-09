@@ -1,7 +1,9 @@
+import { safeSql } from '@supabase/pg-meta'
 import { UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
 
 import generateV4 from '../../pages/api/ai/sql/generate-v4'
+import { getTools } from '@/lib/ai/tools'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
@@ -24,7 +26,7 @@ test('generateV4 calls the tool sanitizer', async () => {
               type: 'tool-execute_sql',
               state: 'output-available',
               toolCallId: 'test-tool-call-id',
-              input: { sql: 'SELECT * FROM users' },
+              input: { sql: safeSql`SELECT * FROM users` },
               output: [{ id: 1, name: 'test-output' }],
             },
           ],
@@ -33,6 +35,7 @@ test('generateV4 calls the tool sanitizer', async () => {
       projectRef: 'test-project',
       connectionString: 'test-connection',
       orgSlug: 'test-org',
+      supportMode: true,
     },
     on: vi.fn(),
   }
@@ -41,6 +44,7 @@ test('generateV4 calls the tool sanitizer', async () => {
     status: vi.fn(() => mockRes),
     json: vi.fn(() => mockRes),
     setHeader: vi.fn(() => mockRes),
+    on: vi.fn(),
   }
 
   vi.mock('@/lib/ai/ai-details', () => ({
@@ -57,11 +61,11 @@ test('generateV4 calls the tool sanitizer', async () => {
   vi.mock('@/lib/ai/model', () => ({
     getModel: vi.fn().mockResolvedValue({
       modelParams: { model: {} },
-      promptProviderOptions: {},
+      systemProviderOptions: {},
     }),
   }))
 
-  vi.mock('@/data/sql/execute-sql-query', () => ({
+  vi.mock('@/data/sql/execute-sql-mutation', () => ({
     executeSql: vi.fn().mockResolvedValue({ result: [] }),
   }))
 
@@ -82,4 +86,12 @@ test('generateV4 calls the tool sanitizer', async () => {
   await generateV4(mockReq as any, mockRes as any)
 
   expect(sanitizeMessagePart).toHaveBeenCalled()
+  expect(getTools).toHaveBeenCalledWith(
+    expect.objectContaining({
+      supportMode: true,
+    })
+  )
+  // The response 'close' event must be wired up so the remote MCP connection
+  // opened in getTools is torn down when the stream finishes or the client drops
+  expect(mockRes.on).toHaveBeenCalledWith('close', expect.any(Function))
 })

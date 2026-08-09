@@ -4,7 +4,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import Results from './Results'
+import { Results } from './Results'
 import { getSqlErrorLines } from './UtilityTabResults.utils'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -15,7 +15,7 @@ import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-q
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -31,10 +31,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     const { ref } = useParams()
     const state = useDatabaseSelectorStateSnapshot()
     const { data: organization } = useSelectedOrganizationQuery()
-    const snapV2 = useSqlEditorV2StateSnapshot()
+    const sessionSnap = useSqlEditorSessionSnapshot()
     const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-    const result = snapV2.results[id]?.[0]
+    const result = sessionSnap.results[id]?.[0]
     const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
     // Customers on HIPAA plans should not have access to Supabase AI
@@ -50,7 +50,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
 
     if (isExecuting) {
       return (
-        <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
           <Loader2 size={14} className="animate-spin" />
           <p className="m-0 border-0 font-mono text-sm">Running...</p>
         </div>
@@ -65,7 +65,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
 
       return (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <div className="flex flex-row justify-between items-start py-4 px-6 gap-x-4">
             {isTimeout ? (
               <div className="flex flex-col gap-y-1">
@@ -136,10 +136,10 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {readReplicaError && (
                 <Button
                   className="py-2"
-                  type="default"
+                  variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
-                    snapV2.resetResults(id)
+                    sessionSnap.resetResult(id)
                   }}
                 >
                   Switch to primary database
@@ -148,7 +148,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {errorLines.length > 0 && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <CopyButton iconOnly type="default" text={errorLines.join('\n')} />
+                    <CopyButton iconOnly variant="default" text={errorLines.join('\n')} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
                     <span>Copy error</span>
@@ -171,7 +171,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
     } else if (!result) {
       return (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
             Click <code className="text-code-inline">Run</code> to execute your query
           </p>
@@ -179,7 +179,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
     } else if (result.rows.length <= 0) {
       return (
-        <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark overflow-y-auto">
+        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
         </div>
       )

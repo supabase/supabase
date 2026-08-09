@@ -103,7 +103,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               aria-label="Hours"
               onBlur={(event) => onInputBlur(event, 'h')}
               onChange={(event) => onInputChange(event, 'h')}
-              className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
+              className="w-full text-sm bg-transparent p-0 text-center outline-hidden border-none focus:ring-0"
             />
           </TooltipTrigger>
 
@@ -122,7 +122,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               aria-label="Minutes"
               onBlur={(event) => onInputBlur(event, 'm')}
               onChange={(event) => onInputChange(event, 'm')}
-              className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
+              className="w-full text-sm bg-transparent p-0 text-center outline-hidden border-none focus:ring-0"
             />
           </TooltipTrigger>
 
@@ -141,7 +141,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               aria-label="Seconds"
               onBlur={(event) => onInputBlur(event, 's')}
               onChange={(event) => onInputChange(event, 's')}
-              className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
+              className="w-full text-sm bg-transparent p-0 text-center outline-hidden border-none focus:ring-0"
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">Seconds (SS)</TooltipContent>

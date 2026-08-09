@@ -95,6 +95,7 @@ export function resolveSteps(schema: ConnectSchema, state: ConnectState): Resolv
         id: step.id,
         title: step.title,
         description: step.description,
+        optional: step.optional,
         content: content ?? '',
       }
     })

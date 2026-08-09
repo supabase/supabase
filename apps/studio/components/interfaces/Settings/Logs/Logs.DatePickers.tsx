@@ -10,17 +10,19 @@ import {
   Calendar,
   cn,
   copyToClipboard,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD } from './Logs.constants'
 import type { DatetimeHelper } from './Logs.types'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import type { ShortcutId } from '@/state/shortcuts/registry'
 
 type Unit = 'minute' | 'hour' | 'day'
 
@@ -88,14 +90,28 @@ export type DatePickerValue = {
   text?: string
 }
 
+const toValidDate = (value?: string): Date | null => {
+  if (!value) return null
+  const date = new Date(value)
+  return isNaN(date.getTime()) ? null : date
+}
+
 interface LogsDatePickerProps {
   value: DatePickerValue
   helpers: DatetimeHelper[]
   onSubmit: (value: DatePickerValue) => void
   buttonTriggerProps?: ButtonProps
-  popoverContentProps?: typeof PopoverContent_Shadcn_
+  popoverContentProps?: typeof PopoverContent
   hideWarnings?: boolean
   align?: 'start' | 'end' | 'center'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  /**
+   * Registered shortcut id whose hotkey is shown in a tooltip on the trigger
+   * button. The tooltip hides while the popover is open so it doesn't sit on
+   * top of the picker. Leave undefined to render no tooltip.
+   */
+  shortcutId?: ShortcutId
 }
 
 export const LogsDatePicker = ({
@@ -106,8 +122,17 @@ export const LogsDatePicker = ({
   popoverContentProps,
   hideWarnings,
   align = 'end',
+  open: openProp,
+  onOpenChange,
+  shortcutId,
 }: PropsWithChildren<LogsDatePickerProps>) => {
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = openProp !== undefined
+  const open = isControlled ? openProp : internalOpen
+  const setOpen = (next: boolean) => {
+    if (!isControlled) setInternalOpen(next)
+    onOpenChange?.(next)
+  }
   const [customValue, setCustomValue] = useState('')
 
   const displayedHelpers = useMemo(() => {
@@ -120,13 +145,13 @@ export const LogsDatePicker = ({
   useEffect(() => {
     if (!open) {
       setCustomValue('')
-      setStartDate(value.from ? new Date(value.from) : null)
-      const defaultEndDate = value.to ? new Date(value.to) : new Date()
+      setStartDate(toValidDate(value.from))
+      const defaultEndDate = toValidDate(value.to) ?? new Date()
       setEndDate(defaultEndDate)
       setCurrentMonth(new Date(defaultEndDate))
 
-      const fromDate = value.from ? new Date(value.from) : null
-      const toDate = value.to ? new Date(value.to) : null
+      const fromDate = toValidDate(value.from)
+      const toDate = toValidDate(value.to)
 
       setStartTime({
         HH: fromDate?.getHours().toString().padStart(2, '0') || '00',
@@ -161,11 +186,9 @@ export const LogsDatePicker = ({
     setOpen(false)
   }
 
-  const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
-  const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
-  const [currentMonth, setCurrentMonth] = useState<Date>(() =>
-    value.to ? new Date(value.to) : new Date()
-  )
+  const [startDate, setStartDate] = useState<Date | null>(toValidDate(value.from))
+  const [endDate, setEndDate] = useState<Date | null>(toValidDate(value.to) ?? new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => toValidDate(value.to) ?? new Date())
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',
@@ -316,28 +339,38 @@ export const LogsDatePicker = ({
     return true
   }
 
+  const triggerButton = (
+    <PopoverTrigger asChild>
+      <Button variant="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
+        {value.isHelper
+          ? value.text
+          : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
+      </Button>
+    </PopoverTrigger>
+  )
+
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
-          {value.isHelper
-            ? value.text
-            : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+    <Popover open={open} onOpenChange={setOpen}>
+      {shortcutId ? (
+        <ShortcutTooltip shortcutId={shortcutId} side="bottom" open={open ? false : undefined}>
+          {triggerButton}
+        </ShortcutTooltip>
+      ) : (
+        triggerButton
+      )}
+      <PopoverContent
         className="flex w-full p-0"
         side="bottom"
         align={align}
         {...popoverContentProps}
       >
         <div className="border-r p-2 flex flex-col gap-px">
-          <Input_Shadcn_
+          <Input
             type="text"
             placeholder="e.g. 2h, 30m, 7d"
             value={customValue}
             onChange={(e) => setCustomValue(e.target.value)}
-            className="mb-2 text-xs h-7 rounded-sm"
+            className="mb-2 text-xs h-7 rounded-xs"
           />
           <RadioGroup
             onValueChange={handleHelperChange}
@@ -348,7 +381,7 @@ export const LogsDatePicker = ({
               <Label
                 key={helper.text}
                 className={cn(
-                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-sm text-xs w-full',
+                  '[&:has([data-state=checked])]:bg-background-overlay-hover [&:has([data-state=checked])]:text-foreground px-4 py-1.5 text-foreground-light flex items-center gap-2 hover:bg-background-overlay-hover hover:text-foreground transition-all rounded-xs text-xs w-full',
                   {
                     'cursor-not-allowed pointer-events-none opacity-50': helper.disabled,
                   }
@@ -370,9 +403,9 @@ export const LogsDatePicker = ({
           </RadioGroup>
         </div>
 
-        <div>
+        <div className="w-fit max-w-full">
           <div className="flex p-2 gap-2 items-center">
-            <div className="flex flex-grow *:flex-grow gap-2 font-mono">
+            <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
                 type="start"
                 startTime={startTime}
@@ -396,7 +429,7 @@ export const LogsDatePicker = ({
                 endDate={endDate}
               />
             </div>
-            <div className="flex-shrink">
+            <div className="shrink">
               <ButtonTooltip
                 tooltip={{
                   content: {
@@ -404,7 +437,7 @@ export const LogsDatePicker = ({
                   },
                 }}
                 icon={<HistoryIcon size={14} />}
-                type="text"
+                variant="text"
                 size="tiny"
                 className="px-1.5"
                 onClick={() => {
@@ -414,7 +447,7 @@ export const LogsDatePicker = ({
               ></ButtonTooltip>
             </div>
           </div>
-          <div className="p-2 border-t">
+          <div className="border-t">
             <Calendar
               mode="range"
               month={currentMonth}
@@ -426,18 +459,18 @@ export const LogsDatePicker = ({
             />
           </div>
           {isLargeRange && !hideWarnings && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 text-warning-foreground border-warning-500 text-warning">
-              Large ranges may result in memory errors for <br /> big projects.
-            </div>
+            <p className="w-0 min-w-full px-3 pt-1 pb-4 text-xs text-warning">
+              Large ranges may result in memory errors for big projects.
+            </p>
           )}
           <div className="flex items-center justify-end gap-2 p-2 border-t">
             {startDate && endDate ? (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 onClick={handleCopy}
                 className={cn({
-                  'text-brand-600': copied || pasted,
+                  'text-brand-link': copied || pasted,
                 })}
               >
                 {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}
@@ -445,7 +478,7 @@ export const LogsDatePicker = ({
             ) : null}
 
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 const today = new Date()
                 setCurrentMonth(today)
@@ -458,7 +491,7 @@ export const LogsDatePicker = ({
             <Button onClick={handleApply}>Apply</Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -1,3 +1,5 @@
+@reference "./globals.css";
+
 .sb-grid {
   @apply flex h-full flex-col;
 }
@@ -13,6 +15,7 @@
   @apply text-grid;
   @apply border-secondary border-r border-b;
   @apply text-foreground;
+  padding-inline: 0.5rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -28,18 +31,23 @@
   @apply h-full;
 }
 
-.rdg-cell-frozen-last {
-  @apply border-secondary border-r-2 shadow-none;
+.rdg-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {
+  @apply border-secondary border-r;
 }
 
 .rdg-cell[aria-selected='true'] {
   box-shadow: inset 0 0 0 1px #24b47e;
 }
 
+.rdg:not(:focus-within):not(.rdg-context-menu-open) .rdg-cell[aria-selected='true'] {
+  box-shadow: none;
+  outline: none;
+}
+
 /* Cell with unsaved changes - warning (amber) background/text color */
 .rdg-cell.rdg-cell--dirty {
   background-color: hsl(var(--warning-300) / 0.75);
-  color: hsl(var(--warning-default));
+  color: hsl(var(--warning-600));
 }
 
 /* Row pending addition - green background, green text */
@@ -116,7 +124,7 @@
 */
 
 .rdg-header-row {
-  @apply bg-surface-200 select-none border-none;
+  @apply select-none border-none;
 }
 
 .rdg-header-row {
@@ -126,20 +134,23 @@
 }
 
 .rdg-header-row .rdg-cell {
-  @apply bg-surface-200 border-default border-b;
+  @apply bg-dash-canvas border-default border-b;
+}
+
+.rdg-header-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {
+  @apply border-default border-r border-b;
+}
+
+[data-theme='dark'] .rdg-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen),
+[data-theme='dark'] .rdg-header-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {
+  @apply border-r-strong;
 }
 
 .rdg-header-row .rdg-cell p {
   @apply text-typography-body-light [[data-theme*=dark]_&]:text-typography-body-dark;
 }
-.rdg-header-row .rdg-cell .react-contextmenu-wrapper {
-  @apply flex h-full items-center px-2 transition duration-100 ease-in-out;
-}
-.rdg-header-row .rdg-cell .react-contextmenu-wrapper:hover {
-  @apply bg-surface-200;
-}
 .rdg-header-row .rdg-checkbox {
-  @apply bg-surface-200 border-default rounded-sm border;
+  @apply bg-200 border-default rounded-xs border;
 }
 .rdg-header-row .rdg-checkbox-input:checked + .rdg-checkbox {
   @apply border-default border-4 bg-green-900;
@@ -160,7 +171,7 @@
 
 .rdg-row {
   @apply bg-dash-sidebar transition-colors;
-  @apply hover:bg-surface-200;
+  @apply hover:bg-200;
 }
 
 /* edit button */
@@ -177,7 +188,7 @@
 
 /* select row */
 .rdg-row[aria-selected='true'] {
-  @apply bg-surface-200;
+  @apply bg-200;
 }
 
 .tab-cursor {
@@ -228,10 +239,10 @@
   }
 
   [type='checkbox'] {
-    @apply cursor-pointer rounded border border-solid;
+    @apply cursor-pointer rounded-sm border border-solid;
 
     @apply text-foreground border-strong transition-all;
-    @apply hover:border-foreground focus:ring-0 focus:outline-none;
+    @apply hover:border-foreground focus:ring-0 focus:outline-hidden;
 
     @apply bg-control;
 
@@ -252,7 +263,7 @@
   @apply absolute top-0 inline-flex h-full items-center justify-center;
   @apply text-xs font-medium;
   @apply text-border-muted;
-  @apply active:bg-alternative hover:text-white focus:z-10 focus:outline-none;
+  @apply active:bg-alternative hover:text-white focus:z-10 focus:outline-hidden;
   @apply transition duration-150 ease-in-out;
   @apply cursor-pointer;
   z-index: 1;
@@ -271,7 +282,7 @@
 }
 
 .rdg__segmented-control__label {
-  @apply bg-overlay-hover border-control z-0 inline-block h-full transform rounded border shadow transition duration-200 ease-in-out;
+  @apply bg-overlay-hover border-control z-0 inline-block h-full transform rounded-sm border shadow-sm transition duration-200 ease-in-out;
 }
 
 .rdg__segmented-control__label--left {
@@ -288,106 +299,6 @@
 }
 
 /*
-  DropdownControl
-*/
-
-.dropdown-control {
-  @apply overflow-auto;
-}
-
-.dropdown-control .sbui-typography {
-  @apply block px-2 py-4;
-}
-
-/*
-  NullValue
-*/
-
-.null-value {
-  @apply block;
-}
-
-/*
-  CheckboxEditor
-*/
-
-.sb-grid-checkbox-editor {
-  @apply flex h-full w-full;
-}
-
-.sb-grid-checkbox-editor__input {
-  @apply h-4 w-4;
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-/*
-  JsonEditor
-*/
-
-.sb-grid-json-editor__trigger {
-  @apply text-grid overflow-hidden overflow-ellipsis px-2;
-}
-
-/*
-  NumberEditor
-*/
-
-.sb-grid-number-editor {
-  @apply h-full w-full px-2;
-}
-
-/*
-  SelectEditor
-*/
-
-.sb-grid-select-editor {
-  button {
-    @apply border-none rounded-none shadow-none;
-    box-shadow: none !important;
-  }
-}
-
-/*
-  TextEditor
-*/
-
-.sb-grid-text-editor__trigger {
-  @apply text-grid overflow-hidden overflow-ellipsis px-2;
-}
-
-/*
-  TimeEditor
-*/
-
-.sb-grid-time-editor {
-  @apply h-full w-full px-2;
-}
-
-/*
-  Footer
-*/
-
-.sb-grid-footer {
-  @apply bg-surface-100 flex h-10 items-center justify-between px-2;
-}
-
-.sb-grid-footer__inner {
-  @apply flex items-center;
-}
-
-/*
-  ForeignKeyFormatter
-*/
-
-.sb-grid-foreign-key-formatter {
-  @apply flex w-full items-center justify-between;
-}
-
-.sb-grid-foreign-key-formatter__text {
-  @apply m-0 flex-grow overflow-hidden overflow-ellipsis;
-}
-
-/*
   ColumnHeader
 */
 
@@ -400,16 +311,16 @@
 }
 
 .sb-grid-column-header__inner {
-  @apply flex items-center gap-2 overflow-hidden overflow-ellipsis;
+  @apply flex items-center gap-2 overflow-hidden text-ellipsis;
 }
 
 .sb-grid-column-header__inner__name {
-  @apply text-foreground overflow-hidden overflow-ellipsis text-xs select-text;
+  @apply text-foreground overflow-hidden text-ellipsis text-xs select-text;
 }
 
 .sb-grid-column-header__inner__format {
   @apply text-xs;
-  @apply overflow-hidden overflow-ellipsis font-normal;
+  @apply overflow-hidden text-ellipsis font-normal;
   @apply text-foreground-light;
 }
 
@@ -419,22 +330,6 @@
 
 .sb-grid-column-header__inner svg {
   @apply border-brand text-brand;
-}
-
-/*
-  Grid
-*/
-
-.sb-grid-grid--loading {
-  @apply flex justify-center bg-transparent;
-}
-
-.sb-grid-grid--loading__inner {
-  @apply flex items-center;
-}
-
-.sb-grid-grid--loading__inner__text {
-  @apply m-8;
 }
 
 /*
@@ -452,96 +347,4 @@
 .sb-grid-select-cell__header__input {
   /* @apply focus:ring-brand-300; */
   @apply border-background-surface-100;
-}
-
-/*
-  Header
-*/
-
-.sb-grid-header {
-  @apply bg-surface-100 flex h-10 justify-between px-2;
-}
-
-.sb-grid-header__inner {
-  @apply flex items-center space-x-2;
-}
-
-.sb-grid-header__inner__divider {
-  @apply py-2;
-}
-
-.row_header__selected-rows {
-  @apply ml-2 mr-2;
-}
-
-/*
-  StatusLabel
-*/
-
-.sb-grid-status-label {
-  @apply text-grid text-white;
-}
-
-.sb-grid-status-label__no-msg {
-  @apply flex h-5 w-5;
-}
-
-.sb-grid-status-label__no-msg > div {
-  @apply m-auto h-2 w-2 rounded-full bg-green-900;
-}
-
-/*
-  Empty value
-*/
-
-.sb-grid-empty-value {
-  @apply block;
-}
-
-/*
-header/sort/SortDropdown
-*/
-
-.sb-grid-sort-popover {
-  @apply w-96;
-}
-
-.sb-grid-dropdown__empty {
-  @apply py-2;
-}
-
-.sb-grid-dropdown__empty__text {
-  @apply block;
-}
-
-.sb-grid-dropdown__item-trigger {
-  @apply my-1;
-}
-
-/*
-header/sort/SortRow
-*/
-
-.sb-grid-sort-row {
-  @apply flex justify-between space-x-3;
-}
-
-.sb-grid-sort-row__item {
-  @apply flex items-center space-x-3;
-}
-
-.sb-grid-sort-row__item__remove {
-  @apply bg-transparent p-0 hover:bg-transparent;
-}
-
-.sb-grid-sort-row__item__label {
-  @apply flex items-center space-x-2;
-}
-
-.sb-grid-sort-row__item_toogle {
-  @apply flex w-28 items-center gap-0 space-x-3;
-}
-
-.sb-grid-sort-row__item__move {
-  @apply flex cursor-move;
 }

@@ -1,6 +1,6 @@
 import { BlockFieldConfig } from '../types'
 import { getStorageMetadata } from '../utils/storageUtils'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, tryParseJson } from '@/lib/helpers'
 
 // Helper functions that avoid duplication with existing storage utilities
 const getFileName = (path: string): string => {
@@ -23,23 +23,6 @@ const formatStorageDate = (dateString: string): string => {
 // =============================================================================
 // NETWORK FIELDS
 // =============================================================================
-
-// Field configurations - using filterable field IDs where possible
-export const originFields: BlockFieldConfig[] = [
-  {
-    id: 'date', // Matches filterFields 'date' (timerange) - FILTERABLE
-    label: 'Time',
-    getValue: (data) => {
-      if (!data?.timestamp && !data?.date) return null
-      try {
-        const timestamp = data?.timestamp || data?.date
-        return new Date(timestamp).toLocaleString()
-      } catch {
-        return 'Invalid date'
-      }
-    },
-  },
-]
 
 // Primary Network Fields (Always Visible) - FILTERABLE
 export const networkPrimaryFields: BlockFieldConfig[] = [
@@ -371,28 +354,34 @@ export const postgrestResponseFields: BlockFieldConfig[] = [
 // Primary GoTrue/Auth Fields (Always Visible)
 export const authPrimaryFields: BlockFieldConfig[] = [
   {
-    id: 'auth_path',
-    label: 'Auth Path',
-    getValue: (data, enrichedData) => {
-      return enrichedData?.path || enrichedData?.request_path || data?.path
-    },
-    requiresEnrichedData: true,
-  },
-  {
     id: 'log_id',
     label: 'Log ID',
     getValue: (data, enrichedData) => {
       const logId = data?.id || enrichedData?.id
-      return logId ? `${logId.substring(0, 8)}...` : null
+      return logId ?? null
+    },
+  },
+  {
+    id: 'status',
+    label: 'Status',
+    getValue: (data) => {
+      return data.status
+    },
+  },
+  {
+    id: 'auth_path',
+    label: 'Auth Path',
+    getValue: (data, enrichedData) => {
+      return enrichedData?.path || enrichedData?.request_path || data?.path || data?.pathname
     },
   },
   {
     id: 'referer',
     label: 'Referer',
-    getValue: (_data, enrichedData) => {
-      return enrichedData?.headers_referer || null
+    getValue: (data, enrichedData) => {
+      const eventMessage = tryParseJson(data.event_message)
+      return eventMessage?.referer || enrichedData?.headers_referer || null
     },
-    requiresEnrichedData: true,
   },
 ]
 
@@ -656,6 +645,12 @@ export const storageDetailsFields: BlockFieldConfig[] = [
 // Primary Postgres Fields (Always Visible)
 export const postgresPrimaryFields: BlockFieldConfig[] = [
   {
+    id: 'event_message',
+    label: 'Message',
+    getValue: (data, enrichedData) => enrichedData?.event_message || data?.event_message,
+    wrap: true,
+  },
+  {
     id: 'status',
     label: 'Status',
     getValue: (data, enrichedData) => enrichedData?.status || data?.status,
@@ -678,6 +673,20 @@ export const postgresPrimaryFields: BlockFieldConfig[] = [
     getValue: (data, enrichedData) => enrichedData?.database_user || data?.database_user,
     requiresEnrichedData: true,
   },
+  {
+    id: 'query',
+    label: 'Query',
+    getValue: (data, enrichedData) => enrichedData?.query || data?.query,
+    requiresEnrichedData: true,
+    wrap: true,
+  },
+  {
+    id: 'detail',
+    label: 'Details',
+    getValue: (data, enrichedData) => enrichedData?.detail || data?.detail,
+    requiresEnrichedData: true,
+    wrap: true,
+  },
 ]
 
 // Postgres Details (Collapsible)
@@ -697,10 +706,7 @@ export const postgresDetailsFields: BlockFieldConfig[] = [
   {
     id: 'session_id',
     label: 'Session ID',
-    getValue: (data, enrichedData) => {
-      const sessionId = enrichedData?.session_id || data?.session_id
-      return sessionId ? `${sessionId.substring(0, 12)}...` : null
-    },
+    getValue: (data, enrichedData) => enrichedData?.session_id || data?.session_id,
     requiresEnrichedData: true,
   },
   {

@@ -1,5 +1,5 @@
 import { BucketPlus } from 'icons'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { CreateBucketButton } from './NewBucketButton'
 import { BUCKET_TYPES } from './Storage.constants'
@@ -7,7 +7,7 @@ import { BUCKET_TYPES } from './Storage.constants'
 interface EmptyBucketStateProps {
   bucketType: keyof typeof BUCKET_TYPES
   className?: string
-  onCreateBucket?: () => void
+  onCreateBucket: () => void
 }
 
 export const EmptyBucketState = ({

@@ -1,4 +1,4 @@
-import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
+import { FOREIGN_KEY_CASCADE_ACTION, safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -8,7 +8,7 @@ import { createTable } from './SidePanelEditor.utils'
 // Define mock functions at module level
 const mockExecuteSql = vi.fn()
 const mockGetTable = vi.fn()
-const mockSendEvent = vi.fn()
+const mockTrack = vi.fn()
 const mockPrefetchEditorTablePage = vi.fn()
 const mockToastLoading = vi.fn()
 const mockToastSuccess = vi.fn()
@@ -22,17 +22,13 @@ vi.mock('@/data/query-client', () => ({
   }),
 }))
 
-vi.mock('@/data/sql/execute-sql-query', () => ({
+vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: (...args: unknown[]) => mockExecuteSql(...args),
 }))
 
 vi.mock('@/data/tables/table-retrieve-query', () => ({
   getTable: (...args: unknown[]) => mockGetTable(...args),
   getTableQuery: (...args: unknown[]) => mockGetTable(...args),
-}))
-
-vi.mock('@/data/telemetry/send-event-mutation', () => ({
-  sendEvent: (...args: unknown[]) => mockSendEvent(...args),
 }))
 
 vi.mock('@/data/prefetchers/project.$ref.editor.$id', () => ({
@@ -99,7 +95,7 @@ describe('createTable', () => {
     // Default mock implementations
     mockExecuteSql.mockResolvedValue({ result: [] })
     mockGetTable.mockResolvedValue(mockTableResult)
-    mockSendEvent.mockResolvedValue({})
+    mockTrack.mockReset()
     mockPrefetchEditorTablePage.mockResolvedValue(undefined)
     mockFetchQuery.mockImplementation(({ queryFn }) => {
       if (queryFn) {
@@ -118,6 +114,7 @@ describe('createTable', () => {
       columns: [],
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     expect(mockExecuteSql).toHaveBeenCalledTimes(1)
@@ -134,20 +131,10 @@ describe('createTable', () => {
       id: toastId,
     })
 
-    // Should track table creation event
-    expect(mockSendEvent).toHaveBeenCalledWith({
-      event: {
-        action: 'table_created',
-        properties: {
-          has_generated_policies: false,
-          method: 'table_editor',
-          schema_name: 'public',
-          table_name: 'test_table',
-        },
-        groups: {
-          project: projectRef,
-        },
-      },
+    expect(mockTrack).toHaveBeenCalledWith('table_created', {
+      method: 'table_editor',
+      schema_name: 'public',
+      table_name: 'test_table',
     })
 
     // Should prefetch the editor table page
@@ -160,7 +147,6 @@ describe('createTable', () => {
     )
 
     expect(result).toStrictEqual({
-      failedPolicies: [],
       table: mockTableResult,
     })
   })
@@ -174,23 +160,16 @@ describe('createTable', () => {
       columns: [],
       foreignKeyRelations: [],
       isRLSEnabled: true,
+      track: mockTrack,
     })
 
     const sqlCall = mockExecuteSql.mock.calls[0][0]
     expect(sqlCall.sql).toContain('ENABLE ROW LEVEL SECURITY')
 
-    expect(mockSendEvent).toHaveBeenCalledWith({
-      event: {
-        action: 'table_rls_enabled',
-        properties: {
-          method: 'table_editor',
-          schema_name: 'public',
-          table_name: 'test_table',
-        },
-        groups: {
-          project: projectRef,
-        },
-      },
+    expect(mockTrack).toHaveBeenCalledWith('table_rls_enabled', {
+      method: 'table_editor',
+      schema_name: 'public',
+      table_name: 'test_table',
     })
   })
 
@@ -220,6 +199,7 @@ describe('createTable', () => {
       columns,
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     const sqlCall = mockExecuteSql.mock.calls[0][0]
@@ -255,6 +235,7 @@ describe('createTable', () => {
       columns,
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     const sqlCall = mockExecuteSql.mock.calls[0][0]
@@ -299,6 +280,7 @@ describe('createTable', () => {
       columns,
       foreignKeyRelations,
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     const sqlCall = mockExecuteSql.mock.calls[0][0]
@@ -306,67 +288,6 @@ describe('createTable', () => {
     expect(sqlCall.sql).toContain('REFERENCES')
     expect(sqlCall.sql).toContain('users')
     expect(sqlCall.sql).toContain('ON DELETE CASCADE')
-  })
-
-  it('should include organization slug in telemetry when provided', async () => {
-    const organizationSlug = 'test-org'
-
-    await createTable({
-      projectRef,
-      connectionString,
-      toastId,
-      payload: basePayload,
-      columns: [],
-      foreignKeyRelations: [],
-      isRLSEnabled: true,
-      organizationSlug,
-    })
-
-    expect(mockSendEvent).toHaveBeenCalledWith({
-      event: expect.objectContaining({
-        action: 'table_created',
-        groups: {
-          project: projectRef,
-          organization: organizationSlug,
-        },
-      }),
-    })
-
-    expect(mockSendEvent).toHaveBeenCalledWith({
-      event: expect.objectContaining({
-        action: 'table_rls_enabled',
-        groups: {
-          project: projectRef,
-          organization: organizationSlug,
-        },
-      }),
-    })
-  })
-
-  it('should handle telemetry errors gracefully', async () => {
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    mockSendEvent.mockRejectedValue(new Error('Telemetry failed'))
-
-    const result = await createTable({
-      projectRef,
-      connectionString,
-      toastId,
-      payload: basePayload,
-      columns: [],
-      foreignKeyRelations: [],
-      isRLSEnabled: false,
-    })
-
-    expect(result).toStrictEqual({
-      failedPolicies: [],
-      table: mockTableResult,
-    })
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Failed to track table creation event:',
-      expect.any(Error)
-    )
-
-    consoleErrorSpy.mockRestore()
   })
 
   it('should create a table with nullable connectionString', async () => {
@@ -378,6 +299,7 @@ describe('createTable', () => {
       columns: [],
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     expect(mockExecuteSql).toHaveBeenCalledWith(
@@ -405,6 +327,7 @@ describe('createTable', () => {
       columns,
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     expect(mockExecuteSql).toHaveBeenCalledTimes(1)
@@ -427,6 +350,7 @@ describe('createTable', () => {
       columns,
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     expect(mockExecuteSql).toHaveBeenCalledTimes(1)
@@ -448,6 +372,7 @@ describe('createTable', () => {
       columns,
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     expect(mockExecuteSql).toHaveBeenCalledTimes(1)
@@ -458,7 +383,7 @@ describe('createTable', () => {
       createColumnField({
         name: 'age',
         format: 'int4',
-        check: 'age >= 0',
+        check: safeSql`age >= 0`,
         isNullable: false,
       }),
     ]
@@ -471,6 +396,7 @@ describe('createTable', () => {
       columns,
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     expect(mockExecuteSql).toHaveBeenCalledTimes(1)
@@ -488,6 +414,7 @@ describe('createTable', () => {
         columns: [],
         foreignKeyRelations: [],
         isRLSEnabled: false,
+        track: mockTrack,
       })
     ).rejects.toThrow('SQL execution failed')
   })
@@ -507,17 +434,15 @@ describe('createTable', () => {
       columns: [],
       foreignKeyRelations: [],
       isRLSEnabled: false,
+      track: mockTrack,
     })
 
     const sqlCall = mockExecuteSql.mock.calls[0][0]
     expect(sqlCall.sql).toMatch(/private\.custom_table|"private"\."custom_table"/)
 
-    expect(mockSendEvent).toHaveBeenCalledWith({
-      event: expect.objectContaining({
-        properties: expect.objectContaining({
-          schema_name: 'private',
-        }),
-      }),
-    })
+    expect(mockTrack).toHaveBeenCalledWith(
+      'table_created',
+      expect.objectContaining({ schema_name: 'private' })
+    )
   })
 })

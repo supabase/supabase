@@ -1,19 +1,18 @@
-import { useParams } from 'common'
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { SidePanel } from 'ui'
 
+import { type ForeignProject } from '../../Integrations/VercelGithub/VercelGithub.types'
 import { ENV_VAR_RAW_KEYS } from '@/components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
-import ProjectLinker, {
-  ForeignProject,
-} from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import { ProjectLinker } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
 import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
 import { useSidePanelsStateSnapshot } from '@/state/side-panels'
@@ -25,7 +24,7 @@ const VERCEL_ICON = (
 )
 
 export const SidePanelVercelProjectLinker = () => {
-  const { ref } = useParams()
+  const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
   const organizationIntegrationId = sidePanelStateSnapshot.vercelConnectionsIntegrationId
@@ -126,7 +125,7 @@ Check the details below before proceeding
         <SidePanel.Content className="flex flex-col gap-2">
           <ProjectLinker
             slug={selectedOrganization?.slug}
-            defaultSupabaseProjectRef={ref}
+            defaultSupabaseProject={selectedProject}
             organizationIntegrationId={selectedIntegration?.id}
             foreignProjects={vercelProjects}
             onCreateConnections={onCreateConnections}
@@ -158,5 +157,3 @@ ${ENV_VAR_RAW_KEYS.map((x) => {
     </SidePanel>
   )
 }
-
-export default SidePanelVercelProjectLinker

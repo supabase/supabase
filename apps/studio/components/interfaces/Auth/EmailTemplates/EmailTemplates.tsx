@@ -18,13 +18,22 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
-import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
-import { slugifyTitle } from './EmailTemplates.utils'
-import AlertError from '@/components/ui/AlertError'
+import { TEMPLATES_SCHEMAS } from './AuthTemplatesValidation'
+import { CustomEmailTemplateRestrictionAdmonition } from './CustomEmailTemplateRestrictionAdmonition'
+import {
+  hasCustomEmailSender,
+  isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
+  slugifyTitle,
+} from './EmailTemplates.utils'
+import { SendEmailHookActiveAdmonition } from './SendEmailHookActiveAdmonition'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const notificationEnabledKeys = TEMPLATES_SCHEMAS.filter(
@@ -45,6 +54,9 @@ const NotificationsFormSchema = z.object({
 
 export const EmailTemplates = () => {
   const { ref: projectRef } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
+
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
@@ -67,10 +79,22 @@ export const EmailTemplates = () => {
     },
   })
 
-  const builtInSMTP =
-    isSuccess &&
-    authConfig &&
-    (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+  const usingBuiltInEmailSender = !hasCustomEmailSender(authConfig)
+  const hasSendEmailHook = !!(
+    authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI
+  )
+  const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
+    authConfig,
+    organization: selectedOrganization,
+    projectInsertedAt: selectedProject?.inserted_at,
+  })
+  const isTemplateEditBlocked =
+    isTemplateRestrictionStatusKnown &&
+    isCustomEmailTemplateEditingRestricted({
+      authConfig,
+      organization: selectedOrganization,
+      projectInsertedAt: selectedProject?.inserted_at,
+    })
 
   const defaultValues = notificationEnabledKeys.reduce(
     (acc, key) => {
@@ -85,7 +109,7 @@ export const EmailTemplates = () => {
     defaultValues,
   })
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: z.infer<typeof NotificationsFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
     updateAuthConfig({ projectRef: projectRef, config: { ...values } })
   }
@@ -115,8 +139,24 @@ export const EmailTemplates = () => {
       )}
       {isSuccess && (
         <>
+          {isTemplateEditBlocked && !hasSendEmailHook && (
+            <PageSection>
+              <PageSectionContent>
+                <CustomEmailTemplateRestrictionAdmonition />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
+          {hasSendEmailHook && (
+            <PageSection>
+              <PageSectionContent>
+                <SendEmailHookActiveAdmonition />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
           <PageSection>
-            {builtInSMTP && (
+            {usingBuiltInEmailSender && !isTemplateEditBlocked && (
               <Admonition
                 type="warning"
                 title="Set up custom SMTP"
@@ -132,9 +172,8 @@ export const EmailTemplates = () => {
                   </p>
                 }
                 layout="horizontal"
-                className="mb-4"
                 actions={
-                  <Button asChild type="default">
+                  <Button asChild variant="default">
                     <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
                   </Button>
                 }
@@ -237,13 +276,13 @@ export const EmailTemplates = () => {
                     )}
                     <CardFooter className="justify-end space-x-2">
                       {notificationsForm.formState.isDirty && (
-                        <Button type="default" onClick={() => notificationsForm.reset()}>
+                        <Button variant="default" onClick={() => notificationsForm.reset()}>
                           Cancel
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         disabled={
                           !canUpdateConfig ||
                           isUpdatingConfig ||

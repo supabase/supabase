@@ -2,7 +2,6 @@ import assert from 'node:assert'
 import { Eval } from 'braintrust'
 
 import { dataset } from './dataset'
-import { buildAssistantEvalOutput } from './output'
 import {
   completenessScorer,
   concisenessScorer,
@@ -10,6 +9,7 @@ import {
   docsFaithfulnessScorer,
   goalCompletionScorer,
   knowledgeUsageScorer,
+  safetyScorer,
   toolUsageScorer,
   urlValidityScorer,
 } from './scorer'
@@ -31,22 +31,30 @@ Eval('Assistant', {
     const modelResponse = await getModel({ provider: 'openai', modelEntry })
     if (modelResponse.error) throw modelResponse.error
 
-    const result = await generateAssistantResponse({
-      ...modelResponse.modelParams,
-      messages: [
-        {
-          id: '1',
-          role: 'user',
-          parts: [{ type: 'text', text: input.prompt }],
-        },
-      ],
-      tools: await getMockTools(input.mockTables ? { list_tables: input.mockTables } : undefined),
-    })
+    // Owns the lifecycle of the remote MCP client opened inside getMockTools:
+    // aborting once generation is done closes that connection.
+    const toolsAbortController = new AbortController()
+    try {
+      const result = await generateAssistantResponse({
+        ...modelResponse.modelParams,
+        messages: [
+          {
+            id: '1',
+            role: 'user',
+            parts: [{ type: 'text', text: input.prompt }],
+          },
+        ],
+        tools: await getMockTools(
+          input.mockTables ? { list_tables: input.mockTables } : undefined,
+          toolsAbortController.signal
+        ),
+      })
 
-    // `result.toolCalls` only shows the last step, instead aggregate tools across all steps
-    const [finishReason, steps] = await Promise.all([result.finishReason, result.steps])
-
-    return buildAssistantEvalOutput(finishReason, steps)
+      const finishReason = await result.finishReason
+      return { finishReason }
+    } finally {
+      toolsAbortController.abort()
+    }
   },
   scores: [
     toolUsageScorer,
@@ -58,6 +66,7 @@ Eval('Assistant', {
     completenessScorer,
     docsFaithfulnessScorer,
     correctnessScorer,
+    safetyScorer,
     urlValidityScorer,
   ],
 })

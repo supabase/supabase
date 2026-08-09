@@ -1,0 +1,9 @@
+<h2>Reset password</h2>
+
+<p>Use this link to choose a new password for your account.</p>
+<p>
+  <a
+    href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next={{ .RedirectTo }}"
+    >Reset password</a
+  >
+</p>

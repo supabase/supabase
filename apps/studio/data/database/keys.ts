@@ -9,8 +9,8 @@ export const databaseKeys = {
     schema: string | undefined,
     table: string | undefined
   ) => ['projects', projectRef, 'table-columns', schema, table] as const,
-  databaseFunctions: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'database-functions'] as const,
+  databaseFunctions: (projectRef: string | undefined, schema?: string) =>
+    ['projects', projectRef, 'database-functions', schema].filter(Boolean),
   entityDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'entity-definition', id] as const,
   entityDefinitions: (projectRef: string | undefined, schemas: string[]) =>
@@ -64,6 +64,8 @@ export const databaseKeys = {
   ) => ['projects', projectRef, 'table-index-advisor', schema, table] as const,
   supamonitorEnabled: (projectRef: string | undefined) =>
     ['projects', projectRef, 'supamonitor-enabled'] as const,
+  databaseActivity: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'database-activity'] as const,
 }
 
 export const getLiveTupleEstimateKey = (

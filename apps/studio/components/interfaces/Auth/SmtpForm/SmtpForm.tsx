@@ -9,31 +9,36 @@ import {
   Card,
   CardContent,
   CardFooter,
-  cn,
   Form,
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   Switch,
 } from 'ui'
-import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Admonition } from 'ui-patterns/admonition'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
 import { urlRegex } from '../Auth.constants'
+import { AUTH_TEMPLATE_RESET_TYPES } from '../EmailTemplates/EmailTemplates.constants'
+import { isBeforeFreeTierTemplateBlockCutoff } from '../EmailTemplates/EmailTemplates.utils'
+import { SmtpDisableConfirmationDialog } from './SmtpDisableConfirmationDialog'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const smtpEnabledSchema = z.object({
   ENABLE_SMTP: z.literal(true),
@@ -96,9 +101,14 @@ type SmtpFormValues = z.infer<typeof smtpSchema>
 export const SmtpForm = () => {
   const { ref: projectRef } = useParams()
   const { data: authConfig, error: authConfigError, isError } = useAuthConfigQuery({ projectRef })
+  const { data: selectedProject } = useSelectedProjectQuery()
+
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
 
   const [enableSmtp, setEnableSmtp] = useState(false)
+  const [showDisableConfirmation, setShowDisableConfirmation] = useState(false)
+  const [pendingValues, setPendingValues] = useState<SmtpFormValues | null>(null)
 
   const { can: canReadConfig } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -108,6 +118,10 @@ export const SmtpForm = () => {
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
+
+  const blockEditingOnReset =
+    !!selectedProject?.inserted_at &&
+    isBeforeFreeTierTemplateBlockCutoff(selectedProject.inserted_at)
 
   const form = useForm<SmtpFormValues>({
     resolver: zodResolver(
@@ -137,29 +151,15 @@ export const SmtpForm = () => {
 
   const { isDirty } = form.formState
 
-  // Update form values when auth config is loaded
-  useEffect(() => {
-    if (authConfig) {
-      const formValues = generateFormValues(authConfig)
-      form.reset({
-        ...formValues,
-        ENABLE_SMTP: isSmtpEnabled(authConfig),
-      } as SmtpFormValues)
-      setEnableSmtp(isSmtpEnabled(authConfig))
-    }
-  }, [authConfig, form])
-
-  // Update enableSmtp state when the form field changes
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === 'ENABLE_SMTP') {
-        setEnableSmtp(value.ENABLE_SMTP as boolean)
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [form])
-
-  const onSubmit: SubmitHandler<SmtpFormValues> = (values) => {
+  const doUpdate = ({
+    values,
+    onSuccess,
+    onError,
+  }: {
+    values: SmtpFormValues
+    onSuccess?: () => void
+    onError?: () => void
+  }) => {
     const { ENABLE_SMTP, ...rest } = values
     const basePayload = ENABLE_SMTP ? rest : defaultDisabledSmtpFormValues
 
@@ -187,13 +187,75 @@ export const SmtpForm = () => {
       {
         onError: (error) => {
           toast.error(`Failed to update settings: ${error.message}`)
+          onError?.()
         },
         onSuccess: () => {
           toast.success('Successfully updated settings')
+          onSuccess?.()
         },
       }
     )
   }
+
+  const onSubmit: SubmitHandler<SmtpFormValues> = (values) => {
+    const isDisablingSmtp = !values.ENABLE_SMTP && isSmtpEnabled(authConfig)
+
+    if (isDisablingSmtp) {
+      setPendingValues(values)
+      setShowDisableConfirmation(true)
+      return
+    }
+
+    doUpdate({ values })
+  }
+
+  const handleConfirmDisable = (): Promise<void> => {
+    if (!pendingValues || !projectRef) return Promise.resolve()
+
+    return new Promise<void>((resolve, reject) => {
+      doUpdate({
+        values: pendingValues,
+        onSuccess: async () => {
+          setPendingValues(null)
+          try {
+            const results = await Promise.allSettled(
+              AUTH_TEMPLATE_RESET_TYPES.map((template) =>
+                resetAuthTemplate({ projectRef, template })
+              )
+            )
+            if (results.some((r) => r.status === 'rejected')) {
+              toast.error('SMTP disabled, but some email templates could not be reset')
+            }
+          } finally {
+            resolve()
+          }
+        },
+        onError: reject,
+      })
+    })
+  }
+
+  // Update form values when auth config is loaded
+  useEffect(() => {
+    if (authConfig) {
+      const formValues = generateFormValues(authConfig)
+      form.reset({
+        ...formValues,
+        ENABLE_SMTP: isSmtpEnabled(authConfig),
+      } as SmtpFormValues)
+      setEnableSmtp(isSmtpEnabled(authConfig))
+    }
+  }, [authConfig, form])
+
+  // Update enableSmtp state when the form field changes
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === 'ENABLE_SMTP') {
+        setEnableSmtp(value.ENABLE_SMTP as boolean)
+      }
+    })
+    return () => subscription.unsubscribe()
+  }, [form])
 
   if (isError) {
     return (
@@ -215,8 +277,7 @@ export const SmtpForm = () => {
     )
   }
 
-  const showFooterMessage =
-    form.formState.isDirty && ((enableSmtp && !isSmtpEnabled(authConfig)) || !enableSmtp)
+  const showEnablingAdmonition = form.formState.isDirty && enableSmtp && !isSmtpEnabled(authConfig)
 
   return (
     <PageSection>
@@ -233,13 +294,12 @@ export const SmtpForm = () => {
                       layout="flex-row-reverse"
                       label="Enable custom SMTP"
                       description={
-                        <p className="max-w-full prose text-sm text-foreground-lighter">
-                          Emails will be sent using your custom SMTP provider. Email rate limits can
-                          be adjusted{' '}
+                        <p className="text-sm text-foreground-lighter">
+                          Send auth emails through your custom SMTP provider.{' '}
                           <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
-                            here
-                          </InlineLink>
-                          .
+                            Rate limits
+                          </InlineLink>{' '}
+                          apply.
                         </p>
                       }
                     >
@@ -253,15 +313,6 @@ export const SmtpForm = () => {
                     </FormItemLayout>
                   )}
                 />
-
-                {enableSmtp && !isSmtpEnabled(form.getValues() as any) && (
-                  <Admonition
-                    type="warning"
-                    title="All fields must be filled"
-                    description="Each of the fields below must be filled before custom SMTP can be enabled."
-                    className="bg-warning-200 border-warning-400 mt-4"
-                  />
-                )}
               </CardContent>
 
               {enableSmtp && (
@@ -284,7 +335,7 @@ export const SmtpForm = () => {
                               description="The email address the emails are sent from."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="noreply@yourdomain.com"
                                   disabled={!canUpdateConfig}
@@ -303,7 +354,7 @@ export const SmtpForm = () => {
                               description="Name displayed in the recipient's inbox."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="Your Name"
                                   disabled={!canUpdateConfig}
@@ -334,7 +385,7 @@ export const SmtpForm = () => {
                               description="Hostname or IP address of your SMTP server."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="your.smtp.host.com"
                                   disabled={!canUpdateConfig}
@@ -372,7 +423,7 @@ export const SmtpForm = () => {
                               }
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   type="number"
                                   value={field.value}
                                   onChange={(e) => field.onChange(e.target.value)}
@@ -418,7 +469,7 @@ export const SmtpForm = () => {
                               description="Username for your SMTP server."
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   placeholder="SMTP Username"
                                   disabled={!canUpdateConfig}
@@ -437,7 +488,7 @@ export const SmtpForm = () => {
                               description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
                             >
                               <FormControl>
-                                <Input {...field} reveal copy disabled={!canUpdateConfig} />
+                                <PasswordInput {...field} reveal copy disabled={!canUpdateConfig} />
                               </FormControl>
                             </FormItemLayout>
                           )}
@@ -448,27 +499,28 @@ export const SmtpForm = () => {
                 </>
               )}
 
-              <CardFooter
-                className={cn(showFooterMessage ? 'justify-between' : 'justify-end', 'gap-x-2')}
-              >
-                {showFooterMessage &&
-                  (enableSmtp ? (
-                    <p className="text-sm text-foreground-light">
-                      Rate limit for sending emails will be increased to 30 and{' '}
+              {showEnablingAdmonition && (
+                <Admonition
+                  type="default"
+                  className="rounded-none border-x-0 border-t-0"
+                  description={
+                    <>
+                      The email rate limit will be increased to 30 emails per hour after enabling
+                      custom SMTP. It can be{' '}
                       <InlineLink href={`/project/${projectRef}/auth/rate-limits`}>
-                        can be adjusted
+                        adjusted further
                       </InlineLink>{' '}
-                      after enabling custom SMTP
-                    </p>
-                  ) : (
-                    <p className="text-sm text-foreground-light">
-                      Rate limit for sending emails will be reduced to 2 after disabling custom SMTP
-                    </p>
-                  ))}
+                      at any time.
+                    </>
+                  }
+                />
+              )}
+
+              <CardFooter className="justify-end gap-x-2">
                 <div className="flex items-center gap-x-2">
                   {isDirty && (
                     <Button
-                      type="default"
+                      variant="default"
                       onClick={() => {
                         form.reset()
                         setEnableSmtp(isSmtpEnabled(authConfig))
@@ -478,8 +530,8 @@ export const SmtpForm = () => {
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     loading={isUpdatingConfig}
                     disabled={!canUpdateConfig || !isDirty}
                   >
@@ -491,6 +543,12 @@ export const SmtpForm = () => {
           </form>
         </Form>
       </PageSectionContent>
+      <SmtpDisableConfirmationDialog
+        open={showDisableConfirmation}
+        onOpenChange={setShowDisableConfirmation}
+        onConfirm={handleConfirmDisable}
+        blockEditingOnReset={blockEditingOnReset}
+      />
     </PageSection>
   )
 }

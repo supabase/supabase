@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Markdown } from 'ui-patterns/Markdown'
 
-import { Markdown } from '@/components/interfaces/Markdown'
+import { loadIntegrationOverview } from '@/static-data/integrations/overviews'
 
 interface MarkdownContentProps {
   content: string | null | undefined
@@ -13,15 +14,26 @@ export const MarkdownContent = ({
 }: MarkdownContentProps) => {
   const [localContent, setLocalContent] = useState<string>('')
 
+  useEffect(() => {
+    // Reset on every id/remote change so navigating between integrations
+    // doesn't show the previous one's overview while the new import resolves.
+    setLocalContent('')
+
+    if (!integrationId || remoteContent) return
+
+    let cancelled = false
+    loadIntegrationOverview(integrationId)
+      .then((markdown) => {
+        if (!cancelled && markdown !== null) setLocalContent(markdown)
+      })
+      .catch((error) => console.error('Error loading markdown:', error))
+
+    return () => {
+      cancelled = true
+    }
+  }, [integrationId, remoteContent])
+
   const content = remoteContent || localContent
 
-  useEffect(() => {
-    if (!!integrationId && !content) {
-      import(`@/static-data/integrations/${integrationId}/overview.md`)
-        .then((module) => setLocalContent(String(module.default)))
-        .catch((error) => console.error('Error loading markdown:', error))
-    }
-  }, [integrationId, content])
-
-  return <Markdown className="flex flex-col gap-y-4 text-foreground-light">{content}</Markdown>
+  return <Markdown className="text-sm">{content}</Markdown>
 }

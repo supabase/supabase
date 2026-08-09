@@ -1,0 +1,23 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "realtime-cursor",
+  "type": "registry:component",
+  "title": "Realtime Cursor",
+  "description": "Component which renders realtime cursors from other users in a room.",
+  "registryDependencies": [],
+  "dependencies": ["lucide-react"],
+  "files": [
+    {
+      "path": "registry/default/blocks/realtime-cursor/components/cursor.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-cursor/components/realtime-cursors.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/realtime-cursor/hooks/use-realtime-cursors.ts",
+      "type": "registry:hook"
+    }
+  ]
+}

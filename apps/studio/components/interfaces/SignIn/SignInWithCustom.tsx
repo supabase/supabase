@@ -10,6 +10,10 @@ interface SignInWithCustomProps {
   providerName: string
 }
 
+const formatProviderName = (name: string) => {
+  return name.replace('custom:', '')
+}
+
 export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
   const [loading, setLoading] = useState(false)
 
@@ -41,8 +45,8 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
   }
 
   return (
-    <Button block onClick={handleCustomSignIn} size="large" type="default" loading={loading}>
-      Continue with {providerName}
+    <Button block onClick={handleCustomSignIn} size="large" variant="default" loading={loading}>
+      Continue with <span className="capitalize">{formatProviderName(providerName)}</span>
     </Button>
   )
 }

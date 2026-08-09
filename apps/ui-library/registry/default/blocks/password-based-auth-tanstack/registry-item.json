@@ -1,0 +1,75 @@
+{
+  "name": "password-based-auth-tanstack",
+  "type": "registry:block",
+  "title": "Password Based Auth flow for tanstack and Supabase",
+  "description": "Password Based Auth flow for tanstack and Supabase",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "dependencies": ["@supabase/ssr@latest"],
+  "files": [
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/login.tsx",
+      "type": "registry:file",
+      "target": "routes/login.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/error.tsx",
+      "type": "registry:file",
+      "target": "routes/auth/error.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected.tsx",
+      "type": "registry:file",
+      "target": "routes/_protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/protected.tsx",
+      "type": "registry:file",
+      "target": "routes/_protected/protected.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts",
+      "type": "registry:file",
+      "target": "routes/auth/confirm.ts"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/components/login-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up.tsx",
+      "type": "registry:file",
+      "target": "routes/sign-up.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/sign-up-success.tsx",
+      "type": "registry:file",
+      "target": "routes/sign-up-success.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/components/sign-up-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/forgot-password.tsx",
+      "type": "registry:file",
+      "target": "routes/forgot-password.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/update-password.tsx",
+      "type": "registry:file",
+      "target": "routes/update-password.tsx"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/components/forgot-password-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/components/update-password-form.tsx",
+      "type": "registry:component"
+    },
+    {
+      "path": "registry/default/blocks/password-based-auth-tanstack/lib/supabase/fetch-user-server-fn.ts",
+      "type": "registry:lib"
+    }
+  ]
+}

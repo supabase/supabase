@@ -8,12 +8,12 @@ import {
   Badge,
   FormControl,
   FormField,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -28,9 +28,13 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<CreateProjectForm>
+  disableOrganizationSelection: boolean
 }
 
-export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
+export const OrganizationSelector = ({
+  form,
+  disableOrganizationSelection,
+}: OrganizationSelectorProps) => {
   const router = useRouter()
   const { slug } = useParams()
   const queryClient = useQueryClient()
@@ -54,34 +58,36 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
         control={form.control}
         name="organization"
         render={({ field }) => (
-          <FormItemLayout label="Organization" layout="horizontal">
+          <FormItemLayout id="organization" label="Organization" layout="horizontal">
             {(organizations?.length ?? 0) > 0 && (
-              <Select_Shadcn_
-                onValueChange={(slug) => {
-                  field.onChange(slug)
-                  router.push(`/new/${slug}`)
-                }}
-                value={field.value}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Select an organization" />
-                  </SelectTrigger_Shadcn_>
-                </FormControl>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
-                    {organizations?.map((x) => (
-                      <SelectItem_Shadcn_ key={x.id} value={x.slug}>
-                        <div className="flex justify-between items-center gap-2 w-full">
-                          <span>{x.name}</span>
-                          <Badge className="mt-[1px]">{x.plan.name}</Badge>
-                        </div>
-                      </SelectItem_Shadcn_>
-                    ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+              <FormControl>
+                <Select
+                  name="organization"
+                  onValueChange={(slug) => {
+                    field.onChange(slug)
+                    router.push(`/new/${slug}`)
+                  }}
+                  value={field.value}
+                  defaultValue={field.value}
+                  disabled={disableOrganizationSelection}
+                >
+                  <SelectTrigger id="organization">
+                    <SelectValue placeholder="Select an organization" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {organizations?.map((x) => (
+                        <SelectItem key={x.id} value={x.slug}>
+                          <div className="flex justify-between items-center gap-2 w-full">
+                            <span>{x.name}</span>
+                            <Badge className="mt-px">{x.plan.name}</Badge>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
             )}
           </FormItemLayout>
         )}

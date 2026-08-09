@@ -57,11 +57,15 @@ export const FormSchema = z
     name: z.string().min(1, 'Please provide a name for your webhook'),
     table_id: z.string().min(1, 'Please select a table'),
     http_method: z.enum(['GET', 'POST']),
-    timeout_ms: z.coerce
-      .number()
-      .int()
-      .gte(1000, 'Timeout should be at least 1000ms')
-      .lte(10000, 'Timeout should not exceed 10,000ms'),
+    timeout_ms: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Timeout should be at least 1000ms')
+          .lte(10000, 'Timeout should not exceed 10,000ms'),
+      ])
+      .refine((value) => value !== '', 'Timeout is required'),
     events: z.array(z.string()).min(1, 'Please select at least one event'),
     httpHeaders: httpHeadersSchema,
     httpParameters: httpParametersSchema,

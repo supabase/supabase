@@ -1,12 +1,5 @@
 import type { RenderEditCellProps } from 'react-data-grid'
-import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 interface SelectEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
   TRow,
@@ -39,20 +32,20 @@ export function SelectEditor<TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Select_Shadcn_ name="select-editor" defaultValue={value ?? ''} onValueChange={onChange}>
-      <SelectTrigger_Shadcn_ onBlur={onBlur} style={{ width: `${column.width}px` }}>
-        <SelectValue_Shadcn_ id="select-editor" placeholder="NULL" />
-      </SelectTrigger_Shadcn_>
-      <SelectContent_Shadcn_>
-        <SelectGroup_Shadcn_>
-          {isNullable ? <SelectItem_Shadcn_ value={null as any}>NULL</SelectItem_Shadcn_> : null}
+    <Select name="select-editor" defaultValue={value ?? ''} onValueChange={onChange}>
+      <SelectTrigger onBlur={onBlur} style={{ width: `${column.width}px` }}>
+        <SelectValue id="select-editor" placeholder="NULL" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          {isNullable ? <SelectItem value={null as any}>NULL</SelectItem> : null}
           {options.map(({ label, value }) => (
-            <SelectItem_Shadcn_ key={value} value={value}>
+            <SelectItem key={value} value={value}>
               {label}
-            </SelectItem_Shadcn_>
+            </SelectItem>
           ))}
-        </SelectGroup_Shadcn_>
-      </SelectContent_Shadcn_>
-    </Select_Shadcn_>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   )
 }

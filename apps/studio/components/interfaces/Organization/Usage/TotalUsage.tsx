@@ -7,7 +7,7 @@ import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/B
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
 import { SectionContent } from './SectionContent'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import {
   ComputeUsageMetric,
   computeUsageMetricLabel,
@@ -16,6 +16,7 @@ import {
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface ComputeProps {
@@ -37,6 +38,9 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.LOG_STORAGE,
   PricingMetric.LOG_QUERYING,
   PricingMetric.ACTIVE_COMPUTE_HOURS,
+  PricingMetric.ETL_PIPELINE,
+  PricingMetric.ETL_REPLICATED_DATA,
+  PricingMetric.ETL_COPY_BACKFILL_DATA,
 ]
 
 export const TotalUsage = ({
@@ -50,6 +54,8 @@ export const TotalUsage = ({
   const isMobile = useBreakpoint('md')
   const isUsageBillingEnabled = subscription?.usage_billing_enabled
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
+  const { data: org } = useSelectedOrganizationQuery()
+  const hasActiveRestriction = Boolean(org?.restriction_status)
 
   const {
     data: usage,
@@ -154,7 +160,7 @@ export const TotalUsage = ({
 
         {isSuccessUsage && subscription && (
           <div>
-            {showRelationToSubscription && !isOnHigherPlan && (
+            {showRelationToSubscription && !isOnHigherPlan && !hasActiveRestriction && (
               <p className="text-sm">
                 {!hasExceededAnyLimits ? (
                   <span>
@@ -193,7 +199,7 @@ export const TotalUsage = ({
                 )}
               </p>
             )}
-            <div className="grid grid-cols-2 mt-3 gap-[1px] bg-border">
+            <div className="grid grid-cols-2 mt-3 gap-px bg-border">
               {sortedBillingMetrics.map((metric, i) => {
                 return (
                   <div
