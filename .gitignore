@@ -174,3 +174,6 @@ docker/volumes/db/pre_upgrade_dump_all.sql
 docker/.env.unified-auth
 docker/auth.env
 
+docker/az-*/*.env*
+docker/az-*/auth.env
+docker/az-*/.env.unified-auth
