@@ -1,0 +1,33 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Victor at Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Fri, 14 Oct 2022 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/planetpg-victor-rss.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</guid>
+  <title>Postgres Full Text Search vs the rest</title>
+  <link>https://supabase.com/blog/postgres-full-text-search-vs-the-rest</link>
+  <description>Comparing one of the most popular Postgres features against alternatives</description>
+  <pubDate>Fri, 14 Oct 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/choosing-a-postgres-primary-key</guid>
+  <title>Choosing a Postgres Primary Key</title>
+  <link>https://supabase.com/blog/choosing-a-postgres-primary-key</link>
+  <description>Turns out the question of which identifier to use as a Primary Key is complicated -- we&apos;re going to dive into some of the complexity and inherent trade-offs, and figure things out</description>
+  <pubDate>Thu, 08 Sep 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/seen-by-in-postgresql</guid>
+  <title>Implementing &quot;seen by&quot; functionality with Postgres</title>
+  <link>https://supabase.com/blog/seen-by-in-postgresql</link>
+  <description>Different approaches for tracking visitor counts with PostgreSQL.</description>
+  <pubDate>Mon, 18 Jul 2022 00:00:00 -0700</pubDate>
+</item>
+
+    </channel>
+  </rss>

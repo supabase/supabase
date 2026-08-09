@@ -1,0 +1,38 @@
+.day5-grid {
+  grid-template-areas:
+    'commandK    commandK   '
+    'wrappers    wrappers   '
+    'nullable    apiAutodocs'
+    'pgRoles     pgRoles    '
+    'casDeletes  casDeletes '
+    'graphiQL    graphiQL   '
+    'dbWebhooks  dbWebhooks '
+    'viewsTables viewsTables'
+    'JSONsupport JSONsupport'
+    'insights    insights   ';
+}
+
+@media (min-width: 768px) {
+  .day5-grid {
+    grid-template-areas:
+      'commandK    commandK     commandK    commandK   '
+      'wrappers    wrappers     nullable    apiAutodocs'
+      'pgRoles     pgRoles      casDeletes  casDeletes '
+      'pgRoles     pgRoles      casDeletes  casDeletes '
+      'graphiQL    graphiQL     graphiQL    graphiQL   '
+      'dbWebhooks  dbWebhooks   dbWebhooks  dbWebhooks '
+      'viewsTables viewsTables  JSONsupport JSONsupport'
+      'insights    insights     insights    insights   ';
+  }
+}
+
+@media (min-width: 1280px) {
+  .day5-grid {
+    grid-template-areas:
+      'commandK    commandK     commandK    commandK    commandK   commandK'
+      'wrappers    wrappers     nullable    apiAutodocs pgRoles    pgRoles'
+      'casDeletes  casDeletes   graphiQL    graphiQL    pgRoles    pgRoles'
+      'casDeletes  casDeletes   dbWebhooks  dbWebhooks  dbWebhooks dbWebhooks'
+      'viewsTables viewsTables  JSONsupport insights    insights   insights';
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "type": "Announcement",
+    "title": "Edge Functions: Node and native npm compatibility",
+    "description": "We're adding Node and native npm compatibility for Edge Functions",
+    "imgUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
+    "logoUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
+    "organization": "Supabase",
+    "url": "/blog/edge-functions-node-npm",
+    "postMeta": {
+      "name": "laktek",
+      "publishDate": "Dec 12, 2023",
+      "readLength": 5
+    },
+    "ctaText": "Learn more"
+  },
+  {
+    "type": "Announcement",
+    "title": "Supabase Launch Week X Hackathon",
+    "description": "Build an Open Source Project over 10 days. 5 prize categories",
+    "imgUrl": "/images/blog/lwx-hackathon/ogimage.png",
+    "logoUrl": "/images/blog/lwx-hackathon/ogimage.png",
+    "organization": "Supabase",
+    "url": "/blog/supabase-hackathon-lwx",
+    "postMeta": {
+      "name": "ant_wilson",
+      "publishDate": "Dec 05, 2023",
+      "readLength": 3
+    },
+    "ctaText": "Learn more"
+  }
+]

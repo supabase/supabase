@@ -9,26 +9,26 @@
 #   COMPOSE_FILE=docker-compose.yml
 #   COMPOSE_FILE=docker-compose.yml:docker-compose.pg17.yml
 #
-# Manage with: ./run.sh config add <name> | config remove <name>
+# Manage with: sh run.sh config add <name> | config remove <name>
 # (accepts either a short name like 'pg17' or 'docker-compose.pg17.yml')
 #
 # Usage:
-#   ./run.sh start                  # docker compose up -d --wait
-#   ./run.sh stop                   # docker compose down
-#   ./run.sh restart [service]      # restart the stack (or named services)
-#   ./run.sh restart --except <svc>...  # restart all services except the named ones
-#   ./run.sh recreate [service]     # stop then start (or force-recreate one service)
-#   ./run.sh recreate --except <svc>...  # force-recreate all services except the named ones
-#   ./run.sh status                 # docker compose ps
-#   ./run.sh logs [service]         # follow logs (all or one service)
-#   ./run.sh inspect <service>      # docker inspect on a service's container
-#   ./run.sh printenv <service>     # print a service's environment variables
-#   ./run.sh pull                   # pull images
-#   ./run.sh config                 # show the active COMPOSE_FILE list
-#   ./run.sh config add <name>      # add an override to COMPOSE_FILE in .env
-#   ./run.sh config remove <name>   # remove an override from COMPOSE_FILE in .env
-#   ./run.sh compose-config         # dump fully-resolved docker compose config
-#   ./run.sh secrets                # print key passwords and API keys from .env
+#   sh run.sh start                  # docker compose up -d --wait
+#   sh run.sh stop                   # docker compose down
+#   sh run.sh restart [service]      # restart the stack (or named services)
+#   sh run.sh restart --except <svc>...  # restart all services except the named ones
+#   sh run.sh recreate [service]     # stop then start (or force-recreate one service)
+#   sh run.sh recreate --except <svc>...  # force-recreate all services except the named ones
+#   sh run.sh status                 # docker compose ps
+#   sh run.sh logs [service]         # follow logs (all or one service)
+#   sh run.sh inspect <service>      # docker inspect on a service's container
+#   sh run.sh printenv <service>     # print a service's environment variables
+#   sh run.sh pull                   # pull images
+#   sh run.sh config                 # show the active COMPOSE_FILE list
+#   sh run.sh config add <name>      # add an override to COMPOSE_FILE in .env
+#   sh run.sh config remove <name>   # remove an override from COMPOSE_FILE in .env
+#   sh run.sh compose-config         # dump fully-resolved docker compose config
+#   sh run.sh secrets                # print key passwords and API keys from .env
 #
 
 set -e
@@ -98,7 +98,7 @@ write_compose_file() {
 
 ############
 # Docker compose override files to layer on top of docker-compose.yml.
-# Colon-separated list. Manage with ./run.sh config add|remove <name>.
+# Colon-separated list. Manage with: sh run.sh config add|remove <name>.
 #
 # Examples:
 #   COMPOSE_FILE=docker-compose.yml

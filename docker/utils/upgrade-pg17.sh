@@ -6,7 +6,7 @@
 # Upgrade self-hosted Supabase Postgres from 15 to 17.
 #
 # Uses Supabase's pg_upgrade scripts (initiate.sh + complete.sh) inside a
-# temporary PG15 container, then swaps data directories and starts Postgres 17.
+# temporary PG 15 container, then swaps data directories and starts Postgres 17.
 #
 # Usage (must be run as root or with sudo):
 #   cd docker/
@@ -27,8 +27,8 @@
 #   1. docker compose -f docker-compose.yml -f docker-compose.pg17.yml down
 #   2. rm -rf ./volumes/db/data
 #   3. mv ./volumes/db/data.bak.pg15 ./volumes/db/data
-#   4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/
-#   5. docker compose up -d
+#   4. docker compose -f docker-compose.yml -f docker-compose.pg15.yml run --rm db chown -R postgres:postgres /etc/postgresql-custom/
+#   5. docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d
 #
 
 # Ensure we're running under bash (not sh/zsh/dash).
@@ -50,16 +50,24 @@ done
 # --- Configuration ----------------------------------------------------------
 
 # Image used for the upgrade tarball + complete.sh container.
-# Must share glibc with PG15 (the extracted ELF binaries run inside PG15).
+# Must share glibc with PG 15 (the extracted ELF binaries run inside PG15).
+# Pinned to .063: later images bumped glibc, which breaks the ELF extraction.
 PG17_UPGRADE_IMAGE="supabase/postgres:17.6.1.063"
 # Tag in supabase/postgres repo matching the upgrade image (for downloading scripts)
 PG17_SCRIPTS_REF="17.6.1.063"
+
+# Final Postgres 17 image that runs after the upgrade. Pinned here (not read from
+# the compose files). Keep in sync with the db image in docker-compose.yml (and
+# docker-compose.pg17.yml). Used for pulling, chowning data/db-config to the
+# target's postgres UID, and running the post-upgrade migrations.
+PG17_TARGET_IMAGE="supabase/postgres:17.6.1.136"
+
 DB_CONTAINER="supabase-db"
 UPGRADE_CONTAINER="supabase-pg-upgrade"
 COMPLETE_CONTAINER="supabase-pg-complete"
 
-DATA_DIR="./volumes/db/data"
-BACKUP_DIR="./volumes/db/data.bak.pg15"
+DATA_DIR="/opt/supabase/supabase-data/postgres"
+BACKUP_DIR="/opt/supabase/supabase-data/postgres.bak.pg15"
 # Include image tag in cache filename so changing PG17_UPGRADE_IMAGE invalidates it
 PG17_TAG="${PG17_UPGRADE_IMAGE##*:}"
 TARBALL_CACHE="./volumes/db/pg17_upgrade_bin_${PG17_TAG}.tar.gz"
@@ -84,7 +92,8 @@ db_config_vol=""
 # inside Docker - the resulting files are root-owned and can't be deleted
 # by the host user on macOS.
 cleanup() {
-    docker rm -f "$UPGRADE_CONTAINER" >/dev/null 2>&1 || true
+    docker exec "$UPGRADE_CONTAINER" cat /tmp/pg15.log 2>/dev/null || true
+    # docker rm -f "$UPGRADE_CONTAINER" 2>/dev/null || true
     docker rm -f "$COMPLETE_CONTAINER" >/dev/null 2>&1 || true
     if [ -n "$staging_dir" ] && [ -d "$staging_dir" ]; then
         docker run --rm -v "$staging_dir:/cleanup" alpine rm -rf /cleanup 2>/dev/null || true
@@ -96,7 +105,7 @@ trap cleanup EXIT
 on_interrupt() {
     echo ""
     warn "Interrupted. Cleaning up..."
-    # If db-config was chowned to PG17, restore for PG15 rollback
+    # If db-config was chowned to PG17, restore for PG 15 rollback
     if [ -n "$db_config_vol" ] && [ -n "$current_image" ]; then
         docker run --rm -v "${db_config_vol}:/vol" "$current_image" \
             chown -R postgres:postgres /vol/ 2>/dev/null || true
@@ -158,10 +167,6 @@ preflight() {
         | grep -E '^db-config$|_db-config$' | head -n 1)
     [ -n "$db_config_vol" ] || die "Could not find db-config volume. Is Supabase running?"
 
-    # Read the target PG17 image from the compose overlay (what the user will run)
-    PG17_TARGET_IMAGE=$(grep 'image:.*postgres' docker-compose.pg17.yml | awk '{print $2}' | head -n 1)
-    [ -n "$PG17_TARGET_IMAGE" ] || die "Could not read image from docker-compose.pg17.yml."
-
     pg_password=$(grep '^POSTGRES_PASSWORD=' .env | cut -d '=' -f 2- | sed "s/^['\"]//;s/['\"]$//" | head -n 1)
     [ -n "$pg_password" ] || die "POSTGRES_PASSWORD not set in .env."
 
@@ -187,8 +192,8 @@ preflight() {
         warn "  1. docker compose -f docker-compose.yml -f docker-compose.pg17.yml down"
         warn "  2. rm -rf $DATA_DIR"
         warn "  3. mv $BACKUP_DIR $DATA_DIR"
-        warn "  4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
-        warn "  5. docker compose up -d"
+        warn "  4. docker compose -f docker-compose.yml -f docker-compose.pg15.yml run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
+        warn "  5. docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d"
         echo ""
         warn "Continuing will DELETE the existing backup permanently."
         confirm "Delete $BACKUP_DIR and start a fresh upgrade?"
@@ -265,8 +270,8 @@ pull_image() {
 
 # --- Step 2: Build upgrade tarball -----------------------------------------
 #
-# Extracts PG17 binaries, libraries, share data, and upgrade scripts from
-# the PG17 Docker image into a tarball that initiate.sh can consume.
+# Extracts PG 17 binaries, libraries, share data, and upgrade scripts from
+# the PG 17 Docker image into a tarball that initiate.sh can consume.
 #
 # The tarball uses the "non-nix" layout (17/bin, 17/lib, 17/share - no
 # nix_flake_version file), so initiate.sh sets LD_LIBRARY_PATH to find
@@ -281,7 +286,7 @@ build_tarball() {
     echo "  Staging directory: $staging_dir"
 
     # Download upgrade scripts from the supabase/postgres repo (pinned to PG17_SCRIPTS_REF).
-    # These are no longer bundled in the latest PG17 Docker images.
+    # These are no longer bundled in the latest PG 17 Docker images.
     info "Downloading upgrade scripts (ref: $PG17_SCRIPTS_REF)"
     local scripts_base="https://raw.githubusercontent.com/supabase/postgres/${PG17_SCRIPTS_REF}/ansible/files/admin_api_scripts/pg_upgrade_scripts"
     mkdir -p "$staging_dir/scripts"
@@ -407,7 +412,7 @@ stop_and_backup() {
     local key_backup="./volumes/db/pgsodium_root.key.bak.pg15"
     docker run --rm -v "${db_config_vol}:/src:ro" -v "$(pwd)/volumes/db:/dst" \
         alpine cp /src/pgsodium_root.key /dst/pgsodium_root.key.bak.pg15 \
-        || die "Failed to back up pgsodium root key from db-config volume."
+        || warn "Failed to back up pgsodium root key from db-config volume. Ignoring."
     echo "  Saved to: $key_backup"
 
     info "Stopping all Supabase services"
@@ -444,8 +449,11 @@ run_upgrade() {
         infinity
 
     info "Preparing upgrade environment"
+
     docker exec "$UPGRADE_CONTAINER" bash -c '
         # Symlink bind mounts to the paths the upgrade scripts expect
+        mkdir -p /var/lib/postgresql /var/run/postgresql /var/lib/dpkg/updates
+        chown -R postgres:postgres /var/run/postgresql
         rm -rf /var/lib/postgresql/data
         ln -s /mnt/host-pgdata /var/lib/postgresql/data
         ln -s /mnt/host-migration /data_migration
@@ -464,13 +472,18 @@ run_upgrade() {
         sed -i "s|PGSHARENEW=\"\$PG_UPGRADE_BIN_DIR/share\"|PGSHARENEW=\"\$PG_UPGRADE_BIN_DIR/share/postgresql\"|" /tmp/upgrade/initiate.sh
     '
 
+    # Fix ownership on db-config volume in upgrade container to allow pgsodium_getkey.sh
+    if [ -n "$db_config_vol" ]; then
+        docker exec "$UPGRADE_CONTAINER" chown -R postgres:postgres /etc/postgresql-custom 2>/dev/null || true
+    fi
+
     info "Starting Postgres 15 in upgrade container"
     docker exec "$UPGRADE_CONTAINER" bash -c '
         su postgres -c "pg_ctl start -o \"-c config_file=/etc/postgresql/postgresql.conf\" -l /tmp/postgres.log"
     '
     wait_for_healthy "$UPGRADE_CONTAINER"
 
-    # initiate.sh expects the PG17 binaries tarball at /tmp/persistent/pg_upgrade_bin.tar.gz
+    # initiate.sh expects the PG 17 binaries tarball at /tmp/persistent/pg_upgrade_bin.tar.gz
     # (hardcoded path - copied there during container setup above).
     #
     # Env vars for the unwrapped nix ELF binaries in the tarball:
@@ -502,7 +515,7 @@ run_upgrade() {
     docker rm -f "$UPGRADE_CONTAINER" >/dev/null 2>&1 || true
 }
 
-# --- Step 6: Run complete.sh in a native PG17 container -------------------
+# --- Step 6: Run complete.sh in a native PG 17 container -------------------
 #
 # complete.sh applies post-upgrade patches (pg_net grants, vault re-encryption,
 # pg_cron, predefined roles, vacuumdb, etc.). We run it in a PG17 container
@@ -525,8 +538,8 @@ run_complete() {
 
     info "Preparing complete.sh environment"
     # Save original db-config ownership so we can restore it if complete.sh fails.
-    # complete.sh needs PG17 ownership to start postgres, but if it fails the
-    # user needs to fall back to PG15 which uses a different uid.
+    # complete.sh needs PG 17 ownership to start postgres, but if it fails the
+    # user needs to fall back to PG 15 which uses a different uid.
     docker exec "$COMPLETE_CONTAINER" bash -c '
         stat -c "%u:%g" /etc/postgresql-custom/pgsodium_root.key 2>/dev/null > /tmp/dbconfig_owner || true
     '
@@ -536,6 +549,7 @@ run_complete() {
         ln -s /mnt/host-migration /data_migration
 
         # Remove the image default data dir (complete.sh creates a symlink here)
+        mkdir -p /var/lib/postgresql
         rm -rf /var/lib/postgresql/data
 
         # Fix ownership on db-config volume (PG15 uid differs from PG17)
@@ -570,7 +584,7 @@ run_complete() {
         warn "complete.sh failed. Postgres log:"
         docker exec "$COMPLETE_CONTAINER" cat /tmp/postgres.log 2>/dev/null || true
         echo ""
-        # Restore db-config ownership so PG15 can start for rollback
+        # Restore db-config ownership so PG 15 can start for rollback
         warn "Restoring db-config ownership for PG15..."
         local orig_owner
         orig_owner=$(docker exec "$COMPLETE_CONTAINER" cat /tmp/dbconfig_owner 2>/dev/null || true)
@@ -582,7 +596,7 @@ run_complete() {
         echo "  Your Postgres 15 data is unchanged (data swap has not happened yet)."
         echo "  To restart Postgres 15:"
         echo "    rm -rf $MIGRATION_DIR"
-        echo "    docker compose up -d"
+        echo "    docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d"
         echo ""
         die "complete.sh failed (status: $status)"
     fi
@@ -609,7 +623,7 @@ swap_data() {
 start_pg17() {
     info "Starting Supabase with Postgres 17"
 
-    # Ensure db-config volume has correct ownership and structure for PG17.
+    # Ensure db-config volume has correct ownership and structure for PG 17.
     # complete.sh does this too, but just in case of partial
     # failures from previous runs.
     docker run --rm -v "${db_config_vol}:/vol" "$PG17_TARGET_IMAGE" sh -c '
@@ -641,15 +655,28 @@ start_pg17() {
 
 # --- Step 9: Apply migrations not covered by complete.sh -------------------
 #
-# These PG17 migrations run on fresh installs via initdb but not after
+# These PG 17 migrations run on fresh installs via initdb but not after
 # pg_upgrade (init scripts don't rerun when PG_VERSION already exists).
-# complete.sh doesn't cover them either.
+# complete.sh doesn't cover them either. On the platform a tracked migration
+# runner (dbmate) applies them; self-hosted has no such tracking, so we apply
+# the idempotent, safe-on-an-existing-DB ones directly here.
 #
 # Source: postgres/migrations/db/migrations/
 #   - 20250710151649_supabase_read_only_user_default_transaction_read_only.sql
 #   - 20251001204436_predefined_role_grants.sql (supabase_etl_admin + pg_monitor)
 #   - 20251105172723_grant_pg_reload_conf_to_postgres.sql
 #   - 20251121132723_correct_search_path_pgbouncer.sql
+#   - 20260211120934_supabase_privileged_role.sql (target image's supautils.conf
+#     references this role; it must exist or supautils config is broken)
+#   - 20260413000000_fix-authenticator-session-preload-libraries.sql
+#   - 20260421000001_rescope_pg_graphql_access_trigger.sql
+#
+# NOT applied:
+#   - 20260421000000_pg_graphql-off-by-default.sql: drops pg_graphql. Safe on a
+#     fresh install, but destructive on an existing DB that uses pg_graphql.
+#
+# This step also reconciles extension versions (complete.sh ran with the .063
+# binaries) and the pg_cron 1.6 -> 1.6.4 version label. See below.
 
 apply_role_migrations() {
     info "Applying Postgres 17 migrations"
@@ -663,7 +690,7 @@ apply_role_migrations() {
             -c "ALTER DATABASE \"$db\" REFRESH COLLATION VERSION;" || true
     done
 
-    # Create supabase_etl_admin role (doesn't exist in PG15 images).
+    # Create supabase_etl_admin role (doesn't exist in PG 15 images).
     # Must be created before running predefined_role_grants.sql which
     # assumes it exists.
     run_sql_on "$DB_CONTAINER" -c "
@@ -677,7 +704,7 @@ apply_role_migrations() {
         END
         \$\$;" || true
 
-    # Run the migration files directly from the PG17 container image.
+    # Run the migration files directly from the PG 17 container image.
     # They're idempotent (IF EXISTS / IF NOT EXISTS guards).
     local migration_dir="/docker-entrypoint-initdb.d/migrations"
     local migrations="
@@ -685,6 +712,9 @@ apply_role_migrations() {
         20251001204436_predefined_role_grants.sql
         20251105172723_grant_pg_reload_conf_to_postgres.sql
         20251121132723_correct_search_path_pgbouncer.sql
+        20260211120934_supabase_privileged_role.sql
+        20260413000000_fix-authenticator-session-preload-libraries.sql
+        20260421000001_rescope_pg_graphql_access_trigger.sql
     "
 
     for m in $migrations; do
@@ -695,6 +725,54 @@ apply_role_migrations() {
             psql -h localhost -U supabase_admin -d postgres -v ON_ERROR_STOP=1 \
                 -f "${migration_dir}/${m}" || warn "  $m failed (non-fatal)"
     done
+
+    # Reconcile extension versions to the target image. pg_upgrade generates
+    # update_extensions.sql, but complete.sh runs it inside the .063 container, so
+    # extensions only get updated to .063's versions. The final image ships newer
+    # .so files, leaving the catalog version behind what's loaded.
+    #
+    # Mirror what update_extensions.sql does, but against the running target image
+    # and for every installed extension: ALTER EXTENSION ... UPDATE brings each one
+    # up to the image's default version. This is generic on purpose - it tracks the
+    # image (matching platform behavior) and stays correct across future image
+    # bumps without maintaining a hardcoded list. ALTER ... UPDATE is a no-op when
+    # already at the default. Per-extension exceptions are caught so one extension
+    # with no update path (e.g. pg_cron 1.6 -> 1.6.4, handled below) does not abort
+    # the rest.
+    info "Reconciling extension versions to the target image"
+    run_sql_on "$DB_CONTAINER" -c "
+        DO \$\$
+        DECLARE r record;
+        BEGIN
+            FOR r IN SELECT extname FROM pg_extension LOOP
+                BEGIN
+                    EXECUTE format('ALTER EXTENSION %I UPDATE', r.extname);
+                EXCEPTION WHEN OTHERS THEN
+                    RAISE NOTICE 'skipped extension %: %', r.extname, SQLERRM;
+                END;
+            END LOOP;
+        END
+        \$\$;" || warn "extension version reconcile had errors (non-fatal)"
+
+    # pg_cron: PG 15 registers the extension as '1.6'; PG 17 images package it as
+    # '1.6.4' with no '1.6' -> '1.6.4' update path, so ALTER EXTENSION ... UPDATE
+    # has no path to follow. complete.sh only fixes this when pg_cron is owned by
+    # 'postgres' (it drops + recreates). Manually-enabled instances are often
+    # owned by supabase_admin, where that path is skipped. Reconcile the catalog
+    # label directly: the loaded .so and the SQL objects are already
+    # 1.6.4-equivalent (no SQL delta between 1.6 and 1.6.4). No DROP, so any
+    # scheduled jobs are untouched.
+    run_sql_on "$DB_CONTAINER" -c "
+        DO \$\$
+        DECLARE want text;
+        BEGIN
+            SELECT default_version INTO want FROM pg_available_extensions WHERE name = 'pg_cron';
+            IF want IS NOT NULL
+               AND EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron' AND extversion <> want) THEN
+                UPDATE pg_extension SET extversion = want WHERE extname = 'pg_cron';
+            END IF;
+        END
+        \$\$;" || warn "pg_cron version reconcile had errors (non-fatal)"
 }
 
 # --- Step 10: Verify ------------------------------------------------------
@@ -726,8 +804,8 @@ verify() {
     echo "    1. docker compose -f docker-compose.yml -f docker-compose.pg17.yml down"
     echo "    2. rm -rf $DATA_DIR"
     echo "    3. mv $BACKUP_DIR $DATA_DIR"
-    echo "    4. docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
-    echo "    5. docker compose up -d"
+    echo "    4. docker compose -f docker-compose.yml -f docker-compose.pg15.yml run --rm db chown -R postgres:postgres /etc/postgresql-custom/"
+    echo "    5. docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d"
     echo ""
 }
 

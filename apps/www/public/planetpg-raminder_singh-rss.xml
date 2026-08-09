@@ -1,0 +1,26 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Raminder Singh at Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Thu, 11 Apr 2024 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/planetpg-raminder_singh-rss.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid>https://supabase.com/blog/postgres-roles-and-privileges</guid>
+  <title>Postgres Roles and Privileges</title>
+  <link>https://supabase.com/blog/postgres-roles-and-privileges</link>
+  <description>A guide to Postgres roles and privileges</description>
+  <pubDate>Thu, 11 Apr 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/how-pg-graphql-works</guid>
+  <title>How pg_graphql works</title>
+  <link>https://supabase.com/blog/how-pg-graphql-works</link>
+  <description>An insight into the internals of GraphQL in Postgres using pg_graphql, and how you can contribute.</description>
+  <pubDate>Wed, 24 Jan 2024 00:00:00 -0700</pubDate>
+</item>
+
+    </channel>
+  </rss>

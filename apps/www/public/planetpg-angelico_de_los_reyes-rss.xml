@@ -1,0 +1,40 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>'Postgres | Supabase Blog</title>
+      <link>https://supabase.com/blog</link>
+      <description>Latest Postgres news from Angelico de los Reyes at Supabase</description>
+      <language>en</language>
+      <lastBuildDate>Fri, 16 Dec 2022 00:00:00 -0700</lastBuildDate>
+      <atom:link href="https://supabase.com/planetpg-angelico_de_los_reyes-rss.xml" rel="self" type="application/rss+xml"/>
+      <item>
+  <guid>https://supabase.com/blog/postgres-point-in-time-recovery</guid>
+  <title>Point in Time Recovery is now available for Pro projects</title>
+  <link>https://supabase.com/blog/postgres-point-in-time-recovery</link>
+  <description>We&apos;re making PITR available for more projects, with a new Dashboard UI that makes it simple to use.</description>
+  <pubDate>Fri, 16 Dec 2022 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/continuous-postgresql-backup-walg</guid>
+  <title>Continuous PostgreSQL Backups using WAL-G</title>
+  <link>https://supabase.com/blog/continuous-postgresql-backup-walg</link>
+  <description>Have you ever wanted to restore your database&apos;s state to a particular moment in time? This post explains how, using WAL-G.</description>
+  <pubDate>Sun, 02 Aug 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-templates</guid>
+  <title>What are PostgreSQL Templates?</title>
+  <link>https://supabase.com/blog/postgresql-templates</link>
+  <description>What are PostgreSQL templates and what are they used for?</description>
+  <pubDate>Thu, 09 Jul 2020 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgresql-physical-logical-backups</guid>
+  <title>Physical vs Logical Backups in PostgreSQL</title>
+  <link>https://supabase.com/blog/postgresql-physical-logical-backups</link>
+  <description>What are physical and logical backups in Postgres?</description>
+  <pubDate>Tue, 07 Jul 2020 00:00:00 -0700</pubDate>
+</item>
+
+    </channel>
+  </rss>

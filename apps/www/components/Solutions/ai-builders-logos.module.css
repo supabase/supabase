@@ -1,0 +1,49 @@
+.logo {
+  --duration: 500ms;
+  --curve: ease;
+
+  &[data-animate='false'] {
+    &[data-state='enter'] {
+      opacity: 0;
+      animation: none;
+    }
+    &[data-state='exit'] {
+      opacity: 1;
+      animation: none;
+    }
+  }
+
+  &[data-state='enter'][data-animate='true'] {
+    animation: enter var(--duration) var(--curve) var(--delay) both;
+  }
+
+  &[data-state='exit'][data-animate='true'] {
+    animation: exit var(--duration) var(--curve) var(--delay) both;
+  }
+}
+
+@keyframes enter {
+  0% {
+    translate: 0 32px;
+    filter: blur(4px);
+    opacity: 0;
+  }
+  100% {
+    translate: 0 0;
+    filter: blur(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes exit {
+  0% {
+    translate: 0 0;
+    filter: blur(0px);
+    opacity: 1;
+  }
+  100% {
+    translate: 0 -32px;
+    filter: blur(4px);
+    opacity: 0;
+  }
+}

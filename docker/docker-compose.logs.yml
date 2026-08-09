@@ -1,0 +1,99 @@
+# This override adds the following to the self-hosted Supabase configuration:
+#   - Logflare: Log management and event analytics platform
+#   - Vector: High-performance observability data pipeline for logs
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.logs.yml up -d
+
+services:
+
+  studio:
+    depends_on:
+      analytics:
+        condition: service_healthy
+    environment:
+      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
+      LOGFLARE_URL: http://analytics:4000
+      ENABLED_FEATURES_LOGS_ALL: "true"
+
+  analytics:
+    container_name: supabase-analytics
+    image: supabase/logflare:1.43.1
+    restart: unless-stopped
+    #ports:
+    #  - 4000:4000
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sSfL -o /dev/null http://localhost:4000/health"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      db:
+        # Disable this if you are using an external Postgres database
+        condition: service_healthy
+    environment:
+      LOGFLARE_NODE_HOST: 127.0.0.1
+
+      DB_USERNAME: supabase_admin
+      DB_DATABASE: _supabase
+      DB_HOSTNAME: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_SCHEMA: _analytics
+
+      # Enable single-tenant mode for Logflare
+      LOGFLARE_SINGLE_TENANT: "true"
+      # Seed Supabase-related metadata
+      LOGFLARE_SUPABASE_MODE: "true"
+
+      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
+      LOGFLARE_PRIVATE_ACCESS_TOKEN: ${LOGFLARE_PRIVATE_ACCESS_TOKEN}
+
+      LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
+
+      # Comment out the following two variables when switching to
+      # the BigQuery backend for logs
+      POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/_supabase
+      POSTGRES_BACKEND_SCHEMA: _analytics
+
+      # Uncomment to use the BigQuery backend for logs
+      #GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
+      #GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
+    # Uncomment to use the BigQuery backend for logs (requires gcloud.json
+    # service account key from Google Cloud Console)
+    #volumes:
+    #  - ./gcloud.json:/opt/app/rel/logflare/bin/gcloud.json:ro,z
+
+  vector:
+    container_name: supabase-vector
+    image: timberio/vector:0.53.0-alpine
+    restart: unless-stopped
+    volumes:
+      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro,z
+      - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro,z
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://vector:9001/health"
+        ]
+      timeout: 5s
+      interval: 5s
+      retries: 3
+    depends_on:
+      analytics:
+        condition: service_healthy
+    environment:
+      LOGFLARE_PUBLIC_ACCESS_TOKEN: ${LOGFLARE_PUBLIC_ACCESS_TOKEN}
+    command:
+      [
+        "--config",
+        "/etc/vector/vector.yml"
+      ]
+    security_opt:
+      - "label=disable"

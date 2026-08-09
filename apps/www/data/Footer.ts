@@ -1,0 +1,218 @@
+import {
+  appTypeSolutions,
+  migrationSolutions,
+  skillBasedSolutions,
+  useCaseSolutions,
+} from 'data/Solutions'
+import { PrivacySettings } from 'ui-patterns/PrivacySettings'
+
+const footerData = [
+  {
+    title: 'Product',
+    links: [
+      {
+        text: 'Pricing',
+        url: '/pricing',
+      },
+      {
+        text: 'Database',
+        url: '/database',
+      },
+      {
+        text: 'Auth',
+        url: '/auth',
+      },
+      {
+        text: 'Functions',
+        url: '/edge-functions',
+      },
+      {
+        text: 'Realtime',
+        url: '/realtime',
+      },
+      {
+        text: 'Storage',
+        url: '/storage',
+      },
+      {
+        text: 'Vector',
+        url: '/modules/vector',
+      },
+      {
+        text: 'Cron',
+        url: '/modules/cron',
+      },
+      {
+        text: 'Feature Catalog',
+        url: '/features',
+      },
+      {
+        text: 'Launch Week',
+        url: '/launch-week',
+      },
+    ],
+  },
+  {
+    title: 'Solutions',
+    links: [
+      ...skillBasedSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...useCaseSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...appTypeSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+      ...migrationSolutions.solutions.map((solution) => ({
+        text: solution.text,
+        url: solution.url,
+      })),
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      {
+        text: 'Blog',
+        url: '/blog',
+      },
+      {
+        text: 'Support',
+        url: '/support',
+      },
+      {
+        text: 'System Status',
+        url: 'https://status.supabase.com/',
+      },
+      {
+        text: 'Become a Partner',
+        url: '/partners',
+      },
+      {
+        text: 'Partner Catalog',
+        url: '/partners/catalog',
+      },
+      {
+        text: 'Brand Assets',
+        url: '/brand-assets',
+      },
+      {
+        text: 'Security & Compliance',
+        url: '/security',
+      },
+      {
+        text: 'DPA',
+        url: '/legal/dpa',
+      },
+      {
+        text: 'SOC2',
+        url: '/security',
+      },
+      {
+        text: 'HIPAA',
+        url: 'https://forms.supabase.com/hipaa2',
+      },
+    ],
+  },
+  {
+    title: 'Developers',
+    links: [
+      {
+        text: 'Documentation',
+        url: '/docs',
+      },
+      {
+        text: 'Supabase UI',
+        url: 'https://supabase.com/ui',
+      },
+      {
+        text: 'Changelog',
+        url: '/changelog',
+      },
+      {
+        text: 'RSS',
+        url: '/rss.xml',
+      },
+    ],
+  },
+  {
+    title: 'Community',
+    links: [
+      {
+        text: 'Events & Webinars',
+        url: '/events',
+      },
+      {
+        text: 'SupaSquad',
+        url: '/supasquad',
+      },
+      {
+        text: 'Contributing',
+        url: 'https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md',
+      },
+      {
+        text: 'Open Source',
+        url: '/open-source',
+      },
+      {
+        text: 'DevTo',
+        url: 'https://dev.to/supabase',
+      },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      {
+        text: 'Company',
+        url: '/company',
+      },
+      {
+        text: 'Careers',
+        url: '/careers',
+      },
+      {
+        text: 'General Availability',
+        url: '/ga',
+      },
+      {
+        text: 'Legal Hub',
+        url: '/legal',
+      },
+      {
+        text: 'Privacy Policy',
+        url: '/privacy',
+      },
+      {
+        text: 'Privacy Settings',
+        component: PrivacySettings,
+      },
+      {
+        text: 'Acceptable Use Policy',
+        url: '/aup',
+      },
+      {
+        text: 'Humans.txt',
+        url: '/humans.txt',
+      },
+      {
+        text: 'Lawyers.txt',
+        url: '/lawyers.txt',
+      },
+      {
+        text: 'Security.txt',
+        url: '/.well-known/security.txt',
+      },
+      {
+        text: 'Contact Us',
+        url: '/contact-us',
+      },
+    ],
+  },
+]
+
+export default footerData

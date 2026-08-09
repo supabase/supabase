@@ -1,0 +1,113 @@
+.border-gradient {
+  --color1: #0a5c36;
+  --color2: #2ecc71;
+  --color3: #b44bff;
+  --angle: 0deg;
+
+  border: none;
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.border-gradient::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  left: 50%;
+  top: 50%;
+  border-radius: 6px;
+  transform: translate3d(-50%, -50%, -2px);
+  background: linear-gradient(var(--angle), var(--color1), var(--color2), var(--color3));
+  filter: blur(0);
+  animation: animate-bg 10s linear infinite alternate;
+}
+
+.border-gradient::before {
+  transform: translate3d(-50%, -50%, -1px);
+  backdrop-filter: blur(0);
+}
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --color1 {
+  syntax: '<color>';
+  initial-value: #0a5c36;
+  inherits: false;
+}
+
+@property --color2 {
+  syntax: '<color>';
+  initial-value: #2ecc71;
+  inherits: false;
+}
+
+@property --color3 {
+  syntax: '<color>';
+  initial-value: #b44bff;
+  inherits: false;
+}
+
+@keyframes animate-bg {
+  0% {
+    --angle: 0deg;
+    --color1: #0a5c36;
+    --color2: #2ecc71;
+    --color3: #b44bff;
+  }
+  12.5% {
+    --angle: 45deg;
+    --color1: #2ecc71;
+    --color2: #b44bff;
+    --color3: #0a5c36;
+  }
+  25% {
+    --angle: 90deg;
+    --color1: #b44bff;
+    --color2: #0a5c36;
+    --color3: #2ecc71;
+  }
+  37.5% {
+    --angle: 135deg;
+    --color1: #0a5c36;
+    --color2: #2ecc71;
+    --color3: #b44bff;
+  }
+  50% {
+    --angle: 180deg;
+    --color1: #2ecc71;
+    --color2: #b44bff;
+    --color3: #0a5c36;
+  }
+  62.5% {
+    --angle: 225deg;
+    --color1: #b44bff;
+    --color2: #0a5c36;
+    --color3: #2ecc71;
+  }
+  75% {
+    --angle: 270deg;
+    --color1: #0a5c36;
+    --color2: #2ecc71;
+    --color3: #b44bff;
+  }
+  87.5% {
+    --angle: 315deg;
+    --color1: #2ecc71;
+    --color2: #b44bff;
+    --color3: #0a5c36;
+  }
+  100% {
+    --angle: 360deg;
+    --color1: #0a5c36;
+    --color2: #2ecc71;
+    --color3: #b44bff;
+  }
+}
