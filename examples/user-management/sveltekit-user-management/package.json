@@ -1,0 +1,27 @@
+{
+  "name": "supabase-sveltekit",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^7.0.1",
+    "@sveltejs/kit": "^2.55.0",
+    "@sveltejs/vite-plugin-svelte": "^6.0.0",
+    "svelte": "^5.54.1",
+    "svelte-check": "^4.4.5",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@supabase/ssr": "latest",
+    "@supabase/supabase-js": "^2"
+  }
+}
