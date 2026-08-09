@@ -8,7 +8,7 @@ import {
   FieldValues,
   useFieldArray,
 } from 'react-hook-form'
-import { Button, cn, FormControl, FormField, FormItem, FormMessage, Input_Shadcn_ } from 'ui'
+import { Button, cn, FormControl, FormField, FormItem, FormMessage, Input } from 'ui'
 
 export interface SingleValueFieldArrayProps<
   TFieldValues extends FieldValues,
@@ -27,17 +27,17 @@ export interface SingleValueFieldArrayProps<
   removeLabel?: string
   disabled?: boolean
   minimumRows?: number
-  inputSize?: React.ComponentProps<typeof Input_Shadcn_>['size']
+  inputSize?: React.ComponentProps<typeof Input>['size']
   inputAutoComplete?: string
   className?: string
   rowsClassName?: string
   rowClassName?: string
   inputClassName?: string
   addButtonClassName?: string
-  addButtonType?: React.ComponentProps<typeof Button>['type']
+  addButtonType?: React.ComponentProps<typeof Button>['variant']
   addButtonSize?: React.ComponentProps<typeof Button>['size']
   removeButtonClassName?: string
-  removeButtonType?: React.ComponentProps<typeof Button>['type']
+  removeButtonType?: React.ComponentProps<typeof Button>['variant']
   removeButtonSize?: React.ComponentProps<typeof Button>['size']
 }
 
@@ -95,7 +95,7 @@ export const SingleValueFieldArray = <
               render={({ field }) => (
                 <FormItem className="flex-1">
                   <FormControl>
-                    <Input_Shadcn_
+                    <Input
                       {...field}
                       size={inputSize}
                       autoComplete={inputAutoComplete}
@@ -110,9 +110,9 @@ export const SingleValueFieldArray = <
             />
 
             <Button
-              type={removeButtonType}
+              variant={removeButtonType}
               size={removeButtonSize}
-              htmlType="button"
+              type="button"
               icon={<Trash size={12} />}
               aria-label={removeLabel}
               disabled={disableRemove}
@@ -125,9 +125,9 @@ export const SingleValueFieldArray = <
 
       <div className="flex items-center">
         <Button
-          type={addButtonType}
+          variant={addButtonType}
           size={addButtonSize}
-          htmlType="button"
+          type="button"
           icon={<Plus strokeWidth={1.5} />}
           disabled={disabled}
           onClick={() => append(createEmptyRow())}

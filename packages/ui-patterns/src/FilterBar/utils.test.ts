@@ -17,7 +17,6 @@ import {
   isSyncOptionsFunction,
   removeFromGroup,
   resolvePropertyChange,
-  truncateText,
   updateNestedLogicalOperator,
   updateNestedOperator,
   updateNestedPropertyName,
@@ -477,24 +476,6 @@ describe('FilterBar Utils', () => {
     })
   })
 
-  describe('truncateText', () => {
-    it('returns text unchanged if under max length', () => {
-      expect(truncateText('hello', 10)).toBe('hello')
-    })
-
-    it('returns text unchanged if exactly max length', () => {
-      expect(truncateText('hello', 5)).toBe('hello')
-    })
-
-    it('truncates text and adds ellipsis if over max length', () => {
-      expect(truncateText('hello world', 5)).toBe('hello...')
-    })
-
-    it('handles empty string', () => {
-      expect(truncateText('', 10)).toBe('')
-    })
-  })
-
   describe('getActionItemLabel', () => {
     it('returns original label for non-action items', () => {
       const item: MenuItem = { value: 'test', label: 'Test Label' }
@@ -516,14 +497,16 @@ describe('FilterBar Utils', () => {
       expect(getActionItemLabel(item)).toBe('Ask AI: "Find users"')
     })
 
-    it('truncates long input values at 30 characters', () => {
+    it('returns full input value (no truncation — CSS handles overflow)', () => {
       const item: MenuItem = {
         value: 'ai',
         label: 'Filter by AI',
         isAction: true,
         actionInputValue: 'Find all users who registered in the last 30 days',
       }
-      expect(getActionItemLabel(item)).toBe('Ask AI: "Find all users who registered ..."')
+      expect(getActionItemLabel(item)).toBe(
+        'Ask AI: "Find all users who registered in the last 30 days"'
+      )
     })
   })
 

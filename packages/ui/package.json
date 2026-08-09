@@ -9,16 +9,16 @@
     "preinstall": "npx only-allow pnpm",
     "typecheck": "tsc --noEmit",
     "generate-tailwind-classes": "tsx ./scripts/generate-tailwind-classes.ts",
-    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
     "test:report": "open coverage/lcov-report/index.html"
   },
   "dependencies": {
-    "@tailwindcss/forms": "^0.5.0",
-    "@tailwindcss/typography": "^0.5.9",
-    "class-variance-authority": "^0.6.1",
-    "clsx": "^1.2.1",
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.19",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "color": "^4.2.3",
     "date-fns": "^2.30.0",
@@ -38,13 +38,15 @@
     "react-resizable-panels": "^4.6.5",
     "recharts": "catalog:",
     "sonner": "^1.5.0",
-    "tailwind-merge": "^1.13.2",
+    "tailwind-merge": "^3.5.0",
     "tailwindcss": "catalog:",
-    "vaul": "^0.9.9"
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
+    "@hookform/resolvers": "^3.1.1",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.0.0",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -54,6 +56,7 @@
     "config": "workspace:*",
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

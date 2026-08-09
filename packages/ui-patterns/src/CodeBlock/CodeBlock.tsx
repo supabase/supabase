@@ -31,27 +31,34 @@ import { Button, cn, copyToClipboard } from 'ui'
 
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
-export type CodeBlockLang =
-  | 'js'
-  | 'jsx'
-  | 'sql'
-  | 'py'
-  | 'bash'
-  | 'ts'
-  | 'dart'
-  | 'json'
-  | 'csharp'
-  | 'kotlin'
-  | 'curl'
-  | 'http'
-  | 'php'
-  | 'python'
-  | 'go'
-  | 'pgsql'
-  | 'swift'
-  | 'yaml'
-  | 'toml'
-  | 'html'
+const codeBlockLangs = [
+  'js',
+  'jsx',
+  'sql',
+  'py',
+  'bash',
+  'ts',
+  'dart',
+  'json',
+  'csharp',
+  'kotlin',
+  'curl',
+  'http',
+  'php',
+  'python',
+  'go',
+  'pgsql',
+  'swift',
+  'yaml',
+  'toml',
+  'html',
+] as const
+
+export type CodeBlockLang = (typeof codeBlockLangs)[number]
+
+export function isCodeBlockLang(lang: string): lang is CodeBlockLang {
+  return (codeBlockLangs as readonly string[]).includes(lang)
+}
 
 export interface CodeBlockProps {
   title?: ReactNode
@@ -195,7 +202,7 @@ export const CodeBlock = ({
             wrapLines={wrapLines}
             style={monokaiTheme}
             className={cn(
-              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100 outline-none focus:border-foreground-lighter/50',
+              'code-block border border-surface p-4 w-full my-0! !bg-surface-100 outline-hidden focus:border-foreground-lighter/50',
               `${!title ? 'rounded-md' : 'rounded-t-none rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
               className
@@ -212,10 +219,10 @@ export const CodeBlock = ({
                     display: 'block',
                     backgroundColor: styleConfig?.highlightBackgroundColor
                       ? styleConfig?.highlightBackgroundColor
-                      : 'hsl(var(--background-selection))',
+                      : 'var(--background-selection)',
                     borderLeft: highlightBorder
-                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'hsl(var(--foreground-default)'})`
-                      : null,
+                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'var(--foreground-default)'}`
+                      : undefined,
                   },
                   class: 'hljs-line-highlight',
                 }
@@ -260,8 +267,8 @@ export const CodeBlock = ({
               ].join(' ')}
             >
               <Button
-                type="default"
-                className="px-1.5"
+                variant="default"
+                className="px-1.5 dark:bg-200! dark:hover:bg-button! hover:bg-alternative!"
                 icon={copied ? <Check /> : <Copy />}
                 onClick={() => onSelectCopy(value || children)}
               >

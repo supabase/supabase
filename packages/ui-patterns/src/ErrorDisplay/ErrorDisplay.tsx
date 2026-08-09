@@ -4,7 +4,7 @@ import { HelpCircle } from 'lucide-react'
 import { forwardRef, useEffect, useRef } from 'react'
 import { Card, CardHeader, cn } from 'ui'
 
-import { WarningIcon } from '../admonition'
+import { WarningIcon } from '../Admonition'
 import type { ErrorDisplayProps, SupportFormParams } from './ErrorDisplay.types'
 
 export type { SupportFormParams } from './ErrorDisplay.types'
@@ -60,7 +60,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
         </CardHeader>
 
         <div className="px-4 py-3 bg-warning-200 border-y border-warning-500">
-          <pre className="text-xs font-mono text-warning-600 whitespace-pre-wrap break-words overflow-auto max-h-32">
+          <pre className="text-xs font-mono text-warning-600 whitespace-pre-wrap wrap-break-word overflow-auto max-h-32">
             {errorMessage}
           </pre>
         </div>
@@ -68,7 +68,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
         {children && <div>{children}</div>}
 
         <div className="px-3 py-2 border-t border-default flex items-center gap-2">
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <HelpCircle className="h-4 w-4 text-foreground-muted" />
           </div>
           <span className="text-sm text-foreground-light">Need help?</span>
@@ -76,7 +76,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
             href={supportUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-foreground flex-shrink-0 underline hover:text-foreground-light transition-colors"
+            className="text-sm text-foreground shrink-0 underline hover:text-foreground-light transition-colors"
             onClick={onSupportClick}
           >
             {supportLabel}
