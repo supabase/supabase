@@ -81,6 +81,16 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
     debounceMs = 1000,
   } = deps
 
+  /**
+   * Snippet ids whose pending save still owes a list invalidation. `debounce`
+   * keeps only the *last* call's arguments, so an invalidating save (a rename,
+   * a favorite toggle, an AI-generated title) coalesced with a later
+   * non-invalidating one (a keystroke) would otherwise drop its invalidation
+   * and leave the snippet lists stale. Latched here until the save that owes
+   * the invalidation actually performs it.
+   */
+  const pendingInvalidation = new Set<string>()
+
   async function saveSnippet({ id, projectRef, shouldInvalidate }: SaveSnippetArgs) {
     const snippet = state.snippets[id]?.snippet
     // Only persist a snippet whose content has been loaded — otherwise we would
@@ -92,6 +102,7 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
       snippet.status = statusOnSaveStart(snippet.status)
       await upsertContent({ projectRef, payload })
       if (shouldInvalidate) await invalidate(projectRef)
+      pendingInvalidation.delete(id)
       snippet.status = statusOnSaveSuccess()
     } catch (error) {
       snippet.status = statusOnSaveError(snippet.status)
@@ -102,7 +113,11 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
 
   /** Debounced per snippet id; rapid edits to one snippet coalesce to one save. */
   function scheduleSaveSnippet(args: SaveSnippetArgs) {
-    memoizedSaveSnippet(args.id)(args)
+    if (args.shouldInvalidate) pendingInvalidation.add(args.id)
+    memoizedSaveSnippet(args.id)({
+      ...args,
+      shouldInvalidate: pendingInvalidation.has(args.id),
+    })
   }
 
   async function createFolder({ projectRef, name, placeholderId }: CreateFolderArgs) {
