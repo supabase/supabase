@@ -1,18 +1,22 @@
-import { render } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { NotebookEditor } from '../NotebookEditor'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
+import { customRender } from '@/tests/lib/custom-render'
 
 const { mockUseParams, mockAddTab } = vi.hoisted(() => ({
   mockUseParams: vi.fn(),
   mockAddTab: vi.fn(),
 }))
 
-vi.mock('common', () => ({
-  useParams: () => mockUseParams(),
-}))
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    useParams: () => mockUseParams(),
+  }
+})
 
 vi.mock('@/state/tabs', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/state/tabs')>()
@@ -55,7 +59,7 @@ describe('NotebookEditor tab registration', () => {
       notebook: makeNotebook('notebook-1', { name: 'My Notebook' }),
     })
 
-    render(<NotebookEditor />)
+    customRender(<NotebookEditor />)
 
     expect(mockAddTab).toHaveBeenCalledTimes(1)
     expect(mockAddTab).toHaveBeenCalledWith({
@@ -63,24 +67,26 @@ describe('NotebookEditor tab registration', () => {
       type: 'notebook',
       label: 'My Notebook',
       metadata: { notebookId: 'notebook-1' },
+      isPreview: false,
     })
   })
 
   it('falls back to "New Notebook" as the label when the notebook has not loaded yet', () => {
-    render(<NotebookEditor />)
+    customRender(<NotebookEditor />)
 
     expect(mockAddTab).toHaveBeenCalledWith({
       id: 'notebook-notebook-1',
       type: 'notebook',
       label: 'New Notebook',
       metadata: { notebookId: 'notebook-1' },
+      isPreview: false,
     })
   })
 
   it('does not register a tab when there is no id in the route', () => {
     mockUseParams.mockReturnValue({ ref: 'default', id: undefined })
 
-    render(<NotebookEditor />)
+    customRender(<NotebookEditor />)
 
     expect(mockAddTab).not.toHaveBeenCalled()
   })
