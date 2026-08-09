@@ -235,6 +235,12 @@ schema, `onChange`, rendering, and the submit mapping.
 
 - Gate Save on `isDirty`; show Cancel only when dirty. In the owner, destructure
   from `form.formState`; anywhere else, `useFormState({ control })`.
+- When the form lives in a Sheet or Dialog, also wire dirty dismissal:
+  `useConfirmOnClose` + `DiscardChangesConfirmationDialog`. Route Cancel,
+  Escape, and backdrop through the guard; call the raw `onClose` on successful
+  submit so you do not prompt after save. Details:
+  `apps/design-system/content/docs/ui-patterns/modality.mdx` (Dirty form
+  dismissal) and the studio-ui-patterns skill Sheets section.
 - To show _which_ fields changed (review/summary dialogs), read `dirtyFields`
   from the same subscription instead of hand-comparing
   `defaultValues.x !== watchedX`. RHF already does that comparison correctly;

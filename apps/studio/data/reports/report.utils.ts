@@ -1,7 +1,7 @@
 import { type ComparisonOperator } from '@/components/interfaces/Reports/v2/ReportsNumericFilter'
 import { AnalyticsInterval } from '@/data/analytics/constants'
-import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 
 export type Granularity = 'minute' | 'hour' | 'day'
@@ -66,49 +66,19 @@ export const REPORT_STATUS_CODE_COLORS: { [key: string]: { light: string; dark: 
   default: { light: '#757575', dark: '#9E9E9E' },
 }
 
-export const useEdgeFnIdToName = ({ projectRef }: { projectRef: string }) => {
-  const { data: edgeFunctions, isPending: isLoading } = useEdgeFunctionsQuery({
-    projectRef,
-  })
-
-  function edgeFnIdToName(id: string) {
-    return edgeFunctions?.find((fn) => fn.id === id)?.name
-  }
-
-  return {
-    edgeFnIdToName,
-    isLoading,
-  }
-}
-
 export async function fetchLogs(
   projectRef: string,
   sql: SafeLogSqlFragment,
   startDate: string,
-  endDate: string
+  endDate: string,
+  useOtel = false
 ) {
   return await executeAnalyticsSql({
     projectRef,
-    endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+    endpoint: logsAllEndpointUrl(useOtel),
     sql,
     iso_timestamp_start: startDate,
     iso_timestamp_end: endDate,
     method: 'get',
   })
-}
-
-export const STATUS_CODE_COLORS: { [key: string]: { light: string; dark: string } } = {
-  '400': { light: '#FFD54F', dark: '#FFF176' },
-  '401': { light: '#FF8A65', dark: '#FFAB91' },
-  '403': { light: '#FFB74D', dark: '#FFCC80' },
-  '404': { light: '#90A4AE', dark: '#B0BEC5' },
-  '409': { light: '#BA68C8', dark: '#CE93D8' },
-  '410': { light: '#A1887F', dark: '#BCAAA4' },
-  '422': { light: '#FF9800', dark: '#FFB74D' },
-  '429': { light: '#E65100', dark: '#F57C00' },
-  '500': { light: '#B71C1C', dark: '#D32F2F' },
-  '502': { light: '#9575CD', dark: '#B39DDB' },
-  '503': { light: '#0097A7', dark: '#4DD0E1' },
-  '504': { light: '#C0CA33', dark: '#D4E157' },
-  default: { light: '#757575', dark: '#9E9E9E' },
 }
