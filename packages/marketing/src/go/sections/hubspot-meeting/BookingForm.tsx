@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button, Input_Shadcn_ } from 'ui'
+import { Button, Input } from 'ui'
 
 interface BookingFormProps {
   onSubmit: (data: {
@@ -86,7 +86,7 @@ export default function BookingForm({
           <label htmlFor="hs-firstName" className="text-foreground-light text-sm font-medium">
             First name *
           </label>
-          <Input_Shadcn_
+          <Input
             id="hs-firstName"
             type="text"
             required
@@ -100,7 +100,7 @@ export default function BookingForm({
           <label htmlFor="hs-lastName" className="text-foreground-light text-sm font-medium">
             Last name *
           </label>
-          <Input_Shadcn_
+          <Input
             id="hs-lastName"
             type="text"
             required
@@ -114,7 +114,7 @@ export default function BookingForm({
           <label htmlFor="hs-email" className="text-foreground-light text-sm font-medium">
             Email *
           </label>
-          <Input_Shadcn_
+          <Input
             id="hs-email"
             type="email"
             required
@@ -130,7 +130,7 @@ export default function BookingForm({
             <button
               type="button"
               onClick={onDismissError}
-              className="text-destructive-600/60 hover:text-destructive-600 transition-colors flex-shrink-0 p-0.5"
+              className="text-destructive-600/60 hover:text-destructive-600 transition-colors shrink-0 p-0.5"
               aria-label="Dismiss error"
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -146,8 +146,8 @@ export default function BookingForm({
         )}
 
         <Button
-          htmlType="submit"
-          type="primary"
+          type="submit"
+          variant="primary"
           disabled={!isValid || isSubmitting}
           loading={isSubmitting}
           size="medium"
