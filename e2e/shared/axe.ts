@@ -1,25 +1,68 @@
-interface AxeNodeLike {
-  target: unknown[]
-  html: string
-}
-
-interface AxeViolationLike {
-  id: string
-  impact?: string | null
-  help: string
-  nodes: AxeNodeLike[]
-}
+import { AxeBuilder } from '@axe-core/playwright'
+import type { Page } from '@playwright/test'
+import type { Result } from 'axe-core'
 
 export const MAX_REPORTED_NODES = 5
 
 export const MAX_REPORTED_HTML = 200
 
-export function violationIds(violations: AxeViolationLike[]): string[] {
+export type ScanOptions = {
+  rules?: string[]
+  tags?: string[]
+  excludeRules?: string[]
+  include?: string
+}
+
+export async function settleForAxe(page: Page): Promise<void> {
+  await page.waitForLoadState('domcontentloaded')
+  await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
+
+  await page
+    .evaluate(
+      ({ quietMs, capMs }) =>
+        new Promise<void>((resolve) => {
+          let timer: ReturnType<typeof setTimeout>
+          const observer = new MutationObserver(() => {
+            clearTimeout(timer)
+            timer = setTimeout(finish, quietMs)
+          })
+
+          function finish() {
+            clearTimeout(cap)
+            clearTimeout(timer)
+            observer.disconnect()
+            resolve()
+          }
+
+          const cap = setTimeout(finish, capMs)
+          timer = setTimeout(finish, quietMs)
+          observer.observe(document.body, { subtree: true, childList: true, attributes: true })
+        }),
+      { quietMs: 500, capMs: 5_000 }
+    )
+    .catch(() => {})
+}
+
+// Legacy mode keeps cross-origin embeds out of the scan. Rules and tags are
+// mutually exclusive in one axe run, so `rules` wins when both are given.
+export async function scan(page: Page, options: ScanOptions): Promise<Result[]> {
+  let builder = new AxeBuilder({ page }).setLegacyMode(true)
+
+  if (options.include) builder = builder.include(options.include)
+  if (options.rules) builder = builder.withRules(options.rules)
+  else if (options.tags) builder = builder.withTags(options.tags)
+  if (options.excludeRules?.length) builder = builder.disableRules(options.excludeRules)
+
+  const { violations } = await builder.analyze()
+  return violations
+}
+
+export function violationIds(violations: Result[]): string[] {
   return violations.map((violation) => violation.id)
 }
 
 export function formatViolations(
-  violations: AxeViolationLike[],
+  violations: Result[],
   maxNodes: number = MAX_REPORTED_NODES
 ): string {
   return violations

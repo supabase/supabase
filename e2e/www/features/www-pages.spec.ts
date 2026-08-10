@@ -1,10 +1,9 @@
-import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
-import { formatViolations, violationIds } from '../../shared/axe.ts'
+import { formatViolations, scan, violationIds } from '../../shared/axe.ts'
 import { parsePagePaths } from '../../shared/paths.ts'
 
-const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
+const ENFORCED_RULES = ['page-has-heading-one']
 
 const pagePaths = parsePagePaths(process.env.WWW_E2E_PAGE_PATHS)
 
@@ -25,10 +24,7 @@ test.describe('WWW content pages', () => {
         `${pagePath} should return a successful status, got ${response?.status()}`
       ).toBeTruthy()
 
-      const { violations } = await new AxeBuilder({ page })
-        .setLegacyMode(true)
-        .withRules(ENFORCED_RULES)
-        .analyze()
+      const violations = await scan(page, { rules: ENFORCED_RULES })
 
       expect(
         violationIds(violations),

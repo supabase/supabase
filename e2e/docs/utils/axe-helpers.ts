@@ -1,6 +1,7 @@
-import { AxeBuilder } from '@axe-core/playwright'
 import type { Page, TestInfo } from '@playwright/test'
 import type { Result } from 'axe-core'
+
+import { scan } from '../../shared/axe.ts'
 
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
@@ -33,50 +34,15 @@ export function shouldEnforceAll(): boolean {
   return !!process.env.A11Y_ENFORCE_ALL
 }
 
-export async function settleForAxe(page: Page): Promise<void> {
-  await page.waitForLoadState('domcontentloaded')
-  await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {})
-
-  await page
-    .evaluate(
-      ({ quietMs, capMs }) =>
-        new Promise<void>((resolve) => {
-          let timer: ReturnType<typeof setTimeout>
-          const observer = new MutationObserver(() => {
-            clearTimeout(timer)
-            timer = setTimeout(finish, quietMs)
-          })
-
-          function finish() {
-            clearTimeout(cap)
-            clearTimeout(timer)
-            observer.disconnect()
-            resolve()
-          }
-
-          const cap = setTimeout(finish, capMs)
-          timer = setTimeout(finish, quietMs)
-          observer.observe(document.body, { subtree: true, childList: true, attributes: true })
-        }),
-      { quietMs: 500, capMs: 5_000 }
-    )
-    .catch(() => {})
-}
-
 export async function scanArticle(
   page: Page,
   surface: string,
   include: string
 ): Promise<A11yScanResult> {
-  const scan = () => new AxeBuilder({ page }).setLegacyMode(true).include(include)
+  const reported = await scan(page, { tags: WCAG_TAGS, excludeRules: EXCLUDED_RULES, include })
+  const enforced = await scan(page, { rules: ENFORCED_RULES, include })
 
-  const reported = await scan().withTags(WCAG_TAGS).disableRules(EXCLUDED_RULES).analyze()
-
-  const enforced = await scan().withRules(ENFORCED_RULES).analyze()
-
-  const byRule = new Map(
-    [...reported.violations, ...enforced.violations].map((violation) => [violation.id, violation])
-  )
+  const byRule = new Map([...reported, ...enforced].map((violation) => [violation.id, violation]))
 
   const elementCount = await page.evaluate(
     (selector) => document.querySelector(selector)?.querySelectorAll('*').length ?? 0,
@@ -134,4 +100,4 @@ export function blockingViolations(result: A11yScanResult): Result[] {
   return result.violations.filter((violation) => ENFORCED_RULES.includes(violation.id))
 }
 
-export { formatViolations, violationIds } from '../../shared/axe.ts'
+export { formatViolations, settleForAxe, violationIds } from '../../shared/axe.ts'
