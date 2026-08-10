@@ -26,7 +26,7 @@ export const toolSetValidationSchema = z.record(
     'list_branches',
     'search_docs',
     'get_advisors',
-    'get_logs',
+    'query_logs',
 
     // Local tools
     'execute_sql',
@@ -95,7 +95,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
-  get_logs: TOOL_CATEGORIES.LOG,
+  query_logs: TOOL_CATEGORIES.LOG,
 }
 
 /**
