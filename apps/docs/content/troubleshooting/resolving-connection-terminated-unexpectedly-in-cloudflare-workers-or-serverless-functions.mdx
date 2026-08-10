@@ -1,0 +1,93 @@
+---
+title = "Resolving 'Connection terminated unexpectedly' in Cloudflare Workers and Serverless Functions"
+date_created = "2026-08-10T00:00:00+00:00"
+topics = [ "database", "supavisor", "functions" ]
+keywords = [ "cloudflare", "workers", "connection terminated unexpectedly", "pooler", "postgres", "pg", "serverless" ]
+[[errors]]
+code = "Connection terminated unexpectedly"
+message = "postgres connection terminated unexpectedly"
+---
+
+When connecting to Supabase Postgres or the Supavisor connection pooler from Cloudflare Workers or serverless functions using raw Postgres clients (e.g. `node-postgres`/`pg`, `PGQB`, `knex`, `postgres-js`), you may encounter the following error:
+
+```text
+Error: Connection terminated unexpectedly
+```
+
+## Why does this happen?
+
+### 1. Storing persistent client connections in global scope across serverless invocations
+
+Serverless runtimes (such as Cloudflare Workers or Vercel Edge Functions) freeze execution isolates when a request completes. During this idle freeze period, TCP socket connections are dropped by the Cloudflare edge network or by Supavisor after idle timeouts.
+
+If you cache a database client instance in global variable scope (for example, `let qb` or `let client` outside the request handler), subsequent worker invocations that reuse the warm isolate attempt to execute queries on the closed/dead TCP socket, producing `Connection terminated unexpectedly`.
+
+```js
+// ❌ Problematic pattern: Caching TCP client in global scope across invocations
+let qb;
+
+async function setupConnection_QB(env) {
+  if (!qb) {
+    // Sockets created here become stale after worker isolate freezes between requests
+    qb = new PGQB(new Client(env.SUPABASE_CONNECTION_STRING_POOLER));
+    await qb.connect();
+  }
+  return qb;
+}
+```
+
+### 2. Transaction pooler (Port 6543) session limitations
+
+Supavisor in **Transaction Mode (port 6543)** returns backend database connections to the pool immediately after each transaction. It does not support persistent long-lived client connections or session-level prepared statements.
+
+---
+
+## How to resolve this issue
+
+### Approach 1: Use Supabase JS Client (`@supabase/supabase-js`) or Data API (Recommended)
+
+For Cloudflare Workers and edge environments, using the HTTP-based Supabase Data API (PostgREST) via `@supabase/supabase-js` is recommended. Stateless HTTP requests eliminate TCP socket management and stale connection issues entirely.
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+export default {
+  async fetch(request, env) {
+    const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY)
+    const { data, error } = await supabase.from('my_view').select('*')
+    return Response.json(data)
+  },
+}
+```
+
+### Approach 2: Use Cloudflare Hyperdrive
+
+If you require direct SQL queries from Cloudflare Workers, set up [Cloudflare Hyperdrive](https://developers.cloudflare.com/hyperdrive/). Hyperdrive handles connection pooling and TCP socket health natively at Cloudflare's edge network, maintaining healthy pooled connections to your Supabase database.
+
+### Approach 3: Per-request connection lifecycle (Do NOT cache client sockets globally)
+
+If using direct Postgres client drivers (such as `node-postgres` with `cloudflare:sockets` or `postgres-js`), instantiate, connect, and close the client within each request handler lifecycle instead of storing open client sockets in global module scope:
+
+```js
+import { Client } from 'pg'
+
+export default {
+  async fetch(request, env) {
+    // Create a connection per request invocation
+    const client = new Client(env.SUPABASE_CONNECTION_STRING_POOLER)
+    await client.connect()
+
+    try {
+      const res = await client.query('SELECT * FROM my_view')
+      return Response.json(res.rows)
+    } finally {
+      // Ensure the socket connection is cleanly closed
+      await client.end()
+    }
+  },
+}
+```
+
+### Approach 4: Disable prepared statements when using Transaction Pooler (Port 6543)
+
+If connecting through the Transaction Pooler (**port 6543**), ensure prepared statements are disabled in your ORM or driver config (or append `?pgbouncer=true` to your connection string) to prevent prepared statement syntax errors and unexpected connection drops.
