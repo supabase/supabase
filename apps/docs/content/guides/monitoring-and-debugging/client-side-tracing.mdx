@@ -4,7 +4,7 @@ title: 'Client-side tracing'
 description: 'Propagate W3C trace context from the Supabase JS, Swift, and Dart SDKs through Supabase services'
 ---
 
-The Supabase JS, Swift, and Dart SDKs can attach [W3C Trace Context](https://www.w3.org/TR/trace-context/) headers (`traceparent`, `tracestate`, `baggage`) to outgoing requests. The resulting `trace_id` flows through Supabase services and appears in API Gateway and Edge Function logs, so you can correlate client-side spans with the server-side logs they produced — end-to-end, across the network boundary.
+The Supabase JS, Swift, Dart and Python SDKs can attach [W3C Trace Context](https://www.w3.org/TR/trace-context/) headers (`traceparent`, `tracestate`, `baggage`) to outgoing requests. The resulting `trace_id` flows through Supabase services and appears in API Gateway and Edge Function logs, so you can correlate client-side spans with the server-side logs they produced — end-to-end, across the network boundary.
 
 Because the headers follow the W3C standard, any compliant tracing SDK (such as OpenTelemetry, Sentry, Datadog, or Honeycomb) can pick up the trace on the server side, including in self-hosted collectors. On the client side, some vendor SDKs need a small configuration change before they emit the standard headers — see [Using a vendor tracing SDK](#using-a-vendor-tracing-sdk) in the JavaScript tab.
 
@@ -223,6 +223,41 @@ Requires `supabase` `2.x` or later (Flutter or Dart-only).
 | `traceContextProvider`    | `TraceContextProvider?` | `null`  | Callback returning the current `TraceContext`. Return `null` when there is no active span.                                                                                        |
 
 Headers are only injected on requests targeting Supabase hosts (`*.supabase.co`, `*.supabase.in`, your project host, and loopback addresses for local development). Third-party hosts never receive trace headers.
+
+</TabPanel>
+
+<TabPanel id="python" label="Python">
+
+The Python `opentelemetry` propagation is handled entirely through the `opentelemetry-instrumentation-httpx` package.
+
+1. **Add** the `opentelemetry-sdk` and `opentelemetry-instrumentation-httpx` package:
+
+```sh
+uv add openetelemtry-sdk opentelemetry-instrumentation-httpx
+```
+
+2. **Instrument** `httpx` clients using the `HTTPXClientInstrumentor`:
+
+```python
+from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+HTTPXClientInstrumentor().instrument()
+```
+
+3. **Create** your `SupabaseClient`. Any active span is now propagated automatically:
+
+```python
+from opentelemetry.sdk.trace import TracerProvider
+
+trace.set_tracer_provider(TracerProvider()) 
+tracer = trace.get_tracer(__name__)
+
+async def query():
+    with tracer.start_as_current_span("orchestral_query") as span:
+        await client.from_("orchestral_sections") \
+                    .select("name, instruments(name)") \
+                    .order("name", desc=True, foreign_table="instruments") \
+                    .execute()
+```
 
 </TabPanel>
 
