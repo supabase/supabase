@@ -48,6 +48,15 @@ export const TimezoneSettings = () => {
 
   const triggerLabel = useMemo(() => formatTimezoneLabel(timezone), [timezone])
 
+  const options = useMemo(
+    () =>
+      TIMEZONES_BY_IANA.map((entry) => ({
+        iana: entry.utc[0],
+        label: formatTimezoneLabel(entry.utc[0]),
+      })),
+    []
+  )
+
   if (!timezonePickerEnabled) return null
 
   const handleSelect = (nextStored: string) => {
@@ -127,9 +136,7 @@ export const TimezoneSettings = () => {
                               )}
                             />
                           </CommandItem>
-                          {TIMEZONES_BY_IANA.map((entry) => {
-                            const ianaName = entry.utc[0]
-                            const label = formatTimezoneLabel(ianaName)
+                          {options.map(({ iana: ianaName, label }) => {
                             const isSelected = !isAutoDetected && storedTimezone === ianaName
                             return (
                               <CommandItem

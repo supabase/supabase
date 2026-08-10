@@ -36,6 +36,15 @@ export const TimezoneDropdown = () => {
     return formatTimezoneLabel(timezone)
   }, [timezone])
 
+  const options = useMemo(
+    () =>
+      TIMEZONES_BY_IANA.map((entry) => ({
+        iana: entry.utc[0],
+        label: formatTimezoneLabel(entry.utc[0]),
+      })),
+    []
+  )
+
   const handleSelect = (nextStored: string) => {
     setTimezone(nextStored)
     const resolvedNext = nextStored || guessLocalTimezone()
@@ -95,9 +104,7 @@ export const TimezoneDropdown = () => {
                       )}
                     />
                   </CommandItem>
-                  {TIMEZONES_BY_IANA.map((entry) => {
-                    const ianaName = entry.utc[0]
-                    const label = formatTimezoneLabel(ianaName)
+                  {options.map(({ iana: ianaName, label }) => {
                     const isSelected = !isAutoDetected && storedTimezone === ianaName
                     return (
                       <CommandItem
