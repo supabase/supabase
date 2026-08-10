@@ -1,11 +1,9 @@
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Globe } from 'lucide-react'
-import Link from 'next/link'
+import { CalendarIcon, ExternalLink } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import {
-  Badge,
   Button,
   Calendar,
   FormControl,
@@ -31,11 +29,11 @@ import {
 import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { GitHubConfigCallout } from '../GitHubConfigCallout'
 import type { Enum } from './AuthProvidersForm.types'
-import { AUTH_KEY_TO_ENV_NAME } from '@/components/interfaces/EnvironmentVariables/EnvironmentVariables.constants'
-import type { EnvironmentVariable } from '@/components/interfaces/EnvironmentVariables/EnvironmentVariables.types'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { BASE_PATH } from '@/lib/constants'
+import type { GitHubConfigFieldState } from '@/lib/github-config-drift'
 
 interface FormFieldProps {
   projectRef: string | undefined
@@ -46,8 +44,7 @@ interface FormFieldProps {
   hasAccess: boolean
   disabled?: boolean
   readOnly?: boolean
-  isEnvVar?: boolean
-  envVarScopes?: EnvironmentVariable[]
+  githubConfigState?: GitHubConfigFieldState
 }
 
 const FormField = ({
@@ -59,8 +56,7 @@ const FormField = ({
   hasAccess,
   disabled: disabledProp,
   readOnly,
-  isEnvVar = false,
-  envVarScopes = [],
+  githubConfigState,
 }: FormFieldProps) => {
   const { setValue } = useFormContext()
   const { description: originalDescription } = properties
@@ -82,6 +78,10 @@ const FormField = ({
   }
   const disabled =
     disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
+  const fieldLabel = properties.title
+  const fieldCallout = (
+    <GitHubConfigCallout className="col-span-full mb-2" state={githubConfigState} />
+  )
 
   const showValue = useWatch({
     control,
@@ -110,6 +110,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -117,7 +118,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -159,11 +160,10 @@ const FormField = ({
       )
 
     case 'string': {
-      const envVarName = AUTH_KEY_TO_ENV_NAME[name]
-
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -171,7 +171,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <Markdown content={description} className="text-foreground-lighter" />
@@ -179,35 +179,7 @@ const FormField = ({
                   }
                 >
                   <div className="col-span-6 space-y-2">
-                    {isEnvVar && envVarName && projectRef ? (
-                      <Link
-                        href={`/project/${projectRef}/environment-variables`}
-                        className="flex h-[34px] w-full items-center overflow-hidden rounded-md transition-opacity hover:opacity-80"
-                      >
-                        <div className="flex h-full items-center rounded-l-md border-y border-l border-[rgba(34,128,157,0.4)] bg-[rgba(89,210,247,0.12)] px-2.5">
-                          <Globe size={13} className="shrink-0 text-[#25c8ff]" strokeWidth={1.5} />
-                        </div>
-                        <div className="flex h-full flex-1 items-center gap-2 rounded-r-md border border-[rgba(34,128,157,0.4)] bg-[rgba(89,210,247,0.12)] px-2.5">
-                          <span className="flex-1 truncate text-left font-mono text-xs text-[#25c8ff]">
-                            {properties.isSecret ? '••••••••' : field.value}
-                          </span>
-                          {envVarScopes.map((variable) => (
-                            <span
-                              key={variable.sourceKey}
-                              className="shrink-0 rounded-full border border-border bg-surface-100 px-1.5 py-[3px] text-[10px] leading-none text-foreground-lighter"
-                            >
-                              {variable.scope === null
-                                ? 'All'
-                                : variable.scope === 'branch'
-                                  ? variable.branch
-                                  : variable.scope === 'preview'
-                                    ? 'All Previews'
-                                    : variable.scope}
-                            </span>
-                          ))}
-                        </div>
-                      </Link>
-                    ) : properties.isSecret ? (
+                    {properties.isSecret ? (
                       <FormControl>
                         <DataInput
                           {...field}
@@ -223,14 +195,6 @@ const FormField = ({
                         <Input {...field} id={name} readOnly={readOnly} />
                       </FormControl>
                     )}
-                    {envVarName && (
-                      <Badge
-                        variant="secondary"
-                        className="font-mono text-xs text-foreground-lighter"
-                      >
-                        {envVarName}
-                      </Badge>
-                    )}
                   </div>
                 </FormItemLayout>
               )}
@@ -245,6 +209,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -252,33 +217,23 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <Markdown content={description} className="text-foreground-lighter" />
                     ) : null
                   }
                 >
-                  <div className="col-span-6 space-y-2">
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        id={name}
-                        rows={4}
-                        placeholder="Enter multi-line text"
-                        className="resize-none"
-                        readOnly={readOnly}
-                      />
-                    </FormControl>
-                    {AUTH_KEY_TO_ENV_NAME[name] && (
-                      <Badge
-                        variant="secondary"
-                        className="font-mono text-xs text-foreground-lighter"
-                      >
-                        {AUTH_KEY_TO_ENV_NAME[name]}
-                      </Badge>
-                    )}
-                  </div>
+                  <FormControl className="col-span-6">
+                    <Textarea
+                      {...field}
+                      id={name}
+                      rows={4}
+                      placeholder="Enter multi-line text"
+                      className="resize-none"
+                      readOnly={readOnly}
+                    />
+                  </FormControl>
                 </FormItemLayout>
               )}
             />
@@ -291,6 +246,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -298,7 +254,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <Markdown content={description} className="text-foreground-lighter" />
@@ -347,6 +303,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -354,7 +311,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     <div className="flex flex-col gap-1">
                       {description ? <Markdown content={description} /> : null}
@@ -390,6 +347,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -397,7 +355,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <div className="form-field-markdown">

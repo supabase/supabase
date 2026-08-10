@@ -108,6 +108,12 @@ export const useGenerateSettingsMenu = () => {
           shortcutId: SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
         },
         {
+          name: 'Code configuration',
+          key: 'configuration-drift',
+          url: `/project/${ref}/settings/configuration-drift`,
+          items: [],
+        },
+        {
           name: 'Infrastructure',
           key: 'infrastructure',
           url: getInfrastructurePath(ref),

@@ -30,6 +30,7 @@ import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/ap
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
 import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
+import { Route as ApiGithubConfigRouteImport } from './routes/api/github-config'
 import { Route as ApiGetUtcTimeRouteImport } from './routes/api/get-utc-time'
 import { Route as ApiGetS3KeysRouteImport } from './routes/api/get-s3-keys'
 import { Route as ApiGetIpAddressRouteImport } from './routes/api/get-ip-address'
@@ -107,6 +108,7 @@ import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/pro
 import { Route as ProjectRefSettingsInfrastructureRouteImport } from './routes/project/$ref/settings/infrastructure'
 import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
 import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
+import { Route as ProjectRefSettingsConfigurationDriftRouteImport } from './routes/project/$ref/settings/configuration-drift'
 import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
 import { Route as ProjectRefSettingsApiRouteImport } from './routes/project/$ref/settings/api'
 import { Route as ProjectRefSettingsAddonsRouteImport } from './routes/project/$ref/settings/addons'
@@ -155,6 +157,7 @@ import { Route as ProjectRefDatabaseFunctionsRouteImport } from './routes/projec
 import { Route as ProjectRefDatabaseExtensionsRouteImport } from './routes/project/$ref/database/extensions'
 import { Route as ProjectRefDatabaseColumnPrivilegesRouteImport } from './routes/project/$ref/database/column-privileges'
 import { Route as ProjectRefBranchesMergeRequestsRouteImport } from './routes/project/$ref/branches/merge-requests'
+import { Route as ProjectRefBranchesConfigurationDriftRouteImport } from './routes/project/$ref/branches/configuration-drift'
 import { Route as ProjectRefAuthUsersRouteImport } from './routes/project/$ref/auth/users'
 import { Route as ProjectRefAuthUrlConfigurationRouteImport } from './routes/project/$ref/auth/url-configuration'
 import { Route as ProjectRefAuthThirdPartyRouteImport } from './routes/project/$ref/auth/third-party'
@@ -423,6 +426,11 @@ const ApiIncidentStatusRoute = ApiIncidentStatusRouteImport.update({
 const ApiIncidentBannerRoute = ApiIncidentBannerRouteImport.update({
   id: '/api/incident-banner',
   path: '/api/incident-banner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiGithubConfigRoute = ApiGithubConfigRouteImport.update({
+  id: '/api/github-config',
+  path: '/api/github-config',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiGetUtcTimeRoute = ApiGetUtcTimeRouteImport.update({
@@ -827,6 +835,12 @@ const ProjectRefSettingsDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
+const ProjectRefSettingsConfigurationDriftRoute =
+  ProjectRefSettingsConfigurationDriftRouteImport.update({
+    id: '/configuration-drift',
+    path: '/configuration-drift',
+    getParentRoute: () => ProjectRefSettingsRoute,
+  } as any)
 const ProjectRefSettingsApiKeysRoute =
   ProjectRefSettingsApiKeysRouteImport.update({
     id: '/api-keys',
@@ -1104,6 +1118,12 @@ const ProjectRefBranchesMergeRequestsRoute =
   ProjectRefBranchesMergeRequestsRouteImport.update({
     id: '/merge-requests',
     path: '/merge-requests',
+    getParentRoute: () => ProjectRefBranchesRoute,
+  } as any)
+const ProjectRefBranchesConfigurationDriftRoute =
+  ProjectRefBranchesConfigurationDriftRouteImport.update({
+    id: '/configuration-drift',
+    path: '/configuration-drift',
     getParentRoute: () => ProjectRefBranchesRoute,
   } as any)
 const ProjectRefAuthUsersRoute = ProjectRefAuthUsersRouteImport.update({
@@ -2083,6 +2103,7 @@ export interface FileRoutesByFullPath {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
+  '/api/github-config': typeof ApiGithubConfigRoute
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
@@ -2172,6 +2193,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
+  '/project/$ref/branches/configuration-drift': typeof ProjectRefBranchesConfigurationDriftRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -2220,6 +2242,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/configuration-drift': typeof ProjectRefSettingsConfigurationDriftRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -2392,6 +2415,7 @@ export interface FileRoutesByTo {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
+  '/api/github-config': typeof ApiGithubConfigRoute
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
@@ -2472,6 +2496,7 @@ export interface FileRoutesByTo {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
+  '/project/$ref/branches/configuration-drift': typeof ProjectRefBranchesConfigurationDriftRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -2517,6 +2542,7 @@ export interface FileRoutesByTo {
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
+  '/project/$ref/settings/configuration-drift': typeof ProjectRefSettingsConfigurationDriftRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -2693,6 +2719,7 @@ export interface FileRoutesById {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
+  '/api/github-config': typeof ApiGithubConfigRoute
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
@@ -2782,6 +2809,7 @@ export interface FileRoutesById {
   '/project/$ref/auth/third-party': typeof ProjectRefAuthThirdPartyRoute
   '/project/$ref/auth/url-configuration': typeof ProjectRefAuthUrlConfigurationRoute
   '/project/$ref/auth/users': typeof ProjectRefAuthUsersRoute
+  '/project/$ref/branches/configuration-drift': typeof ProjectRefBranchesConfigurationDriftRoute
   '/project/$ref/branches/merge-requests': typeof ProjectRefBranchesMergeRequestsRoute
   '/project/$ref/database/column-privileges': typeof ProjectRefDatabaseColumnPrivilegesRoute
   '/project/$ref/database/extensions': typeof ProjectRefDatabaseExtensionsRoute
@@ -2830,6 +2858,7 @@ export interface FileRoutesById {
   '/project/$ref/settings/addons': typeof ProjectRefSettingsAddonsRoute
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
+  '/project/$ref/settings/configuration-drift': typeof ProjectRefSettingsConfigurationDriftRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
   '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRoute
@@ -3005,6 +3034,7 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
+    | '/api/github-config'
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
@@ -3094,6 +3124,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
+    | '/project/$ref/branches/configuration-drift'
     | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -3142,6 +3173,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/configuration-drift'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -3314,6 +3346,7 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
+    | '/api/github-config'
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
@@ -3394,6 +3427,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
+    | '/project/$ref/branches/configuration-drift'
     | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -3439,6 +3473,7 @@ export interface FileRouteTypes {
     | '/project/$ref/realtime/settings'
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
+    | '/project/$ref/settings/configuration-drift'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -3614,6 +3649,7 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
+    | '/api/github-config'
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
@@ -3703,6 +3739,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth/third-party'
     | '/project/$ref/auth/url-configuration'
     | '/project/$ref/auth/users'
+    | '/project/$ref/branches/configuration-drift'
     | '/project/$ref/branches/merge-requests'
     | '/project/$ref/database/column-privileges'
     | '/project/$ref/database/extensions'
@@ -3751,6 +3788,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/addons'
     | '/project/$ref/settings/api'
     | '/project/$ref/settings/api-keys'
+    | '/project/$ref/settings/configuration-drift'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
     | '/project/$ref/settings/infrastructure'
@@ -3916,6 +3954,7 @@ export interface RootRouteChildren {
   ApiGetIpAddressRoute: typeof ApiGetIpAddressRoute
   ApiGetS3KeysRoute: typeof ApiGetS3KeysRoute
   ApiGetUtcTimeRoute: typeof ApiGetUtcTimeRoute
+  ApiGithubConfigRoute: typeof ApiGithubConfigRoute
   ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
   ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiParseQueryRoute: typeof ApiParseQueryRoute
@@ -4166,6 +4205,13 @@ declare module '@tanstack/react-router' {
       path: '/api/incident-banner'
       fullPath: '/api/incident-banner'
       preLoaderRoute: typeof ApiIncidentBannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/github-config': {
+      id: '/api/github-config'
+      path: '/api/github-config'
+      fullPath: '/api/github-config'
+      preLoaderRoute: typeof ApiGithubConfigRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/get-utc-time': {
@@ -4707,6 +4753,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefSettingsDashboardRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
+    '/project/$ref/settings/configuration-drift': {
+      id: '/project/$ref/settings/configuration-drift'
+      path: '/configuration-drift'
+      fullPath: '/project/$ref/settings/configuration-drift'
+      preLoaderRoute: typeof ProjectRefSettingsConfigurationDriftRouteImport
+      parentRoute: typeof ProjectRefSettingsRoute
+    }
     '/project/$ref/settings/api-keys': {
       id: '/project/$ref/settings/api-keys'
       path: '/api-keys'
@@ -5041,6 +5094,13 @@ declare module '@tanstack/react-router' {
       path: '/merge-requests'
       fullPath: '/project/$ref/branches/merge-requests'
       preLoaderRoute: typeof ProjectRefBranchesMergeRequestsRouteImport
+      parentRoute: typeof ProjectRefBranchesRoute
+    }
+    '/project/$ref/branches/configuration-drift': {
+      id: '/project/$ref/branches/configuration-drift'
+      path: '/configuration-drift'
+      fullPath: '/project/$ref/branches/configuration-drift'
+      preLoaderRoute: typeof ProjectRefBranchesConfigurationDriftRouteImport
       parentRoute: typeof ProjectRefBranchesRoute
     }
     '/project/$ref/auth/users': {
@@ -6411,11 +6471,14 @@ const ProjectRefAuthRouteWithChildren = ProjectRefAuthRoute._addFileChildren(
 )
 
 interface ProjectRefBranchesRouteChildren {
+  ProjectRefBranchesConfigurationDriftRoute: typeof ProjectRefBranchesConfigurationDriftRoute
   ProjectRefBranchesMergeRequestsRoute: typeof ProjectRefBranchesMergeRequestsRoute
   ProjectRefBranchesIndexRoute: typeof ProjectRefBranchesIndexRoute
 }
 
 const ProjectRefBranchesRouteChildren: ProjectRefBranchesRouteChildren = {
+  ProjectRefBranchesConfigurationDriftRoute:
+    ProjectRefBranchesConfigurationDriftRoute,
   ProjectRefBranchesMergeRequestsRoute: ProjectRefBranchesMergeRequestsRoute,
   ProjectRefBranchesIndexRoute: ProjectRefBranchesIndexRoute,
 }
@@ -6720,6 +6783,7 @@ interface ProjectRefSettingsRouteChildren {
   ProjectRefSettingsAddonsRoute: typeof ProjectRefSettingsAddonsRoute
   ProjectRefSettingsApiRoute: typeof ProjectRefSettingsApiRoute
   ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
+  ProjectRefSettingsConfigurationDriftRoute: typeof ProjectRefSettingsConfigurationDriftRoute
   ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
   ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
   ProjectRefSettingsInfrastructureRoute: typeof ProjectRefSettingsInfrastructureRoute
@@ -6736,6 +6800,8 @@ const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
   ProjectRefSettingsAddonsRoute: ProjectRefSettingsAddonsRoute,
   ProjectRefSettingsApiRoute: ProjectRefSettingsApiRoute,
   ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
+  ProjectRefSettingsConfigurationDriftRoute:
+    ProjectRefSettingsConfigurationDriftRoute,
   ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
   ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
   ProjectRefSettingsInfrastructureRoute: ProjectRefSettingsInfrastructureRoute,
@@ -6904,6 +6970,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGetIpAddressRoute: ApiGetIpAddressRoute,
   ApiGetS3KeysRoute: ApiGetS3KeysRoute,
   ApiGetUtcTimeRoute: ApiGetUtcTimeRoute,
+  ApiGithubConfigRoute: ApiGithubConfigRoute,
   ApiIncidentBannerRoute: ApiIncidentBannerRoute,
   ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiParseQueryRoute: ApiParseQueryRoute,

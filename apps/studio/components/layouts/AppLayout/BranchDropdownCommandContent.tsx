@@ -29,6 +29,7 @@ export interface BranchDropdownCommandContentProps {
   projectRef: string | undefined
   onClose: () => void
   onCreateBranch: () => void
+  hasSelectedBranchDrift?: boolean
 }
 
 export function BranchDropdownCommandContent({
@@ -41,6 +42,7 @@ export function BranchDropdownCommandContent({
   projectRef,
   onClose,
   onCreateBranch,
+  hasSelectedBranchDrift = false,
 }: BranchDropdownCommandContentProps) {
   const track = useTrack()
 
@@ -101,14 +103,18 @@ export function BranchDropdownCommandContent({
         <CommandList className="flex flex-col flex-1 p-1 min-h-0 overflow-y-auto max-h-none!">
           {isBranchingEnabled && <CommandEmpty>No branches found</CommandEmpty>}
           <CommandGroup className="min-h-0">
-            {branchList.map((branch) => (
-              <BranchLink
-                key={branch.id}
-                branch={branch}
-                isSelected={branch.id === selectedBranch?.id || branchesCount === 0}
-                onClose={onClose}
-              />
-            ))}
+            {branchList.map((branch) => {
+              const isSelected = branch.id === selectedBranch?.id || branchesCount === 0
+              return (
+                <BranchLink
+                  key={branch.id}
+                  branch={branch}
+                  isSelected={isSelected}
+                  hasConfigDrift={isSelected && hasSelectedBranchDrift}
+                  onClose={onClose}
+                />
+              )
+            })}
           </CommandGroup>
         </CommandList>
       </Command>
@@ -122,14 +128,18 @@ export function BranchDropdownCommandContent({
         {isBranchingEnabled && <CommandEmpty>No branches found</CommandEmpty>}
         <CommandGroup>
           <ScrollArea className="max-h-[210px] overflow-y-auto">
-            {branchList.map((branch) => (
-              <BranchLink
-                key={branch.id}
-                branch={branch}
-                isSelected={branch.id === selectedBranch?.id || branchesCount === 0}
-                onClose={onClose}
-              />
-            ))}
+            {branchList.map((branch) => {
+              const isSelected = branch.id === selectedBranch?.id || branchesCount === 0
+              return (
+                <BranchLink
+                  key={branch.id}
+                  branch={branch}
+                  isSelected={isSelected}
+                  hasConfigDrift={isSelected && hasSelectedBranchDrift}
+                  onClose={onClose}
+                />
+              )
+            })}
           </ScrollArea>
         </CommandGroup>
 

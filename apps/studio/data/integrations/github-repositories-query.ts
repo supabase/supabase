@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { getGitHubAppLocalMock, isGitHubAppLocalMockEnabled } from './github-app-local-mock'
 import { integrationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getGitHubRepositories(signal?: AbortSignal) {
+  if (isGitHubAppLocalMockEnabled()) return getGitHubAppLocalMock().repositories
+
   const { data, error } = await get('/platform/integrations/github/repositories', {
     signal,
   })

@@ -17,6 +17,7 @@ import { ProjectBranchSelectorSheet } from './ProjectBranchSelectorSheet'
 import { ProjectBranchSelectorTrigger } from './ProjectBranchSelectorTrigger'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useSelectedGitHubConfigDrift } from '@/hooks/misc/useGitHubConfigDrift'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -26,6 +27,7 @@ export function ProjectBranchSelector() {
   const { ref } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
+  const { hasDrift: hasConfigDrift } = useSelectedGitHubConfigDrift()
 
   const isBranch = project?.parentRef !== project?.ref
   const isProductionBranch = !isBranch
@@ -79,6 +81,7 @@ export function ProjectBranchSelector() {
     isBranch,
     isProductionBranch,
     branchDisplayName,
+    hasConfigDrift,
     onGoToOrganization: goToOrganization,
   }
 

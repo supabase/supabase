@@ -10,7 +10,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -20,7 +19,6 @@ import * as z from 'zod'
 
 import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { ProjectAccessSection } from './ProjectAccessSection'
-import { useProjectConfig } from '@/components/interfaces/EnvironmentVariables/useProjectConfig'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBranchesQuery } from '@/data/branches/branches-query'
@@ -33,7 +31,6 @@ import { DOCS_URL } from '@/lib/constants'
 export const General = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: projectConfig, isSuccess: isProjectConfigSuccess } = useProjectConfig()
   const isBranch = Boolean(project?.parent_project_ref)
   const entityLabel = isBranch ? 'Branch' : 'Project'
 
@@ -268,63 +265,6 @@ export const General = () => {
           )}
         </PageSectionContent>
       </PageSection>
-
-      {isProjectConfigSuccess && (
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Project configuration</PageSectionTitle>
-              <PageSectionDescription>
-                Workflow and schema settings managed by the Supabase CLI.
-              </PageSectionDescription>
-            </PageSectionSummary>
-          </PageSectionMeta>
-          <PageSectionContent>
-            <Card>
-              {(
-                [
-                  {
-                    label: 'Workflow profile',
-                    description: 'The workflow model for this project.',
-                    value: projectConfig?.workflow_profile,
-                  },
-                  {
-                    label: 'Schema management',
-                    description: 'How database schema changes are managed.',
-                    value: projectConfig?.schema_management,
-                  },
-                  {
-                    label: 'Config source',
-                    description: 'Where project configuration is stored.',
-                    value: projectConfig?.config_source,
-                  },
-                  {
-                    label: 'Production branch',
-                    description: 'The Git branch mapped to the production environment.',
-                    value: projectConfig?.production_branch,
-                  },
-                ] as const
-              ).map(({ label, description, value }) => (
-                <CardContent key={label}>
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label={label}
-                    description={description}
-                    className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
-                  >
-                    <PasswordInput
-                      copy={!!value}
-                      readOnly
-                      size="small"
-                      value={value ?? 'Not set'}
-                    />
-                  </FormItemLayout>
-                </CardContent>
-              ))}
-            </Card>
-          </PageSectionContent>
-        </PageSection>
-      )}
 
       <ProjectAccessSection />
     </>

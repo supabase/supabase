@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { useState } from 'react'
+import { Badge } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -12,6 +13,7 @@ import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import type { Branch } from '@/data/branches/branches-query'
+import { useSelectedGitHubConfigDrift } from '@/hooks/misc/useGitHubConfigDrift'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -30,6 +32,7 @@ export const BranchDropdown = ({
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const { data: projectDetails } = useSelectedProjectQuery()
+  const { hasDrift: hasConfigDrift } = useSelectedGitHubConfigDrift()
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -83,6 +86,7 @@ export const BranchDropdown = ({
       projectRef={ref}
       onClose={close}
       onCreateBranch={() => snap.setShowCreateBranchModal(true)}
+      hasSelectedBranchDrift={hasConfigDrift}
     />
   )
 
@@ -106,6 +110,7 @@ export const BranchDropdown = ({
             {isBranchingEnabled ? selectedBranch?.name : 'main'}
           </span>
           <BranchBadge branch={selectedBranch} isBranchingEnabled={isBranchingEnabled} />
+          {hasConfigDrift && <Badge variant="warning">Drift</Badge>}
         </>
       }
       linkClassName="flex items-center gap-2 shrink-0"

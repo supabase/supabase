@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
-import { useState } from 'react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -33,12 +34,7 @@ type SecretPair = {
 const FormSchema = z.object({
   secrets: z.array(
     z.object({
-      name: z
-        .string()
-        .min(1, 'Please provide a name for your variable')
-        .refine((value) => !value.match(/^(SUPABASE_).*/), {
-          message: 'Name must not start with the SUPABASE_ prefix',
-        }),
+      name: z.string().min(1, 'Please provide a name for your variable'),
       value: z.string().min(1, 'Please provide a value for your variable'),
     })
   ),
@@ -60,11 +56,19 @@ const AddEnvironmentVariableForm = () => {
   const [visibleSecrets, setVisibleSecrets] = useState<Set<string>>(new Set())
   const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
   const [pendingSecrets, setPendingSecrets] = useState<z.infer<typeof FormSchema> | null>(null)
+  const [addKey, setAddKey] = useQueryState('add', parseAsString.withOptions({ history: 'push', clearOnDefault: true }))
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
+
+  useEffect(() => {
+    if (addKey) {
+      form.reset({ secrets: [{ name: addKey, value: '' }] })
+      setAddKey(null)
+    }
+  }, [addKey])
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -125,7 +129,12 @@ const AddEnvironmentVariableForm = () => {
 
   const { mutate: createSecret, isPending: isCreating } = useSecretsCreateMutation({
     onSuccess: (_, variables) => {
-      toast.success(`Successfully created new variable "${variables.secrets[0].name}"`)
+      const count = variables.secrets.length
+      toast.success(
+        count > 1
+          ? `Successfully created ${count} environment variables`
+          : `Successfully created new variable "${variables.secrets[0].name}"`
+      )
       setTimeout(() => {
         form.reset()
         setVisibleSecrets(new Set())

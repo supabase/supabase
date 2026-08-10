@@ -32,12 +32,15 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
+import { getBasicAuthGitHubConfigStates } from './BasicAuthSettingsForm.utils'
+import { GitHubConfigCallout } from './GitHubConfigCallout'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedGitHubConfig } from '@/hooks/misc/useGitHubConfigDrift'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -52,6 +55,7 @@ const schema = z.object({
 export const BasicAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const showManualLinking = useIsFeatureEnabled('authentication:show_manual_linking')
+  const { data: githubConfig } = useSelectedGitHubConfig()
 
   const {
     data: authConfig,
@@ -61,6 +65,9 @@ export const BasicAuthSettingsForm = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
+  const githubConfigStates = authConfig
+    ? getBasicAuthGitHubConfigStates(authConfig, githubConfig?.config)
+    : undefined
 
   const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -168,6 +175,10 @@ export const BasicAuthSettingsForm = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Card>
                 <CardContent>
+                  <GitHubConfigCallout
+                    className="mb-4"
+                    state={githubConfigStates?.DISABLE_SIGNUP}
+                  />
                   <FormField
                     control={form.control}
                     name="DISABLE_SIGNUP"
@@ -190,6 +201,10 @@ export const BasicAuthSettingsForm = () => {
                 </CardContent>
                 {showManualLinking && (
                   <CardContent>
+                    <GitHubConfigCallout
+                      className="mb-4"
+                      state={githubConfigStates?.SECURITY_MANUAL_LINKING_ENABLED}
+                    />
                     <FormField
                       control={form.control}
                       name="SECURITY_MANUAL_LINKING_ENABLED"
@@ -223,6 +238,10 @@ export const BasicAuthSettingsForm = () => {
                   </CardContent>
                 )}
                 <CardContent>
+                  <GitHubConfigCallout
+                    className="mb-4"
+                    state={githubConfigStates?.EXTERNAL_ANONYMOUS_USERS_ENABLED}
+                  />
                   <FormField
                     control={form.control}
                     name="EXTERNAL_ANONYMOUS_USERS_ENABLED"
@@ -313,6 +332,10 @@ export const BasicAuthSettingsForm = () => {
                   )}
                 </CardContent>
                 <CardContent>
+                  <GitHubConfigCallout
+                    className="mb-4"
+                    state={githubConfigStates?.MAILER_AUTOCONFIRM}
+                  />
                   <FormField
                     control={form.control}
                     name="MAILER_AUTOCONFIRM"

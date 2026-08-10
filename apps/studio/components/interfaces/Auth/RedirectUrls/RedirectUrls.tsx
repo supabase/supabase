@@ -24,6 +24,7 @@ import {
 } from 'ui-patterns/PageSection'
 
 import { parseRedirectUrls } from '../Auth.constants'
+import { GitHubConfigCallout } from '../GitHubConfigCallout'
 import { AddNewURLModal } from './AddNewURLModal'
 import { RedirectUrlList } from './RedirectUrlList'
 import { ValueContainer } from './ValueContainer'
@@ -32,7 +33,9 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useSelectedGitHubConfig } from '@/hooks/misc/useGitHubConfigDrift'
 import { DOCS_URL } from '@/lib/constants'
+import { getAuthFieldConfigState } from '@/lib/github-config-drift'
 
 export const RedirectUrls = () => {
   const { ref: projectRef } = useParams()
@@ -43,12 +46,20 @@ export const RedirectUrls = () => {
     isError,
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
+  const { data: githubConfig } = useSelectedGitHubConfig()
   const { mutateAsync: updateAuthConfig, isPending: isUpdatingConfig } =
     useAuthConfigUpdateMutation()
 
   const URI_ALLOW_LIST_ARRAY = useMemo(() => {
     return parseRedirectUrls(authConfig?.URI_ALLOW_LIST)
   }, [authConfig?.URI_ALLOW_LIST])
+  const githubConfigState = authConfig
+    ? getAuthFieldConfigState({
+        fieldName: 'URI_ALLOW_LIST',
+        dashboardValue: authConfig.URI_ALLOW_LIST,
+        githubConfig: githubConfig?.config,
+      })
+    : undefined
 
   const [open, setOpen] = useState(false)
   const [openRemoveSelected, setOpenRemoveSelected] = useState(false)
@@ -89,6 +100,7 @@ export const RedirectUrls = () => {
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
+        <GitHubConfigCallout className="mb-4" state={githubConfigState} />
         {isLoading && (
           <>
             <ValueContainer>

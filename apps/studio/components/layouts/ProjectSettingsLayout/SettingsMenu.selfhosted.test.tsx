@@ -108,6 +108,7 @@ describe('useGenerateSettingsMenu (self-hosted)', () => {
 
     expect(configGroup?.items.some((item) => item.key === 'infrastructure')).toBe(false)
     expect(configGroup?.items.some((item) => item.key === 'addons')).toBe(false)
+    expect(configGroup?.items.some((item) => item.key === 'configuration-drift')).toBe(false)
   })
 
   it('does not include billing group in self-hosted mode', () => {

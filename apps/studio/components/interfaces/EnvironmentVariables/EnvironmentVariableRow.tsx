@@ -49,9 +49,10 @@ const EnvironmentVariableRow = ({
 
   const displayValue = variable.isSecret
     ? revealed
-      ? variable.value || '(write-only)'
+      ? variable.value ?? ''
       : '••••••••••••••'
     : variable.value
+  const isWriteOnly = variable.isSecret && revealed && !variable.value
 
   return (
     <TableRow>
@@ -84,7 +85,7 @@ const EnvironmentVariableRow = ({
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  This config value has no backing env var in the env server
+                  A required secret hasn't been set for this config field yet
                 </TooltipContent>
               </Tooltip>
             )}
@@ -117,14 +118,18 @@ const EnvironmentVariableRow = ({
             icon={revealed ? <EyeOff size={14} /> : <Eye size={14} />}
             onClick={() => setRevealed((v) => !v)}
           />
-          <p
-            className={cn(
-              'font-mono text-sm text-foreground-light flex-1 truncate',
-              variable.isSecret && !revealed && 'tracking-wider'
-            )}
-          >
-            {displayValue}
-          </p>
+          {isWriteOnly ? (
+            <p className="text-sm text-foreground-lighter italic flex-1">Hidden — write-only secret</p>
+          ) : (
+            <p
+              className={cn(
+                'font-mono text-sm text-foreground-light flex-1 truncate',
+                variable.isSecret && !revealed && 'tracking-wider'
+              )}
+            >
+              {displayValue}
+            </p>
+          )}
         </div>
       </TableCell>
 

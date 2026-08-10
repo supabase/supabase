@@ -47,6 +47,7 @@ export interface FetchGitHubConfigOptions {
   branch?: string
   token?: string
   configPaths?: string[]
+  includeOriginalContent?: boolean
   signal?: AbortSignal
   fetcher?: typeof fetch
 }
@@ -56,6 +57,7 @@ export async function fetchGitHubConfig({
   branch,
   token,
   configPaths = DEFAULT_GITHUB_CONFIG_PATHS,
+  includeOriginalContent = false,
   signal,
   fetcher = fetch,
 }: FetchGitHubConfigOptions): Promise<GitHubConfigResponse> {
@@ -73,27 +75,79 @@ export async function fetchGitHubConfig({
   }
 
   const headers = createGitHubHeaders(token)
-  const resolvedBranch =
-    branch?.trim() ||
-    (await getDefaultBranch({
+  const requestedBranch = branch?.trim()
+  const branchesTried: string[] = []
+
+  if (requestedBranch) {
+    branchesTried.push(requestedBranch)
+    const config = await fetchGitHubConfigFromBranch({
       repository: normalizedRepository,
+      branch: requestedBranch,
+      configPaths: normalizedPaths,
       headers,
+      includeOriginalContent,
       signal,
       fetcher,
-    }))
+    })
+    if (config) return config
+  }
 
-  for (const configPath of normalizedPaths) {
-    const response = await fetcher(
-      createContentsUrl(normalizedRepository, configPath, resolvedBranch),
-      { headers, signal }
-    )
+  const defaultBranch = await getDefaultBranch({
+    repository: normalizedRepository,
+    headers,
+    signal,
+    fetcher,
+  })
+
+  if (defaultBranch !== requestedBranch) {
+    branchesTried.push(defaultBranch)
+    const config = await fetchGitHubConfigFromBranch({
+      repository: normalizedRepository,
+      branch: defaultBranch,
+      configPaths: normalizedPaths,
+      headers,
+      includeOriginalContent,
+      signal,
+      fetcher,
+    })
+    if (config) return config
+  }
+
+  throw new GitHubConfigError(
+    'CONFIG_NOT_FOUND',
+    `No config file was found in ${normalizedRepository} on ${branchesTried.join(', ')}. Tried: ${normalizedPaths.join(', ')}.`
+  )
+}
+
+async function fetchGitHubConfigFromBranch({
+  repository,
+  branch,
+  configPaths,
+  headers,
+  includeOriginalContent,
+  signal,
+  fetcher,
+}: {
+  repository: string
+  branch: string
+  configPaths: string[]
+  headers: Headers
+  includeOriginalContent: boolean
+  signal?: AbortSignal
+  fetcher: typeof fetch
+}): Promise<GitHubConfigResponse | undefined> {
+  for (const configPath of configPaths) {
+    const response = await fetcher(createContentsUrl(repository, configPath, branch), {
+      headers,
+      signal,
+    })
 
     if (response.status === 404) continue
     if (!response.ok) {
       const message = await readGitHubError(response)
       throw new GitHubConfigError(
         'CONFIG_UNAVAILABLE',
-        `GitHub could not read ${configPath} from ${normalizedRepository}@${resolvedBranch}: ${message}`,
+        `GitHub could not read ${configPath} from ${repository}@${branch}: ${message}`,
         response.status
       )
     }
@@ -110,21 +164,21 @@ export async function fetchGitHubConfig({
     const content = Buffer.from(payload.content.replaceAll('\n', ''), 'base64').toString('utf8')
     const config = parseConfig(content, format, payload.path ?? configPath)
     const source: GitHubConfigSource = {
-      repository: normalizedRepository,
-      branch: resolvedBranch,
+      repository,
+      branch,
       path: payload.path ?? configPath,
       format,
       sha: payload.sha ?? '',
       htmlUrl: payload.html_url ?? null,
     }
 
-    return { source, config, managedPaths: listManagedConfigPaths(config) }
+    return {
+      source,
+      config,
+      managedPaths: listManagedConfigPaths(config),
+      ...(includeOriginalContent ? { originalContent: content } : {}),
+    }
   }
-
-  throw new GitHubConfigError(
-    'CONFIG_NOT_FOUND',
-    `No config file was found in ${normalizedRepository}@${resolvedBranch}. Tried: ${normalizedPaths.join(', ')}.`
-  )
 }
 
 export function parseConfig(

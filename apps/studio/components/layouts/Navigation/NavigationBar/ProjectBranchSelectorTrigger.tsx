@@ -1,4 +1,4 @@
-import { ChevronsUpDown, GitBranch } from 'lucide-react'
+import { ChevronsUpDown, GitBranch, TriangleAlert } from 'lucide-react'
 import { forwardRef } from 'react'
 import { cn, SidebarMenuButton } from 'ui'
 
@@ -8,6 +8,7 @@ export interface ProjectBranchSelectorTriggerProps {
   isBranch: boolean
   isProductionBranch: boolean
   branchDisplayName: string
+  hasConfigDrift?: boolean
   onGoToOrganization: () => void
   onClick?: () => void
 }
@@ -22,6 +23,7 @@ export const ProjectBranchSelectorTrigger = forwardRef<
       selectedOrgInitial,
       isBranch,
       branchDisplayName,
+      hasConfigDrift = false,
       onClick,
     }: ProjectBranchSelectorTriggerProps,
     ref
@@ -48,6 +50,15 @@ export const ProjectBranchSelectorTrigger = forwardRef<
           >
             <GitBranch className="shrink-0 size-3" strokeWidth={1.5} />
             <span className="truncate min-w-0 leading-tight text-xs">{branchDisplayName}</span>
+            {hasConfigDrift && (
+              <span
+                className="ml-1 inline-flex shrink-0 items-center gap-1 text-xs text-warning"
+                title="This branch's config.toml differs from the live dashboard"
+              >
+                <TriangleAlert className="size-3" strokeWidth={1.5} />
+                Drift
+              </span>
+            )}
           </div>
         </div>
 

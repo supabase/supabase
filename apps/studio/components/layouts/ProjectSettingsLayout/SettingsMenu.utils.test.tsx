@@ -80,6 +80,21 @@ describe('useGenerateSettingsMenu', () => {
     expect(hasMembers).toBe(false)
   })
 
+  it('includes configuration drift in project settings', () => {
+    const { result } = renderHook(() => useGenerateSettingsMenu())
+    const configurationGroup = result.current.find((group) => group.title === 'Configuration')
+
+    expect(configurationGroup?.items).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: 'configuration-drift',
+          name: 'Code configuration',
+          url: '/project/project-ref/settings/configuration-drift',
+        }),
+      ])
+    )
+  })
+
   it('uses Infrastructure as the canonical compute and disk destination', () => {
     const { result } = renderHook(() => useGenerateSettingsMenu())
     const configurationGroup = result.current.find((group) => group.title === 'Configuration')
