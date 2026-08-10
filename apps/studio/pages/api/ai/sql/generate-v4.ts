@@ -15,6 +15,7 @@ import {
 } from '@/lib/ai/assistant-message-metadata'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
+import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import {
   DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
@@ -148,6 +149,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
+  const explorerEnabled = await isExplorerEnabled(claims?.email)
+
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
   let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
@@ -184,6 +187,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       accessToken,
       baseUrl: getURL(),
       supportMode,
+      isExplorerEnabled: explorerEnabled,
       signal: abortController.signal,
     })
 

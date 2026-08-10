@@ -1,6 +1,7 @@
 import * as configcat from 'configcat-js'
 
 let client: configcat.IConfigCatClient
+let serverClient: configcat.IConfigCatClient
 
 /**
  * To set up ConfigCat for another app
@@ -56,12 +57,17 @@ async function getClient() {
   }
 }
 
-export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
-  const client = await getClient()
+function buildUser(userEmail: string, customAttributes?: Record<string, string>) {
   const _customAttributes = {
     ...customAttributes,
     is_staff: !!userEmail ? userEmail.includes('@supabase.').toString() : 'false',
   }
+
+  return new configcat.User(userEmail || 'anonymous', undefined, undefined, _customAttributes)
+}
+
+export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
+  const client = await getClient()
 
   if (!client) {
     return []
@@ -69,13 +75,53 @@ export async function getFlags(userEmail: string = '', customAttributes?: Record
 
   await client.waitForReady()
 
-  if (userEmail) {
-    return client.getAllValuesAsync(
-      new configcat.User(userEmail, undefined, undefined, _customAttributes)
-    )
-  } else {
-    return client.getAllValuesAsync(
-      new configcat.User('anonymous', undefined, undefined, _customAttributes)
-    )
+  return client.getAllValuesAsync(buildUser(userEmail, customAttributes))
+}
+
+async function getServerClient() {
+  if (serverClient) return serverClient
+
+  const proxyUrl = process.env.NEXT_PUBLIC_CONFIGCAT_PROXY_URL
+  const sdkKey = process.env.NEXT_PUBLIC_CONFIGCAT_SDK_KEY
+
+  if (!proxyUrl && !sdkKey) {
+    console.log('Skipping server ConfigCat set up as env vars are not present')
+    return undefined
   }
+
+  try {
+    if (proxyUrl) {
+      serverClient = configcat.getClient(
+        'configcat-proxy/server-v1',
+        configcat.PollingMode.LazyLoad,
+        {
+          baseUrl: proxyUrl,
+        }
+      )
+      return serverClient
+    }
+
+    if (sdkKey) {
+      serverClient = configcat.getClient(sdkKey, configcat.PollingMode.LazyLoad)
+      return serverClient
+    }
+
+    return undefined
+  } catch (error: any) {
+    console.error(`Failed to get server ConfigCat client: ${error.message}`)
+    return undefined
+  }
+}
+
+export async function getServerFlags(
+  userEmail: string = '',
+  customAttributes?: Record<string, string>
+) {
+  const client = await getServerClient()
+
+  if (!client) {
+    return []
+  }
+
+  return client.getAllValuesAsync(buildUser(userEmail, customAttributes))
 }
