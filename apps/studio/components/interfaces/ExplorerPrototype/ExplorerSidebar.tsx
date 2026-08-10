@@ -1,7 +1,7 @@
 /**
  * PROTOTYPE — the Explorer sidebar, as a drill-down menu.
  *
- * Root level is saved resource types plus a mixed "Recent" group, ordered by
+ * Root level is saved resource types plus a mixed "Recently updated" group, ordered by
  * last modification. Choosing a type drills into that type's full list, with a
  * search field and a back button. The sidebar never renders a resource — it
  * only opens tabs.
@@ -179,7 +179,7 @@ export const ExplorerSidebar = ({
 
             <section className="flex flex-col gap-px">
               <h3 className="mb-2 px-3 font-mono text-sm font-normal uppercase text-foreground-lighter">
-                Recent
+                Recently updated
               </h3>
               {resolvedRecents.map((item) => {
                 const Icon = RESOURCE_ICON[item.resource.type]

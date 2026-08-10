@@ -525,8 +525,8 @@ describe('sidebar drill-down', () => {
     expect(root.getByRole('button', { name: /Notebooks/ })).toBeInTheDocument()
     expect(root.getByRole('button', { name: /Chats/ })).toBeInTheDocument()
 
-    expect(root.getByText('Recent')).toBeInTheDocument()
-    // Recent mixes types: notebooks and chats both appear.
+    expect(root.getByText('Recently updated')).toBeInTheDocument()
+    // Recently updated mixes types: notebooks and chats both appear.
     expect(root.getByRole('button', { name: /Authentication health/ })).toBeInTheDocument()
     expect(root.getByRole('button', { name: /Debugging signups/ })).toBeInTheDocument()
 
