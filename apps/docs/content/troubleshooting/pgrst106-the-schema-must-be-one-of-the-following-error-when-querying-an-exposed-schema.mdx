@@ -15,7 +15,7 @@ You may encounter a `PGRST106` error, stating `{"code":"PGRST106","message":"The
 This error occurs because the `authenticator` role's `pgrst.db_schemas` setting does not include the desired schema. This creates a conflict, as PostgREST relies on this setting to know which schemas it should expose.
 
 **How to Resolve This:**
-Check if the setting exists for "all databases" or for a specific database using the below SQL query by connecting to your database:
+The `authenticator` settings can be role-wide or database-specific. You can check using the below SQL query by connecting to your database:
 ```
 SELECT
     setrole::regrole,
@@ -31,7 +31,7 @@ To fix this, you need to update the `pgrst.db_schemas` setting for the `authenti
 - **To explicitly add your schema:**
   If you want to add your specific schema (e.g., `your_schema_name`) alongside existing schemas (like `public`), use the following command. Remember to replace `your_schema_name` with your actual schema name and include all other necessary schemas already defined.
 
-For all databases:
+For all databases(role-wide):
   `ALTER ROLE authenticator SET pgrst.db_schemas = 'public, your_schema_name';`
 
 For a specific database(example: postgres)
@@ -40,7 +40,7 @@ For a specific database(example: postgres)
 - **To reset to [dashboard configuration](/dashboard/project/_/settings/api):**
   Alternatively, you can reset this setting to allow the Supabase dashboard's configuration to take effect automatically.
 
-For all databases:
+For all databases(role-wide):
   `ALTER ROLE authenticator RESET pgrst.db_schemas;`
 
 For a specific database(example: postgres)
