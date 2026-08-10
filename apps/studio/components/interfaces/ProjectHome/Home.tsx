@@ -18,6 +18,7 @@ import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 import { AdvisorSection } from './AdvisorSection'
+import { BranchesSection } from './BranchesSection'
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
@@ -27,6 +28,7 @@ import { SortableSection } from '@/components/interfaces/ProjectHome/SortableSec
 import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
 import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
@@ -38,6 +40,11 @@ export const ProjectHome = () => {
   const snap = useAppStateSnapshot()
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
+
+  const { data: branches, isPending: isLoadingBranches } = useBranchesQuery(
+    { projectRef: project?.ref },
+    { enabled: IS_PLATFORM && !!project?.ref }
+  )
 
   const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
 
@@ -95,6 +102,7 @@ export const ProjectHome = () => {
   const showConnectSection = !!project && (!IS_PLATFORM || !isMatureProject)
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
+    if (id === 'branches') return IS_PLATFORM && !!project
     if (id === 'connect') return showConnectSection
     if (id === 'usage' || id === 'custom-report') return IS_PLATFORM
     return true
@@ -117,6 +125,17 @@ export const ProjectHome = () => {
               <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
                 <SortableContext items={renderOrder} strategy={verticalListSortingStrategy}>
                   {renderOrder.map((id) => {
+                    if (id === 'branches' && project?.ref) {
+                      return (
+                        <SortableSection key={id} id={id}>
+                          <BranchesSection
+                            projectRef={project.ref}
+                            branches={branches}
+                            isLoading={isLoadingBranches}
+                          />
+                        </SortableSection>
+                      )
+                    }
                     if (IS_PLATFORM && id === 'usage') {
                       return (
                         <div

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
+import { getGitHubAppLocalMock, isGitHubAppLocalMockEnabled } from './github-app-local-mock'
 import { integrationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -15,6 +16,8 @@ export async function getGitHubConnections(
   signal?: AbortSignal
 ) {
   if (!organizationId) throw new Error('organizationId is required')
+
+  if (isGitHubAppLocalMockEnabled()) return getGitHubAppLocalMock().connections.connections
 
   const { data, error } = await get('/platform/integrations/github/connections', {
     params: {

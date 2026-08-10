@@ -84,6 +84,7 @@ const PUSHER_URL = 'https://*.pusher.com'
 const PUSHER_URL_WS = 'wss://*.pusher.com'
 
 const GOOGLE_MAPS_API_URL = 'https://maps.googleapis.com'
+const ENV_SERVER_URL = 'http://localhost:3457'
 
 export function getCSP() {
   const DEFAULT_SRC_URLS = [
@@ -153,6 +154,7 @@ export function getCSP() {
   const defaultSrcDirective = [
     `default-src 'self'`,
     ...DEFAULT_SRC_URLS,
+    ENV_SERVER_URL,
     ...(isDevOrStaging
       ? [
           SUPABASE_STAGING_PROJECTS_URL,

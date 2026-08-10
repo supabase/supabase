@@ -77,6 +77,7 @@ const routesToIgnoreDBConnection = [
   '/project/[ref]/settings',
   '/project/[ref]/functions',
   '/project/[ref]/logs',
+  '/project/[ref]/environment-variables',
 ]
 
 const routesToIgnorePostgrestConnection = [

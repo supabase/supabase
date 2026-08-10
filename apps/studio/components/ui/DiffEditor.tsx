@@ -27,6 +27,7 @@ const DEFAULT_OPTIONS: monacoEditor.IStandaloneDiffEditorConstructionOptions = {
   renderSideBySide: false,
   renderGutterMenu: false,
   padding: { top: 4 },
+  automaticLayout: true,
 }
 
 export const DiffEditor = ({

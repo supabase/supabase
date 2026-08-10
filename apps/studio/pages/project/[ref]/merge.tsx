@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, NavMenu, NavMenuItem } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -16,6 +16,7 @@ import {
 } from '@/components/interfaces/Branching/MergeRequest'
 import { DatabaseDiffPanel } from '@/components/interfaces/BranchManagement/DatabaseDiffPanel'
 import { EdgeFunctionsDiffPanel } from '@/components/interfaces/BranchManagement/EdgeFunctionsDiffPanel'
+import { EnvironmentVariablesDiffPanel } from '@/components/interfaces/BranchManagement/EnvironmentVariablesDiffPanel'
 import { OutOfDateNotice } from '@/components/interfaces/BranchManagement/OutOfDateNotice'
 import { WorkflowLogsCard } from '@/components/interfaces/BranchManagement/WorkflowLogsCard'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -272,30 +273,6 @@ const MergePage: NextPageWithLayout = () => {
     [project?.ref]
   )
 
-  const currentTab = (router.query.tab as string) || 'database'
-
-  const navigationItems = useMemo(() => {
-    const buildHref = (tab: string) => {
-      const query: Record<string, string> = { tab }
-      if (currentWorkflowRunId) query.workflow_run_id = currentWorkflowRunId
-      const qs = new URLSearchParams(query).toString()
-      return `/project/[ref]/merge?${qs}`
-    }
-
-    return [
-      {
-        label: 'Database',
-        href: buildHref('database'),
-        active: currentTab === 'database',
-      },
-      {
-        label: 'Edge Functions',
-        href: buildHref('edge-functions'),
-        active: currentTab === 'edge-functions',
-      },
-    ]
-  }, [currentWorkflowRunId, currentTab])
-
   useEffect(() => {
     setWorkflowFinalStatus(null)
   }, [currentWorkflowRunId])
@@ -412,33 +389,27 @@ const MergePage: NextPageWithLayout = () => {
               />
             </div>
           ) : null}
-
-          <NavMenu className="mt-4 border-none">
-            {navigationItems.map((item) => {
-              const isActive =
-                item.active !== undefined ? item.active : router.asPath.split('?')[0] === item.href
-              return (
-                <NavMenuItem key={item.label} active={isActive}>
-                  <Link
-                    href={
-                      item.href.includes('[ref]') && !!ref
-                        ? item.href.replace('[ref]', ref)
-                        : item.href
-                    }
-                    className={cn('inline-flex items-center gap-2', isActive && 'text-foreground')}
-                  >
-                    {item.label}
-                  </Link>
-                </NavMenuItem>
-              )
-            })}
-          </NavMenu>
         </ScaffoldContainer>
       </div>
-
       <ScaffoldContainer size="full" className="flex min-h-0 flex-1 flex-col pt-6 pb-12">
-        <div className="flex min-h-0 flex-1 flex-col">
-          {currentTab === 'database' ? (
+        <div className="space-y-10">
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-base text-foreground">Configuration</h2>
+              <p className="text-sm text-foreground-light">
+                Auth and API settings that will be promoted to production.
+              </p>
+            </div>
+            <EnvironmentVariablesDiffPanel branchRef={ref} parentProjectRef={parentProjectRef} />
+          </section>
+
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-base text-foreground">Database</h2>
+              <p className="text-sm text-foreground-light">
+                Schema changes between this branch and production.
+              </p>
+            </div>
             <DatabaseDiffPanel
               diffContent={diffContent}
               isLoading={isDatabaseDiffLoading || isDatabaseDiffRefetching}
@@ -446,9 +417,17 @@ const MergePage: NextPageWithLayout = () => {
               showRefreshButton={true}
               currentBranchRef={ref}
             />
-          ) : (
+          </section>
+
+          <section className="space-y-3">
+            <div>
+              <h2 className="text-base text-foreground">Edge Functions</h2>
+              <p className="text-sm text-foreground-light">
+                Function changes that will be included in this merge.
+              </p>
+            </div>
             <EdgeFunctionsDiffPanel diffResults={edgeFunctionsDiff} currentBranchRef={ref} />
-          )}
+          </section>
         </div>
       </ScaffoldContainer>
 

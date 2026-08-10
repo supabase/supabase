@@ -17,6 +17,7 @@ export const HOSTED_SUPPORTED_API_URLS = [
   '/get-ip-address',
   '/get-utc-time',
   '/get-deployment-commit',
+  '/api/github-config',
   '/check-cname',
   '/edge-functions/test',
   '/edge-functions/body',

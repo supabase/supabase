@@ -16,10 +16,13 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { GitHubConfigCallout } from '../GitHubConfigCallout'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedGitHubConfig } from '@/hooks/misc/useGitHubConfigDrift'
+import { getAuthFieldConfigState } from '@/lib/github-config-drift'
 
 const schema = z.object({
   SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
@@ -33,6 +36,7 @@ const SiteUrl = () => {
     isError,
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
+  const { data: githubConfig } = useSelectedGitHubConfig()
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
@@ -48,6 +52,13 @@ const SiteUrl = () => {
     },
   })
   const { isDirty } = siteUrlForm.formState
+  const githubConfigState = authConfig
+    ? getAuthFieldConfigState({
+        fieldName: 'SITE_URL',
+        dashboardValue: authConfig.SITE_URL,
+        githubConfig: githubConfig?.config,
+      })
+    : undefined
 
   useEffect(() => {
     if (authConfig && !isUpdatingSiteUrl) {
@@ -103,6 +114,7 @@ const SiteUrl = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
+        <GitHubConfigCallout className="mb-4" state={githubConfigState} />
         <Form {...siteUrlForm}>
           <form onSubmit={siteUrlForm.handleSubmit(onSubmitSiteUrl)}>
             <Card>

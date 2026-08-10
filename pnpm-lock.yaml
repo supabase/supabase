@@ -104,6 +104,7 @@ catalogs:
       version: 3.25.76
 
 overrides:
+  '@supabase-dx/config': file:/Users/jonathansummers-muir/Documents/GitHub/supabase/supabase-vscode-extension/packages/config
   '@ardatan/relay-compiler>immutable': ^3.8.3
   monaco-editor: 0.52.2
   '@mapbox/node-pre-gyp>tar': ^7.5.21
@@ -978,6 +979,12 @@ importers:
       '@stripe/sync-engine':
         specifier: 1.0.32
         version: 1.0.32(@types/node@22.13.14)(supports-color@8.1.1)
+      '@supabase-dx/config':
+        specifier: file:/Users/jonathansummers-muir/Documents/GitHub/supabase/supabase-vscode-extension/packages/config
+        version: file:../supabase-vscode-extension/packages/config
+      '@supabase-dx/env-vars':
+        specifier: link:/Users/jonathansummers-muir/Documents/GitHub/supabase/supabase-vscode-extension/packages/env-vars
+        version: link:../../../supabase-vscode-extension/packages/env-vars
       '@supabase/auth-js':
         specifier: 'catalog:'
         version: 2.110.9
@@ -1212,6 +1219,9 @@ importers:
       shared-data:
         specifier: workspace:*
         version: link:../../packages/shared-data
+      smol-toml:
+        specifier: ^1.6.1
+        version: 1.6.1
       sonner:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -7663,6 +7673,9 @@ packages:
   '@stripe/sync-engine@1.0.32':
     resolution: {integrity: sha512-c1Ht5A7Jl0UWDwDr9tzIcpusr3B02l868UT3qgSuFuwVoTyvnX+G8h4n6rJ9hTKD07ktKA2MLL8KnXt1S1wUzA==}
     hasBin: true
+
+  '@supabase-dx/config@file:../supabase-vscode-extension/packages/config':
+    resolution: {directory: ../supabase-vscode-extension/packages/config, type: directory}
 
   '@supabase-labs/y-supabase@0.1.0':
     resolution: {integrity: sha512-1ItaKbcImgy7ueYfJcyVYihqCKi9RAee9MKBV8wcCqSMNsrWvw4ibhW8ai91kWsewsiWzIDXVPONgcUcxagk9g==}
@@ -23662,6 +23675,8 @@ snapshots:
       - pg-native
       - supports-color
       - utf-8-validate
+
+  '@supabase-dx/config@file:../supabase-vscode-extension/packages/config': {}
 
   '@supabase-labs/y-supabase@0.1.0':
     dependencies:

@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   Form,
   Sheet,
@@ -37,16 +38,19 @@ import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from '@/lib/constants'
+import { getAuthFieldConfigState } from '@/lib/github-config-drift'
+import type { GitHubConfigResponse } from '@/lib/github-config.types'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
   isActive: boolean
+  githubConfig?: GitHubConfigResponse
 }
 
 const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
 
-export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
+export const ProviderForm = ({ config, provider, isActive, githubConfig }: ProviderFormProps) => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -123,6 +127,28 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
     return getValuesForProvider(config)
   }, [config, getValuesForProvider, provider])
 
+  const githubConfigStates = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.keys(provider.properties).map((fieldName) => [
+          fieldName,
+          getAuthFieldConfigState({
+            fieldName,
+            dashboardValue: INITIAL_VALUES?.[fieldName],
+            githubConfig: githubConfig?.config,
+            isSecret: provider.properties[fieldName].isSecret,
+          }),
+        ])
+      ),
+    [INITIAL_VALUES, githubConfig?.config, provider.properties]
+  )
+  const driftedFields = Object.values(githubConfigStates).filter(
+    (state) => state.status === 'drifted'
+  ).length
+  const managedFields = Object.values(githubConfigStates).filter(
+    (state) => state.status === 'managed'
+  ).length
+
   const onSubmit = (values: any) => {
     const payload = { ...values }
     Object.keys(values).map((x: string) => {
@@ -188,18 +214,27 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
           />
         }
         meta={
-          isActive ? (
-            <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
-              <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
-                <Check strokeWidth={2} size={12} />
-              </span>
-              <span className="px-1">Enabled</span>
-            </div>
-          ) : (
-            <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
-              Disabled
-            </div>
-          )
+          <div className="flex items-center gap-2">
+            {driftedFields > 0 ? (
+              <Badge variant="warning">
+                {driftedFields} {driftedFields === 1 ? 'drift' : 'drifts'}
+              </Badge>
+            ) : managedFields > 0 ? (
+              <Badge variant="success">{managedFields} managed</Badge>
+            ) : null}
+            {isActive ? (
+              <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-brand">
+                <span className="rounded-full bg-brand p-0.5 text-xs text-brand-200">
+                  <Check strokeWidth={2} size={12} />
+                </span>
+                <span className="px-1">Enabled</span>
+              </div>
+            ) : (
+              <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
+                Disabled
+              </div>
+            )}
+          </div>
         }
       >
         {provider.title}
@@ -231,7 +266,6 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               {Object.keys(provider.properties).map((x: string) => {
                 const { entitlementKey } = provider.properties[x]
                 const hasAccess = entitlementKey == null || hasEntitlementAccess(entitlementKey)
-
                 return (
                   <FormField
                     key={x}
@@ -242,6 +276,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                     control={form.control}
                     readOnly={shouldDisableField(x) || !canUpdateConfig}
                     hasAccess={hasAccess}
+                    githubConfigState={githubConfigStates[x]}
                   />
                 )
               })}

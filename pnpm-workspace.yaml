@@ -92,6 +92,7 @@ minimumReleaseAgeExclude:
   - react-use
 
 overrides:
+  '@supabase-dx/config': 'file:/Users/jonathansummers-muir/Documents/GitHub/supabase/supabase-vscode-extension/packages/config'
   '@ardatan/relay-compiler>immutable': ^3.8.3
   'monaco-editor': 'catalog:'
   '@mapbox/node-pre-gyp>tar': ^7.5.21

@@ -13,7 +13,7 @@ const ProvidersPage: NextPageWithLayout = () => {
   const showCustomProviders = useIsFeatureEnabled('authentication:show_custom_providers')
 
   return (
-    <PageContainer size="default">
+    <PageContainer size="small">
       <BasicAuthSettingsForm />
       {showProviders && <AuthProvidersForm />}
       {showCustomProviders && <CustomAuthProviders />}

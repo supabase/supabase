@@ -9,6 +9,8 @@ import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
+const githubConfigMock = vi.hoisted(() => vi.fn())
+
 vi.mock('sonner', () => ({
   toast: {
     success: vi.fn(),
@@ -18,6 +20,10 @@ vi.mock('sonner', () => ({
 
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+}))
+
+vi.mock('@/hooks/misc/useGitHubConfigDrift', () => ({
+  useSelectedGitHubConfig: githubConfigMock,
 }))
 
 vi.mock('@/lib/constants', async () => {
@@ -37,12 +43,56 @@ const renderSiteUrl = () => customRender(<SiteUrl />)
 describe('SiteUrl', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    githubConfigMock.mockReturnValue({ data: undefined })
 
     addAPIMock({
       method: 'get',
       path: '/platform/auth/:ref/config',
       response: { SITE_URL: CURRENT_SITE_URL } as unknown as AuthConfigResponse,
     })
+  })
+
+  it('shows the managed config callout when the site URL matches config.toml', async () => {
+    githubConfigMock.mockReturnValue({
+      data: { config: { auth: { site_url: CURRENT_SITE_URL } } },
+    })
+
+    renderSiteUrl()
+
+    expect(await screen.findByText('Managed by config.toml')).toBeInTheDocument()
+    expect(screen.getByText('Managed by config.toml').parentElement).toHaveTextContent(
+      'current environment matches auth.site_url.'
+    )
+  })
+
+  it('shows drift from the platform default when site URL is absent from code-managed config', async () => {
+    githubConfigMock.mockReturnValue({
+      data: { config: { config_source: 'code', auth: {} } },
+    })
+
+    renderSiteUrl()
+
+    expect(await screen.findByText('Drift from config.toml')).toBeInTheDocument()
+    expect(screen.getByText('Drift from config.toml').parentElement).toHaveTextContent(
+      'current environment differs from auth.site_url and is currently active.'
+    )
+  })
+
+  it('does not show a config callout when an absent site URL still uses the platform default', async () => {
+    githubConfigMock.mockReturnValue({
+      data: { config: { config_source: 'code', auth: {} } },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/auth/:ref/config',
+      response: { SITE_URL: 'http://localhost:3000' } as unknown as AuthConfigResponse,
+    })
+
+    renderSiteUrl()
+
+    expect(await screen.findByDisplayValue('http://localhost:3000')).toBeInTheDocument()
+    expect(screen.queryByText('Managed by config.toml')).not.toBeInTheDocument()
+    expect(screen.queryByText('Drift from config.toml')).not.toBeInTheDocument()
   })
 
   it('trims leading and trailing whitespace from the site URL before submitting', async () => {

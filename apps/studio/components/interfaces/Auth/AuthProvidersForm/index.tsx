@@ -18,10 +18,12 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useSelectedGitHubConfig } from '@/hooks/misc/useGitHubConfigDrift'
 import { DOCS_URL } from '@/lib/constants'
 
 export const AuthProvidersForm = () => {
   const { ref: projectRef } = useParams()
+  const { data: githubConfig } = useSelectedGitHubConfig()
   const {
     data: authConfig,
     error: authConfigError,
@@ -112,6 +114,7 @@ export const AuthProvidersForm = () => {
                       config={authConfig!}
                       provider={providerSchema as unknown as Provider}
                       isActive={isActive}
+                      githubConfig={githubConfig}
                     />
                   )
                 })}

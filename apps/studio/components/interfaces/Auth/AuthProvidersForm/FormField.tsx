@@ -29,9 +29,11 @@ import {
 import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { GitHubConfigCallout } from '../GitHubConfigCallout'
 import type { Enum } from './AuthProvidersForm.types'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { BASE_PATH } from '@/lib/constants'
+import type { GitHubConfigFieldState } from '@/lib/github-config-drift'
 
 interface FormFieldProps {
   projectRef: string | undefined
@@ -42,6 +44,7 @@ interface FormFieldProps {
   hasAccess: boolean
   disabled?: boolean
   readOnly?: boolean
+  githubConfigState?: GitHubConfigFieldState
 }
 
 const FormField = ({
@@ -53,6 +56,7 @@ const FormField = ({
   hasAccess,
   disabled: disabledProp,
   readOnly,
+  githubConfigState,
 }: FormFieldProps) => {
   const { setValue } = useFormContext()
   const { description: originalDescription } = properties
@@ -74,6 +78,10 @@ const FormField = ({
   }
   const disabled =
     disabledProp || (properties.type === 'boolean' ? !hasAccess && !fieldValue : !hasAccess)
+  const fieldLabel = properties.title
+  const fieldCallout = (
+    <GitHubConfigCallout className="col-span-full mb-2" state={githubConfigState} />
+  )
 
   const showValue = useWatch({
     control,
@@ -102,6 +110,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -109,7 +118,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
@@ -150,10 +159,11 @@ const FormField = ({
         </>
       )
 
-    case 'string':
+    case 'string': {
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -161,27 +171,31 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <Markdown content={description} className="text-foreground-lighter" />
                     ) : null
                   }
                 >
-                  <FormControl className="col-span-6">
+                  <div className="col-span-6 space-y-2">
                     {properties.isSecret ? (
-                      <DataInput
-                        {...field}
-                        id={name}
-                        size="small"
-                        copy
-                        reveal
-                        readOnly={readOnly}
-                      />
+                      <FormControl>
+                        <DataInput
+                          {...field}
+                          id={name}
+                          size="small"
+                          copy
+                          reveal
+                          readOnly={readOnly}
+                        />
+                      </FormControl>
                     ) : (
-                      <Input {...field} id={name} readOnly={readOnly} />
+                      <FormControl>
+                        <Input {...field} id={name} readOnly={readOnly} />
+                      </FormControl>
                     )}
-                  </FormControl>
+                  </div>
                 </FormItemLayout>
               )}
             />
@@ -189,11 +203,13 @@ const FormField = ({
           <Separator className="w-full" />
         </>
       )
+    }
 
     case 'multiline-string':
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -201,7 +217,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <Markdown content={description} className="text-foreground-lighter" />
@@ -230,6 +246,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -237,7 +254,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <Markdown content={description} className="text-foreground-lighter" />
@@ -286,6 +303,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -293,7 +311,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     <div className="flex flex-col gap-1">
                       {description ? <Markdown content={description} /> : null}
@@ -329,6 +347,7 @@ const FormField = ({
       return (
         <>
           <SheetSection>
+            {fieldCallout}
             <UIFormField
               control={control}
               name={name}
@@ -336,7 +355,7 @@ const FormField = ({
               render={({ field }) => (
                 <FormItemLayout
                   layout="horizontal"
-                  label={properties.title}
+                  label={fieldLabel}
                   description={
                     description ? (
                       <div className="form-field-markdown">
