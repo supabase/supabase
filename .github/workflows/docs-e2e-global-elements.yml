@@ -1,10 +1,6 @@
 name: Docs Global Elements E2E Tests
 
-# Unlike "Docs E2E", this check is not required on master, so it can use a
-# `paths` trigger filter: pull requests that touch no global elements simply
-# never start it. Scope is the fixed page list in
-# e2e/docs/utils/docs-global-elements.ts — one page per layout — because these
-# elements are global and do not vary by content.
+# Not a required check, unlike "Docs E2E", so a `paths` filter is safe here.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]

@@ -113,6 +113,7 @@ const GlobalMobileMenu = ({ open, setOpen }: Props) => {
       <AnimatePresence mode="wait">
         {open && (
           <m.div
+            data-test="sb-docs-mobile-menu"
             variants={container}
             initial="hidden"
             animate="show"

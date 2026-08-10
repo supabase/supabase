@@ -198,7 +198,7 @@ outside the article, see [Global element scans](#global-element-scans).
 ## Global element scans
 
 This suite scans what the per-page suite excludes: the top navigation bar,
-sidebar navigation, table of contents, breadcrumbs, and footer.
+sidebar navigation, content sidebar, breadcrumbs, and footer.
 
 ```bash
 PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:global-elements
@@ -210,23 +210,35 @@ per-page suite uses. A second page on a layout already covered would scan the
 same markup for the same result. Add a page only for a layout the list doesn't
 reach yet.
 
-Each page asserts that its regions are still in the DOM, then scans the page
-with the article excluded. Regions are matched on `data-test` attributes in
-`apps/docs`, so a styling or markup change can't quietly drop one from the scan.
-A missing region is a soft failure: the test still reports its scan.
+Every page runs at two viewports, 1280x800 and 390x844. A layout hides
+different elements at each width, so the two runs scan different markup. One
+extra test opens the mobile menu overlay and scans it, because that markup only
+exists once opened. The overlay is the same list on every page, so one page
+covers it.
 
-This suite keeps the page-level rules the article scan skips — `color-contrast`,
-`html-has-lang`, `document-title` — because global elements are where those
-live. It only drops `page-has-heading-one`, whose target is the excluded article.
+Each page asserts that its elements are visible, then scans the page with the
+article excluded. Elements are matched on `data-test` attributes in `apps/docs`,
+so a styling or markup change can't quietly drop one from the scan. Visibility
+rather than presence matters here, since axe skips hidden subtrees and an
+attached element that renders nothing would pass while scanning nothing. Which
+elements to expect at which width lives in `GLOBAL_ELEMENTS`. A missing element
+is a soft failure: the test still reports its scan.
+
+This suite keeps the page-level rules the article scan skips, such as
+`html-has-lang` and `document-title`, because global elements are where those
+live. It drops `page-has-heading-one`, whose target is the excluded article, and
+`color-contrast`, which is most of the scan time.
 
 Like the article scan, most findings are reported as warnings. Blocking rules
 are `GLOBAL_ELEMENTS_ENFORCED_RULES` in `utils/axe-helpers.ts`. A violation in a
 global element appears on every docs page, so keep that list green rather than
 growing it.
 
-`button-name` is reported rather than blocking: the filter comboboxes on
+`button-name` is reported rather than blocking. The filter comboboxes on
 `/docs/guides/troubleshooting` have no accessible name, and they also trip
-`aria-required-attr`. Promote the rule once those are named.
+`aria-required-attr`. The sidebar toggle in `layouts/MainSkeleton.tsx` is
+icon-only and unnamed, which shows up at mobile width. Promote the rule once
+those are named.
 
 Runs live in their own config (`playwright.global-elements.config.ts`) and
 report folder (`playwright-report-global-elements/`), so `pnpm e2e:docs` on a
@@ -234,7 +246,10 @@ content pull request never picks them up.
 
 Not covered:
 
-- Mobile layouts. The suite runs one desktop viewport.
+- `color-contrast`, which the suite skips for speed. Nothing checks docs
+  contrast now.
+- Keyboard behavior in the mobile menu, including focus order and focus
+  trapping. Axe reports the markup, not the interaction.
 - Global elements that arrive through `packages/ui` rather than `apps/docs`. CI
   doesn't watch that path, so run this manually when a shared component changes.
 - Client library reference pages such as `/docs/reference/javascript/*`, which

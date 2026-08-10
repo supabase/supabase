@@ -7,12 +7,15 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
 
 // A violation in a global element lands on every docs page, so keep this list
-// green rather than growing it with findings that aren't fixed yet.
+// green rather than growing it with findings that aren't fixed yet. Rules must
+// be within WCAG_TAGS and absent from GLOBAL_ELEMENTS_EXCLUDED_RULES, since
+// scanOutsideArticle finds them in its one tagged pass.
 export const GLOBAL_ELEMENTS_ENFORCED_RULES = ['link-name']
 
-// Page-level rules stay on here, unlike the article scan, which can't reach
-// them. Only `page-has-heading-one` goes: its target is the excluded article.
-export const GLOBAL_ELEMENTS_EXCLUDED_RULES = ['page-has-heading-one']
+// Page-level rules the article scan can't reach stay on here.
+// `page-has-heading-one` targets the excluded article; `color-contrast` is most
+// of the scan time.
+export const GLOBAL_ELEMENTS_EXCLUDED_RULES = ['color-contrast', 'page-has-heading-one']
 
 export const EXCLUDED_RULES = [
   'color-contrast',
@@ -109,22 +112,15 @@ export async function scanOutsideArticle(
   surface: string,
   exclude: string[]
 ): Promise<A11yScanResult> {
-  const scan = () =>
-    exclude.reduce(
-      (builder, selector) => builder.exclude(selector),
-      new AxeBuilder({ page }).setLegacyMode(true)
-    )
+  const builder = exclude.reduce(
+    (acc, selector) => acc.exclude(selector),
+    new AxeBuilder({ page }).setLegacyMode(true)
+  )
 
-  const reported = await scan()
+  const reported = await builder
     .withTags(WCAG_TAGS)
     .disableRules(GLOBAL_ELEMENTS_EXCLUDED_RULES)
     .analyze()
-
-  const enforced = await scan().withRules(GLOBAL_ELEMENTS_ENFORCED_RULES).analyze()
-
-  const byRule = new Map(
-    [...reported.violations, ...enforced.violations].map((violation) => [violation.id, violation])
-  )
 
   const elementCount = await page.evaluate(
     (selectors) =>
@@ -146,7 +142,7 @@ export async function scanOutsideArticle(
     loaded: true,
     status: null,
     elementCount,
-    violations: [...byRule.values()],
+    violations: reported.violations,
   }
 }
 

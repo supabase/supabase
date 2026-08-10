@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import type { TestInfo } from '@playwright/test'
+import type { Page, TestInfo } from '@playwright/test'
 
 import {
   attachScanReport,
@@ -15,8 +15,13 @@ import {
 } from '../utils/axe-helpers.js'
 import {
   articleSelectorsOnPage,
+  elementsForViewport,
   GLOBAL_ELEMENTS,
   GLOBAL_ELEMENT_PAGES,
+  MOBILE_MENU_SELECTOR,
+  renderedLocator,
+  VIEWPORTS,
+  type ViewportName,
 } from '../utils/docs-global-elements.js'
 
 function annotate(testInfo: TestInfo, description: string) {
@@ -24,84 +29,133 @@ function annotate(testInfo: TestInfo, description: string) {
   console.warn(`::warning title=Accessibility::${description}`)
 }
 
+async function load(page: Page, testInfo: TestInfo, path: string, surface: string) {
+  let response
+  try {
+    response = await page.goto(path)
+  } catch (error) {
+    await attachScanReport(
+      testInfo,
+      unloadedResult(surface, path, null, 'document', GLOBAL_ELEMENTS_EXCLUDED_RULES)
+    )
+    throw error
+  }
+
+  const status = response?.status() ?? null
+
+  if (!response?.ok()) {
+    await attachScanReport(
+      testInfo,
+      unloadedResult(surface, page.url(), status, 'document', GLOBAL_ELEMENTS_EXCLUDED_RULES)
+    )
+    expect(response?.ok(), `Expected a successful response for ${path}, got ${status}`).toBeTruthy()
+  }
+
+  return status
+}
+
+async function scanAndAssert(
+  page: Page,
+  testInfo: TestInfo,
+  surface: string,
+  status: number | null
+) {
+  const exclude = await articleSelectorsOnPage(page)
+  const result = await scanOutsideArticle(page, surface, exclude)
+  result.status = status
+
+  await attachScanReport(testInfo, result)
+
+  if (scanLooksEmpty(result)) {
+    annotate(
+      testInfo,
+      `${surface} scanned only ${result.elementCount} element(s) outside the article, so a clean ` +
+        'result here proves nothing. Most likely the page had not finished rendering.'
+    )
+  }
+
+  const blocking = blockingViolations(result, GLOBAL_ELEMENTS_ENFORCED_RULES)
+
+  const reported = result.violations.filter((violation) => !blocking.includes(violation))
+  if (reported.length) {
+    annotate(
+      testInfo,
+      `${surface} global elements have ${reported.length} non-blocking accessibility finding(s): ` +
+        reported.map((v) => `${v.id} (${v.nodes.length})`).join(', ')
+    )
+  }
+
+  const enforced = shouldEnforceAll()
+    ? 'all WCAG 2.1 A/AA rules'
+    : GLOBAL_ELEMENTS_ENFORCED_RULES.join(', ')
+
+  expect(
+    blocking.map((violation) => violation.id).sort(),
+    `${surface} global elements have blocking a11y violations (${enforced}):\n${formatViolations(blocking)}`
+  ).toEqual([])
+}
+
 test.describe('Docs global elements', () => {
   // Without this, every test in this file runs on one worker.
   test.describe.configure({ mode: 'parallel' })
 
-  for (const { path, layout, landmarks } of GLOBAL_ELEMENT_PAGES) {
-    test(`${path} (${layout}) global elements have no blocking accessibility violations @global-elements`, async ({
-      page,
-    }, testInfo) => {
-      test.setTimeout(120_000)
+  for (const { path, layout, elements } of GLOBAL_ELEMENT_PAGES) {
+    for (const viewport of Object.keys(VIEWPORTS) as ViewportName[]) {
+      const surface = `${path} at ${viewport}`
 
-      let response
-      try {
-        response = await page.goto(path)
-      } catch (error) {
-        await attachScanReport(
-          testInfo,
-          unloadedResult(path, path, null, 'document', GLOBAL_ELEMENTS_EXCLUDED_RULES)
-        )
-        throw error
-      }
+      test(`${surface} (${layout}) global elements have no blocking accessibility violations @global-elements`, async ({
+        page,
+      }, testInfo) => {
+        test.setTimeout(120_000)
 
-      const status = response?.status() ?? null
+        await page.setViewportSize(VIEWPORTS[viewport])
 
-      if (!response?.ok()) {
-        await attachScanReport(
-          testInfo,
-          unloadedResult(path, page.url(), status, 'document', GLOBAL_ELEMENTS_EXCLUDED_RULES)
-        )
-        expect(
-          response?.ok(),
-          `Expected a successful response for ${path}, got ${status}`
-        ).toBeTruthy()
-        return
-      }
+        const status = await load(page, testInfo, path, surface)
+        if (status && status >= 400) return
 
-      await settleForAxe(page)
+        await settleForAxe(page)
 
-      // Soft, so a missing landmark still reports its scan instead of hiding it.
-      for (const landmark of landmarks) {
-        const { selector, label } = GLOBAL_ELEMENTS[landmark]
-        await expect
-          .soft(page.locator(selector).first(), `${path} should render the ${label} (${selector})`)
-          .toBeAttached()
-      }
+        // Visible, not just attached: axe skips hidden subtrees, so an attached
+        // element that renders nothing would pass while scanning nothing.
+        // Soft, so a missing element still reports its scan instead of hiding it.
+        for (const name of elementsForViewport(elements, viewport)) {
+          const { selector, label } = GLOBAL_ELEMENTS[name]
+          await expect
+            .soft(
+              renderedLocator(page, selector),
+              `${surface} should render the ${label} (${selector})`
+            )
+            .toBeVisible()
+        }
 
-      const exclude = await articleSelectorsOnPage(page)
-      const result = await scanOutsideArticle(page, path, exclude)
-      result.status = status
-
-      await attachScanReport(testInfo, result)
-
-      if (scanLooksEmpty(result)) {
-        annotate(
-          testInfo,
-          `${path} scanned only ${result.elementCount} element(s) outside the article, so a clean ` +
-            'result here proves nothing. Most likely the page had not finished rendering.'
-        )
-      }
-
-      const blocking = blockingViolations(result, GLOBAL_ELEMENTS_ENFORCED_RULES)
-
-      const reported = result.violations.filter((violation) => !blocking.includes(violation))
-      if (reported.length) {
-        annotate(
-          testInfo,
-          `${path} global elements have ${reported.length} non-blocking accessibility finding(s): ` +
-            reported.map((v) => `${v.id} (${v.nodes.length})`).join(', ')
-        )
-      }
-
-      const enforced = shouldEnforceAll()
-        ? 'all WCAG 2.1 A/AA rules'
-        : GLOBAL_ELEMENTS_ENFORCED_RULES.join(', ')
-
-      expect(
-        blocking.map((violation) => violation.id).sort(),
-        `${path} global elements have blocking a11y violations (${enforced}):\n${formatViolations(blocking)}`
-      ).toEqual([])
-    })
+        await scanAndAssert(page, testInfo, surface, status)
+      })
+    }
   }
+
+  // The overlay is a static list, identical on every page, so one page covers
+  // it. Its markup only exists once opened.
+  test('the mobile menu overlay has no blocking accessibility violations @global-elements', async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(120_000)
+
+    const path = '/docs'
+    const surface = '/docs with the mobile menu open'
+
+    await page.setViewportSize(VIEWPORTS.mobile)
+
+    const status = await load(page, testInfo, path, surface)
+    if (status && status >= 400) return
+
+    await renderedLocator(page, GLOBAL_ELEMENTS.menuTrigger.selector).click()
+    await expect(
+      page.locator(MOBILE_MENU_SELECTOR),
+      `${surface} should open the mobile menu overlay`
+    ).toBeVisible()
+
+    await settleForAxe(page)
+
+    await scanAndAssert(page, testInfo, surface, status)
+  })
 })
