@@ -195,30 +195,34 @@
   --accent-foreground: var(--foreground);
 
   /*
-   * Control surface roles (pair with --border-control / --border-control-hover):
-   *   --field          sunk well for text entry (Input, Textarea, filled MultiSelect)
-   *   --control-raised raised plate for choosers (Select, empty MultiSelect)
-   * Opaque overlaying chrome (default Button fill) stays on --card / --popover —
-   * those must occlude underlying content, not read as form wells or plates.
+   * Control surface roles (local relative to whatever plate they sit on):
+   *   --field          sunk text entry (Input, Textarea, filled MultiSelect)
+   *   --control-raised raised chooser plate (Select, empty MultiSelect)
+   *   --control        alias of --control-raised (Saxon's "one elevated control")
    *
-   * Rest borders: fields use border-control; raised / buttons use border-strong
-   * (both currently alias --input via compat — role names are for migration).
-   * Interactive step is always --border-control-hover. Invalid fields parallel
-   * that ladder with destructive-400 → destructive.
+   * Alpha overlays, not solids from --background. Solids are page-relative, so a
+   * control at card (e1) on a Sheet (popover / e2) sits *between* page and sheet
+   * (reads as accidental sink on dark, vanishes into the sheet near the light
+   * ceiling). Black/white alpha always darkens/lightens the *local* plate.
    *
-   * --control-raised aliases --card today (role name for call sites). Prefer the
-   * role token so fill can diverge from card later without hunting components.
+   * Light caveat: the canvas sits near L≈1 (--surface 0.995), so white raises
+   * have little headroom on sheets. Sunk wells still read; raises lean on
+   * border-strong / border-control-hover more than fill. Widening light
+   * headroom would mean retuning --surface (design-group territory).
    *
-   * --field is a recessed solid twin of --card on the elevation axis (card is
-   * +e1 from --background). A full e1 dig reads too strong against sheet chrome,
-   * so --elevation-field scales the recess (0.35 ≈ soft well).
+   * Opaque overlaying chrome (default Button fill) stays on --card / --popover
+   * so floating actions can occlude content (DEPR-636). Floating *clusters*
+   * may still prefer a solid Popover shell underneath.
+   *
+   * Borders: fields rest on border-control; raised / buttons on border-strong
+   * (both still alias --input via compat). Interactive step is
+   * --border-control-hover. Invalid fields parallel that ladder with
+   * destructive-400 → destructive.
    */
-  --elevation-field: 0.35;
-  --field: oklch(
-    from var(--background)
-      calc(l - var(--elevation-step) * var(--elevation-1) * var(--elevation-field)) c h
-  );
-  --control-raised: var(--card);
+  --elevation-field: 0.85;
+  --field: oklch(0 0 0 / calc(var(--muted-alpha) * var(--elevation-field)));
+  --control-raised: oklch(1 0 0 / var(--muted-alpha));
+  --control: var(--control-raised);
 
   --warning: oklch(var(--warning-lightness) var(--expressive-chroma) var(--warning-hue));
   --destructive: oklch(
