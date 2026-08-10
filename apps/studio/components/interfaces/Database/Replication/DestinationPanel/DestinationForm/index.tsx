@@ -524,18 +524,9 @@ export const DestinationForm = ({
                 ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
                   <DuckLakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
-                  <SnowflakeFields
-                    form={form}
-                    editMode={editMode}
-                    hasStoredPrivateKeyPassphrase={
-                      editMode && !!defaultValues.snowflakePrivateKeyPassphrase
-                    }
-                  />
+                  <SnowflakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
-                  <ClickHouseFields
-                    form={form}
-                    hasStoredPassword={editMode && !!defaultValues.clickhousePassword}
-                  />
+                  <ClickHouseFields form={form} editMode={editMode} />
                 ) : null}
 
                 <DialogSectionSeparator />
