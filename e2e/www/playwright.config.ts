@@ -10,6 +10,7 @@ export default defineConfig({
   retries: IS_CI ? 2 : 0,
   maxFailures: 3,
   expect: { timeout: 15_000 },
+  fullyParallel: true,
   workers: 1,
   use: {
     baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000',

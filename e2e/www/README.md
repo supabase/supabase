@@ -59,8 +59,13 @@ global `maxFailures: 3`. The suite runs one worker by default, so pass
 `--workers` to parallelize it:
 
 ```bash
-PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:www:all -- --workers=6
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:www:all -- --workers=4
 ```
+
+Against production, raising workers does not pay off: a serial full run finishes
+in about 17 minutes with no failures, while four workers took longer and timed
+out on 34 of 480 navigations. Those timeouts are load, not page defects. Prefer
+the default single worker unless you are pointed at a preview or a local server.
 
 ## Choose a target URL
 
@@ -107,8 +112,14 @@ prefix; customers and alternatives use the filename as-is.
 
 Each page gets one test: it must return a successful status, and an axe scan
 must report no `page-has-heading-one` violations. That is the only rule enforced
-today — add more in `features/www-pages.spec.ts` once a class of issue reaches
-zero across the site.
+today — add more to `ENFORCED_RULES` in `features/www-pages.spec.ts` once a class
+of issue reaches zero across the site.
+
+`ENFORCED_RULES` is deliberately separate from the docs suite's list. Docs
+enforces `heading-order` as well; www cannot yet. A full-site scan found
+`heading-order` violations on the large majority of content pages, almost all
+from the same two shared components — the related-posts card (`h4` under an `h2`)
+and a trailing `h6`. Enforcing it here would fail nearly every pull request.
 
 ### Out of scope
 
