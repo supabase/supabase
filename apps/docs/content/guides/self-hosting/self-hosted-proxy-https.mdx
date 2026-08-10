@@ -120,7 +120,7 @@ Self-signed certificates trigger browser warnings and are rejected by most OAuth
 
 </Admonition>
 
-For development or internal networks where you cannot use Let's Encrypt, here's how you can configure the [Kong gateway override](/docs/guides/self-hosting/self-hosted-envoy#reverting-to-kong) to serve HTTPS directly using self-signed certificates. This requires the Kong override (`sh run.sh config add kong`); the default Envoy gateway does not terminate TLS, so use Caddy or Nginx above instead.
+For development or internal networks where you cannot use Let's Encrypt, here's how you can configure the legacy Kong API gateway to serve HTTPS directly using self-signed certificates. This requires the Kong override (`sh run.sh config add kong`); the default Envoy gateway does not terminate TLS, so use Caddy or Nginx above instead.
 
 ### Step 1: Generate a self-signed certificate
 

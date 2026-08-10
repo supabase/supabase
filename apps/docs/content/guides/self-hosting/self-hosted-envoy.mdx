@@ -209,16 +209,15 @@ If you customize the `cors:` block in `lds.template.yaml` to enable `allow_crede
 
 The gateway is configured with these production-oriented settings:
 
-| Setting                                               | Purpose                                                                                                                                                                                            |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `normalize_path: true`, `merge_slashes: true`         | Prevents path-confusion bypass of RBAC prefix rules                                                                                                                                                |
-| `path_with_escaped_slashes_action: REJECT_REQUEST`    | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
-| `use_remote_address: true`                            | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
-| `headers_with_underscores_action: REJECT_REQUEST`     | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                                    |
-| `per_connection_buffer_limit_bytes: 32768`            | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
-| `max_active_downstream_connections: 30000`            | Overload manager limit on total downstream connections                                                                                                                                             |
-| Admin interface bound to `127.0.0.1:9901`             | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |
-| Image pinned to `envoyproxy/envoy:v1.37.2` (or newer) | Includes published security patches for Envoy 1.37.x                                                                                                                                               |
+| Setting                                            | Purpose                                                                                                                                                                                            |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `normalize_path: true`, `merge_slashes: true`      | Prevents path-confusion bypass of RBAC prefix rules                                                                                                                                                |
+| `path_with_escaped_slashes_action: REJECT_REQUEST` | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
+| `use_remote_address: true`                         | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
+| `headers_with_underscores_action: REJECT_REQUEST`  | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                                    |
+| `per_connection_buffer_limit_bytes: 32768`         | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
+| `max_active_downstream_connections: 30000`         | Overload manager limit on total downstream connections                                                                                                                                             |
+| Admin interface bound to `127.0.0.1:9901`          | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |
 
 <Admonition type="caution">
 
