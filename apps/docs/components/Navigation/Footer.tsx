@@ -5,7 +5,7 @@ import { LayoutMainContent } from '~/layouts/DefaultLayout'
 
 const Footer = ({ className }: { className?: string }) => (
   <LayoutMainContent className={cn('pt-0', className)}>
-    <footer role="contentinfo" aria-label="footer">
+    <footer role="contentinfo" aria-label="footer" data-test="sb-docs-footer">
       <div className="mt-16">
         <ul className="flex flex-col gap-2">
           {primaryLinks.map(({ url, featherIcon: Icon, text, ctaLabel }) => (

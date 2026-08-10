@@ -129,7 +129,10 @@ const GuidesSidebar = ({
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
+    <div
+      data-test="sb-docs-toc-sidebar"
+      className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}
+    >
       <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
         {video && (
           <div className="relative pl-5">

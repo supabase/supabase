@@ -1,0 +1,164 @@
+name: Docs Global Elements E2E Tests
+
+# Unlike "Docs E2E", this check is not required on master, so it can use a
+# `paths` trigger filter: pull requests that touch no global elements simply
+# never start it. Scope is the fixed page list in
+# e2e/docs/utils/docs-global-elements.ts — one page per layout — because these
+# elements are global and do not vary by content.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft]
+    branches: ['master']
+    paths:
+      - 'apps/docs/app/**'
+      - 'apps/docs/components/**'
+      - 'apps/docs/features/ui/**'
+      - 'apps/docs/layouts/**'
+      - 'e2e/docs/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/docs-e2e-global-elements.yml'
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Base URL to test against'
+        required: false
+        default: 'https://supabase.com'
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: read
+  pull-requests: read
+
+env:
+  CI: true
+
+jobs:
+  global-elements:
+    name: Docs Global Elements E2E
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    timeout-minutes: 30
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      # Runs before checkout. Decides whether a Vercel docs preview exists to
+      # test against; a harness-only change has none, so production serves the
+      # markup this suite scans.
+      - name: Detect changed paths
+        id: changes
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            docs_app:
+              - 'apps/docs/**'
+
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            e2e/docs
+            scripts
+            patches
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Enable pnpm store cache
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      # Same Vercel handling as docs-e2e.yml. See scripts/waitForVercelDocsPreview.js.
+      - name: Wait for Vercel docs preview
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.docs_app == 'true'
+        id: deployment
+        continue-on-error: true
+        run: node scripts/waitForVercelDocsPreview.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+
+      - name: Resolve base URL
+        id: base-url
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_URL_INPUT: ${{ inputs.base_url }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+          DOCS_APP_CHANGED: ${{ steps.changes.outputs.docs_app }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            printf 'url=%s\n' "$BASE_URL_INPUT" >> "$GITHUB_OUTPUT"
+            if [ "$BASE_URL_INPUT" = "https://supabase.com" ]; then
+              echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            fi
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -n "$DEPLOYMENT_URL" ]; then
+            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # A harness-only change ships no markup, so production serves exactly
+          # the markup this suite is meant to scan.
+          if [ "$DOCS_APP_CHANGED" != "true" ]; then
+            echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # This pull request changes global elements and nothing is serving them.
+          # Production would scan the old markup and pass for the wrong reason.
+          echo "url=" >> "$GITHUB_OUTPUT"
+          echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          echo "should_test=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::No Vercel docs preview URL for this pull request, so nothing is serving the global elements it changes. Skipping rather than scanning production, which still has the old markup."
+
+      - name: Install dependencies
+        if: steps.base-url.outputs.should_test == 'true'
+        run: pnpm install --frozen-lockfile --filter=e2e-docs...
+
+      - name: Install Playwright Chromium
+        if: steps.base-url.outputs.should_test == 'true'
+        run: pnpm -C e2e/docs exec playwright install chromium --with-deps --only-shell
+
+      - name: Run docs global elements E2E
+        if: steps.base-url.outputs.should_test == 'true'
+        working-directory: e2e/docs
+        run: pnpm run e2e:docs:global-elements
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_DOCS || '' }}
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: docs-global-elements-playwright-report
+          path: |
+            e2e/docs/playwright-report-global-elements/
+            e2e/docs/test-results/
+          retention-days: 7

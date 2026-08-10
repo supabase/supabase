@@ -6,6 +6,14 @@ export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
 export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
 
+// A violation in a global element lands on every docs page, so keep this list
+// green rather than growing it with findings that aren't fixed yet.
+export const GLOBAL_ELEMENTS_ENFORCED_RULES = ['link-name']
+
+// Page-level rules stay on here, unlike the article scan, which can't reach
+// them. Only `page-has-heading-one` goes: its target is the excluded article.
+export const GLOBAL_ELEMENTS_EXCLUDED_RULES = ['page-has-heading-one']
+
 export const EXCLUDED_RULES = [
   'color-contrast',
   'html-has-lang',
@@ -22,6 +30,7 @@ export interface A11yScanResult {
   surface: string
   url: string
   include: string
+  exclude?: string[]
   excludedRules: string[]
   loaded: boolean
   status: number | null
@@ -95,17 +104,64 @@ export async function scanArticle(
   }
 }
 
+export async function scanOutsideArticle(
+  page: Page,
+  surface: string,
+  exclude: string[]
+): Promise<A11yScanResult> {
+  const scan = () =>
+    exclude.reduce(
+      (builder, selector) => builder.exclude(selector),
+      new AxeBuilder({ page }).setLegacyMode(true)
+    )
+
+  const reported = await scan()
+    .withTags(WCAG_TAGS)
+    .disableRules(GLOBAL_ELEMENTS_EXCLUDED_RULES)
+    .analyze()
+
+  const enforced = await scan().withRules(GLOBAL_ELEMENTS_ENFORCED_RULES).analyze()
+
+  const byRule = new Map(
+    [...reported.violations, ...enforced.violations].map((violation) => [violation.id, violation])
+  )
+
+  const elementCount = await page.evaluate(
+    (selectors) =>
+      document.body.querySelectorAll('*').length -
+      selectors.reduce(
+        (sum, selector) =>
+          sum + (document.querySelector(selector)?.querySelectorAll('*').length ?? 0) + 1,
+        0
+      ),
+    exclude
+  )
+
+  return {
+    surface,
+    url: page.url(),
+    include: 'document',
+    exclude,
+    excludedRules: GLOBAL_ELEMENTS_EXCLUDED_RULES,
+    loaded: true,
+    status: null,
+    elementCount,
+    violations: [...byRule.values()],
+  }
+}
+
 export function unloadedResult(
   surface: string,
   url: string,
   status: number | null,
-  include: string
+  include: string,
+  excludedRules: string[] = EXCLUDED_RULES
 ): A11yScanResult {
   return {
     surface,
     url,
     include,
-    excludedRules: EXCLUDED_RULES,
+    excludedRules,
     loaded: false,
     status,
     elementCount: 0,
@@ -129,9 +185,12 @@ export async function attachScanReport(testInfo: TestInfo, result: A11yScanResul
   })
 }
 
-export function blockingViolations(result: A11yScanResult): Result[] {
+export function blockingViolations(
+  result: A11yScanResult,
+  enforcedRules: string[] = ENFORCED_RULES
+): Result[] {
   if (shouldEnforceAll()) return result.violations
-  return result.violations.filter((violation) => ENFORCED_RULES.includes(violation.id))
+  return result.violations.filter((violation) => enforcedRules.includes(violation.id))
 }
 
 export function formatViolations(violations: Result[]): string {

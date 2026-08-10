@@ -16,6 +16,7 @@ This page covers:
   scope is wrong
 - [What the suite covers](#what-the-suite-covers) — in-scope paths and limits
 - [Accessibility scans](#accessibility-scans) — WCAG coverage and skipped rules
+- [Global element scans](#global-element-scans) — navigation, sidebar, and footer
 - [Debug failures](#debug-failures) — reports and traces
 - [How CI uses this suite](#how-ci-uses-this-suite) — pull request behavior
 
@@ -185,13 +186,60 @@ own content.
 
 `EXCLUDED_RULES` in `utils/axe-helpers.ts` lists the rules the scan skips.
 `color-contrast` is most of the scan time and finds nothing inside an article, since
-docs contrast comes from shared tokens and chrome. The rest target `<html>`, `<head>`,
-and `<body>`, which an article-scoped scan can't reach.
+docs contrast comes from shared tokens and global elements. The rest target `<html>`,
+`<head>`, and `<body>`, which an article-scoped scan can't reach.
 
 Cross-origin frames are skipped, so a third-party embed isn't reported as ours.
 
-Not covered: `/docs/reference/*`, shared chrome, and most of WCAG. Keyboard
-navigation, focus management, and screen reader behavior need manual testing.
+Not covered: `/docs/reference/*` articles and most of WCAG. Keyboard navigation,
+focus management, and screen reader behavior need manual testing. For everything
+outside the article, see [Global element scans](#global-element-scans).
+
+## Global element scans
+
+This suite scans what the per-page suite excludes: the top navigation bar,
+sidebar navigation, table of contents, breadcrumbs, and footer.
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:global-elements
+```
+
+These elements are global, so scope is a fixed list — one page per layout, in
+`utils/docs-global-elements.ts` — instead of the changed-files scope the
+per-page suite uses. A second page on a layout already covered would scan the
+same markup for the same result. Add a page only for a layout the list doesn't
+reach yet.
+
+Each page asserts that its regions are still in the DOM, then scans the page
+with the article excluded. Regions are matched on `data-test` attributes in
+`apps/docs`, so a styling or markup change can't quietly drop one from the scan.
+A missing region is a soft failure: the test still reports its scan.
+
+This suite keeps the page-level rules the article scan skips — `color-contrast`,
+`html-has-lang`, `document-title` — because global elements are where those
+live. It only drops `page-has-heading-one`, whose target is the excluded article.
+
+Like the article scan, most findings are reported as warnings. Blocking rules
+are `GLOBAL_ELEMENTS_ENFORCED_RULES` in `utils/axe-helpers.ts`. A violation in a
+global element appears on every docs page, so keep that list green rather than
+growing it.
+
+`button-name` is reported rather than blocking: the filter comboboxes on
+`/docs/guides/troubleshooting` have no accessible name, and they also trip
+`aria-required-attr`. Promote the rule once those are named.
+
+Runs live in their own config (`playwright.global-elements.config.ts`) and
+report folder (`playwright-report-global-elements/`), so `pnpm e2e:docs` on a
+content pull request never picks them up.
+
+Not covered:
+
+- Mobile layouts. The suite runs one desktop viewport.
+- Global elements that arrive through `packages/ui` rather than `apps/docs`. CI
+  doesn't watch that path, so run this manually when a shared component changes.
+- Client library reference pages such as `/docs/reference/javascript/*`, which
+  serve a bare link list to a headless browser and render nothing to scan.
+  `/docs/reference/cli/introduction` covers the reference layout instead.
 
 ## Debug failures
 
@@ -218,3 +266,9 @@ owned docs content, partials, or `e2e/docs`.
 Draft pull requests stay skipped until you mark them ready for review. Manual
 `workflow_dispatch` runs require a `page_paths` input and accept an optional
 `base_url`, which defaults to production.
+
+The global element suite runs from `.github/workflows/docs-e2e-global-elements.yml` on pull
+requests that touch docs layout code or `e2e/docs`. That check isn't required on
+master, so it uses a `paths` trigger and simply never starts on other pull
+requests. It scans the Vercel preview when `apps/docs` changed, production when
+only the harness changed, and skips when a change to those elements has no preview to test.

@@ -33,6 +33,7 @@ const TopNavBar: FC = () => {
     <>
       <nav
         aria-label="top bar"
+        data-test="sb-docs-top-nav"
         className="w-full z-40 flex flex-col border-b backdrop-blur-sm backdrop-filter bg-default/75"
       >
         <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
