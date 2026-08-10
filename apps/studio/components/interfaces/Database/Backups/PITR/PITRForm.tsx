@@ -1,24 +1,17 @@
 import dayjs from 'dayjs'
-import { HelpCircle } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Calendar, cn } from 'ui'
 
-import { type Timezone } from './PITR.types'
-import {
-  constrainDateToRange,
-  formatNumberToTwoDigits,
-  getClientTimezone,
-  getDatesBetweenRange,
-} from './PITR.utils'
+import { getDatesBetweenRange, toCalendarDate, withCalendarDate, withTime } from './PITR.utils'
 import TimeInput from './TimeInput'
 import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
-import InformationBox from '@/components/ui/InformationBox'
+import { guessLocalTimezone } from '@/lib/dayjs'
 
 type Props = {
   onSubmit: (data: {
-    selectedTimezone: Timezone
+    selectedTimezone: string
     recoveryTimeTargetUnix: number
     recoveryTimeString: string
     recoveryTimeStringUtc: string
@@ -34,19 +27,15 @@ export function PITRForm({
   latestAvailableBackupUnix,
   disabled = false,
 }: Props) {
-  const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
-  const earliestAvailableBackup = dayjs
-    .unix(earliestAvailableBackupUnix ?? 0)
-    .tz(selectedTimezone.utc[0])
-  const latestAvailableBackup = dayjs
-    .unix(latestAvailableBackupUnix ?? 0)
-    .tz(selectedTimezone.utc[0])
-  const earliestAvailableBackupAsDate = earliestAvailableBackup.toDate()
-  const latestAvailableBackupAsDate = latestAvailableBackup.toDate()
+  const [selectedTimezone, setSelectedTimezone] = useState<string>(guessLocalTimezone)
+  const earliestAvailableBackup = dayjs.unix(earliestAvailableBackupUnix ?? 0).tz(selectedTimezone)
+  const latestAvailableBackup = dayjs.unix(latestAvailableBackupUnix ?? 0).tz(selectedTimezone)
 
-  const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
+  // Held as an instant rather than a wall clock so that switching timezone
+  // re-renders the same point in time instead of shifting it
+  const [selectedUnix, setSelectedUnix] = useState(latestAvailableBackupUnix ?? 0)
 
-  const selectedDate = dayjs(selectedDateRaw).tz(selectedTimezone.utc[0], true)
+  const selectedDate = dayjs.unix(selectedUnix).tz(selectedTimezone)
   const isSelectedOnEarliestDay = selectedDate.isSame(earliestAvailableBackup, 'day')
   const isSelectedOnLatestDay = selectedDate.isSame(latestAvailableBackup, 'day')
   const availableDates = getDatesBetweenRange(earliestAvailableBackup, latestAvailableBackup)
@@ -69,35 +58,15 @@ export function PITRForm({
     s: latestAvailableBackup.second(),
   }
 
-  const recoveryTimeTargetUnix = selectedDate.unix()
-  const recoveryTimeString = selectedDate.format('DD MMM YYYY HH:mm:ss')
-  const recoveryTimeStringUtc = selectedDate.utc().format('DD MMM YYYY HH:mm:ss')
-
-  const isWithinRange = useMemo(
-    () =>
-      (!!selectedDate && selectedDate.isSame(latestAvailableBackup)) ||
-      selectedDate.isSame(earliestAvailableBackup) ||
-      (selectedDate.isBefore(latestAvailableBackup) &&
-        selectedDate.isAfter(earliestAvailableBackup)),
-    [selectedDate, latestAvailableBackup, earliestAvailableBackup]
-  )
-
-  const onUpdateDate = (date: Date) => {
-    setSelectedDateRaw(
-      constrainDateToRange(
-        dayjs(date).tz(selectedTimezone.utc[0], true),
-        earliestAvailableBackup,
-        latestAvailableBackup
-      ).toDate()
-    )
-  }
+  const isWithinRange =
+    !selectedDate.isBefore(earliestAvailableBackup) && !selectedDate.isAfter(latestAvailableBackup)
 
   const handleSubmit = () => {
     onSubmit({
       selectedTimezone,
-      recoveryTimeTargetUnix,
-      recoveryTimeString,
-      recoveryTimeStringUtc,
+      recoveryTimeTargetUnix: selectedDate.unix(),
+      recoveryTimeString: selectedDate.format('DD MMM YYYY HH:mm:ss'),
+      recoveryTimeStringUtc: selectedDate.utc().format('DD MMM YYYY HH:mm:ss'),
     })
   }
 
@@ -109,7 +78,7 @@ export function PITRForm({
           <div className="flex items-center justify-end gap-3 p-6">
             <ButtonTooltip
               variant="default"
-              disabled={disabled || !selectedDate || !isWithinRange}
+              disabled={disabled || !isWithinRange}
               onClick={handleSubmit}
               tooltip={{
                 content: {
@@ -132,14 +101,16 @@ export function PITRForm({
             <Calendar
               mode="single"
               required={true}
-              selected={selectedDateRaw}
-              onSelect={onUpdateDate}
-              defaultMonth={latestAvailableBackupAsDate}
-              startMonth={earliestAvailableBackupAsDate}
-              endMonth={latestAvailableBackupAsDate}
+              selected={toCalendarDate(selectedDate)}
+              onSelect={(date) =>
+                setSelectedUnix(withCalendarDate(selectedDate, date, selectedTimezone).unix())
+              }
+              defaultMonth={toCalendarDate(latestAvailableBackup)}
+              startMonth={toCalendarDate(earliestAvailableBackup)}
+              endMonth={toCalendarDate(latestAvailableBackup)}
               disabled={[
-                { before: earliestAvailableBackupAsDate },
-                { after: latestAvailableBackupAsDate },
+                { before: toCalendarDate(earliestAvailableBackup) },
+                { after: toCalendarDate(latestAvailableBackup) },
               ]}
               classNames={{
                 root: 'w-min px-0',
@@ -160,83 +131,56 @@ export function PITRForm({
           </div>
 
           <div className="w-full lg:w-2/3">
-            {!selectedDate ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="mx-2">
-                  <InformationBox
-                    defaultVisibility
-                    hideCollapse
-                    icon={<HelpCircle size={14} strokeWidth={2} />}
-                    title="Select a date which you'd like to restore your database to"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-8 py-2">
-                <div className="flex flex-col gap-y-4">
-                  <p className="text-sm text-foreground">Enter a time to restore to</p>
-                  <div className="space-y-1">
-                    <p className="text-sm text-foreground-light">Time zone</p>
-                    <div className="w-[350px]">
-                      <TimezoneSelection
-                        selectedTimezone={selectedTimezone}
-                        onSelectTimezone={setSelectedTimezone}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="space-y-1">
-                      <p className="text-sm text-foreground-light">Recovery time</p>
-                      {isSelectedOnEarliestDay && (
-                        <p className="text-sm text-foreground-lighter">
-                          <strong>Earliest backup available for this date</strong>:{' '}
-                          {earliestAvailableBackup.format('HH:mm:ss')}
-                        </p>
-                      )}
-                      {isSelectedOnLatestDay && (
-                        <p className="text-sm text-foreground-lighter">
-                          <strong>Latest backup available for this date</strong>:{' '}
-                          {latestAvailableBackup.format('HH:mm:ss')}
-                        </p>
-                      )}
-                      <TimeInput
-                        defaultTime={selectedTime}
-                        minimumTime={
-                          isSelectedOnEarliestDay ? earliestAvailableBackupTime : undefined
-                        }
-                        maximumTime={isSelectedOnLatestDay ? latestAvailableBackupTime : undefined}
-                        onChange={({ h, m, s }) => {
-                          const newDate = dayjs(selectedDateRaw)
-                            .set('hour', h)
-                            .set('minute', m)
-                            .set('second', s)
-
-                          setSelectedDateRaw(newDate.toDate())
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
+            <div className="space-y-8 py-2">
+              <div className="flex flex-col gap-y-4">
+                <p className="text-sm text-foreground">Enter a time to restore to</p>
                 <div className="space-y-1">
-                  <p className="text-sm text-foreground-light">Database will be restored to:</p>
-                  <p className="text-3xl">
-                    <span>{dayjs(selectedDate).format('DD MMM YYYY')}</span>
-                    <span>
-                      , {formatNumberToTwoDigits(selectedTime.h)}:
-                      {formatNumberToTwoDigits(selectedTime.m)}:
-                      {formatNumberToTwoDigits(selectedTime.s)}
-                    </span>
-                  </p>
-
-                  <p className="text-sm text-foreground-lighter mt-4 text-balance">
-                    Backups are captured every 2 minutes, allowing you to enter a time and restore
-                    your database to the closest backup point. We'll match the time you enter to the
-                    closest backup within the 2-minute window
-                  </p>
+                  <p className="text-sm text-foreground-light">Time zone</p>
+                  <div className="w-[350px]">
+                    <TimezoneSelection
+                      selectedTimezone={selectedTimezone}
+                      onSelectTimezone={setSelectedTimezone}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="space-y-1">
+                    <p className="text-sm text-foreground-light">Recovery time</p>
+                    {isSelectedOnEarliestDay && (
+                      <p className="text-sm text-foreground-lighter">
+                        <strong>Earliest backup available for this date</strong>:{' '}
+                        {earliestAvailableBackup.format('HH:mm:ss')}
+                      </p>
+                    )}
+                    {isSelectedOnLatestDay && (
+                      <p className="text-sm text-foreground-lighter">
+                        <strong>Latest backup available for this date</strong>:{' '}
+                        {latestAvailableBackup.format('HH:mm:ss')}
+                      </p>
+                    )}
+                    <TimeInput
+                      defaultTime={selectedTime}
+                      minimumTime={
+                        isSelectedOnEarliestDay ? earliestAvailableBackupTime : undefined
+                      }
+                      maximumTime={isSelectedOnLatestDay ? latestAvailableBackupTime : undefined}
+                      onChange={(time) => setSelectedUnix(withTime(selectedDate, time).unix())}
+                    />
+                  </div>
                 </div>
               </div>
-            )}
+
+              <div className="space-y-1">
+                <p className="text-sm text-foreground-light">Database will be restored to:</p>
+                <p className="text-3xl">{selectedDate.format('DD MMM YYYY, HH:mm:ss')}</p>
+
+                <p className="text-sm text-foreground-lighter mt-4 text-balance">
+                  Backups are captured every 2 minutes, allowing you to enter a time and restore
+                  your database to the closest backup point. We'll match the time you enter to the
+                  closest backup within the 2-minute window
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </FormPanel>
