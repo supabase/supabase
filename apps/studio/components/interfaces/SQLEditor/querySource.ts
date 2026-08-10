@@ -5,6 +5,7 @@ import { generateDynamicHelper } from '@/components/interfaces/Settings/Logs/Log
 import type { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { ResolvedLogDateRange } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import type { Snippet } from '@/data/content/sql-folders-query'
+import { isoDateTimeString, type IsoDateTimeString } from '@/lib/iso-datetime'
 
 /**
  * Domain view of where a snippet's query runs. Derived from the content TYPE:
@@ -58,22 +59,6 @@ export function resolveSnippetSource(
   sourceParam: string | undefined
 ): SqlSnippetSource {
   return snippet !== undefined ? getSnippetSource(snippet) : parseSqlSnippetSource(sourceParam)
-}
-
-/**
- * An ISO-8601 datetime proven valid at construction via a dayjs parse. Absolute
- * log ranges carry these instead of raw strings so an unvalidated datetime can
- * never reach execution.
- */
-export type IsoDateTimeString = string & { readonly __isoDateTimeBrand: unique symbol }
-
-/**
- * Validate a raw string as an ISO datetime, returning the branded value or null.
- * The sole construction site for `IsoDateTimeString` outside `now`.
- */
-export function isoDateTimeString(raw: string): IsoDateTimeString | null {
-  if (!raw) return null
-  return dayjs(raw).isValid() ? (raw as IsoDateTimeString) : null
 }
 
 /** `now` as a branded ISO datetime — `toISOString()` is always valid ISO-8601. */

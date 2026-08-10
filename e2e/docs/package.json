@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
-    "@types/node": "catalog:"
+    "@types/node": "catalog:",
+    "axe-core": "^4.12.1"
   }
 }
