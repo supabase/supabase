@@ -1,16 +1,18 @@
 import { MessageCirclePlus, NotebookText, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 
+import { useCreateNotebook } from './hooks'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
 import { AssistantModel } from '@/state/ai-assistant-state'
 
 export const ExplorerHome = () => {
+  const { createNotebook } = useCreateNotebook()
+
   const [value, setValue] = useState<string>('')
   const [selectedModel, setSelectedModal] = useState<AssistantModel>('gpt-5.4-nano')
 
   const onCreateNotebook = () => {}
-
   const onCreateChat = () => {}
 
   return (
@@ -41,7 +43,7 @@ export const ExplorerHome = () => {
               title="Create a notebook"
               description="Combine notes, queries, and results"
               bgColor="bg-blue-500"
-              onClick={onCreateNotebook}
+              onClick={createNotebook}
             />
             <ActionCard
               icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
