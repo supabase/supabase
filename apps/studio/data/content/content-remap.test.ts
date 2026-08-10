@@ -231,6 +231,43 @@ describe('unmapSqlContentField', () => {
   })
 })
 
+describe('unmapSqlContentField (notebooks)', () => {
+  // Notebook content only ever reaches `unmapSqlContentField` via createNotebook/updateNotebook,
+  // which always hand it a WritableNotebook — plain `sql` per cell, `id` present only for
+  // existing cells. That's already wire-shaped, so this is a pure passthrough.
+  it('returns notebook content completely unchanged', () => {
+    const writableNotebook = {
+      id: 'e4bbee88-8d2b-4de7-aa5c-5aa8ac270b55',
+      type: 'notebook' as const,
+      content: {
+        schema_version: 1 as const,
+        cells: [
+          { _tag: 'markdown_cell' as const, text: '# New cell' },
+          {
+            _tag: 'database_cell' as const,
+            id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
+            sql: 'select * from auth.users limit 100',
+            row_limit: 100,
+          },
+          {
+            _tag: 'log_cell' as const,
+            sql: "select timestamp, event_message from edge_logs where source = 'edge_logs' limit 10",
+            time_range: {
+              _tag: 'relative_time_range' as const,
+              unit: 'hour' as const,
+              amount: 1,
+            },
+          },
+        ],
+      },
+    }
+
+    const result = unmapSqlContentField(writableNotebook)
+
+    expect(result).toBe(writableNotebook)
+  })
+})
+
 describe('remap/unmap round-trip', () => {
   it('returns the original content shape after remap then unmap for sql snippets', () => {
     const result = unmapSqlContentField(remapSqlContentField(SQL_SNIPPET))
@@ -242,11 +279,5 @@ describe('remap/unmap round-trip', () => {
     const result = unmapSqlContentField(remapSqlContentField(LOG_SQL_SNIPPET))
 
     expect(result.content).toEqual(LOG_SQL_SNIPPET.content)
-  })
-
-  it('returns the original content shape after remap then unmap for notebooks', () => {
-    const result = unmapSqlContentField(remapSqlContentField(NOTEBOOK))
-
-    expect(result.content).toEqual(NOTEBOOK.content)
   })
 })
