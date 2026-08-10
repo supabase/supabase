@@ -233,27 +233,36 @@ The Python `opentelemetry` propagation is handled entirely through the `opentele
 1. **Add** the `opentelemetry-sdk` and `opentelemetry-instrumentation-httpx` package:
 
 ```sh
-uv add openetelemtry-sdk opentelemetry-instrumentation-httpx
+uv add opentelemetry-sdk opentelemetry-instrumentation-httpx
 ```
 
-2. **Instrument** `httpx` clients using the `HTTPXClientInstrumentor`:
+2. **Instrument** the `httpx` client using the `HTTPXClientInstrumentor`:
 
 ```python
 from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
 HTTPXClientInstrumentor().instrument()
 ```
 
+<Admonition type="note">
+
+This will instrument all `httpx` clients in your process. If you want to instrument only the Supabase client, you can use `HTTPXClientInstrumentor.instrument_client` in the specific sub-package client you want to trace.
+
+</Admonition>
+
 3. **Create** your `SupabaseClient`. Any active span is now propagated automatically:
 
 ```python
+from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
+
+from supabase import AsyncClient
 
 trace.set_tracer_provider(TracerProvider()) 
 tracer = trace.get_tracer(__name__)
 
-async def query():
+async def query(client: AsyncClient):
     with tracer.start_as_current_span("orchestral_query") as span:
-        await client.from_("orchestral_sections") \
+        await client.table("orchestral_sections") \
                     .select("name, instruments(name)") \
                     .order("name", desc=True, foreign_table="instruments") \
                     .execute()
