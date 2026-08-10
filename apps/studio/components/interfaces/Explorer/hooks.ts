@@ -26,7 +26,7 @@ export const useCreateNotebook = () => {
       visibility: 'project',
       favorite: false,
       content: {
-        schema_version: '1.0',
+        schema_version: 1,
         cells: [],
       },
       owner_id: profile.id,
