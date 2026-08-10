@@ -134,15 +134,4 @@ export function blockingViolations(result: A11yScanResult): Result[] {
   return result.violations.filter((violation) => ENFORCED_RULES.includes(violation.id))
 }
 
-export function formatViolations(violations: Result[]): string {
-  return violations
-    .map(
-      (violation) =>
-        `${violation.id} (${violation.impact}, ${violation.nodes.length} node(s)): ${violation.help}\n` +
-        violation.nodes
-          .slice(0, 5)
-          .map((node) => `    ${node.target.join(' ')}\n      ${node.html.slice(0, 200)}`)
-          .join('\n')
-    )
-    .join('\n')
-}
+export { formatViolations, violationIds } from '../../shared/axe.ts'

@@ -1,22 +1,12 @@
 import { AxeBuilder } from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import type { Result } from 'axe-core'
 
+import { formatViolations, violationIds } from '../../shared/axe.ts'
 import { parsePagePaths } from '../../shared/paths.ts'
 
-const ENFORCED_RULES = ['page-has-heading-one']
+const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
 
 const pagePaths = parsePagePaths(process.env.WWW_E2E_PAGE_PATHS)
-
-function summarize(violations: Result[]): string {
-  return violations
-    .map(
-      (violation) =>
-        `  ${violation.id} (${violation.nodes.length} node(s)): ${violation.help}\n` +
-        violation.nodes.map((node) => `    ${node.target.join(' ')}`).join('\n')
-    )
-    .join('\n')
-}
 
 test.describe('WWW content pages', () => {
   test('resolved page list must not be empty', () => {
@@ -41,9 +31,9 @@ test.describe('WWW content pages', () => {
         .analyze()
 
       expect(
-        violations.map((violation) => violation.id),
+        violationIds(violations),
         `${pagePath} violates enforced a11y rules (${ENFORCED_RULES.join(', ')}):\n` +
-          summarize(violations)
+          formatViolations(violations)
       ).toEqual([])
     })
   }

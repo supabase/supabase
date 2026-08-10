@@ -12,6 +12,7 @@ import {
   settleForAxe,
   shouldEnforceAll,
   unloadedResult,
+  violationIds,
 } from '../utils/axe-helpers.js'
 import {
   articleSelectorForPagePath,
@@ -137,7 +138,7 @@ test.describe('Docs owned pages', () => {
       const enforced = shouldEnforceAll() ? 'all WCAG 2.1 A/AA rules' : ENFORCED_RULES.join(', ')
 
       expect(
-        blocking,
+        violationIds(blocking),
         `${pagePath} has blocking a11y violations (${enforced}):\n${formatViolations(blocking)}`
       ).toEqual([])
     })
