@@ -7,6 +7,7 @@ import {
   DevelopmentOperations,
   ExecuteSqlOptions,
   GetLogsOptions,
+  QueryLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
 
 import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
@@ -117,6 +118,8 @@ export function getDebuggingOperations({
   headers,
 }: GetDebuggingOperationsOptions): DebuggingOperations {
   return {
+    // Self-hosted logs are served by Logflare, which speaks BigQuery SQL.
+    logsDialect: 'bigquery',
     async getLogs(projectRef: string, options: GetLogsOptions) {
       const sql = getLogQuery(options.service)
 
@@ -125,6 +128,25 @@ export function getDebuggingOperations({
         projectRef,
         params: {
           sql,
+          iso_timestamp_start: options.iso_timestamp_start,
+          iso_timestamp_end: options.iso_timestamp_end,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    },
+    async queryLogs(projectRef: string, options: QueryLogsOptions) {
+      // Pass the model's SQL straight through to the same Logflare endpoint
+      // getLogs uses, which already accepts an arbitrary `sql` param.
+      const { data, error } = await retrieveAnalyticsData({
+        name: 'logs.all',
+        projectRef,
+        params: {
+          sql: options.sql,
           iso_timestamp_start: options.iso_timestamp_start,
           iso_timestamp_end: options.iso_timestamp_end,
         },
