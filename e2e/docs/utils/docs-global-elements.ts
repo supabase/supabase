@@ -9,9 +9,7 @@ export const VIEWPORTS = {
 
 export type ViewportName = keyof typeof VIEWPORTS
 
-// Selectors match `data-test` attributes in apps/docs, so restyling or
-// remarkup cannot silently drop an element out of the scan. `viewports` lists
-// where an element is expected to be visible; it defaults to both.
+// `viewports` lists where an element renders. It defaults to both.
 export const GLOBAL_ELEMENTS = {
   topNav: { selector: '[data-test="sb-docs-top-nav"]', label: 'top navigation bar' },
   sidebarNav: {
@@ -45,8 +43,7 @@ export interface GlobalElementPage {
   elements: GlobalElement[]
 }
 
-// One page per layout. These elements are global, so a second page on a layout
-// already covered scans the same markup for the same result.
+// One page per layout. A second page on a covered layout scans the same markup.
 export const GLOBAL_ELEMENT_PAGES: GlobalElementPage[] = [
   {
     path: '/docs',
@@ -80,8 +77,7 @@ export const GLOBAL_ELEMENT_PAGES: GlobalElementPage[] = [
   },
 ]
 
-// The top bar ships twice, once in a `hidden lg:flex` wrapper and once in a
-// `flex lg:hidden` one, so match whichever copy renders at this viewport.
+// The top bar ships twice, desktop and mobile, so match the copy that renders.
 export function renderedLocator(page: Page, selector: string) {
   return page.locator(`${selector}:visible`).first()
 }

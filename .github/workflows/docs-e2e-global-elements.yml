@@ -41,9 +41,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
-      # Runs before checkout. Decides whether a Vercel docs preview exists to
-      # test against; a harness-only change has none, so production serves the
-      # markup this suite scans.
+      # Runs before checkout. A harness-only change has no preview to test.
       - name: Detect changed paths
         id: changes
         if: github.event_name == 'pull_request'
@@ -117,8 +115,7 @@ jobs:
             exit 0
           fi
 
-          # A harness-only change ships no markup, so production serves exactly
-          # the markup this suite is meant to scan.
+          # A harness-only change ships no markup, so production serves ours.
           if [ "$DOCS_APP_CHANGED" != "true" ]; then
             echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
             echo "use_bypass=false" >> "$GITHUB_OUTPUT"
@@ -126,7 +123,6 @@ jobs:
             exit 0
           fi
 
-          # This pull request changes global elements and nothing is serving them.
           # Production would scan the old markup and pass for the wrong reason.
           echo "url=" >> "$GITHUB_OUTPUT"
           echo "use_bypass=false" >> "$GITHUB_OUTPUT"

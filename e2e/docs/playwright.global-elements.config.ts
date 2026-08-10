@@ -2,8 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 const IS_CI = !!process.env.CI
 
-// A separate config rather than a project in playwright.config.ts, so
-// `pnpm e2e:docs` on a content pull request never picks these up.
+// Separate config, so `pnpm e2e:docs` never picks these up.
 export default defineConfig({
   testDir: './global-elements',
   testMatch: /.*\.spec\.ts/,

@@ -115,9 +115,8 @@ test.describe('Docs global elements', () => {
 
         await settleForAxe(page)
 
-        // Visible, not just attached: axe skips hidden subtrees, so an attached
-        // element that renders nothing would pass while scanning nothing.
-        // Soft, so a missing element still reports its scan instead of hiding it.
+        // Visible, not attached: axe skips hidden subtrees.
+        // Soft, so a missing element still reports its scan.
         for (const name of elementsForViewport(elements, viewport)) {
           const { selector, label } = GLOBAL_ELEMENTS[name]
           await expect
@@ -133,8 +132,7 @@ test.describe('Docs global elements', () => {
     }
   }
 
-  // The overlay is a static list, identical on every page, so one page covers
-  // it. Its markup only exists once opened.
+  // Same overlay on every page, and its markup only exists once opened.
   test('the mobile menu overlay has no blocking accessibility violations @global-elements', async ({
     page,
   }, testInfo) => {
