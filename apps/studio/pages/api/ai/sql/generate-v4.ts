@@ -29,6 +29,7 @@ import { getTools } from '@/lib/ai/tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 export const maxDuration = 120
 
@@ -149,7 +150,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
-  const explorerEnabled = await isExplorerEnabled(claims?.email)
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 

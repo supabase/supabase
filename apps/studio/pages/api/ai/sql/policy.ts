@@ -13,6 +13,7 @@ import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { RLS_PROMPT } from '@/lib/ai/prompts'
 import { getTools } from '@/lib/ai/tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 const policySchema = z.object({
   sql: z.string().describe('The generated Postgres CREATE POLICY statement.'),
@@ -89,7 +90,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
     }
   }
 
-  const explorerEnabled = await isExplorerEnabled(claims?.email)
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
 
   try {
     const { modelParams, error: modelError } = await getModel({

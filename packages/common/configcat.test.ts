@@ -5,7 +5,6 @@ vi.mock('configcat-js', () => ({
   getClient: vi.fn(),
   PollingMode: {
     AutoPoll: 'AutoPoll',
-    LazyLoad: 'LazyLoad',
   },
   ClientCacheState: {
     NoFlagData: 0,
@@ -76,69 +75,6 @@ describe('configcat', () => {
     expect(proxyClient.dispose).toHaveBeenCalled()
     expect(configcat.getClient).toHaveBeenNthCalledWith(2, 'test-sdk-key', 'AutoPoll', {
       pollIntervalSeconds: 7 * 60,
-    })
-  })
-
-  describe('getServerFlags', () => {
-    it('should return empty array and skip getClient when no SDK key is present', async () => {
-      const { getServerFlags } = await import('./configcat')
-      const result = await getServerFlags('test@example.com')
-
-      expect(result).toEqual([])
-      expect(configcat.getClient).not.toHaveBeenCalled()
-    })
-
-    it('should prefer the proxy over the direct SDK key when both are configured', async () => {
-      vi.stubEnv('NEXT_PUBLIC_CONFIGCAT_SDK_KEY', 'test-sdk-key')
-      vi.stubEnv('NEXT_PUBLIC_CONFIGCAT_PROXY_URL', 'https://proxy.example.com')
-      mockClient.getAllValuesAsync.mockResolvedValue([])
-
-      const { getServerFlags } = await import('./configcat')
-      await getServerFlags('test@example.com')
-
-      expect(configcat.getClient).toHaveBeenCalledTimes(1)
-      expect(configcat.getClient).toHaveBeenCalledWith('configcat-proxy/server-v1', 'LazyLoad', {
-        baseUrl: 'https://proxy.example.com',
-      })
-      expect(mockClient.waitForReady).not.toHaveBeenCalled()
-    })
-
-    it('should fall back to the direct SDK key when no proxy URL is configured', async () => {
-      vi.stubEnv('NEXT_PUBLIC_CONFIGCAT_SDK_KEY', 'test-sdk-key')
-      mockClient.getAllValuesAsync.mockResolvedValue([])
-
-      const { getServerFlags } = await import('./configcat')
-      await getServerFlags('test@example.com')
-
-      expect(configcat.getClient).toHaveBeenCalledWith('test-sdk-key', 'LazyLoad')
-    })
-
-    it('should call getAllValuesAsync with a user built from the given email', async () => {
-      vi.stubEnv('NEXT_PUBLIC_CONFIGCAT_SDK_KEY', 'test-sdk-key')
-      const mockValues = [{ settingKey: 'explorer', settingValue: true }]
-      mockClient.getAllValuesAsync.mockResolvedValue(mockValues)
-
-      const { getServerFlags } = await import('./configcat')
-      const result = await getServerFlags('test@example.com')
-
-      expect(configcat.User).toHaveBeenCalledWith(
-        'test@example.com',
-        undefined,
-        undefined,
-        expect.any(Object)
-      )
-      expect(result).toEqual(mockValues)
-    })
-
-    it('reuses the same client across calls instead of creating a new one each time', async () => {
-      vi.stubEnv('NEXT_PUBLIC_CONFIGCAT_SDK_KEY', 'test-sdk-key')
-      mockClient.getAllValuesAsync.mockResolvedValue([])
-
-      const { getServerFlags } = await import('./configcat')
-      await getServerFlags('a@example.com')
-      await getServerFlags('b@example.com')
-
-      expect(configcat.getClient).toHaveBeenCalledTimes(1)
     })
   })
 })
