@@ -101,8 +101,14 @@ export function createSaveMechanism(deps: SaveMechanismDeps) {
     try {
       snippet.status = statusOnSaveStart(snippet.status)
       await upsertContent({ projectRef, payload })
-      if (shouldInvalidate) await invalidate(projectRef)
-      pendingInvalidation.delete(id)
+      // Only a save that actually invalidated may clear the obligation. A save
+      // running with `shouldInvalidate: false` was scheduled while nothing was
+      // latched, so clearing it here would discard an obligation queued by a
+      // newer save while this one was in flight.
+      if (shouldInvalidate) {
+        await invalidate(projectRef)
+        pendingInvalidation.delete(id)
+      }
       snippet.status = statusOnSaveSuccess()
     } catch (error) {
       snippet.status = statusOnSaveError(snippet.status)
