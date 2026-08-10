@@ -33,6 +33,15 @@ describe('withCalendarDate', () => {
     expect(updated.tz('America/New_York').format('YYYY-MM-DD HH:mm:ss')).toBe('2026-02-20 12:00:00')
   })
 
+  it('lands on a real instant when the wall clock does not exist on the new date', () => {
+    // 02:30 does not exist in New York on 08 Mar 2026, the clocks jump 02:00 to 03:00
+    const current = dayjs.tz('2026-03-20 02:30:00', 'America/New_York')
+    const updated = withCalendarDate(current, new Date(2026, 2, 8), 'America/New_York')
+
+    expect(updated.isValid()).toBe(true)
+    expect(updated.tz('America/New_York').format('YYYY-MM-DD HH:mm:ss')).toBe('2026-03-08 03:30:00')
+  })
+
   it('does not overflow when the new month is shorter than the current one', () => {
     const current = dayjs.tz('2026-01-31 08:00:00', 'UTC')
     const updated = withCalendarDate(current, new Date(2026, 1, 28), 'UTC')
