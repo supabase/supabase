@@ -37,6 +37,8 @@ export const toolSetValidationSchema = z.record(
     'list_policies',
     'list_reports',
     'get_report',
+    'list_notebooks',
+    'get_notebook',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
@@ -88,6 +90,8 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_policies: TOOL_CATEGORIES.SCHEMA,
   list_reports: TOOL_CATEGORIES.SCHEMA,
   get_report: TOOL_CATEGORIES.SCHEMA,
+  list_notebooks: TOOL_CATEGORIES.SCHEMA,
+  get_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,
