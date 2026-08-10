@@ -2,8 +2,9 @@ import { useMemo } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 import { proxyMap } from 'valtio/utils'
 
-import type { Notebook, NotebookCell, StateNotebook } from './types'
+import type { Notebook, StateNotebook } from './types'
 import type { SnippetStatus } from '@/data/content/snippet-status'
+import type { Notebooks } from '@/types'
 
 // [Joshen] Deliberately copied from sql-editor-lifecycle cause we might deprecate
 // that in favor of notebooks in the long run
@@ -80,7 +81,7 @@ export const notebooksState = proxy({
     skipSave,
   }: {
     id: string
-    cells: NotebookCell[]
+    cells: Notebooks.Cell[]
     skipSave?: boolean
   }) => {
     const stateNotebook = notebooksState.notebooks[id]
