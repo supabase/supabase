@@ -288,7 +288,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 <div
                   className={cn(
                     'relative text-sm text-left flex flex-col gap-0 px-0 py-3 w-full h-[110px]',
-                    'bg-overlay rounded-md border p-2 hover:border-foreground-muted'
+                    'bg-overlay rounded-md border p-2 hover:border-control-hover'
                   )}
                 >
                   <SupportLink

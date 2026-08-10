@@ -30,9 +30,8 @@ const connectModeButtonVariants = cva(
   {
     variants: {
       selected: {
-        true: 'z-1 border-foreground-muted bg-surface-300 ring-1 ring-border',
-        false:
-          'hover:z-1 hover:border-foreground-muted hover:bg-background dark:hover:bg-surface-200',
+        true: 'z-1 border-control-hover bg-surface-300',
+        false: 'hover:z-1 hover:border-control-hover hover:bg-background dark:hover:bg-surface-200',
       },
       // Narrow 2-col outer corners
       topLeft: {

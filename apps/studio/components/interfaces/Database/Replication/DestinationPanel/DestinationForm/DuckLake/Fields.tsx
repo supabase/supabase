@@ -82,10 +82,8 @@ const DuckLakeModeSelector = ({
             onClick={() => onChange(option.value)}
             className={cn(
               'relative flex flex-col gap-y-3 rounded-md border p-4 text-left transition',
-              'hover:border-foreground-muted',
-              selected
-                ? 'border-foreground-muted bg-surface-300 ring-1 ring-border'
-                : 'border-default bg-surface-100'
+              'hover:border-control-hover',
+              selected ? 'border-control-hover bg-surface-300' : 'border-default bg-surface-100'
             )}
           >
             <div className="flex items-start justify-between">
