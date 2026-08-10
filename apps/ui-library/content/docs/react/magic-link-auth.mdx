@@ -45,7 +45,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=
 
 ```ts
 import { useEffect } from "react"
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@/lib/supabase/client"
 
 export default function AuthenticatedRoute() {
   useEffect(() => {
