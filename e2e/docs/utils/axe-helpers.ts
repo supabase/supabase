@@ -12,10 +12,10 @@ export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
 // scanOutsideArticle finds them in its one tagged pass.
 export const GLOBAL_ELEMENTS_ENFORCED_RULES = ['link-name']
 
-// Page-level rules the article scan can't reach stay on here.
-// `page-has-heading-one` targets the excluded article; `color-contrast` is most
-// of the scan time.
-export const GLOBAL_ELEMENTS_EXCLUDED_RULES = ['color-contrast', 'page-has-heading-one']
+// Page-level rules the article scan can't reach stay on here, including
+// `color-contrast`, which docs takes from shared tokens. Only
+// `page-has-heading-one` goes: its target is the excluded article.
+export const GLOBAL_ELEMENTS_EXCLUDED_RULES = ['page-has-heading-one']
 
 export const EXCLUDED_RULES = [
   'color-contrast',

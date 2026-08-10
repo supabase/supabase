@@ -225,9 +225,10 @@ elements to expect at which width lives in `GLOBAL_ELEMENTS`. A missing element
 is a soft failure: the test still reports its scan.
 
 This suite keeps the page-level rules the article scan skips, such as
-`html-has-lang` and `document-title`, because global elements are where those
-live. It drops `page-has-heading-one`, whose target is the excluded article, and
-`color-contrast`, which is most of the scan time.
+`color-contrast`, `html-has-lang`, and `document-title`, because global elements
+are where those live. It drops only `page-has-heading-one`, whose target is the
+excluded article. `color-contrast` is most of the scan time, and this is the
+only suite that runs it.
 
 Like the article scan, most findings are reported as warnings. Blocking rules
 are `GLOBAL_ELEMENTS_ENFORCED_RULES` in `utils/axe-helpers.ts`. A violation in a
@@ -246,8 +247,6 @@ content pull request never picks them up.
 
 Not covered:
 
-- `color-contrast`, which the suite skips for speed. Nothing checks docs
-  contrast now.
 - Keyboard behavior in the mobile menu, including focus order and focus
   trapping. Axe reports the markup, not the interaction.
 - Global elements that arrive through `packages/ui` rather than `apps/docs`. CI
