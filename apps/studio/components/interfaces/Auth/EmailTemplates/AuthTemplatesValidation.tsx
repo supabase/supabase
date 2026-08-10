@@ -1,6 +1,20 @@
 import * as z from 'zod'
 
 import type { AuthTemplate, TemplateVariable, TemplateVariableName } from './EmailTemplates.types'
+import { validateGoTemplate } from './EmailTemplates.utils'
+
+const createSubjectSchema = (subjectKey: string) =>
+  z.object({
+    [subjectKey]: z
+      .string()
+      .min(1, 'Subject is required.')
+      .refine(
+        (val) => validateGoTemplate(val).valid,
+        (val) => ({
+          message: `Invalid template syntax: ${validateGoTemplate(val).error}`,
+        })
+      ),
+  })
 
 const TemplateVariables: Record<TemplateVariableName, TemplateVariable> = {
   ConfirmationURL: {
@@ -98,9 +112,7 @@ const CONFIRMATION: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.RedirectTo,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_CONFIRMATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_CONFIRMATION'),
   misc: {
     emailTemplateType: 'authentication',
   },
@@ -127,9 +139,7 @@ const INVITE: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.RedirectTo,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_INVITE: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_INVITE'),
   misc: {
     emailTemplateType: 'authentication',
   },
@@ -156,9 +166,7 @@ const MAGIC_LINK: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.RedirectTo,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_MAGIC_LINK: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_MAGIC_LINK'),
   misc: {
     emailTemplateType: 'authentication',
   },
@@ -186,9 +194,7 @@ const EMAIL_CHANGE: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.RedirectTo,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_EMAIL_CHANGE: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_EMAIL_CHANGE'),
   misc: {
     emailTemplateType: 'authentication',
   },
@@ -215,9 +221,7 @@ const RECOVERY: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.RedirectTo,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_RECOVERY: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_RECOVERY'),
   misc: {
     emailTemplateType: 'authentication',
   },
@@ -238,9 +242,7 @@ const REAUTHENTICATION: AuthTemplate = {
     TemplateVariables.Email,
     TemplateVariables.Data,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_REAUTHENTICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_REAUTHENTICATION'),
   misc: {
     emailTemplateType: 'authentication',
   },
@@ -257,9 +259,7 @@ const PASSWORD_CHANGED_NOTIFICATION: AuthTemplate = {
     MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
   },
   variables: [TemplateVariables.Email, TemplateVariables.Data, TemplateVariables.SiteURL],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION'),
   misc: {
     emailTemplateType: 'security',
   },
@@ -280,9 +280,7 @@ const EMAIL_CHANGED_NOTIFICATION: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.SiteURL,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION'),
   misc: {
     emailTemplateType: 'security',
   },
@@ -304,9 +302,7 @@ const PHONE_CHANGED_NOTIFICATION: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.SiteURL,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION'),
   misc: {
     emailTemplateType: 'security',
   },
@@ -327,9 +323,7 @@ const IDENTITY_LINKED_NOTIFICATION: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.SiteURL,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION'),
   misc: {
     emailTemplateType: 'security',
   },
@@ -350,9 +344,7 @@ const IDENTITY_UNLINKED_NOTIFICATION: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.SiteURL,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION'),
   misc: {
     emailTemplateType: 'security',
   },
@@ -373,9 +365,7 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.SiteURL,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION'),
   misc: {
     emailTemplateType: 'security',
   },
@@ -396,9 +386,7 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: AuthTemplate = {
     TemplateVariables.Data,
     TemplateVariables.SiteURL,
   ],
-  validationSchema: z.object({
-    MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
-  }),
+  validationSchema: createSubjectSchema('MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION'),
   misc: {
     emailTemplateType: 'security',
   },
