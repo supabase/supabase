@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
@@ -6,21 +7,26 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { AccessTokenList } from '@/components/interfaces/Account/AccessTokens/AccessTokenList'
 import { AccessTokenNewBanner } from '@/components/interfaces/Account/AccessTokens/AccessTokenNewBanner/AccessTokenNewBanner'
 import { NewTokenButton } from '@/components/interfaces/Account/AccessTokens/Classic/NewTokenButton'
+import { MigrationAdmonition } from '@/components/interfaces/Account/AccessTokens/MigrationAdmonition'
+import { NewScopedTokenSheet } from '@/components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenSheet'
 import { AccessTokensLayout } from '@/components/layouts/AccessTokens/AccessTokensLayout'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { NewAccessToken } from '@/data/access-tokens/access-tokens-create-mutation'
+import { NewScopedAccessToken } from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const UserAccessTokens: NextPageWithLayout = () => {
-  const [newToken, setNewToken] = useState<NewAccessToken | undefined>()
+  const scopedTokensEnabled = useFlag('scopedPAT')
+  const [newToken, setNewToken] = useState<NewScopedAccessToken | NewAccessToken | undefined>()
   const [searchString, setSearchString] = useState('')
 
   return (
     <AccessTokensLayout>
       <div className="space-y-4">
+        {scopedTokensEnabled && <MigrationAdmonition />}
         {newToken && (
           <AccessTokenNewBanner
             token={newToken}
@@ -50,7 +56,11 @@ const UserAccessTokens: NextPageWithLayout = () => {
                 CLI docs
               </a>
             </Button>
-            <NewTokenButton onCreateToken={setNewToken} />
+            {scopedTokensEnabled ? (
+              <NewScopedTokenSheet onCreateExperimentalToken={setNewToken} />
+            ) : (
+              <NewTokenButton onCreateToken={setNewToken} />
+            )}
           </div>
         </div>
         <AccessTokenList
@@ -58,6 +68,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
           onDeleteSuccess={(id) => {
             if (id === newToken?.id) setNewToken(undefined)
           }}
+          scopedTokensEnabled={scopedTokensEnabled}
         />
       </div>
     </AccessTokensLayout>

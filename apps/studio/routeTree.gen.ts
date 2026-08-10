@@ -26,6 +26,7 @@ import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
+import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
 import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
@@ -63,6 +64,7 @@ import { Route as ProjectRefMergeRouteImport } from './routes/project/$ref/merge
 import { Route as ProjectRefLogsRouteImport } from './routes/project/$ref/logs'
 import { Route as ProjectRefIntegrationsRouteImport } from './routes/project/$ref/integrations'
 import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/functions'
+import { Route as ProjectRefExplorerRouteImport } from './routes/project/$ref/explorer'
 import { Route as ProjectRefEditorRouteImport } from './routes/project/$ref/editor'
 import { Route as ProjectRefDatabaseRouteImport } from './routes/project/$ref/database'
 import { Route as ProjectRefBranchesRouteImport } from './routes/project/$ref/branches'
@@ -87,6 +89,7 @@ import { Route as ProjectRefObservabilityIndexRouteImport } from './routes/proje
 import { Route as ProjectRefLogsIndexRouteImport } from './routes/project/$ref/logs/index'
 import { Route as ProjectRefIntegrationsIndexRouteImport } from './routes/project/$ref/integrations/index'
 import { Route as ProjectRefFunctionsIndexRouteImport } from './routes/project/$ref/functions/index'
+import { Route as ProjectRefExplorerIndexRouteImport } from './routes/project/$ref/explorer/index'
 import { Route as ProjectRefEditorIndexRouteImport } from './routes/project/$ref/editor/index'
 import { Route as ProjectRefBranchesIndexRouteImport } from './routes/project/$ref/branches/index'
 import { Route as ProjectRefApiIndexRouteImport } from './routes/project/$ref/api/index'
@@ -226,6 +229,7 @@ import { Route as ProjectRefFunctionsFunctionSlugLogsRouteImport } from './route
 import { Route as ProjectRefFunctionsFunctionSlugInvocationsRouteImport } from './routes/project/$ref/functions/$functionSlug/invocations'
 import { Route as ProjectRefFunctionsFunctionSlugDetailsRouteImport } from './routes/project/$ref/functions/$functionSlug/details'
 import { Route as ProjectRefFunctionsFunctionSlugCodeRouteImport } from './routes/project/$ref/functions/$functionSlug/code'
+import { Route as ProjectRefExplorerNotebookIdRouteImport } from './routes/project/$ref/explorer/notebook/$id'
 import { Route as ProjectRefDatabaseTriggersEventRouteImport } from './routes/project/$ref/database/triggers/event'
 import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/project/$ref/database/triggers/data'
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
@@ -400,6 +404,12 @@ const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
   path: '/api/status-override',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiScopedAccessTokenPermissionsRoute =
+  ApiScopedAccessTokenPermissionsRouteImport.update({
+    id: '/api/scoped-access-token-permissions',
+    path: '/api/scoped-access-token-permissions',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiParseQueryRoute = ApiParseQueryRouteImport.update({
   id: '/api/parse-query',
   path: '/api/parse-query',
@@ -588,6 +598,11 @@ const ProjectRefFunctionsRoute = ProjectRefFunctionsRouteImport.update({
   path: '/functions',
   getParentRoute: () => ProjectRefRoute,
 } as any)
+const ProjectRefExplorerRoute = ProjectRefExplorerRouteImport.update({
+  id: '/explorer',
+  path: '/explorer',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
 const ProjectRefEditorRoute = ProjectRefEditorRouteImport.update({
   id: '/editor',
   path: '/editor',
@@ -715,6 +730,11 @@ const ProjectRefFunctionsIndexRoute =
     path: '/',
     getParentRoute: () => ProjectRefFunctionsRoute,
   } as any)
+const ProjectRefExplorerIndexRoute = ProjectRefExplorerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProjectRefExplorerRoute,
+} as any)
 const ProjectRefEditorIndexRoute = ProjectRefEditorIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -1496,6 +1516,12 @@ const ProjectRefFunctionsFunctionSlugCodeRoute =
     path: '/code',
     getParentRoute: () => ProjectRefFunctionsFunctionSlugRoute,
   } as any)
+const ProjectRefExplorerNotebookIdRoute =
+  ProjectRefExplorerNotebookIdRouteImport.update({
+    id: '/notebook/$id',
+    path: '/notebook/$id',
+    getParentRoute: () => ProjectRefExplorerRoute,
+  } as any)
 const ProjectRefDatabaseTriggersEventRoute =
   ProjectRefDatabaseTriggersEventRouteImport.update({
     id: '/event',
@@ -2060,6 +2086,7 @@ export interface FileRoutesByFullPath {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
+  '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2085,6 +2112,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
+  '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
@@ -2209,6 +2237,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations/': typeof ProjectRefIntegrationsIndexRoute
   '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
@@ -2253,6 +2282,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
@@ -2365,6 +2395,7 @@ export interface FileRoutesByTo {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
+  '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2503,6 +2534,7 @@ export interface FileRoutesByTo {
   '/project/$ref/api': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/explorer': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations': typeof ProjectRefIntegrationsIndexRoute
   '/project/$ref/logs': typeof ProjectRefLogsIndexRoute
@@ -2547,6 +2579,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
@@ -2663,6 +2696,7 @@ export interface FileRoutesById {
   '/api/incident-banner': typeof ApiIncidentBannerRoute
   '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
+  '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
   '/api/status-override': typeof ApiStatusOverrideRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/new/$slug': typeof NewSlugRoute
@@ -2688,6 +2722,7 @@ export interface FileRoutesById {
   '/project/$ref/branches': typeof ProjectRefBranchesRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/editor': typeof ProjectRefEditorRouteWithChildren
+  '/project/$ref/explorer': typeof ProjectRefExplorerRouteWithChildren
   '/project/$ref/functions': typeof ProjectRefFunctionsRouteWithChildren
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
@@ -2812,6 +2847,7 @@ export interface FileRoutesById {
   '/project/$ref/api/': typeof ProjectRefApiIndexRoute
   '/project/$ref/branches/': typeof ProjectRefBranchesIndexRoute
   '/project/$ref/editor/': typeof ProjectRefEditorIndexRoute
+  '/project/$ref/explorer/': typeof ProjectRefExplorerIndexRoute
   '/project/$ref/functions/': typeof ProjectRefFunctionsIndexRoute
   '/project/$ref/integrations/': typeof ProjectRefIntegrationsIndexRoute
   '/project/$ref/logs/': typeof ProjectRefLogsIndexRoute
@@ -2856,6 +2892,7 @@ export interface FileRoutesById {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
   '/project/$ref/functions/$functionSlug/details': typeof ProjectRefFunctionsFunctionSlugDetailsRoute
   '/project/$ref/functions/$functionSlug/invocations': typeof ProjectRefFunctionsFunctionSlugInvocationsRoute
@@ -2971,6 +3008,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
+    | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -2996,6 +3034,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches'
     | '/project/$ref/database'
     | '/project/$ref/editor'
+    | '/project/$ref/explorer'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
@@ -3120,6 +3159,7 @@ export interface FileRouteTypes {
     | '/project/$ref/api/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
+    | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
     | '/project/$ref/integrations/'
     | '/project/$ref/logs/'
@@ -3164,6 +3204,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/functions/$functionSlug/code'
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
@@ -3276,6 +3317,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
+    | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -3414,6 +3456,7 @@ export interface FileRouteTypes {
     | '/project/$ref/api'
     | '/project/$ref/branches'
     | '/project/$ref/editor'
+    | '/project/$ref/explorer'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
@@ -3458,6 +3501,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/functions/$functionSlug/code'
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
@@ -3573,6 +3617,7 @@ export interface FileRouteTypes {
     | '/api/incident-banner'
     | '/api/incident-status'
     | '/api/parse-query'
+    | '/api/scoped-access-token-permissions'
     | '/api/status-override'
     | '/integrations/vercel'
     | '/new/$slug'
@@ -3598,6 +3643,7 @@ export interface FileRouteTypes {
     | '/project/$ref/branches'
     | '/project/$ref/database'
     | '/project/$ref/editor'
+    | '/project/$ref/explorer'
     | '/project/$ref/functions'
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
@@ -3722,6 +3768,7 @@ export interface FileRouteTypes {
     | '/project/$ref/api/'
     | '/project/$ref/branches/'
     | '/project/$ref/editor/'
+    | '/project/$ref/explorer/'
     | '/project/$ref/functions/'
     | '/project/$ref/integrations/'
     | '/project/$ref/logs/'
@@ -3766,6 +3813,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/functions/$functionSlug/code'
     | '/project/$ref/functions/$functionSlug/details'
     | '/project/$ref/functions/$functionSlug/invocations'
@@ -3871,6 +3919,7 @@ export interface RootRouteChildren {
   ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
   ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiParseQueryRoute: typeof ApiParseQueryRoute
+  ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
   ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   NewSlugRoute: typeof NewSlugRoute
@@ -4089,6 +4138,13 @@ declare module '@tanstack/react-router' {
       path: '/api/status-override'
       fullPath: '/api/status-override'
       preLoaderRoute: typeof ApiStatusOverrideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/scoped-access-token-permissions': {
+      id: '/api/scoped-access-token-permissions'
+      path: '/api/scoped-access-token-permissions'
+      fullPath: '/api/scoped-access-token-permissions'
+      preLoaderRoute: typeof ApiScopedAccessTokenPermissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/parse-query': {
@@ -4350,6 +4406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefFunctionsRouteImport
       parentRoute: typeof ProjectRefRoute
     }
+    '/project/$ref/explorer': {
+      id: '/project/$ref/explorer'
+      path: '/explorer'
+      fullPath: '/project/$ref/explorer'
+      preLoaderRoute: typeof ProjectRefExplorerRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
     '/project/$ref/editor': {
       id: '/project/$ref/editor'
       path: '/editor'
@@ -4517,6 +4580,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/$ref/functions/'
       preLoaderRoute: typeof ProjectRefFunctionsIndexRouteImport
       parentRoute: typeof ProjectRefFunctionsRoute
+    }
+    '/project/$ref/explorer/': {
+      id: '/project/$ref/explorer/'
+      path: '/'
+      fullPath: '/project/$ref/explorer/'
+      preLoaderRoute: typeof ProjectRefExplorerIndexRouteImport
+      parentRoute: typeof ProjectRefExplorerRoute
     }
     '/project/$ref/editor/': {
       id: '/project/$ref/editor/'
@@ -5491,6 +5561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefFunctionsFunctionSlugCodeRouteImport
       parentRoute: typeof ProjectRefFunctionsFunctionSlugRoute
     }
+    '/project/$ref/explorer/notebook/$id': {
+      id: '/project/$ref/explorer/notebook/$id'
+      path: '/notebook/$id'
+      fullPath: '/project/$ref/explorer/notebook/$id'
+      preLoaderRoute: typeof ProjectRefExplorerNotebookIdRouteImport
+      parentRoute: typeof ProjectRefExplorerRoute
+    }
     '/project/$ref/database/triggers/event': {
       id: '/project/$ref/database/triggers/event'
       path: '/event'
@@ -6437,6 +6514,19 @@ const ProjectRefEditorRouteChildren: ProjectRefEditorRouteChildren = {
 const ProjectRefEditorRouteWithChildren =
   ProjectRefEditorRoute._addFileChildren(ProjectRefEditorRouteChildren)
 
+interface ProjectRefExplorerRouteChildren {
+  ProjectRefExplorerIndexRoute: typeof ProjectRefExplorerIndexRoute
+  ProjectRefExplorerNotebookIdRoute: typeof ProjectRefExplorerNotebookIdRoute
+}
+
+const ProjectRefExplorerRouteChildren: ProjectRefExplorerRouteChildren = {
+  ProjectRefExplorerIndexRoute: ProjectRefExplorerIndexRoute,
+  ProjectRefExplorerNotebookIdRoute: ProjectRefExplorerNotebookIdRoute,
+}
+
+const ProjectRefExplorerRouteWithChildren =
+  ProjectRefExplorerRoute._addFileChildren(ProjectRefExplorerRouteChildren)
+
 interface ProjectRefFunctionsFunctionSlugRouteChildren {
   ProjectRefFunctionsFunctionSlugCodeRoute: typeof ProjectRefFunctionsFunctionSlugCodeRoute
   ProjectRefFunctionsFunctionSlugDetailsRoute: typeof ProjectRefFunctionsFunctionSlugDetailsRoute
@@ -6716,6 +6806,7 @@ interface ProjectRefRouteChildren {
   ProjectRefBranchesRoute: typeof ProjectRefBranchesRouteWithChildren
   ProjectRefDatabaseRoute: typeof ProjectRefDatabaseRouteWithChildren
   ProjectRefEditorRoute: typeof ProjectRefEditorRouteWithChildren
+  ProjectRefExplorerRoute: typeof ProjectRefExplorerRouteWithChildren
   ProjectRefFunctionsRoute: typeof ProjectRefFunctionsRouteWithChildren
   ProjectRefIntegrationsRoute: typeof ProjectRefIntegrationsRouteWithChildren
   ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
@@ -6735,6 +6826,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefBranchesRoute: ProjectRefBranchesRouteWithChildren,
   ProjectRefDatabaseRoute: ProjectRefDatabaseRouteWithChildren,
   ProjectRefEditorRoute: ProjectRefEditorRouteWithChildren,
+  ProjectRefExplorerRoute: ProjectRefExplorerRouteWithChildren,
   ProjectRefFunctionsRoute: ProjectRefFunctionsRouteWithChildren,
   ProjectRefIntegrationsRoute: ProjectRefIntegrationsRouteWithChildren,
   ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,
@@ -6815,6 +6907,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiIncidentBannerRoute: ApiIncidentBannerRoute,
   ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiParseQueryRoute: ApiParseQueryRoute,
+  ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
   ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   NewSlugRoute: NewSlugRoute,

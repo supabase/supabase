@@ -20,7 +20,11 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
     >
       <div className="px-5 py-8 lg:px-0 lg:py-0">
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
-        <article className="prose max-w-none mt-4">
+        <article
+          id="sb-docs-troubleshooting-main-article"
+          data-testid="sb-docs-troubleshooting-main-article"
+          className="prose max-w-none mt-4"
+        >
           <h1>{entry.data.title}</h1>
           {dateUpdated && (
             <p className="text-sm text-foreground-lighter">

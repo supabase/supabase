@@ -35,6 +35,26 @@ This creates Markdown files for all routes under the `public/markdown/guides` di
 
 For production this setup runs as a `prebuild` task to allow Vercel to bundle these files with middleware and functions.
 
+## Accessibility checks
+
+Docs pages are scanned for WCAG 2.1 A/AA issues with axe-core, as part of the
+Playwright suite in `e2e/docs`. Pull requests scan the pages your change affects,
+limited to the main article.
+
+To scan the pages your current branch changes:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:docs:a11y
+```
+
+That resolves which pages to scan from your branch, but reads them from
+production, so it won't see your edits and will 404 on a page you just added.
+Point `PLAYWRIGHT_BASE_URL` at your pull request's preview to scan your own
+content.
+
+See [`e2e/docs/README.md`](https://github.com/supabase/supabase/blob/master/e2e/docs/README.md)
+for coverage and skipped rules.
+
 ## Contributing
 
 For repo organization and style guide, see the [contributing guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md).
