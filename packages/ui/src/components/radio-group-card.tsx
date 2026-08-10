@@ -37,7 +37,7 @@ const RadioGroupCardItem = React.forwardRef<
         'p-2',
         // 'hover:bg-selection',
         'hover:border-control-hover',
-        'hover:z-1 focus-visible:z-1',
+        'hover:z-1 focus-visible:z-1 focus-visible:border-control-hover',
         'outline-hidden',
         'transition-colors',
         'group',
