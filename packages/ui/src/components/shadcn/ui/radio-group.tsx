@@ -56,7 +56,7 @@ const RadioGroupLargeItem = React.forwardRef<
         'rounded-md border border-strong',
         'p-2',
         'shadow-xs',
-        'hover:border-control-hover hover:bg-surface-300',
+        'hover:border-control-hover focus-visible:border-control-hover hover:bg-surface-300',
         'data-[state=checked]:bg-selection data-[state=checked]:border-control-hover',
         'transition-colors',
         'group',
@@ -86,6 +86,7 @@ const RadioGroupLargeItem = React.forwardRef<
                 'border border-stronger',
                 'rounded-full',
                 'group-hover:border-control-hover',
+                'group-focus-visible:border-control-hover',
                 'group-data-[state=checked]:border-control-hover',
                 'transition-colors'
               )}
