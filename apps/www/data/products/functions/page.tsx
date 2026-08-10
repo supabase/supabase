@@ -7,9 +7,6 @@ import Examples from '~/data/Examples'
 import solutions from '~/data/MainProducts'
 
 const FunctionsHero = dynamic(() => import('~/components/Products/Functions/FunctionsHero'))
-const RealtimeLogs = dynamic(() => import('~/components/Products/Functions/RealtimeLogs'))
-const Metrics = dynamic(() => import('~/components/Products/Functions/Metrics'))
-const QueryLogs = dynamic(() => import('~/components/Products/Functions/QueryLogs'))
 const LocalDXImage = dynamic(() => import('~/components/Products/Functions/LocalDXImage'))
 const ParityImage = dynamic(() => import('~/components/Products/Functions/ParityImage'))
 const NpmEcosystem = dynamic(() => import('~/components/Products/Functions/NpmEcosystem'))
@@ -280,34 +277,6 @@ export default (isMobile?: boolean) => ({
       {
         label: 'Secure',
         paragraph: 'Scale with confidence with SSL, Firewall and DDOS protection built in',
-      },
-    ],
-  },
-  o11y: {
-    title: 'Built-in observability',
-    panels: [
-      {
-        id: 'realtime-logs',
-        label: 'Realtime logs',
-        icon: '',
-        paragraph:
-          'Stream logs to the dashboard in realtime. Logs are populated with rich metadata to help debugging',
-        image: RealtimeLogs,
-      },
-      {
-        id: 'log-explorer',
-        label: 'Query Logs via Log explorer',
-        icon: '',
-        paragraph:
-          'Get deeper insights into how your functions are behaving by writing SQL queries on function logs',
-        image: QueryLogs,
-      },
-      {
-        id: 'metrics',
-        label: 'Metrics',
-        icon: '',
-        paragraph: 'Dashboards show the health of your functions at all times',
-        image: Metrics,
       },
     ],
   },
