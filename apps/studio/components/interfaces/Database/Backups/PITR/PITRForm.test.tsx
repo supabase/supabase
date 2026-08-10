@@ -18,14 +18,13 @@ dayjs.extend(customParseFormat)
 // The bugs this covers only reproduce when the browser timezone differs from
 // the selected one, so the host timezone can't be left to chance
 const BROWSER_TIMEZONE = 'America/New_York'
-const originalTimezone = process.env.TZ
 
 beforeAll(() => {
-  process.env.TZ = BROWSER_TIMEZONE
+  vi.stubEnv('TZ', BROWSER_TIMEZONE)
 })
 
 afterAll(() => {
-  process.env.TZ = originalTimezone
+  vi.unstubAllEnvs()
 })
 
 afterEach(() => {
