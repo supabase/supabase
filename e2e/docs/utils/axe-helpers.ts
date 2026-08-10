@@ -9,8 +9,23 @@ export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one']
 // A violation in a global element lands on every docs page, so keep this list
 // green rather than growing it with findings that aren't fixed yet. Rules must
 // be within WCAG_TAGS and absent from GLOBAL_ELEMENTS_EXCLUDED_RULES, since
-// scanOutsideArticle finds them in its one tagged pass.
-export const GLOBAL_ELEMENTS_ENFORCED_RULES = ['link-name']
+// scanOutsideArticle finds them in its one tagged pass. Every rule here is
+// applicable on all scanned surfaces, so it guards something today.
+export const GLOBAL_ELEMENTS_ENFORCED_RULES = [
+  'aria-allowed-attr',
+  'aria-deprecated-role',
+  'aria-hidden-focus',
+  'aria-roles',
+  'aria-valid-attr',
+  'bypass',
+  'document-title',
+  'html-has-lang',
+  'html-lang-valid',
+  'image-alt',
+  'link-name',
+  'meta-viewport',
+  'nested-interactive',
+]
 
 // Page-level rules the article scan can't reach stay on here, including
 // `color-contrast`, which docs takes from shared tokens. Only

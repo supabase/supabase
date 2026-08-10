@@ -235,6 +235,12 @@ are `GLOBAL_ELEMENTS_ENFORCED_RULES` in `utils/axe-helpers.ts`. A violation in a
 global element appears on every docs page, so keep that list green rather than
 growing it.
 
+Everything on that list passes today and is applicable on every scanned surface,
+so each rule guards something. Before adding one, check that axe reports passing
+nodes for it rather than reporting it as inapplicable, and that it has no
+`incomplete` nodes. Inapplicable rules guard nothing, and undecided ones can flip
+to failing on an unrelated change.
+
 `button-name` is reported rather than blocking. The filter comboboxes on
 `/docs/guides/troubleshooting` have no accessible name, and they also trip
 `aria-required-attr`. The sidebar toggle in `layouts/MainSkeleton.tsx` is
