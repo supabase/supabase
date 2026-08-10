@@ -27,18 +27,9 @@ import { clipboard, cn, mergeDeep } from 'ui' // clsx + tailwind-merge
 - Prefer shadcn semantic pairs (`bg-card text-card-foreground`, `bg-muted text-muted-foreground`,
   `bg-tertiary text-tertiary-foreground`) over hardcoded colors. Legacy utilities such as
   `text-foreground-light` and `border-default` are compatibility aliases only.
-- **Control surfaces** (named roles; use these instead of inventing fills per component):
-
-  | Role              | Fill                                              | Rest border              | Hover / open / focus border | Use for                                                    |
-  | ----------------- | ------------------------------------------------- | ------------------------ | --------------------------- | ---------------------------------------------------------- |
-  | Field (sunk)      | `bg-field`                                        | `border-control`         | `border-control-hover`      | Input, Textarea, InputGroup, filled MultiSelect            |
-  | Raised control    | `bg-control-raised`                               | `border-strong`          | `border-control-hover`      | Select, empty MultiSelect                                  |
-  | Overlaying action | `bg-background dark:bg-card` → `hover:bg-popover` | `border-strong`          | `border-control-hover`      | Default Button, CommandMenu trigger (must occlude content) |
-  | Invalid field     | `bg-destructive-200`                              | `border-destructive-400` | `border-destructive`        | `aria-invalid` on field chrome                             |
-
-  Dashed Button shares the same hover/open border. Radio cards/stacked/large use
-  `border-control-hover` for hover, focus, and checked borders.
-
+- Control surface roles (`bg-field`, `bg-control-raised`, `border-control-hover`) and their formulas
+  live in [`build/css/source/semantic.css`](./build/css/source/semantic.css) — use those named
+  tokens rather than inventing fills per component.
 - Themes set the core `--hue` (or the split `--surface-hue` / `--primary-hue`), `--chroma`,
   `--surface`, `--foreground-lightness`, and `--contrast` inputs, plus their
   `--muted-foreground-level` and `--tertiary-foreground-level` hierarchy.

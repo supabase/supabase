@@ -201,6 +201,14 @@
    * Opaque overlaying chrome (default Button fill) stays on --card / --popover —
    * those must occlude underlying content, not read as form wells or plates.
    *
+   * Rest borders: fields use border-control; raised / buttons use border-strong
+   * (both currently alias --input via compat — role names are for migration).
+   * Interactive step is always --border-control-hover. Invalid fields parallel
+   * that ladder with destructive-400 → destructive.
+   *
+   * --control-raised aliases --card today (role name for call sites). Prefer the
+   * role token so fill can diverge from card later without hunting components.
+   *
    * --field is a recessed solid twin of --card on the elevation axis (card is
    * +e1 from --background). A full e1 dig reads too strong against sheet chrome,
    * so --elevation-field scales the recess (0.35 ≈ soft well).
