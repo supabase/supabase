@@ -31,7 +31,7 @@ import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { formatTimezoneLabel } from '@/lib/constants/timezones'
-import { guessLocalTimezone } from '@/lib/dayjs'
+import { useTimezone } from '@/lib/datetime'
 
 export const PITRSelection = () => {
   const router = useRouter()
@@ -43,7 +43,9 @@ export const PITRSelection = () => {
 
   const [showConfiguration, setShowConfiguration] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [selectedTimezone, setSelectedTimezone] = useState<string>(guessLocalTimezone)
+  const { timezone } = useTimezone()
+  const [overriddenTimezone, setOverriddenTimezone] = useState<string>()
+  const selectedTimezone = overriddenTimezone ?? timezone
   const [selectedRecoveryPoint, setSelectedRecoveryPoint] = useState<{
     selectedTimezone: string
     recoveryTimeTargetUnix: number
@@ -109,7 +111,7 @@ export const PITRSelection = () => {
           {!showConfiguration ? (
             <PITRStatus
               selectedTimezone={selectedTimezone}
-              onUpdateTimezone={setSelectedTimezone}
+              onUpdateTimezone={setOverriddenTimezone}
               onSetConfiguration={() => setShowConfiguration(true)}
             />
           ) : (

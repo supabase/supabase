@@ -7,7 +7,7 @@ import TimeInput from './TimeInput'
 import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
-import { guessLocalTimezone } from '@/lib/dayjs'
+import { useTimezone } from '@/lib/datetime'
 
 type Props = {
   onSubmit: (data: {
@@ -27,7 +27,10 @@ export function PITRForm({
   latestAvailableBackupUnix,
   disabled = false,
 }: Props) {
-  const [selectedTimezone, setSelectedTimezone] = useState<string>(guessLocalTimezone)
+  const { timezone } = useTimezone()
+  const [overriddenTimezone, setOverriddenTimezone] = useState<string>()
+  const selectedTimezone = overriddenTimezone ?? timezone
+
   const earliestAvailableBackup = dayjs.unix(earliestAvailableBackupUnix ?? 0).tz(selectedTimezone)
   const latestAvailableBackup = dayjs.unix(latestAvailableBackupUnix ?? 0).tz(selectedTimezone)
 
@@ -139,7 +142,7 @@ export function PITRForm({
                   <div className="w-[350px]">
                     <TimezoneSelection
                       selectedTimezone={selectedTimezone}
-                      onSelectTimezone={setSelectedTimezone}
+                      onSelectTimezone={setOverriddenTimezone}
                     />
                   </div>
                 </div>
