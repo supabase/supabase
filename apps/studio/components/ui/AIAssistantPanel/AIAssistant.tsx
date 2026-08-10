@@ -15,8 +15,8 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { ErrorBoundary } from '../ErrorBoundary/ErrorBoundary'
 import { InlineLinkClassName } from '../InlineLink'
 import { ASSISTANT_ERRORS } from './AiAssistant.constants'
-import type { SqlSnippet } from './AIAssistant.types'
 import {
+  containsLogsSnippets,
   hasPendingToolApproval,
   onErrorChat,
   resolvePendingToolApprovalsAsDenied,
@@ -31,6 +31,7 @@ import {
 } from './elements/Conversation'
 import { Message } from './Message'
 import { Markdown } from '@/components/interfaces/Markdown'
+import { resolveSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
@@ -40,6 +41,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { AssistantMessageMetadata } from '@/lib/ai/assistant-message-metadata'
 import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
@@ -50,7 +52,7 @@ import {
 import { IS_PLATFORM } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
-import type { AssistantModel } from '@/state/ai-assistant-state'
+import type { AssistantModel, SqlSnippet } from '@/state/ai-assistant-state'
 import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -64,7 +66,7 @@ interface AIAssistantProps {
 
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
-  const { id: entityId } = useParams()
+  const { id: entityId, source: sourceParam } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const searchParams = useSearchParamsShallow()
 
@@ -108,6 +110,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  // Whether attached queries are sent at all. One definition, shared by the chat form
+  // (which folds them into the message text) and the message metadata (which states
+  // whether any of them was a logs query), so the two can't disagree.
+  const includeSnippetsInMessage = aiOptInLevel !== 'disabled'
   const showMetadataWarning =
     IS_PLATFORM &&
     !!selectedOrganization &&
@@ -135,6 +141,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const isInSQLEditor = router.pathname.includes('/sql/[id]')
   const snippet = snippets[entityId ?? '']
   const snippetContent = snippet?.snippet?.content?.unchecked_sql
+
+  const openSnippetSource = isInSQLEditor
+    ? resolveSnippetSource(snippet?.snippet, sourceParam)
+    : undefined
 
   const { data: tables } = useTablesQuery(
     {
@@ -355,11 +365,23 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
       setEditingMessageId(null)
     }
 
+    // Read off the attachments this message actually carries, so detaching the
+    // "Current Query" chip also drops the claim. Gated on the same condition that
+    // decides whether attachments make it into the text at all: with AI opt-in
+    // disabled the chip is shown but no query is sent, and claiming otherwise would
+    // have the server prepend ClickHouse context for a message holding no query.
+    // Rides on the message rather than the request, so a Retry reproduces the context
+    // the message was asked in.
+    const metadata: AssistantMessageMetadata = {
+      containsLogsSnippets: includeSnippetsInMessage && containsLogsSnippets(snap.sqlSnippets),
+    }
+
     const payload = {
       role: 'user',
       createdAt: new Date(),
       parts: [{ type: 'text', text: finalContent }],
       id: uuidv4(),
+      metadata,
     } as MessageType
 
     snap.clearSqlSnippets()
@@ -421,10 +443,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   useEffect(() => {
     const isOpen = activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
     if (isOpen && isInSQLEditor && !!snippetContent) {
-      snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
+      snap.setSqlSnippets([
+        { label: 'Current Query', content: snippetContent, source: openSnippetSource },
+      ])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSidebar?.id, isInSQLEditor, snippetContent])
+  }, [activeSidebar?.id, isInSQLEditor, snippetContent, openSnippetSource])
 
   return (
     <ErrorBoundary
@@ -673,7 +697,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               newSnippets.splice(index, 1)
               snap.setSqlSnippets(newSnippets)
             }}
-            includeSnippetsInMessage={aiOptInLevel !== 'disabled'}
+            includeSnippetsInMessage={includeSnippetsInMessage}
             selectedModel={selectedModel}
             onSelectModel={(model) => snap.setModel(model)}
           />

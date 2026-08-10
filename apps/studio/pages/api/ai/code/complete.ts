@@ -8,10 +8,14 @@ import z from 'zod'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import {
+  buildClickhouseLogsSchemaSection,
+  CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
+  CLICKHOUSE_LOGS_REWRITE_INSTRUCTION,
+} from '@/lib/ai/clickhouse-logs'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL, LOGS_REWRITE_MODEL } from '@/lib/ai/model.utils'
 import {
-  CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
   COMPLETION_PROMPT,
   EDGE_FUNCTION_PROMPT,
   PG_BEST_PRACTICES,
@@ -124,12 +128,24 @@ const requestBodySchema = z.object({
     textAfterCursor: z.string(),
     prompt: z.string(),
     selection: z.string(),
+    /**
+     * The real `log_attributes` keys observed for the query's source, when the
+     * client discovered them. ClickHouse-only — there is no schema to fetch
+     * server-side for the logs table the way there is for Postgres DDL.
+     */
+    availableKeys: z.array(z.string()).optional(),
   }),
   projectRef: z.string(),
   connectionString: z.string().nullish(),
   orgSlug: z.string().optional(),
   language: z.string().optional(),
   dialect: z.enum(['postgres', 'clickhouse']).optional(),
+  /**
+   * What the caller wants done. `rewrite` swaps the user instruction for the
+   * canonical BigQuery → ClickHouse rewrite instruction, so the client never has
+   * to carry prompt text. ClickHouse-only; defaults to `edit`.
+   */
+  intent: z.enum(['edit', 'rewrite']).optional(),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -150,8 +166,10 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
     }
 
-    const { completionMetadata, projectRef, connectionString, orgSlug, language, dialect } = data
-    const { textBeforeCursor, textAfterCursor, prompt, selection } = completionMetadata
+    const { completionMetadata, projectRef, connectionString, orgSlug, language, dialect, intent } =
+      data
+    const { textBeforeCursor, textAfterCursor, prompt, selection, availableKeys } =
+      completionMetadata
     const isClickhouse = dialect === 'clickhouse'
 
     const authorization = req.headers.authorization
@@ -232,8 +250,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     const system = isClickhouse
       ? source`
-          You rewrite SQL queries to ClickHouse SQL for the Supabase logs table.
-          Output only the rewritten SQL query: no explanation, no markdown, and no code fences.
+          You write and edit ClickHouse SQL for the Supabase logs table.
+          Reply with ONLY the SQL that replaces the <selection> block below, keeping the
+          surrounding query valid: no explanation, no comments, and no markdown code fences.
           ${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
           ${SECURITY_PROMPT}
         `
@@ -243,23 +262,31 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           ${SECURITY_PROMPT}
         `
 
-    const userMessage = isClickhouse
-      ? prompt
-      : source`
-          ## Database Schema
+    const schemaSection = isClickhouse
+      ? { heading: 'Logs Schema', body: buildClickhouseLogsSchemaSection(availableKeys) }
+      : {
+          heading: 'Database Schema',
+          body: buildDatabaseSchemaSection({ includeSchema, schemaListResult, schemaDDLResult }),
+        }
 
-          ${buildDatabaseSchemaSection({ includeSchema, schemaListResult, schemaDDLResult })}
+    const instruction =
+      isClickhouse && intent === 'rewrite' ? CLICKHOUSE_LOGS_REWRITE_INSTRUCTION : prompt
 
-          ## Code
+    const userMessage = source`
+      ## ${schemaSection.heading}
 
-          \`\`\`${language ?? ''}
-          ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
-          \`\`\`
+      ${schemaSection.body}
 
-          ## Instruction
+      ## Code
 
-          ${prompt}
-        `
+      \`\`\`${language ?? ''}
+      ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
+      \`\`\`
+
+      ## Instruction
+
+      ${instruction}
+    `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88

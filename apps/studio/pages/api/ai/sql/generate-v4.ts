@@ -8,6 +8,11 @@ import z from 'zod'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
+import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
+import {
+  assistantMessageMetadataSchema,
+  messagesIncludeLogsSnippets,
+} from '@/lib/ai/assistant-message-metadata'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { getModel } from '@/lib/ai/model'
@@ -100,6 +105,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   const messagesValidation = await safeValidateUIMessages({
     messages: rawMessages,
+    metadataSchema: assistantMessageMetadataSchema,
   })
   if (!messagesValidation.success) {
     return res.status(400).json({
@@ -108,6 +114,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     })
   }
   const messages = messagesValidation.data
+
+  const includesLogsSnippets = messagesIncludeLogsSnippets(messages)
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
@@ -203,7 +211,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
       return schemas?.length > 0
         ? `The available database schema names are: ${JSON.stringify(schemas)}`
-        : "You don't have access to any schemas."
+        : NO_SCHEMA_ACCESS_MESSAGE
     }
 
     const result = await generateAssistantResponse({
@@ -224,6 +232,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       userId,
       orgId,
       planId,
+      includesLogsSnippets,
       requestedModel,
       systemProviderOptions,
       abortSignal: abortController.signal,

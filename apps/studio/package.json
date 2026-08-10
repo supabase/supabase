@@ -76,7 +76,7 @@
     "@supabase/mcp-server-supabase": "^0.7.0",
     "@supabase/pg-meta": "workspace:*",
     "@supabase/realtime-js": "catalog:",
-    "@supabase/shared-types": "0.1.88",
+    "@supabase/shared-types": "0.1.91",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-devtools": "^0.10.3",
     "@tanstack/react-hotkeys": "^0.10.0",

@@ -80,6 +80,7 @@ The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 - Install prerequisites (`git`, `openssl`, `jq`) and Docker Engine if not already present
 - Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
 - Create a project directory (`supabase-project` by default) and copy the configuration files into it
+- Record the installed release version in `.supabase-version` for future `update.sh` upgrades
 - Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
 - Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and enables the matching entries in `docker-compose.yml`)
 - Pull the Docker images
@@ -105,7 +106,7 @@ Not on Linux, or want to do it manually? See [Manual installation](#manual-insta
 
 ### Manual installation
 
-This path gets the Docker Compose configuration onto your server; you'll configure secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase).
+This path gets the Docker Compose configuration onto your server, pinned to a specific tag. You'll set up secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase). For a newer release, use the [latest tag](https://github.com/supabase/supabase/tags).
 
 <Tabs
 scrollable
@@ -121,7 +122,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -137,6 +138,9 @@ cp -rf supabase/docker/. supabase-project
 # Switch to the project directory and create a .env from the example
 cd supabase-project && cp .env.example .env
 
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
+
 # Pull the latest images
 docker compose pull
 ```
@@ -149,7 +153,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -169,6 +173,9 @@ cp -rf supabase/docker/. supabase-project
 
 # Switch to the project directory and create a .env from the example
 cd supabase-project && cp .env.example .env
+
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull

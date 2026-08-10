@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { useCallback } from 'react'
 import { cn } from 'ui'
 
+import { LegacyLogsRewriteBanner } from './LegacyLogsRewriteBanner'
 import { useSQLEditorContext } from './SQLEditorContext'
 import {
   useSqlEditorAssistant,
@@ -171,23 +172,32 @@ const SQLEditorMainView = () => {
   )
 }
 
+function LoadingSpinner() {
+  return (
+    <div className="overflow-y-auto h-full">
+      <div className="flex h-full w-full items-center justify-center">
+        <Loader2 className="animate-spin text-brand" />
+      </div>
+    </div>
+  )
+}
+
 /** The top (editor) resizable panel: loading state, diff view, and main editor. */
 export const SQLEditorEditorPanel = () => {
-  const { isLoading } = useSqlEditorSnippet()
+  const { id, isLoading } = useSqlEditorSnippet()
   const { diff } = useSqlEditorAssistant()
 
+  if (isLoading) {
+    return <LoadingSpinner />
+  }
+
   return (
-    <div className="grow overflow-y-auto border-b h-full">
-      {isLoading ? (
-        <div className="flex h-full w-full items-center justify-center">
-          <Loader2 className="animate-spin text-brand" />
-        </div>
-      ) : (
-        <>
-          {diff.isDiffOpen && <SQLEditorDiffView />}
-          <SQLEditorMainView />
-        </>
-      )}
+    <div className="h-full flex flex-col">
+      <LegacyLogsRewriteBanner key={id} />
+      <div className="grow overflow-y-auto min-h-0">
+        {diff.isDiffOpen && <SQLEditorDiffView />}
+        <SQLEditorMainView />
+      </div>
     </div>
   )
 }
