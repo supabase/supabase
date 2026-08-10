@@ -29,17 +29,15 @@ export const TimezoneSelection = ({
   const [open, setOpen] = useState(false)
   const listboxId = useId()
 
-  // The browser's own zone is often an alias of a catalog entry rather than its
-  // primary name, so it needs adding explicitly to be selectable
-  const [initialTimezone] = useState(selectedTimezone)
-
   const options = useMemo(() => {
     const catalogNames = TIMEZONES_BY_IANA.map((entry) => entry.utc[0])
-    const ianaNames = catalogNames.includes(initialTimezone)
+    // The selected zone is often an alias of a catalog entry rather than its
+    // primary name, so it needs adding explicitly to stay selectable
+    const ianaNames = catalogNames.includes(selectedTimezone)
       ? catalogNames
-      : [initialTimezone, ...catalogNames]
+      : [selectedTimezone, ...catalogNames]
     return ianaNames.map((iana) => ({ iana, label: formatTimezoneLabel(iana) }))
-  }, [initialTimezone])
+  }, [selectedTimezone])
 
   const selectedLabel = formatTimezoneLabel(selectedTimezone)
 
