@@ -155,13 +155,13 @@ export function useSqlEditorAi({
 
       if (!sourceSqlDiff || !editor.isReady() || !diffController.isMounted()) {
         toast.error('Unable to apply the AI SQL diff right now. Please try again.')
-        throw new Error('AI diff could not be applied: editor/diff state unavailable')
+        return
       }
 
       const sql = diffController.getModifiedValue()
       if (sql === undefined) {
         toast.error('Unable to apply the AI edit because the diff editor returned no SQL.')
-        throw new Error('AI diff accepted, but modified SQL was undefined')
+        return
       }
 
       if (selectedDiffType === DiffType.NewSnippet) {
