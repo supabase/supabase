@@ -287,7 +287,7 @@ const ExpirationPolicySection = ({
                     }}
                   />
                   <InputGroupAddon align="inline-end">
-                    <InputGroupText>max</InputGroupText>
+                    <InputGroupText>versions</InputGroupText>
                   </InputGroupAddon>
                 </InputGroup>
               </FormControl>
@@ -304,7 +304,15 @@ const ExpirationPolicySection = ({
         />
       )}
 
-      {hasBothConditions && <ExpirationExplainer days={days} versions={versions} mode={mode} />}
+      {!hasNoPolicy && (
+        <ExpirationExplainer
+          hasDays={hasDays}
+          hasVersions={hasVersions}
+          days={days}
+          versions={versions}
+          mode={mode}
+        />
+      )}
     </div>
   )
 }
@@ -403,15 +411,22 @@ const InlineModeToggle = ({ mode, onModeChange }: InlineModeToggleProps) => {
 // ── Collapsible explainer ────────────────────────────────────────────────
 
 interface ExpirationExplainerProps {
+  hasDays: boolean
+  hasVersions: boolean
   days: number
   versions: number
   mode: ExpirationMode
 }
 
-const ExpirationExplainer = ({ days, versions, mode }: ExpirationExplainerProps) => {
+const ExpirationExplainer = ({
+  hasDays,
+  hasVersions,
+  days,
+  versions,
+  mode,
+}: ExpirationExplainerProps) => {
   const [isOpen, setIsOpen] = useState(false)
-  const isBoth = mode === 'and'
-  const olderAge = Math.round(days * 1.1)
+  const hasBothConditions = hasDays && hasVersions
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -430,26 +445,85 @@ const ExpirationExplainer = ({ days, versions, mode }: ExpirationExplainerProps)
             Example
           </p>
           <p className="text-xs leading-relaxed text-foreground-lighter">
-            {isBoth ? (
-              <>
-                With{' '}
-                <span className="text-foreground-light">{versions + 2} noncurrent versions</span>,
-                the oldest at <span className="text-foreground-light">{olderAge}d</span>: only
-                versions that exceed <em>both</em> the {versions}-version cap and the {days}-day
-                limit are removed. v{versions} exceeds the age limit but is within the cap — kept.
-              </>
-            ) : (
-              <>
-                With{' '}
-                <span className="text-foreground-light">{versions + 2} noncurrent versions</span>,
-                the oldest at <span className="text-foreground-light">{olderAge}d</span>: versions
-                exceeding <em>either</em> the {versions}-version cap or the {days}-day limit are
-                removed. Each rule is enforced independently.
-              </>
-            )}
+            <ExpirationExplainerBody
+              hasDays={hasDays}
+              hasVersions={hasVersions}
+              hasBothConditions={hasBothConditions}
+              days={days}
+              versions={versions}
+              mode={mode}
+            />
           </p>
         </div>
       </CollapsibleContent>
     </Collapsible>
   )
+}
+
+const ExpirationExplainerBody = ({
+  hasDays,
+  hasVersions,
+  hasBothConditions,
+  days,
+  versions,
+  mode,
+}: {
+  hasDays: boolean
+  hasVersions: boolean
+  hasBothConditions: boolean
+  days: number
+  versions: number
+  mode: ExpirationMode
+}) => {
+  if (hasDays && !hasVersions) {
+    const olderAge = Math.round(days * 1.5)
+    return (
+      <>
+        A file with <span className="text-foreground-light">4 noncurrent versions</span> aged{' '}
+        <span className="text-foreground-light">
+          {olderAge}d, {days + 5}d, {Math.max(1, days - 5)}d, {Math.max(1, days - 10)}d
+        </span>
+        : versions older than {days} days are permanently deleted. Newer versions are kept
+        regardless of how many there are.
+      </>
+    )
+  }
+
+  if (!hasDays && hasVersions) {
+    return (
+      <>
+        A file with{' '}
+        <span className="text-foreground-light">{versions + 3} noncurrent versions</span>: only the
+        newest {versions} are kept. The {versions + 3 - versions} oldest are permanently deleted,
+        regardless of their age.
+      </>
+    )
+  }
+
+  if (hasBothConditions) {
+    const olderAge = Math.round(days * 1.1)
+    const isBoth = mode === 'and'
+
+    if (isBoth) {
+      return (
+        <>
+          With <span className="text-foreground-light">{versions + 2} noncurrent versions</span>,
+          the oldest at <span className="text-foreground-light">{olderAge}d</span>: only versions
+          that exceed <em>both</em> the {versions}-version cap and the {days}-day limit are removed.
+          v{versions} exceeds the age limit but is within the cap — kept.
+        </>
+      )
+    }
+
+    return (
+      <>
+        With <span className="text-foreground-light">{versions + 2} noncurrent versions</span>, the
+        oldest at <span className="text-foreground-light">{olderAge}d</span>: versions exceeding{' '}
+        <em>either</em> the {versions}-version cap or the {days}-day limit are removed. Each rule is
+        enforced independently.
+      </>
+    )
+  }
+
+  return null
 }
