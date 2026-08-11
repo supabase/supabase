@@ -20,29 +20,6 @@ import { createNotebook, updateNotebook } from '@/data/content/notebooks/noteboo
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import type { Notebooks } from '@/types'
 
-// Converts a domain cell's branded `unchecked_sql` to the wire schema's plain `sql: string`
-// (CellWire.sql carries no brand — see notebook-schema.ts). This intentionally discards the
-// UntrustedSqlFragment marker, so the result must never be persisted or executed as-is:
-//   - get_notebook returns it to the agent for display only.
-//   - update_notebook feeds it through applyNotebookOperations (pure data manipulation, no
-//     execution), then re-promotes every cell via acceptUntrustedSql/acceptUntrustedLogsSql
-//     inline in its own execute — that inline promotion, gated by that tool's own
-//     `needsApproval: true`, is the only place user approval for this SQL is granted.
-function toWireCell(cell: Notebooks.Content['cells'][number]): CellWire {
-  switch (cell._tag) {
-    case 'markdown_cell':
-      return cell
-    case 'database_cell': {
-      const { unchecked_sql, ...rest } = cell
-      return { ...rest, sql: unchecked_sql }
-    }
-    case 'log_cell': {
-      const { unchecked_sql, ...rest } = cell
-      return { ...rest, sql: unchecked_sql }
-    }
-  }
-}
-
 function describeOperationError(error: NotebookOperationError): string {
   switch (error._tag) {
     case 'unknown_cell_id':
@@ -113,7 +90,22 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           name: notebook.name,
           description: notebook.description,
           visibility: notebook.visibility,
-          cells: notebook.content.cells.map(toWireCell),
+          // Inlined rather than a shared helper: this discards the `unchecked_sql` brand for
+          // display purposes only — the result is returned to the agent, never written back.
+          cells: notebook.content.cells.map((cell) => {
+            switch (cell._tag) {
+              case 'markdown_cell':
+                return cell
+              case 'database_cell': {
+                const { unchecked_sql, ...rest } = cell
+                return { ...rest, sql: unchecked_sql }
+              }
+              case 'log_cell': {
+                const { unchecked_sql, ...rest } = cell
+                return { ...rest, sql: unchecked_sql }
+              }
+            }
+          }),
         }
       },
     }),
@@ -172,9 +164,29 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
       needsApproval: true,
       execute: async ({ id, operations }) => {
         const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+
+        // Inlined rather than a shared helper, right beside this tool's own
+        // `needsApproval: true`: this discards each cell's `unchecked_sql` brand so
+        // applyNotebookOperations can splice cells as plain data. The result is never
+        // written or executed as-is — every cell is re-promoted via
+        // acceptUntrustedSql/acceptUntrustedLogsSql further down in this same execute,
+        // right before the PUT.
         const wireNotebook: NotebookWire = {
           schema_version: notebook.content.schema_version,
-          cells: notebook.content.cells.map(toWireCell),
+          cells: notebook.content.cells.map((cell): CellWire => {
+            switch (cell._tag) {
+              case 'markdown_cell':
+                return cell
+              case 'database_cell': {
+                const { unchecked_sql, ...rest } = cell
+                return { ...rest, sql: unchecked_sql }
+              }
+              case 'log_cell': {
+                const { unchecked_sql, ...rest } = cell
+                return { ...rest, sql: unchecked_sql }
+              }
+            }
+          }),
         }
 
         const result = applyNotebookOperations(wireNotebook, operations)
