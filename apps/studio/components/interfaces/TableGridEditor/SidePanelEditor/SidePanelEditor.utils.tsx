@@ -751,7 +751,25 @@ export const createTable = async ({
   return { table, failedPolicies }
 }
 
-/** TODO: Refactor to do in a single transaction */
+/**
+ * Updates a table's schema, constraints, and foreign key relations.
+ * This handles primary keys, RLS enablement, adding/removing columns, and foreign keys.
+ * 
+ * TODO: Refactor to execute in a single transaction for better atomicity.
+ * 
+ * @param params - The parameters for updating the table.
+ * @param params.projectRef - The unique reference of the project.
+ * @param params.connectionString - The database connection string.
+ * @param params.toastId - Identifier for the loading toast notification.
+ * @param params.table - The existing table definition.
+ * @param params.payload - The updated table payload.
+ * @param params.columns - The new column definitions.
+ * @param params.foreignKeyRelations - The updated list of foreign keys.
+ * @param params.existingForeignKeyRelations - The existing foreign key relations.
+ * @param params.primaryKey - The primary key constraint, if updated.
+ * @param params.organizationSlug - The organization slug for telemetry tracking.
+ * @returns The updated table definition and a boolean indicating if any error occurred.
+ */
 export const updateTable = async ({
   projectRef,
   connectionString,
@@ -1012,6 +1030,19 @@ export const formatRowsForInsert = ({
   })
 }
 
+/**
+ * Parses a CSV spreadsheet and inserts its rows into a specified table in batches.
+ * 
+ * @param params - The parameters for importing spreadsheet data.
+ * @param params.projectRef - The unique reference of the project.
+ * @param params.connectionString - The database connection string.
+ * @param params.file - The CSV file to import.
+ * @param params.table - The table to insert rows into.
+ * @param params.selectedHeaders - The column headers to include in the import.
+ * @param params.emptyStringAsNullHeaders - Headers that should treat empty strings as null.
+ * @param params.onProgressUpdate - Callback to report import progress percentage.
+ * @returns An object containing an error if the import failed, or undefined if successful.
+ */
 export async function insertRowsViaSpreadsheet({
   projectRef,
   connectionString,
@@ -1113,6 +1144,19 @@ export async function insertRowsViaSpreadsheet({
   })
 }
 
+/**
+ * Inserts an array of raw row objects into a specified table in batches.
+ * 
+ * @param params - The parameters for inserting rows.
+ * @param params.projectRef - The unique reference of the project.
+ * @param params.connectionString - The database connection string.
+ * @param params.table - The table to insert rows into.
+ * @param params.rows - The raw array of row objects to insert.
+ * @param params.selectedHeaders - The column headers to include.
+ * @param params.emptyStringAsNullHeaders - Headers that should treat empty strings as null.
+ * @param params.onProgressUpdate - Callback to report import progress percentage.
+ * @returns An object containing an error if the insertion failed, or undefined if successful.
+ */
 export async function insertTableRows({
   projectRef,
   connectionString,
@@ -1142,10 +1186,12 @@ export async function insertTableRows({
 
   const batches = chunk(formattedRows, BATCH_SIZE)
   const tasks = batches.map((batch) => {
-    return async () => {
+    return () => {
       const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
-      await executeSql({ projectRef, connectionString, sql: insertQuery })
-      insertProgress = insertProgress + batch.length / rows.length
+      return executeSql({ projectRef, connectionString, sql: insertQuery })
+        .then(() => {
+          insertProgress = insertProgress + batch.length / rows.length
+        })
     }
   })
 
