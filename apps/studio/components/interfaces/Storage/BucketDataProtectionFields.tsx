@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { useState } from 'react'
-import { useFormContext, useFormState, useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import {
   Collapsible,
   CollapsibleContent,
@@ -9,6 +9,10 @@ import {
   DialogSectionSeparator,
   FormControl,
   FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Switch,
   cn,
 } from 'ui'
@@ -42,7 +46,7 @@ export const BucketDataProtectionFields = ({
   initialMaxVersions,
   isPublicBucket = false,
 }: BucketDataProtectionFieldsProps) => {
-  const { control, getValues, setValue } = useFormContext<BucketProtectionFormValues>()
+  const { control, setValue } = useFormContext<BucketProtectionFormValues>()
   const { data: organization, isSuccess: isOrganizationLoaded } = useSelectedOrganizationQuery()
 
   const initialVersioningEnabled = initialVersioningState === 'enabled'
@@ -88,35 +92,13 @@ export const BucketDataProtectionFields = ({
   const hasVersions = typeof maxVersionsRaw === 'number' && maxVersionsRaw > 0
   const hasBothConditions = hasDays && hasVersions
 
-  // Prefill the retention fields with the plan's defaults when versioning is
-  // switched on, so the user doesn't start from a blank state.
-  const enableVersioning = (onChange: (value: boolean) => void) => {
-    onChange(true)
-    if (planLimits) {
-      if (getValues('version_expiry_days') === '') {
-        setValue('version_expiry_days', planLimits.defaultRetentionDays, {
-          shouldDirty: true,
-          shouldValidate: true,
-        })
-      }
-      if (getValues('max_noncurrent_versions') === '') {
-        setValue('max_noncurrent_versions', planLimits.defaultVersions, {
-          shouldDirty: true,
-          shouldValidate: true,
-        })
-      }
-    }
-  }
-
   // Turning versioning off never deletes anything by itself — a bucket that's
   // ever had it enabled can only be suspended, not returned to a plain
   // "disabled" state, so nothing needs a destructive confirmation here.
+  // Both expiration fields default to empty (no limit) — the user opts in to
+  // each condition deliberately rather than receiving prefilled defaults.
   const handleVersioningToggle = (checked: boolean, onChange: (value: boolean) => void) => {
-    if (checked) {
-      enableVersioning(onChange)
-    } else {
-      onChange(false)
-    }
+    onChange(checked)
   }
 
   const handleModeChange = (mode: ExpirationMode) => {
@@ -234,9 +216,7 @@ const ExpirationPolicySection = ({
   mode,
   onModeChange,
 }: ExpirationPolicySectionProps) => {
-  const { errors } = useFormState({ control })
-  const daysError = errors.version_expiry_days?.message
-  const versionsError = errors.max_noncurrent_versions?.message
+  const hasNoPolicy = !hasDays && !hasVersions
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -252,44 +232,35 @@ const ExpirationPolicySection = ({
         />
       </div>
 
-      <div className="flex flex-col gap-y-3">
+      <div className="flex flex-col gap-y-2">
         <FormField
           name="version_expiry_days"
           control={control}
           render={({ field }) => (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between gap-x-6">
-                <label
-                  htmlFor="version-expiry-days"
-                  className="text-sm text-foreground select-none"
-                >
-                  Noncurrent version expiration
-                </label>
-                <div
-                  className={cn(
-                    'flex shrink-0 items-center overflow-hidden rounded-md border bg-surface-200',
-                    daysError ? 'border-destructive' : 'border-default'
-                  )}
-                >
-                  <input
-                    id="version-expiry-days"
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
+            <FormItemLayout
+              name="version_expiry_days"
+              label="Noncurrent version expiration"
+              layout="flex-row-reverse"
+            >
+              <FormControl>
+                <InputGroup>
+                  <FormInputGroupInput
+                    {...field}
+                    type="number"
+                    min={1}
                     placeholder="—"
-                    className="w-12 bg-transparent py-1.5 pr-0 pl-2.5 text-right text-sm text-foreground outline-none"
-                    value={field.value === '' ? '' : String(field.value)}
+                    value={field.value === '' ? '' : field.value}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
                       field.onChange(raw === '' ? '' : Number(raw))
                     }}
-                    onBlur={field.onBlur}
                   />
-                  <span className="py-1.5 pr-2.5 pl-1 text-sm text-foreground-muted">days</span>
-                </div>
-              </div>
-              {daysError && <p className="text-sm text-destructive">{String(daysError)}</p>}
-            </div>
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>days</InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+            </FormItemLayout>
           )}
         />
 
@@ -297,42 +268,41 @@ const ExpirationPolicySection = ({
           name="max_noncurrent_versions"
           control={control}
           render={({ field }) => (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between gap-x-6">
-                <label
-                  htmlFor="max-noncurrent-versions"
-                  className="text-sm text-foreground select-none"
-                >
-                  Retained noncurrent versions
-                </label>
-                <div
-                  className={cn(
-                    'flex shrink-0 items-center overflow-hidden rounded-md border bg-surface-200',
-                    versionsError ? 'border-destructive' : 'border-default'
-                  )}
-                >
-                  <input
-                    id="max-noncurrent-versions"
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
+            <FormItemLayout
+              name="max_noncurrent_versions"
+              label="Retained noncurrent versions"
+              layout="flex-row-reverse"
+            >
+              <FormControl>
+                <InputGroup>
+                  <FormInputGroupInput
+                    {...field}
+                    type="number"
+                    min={1}
                     placeholder="—"
-                    className="w-12 bg-transparent py-1.5 pr-0 pl-2.5 text-right text-sm text-foreground outline-none"
-                    value={field.value === '' ? '' : String(field.value)}
+                    value={field.value === '' ? '' : field.value}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
                       field.onChange(raw === '' ? '' : Number(raw))
                     }}
-                    onBlur={field.onBlur}
                   />
-                  <span className="py-1.5 pr-2.5 pl-1 text-sm text-foreground-muted">max</span>
-                </div>
-              </div>
-              {versionsError && <p className="text-sm text-destructive">{String(versionsError)}</p>}
-            </div>
+                  <InputGroupAddon align="inline-end">
+                    <InputGroupText>max</InputGroupText>
+                  </InputGroupAddon>
+                </InputGroup>
+              </FormControl>
+            </FormItemLayout>
           )}
         />
       </div>
+
+      {hasNoPolicy && (
+        <Admonition
+          type="warning"
+          title="No expiration policy"
+          description="All noncurrent versions count toward storage usage and incur ongoing costs. Consider setting an expiration policy to automatically remove outdated versions."
+        />
+      )}
 
       {hasBothConditions && <ExpirationExplainer days={days} versions={versions} mode={mode} />}
     </div>
