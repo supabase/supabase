@@ -15,7 +15,7 @@ This page covers using the [Supabase MCP Server](/docs/guides/ai-tools/mcp) and 
 
 </Admonition>
 
-Normally, each member of your organization has to individually sign in and approve their AI tool's connection to the [Supabase MCP Server](/docs/guides/ai-tools/mcp). Enterprise-managed authentication removes that per-user step: once your identity provider (IdP) and MCP client both trust each other for single sign-on, members get access to the Supabase MCP Server automatically, without a separate approval prompt.
+Normally, each member of your organization has to individually sign in and approve their AI tool's connection to the [Supabase MCP Server](/docs/guides/ai-tools/mcp). Enterprise-managed authentication removes that per-user step. Once your identity provider (IdP) and MCP client both trust each other for single sign-on, members get access to the Supabase MCP Server automatically, without a separate approval prompt.
 
 This is Supabase's implementation of the MCP [Enterprise-Managed Authorization](https://github.com/modelcontextprotocol/ext-auth/blob/main/specification/stable/enterprise-managed-authorization.mdx) extension, which relies on an **ID-JAG** (Identity Assertion JWT Authorization Grant) issued by your IdP.
 
