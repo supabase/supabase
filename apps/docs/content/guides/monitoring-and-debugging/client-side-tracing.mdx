@@ -88,9 +88,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   tracePropagation: {
     enabled: true,
     // Default: true. Non-sampled requests carry only `traceparent` (with the
-    // sampled flag preserved, so nothing is recorded downstream) — logs stay
-    // correlatable while `tracestate` and `baggage` are withheld. Set to
-    // false to always send the full trace context regardless of sampling.
+    // sampled flag preserved, so nothing is recorded downstream) — log
+    // correlation keeps working while `tracestate` and `baggage` are withheld.
+    // Set to false to always send the full trace context regardless of sampling.
     respectSamplingDecision: false,
   },
 })
@@ -124,7 +124,7 @@ The SDK never throws when it can't propagate, which keeps it safe to enable but 
 - **`@opentelemetry/api` is not installed** in the app making the request. On `2.112.0` and later the tracing subpath imports it directly, so a missing package surfaces as a module resolution error. On `2.106.0`–`2.111.x` it's loaded dynamically and the SDK silently no-ops.
 - **No `TracerProvider` registered.** `@opentelemetry/api` defaults to a noop provider that produces non-recorded spans. Ensure your app calls `provider.register()` (or your vendor SDK's equivalent) before making requests.
 - **Your tracing SDK's propagator doesn't emit W3C `traceparent`.** Sentry's propagator, for example, only emits it when `propagateTraceparent: true` is set. From version `2.112.3` the SDK logs a one-time warning naming the headers the propagator wrote — see [Using a vendor tracing SDK](#using-a-vendor-tracing-sdk).
-- **The upstream trace is not sampled** (versions before `2.112.3`). Older versions skip all trace headers when the upstream trace is not sampled. From `2.112.3`, non-sampled requests still carry `traceparent`, so logs remain correlatable by default. Set `respectSamplingDecision: false` to always send the full trace context.
+- **The upstream trace is not sampled** (versions before `2.112.3`). Older versions skip all trace headers when the upstream trace is not sampled. From `2.112.3`, non-sampled requests still carry `traceparent`, so log correlation keeps working by default. Set `respectSamplingDecision: false` to always send the full trace context.
 - **You're calling a non-Supabase host through a custom `fetch`.** Trace headers are only attached to Supabase domains (`*.supabase.co`, `*.supabase.in`, `localhost`).
 - **You're using the CDN (UMD) build.** Trace propagation isn't available there — the tracing runtime can't be loaded from a script tag.
 
