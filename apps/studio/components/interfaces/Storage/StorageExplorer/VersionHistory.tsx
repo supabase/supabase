@@ -17,7 +17,7 @@ import {
 import { type ObjectVersion } from '@/data/storage/protection/protection-mocks'
 import { formatBytes } from '@/lib/helpers'
 
-import { getMockBucketProtection } from '../StorageProtection.constants'
+import { getMockBucketProtection, type ExpirationMode } from '../StorageProtection.constants'
 
 interface VersionHistoryProps {
   projectRef?: string
@@ -72,9 +72,23 @@ export const VersionHistory = ({
 
   const bucketProtection = getMockBucketProtection(bucketId)
   const cap = bucketProtection.maxNoncurrentVersions
-  const usageRatio = cap && cap > 0 ? noncurrentCount / cap : 0
-  const isNearingCap = cap !== null && cap > 0 && usageRatio >= 0.8
-  const isAtCap = cap !== null && cap > 0 && noncurrentCount >= cap
+  const expiryDays = bucketProtection.versionExpiryDays
+  const mode = bucketProtection.expirationMode
+  const hasCap = cap !== null && cap > 0
+  const hasExpiryDays = expiryDays !== null && expiryDays > 0
+  const hasPolicy = hasCap || hasExpiryDays
+
+  const usageRatio = hasCap ? noncurrentCount / cap : 0
+  const isNearingCap = hasCap && usageRatio >= 0.8
+  const isAtCap = hasCap && noncurrentCount >= cap
+
+  // Pre-compute each noncurrent version's index (0-based, newest first) so
+  // the render loop can look it up without mutation.
+  const noncurrentIndices = new Map<string, number>()
+  let noncurrentIdx = 0
+  for (const v of versions) {
+    if (!v.isCurrent) noncurrentIndices.set(v.versionId, noncurrentIdx++)
+  }
 
   return (
     <div className="space-y-4">
@@ -85,11 +99,19 @@ export const VersionHistory = ({
             .filter(Boolean)
             .join(' · ')}
         </p>
-        {cap !== null && cap > 0 && (
-          <div className="flex items-center gap-x-2 pt-1">
-            <Badge variant={isAtCap ? 'warning' : 'default'}>
-              {noncurrentCount} / {cap} noncurrent
-            </Badge>
+        {hasPolicy && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
+            {hasCap && (
+              <Badge variant={isAtCap ? 'warning' : 'default'}>
+                {noncurrentCount} / {cap} noncurrent
+              </Badge>
+            )}
+            {hasExpiryDays && <Badge variant="default">{expiryDays}d retention</Badge>}
+            {hasCap && hasExpiryDays && (
+              <span className="text-xs text-foreground-lighter">
+                {mode === 'and' ? 'both conditions required' : 'either condition expires'}
+              </span>
+            )}
             {isAtCap && (
               <span className="text-xs text-warning-600">
                 At cap — the next overwrite will auto-expire the oldest version.
@@ -207,6 +229,15 @@ export const VersionHistory = ({
                   <p className="mt-1 font-mono text-xs text-foreground-muted">
                     v: {shortVersion(version.versionId)}
                   </p>
+                  {!version.isCurrent && hasPolicy && (
+                    <VersionExpiryIndicator
+                      version={version}
+                      noncurrentIndex={noncurrentIndices.get(version.versionId) ?? 0}
+                      expiryDays={expiryDays}
+                      cap={cap}
+                      mode={mode}
+                    />
+                  )}
                 </div>
               </li>
             )
@@ -249,5 +280,73 @@ export const VersionHistory = ({
         </p>
       </ConfirmationModal>
     </div>
+  )
+}
+
+// ── Per-version expiry indicator ────────────────────────────────────────
+
+interface VersionExpiryIndicatorProps {
+  version: ObjectVersion
+  noncurrentIndex: number
+  expiryDays: number | null
+  cap: number | null
+  mode: ExpirationMode
+}
+
+const VersionExpiryIndicator = ({
+  version,
+  noncurrentIndex,
+  expiryDays,
+  cap,
+  mode,
+}: VersionExpiryIndicatorProps) => {
+  const hasDaysRule = expiryDays !== null && expiryDays > 0
+  const hasCapRule = cap !== null && cap > 0
+
+  const daysOld = dayjs().diff(dayjs(version.createdAt), 'day')
+  const daysRemaining = hasDaysRule ? expiryDays - daysOld : null
+  const exceedsDays = hasDaysRule && daysOld >= expiryDays
+  const exceedsCap = hasCapRule && noncurrentIndex >= cap
+
+  // Whether this version would expire under the combined policy
+  const wouldExpire =
+    hasDaysRule && hasCapRule
+      ? mode === 'and'
+        ? exceedsDays && exceedsCap
+        : exceedsDays || exceedsCap
+      : exceedsDays || exceedsCap
+
+  const parts: string[] = []
+
+  if (hasDaysRule) {
+    if (daysRemaining !== null && daysRemaining > 0) {
+      parts.push(`Expires in ${daysRemaining}d`)
+    } else {
+      parts.push(`Past ${expiryDays}d limit`)
+    }
+  }
+
+  if (hasCapRule) {
+    parts.push(`#${noncurrentIndex + 1} of ${cap}`)
+  }
+
+  if (parts.length === 0) return null
+
+  const isWarning = wouldExpire
+  const isSoonToExpire = !wouldExpire && daysRemaining !== null && daysRemaining <= 7
+
+  return (
+    <p
+      className={cn(
+        'mt-0.5 text-xs',
+        isWarning
+          ? 'text-warning-600'
+          : isSoonToExpire
+            ? 'text-warning-600'
+            : 'text-foreground-muted'
+      )}
+    >
+      {parts.join(' · ')}
+    </p>
   )
 }
