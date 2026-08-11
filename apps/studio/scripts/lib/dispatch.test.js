@@ -7,6 +7,7 @@ import {
   getDevServerArgs,
   getDispatchScript,
   getPnpmSpawnInvocation,
+  resolveDevServerArgs,
   resolveStudioPort,
 } from './dispatch.js'
 
@@ -84,6 +85,19 @@ describe('getDevServerArgs', () => {
   it('adds nothing for targets that do not take a port', () => {
     expect(getDevServerArgs('build:next', 8082)).toEqual([])
     expect(getDevServerArgs('start:next', 8082)).toEqual([])
+  })
+})
+
+describe('resolveDevServerArgs', () => {
+  it('does not validate STUDIO_PORT for targets that do not use it', () => {
+    expect(resolveDevServerArgs('build:next', 'not-a-port')).toEqual([])
+    expect(resolveDevServerArgs('start:tanstack', 'not-a-port')).toEqual([])
+  })
+
+  it('validates and resolves STUDIO_PORT for dev targets only', () => {
+    expect(resolveDevServerArgs('dev:next', 'not-a-port')).toBeNull()
+    expect(resolveDevServerArgs('dev:next', '3000', '9000')).toEqual(['-p', '3000'])
+    expect(resolveDevServerArgs('dev:tanstack', undefined, '9000')).toEqual(['--port', '9000'])
   })
 })
 

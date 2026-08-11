@@ -20,10 +20,9 @@ import { fileURLToPath } from 'node:url'
 
 import {
   getChildEnv,
-  getDevServerArgs,
   getDispatchScript,
   getPnpmSpawnInvocation,
-  resolveStudioPort,
+  resolveDevServerArgs,
 } from './lib/dispatch.js'
 import { readEnvFiles } from './lib/env.js'
 
@@ -47,9 +46,9 @@ if (!script) {
 // dev server received the literal `${STUDIO_PORT:-8082}` and refused to start.
 // Resolving it here gives both platforms one implementation, and keeps the
 // value out of the shell string entirely on the Windows path.
-const port = resolveStudioPort(process.env.STUDIO_PORT, fileEnv.STUDIO_PORT)
+const devServerArgs = resolveDevServerArgs(script, process.env.STUDIO_PORT, fileEnv.STUDIO_PORT)
 
-if (port === null) {
+if (devServerArgs === null) {
   console.error(
     `dispatch.js: STUDIO_PORT must be a port number between 0 and 65535 ` +
       `(got "${process.env.STUDIO_PORT ?? fileEnv.STUDIO_PORT}")`
@@ -64,7 +63,7 @@ if (port === null) {
 // child interactive and lets the parent exit cleanly when the child does.
 // Windows needs a shell to resolve pnpm.cmd; spawning `pnpm` directly
 // otherwise fails with ENOENT even when pnpm is available in PowerShell.
-const pnpm = getPnpmSpawnInvocation(script, process.platform, getDevServerArgs(script, port))
+const pnpm = getPnpmSpawnInvocation(script, process.platform, devServerArgs)
 const child = spawn(pnpm.command, pnpm.args, {
   stdio: 'inherit',
   env: getChildEnv(script, process.env),

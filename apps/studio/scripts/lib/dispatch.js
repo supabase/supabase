@@ -37,6 +37,18 @@ export function getDevServerArgs(script, port) {
   return [script === 'dev:tanstack' ? '--port' : '-p', String(port)]
 }
 
+// Build and start do not consume STUDIO_PORT, so an unrelated value in the
+// environment must not block them. Dev targets resolve the first configured
+// candidate and return null when it is not a valid port.
+export function resolveDevServerArgs(script, ...portCandidates) {
+  if (!VALID_SCRIPTS.has(script)) return null
+  if (!script.startsWith('dev:')) return []
+
+  const port = resolveStudioPort(...portCandidates)
+  if (port === null) return null
+  return getDevServerArgs(script, port)
+}
+
 // Environment for the dispatched child, kept here so the Windows and POSIX
 // paths cannot drift apart.
 export function getChildEnv(script, env = {}) {
