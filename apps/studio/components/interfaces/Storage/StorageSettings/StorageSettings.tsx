@@ -106,16 +106,6 @@ export const StorageSettings = () => {
     !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
   const [isUpdating, setIsUpdating] = useState(false)
-  const initialFormValues = useMemo(() => {
-    const { value, unit } = convertFromBytes(config?.fileSizeLimit ?? 0)
-
-    return {
-      fileSizeLimit: value,
-      unit,
-      imageTransformationEnabled:
-        config?.features?.imageTransformation?.enabled ?? hasAccessToImageTransformations,
-    }
-  }, [config, hasAccessToImageTransformations])
 
   const maxBytes = useMemo(() => {
     if (organization?.usage_billing_enabled || isEntitlementUnlimited()) {
