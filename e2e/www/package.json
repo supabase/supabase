@@ -8,7 +8,8 @@
     "e2e:www:all": "node --experimental-strip-types scripts/run-e2e-www.ts --all"
   },
   "dependencies": {
-    "@playwright/test": "^1.59.1"
+    "@playwright/test": "^1.59.1",
+    "e2e-shared": "workspace:*"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",
