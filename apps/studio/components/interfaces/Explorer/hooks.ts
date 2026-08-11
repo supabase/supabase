@@ -27,7 +27,28 @@ export const useCreateNotebook = () => {
       favorite: false,
       content: {
         schema_version: 1,
-        cells: [],
+        // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
+        cells: [
+          {
+            _tag: 'markdown_cell',
+            id: '1',
+            text: `
+# Title
+A brief description on what this notebook is about
+        `.trim(),
+          },
+          {
+            _tag: 'markdown_cell',
+            id: '2',
+            text: `
+## Section
+This is a sample paragraph to demonstrate the Markdown cells
+1. List item 1
+2. List item 2
+3. List item 3
+            `,
+          },
+        ],
       },
       owner_id: profile.id,
       project_id: project.id,
