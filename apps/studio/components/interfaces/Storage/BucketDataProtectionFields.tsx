@@ -224,8 +224,8 @@ const ExpirationPolicySection = ({
     <div className="flex flex-col gap-y-4">
       <div>
         <p className="mb-1.5 flex items-center gap-x-1.5 text-sm font-medium text-foreground">
-          <BroomSparklesIcon size={14} className="text-foreground-lighter" />
           Expiration policy
+          <BroomSparklesIcon size={14} className="text-foreground-lighter" />
         </p>
         <ExpirationSentence
           hasDays={hasDays}

@@ -195,14 +195,14 @@ export const PreviewPane = () => {
     // Viewport-height aware. ~144px of chrome sits above the preview (close
     // button + surrounding padding + filename summary), so the preview height
     // is derived from what's left of the viewport rather than raw vh: 40% of
-    // the remaining space, floored at 120px and capped at 230px. The floor
+    // the remaining space, floored at 120px and capped at 180px. The floor
     // guarantees the sections below always have room to scroll; the cap keeps
     // the preview from dominating on tall viewports; and subtracting the
     // chrome upfront makes the shrink kick in noticeably earlier than a plain
     // vh clamp would.
     <div
       className="relative shrink-0 border border-overlay"
-      style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 230px)' }}
+      style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
     >
       <div className="flex h-full w-full items-center">
         <PreviewFile item={file} />

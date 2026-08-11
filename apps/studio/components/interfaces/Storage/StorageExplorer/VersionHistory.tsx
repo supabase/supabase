@@ -11,6 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -108,27 +111,43 @@ export const VersionHistory = ({
   return (
     <div className="space-y-4">
       {hasPolicy && (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          {hasCap && (
-            <Badge variant={isAtCap ? 'warning' : 'default'}>
-              {noncurrentCount} / {cap} noncurrent
-            </Badge>
-          )}
-          {hasExpiryDays && <Badge variant="default">{expiryDays}d retention</Badge>}
-          {hasCap && hasExpiryDays && (
-            <span className="text-xs text-foreground-lighter">
-              {mode === 'and' ? 'both conditions required' : 'either condition expires'}
-            </span>
-          )}
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            {hasCap && (
+              <Badge variant={isAtCap ? 'warning' : 'default'}>
+                {noncurrentCount} / {cap} noncurrent
+              </Badge>
+            )}
+            {hasExpiryDays && <Badge variant="default">{expiryDays}d retention</Badge>}
+          </div>
+          <p className="text-xs text-foreground-lighter">
+            {hasCap && hasExpiryDays ? (
+              mode === 'and' ? (
+                <>
+                  Versions are removed only when they exceed <strong>both</strong> the cap and the
+                  retention window.
+                </>
+              ) : (
+                <>
+                  Versions are removed as soon as they exceed <strong>either</strong> the cap or the
+                  retention window.
+                </>
+              )
+            ) : hasCap ? (
+              <>Older versions are removed once the cap is reached.</>
+            ) : (
+              <>Versions older than the retention window are removed.</>
+            )}
+          </p>
           {isAtCap && (
-            <span className="text-xs text-warning-600">
+            <p className="text-xs text-warning-600">
               The next overwrite will auto-expire the oldest version.
-            </span>
+            </p>
           )}
           {!isAtCap && isNearingCap && (
-            <span className="text-xs text-foreground-lighter">
+            <p className="text-xs text-foreground-lighter">
               Nearing cap. Older versions auto-expire once the limit is reached.
-            </span>
+            </p>
           )}
         </div>
       )}
@@ -145,67 +164,52 @@ export const VersionHistory = ({
         <ol className="flex flex-col">
           {versions.map((version) => {
             const isSelected = previewedVersionId === version.versionId
+            const meta = version.isCurrent ? undefined : versionMeta.get(version.versionId)
             return (
-              <li key={version.versionId} className="group flex gap-x-3">
-                <div className="flex flex-col items-center pt-1.5">
-                  <span
-                    className={cn(
-                      'h-2.5 w-2.5 rounded-full',
-                      version.isCurrent || isSelected ? 'bg-brand' : 'bg-foreground-muted'
+              <li
+                key={version.versionId}
+                role="button"
+                tabIndex={0}
+                className="group -mx-2 cursor-pointer px-2 pb-4"
+                onClick={() => onPreview?.(version)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') onPreview?.(version)
+                }}
+              >
+                <div className="flex items-center justify-between gap-x-2">
+                  <div className="flex items-center gap-x-2">
+                    <span
+                      className={cn(
+                        'text-sm',
+                        isSelected ? 'text-brand' : 'text-foreground',
+                        onPreview && 'group-hover:underline'
+                      )}
+                    >
+                      {dayjs(version.createdAt).format('MMM D, HH:mm')}
+                    </span>
+                    {version.isCurrent && <Badge variant="success">Current</Badge>}
+                    {meta && hasPolicy && (
+                      <VersionExpiryIndicator
+                        version={version}
+                        position={meta.position}
+                        capExceeded={meta.capExceeded}
+                        expiryDays={expiryDays}
+                        cap={cap}
+                        mode={mode}
+                      />
                     )}
+                  </div>
+
+                  <VersionActionsMenu
+                    version={version}
+                    isRestoring={isRestoring}
+                    onRestore={() => handleRestore(version)}
+                    onDelete={() => setVersionToDelete(version)}
                   />
                 </div>
-
-                <div
-                  role="button"
-                  tabIndex={0}
-                  className="-mx-2 flex-1 cursor-pointer px-2 pb-4"
-                  onClick={() => onPreview?.(version)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') onPreview?.(version)
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-x-2">
-                    <div className="flex items-center gap-x-2">
-                      <span
-                        className={cn(
-                          'text-sm',
-                          isSelected ? 'text-brand' : 'text-foreground',
-                          onPreview && 'group-hover:underline'
-                        )}
-                      >
-                        {dayjs(version.createdAt).format('MMM D, HH:mm')}
-                      </span>
-                      {version.isCurrent && <Badge variant="success">Current</Badge>}
-                    </div>
-
-                    <VersionActionsMenu
-                      version={version}
-                      isRestoring={isRestoring}
-                      onRestore={() => handleRestore(version)}
-                      onDelete={() => setVersionToDelete(version)}
-                    />
-                  </div>
-                  <p className="mt-0.5 text-xs text-foreground-lighter">
-                    {formatBytes(version.size)}
-                  </p>
-                  {!version.isCurrent &&
-                    hasPolicy &&
-                    (() => {
-                      const meta = versionMeta.get(version.versionId)
-                      if (!meta) return null
-                      return (
-                        <VersionExpiryIndicator
-                          version={version}
-                          position={meta.position}
-                          capExceeded={meta.capExceeded}
-                          expiryDays={expiryDays}
-                          cap={cap}
-                          mode={mode}
-                        />
-                      )
-                    })()}
-                </div>
+                <p className="mt-0.5 text-xs text-foreground-lighter">
+                  {formatBytes(version.size)}
+                </p>
               </li>
             )
           })}
@@ -272,24 +276,30 @@ const VersionActionsMenu = ({
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => toast.success(`Downloading ${label}`)}>
+          <DropdownMenuItem
+            className="gap-x-2"
+            onClick={() => toast.success(`Downloading ${label}`)}
+          >
             <Download size={14} />
             Download
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => toast.success(`Copied URL for ${label}`)}>
+          <DropdownMenuItem
+            className="gap-x-2"
+            onClick={() => toast.success(`Copied URL for ${label}`)}
+          >
             <Copy size={14} />
             Get URL
           </DropdownMenuItem>
           {!version.isCurrent && (
             <>
-              <DropdownMenuItem disabled={isRestoring} onClick={onRestore}>
+              <DropdownMenuItem className="gap-x-2" disabled={isRestoring} onClick={onRestore}>
                 <RotateCcw size={14} />
                 Restore as current
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={onDelete}
-                className="text-destructive focus:text-destructive"
+                className="gap-x-2 text-destructive focus:text-destructive"
               >
                 <Trash2 size={14} />
                 Delete permanently
@@ -350,24 +360,35 @@ const VersionExpiryIndicator = ({
   const isSoonToExpire = !wouldExpire && daysRemaining !== null && daysRemaining <= 7
   const emphasize = isWarning || isSoonToExpire
 
+  const combineLabel =
+    hasDaysRule && hasCapRule
+      ? mode === 'and'
+        ? 'Removed when both rules apply.'
+        : 'Removed as soon as either rule applies.'
+      : null
+
   return (
-    <div className="mt-1 flex items-center gap-x-2">
-      {daysLabel !== null && (
+    <Tooltip>
+      <TooltipTrigger asChild>
         <span
           className={cn(
-            'inline-flex items-center gap-x-1 text-xs',
-            emphasize ? 'text-warning-600' : 'text-foreground-muted'
+            'inline-flex shrink-0 cursor-help',
+            emphasize ? 'text-warning-600' : 'text-foreground-lighter'
           )}
+          onClick={(e) => e.stopPropagation()}
         >
-          <BroomSparklesIcon size={12} />
-          {daysLabel}
+          <BroomSparklesIcon size={14} />
         </span>
-      )}
-      {hasCapRule && (
-        <Badge variant={isWarning ? 'warning' : 'default'}>
-          {position}/{cap}
-        </Badge>
-      )}
-    </div>
+      </TooltipTrigger>
+      <TooltipContent side="top" className="max-w-64 space-y-1">
+        {daysLabel !== null && <p>{daysLabel}</p>}
+        {hasCapRule && (
+          <p>
+            Position {position} of {cap} noncurrent
+          </p>
+        )}
+        {combineLabel && <p className="text-foreground-lighter">{combineLabel}</p>}
+      </TooltipContent>
+    </Tooltip>
   )
 }
