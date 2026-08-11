@@ -5,8 +5,8 @@ import { z } from 'zod'
 import { getContent } from '@/data/content/content-infinite-query'
 import {
   applyNotebookOperations,
+  describeNotebookOperationError,
   notebookOperationsSchema,
-  type NotebookOperationError,
 } from '@/data/content/notebooks/notebook-operations'
 import { getNotebook } from '@/data/content/notebooks/notebook-query'
 import {
@@ -19,17 +19,6 @@ import {
 import { createNotebook, updateNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import type { Notebooks } from '@/types'
-
-function describeOperationError(error: NotebookOperationError): string {
-  switch (error._tag) {
-    case 'unknown_cell_id':
-      return `No cell with id "${error.cell_id}" exists in this notebook.`
-    case 'conflicting_operations':
-      return `More than one operation targets cell "${error.cell_id}".`
-    case 'empty_result':
-      return 'This update would leave the notebook with no cells.'
-  }
-}
 
 export type NotebookToolsContext = {
   projectRef?: string
@@ -191,7 +180,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
 
         const result = applyNotebookOperations(wireNotebook, operations)
         if (!result.success) {
-          throw new Error(describeOperationError(result.error))
+          throw new Error(describeNotebookOperationError(result.error))
         }
 
         // Same promotion as create_notebook above, inlined here for the same auditability
