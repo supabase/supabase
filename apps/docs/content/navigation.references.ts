@@ -30,6 +30,20 @@ export const REFERENCES = {
       },
     },
   },
+  server: {
+    type: 'sdk',
+    name: 'Server',
+    library: '@supabase/server',
+    libPath: 'server',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_server_v1',
+      },
+    },
+  },
   dart: {
     type: 'sdk',
     name: 'Flutter',

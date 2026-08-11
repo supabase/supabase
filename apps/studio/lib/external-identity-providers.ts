@@ -40,9 +40,22 @@ export const GITHUB_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
   showInAccountPreferences: false,
 }
 
+export const CHATGPT_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
+  id: 'chatgpt',
+  authProvider: 'custom:openai',
+  displayName: 'ChatGPT',
+  iconPath: '/img/icons/openai-icon.svg',
+  showOnSignIn: true,
+  showOnSignUp: true,
+  showInAccountPreferences: false,
+}
+
 // Registry of every known provider, independent of which are currently enabled. Used for config and
 // display lookups (e.g. resolving the provider that a mid-flow interstitial was reached with).
-const IDENTITY_PROVIDERS: ExternalIdentityProviderConfig[] = [GITHUB_IDENTITY_PROVIDER]
+const IDENTITY_PROVIDERS: ExternalIdentityProviderConfig[] = [
+  GITHUB_IDENTITY_PROVIDER,
+  CHATGPT_IDENTITY_PROVIDER,
+]
 
 export function normalizeIconPath(iconPath: string): string {
   if (

@@ -28,15 +28,19 @@ import {
 import { PROJECT_STATUS } from '@/lib/constants'
 import { type ResponseError } from '@/types'
 
-const RestartServerButton = () => {
+export const RestartServerButton = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const isProjectActive = useIsProjectActive()
+
+  const isBranch = Boolean(project?.parent_project_ref)
+  const entityLabel = isBranch ? 'branch' : 'project'
+  const entityLabelCapitalized = entityLabel.charAt(0).toUpperCase() + entityLabel.slice(1)
   const canRestart = isProjectActive || project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const { setProjectStatus } = useSetProjectStatus()
 
-  const [serviceToRestart, setServiceToRestart] = useState<'project' | 'database'>()
+  const [serviceToRestart, setServiceToRestart] = useState<'project' | 'branch' | 'database'>()
 
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
@@ -79,7 +83,7 @@ const RestartServerButton = () => {
     restartProject({ ref: projectRef })
   }
 
-  const requestDatabaseRestart = async () => {
+  const requestDatabaseRestart = () => {
     if (!canRestartProject) {
       return toast.error('You do not have the required permissions to restart this project')
     }
@@ -115,29 +119,30 @@ const RestartServerButton = () => {
               projectRestartDisabled ||
               isAwsK8s
             }
-            onClick={() => setServiceToRestart('project')}
+            onClick={() => setServiceToRestart(entityLabel)}
             tooltip={{
               content: {
                 side: 'bottom',
                 text: projectRestartDisabled
-                  ? 'Project restart is currently disabled'
+                  ? `${entityLabelCapitalized} restart is currently disabled`
                   : !canRestartProject
-                    ? 'You need additional permissions to restart this project'
+                    ? `You need additional permissions to restart this ${entityLabel}`
                     : !canRestart
-                      ? 'Unable to restart project as project is not active'
+                      ? `Unable to restart ${entityLabel} as ${entityLabel} is not active`
                       : isAwsK8s
-                        ? 'Project restart is not supported for AWS (Revamped) projects'
+                        ? `${entityLabelCapitalized} restart is not supported for AWS (Revamped) projects`
                         : undefined,
               },
             }}
           >
-            Restart project
+            Restart {entityLabel}
           </ButtonTooltip>
           {hasRestartDropdown && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="default"
+                  aria-label={`Restart ${entityLabel}`}
                   className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
                   icon={<ChevronDown />}
                   disabled={!canRestartProject}
@@ -191,16 +196,14 @@ const RestartServerButton = () => {
         confirmLabelLoading="Restarting"
         loading={isLoading}
         onCancel={() => setServiceToRestart(undefined)}
-        onConfirm={async () => {
-          if (serviceToRestart === 'project') {
-            await requestProjectRestart()
+        onConfirm={() => {
+          if (serviceToRestart === 'project' || serviceToRestart === 'branch') {
+            requestProjectRestart()
           } else if (serviceToRestart === 'database') {
-            await requestDatabaseRestart()
+            requestDatabaseRestart()
           }
         }}
       />
     </>
   )
 }
-
-export default RestartServerButton

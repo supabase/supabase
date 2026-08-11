@@ -23,7 +23,7 @@ function ModulesNav({ activePage, docsUrl }: Props) {
                 key={currentModule.name}
                 className={cn(
                   'flex items-center gap-1.5 px-2 first:-ml-2 py-3 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
-                  'focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground focus-visible:outline-brand-600',
+                  'focus-ring focus-visible:text-foreground',
                   currentModule.name === activePage && 'border-foreground-light text-foreground'
                 )}
                 href={currentModule.url ?? ''}
@@ -52,7 +52,7 @@ function ModulesNav({ activePage, docsUrl }: Props) {
             <Link
               className={cn(
                 'flex items-center gap-1.5 py-3 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
-                'focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground focus-visible:outline-brand-600'
+                'focus-ring focus-visible:text-foreground'
               )}
               href={docsUrl}
             >

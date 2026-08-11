@@ -91,7 +91,8 @@ Depending on your setup, you may need to adjust these values - for example, to u
 An override `docker-compose.rustfs.yml` can be added to enable RustFS container and provide an S3-compatible API for Storage backend:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.rustfs.yml up -d
+sh run.sh config add rustfs
+sh run.sh start
 ```
 
 Make sure to review the Storage section in your `.env` file for related configuration options.
@@ -112,7 +113,8 @@ MinIO no longer publishes open source Docker images or maintains their open sour
 An override `docker-compose.s3.yml` can be added to enable MinIO container and provide an S3-compatible API for Storage backend:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.s3.yml up -d
+sh run.sh config add s3
+sh run.sh start
 ```
 
 Make sure to review the Storage section in your `.env` file for related configuration options.

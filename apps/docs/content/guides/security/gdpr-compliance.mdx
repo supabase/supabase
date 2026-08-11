@@ -1,0 +1,19 @@
+---
+id: 'gdpr-compliance'
+title: 'GDPR compliance and Supabase'
+description: 'How Supabase supports GDPR-compliant deployments, including data residency and the Data Processing Agreement (DPA).'
+---
+
+Supabase supports building GDPR-compliant applications. Building a compliant application is a [shared responsibility](/docs/guides/deployment/shared-responsibility-model): Supabase secures the underlying infrastructure, while you're responsible for your application's data processing activities, consent flows, and access controls.
+
+## Data residency
+
+Each Supabase project is deployed to a single primary region, and your project's primary Postgres database, Auth service, and Storage objects are hosted in that region. Choosing a [specific region](/docs/guides/platform/regions#specific-regions) within the EU pins these services to that exact AWS region.
+
+Note that the "Europe" general region grouping also includes London (UK) and Zurich (Switzerland) — both have GDPR-adequacy data protection regimes, but neither is an EU member state. If your compliance requirements call for data to stay within the EU specifically, choose a specific EU region rather than the general Europe grouping. See [available regions](/docs/guides/platform/regions) for the full list.
+
+Choosing a region is a data-location control and does not make your application GDPR compliant on its own. Backups, logs, data exported to external systems, Edge Function execution, and sub-processors can affect your data residency and international transfer analysis.
+
+## Data processing agreement (DPA)
+
+If you need a formal data processing contract under GDPR, Supabase provides a Data Processing Agreement (DPA). [Request or view the DPA](/legal/dpa).

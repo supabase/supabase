@@ -1,9 +1,9 @@
 ---
 name: studio-testing
-description: Testing strategy for Supabase Studio. Use when writing tests, deciding what
-  type of test to write, extracting logic from components into testable utility
-  functions, or reviewing test coverage. Covers unit tests, component tests,
-  and E2E test selection criteria.
+description: Testing strategy for Supabase Studio. Use when writing tests, deciding
+  whether a change needs tests and which type, extracting logic from components into
+  testable utility functions, or reviewing test coverage. Covers unit tests, component
+  tests, and E2E test selection criteria.
 ---
 
 # Studio Testing Strategy
@@ -162,14 +162,14 @@ try/finally for resource cleanup. For E2E execution details, see the
 
 ## Codebase References
 
-| What                    | Where                                                                                                                                                                                                 |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What                    | Where                                                                                                                                                                                     |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Util test examples      | `apps/studio/tests/components/Grid/Grid.utils.test.ts`, `apps/studio/tests/components/Billing/TaxID.utils.test.ts`, `apps/studio/tests/components/Editor/SpreadsheetImport.utils.test.ts` |
-| Component test examples | `apps/studio/tests/features/logs/LogsFilterPopover.test.tsx`, `apps/studio/tests/components/CopyButton.test.tsx`                                                                                      |
-| E2E test example        | `e2e/studio/features/filter-bar.spec.ts`                                                                                                                                                              |
-| E2E helpers pattern     | `e2e/studio/utils/filter-bar-helpers.ts`                                                                                                                                                              |
-| Custom render           | `apps/studio/tests/lib/custom-render.tsx`                                                                                                                                                             |
-| MSW mock setup          | `apps/studio/tests/lib/msw.ts` (`addAPIMock`)                                                                                                                                                         |
-| Test README             | `apps/studio/tests/README.md`                                                                                                                                                                         |
-| Vitest config           | `apps/studio/vitest.config.ts`                                                                                                                                                                        |
-| Related skills          | `studio-e2e-tests` (running E2E), `vitest` (API reference), `vercel-composition-patterns` (component architecture)                                    |
+| Component test examples | `apps/studio/tests/features/logs/LogsFilterPopover.test.tsx`, `apps/studio/tests/components/CopyButton.test.tsx`                                                                          |
+| E2E test example        | `e2e/studio/features/filter-bar.spec.ts`                                                                                                                                                  |
+| E2E helpers pattern     | `e2e/studio/utils/filter-bar-helpers.ts`                                                                                                                                                  |
+| Custom render           | `apps/studio/tests/lib/custom-render.tsx`                                                                                                                                                 |
+| MSW mock setup          | `apps/studio/tests/lib/msw.ts` (`addAPIMock`)                                                                                                                                             |
+| Test README             | `apps/studio/tests/README.md`                                                                                                                                                             |
+| Vitest config           | `apps/studio/vitest.config.ts`                                                                                                                                                            |
+| Related skills          | `studio-e2e-tests` (running E2E), `vitest` (API reference), `vercel-composition-patterns` (component architecture)                                                                        |

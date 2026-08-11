@@ -97,7 +97,11 @@ const Details: FC<PropsWithChildren<IDetails>> = ({ children, title, fullWidth =
         fullWidth && 'w-full'
       )}
     >
-      {title && <h3 className="mt-0 text-foreground text-base">{title}</h3>}
+      {title && (
+        <span className="block mt-0 mb-[18px] text-foreground text-base font-heading font-semibold">
+          {title}
+        </span>
+      )}
       {children}
     </div>
   )

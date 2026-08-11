@@ -22,7 +22,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 const schema = z.object({
-  SITE_URL: z.string().min(1, 'Must have a Site URL'),
+  SITE_URL: z.string().trim().min(1, 'Must have a Site URL'),
 })
 
 const SiteUrl = () => {

@@ -7,6 +7,7 @@ export const Route = createFileRoute('/_auth/cli/login')({
 })
 
 function CliLogin() {
-  // Next page default export is already wrapped in withAuth and inlines APIAuthorizationLayout.
+  // Next page default export is already wrapped in withAuth and inlines InterstitialLayout
+  // (via a local CliLoginInterstitial wrapper).
   return <CliLoginPage dehydratedState={undefined} />
 }

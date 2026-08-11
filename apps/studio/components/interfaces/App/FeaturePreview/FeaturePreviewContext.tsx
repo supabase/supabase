@@ -49,6 +49,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
           return { ...a, [b.key]: false }
         }
 
+        // A forced preview has become the default behavior, so it's on whatever
+        // the user stored previously — including an explicit opt-out. Applied
+        // here rather than in the individual `useIsXEnabled` helpers so that the
+        // feature preview modal reflects it too.
+        if (b.isForced) {
+          return { ...a, [b.key]: true }
+        }
+
         const defaultOptIn = b.isDefaultOptIn
         const localStorageValue = safeLocalStorage.getItem(b.key)
         return {
@@ -66,7 +74,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
       // flag-derived defaults (e.g. default opt-in) are reflected in `flags`.
       if (hasLoaded) setIsInitialized(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [hasLoaded])
 
   const value = {
@@ -94,10 +101,11 @@ export const useUnifiedLogsPreview = () => {
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
-  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn = isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn =
+    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -127,15 +135,26 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
-export const useIsRLSTesterEnabled = () => {
+/**
+ * Whether the SQL Editor saves snippets only on request. True when the user
+ * opted into the preview themselves *or* the `sqlEditorManualSaveForced` rollout
+ * has reached them — the preview's `isForced` flag folds the latter into `flags`.
+ */
+export const useIsSqlEditorManualSaveEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
 export const useIsMarketplaceEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
+}
+
+export const useIsDatabaseConnectionsEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
+  return isDatabaseConnectionsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]
 }
 
 export const useFeaturePreviewModal = () => {

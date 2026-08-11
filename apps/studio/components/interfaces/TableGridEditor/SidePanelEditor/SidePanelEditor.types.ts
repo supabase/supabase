@@ -59,6 +59,7 @@ export interface ColumnField {
   isPrimaryKey: boolean
   isNewColumn: boolean
   isEncrypted: boolean
+  isSensitiveData?: boolean
 }
 
 export interface PostgresDataTypeOption {

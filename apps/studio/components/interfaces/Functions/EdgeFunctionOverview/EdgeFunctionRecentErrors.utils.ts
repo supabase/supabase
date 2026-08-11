@@ -8,6 +8,7 @@ import {
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { AlertErrorProps } from '@/components/ui/AlertError'
+import { DOCS_URL } from '@/lib/constants'
 
 dayjs.extend(relativeTime)
 
@@ -72,7 +73,7 @@ export const getDisplayErrorMessage = (group: RecentErrorGroup): string => {
   return summarizeErrorMessage(group.message)
 }
 
-const TROUBLESHOOTING_DOCS_BASE = 'https://supabase.com/docs/guides/troubleshooting'
+const TROUBLESHOOTING_DOCS_BASE = `${DOCS_URL}/guides/troubleshooting`
 
 export const buildTroubleshootingDocsUrl = ({ statusCode }: { statusCode?: string }): string => {
   const numericStatusCode = Number(statusCode)
@@ -127,17 +128,21 @@ export const toIsoTimestamp = (value?: string | number) => {
   return Number.isNaN(date.valueOf()) ? undefined : date.toISOString()
 }
 
+export const SINCE_LAST_DEPLOY_MAX_RANGE_MS = 24 * 60 * 60 * 1000
+
 export const getSinceLastDeployLogRange = (updatedAt?: string | number, now: Date = new Date()) => {
   const isoTimestampStart = toIsoTimestamp(updatedAt)
   if (!isoTimestampStart) return {}
 
   const startDate = new Date(isoTimestampStart)
   const normalizedNow = new Date(now)
-  const endDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+  const nowDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+  const endDate = new Date(Math.max(startDate.valueOf(), nowDate.valueOf()))
+  const earliestAllowedStart = endDate.valueOf() - SINCE_LAST_DEPLOY_MAX_RANGE_MS
 
   return {
-    isoTimestampStart,
-    isoTimestampEnd: new Date(Math.max(startDate.valueOf(), endDate.valueOf())).toISOString(),
+    isoTimestampStart: new Date(Math.max(startDate.valueOf(), earliestAllowedStart)).toISOString(),
+    isoTimestampEnd: endDate.toISOString(),
   }
 }
 

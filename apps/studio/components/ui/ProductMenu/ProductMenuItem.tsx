@@ -85,7 +85,7 @@ export const ProductMenuItem = ({
     }
 
     const link = (
-      <Link href={url} className="block" target={target} onClick={onClick}>
+      <Link href={url} className="group block" target={target} onClick={onClick}>
         {menuItem}
       </Link>
     )

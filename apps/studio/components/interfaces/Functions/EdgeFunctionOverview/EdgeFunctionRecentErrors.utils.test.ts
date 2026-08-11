@@ -107,6 +107,13 @@ limit 25`)
     })
 
     expect(getSinceLastDeployLogRange()).toEqual({})
+
+    expect(getSinceLastDeployLogRange('2026-03-18T00:00:00.000Z')).toEqual({
+      isoTimestampStart: '2026-03-19T12:00:00.000Z',
+      isoTimestampEnd: '2026-03-20T12:00:00.000Z',
+    })
+
+    vi.useRealTimers()
   })
 
   it('builds the since-deploy invocation count query and empty-state message', () => {

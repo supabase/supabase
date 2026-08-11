@@ -313,7 +313,7 @@ const EdgeFunctionDetailsLayout = ({
                   onOpenChange={setIsTimestampHoverCardOpen}
                 >
                   <HoverCardTrigger asChild>
-                    <button type="button" className="flex items-center gap-2 group">
+                    <button type="button" tabIndex={0} className="flex items-center gap-2 group">
                       <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
                       <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
                         {updatedRelative ?? 'Deploy status unavailable'}

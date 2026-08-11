@@ -58,7 +58,7 @@ export const queriesFactory = <T extends string>(
     } else {
       return {
         ...acc,
-        [k]: () => useLogsQuery(projectRef),
+        [k]: () => useLogsQuery({ projectRef }),
       }
     }
   }, {})

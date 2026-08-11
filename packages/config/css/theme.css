@@ -37,7 +37,7 @@
   --color-foreground-light: var(--muted-foreground);
   --color-foreground-lighter: var(--tertiary-foreground);
   --color-foreground-muted: var(--foreground-muted);
-  --color-foreground-contrast: var(--primary-foreground);
+  --color-foreground-contrast: var(--foreground-contrast);
   --color-background-200: var(--background-200);
   --color-background-alternative-200: var(--background-alternative-200);
   --color-background-alternative: var(--background-alternative-default);
@@ -346,7 +346,7 @@
   --text-color-light: var(--muted-foreground);
   --text-color-lighter: var(--tertiary-foreground);
   --text-color-muted: var(--foreground-muted);
-  --text-color-contrast: var(--primary-foreground);
+  --text-color-contrast: var(--foreground-contrast);
 
   /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
   --font-sans: var(

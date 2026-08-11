@@ -1,11 +1,25 @@
 /*
  * Font setup for the Vite/TanStack Start build.
- * The Next.js build uses next/font via fonts/index.ts; keep the
- * CSS var names (--font-custom, --font-source-code-pro) in sync so
- * styles that reference them work in both pipelines.
- * Source Code Pro is loaded via a <link> in the root route's head().
+ *
+ * The Next.js build uses next/font (fonts/index.ts + the inline :root style in
+ * pages/_app.tsx). This file is the TanStack equivalent, and the CSS var names
+ * MUST match what the theme/Tailwind consume:
+ *   --font-sans            -> body (Inter)          [theme.css: --font-sans]
+ *   --font-heading         -> headings (Manrope)    [globals.css @theme inline]
+ *   --font-source-code-pro -> mono (Source Code Pro)
+ * If a var is renamed on the Next side (fonts/index.ts / theme.css), rename it
+ * here too — otherwise the TanStack build silently falls through to the theme
+ * fallback chain.
+ *
+ * All three families are vendored below (matching next/font, which self-hosts
+ * them on the Next build) so nothing depends on the Google Fonts CDN at runtime
+ * — important for self-hosted / offline studio. Inter and Source Code Pro reuse
+ * the woff2 files fonts/index.ts already ships; Manrope's subset woff2 live in
+ * fonts/manrope/. Weight ranges mirror fonts/index.ts (Inter 100–900, Source
+ * Code Pro 200–900, Manrope 200–800; Manrope has no italic).
  */
 
+/* Inter — body (--font-sans) */
 @font-face {
   font-family: 'Inter';
   src: url('../fonts/inter/InterVariable.woff2') format('woff2');
@@ -22,7 +36,49 @@
   font-display: swap;
 }
 
+/* Manrope — headings (--font-heading). Latin + Latin-ext subsets, standard
+ * Google Fonts unicode-ranges. No italic axis. */
+@font-face {
+  font-family: Manrope;
+  src: url('../fonts/manrope/manrope-latin-wght-normal.woff2') format('woff2');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: Manrope;
+  src: url('../fonts/manrope/manrope-latin-ext-wght-normal.woff2') format('woff2');
+  font-weight: 200 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range:
+    U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Source Code Pro — mono (--font-source-code-pro) */
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('../fonts/source-code-pro/SourceCodePro-Variable.woff2') format('woff2');
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('../fonts/source-code-pro/SourceCodePro-Variable-Italic.woff2') format('woff2');
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
-  --font-custom: 'Inter', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-heading: 'Manrope', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-source-code-pro: 'Source Code Pro', 'Office Code Pro', Menlo, monospace;
 }

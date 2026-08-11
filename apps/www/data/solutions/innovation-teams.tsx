@@ -276,7 +276,7 @@ const data: () => {
       customers: [
         {
           name: 'eXp Realty',
-          logo: '/images/customers/logos/exprealty.svg',
+          logo: '/images/customers/logos/exprealty.png',
           highlights: [
             'Saved $3M+ annually across multiple systems',
             '70+ vibe-coded applications in production',

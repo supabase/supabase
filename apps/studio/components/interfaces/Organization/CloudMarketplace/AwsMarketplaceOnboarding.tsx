@@ -1,8 +1,7 @@
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -20,7 +19,10 @@ import {
   type CloudMarketplaceOnboardingInfo,
 } from '@/components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
 import { NewAwsMarketplaceOrgModal } from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgModal'
-import { InterstitialAccountRow } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialAccountRow,
+  InterstitialActionError,
+} from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useOrganizationLinkAwsMarketplaceMutation } from '@/data/organizations/organization-link-aws-marketplace-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
@@ -36,12 +38,6 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string | null>(null)
   const [linkedOrgSlug, setLinkedOrgSlug] = useState<string | null>(null)
   const [showOrgCreationDialog, setShowOrgCreationDialog] = useState(false)
-
-  useEffect(() => {
-    setSelectedOrgSlug(null)
-    setLinkedOrgSlug(null)
-    setShowOrgCreationDialog(false)
-  }, [buyerId])
 
   const {
     data: organizations,
@@ -72,15 +68,19 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
     { enabled: !!shouldLoadOnboardingInfo }
   )
 
-  const { mutate: linkOrganization, isPending: isLinkingOrganization } =
-    useOrganizationLinkAwsMarketplaceMutation({
-      onSuccess: (_, variables) => {
-        setLinkedOrgSlug(variables.slug)
-      },
-      onError: (error) => {
-        toast.error(error.message, { duration: 7_000 })
-      },
-    })
+  const {
+    mutate: linkOrganization,
+    isPending: isLinkingOrganization,
+    error: linkOrganizationError,
+    reset: resetLinkOrganizationError,
+  } = useOrganizationLinkAwsMarketplaceMutation({
+    onSuccess: (_, variables) => {
+      setLinkedOrgSlug(variables.slug)
+    },
+  })
+  const linkError = linkOrganizationError
+    ? `Failed to link organization: ${linkOrganizationError.message}`
+    : undefined
 
   const effectiveOrganizations = useMemo(
     () => organizations ?? EMPTY_ORGANIZATIONS,
@@ -141,6 +141,18 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
         eligibilityByOrganizationSlug: eligibilityBySlug,
       }
     }, [onboardingInfo, effectiveOrganizations])
+
+  const resetOnBuyerChange = useEffectEvent(() => {
+    setSelectedOrgSlug(null)
+    setLinkedOrgSlug(null)
+    setShowOrgCreationDialog(false)
+    resetLinkOrganizationError()
+  })
+
+  useEffect(() => {
+    resetOnBuyerChange()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [buyerId])
 
   if (!buyerId) {
     return (
@@ -249,6 +261,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
   const primaryAction = hasLinkableOrganizations
     ? () => {
         if (!selectedOrgSlug || !buyerId) return
+        resetLinkOrganizationError()
         linkOrganization({ slug: selectedOrgSlug, buyerId })
       }
     : () => setShowOrgCreationDialog(true)
@@ -278,7 +291,10 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               }
               selectedSlug={selectedOrgSlug}
               disabled={isLinking}
-              onSelect={setSelectedOrgSlug}
+              onSelect={(slug) => {
+                setSelectedOrgSlug(slug)
+                resetLinkOrganizationError()
+              }}
               createLabel={hasLinkableOrganizations ? 'Create new organization' : undefined}
               onCreate={hasLinkableOrganizations ? () => setShowOrgCreationDialog(true) : undefined}
             />
@@ -292,21 +308,26 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
           )}
 
           <div className="flex flex-col gap-5">
-            <Button
-              variant="primary"
-              block
-              loading={isLinking}
-              disabled={hasLinkableOrganizations && (!selectedOrgSlug || isLinking)}
-              onClick={primaryAction}
-            >
-              {primaryLabel}
-            </Button>
-            <p className="text-center text-xs text-foreground-lighter text-balance">
-              <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
-                Learn more
-              </InlineLink>{' '}
-              about billing through AWS.
-            </p>
+            <div className="flex flex-col gap-2">
+              <Button
+                variant="primary"
+                block
+                loading={isLinking}
+                disabled={hasLinkableOrganizations && (!selectedOrgSlug || isLinking)}
+                onClick={primaryAction}
+              >
+                {primaryLabel}
+              </Button>
+              <InterstitialActionError error={linkError} />
+            </div>
+            {!linkError && (
+              <p className="text-center text-xs text-foreground-lighter text-balance">
+                <InlineLink href={`${DOCS_URL}/guides/platform/aws-marketplace`}>
+                  Learn more
+                </InlineLink>{' '}
+                about billing through AWS.
+              </p>
+            )}
           </div>
         </div>
       </AwsMarketplaceInterstitial>

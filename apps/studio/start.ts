@@ -1,3 +1,7 @@
+import {
+  sentryGlobalFunctionMiddleware,
+  sentryGlobalRequestMiddleware,
+} from '@sentry/tanstackstart-react'
 import { createMiddleware, createStart } from '@tanstack/react-start'
 
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
@@ -30,6 +34,13 @@ const platformApiGuard = createMiddleware({ type: 'request' }).server(({ request
   return next()
 })
 
+// Sentry's global middlewares go at the FRONT so they wrap the whole request /
+// server-function lifecycle — including errors that downstream code swallows
+// into a 500, which the manual `@sentry/nextjs` approach never sees. The SDK's
+// Vite plugin can auto-wrap these arrays instead, but we disable that
+// (`autoInstrumentMiddleware: false` in vite.config.ts) and wire them
+// explicitly so the instrumentation is visible in source.
 export const startInstance = createStart(() => ({
-  requestMiddleware: [platformApiGuard],
+  requestMiddleware: [sentryGlobalRequestMiddleware, platformApiGuard],
+  functionMiddleware: [sentryGlobalFunctionMiddleware],
 }))

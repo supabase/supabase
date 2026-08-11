@@ -4,16 +4,16 @@
     {
       "name": "supabase",
       "type": "archive",
-      "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector).",
-      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.5/supabase.tar.gz",
-      "digest": "sha256:5acb0974e54db43ac66fcb55170dee2059b423d5253a9c1f14a51df44358f07a"
+      "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, declarative schemas, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector).",
+      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.6/supabase.tar.gz",
+      "digest": "sha256:35dac7224b4c9594d6db63f197120ea4168581196edd741164c925aaeab6ec83"
     },
     {
       "name": "supabase-postgres-best-practices",
       "type": "archive",
       "description": "Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations.",
-      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.5/supabase-postgres-best-practices.tar.gz",
-      "digest": "sha256:2db40cf84865e73c908ff080d101ab1ca60829cd379f4e6c15d7287d33ce61e5"
+      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.6/supabase-postgres-best-practices.tar.gz",
+      "digest": "sha256:57a5315af73864add7bc42eaa3d5c9f309c767d50185583165e6ecd1abd30404"
     }
   ]
 }

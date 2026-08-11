@@ -1,18 +1,28 @@
 import { safeLocalStorage, useParams } from 'common'
 import { partition } from 'lodash'
 import { type NextRouter } from 'next/router'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+  type ComponentType,
+} from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import type { EditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
+import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
+  explorer: ['notebook'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook'
 
 type CreateTabIdParams = {
   r: { id: number }
@@ -21,6 +31,7 @@ type CreateTabIdParams = {
   f: { id: number }
   p: { id: number }
   sql: { id: string }
+  notebook: { id: string }
   schema: { schema: string }
   view: never
   function: never
@@ -36,11 +47,56 @@ export interface Tab {
     name?: string
     tableId?: number
     sqlId?: string
+    notebookId?: string
     scrollTop?: number
+    /**
+     * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
+     * so the tab can show the matching icon without re-fetching the snippet.
+     * Absent on tabs persisted before this field existed — treat absent as
+     * `'database'` and backfill from the loaded snippet (source is immutable, so
+     * it never goes stale once set).
+     */
+    sqlSource?: SqlSnippetSource
   }
   isPreview?: boolean
   createdAt?: Date
   updatedAt?: Date
+}
+
+/** Copy shown in the confirmation dialog before a close is allowed to proceed. */
+export interface TabCloseConfirmation {
+  title: string
+  description: string
+}
+
+/**
+ * Per-tab-type behavior and UI the tabs layout delegates to, so the layout
+ * stays agnostic of what any given tab kind means. A domain (e.g. the SQL
+ * editor) registers a handler for its tab type via `registerTabTypeHandler`;
+ * tabs of types without a handler close with no extra behavior and show no
+ * status indicator.
+ */
+export interface TabTypeHandler {
+  /**
+   * Cleanup to run when the user closes a tab of this type (e.g. discarding a
+   * SQL snippet's unsaved local edits). Runs after the tab has been removed.
+   */
+  onClose?: (tab: Tab) => void
+  /**
+   * Whether closing these tabs needs user confirmation. Receives the whole set
+   * of this type being closed (e.g. a bulk "Close Others") so the handler owns
+   * the dialog copy, including wording it for one vs. many. Return the copy to
+   * confirm first; return null/undefined to close immediately.
+   */
+  confirmClose?: (tabs: Tab[]) => TabCloseConfirmation | null | undefined
+  /**
+   * Optional component rendered inside the tab to show type-specific status
+   * (e.g. a VS Code-style unsaved-changes dot for a SQL snippet). Owning the
+   * component here keeps the layout agnostic of what "status" means per type and
+   * lets the domain drive its own reactivity. Rendered only when it has
+   * something to show; otherwise it should render nothing.
+   */
+  StatusIndicator?: ComponentType<{ tab: Tab }>
 }
 
 const MAX_RECENT_ITEMS = 8
@@ -55,6 +111,7 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    sqlSource?: SqlSnippetSource
   }
 }
 
@@ -73,27 +130,27 @@ function getSavedRecentItems(ref: string): RecentItem[] {
   }
 }
 
-const DEFAULT_TABS_STATE = {
+const createDefaultTabsState = () => ({
   activeTab: null as string | null,
   openTabs: [] as string[],
   tabsMap: {} as Record<string, Tab>,
   previewTabId: undefined as string | undefined,
   recentItems: [],
-}
+})
 const TABS_STORAGE_KEY = 'supabase_studio_tabs'
 const getTabsStorageKey = (ref: string) => `${TABS_STORAGE_KEY}_${ref}`
 
 function getSavedTabs(ref: string) {
-  if (!ref) return DEFAULT_TABS_STATE
+  if (!ref) return createDefaultTabsState()
 
   const stored = safeLocalStorage.getItem(getTabsStorageKey(ref))
 
-  if (!stored) return DEFAULT_TABS_STATE
+  if (!stored) return createDefaultTabsState()
 
   try {
-    const parsed = JSON.parse(
-      stored ?? JSON.stringify(DEFAULT_TABS_STATE)
-    ) as typeof DEFAULT_TABS_STATE
+    const parsed = JSON.parse(stored ?? JSON.stringify(createDefaultTabsState())) as ReturnType<
+      typeof createDefaultTabsState
+    >
 
     if (
       !parsed.openTabs ||
@@ -101,12 +158,12 @@ function getSavedTabs(ref: string) {
       !parsed.tabsMap ||
       typeof parsed.tabsMap !== 'object'
     ) {
-      return DEFAULT_TABS_STATE
+      return createDefaultTabsState()
     }
 
     return parsed
   } catch (error) {
-    return DEFAULT_TABS_STATE
+    return createDefaultTabsState()
   }
 }
 
@@ -127,6 +184,11 @@ const syncRecentItemWithTab = (item: RecentItem, tab: Pick<Tab, 'label' | 'metad
 export function createTabsState(projectRef: string) {
   const recentItems = getSavedRecentItems(projectRef)
   const { openTabs, activeTab, tabsMap, previewTabId } = getSavedTabs(projectRef)
+
+  // Per-type behavior/UI, kept outside the Valtio proxy so handler closures
+  // (which may capture non-serializable things like a React Query client or a
+  // React component) are never proxied or persisted.
+  const tabHandlers = new Map<TabType, TabTypeHandler>()
 
   const store = proxy({
     // RECENT ITEMS
@@ -222,22 +284,35 @@ export function createTabsState(projectRef: string) {
       store.previewTabId = tab.id
       store.activeTab = tab.id
     },
-    updateTab: (id: string, updates: { label?: string; scrollTop?: number }) => {
-      if (!!store.tabsMap[id]) {
-        if ('label' in updates) {
-          store.tabsMap[id].label = updates.label
-          // Keep the persisted name aligned with the visible label so browser titles
-          // and tab state recover cleanly after entity renames.
-          if (typeof updates.label === 'string' && store.tabsMap[id].metadata) {
-            store.tabsMap[id].metadata.name = updates.label
-          }
+    updateTab: (
+      id: string,
+      updates: { label?: string; scrollTop?: number; sqlSource?: SqlSnippetSource }
+    ) => {
+      const tab = store.tabsMap[id]
+      if (!tab) return
 
-          const recentItem = store.recentItems.find((item) => item.id === id)
-          if (recentItem) syncRecentItemWithTab(recentItem, store.tabsMap[id])
+      if ('label' in updates) {
+        tab.label = updates.label
+        // Keep the persisted name aligned with the visible label so browser titles
+        // and tab state recover cleanly after entity renames.
+        if (typeof updates.label === 'string' && tab.metadata) {
+          tab.metadata.name = updates.label
         }
-        if ('scrollTop' in updates && store.tabsMap[id].metadata) {
-          store.tabsMap[id].metadata.scrollTop = updates.scrollTop
-        }
+
+        const recentItem = store.recentItems.find((item) => item.id === id)
+        if (recentItem) syncRecentItemWithTab(recentItem, tab)
+      }
+      if ('scrollTop' in updates && tab.metadata) {
+        tab.metadata.scrollTop = updates.scrollTop
+      }
+      // Backfill the immutable source onto a tab (and its recent item) that
+      // predates the field, so its icon resolves correctly once the snippet loads.
+      if (updates.sqlSource !== undefined) {
+        if (tab.metadata) tab.metadata.sqlSource = updates.sqlSource
+        else tab.metadata = { sqlSource: updates.sqlSource }
+
+        const recentItem = store.recentItems.find((item) => item.id === id)
+        if (recentItem) syncRecentItemWithTab(recentItem, tab)
       }
     },
     // Function to remove a tab from the store
@@ -247,6 +322,12 @@ export function createTabsState(projectRef: string) {
       const idx = store.openTabs.indexOf(id)
       store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
       delete store.tabsMap[id]
+
+      // Clear the preview tab reference if the removed tab was the preview tab,
+      // so it doesn't linger in (persisted) state pointing at a closed tab
+      if (store.previewTabId === id) {
+        store.previewTabId = undefined
+      }
 
       // Update active tab if the removed tab was active
       if (id === store.activeTab) {
@@ -307,6 +388,9 @@ export function createTabsState(projectRef: string) {
           const schema = (router.query.schema as string) || 'public'
           router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
           break
+        case 'notebook':
+          router.push(`/project/${router.query.ref}/explorer/notebook/${tab.metadata?.notebookId}`)
+          break
         case 'r':
         case 'v':
         case 'm':
@@ -322,6 +406,67 @@ export function createTabsState(projectRef: string) {
           break
       }
     },
+    // TAB TYPE HANDLER REGISTRY
+    //
+    // Lets a domain own what a tab of its type means — how it closes and what
+    // status it shows — without the layout having to know. Registered per tab
+    // type; returns an unregister function.
+    //
+    // Bumped on every (un)register so components that render per-type UI (the
+    // status indicator) re-render to pick up a handler registered after they
+    // first rendered — handlers register in an effect, which runs after the
+    // tabs first paint.
+    handlerRegistrationVersion: 0,
+    registerTabTypeHandler: (type: TabType, handler: TabTypeHandler) => {
+      tabHandlers.set(type, handler)
+      store.handlerRegistrationVersion++
+      return () => {
+        if (tabHandlers.get(type) === handler) {
+          tabHandlers.delete(type)
+          store.handlerRegistrationVersion++
+        }
+      }
+    },
+
+    // The status-indicator component registered for a tab type, if any. Read
+    // `handlerRegistrationVersion` alongside this in render to stay reactive to
+    // late registration.
+    getTabStatusIndicator: (type: TabType) => tabHandlers.get(type)?.StatusIndicator,
+
+    // The confirmation to show before closing the given tabs, or null if none
+    // need confirming. Tabs are grouped by type and each type's handler is asked
+    // about its own set (so it can word the copy for one vs. many); the first
+    // handler that asks to confirm wins. The store authors no copy itself — that
+    // stays a concern of the registering domain.
+    getCloseConfirmation: (ids: string[]): TabCloseConfirmation | null => {
+      const tabsByType = new Map<TabType, Tab[]>()
+      for (const id of ids) {
+        const tab = store.tabsMap[id]
+        if (!tab) continue
+        const group = tabsByType.get(tab.type)
+        if (group) group.push(tab)
+        else tabsByType.set(tab.type, [tab])
+      }
+
+      for (const [type, tabs] of tabsByType) {
+        const confirmation = tabHandlers.get(type)?.confirmClose?.(tabs)
+        if (confirmation) return confirmation
+      }
+      return null
+    },
+
+    // Close multiple tabs as an intentional user action, running each tab type's
+    // close handler afterwards. Distinct from `removeTabs`, the low-level store
+    // mutation used for re-keying (rename/move) and stale cleanup, which must
+    // NOT trigger discard behavior.
+    closeTabs: (ids: string[]) => {
+      const closedTabs = ids
+        .map((id) => store.tabsMap[id])
+        .filter((tab): tab is Tab => tab !== undefined)
+      store.removeTabs(ids)
+      closedTabs.forEach((tab) => tabHandlers.get(tab.type)?.onClose?.(tab))
+    },
+
     handleTabClose: ({
       id,
       router,
@@ -331,7 +476,7 @@ export function createTabsState(projectRef: string) {
     }: {
       id: string
       router: NextRouter
-      editor?: 'sql' | 'table'
+      editor?: EditorType
       onClose?: (id: string) => void
       onClearDashboardHistory: () => void
     }) => {
@@ -379,6 +524,9 @@ export function createTabsState(projectRef: string) {
             case 'sql':
               router.push(`/project/${router.query.ref}/sql`)
               break
+            case 'notebook':
+              router.push(`/project/${router.query.ref}/explorer`)
+              break
             case 'r':
             case 'v':
             case 'm':
@@ -393,6 +541,12 @@ export function createTabsState(projectRef: string) {
       }
 
       onClose?.(id)
+
+      // Run the tab type's registered close behavior (e.g. discard a SQL
+      // snippet's unsaved edits). `tabBeingClosed` is captured before removal.
+      if (tabBeingClosed) {
+        tabHandlers.get(tabBeingClosed.type)?.onClose?.(tabBeingClosed)
+      }
     },
     handleTabCloseAll: ({
       editor,
@@ -492,6 +646,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `p-${(params as CreateTabIdParams['p']).id}`
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
+    case 'notebook':
+      return `notebook-${(params as CreateTabIdParams['sql']).id}`
     default:
       return ''
   }

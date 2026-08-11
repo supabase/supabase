@@ -45,7 +45,7 @@ const customerStories = [
   },
   {
     name: 'Hyper',
-    logo: '/images/customers/logos/hyper.svg',
+    logo: '/images/customers/logos/hyper.png',
     icon: '/images/customers/logos/hyper-icon.svg',
     tagline: 'An AI-native marketing platform with agents that operate across the entire workflow.',
     quote:

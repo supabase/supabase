@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Form } from 'ui'
 
 import {
@@ -28,7 +28,7 @@ export const NewAwsMarketplaceOrgForm = ({ onSubmit }: Props) => {
     },
   })
 
-  const kind = form.watch('kind')
+  const kind = useWatch({ control: form.control, name: 'kind' })
 
   return (
     <Form {...form}>

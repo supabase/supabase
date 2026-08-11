@@ -1,11 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useRevealedSecret } from '@/components/interfaces/APIKeys/useRevealedSecret'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLatest } from '@/hooks/misc/useLatest'
 
 const AUTO_HIDE_MS = 10_000
 const SECRET_MASK = '••••••••••••••••••••'
@@ -52,21 +53,26 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     'service_api_keys'
   )
 
+  const [isRevealed, setIsRevealed] = useState(false)
+  // So async callbacks below can check the current reveal state after an
+  // await, instead of the value closed over when they started.
+  const isRevealedRef = useLatest(isRevealed)
+
   const { data: apiUrl, isPending: isLoadingUrl } = useProjectApiUrl({ projectRef })
+  const resolvedUrl = apiUrl || 'your-project-url'
+  const jwksUrl = apiUrl
+    ? new URL(JWKS_DISCOVERY_PATH, apiUrl).href
+    : `your-project-url${JWKS_DISCOVERY_PATH}`
+
   const { data: keys, isLoading: isLoadingKeys } = useAPIKeys(
     { projectRef },
     { enabled: canReadAPIKeys }
   )
-
-  const canReveal = canReadAPIKeys
-
-  const resolvedUrl = apiUrl || 'your-project-url'
   const publishableKey = keys?.publishableKey?.api_key ?? keys?.anonKey?.api_key ?? ''
   const secretKey = keys?.secretKey
-
-  const jwksUrl = apiUrl
-    ? new URL(JWKS_DISCOVERY_PATH, apiUrl).href
-    : `your-project-url${JWKS_DISCOVERY_PATH}`
+  const maskedValue = secretKey?.api_key
+    ? `${secretKey.api_key.slice(0, 15)}${SECRET_MASK}`
+    : 'your-secret-key'
 
   const {
     data: revealedSecret,
@@ -75,44 +81,51 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     clear,
   } = useRevealedSecret({ projectRef, id: secretKey?.id })
 
-  const [isRevealed, setIsRevealed] = useState(false)
+  // toggle() and getSecretValue() can both decide to reveal before either
+  // resolves (e.g. clicking "Reveal" and "Copy" in quick succession); share
+  // one in-flight request rather than firing two and racing to set state.
+  const revealPromiseRef = useRef<ReturnType<typeof reveal> | null>(null)
+  const revealOnce = useCallback(() => {
+    if (!revealPromiseRef.current) {
+      revealPromiseRef.current = reveal().finally(() => {
+        revealPromiseRef.current = null
+      })
+    }
+    return revealPromiseRef.current
+  }, [reveal])
 
-  useEffect(() => {
-    if (!isRevealed || !revealedSecret) return
-    const timer = setTimeout(() => {
-      setIsRevealed(false)
-      clear()
-    }, AUTO_HIDE_MS)
-    return () => clearTimeout(timer)
-  }, [isRevealed, revealedSecret, clear])
-
-  const maskedValue = secretKey?.api_key
-    ? `${secretKey.api_key.slice(0, 15)}${SECRET_MASK}`
-    : 'your-secret-key'
+  // clear() invalidates the in-flight reveal request (by request id) but
+  // doesn't know about revealPromiseRef, so a hide immediately followed by
+  // another reveal would otherwise reuse that now-invalidated promise
+  // instead of firing a fresh request.
+  const clearReveal = useCallback(() => {
+    revealPromiseRef.current = null
+    clear()
+  }, [clear])
 
   const toggle = useCallback(async () => {
-    if (!secretKey || !canReveal) return
+    if (!secretKey || !canReadAPIKeys) return
     if (isRevealed) {
       setIsRevealed(false)
-      clear()
+      clearReveal()
     } else {
       setIsRevealed(true)
       try {
-        await reveal()
-      } catch {
+        await revealOnce()
+      } catch (error) {
         setIsRevealed(false)
-        throw new Error('Failed to reveal secret API key')
+        throw new Error('Failed to reveal secret API key', { cause: error })
       }
     }
-  }, [secretKey, canReveal, isRevealed, clear, reveal])
+  }, [secretKey, canReadAPIKeys, isRevealed, clearReveal, revealOnce])
 
   const getSecretValue = useCallback(async () => {
-    if (!secretKey || !canReveal) return 'your-secret-key'
+    if (!secretKey || !canReadAPIKeys) return 'your-secret-key'
     if (revealedSecret) return revealedSecret
-    const value = await reveal()
-    if (!isRevealed) clear()
+    const value = await revealOnce()
+    if (!isRevealedRef.current) clearReveal()
     return value ?? 'your-secret-key'
-  }, [secretKey, canReveal, revealedSecret, reveal, isRevealed, clear])
+  }, [secretKey, canReadAPIKeys, revealedSecret, revealOnce, clearReveal])
 
   const buildEnv = useCallback(async () => {
     const secretValue = await getSecretValue()
@@ -124,6 +137,15 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     ].join('\n')
   }, [resolvedUrl, publishableKey, jwksUrl, getSecretValue])
 
+  useEffect(() => {
+    if (!isRevealed || !revealedSecret) return
+    const timer = setTimeout(() => {
+      setIsRevealed(false)
+      clearReveal()
+    }, AUTO_HIDE_MS)
+    return () => clearTimeout(timer)
+  }, [isRevealed, revealedSecret, clearReveal])
+
   return {
     isLoading: isLoadingUrl || isLoadingKeys || isLoadingPermission,
     canReadAPIKeys,
@@ -132,7 +154,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     jwksUrl,
     secret: {
       exists: !!secretKey,
-      canReveal,
+      canReveal: canReadAPIKeys,
       isRevealed,
       isRevealing,
       maskedValue,

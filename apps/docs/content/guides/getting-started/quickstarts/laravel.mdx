@@ -4,9 +4,11 @@ subtitle: 'Learn how to create a PHP Laravel project, connect it to your Supabas
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="laravel" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Laravel project
+## 3. Create a Laravel project
 
 Make sure your PHP and Composer versions are up to date, then use `composer create-project` to scaffold a new Laravel project.
 
@@ -14,6 +16,18 @@ See the [Laravel docs](https://laravel.com/docs/10.x/installation#creating-a-lar
 
 ```bash
 composer create-project laravel/laravel example-app
+```
+
+## 4. Install Supabase's Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install the authentication template
@@ -27,9 +41,7 @@ php artisan breeze:install
 
 ## 6. Set up the Postgres connection details
 
-Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
-
-When your project is up and running, navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&method=session).
+Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&connectTab=direct&method=session).
 
 Look for the Session Pooler connection string and copy the string. You will need to replace the Password with your saved database password. You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
 
@@ -41,7 +53,7 @@ If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/
 
 ```bash name=.env
 DB_CONNECTION=pgsql
-DB_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
+DB_URL=postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres
 ```
 
 ## 7. Change the default schema
@@ -65,9 +77,11 @@ The schema you specify in `search_path` has to exist on Supabase. You can create
     'prefix' => '',
     'prefix_indexes' => true,
     'search_path' => 'laravel',
-    'sslmode' => 'prefer',
+    'sslmode' => 'require',
 ],
 ```
+
+Laravel ships with `sslmode` set to `prefer`, which sends your data in plaintext if the encrypted attempt fails. Set it to `require` so the connection fails instead. You can also [enforce SSL](/docs/guides/platform/ssl-enforcement) on the database side.
 
 ## 8. Run the database migrations
 
@@ -86,3 +100,9 @@ Run the development server. Go to http://127.0.0.1:8000 in a browser to see your
 ```bash
 php artisan serve
 ```
+
+## Next steps
+
+- Learn more about [Supabase Auth](/docs/guides/auth) if you want to replace Laravel's built-in authentication
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

@@ -67,27 +67,11 @@ async function getSources(): Promise<Source[]> {
     { title: 'Supabase Reference (Kotlin)', relPath: 'llms/kotlin.txt', enabled: sdkKotlin },
     { title: 'Supabase Reference (Python)', relPath: 'llms/python.txt', enabled: sdkPython },
     { title: 'Supabase Reference (C#)', relPath: 'llms/csharp.txt', enabled: sdkCsharp },
+    { title: 'Supabase Server SDK Reference', relPath: 'llms/server.txt', enabled: true },
     { title: 'Supabase CLI Reference', relPath: 'llms/cli.txt', enabled: true },
     { title: 'Supabase Management API Reference', relPath: 'llms/api.txt', enabled: true },
   ]
 }
-
-// Editorial ordering for the product overview list (mirrors the homepage
-// products section); not derived from MD_PAGES because the order is
-// intentional. When dropping a new content/md/<slug>.md file, add a matching
-// entry here too — otherwise the page ships but won't be linked from /llms.txt.
-const PRODUCT_OVERVIEW_LINKS = [
-  '- [Supabase Overview](https://supabase.com/homepage.md)',
-  '- [Supabase Database](https://supabase.com/database.md)',
-  '- [Supabase Auth](https://supabase.com/auth.md)',
-  '- [Supabase Storage](https://supabase.com/storage.md)',
-  '- [Supabase Edge Functions](https://supabase.com/edge-functions.md)',
-  '- [Supabase Realtime](https://supabase.com/realtime.md)',
-  '- [Supabase Vector](https://supabase.com/vector.md)',
-  '- [Supabase Cron](https://supabase.com/modules/cron.md)',
-  '- [Supabase Queues](https://supabase.com/modules/queues.md)',
-  '- [Supabase Pricing](https://supabase.com/pricing.md)',
-].join('\n')
 
 export async function GET() {
   const sources = await getSources()
@@ -106,9 +90,9 @@ export async function GET() {
     '',
     sourceLinks,
     '',
-    '## Product Overview',
+    '## Pricing',
     '',
-    PRODUCT_OVERVIEW_LINKS,
+    '- [Supabase Pricing](https://supabase.com/pricing.md)',
   ].join('\n')
 
   return new Response(content, {

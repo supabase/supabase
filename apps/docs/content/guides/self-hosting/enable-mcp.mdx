@@ -193,7 +193,7 @@ defaultActiveId="kong"
 <TabPanel id="kong" label="Kong">
 
 ```sh
-docker compose restart kong
+sh run.sh restart kong
 ```
 
 </TabPanel>
@@ -201,8 +201,10 @@ docker compose restart kong
 <TabPanel id="envoy" label="Envoy">
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+sh run.sh restart api-gw
 ```
+
+This assumes the Envoy override is already active (`sh run.sh config add envoy`).
 
 </TabPanel>
 

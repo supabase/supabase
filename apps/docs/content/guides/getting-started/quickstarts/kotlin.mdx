@@ -4,11 +4,25 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="kotlin" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create an Android app with Android Studio
+## 3. Create an Android app with Android Studio
 
 Select the **Android Studio > New > New Android Project** menu item.
+
+## 4. Install Supabase's Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
+```
 
 ## 5. Install dependencies
 
@@ -16,7 +30,7 @@ Open `build.gradle.kts` (app) file and add the serialization plugin, Ktor client
 
 Replace the version placeholders `$kotlin_version` with the Kotlin version of the project, and `$supabase_version` and `$ktor_version` with the respective latest versions.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 You can find the latest supabase-kt version [on GitHub](https://github.com/supabase-community/supabase-kt/releases) and Ktor [in the Ktor documentation](https://ktor.io/docs/welcome.html).
 
@@ -46,15 +60,13 @@ Add the following line to the `AndroidManifest.xml` file under the `manifest` ta
 ...
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
-
 ## 7. Initialize the Supabase client
 
 You can create a Supabase client whenever you need to perform an API call.
 
 For a quick example, create a client at the top of the `MainActivity.kt` file below the imports.
 
-Replace the `supabaseUrl` and `supabaseKey` with your own, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=androidkotlin&tab=mobiles):
+Replace the `supabaseUrl` and `supabaseKey` with your own, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=androidkotlin&connectTab=mobiles):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=androidkotlin">
@@ -73,6 +85,8 @@ val supabase = createSupabaseClient(
 }
 ...
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
 ## 8. Create a data model for instruments
 
@@ -144,3 +158,10 @@ fun InstrumentsList() {
 ## 10. Start the app
 
 Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.
+
+## Next steps
+
+- Learn how to build a complete user management app with authentication in the [Kotlin tutorial](/docs/guides/getting-started/tutorials/with-kotlin)
+- Explore the [supabase-kt](https://github.com/supabase-community/supabase-kt) library on GitHub
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

@@ -12,9 +12,8 @@ import {
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { isEqual } from 'lodash'
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -35,7 +34,11 @@ import * as z from 'zod'
 
 import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
-import { checkIfPolicyHasChanged, generateCreatePolicyQuery } from './PolicyEditorPanel.utils'
+import {
+  checkIfPolicyHasChanged,
+  generateCreatePolicyQuery,
+  generateUpdatePolicyPayload,
+} from './PolicyEditorPanel.utils'
 import { PolicyEditorPanelHeader } from './PolicyEditorPanelHeader'
 import { PolicyTemplates } from './PolicyTemplates'
 import { QueryError } from './QueryError'
@@ -130,7 +133,10 @@ export const PolicyEditorPanel = memo(function ({
     defaultValues,
   })
 
-  const { name, table, behavior, command, roles } = form.watch()
+  const [name, table, behavior, command, roles] = useWatch({
+    control: form.control,
+    name: ['name', 'table', 'behavior', 'command', 'roles'],
+  })
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
@@ -169,12 +175,15 @@ export const PolicyEditorPanel = memo(function ({
             name,
             roles: roles.length === 0 ? ['public'] : roles.split(', '),
             definition: editorOneFormattedValue,
-            check: command === 'INSERT' ? editorOneFormattedValue : editorTwoFormattedValue,
+            check:
+              selectedPolicy.command === 'INSERT'
+                ? editorOneFormattedValue
+                : editorTwoFormattedValue,
           })
         : false
 
     return policyCreateUnsaved || policyUpdateUnsaved
-  }, [command, name, roles, selectedPolicy])
+  }, [name, roles, selectedPolicy])
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: hasUnsavedChanges,
@@ -189,15 +198,14 @@ export const PolicyEditorPanel = memo(function ({
     const usingExpr = command !== 'insert' ? using : undefined
     const checkExpr = command === 'insert' ? using : check
 
-    if (command === 'insert' && !checkExpr?.trim()) {
-      return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
-    } else if (command !== 'insert' && !usingExpr?.trim()) {
-      return setFieldError('Please provide a SQL expression for the USING statement')
-    } else {
-      setFieldError(undefined)
-    }
-
     if (selectedPolicy === undefined) {
+      if (command === 'insert' && !checkExpr?.trim()) {
+        return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
+      } else if (command !== 'insert' && !usingExpr?.trim()) {
+        return setFieldError('Please provide a SQL expression for the USING statement')
+      }
+      setFieldError(undefined)
+
       const sql = generateCreatePolicyQuery({
         name,
         schema,
@@ -219,34 +227,37 @@ export const PolicyEditorPanel = memo(function ({
         },
       })
     } else if (selectedProject !== undefined) {
-      const payload: {
-        name?: string
-        definition?: SafeSqlFragment
-        check?: SafeSqlFragment
-        roles?: Array<string>
-      } = {}
       const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
-      // Trim for string comparison against the stored policy values. The Save click is the
-      // explicit user gesture that promotes editor content to executable SQL.
-      const usingVal = using?.trim()
-      const checkVal = check?.trim()
 
-      if (name !== selectedPolicy.name) payload.name = name
-      if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
-      if (selectedPolicy.definition !== null && selectedPolicy.definition !== usingVal)
-        payload.definition =
-          usingVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(usingVal))
-
+      // A null definition/check is valid (the policy was created without that clause), so
+      // updates only require an expression where the policy already has one — ALTER POLICY
+      // can only replace an expression, not remove it.
       if (selectedPolicy.command === 'INSERT') {
-        // [Joshen] Cause editor one will be the check statement in this scenario
-        if (selectedPolicy.check !== usingVal)
-          payload.check =
-            usingVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(usingVal))
+        if (selectedPolicy.check !== null && !using?.trim()) {
+          return setFieldError(
+            'The WITH CHECK expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+          )
+        }
       } else {
-        if (selectedPolicy.check !== checkVal)
-          payload.check =
-            checkVal === undefined ? undefined : acceptUntrustedSql(untrustedSql(checkVal))
+        if (selectedPolicy.definition !== null && !using?.trim()) {
+          return setFieldError(
+            'The USING expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+          )
+        }
+        if (selectedPolicy.check !== null && !check?.trim()) {
+          return setFieldError(
+            'The WITH CHECK expression cannot be removed. Provide a new expression, or delete and recreate the policy without it.'
+          )
+        }
       }
+      setFieldError(undefined)
+
+      const payload = generateUpdatePolicyPayload(selectedPolicy, {
+        name,
+        roles: updatedRoles,
+        using,
+        check,
+      })
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
 
@@ -254,7 +265,15 @@ export const PolicyEditorPanel = memo(function ({
         projectRef: selectedProject.ref,
         connectionString: selectedProject?.connectionString,
         originalPolicy: selectedPolicy,
-        payload,
+        // The Save click is the explicit user gesture that promotes editor content
+        // to executable SQL.
+        payload: {
+          name: payload.name,
+          roles: payload.roles,
+          definition:
+            payload.definition === undefined ? undefined : acceptUntrustedSql(payload.definition),
+          check: payload.check === undefined ? undefined : acceptUntrustedSql(payload.check),
+        },
       })
     }
   }
@@ -330,7 +349,7 @@ export const PolicyEditorPanel = memo(function ({
               showClose={false}
               size={showTools ? 'lg' : 'default'}
               className={cn(
-                'bg-surface-200 p-0 flex flex-row gap-0',
+                'bg-popover p-0 flex flex-row gap-0',
                 showTools ? 'min-w-screen! lg:min-w-[1000px]!' : 'min-w-screen! lg:min-w-[600px]!'
               )}
             >

@@ -20,7 +20,7 @@ services:
 
   nginx:
     container_name: supabase-nginx
-    image: jonasal/nginx-certbot:6.2.0-nginx1.31.0
+    image: jonasal/nginx-certbot:6.2.0-nginx1.31.3
     restart: unless-stopped
     ports:
       - "80:80"

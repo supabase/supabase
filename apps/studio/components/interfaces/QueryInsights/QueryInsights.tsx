@@ -53,10 +53,13 @@ export const QueryInsights = ({ dateRange }: QueryInsightsProps) => {
     [effectiveDateRange]
   )
 
-  const { logData, isLoading } = useLogsQuery(ref as string, {
-    sql,
-    iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
-    iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
+  const { logData, isLoading } = useLogsQuery({
+    projectRef: ref as string,
+    initialParams: {
+      sql,
+      iso_timestamp_start: effectiveDateRange.iso_timestamp_start,
+      iso_timestamp_end: effectiveDateRange.iso_timestamp_end,
+    },
   })
 
   const [selectedQuery, setSelectedQuery] = useState<string | null>(null)

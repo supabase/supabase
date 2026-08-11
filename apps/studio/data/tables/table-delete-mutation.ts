@@ -62,7 +62,7 @@ export const useTableDeleteMutation = ({
         }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
         // invalidate all views from this schema
-        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, schema) }),
+        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, [schema]) }),
       ])
 
       await onSuccess?.(data, variables, context)

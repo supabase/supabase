@@ -24,6 +24,7 @@ Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
+Anna Baker
 Ant Evans
 Ant Wilson
 Ariuna K
@@ -58,8 +59,8 @@ Chris Chapman (Chappie)
 Chris Copplestone
 Chris Gwilliams
 Chris Martin
+Chris Opland
 Chris Stockton
-Chris Ward
 Christian Funkhouser
 Claudiu Dragalina-Paraipan
 Clayton Kast
@@ -69,6 +70,7 @@ Colum Ferry
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
@@ -102,6 +104,7 @@ Fady A
 Fatuma Abdullahi
 Felipe Stival
 Ferhat Elmas
+Filipe Cabaco
 Firas El Rachidi
 Francesco Sansalvadore
 Gabriel Claudino
@@ -146,6 +149,7 @@ Joanna Michniewicz
 Joaquim Moreno
 Joel Low
 Joey Freeland
+Joey Lei
 John Fitzgerald
 Joel Martin
 Johan Bergström
@@ -200,6 +204,7 @@ Matthew Hambright
 Matt Hudson
 Matt Johnston
 Matt Rossman
+Matt Smiley
 Matthias Luft
 Mats Kindahl
 Mert Yerekapan
@@ -238,6 +243,7 @@ Qiao Han
 Quintin Willison
 Rafael Chacón
 Raminder Singh
+Rand Arete
 Raúl Barroso
 Riccardo Busetti
 Richard Kasprzak
@@ -264,9 +270,13 @@ Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shaii O
+Shane Adams
 Shane E
+Shaun Newman
+Shardul Borhade
 Shreekar Shetty
 Sreyas Udayavarman
+Stephanie Jackson (stejacks)
 Stephen Morgan
 Steve Chavez
 Steven Eubank
@@ -277,14 +287,17 @@ Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taha Le Bras
 Tanun Chalermsinsuwan
+Tarun Khandelwal
 Taryn King
 Terry Sutton
 Terry Wilcox
+Thanya Nitithatsanakul
 Thomas E
 Tim Frietas
 Tim Palmer
 Timothy Lim
 Tina Ha
+Tobias Pfeiffer
 Tom Ashley
 Tom G
 Tomás Pozo
@@ -296,6 +309,7 @@ Utkarash Singh
 Victor Farazdagi
 Warwick Mitchell
 Wen Bo Xie
+Wendie Cheung
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov
@@ -315,7 +329,7 @@ Supabase would not be possible without the work of some other amazing open sourc
 
 - Postgres - https://www.postgresql.org/
 - PostgREST - https://github.com/PostgREST
-- Kong - https://github.com/kong/
+- Envoy - https://github.com/envoyproxy/envoy
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
 - shadcn/ui - https://ui.shadcn.com/

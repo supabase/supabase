@@ -23,7 +23,7 @@ import {
   SelectValue,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

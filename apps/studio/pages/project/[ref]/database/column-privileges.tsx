@@ -55,26 +55,26 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
 
+  // Default to (or fall back to) the first table of the selected schema. The
+  // fallback matters because the schema can also change via the URL, which
+  // leaves `selectedTable` pointing at a table from the previous schema.
   useEffect(() => {
     if (!isSuccessTables) return
-    const tables = tableList
-      .filter((table) => table.schema === selectedSchema)
-      .map((table) => table.name)
-    if (tables[0] && selectedTable === undefined) {
-      setSelectedTable(tables[0])
+    const tableNames = tableList.map((table) => table.name)
+    if (selectedTable === undefined || !tableNames.includes(selectedTable)) {
+      setSelectedTable(tableNames[0])
     }
-  }, [isSuccessTables, tableList, selectedSchema, selectedTable])
+  }, [isSuccessTables, tableList, selectedTable])
 
   const { data: allRoles, isPending: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const tables = tableList
-    ?.filter((table) => table.schema === selectedSchema)
-    .map((table) => table.name)
+  const tables = tableList?.map((table) => table.name)
 
   const {
     data: allTablePrivileges,
@@ -104,38 +104,34 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
   const {
     data: allColumnPrivileges,
-    isPending: isLoadingColumnPrivileges,
+    isPending: isPendingColumnPrivileges,
     isError: isErrorColumnPrivileges,
     error: errorColumnPrivileges,
   } = useColumnPrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: selectedSchema,
+    table: selectedTable,
   })
+
+  // The query is disabled until a table is selected, and a disabled query stays
+  // `isPending` forever -- so don't report it as loading in that state, or a
+  // schema with no tables never gets past the skeleton.
+  const isLoadingColumnPrivileges = selectedTable !== undefined && isPendingColumnPrivileges
 
   const columnPrivileges = useMemo(
     () =>
-      allColumnPrivileges
-        ?.filter(
-          (privilege) =>
-            privilege.relation_schema === selectedSchema &&
-            privilege.relation_name === selectedTable
-        )
-        .map((privilege) => ({
-          ...privilege,
-          privileges: privilege.privileges.filter(
-            (privilege) => privilege.grantee === selectedRole
-          ),
-        })) ?? [],
-    [allColumnPrivileges, selectedRole, selectedSchema, selectedTable]
+      allColumnPrivileges?.map((privilege) => ({
+        ...privilege,
+        privileges: privilege.privileges.filter((privilege) => privilege.grantee === selectedRole),
+      })) ?? [],
+    [allColumnPrivileges, selectedRole]
   )
 
   const rolesList = allRoles?.filter((role: PgRole) => EDITABLE_ROLES.includes(role.name)) ?? []
   const roles = rolesList.map((role: PgRole) => role.name)
 
-  const table = tableList?.find(
-    (table) => table.schema === selectedSchema && table.name === selectedTable
-  )
+  const table = tableList?.find((table) => table.name === selectedTable)
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
   const {
@@ -170,9 +166,10 @@ const PrivilegesPage: NextPageWithLayout = () => {
       }
     }
 
-    const newTable = tableList?.find((table) => table.schema === schema)?.name
     setSelectedSchema(schema)
-    setSelectedTable(newTable)
+    // The table list is scoped to the schema, so the incoming schema's tables
+    // aren't loaded yet -- the effect above picks the first one once they are.
+    setSelectedTable(undefined)
   }
 
   const handleChangeTable = (table: string) => {
@@ -192,15 +189,17 @@ const PrivilegesPage: NextPageWithLayout = () => {
   }
 
   const { apply: applyColumnPrivileges, isLoading: isApplyingChanges } =
-    useApplyPrivilegeOperations(
-      useCallback(() => {
+    useApplyPrivilegeOperations({
+      schema: selectedSchema,
+      table: selectedTable,
+      onSuccess: useCallback(() => {
         toast.success(
           `Successfully updated privileges on ${selectedSchema}.${selectedTable} for ${selectedRole}`,
           { duration: 6000 }
         )
         resetOperations()
-      }, [resetOperations, selectedRole, selectedSchema, selectedTable])
-    )
+      }, [resetOperations, selectedRole, selectedSchema, selectedTable]),
+    })
 
   function applyChanges() {
     applyColumnPrivileges(operations)

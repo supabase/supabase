@@ -8,6 +8,8 @@
 
 /apps/studio/ @supabase/Dashboard
 
+/apps/docs/ @supabase/docs
+
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
 /apps/www/lib/redirects.js
@@ -19,4 +21,4 @@
 /apps/studio/components/interfaces/Organization/Documents/          @supabase/security
 /apps/studio/pages/new/index.tsx                                    @supabase/security
 
-/packages/shared-data/compute-disk-limits.ts @supabase/infra @supabase/platform
+/packages/shared-data/compute-disk-limits.ts @supabase/platform

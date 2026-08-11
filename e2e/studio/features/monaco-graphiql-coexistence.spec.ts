@@ -18,13 +18,20 @@ import { toUrl } from '../utils/to-url.js'
 test.describe('Monaco / GraphiQL coexistence', () => {
   test.skip(env.IS_PLATFORM, 'Self-hosted mode only — GraphiQL + SQL editor on one local project')
 
-  // Client-side navigation via the Next router (keeps already-loaded chunks/CSS in place).
+  // Client-side navigation (keeps already-loaded chunks/CSS in place). The Next
+  // build exposes `window.next.router`; the TanStack build has no equivalent
+  // global, but its router subscribes to popstate, so pushState + popstate
+  // emulates the same SPA navigation without unloading chunks.
   const routerPush = async (page: Page, path: string) => {
     await page.evaluate((p) => {
       const router = (window as unknown as { next?: { router?: { push: (p: string) => void } } })
         .next?.router
-      if (!router) throw new Error('Next router not available for client-side navigation')
-      router.push(p)
+      if (router) {
+        router.push(p)
+        return
+      }
+      window.history.pushState({}, '', p)
+      window.dispatchEvent(new PopStateEvent('popstate'))
     }, path)
   }
 

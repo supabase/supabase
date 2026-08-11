@@ -9,7 +9,7 @@ import type { Metadata, Viewport } from 'next'
 import Providers from './providers'
 import { APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
-const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
+const site_title = `${APP_NAME} | The Postgres Development Platform`
 
 export const metadata: Metadata = {
   title: site_title,

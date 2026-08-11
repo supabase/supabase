@@ -77,6 +77,24 @@ final data = await supabase.schema('myschema').from('todos').select();
 ````
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Initialize the client with a custom schema
+var supabase = new Supabase.Client(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY,
+  new SupabaseOptions { Schema = "myschema" }
+);
+await supabase.InitializeAsync();
+
+// Make a request
+var todos = await supabase.From<Todo>().Get();
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash

@@ -424,7 +424,7 @@ th code {
   --code-foreground: #ffffff;
   --code-token-constant: #3ecf8e;
   --code-token-string: #ffcda1;
-  --code-token-comment: #7e7e7e;
+  --code-token-comment: #949494;
   --code-token-parameter: #ffffff;
   --code-token-function: #3ecf8e;
   --code-token-string-expression: #ffcda1;
@@ -436,14 +436,14 @@ th code {
 }
 [data-theme='light'],
 .light {
-  --code-token-keyword: #6b35dc;
+  --code-token-keyword: #5f2fc4;
   --code-foreground: oklch(from var(--foreground-light) l c h / 1);
   --code-token-constant: #15593b;
-  --code-token-string: #f1a10d;
-  --code-token-comment: #7e7e7e;
+  --code-token-string: #9a5200;
+  --code-token-comment: #6a6a6a;
   --code-token-parameter: oklch(from var(--foreground-light) l c h / 1);
   --code-token-function: #15593b;
-  --code-token-string-expression: #f1a10d;
+  --code-token-string-expression: #9a5200;
   --code-token-punctuation: oklch(from var(--foreground-light) l c h / 1);
   --code-token-link: oklch(from var(--foreground-light) l c h / 1);
   --code-token-number: oklch(from var(--foreground-light) l c h / 1);

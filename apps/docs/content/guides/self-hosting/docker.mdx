@@ -54,7 +54,7 @@ Minimum requirements for running all Supabase components, suitable for developme
 
 If you don't need specific services, such as Realtime, Storage, imgproxy, or Edge Runtime (`functions`), you can remove the corresponding sections and dependencies from `docker-compose.yml` to reduce resource requirements.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can [enable](#enabling-analytics) Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional docker-compose override file. Note that enabling these services will increase resource requirements.
 
@@ -80,6 +80,7 @@ The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 - Install prerequisites (`git`, `openssl`, `jq`) and Docker Engine if not already present
 - Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
 - Create a project directory (`supabase-project` by default) and copy the configuration files into it
+- Record the installed release version in `.supabase-version` for future `update.sh` upgrades
 - Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
 - Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and enables the matching entries in `docker-compose.yml`)
 - Pull the Docker images
@@ -105,7 +106,7 @@ Not on Linux, or want to do it manually? See [Manual installation](#manual-insta
 
 ### Manual installation
 
-This path gets the Docker Compose configuration onto your server; you'll configure secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase).
+This path gets the Docker Compose configuration onto your server, pinned to a specific tag. You'll set up secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase). For a newer release, use the [latest tag](https://github.com/supabase/supabase/tags).
 
 <Tabs
 scrollable
@@ -121,7 +122,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -131,14 +132,14 @@ mkdir supabase-project
 # ├── supabase
 # └── supabase-project
 
-# Copy the compose files over to your project
-cp -rf supabase/docker/* supabase-project
+# Copy the configuration to your project
+cp -rf supabase/docker/. supabase-project
 
-# Copy the example environment file
-cp supabase/docker/.env.example supabase-project/.env
+# Switch to the project directory and create a .env from the example
+cd supabase-project && cp .env.example .env
 
-# Switch to your project directory
-cd supabase-project
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -152,7 +153,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -167,14 +168,14 @@ mkdir supabase-project
 # ├── supabase
 # └── supabase-project
 
-# Copy the compose files over to your project
-cp -rf supabase/docker/* supabase-project
+# Copy the configuration over to your project
+cp -rf supabase/docker/. supabase-project
 
-# Copy the example environment file
-cp supabase/docker/.env.example supabase-project/.env
+# Switch to the project directory and create a .env from the example
+cd supabase-project && cp .env.example .env
 
-# Switch to your project directory
-cd supabase-project
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -184,7 +185,7 @@ docker compose pull
 
 </Tabs>
 
-<Admonition type="tip">
+<Admonition type="note">
 
   If you are using rootless Docker, edit `.env` and set `DOCKER_SOCKET_LOCATION` to your docker socket location. For example: `/run/user/1000/docker.sock`. Otherwise, you will see an error like `container supabase-vector exited (0)`.
 
@@ -353,10 +354,10 @@ curl http://<your-domain>:8000/functions/v1/hello
 Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart the service to pick them up:
 
 ```sh
-sh run.sh recreate functions
+sh run.sh restart functions
 ```
 
-This force-recreates the container (equivalent to `docker compose up -d --wait --force-recreate --no-deps functions`). A plain `docker compose restart` is not sufficient as it does not pick up configuration changes.
+The main worker loads each function from disk per request, so a restart is enough to pick up new or changed function code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
 
 See the [Self-hosted Edge Functions](/docs/guides/self-hosting/self-hosted-functions) guide for more details.
 
@@ -414,18 +415,20 @@ The `config add` / `config remove` commands manage the `COMPOSE_FILE` [variable]
 
 ## Updating
 
-We publish stable releases of the Docker Compose setup approximately once a month. The versions in each release are tested together, so they may lag behind the latest images on Docker Hub. To update, apply the latest changes from the repository and restart the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is **not guaranteed**. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
+We publish stable snapshots of the Docker Compose setup approximately once a month. The images are tested together, so they may lag behind the latest updates on [Docker Hub](https://hub.docker.com/u/supabase). If you want to run different versions of individual services, you can change the image tags in the compose files, but compatibility is **not guaranteed**.
 
-To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md). Make sure to also check the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
+To follow the updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
 
-After updating the configuration, you need to restart services to pick up the changes, which may result in downtime for your applications and users.
+The `update.sh` script updates an existing deployment in place. By default, it pulls the [latest](https://github.com/supabase/supabase/tags) `self-hosted/v*` configuration and merges it over your files with a three-way merge.
 
-For example, you'd like to update or rollback the Studio image. Follow the steps below:
+Refer to [Update your self-hosted deployment](/docs/guides/self-hosting/updating) for the full walkthrough - breaking changes, conflict resolution, pinning a release, and older installs without a recorded version.
+
+To change or roll back a single service's image instead of updating everything - for example, Studio:
 
 1. Check the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) images on [Supabase Docker Hub](https://hub.docker.com/u/supabase)
-2. Find the latest version (tag) number. It looks something like `2026.04.27-sha-5f60601`
-3. Update the Studio `image` configuration in the `docker-compose.yml` file. It should look like this: `image: supabase/studio:2026.04.27-sha-5f60601`
-4. Run `sh run.sh pull` to pull the new image, then `sh run.sh recreate studio` to restart Studio from it without taking down the rest of the stack.
+2. Find the version (tag) you want. It looks something like `2026.04.27-sha-5f60601`
+3. Update the Studio `image` in `docker-compose.yml`: `image: supabase/studio:2026.04.27-sha-5f60601`
+4. Run `sh run.sh pull` to pull the new image, then `sh run.sh recreate studio` to update Studio without taking down the rest of the stack.
 
 ## Uninstalling
 
@@ -503,7 +506,7 @@ To change the database password after the initial setup, run:
 sh utils/db-passwd.sh
 ```
 
-The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with:
+The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, stop and start the services with:
 
 ```sh
 sh run.sh recreate

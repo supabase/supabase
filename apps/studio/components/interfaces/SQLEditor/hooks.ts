@@ -95,17 +95,20 @@ export function useSqlEditorDiff() {
     setSelectedDiffType(undefined)
   }, [])
 
-  return {
-    sourceSqlDiff,
-    setSourceSqlDiff,
-    selectedDiffType,
-    setSelectedDiffType,
-    isAcceptDiffLoading,
-    setIsAcceptDiffLoading,
-    isDiffOpen,
-    defaultSqlDiff,
-    closeDiff,
-  }
+  return useMemo(
+    () => ({
+      sourceSqlDiff,
+      setSourceSqlDiff,
+      selectedDiffType,
+      setSelectedDiffType,
+      isAcceptDiffLoading,
+      setIsAcceptDiffLoading,
+      isDiffOpen,
+      defaultSqlDiff,
+      closeDiff,
+    }),
+    [sourceSqlDiff, selectedDiffType, isAcceptDiffLoading, isDiffOpen, defaultSqlDiff, closeDiff]
+  )
 }
 
 interface PromptState {
@@ -136,16 +139,24 @@ export function useSqlEditorPrompt() {
     }
   }, [promptState.isOpen])
 
-  const resetPrompt = () => {
+  const resetPrompt = useCallback(() => {
     setPromptState(initialPromptState)
     setPromptInput('')
-  }
+  }, [])
 
-  return {
-    promptState,
-    setPromptState,
-    promptInput,
-    setPromptInput,
-    resetPrompt,
-  }
+  const openPrompt = useCallback((context: Omit<PromptState, 'isOpen'>) => {
+    setPromptState((prev) => ({ ...prev, isOpen: true, ...context }))
+  }, [])
+
+  return useMemo(
+    () => ({
+      promptState,
+      setPromptState,
+      promptInput,
+      setPromptInput,
+      resetPrompt,
+      openPrompt,
+    }),
+    [promptState, promptInput, resetPrompt, openPrompt]
+  )
 }

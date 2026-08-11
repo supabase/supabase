@@ -269,10 +269,15 @@ function getAllParsedMdxEvents(): SupabaseEvent[] {
 /**
  * Read all events under `_events/` and return today-and-future events.
  * Past events are excluded (by end_date when present, otherwise start date).
+ * Events already flipped to `onDemand: true` are excluded too — they've
+ * already happened and belong in the on-demand bucket (getOnDemandMdxEvents),
+ * not the upcoming one, regardless of how their UTC-converted date compares to today.
  */
 export const getMdxEvents = (): SupabaseEvent[] => {
   const today = startOfTodayUtc()
-  return getAllParsedMdxEvents().filter((event) => new Date(event.end_date ?? event.date) >= today)
+  return getAllParsedMdxEvents().filter(
+    (event) => !event.onDemand && new Date(event.end_date ?? event.date) >= today
+  )
 }
 
 /** All MDX events with `onDemand: true`, including past recordings. */

@@ -6,6 +6,39 @@ export type Database = {
       [_ in never]: never
     }
     Views: {
+      catalog_listings: {
+        Row: {
+          built_by: string | null
+          categories: Json | null
+          content: string | null
+          description: string | null
+          documentation_url: string | null
+          featured: boolean | null
+          id: string | null
+          images: string[] | null
+          listing_logo: string | null
+          listing_tsv: unknown
+          marketplace_url: string | null
+          partner_id: string | null
+          partner_logo: string | null
+          partner_name: string | null
+          partner_slug: string | null
+          published_in_marketplace: boolean | null
+          slug: string | null
+          title: string | null
+          website_url: string | null
+          youtube_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'listings_partner_id_fkey'
+            columns: ['partner_id']
+            isOneToOne: false
+            referencedRelation: 'partners'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       categories: {
         Row: {
           description: string | null

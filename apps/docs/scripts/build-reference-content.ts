@@ -18,6 +18,10 @@ import matter from 'gray-matter'
 
 import {
   buildMap,
+  KIND_CLASS,
+  KIND_INTERFACE,
+  KIND_PROPERTY,
+  KIND_TYPE_ALIAS,
   KIND_VARIABLE,
   normalizeComment,
   parseSignature,
@@ -365,6 +369,52 @@ function collectFunctions(
         isConst: node.flags?.isConst ?? false,
       }
       out.typeSpec.variables[ref] = variableEntry
+    } else if (node.kind === KIND_TYPE_ALIAS && node.type) {
+      // Type alias — store description and underlying type definition
+      const variableEntry: VariableTypes = {
+        name: ref,
+        type: parseType(node.type, idMap),
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+        isConst: false,
+      }
+      out.typeSpec.variables[ref] = variableEntry
+    } else if (node.kind === KIND_INTERFACE && node.children) {
+      // Interface — store as a method-like entry so the renderer shows properties as a param table
+      const params = (node.children as any[])
+        .filter((child: any) => child.kind === KIND_PROPERTY)
+        .map((prop: any) => ({
+          name: prop.name,
+          comment: prop.comment ? normalizeComment(prop.comment as any) : undefined,
+          isOptional: prop.flags?.isOptional ?? false,
+          type: prop.type ? parseType(prop.type, idMap) : undefined,
+        }))
+      const methodEntry: MethodTypes = {
+        name: ref,
+        params,
+        ret: undefined,
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+      }
+      out.typeSpec.methods[ref] = methodEntry
+    } else if (node.kind === KIND_CLASS && node.children) {
+      // Class — store as a method-like entry so the renderer shows the class
+      // description plus its public properties as a param table. Without this,
+      // classes fall through every branch and only their constructor child is
+      // stored, leaving the class ref (which functions.json points at) empty.
+      const params = (node.children as any[])
+        .filter((child: any) => child.kind === KIND_PROPERTY)
+        .map((prop: any) => ({
+          name: prop.name,
+          comment: prop.comment ? normalizeComment(prop.comment as any) : undefined,
+          isOptional: prop.flags?.isOptional ?? false,
+          type: prop.type ? parseType(prop.type, idMap) : undefined,
+        }))
+      const methodEntry: MethodTypes = {
+        name: ref,
+        params,
+        ret: undefined,
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+      }
+      out.typeSpec.methods[ref] = methodEntry
     }
   }
 

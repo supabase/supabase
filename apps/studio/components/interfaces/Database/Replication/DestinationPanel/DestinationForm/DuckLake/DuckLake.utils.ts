@@ -63,10 +63,10 @@ const DUCKLAKE_SUPABASE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
 const DUCKLAKE_CUSTOM_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
   { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
   { path: 'ducklakeDataPath', message: 'Data path is required' },
-  { path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' },
-  { path: 'ducklakeS3SecretAccessKey', message: 'S3 Secret Access Key is required' },
-  { path: 'ducklakeS3Region', message: 'S3 Region is required' },
-  { path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' },
+  { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
+  { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
+  { path: 'ducklakeS3Region', message: 'S3 region is required' },
+  { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
 ]
 
 const DUCKLAKE_CUSTOM_SECRET_FIELDS = new Set<DucklakeFieldPath>([
@@ -113,7 +113,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeS3AccessKeyId',
-      message: 'S3 Access Key ID is required',
+      message: 'S3 access key ID is required',
     })
   }
 
@@ -124,7 +124,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeS3SecretAccessKey',
-      message: 'S3 Secret Access Key is required',
+      message: 'S3 secret access key is required',
     })
   }
 
@@ -157,7 +157,7 @@ export const getDucklakeValidationIssues = (
   ) {
     issues.push({
       path: 'ducklakeS3Endpoint',
-      message: 'S3 endpoint should not contain the protocol scheme',
+      message: 'S3 endpoint must not contain the protocol scheme',
     })
   }
 

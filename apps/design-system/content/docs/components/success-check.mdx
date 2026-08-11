@@ -1,0 +1,33 @@
+---
+title: Success Check
+description: A brand-coloured success indicator with a check mark.
+component: true
+---
+
+Use `SuccessCheck` when you need a compact, consistent mark for:
+
+- **Selected state:** e.g. the chosen organisation in a list of cards
+- **Completion progress:** e.g. finished steps in an upgrade or setup flow
+
+<ComponentPreview name="success-check-demo" peekCode />
+
+## Usage
+
+```tsx
+import { SuccessCheck } from 'ui'
+;<SuccessCheck />
+```
+
+## Examples
+
+### Selected state
+
+Show which option is currently selected. Position the check absolutely in the trailing corner of the selectable item.
+
+<ComponentPreview name="success-check-selected" peekCode />
+
+### Completion progress
+
+Mark finished steps in a linear progress list. Incomplete steps use a plain circle instead.
+
+<ComponentPreview name="success-check-progress" peekCode />

@@ -22,7 +22,7 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
-import { BASE_PATH } from '@/lib/constants'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 const CodePage = () => {
@@ -176,7 +176,7 @@ const CodePage = () => {
                 </li>
                 <li>
                   3. Or use the{' '}
-                  <InlineLink href="https://supabase.com/docs/reference/api/v1-deploy-a-function">
+                  <InlineLink href={`${DOCS_URL}/reference/api/v1-deploy-a-function`}>
                     Management API
                   </InlineLink>
                 </li>

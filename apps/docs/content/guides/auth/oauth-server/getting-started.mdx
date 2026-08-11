@@ -12,7 +12,7 @@ Before you begin, make sure you have:
 
 - A Supabase project (create one at [supabase.com](https://supabase.com))
 - Admin access to your project
-- (Optional) [Supabase CLI](/docs/guides/cli) v2.54.11 or higher for local development
+- (Optional) [Supabase CLI](/docs/guides/local-development) v2.54.11 or higher for local development
 
 ## Overview
 
@@ -115,7 +115,7 @@ This ensures that JWTs issued by your local instance use the correct issuer clai
 </TabPanel>
 </Tabs>
 
-<Admonition type="tip">
+<Admonition type="note">
 
 **Use asymmetric JWT signing keys for better security**
 
@@ -498,7 +498,7 @@ Store the client secret securely. It will only be shown once. If you lose it, yo
 
 </Admonition>
 
-#### Token endpoint authentication method
+### Token endpoint authentication method
 
 When a client exchanges an authorization code or refreshes a token, it must authenticate with the token endpoint. The `token_endpoint_auth_method` controls how this authentication happens:
 

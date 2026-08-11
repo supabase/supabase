@@ -5,54 +5,78 @@ packages:
   - e2e/*
 
 blockExoticSubdeps: true
+engineStrict: true
+updateNotifier: false
+# Doesn't work because of Typescript issues with peer dependencies, see https://github.com/pnpm/pnpm/issues/9739
+enableGlobalVirtualStore: false
 
 catalog:
   '@monaco-editor/react': ^4.7.0
   '@sentry/nextjs': ^10.59.0
-  '@supabase/auth-js': 2.108.2
-  '@supabase/postgrest-js': 2.108.2
-  '@supabase/realtime-js': 2.108.2
+  '@sentry/tanstackstart-react': ^10.59.0
+  '@supabase/auth-js': 2.112.3
+  '@supabase/postgrest-js': 2.112.3
+  '@supabase/realtime-js': 2.112.3
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.108.2
+  '@supabase/supabase-js': 2.112.3
   '@tanstack/react-router': ^1.169.2
   '@tanstack/react-start': ^1.167.65
   '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
+  # TypeScript 7 has no programmatic API until 7.1, so `typescript` stays aliased
+  # to the 6.0-API compat package for tools that import it (typescript-eslint,
+  # Next.js build typechecking), while `@typescript/native` provides the native
+  # TS 7 `tsc` binary used by typecheck scripts.
+  # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
+  '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
   '@vitest/coverage-v8': ^4.1.4
   '@vitest/ui': ^4.1.4
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   monaco-editor: 0.52.2
-  next: 16.2.6
+  next: ^16.2.11
   next-themes: ^0.4.6
-  postcss: ^8.5.10
+  postcss: ^8.5.18
   radix-ui: ^1.4.3
   react: ^19.2.6
   react-dom: ^19.2.6
   recharts: ^2.15.4
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
-  typescript: ~6.0.0
-  valtio: ^1.12.0
+  typescript: ~6.0.2
+  valtio: ^2.3.2
   vite: ^8.0.16
   vite-tsconfig-paths: ^6.1.1
   vitest: ^4.1.4
   zod: 3.25.76
 
-ignoredBuiltDependencies:
-  - '@parcel/watcher'
-  - '@sentry/cli'
-  - contentlayer2
-  - core-js
-  - es5-ext
-  - esbuild
-  - libpg-query
-  - msw
-  - protobufjs
-  - sharp
+allowBuilds:
+  '@parcel/watcher': false
+  '@sentry/cli': false
+  '@supabase/build-icons@file:packages/build-icons': set this to true or false
+  '@supabase/pg-meta@file:packages/pg-meta': set this to true or false
+  ai-commands@file:packages/ai-commands: set this to true or false
+  api-types@file:packages/api-types: set this to true or false
+  common@file:packages/common: set this to true or false
+  config@file:packages/config: set this to true or false
+  contentlayer2: false
+  core-js: false
+  dev-tools@file:packages/dev-tools: set this to true or false
+  es5-ext: false
+  esbuild: false
+  icons@file:packages/icons: set this to true or false
+  libpg-query: false
+  msw: false
+  node-pty: true
+  protobufjs: false
+  shared-data@file:packages/shared-data: set this to true or false
+  sharp: false
+  supabase: true
+  ui-patterns@file:packages/ui-patterns: set this to true or false
+  ui@file:packages/ui: set this to true or false
 
 minimumReleaseAge: 4320
 
@@ -60,24 +84,22 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  - typescript
+  - '@typescript/*'
   # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
   - react-use
 
-onlyBuiltDependencies:
-  - node-pty
-  - supabase
-
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
   'monaco-editor': 'catalog:'
-  '@mapbox/node-pre-gyp>tar': ^7.5.11
+  '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
   braintrust>uuid: ^11.1.1
-  cacache>tar: ^7.5.11
+  cacache>tar: ^7.5.21
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
   # Pin h3 v1 to a single version so the Nuxt registry example (vue-blocks)
@@ -87,15 +109,17 @@ overrides:
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   mdx-bundler>uuid: ^11.1.1
-  node-gyp>tar: ^7.5.11
+  node-gyp>tar: ^7.5.21
   nodemailer: ^7.0.11
   postcss: 'catalog:'
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
-  supabase>tar: ^7.5.11
+  supabase>tar: ^7.5.21
   tmp: ^0.2.7
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1
+  'codemirror-graphql>@codemirror/language': 6.11.0
+  '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
   react-data-grid: patches/react-data-grid.patch

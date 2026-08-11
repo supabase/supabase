@@ -7,7 +7,7 @@ subtitle: 'Using your connections resourcefully'
 
 ## Connections
 
-Every [Compute Add-On](/docs/guides/platform/compute-add-ons) has a pre-configured direct connection count and Supavisor pool size. This guide discusses ways to observe and manage them resourcefully.
+Every [Compute Add-On](/docs/guides/platform/compute-and-disk) has a pre-configured direct connection count and Supavisor pool size. This guide discusses ways to observe and manage them resourcefully.
 
 ### Configuring Supavisor's pool size
 
@@ -47,11 +47,11 @@ For Teams and Enterprise plans, Supabase provides Advanced Telemetry charts dire
 
 This chart helps you monitor connection pool usage, identify connection leaks, and plan capacity. It also shows a reference line for your compute size's maximum connection limit.
 
-For more details on using these monitoring charts, see the [Reports guide](/docs/guides/telemetry/reports#advanced-telemetry).
+For more details on using these monitoring charts, see the [Reports guide](/docs/guides/monitoring-and-debugging/reports#advanced-telemetry).
 
 #### Grafana Dashboard
 
-Supabase offers a Grafana Dashboard that records and visualizes over 200 project metrics, including connections. For setup instructions, check the [metrics docs](/docs/guides/telemetry/metrics).
+Supabase offers a Grafana Dashboard that records and visualizes over 200 project metrics, including connections. For setup instructions, check the [metrics docs](/docs/guides/monitoring-and-debugging/metrics).
 
 Its "Client Connections" graph displays connections for both Supavisor and Postgres
 ![client connection graph](/docs/img/database/grafana-connections.png)

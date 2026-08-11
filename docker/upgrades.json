@@ -1,0 +1,30 @@
+{
+  "_schema": {
+    "description": "Manual-action manifest for self-hosted upgrades, read by update.sh with jq. Hand-edit this file directly; it is the source of truth (no generation step). Keys are self-hosted release versions as bare semver (e.g. \"0.7.0\"), matching the self-hosted/vX.Y.Z tag and the \"## [0.7.0]\" CHANGELOG heading. Only add an entry for a release that needs an action a file diff cannot encode: a data migration, a run-this-first script, or a breaking default. Routine config changes are applied automatically by update.sh's 3-way merge and must NOT be listed here. update.sh gates on entries in (your version, target version], ordered with sort -V.",
+    "fields": {
+      "breaking": "bool - requires explicit user confirmation before applying",
+      "gate": "string|null - script to run before upgrading past this release (e.g. utils/upgrade-pg17.sh)",
+      "migration_guide_url": "string|null - link to the per-release migration guide",
+      "requires": "string[] - free-text manual steps shown to the user"
+    }
+  },
+  "0.6.0": {
+    "breaking": true,
+    "gate": "utils/upgrade-pg17.sh",
+    "migration_guide_url": "https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17",
+    "requires": [
+      "Postgres 17 is now the default. Do NOT start Postgres 17 against an existing Postgres 15 data directory - back up your database first.",
+      "Run 'sudo bash utils/upgrade-pg17.sh' (needs bash + root) to migrate Postgres 15 -> 17, then recreate containers. To defer, pin Postgres 15 with the docker-compose.pg15.yml override.",
+      "Includes a security fix for the API gateway (Realtime /api/tenants and /api/openapi routes) - strongly recommended for any instance running Realtime."
+    ]
+  },
+  "0.7.0": {
+    "breaking": true,
+    "gate": null,
+    "migration_guide_url": "https://github.com/orgs/supabase/discussions/47093",
+    "requires": [
+      "API_EXTERNAL_URL now includes the /auth/v1 path prefix, and SAML SSO endpoints moved to /auth/v1/sso/saml/*. Update custom OAuth provider callback URLs and any SAML configuration accordingly.",
+      "Anon (publishable) key access to the OpenAPI spec at /rest/v1/ has been removed. Use the service role or secret API key if you relied on it; normal data access via /rest/v1/<table> is unaffected."
+    ]
+  }
+}

@@ -2,7 +2,6 @@
 
 import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
-import '@/styles/focus.css'
 // Vite-only: defines @font-face for the custom fonts. The Next pipeline
 // (pages/_app.tsx) loads these via next/font instead, so this import has no
 // counterpart there — but dropping it under Vite makes the browser fall back
@@ -20,17 +19,18 @@ import '@/styles/stripe.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
-import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
+  ClientOnly,
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   redirect,
   Scripts,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -47,7 +47,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
-import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import {
   lazy,
   Suspense,
@@ -59,6 +58,7 @@ import {
 } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
+import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
@@ -66,15 +66,24 @@ import { FeaturePreviewContextProvider } from '@/components/interfaces/App/Featu
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
+import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { splitInternalUrl } from '@/lib/internal-url'
+// Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
+// injects a trailing slash before the query on every nuqs write (see module).
+import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
+import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
 import Error404 from '@/pages/404'
 import Error500 from '@/pages/500'
@@ -96,23 +105,55 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const cloudProvider = useDefaultProvider()
+
+  const getConfigCatFlags = useCallback(
+    (userEmail?: string) => {
+      const customAttributes: Record<string, string> = {}
+      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
+      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      return getFlags(userEmail, customAttributes)
+    },
+    [cloudProvider, selectedOrganization?.plan?.id]
+  )
 
   return (
-    <FeatureFlagProvider {...props} organizationSlug={selectedOrganization?.slug ?? undefined}>
+    <FeatureFlagProvider
+      {...props}
+      getConfigCatFlags={getConfigCatFlags}
+      organizationSlug={selectedOrganization?.slug ?? undefined}
+    >
       {children}
     </FeatureFlagProvider>
   )
 }
 
-// Keep dev-only components out of the production bundle.
-const IS_DEV_TOOLBAR_ENABLED =
+// Bridges the user's stored timezone preference into TimestampInfoProvider so
+// dayjs.tz.setDefault runs app-wide (see @/lib/datetime).
+const TimestampInfoTimezoneBridge = ({ children }: { children: ReactNode }) => {
+  const { timezone } = useTimezone()
+  return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
+}
+
+const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+// Keep dev-only components out of the production bundle.
+const IS_DEV_TOOLBAR_ENABLED = IS_NON_PROD_ENV
 
 const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
   ? lazy(() =>
       import('@/components/ui/DevToolbar/ResourceWarningsTab').then((m) => ({
         default: m.ResourceWarningsTab,
+      }))
+    )
+  : () => null
+
+const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
+  ? lazy(() =>
+      import('@/components/ui/DevToolbar/ProjectStatusTab').then((m) => ({
+        default: m.ProjectStatusTab,
       }))
     )
   : () => null
@@ -128,23 +169,26 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
           </Suspense>
         ),
       },
+      {
+        id: 'project-status',
+        label: 'Project Status',
+        content: (
+          <Suspense fallback={null}>
+            <ProjectStatusTab />
+          </Suspense>
+        ),
+      },
     ]
   : []
 
-// [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
-// locally. We're however, only storing the assets which we need (based on what the network tab loads
-// while using monaco). If we end up facing more effort trying to maintain this, probably to either
-// use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
-// The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
-loader.config({
-  paths: {
-    vs: IS_PLATFORM
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
-      : `${BASE_PATH}/monaco-editor`,
-  },
-})
+configureMonacoLoader()
 
-const FAVICON_ROUTE = '/favicon'
+// Non-prod (local + hosted staging) uses the white favicon, matching the Next
+// build (pages/_app.tsx passes `/favicon/staging` to MetaFaviconsPagesRouter for
+// non-prod). Uses the same synchronous NEXT_PUBLIC_ENVIRONMENT signal as
+// IS_DEV_TOOLBAR_ENABLED above, so it works at module scope (the `head()` route
+// option isn't a React component and can't run the async CLI check _app does).
+const FAVICON_ROUTE = IS_NON_PROD_ENV ? '/favicon/staging' : '/favicon'
 const THEME_COLOR = '1E1E1E'
 const APPLICATION_NAME = 'Supabase Studio'
 
@@ -174,7 +218,7 @@ function buildRootHead() {
   const meta: Array<Record<string, string>> = [
     { charSet: 'utf-8' },
     { name: 'viewport', content: 'initial-scale=1.0, width=device-width' },
-    { property: 'og:image', content: `${BASE_PATH}/img/supabase-logo.png` },
+    { property: 'og:image', content: `${BASE_PATH}/img/supabase-og.png` },
     { name: 'googlebot', content: 'notranslate' },
     { name: 'application-name', content: APPLICATION_NAME },
     { name: 'msapplication-TileColor', content: `#${THEME_COLOR}` },
@@ -200,13 +244,10 @@ function buildRootHead() {
   ]
 
   const links: Array<Record<string, string>> = [
-    // Google Fonts — Source Code Pro (the local CustomFont is declared in styles/fonts.css).
-    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: '' },
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap',
-    },
+    // Fonts (Inter, Manrope, Source Code Pro) are all vendored via @font-face in
+    // styles/fonts.css — no Google Fonts CDN dependency at runtime, matching how
+    // next/font self-hosts them on the Next build (and keeping self-hosted/offline
+    // studio working).
     ...APPLE_TOUCH_ICON_SIZES.map((size) => ({
       rel: 'apple-touch-icon-precomposed',
       sizes: size,
@@ -288,10 +329,24 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       pathname: location.pathname,
       search: location.search as Record<string, string | string[] | undefined>,
       isPlatform: IS_PLATFORM,
+      hash: location.hash,
     })
     if (!match) return
-    const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination
-    throw redirect({ href, statusCode: match.permanent ? 308 : 307 })
+    // `to`/`search`/`hash`, never `href`: the router treats `href` as an
+    // opaque (external) target, and preloading a Link whose beforeLoad
+    // throws `redirect({ href })` recurses forever — the preload retry
+    // rebuilds the origin location and re-runs this beforeLoad
+    // (https://github.com/TanStack/router/issues/7141). `to` is also
+    // basepath-relative, so no manual BASE_PATH prefix. The explicit
+    // `search`/`hash` fallbacks clear the incoming values rather than
+    // inherit them — `preserveQueryAndHash` already merged what carries over.
+    const { to, search, hash } = splitInternalUrl(match.destination)
+    throw redirect<AnyRouter, string>({
+      to,
+      search: search ?? {},
+      hash: hash ?? '',
+      statusCode: match.permanent ? 308 : 307,
+    })
   },
   component: RootComponent,
   shellComponent: RootDocument,
@@ -302,58 +357,52 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
   useThemeSandbox()
 
-  const cloudProvider = useDefaultProvider()
-
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider]
-  )
-
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <NuqsAdapter>
         <AuthProvider>
-          <FeatureFlagProviderWithOrgContext
-            API_URL={API_URL}
-            enabled={IS_PLATFORM}
-            getConfigCatFlags={getConfigCatFlags}
-          >
+          <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
             <ProfileProvider>
-              <DynamicTitle />
-              <TooltipProvider delayDuration={0}>
-                <RouteValidationWrapper>
-                  <ThemeProvider
-                    defaultTheme="system"
-                    themes={['dark', 'light', 'classic-dark']}
-                    enableSystem
-                    disableTransitionOnChange
-                  >
-                    <DevToolbarProvider apiUrl={API_URL}>
-                      <AiAssistantStateContextProvider>
-                        <CommandProvider>
-                          <BannerStackProvider>
-                            <FeaturePreviewContextProvider>
-                              <MainScrollContainerProvider>
-                                <Outlet />
-                              </MainScrollContainerProvider>
-                              <StudioCommandMenu />
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </BannerStackProvider>
-                          <Toaster />
-                          <MonacoThemeProvider />
-                        </CommandProvider>
-                      </AiAssistantStateContextProvider>
-                      <DevToolbar extraTabs={devToolbarExtraTabs} />
-                      <DevToolbarTrigger />
-                    </DevToolbarProvider>
-                  </ThemeProvider>
-                </RouteValidationWrapper>
-              </TooltipProvider>
-              <Telemetry />
+              <TimezoneProvider>
+                <TimestampInfoTimezoneBridge>
+                  <DynamicTitle />
+                  <TooltipProvider>
+                    <RouteValidationWrapper>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
+                        <DevToolbarProvider apiUrl={API_URL}>
+                          <AiAssistantStateContextProvider>
+                            <CommandProvider>
+                              <BannerStackProvider>
+                                <FeaturePreviewContextProvider>
+                                  <MainScrollContainerProvider>
+                                    <ClientOnly fallback={<ShellFallback />}>
+                                      <Outlet />
+                                    </ClientOnly>
+                                  </MainScrollContainerProvider>
+                                  <GlobalShortcuts />
+                                  <StudioCommandMenu />
+                                  <FeaturePreviewModal />
+                                </FeaturePreviewContextProvider>
+                              </BannerStackProvider>
+                              <Toaster />
+                              <ToastErrorTracker />
+                              <MonacoThemeProvider />
+                            </CommandProvider>
+                          </AiAssistantStateContextProvider>
+                          <DevToolbar extraTabs={devToolbarExtraTabs} />
+                          <DevToolbarTrigger />
+                        </DevToolbarProvider>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
+                  <Telemetry />
+                </TimestampInfoTimezoneBridge>
+              </TimezoneProvider>
             </ProfileProvider>
           </FeatureFlagProviderWithOrgContext>
         </AuthProvider>

@@ -14,6 +14,7 @@ import { source } from 'common-tags'
 
 import type { AssistantEvalInput } from '@/evals/scorer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { buildAssistantContextMessages, NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import { IS_TRACING_ENABLED } from '@/lib/ai/braintrust-logger'
 import { CHAT_PROMPT, GENERAL_PROMPT, LIMITATIONS_PROMPT, SECURITY_PROMPT } from '@/lib/ai/prompts'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
@@ -30,9 +31,11 @@ export async function generateAssistantResponse({
   chatId,
   chatName,
   allowTracing,
+  supportMode,
   userId,
   orgId,
   planId,
+  includesLogsSnippets,
   systemProviderOptions,
   providerOptions,
   requestedModel,
@@ -48,9 +51,12 @@ export async function generateAssistantResponse({
   chatId?: string
   chatName?: string
   allowTracing?: boolean
+  supportMode?: boolean
   userId?: string
   orgId?: number
   planId?: string
+  /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
+  includesLogsSnippets?: boolean
   requestedModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
@@ -96,7 +102,7 @@ export async function generateAssistantResponse({
         ? shouldTrace
           ? await traced(async () => getSchemas(), { name: 'getSchemas', type: 'function' })
           : await getSchemas()
-        : "You don't have access to any schemas."
+        : NO_SCHEMA_ACCESS_MESSAGE
 
     // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
     const system = source`
@@ -115,13 +121,6 @@ export async function generateAssistantResponse({
       - \`realtime\` — Supabase Realtime
     `
 
-    const hasProjectContext =
-      projectRef || chatName || schemasString !== "You don't have access to any schemas."
-
-    const assistantContent = hasProjectContext
-      ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
-      : undefined
-
     const systemMessage: SystemModelMessage = {
       role: 'system',
       content: system,
@@ -129,14 +128,13 @@ export async function generateAssistantResponse({
     }
 
     const coreMessages: ModelMessage[] = [
-      ...(assistantContent
-        ? [
-            {
-              role: 'assistant' as const,
-              content: assistantContent,
-            },
-          ]
-        : []),
+      ...buildAssistantContextMessages({
+        projectRef,
+        chatName,
+        schemasString,
+        supportMode,
+        includesLogsSnippets,
+      }),
       ...(await convertToModelMessages(messages)),
     ]
 

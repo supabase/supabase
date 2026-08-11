@@ -214,24 +214,26 @@ export const AIEditor = ({
     })
 
     if (language === 'javascript' || language === 'typescript') {
-      // The Deno libs are loaded as a raw text via raw-loader in next.config.ts. They're passed as raw text to the
-      // Monaco editor. The @vite-ignore stops Vite/Rolldown's dep scanner from following the dynamic import and
-      // trying to parse the .d.ts declarations as runtime modules — that crashes the scan in vite 8.0.13+ and
-      // cascades into SSR pre-bundling breakage.
-      import(/* @vite-ignore */ '@/public/deno/edge-runtime.d.ts' as string)
-        .then((module) => {
-          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
-        })
-        .catch((error) => {
-          console.error('Failed to load Deno edge-runtime typings:', error)
-        })
-      import(/* @vite-ignore */ '@/public/deno/lib.deno.d.ts' as string)
-        .then((module) => {
-          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
-        })
-        .catch((error) => {
-          console.error('Failed to load Deno lib typings:', error)
-        })
+      // The Deno libs load as raw text — via the raw-loader rules in
+      // next.config.ts (Next/turbopack) and the `rawTextLoader` plugin in
+      // vite.config.ts (TanStack/Vite) — and are registered as Monaco extra
+      // libs. The specifiers must stay string literals so both bundlers can
+      // statically analyze and code-split them; the `as string` cast keeps
+      // tsc from resolving the `.d.ts` files as declaration files (TS2846 /
+      // "not a module") while erasing to a plain literal for the bundlers.
+      const denoTypeLibs: Record<string, Promise<{ default: string }>> = {
+        'edge-runtime': import('@/public/deno/edge-runtime.d.ts' as string),
+        'lib.deno': import('@/public/deno/lib.deno.d.ts' as string),
+      }
+      for (const [lib, loading] of Object.entries(denoTypeLibs)) {
+        loading
+          .then((module) => {
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+          })
+          .catch((error) => {
+            console.error(`Failed to load Deno ${lib} typings:`, error)
+          })
+      }
     }
 
     refreshCloseAction()

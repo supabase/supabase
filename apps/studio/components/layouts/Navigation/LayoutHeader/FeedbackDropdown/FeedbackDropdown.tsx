@@ -13,6 +13,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { helpPanelState } from '@/state/help-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 export const FeedbackDropdown = ({ className }: { className?: string }) => {
@@ -44,7 +45,6 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
     >
       <PopoverTrigger asChild>
         <Button
-          asChild
           onClick={() => {
             setIsOpen((isOpen) => !isOpen)
             setStage('select')
@@ -99,7 +99,12 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                   snap.newChat(ASSISTANT_SUGGESTIONS)
                   setIsOpen(false)
                 }}
-                onSupportClick={() => setIsOpen(false)}
+                onSupportClick={() => {
+                  helpPanelState.requestedView = 'support'
+                  setIsOpen(false)
+                  openSidebar(SIDEBAR_KEYS.HELP_PANEL)
+                  return false
+                }}
               />
             </div>
             <PopoverSeparator />
