@@ -134,12 +134,11 @@ export const ResourceExhaustionWarningBanner = () => {
   // True for a single compute warning, or when all active warnings are compute-related
   const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)
 
-  // A restart cannot help while the project is already moving between states, and firing one
-  // off a stale warning would queue a second reboot on top of the one in flight
+  // Warnings lag real metrics, so a stale one would queue a second reboot mid-restart
   const isProjectTransitioning =
     project?.status !== undefined && TRANSITIONAL_PROJECT_STATUSES.includes(project.status)
-  const canRestartDatabase = activeWarnings.includes('memory_and_swap_exhaustion')
-  const showRestartButton = canRestartDatabase && !isProjectTransitioning
+  const isMemoryExhaustion = activeWarnings.includes('memory_and_swap_exhaustion')
+  const showRestartButton = isMemoryExhaustion && !isProjectTransitioning
 
   const correctionUrl = getResourceWarningCorrectionUrl({
     metric,

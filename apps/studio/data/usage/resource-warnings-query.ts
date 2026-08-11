@@ -12,10 +12,7 @@ export type ResourceWarningsVariables = {
   slug?: string
 }
 
-/**
- * Resource warnings drive outage banners, so they need to surface a problem that starts
- * after page load rather than sitting on an hour-old cache.
- */
+// Outage banners read these, so they have to catch a problem that starts after page load
 export const RESOURCE_WARNINGS_POLL_INTERVAL = 1000 * 60
 
 export async function getResourceWarnings(

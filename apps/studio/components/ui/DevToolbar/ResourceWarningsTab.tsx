@@ -58,12 +58,10 @@ export const ResourceWarningsTab = () => {
   // the Warnings tab.
   const hasOverridesRef = useRef(false)
 
-  // Holds the exact array written into both caches, so the re-apply below can tell its own
-  // writes apart from a background refetch and avoid looping on its own updates.
+  // Compared by identity below to tell our own writes apart from a background refetch
   const appliedWarningsRef = useRef<ResourceWarning[] | null>(null)
 
-  // Resource warnings poll in the background, so a refetch would replace the injected warnings
-  // with real data while the toolbar is still open.
+  // Polling would otherwise replace the injected warnings while the toolbar is still open
   useEffect(() => {
     return queryClient.getQueryCache().subscribe((event) => {
       const appliedWarnings = appliedWarningsRef.current
