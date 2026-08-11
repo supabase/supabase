@@ -67,9 +67,9 @@ export const OngoingQueriesPanel = () => {
     }
   }, [viewOngoingQueries])
 
-  const { mutate: abortQuery, isPending } = useSessionTerminateMutation({
+  const { mutate: terminateSession, isPending } = useSessionTerminateMutation({
     onSuccess: () => {
-      toast.success(`Successfully aborted query (ID: ${selectedId})`)
+      toast.success(`Successfully terminated session (ID: ${selectedId})`)
       setSelectedId(undefined)
     },
   })
@@ -173,19 +173,22 @@ export const OngoingQueriesPanel = () => {
       <ConfirmationModal
         loading={isPending}
         variant="warning"
-        title={`Confirm to abort this query? (ID: ${selectedId})`}
+        title={`Confirm to terminate this session? (ID: ${selectedId})`}
         visible={selectedId !== undefined}
         onCancel={() => setSelectedId(undefined)}
         onConfirm={() => {
           if (selectedId !== undefined)
-            abortQuery({
+            terminateSession({
               pid: selectedId,
               projectRef: project?.ref,
               connectionString: database?.connectionString,
             })
         }}
       >
-        <p className="text-sm">This will force the query to stop running.</p>
+        <p className="text-sm">
+          Terminating this session will close its connection and roll back any open transaction. The
+          application will need to reconnect.
+        </p>
       </ConfirmationModal>
     </>
   )

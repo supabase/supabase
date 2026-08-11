@@ -47,7 +47,7 @@ export const useSessionTerminateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to abort query: ${data.message}`)
+        toast.error(`Failed to terminate session: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

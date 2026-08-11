@@ -28,6 +28,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import {
@@ -472,17 +473,33 @@ export const ActivityRow = ({
       <AlertDialog open={showTerminateConfirmDialog} onOpenChange={setShowTerminateConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm to terminate this process?</AlertDialogTitle>
+            <AlertDialogTitle>Confirm to terminate this session?</AlertDialogTitle>
+            {activity.state === 'active' && (
+              <Admonition
+                type="warning"
+                className="border-x-0 rounded-none border-t-0"
+                title="This session is currently running a query"
+                description="Cancelling it may solve the problem without closing the connection."
+              />
+            )}
             <AlertDialogDescription>
-              This will force the query to stop running.
+              Ending this session will close its connection and roll back any open transaction. The
+              application will need to reconnect.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant="warning" onClick={onConfirmTerminate}>
-              Terminate
-            </AlertDialogAction>
+          <AlertDialogFooter className={cn(activity.state === 'active' && 'sm:justify-between')}>
+            <AlertDialogCancel>Back</AlertDialogCancel>
+            <div className="flex items-center gap-x-2">
+              {activity.state === 'active' && (
+                <AlertDialogAction variant="default" onClick={onCancelQuery}>
+                  Cancel query
+                </AlertDialogAction>
+              )}
+              <AlertDialogAction variant="warning" onClick={onConfirmTerminate}>
+                Terminate
+              </AlertDialogAction>
+            </div>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
