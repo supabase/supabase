@@ -216,6 +216,7 @@ const ExpirationPolicySection = ({
   mode,
   onModeChange,
 }: ExpirationPolicySectionProps) => {
+  const { trigger } = useFormContext<BucketProtectionFormValues>()
   const hasNoPolicy = !hasDays && !hasVersions
 
   return (
@@ -252,6 +253,7 @@ const ExpirationPolicySection = ({
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
                       field.onChange(raw === '' ? '' : Number(raw))
+                      trigger('version_expiry_days')
                     }}
                   />
                   <InputGroupAddon align="inline-end">
@@ -282,6 +284,7 @@ const ExpirationPolicySection = ({
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
                       field.onChange(raw === '' ? '' : Number(raw))
+                      trigger('max_noncurrent_versions')
                     }}
                   />
                   <InputGroupAddon align="inline-end">

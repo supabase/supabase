@@ -62,7 +62,7 @@ export const superRefineBucketProtection = (
       ctx.addIssue({
         path: ['max_noncurrent_versions'],
         code: z.ZodIssueCode.custom,
-        message: `Cannot exceed ${S3_MAX_NONCURRENT_VERSIONS} versions (S3 lifecycle policy limit)`,
+        message: `Cannot exceed ${S3_MAX_NONCURRENT_VERSIONS} versions`,
       })
     } else if (
       data.max_noncurrent_versions < planLimits.minVersions ||
