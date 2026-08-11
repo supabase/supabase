@@ -25,7 +25,7 @@
     },
     {
       "path": "registry/default/blocks/oauth-consent-react-router/app/routes/oauth.consent.tsx",
-      "content": "import { useSearchParams } from 'react-router'\n\nimport { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components/oauth-consent'\n\nexport default function ConsentRoute() {\n  const [searchParams] = useSearchParams()\n\n  return (\n    <main className=\"flex min-h-svh items-center justify-center p-6 md:p-10\">\n      <OAuthConsent className=\"w-full max-w-lg\" authorizationId={searchParams.get('authorization_id')} />\n    </main>\n  )\n}\n",
+      "content": "import { useSearchParams } from 'react-router'\n\nimport { OAuthConsent } from '@/registry/default/blocks/oauth-consent/components/oauth-consent'\n\nexport default function ConsentRoute() {\n  const [searchParams] = useSearchParams()\n\n  return (\n    <main className=\"flex min-h-svh items-center justify-center p-6 md:p-10\">\n      <OAuthConsent\n        className=\"w-full max-w-lg\"\n        authorizationId={searchParams.get('authorization_id')}\n      />\n    </main>\n  )\n}\n",
       "type": "registry:file",
       "target": "app/routes/oauth.consent.tsx"
     },

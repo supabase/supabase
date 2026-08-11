@@ -7,7 +7,10 @@ export default function ConsentRoute() {
 
   return (
     <main className="flex min-h-svh items-center justify-center p-6 md:p-10">
-      <OAuthConsent className="w-full max-w-lg" authorizationId={searchParams.get('authorization_id')} />
+      <OAuthConsent
+        className="w-full max-w-lg"
+        authorizationId={searchParams.get('authorization_id')}
+      />
     </main>
   )
 }
