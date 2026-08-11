@@ -29,6 +29,7 @@ The rest of this page writes examples as `supabase <command>`; translate them to
   size="small"
   type="underlined"
   defaultActiveId="npm"
+  queryGroup="platform"
 >
 <TabPanel id="npm" label="npm">
 
@@ -104,6 +105,7 @@ Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions
   size="small"
   type="underlined"
   defaultActiveId="npm"
+  queryGroup="platform"
 >
 <TabPanel id="npm" label="npm">
 
@@ -160,8 +162,24 @@ When a new [version](https://github.com/supabase/cli/releases) is released, you 
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="macos"
+  defaultActiveId="npm"
+  queryGroup="platform"
 >
+<TabPanel id="npm" label="npm">
+
+Update the CLI with [npm](https://www.npmjs.com/package/supabase):
+
+```sh
+npm update supabase --save-dev
+```
+
+Update to the latest beta release or switch a stable install to the beta channel with:
+
+```sh
+npm install supabase@beta --save-dev
+```
+
+</TabPanel>
 <TabPanel id="macos" label="macOS">
 
 ```sh
@@ -202,7 +220,7 @@ Beta channel:
 brew upgrade supabase-beta
 ```
 
-#### Linux package manager
+#### Linux packages
 
 1. Download the latest package from the [Supabase CLI releases page](https://github.com/supabase/cli/releases/latest)
 2. Install the package using the same commands as the [initial installation](#linux-packages):
@@ -211,26 +229,11 @@ brew upgrade supabase-beta
    - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
-<TabPanel id="npm" label="npm">
-
-If you have installed the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase), you can update it with:
-
-```sh
-npm update supabase --save-dev
-```
-
-Beta channel (`supabase@beta`):
-
-```sh
-npm update supabase@beta --save-dev
-```
-
-</TabPanel>
 </Tabs>
 
 If you have any Supabase containers running locally, stop them and delete their data volumes before proceeding with the upgrade. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
 
-<Admonition type="tip" title="Backup and stop running containers">
+<Admonition type="note" title="Backup and stop running containers">
 
 Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
 
@@ -384,7 +387,7 @@ Local logs rely on the Supabase Analytics Server which accesses the docker loggi
 
 <Admonition type="note">
 
-For advanced logs analysis using the Logs Explorer, it is advised to use the BigQuery backend instead of the default Postgres backend. Read about the steps [here](/docs/reference/self-hosting-analytics/introduction#bigquery).
+For advanced logs analysis using the Logs Explorer, it is advised to use the BigQuery backend instead of the default Postgres backend. Read about the steps [here](/docs/reference/self-hosting-analytics/introduction#using-the-bigquery-backend).
 
 </Admonition>
 

@@ -248,7 +248,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
       )}
 
       <Sheet open={!!shouldShowInstallSheet} onOpenChange={handleCloseInstallSheet}>
-        <SheetContent size="lg" tabIndex={undefined} className="flex flex-col gap-0">
+        <SheetContent size="lg" className="flex flex-col gap-0">
           <Form {...form}>
             <form
               id={formId}

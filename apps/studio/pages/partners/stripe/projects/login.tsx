@@ -10,6 +10,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   InterstitialAccountRow,
+  InterstitialActionError,
   InterstitialLayout,
   LogoPair,
   PartnerLogo,
@@ -27,7 +28,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize Stripe Projects', brand: 'Supabase' })
 
-const StripeProjectsLoginPage: NextPageWithLayout = () => {
+export const StripeProjectsLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ar_id } = useParams()
   const signOut = useSignOut()
@@ -48,7 +49,12 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
     mutate: confirmAccountRequest,
     isPending: isConfirmationPending,
     isSuccess: isConfirmationSuccess,
+    error: confirmationMutationError,
+    reset: resetConfirmationError,
   } = useConfirmAccountRequestMutation()
+  const confirmationError = confirmationMutationError
+    ? `Failed to authorize Stripe Projects: ${confirmationMutationError.message}`
+    : undefined
 
   useEffect(() => {
     if (!router.isReady) return
@@ -60,6 +66,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
 
   const handleApprove = async () => {
     if (!ar_id || isConfirmationPending) return
+    resetConfirmationError()
     confirmAccountRequest({ arId: ar_id })
   }
 
@@ -140,7 +147,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
           {showAuthorizationState && emailMatches && linkedOrg && (
             <div className="flex flex-col gap-3">
               <Admonition
-                type="tip"
+                type="note"
                 description={
                   <>
                     <span className="font-medium text-foreground">{linkedOrg.name}</span> is already
@@ -155,6 +162,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 <Button variant="text" block onClick={() => router.push('/')}>
                   Cancel
                 </Button>
+                <InterstitialActionError error={confirmationError} />
               </div>
             </div>
           )}
@@ -195,6 +203,7 @@ const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 <Button variant="text" onClick={() => router.push('/')}>
                   Cancel
                 </Button>
+                <InterstitialActionError error={confirmationError} />
               </div>
             </div>
           )}

@@ -23,17 +23,7 @@ on public.instruments
 for select to anon
 using (true);`
 
-## 1. Create a Supabase project
-
-To start, you need a Supabase project.
-
-Create a new Supabase project from [the Dashboard of any organization](/dashboard/new/_) you belong to.
-
-<Admonition type="tip" title="Want to create a project programmatically?">
-
-Use [the Management API](/docs/reference/api/v1-create-a-project) or ask [the MCP server](/docs/guides/ai-tools/mcp#account-management) to create a new Supabase project.
-
-</Admonition>
+<$Partial path="quickstart_create_project.mdx" />
 
 ## 2. Set up your database
 
@@ -41,13 +31,13 @@ When your Supabase project is up and running, create an `instruments` table with
 
 Do these steps within your project's dashboard by copying and running the snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Save some steps by <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>clicking here to prefill the SQL</a> in the SQL Editor, and then clicking **Run**.
 
 </Admonition>
 
-<Admonition type="tip" title="Want to setup the database programmatically?">
+<Admonition type="note" title="Want to setup the database programmatically?">
 
 You can use [the Management API](/docs/reference/api/v1-run-a-query) or ask [the MCP server](/docs/guides/ai-tools/mcp#database) to execute SQL queries.
 

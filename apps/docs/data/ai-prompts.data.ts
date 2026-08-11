@@ -201,6 +201,30 @@ database.new and run the instruments table SQL. Then:
 
 REFERENCE
 https://supabase.com/docs/guides/getting-started/quickstarts/solidjs.md`,
+  'spring-boot': `Help me add Supabase to my Spring Boot project. Create a Supabase project at
+database.new. Then:
+1. Run \`curl https://start.spring.io/starter.zip -d dependencies=web,data-jpa,postgresql
+   -d type=maven-project -d language=java -d groupId=com.example -d artifactId=instruments
+   -d name=instruments -o instruments.zip\` and unzip it to scaffold the project.
+2. Copy the JDBC connection string for the Session pooler (port 5432) from the Supabase
+   Connect panel and export it as a \`SUPABASE_DB_URL\` environment variable, so the
+   password stays out of source control. Set \`spring.datasource.url=\${SUPABASE_DB_URL}\`
+   and \`spring.datasource.driver-class-name\` in \`application.properties\`. Avoid the
+   Transaction pooler (port 6543) since Hibernate relies on prepared statements.
+3. Set \`spring.jpa.hibernate.ddl-auto=update\` and
+   \`spring.jpa.properties.hibernate.default_schema\` in \`application.properties\`, so
+   Hibernate creates tables outside the \`public\` schema that Supabase exposes as a data API.
+4. Create an \`Instrument\` JPA entity mapped to the \`instruments\` table with
+   \`@Table(name = "instruments")\`, and an \`InstrumentRepository\` extending
+   \`JpaRepository\`.
+5. Add a \`CommandLineRunner\` bean to \`InstrumentsApplication\` that seeds the table
+   with a few instruments the first time the app starts.
+6. Create an \`InstrumentController\` with a \`GET /instruments\` endpoint that returns
+   \`instrumentRepository.findAll()\`.
+7. Run \`./mvnw spring-boot:run\` and open http://localhost:8080/instruments.
+
+REFERENCE
+https://supabase.com/docs/guides/getting-started/quickstarts/spring-boot.md`,
   sveltekit: `Help me add Supabase to my SvelteKit project. Create a Supabase project at
 database.new and run the instruments table SQL. Then:
 1. Run \`npx sv create my-app\` to scaffold the app.

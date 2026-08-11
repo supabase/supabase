@@ -6,17 +6,18 @@ Next.js pages router + TanStack Start (mid-migration, see below), React 19. Dev 
 
 Load the skills matching the task; stack them when a task spans areas:
 
-| Task                                                   | Additional skills                                                                                 |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
-| Query/mutation hooks, query keys (`data/**`)           | `studio-queries`                                                                                  |
-| UI: pages, forms, tables, charts, sheets, empty states | `studio-ui-patterns`                                                                              |
-| Displaying API errors                                  | `studio-error-handling`                                                                           |
-| Tests (deciding, writing, reviewing)                   | `studio-testing`, then `studio-mock-api-tests` (component/MSW) or `studio-e2e-tests` (Playwright) |
-| PostHog event tracking                                 | `telemetry-standards`                                                                             |
-| SQL against user databases                             | `safe-sql-execution`                                                                              |
-| Logs Explorer SQL, `data/logs`                         | `clickhouse-logs-queries`                                                                         |
-| Component API design, boolean-prop refactors           | `vercel-composition-patterns`                                                                     |
-| User-facing copy                                       | `copywriting`                                                                                     |
+| Task                                                                      | Additional skills                                                                                 |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Query/mutation hooks, query keys (`data/**`)                              | `studio-queries`                                                                                  |
+| UI: pages, forms, tables, charts, sheets, empty states                    | `studio-ui-patterns`                                                                              |
+| Form logic: react-hook-form fields, watch/formState, reset, number inputs | `react-hook-form`                                                                                 |
+| Displaying API errors                                                     | `studio-error-handling`                                                                           |
+| Tests (deciding, writing, reviewing)                                      | `studio-testing`, then `studio-mock-api-tests` (component/MSW) or `studio-e2e-tests` (Playwright) |
+| PostHog event tracking                                                    | `telemetry-standards`                                                                             |
+| SQL against user databases                                                | `safe-sql-execution`                                                                              |
+| Logs Explorer SQL, `data/logs`                                            | `clickhouse-logs-queries`                                                                         |
+| Component API design, boolean-prop refactors                              | `vercel-composition-patterns`                                                                     |
+| User-facing copy                                                          | `copywriting`                                                                                     |
 
 ## TanStack Start migration
 

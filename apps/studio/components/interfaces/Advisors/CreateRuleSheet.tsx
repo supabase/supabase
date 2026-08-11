@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -99,7 +99,10 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
     defaultValues,
   })
 
-  const { lint_name, assigned_to, is_disabled } = form.watch()
+  const [lint_name, assigned_to, is_disabled] = useWatch({
+    control: form.control,
+    name: ['lint_name', 'assigned_to', 'is_disabled'],
+  })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -200,7 +203,7 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                   <Admonition showIcon={false} type="default">
                     {generateRuleDescription({
                       name: lint_name,
-                      disabled: is_disabled,
+                      disabled: is_disabled ?? defaultValues.is_disabled,
                       member: members.find((x) => x.gotrue_id === assigned_to),
                     })}
                   </Admonition>

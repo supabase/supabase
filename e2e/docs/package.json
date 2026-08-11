@@ -6,6 +6,7 @@
   "scripts": {
     "e2e:docs": "node --experimental-strip-types scripts/run-e2e-docs.ts",
     "e2e:docs:all": "node --experimental-strip-types scripts/run-e2e-docs.ts --all",
+    "e2e:docs:a11y": "node --experimental-strip-types scripts/run-e2e-docs.ts --grep @a11y",
     "e2e:ui": "node --experimental-strip-types scripts/run-e2e-docs.ts --ui",
     "e2e:docs:local-smoke": "playwright test --config=playwright.local-smoke.config.ts",
     "resolve-docs-scope": "node --experimental-strip-types scripts/resolve-docs-scope.ts"
@@ -14,6 +15,8 @@
     "@playwright/test": "^1.59.1"
   },
   "devDependencies": {
-    "@types/node": "catalog:"
+    "@axe-core/playwright": "^4.12.1",
+    "@types/node": "catalog:",
+    "axe-core": "^4.12.1"
   }
 }

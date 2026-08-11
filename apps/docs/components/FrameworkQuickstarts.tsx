@@ -43,6 +43,16 @@ const frameworks = [
     href: '/guides/getting-started/quickstarts/nuxtjs',
   },
   {
+    name: 'SvelteKit',
+    icon: '/docs/img/icons/svelte-icon',
+    href: '/guides/getting-started/quickstarts/sveltekit',
+  },
+  {
+    name: 'Hono',
+    icon: '/docs/img/icons/hono-icon',
+    href: '/guides/getting-started/quickstarts/hono',
+  },
+  {
     name: 'iOS Swift',
     icon: '/docs/img/icons/swift-icon-orange',
     href: '/guides/getting-started/quickstarts/ios-swiftui',

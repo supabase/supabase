@@ -1,5 +1,6 @@
 'use client'
 
+import { ReactNode } from 'react'
 import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 
 import { getMappingForError } from './ErrorMatcher.utils'
@@ -11,9 +12,17 @@ interface ErrorMatcherProps {
   error: string | { message: string }
   supportFormParams?: SupportFormParams
   className?: string
+  /** Shown when the error isn't classified with its own troubleshooting steps. */
+  fallback?: ReactNode
 }
 
-export function ErrorMatcher({ title, error, supportFormParams, className }: ErrorMatcherProps) {
+export function ErrorMatcher({
+  title,
+  error,
+  supportFormParams,
+  className,
+  fallback,
+}: ErrorMatcherProps) {
   const track = useTrack()
 
   const message = typeof error === 'string' ? error : error.message
@@ -48,7 +57,7 @@ export function ErrorMatcher({ title, error, supportFormParams, className }: Err
           : undefined
       }
     >
-      {Troubleshooting && <Troubleshooting />}
+      {Troubleshooting ? <Troubleshooting /> : fallback}
     </ErrorDisplay>
   )
 }

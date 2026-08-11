@@ -56,12 +56,6 @@ import { formatBytes } from '@/lib/helpers'
 
 const formId = 'storage-settings-form'
 
-interface StorageSettingsState {
-  fileSizeLimit: number
-  unit: StorageSizeUnits
-  imageTransformationEnabled: boolean
-}
-
 export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -112,11 +106,6 @@ export const StorageSettings = () => {
     !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
   const [isUpdating, setIsUpdating] = useState(false)
-  const [initialValues, setInitialValues] = useState<StorageSettingsState>({
-    fileSizeLimit: 0,
-    unit: StorageSizeUnits.MB,
-    imageTransformationEnabled: false,
-  })
 
   const maxBytes = useMemo(() => {
     if (organization?.usage_billing_enabled || isEntitlementUnlimited()) {
@@ -153,12 +142,15 @@ export const StorageSettings = () => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: initialValues,
+    defaultValues: {
+      fileSizeLimit: 0,
+      unit: StorageSizeUnits.MB,
+      imageTransformationEnabled: false,
+    },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
   })
 
-  const { unit: storageUnit } = form.watch()
   const fileSizeLimitError = form.formState.errors.fileSizeLimit
 
   const { mutate: updateStorageConfig } = useProjectStorageConfigUpdateUpdateMutation({
@@ -225,27 +217,17 @@ export const StorageSettings = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && config && !isLoading) {
-      const { fileSizeLimit, features } = config
-      const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      const imageTransformationEnabled =
-        features?.imageTransformation?.enabled ?? hasAccessToImageTransformations
+    if (!isSuccess || !config || isLoading) return
 
-      setInitialValues({
-        fileSizeLimit: value,
-        unit: unit,
-        imageTransformationEnabled,
-      })
+    const { value, unit } = convertFromBytes(config.fileSizeLimit ?? 0)
 
-      // Reset the form values when the config values load
-      form.reset({
-        fileSizeLimit: value,
-        unit: unit,
-        imageTransformationEnabled,
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, config, isLoading, hasAccessToImageTransformations])
+    form.reset({
+      fileSizeLimit: value,
+      unit,
+      imageTransformationEnabled:
+        config.features?.imageTransformation?.enabled ?? hasAccessToImageTransformations,
+    })
+  }, [isSuccess, config, isLoading, hasAccessToImageTransformations, form])
 
   return (
     <PageContainer>
@@ -355,6 +337,7 @@ export const StorageSettings = () => {
                                     name="unit"
                                     render={({ field: unitField }) => (
                                       <Select
+                                        key={unitField.value}
                                         value={unitField.value}
                                         onValueChange={(val) => {
                                           unitField.onChange(val)
@@ -366,9 +349,7 @@ export const StorageSettings = () => {
                                         }
                                       >
                                         <SelectTrigger className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
-                                          <SelectValue placeholder="Choose a prefix">
-                                            {storageUnit}
-                                          </SelectValue>
+                                          <SelectValue placeholder="Choose a prefix" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           {Object.values(StorageSizeUnits).map((unit: string) => (

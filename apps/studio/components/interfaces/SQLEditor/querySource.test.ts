@@ -5,9 +5,12 @@ import {
   datePickerValueToLogDateRange,
   DEFAULT_LOG_DATE_RANGE,
   getSnippetSource,
-  isoDateTimeString,
+  isLogsSource,
+  logDateRangesEqual,
   logDateRangeToDatePickerValue,
   resolveLogRunRange,
+  resolveSnippetSource,
+  sqlSourceToFenceLanguage,
   type LogDateRange,
 } from './querySource'
 import {
@@ -17,6 +20,7 @@ import {
 import { generateHelpersFromInput } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import type { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { DatetimeHelper } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { isoDateTimeString } from '@/lib/iso-datetime'
 
 /** Build the `DatePickerValue` the Logs picker submits when a helper is selected. */
 const valueFromHelper = (helper: DatetimeHelper): DatePickerValue => ({
@@ -49,19 +53,42 @@ describe('querySource.ts:getSnippetSource', () => {
   })
 })
 
-describe('querySource.ts:isoDateTimeString', () => {
-  it('accepts a valid ISO datetime', () => {
-    const raw = '2025-01-01T12:00:00.000Z'
-    expect(isoDateTimeString(raw)).toBe(raw)
+describe('querySource.ts:isLogsSource', () => {
+  it('is true only for the logs source', () => {
+    expect(isLogsSource('logs')).toBe(true)
+    expect(isLogsSource('database')).toBe(false)
   })
 
-  it('rejects an empty string', () => {
-    expect(isoDateTimeString('')).toBeNull()
+  it('is false for an absent source', () => {
+    expect(isLogsSource(undefined)).toBe(false)
+  })
+})
+
+describe('querySource.ts:sqlSourceToFenceLanguage', () => {
+  it('labels a logs query as clickhouse and everything else as sql', () => {
+    expect(sqlSourceToFenceLanguage('logs')).toBe('clickhouse')
+    expect(sqlSourceToFenceLanguage('database')).toBe('sql')
   })
 
-  it('rejects junk', () => {
-    expect(isoDateTimeString('not-a-date')).toBeNull()
-    expect(isoDateTimeString('2025-13-45T99:99:99Z')).toBeNull()
+  // Attachments can carry no source; those are Postgres SQL.
+  it('treats an absent source as sql', () => {
+    expect(sqlSourceToFenceLanguage(undefined)).toBe('sql')
+  })
+})
+
+describe('querySource.ts:resolveSnippetSource', () => {
+  it('prefers the snippet type over the URL param', () => {
+    expect(resolveSnippetSource({ type: 'log_sql' }, undefined)).toBe('logs')
+    // A stale/mismatched param must not override a snippet that already exists.
+    expect(resolveSnippetSource({ type: 'sql' }, 'logs')).toBe('database')
+  })
+
+  // A fresh `/sql/new` tab has no snippet until the first keystroke, so the param is
+  // the only signal that it is a logs tab.
+  it('falls back to the URL param before the snippet exists', () => {
+    expect(resolveSnippetSource(undefined, 'logs')).toBe('logs')
+    expect(resolveSnippetSource(undefined, undefined)).toBe('database')
+    expect(resolveSnippetSource(undefined, 'nonsense')).toBe('database')
   })
 })
 
@@ -226,5 +253,59 @@ describe('querySource.ts:resolveLogRunRange', () => {
       from: '2025-01-01T00:00:00.000Z',
       to: '2025-01-02T00:00:00.000Z',
     })
+  })
+})
+
+describe('querySource.ts:logDateRangesEqual', () => {
+  it('matches relative ranges on amount + unit regardless of label formatting', () => {
+    const lastHourPreset = EXPLORER_DATEPICKER_HELPERS.find((h) => h.text === 'Last hour')!
+    const presetRange = datePickerValueToLogDateRange({
+      from: lastHourPreset.calcFrom(),
+      to: lastHourPreset.calcTo(),
+      isHelper: true,
+      text: lastHourPreset.text,
+    })
+
+    expect(
+      logDateRangesEqual(presetRange, { kind: 'relative', last: { amount: 1, unit: 'hour' } })
+    ).toBe(true)
+  })
+
+  it('does not match relative ranges with a different amount or unit', () => {
+    expect(
+      logDateRangesEqual(
+        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
+        { kind: 'relative', last: { amount: 3, unit: 'hour' } }
+      )
+    ).toBe(false)
+    expect(
+      logDateRangesEqual(
+        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
+        { kind: 'relative', last: { amount: 1, unit: 'day' } }
+      )
+    ).toBe(false)
+  })
+
+  it('matches absolute ranges on their ISO endpoints', () => {
+    const from = isoDateTimeString('2025-01-01T00:00:00.000Z')!
+    const to = isoDateTimeString('2025-01-02T00:00:00.000Z')!
+    expect(logDateRangesEqual({ kind: 'absolute', from, to }, { kind: 'absolute', from, to })).toBe(
+      true
+    )
+  })
+
+  it('never matches a relative range against an absolute one', () => {
+    const from = isoDateTimeString('2025-01-01T00:00:00.000Z')!
+    const to = isoDateTimeString('2025-01-02T00:00:00.000Z')!
+    expect(
+      logDateRangesEqual(
+        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
+        {
+          kind: 'absolute',
+          from,
+          to,
+        }
+      )
+    ).toBe(false)
   })
 })

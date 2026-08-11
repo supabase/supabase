@@ -11,7 +11,7 @@ database_id = "7d755701-747f-4c3a-b8be-236c5518e4eb"
 
 > Building an index without the `CONCURRENTLY` modifier will lock the table, but it will also increase build times. For general advice about indexes, check out this [guide](https://github.com/orgs/supabase/discussions/22449).
 
-### **To speed up queries, it is ideal to create an HSNW index on your embedded column**
+## **To speed up queries, it is ideal to create an HSNW index on your embedded column**
 
 The general structure for creating an HNSW index follows this pattern:
 
@@ -72,7 +72,7 @@ show maintenance_work_mem;
 
 **4. Increase cores for index creation (optional)**
 
-The `max_parallel_maintenance_workers` variable limits the amount of cores that can be used by maintenance operations, including indexing tables. In your session, you should try to set it to a value roughly 1/2 to 2/3s of your [compute core amount](/docs/guides/platform/compute-add-ons):
+The `max_parallel_maintenance_workers` variable limits the amount of cores that can be used by maintenance operations, including indexing tables. In your session, you should try to set it to a value roughly 1/2 to 2/3s of your [compute core amount](/docs/guides/platform/compute-and-disk):
 
 ```sql
 set max_parallel_maintenance_workers to <integer>;
@@ -100,12 +100,12 @@ show statement_timeout;
 
 **6. Consider temporarily upgrading your compute size (optional)**
 
-If your task is particularly long, you can speed it up by boosting your computing power temporarily. Compute size is charged by the hour, so you can increase it for an hour or two to finish your task faster, then scale it back afterwards. Here is a list of [compute add-ons](/docs/guides/platform/compute-add-ons). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
+If your task is particularly long, you can speed it up by boosting your computing power temporarily. Compute size is charged by the hour, so you can increase it for an hour or two to finish your task faster, then scale it back afterwards. Here is a list of [compute add-ons](/docs/guides/platform/compute-and-disk). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
 
 **7. Consider increasing disk size (optional)**
 
 HSNW indexes can produce temporary files during their construction that may consume a few GBs worth of disk.
-Consider increasing the disk size in the [Compute and Disk settings](/dashboard/project/_/settings/compute-and-disk) to accommodate for short-term disk stress.
+Consider increasing the disk size in the [Infrastructure settings](/dashboard/project/_/settings/infrastructure) to accommodate for short-term disk stress.
 
 <img
   width="947"

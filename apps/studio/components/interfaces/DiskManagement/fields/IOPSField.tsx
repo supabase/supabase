@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   Button,
   FormControl,
@@ -27,11 +27,11 @@ type IOPSFieldProps = {
 
 export function IOPSField({ form, disableInput }: IOPSFieldProps) {
   const { ref: projectRef } = useParams()
-  const { control, formState, setValue, trigger, getValues, watch } = form
+  const { control, formState, setValue, trigger, getValues } = form
 
-  const watchedStorageType = watch('storageType')
-  const watchedComputeSize = watch('computeSize')
-  const watchedIOPS = watch('provisionedIOPS') ?? 0
+  const watchedStorageType = useWatch({ control, name: 'storageType' })
+  const watchedComputeSize = useWatch({ control, name: 'computeSize' })
+  const watchedIOPS = useWatch({ control, name: 'provisionedIOPS' }) ?? 0
 
   const { isError } = useDiskAttributesQuery({ projectRef })
 
@@ -86,6 +86,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                 <FormInputGroupInput
                   type="number"
                   {...field}
+                  id={field.name}
                   value={field.value}
                   disabled={disableInput || disableIopsInput || isError}
                   onChange={(e) => {

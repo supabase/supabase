@@ -78,6 +78,28 @@ const findLongestRunning = (
     return longest === null || duration > longest.duration ? { activity, duration } : longest
   }, null)
 
+// Counts every activity transitively blocked by pid - not just direct waiters, but their waiters
+// in turn - so a long chain outweighs several short ones. Traverses breadth-first over a single
+// counted set so a waiter reachable through more than one blocker (a "diamond") is still only
+// counted once.
+const countTransitivelyBlocked = (pid: number, activities: DatabaseActivity[]): number => {
+  const counted = new Set<number>()
+  const queue = [pid]
+
+  while (queue.length > 0) {
+    const currentPid = queue.shift()!
+    const directWaiters = activities.filter((x) => x.blocked_by.includes(currentPid))
+
+    for (const waiter of directWaiters) {
+      if (counted.has(waiter.pid)) continue
+      counted.add(waiter.pid)
+      queue.push(waiter.pid)
+    }
+  }
+
+  return counted.size
+}
+
 // Derives the Overview page's connection/activity metrics (and their warning thresholds) from the
 // raw pg_stat_activity rows, so the logic can be unit tested independently of the component.
 export const getConnectionMetrics = (activities: DatabaseActivity[]): ConnectionMetrics => {
@@ -113,18 +135,14 @@ export const getConnectionMetrics = (activities: DatabaseActivity[]): Connection
       longestRunningQuery?.activity.state === 'idle in transaction (aborted)') &&
       longestRunningQuery.duration >= WARN_DURATION_IDLE_TXN)
 
-  const blockingCounts = activities.reduce<Map<number, number>>((counts, activity) => {
-    activity.blocked_by.forEach((pid) => counts.set(pid, (counts.get(pid) ?? 0) + 1))
-    return counts
-  }, new Map())
-
-  const queryBlockingTheMostQueries = [...blockingCounts].reduce<{
+  const queryBlockingTheMostQueries = activities.reduce<{
     activity: DatabaseActivity
     count: number
-  } | null>((mostBlocking, [pid, count]) => {
+  } | null>((mostBlocking, activity) => {
+    const count = countTransitivelyBlocked(activity.pid, activities)
+    if (count === 0) return mostBlocking
     if (mostBlocking && count <= mostBlocking.count) return mostBlocking
-    const activity = activities.find((x) => x.pid === pid)
-    return activity ? { activity, count } : mostBlocking
+    return { activity, count }
   }, null)
 
   const warnTopBlocker = (queryBlockingTheMostQueries?.count ?? 0) >= WARN_TOP_BLOCKER
@@ -140,4 +158,38 @@ export const getConnectionMetrics = (activities: DatabaseActivity[]): Connection
     queryBlockingTheMostQueries,
     warnTopBlocker,
   }
+}
+
+export const getBlockChain = (pid: number, activities: DatabaseActivity[]) => {
+  const chain = [pid]
+  const visited = new Set([pid])
+  let current = activities.find((x) => x.pid === pid)
+
+  while (current && current.blocked_by.length > 0) {
+    const nextPid = current.blocked_by[0]
+    if (visited.has(nextPid)) break
+    chain.push(nextPid)
+    visited.add(nextPid)
+    current = activities.find((x) => x.pid === nextPid)
+  }
+
+  return chain
+}
+
+// Walks the opposite direction of getBlockChain: starting from a root blocker
+// (blocked_by.length === 0), finds the chain of pids waiting on it, nearest first
+export const getBlockingChain = (rootPid: number, activities: DatabaseActivity[]) => {
+  const chain: number[] = []
+  const visited = new Set([rootPid])
+  let currentPid = rootPid
+
+  while (true) {
+    const next = activities.find((x) => !visited.has(x.pid) && x.blocked_by.includes(currentPid))
+    if (!next) break
+    chain.push(next.pid)
+    visited.add(next.pid)
+    currentPid = next.pid
+  }
+
+  return chain
 }

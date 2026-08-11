@@ -4,7 +4,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 export function WrapperDashboardIntegration({ title, path }: { title: string; path: string }) {
   return (
-    <Admonition type="tip" className="mb-4">
+    <Admonition type="note" className="mb-4">
       <p>You can enable the {title} wrapper right from the Supabase dashboard.</p>
 
       <Button asChild>

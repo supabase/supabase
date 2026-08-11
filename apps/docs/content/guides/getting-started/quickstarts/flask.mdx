@@ -18,9 +18,11 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
 
 To install, run the following command in the root of your project:
 
@@ -40,10 +42,12 @@ pip install flask supabase
 
 ## 6. Create environment variables file
 
-Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
+Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=flask):
 
 <Button variant="primary" asChild>
-  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=flask">
+    Open Connect panel
+  </a>
 </Button>
 
 ```text name=.env
@@ -51,7 +55,7 @@ SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
+<$Partial path="api_settings.mdx" variables={{ "framework": "flask", "tab": "frameworks" }} />
 
 ## 7. Query data from the app
 

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getConnectionMetrics } from './DatabaseConnections.utils'
+import { getBlockChain, getBlockingChain, getConnectionMetrics } from './DatabaseConnections.utils'
 import { type DatabaseActivity } from '@/data/database/activity-query'
 
 const NOW = '2024-01-15T12:00:00Z'
@@ -193,6 +193,34 @@ describe('getConnectionMetrics', () => {
 
       const { queryBlockingTheMostQueries } = getConnectionMetrics(activities)
       expect(queryBlockingTheMostQueries?.activity.pid).toBe(1)
+      expect(queryBlockingTheMostQueries?.count).toBe(4)
+    })
+
+    it('counts transitively - a longer block chain outweighs several short ones', () => {
+      const activities = [
+        activity({ pid: 1, blocked_by: [2] }),
+        activity({ pid: 2, blocked_by: [3] }),
+        activity({ pid: 3, blocked_by: [] }),
+        activity({ pid: 4, blocked_by: [5] }),
+        activity({ pid: 5, blocked_by: [] }),
+      ]
+
+      const { queryBlockingTheMostQueries } = getConnectionMetrics(activities)
+      expect(queryBlockingTheMostQueries?.activity.pid).toBe(3)
+      expect(queryBlockingTheMostQueries?.count).toBe(2)
+    })
+
+    it('counts a diamond-shaped block pattern once, not per incoming path', () => {
+      // root blocks both p1 and p2 directly, and both p1 and p2 block w - w must only count once
+      const activities = [
+        activity({ pid: 0, blocked_by: [] }),
+        activity({ pid: 1, blocked_by: [0] }),
+        activity({ pid: 2, blocked_by: [0] }),
+        activity({ pid: 3, blocked_by: [1, 2] }),
+      ]
+
+      const { queryBlockingTheMostQueries } = getConnectionMetrics(activities)
+      expect(queryBlockingTheMostQueries?.activity.pid).toBe(0)
       expect(queryBlockingTheMostQueries?.count).toBe(3)
     })
 
@@ -215,5 +243,91 @@ describe('getConnectionMetrics', () => {
 
       expect(getConnectionMetrics(activities).warnTopBlocker).toBe(true)
     })
+  })
+})
+
+describe('getBlockChain', () => {
+  it('returns just the pid when it is not blocked', () => {
+    const activities = [activity({ pid: 1, blocked_by: [] })]
+
+    expect(getBlockChain(1, activities)).toEqual([1])
+  })
+
+  it('walks blocked_by up to the root, nearest first', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2] }),
+      activity({ pid: 2, blocked_by: [3] }),
+      activity({ pid: 3, blocked_by: [] }),
+    ]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 2, 3])
+  })
+
+  it('only follows the first blocker when blocked by multiple pids', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2, 3] }),
+      activity({ pid: 2, blocked_by: [] }),
+      activity({ pid: 3, blocked_by: [] }),
+    ]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 2])
+  })
+
+  it('stops rather than looping on a cycle', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2] }),
+      activity({ pid: 2, blocked_by: [1] }),
+    ]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 2])
+  })
+
+  it('includes a blocker pid even if its own activity record is missing', () => {
+    const activities = [activity({ pid: 1, blocked_by: [99] })]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 99])
+  })
+})
+
+describe('getBlockingChain', () => {
+  it('returns an empty chain when nothing is blocked by the root', () => {
+    const activities = [activity({ pid: 1, blocked_by: [] })]
+
+    expect(getBlockingChain(1, activities)).toEqual([])
+  })
+
+  it('walks forward from the root, nearest waiter first', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2] }),
+      activity({ pid: 2, blocked_by: [3] }),
+      activity({ pid: 3, blocked_by: [] }),
+    ]
+
+    expect(getBlockingChain(3, activities)).toEqual([2, 1])
+  })
+
+  it('does not require the root pid to have its own activity record', () => {
+    const activities = [activity({ pid: 2, blocked_by: [1] })]
+
+    expect(getBlockingChain(1, activities)).toEqual([2])
+  })
+
+  it('stops rather than looping on a cycle', () => {
+    const activities = [
+      activity({ pid: 2, blocked_by: [1] }),
+      activity({ pid: 3, blocked_by: [2] }),
+      activity({ pid: 1, blocked_by: [3] }), // would cycle back to the root
+    ]
+
+    expect(getBlockingChain(1, activities)).toEqual([2, 3])
+  })
+
+  it('only follows one branch when the root has multiple direct waiters', () => {
+    const activities = [
+      activity({ pid: 2, blocked_by: [1] }),
+      activity({ pid: 3, blocked_by: [1] }),
+    ]
+
+    expect(getBlockingChain(1, activities)).toEqual([2])
   })
 })

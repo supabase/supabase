@@ -192,7 +192,7 @@ function CopyButton({ label, value }: { label: string; value: string }) {
           setCopied(true)
         })
       }}
-      className="rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
+      className="cursor-pointer rounded-sm p-1.5 text-foreground-muted transition-colors hover:bg-surface-200 hover:text-foreground focus-ring"
       aria-label={copied ? `${label} copied` : `Copy ${label}`}
       title={copied ? 'Copied' : 'Copy to clipboard'}
     >

@@ -14,6 +14,7 @@ import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -59,7 +60,7 @@ const WrapperOverviewContent = () => {
 
       {!!CreateWrapperSheetComponent && !!wrapperMeta && (
         <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
-          <SheetContent size="lg" tabIndex={undefined}>
+          <SheetContent size="lg">
             <CreateWrapperSheetComponent
               wrapperMeta={wrapperMeta}
               onDirty={setIsDirty}
@@ -124,7 +125,7 @@ const AddNewWrapperCTA = () => {
           <Link
             href={
               databaseNeedsUpgrading
-                ? `/project/${project?.ref}/settings/infrastructure`
+                ? getServiceVersionsPath(project?.ref)
                 : `/project/${project?.ref}/database/extensions?filter=wrappers`
             }
           >

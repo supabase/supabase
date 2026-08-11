@@ -1,20 +1,30 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { cn } from 'ui'
+import { cn, copyToClipboard } from 'ui'
 
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { MessageActions } from './Message.Actions'
 import type { AddToolApprovalResponse, MessageInfo } from './Message.Context'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
 import { MessageDisplay } from './Message.Display'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
-  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
+  const snap = useAiAssistantStateSnapshot()
   const { onCancelEdit, onRate } = useMessageActionsContext()
+  const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
 
   const handleRate = (newRating: 'positive' | 'negative', reason?: string) => {
     onRate?.(id, newRating, reason)
+  }
+
+  const handleCopy = (onSuccess: () => void) => {
+    const response = message.parts
+      .filter((x) => x.type === 'text')
+      .map((x) => x.text)
+      .join('\n')
+    copyToClipboard(response, onSuccess)
   }
 
   return (
@@ -28,8 +38,9 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
       <MessageDisplay.MainArea>
         <MessageDisplay.Content message={message} />
       </MessageDisplay.MainArea>
-      {!readOnly && isLastMessage && onRate && !isLoading && (
-        <MessageActions alwaysShow>
+      {!readOnly && onRate && !isLoading && (
+        <MessageActions alwaysShow={isLastMessage}>
+          <MessageActions.Copy onClick={handleCopy} />
           <MessageActions.ThumbsUp
             onClick={() => handleRate('positive')}
             isActive={rating === 'positive'}
@@ -40,6 +51,7 @@ function AssistantMessage({ message }: { message: VercelMessage }) {
             isActive={rating === 'negative'}
             disabled={!!rating}
           />
+          <MessageActions.Branch onClick={() => snap.branchChat(id)} />
         </MessageActions>
       )}
     </MessageDisplay.Container>

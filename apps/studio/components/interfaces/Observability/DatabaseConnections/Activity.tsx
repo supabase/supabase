@@ -1,17 +1,17 @@
 import { isEqual } from 'lodash'
 import { Search, X } from 'lucide-react'
-import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs'
-import { useEffect } from 'react'
+import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportsSelectFilter } from '../../Reports/v2/ReportsSelectFilter'
-import { ActivityRow } from './ActivityRow'
+import { GroupedActivityRow } from './ActivityRow'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 const DEFAULT_ROLES_FILTER = ['anon', 'authenticated', 'postgres']
 
@@ -20,9 +20,8 @@ interface ActivityProps {
 }
 
 export const Activity = ({ live }: ActivityProps) => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
-
-  const [selectedPid] = useQueryState('pid', parseAsInteger)
 
   const [
     {
@@ -30,6 +29,7 @@ export const Activity = ({ live }: ActivityProps) => {
       states: statesFilter,
       applications: applicationsFilter,
       roles: rolesFilter,
+      view: viewFilter,
     },
     setQueryStates,
   ] = useQueryStates({
@@ -37,15 +37,17 @@ export const Activity = ({ live }: ActivityProps) => {
     states: parseAsArrayOf(parseAsString, ',').withDefault([]),
     applications: parseAsArrayOf(parseAsString, ',').withDefault([]),
     roles: parseAsArrayOf(parseAsString, ',').withDefault(DEFAULT_ROLES_FILTER),
+    view: parseAsString.withDefault(''),
   })
 
   const hasNoFiltersApplied =
     searchFilter.length === 0 &&
     statesFilter.length === 0 &&
     applicationsFilter.length === 0 &&
-    isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
+    isEqual(rolesFilter, DEFAULT_ROLES_FILTER) &&
+    viewFilter === ''
 
-  const { data, isPending, isSuccess } = useDatabaseActivityQuery(
+  const { data, isPending } = useDatabaseActivityQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -61,6 +63,9 @@ export const Activity = ({ live }: ActivityProps) => {
   const matchesSearch = (activity: { query: string | null }) =>
     !searchFilter || (activity.query?.toLowerCase().includes(searchFilter.toLowerCase()) ?? false)
 
+  // Pids referenced in some other activity's blocked_by - i.e. they are blocking something
+  const blockingPids = new Set((data ?? []).flatMap((x) => x.blocked_by))
+
   const activities = data?.filter((activity) => {
     const matchesState =
       !statesFilter ||
@@ -69,8 +74,21 @@ export const Activity = ({ live }: ActivityProps) => {
     const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
     const matchesApplication =
       applicationsFilter.length === 0 || applicationsFilter.includes(activity.application_name)
-    return matchesState && matchesRole && matchesApplication && matchesSearch(activity)
+    // In the blocked view, only show root blockers - activities blocking others while not
+    // themselves blocked. Everything they block is shown nested under them instead.
+    const matchesView =
+      viewFilter !== 'blockers' ||
+      (activity.blocked_by.length === 0 && blockingPids.has(activity.pid))
+    return (
+      matchesState && matchesRole && matchesApplication && matchesView && matchesSearch(activity)
+    )
   })
+  const rootBlockers = (data ?? []).filter(
+    (x) =>
+      x.blocked_by.length === 0 &&
+      blockingPids.has(x.pid) &&
+      (rolesFilter.length === 0 || rolesFilter.includes(x.role_name))
+  )
 
   const stateOptions = [
     'Idle',
@@ -87,6 +105,7 @@ export const Activity = ({ live }: ActivityProps) => {
         y.state === x.toLowerCase() &&
         (rolesFilter.length === 0 || rolesFilter.includes(y.role_name)) &&
         (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
+        (viewFilter !== 'blockers' || y.blocked_by.length > 0) &&
         matchesSearch(y)
     ).length,
   }))
@@ -103,6 +122,7 @@ export const Activity = ({ live }: ActivityProps) => {
           (!statesFilter ||
             statesFilter.length === 0 ||
             (y.state !== null && statesFilter.includes(y.state))) &&
+          (viewFilter !== 'blockers' || y.blocked_by.length > 0) &&
           matchesSearch(y)
       ).length,
     }))
@@ -121,6 +141,7 @@ export const Activity = ({ live }: ActivityProps) => {
             statesFilter.length === 0 ||
             (y.state !== null && statesFilter.includes(y.state))) &&
           (applicationsFilter.length === 0 || applicationsFilter.includes(y.application_name)) &&
+          (viewFilter !== 'blockers' || y.blocked_by.length > 0) &&
           matchesSearch(y)
       ).length,
     }))
@@ -134,31 +155,25 @@ export const Activity = ({ live }: ActivityProps) => {
     })
 
   const onResetFilters = () => {
+    track('database_connections_filter_updated', { type: 'reset' })
     setQueryStates({
       search: '',
       states: [],
       roles: DEFAULT_ROLES_FILTER,
       applications: [],
+      view: '',
     })
   }
-
-  useEffect(() => {
-    if (selectedPid && isSuccess) {
-      document
-        .getElementById(selectedPid.toString())
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-  }, [selectedPid, isSuccess])
 
   return (
     <div className="flex flex-col gap-y-4">
       <h2>Sessions</h2>
-      <div className="flex gap-x-2">
+      <div className="flex gap-2 flex-wrap">
         <Input
           size="tiny"
           icon={<Search />}
           placeholder="Search query"
-          className="w-64"
+          className="w-56"
           value={searchFilter}
           onChange={(e) => setQueryStates({ search: e.target.value })}
         />
@@ -166,7 +181,11 @@ export const Activity = ({ live }: ActivityProps) => {
           label="State"
           options={stateOptions}
           value={statesFilter ?? []}
-          onChange={(states) => setQueryStates({ states })}
+          onChange={(states) => {
+            if (isEqual(states, statesFilter)) return
+            track('database_connections_filter_updated', { type: 'state' })
+            setQueryStates({ states })
+          }}
           isLoading={isPending}
           popoverClassName="w-60"
         />
@@ -175,7 +194,11 @@ export const Activity = ({ live }: ActivityProps) => {
           label="Roles"
           options={roleOptions}
           value={rolesFilter ?? []}
-          onChange={(roles) => setQueryStates({ roles })}
+          onChange={(roles) => {
+            if (isEqual(roles, rolesFilter)) return
+            track('database_connections_filter_updated', { type: 'roles' })
+            setQueryStates({ roles })
+          }}
           isLoading={isPending}
           popoverClassName="w-72"
         />
@@ -184,10 +207,32 @@ export const Activity = ({ live }: ActivityProps) => {
           label="Application"
           options={applicationOptions}
           value={applicationsFilter ?? []}
-          onChange={(applications) => setQueryStates({ applications })}
+          onChange={(applications) => {
+            if (isEqual(applications, applicationsFilter)) return
+            track('database_connections_filter_updated', { type: 'application' })
+            setQueryStates({ applications })
+          }}
           isLoading={isPending}
           popoverClassName="w-60"
         />
+        <ButtonTooltip
+          variant={viewFilter === 'blockers' ? 'default' : 'dashed'}
+          iconRight={rootBlockers.length > 0 ? <span>{rootBlockers.length}</span> : null}
+          onClick={() => {
+            track('database_connections_blocker_view_clicked', {
+              newState: viewFilter === 'blockers' ? 'disabled' : 'enabled',
+            })
+            setQueryStates({ view: viewFilter === 'blockers' ? '' : 'blockers' })
+          }}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: 'Shows queries currently blocking others',
+            },
+          }}
+        >
+          Root blockers
+        </ButtonTooltip>
         {!hasNoFiltersApplied && (
           <ButtonTooltip
             variant="text"
@@ -256,7 +301,7 @@ export const Activity = ({ live }: ActivityProps) => {
             ) : null}
 
             {activities?.map((activity) => (
-              <ActivityRow key={activity.pid} activity={activity} />
+              <GroupedActivityRow key={activity.pid} activity={activity} />
             ))}
           </TableBody>
         </Table>

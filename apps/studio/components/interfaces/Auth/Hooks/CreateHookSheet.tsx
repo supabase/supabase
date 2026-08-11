@@ -8,7 +8,7 @@ import {
 import { useParams } from 'common'
 import randomBytes from 'randombytes'
 import { useEffect, useMemo } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -167,7 +167,10 @@ export const CreateHookSheet = ({
   })
 
   const isDirty = form.formState.isDirty
-  const { postgresValues, hookType, selectedType, enabled } = form.watch()
+  const [postgresValues, hookType, selectedType, enabled] = useWatch({
+    control: form.control,
+    name: ['postgresValues', 'hookType', 'selectedType', 'enabled'],
+  })
   const {
     confirmOnClose,
     handleOpenChange,

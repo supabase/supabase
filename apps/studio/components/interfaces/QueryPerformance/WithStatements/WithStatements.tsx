@@ -241,7 +241,11 @@ export const WithStatements = ({
           </>
         }
       />
-      <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+
+      <div>
+        <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
+      </div>
+
       <QueryPerformanceGrid
         aggregatedData={processedData}
         isLoading={isLoading}

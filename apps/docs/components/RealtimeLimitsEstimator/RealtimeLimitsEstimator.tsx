@@ -57,7 +57,9 @@ export default function RealtimeLimitsEstimater({}) {
 
   return (
     <div>
-      <h4>Set your expected parameters</h4>
+      <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
+        Set your expected parameters
+      </span>
       <div className="grid mb-8 gap-y-8 gap-x-8 grid-cols-2 xl:grid-cols-4">
         <div>
           <Label htmlFor="computeAddOn">Compute:</Label>
@@ -107,7 +109,9 @@ export default function RealtimeLimitsEstimater({}) {
 
       {limits && (
         <div className="mt-8">
-          <h4>Current maximum possible throughput</h4>
+          <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
+            Current maximum possible throughput
+          </span>
 
           <table className="table-auto">
             <thead>
@@ -158,7 +162,9 @@ export default function RealtimeLimitsEstimater({}) {
               .filter((v, i, a) => a.indexOf(v) === i)
               .map((computeAddOn) => (
                 <div>
-                  <h4>{COMPUTE_LABELS[computeAddOn]}</h4>
+                  <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
+                    {COMPUTE_LABELS[computeAddOn]}
+                  </span>
                   <table className="table-auto">
                     <thead>
                       <tr>

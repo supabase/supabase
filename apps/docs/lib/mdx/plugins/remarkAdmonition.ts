@@ -116,9 +116,8 @@ function mapAdmonitionType(type: string): AdmonitionProps['type'] {
     case 'quote':
     case 'example':
     case 'note':
-      return 'note'
     case 'tip':
-      return 'tip'
+      return 'note'
     case 'warning':
       return 'caution'
     case 'failure':

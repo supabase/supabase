@@ -29,6 +29,11 @@ export const contentListingItemSchema = z.object({
   badge: z.string().min(1).optional(),
   /** Grid cards only. Defaults to inline (next to the title), matching existing usage. */
   badgePosition: z.enum(['inline', 'below']).optional(),
+  /**
+   * When set, the item is omitted unless `isFeatureEnabled(feature)` is true.
+   * Use for SDK- or product-gated links (e.g. `sdk:dart`) inside a shared listing.
+   */
+  feature: z.string().min(1).optional(),
 })
 
 export const contentListingGroupTypeSchema = z.enum(['list', 'grid'])

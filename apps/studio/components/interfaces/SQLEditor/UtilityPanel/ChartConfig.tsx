@@ -189,7 +189,7 @@ export const ChartConfig = ({
         </div>
 
         {!acknowledged && (
-          <Admonition showIcon={false} type="tip" className="p-2 relative group">
+          <Admonition showIcon={false} type="note" className="p-2 relative group">
             <Tooltip>
               <TooltipTrigger
                 onClick={() => setAcknowledged(true)}
