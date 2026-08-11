@@ -1,8 +1,16 @@
+import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
 import { getContent } from '@/data/content/content-infinite-query'
 import { getNotebook } from '@/data/content/notebooks/notebook-query'
+import {
+  agentNotebookSchema,
+  type WritableCell,
+  type WritableNotebook,
+} from '@/data/content/notebooks/notebook-schema'
+import { createNotebook } from '@/data/content/notebooks/notebook-upsert-mutation'
+import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import type { Notebooks } from '@/types'
 
 export type NotebookToolsContext = {
@@ -79,6 +87,47 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
             }
           }),
         }
+      },
+    }),
+    create_notebook: tool({
+      description:
+        'Asks the user to create a new notebook with the given cells. Requires user approval before creating.',
+      inputSchema: z.object({
+        name: z.string().describe('A short, descriptive name for the notebook.'),
+        description: z
+          .string()
+          .optional()
+          .describe('A short description of what the notebook is for.'),
+        content: agentNotebookSchema.describe(
+          'The notebook content: a schema version and an ordered list of cells (markdown, database, or log). Cells must not include an id — one is assigned when the notebook is saved.'
+        ),
+      }),
+      needsApproval: true,
+      execute: async ({ name, description, content }) => {
+        const cells: WritableNotebook['cells'] = content.cells.map((cell): WritableCell => {
+          switch (cell._tag) {
+            case 'markdown_cell':
+              return cell
+            case 'database_cell':
+              // The `needsApproval: true` gate above is the user gesture that promotes this SQL from untrusted to safe.
+              return { ...cell, sql: acceptUntrustedSql(untrustedSql(cell.sql)) }
+            case 'log_cell':
+              return { ...cell, sql: acceptUntrustedLogsSql(untrustedLogSql(cell.sql)) }
+          }
+        })
+
+        const result = await createNotebook(
+          {
+            projectRef: projectRef ?? '',
+            name,
+            description,
+            content: { schema_version: content.schema_version, cells },
+          },
+          undefined,
+          authHeaders
+        )
+
+        return { id: result.id, name }
       },
     }),
   }

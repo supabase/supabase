@@ -47,16 +47,19 @@ export type CreateNotebookVariables = {
 
 export async function createNotebook(
   { projectRef, name, description, content }: CreateNotebookVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
-  const payload = buildNotebookUpsertPayload({
-    id: crypto.randomUUID(),
-    name,
-    description,
-    content,
-  })
+  const id = crypto.randomUUID()
+  const payload = buildNotebookUpsertPayload({ id, name, description, content })
 
-  return upsertContent({ projectRef, payload: payload as unknown as UpsertContentPayload }, signal)
+  await upsertContent(
+    { projectRef, payload: payload as unknown as UpsertContentPayload },
+    signal,
+    headersInit
+  )
+
+  return { id }
 }
 
 export type CreateNotebookData = Awaited<ReturnType<typeof createNotebook>>
@@ -65,11 +68,16 @@ export type UpdateNotebookVariables = CreateNotebookVariables & { id: string }
 
 export async function updateNotebook(
   { projectRef, id, name, description, content }: UpdateNotebookVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   const payload = buildNotebookUpsertPayload({ id, name, description, content })
 
-  return upsertContent({ projectRef, payload: payload as unknown as UpsertContentPayload }, signal)
+  return upsertContent(
+    { projectRef, payload: payload as unknown as UpsertContentPayload },
+    signal,
+    headersInit
+  )
 }
 
 export type UpdateNotebookData = Awaited<ReturnType<typeof updateNotebook>>

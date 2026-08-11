@@ -3,7 +3,25 @@ import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
 import { getNotebookTools } from './notebook-tools'
+import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+const VALID_AGENT_CONTENT: AgentNotebook = {
+  schema_version: 1,
+  cells: [
+    { _tag: 'markdown_cell', text: '# Signup funnel' },
+    {
+      _tag: 'database_cell',
+      sql: 'select * from auth.users limit 100',
+      row_limit: 100,
+    },
+    {
+      _tag: 'log_cell',
+      sql: "select timestamp, event_message from edge_logs where source = 'edge_logs' limit 10",
+      time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+    },
+  ],
+}
 
 type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdResponse']
 type GetUserContentResponse = components['schemas']['GetUserContentResponse']
@@ -29,10 +47,10 @@ const NOTEBOOK_CONTENT = {
 
 describe('ai/tools/notebook-tools', () => {
   describe('getNotebookTools', () => {
-    it('should return list_notebooks and get_notebook tools', () => {
+    it('should return list_notebooks, get_notebook, and create_notebook tools', () => {
       const tools = getNotebookTools()
 
-      expect(Object.keys(tools)).toEqual(['list_notebooks', 'get_notebook'])
+      expect(Object.keys(tools)).toEqual(['list_notebooks', 'get_notebook', 'create_notebook'])
     })
 
     it('should not require approval to read notebooks', () => {
@@ -40,6 +58,12 @@ describe('ai/tools/notebook-tools', () => {
 
       expect(tools.list_notebooks.needsApproval).toBeUndefined()
       expect(tools.get_notebook.needsApproval).toBeUndefined()
+    })
+
+    it('should require approval to create a notebook', () => {
+      const tools = getNotebookTools()
+
+      expect(tools.create_notebook.needsApproval).toBe(true)
     })
   })
 
@@ -205,6 +229,97 @@ describe('ai/tools/notebook-tools', () => {
       await expect(
         tools.get_notebook.execute({ id: 'missing' }, { toolCallId: 'test', messages: [] })
       ).rejects.toThrow()
+    })
+  })
+
+  describe('create_notebook', () => {
+    it('should reject content whose cells carry an agent-supplied id', () => {
+      const tools = getNotebookTools()
+      const schema = tools.create_notebook.inputSchema
+
+      if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
+
+      const result = schema.safeParse({
+        name: 'Signup funnel',
+        content: {
+          schema_version: 1,
+          cells: [{ _tag: 'markdown_cell', id: 'cell-1', text: '# Signup funnel' }],
+        },
+      })
+
+      expect(result.success).toBe(false)
+    })
+
+    it('should accept a valid id-less notebook with all three cell types', () => {
+      const tools = getNotebookTools()
+      const schema = tools.create_notebook.inputSchema
+
+      if (!('safeParse' in schema)) throw new Error('inputSchema has no safeParse')
+
+      const result = schema.safeParse({
+        name: 'Signup funnel',
+        description: 'Tracks signups over time',
+        content: VALID_AGENT_CONTENT,
+      })
+
+      expect(result.success).toBe(true)
+    })
+
+    it('should PUT a notebook with promoted SQL and no cell ids', async () => {
+      let sentBody: Record<string, unknown> | undefined
+      addAPIMock({
+        method: 'put',
+        path: '/platform/projects/:ref/content',
+        response: async ({ request }) => {
+          sentBody = (await request.json()) as Record<string, unknown>
+          return new HttpResponse(null)
+        },
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.create_notebook.execute) throw new Error('execute is undefined')
+
+      await tools.create_notebook.execute(
+        { name: 'Signup funnel', content: VALID_AGENT_CONTENT },
+        { toolCallId: 'test', messages: [] }
+      )
+
+      expect(sentBody?.type).toBe('notebook')
+      expect(sentBody?.visibility).toBe('project')
+
+      const content = sentBody?.content as { cells: Array<Record<string, unknown>> }
+      for (const cell of content.cells) {
+        expect(cell).not.toHaveProperty('id')
+      }
+
+      const [, databaseCell, logCell] = content.cells
+      expect(databaseCell.sql).toBe('select * from auth.users limit 100')
+      expect(logCell.sql).toBe(
+        "select timestamp, event_message from edge_logs where source = 'edge_logs' limit 10"
+      )
+    })
+
+    it('should return the id it generated and sent, since a successful create response has no body', async () => {
+      let sentBody: Record<string, unknown> | undefined
+      addAPIMock({
+        method: 'put',
+        path: '/platform/projects/:ref/content',
+        response: async ({ request }) => {
+          sentBody = (await request.json()) as Record<string, unknown>
+          return new HttpResponse(null)
+        },
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.create_notebook.execute) throw new Error('execute is undefined')
+
+      const result = await tools.create_notebook.execute(
+        { name: 'Signup funnel', content: VALID_AGENT_CONTENT },
+        { toolCallId: 'test', messages: [] }
+      )
+
+      expect(typeof sentBody?.id).toBe('string')
+      expect(result).toEqual({ id: sentBody?.id, name: 'Signup funnel' })
     })
   })
 })
