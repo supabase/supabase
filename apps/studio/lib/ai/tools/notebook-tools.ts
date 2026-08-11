@@ -20,6 +20,14 @@ import { createNotebook, updateNotebook } from '@/data/content/notebooks/noteboo
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import type { Notebooks } from '@/types'
 
+// Converts a domain cell's branded `unchecked_sql` to the wire schema's plain `sql: string`
+// (CellWire.sql carries no brand — see notebook-schema.ts). This intentionally discards the
+// UntrustedSqlFragment marker, so the result must never be persisted or executed as-is:
+//   - get_notebook returns it to the agent for display only.
+//   - update_notebook feeds it through applyNotebookOperations (pure data manipulation, no
+//     execution), then re-promotes every cell via acceptUntrustedSql/acceptUntrustedLogsSql
+//     inline in its own execute — that inline promotion, gated by that tool's own
+//     `needsApproval: true`, is the only place user approval for this SQL is granted.
 function toWireCell(cell: Notebooks.Content['cells'][number]): CellWire {
   switch (cell._tag) {
     case 'markdown_cell':
