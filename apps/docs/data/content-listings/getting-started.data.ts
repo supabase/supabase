@@ -84,6 +84,14 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.',
     },
     {
+      title: 'Astro',
+      href: '/guides/getting-started/quickstarts/astrojs',
+      icon: '/docs/img/icons/astro-icon',
+      hasLightIcon: true,
+      description:
+        'Learn how to create a Supabase project, add sample data, and query from an Astro app.',
+    },
+    {
       title: 'Hono',
       href: '/guides/getting-started/quickstarts/hono',
       icon: '/docs/img/icons/hono-icon',
@@ -98,6 +106,14 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
+    },
+    {
+      title: 'Expo React Native',
+      href: '/guides/getting-started/quickstarts/expo-react-native',
+      icon: '/docs/img/icons/expo-icon',
+      hasLightIcon: true,
+      description:
+        'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Expo app.',
     },
     {
       title: 'Flutter',
@@ -165,6 +181,30 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Refine app.',
+    },
+    {
+      title: 'Python',
+      href: '/guides/getting-started/quickstarts/flask',
+      icon: '/docs/img/icons/python-icon',
+      hasLightIcon: false,
+      description:
+        'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Python app.',
+    },
+    {
+      title: 'Laravel',
+      href: '/guides/getting-started/quickstarts/laravel',
+      icon: '/docs/img/icons/laravel-icon',
+      hasLightIcon: false,
+      description:
+        'Learn how to create a PHP Laravel project, connect it to your Supabase Postgres database, and configure user authentication.',
+    },
+    {
+      title: 'Ruby on Rails',
+      href: '/guides/getting-started/quickstarts/ruby-on-rails',
+      icon: '/docs/img/icons/rails-icon',
+      hasLightIcon: false,
+      description:
+        'Learn how to create a Rails project and connect it to your Supabase Postgres database.',
     },
   ],
 }

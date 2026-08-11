@@ -10,6 +10,12 @@ breadcrumb: 'Framework Quickstarts'
 
 Save your database password securely. You need it for the connection string.
 
+<Admonition type="note">
+
+This quickstart uses Prisma migrations against your Postgres database. Use a **dedicated Supabase project** (or an empty database) so Prisma does not try to reconcile tables created by other apps or quickstarts.
+
+</Admonition>
+
 ## 2. Gather database connection strings
 
 Open the project [**Connect** panel](/dashboard/project/_?showConnect=true&connectTab=direct). This quickstart connects using the [**Transaction pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=transaction) and [**Session pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=session) mode. Transaction mode is used for application queries and Session mode is used for running migrations with Prisma.
@@ -18,7 +24,7 @@ To do this, set the connection mode to `Transaction` in the [Database Settings p
 
 To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
 
-You will need the Transaction mode connection string and the Session mode connection string to set up environment variables in Step 6.
+You will need the Transaction mode connection string and the Session mode connection string to set up environment variables in Step 5.
 
 <Admonition type="note">
 
@@ -34,31 +40,21 @@ Create a RedwoodJS app with TypeScript.
 
 The [`yarn` package manager](https://yarnpkg.com) is required to create a RedwoodJS app. You will use it to run RedwoodJS commands later.
 
-While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` flag.
+While TypeScript is recommended, if you want a JavaScript app, omit the `--ts` flag.
+
+RedwoodJS 8.x officially supports Node `20.x`. On Node 22 or later, `create-redwood-app` may prompt you to override the version check — select **Override error and continue install**, or switch to Node 20 with a version manager such as [`nvm`](https://github.com/nvm-sh/nvm).
 
 </Admonition>
 
 ```bash
-yarn create redwood-app my-app --ts
+yarn create redwood-app my-app --ts --git-init false
 ```
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+<$Partial path="quickstart_ai_tooling.mdx" />
 
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
-
-## 5. Install MCP server (optional)
-
-The Supabase MCP server connects AI assistants to Supabase, allowing you to interact with your projects on your behalf. Find out more on how to add it to your client in [the MCP docs](/docs/guides/ai-tools/mcp).
-
-## 6. Configure environment variables
+## 5. Configure environment variables
 
 In your `.env` file, add the following environment variables for your database connection:
 
@@ -68,17 +64,17 @@ In your `.env` file, add the following environment variables for your database c
 
 ```bash name=.env
 # Transaction mode connection string — used by Prisma Client for app queries
-DATABASE_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+DATABASE_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres?pgbouncer=true&connection_limit=1"
 
 # Session mode connection string — used by Prisma Migrate
-DIRECT_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-[REGION].pooler.supabase.com:5432/postgres"
+DIRECT_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres"
 ```
 
-## 7. Update your Prisma schema
+## 6. Update your Prisma schema
 
 By default, RedwoodJS ships with a SQLite database, but we want to use Postgres.
 
-Update your Prisma schema file `api/db/schema.prisma` to use your Supabase Postgres database connection environment variables you set up in Step 6.
+Update your Prisma schema file `api/db/schema.prisma` to use your Supabase Postgres database connection environment variables you set up in Step 5.
 
 ```prisma name=api/db/schema.prisma
 datasource db {
@@ -88,9 +84,15 @@ datasource db {
 }
 ```
 
-## 8. Create the instrument model and apply a schema migration
+## 7. Create the instrument model and apply a schema migration
 
 Create the Instrument model in `api/db/schema.prisma` and then run `yarn rw prisma migrate dev` from your terminal to apply the migration.
+
+<Admonition type="note">
+
+`yarn rw prisma migrate dev` requires an interactive terminal. It prompts for a migration name and cannot run in fully non-interactive CI shells.
+
+</Admonition>
 
 ```prisma name=api/db/schema.prisma
 model Instrument {
@@ -99,7 +101,7 @@ model Instrument {
 }
 ```
 
-## 9. Update seed script
+## 8. Update seed script
 
 Seed the database with a few instruments.
 
@@ -128,7 +130,7 @@ export default async () => {
 }
 ```
 
-## 10. Seed your database
+## 9. Seed your database
 
 Run the seed database command to populate the `Instrument` table with the instruments you created.
 
@@ -142,7 +144,7 @@ The reset database command `yarn rw prisma db reset` recreates the tables and al
 yarn rw prisma db seed
 ```
 
-## 11. Scaffold the instrument UI
+## 10. Scaffold the instrument UI
 
 Use RedwoodJS generators to scaffold a CRUD UI for the `Instrument` model.
 
@@ -150,15 +152,17 @@ Use RedwoodJS generators to scaffold a CRUD UI for the `Instrument` model.
 yarn rw g scaffold instrument
 ```
 
-## 12. Start the app
+## 11. Start the app
 
 Start the app via `yarn rw dev`. A browser will open to the RedwoodJS Splash page.
 
-## 13. View instruments UI
+## 12. View instruments UI
 
 Click on `/instruments` to visit http://localhost:8910/instruments where should see the list of instruments.
 
 You may now edit, delete, and add new instruments using the scaffolded UI.
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

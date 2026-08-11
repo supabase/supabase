@@ -1,0 +1,19 @@
+Navigate to your project dashboard and click on [Connect](/dashboard/project/_?showConnect=true&connectTab=direct&method=session).
+
+<Admonition type="caution">
+
+Don't use the **Transaction pooler** (port `6543`) as your app's main data source — most ORMs, including this framework's, rely on server-side prepared statements, which the Transaction pooler doesn't support. Use the **Session pooler** (port `5432`), or the direct connection string if you're in an [IPv6 environment](/docs/guides/troubleshooting/supabase--your-network-ipv4-and-ipv6-compatibility-cHe3BP) or have the [IPv4 Add-On](/docs/guides/platform/ipv4-address).
+
+</Admonition>
+
+Look for the **Session pooler** connection string and copy it. Replace the password placeholder with your saved database password, and [percent-encode](https://en.wikipedia.org/wiki/Percent-encoding) any reserved characters it contains, such as `&`, `#`, `?`, or a space.
+
+The connection strings below show the format only. Take the host, port, and username from the string you copied rather than typing the bracketed placeholders literally.
+
+<Admonition type="note">
+
+You can reset your database password in your [Database Settings](/dashboard/project/_/database/settings) if you do not have it.
+
+</Admonition>
+
+Set `sslmode=require` — either on the connection string itself, or as an explicit config option if your framework sets it separately. Most drivers default to `prefer`, which falls back to sending your data in plaintext if the encrypted attempt fails. You can also [enforce SSL](/docs/guides/platform/ssl-enforcement) on the database side.

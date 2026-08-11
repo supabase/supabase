@@ -12,27 +12,29 @@ breadcrumb: 'Framework Quickstarts'
 
 Select the **Android Studio > New > New Android Project** menu item.
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install dependencies
 
 Open `build.gradle.kts` (app) file and add the serialization plugin, Ktor client, and Supabase client.
 
-Replace the version placeholders `$kotlin_version` with the Kotlin version of the project, and `$supabase_version` and `$ktor_version` with the respective latest versions.
+Replace the version placeholders `$kotlin_version` with the Kotlin version of the project, and `$supabase_version` and `$ktor_version` with the respective latest versions. For example, Kotlin `2.2.21`, supabase-kt BOM `3.5.0`, and Ktor `3.0.3`.
 
 <Admonition type="note">
 
-You can find the latest supabase-kt version [on GitHub](https://github.com/supabase-community/supabase-kt/releases) and Ktor [in the Ktor documentation](https://ktor.io/docs/welcome.html).
+If your project uses Kotlin 2.0 or newer with Jetpack Compose, also apply the Compose compiler plugin in your root `build.gradle.kts` and app module:
+
+```kotlin
+id("org.jetbrains.kotlin.plugin.compose") version "$kotlin_version" apply false
+```
+
+</Admonition>
+
+<Admonition type="note">
+
+You can find the latest supabase-kt version [on GitHub](https://github.com/supabase-community/supabase-kt/releases) and Ktor [in the Ktor documentation](https://ktor.io/docs/welcome.html). Match your Kotlin version to the supabase-kt release requirements.
 
 </Admonition>
 
@@ -75,11 +77,12 @@ Replace the `supabaseUrl` and `supabaseKey` with your own, which you can get fro
 </Button>
 
 ```kotlin
+import io.github.jan.supabase.postgrest.from
 import ...
 
 val supabase = createSupabaseClient(
-    supabaseUrl = "https://xyzcompany.supabase.co",
-    supabaseKey = "your_publishable_key"
+    supabaseUrl = "YOUR_SUPABASE_URL",
+    supabaseKey = "YOUR_SUPABASE_PUBLISHABLE_KEY"
   ) {
     install(Postgrest)
 }
@@ -88,6 +91,8 @@ val supabase = createSupabaseClient(
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
+<$Partial path="quickstart_mobile_env_note.mdx" />
+
 ## 8. Create a data model for instruments
 
 Create a serializable data class to represent the data from the database.
@@ -95,6 +100,8 @@ Create a serializable data class to represent the data from the database.
 Add the following below the `createSupabaseClient` function in the `MainActivity.kt` file.
 
 ```kotlin
+import kotlinx.serialization.Serializable
+
 @Serializable
 data class Instrument(
     val id: Int,
@@ -114,19 +121,23 @@ This example application makes a network request from the UI code. In production
 
 </Admonition>
 
+<Admonition type="note">
+
+This snippet omits the app-specific theme wrapper that Android Studio generates (named after your project, e.g. `<YourAppName>Theme`), so it compiles regardless of what you named your project. Wrap the `Surface` in your generated theme composable from `ui/theme/Theme.kt` if you want your project's Material theme applied.
+
+</Admonition>
+
 ```kotlin
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            SupabaseTutorialTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    InstrumentsList()
-                }
+            // A surface container using the 'background' color from the theme
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                InstrumentsList()
             }
         }
     }
@@ -135,11 +146,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun InstrumentsList() {
     var instruments by remember { mutableStateOf<List<Instrument>>(listOf()) }
+    var error by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
-            instruments = supabase.from("instruments")
-                              .select().decodeList<Instrument>()
+            try {
+                instruments = supabase.from("instruments")
+                                  .select().decodeList<Instrument>()
+            } catch (e: Exception) {
+                error = e.message
+            }
         }
+    }
+    if (error != null) {
+        Text(
+            "Error loading instruments: $error",
+            modifier = Modifier.padding(8.dp),
+        )
+        return
     }
     LazyColumn {
         items(
@@ -158,6 +181,8 @@ fun InstrumentsList() {
 ## 10. Start the app
 
 Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 
