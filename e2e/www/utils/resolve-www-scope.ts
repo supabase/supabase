@@ -42,7 +42,15 @@ export function changedFileToPagePath(filePath: string): string | null {
 }
 
 async function isPageBuilt(absolutePath: string): Promise<boolean> {
-  const source = await readFile(absolutePath, 'utf8').catch(() => '')
+  let source: string
+  try {
+    source = await readFile(absolutePath, 'utf8')
+  } catch (error) {
+    // A deleted page has no route to test; anything else is a real failure.
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false
+    throw error
+  }
+
   const frontmatter = FRONTMATTER_RE.exec(source)?.[1]
   return !frontmatter || !DISABLE_PAGE_BUILD_RE.test(frontmatter)
 }
