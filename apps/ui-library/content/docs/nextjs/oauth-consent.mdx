@@ -34,6 +34,8 @@ router.push(next?.startsWith('/') && !next.startsWith('//') ? next : '/protected
 
 Set the `productName` prop to replace the `Your product` placeholder in the consent header.
 
+Your middleware must let unauthenticated requests reach `/oauth/consent`. The middleware in `lib/supabase/middleware.ts` skips any path starting with `/oauth`. Middleware that redirects to a login page before the consent route runs drops the authorization and ends the OAuth flow at your login screen.
+
 ### Getting started
 
 After installing the block, you'll have the following environment variables in your `.env.local` file:
@@ -48,7 +50,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
 ### Configure the OAuth server
 
-Enable the OAuth server in the Supabase Dashboard under **Authentication** > **OAuth Server**, then set its authorization URL path to `/oauth/consent`. For local development, add the following to `supabase/config.toml`:
+Enable the OAuth server in the Supabase Dashboard under **Authentication** > **OAuth Server**, then set its authorization URL path to `/oauth/consent`. For local development, set the following in `supabase/config.toml`:
 
 ```toml
 [auth.oauth_server]
@@ -56,7 +58,7 @@ enabled = true
 authorization_url_path = "/oauth/consent"
 ```
 
-Merge this section into an existing `supabase/config.toml`; do not replace the file.
+Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false`. Edit that section rather than adding a second one, which fails with `table oauth_server already exists`.
 
 The route expects the `authorization_id` query parameter that Supabase Auth supplies during the authorization flow.
 

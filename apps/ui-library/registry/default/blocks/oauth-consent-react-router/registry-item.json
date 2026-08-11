@@ -3,7 +3,7 @@
   "type": "registry:block",
   "title": "OAuth Consent for React Router",
   "description": "OAuth 2.1 consent screen and route for an existing authenticated application.",
-  "docs": "After installation, merge the following into `supabase/config.toml`; do not replace an existing file:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```",
+  "docs": "After installation, set the following in `supabase/config.toml`. Recent CLI versions already write an `[auth.oauth_server]` section with `enabled = false` \u2014 edit that section rather than adding a second one:\n\n```toml\n[auth.oauth_server]\nenabled = true\nauthorization_url_path = \"/oauth/consent\"\n```",
   "registryDependencies": ["button", "card"],
   "files": [
     {
