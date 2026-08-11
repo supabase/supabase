@@ -114,14 +114,14 @@ If your application is slow or hanging, the cause is usually visible right now i
 
 The `state` column on `pg_stat_activity` can be one of six values:
 
-| State                           | Meaning                                                                                                                                                                                                                 |
-| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `active`                        | The session is currently executing a query. A query running longer than expected is worth investigating, but a nonzero count of active sessions is normal on its own.                                                   |
-| `idle`                          | The session is connected and waiting for the client to send a new command. Normal for pooled or long-lived connections.                                                                                                 |
-| `idle in transaction`           | The session has an open transaction but isn't currently running a query. This holds locks and blocks table cleanup for as long as it stays open, and almost always means the application forgot to commit or roll back. |
-| `idle in transaction (aborted)` | The last statement in the transaction failed, and the client hasn't sent a rollback yet. The session is stuck holding its locks until it does.                                                                          |
-| `fastpath function call`        | The session is executing a function through Postgres's low-level fastpath protocol, most commonly for large object reads or writes. Rare, and normally brief.                                                           |
-| `disabled`                      | Activity tracking (`track_activities`) is turned off for this session, so Postgres isn't recording its state or query.                                                                                                  |
+| State                           | Meaning                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `active`                        | The session is currently executing a query. A query running longer than expected is worth investigating, but a nonzero count of active sessions is normal on its own.                                                                                                                                                                                                                                  |
+| `idle`                          | The session is connected and waiting for the client to send a new command. Normal for pooled or long-lived connections.                                                                                                                                                                                                                                                                                |
+| `idle in transaction`           | The session has an open transaction but isn't currently running a query. This holds locks and blocks table cleanup for as long as it stays open, and almost always means the application forgot to commit or roll back.                                                                                                                                                                                |
+| `idle in transaction (aborted)` | The last statement in the transaction failed. Postgres releases the transaction's ordinary locks as part of the abort - the exception is session-level advisory locks (`pg_advisory_lock`, not `pg_advisory_xact_lock`), which are held until explicitly unlocked or the session ends. The client still needs to send `rollback` to close the transaction before the session will accept new commands. |
+| `fastpath function call`        | The session is executing a function through Postgres's low-level fastpath protocol, most commonly for large object reads or writes. Rare, and normally brief.                                                                                                                                                                                                                                          |
+| `disabled`                      | Activity tracking (`track_activities`) is turned off for this session, so Postgres isn't recording its state or query.                                                                                                                                                                                                                                                                                 |
 
 `idle in transaction` is the state most worth watching. Unlike a slow `active` query, which is at least making progress, an idle-in-transaction session is holding its locks indefinitely while doing nothing.
 
@@ -150,7 +150,7 @@ where
 order by a.query_start asc nulls last;
 ```
 
-The `where` clause excludes the query's own session and Postgres's internal background workers (autovacuum, the WAL writer, extensions like `pg_cron`), so the results only show sessions a client actually opened.
+The `where` clause excludes the query's own session and Postgres's internal background workers (autovacuum, the WAL writer, extensions like `pg_cron`), so the results only show sessions a client opened.
 
 `blocked_by` is an array, not a single value, for two reasons:
 
@@ -167,7 +167,8 @@ Postgres gives you two ways to stop a session, and they behave differently:
 Which one to use depends on the session's state:
 
 - For an `active` session that's stuck waiting on a lock or running longer than expected, cancel it first. It's the less disruptive option, and it's usually enough to unstick the wait or stop the runaway query.
-- For a session that's `idle in transaction` or `idle in transaction (aborted)`, cancelling does nothing - there's no running query to cancel, and the open transaction stays open regardless. Terminating the session is the only way to force the transaction closed and release its locks.
+- For a session that's `idle in transaction`, cancelling does nothing - there's no running query to cancel, and the open transaction stays open regardless. Terminating the session is the only way to force the transaction closed and release its locks.
+- For a session that's `idle in transaction (aborted)`, its ordinary locks were already released when the transaction aborted. The correct fix is for the client to issue `rollback`, which closes the transaction cleanly. Reserve `pg_terminate_backend` for a client that's unresponsive or a connection that needs to close regardless - it won't release anything further in this case, aside from a session-level advisory lock, which persists until the session ends.
 
 Both functions require you to either be a superuser, hold the `pg_signal_backend` role, or be signalling your own session - and even `pg_signal_backend` can't be used to stop a session belonging to an actual superuser role. If you hit a permission error while terminating a session, see [this troubleshooting guide](/docs/guides/troubleshooting/high-cpu-and-slow-queries-with-error-must-be-a-superuser-to-terminate-superuser-process).
 
