@@ -58,6 +58,33 @@ export const ResourceWarningsTab = () => {
   // the Warnings tab.
   const hasOverridesRef = useRef(false)
 
+  // Holds the exact array written into both caches, so the re-apply below can tell its own
+  // writes apart from a background refetch and avoid looping on its own updates.
+  const appliedWarningsRef = useRef<ResourceWarning[] | null>(null)
+
+  // Resource warnings poll in the background, so a refetch would replace the injected warnings
+  // with real data while the toolbar is still open.
+  useEffect(() => {
+    return queryClient.getQueryCache().subscribe((event) => {
+      const appliedWarnings = appliedWarningsRef.current
+      if (!hasOverridesRef.current || appliedWarnings === null) return
+      if (event.type !== 'updated' || event.action.type !== 'success') return
+
+      const [scope, resource] = event.query.queryKey
+      if (scope !== 'projects' || resource !== 'resource-warnings') return
+      if (event.query.state.data === appliedWarnings) return
+
+      const { ref: latestRef, orgSlug: latestOrgSlug } = latestValues.current
+      queryClient.setQueryData(usageKeys.resourceWarnings(undefined, latestRef), appliedWarnings)
+      if (latestOrgSlug) {
+        queryClient.setQueryData(
+          usageKeys.resourceWarnings(latestOrgSlug, undefined),
+          appliedWarnings
+        )
+      }
+    })
+  }, [queryClient])
+
   // Invalidate both cache keys on unmount so banners revert to real data
   // when the toolbar sheet closes (which unmounts this component).
   useEffect(() => {
@@ -96,6 +123,7 @@ export const ResourceWarningsTab = () => {
       setIsReadOnly(false)
       setOrgWarning('none')
       hasOverridesRef.current = false
+      appliedWarningsRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
@@ -120,8 +148,10 @@ export const ResourceWarningsTab = () => {
     }
     // Write to both cache keys: ref-based (ResourceExhaustionWarningBanner) and
     // slug-based (ProjectLayout, TopSection, ProjectList) consumers.
-    queryClient.setQueryData(usageKeys.resourceWarnings(undefined, ref), [mockWarning])
-    queryClient.setQueryData(usageKeys.resourceWarnings(orgSlug, undefined), [mockWarning])
+    const mockWarnings = [mockWarning]
+    appliedWarningsRef.current = mockWarnings
+    queryClient.setQueryData(usageKeys.resourceWarnings(undefined, ref), mockWarnings)
+    queryClient.setQueryData(usageKeys.resourceWarnings(orgSlug, undefined), mockWarnings)
 
     const effectiveOrgWarning = nextOrgWarnings ?? orgWarning
     const restrictionStatus: Organization['restriction_status'] =
@@ -189,6 +219,7 @@ export const ResourceWarningsTab = () => {
     setOrgWarning('none')
 
     hasOverridesRef.current = false
+    appliedWarningsRef.current = null
     queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(undefined, ref) })
     if (orgSlug) {
       queryClient.invalidateQueries({ queryKey: usageKeys.resourceWarnings(orgSlug, undefined) })

@@ -12,6 +12,12 @@ export type ResourceWarningsVariables = {
   slug?: string
 }
 
+/**
+ * Resource warnings drive outage banners, so they need to surface a problem that starts
+ * after page load rather than sitting on an hour-old cache.
+ */
+export const RESOURCE_WARNINGS_POLL_INTERVAL = 1000 * 60
+
 export async function getResourceWarnings(
   variables?: ResourceWarningsVariables,
   signal?: AbortSignal
@@ -46,6 +52,7 @@ export const useResourceWarningsQuery = <TData = ResourceWarningsData>(
     queryFn: ({ signal }) => getResourceWarnings(variables, signal),
     enabled:
       IS_PLATFORM && enabled && (variables.ref !== undefined || variables.slug !== undefined),
-    staleTime: 1000 * 60 * 60,
+    staleTime: RESOURCE_WARNINGS_POLL_INTERVAL,
+    refetchInterval: RESOURCE_WARNINGS_POLL_INTERVAL,
     ...options,
   })
