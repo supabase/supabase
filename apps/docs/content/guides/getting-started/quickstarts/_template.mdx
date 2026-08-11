@@ -91,13 +91,17 @@ The numbered items below match the step numbers in the guides' own headings.
    permission.
 10. **Next steps** — canonical order: framework-specific Auth pointer (or the
     generic `Set up [Auth](/docs/guides/auth) for your app` if there's no
-    framework-specific one) → Insert more data → Storage → UI Library (`/ui`).
-    - Only link `/ui` from a framework the UI Library actually ships blocks for.
+    framework-specific one) → Insert more data → Storage → Supabase Library (`/ui`).
+    - Only link `/ui` from a framework Supabase Library actually ships blocks for.
       The supported list is `supportedFrameworks` in
       `apps/ui-library/config/docs.ts`, currently Next.js, Nuxt, React, React
       Router, TanStack, and Vue. Check it rather than assuming — Astro, SolidJS,
       and SvelteKit are **not** supported, so those guides omit the link even
       though they render a component-based frontend.
+    - `/ui` and `/ui/docs/*` are permanent redirects to `/library` and
+      `/library/docs/*`. Existing guides still link `/ui`; point new links at
+      `/library` directly, and use `/library/docs/<framework>/<block>` for
+      individual blocks.
     - Also omit it from mobile-native and backend-only guides, and from RedwoodJS
       and Refine, which ship their own component and Inferencer story.
 
