@@ -195,33 +195,26 @@
   --accent-foreground: var(--foreground);
 
   /*
-   * Control surface roles (local relative to whatever plate they sit on):
+   * Control surface roles (design sync: sunk fields + raised choosers):
    *   --field          sunk text entry (Input, Textarea, filled MultiSelect)
    *   --control-raised raised chooser plate (Select, empty MultiSelect)
-   *   --control        alias of --control-raised (Saxon's "one elevated control")
+   *   --control        alias of --control-raised
    *
-   * Alpha overlays, not solids from --background. Solids are page-relative, so a
-   * control at card (e1) on a Sheet (popover / e2) sits *between* page and sheet
-   * (reads as accidental sink on dark, vanishes into the sheet near the light
-   * ceiling). Black/white alpha always darkens/lightens the *local* plate.
+   * Alpha overlays relative to the local plate (page, sheet, card) — not solids
+   * from --background. Page-relative solids sit between canvas (e0) and Sheet
+   * (popover e2) and vanish on light near the white ceiling.
    *
-   * Light caveat: the canvas sits near L≈1 (--surface 0.995), so white raises
-   * have little headroom on sheets. Sunk wells still read; raises lean on
-   * border-strong / border-control-hover more than fill. Widening light
-   * headroom would mean retuning --surface (design-group territory).
+   * Field ≈ historic light-mode wash (foreground/[.026]): soft always-sink via
+   * black. Raised is a soft white lift so selects read button-like without the
+   * stark dark wells. Borders carry most hover chrome (--border-control-hover).
+   * Light raises still have little headroom on sheets; sheets matching app
+   * background would widen that later.
    *
-   * Opaque overlaying chrome (default Button fill) stays on --card / --popover
-   * so floating actions can occlude content (DEPR-636). Floating *clusters*
-   * may still prefer a solid Popover shell underneath.
-   *
-   * Borders: fields rest on border-control; raised / buttons on border-strong
-   * (both still alias --input via compat). Interactive step is
-   * --border-control-hover. Invalid fields parallel that ladder with
-   * destructive-400 → destructive.
+   * Default Button stays opaque card/popover for occluding chrome (DEPR-636).
+   * Floating clusters can wrap in a solid Popover as a follow-up.
    */
-  --elevation-field: 0.85;
-  --field: oklch(0 0 0 / calc(var(--muted-alpha) * var(--elevation-field)));
-  --control-raised: oklch(1 0 0 / var(--muted-alpha));
+  --field: oklch(0 0 0 / 0.026);
+  --control-raised: oklch(1 0 0 / calc(var(--muted-alpha) * 0.65));
   --control: var(--control-raised);
 
   --warning: oklch(var(--warning-lightness) var(--expressive-chroma) var(--warning-hue));
