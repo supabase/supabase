@@ -1,27 +1,26 @@
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
-import { Badge, cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
+import { cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { TOKEN_DENIED_REMEDIATION } from '../AccessToken.constants'
 import {
   computeOverallRisk,
-  PERMISSION_CATALOG_BY_CATEGORY,
+  PERMISSION_MODE_LABEL,
   scopesToSelection,
-  type OverallRisk,
-  type PermissionCatalogEntry,
-  type PermissionMode,
   type ResourceAccessMode,
-  type RiskLevel,
 } from '../AccessToken.permissions'
+import { useCapabilitySummary } from '../hooks/useCapabilitySummary'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
+import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
+import { McpUnsupportedWarning } from './McpUnsupportedWarning'
+import { CapabilityCategoryList, ResourceSummaryItem, RiskLevelSummary } from './TokenSummaryRows'
 import { DocsButton } from '@/components/ui/DocsButton'
-import {
-  getEnabledEndpointsForCapability,
-  getEnabledMcpTools,
-  useGetEnabledEndpointsForCapability,
-} from '@/data/scoped-access-tokens/permission-scope-map-query'
+import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
 import { DOCS_URL } from '@/lib/constants'
+import { pluralize } from '@/lib/helpers'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -29,33 +28,15 @@ interface ViewTokenSheetProps {
   onClose: () => void
 }
 
-const RISK_TONE_VARIANT: Record<
-  OverallRisk['tone'],
-  'default' | 'success' | 'warning' | 'destructive'
-> = {
-  default: 'default',
-  low: 'success',
-  medium: 'warning',
-  high: 'destructive',
-}
-
-const RISK_DOT_CLASS: Record<RiskLevel, string> = {
-  low: 'bg-brand-600',
-  medium: 'bg-warning-600',
-  high: 'bg-destructive-600',
-}
-
-const modeLabel = (mode: PermissionMode) =>
-  mode === 'readwrite' ? 'Read-write' : mode === 'read' ? 'Read' : 'None'
-
 const SCOPE_TO_RESOURCE_ACCESS: Record<'user' | 'organization' | 'project', ResourceAccessMode> = {
   user: 'account',
   organization: 'organization',
   project: 'project',
 }
 
+const EMPTY_BINDINGS: string[] = []
+
 export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProps) {
-  const { organizations, projects } = useOrgAndProjectData()
   const { data: permissionScopeMap } = useGetEnabledEndpointsForCapability()
 
   const {
@@ -71,72 +52,114 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     }
   )
 
+  // The sheet stays mounted (hidden) on the tokens page; don't fetch org/project data until it's
+  // actually opened on a token.
+  const { organizations, projects } = useOrgAndProjectData({ enabled: visible && !!token })
+
   const resourceAccess = token ? SCOPE_TO_RESOURCE_ACCESS[token.scope] : 'project'
   const grantedScopes = useMemo(() => token?.permissions ?? [], [token?.permissions])
 
   const selection = useMemo(() => scopesToSelection(grantedScopes), [grantedScopes])
 
+  const tokenOrganizationSlugs = token?.organization_slugs ?? EMPTY_BINDINGS
+  const tokenProjectRefs = token?.project_refs ?? EMPTY_BINDINGS
+
+  const access = useTokenAccessEvaluation({
+    selection,
+    resourceAccess,
+    organizationSlugs: tokenOrganizationSlugs,
+    projectRefs: tokenProjectRefs,
+    enabled: visible && !!token,
+  })
+  const hasExceedingCapabilities = access.exceedingEntryKeys.length > 0
+
+  // Deleting a project/org erases the token's binding to it, so a resource-scoped token with no
+  // bindings left means everything it was bound to has been deleted.
+  const hasNoBoundResources = token !== undefined && access.hasNoBoundResources
+
+  const resourceNoun = resourceAccess === 'organization' ? 'organization' : 'project'
+  // Deleted bindings are erased from the token, so the original count is unknowable — the
+  // phrasing has to work for any number of resources.
+  const boundResourcesDeletedText = `Every ${resourceNoun} this token was bound to has been deleted`
+
   const risk = useMemo(
-    () => computeOverallRisk(selection, resourceAccess),
-    [selection, resourceAccess]
+    () => computeOverallRisk(access.effectiveSelection, resourceAccess),
+    [access.effectiveSelection, resourceAccess]
   )
 
-  const activeByCategory = useMemo(
-    () =>
-      PERMISSION_CATALOG_BY_CATEGORY.map((category) => ({
-        ...category,
-        entries: category.entries
-          .map((entry) => ({ entry, mode: selection[entry.key] ?? 'none' }))
-          .filter(({ mode }) => mode !== 'none'),
-      })).filter((category) => category.entries.length > 0),
-    [selection]
-  )
   const hasCapabilities = grantedScopes.length > 0
 
-  const mcpTools = useMemo(
-    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }),
-    [grantedScopes, permissionScopeMap]
-  )
+  const { activeByCategory, mcpTools, capabilityGroups } = useCapabilitySummary({
+    selection,
+    grantedScopes,
+    permissionScopeMap,
+  })
 
-  const capabilityGroups = useMemo(() => {
-    const groups: { entry: PermissionCatalogEntry; mode: PermissionMode; endpoints: string[][] }[] =
-      []
-    for (const category of activeByCategory) {
-      for (const { entry, mode } of category.entries) {
-        const capabilityScopes =
-          mode === 'readwrite' ? [...entry.readScopes, ...entry.writeScopes] : entry.readScopes
-        const endpoints = getEnabledEndpointsForCapability({
-          capabilityScopes,
-          allGrantedScopes: grantedScopes,
-          permissionScopeMap,
-        })
-        if (endpoints.length > 0) {
-          groups.push({ entry, mode, endpoints: endpoints.map((e) => [e.method, e.path]) })
-        }
-      }
-    }
-    return groups
-  }, [activeByCategory, grantedScopes, permissionScopeMap])
-
+  // Accessible resources render with their name and ref/slug. Resources the user has lost access
+  // to are aggregated into an anonymous count — their identifiers aren't shown.
   const resourceSummary = useMemo(() => {
+    const inaccessibleCountItem = (lostCount: number, noun: string) =>
+      lostCount === 0
+        ? []
+        : [
+            {
+              key: 'inaccessible',
+              label: `${lostCount} ${pluralize(lostCount, noun)}`,
+              sublabel: undefined,
+              isInaccessible: true,
+            },
+          ]
+
     if (resourceAccess === 'project') {
-      const selectedProjects = projects.filter((p) => (token?.project_refs ?? []).includes(p.ref))
+      const projectsByRef = new Map(projects.map((project) => [project.ref, project]))
+      const accessible = tokenProjectRefs.flatMap((ref) => {
+        const name = projectsByRef.get(ref)?.name
+        if (name === undefined) return []
+        return [{ key: ref, label: name, sublabel: ref, isInaccessible: false }]
+      })
       return {
-        title: 'Project',
-        items: selectedProjects.length > 0 ? selectedProjects.map((p) => p.name) : ['-'],
+        title: 'Projects',
+        items: [
+          ...accessible,
+          ...inaccessibleCountItem(access.inaccessibleProjectRefs.length, 'project'),
+        ],
       }
     }
     if (resourceAccess === 'organization') {
-      const selectedOrganizations = organizations.filter((o) =>
-        (token?.organization_slugs ?? []).includes(o.slug)
-      )
+      const organizationsBySlug = new Map(organizations.map((org) => [org.slug, org]))
+      const accessible = tokenOrganizationSlugs.flatMap((slug) => {
+        const name = organizationsBySlug.get(slug)?.name
+        if (name === undefined) return []
+        return [{ key: slug, label: name, sublabel: slug, isInaccessible: false }]
+      })
       return {
-        title: 'Organization',
-        items: selectedOrganizations.length > 0 ? selectedOrganizations.map((o) => o.name) : ['-'],
+        title: 'Organizations',
+        items: [
+          ...accessible,
+          ...inaccessibleCountItem(access.inaccessibleOrgSlugs.length, 'organization'),
+        ],
       }
     }
-    return { title: 'Account', items: ['Account-level access'] }
-  }, [resourceAccess, token, projects, organizations])
+    return {
+      title: 'Account',
+      items: [
+        {
+          key: 'account',
+          label: 'Account-level access',
+          sublabel: undefined,
+          isInaccessible: false,
+        },
+      ],
+    }
+  }, [
+    resourceAccess,
+    tokenProjectRefs,
+    tokenOrganizationSlugs,
+    projects,
+    organizations,
+    access.inaccessibleProjectRefs,
+    access.inaccessibleOrgSlugs,
+  ])
 
   const rows: [string, React.ReactNode][] = token
     ? [
@@ -183,10 +206,19 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
               {resourceSummary.title}
             </p>
             <div className="divide-y">
+              {resourceSummary.items.length === 0 && hasNoBoundResources && (
+                <p className="py-2 text-sm text-foreground-lighter">{boundResourcesDeletedText}</p>
+              )}
+              {resourceSummary.items.length === 0 && !hasNoBoundResources && (
+                <p className="py-2 text-sm text-foreground-lighter">-</p>
+              )}
               {resourceSummary.items.map((item) => (
-                <p key={item} className="py-2 text-sm text-foreground">
-                  {item}
-                </p>
+                <ResourceSummaryItem
+                  key={item.key}
+                  label={item.label}
+                  sublabel={item.sublabel}
+                  isInaccessible={item.isInaccessible}
+                />
               ))}
             </div>
           </div>,
@@ -194,50 +226,14 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         [
           'Capabilities',
           hasCapabilities ? (
-            <div className="space-y-4">
-              {activeByCategory.map((category) => (
-                <div key={category.key} className="space-y-2">
-                  <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-                    {category.name}
-                  </p>
-                  <div className="divide-y">
-                    {category.entries.map(({ entry, mode }) => (
-                      <div
-                        key={entry.key}
-                        className="flex items-center justify-between gap-2 text-sm py-2"
-                      >
-                        <span className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              'h-1.5 w-1.5 shrink-0 rounded-full',
-                              RISK_DOT_CLASS[entry.risk]
-                            )}
-                          />
-                          <span className="text-foreground text-wrap">{entry.name}</span>
-                        </span>
-                        <span className="text-foreground-lighter text-xs font-mono uppercase font-normal text-right">
-                          {modeLabel(mode)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <CapabilityCategoryList categories={activeByCategory} accessEntries={access.entries} />
           ) : (
             <span className="text-foreground-lighter">No capabilities selected</span>
           ),
         ],
         [
           'Risk level',
-          <span key="risk" className="flex flex-wrap items-center gap-2">
-            <span className="flex">
-              <Badge variant={RISK_TONE_VARIANT[risk.tone]}>{risk.level} Risk</Badge>
-            </span>
-            <span className="text-sm text-foreground leading-px">
-              {risk.text.replace(`${risk.level} — `, '')}
-            </span>
-          </span>,
+          <RiskLevelSummary key="risk" risk={risk} showRoleCaveat={hasExceedingCapabilities} />,
         ],
       ]
     : []
@@ -253,7 +249,18 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           <p className="truncate" title={`View access for ${token?.name}`}>
             View access for {token?.name}
           </p>
-          <DocsButton href={`${DOCS_URL}/reference/api/introduction`} />
+          <div className="flex items-center gap-2">
+            <DocsButton
+              href={`${DOCS_URL}/guides/platform/access-control`}
+              topic="Access control"
+              label="Access control docs"
+            />
+            <DocsButton
+              href={`${DOCS_URL}/reference/api/introduction`}
+              topic="Management API"
+              label="API docs"
+            />
+          </div>
         </SheetHeader>
         <ScrollArea className="flex-1">
           <div className="space-y-6 px-5 sm:px-6 py-6">
@@ -273,6 +280,27 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
             {token && (
               <>
+                {hasNoBoundResources && (
+                  <Admonition
+                    type="destructive"
+                    title="This token's resources no longer exist"
+                    description={`${boundResourcesDeletedText}. ${TOKEN_DENIED_REMEDIATION}`}
+                  />
+                )}
+                {access.hasNoAccessibleResource && (
+                  <Admonition
+                    type="destructive"
+                    title="This token no longer has access"
+                    description={`You were removed from the ${resourceNoun}s this token is bound to. ${TOKEN_DENIED_REMEDIATION}`}
+                  />
+                )}
+                {hasExceedingCapabilities && !access.hasNoAccessibleResource && (
+                  <Admonition
+                    type="warning"
+                    title="Some permissions exceed your current role for the selected resources"
+                    description="A token only works with permissions you currently hold. Permissions marked below will be denied until your role includes them."
+                  />
+                )}
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm">Token summary</h3>
                   <dl className="divide-y rounded-md border bg-surface-300">
@@ -299,7 +327,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                             <div className="flex items-center justify-between border-b bg-surface-100 px-3 py-2">
                               <span className="text-xs text-foreground">{entry.name}</span>
                               <span className="text-[11px] font-mono uppercase text-foreground-lighter">
-                                {mode === 'readwrite' ? 'Read-write' : 'Read'}
+                                {PERMISSION_MODE_LABEL[mode]}
                               </span>
                             </div>
                             <div className="divide-y">
@@ -322,6 +350,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
                     <div className="flex flex-col gap-3">
                       <h3 className="text-sm">MCP tools</h3>
+                      <McpUnsupportedWarning />
                       {mcpTools.length === 0 ? (
                         <p className="text-xs text-foreground-light">
                           No MCP tools are enabled by the selected capabilities.

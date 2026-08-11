@@ -26,7 +26,7 @@ export const useCreateNotebook = () => {
       visibility: 'project',
       favorite: false,
       content: {
-        schema_version: '1.0',
+        schema_version: 1,
         // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
         cells: [
           {

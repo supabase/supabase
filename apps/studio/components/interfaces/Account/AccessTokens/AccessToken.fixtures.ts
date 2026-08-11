@@ -1,3 +1,8 @@
+import { platformComponents as components } from 'api-types'
+import { HttpResponse } from 'msw'
+
+import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
+import { addAPIMock } from '@/tests/lib/msw'
 import type { Permission } from '@/types'
 
 /**
@@ -7,6 +12,10 @@ import type { Permission } from '@/types'
  * base role, per the ABAC default_permissions seeds (platform: middleware-db). Roles inherit
  * lower roles' rows. Keep the rows in lockstep with ROLE_PROBES in AccessToken.roles.ts.
  */
+
+type AccessControlPermission = components['schemas']['AccessControlPermission']
+type OrganizationResponse = components['schemas']['OrganizationResponse']
+type ProjectsResponse = components['schemas']['ListProjectsPaginatedResponse']
 
 /** Satisfies both Studio's `Permission` type and the API's `AccessControlPermission` row shape. */
 export type PermissionRowFixture = Permission & {
@@ -18,7 +27,9 @@ export const permissionRow = (
   organization_slug: string,
   actions: string[],
   resources: string[],
-  project_refs: string[] = []
+  // Org-wide rows serialize as [] or null on the wire (nullable in the API contract; the
+  // view-synthesized admin rows for auth.subject_roles/user_invites are null).
+  project_refs: string[] | null = []
 ): PermissionRowFixture => ({
   actions: actions as Permission['actions'],
   condition: null as unknown as Permission['condition'],
@@ -60,3 +71,52 @@ export const ownerRows = (slug: string, refs: string[] = []) => [
   permissionRow(slug, ['write:Update'], ['organizations'], refs),
   permissionRow(slug, ['write:Create', 'write:Delete'], ['auth.subject_roles'], refs),
 ]
+
+export const MOCK_ORG = { slug: 'acme-prod', name: 'Acme Production' }
+export const MOCK_PROJECT = { ref: 'project-1', name: 'Project 1' }
+
+/**
+ * Registers the GET mocks every scoped-token surface fires on mount: one organization
+ * ({@link MOCK_ORG}), one project ({@link MOCK_PROJECT}), and the permission scope map.
+ */
+export const mockScopedTokenEnvironment = () => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations',
+    response: () =>
+      HttpResponse.json<OrganizationResponse[]>([
+        createMockOrganizationResponse({ slug: MOCK_ORG.slug, name: MOCK_ORG.name }),
+      ]),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects',
+    response: () =>
+      HttpResponse.json<ProjectsResponse>({
+        pagination: { count: 1, limit: 100, offset: 0 },
+        projects: [
+          {
+            ...createMockProject({ id: 1, ref: MOCK_PROJECT.ref, name: MOCK_PROJECT.name }),
+            organization_slug: MOCK_ORG.slug,
+            preview_branch_refs: [],
+          },
+        ],
+      }),
+  })
+  addAPIMock({
+    method: 'get',
+    // @ts-expect-error Studio API is missing from types
+    path: '/scoped-access-token-permissions',
+    response: () => HttpResponse.json({ scopes: {}, endpoints: {}, mcp_tools: {} }),
+  })
+}
+
+export const mockPermissionsApi = (rows: PermissionRowFixture[]) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/profile/permissions',
+    // Permission['condition'] (jsonLogic operator interfaces) has no index signature, so TS won't
+    // match it against the API row's `{ [key: string]: unknown }` — the runtime shape is fine.
+    response: () =>
+      HttpResponse.json<AccessControlPermission[]>(rows as unknown as AccessControlPermission[]),
+  })

@@ -13,7 +13,7 @@ function makeNotebook(id: string, overrides: Partial<Notebook> = {}): Notebook {
     favorite: false,
     owner_id: 7,
     project_id: 42,
-    content: { schema_version: '1.0', cells: [] },
+    content: { schema_version: 1, cells: [] },
     ...overrides,
   }
 }
@@ -44,7 +44,7 @@ describe('notebooksState', () => {
 
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ id: '1', _tag: 'markdown_cell', text: 'hello' }],
+      cells: [{ _tag: 'markdown_cell', id: 'cell-1', text: 'hello' }],
     })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
@@ -56,7 +56,7 @@ describe('notebooksState', () => {
 
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ id: '1', _tag: 'markdown_cell', text: 'hello' }],
+      cells: [{ _tag: 'markdown_cell', id: 'cell-1', text: 'hello' }],
     })
 
     expect(notebooksState.notebooks['notebook-1'].status).toBe('new')
@@ -66,7 +66,7 @@ describe('notebooksState', () => {
     notebooksState.setNotebook({ projectRef: 'ref', notebook: makeNotebook('notebook-1') })
     notebooksState.updateCells({
       id: 'notebook-1',
-      cells: [{ id: '1', _tag: 'markdown_cell', text: 'hello' }],
+      cells: [{ _tag: 'markdown_cell', id: 'cell-1', text: 'hello' }],
     })
     expect(notebooksState.notebooks['notebook-1'].status).toBe('unsaved')
 

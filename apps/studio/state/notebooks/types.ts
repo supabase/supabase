@@ -1,10 +1,5 @@
-import type { Cell } from '@/data/content/notebooks/notebook-schema'
 import { SnippetStatus } from '@/data/content/snippet-status'
-
-interface NotebookContent {
-  schema_version: string
-  cells: Cell[]
-}
+import type { Notebooks } from '@/types'
 
 export interface Notebook {
   id: string
@@ -15,7 +10,7 @@ export interface Notebook {
   favorite: boolean
   owner_id: number
   project_id: number
-  content?: NotebookContent // Undefined until loaded
+  content?: Notebooks.Content // Undefined until loaded
 }
 
 export interface StateNotebook {

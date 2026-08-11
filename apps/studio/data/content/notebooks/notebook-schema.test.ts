@@ -1,7 +1,12 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
-import { agentNotebookSchema, notebookDomainSchema, notebookSchema } from './notebook-schema'
+import {
+  agentNotebookSchema,
+  notebookDomainSchema,
+  notebookSchema,
+  writableNotebookSchema,
+} from './notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 
 const FULL_NOTEBOOK = {
@@ -128,6 +133,79 @@ describe('agentNotebookSchema', () => {
     const result = agentNotebookSchema.safeParse({
       schema_version: 1,
       cells: [{ _tag: 'markdown_cell', id: 'should-not-be-here', text: 'hello' }],
+    })
+
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('writableNotebookSchema', () => {
+  it('accepts a notebook where every cell lacks an id (create-shaped)', () => {
+    const result = writableNotebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        { _tag: 'markdown_cell', text: '# Signup funnel' },
+        { _tag: 'database_cell', sql: 'select * from auth.users limit 100', row_limit: 100 },
+        {
+          _tag: 'log_cell',
+          sql: "select timestamp, event_message from edge_logs where source = 'edge_logs' limit 10",
+          time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+        },
+      ],
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts a notebook with a mix of cells with and without an id (update-shaped)', () => {
+    const result = writableNotebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'database_cell',
+          id: 'b1ffcd88-8d1a-4de7-aa5c-5aa8ac270b22',
+          sql: 'select * from auth.users limit 100',
+          row_limit: 100,
+        },
+        {
+          _tag: 'log_cell',
+          sql: "select timestamp, event_message from edge_logs where source = 'edge_logs' limit 10",
+          time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+        },
+      ],
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an unknown cell _tag', () => {
+    const result = writableNotebookSchema.safeParse({
+      schema_version: 1,
+      cells: [{ _tag: 'chart_cell', text: 'hi' }],
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a database_cell missing row_limit', () => {
+    const result = writableNotebookSchema.safeParse({
+      schema_version: 1,
+      cells: [{ _tag: 'database_cell', sql: 'select 1' }],
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects an invalid relative_time_range unit', () => {
+    const result = writableNotebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'log_cell',
+          sql: 'select 1',
+          time_range: { _tag: 'relative_time_range', unit: 'fortnight', amount: 1 },
+        },
+      ],
     })
 
     expect(result.success).toBe(false)

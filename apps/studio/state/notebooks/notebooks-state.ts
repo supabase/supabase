@@ -3,8 +3,8 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 import { proxyMap } from 'valtio/utils'
 
 import type { Notebook, StateNotebook } from './types'
-import type { Cell } from '@/data/content/notebooks/notebook-schema'
 import type { SnippetStatus } from '@/data/content/snippet-status'
+import type { Notebooks } from '@/types'
 
 // [Joshen] Deliberately copied from sql-editor-lifecycle cause we might deprecate
 // that in favor of notebooks in the long run
@@ -75,7 +75,15 @@ export const notebooksState = proxy({
    * at the call site and pass it here, since the notebook is saved as one JSON
    * document rather than per-cell.
    */
-  updateCells: ({ id, cells, skipSave }: { id: string; cells: Cell[]; skipSave?: boolean }) => {
+  updateCells: ({
+    id,
+    cells,
+    skipSave,
+  }: {
+    id: string
+    cells: Notebooks.Cell[]
+    skipSave?: boolean
+  }) => {
     const stateNotebook = notebooksState.notebooks[id]
     if (!stateNotebook?.notebook.content) return
     stateNotebook.notebook.content.cells = cells

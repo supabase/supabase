@@ -5,7 +5,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { RLS_PROMPT } from '@/lib/ai/prompts'
@@ -75,14 +75,11 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     aiOptInLevel = 'schema'
   }
 
-  if (IS_PLATFORM && orgSlug && authorization) {
+  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
-      const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-      })
+      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
-      aiOptInLevel = orgAIOptInLevel
+      aiOptInLevel = aiDetails.aiOptInLevel
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
