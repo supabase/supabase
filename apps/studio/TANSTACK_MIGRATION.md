@@ -577,8 +577,8 @@ for the Vite pipeline:
 
 - `pnpm-workspace.yaml` catalog now includes `@tanstack/react-router`,
   `@tanstack/react-start`, `@tanstack/react-table` so studio and
-  ui-library stay aligned. `react-query` is **not** in the catalog yet
-  — three consumers (studio, docs, ui-library) sit on different 5.x
+  library stay aligned. `react-query` is **not** in the catalog yet
+  — three consumers (studio, docs, library) sit on different 5.x
   ranges and unifying them is a separate decision.
 - `NODE_OPTIONS=--max-old-space-size=8192` is set on the studio
   `dev` script — Vite's Rolldown-RC frontend hits the default 4 GB

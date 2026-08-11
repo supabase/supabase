@@ -298,9 +298,9 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'reference_javascript',
           },
           {
-            label: 'UI Library',
+            label: 'Library',
             icon: 'ui',
-            href: 'https://supabase.com/ui' as `/${string}`,
+            href: 'https://supabase.com/library' as `/${string}`,
             level: 'ui',
           },
         ],
