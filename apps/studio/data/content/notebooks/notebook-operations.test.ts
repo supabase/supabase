@@ -117,6 +117,61 @@ describe('applyNotebookOperations', () => {
     ])
   })
 
+  it('resolves a move anchored on another moved cell using its new position', () => {
+    // cell-1 moves after cell-3 first, landing at [cell-2, cell-3, cell-1]; cell-2 then moves
+    // after cell-1's *new* position, giving [cell-3, cell-1, cell-2].
+    const ops: NotebookOperation[] = [
+      { _tag: 'move_cell', cell_id: 'cell-1', after_cell_id: 'cell-3' },
+      { _tag: 'move_cell', cell_id: 'cell-2', after_cell_id: 'cell-1' },
+    ]
+
+    const result = applyNotebookOperations(NOTEBOOK, ops)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+      'cell-3',
+      'cell-1',
+      'cell-2',
+    ])
+  })
+
+  it('produces a different result when the same two moves are given in the opposite order', () => {
+    // cell-2 moves after cell-1 first — a no-op, since it's already there — landing at
+    // [cell-1, cell-2, cell-3]; cell-1 then moves after cell-3, giving [cell-2, cell-3, cell-1].
+    const ops: NotebookOperation[] = [
+      { _tag: 'move_cell', cell_id: 'cell-2', after_cell_id: 'cell-1' },
+      { _tag: 'move_cell', cell_id: 'cell-1', after_cell_id: 'cell-3' },
+    ]
+
+    const result = applyNotebookOperations(NOTEBOOK, ops)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+      'cell-2',
+      'cell-3',
+      'cell-1',
+    ])
+  })
+
+  it('resolves two moves that anchor on each other back to the original order', () => {
+    const ops: NotebookOperation[] = [
+      { _tag: 'move_cell', cell_id: 'cell-1', after_cell_id: 'cell-2' },
+      { _tag: 'move_cell', cell_id: 'cell-2', after_cell_id: 'cell-1' },
+    ]
+
+    const result = applyNotebookOperations(NOTEBOOK, ops)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.notebook.cells.map((cell) => ('id' in cell ? cell.id : undefined))).toEqual([
+      'cell-1',
+      'cell-2',
+      'cell-3',
+    ])
+  })
+
   it('applies an insert, a replace, and a delete together', () => {
     const ops: NotebookOperation[] = [
       { _tag: 'delete_cell', cell_id: 'cell-1' },

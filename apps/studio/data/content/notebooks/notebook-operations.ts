@@ -78,43 +78,10 @@ function targetCellId(operation: NotebookOperation): string | undefined {
   }
 }
 
-function referencedCellIds(operation: NotebookOperation): string[] {
-  switch (operation._tag) {
-    case 'insert_cell':
-      return operation.after_cell_id === CELL_ANCHOR_START ? [] : [operation.after_cell_id]
-    case 'replace_cell':
-    case 'delete_cell':
-      return [operation.cell_id]
-    case 'move_cell': {
-      const anchors = operation.after_cell_id === CELL_ANCHOR_START ? [] : [operation.after_cell_id]
-      return [operation.cell_id, ...anchors]
-    }
-  }
-}
-
 export function applyNotebookOperations(
   notebook: NotebookWire,
   operations: NotebookOperation[]
 ): ApplyNotebookOperationsResult {
-  const existingIds = new Set(notebook.cells.map((cell) => cell.id))
-
-  for (const operation of operations) {
-    for (const cellId of referencedCellIds(operation)) {
-      if (!existingIds.has(cellId)) {
-        return { success: false, error: { _tag: 'unknown_cell_id', cell_id: cellId } }
-      }
-    }
-
-    // A move targeting its own anchor is a no-op that's simplest to reject as a conflict
-    // rather than special-case through the anchor-resolution logic below.
-    if (operation._tag === 'move_cell' && operation.after_cell_id === operation.cell_id) {
-      return {
-        success: false,
-        error: { _tag: 'conflicting_operations', cell_id: operation.cell_id },
-      }
-    }
-  }
-
   const targetedIds = new Set<string>()
   for (const operation of operations) {
     const cellId = targetCellId(operation)
@@ -126,54 +93,85 @@ export function applyNotebookOperations(
     targetedIds.add(cellId)
   }
 
-  const deletedIds = new Set(
-    operations.filter((op) => op._tag === 'delete_cell').map((op) => op.cell_id)
-  )
-  const replacements = new Map(
-    operations
-      .filter((op): op is ReplaceCellOperation => op._tag === 'replace_cell')
-      .map((op) => [op.cell_id, op.cell])
-  )
-  const movedIds = new Set(
-    operations.filter((op) => op._tag === 'move_cell').map((op) => op.cell_id)
-  )
+  const cells: OperationResultCell[] = [...notebook.cells]
+  const indexOfCellId = (cellId: string) =>
+    cells.findIndex((cell) => 'id' in cell && cell.id === cellId)
 
-  const insertionsAfter = new Map<string, OperationResultCell[]>()
-  const appendInsertion = (anchor: string, cell: OperationResultCell) => {
-    const existing = insertionsAfter.get(anchor)
-    if (existing) {
-      existing.push(cell)
-    } else {
-      insertionsAfter.set(anchor, [cell])
+  const insertedAfter = new Map<string, number>()
+  const insertAfter = (
+    anchor: string,
+    item: OperationResultCell
+  ): NotebookOperationError | undefined => {
+    const anchorIndex = anchor === CELL_ANCHOR_START ? -1 : indexOfCellId(anchor)
+    if (anchor !== CELL_ANCHOR_START && anchorIndex === -1) {
+      return { _tag: 'unknown_cell_id', cell_id: anchor }
     }
+
+    const offset = insertedAfter.get(anchor) ?? 0
+    cells.splice(anchorIndex + 1 + offset, 0, item)
+    insertedAfter.set(anchor, offset + 1)
+    return undefined
   }
 
   for (const operation of operations) {
-    if (operation._tag === 'insert_cell') {
-      appendInsertion(operation.after_cell_id, operation.cell)
-    } else if (operation._tag === 'move_cell') {
-      const movedCell = notebook.cells.find((cell) => cell.id === operation.cell_id)
-      if (movedCell) appendInsertion(operation.after_cell_id, movedCell)
+    switch (operation._tag) {
+      case 'insert_cell': {
+        const error = insertAfter(operation.after_cell_id, operation.cell)
+        if (error) return { success: false, error }
+        break
+      }
+      case 'replace_cell': {
+        const index = indexOfCellId(operation.cell_id)
+        if (index === -1) {
+          return {
+            success: false,
+            error: { _tag: 'unknown_cell_id', cell_id: operation.cell_id },
+          }
+        }
+        cells[index] = operation.cell
+        break
+      }
+      case 'delete_cell': {
+        const index = indexOfCellId(operation.cell_id)
+        if (index === -1) {
+          return {
+            success: false,
+            error: { _tag: 'unknown_cell_id', cell_id: operation.cell_id },
+          }
+        }
+        cells.splice(index, 1)
+        break
+      }
+      case 'move_cell': {
+        if (operation.after_cell_id === operation.cell_id) {
+          return {
+            success: false,
+            error: { _tag: 'conflicting_operations', cell_id: operation.cell_id },
+          }
+        }
+
+        const fromIndex = indexOfCellId(operation.cell_id)
+        if (fromIndex === -1) {
+          return {
+            success: false,
+            error: { _tag: 'unknown_cell_id', cell_id: operation.cell_id },
+          }
+        }
+
+        const [movedCell] = cells.splice(fromIndex, 1)
+        const error = insertAfter(operation.after_cell_id, movedCell)
+        if (error) return { success: false, error }
+        break
+      }
     }
   }
 
-  const resultCells: OperationResultCell[] = [...(insertionsAfter.get(CELL_ANCHOR_START) ?? [])]
-
-  for (const cell of notebook.cells) {
-    if (!deletedIds.has(cell.id) && !movedIds.has(cell.id)) {
-      const replacement = replacements.get(cell.id)
-      resultCells.push(replacement ?? cell)
-    }
-
-    resultCells.push(...(insertionsAfter.get(cell.id) ?? []))
-  }
-
-  if (resultCells.length === 0) {
+  if (cells.length === 0) {
     return { success: false, error: { _tag: 'empty_result' } }
   }
 
   return {
     success: true,
-    notebook: { schema_version: notebook.schema_version, cells: resultCells },
+    notebook: { schema_version: notebook.schema_version, cells },
   }
 }
