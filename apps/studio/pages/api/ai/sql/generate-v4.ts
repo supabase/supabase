@@ -15,6 +15,7 @@ import {
 } from '@/lib/ai/assistant-message-metadata'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
+import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import {
   DEFAULT_ASSISTANT_ADVANCE_MODEL_ID,
@@ -28,6 +29,7 @@ import { getTools } from '@/lib/ai/tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 export const maxDuration = 120
 
@@ -148,6 +150,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
+
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
   let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_ADVANCE_MODEL_ID
@@ -184,6 +188,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       accessToken,
       baseUrl: getURL(),
       supportMode,
+      isExplorerEnabled: explorerEnabled,
       signal: abortController.signal,
     })
 

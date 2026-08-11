@@ -1,3 +1,4 @@
+import type { JwtPayload } from '@supabase/supabase-js'
 import { generateText, Output, stepCountIs } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
@@ -6,11 +7,13 @@ import { z } from 'zod'
 
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
+import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { RLS_PROMPT } from '@/lib/ai/prompts'
 import { getTools } from '@/lib/ai/tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 const policySchema = z.object({
   sql: z.string().describe('The generated Postgres CREATE POLICY statement.'),
@@ -40,19 +43,19 @@ const requestBodySchema = z.object({
   message: z.string().optional(),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const { method } = req
 
   switch (method) {
     case 'POST':
-      return handlePost(req, res)
+      return handlePost(req, res, claims)
     default:
       res.setHeader('Allow', ['POST'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
-export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+export async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -87,6 +90,8 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
+
   try {
     const { modelParams, error: modelError } = await getModel({
       provider: 'openai',
@@ -113,6 +118,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         authorization,
         aiOptInLevel,
         accessToken,
+        isExplorerEnabled: explorerEnabled,
         signal: toolsAbortController.signal,
       })
 
