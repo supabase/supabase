@@ -11,8 +11,18 @@ export interface UseOAuthConsentOptions {
   signInPath?: string
 }
 
-const sameOriginPath = (path: string | null | undefined, fallback = '/') =>
-  path?.startsWith('/') && !path.startsWith('//') ? path : fallback
+const sameOriginPath = (path: string | null | undefined, fallback = '/') => {
+  if (!path?.startsWith('/')) return fallback
+
+  try {
+    const url = new URL(path, window.location.origin)
+    return url.origin === window.location.origin
+      ? `${url.pathname}${url.search}${url.hash}`
+      : fallback
+  } catch {
+    return fallback
+  }
+}
 
 const withNextParam = (path: string, next: string) =>
   `${path}${path.includes('?') ? '&' : '?'}next=${encodeURIComponent(next)}`

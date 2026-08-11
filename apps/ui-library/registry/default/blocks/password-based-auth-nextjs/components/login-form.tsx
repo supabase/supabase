@@ -21,7 +21,16 @@ import { Link } from '@/registry/default/components/ui/link'
 // the OAuth consent screen sent the user here to sign in first.
 const getNextPath = (fallback: string) => {
   const next = new URLSearchParams(window.location.search).get('next')
-  return next?.startsWith('/') && !next.startsWith('//') ? next : fallback
+  if (!next?.startsWith('/')) return fallback
+
+  try {
+    const url = new URL(next, window.location.origin)
+    return url.origin === window.location.origin
+      ? `${url.pathname}${url.search}${url.hash}`
+      : fallback
+  } catch {
+    return fallback
+  }
 }
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {

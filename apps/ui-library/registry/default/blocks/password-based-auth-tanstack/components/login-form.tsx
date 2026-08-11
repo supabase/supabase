@@ -14,6 +14,21 @@ import {
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
 
+// Follows the `next` query parameter if it resolves to this application's origin.
+const getNextPath = () => {
+  const next = new URLSearchParams(window.location.search).get('next')
+  if (!next?.startsWith('/')) return null
+
+  try {
+    const url = new URL(next, window.location.origin)
+    return url.origin === window.location.origin
+      ? `${url.pathname}${url.search}${url.hash}`
+      : null
+  } catch {
+    return null
+  }
+}
+
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -36,8 +51,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       // Follow the `next` query parameter if it is a same-origin relative path, e.g. when
       // the OAuth consent screen sent the user here to sign in first. It may point outside
       // the typed route tree, so it needs a full navigation.
-      const next = new URLSearchParams(window.location.search).get('next')
-      if (next?.startsWith('/') && !next.startsWith('//')) {
+      const next = getNextPath()
+      if (next) {
         window.location.assign(next)
         return
       }

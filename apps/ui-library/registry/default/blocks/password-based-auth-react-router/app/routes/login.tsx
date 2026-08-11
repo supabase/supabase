@@ -14,11 +14,20 @@ import { Label } from '@/registry/default/components/ui/label'
 
 // Follows the `next` form value if it is a same-origin relative path, e.g. when
 // the OAuth consent screen sent the user here to sign in first.
-const safeNextPath = (next: FormDataEntryValue | null, fallback: string) =>
-  typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : fallback
+const safeNextPath = (next: FormDataEntryValue | null, origin: string, fallback: string) => {
+  if (typeof next !== 'string' || !next.startsWith('/')) return fallback
+
+  try {
+    const url = new URL(next, origin)
+    return url.origin === origin ? `${url.pathname}${url.search}${url.hash}` : fallback
+  } catch {
+    return fallback
+  }
+}
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
+  const origin = new URL(request.url).origin
 
   const formData = await request.formData()
 
@@ -37,7 +46,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // Update this route to redirect to an authenticated route. The user already has an active session.
-  return redirect(safeNextPath(formData.get('next'), '/protected'), { headers })
+  return redirect(safeNextPath(formData.get('next'), origin, '/protected'), { headers })
 }
 
 export default function Login() {
