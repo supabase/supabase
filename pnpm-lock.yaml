@@ -2023,6 +2023,9 @@ importers:
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1
+      e2e-shared:
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1
@@ -2083,6 +2086,9 @@ importers:
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1
+      e2e-shared:
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1
