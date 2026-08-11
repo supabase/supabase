@@ -71,36 +71,78 @@ const daysAgoFromNow = (days: number) => {
   return date.toISOString()
 }
 
-export const getMockObjectVersions = (_objectName: string): ObjectVersion[] => [
-  {
+/**
+ * Options that let the mock adapt its version list to the bucket's current
+ * lifecycle policy, so the labels rendered against it always make sense in
+ * context — e.g. never returning a version older than the retention window
+ * (which would render as "Past Nd limit") and never returning more than the
+ * configured cap (which would render as "#3 of 2").
+ *
+ * `null`/omitted means "no limit for that condition" — matches the shape of
+ * `BucketProtection.versionExpiryDays` / `maxNoncurrentVersions`.
+ */
+export interface MockObjectVersionsOptions {
+  cap?: number | null
+  expiryDays?: number | null
+}
+
+/**
+ * Noncurrent version templates, newest first. Ages are picked to spread across
+ * common retention windows so at least one shows a near-expiry countdown under
+ * typical (30d) settings, while tighter policies still leave the freshest
+ * couple retained.
+ */
+const NONCURRENT_VERSION_TEMPLATES: Array<{
+  versionId: string
+  size: number
+  daysAgo: number
+  action: ObjectVersionAction
+}> = [
+  { versionId: '2b7d9153aa9e', size: 790 * KB, daysAgo: 1, action: 'overwrite' },
+  { versionId: 'a19c04f7de40', size: 760 * KB, daysAgo: 3, action: 'overwrite' },
+  { versionId: '5c0278b3ac7a', size: 744 * KB, daysAgo: 8, action: 'overwrite' },
+  { versionId: '9f4e1a2b8c3d', size: 720 * KB, daysAgo: 20, action: 'overwrite' },
+  { versionId: '6a1b8d2f5c47', size: 705 * KB, daysAgo: 27, action: 'overwrite' },
+  { versionId: '3e7c2b91da85', size: 680 * KB, daysAgo: 60, action: 'initial upload' },
+]
+
+export const getMockObjectVersions = (
+  _objectName: string,
+  options: MockObjectVersionsOptions = {}
+): ObjectVersion[] => {
+  const cap = options.cap ?? null
+  const expiryDays = options.expiryDays ?? null
+  const hasCap = cap !== null && cap > 0
+  const hasExpiryDays = expiryDays !== null && expiryDays > 0
+
+  const current: ObjectVersion = {
     versionId: '8f3a2c9b41c1',
     size: 812 * KB,
-    createdAt: BASE_DATE,
+    createdAt: daysAgoFromNow(0),
     isCurrent: true,
     action: 'overwrite',
-  },
-  {
-    versionId: '2b7d9153aa9e',
-    size: 790 * KB,
-    createdAt: daysAgo(4, '18:02:00'),
-    isCurrent: false,
-    action: 'overwrite',
-  },
-  {
-    versionId: 'a19c04f7de40',
-    size: 760 * KB,
-    createdAt: daysAgo(10, '11:40:00'),
-    isCurrent: false,
-    action: 'overwrite',
-  },
-  {
-    versionId: '5c0278b3ac7a',
-    size: 744 * KB,
-    createdAt: daysAgo(22, '08:20:00'),
-    isCurrent: false,
-    action: 'initial upload',
-  },
-]
+  }
+
+  let noncurrent = NONCURRENT_VERSION_TEMPLATES
+  // Retention: drop templates whose age would render as "Past Nd limit". Keep
+  // a 1-day buffer so time-of-day rounding in the indicator can't push a
+  // surviving version over the edge.
+  if (hasExpiryDays) noncurrent = noncurrent.filter((v) => v.daysAgo < expiryDays - 1)
+  // Cap: never return more than the configured maximum so the "#N of cap"
+  // label is always valid.
+  if (hasCap) noncurrent = noncurrent.slice(0, cap)
+
+  return [
+    current,
+    ...noncurrent.map((v) => ({
+      versionId: v.versionId,
+      size: v.size,
+      createdAt: daysAgoFromNow(v.daysAgo),
+      isCurrent: false,
+      action: v.action,
+    })),
+  ]
+}
 
 /**
  * Mutable in-memory "deleted files" store. Shared across buckets, mirroring

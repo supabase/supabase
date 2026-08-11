@@ -245,13 +245,6 @@ export const VersionHistory = ({
         </ol>
       )}
 
-      <Admonition
-        showIcon={false}
-        type="default"
-        title="Restoring is non-destructive"
-        description="Restoring makes an older version the new current version. The previous current version becomes a noncurrent version you can still recover."
-      />
-
       <ConfirmationModal
         variant="destructive"
         visible={versionToDelete !== undefined}
