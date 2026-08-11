@@ -94,7 +94,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
     if (!live || !isDatabaseConnectionsEnabled) return
     const interval = setInterval(() => setNow(dayjs.utc()), 1000)
     return () => clearInterval(interval)
-  }, [live])
+  }, [live, isDatabaseConnectionsEnabled])
 
   return (
     <ReportPadding className="gap-y-12">
