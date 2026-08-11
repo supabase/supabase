@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import {
   AlertCircle,
   ChevronDown,
+  ChevronRight,
   Copy,
   Download,
   Info,
@@ -11,19 +12,19 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import {
   Button,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
 } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -191,8 +192,16 @@ export const PreviewPane = () => {
   }
 
   const previewThumbnail = (
-    <div className="relative my-4 border border-overlay">
-      <div className="flex h-56 w-full items-center 2xl:h-72">
+    // Viewport-height aware: the CSS clamp ties the preview height to 40vh
+    // but floors at 120px so the sections below always have room to scroll
+    // on short viewports, and caps at 320px so it doesn't dominate on tall
+    // ones. The parent flex layout keeps this block pinned above the
+    // scrollable sections without needing `position: sticky`.
+    <div
+      className="relative shrink-0 border border-overlay"
+      style={{ height: 'clamp(120px, 40vh, 320px)' }}
+    >
+      <div className="flex h-full w-full items-center">
         <PreviewFile item={file} />
       </div>
       {isPreviewingOlderVersion && (
@@ -219,26 +228,29 @@ export const PreviewPane = () => {
     </div>
   )
 
-  const detailsContent = (
-    <div className="w-full space-y-6">
-      <div className="space-y-1">
-        <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
-        {file.isCorrupted && (
-          <div className="flex items-center space-x-2">
-            <AlertCircle size={14} className="text-foreground-light" />
-            <p className="text-sm text-foreground-light">
-              File is corrupted, please delete and reupload this file again
-            </p>
-          </div>
-        )}
-        {mimeType && (
+  const filenameSummary = (
+    <div className="mt-4 space-y-1">
+      <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
+      {file.isCorrupted && (
+        <div className="flex items-center space-x-2">
+          <AlertCircle size={14} className="text-foreground-light" />
           <p className="text-sm text-foreground-light">
-            {mimeType}
-            {size && <span> - {size}</span>}
+            File is corrupted, please delete and reupload this file again
           </p>
-        )}
-      </div>
+        </div>
+      )}
+      {mimeType && (
+        <p className="text-sm text-foreground-light">
+          {mimeType}
+          {size && <span> · {size}</span>}
+          {showVersions && versionCount !== undefined && <span> · {versionCount} versions</span>}
+        </p>
+      )}
+    </div>
+  )
 
+  const detailsSectionBody = (
+    <div className="space-y-4 pt-3">
       <div className="space-y-2">
         <div>
           <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
@@ -343,38 +355,77 @@ export const PreviewPane = () => {
   return (
     <div
       key={file.id ?? file.name}
-      className="h-full border-l border-overlay bg-surface-100 p-4 overflow-y-auto"
+      className="flex h-full flex-col border-l border-overlay bg-surface-100"
       style={{ width }}
     >
-      <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
+      <div className="flex w-full justify-end px-4 pt-4 text-foreground-lighter transition-colors hover:text-foreground">
         <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
       </div>
 
-      {previewThumbnail}
+      {/* Sticky (via flex-shrink control) preview + filename block. The
+          scrollable sections below get whatever vertical space remains. */}
+      <div className="flex shrink-0 flex-col px-4 pb-4">
+        {previewThumbnail}
+        {filenameSummary}
+      </div>
 
-      {showVersions ? (
-        <Tabs defaultValue="details">
-          <TabsList className="gap-x-4">
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="versions">
-              Versions{versionCount !== undefined ? ` (${versionCount})` : ''}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="details">{detailsContent}</TabsContent>
-          <TabsContent value="versions" className="pt-2">
-            <VersionHistory
-              projectRef={projectRef}
-              bucketId={selectedBucket?.id}
-              objectName={file.name}
-              mimeType={file.metadata?.mimetype}
-              previewedVersionId={previewedVersion?.versionId}
-              onPreview={setPreviewedVersion}
-            />
-          </TabsContent>
-        </Tabs>
-      ) : (
-        detailsContent
-      )}
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+        <PreviewSection title="Details" defaultOpen>
+          {detailsSectionBody}
+        </PreviewSection>
+        {showVersions && (
+          <PreviewSection title="Versions" count={versionCount} defaultOpen>
+            <div className="pt-3">
+              <VersionHistory
+                projectRef={projectRef}
+                bucketId={selectedBucket?.id}
+                objectName={file.name}
+                previewedVersionId={previewedVersion?.versionId}
+                onPreview={setPreviewedVersion}
+              />
+            </div>
+          </PreviewSection>
+        )}
+      </div>
     </div>
+  )
+}
+
+interface PreviewSectionProps {
+  title: string
+  count?: number
+  defaultOpen?: boolean
+  children: ReactNode
+}
+
+/**
+ * Vertically-stacked collapsible section used by the preview panel. Each
+ * section renders a header row with a chevron and (optionally) a count, and
+ * expands to reveal its body. Header borders separate sections cleanly when
+ * multiple are stacked.
+ */
+const PreviewSection = ({ title, count, defaultOpen = false, children }: PreviewSectionProps) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen)
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border-b border-overlay">
+      <CollapsibleTrigger asChild>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between py-3 text-left text-sm font-medium text-foreground transition-colors hover:text-foreground-light"
+        >
+          <span className="flex items-center gap-x-2">
+            {title}
+            {count !== undefined && (
+              <span className="text-xs font-normal text-foreground-lighter">{count}</span>
+            )}
+          </span>
+          <ChevronRight
+            size={14}
+            className={cn('text-foreground-lighter transition-transform', isOpen && 'rotate-90')}
+          />
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="pb-4">{children}</CollapsibleContent>
+    </Collapsible>
   )
 }

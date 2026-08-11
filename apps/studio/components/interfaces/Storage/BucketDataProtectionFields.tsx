@@ -22,6 +22,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
+import { BroomSparklesIcon } from './BroomSparklesIcon'
 import { type BucketProtectionFormValues } from './BucketDataProtectionFields.schema'
 import {
   getVersioningPlanLimits,
@@ -222,7 +223,10 @@ const ExpirationPolicySection = ({
   return (
     <div className="flex flex-col gap-y-4">
       <div>
-        <p className="text-sm font-medium text-foreground mb-1.5">Expiration policy</p>
+        <p className="mb-1.5 flex items-center gap-x-1.5 text-sm font-medium text-foreground">
+          <BroomSparklesIcon size={14} className="text-foreground-lighter" />
+          Expiration policy
+        </p>
         <ExpirationSentence
           hasDays={hasDays}
           hasVersions={hasVersions}

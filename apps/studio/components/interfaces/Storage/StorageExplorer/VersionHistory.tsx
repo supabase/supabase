@@ -1,14 +1,22 @@
 import dayjs from 'dayjs'
-import { Copy, Download, RotateCcw, Trash2 } from 'lucide-react'
+import { Copy, Download, MoreVertical, RotateCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Badge, cn } from 'ui'
+import {
+  Badge,
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import {
   useObjectVersionDeleteMutation,
   useObjectVersionRestoreMutation,
@@ -17,13 +25,13 @@ import {
 import { type ObjectVersion } from '@/data/storage/protection/protection-mocks'
 import { formatBytes } from '@/lib/helpers'
 
+import { BroomSparklesIcon } from '../BroomSparklesIcon'
 import { getMockBucketProtection, type ExpirationMode } from '../StorageProtection.constants'
 
 interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
   objectName: string
-  mimeType?: string
   previewedVersionId?: string
   onPreview?: (version: ObjectVersion) => void
 }
@@ -34,7 +42,6 @@ export const VersionHistory = ({
   projectRef,
   bucketId,
   objectName,
-  mimeType,
   previewedVersionId,
   onPreview,
 }: VersionHistoryProps) => {
@@ -67,7 +74,6 @@ export const VersionHistory = ({
   if (isPending) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve versions" />
 
-  const totalSize = versions.reduce((sum, version) => sum + version.size, 0)
   const noncurrentCount = versions.filter((v) => !v.isCurrent).length
 
   const bucketProtection = getMockBucketProtection(bucketId)
@@ -101,39 +107,31 @@ export const VersionHistory = ({
 
   return (
     <div className="space-y-4">
-      <div className="space-y-1">
-        <h5 className="wrap-break-word text-base text-foreground">{objectName}</h5>
-        <p className="text-sm text-foreground-light">
-          {[mimeType, `${versions.length} versions`, `${formatBytes(totalSize)} total`]
-            .filter(Boolean)
-            .join(' · ')}
-        </p>
-        {hasPolicy && (
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
-            {hasCap && (
-              <Badge variant={isAtCap ? 'warning' : 'default'}>
-                {noncurrentCount} / {cap} noncurrent
-              </Badge>
-            )}
-            {hasExpiryDays && <Badge variant="default">{expiryDays}d retention</Badge>}
-            {hasCap && hasExpiryDays && (
-              <span className="text-xs text-foreground-lighter">
-                {mode === 'and' ? 'both conditions required' : 'either condition expires'}
-              </span>
-            )}
-            {isAtCap && (
-              <span className="text-xs text-warning-600">
-                The next overwrite will auto-expire the oldest version.
-              </span>
-            )}
-            {!isAtCap && isNearingCap && (
-              <span className="text-xs text-foreground-lighter">
-                Nearing cap. Older versions auto-expire once the limit is reached.
-              </span>
-            )}
-          </div>
-        )}
-      </div>
+      {hasPolicy && (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          {hasCap && (
+            <Badge variant={isAtCap ? 'warning' : 'default'}>
+              {noncurrentCount} / {cap} noncurrent
+            </Badge>
+          )}
+          {hasExpiryDays && <Badge variant="default">{expiryDays}d retention</Badge>}
+          {hasCap && hasExpiryDays && (
+            <span className="text-xs text-foreground-lighter">
+              {mode === 'and' ? 'both conditions required' : 'either condition expires'}
+            </span>
+          )}
+          {isAtCap && (
+            <span className="text-xs text-warning-600">
+              The next overwrite will auto-expire the oldest version.
+            </span>
+          )}
+          {!isAtCap && isNearingCap && (
+            <span className="text-xs text-foreground-lighter">
+              Nearing cap. Older versions auto-expire once the limit is reached.
+            </span>
+          )}
+        </div>
+      )}
 
       {bucketProtection.versioning === 'suspended' && (
         <Admonition
@@ -144,9 +142,8 @@ export const VersionHistory = ({
       )}
 
       {isSuccess && (
-        <ol className="relative flex flex-col">
-          {versions.map((version, index) => {
-            const isLast = index === versions.length - 1
+        <ol className="flex flex-col">
+          {versions.map((version) => {
             const isSelected = previewedVersionId === version.versionId
             return (
               <li key={version.versionId} className="group flex gap-x-3">
@@ -157,13 +154,12 @@ export const VersionHistory = ({
                       version.isCurrent || isSelected ? 'bg-brand' : 'bg-foreground-muted'
                     )}
                   />
-                  {!isLast && <span className="w-px flex-1 bg-border" />}
                 </div>
 
                 <div
                   role="button"
                   tabIndex={0}
-                  className="flex-1 pb-4 -mx-2 px-2 cursor-pointer"
+                  className="-mx-2 flex-1 cursor-pointer px-2 pb-4"
                   onClick={() => onPreview?.(version)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') onPreview?.(version)
@@ -183,60 +179,15 @@ export const VersionHistory = ({
                       {version.isCurrent && <Badge variant="success">Current</Badge>}
                     </div>
 
-                    <div className="flex items-center gap-x-1" onClick={(e) => e.stopPropagation()}>
-                      <ButtonTooltip
-                        variant="text"
-                        size="tiny"
-                        className="px-1.5"
-                        icon={<Download size={14} />}
-                        aria-label={`Download version ${shortVersion(version.versionId)}`}
-                        onClick={() =>
-                          toast.success(`Downloading ${shortVersion(version.versionId)}`)
-                        }
-                        tooltip={{ content: { side: 'bottom', text: 'Download' } }}
-                      />
-                      <ButtonTooltip
-                        variant="text"
-                        size="tiny"
-                        className="px-1.5"
-                        icon={<Copy size={14} />}
-                        aria-label={`Get URL for version ${shortVersion(version.versionId)}`}
-                        onClick={() =>
-                          toast.success(`Copied URL for version ${shortVersion(version.versionId)}`)
-                        }
-                        tooltip={{ content: { side: 'bottom', text: 'Get URL' } }}
-                      />
-
-                      {!version.isCurrent && (
-                        <>
-                          <ButtonTooltip
-                            variant="text"
-                            size="tiny"
-                            className="px-1.5"
-                            icon={<RotateCcw size={14} />}
-                            loading={isRestoring}
-                            aria-label={`Restore version ${shortVersion(version.versionId)}`}
-                            onClick={() => handleRestore(version)}
-                            tooltip={{ content: { side: 'bottom', text: 'Restore as current' } }}
-                          />
-                          <ButtonTooltip
-                            variant="text"
-                            size="tiny"
-                            className="px-1.5 hover:text-destructive"
-                            icon={<Trash2 size={14} />}
-                            aria-label={`Delete version ${shortVersion(version.versionId)}`}
-                            onClick={() => setVersionToDelete(version)}
-                            tooltip={{ content: { side: 'bottom', text: 'Delete permanently' } }}
-                          />
-                        </>
-                      )}
-                    </div>
+                    <VersionActionsMenu
+                      version={version}
+                      isRestoring={isRestoring}
+                      onRestore={() => handleRestore(version)}
+                      onDelete={() => setVersionToDelete(version)}
+                    />
                   </div>
                   <p className="mt-0.5 text-xs text-foreground-lighter">
-                    {formatBytes(version.size)} · {version.action}
-                  </p>
-                  <p className="mt-1 font-mono text-xs text-foreground-muted">
-                    v: {shortVersion(version.versionId)}
+                    {formatBytes(version.size)}
                   </p>
                   {!version.isCurrent &&
                     hasPolicy &&
@@ -288,6 +239,65 @@ export const VersionHistory = ({
           action cannot be undone.
         </p>
       </ConfirmationModal>
+    </div>
+  )
+}
+
+// ── Per-version actions dropdown ────────────────────────────────────────
+
+interface VersionActionsMenuProps {
+  version: ObjectVersion
+  isRestoring: boolean
+  onRestore: () => void
+  onDelete: () => void
+}
+
+const VersionActionsMenu = ({
+  version,
+  isRestoring,
+  onRestore,
+  onDelete,
+}: VersionActionsMenuProps) => {
+  const label = shortVersion(version.versionId)
+  return (
+    <div onClick={(e) => e.stopPropagation()}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="text"
+            size="tiny"
+            className="px-1.5"
+            icon={<MoreVertical size={14} />}
+            aria-label={`Actions for version ${label}`}
+          />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => toast.success(`Downloading ${label}`)}>
+            <Download size={14} />
+            Download
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => toast.success(`Copied URL for ${label}`)}>
+            <Copy size={14} />
+            Get URL
+          </DropdownMenuItem>
+          {!version.isCurrent && (
+            <>
+              <DropdownMenuItem disabled={isRestoring} onClick={onRestore}>
+                <RotateCcw size={14} />
+                Restore as current
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={onDelete}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 size={14} />
+                Delete permanently
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
@@ -349,7 +359,7 @@ const VersionExpiryIndicator = ({
             emphasize ? 'text-warning-600' : 'text-foreground-muted'
           )}
         >
-          <Trash2 size={12} />
+          <BroomSparklesIcon size={12} />
           {daysLabel}
         </span>
       )}
