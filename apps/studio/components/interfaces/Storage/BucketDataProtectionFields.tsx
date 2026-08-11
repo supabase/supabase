@@ -1,13 +1,14 @@
-import { useFormContext, useWatch } from 'react-hook-form'
+import { ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import { useFormContext, useFormState, useWatch } from 'react-hook-form'
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   DialogSection,
   DialogSectionSeparator,
   FormControl,
   FormField,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
   Switch,
   cn,
 } from 'ui'
@@ -56,6 +57,7 @@ export const BucketDataProtectionFields = ({
   const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
   const retentionDaysRaw = useWatch({ control, name: 'version_expiry_days' })
   const maxVersionsRaw = useWatch({ control, name: 'max_noncurrent_versions' })
+  const expirationMode = useWatch({ control, name: 'expiration_mode' })
   // Avoid flashing the "upgrade" prompt before we actually know the org's plan
   const showUpgradePrompt = isOrganizationLoaded && !planLimits
 
@@ -81,8 +83,13 @@ export const BucketDataProtectionFields = ({
     nextMaxVersions < initialMaxVersions
   const isTightening = isTighteningRetention || isTighteningMaxVersions
 
+  // Derived state for the sentence builder and collapsible
+  const hasDays = typeof retentionDaysRaw === 'number' && retentionDaysRaw > 0
+  const hasVersions = typeof maxVersionsRaw === 'number' && maxVersionsRaw > 0
+  const hasBothConditions = hasDays && hasVersions
+
   // Prefill the retention fields with the plan's defaults when versioning is
-  // switched on, so the user doesn't have to fill in an empty input to proceed.
+  // switched on, so the user doesn't start from a blank state.
   const enableVersioning = (onChange: (value: boolean) => void) => {
     onChange(true)
     if (planLimits) {
@@ -110,6 +117,10 @@ export const BucketDataProtectionFields = ({
     } else {
       onChange(false)
     }
+  }
+
+  const handleModeChange = (mode: ExpirationMode) => {
+    setValue('expiration_mode', mode, { shouldDirty: true })
   }
 
   return (
@@ -184,127 +195,291 @@ export const BucketDataProtectionFields = ({
         )}
 
         {!!planLimits && isVersioningEnabled && (
-          <div className="flex flex-col gap-y-3">
-            <FormField
-              name="version_expiry_days"
-              control={control}
-              render={({ field }) => (
-                <FormItemLayout
-                  name="version_expiry_days"
-                  label="Noncurrent version expiration"
-                  description="Days a noncurrent version is kept before it expires."
-                  layout="flex-row-reverse"
-                >
-                  <FormControl>
-                    <InputGroup>
-                      <InputGroupInput
-                        id="version-expiry-days"
-                        type="number"
-                        min={planLimits.minRetentionDays}
-                        max={planLimits.maxRetentionDays}
-                        placeholder={`${planLimits.defaultRetentionDays}`}
-                        {...field}
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>days</InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-
-            <ExpirationModeToggle control={control} />
-
-            <FormField
-              name="max_noncurrent_versions"
-              control={control}
-              render={({ field }) => (
-                <FormItemLayout
-                  name="max_noncurrent_versions"
-                  label="Retained noncurrent versions"
-                  description="Maximum noncurrent versions kept per object. The oldest expires once the cap is reached."
-                  layout="flex-row-reverse"
-                >
-                  <FormControl>
-                    <InputGroup>
-                      <InputGroupInput
-                        id="max-noncurrent-versions"
-                        type="number"
-                        min={planLimits.minVersions}
-                        max={planLimits.maxVersions}
-                        placeholder={`${planLimits.defaultVersions}`}
-                        {...field}
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>versions</InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-          </div>
+          <ExpirationPolicySection
+            control={control}
+            hasDays={hasDays}
+            hasVersions={hasVersions}
+            hasBothConditions={hasBothConditions}
+            days={hasDays ? (retentionDaysRaw as number) : 0}
+            versions={hasVersions ? (maxVersionsRaw as number) : 0}
+            mode={expirationMode}
+            onModeChange={handleModeChange}
+          />
         )}
       </DialogSection>
     </>
   )
 }
 
-const EXPIRATION_MODE_OPTIONS: { value: ExpirationMode; label: string; description: string }[] = [
-  {
-    value: 'and',
-    label: 'AND',
-    description: 'Both conditions must be met before a version expires (single lifecycle policy)',
-  },
-  {
-    value: 'or',
-    label: 'OR',
-    description: 'Either condition independently triggers expiration (two lifecycle rules)',
-  },
-]
+// ── Expiration policy section ────────────────────────────────────────────
 
-interface ExpirationModeToggleProps {
+interface ExpirationPolicySectionProps {
   control: ReturnType<typeof useFormContext<BucketProtectionFormValues>>['control']
+  hasDays: boolean
+  hasVersions: boolean
+  hasBothConditions: boolean
+  days: number
+  versions: number
+  mode: ExpirationMode
+  onModeChange: (mode: ExpirationMode) => void
 }
 
-const ExpirationModeToggle = ({ control }: ExpirationModeToggleProps) => {
+const ExpirationPolicySection = ({
+  control,
+  hasDays,
+  hasVersions,
+  hasBothConditions,
+  days,
+  versions,
+  mode,
+  onModeChange,
+}: ExpirationPolicySectionProps) => {
+  const { errors } = useFormState({ control })
+  const daysError = errors.version_expiry_days?.message
+  const versionsError = errors.max_noncurrent_versions?.message
+
   return (
-    <FormField
-      name="expiration_mode"
-      control={control}
-      render={({ field }) => (
-        <FormItemLayout
-          name="expiration_mode"
-          label="Expiration policy evaluation"
-          description={
-            field.value === 'and'
-              ? 'A noncurrent version expires only when both the age and cap conditions are met simultaneously.'
-              : 'A noncurrent version expires as soon as either the age or cap condition is met independently.'
-          }
-          layout="flex-row-reverse"
-        >
-          <FormControl>
-            <div className="inline-flex rounded-md border border-default overflow-hidden">
-              {EXPIRATION_MODE_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={cn(
-                    'px-3 py-1 text-xs font-mono font-medium transition-colors',
-                    field.value === option.value
-                      ? 'bg-foreground text-background'
-                      : 'bg-surface-100 text-foreground-light hover:bg-surface-200'
-                  )}
-                  onClick={() => field.onChange(option.value)}
+    <div className="flex flex-col gap-y-4">
+      <div>
+        <p className="text-sm font-medium text-foreground mb-1.5">Expiration policy</p>
+        <ExpirationSentence
+          hasDays={hasDays}
+          hasVersions={hasVersions}
+          days={days}
+          versions={versions}
+          mode={mode}
+          onModeChange={onModeChange}
+        />
+      </div>
+
+      <div className="flex flex-col gap-y-3">
+        <FormField
+          name="version_expiry_days"
+          control={control}
+          render={({ field }) => (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between gap-x-6">
+                <label
+                  htmlFor="version-expiry-days"
+                  className="text-sm text-foreground select-none"
                 >
-                  {option.label}
-                </button>
-              ))}
+                  Noncurrent version expiration
+                </label>
+                <div
+                  className={cn(
+                    'flex shrink-0 items-center overflow-hidden rounded-md border bg-surface-200',
+                    daysError ? 'border-destructive' : 'border-default'
+                  )}
+                >
+                  <input
+                    id="version-expiry-days"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="—"
+                    className="w-12 bg-transparent py-1.5 pr-0 pl-2.5 text-right text-sm text-foreground outline-none"
+                    value={field.value === '' ? '' : String(field.value)}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, '')
+                      field.onChange(raw === '' ? '' : Number(raw))
+                    }}
+                    onBlur={field.onBlur}
+                  />
+                  <span className="py-1.5 pr-2.5 pl-1 text-sm text-foreground-muted">days</span>
+                </div>
+              </div>
+              {daysError && <p className="text-sm text-destructive">{String(daysError)}</p>}
             </div>
-          </FormControl>
-        </FormItemLayout>
-      )}
-    />
+          )}
+        />
+
+        <FormField
+          name="max_noncurrent_versions"
+          control={control}
+          render={({ field }) => (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between gap-x-6">
+                <label
+                  htmlFor="max-noncurrent-versions"
+                  className="text-sm text-foreground select-none"
+                >
+                  Retained noncurrent versions
+                </label>
+                <div
+                  className={cn(
+                    'flex shrink-0 items-center overflow-hidden rounded-md border bg-surface-200',
+                    versionsError ? 'border-destructive' : 'border-default'
+                  )}
+                >
+                  <input
+                    id="max-noncurrent-versions"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    placeholder="—"
+                    className="w-12 bg-transparent py-1.5 pr-0 pl-2.5 text-right text-sm text-foreground outline-none"
+                    value={field.value === '' ? '' : String(field.value)}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, '')
+                      field.onChange(raw === '' ? '' : Number(raw))
+                    }}
+                    onBlur={field.onBlur}
+                  />
+                  <span className="py-1.5 pr-2.5 pl-1 text-sm text-foreground-muted">max</span>
+                </div>
+              </div>
+              {versionsError && <p className="text-sm text-destructive">{String(versionsError)}</p>}
+            </div>
+          )}
+        />
+      </div>
+
+      {hasBothConditions && <ExpirationExplainer days={days} versions={versions} mode={mode} />}
+    </div>
+  )
+}
+
+// ── Sentence builder ─────────────────────────────────────────────────────
+
+interface ExpirationSentenceProps {
+  hasDays: boolean
+  hasVersions: boolean
+  days: number
+  versions: number
+  mode: ExpirationMode
+  onModeChange: (mode: ExpirationMode) => void
+}
+
+const ExpirationSentence = ({
+  hasDays,
+  hasVersions,
+  days,
+  versions,
+  mode,
+  onModeChange,
+}: ExpirationSentenceProps) => {
+  if (!hasDays && !hasVersions) {
+    return (
+      <p className="text-sm text-foreground-lighter leading-relaxed">
+        No expiration policy configured. Noncurrent versions will be retained indefinitely.
+      </p>
+    )
+  }
+
+  if (hasDays && !hasVersions) {
+    return (
+      <p className="text-sm text-foreground-lighter leading-relaxed">
+        Remove noncurrent versions older than{' '}
+        <span className="text-foreground font-medium">{days} days</span>. No version count limit.
+      </p>
+    )
+  }
+
+  if (!hasDays && hasVersions) {
+    return (
+      <p className="text-sm text-foreground-lighter leading-relaxed">
+        Keep the newest <span className="text-foreground font-medium">{versions}</span> noncurrent
+        versions per object. No age limit.
+      </p>
+    )
+  }
+
+  return (
+    <p className="text-sm text-foreground-lighter leading-[1.7]">
+      Remove noncurrent versions when <InlineModeToggle mode={mode} onModeChange={onModeChange} />{' '}
+      conditions are met: older than{' '}
+      <span className="text-foreground font-medium">{days} days</span> and more than{' '}
+      <span className="text-foreground font-medium">{versions}</span> versions.
+    </p>
+  )
+}
+
+// ── Inline both/either toggle ────────────────────────────────────────────
+
+interface InlineModeToggleProps {
+  mode: ExpirationMode
+  onModeChange: (mode: ExpirationMode) => void
+}
+
+const InlineModeToggle = ({ mode, onModeChange }: InlineModeToggleProps) => {
+  const isBoth = mode === 'and'
+
+  return (
+    <button
+      type="button"
+      className="inline-flex items-center rounded border border-strong bg-surface-200 p-px align-baseline"
+      onClick={() => onModeChange(isBoth ? 'or' : 'and')}
+    >
+      <span
+        className={cn(
+          'rounded-sm px-1.5 py-px text-xs font-medium transition-colors',
+          isBoth ? 'bg-brand text-background-200' : 'text-foreground-muted'
+        )}
+      >
+        both
+      </span>
+      <span
+        className={cn(
+          'rounded-sm px-1.5 py-px text-xs font-medium transition-colors',
+          !isBoth ? 'bg-brand text-background-200' : 'text-foreground-muted'
+        )}
+      >
+        either
+      </span>
+    </button>
+  )
+}
+
+// ── Collapsible explainer ────────────────────────────────────────────────
+
+interface ExpirationExplainerProps {
+  days: number
+  versions: number
+  mode: ExpirationMode
+}
+
+const ExpirationExplainer = ({ days, versions, mode }: ExpirationExplainerProps) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const isBoth = mode === 'and'
+  const olderAge = Math.round(days * 1.1)
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger asChild>
+        <button
+          type="button"
+          className="flex items-center gap-1.5 text-foreground-muted hover:text-foreground-lighter transition-colors"
+        >
+          <ChevronRight size={12} className={cn('transition-transform', isOpen && 'rotate-90')} />
+          <span className="text-xs">See how this works</span>
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="mt-2.5 rounded-md border border-default bg-surface-100 p-3">
+          <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-foreground-muted">
+            Example
+          </p>
+          <p className="text-xs leading-relaxed text-foreground-lighter">
+            {isBoth ? (
+              <>
+                With{' '}
+                <span className="text-foreground-light">{versions + 2} noncurrent versions</span>,
+                the oldest at <span className="text-foreground-light">{olderAge}d</span>: only
+                versions that exceed <em>both</em> the {versions}-version cap and the {days}-day
+                limit are removed. v{versions} exceeds the age limit but is within the cap — kept.
+              </>
+            ) : (
+              <>
+                With{' '}
+                <span className="text-foreground-light">{versions + 2} noncurrent versions</span>,
+                the oldest at <span className="text-foreground-light">{olderAge}d</span>: versions
+                exceeding <em>either</em> the {versions}-version cap or the {days}-day limit are
+                removed. Each rule is enforced independently.
+              </>
+            )}
+          </p>
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

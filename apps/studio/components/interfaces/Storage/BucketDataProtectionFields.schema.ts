@@ -28,6 +28,9 @@ export interface BucketProtectionFormValues {
  * Validates the versioning fields against the org's plan limits. Call this
  * from the parent modal's `.superRefine` so errors surface through the usual
  * `FormItemLayout`/`FormMessage` rendering.
+ *
+ * Both fields are optional — an empty value means "no limit" for that
+ * condition. When a value IS provided it must fall within the plan's bounds.
  */
 export const superRefineBucketProtection = (
   data: BucketProtectionFormValues,
@@ -36,15 +39,10 @@ export const superRefineBucketProtection = (
 ) => {
   if (!data.enable_versioning || !planLimits) return
 
-  if (data.version_expiry_days === '') {
-    ctx.addIssue({
-      path: ['version_expiry_days'],
-      code: z.ZodIssueCode.custom,
-      message: 'Please provide a retention period',
-    })
-  } else if (
-    data.version_expiry_days < planLimits.minRetentionDays ||
-    data.version_expiry_days > planLimits.maxRetentionDays
+  if (
+    data.version_expiry_days !== '' &&
+    (data.version_expiry_days < planLimits.minRetentionDays ||
+      data.version_expiry_days > planLimits.maxRetentionDays)
   ) {
     ctx.addIssue({
       path: ['version_expiry_days'],
@@ -53,15 +51,10 @@ export const superRefineBucketProtection = (
     })
   }
 
-  if (data.max_noncurrent_versions === '') {
-    ctx.addIssue({
-      path: ['max_noncurrent_versions'],
-      code: z.ZodIssueCode.custom,
-      message: 'Please provide a value',
-    })
-  } else if (
-    data.max_noncurrent_versions < planLimits.minVersions ||
-    data.max_noncurrent_versions > planLimits.maxVersions
+  if (
+    data.max_noncurrent_versions !== '' &&
+    (data.max_noncurrent_versions < planLimits.minVersions ||
+      data.max_noncurrent_versions > planLimits.maxVersions)
   ) {
     ctx.addIssue({
       path: ['max_noncurrent_versions'],
