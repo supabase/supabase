@@ -503,9 +503,11 @@ const ExpirationExplainerBody = ({
       return (
         <>
           With <span className="text-foreground-light">{versions + 1} noncurrent versions</span>,
-          the oldest at <span className="text-foreground-light">{days + 1} days</span>: it exceeds{' '}
-          <em>both</em> the {versions}-version cap and the {days}-day limit — deleted. A version
-          within either limit is kept.
+          the oldest at <span className="text-foreground-light">{days + 1} days</span>: it exceeds
+          both the {versions}-version cap and the {days}-day limit, so it is permanently deleted. If
+          the oldest were only{' '}
+          <span className="text-foreground-light">{Math.max(1, days - 1)} days</span> old, it would
+          be kept — both conditions must be met.
         </>
       )
     }
@@ -513,9 +515,12 @@ const ExpirationExplainerBody = ({
     return (
       <>
         With <span className="text-foreground-light">{versions + 1} noncurrent versions</span>, the
-        oldest at <span className="text-foreground-light">{days + 1} days</span>: it exceeds the{' '}
-        {versions}-version cap and is also past the {days}-day limit — <em>either</em> condition
-        alone would delete it.
+        oldest at <span className="text-foreground-light">{Math.max(1, days - 1)} days</span>: it is
+        within the {days}-day limit but exceeds the {versions}-version cap, so it is permanently
+        deleted. Conversely, a file with only{' '}
+        <span className="text-foreground-light">{versions} versions</span> where the oldest is{' '}
+        <span className="text-foreground-light">{days + 1} days</span> old would also have that
+        version deleted — either condition alone is enough.
       </>
     )
   }
