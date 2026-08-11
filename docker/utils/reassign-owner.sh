@@ -20,7 +20,7 @@ if ! docker compose version >/dev/null 2>&1; then
 fi
 
 # Check Postgres service
-db_image_prefix="supabase.postgres:"
+db_image_prefix="supabase/postgres:"
 
 compose_output=$(docker compose ps \
     --format '{{.Image}}\t{{.Service}}\t{{.Status}}' 2>/dev/null |
