@@ -33,6 +33,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         password,
       })
       if (error) throw error
+      // Follow the `next` query parameter if it is a same-origin relative path, e.g. when
+      // the OAuth consent screen sent the user here to sign in first. It may point outside
+      // the typed route tree, so it needs a full navigation.
+      const next = new URLSearchParams(window.location.search).get('next')
+      if (next?.startsWith('/') && !next.startsWith('//')) {
+        window.location.assign(next)
+        return
+      }
       // Update this route to redirect to an authenticated route. The user already has an active session.
       await navigate({ to: '/protected' })
     } catch (error: unknown) {

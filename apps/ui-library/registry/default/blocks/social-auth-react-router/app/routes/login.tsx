@@ -1,4 +1,4 @@
-import { redirect, useFetcher, type ActionFunctionArgs } from 'react-router'
+import { redirect, useFetcher, useSearchParams, type ActionFunctionArgs } from 'react-router'
 
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
@@ -10,14 +10,22 @@ import {
   CardTitle,
 } from '@/registry/default/components/ui/card'
 
+// Follows the `next` form value if it is a same-origin relative path, e.g. when
+// the OAuth consent screen sent the user here to sign in first.
+const safeNextPath = (next: FormDataEntryValue | null, fallback: string) =>
+  typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : fallback
+
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase } = createClient(request)
   const origin = new URL(request.url).origin
 
+  const formData = await request.formData()
+  const next = safeNextPath(formData.get('next'), '/protected')
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: `${origin}/auth/oauth?next=/protected`,
+      redirectTo: `${origin}/auth/oauth?next=${encodeURIComponent(next)}`,
     },
   })
 
@@ -34,6 +42,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Login() {
   const fetcher = useFetcher<typeof action>()
+  const [searchParams] = useSearchParams()
 
   const error = fetcher.data?.error
   const loading = fetcher.state === 'submitting'
@@ -49,6 +58,7 @@ export default function Login() {
             </CardHeader>
             <CardContent>
               <fetcher.Form method="post">
+                <input type="hidden" name="next" value={searchParams.get('next') ?? ''} />
                 <div className="flex flex-col gap-6">
                   {error && <p className="text-sm text-destructive-500">{error}</p>}
                   <Button type="submit" className="w-full" disabled={loading}>

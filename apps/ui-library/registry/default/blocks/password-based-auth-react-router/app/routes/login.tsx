@@ -1,4 +1,4 @@
-import { Link, redirect, useFetcher, type ActionFunctionArgs } from 'react-router'
+import { Link, redirect, useFetcher, useSearchParams, type ActionFunctionArgs } from 'react-router'
 
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
@@ -11,6 +11,11 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
+
+// Follows the `next` form value if it is a same-origin relative path, e.g. when
+// the OAuth consent screen sent the user here to sign in first.
+const safeNextPath = (next: FormDataEntryValue | null, fallback: string) =>
+  typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : fallback
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
@@ -32,11 +37,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // Update this route to redirect to an authenticated route. The user already has an active session.
-  return redirect('/protected', { headers })
+  return redirect(safeNextPath(formData.get('next'), '/protected'), { headers })
 }
 
 export default function Login() {
   const fetcher = useFetcher<typeof action>()
+  const [searchParams] = useSearchParams()
 
   const error = fetcher.data?.error
   const loading = fetcher.state === 'submitting'
@@ -52,6 +58,7 @@ export default function Login() {
             </CardHeader>
             <CardContent>
               <fetcher.Form method="post">
+                <input type="hidden" name="next" value={searchParams.get('next') ?? ''} />
                 <div className="flex flex-col gap-6">
                   <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>

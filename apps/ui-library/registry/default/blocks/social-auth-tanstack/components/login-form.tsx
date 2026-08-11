@@ -11,6 +11,13 @@ import {
   CardTitle,
 } from '@/registry/default/components/ui/card'
 
+// Follows the `next` query parameter if it is a same-origin relative path, e.g. when
+// the OAuth consent screen sent the user here to sign in first.
+const getNextPath = (fallback: string) => {
+  const next = new URLSearchParams(window.location.search).get('next')
+  return next?.startsWith('/') && !next.startsWith('//') ? next : fallback
+}
+
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -25,7 +32,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/oauth?next=/protected`,
+          redirectTo: `${window.location.origin}/auth/oauth?next=${encodeURIComponent(getNextPath('/protected'))}`,
         },
       })
 
