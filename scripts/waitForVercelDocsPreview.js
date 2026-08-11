@@ -80,6 +80,14 @@ async function main() {
     const latest = await fetchLatestStatus(repository, sha, githubToken)
 
     if (latest?.state === 'success') {
+      // A skipped build still posts success, but its target_url points at an
+      // older deployment that does not have this commit's changes. Resolve no
+      // URL so the caller skips rather than testing the wrong markup.
+      if (/^skipped/i.test(latest.description ?? '')) {
+        console.error(`Vercel skipped the docs build for ${sha}: ${latest.description}`)
+        return
+      }
+
       if (!latest.target_url) {
         throw new Error(
           'Vercel docs commit status succeeded but had no target_url to resolve a deployment from'
