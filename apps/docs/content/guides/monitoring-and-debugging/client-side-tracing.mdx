@@ -73,7 +73,7 @@ For security, trace headers are only attached to requests targeting Supabase dom
 
 <Admonition type="note">
 
-Calling Edge Functions from the browser with trace propagation enabled requires the function's CORS allow-list to include the trace headers. Import `corsHeaders` from `@supabase/supabase-js/cors` (version `2.112.3` or later) or add `traceparent`, `tracestate`, and `baggage` to your own allow-list, then redeploy the function. See [CORS support for Edge Functions](/docs/guides/functions/cors).
+Calling Edge Functions from the browser with trace propagation enabled requires the function's CORS allow-list to include the trace headers. In the function, import `corsHeaders` from `npm:@supabase/supabase-js@^2.112.3/cors` or add `traceparent`, `tracestate`, and `baggage` to your own allow-list, then redeploy the function. See [CORS support for Edge Functions](/docs/guides/functions/cors).
 
 </Admonition>
 
@@ -96,22 +96,22 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-| Option                    | Type      | Default | Description                                                                                                                                                                                                                                                        |
-| ------------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `enabled`                 | `boolean` | `false` | Enable trace propagation.                                                                                                                                                                                                                                          |
+| Option                    | Type      | Default | Description                                                                                                                                                                                                                                                   |
+| ------------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enabled`                 | `boolean` | `false` | Enable trace propagation.                                                                                                                                                                                                                                     |
 | `respectSamplingDecision` | `boolean` | `true`  | When `true`, non-sampled requests send only `traceparent` (sampled flag preserved) and omit `tracestate` and `baggage`; `false` always sends the full trace context. On versions before `2.112.3`, `true` skipped all trace headers for non-sampled requests. |
 
 ## Using a vendor tracing SDK
 
 Many tracing SDKs are built on top of OpenTelemetry, but they differ in whether their propagator emits the standard `traceparent` header by default:
 
-| Vendor setup                                                    | Works with `tracePropagation`?  | Required configuration                                                                                                                                                             |
-| --------------------------------------------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| OpenTelemetry SDK (also Honeycomb, Grafana, New Relic via OTLP) | Yes                              | None — the W3C propagator is the default                                                                                                                                            |
-| Sentry (Node.js, including Next.js server-side)                 | Yes, with one flag               | Set `propagateTraceparent: true` in `Sentry.init()` — Sentry's propagator omits `traceparent` by default                                                                            |
-| Sentry (browser)                                                 | Via Sentry's own instrumentation | Set `propagateTraceparent: true` and add your project URL (`https://<ref>.supabase.co`) to `tracePropagationTargets` — Sentry's browser SDK only attaches headers cross-origin for listed targets |
-| Datadog `dd-trace` (Node.js)                                     | Out of the box                   | None — `dd-trace` injects W3C headers at the HTTP layer itself, even without `tracePropagation`                                                                                     |
-| Datadog Browser RUM                                              | Yes, with configuration          | Add your project URL to `allowedTracingUrls` with the `tracecontext` propagator type                                                                                                |
+| Vendor setup                                                    | Works with `tracePropagation`?   | Required configuration                                                                                                                                                                            |
+| --------------------------------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OpenTelemetry SDK (also Honeycomb, Grafana, New Relic via OTLP) | Yes                              | None — the W3C propagator is the default                                                                                                                                                          |
+| Sentry (Node.js, including Next.js server-side)                 | Yes, with one flag               | Set `propagateTraceparent: true` in `Sentry.init()` — Sentry's propagator omits `traceparent` by default                                                                                          |
+| Sentry (browser)                                                | Via Sentry's own instrumentation | Set `propagateTraceparent: true` and add your project URL (`https://<ref>.supabase.co`) to `tracePropagationTargets` — Sentry's browser SDK only attaches headers cross-origin for listed targets. For Edge Functions, also add `sentry-trace` to the function's CORS allow-list: Sentry always sends its own header, and it isn't part of `corsHeaders` |
+| Datadog `dd-trace` (Node.js)                                    | Out of the box                   | None — `dd-trace` injects W3C headers at the HTTP layer itself, even without `tracePropagation`                                                                                                   |
+| Datadog Browser RUM                                             | Yes, with configuration          | Add your project URL to `allowedTracingUrls` with the `tracecontext` propagator type                                                                                                              |
 
 If a propagator is active but doesn't emit `traceparent`, the SDK logs a one-time console warning naming the headers the propagator wrote (version `2.112.3` and later).
 

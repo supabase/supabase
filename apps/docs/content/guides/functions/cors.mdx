@@ -59,19 +59,19 @@ Importing from the SDK keeps your allow-list aligned with the headers the client
 
 <Admonition type="note">
 
-The allow-list only states what a browser *may* send — it doesn't change what the SDK sends. Trace context headers are sent exclusively by clients that explicitly opt in to trace propagation (`tracePropagation: true`, disabled by default). Clients that haven't opted in send exactly the same headers as before.
+The allow-list only states what a browser _may_ send — it doesn't change what the SDK sends. Trace context headers are sent exclusively by clients that explicitly opt in to trace propagation (`tracePropagation: true`, disabled by default). Clients that haven't opted in send exactly the same headers as before.
 
 </Admonition>
 
 The full list, and when each header is sent:
 
-| Header                                | Sent                                                                                                                       |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `authorization`                       | Every request (session token or API key)                                                                                   |
-| `apikey`                              | Every request                                                                                                              |
-| `x-client-info`                       | Every request (SDK name and version)                                                                                       |
-| `content-type`                        | Requests with a body                                                                                                       |
-| `x-retry-count`                       | Only on automatic retry attempts (`postgrest-js` retries failed idempotent requests by default)                            |
+| Header                                 | Sent                                                                                                                                  |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `authorization`                        | Every request (session token or API key)                                                                                              |
+| `apikey`                               | Every request                                                                                                                         |
+| `x-client-info`                        | Every request (SDK name and version)                                                                                                  |
+| `content-type`                         | Requests with a body                                                                                                                  |
+| `x-retry-count`                        | Only on automatic retry attempts (`postgrest-js` retries failed idempotent requests by default)                                       |
 | `traceparent`, `tracestate`, `baggage` | **Only when [trace propagation](/docs/guides/monitoring-and-debugging/client-side-tracing) is explicitly enabled** — never by default |
 
 ### For versions before 2.95.0
