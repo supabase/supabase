@@ -73,6 +73,7 @@ struct ContentView: View {
 
   @State var instruments: [Instrument] = []
   @State var errorMessage: String?
+  @State var isLoading = true
 
   var body: some View {
     List(instruments) { instrument in
@@ -81,7 +82,7 @@ struct ContentView: View {
     .overlay {
       if let errorMessage {
         Text("Error loading instruments: \(errorMessage)")
-      } else if instruments.isEmpty {
+      } else if isLoading {
         ProgressView()
       }
     }
@@ -91,6 +92,8 @@ struct ContentView: View {
       } catch {
         errorMessage = error.localizedDescription
       }
+
+      isLoading = false
     }
   }
 }

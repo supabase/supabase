@@ -106,10 +106,10 @@ export const fetchInstruments = createServerFn({ method: 'GET' }).handler(async 
 
   if (error) {
     console.error(error)
-    return []
+    return { instruments: [], error: error.message }
   }
 
-  return instruments
+  return { instruments, error: null }
 })
 ```
 
@@ -121,15 +121,16 @@ import { createFileRoute } from '@tanstack/react-router'
 import { fetchInstruments } from '@/lib/supabase/fetch-instruments-server-fn'
 
 export const Route = createFileRoute('/')({
-  loader: async () => {
-    const instruments = await fetchInstruments()
-    return { instruments }
-  },
+  loader: async () => fetchInstruments(),
   component: Home,
 })
 
 function Home() {
-  const { instruments } = Route.useLoaderData()
+  const { instruments, error } = Route.useLoaderData()
+
+  if (error) {
+    return <p>Error loading instruments: {error}</p>
+  }
 
   return (
     <ul>

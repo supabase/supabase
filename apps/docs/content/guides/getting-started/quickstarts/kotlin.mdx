@@ -24,10 +24,16 @@ Replace the version placeholders `$kotlin_version` with the Kotlin version of th
 
 <Admonition type="note">
 
-If your project uses Kotlin 2.0 or newer with Jetpack Compose, also apply the Compose compiler plugin in your root `build.gradle.kts` and app module:
+If your project uses Kotlin 2.0 or newer with Jetpack Compose, declare the Compose compiler plugin in your root `build.gradle.kts`:
 
 ```kotlin
 id("org.jetbrains.kotlin.plugin.compose") version "$kotlin_version" apply false
+```
+
+Then apply it in the app module, without the version and without `apply false`:
+
+```kotlin
+id("org.jetbrains.kotlin.plugin.compose")
 ```
 
 </Admonition>

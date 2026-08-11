@@ -23,7 +23,13 @@ Before the numbered steps, and before any heading:
   by the framework itself. `spring-boot.mdx` is the current example: Java 17,
   `curl`, `unzip`. Don't add one to restate the obvious.
 
-The numbered items below match the step numbers in the guides' own headings.
+The list below is the canonical order, not the literal heading numbers.
+`quickstart_db_setup.mdx` supplies headings 1 and 2, so guides that use it start
+their own headings at 3. Guides that use `quickstart_create_project.mdx` alone get
+heading 1 from the partial and start at 2. A guide may also insert a
+framework-specific step — `astrojs.mdx` adds **Configure Astro for SSR** between the
+client library and the environment variables — so number each guide's headings
+sequentially from where its partial leaves off rather than copying numbers from here.
 
 1. **Create a Supabase project** — via `<$Partial path="quickstart_create_project.mdx" />`,
    either directly or nested inside `quickstart_db_setup.mdx` (see below).
