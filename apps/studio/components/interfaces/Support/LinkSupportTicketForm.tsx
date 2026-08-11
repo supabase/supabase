@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link2 } from 'lucide-react'
 import { useEffect } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, DialogSectionSeparator, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -51,7 +51,10 @@ export const LinkSupportTicketForm = ({
     reValidateMode: 'onBlur',
   })
 
-  const { category, organizationSlug, projectRef } = form.watch()
+  const [category, organizationSlug, projectRef] = useWatch({
+    control: form.control,
+    name: ['category', 'organizationSlug', 'projectRef'],
+  })
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const selectedProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
   const subscriptionPlanId = getOrgSubscriptionPlan(organizations, selectedOrgSlug)

@@ -4,6 +4,8 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="vue" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
 ## 3. Create a Vue app
@@ -14,9 +16,11 @@ Create a Vue app using the `npm init` command.
 npm init vue@latest my-app
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
 
 To install, run the following command in the root of your project:
 
@@ -36,10 +40,10 @@ cd my-app && npm install @supabase/supabase-js
 
 ## 6. Declare Supabase environment variables
 
-Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=vue&tab=frameworks):
+Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=vuejs&connectTab=frameworks):
 
 <Button variant="primary" asChild>
-  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=vue">
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=vuejs">
     Open Connect panel
   </a>
 </Button>
@@ -49,7 +53,7 @@ VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "vue", "tab": "frameworks" }} />
+<$Partial path="api_settings.mdx" variables={{ "framework": "vuejs", "tab": "frameworks" }} />
 
 ## 7. Create the Supabase client
 
@@ -100,3 +104,10 @@ Start the app and go to http://localhost:5173 in a browser and you should see th
 ```bash
 npm run dev
 ```
+
+## Next steps
+
+- Explore [drop-in UI components](/ui) for your Supabase app
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)

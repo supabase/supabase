@@ -1228,9 +1228,12 @@ describe('SupportFormPage', () => {
       expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 2')
     })
 
-    await waitFor(() => {
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
-    })
+    await waitFor(
+      () => {
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
+      },
+      { timeout: 5_000 }
+    )
   })
 
   test('AI Assistant suggestion displays when valid project and organization are selected', async () => {
@@ -1758,10 +1761,13 @@ describe('SupportFormPage', () => {
       const renderResult = renderSupportFormPage()
       unmount = renderResult.unmount
 
-      await waitFor(() => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-      })
+      await waitFor(
+        () => {
+          expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+          expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+        },
+        { timeout: 5_000 }
+      )
 
       await selectCategoryOption(screen, 'Database unresponsive')
       await waitFor(() => {

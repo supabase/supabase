@@ -3,7 +3,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { CheckCircle, Download, Loader } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

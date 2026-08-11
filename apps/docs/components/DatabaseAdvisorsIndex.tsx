@@ -17,7 +17,10 @@ export async function DatabaseAdvisorsIndex() {
     const raw = await readFile(join(GENERATED_DIRECTORY, 'database-advisors.json'), 'utf-8')
     lints = JSON.parse(raw)
   } catch (error) {
-    throw error('[database-advisors] Failed to read generated advisor docs', error)
+    console.warn(
+      '[database-advisors] Failed to read generated advisor docs; rendering without them',
+      error
+    )
   }
 
   return (

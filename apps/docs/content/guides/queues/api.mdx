@@ -7,7 +7,7 @@ When you create a Queue in Supabase, you can choose to create helper database fu
 
 Database functions in `pgmq_public` can be exposed via Supabase Data API so consumers client-side can call them. Visit the [Quickstart](/docs/guides/queues/quickstart) for an example.
 
-### `pgmq_public.pop(queue_name)`
+## `pgmq_public.pop(queue_name)`
 
 Retrieves the next available message and deletes it from the specified Queue.
 
@@ -15,7 +15,7 @@ Retrieves the next available message and deletes it from the specified Queue.
 
 ---
 
-### `pgmq_public.send(queue_name, message, sleep_seconds)`
+## `pgmq_public.send(queue_name, message, sleep_seconds)`
 
 Adds a Message to the specified Queue, optionally delaying its visibility to all consumers by a number of seconds.
 
@@ -25,7 +25,7 @@ Adds a Message to the specified Queue, optionally delaying its visibility to all
 
 ---
 
-### `pgmq_public.send_batch(queue_name, messages, sleep_seconds)`
+## `pgmq_public.send_batch(queue_name, messages, sleep_seconds)`
 
 Adds a batch of Messages to the specified Queue, optionally delaying their availability to all consumers by a number of seconds.
 
@@ -35,7 +35,7 @@ Adds a batch of Messages to the specified Queue, optionally delaying their avail
 
 ---
 
-### `pgmq_public.archive(queue_name, message_id)`
+## `pgmq_public.archive(queue_name, message_id)`
 
 Archives a Message by moving it from the Queue table to the Queue's archive table.
 
@@ -44,7 +44,7 @@ Archives a Message by moving it from the Queue table to the Queue's archive tabl
 
 ---
 
-### `pgmq_public.delete(queue_name, message_id)`
+## `pgmq_public.delete(queue_name, message_id)`
 
 Permanently deletes a Message from the specified Queue.
 
@@ -53,7 +53,7 @@ Permanently deletes a Message from the specified Queue.
 
 ---
 
-### `pgmq_public.read(queue_name, sleep_seconds, n)`
+## `pgmq_public.read(queue_name, sleep_seconds, n)`
 
 Reads up to "n" Messages from the specified Queue with an optional "sleep_seconds" (visibility timeout).
 

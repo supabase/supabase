@@ -81,8 +81,7 @@ functions:
   env_file:
     - .env.functions
   environment:
-    JWT_SECRET: ${JWT_SECRET}
-    SUPABASE_URL: http://kong:8000
+    # ... existing variables ...
 ```
 
 <Admonition type="caution">
@@ -106,9 +105,7 @@ functions:
   environment:
     # Custom variables
     MY_CUSTOM_VAR: ${MY_CUSTOM_VAR}
-    # Required variables
-    JWT_SECRET: ${JWT_SECRET}
-    SUPABASE_URL: http://kong:8000
+    # ... existing variables ...
 ```
 
 Then define `MY_CUSTOM_VAR` in your main `.env` file, or specify the value directly.
@@ -127,7 +124,7 @@ The functions service is pre-configured with the following environment variables
 
 | Variable                    | Value                             | Purpose                                           |
 | --------------------------- | --------------------------------- | ------------------------------------------------- |
-| `SUPABASE_URL`              | `http://kong:8000`                | Internal API gateway URL                          |
+| `SUPABASE_URL`              | `http://api-gw:8000`              | Internal API gateway URL                          |
 | `SUPABASE_PUBLIC_URL`       | `http(s)://<your-domain>`         | Base URL for accessing Supabase from the Internet |
 | `JWT_SECRET`                | `your-jwt-secret`                 | Legacy symmetric encryption key for JWTs          |
 | `SUPABASE_ANON_KEY`         | `your-anon-key`                   | Client-side API key (`anon` role).                |
@@ -135,6 +132,7 @@ The functions service is pre-configured with the following environment variables
 | `SUPABASE_DB_URL`           | `postgresql://...`                | Postgres connection string                        |
 | `SUPABASE_PUBLISHABLE_KEYS` | `{"default":"sb_publishable_...}` | New publishable API key                           |
 | `SUPABASE_SECRET_KEYS`      | `{"default":"sb_secret_...}`      | New secret API key                                |
+| `SUPABASE_JWKS`             | `{"keys":[{...}]}`                | JWKS used to verify JWTs issued by Auth           |
 
 Here's an example function that queries a table using `@supabase/supabase-js`:
 

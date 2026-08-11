@@ -101,7 +101,7 @@ describe('TableCopySelection', () => {
     customRender(<TableCopySelectionHarness editMode />)
 
     expect(
-      await screen.findByText(/will not be re-copied until they require one again/)
+      await screen.findByText(/will not sync existing rows again unless you restart them/)
     ).toBeInTheDocument()
   })
 
@@ -111,9 +111,9 @@ describe('TableCopySelection', () => {
 
     customRender(<TableCopySelectionHarness editMode={false} />)
 
-    await screen.findByText('Copy all tables')
+    await screen.findByText('All tables')
     expect(
-      screen.queryByText(/will not be re-copied until they require one again/)
+      screen.queryByText(/will not sync existing rows again unless you restart them/)
     ).not.toBeInTheDocument()
   })
 
@@ -130,7 +130,9 @@ describe('TableCopySelection', () => {
     )
 
     expect(
-      await screen.findByText('1 of 2 publication tables will have their existing rows copied.')
+      await screen.findByText(
+        '1 of 2 publication tables will run initial sync. Ongoing replication will still include every publication table.'
+      )
     ).toBeInTheDocument()
   })
 

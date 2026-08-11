@@ -156,6 +156,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
 - [x] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
+- [x] `routes/project/$ref/explorer.tsx` — converted from a leaf into a shell (`ExplorerLayout` + `Outlet`) to host the new `/explorer/notebook/$id` leaf; parent `project/$ref.tsx` shell still provides DefaultLayout.
 
 ### Project shell — `/api/*`
 
@@ -289,7 +290,6 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/settings/general.tsx` ← `pages/project/[ref]/settings/general.tsx`
 - [x] A `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
 - [x] A `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx` (sets `skipSettingsLayout: true` — page is a useEffect redirect)
-- [x] A `routes/project/$ref/settings/compute-and-disk.tsx` ← `pages/project/[ref]/settings/compute-and-disk.tsx`
 - [x] A `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
 - [x] A `routes/project/$ref/settings/infrastructure.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
 - [x] A `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
@@ -321,6 +321,11 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/editor/index.tsx` ← `pages/project/[ref]/editor/index.tsx`
 - [x] A `routes/project/$ref/editor/$id.tsx` ← `pages/project/[ref]/editor/[id].tsx`
 - [x] A `routes/project/$ref/editor/new.tsx` ← `pages/project/[ref]/editor/new.tsx`
+
+### Project shell — `/explorer/*`
+
+- [x] A `routes/project/$ref/explorer/index.tsx` ← `pages/project/[ref]/explorer/index.tsx`
+- [x] A `routes/project/$ref/explorer/notebook/$id.tsx` ← `pages/project/[ref]/explorer/notebook/[id].tsx`
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 
@@ -572,8 +577,8 @@ for the Vite pipeline:
 
 - `pnpm-workspace.yaml` catalog now includes `@tanstack/react-router`,
   `@tanstack/react-start`, `@tanstack/react-table` so studio and
-  ui-library stay aligned. `react-query` is **not** in the catalog yet
-  — three consumers (studio, docs, ui-library) sit on different 5.x
+  library stay aligned. `react-query` is **not** in the catalog yet
+  — three consumers (studio, docs, library) sit on different 5.x
   ranges and unifying them is a separate decision.
 - `NODE_OPTIONS=--max-old-space-size=8192` is set on the studio
   `dev` script — Vite's Rolldown-RC frontend hits the default 4 GB

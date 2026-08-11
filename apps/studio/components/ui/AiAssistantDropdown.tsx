@@ -142,6 +142,7 @@ export function AiAssistantDropdown({
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button
+            aria-label="More actions"
             variant={variant}
             size={size}
             disabled={disabled}

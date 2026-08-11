@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ENV_VAR_RAW_KEYS } from './Integrations-Vercel.constants'
 import { LogoPair, PartnerLogo, SupabaseLogo } from '@/components/layouts/InterstitialLayout'

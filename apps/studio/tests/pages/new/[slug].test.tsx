@@ -102,6 +102,19 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
   },
 }
 
+const FRANKFURT = 'Central EU (Frankfurt)'
+
+const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    specific: [
+      ...DEFAULT_AVAILABLE_REGIONS.all.specific,
+      { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
+    ],
+  },
+}
+
 const DEFAULT_AVAILABLE_VERSIONS: { available_versions: AvailableVersion[] } = {
   available_versions: [
     { postgres_engine: '15', release_channel: 'ga', version: 'supabase-postgres-15.6.1.139' },
@@ -496,6 +509,28 @@ describe('project creation wizard', () => {
   })
 
   describe('postgres version and orioledb', () => {
+    test('hides advanced configuration when orioledb is unavailable', async () => {
+      mockWizardEndpoints()
+      const onAvailableVersionsRequest = vi.fn()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/organizations/:slug/available-versions',
+        response: () => {
+          onAvailableVersionsRequest()
+          return HttpResponse.json<{ available_versions: AvailableVersion[] }>({
+            available_versions: DEFAULT_AVAILABLE_VERSIONS.available_versions.slice(0, 1),
+          })
+        },
+      })
+
+      await renderWizard()
+
+      await waitFor(() => expect(onAvailableVersionsRequest).toHaveBeenCalled())
+      expect(
+        screen.queryByRole('button', { name: 'Advanced Configuration' })
+      ).not.toBeInTheDocument()
+    })
+
     test('selecting orioledb shows the alpha warning and submits the oriole engine/channel', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
@@ -520,40 +555,109 @@ describe('project creation wizard', () => {
       expect(body.release_channel).toBe('alpha')
     })
 
-    test('rejects high availability combined with orioledb', async () => {
+    test('hides advanced configuration only while high availability is enabled', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
-      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+      await renderWizard()
 
       await fillProjectName('HA Oriole Project')
+      await generateAndWaitForStrongPassword()
       await selectRegion(/Americas/)
-
-      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
-      await user.click(await screen.findByRole('switch'))
 
       fireEvent.click(await screen.findByRole('button', { name: 'Advanced Configuration' }))
       await user.click(await screen.findByRole('radio', { name: /Postgres with OrioleDB/ }))
 
-      await screen.findByText('High availability is not supported with OrioleDB images')
-      expect(onRequest).not.toHaveBeenCalled()
+      const highAvailabilitySwitch = await screen.findByRole('switch')
+      await user.click(highAvailabilitySwitch)
+
+      expect(
+        screen.queryByRole('button', { name: 'Advanced Configuration' })
+      ).not.toBeInTheDocument()
+
+      await user.click(highAvailabilitySwitch)
+      expect(
+        await screen.findByRole('button', { name: 'Advanced Configuration' })
+      ).toBeInTheDocument()
+
+      await user.click(highAvailabilitySwitch)
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].postgres_engine).toBe('17')
+      expect(onRequest.mock.calls[0][0].release_channel).toBe('ga')
+    })
+
+    test('keeps a manually selected Postgres version when available versions refetch', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_FRANKFURT })
+      const onAvailableVersionsRequest = vi.fn()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/organizations/:slug/available-versions',
+        response: () => {
+          onAvailableVersionsRequest()
+          return HttpResponse.json<{ available_versions: AvailableVersion[] }>(
+            DEFAULT_AVAILABLE_VERSIONS
+          )
+        },
+      })
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await fillProjectName('Sticky Version Project')
+      await selectRegion(/Americas/)
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      // Auto-selects the GA default once versions load
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+
+      await user.click(screen.getByLabelText('Postgres version'))
+      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+
+      const requestsBeforeRegionChange = onAvailableVersionsRequest.mock.calls.length
+      await selectRegion(/Frankfurt/)
+      await waitFor(() =>
+        expect(onAvailableVersionsRequest.mock.calls.length).toBeGreaterThan(
+          requestsBeforeRegionChange
+        )
+      )
+
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+    })
+
+    test('keeps a non-default Postgres version when the internal panel is collapsed and reopened', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await screen.findByPlaceholderText('Project name')
+      await selectRegion(/Americas/)
+      const panelToggle = await screen.findByRole('button', {
+        name: 'Internal-only Configuration',
+      })
+      fireEvent.click(panelToggle)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+      await user.click(screen.getByLabelText('Postgres version'))
+      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+
+      fireEvent.click(panelToggle)
+      await waitFor(() => expect(screen.queryByLabelText('Postgres version')).toBeNull())
+      fireEvent.click(panelToggle)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+      )
     })
 
     test('blocks submission with a toast when orioledb becomes unavailable after selection', async () => {
-      const FRANKFURT = 'Central EU (Frankfurt)'
-      mockWizardEndpoints({
-        availableRegions: {
-          ...DEFAULT_AVAILABLE_REGIONS,
-          all: {
-            ...DEFAULT_AVAILABLE_REGIONS.all,
-            specific: [
-              ...DEFAULT_AVAILABLE_REGIONS.all.specific,
-              { code: 'eu-central-1', name: FRANKFURT, provider: 'AWS', type: 'specific' },
-            ],
-          },
-        },
-      })
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_FRANKFURT })
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
 
@@ -589,6 +693,245 @@ describe('project creation wizard', () => {
         )
       )
       expect(onRequest).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('high availability', () => {
+    test('shows the high availability toggle when the entitlement is enabled', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard()
+
+      expect(await screen.findByText('High availability')).toBeInTheDocument()
+      expect(screen.getByText('Alpha')).toBeInTheDocument()
+      expect(screen.getByText(/Free during Alpha for up to 2 projects/)).toBeInTheDocument()
+      expect(
+        screen
+          .getByText('High availability')
+          .compareDocumentPosition(screen.getByText('Compute size'))
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+      expect(
+        screen.queryByRole('button', { name: 'Internal-only Configuration' })
+      ).not.toBeInTheDocument()
+    })
+
+    test('hides the high availability toggle when the org lacks the entitlement', async () => {
+      mockWizardEndpoints({
+        entitlements: [
+          {
+            feature: { key: 'instances.high_availability', type: 'boolean' },
+            hasAccess: false,
+            type: 'boolean',
+            config: { enabled: false },
+          } as Entitlement,
+        ],
+      })
+
+      await renderWizard()
+
+      await screen.findByPlaceholderText('Project name')
+      expect(screen.queryByText('High availability')).not.toBeInTheDocument()
+    })
+
+    test('removes the custom Postgres version field while high availability is enabled', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard({
+        flags: {
+          newProjectInternalOnlyConfiguration: true,
+        },
+      })
+
+      const highAvailabilitySwitch = await screen.findByRole('switch', {
+        name: 'Enable high availability',
+      })
+      await user.click(highAvailabilitySwitch)
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      expect(screen.getByLabelText('Postgres version')).toBeDisabled()
+      expect(screen.queryByPlaceholderText('e.g 17.6.1.104')).not.toBeInTheDocument()
+
+      await user.click(highAvailabilitySwitch)
+
+      expect(await screen.findByPlaceholderText('e.g 17.6.1.104')).toBeInTheDocument()
+    })
+
+    test('shows high availability regions in a dedicated group', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard()
+
+      await user.click(await screen.findByRole('switch', { name: 'Enable high availability' }))
+      await user.click(getSelectTriggerByLabel('Region'))
+
+      expect(await screen.findByText('High Availability Regions')).toBeInTheDocument()
+      expect(screen.queryByText('General regions')).not.toBeInTheDocument()
+      expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+    })
+
+    test('enabling high availability submits the fixed engine and AWS_K8S provider without a custom version', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('HA Project')
+      await generateAndWaitForStrongPassword()
+      await user.click(await screen.findByRole('switch'))
+      await selectRegion(/East US/)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      const body = onRequest.mock.calls[0][0]
+      expect(body.high_availability).toBe(true)
+      expect(body.cloud_provider).toBe('AWS_K8S')
+      expect(body.postgres_engine).toBe('17')
+      expect(body.release_channel).toBe('ga')
+      expect(body.custom_supabase_internal_requests).toBeUndefined()
+    })
+
+    test('forces the high availability region over a manually selected region and restores it', async () => {
+      vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'staging')
+      try {
+        mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_FRANKFURT })
+
+        await renderWizard()
+
+        await screen.findByPlaceholderText('Project name')
+        await selectRegion(/Frankfurt/)
+        expect(getSelectTriggerByLabel('Region')).toHaveTextContent(FRANKFURT)
+
+        const highAvailabilitySwitch = await screen.findByRole('switch', {
+          name: 'Enable high availability',
+        })
+        await user.click(highAvailabilitySwitch)
+
+        await waitFor(() =>
+          expect(getSelectTriggerByLabel('Region')).toHaveTextContent('East US (North Virginia)')
+        )
+
+        await user.click(highAvailabilitySwitch)
+
+        await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent(FRANKFURT))
+      } finally {
+        vi.unstubAllEnvs()
+      }
+    })
+
+    test('restores the Postgres version selection when high availability is toggled off', async () => {
+      mockWizardEndpoints()
+      // Mirror staging: no versions offered for the standard provider, so the
+      // selection only ever gets populated by the AWS_K8S list while HA is on.
+      addAPIMock({
+        method: 'post',
+        path: '/platform/organizations/:slug/available-versions',
+        response: async ({ request }) => {
+          const { provider } = (await request.json()) as { provider: string }
+          return HttpResponse.json<{ available_versions: AvailableVersion[] }>(
+            provider === 'AWS_K8S' ? DEFAULT_AVAILABLE_VERSIONS : { available_versions: [] }
+          )
+        },
+      })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await fillProjectName('HA Selection Restore Project')
+      await generateAndWaitForStrongPassword()
+      await selectRegion(/Americas/)
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      const highAvailabilitySwitch = await screen.findByRole('switch', {
+        name: 'Enable high availability',
+      })
+      await user.click(highAvailabilitySwitch)
+
+      // The AWS_K8S versions load and auto-select a default while HA is on
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+
+      await user.click(highAvailabilitySwitch)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent(
+          'Select a Postgres version for your project'
+        )
+      )
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      const body = onRequest.mock.calls[0][0]
+      expect(body.high_availability).toBe(false)
+      expect(body.postgres_engine).toBeUndefined()
+      expect(body.release_channel).toBeUndefined()
+      expect(body.custom_supabase_internal_requests).toBeUndefined()
+    })
+
+    test('restores a manually selected Postgres version selection after HA toggle', async () => {
+      mockWizardEndpoints()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/organizations/:slug/available-versions',
+        response: async ({ request }) => {
+          const { provider } = (await request.json()) as { provider: string }
+          return HttpResponse.json<{ available_versions: AvailableVersion[] }>(
+            provider === 'AWS_K8S'
+              ? { available_versions: DEFAULT_AVAILABLE_VERSIONS.available_versions.slice(0, 1) }
+              : DEFAULT_AVAILABLE_VERSIONS
+          )
+        },
+      })
+
+      await renderWizard({ flags: { newProjectInternalOnlyConfiguration: true } })
+
+      await fillProjectName('Manual Selection Restore Project')
+      await selectRegion(/Americas/)
+      fireEvent.click(await screen.findByRole('button', { name: 'Internal-only Configuration' }))
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('15.6.1.139')
+      )
+      await user.click(screen.getByLabelText('Postgres version'))
+      await user.click(await screen.findByRole('option', { name: /17\.9\.9\.999/ }))
+      expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+
+      const highAvailabilitySwitch = await screen.findByRole('switch', {
+        name: 'Enable high availability',
+      })
+      await user.click(highAvailabilitySwitch)
+      await user.click(highAvailabilitySwitch)
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('Postgres version')).toHaveTextContent('17.9.9.999')
+      )
+    })
+
+    test('restores the standard Postgres configuration when high availability is disabled', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Standard Project')
+      await generateAndWaitForStrongPassword()
+      const highAvailabilitySwitch = await screen.findByRole('switch')
+      await user.click(highAvailabilitySwitch)
+      await user.click(highAvailabilitySwitch)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      const body = onRequest.mock.calls[0][0]
+      expect(body.high_availability).toBe(false)
+      expect(body.cloud_provider).toBe('AWS')
+      expect(body.postgres_engine).toBeUndefined()
+      expect(body.custom_supabase_internal_requests).toBeUndefined()
     })
   })
 

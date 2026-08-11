@@ -108,10 +108,10 @@ We're always looking to add more destinations. If there is another warehouse, la
 Supabase Pipelines uses a pipeline-based and usage-based pricing model:
 
 - **$0.053 per hour** per configured pipeline
-- **$0.60 per GB** of initial sync data
-- **$3 per GB** of ongoing replication data
+- **$0.60 per GB** of data processed during initial sync
+- **$3 per GB** of data processed during ongoing replication
 
-A pipeline becomes billable as soon as it is created and is charged hourly, including while replication is paused or inactive. Initial sync data covers the first load of existing data, while ongoing replication data covers changes processed after that initial sync. Pricing may change during the public alpha, and we will provide advance notice before any updates take effect.
+A pipeline becomes billable as soon as it is created and is charged hourly, including while replication is paused or inactive. Data processed is Postgres row data accepted by the destination, measured consistently across destinations. The initial sync rate covers the first load of existing data and later resynchronizations, while the ongoing replication rate covers subsequent changes. Pricing may change during the public alpha, and we will provide advance notice before any updates take effect.
 
 ## Things to know during public alpha
 

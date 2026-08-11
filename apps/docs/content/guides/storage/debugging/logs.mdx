@@ -9,15 +9,15 @@ The [Storage Logs](/dashboard/project/_/logs/storage-logs) provide a convenient 
 
 For more advanced filtering needs, use the [Logs Explorer](/dashboard/project/_/logs/explorer) to query the Storage logs dataset directly. The Logs Explorer is separate from the SQL Editor and uses a subset of the BigQuery SQL syntax rather than traditional SQL.
 
-<Admonition type="tip">
+<Admonition type="note">
   
-For more details on filtering the log tables, see [Advanced Log Filtering](/docs/guides/telemetry/advanced-log-filtering)
+For more details on filtering the log tables, see [Advanced Log Filtering](/docs/guides/monitoring-and-debugging/advanced-log-filtering)
 
 </Admonition>
 
-### Example Storage queries for the Logs Explorer
+## Example Storage queries for the Logs Explorer
 
-#### Filter by status 5XX error
+### Filter by status 5XX error
 
 ```sql
 select
@@ -37,7 +37,7 @@ order by timestamp desc
 limit 100;
 ```
 
-#### Filter by status 4XX error
+### Filter by status 4XX error
 
 ```sql
 select
@@ -57,7 +57,7 @@ order by timestamp desc
 limit 100;
 ```
 
-#### Filter by method
+### Filter by method
 
 ```sql
 select id, storage_logs.timestamp, event_message, r.method
@@ -70,7 +70,7 @@ order by timestamp desc
 limit 100;
 ```
 
-#### Filter by IP address
+### Filter by IP address
 
 ```sql
 select id, storage_logs.timestamp, event_message, r.remoteAddress

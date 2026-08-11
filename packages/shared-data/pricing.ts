@@ -202,13 +202,13 @@ export const pricing: Pricing = {
           free: false,
           pro: [
             '$0.053 per pipeline per hour',
-            '$3.00 per GB ongoing replication data',
-            '$0.60 per GB initial sync data',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
           ],
           team: [
             '$0.053 per pipeline per hour',
-            '$3.00 per GB ongoing replication data',
-            '$0.60 per GB initial sync data',
+            '$3.00 per GB processed during ongoing replication',
+            '$0.60 per GB processed during initial sync',
           ],
           enterprise: 'Custom',
         },

@@ -757,6 +757,16 @@ When asked about restoring/recovering deleted data:
 DO NOT start searching for recovery docs before checking deletion docs
 `
 
+// Notebooks haven't shipped yet — gated behind the Explorer feature flag, same as the
+// notebook AI tools (see lib/ai/is-explorer-enabled.ts). Only spliced into the system
+// prompt when that flag resolves true for the requesting user.
+export const NOTEBOOKS_PROMPT = `
+## Notebooks
+- Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
+- Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
+- When the request clearly calls for a notebook, call \`create_notebook\` directly; the tool handles user approval.
+`
+
 export const OUTPUT_ONLY_PROMPT = `
 # Output-Only Mode
 
@@ -784,15 +794,6 @@ When no code context is provided: return a complete, valid implementation.
 export const SQL_COMPLETION_INSTRUCTIONS = `
 # SQL identifier quoting
 Do not quote identifiers unless they actually require it (uppercase letters, reserved words, or special characters). Plain lowercase identifiers should not be quoted.
-`
-
-export const CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS = `
-# Supabase logs SQL (ClickHouse)
-You are writing SQL for Supabase logs, which run on a ClickHouse-backed engine. This is NOT Postgres and NOT BigQuery. Output valid ClickHouse SQL only.
-- All logs are in a single table named \`logs\`, keyed by a \`source\` column. There are no per-service tables (no \`edge_logs\`, \`postgres_logs\`, and so on) and no \`unnest\` joins.
-- Per-source fields live in the \`log_attributes\` Map(String, String), read as \`log_attributes['key']\`. Map values are strings, so wrap numeric ones in \`toInt32OrZero(...)\`.
-- Use ClickHouse functions, not Postgres or BigQuery ones. Use \`match(col, 'regex')\` or \`col ILIKE '%text%'\` instead of \`regexp_contains\`, \`count()\` instead of \`count(*)\`, and select the \`timestamp\` column directly instead of \`cast(timestamp as datetime)\`.
-- Do not quote identifiers with double quotes and do not append a trailing semicolon.
 `
 
 export const LIMITATIONS_PROMPT = `

@@ -7,6 +7,7 @@ import {
 } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
+import { isLogsSource, sqlSourceToFenceLanguage, type SqlSnippetSource } from './querySource'
 import {
   alterDatabasePreventConnectionStatements,
   destructiveSqlRegex,
@@ -23,6 +24,7 @@ import {
 } from './SQLEditor.types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
+import { untrustedLogSql, type UntrustedLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import type { Database } from '@/data/read-replicas/replicas-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
@@ -72,6 +74,7 @@ export const createSqlSnippetSkeletonV2 = ({
   project_id,
   folder_id,
   idOverride,
+  source = 'database',
 }: {
   name: string
   sql: string
@@ -83,10 +86,14 @@ export const createSqlSnippetSkeletonV2 = ({
    * with a known id, such as to prevent flicker in the SQL editor when adding new unsaved snippets.
    */
   idOverride?: string
+  /**
+   * Which backend the new snippet targets.
+   */
+  source?: SqlSnippetSource
 }): SnippetWithContent => {
   const id = idOverride ?? generateUuid([folder_id, `${name}.sql`])
 
-  return {
+  const base = {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,
     owner_id,
@@ -96,12 +103,29 @@ export const createSqlSnippetSkeletonV2 = ({
     favorite: false,
     inserted_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    status: 'new' as const,
+  }
+
+  if (source === 'logs') {
+    return {
+      ...base,
+      type: 'log_sql',
+      content: {
+        schema_version: NEW_SQL_SNIPPET_SKELETON.content.schema_version,
+        content_id: id ?? '',
+        unchecked_sql: untrustedLogSql(sql ?? ''),
+      },
+    }
+  }
+
+  return {
+    ...base,
+    type: 'sql',
     content: {
       ...NEW_SQL_SNIPPET_SKELETON.content,
       content_id: id ?? '',
       unchecked_sql: untrustedSql(sql ?? ''),
-    } as any,
-    status: 'new',
+    },
   }
 }
 
@@ -433,7 +457,7 @@ export function applyAutoLimit(
  */
 export function getEditorSql(
   editor: IStandaloneCodeEditor,
-  snippetContent?: UntrustedSqlFragment
+  snippetContent?: string
 ): UntrustedSqlFragment {
   const selection = editor.getSelection()
   const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
@@ -473,25 +497,46 @@ export function assembleCompletionDiff(
 }
 
 /**
- * Builds the request body sent to the AI completion endpoint. `options` is
- * the caller-provided extra fields (e.g. `completionMetadata`), merged in
- * last so it can override the defaults if it ever needs to.
+ * The SQL dialect the AI writes. Mirrors the `dialect` enum the completion API
+ * route accepts — a snippet's dialect follows its source and never flips, so a
+ * logs snippet always gets ClickHouse SQL and a database snippet Postgres.
+ */
+export type SqlDialect = 'postgres' | 'clickhouse'
+
+/**
+ * Maps a snippet's query source to the dialect the AI should write in. Logs
+ * snippets run against the ClickHouse-backed analytics endpoint; everything
+ * else runs against the user's Postgres database.
+ */
+export function sqlSourceToDialect(source: SqlSnippetSource): SqlDialect {
+  return isLogsSource(source) ? 'clickhouse' : 'postgres'
+}
+
+/**
+ * Builds the request body sent to the AI completion endpoint. `dialect` is
+ * omitted when undefined so callers that don't care keep the route's Postgres
+ * default. `options` is the caller-provided extra fields (e.g.
+ * `completionMetadata`), merged in last so it can override the defaults if it
+ * ever needs to.
  */
 export function buildCompletionRequestBody({
   projectRef,
   connectionString,
   orgSlug,
+  dialect,
   options,
 }: {
   projectRef: string | undefined
   connectionString: string | undefined | null
   orgSlug: string | undefined
+  dialect?: SqlDialect
   options?: { completionMetadata?: unknown }
 }): {
   projectRef: string | undefined
   connectionString: string | undefined | null
   language: 'sql'
   orgSlug: string | undefined
+  dialect?: SqlDialect
   completionMetadata?: unknown
 } {
   return {
@@ -499,19 +544,44 @@ export function buildCompletionRequestBody({
     connectionString,
     language: 'sql',
     orgSlug,
+    ...(dialect !== undefined && { dialect }),
     ...(options ?? {}),
   }
 }
 
 /**
- * Builds the prompt text used to ask the assistant to debug a failing snippet.
+ * Names the dialect for a logs snippet, whose SQL is ClickHouse against the `logs`
+ * table. The in-app assistant also learns this from the message's `sqlSource`
+ * metadata, but the same text is offered as "Copy prompt" and pasted into external
+ * models, so it has to stand on its own — otherwise a logs error gets Postgres advice.
  */
-export function buildDebugPromptText(sql: string, errorMessage: string): string {
-  const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
-  return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+const CLICKHOUSE_LOGS_DEBUG_HINT =
+  'This query runs against the Supabase logs table on a ClickHouse-backed engine, not Postgres.'
+
+/** The shared ask + error + dialect preamble behind both debug entry points. */
+function buildDebugRequestText(errorMessage: string, source: SqlSnippetSource): string {
+  const ask = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
+  return isLogsSource(source) ? `${ask}\n\n${CLICKHOUSE_LOGS_DEBUG_HINT}` : ask
 }
 
-type DebugSnippet = { snippet: { content?: { unchecked_sql?: UntrustedSqlFragment } } } | undefined
+/**
+ * Builds the prompt text used to ask the assistant to debug a failing snippet, and
+ * offered verbatim as the dropdown's copyable prompt.
+ */
+export function buildDebugPromptText(
+  sql: string,
+  errorMessage: string,
+  source: SqlSnippetSource
+): string {
+  const fence = sqlSourceToFenceLanguage(source)
+  return `${buildDebugRequestText(errorMessage, source)}\n\nSQL Query:\n\`\`\`${fence}\n${sql}\n\`\`\``
+}
+
+// Accepts either brand: the debug flow only reads the SQL as text (it's stripped
+// and interpolated into a prompt), so a logs-branded fragment is fine here.
+type DebugSnippet =
+  | { snippet: { content?: { unchecked_sql?: UntrustedSqlFragment | UntrustedLogSqlFragment } } }
+  | undefined
 type DebugResult = { error?: { message?: string } } | undefined
 
 /**
@@ -536,13 +606,18 @@ export function extractDebugContext(
  */
 export function buildDebugChatArgs(
   snippet: DebugSnippet,
-  result: DebugResult
-): { name: string; sqlSnippets: string[]; initialInput: string } {
+  result: DebugResult,
+  source: SqlSnippetSource
+): {
+  name: string
+  sqlSnippets: Array<{ label: string; content: string; source: SqlSnippetSource }>
+  initialInput: string
+} {
   const { sql, errorMessage } = extractDebugContext(snippet, result)
   return {
     name: 'Debug SQL snippet',
-    sqlSnippets: [sql],
-    initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`,
+    sqlSnippets: [{ label: 'Current Query', content: sql, source }],
+    initialInput: buildDebugRequestText(errorMessage, source),
   }
 }
 
