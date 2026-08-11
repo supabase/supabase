@@ -192,14 +192,17 @@ export const PreviewPane = () => {
   }
 
   const previewThumbnail = (
-    // Viewport-height aware: the CSS clamp ties the preview height to 40vh
-    // but floors at 120px so the sections below always have room to scroll
-    // on short viewports, and caps at 320px so it doesn't dominate on tall
-    // ones. The parent flex layout keeps this block pinned above the
-    // scrollable sections without needing `position: sticky`.
+    // Viewport-height aware. ~144px of chrome sits above the preview (close
+    // button + surrounding padding + filename summary), so the preview height
+    // is derived from what's left of the viewport rather than raw vh: 40% of
+    // the remaining space, floored at 120px and capped at 230px. The floor
+    // guarantees the sections below always have room to scroll; the cap keeps
+    // the preview from dominating on tall viewports; and subtracting the
+    // chrome upfront makes the shrink kick in noticeably earlier than a plain
+    // vh clamp would.
     <div
       className="relative shrink-0 border border-overlay"
-      style={{ height: 'clamp(120px, 40vh, 320px)' }}
+      style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 230px)' }}
     >
       <div className="flex h-full w-full items-center">
         <PreviewFile item={file} />
