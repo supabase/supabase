@@ -3,12 +3,12 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { runResolveScopeCli } from '../../shared/resolve-scope-cli.ts'
-import { resolveDocsScope } from '../utils/resolve-docs-scope.ts'
+import { resolveWwwScope } from '../utils/resolve-www-scope.ts'
 
 runResolveScopeCli({
-  label: 'docs',
+  label: 'www',
   repoRoot: join(dirname(fileURLToPath(import.meta.url)), '../../..'),
-  resolveScope: resolveDocsScope,
+  resolveScope: resolveWwwScope,
 }).catch((error) => {
   console.error(error instanceof Error ? error.message : error)
   process.exit(1)

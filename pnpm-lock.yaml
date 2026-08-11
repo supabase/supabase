@@ -2034,6 +2034,22 @@ importers:
         specifier: ^4.12.1
         version: 4.12.1
 
+  e2e/shared:
+    dependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+
   e2e/studio:
     dependencies:
       '@playwright/test':
@@ -2061,6 +2077,22 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.22.4
+
+  e2e/www:
+    dependencies:
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
+    devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
 
   packages/ai-commands:
     dependencies:
