@@ -28,15 +28,23 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: { message: error.message } })
   }
 
-  factors?.factors.forEach(async (factor: any) => {
-    const { error } = await supabase.auth.admin.mfa.deleteFactor({
-      id: factor.id,
-      userId: id as string,
+  // Await every deletion before responding. Without this the handler reports success
+  // while the deletions are still in flight, so a failure is never surfaced and the user
+  // can be left with factors still enrolled.
+  const deletionErrors = await Promise.all(
+    (factors?.factors ?? []).map(async (factor) => {
+      const { error } = await supabase.auth.admin.mfa.deleteFactor({
+        id: factor.id,
+        userId: id as string,
+      })
+      return error
     })
-    if (error) {
-      return res.status(400).json({ error: { message: error.message } })
-    }
-  })
+  )
+
+  const failedDeletion = deletionErrors.find((deletionError) => !!deletionError)
+  if (failedDeletion) {
+    return res.status(400).json({ error: { message: failedDeletion.message } })
+  }
 
   return res.status(200).json({ data: null, error: null })
 }
