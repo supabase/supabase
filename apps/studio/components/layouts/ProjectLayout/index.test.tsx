@@ -153,7 +153,7 @@ vi.mock('@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs', () => ({
   ProjectAPIDocs: () => null,
 }))
 vi.mock('@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner', () => ({
-  ResourceExhaustionWarningBanner: () => null,
+  ResourceExhaustionWarningBanner: () => <div data-testid="resource-exhaustion-banner" />,
 }))
 vi.mock('@/components/ui/ButtonTooltip', () => ({
   ButtonTooltip: ({ children, ...props }: any) => (
@@ -321,6 +321,22 @@ describe('ProjectLayout title', () => {
       screen.getByText('Changes made here may affect your connected Stripe project.')
     ).toBeTruthy()
     expect(screen.getByTestId('partner-icon')).toBeTruthy()
+  })
+
+  it('keeps the resource exhaustion banner mounted while the database is unreachable', () => {
+    mockProjectState.current = { ...mockProjectState.current, postgrestStatus: 'OFFLINE' }
+
+    renderLayout()
+
+    expect(screen.getByTestId('resource-exhaustion-banner')).toBeTruthy()
+  })
+
+  it('keeps the resource exhaustion banner mounted while the project is restoring', () => {
+    mockProjectState.current = { ...mockProjectState.current, status: 'RESTORING' }
+
+    renderLayout()
+
+    expect(screen.getByTestId('resource-exhaustion-banner')).toBeTruthy()
   })
 
   it('uses a project-specific dismiss key for the Stripe project banner', () => {
