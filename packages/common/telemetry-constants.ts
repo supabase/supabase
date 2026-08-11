@@ -1853,7 +1853,7 @@ export interface AssistantMessageRatingSubmittedEvent {
  *
  * @group Events
  * @source supabase-ui
- * @page /ui/docs/{framework}/{templateTitle}
+ * @page /library/docs/{framework}/{templateTitle}
  */
 export interface SupabaseUiCommandCopyButtonClickedEvent {
   action: 'supabase_ui_command_copy_button_clicked'

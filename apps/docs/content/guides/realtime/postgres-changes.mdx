@@ -3438,7 +3438,7 @@ alter table
 
 <Admonition type="caution">
 
-RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record. When RLS is enabled and `replica identity` is set to `full` on a table, the `old` record contains only the primary key(s).
+RLS policies are not applied to `DELETE` statements, because there is no way for Postgres to verify that a user has access to a deleted record.
 
 </Admonition>
 
@@ -3619,9 +3619,9 @@ await channel.Subscribe();
 
 ## Limitations
 
-### Delete events are not filterable
+### Delete events
 
-You can't filter Delete events when tracking Postgres Changes. This limitation is due to the way changes are pulled from Postgres.
+You can only filter Delete events when tracking Postgres Changes if the table has the `replica identity` set to `full`. See [Receiving old records](#receiving-old-records).
 
 ## Scaling Postgres Changes
 

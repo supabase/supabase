@@ -757,6 +757,16 @@ When asked about restoring/recovering deleted data:
 DO NOT start searching for recovery docs before checking deletion docs
 `
 
+// Notebooks haven't shipped yet — gated behind the Explorer feature flag, same as the
+// notebook AI tools (see lib/ai/is-explorer-enabled.ts). Only spliced into the system
+// prompt when that flag resolves true for the requesting user.
+export const NOTEBOOKS_PROMPT = `
+## Notebooks
+- Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
+- Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
+- When the request clearly calls for a notebook, call \`create_notebook\` directly; the tool handles user approval.
+`
+
 export const OUTPUT_ONLY_PROMPT = `
 # Output-Only Mode
 

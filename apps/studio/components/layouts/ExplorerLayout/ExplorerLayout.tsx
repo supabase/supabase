@@ -12,6 +12,7 @@ import { type ExplorerResourceType } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -56,7 +57,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
             newTabButton={<NewTabButton />}
           />
         </div>
-        <div className="h-full">{children}</div>
+        <div className="flex-grow min-h-0">{children}</div>
       </div>
     </ProjectLayoutWithAuth>
   )
@@ -85,6 +86,8 @@ const HomeTabButton = () => {
 }
 
 const NewTabButton = () => {
+  const { createNotebook } = useCreateNotebook()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -103,7 +106,7 @@ const NewTabButton = () => {
         </motion.button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
-        <DropdownMenuItem className="gap-x-2">
+        <DropdownMenuItem className="gap-x-2" onClick={() => createNotebook()}>
           <NotebookText size={14} />
           <span>New notebook</span>
         </DropdownMenuItem>

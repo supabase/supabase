@@ -1,6 +1,8 @@
 import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 
 import type { PermissionCatalogEntry, PermissionMode } from '../../AccessToken.permissions'
+import type { EntryAccess } from '../../AccessToken.roles'
+import { ExceedsRoleBadge } from '../ExceedsRoleBadge'
 import { RiskMarker } from './RiskMarker'
 import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
@@ -9,6 +11,7 @@ interface PermissionRowProps {
   mode: PermissionMode
   onChange: (mode: PermissionMode) => void
   permissionScopeMap: PermissionScopeMap | undefined
+  entryAccess?: EntryAccess
 }
 
 export const PermissionRow = ({
@@ -16,6 +19,7 @@ export const PermissionRow = ({
   mode,
   onChange,
   permissionScopeMap,
+  entryAccess,
 }: PermissionRowProps) => {
   return (
     <div className="flex items-center justify-between gap-4 py-4">
@@ -27,6 +31,9 @@ export const PermissionRow = ({
             </span>
           </Label>
           <RiskMarker entry={entry} permissionScopeMap={permissionScopeMap} />
+          {entryAccess?.status === 'exceeds-role' && (
+            <ExceedsRoleBadge entry={entry} mode={mode} access={entryAccess} />
+          )}
         </span>
         <p id={`${entry.key}-permissions-description`} className="text-xs text-foreground-lighter">
           {entry.description}

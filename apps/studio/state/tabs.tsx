@@ -22,7 +22,7 @@ export const editorEntityTypes = {
   explorer: ['notebook'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook'
 
 type CreateTabIdParams = {
   r: { id: number }
@@ -31,6 +31,7 @@ type CreateTabIdParams = {
   f: { id: number }
   p: { id: number }
   sql: { id: string }
+  notebook: { id: string }
   schema: { schema: string }
   view: never
   function: never
@@ -46,6 +47,7 @@ export interface Tab {
     name?: string
     tableId?: number
     sqlId?: string
+    notebookId?: string
     scrollTop?: number
     /**
      * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
@@ -386,6 +388,9 @@ export function createTabsState(projectRef: string) {
           const schema = (router.query.schema as string) || 'public'
           router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
           break
+        case 'notebook':
+          router.push(`/project/${router.query.ref}/explorer/notebook/${tab.metadata?.notebookId}`)
+          break
         case 'r':
         case 'v':
         case 'm':
@@ -519,6 +524,9 @@ export function createTabsState(projectRef: string) {
             case 'sql':
               router.push(`/project/${router.query.ref}/sql`)
               break
+            case 'notebook':
+              router.push(`/project/${router.query.ref}/explorer`)
+              break
             case 'r':
             case 'v':
             case 'm':
@@ -638,6 +646,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `p-${(params as CreateTabIdParams['p']).id}`
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
+    case 'notebook':
+      return `notebook-${(params as CreateTabIdParams['sql']).id}`
     default:
       return ''
   }
