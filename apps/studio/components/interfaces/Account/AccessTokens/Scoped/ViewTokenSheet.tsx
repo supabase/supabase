@@ -14,7 +14,6 @@ import {
 import { useCapabilitySummary } from '../hooks/useCapabilitySummary'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
-import { McpUnsupportedWarning } from './McpUnsupportedWarning'
 import { CapabilityCategoryList, ResourceSummaryItem, RiskLevelSummary } from './TokenSummaryRows'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
@@ -350,7 +349,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
                     <div className="flex flex-col gap-3">
                       <h3 className="text-sm">MCP tools</h3>
-                      <McpUnsupportedWarning />
                       {mcpTools.length === 0 ? (
                         <p className="text-xs text-foreground-light">
                           No MCP tools are enabled by the selected capabilities.

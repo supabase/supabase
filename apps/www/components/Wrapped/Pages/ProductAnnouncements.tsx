@@ -144,11 +144,11 @@ const months: Month[] = [
       },
       {
         title: 'Supabase UI Library now includes Infinite Query block',
-        url: 'https://supabase.com/ui/docs/infinite-query-hook',
+        url: 'https://supabase.com/library/docs/infinite-query-hook',
       },
       {
         title: 'Supabase UI Library now includes Social Auth',
-        url: 'https://supabase.com/ui/docs/nextjs/social-auth',
+        url: 'https://supabase.com/library/docs/nextjs/social-auth',
       },
       {
         title: 'New SOC2 Report',

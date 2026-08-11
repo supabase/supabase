@@ -36,6 +36,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/ui',
+    destination: '/library',
+  },
+  {
+    permanent: true,
+    source: '/ui/:path*',
+    destination: '/library/:path*',
+  },
+  {
+    permanent: true,
     source: '/auth/Auth',
     destination: '/auth',
   },
