@@ -272,7 +272,7 @@ describe('ai/tools/notebook-tools', () => {
         path: '/platform/projects/:ref/content',
         response: async ({ request }) => {
           sentBody = (await request.json()) as Record<string, unknown>
-          return HttpResponse.json(null)
+          return new HttpResponse(null)
         },
       })
 
@@ -306,7 +306,7 @@ describe('ai/tools/notebook-tools', () => {
         path: '/platform/projects/:ref/content',
         response: async ({ request }) => {
           sentBody = (await request.json()) as Record<string, unknown>
-          return HttpResponse.json(null)
+          return new HttpResponse(null)
         },
       })
 
