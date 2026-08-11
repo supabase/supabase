@@ -1,8 +1,14 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import dayjs from 'dayjs'
-import { CirclePause, CirclePlay } from 'lucide-react'
+import { CirclePause, CirclePlay, TextSearch } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
+import {
+  useFeaturePreviewModal,
+  useIsDatabaseConnectionsEnabled,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Activity } from '@/components/interfaces/Observability/DatabaseConnections/Activity'
 import { buildDatabaseConnectionsSummaryPrompt } from '@/components/interfaces/Observability/DatabaseConnections/DatabaseConnections.ai'
 import { Overview } from '@/components/interfaces/Observability/DatabaseConnections/Overview'
@@ -11,6 +17,7 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useDatabaseActivityQuery } from '@/data/database/activity-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -26,8 +33,10 @@ export const DatabaseConnections: NextPageWithLayout = () => {
   const { data: project } = useSelectedProjectQuery()
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
+  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
+  const { selectFeaturePreview } = useFeaturePreviewModal()
 
-  const [live, setLive] = useState(true)
+  const [live, setLive] = useState(isDatabaseConnectionsEnabled)
   const [now, setNow] = useState(() => dayjs.utc())
 
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleToggleLive, {
@@ -43,7 +52,11 @@ export const DatabaseConnections: NextPageWithLayout = () => {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-    { refetchOnWindowFocus: live, refetchInterval: live ? 3000 : false }
+    {
+      enabled: isDatabaseConnectionsEnabled,
+      refetchOnWindowFocus: live,
+      refetchInterval: live ? 3000 : false,
+    }
   )
 
   function handleToggleLive() {
@@ -88,6 +101,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
       <div className="flex items-center justify-between gap-x-4">
         <div className="flex items-center gap-x-2">
           <h1 className="w-max">Database Connections</h1>
+          <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS} />
           {live && (
             <Tooltip>
               <TooltipTrigger>
@@ -100,35 +114,57 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             </Tooltip>
           )}
         </div>
-        <div className="flex items-center gap-x-2">
-          <ShortcutTooltip
-            shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE}
-            label={live ? 'Pause live mode' : 'Refresh data every 3 seconds'}
-            side="bottom"
-          >
-            <Button
-              variant={live ? 'default' : 'primary'}
-              onClick={handleToggleLive}
-              icon={live ? <CirclePause /> : <CirclePlay />}
+
+        {isDatabaseConnectionsEnabled && (
+          <div className="flex items-center gap-x-2">
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE}
+              label={live ? 'Pause live mode' : 'Refresh data every 3 seconds'}
+              side="bottom"
             >
-              {live ? 'Pause' : 'Live'}
-            </Button>
-          </ShortcutTooltip>
-          <AiAssistantDropdown
-            label="Summarize activity"
-            buildPrompt={buildPrompt}
-            onOpenAssistant={handleSummarizeActivity}
-            disabled={isLoadingActivity}
-            loading={isLoadingActivity}
-            telemetrySource="database_connections"
-            size="tiny"
-            variant="default"
-          />
-        </div>
+              <Button
+                variant={live ? 'default' : 'primary'}
+                onClick={handleToggleLive}
+                icon={live ? <CirclePause /> : <CirclePlay />}
+              >
+                {live ? 'Pause' : 'Live'}
+              </Button>
+            </ShortcutTooltip>
+            <AiAssistantDropdown
+              label="Summarize activity"
+              buildPrompt={buildPrompt}
+              onOpenAssistant={handleSummarizeActivity}
+              disabled={isLoadingActivity}
+              loading={isLoadingActivity}
+              telemetrySource="database_connections"
+              size="tiny"
+              variant="default"
+            />
+          </div>
+        )}
       </div>
 
-      <Overview live={live} />
-      <Activity live={live} />
+      {!isDatabaseConnectionsEnabled && (
+        <EmptyStatePresentational
+          icon={<TextSearch />}
+          title="Diagnose stuck and blocked queries"
+          description="See every session on your database in real time, spot the ones that are slow, idle in a transaction, or blocked, and terminate the one holding things up"
+        >
+          <Button
+            variant="default"
+            onClick={() => selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS)}
+          >
+            Enable feature preview
+          </Button>
+        </EmptyStatePresentational>
+      )}
+
+      {isDatabaseConnectionsEnabled && (
+        <>
+          <Overview live={live} />
+          <Activity live={live} />
+        </>
+      )}
     </ReportPadding>
   )
 }
