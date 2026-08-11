@@ -10,6 +10,12 @@ import type { ExpirationMode, VersioningPlanLimits } from './StorageProtection.c
  */
 const versioningNumberField = z.union([z.literal(''), z.coerce.number().int()])
 
+/**
+ * S3 lifecycle policies support at most 100 noncurrent versions per rule.
+ * This is an absolute ceiling independent of the org's billing plan.
+ */
+export const S3_MAX_NONCURRENT_VERSIONS = 100
+
 export const bucketProtectionFormFields = {
   enable_versioning: z.boolean().default(false),
   version_expiry_days: versioningNumberField.default(''),
@@ -51,15 +57,22 @@ export const superRefineBucketProtection = (
     })
   }
 
-  if (
-    data.max_noncurrent_versions !== '' &&
-    (data.max_noncurrent_versions < planLimits.minVersions ||
-      data.max_noncurrent_versions > planLimits.maxVersions)
-  ) {
-    ctx.addIssue({
-      path: ['max_noncurrent_versions'],
-      code: z.ZodIssueCode.custom,
-      message: `Must be between ${planLimits.minVersions} and ${planLimits.maxVersions} versions on your plan`,
-    })
+  if (data.max_noncurrent_versions !== '') {
+    if (data.max_noncurrent_versions > S3_MAX_NONCURRENT_VERSIONS) {
+      ctx.addIssue({
+        path: ['max_noncurrent_versions'],
+        code: z.ZodIssueCode.custom,
+        message: `Cannot exceed ${S3_MAX_NONCURRENT_VERSIONS} versions (S3 lifecycle policy limit)`,
+      })
+    } else if (
+      data.max_noncurrent_versions < planLimits.minVersions ||
+      data.max_noncurrent_versions > planLimits.maxVersions
+    ) {
+      ctx.addIssue({
+        path: ['max_noncurrent_versions'],
+        code: z.ZodIssueCode.custom,
+        message: `Must be between ${planLimits.minVersions} and ${planLimits.maxVersions} versions on your plan`,
+      })
+    }
   }
 }
