@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Brush, Copy, Download, RotateCcw, Trash2 } from 'lucide-react'
+import { Copy, Download, RotateCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, cn } from 'ui'
@@ -349,7 +349,7 @@ const VersionExpiryIndicator = ({
             emphasize ? 'text-warning-600' : 'text-foreground-muted'
           )}
         >
-          <Brush size={12} />
+          <Trash2 size={12} />
           {daysLabel}
         </span>
       )}
