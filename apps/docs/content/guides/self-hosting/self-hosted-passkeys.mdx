@@ -1,0 +1,68 @@
+---
+title: 'Configure Passkey authentication'
+description: 'Set up passkey authentication for self-hosted Supabase.'
+subtitle: 'Set up passkey authentication for self-hosted Supabase.'
+---
+
+## Overview
+
+[Passkeys](https://fidoalliance.org/passkeys/) are passwordless credentials built on the [WebAuthn](https://www.w3.org/TR/webauthn-3/) standard. The user proves possession of a private key stored on their device (or password manager) using biometrics, a PIN, or a hardware security key. The matching public key is registered with Supabase Auth and used to verify future sign-ins. Passkeys are phishing-resistant and remove the need to manage shared secrets.
+
+<Admonition type="note">
+
+This guide only covers server side setup for configuring passkey support in self-hosted Supabase. For client setup - see the [Passkey authentication](/docs/guides/auth/passkeys#enable-in-the-client) guide.
+
+</Admonition>
+
+## Enable passkey authentication
+
+For self-hosted Supabase, passkey authentication is configured through environment variables passed to the auth service in `docker-compose.yml`. The variables below control passkey authentication and WebAuthn configuration.
+
+| Variable                                    | Description                                                                                                                                                                                                                                                  | Default |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `GOTRUE_PASSKEY_ENABLED`                    | Enables passkey authentication.                                                                                                                                                                                                                              | `false` |
+| `GOTRUE_PASSKEY_MAX_PASSKEYS_PER_USER`      | Maximum number of passkeys a single user can register.                                                                                                                                                                                                       | `10`    |
+| `GOTRUE_WEBAUTHN_RP_ID`                     | The bare domain name for your application (the WebAuthn [relying party](https://www.w3.org/TR/webauthn-3/#relying-party) ID). Do not include a scheme, port, or path. This determines which passkeys can be used. **Required when passkey auth is enabled.** | -       |
+| `GOTRUE_WEBAUTHN_RP_DISPLAY_NAME`           | A human-readable name for your application, shown during the passkey prompt (for example, "My App"). **Required when passkey auth is enabled.**                                                                                                              | -       |
+| `GOTRUE_WEBAUTHN_RP_ORIGINS`                | Comma-separated list of allowed origins (for example, `https://example.com,https://app.example.com`). **Required when passkey auth is enabled.**                                                                                                             | -       |
+| `GOTRUE_WEBAUTHN_CHALLENGE_EXPIRY_DURATION` | How long a WebAuthn challenge remains valid. If the ceremony isn't completed within this window, the client must request a new challenge.                                                                                                                    | `5m`    |
+
+### Configure the Auth service
+
+Add the environment variables to the `auth` service in your `docker-compose.yml`:
+
+```yml name=docker-compose.yml
+services:
+  auth:
+    environment:
+      GOTRUE_PASSKEY_ENABLED: true
+      GOTRUE_PASSKEY_MAX_PASSKEYS_PER_USER: 10 # optional - default is 10
+      GOTRUE_WEBAUTHN_RP_ID: example.com
+      GOTRUE_WEBAUTHN_RP_DISPLAY_NAME: 'my-app'
+      GOTRUE_WEBAUTHN_RP_ORIGINS: https://example.com,https://app.example.com
+      GOTRUE_WEBAUTHN_CHALLENGE_EXPIRY_DURATION: 5m # optional - default is 5 minutes
+```
+
+When setting `GOTRUE_WEBAUTHN_RP_ORIGINS`, keep the following requirements in mind:
+
+- HTTPS is required except for loopback addresses (`localhost`, `127.0.0.1`, `[::1]`).
+- Each origin's hostname must match or be a subdomain of `GOTRUE_WEBAUTHN_RP_ID`.
+- Android native apps can use an app origin of the form `android:apk-key-hash:<base64url SHA-256 of the signing certificate>`.
+
+<Admonition type="caution" title="Changing the Relying Party ID invalidates existing passkeys">
+
+Passkeys are cryptographically bound to the Relying Party (RP) ID they were registered against. Changing the RP ID makes every existing passkey unusable for sign-in, and users will need to register a new one. Pick the RP ID carefully before users start enrolling, and keep it stable once they do.
+
+</Admonition>
+
+### Restart the Auth service
+
+After updating the environment variables, restart the auth service for the changes to take effect:
+
+```bash
+docker compose up -d --force-recreate --no-deps auth
+```
+
+## Next steps
+
+Once passkeys are enabled in your auth service, client-side setup (opting in on the Supabase client, registering a passkey, and signing in) is the same as for hosted projects. See the [Passkey authentication](/docs/guides/auth/passkeys#enable-in-the-client) guide.
