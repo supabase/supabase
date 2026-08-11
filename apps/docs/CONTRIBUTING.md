@@ -19,6 +19,19 @@ To make docs as clear as possible:
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
 
+## AI agent skills for docs authoring
+
+If you're using Claude Code or Cursor, this repo ships four skills that back the stages of the docs authoring checklist ("Write the docs") below. They're checked into `.agents/skills/`, with pointers in `.claude/skills/` and `.cursor/skills/` — both agents pick them up automatically once you're working in this repo, no manual install step needed.
+
+| Skill | Checklist stage | Use for |
+| --- | --- | --- |
+| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls |
+| [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
+| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in Linear and the code |
+| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft against the bar, and PR triage/verification |
+
+The full checklist and quality bar these skills back is mirrored at [`.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md`](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md).
+
 ## Document types
 
 Supabase docs contain 4 types of documents. Before you start writing, think about what type of doc you need.
