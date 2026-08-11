@@ -27,6 +27,11 @@ export const telemetryDebugging: ContentListingGroup = {
       href: '/guides/troubleshooting',
       description: 'Searchable index of known error codes, symptoms, and fixes.',
     },
+    {
+      title: 'Diagnosing stuck and blocked queries',
+      href: '/guides/database/connection-management#diagnosing-stuck-and-blocked-queries',
+      description: 'Find sessions blocked by a lock, and cancel or terminate the one responsible.',
+    },
   ],
 }
 
