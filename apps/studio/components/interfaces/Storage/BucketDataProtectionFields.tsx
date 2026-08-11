@@ -476,15 +476,12 @@ const ExpirationExplainerBody = ({
   mode: ExpirationMode
 }) => {
   if (hasDays && !hasVersions) {
-    const olderAge = Math.round(days * 1.5)
     return (
       <>
-        A file with <span className="text-foreground-light">4 noncurrent versions</span> aged{' '}
-        <span className="text-foreground-light">
-          {olderAge}d, {days + 5}d, {Math.max(1, days - 5)}d, {Math.max(1, days - 10)}d
-        </span>
-        : versions older than {days} days are permanently deleted. Newer versions are kept
-        regardless of how many there are.
+        A noncurrent version aged <span className="text-foreground-light">{days + 1} days</span> is
+        older than the {days}-day limit — it gets permanently deleted. A version at{' '}
+        <span className="text-foreground-light">{Math.max(1, days - 1)} days</span> is within the
+        limit — kept.
       </>
     )
   }
@@ -493,34 +490,32 @@ const ExpirationExplainerBody = ({
     return (
       <>
         A file with{' '}
-        <span className="text-foreground-light">{versions + 3} noncurrent versions</span>: only the
-        newest {versions} are kept. The {versions + 3 - versions} oldest are permanently deleted,
-        regardless of their age.
+        <span className="text-foreground-light">{versions + 1} noncurrent versions</span>: only the
+        newest {versions} are kept. The oldest version is permanently deleted regardless of its age.
       </>
     )
   }
 
   if (hasBothConditions) {
-    const olderAge = Math.round(days * 1.1)
     const isBoth = mode === 'and'
 
     if (isBoth) {
       return (
         <>
-          With <span className="text-foreground-light">{versions + 2} noncurrent versions</span>,
-          the oldest at <span className="text-foreground-light">{olderAge}d</span>: only versions
-          that exceed <em>both</em> the {versions}-version cap and the {days}-day limit are removed.
-          v{versions} exceeds the age limit but is within the cap — kept.
+          With <span className="text-foreground-light">{versions + 1} noncurrent versions</span>,
+          the oldest at <span className="text-foreground-light">{days + 1} days</span>: it exceeds{' '}
+          <em>both</em> the {versions}-version cap and the {days}-day limit — deleted. A version
+          within either limit is kept.
         </>
       )
     }
 
     return (
       <>
-        With <span className="text-foreground-light">{versions + 2} noncurrent versions</span>, the
-        oldest at <span className="text-foreground-light">{olderAge}d</span>: versions exceeding{' '}
-        <em>either</em> the {versions}-version cap or the {days}-day limit are removed. Each rule is
-        enforced independently.
+        With <span className="text-foreground-light">{versions + 1} noncurrent versions</span>, the
+        oldest at <span className="text-foreground-light">{days + 1} days</span>: it exceeds the{' '}
+        {versions}-version cap and is also past the {days}-day limit — <em>either</em> condition
+        alone would delete it.
       </>
     )
   }
