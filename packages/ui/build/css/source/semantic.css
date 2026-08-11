@@ -205,15 +205,18 @@
    * (popover e2) and vanish on light near the white ceiling.
    *
    * Field ≈ historic light-mode wash (foreground/[.026]): soft always-sink via
-   * black. Raised is a soft white lift so selects read button-like without the
-   * stark dark wells. Borders carry most hover chrome (--border-control-hover).
-   * Light raises still have little headroom on sheets; sheets matching app
-   * background would widen that later.
+   * black. --field-alpha is a theme input (stronger in dark.css) because the same
+   * absolute opacity is obvious on light plates and near-invisible on dark ones.
+   * Raised is a soft white lift so selects read button-like without stark wells.
+   * Borders carry most hover chrome (--border-control-hover). Light raises still
+   * have little headroom on sheets; sheets matching app background would widen
+   * that later.
    *
    * Default Button stays opaque card/popover for occluding chrome (DEPR-636).
    * Floating clusters can wrap in a solid Popover as a follow-up.
    */
-  --field: oklch(0 0 0 / 0.026);
+  --field-alpha: 0.026;
+  --field: oklch(0 0 0 / var(--field-alpha));
   --control-raised: oklch(1 0 0 / calc(var(--muted-alpha) * 0.65));
   --control: var(--control-raised);
 
