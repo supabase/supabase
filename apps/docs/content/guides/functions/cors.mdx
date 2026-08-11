@@ -63,6 +63,17 @@ The allow-list only states what a browser *may* send — it doesn't change what 
 
 </Admonition>
 
+The full list, and when each header is actually sent:
+
+| Header                                | Sent                                                                                                                       |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `authorization`                       | Every request (session token or API key)                                                                                   |
+| `apikey`                              | Every request                                                                                                              |
+| `x-client-info`                       | Every request (SDK name and version)                                                                                       |
+| `content-type`                        | Requests with a body                                                                                                       |
+| `x-retry-count`                       | Only on automatic retry attempts (`postgrest-js` retries failed idempotent requests by default)                            |
+| `traceparent`, `tracestate`, `baggage` | **Only when [trace propagation](/docs/guides/monitoring-and-debugging/client-side-tracing) is explicitly enabled** — never by default |
+
 ### For versions before 2.95.0
 
 If you're using `@supabase/supabase-js` before v2.95.0, you'll need to hardcode the CORS headers. Add a `cors.ts` file within a [`_shared` folder](/docs/guides/functions/development-environment#recommended-project-structure). The list must cover every header your calling clients send — include the trace context headers if any client enables `tracePropagation`:
