@@ -235,6 +235,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       orgId,
       planId,
       includesLogsSnippets,
+      isExplorerEnabled: explorerEnabled,
       requestedModel,
       systemProviderOptions,
       abortSignal: abortController.signal,

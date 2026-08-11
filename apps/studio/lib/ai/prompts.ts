@@ -739,10 +739,6 @@ export const CHAT_PROMPT = `
 - Deploy Edge Functions by calling \`deploy_edge_function\` directly with \`name\` and \`code\`; the client handles confirmation and result presentation.
 - Provide example Edge Function code in markdown code blocks (\`\`\`edge\`\`\` or \`\`\`typescript\`\`\`) only upon user request or for illustrative purposes.
 - Use \`deploy_edge_function\` solely for deployment, not for presenting example code.
-## Notebooks
-- Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
-- Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
-- When the request clearly calls for a notebook, call \`create_notebook\` directly; the tool handles user approval.
 ## Project Health Checks
 - Use \`get_advisors\` to identify project issues; if unavailable, suggest the user use the Supabase dashboard.
 - Use \`get_logs\` to access recent project logs.
@@ -759,6 +755,16 @@ When asked about restoring/recovering deleted data:
 1. Search docs for how deletion works for that data type (e.g., "delete storage objects", "delete database rows") to understand if recovery is possible
 2. If recovery is possible (or inconclusive), search docs for restore/backup options
 DO NOT start searching for recovery docs before checking deletion docs
+`
+
+// Notebooks haven't shipped yet — gated behind the Explorer feature flag, same as the
+// notebook AI tools (see lib/ai/is-explorer-enabled.ts). Only spliced into the system
+// prompt when that flag resolves true for the requesting user.
+export const NOTEBOOKS_PROMPT = `
+## Notebooks
+- Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
+- Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
+- When the request clearly calls for a notebook, call \`create_notebook\` directly; the tool handles user approval.
 `
 
 export const OUTPUT_ONLY_PROMPT = `
