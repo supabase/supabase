@@ -158,6 +158,7 @@ export const ActivityRow = ({
     try {
       await cancelQuery({
         pid: activity.pid,
+        backendStart: activity.backend_start,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
       })
@@ -183,6 +184,7 @@ export const ActivityRow = ({
     try {
       await terminateSession({
         pid: activity.pid,
+        backendStart: activity.backend_start,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
       })
