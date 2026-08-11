@@ -130,26 +130,6 @@ og_image: /images/events/2025-01-meetup/custom-og.png # Optional override
 
 **Note**: The `og_image` field is optional. If not provided, OG images are generated automatically via the Edge Function.
 
-## End-to-end checks
-
-Content pages are loaded and scanned with axe-core by the Playwright suite in
-`e2e/www`. Pull requests test the pages your change affects. Today the suite
-enforces one accessibility rule, `page-has-heading-one`.
-
-To test the pages your current branch changes:
-
-```bash
-PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:www
-```
-
-That resolves which pages to test from your branch, but reads them from
-production, so it won't see your edits and will 404 on a page you just added.
-Point `PLAYWRIGHT_BASE_URL` at your pull request's preview to test your own
-content.
-
-See [`e2e/www/README.md`](https://github.com/supabase/supabase/blob/master/e2e/www/README.md)
-for coverage and limits.
-
 ## Go pages (`/go/*`)
 
 `/go/` is a system for building standalone campaign landing pages (lead generation, legal, thank-you flows). The name is intentionally generic — these pages are typically linked from ads, emails, or partner campaigns and are not part of the main site navigation.

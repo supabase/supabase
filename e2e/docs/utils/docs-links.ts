@@ -6,6 +6,10 @@ export const TROUBLESHOOTING_ARTICLE_SELECTOR =
 const DOCS_PATH_PREFIX = '/docs'
 const TROUBLESHOOTING_PATH_PREFIX = '/docs/guides/troubleshooting/'
 
+/**
+ * Pick the main article selector for a docs page path.
+ * Both guides and troubleshooting entries expose a stable data-testid.
+ */
 export function articleSelectorForPagePath(pagePath: string): string {
   const pathname = pagePath.startsWith('http') ? new URL(pagePath).pathname : pagePath
 
@@ -19,6 +23,12 @@ export function articleSelectorForPagePath(pagePath: string): string {
   return GUIDE_ARTICLE_SELECTOR
 }
 
+/**
+ * Collect unique docs-owned links from the main article.
+ *
+ * Cross-app paths such as `/ui` and `/dashboard` are excluded because the
+ * docs preview does not own those routes.
+ */
 export async function collectDocsOwnedLinks(
   page: Page,
   baseURL: string,
@@ -55,8 +65,26 @@ export async function collectDocsOwnedLinks(
   return [...links].sort()
 }
 
-// Vercel bot protection blocks the HeadlessChrome UA on some routes; strip it.
+/**
+ * Playwright's headless Chromium reports a `HeadlessChrome` UA string, which
+ * Vercel's bot protection blocks on some routes (notably /docs/reference/*)
+ * even though the same page loads fine for a real browser. Stripping
+ * `Headless` avoids that false positive when checking links out-of-band via
+ * page.request rather than an actual navigation.
+ */
 export async function browserLikeUserAgent(page: Page): Promise<string> {
   const userAgent = await page.evaluate(() => navigator.userAgent)
   return userAgent.replace('HeadlessChrome', 'Chrome')
+}
+
+/**
+ * Parse DOCS_E2E_PAGE_PATHS (comma- or newline-separated /docs/... paths).
+ */
+export function parseDocsE2EPagePaths(raw: string | undefined): string[] {
+  if (!raw?.trim()) return []
+  return raw
+    .split(/[\n,]/)
+    .map((path) => path.trim())
+    .filter(Boolean)
+    .map((path) => (path.startsWith('/') ? path : `/${path}`))
 }
