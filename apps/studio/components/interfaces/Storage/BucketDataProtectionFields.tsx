@@ -247,7 +247,9 @@ const ExpirationPolicySection = ({
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
+                    inputMode="numeric"
                     placeholder="—"
                     value={field.value === '' ? '' : field.value}
                     onChange={(e) => {
@@ -278,7 +280,9 @@ const ExpirationPolicySection = ({
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
+                    inputMode="numeric"
                     placeholder="—"
                     value={field.value === '' ? '' : field.value}
                     onChange={(e) => {

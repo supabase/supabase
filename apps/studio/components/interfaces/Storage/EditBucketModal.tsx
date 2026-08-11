@@ -194,27 +194,33 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     // the in-memory mock store so the buckets list reflects it right away.
     // Versioning can't go back to a plain "disabled" state once it's ever
     // been turned on — turning the switch off here suspends it instead.
-    setMockBucketProtection(bucket.id, {
+    // When versioning is on, the form is the source of truth for both
+    // retention fields — an empty input means "no limit for that condition"
+    // and must persist as `null`, not silently fall back to the previous
+    // value. When versioning is off but the bucket was previously versioned
+    // (now suspended), the last retention settings are kept as-is so any
+    // versions already retained keep expiring on the same schedule they
+    // were created under.
+    setMockBucketProtection(bucket.name, {
       versioning: values.enable_versioning
         ? 'enabled'
         : bucketProtection.versioning !== 'disabled'
           ? 'suspended'
           : 'disabled',
-      // Suspending keeps the last retention settings around (rather than
-      // nulling them) so the versions already retained keep expiring on the
-      // same schedule they were created under.
-      versionExpiryDays:
-        values.enable_versioning && typeof values.version_expiry_days === 'number'
+      versionExpiryDays: values.enable_versioning
+        ? typeof values.version_expiry_days === 'number'
           ? values.version_expiry_days
-          : bucketProtection.versioning !== 'disabled'
-            ? bucketProtection.versionExpiryDays
-            : null,
-      maxNoncurrentVersions:
-        values.enable_versioning && typeof values.max_noncurrent_versions === 'number'
+          : null
+        : bucketProtection.versioning !== 'disabled'
+          ? bucketProtection.versionExpiryDays
+          : null,
+      maxNoncurrentVersions: values.enable_versioning
+        ? typeof values.max_noncurrent_versions === 'number'
           ? values.max_noncurrent_versions
-          : bucketProtection.versioning !== 'disabled'
-            ? bucketProtection.maxNoncurrentVersions
-            : null,
+          : null
+        : bucketProtection.versioning !== 'disabled'
+          ? bucketProtection.maxNoncurrentVersions
+          : null,
       expirationMode: values.expiration_mode,
     })
 

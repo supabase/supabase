@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Copy, Download, RotateCcw, Trash2 } from 'lucide-react'
+import { BrushCleaning, Copy, Download, RotateCcw, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, cn } from 'ui'
@@ -82,13 +82,22 @@ export const VersionHistory = ({
   const isNearingCap = hasCap && usageRatio >= 0.8
   const isAtCap = hasCap && noncurrentCount >= cap
 
-  // Pre-compute each noncurrent version's index (0-based, newest first) so
-  // the render loop can look it up without mutation.
-  const noncurrentIndices = new Map<string, number>()
-  let noncurrentIdx = 0
-  for (const v of versions) {
-    if (!v.isCurrent) noncurrentIndices.set(v.versionId, noncurrentIdx++)
-  }
+  // Pre-compute each noncurrent version's chronological position (1-based,
+  // oldest = 1) and whether it would be evicted by the cap rule (the oldest
+  // `count - cap` versions when count exceeds cap). Numbering runs oldest→
+  // newest so reading the list top-to-bottom matches the numbering intuition:
+  // the bottom row (oldest, closest to eviction) is #1 and each row above it
+  // increments toward the newest noncurrent.
+  const noncurrentVersions = versions.filter((v) => !v.isCurrent)
+  const versionMeta = new Map<string, { position: number; capExceeded: boolean }>()
+  noncurrentVersions.forEach((v, i) => {
+    // `versions` arrives newest-first, so oldest sits at index count - 1.
+    const chronoIndex = noncurrentCount - 1 - i
+    versionMeta.set(v.versionId, {
+      position: chronoIndex + 1,
+      capExceeded: hasCap && chronoIndex < noncurrentCount - cap,
+    })
+  })
 
   return (
     <div className="space-y-4">
@@ -114,7 +123,7 @@ export const VersionHistory = ({
             )}
             {isAtCap && (
               <span className="text-xs text-warning-600">
-                At cap — the next overwrite will auto-expire the oldest version.
+                The next overwrite will auto-expire the oldest version.
               </span>
             )}
             {!isAtCap && isNearingCap && (
@@ -229,15 +238,22 @@ export const VersionHistory = ({
                   <p className="mt-1 font-mono text-xs text-foreground-muted">
                     v: {shortVersion(version.versionId)}
                   </p>
-                  {!version.isCurrent && hasPolicy && (
-                    <VersionExpiryIndicator
-                      version={version}
-                      noncurrentIndex={noncurrentIndices.get(version.versionId) ?? 0}
-                      expiryDays={expiryDays}
-                      cap={cap}
-                      mode={mode}
-                    />
-                  )}
+                  {!version.isCurrent &&
+                    hasPolicy &&
+                    (() => {
+                      const meta = versionMeta.get(version.versionId)
+                      if (!meta) return null
+                      return (
+                        <VersionExpiryIndicator
+                          version={version}
+                          position={meta.position}
+                          capExceeded={meta.capExceeded}
+                          expiryDays={expiryDays}
+                          cap={cap}
+                          mode={mode}
+                        />
+                      )
+                    })()}
                 </div>
               </li>
             )
@@ -280,7 +296,10 @@ export const VersionHistory = ({
 
 interface VersionExpiryIndicatorProps {
   version: ObjectVersion
-  noncurrentIndex: number
+  /** 1-based chronological position — 1 = oldest noncurrent, N = newest. */
+  position: number
+  /** True when this version sits in the "would be evicted by cap" tail. */
+  capExceeded: boolean
   expiryDays: number | null
   cap: number | null
   mode: ExpirationMode
@@ -288,7 +307,8 @@ interface VersionExpiryIndicatorProps {
 
 const VersionExpiryIndicator = ({
   version,
-  noncurrentIndex,
+  position,
+  capExceeded,
   expiryDays,
   cap,
   mode,
@@ -299,47 +319,45 @@ const VersionExpiryIndicator = ({
   const daysOld = dayjs().diff(dayjs(version.createdAt), 'day')
   const daysRemaining = hasDaysRule ? expiryDays - daysOld : null
   const exceedsDays = hasDaysRule && daysOld >= expiryDays
-  const exceedsCap = hasCapRule && noncurrentIndex >= cap
 
   // Whether this version would expire under the combined policy
   const wouldExpire =
     hasDaysRule && hasCapRule
       ? mode === 'and'
-        ? exceedsDays && exceedsCap
-        : exceedsDays || exceedsCap
-      : exceedsDays || exceedsCap
+        ? exceedsDays && capExceeded
+        : exceedsDays || capExceeded
+      : exceedsDays || capExceeded
 
-  const parts: string[] = []
+  const daysLabel = hasDaysRule
+    ? daysRemaining !== null && daysRemaining > 0
+      ? `Expires in ${daysRemaining}d`
+      : `Past ${expiryDays}d limit`
+    : null
 
-  if (hasDaysRule) {
-    if (daysRemaining !== null && daysRemaining > 0) {
-      parts.push(`Expires in ${daysRemaining}d`)
-    } else {
-      parts.push(`Past ${expiryDays}d limit`)
-    }
-  }
-
-  if (hasCapRule) {
-    parts.push(`#${noncurrentIndex + 1} of ${cap}`)
-  }
-
-  if (parts.length === 0) return null
+  if (daysLabel === null && !hasCapRule) return null
 
   const isWarning = wouldExpire
   const isSoonToExpire = !wouldExpire && daysRemaining !== null && daysRemaining <= 7
+  const emphasize = isWarning || isSoonToExpire
 
   return (
-    <p
-      className={cn(
-        'mt-0.5 text-xs',
-        isWarning
-          ? 'text-warning-600'
-          : isSoonToExpire
-            ? 'text-warning-600'
-            : 'text-foreground-muted'
+    <div className="mt-1 flex items-center gap-x-2">
+      {daysLabel !== null && (
+        <span
+          className={cn(
+            'inline-flex items-center gap-x-1 text-xs',
+            emphasize ? 'text-warning-600' : 'text-foreground-muted'
+          )}
+        >
+          <BrushCleaning size={12} />
+          {daysLabel}
+        </span>
       )}
-    >
-      {parts.join(' · ')}
-    </p>
+      {hasCapRule && (
+        <Badge variant={isWarning ? 'warning' : 'default'}>
+          {position}/{cap}
+        </Badge>
+      )}
+    </div>
   )
 }
