@@ -21,8 +21,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { AlertError } from '@/components/ui/AlertError'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
 import { useOngoingQueriesQuery } from '@/data/sql/ongoing-queries-query'
+import { useSessionTerminateMutation } from '@/data/sql/terminate-session-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useUrlState } from '@/hooks/ui/useUrlState'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -67,7 +67,7 @@ export const OngoingQueriesPanel = () => {
     }
   }, [viewOngoingQueries])
 
-  const { mutate: abortQuery, isPending } = useQueryAbortMutation({
+  const { mutate: abortQuery, isPending } = useSessionTerminateMutation({
     onSuccess: () => {
       toast.success(`Successfully aborted query (ID: ${selectedId})`)
       setSelectedId(undefined)

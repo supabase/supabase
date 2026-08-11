@@ -6,31 +6,40 @@ import { sqlKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type QueryAbortVariables = {
+type SessionTerminateVariables = {
   pid: number
   projectRef?: string
   connectionString?: string | null
 }
 
-export async function abortQuery({ pid, projectRef, connectionString }: QueryAbortVariables) {
+export async function terminateSession({
+  pid,
+  projectRef,
+  connectionString,
+}: SessionTerminateVariables) {
   const sql = getAbortQuerySQL({ pid })
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['terminate-session'],
+  })
   return result
 }
 
-type QueryAbortData = Awaited<ReturnType<typeof abortQuery>>
+type QueryAbortData = Awaited<ReturnType<typeof terminateSession>>
 
-export const useQueryAbortMutation = ({
+export const useSessionTerminateMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<QueryAbortData, ResponseError, QueryAbortVariables>,
+  UseCustomMutationOptions<QueryAbortData, ResponseError, SessionTerminateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<QueryAbortData, ResponseError, QueryAbortVariables>({
-    mutationFn: (vars) => abortQuery(vars),
+  return useMutation<QueryAbortData, ResponseError, SessionTerminateVariables>({
+    mutationFn: (vars) => terminateSession(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: sqlKeys.ongoingQueries(projectRef) })
