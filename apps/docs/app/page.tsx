@@ -204,10 +204,10 @@ const additionalResources = [
     href: '/guides/integrations',
   },
   {
-    title: 'Supabase UI',
+    title: 'Supabase Library',
     description: 'A collection of pre-built Supabase components to speed up your project.',
     icon: 'ui',
-    href: 'https://supabase.com/ui',
+    href: 'https://supabase.com/library',
     external: true,
   },
   {

@@ -7,6 +7,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -22,7 +23,12 @@ type SuggestionsType = {
 
 export type AssistantMessageType = MessageType
 
-export type SqlSnippet = string | { label: string; content: string }
+/**
+ * A query attached to the composer (the "Current Query" chip). `source` records which
+ * backend the attached query runs against, so the dialect travels with the query it
+ * describes.
+ */
+export type SqlSnippet = string | { label: string; content: string; source?: SqlSnippetSource }
 
 export type AssistantModel = AssistantModelId
 

@@ -298,9 +298,9 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'reference_javascript',
           },
           {
-            label: 'UI Library',
+            label: 'Library',
             icon: 'ui',
-            href: 'https://supabase.com/ui' as `/${string}`,
+            href: 'https://supabase.com/library' as `/${string}`,
             level: 'ui',
           },
         ],
@@ -3062,7 +3062,7 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
         },
         {
-          name: 'Tracing with the JS SDK',
+          name: 'Tracing with the client SDKs',
           url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
       ],
@@ -3085,7 +3085,7 @@ export const self_hosting: NavMenuConstant = {
     { name: 'Overview', url: '/guides/self-hosting' },
     { name: 'Deploy with Docker', url: '/guides/self-hosting/docker' },
     { name: 'Configure new API keys', url: '/guides/self-hosting/self-hosted-auth-keys' },
-    { name: 'Enable Envoy API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
+    { name: 'Learn about API Gateway', url: '/guides/self-hosting/self-hosted-envoy' },
     {
       name: 'Add Reverse Proxy with HTTPS',
       url: '/guides/self-hosting/self-hosted-proxy-https',

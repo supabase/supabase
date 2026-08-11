@@ -20,10 +20,10 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { REPLICA_STATUS } from '../Replication.constants'
+import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
-import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { RestartReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/RestartReplicaConfirmationModal'
+import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
 import { type Database } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'

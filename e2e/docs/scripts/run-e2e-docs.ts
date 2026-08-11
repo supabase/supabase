@@ -122,10 +122,7 @@ async function resolvePagePaths(): Promise<string[] | null> {
 async function main() {
   const rawArgs = process.argv.slice(2)
   const runAll = rawArgs.includes('--all')
-  const withoutAll = rawArgs.filter((arg) => arg !== '--all')
-  // pnpm's `--` separator (from `pnpm run ... -- --list`) can land at index 0
-  // or, once `--all` is stripped, wherever `--all` used to precede it.
-  const playwrightArgs = withoutAll[0] === '--' ? withoutAll.slice(1) : withoutAll
+  const playwrightArgs = rawArgs.filter((arg) => arg !== '--all' && arg !== '--')
 
   const pages = runAll ? await resolveAllPagePaths() : await resolvePagePaths()
   if (pages === null) {

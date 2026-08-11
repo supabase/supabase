@@ -24,15 +24,18 @@ describe('High Availability project creation constraints', () => {
   })
 
   it.each([
-    ['local', 'eu-central-1'],
+    ['local', undefined],
     ['staging', 'us-east-1'],
     ['prod', undefined],
-  ])('limits %s projects to the required region', (environment, expectedRegion) => {
-    const regions = [{ code: 'us-east-1' }, { code: 'eu-central-1' }]
+  ])(
+    'applies the %s region restriction to high availability projects',
+    (environment, expectedRegion) => {
+      const regions = [{ code: 'us-east-1' }, { code: 'eu-central-1' }, { code: 'ap-southeast-1' }]
 
-    expect(filterHighAvailabilityRegions(regions, true, environment)).toEqual(
-      expectedRegion === undefined ? regions : [{ code: expectedRegion }]
-    )
-    expect(filterHighAvailabilityRegions(regions, false, environment)).toEqual(regions)
-  })
+      expect(filterHighAvailabilityRegions(regions, true, environment)).toEqual(
+        expectedRegion === undefined ? regions : [{ code: expectedRegion }]
+      )
+      expect(filterHighAvailabilityRegions(regions, false, environment)).toEqual(regions)
+    }
+  )
 })

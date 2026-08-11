@@ -1,10 +1,11 @@
 import dayjs from 'dayjs'
 
-import { generateDynamicHelper } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import type { Unit } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import { generateDynamicHelper } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import type { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { ResolvedLogDateRange } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import type { Snippet } from '@/data/content/sql-folders-query'
+import { isoDateTimeString, type IsoDateTimeString } from '@/lib/iso-datetime'
 
 /**
  * Domain view of where a snippet's query runs. Derived from the content TYPE:
@@ -25,6 +26,19 @@ export function getSnippetSource(snippet: Pick<Snippet, 'type'>): SqlSnippetSour
   return snippet.type === 'log_sql' ? 'logs' : 'database'
 }
 
+export function isLogsSource(source: SqlSnippetSource | undefined): boolean {
+  return source === 'logs'
+}
+
+/**
+ * The markdown fence language a source's SQL is written into a prompt with, so the model
+ * can tell a ClickHouse logs query from Postgres SQL.  */
+export function sqlSourceToFenceLanguage(
+  source: SqlSnippetSource | undefined
+): 'sql' | 'clickhouse' {
+  return isLogsSource(source) ? 'clickhouse' : 'sql'
+}
+
 /**
  * Parse a raw `source` value (e.g. the `?source=` query param a creation entry
  * threads through `/sql/new`) into a `SqlSnippetSource`. Only the explicit
@@ -36,19 +50,15 @@ export function parseSqlSnippetSource(raw: string | undefined): SqlSnippetSource
 }
 
 /**
- * An ISO-8601 datetime proven valid at construction via a dayjs parse. Absolute
- * log ranges carry these instead of raw strings so an unvalidated datetime can
- * never reach execution.
+ * Resolve where an open snippet's query runs, falling back to the `?source=` URL param
+ * when the snippet isn't in the store yet — a fresh `/sql/new` tab is materialized
+ * lazily on the first keystroke, and until then the param is the only signal.
  */
-export type IsoDateTimeString = string & { readonly __isoDateTimeBrand: unique symbol }
-
-/**
- * Validate a raw string as an ISO datetime, returning the branded value or null.
- * The sole construction site for `IsoDateTimeString` outside `now`.
- */
-export function isoDateTimeString(raw: string): IsoDateTimeString | null {
-  if (!raw) return null
-  return dayjs(raw).isValid() ? (raw as IsoDateTimeString) : null
+export function resolveSnippetSource(
+  snippet: Pick<Snippet, 'type'> | undefined,
+  sourceParam: string | undefined
+): SqlSnippetSource {
+  return snippet !== undefined ? getSnippetSource(snippet) : parseSqlSnippetSource(sourceParam)
 }
 
 /** `now` as a branded ISO datetime — `toISOString()` is always valid ISO-8601. */

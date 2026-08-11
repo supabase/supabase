@@ -1,12 +1,22 @@
 ---
 id: 'client-side-tracing'
-title: 'Tracing with the JS SDK'
-description: 'Propagate W3C trace context from the Supabase JS SDK through Supabase services'
+title: 'Client-side tracing'
+description: 'Propagate W3C trace context from the Supabase JS, Swift, and Dart SDKs through Supabase services'
 ---
 
-The Supabase JS SDK can attach [W3C Trace Context](https://www.w3.org/TR/trace-context/) headers (`traceparent`, `tracestate`, `baggage`) to outgoing requests. The resulting `trace_id` flows through Supabase services and appears in API Gateway and Edge Function logs, so you can correlate client-side spans with the server-side logs they produced — end-to-end, across the network boundary.
+The Supabase JS, Swift, and Dart SDKs can attach [W3C Trace Context](https://www.w3.org/TR/trace-context/) headers (`traceparent`, `tracestate`, `baggage`) to outgoing requests. The resulting `trace_id` flows through Supabase services and appears in API Gateway and Edge Function logs, so you can correlate client-side spans with the server-side logs they produced — end-to-end, across the network boundary.
 
-Because the headers follow the W3C standard, any compliant tracing SDK (OpenTelemetry, Sentry, Datadog, Honeycomb, etc.) can pick up the trace on the server side, including in self-hosted collectors.
+Because the headers follow the W3C standard, any compliant tracing SDK (such as OpenTelemetry, Sentry, Datadog, or Honeycomb) can pick up the trace on the server side, including in self-hosted collectors. On the client side, some vendor SDKs need a small configuration change before they emit the standard headers — see [Using a vendor tracing SDK](#using-a-vendor-tracing-sdk) in the JavaScript tab.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+
+<TabPanel id="js" label="JavaScript">
 
 ## Requirements
 
@@ -34,7 +44,7 @@ Trace propagation isn't available through the CDN (UMD) build — there's no way
 
 The SDK reads from whatever `TracerProvider` you register globally — it doesn't configure one for you. If you haven't instrumented your app yet, follow the [OpenTelemetry JavaScript getting started guide](https://opentelemetry.io/docs/languages/js/getting-started/) to install an SDK (`@opentelemetry/sdk-trace-node` for Node, `@opentelemetry/sdk-trace-web` for browsers) and an exporter for your backend (OTLP, Jaeger, Zipkin, or a vendor-specific one).
 
-The Supabase SDK only takes care of propagating the trace context that's already active when a request is made.
+The Supabase SDK only propagates the trace context that's already active when a request is made.
 
 ## Enable trace propagation
 
@@ -61,6 +71,12 @@ await tracer.startActiveSpan('fetch-users', async (span) => {
 
 For security, trace headers are only attached to requests targeting Supabase domains (`*.supabase.co`, `*.supabase.in`, and `localhost` for local development). Third-party hosts called through a custom `fetch` are never tagged.
 
+<Admonition type="note">
+
+Calling Edge Functions from the browser with trace propagation enabled requires the function's CORS allow-list to include the trace headers. In the function, import `corsHeaders` from `npm:@supabase/supabase-js@^2.112.3/cors` or add `traceparent`, `tracestate`, and `baggage` to your own allow-list, then redeploy the function. See [CORS support for Edge Functions](/docs/guides/functions/cors).
+
+</Admonition>
+
 ## Advanced configuration
 
 Pass an object instead of `true` for fine-grained control:
@@ -71,31 +87,33 @@ import '@supabase/supabase-js/tracing'
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   tracePropagation: {
     enabled: true,
-    // Default: true. When false, headers are attached even if the
-    // upstream trace is not sampled — useful when you want every
-    // Supabase request tagged with a trace_id for log correlation.
+    // Default: true. Non-sampled requests carry only `traceparent` (with the
+    // sampled flag preserved, so nothing is recorded downstream) — log
+    // correlation keeps working while `tracestate` and `baggage` are withheld.
+    // Set to false to always send the full trace context regardless of sampling.
     respectSamplingDecision: false,
   },
 })
 ```
 
-| Option                    | Type      | Default | Description                                                         |
-| ------------------------- | --------- | ------- | ------------------------------------------------------------------- |
-| `enabled`                 | `boolean` | `false` | Enable trace propagation.                                           |
-| `respectSamplingDecision` | `boolean` | `true`  | If `true`, skip propagation when the upstream trace is not sampled. |
-
-## Correlating with Supabase logs
-
-Once trace context is flowing through, the `trace_id` appears in:
-
-- **API Gateway logs** — every request to PostgREST, Auth, Storage, and Realtime
-- **Edge Function logs** — invocations and any structured logs emitted from within the function
-
-If you forward Supabase logs to a third-party backend via [Log Drains](/docs/guides/monitoring-and-debugging/log-drains), you can join Supabase logs to your own client and server traces using the shared `trace_id`. This is especially useful for self-hosted setups where you already operate your own OpenTelemetry collector — Supabase logs become first-class citizens in your existing tracing UI.
+| Option                    | Type      | Default | Description                                                                                                                                                                                                                                                   |
+| ------------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enabled`                 | `boolean` | `false` | Enable trace propagation.                                                                                                                                                                                                                                     |
+| `respectSamplingDecision` | `boolean` | `true`  | When `true`, non-sampled requests send only `traceparent` (sampled flag preserved) and omit `tracestate` and `baggage`; `false` always sends the full trace context. On versions before `2.112.3`, `true` skipped all trace headers for non-sampled requests. |
 
 ## Using a vendor tracing SDK
 
-Many tracing SDKs are built on top of OpenTelemetry. They work with this guide as long as a W3C-compliant propagator is registered — but propagator behavior varies. Some vendor SDKs inject only their proprietary headers by default and need extra configuration to also emit the standard `traceparent` header. Check your vendor's OTel integration docs for the exact setup.
+Many tracing SDKs are built on top of OpenTelemetry, but they differ in whether their propagator emits the standard `traceparent` header by default:
+
+| Vendor setup                                                    | Works with `tracePropagation`?   | Required configuration                                                                                                                                                                                                                                                                                                                                   |
+| --------------------------------------------------------------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OpenTelemetry SDK (also Honeycomb, Grafana, New Relic via OTLP) | Yes                              | None — the W3C propagator is the default                                                                                                                                                                                                                                                                                                                 |
+| Sentry (Node.js, including Next.js server-side)                 | Yes, with one flag               | Set `propagateTraceparent: true` in `Sentry.init()` — Sentry's propagator omits `traceparent` by default                                                                                                                                                                                                                                                 |
+| Sentry (browser)                                                | Via Sentry's own instrumentation | Set `propagateTraceparent: true` and add your project URL (`https://<ref>.supabase.co`) to `tracePropagationTargets` — Sentry's browser SDK only attaches headers cross-origin for listed targets. For Edge Functions, also add `sentry-trace` to the function's CORS allow-list: Sentry always sends its own header, and it isn't part of `corsHeaders` |
+| Datadog `dd-trace` (Node.js)                                    | Out of the box                   | None — `dd-trace` injects W3C headers at the HTTP layer itself, even without `tracePropagation`                                                                                                                                                                                                                                                          |
+| Datadog Browser RUM                                             | Yes, with configuration          | Add your project URL to `allowedTracingUrls` with the `tracecontext` propagator type                                                                                                                                                                                                                                                                     |
+
+If a propagator is active but doesn't emit `traceparent`, the SDK logs a one-time console warning naming the headers the propagator wrote (version `2.112.3` and later).
 
 ## Troubleshooting
 
@@ -104,7 +122,117 @@ The SDK never throws when it can't propagate, which keeps it safe to enable but 
 - **The tracing runtime isn't loaded** (version `2.112.0` and later). `tracePropagation` is enabled but your entry point never imports `@supabase/supabase-js/tracing`. The SDK logs a one-time console warning and sends requests without trace headers — look for that warning in your console.
 - **No active span at request time.** The SDK reads the _current_ context. If `supabase.from(...)` is called outside `tracer.startActiveSpan(...)` (or equivalent), there's nothing to propagate. Wrap the call in a span or use OpenTelemetry's automatic instrumentation.
 - **`@opentelemetry/api` is not installed** in the app making the request. On `2.112.0` and later the tracing subpath imports it directly, so a missing package surfaces as a module resolution error. On `2.106.0`–`2.111.x` it's loaded dynamically and the SDK silently no-ops.
-- **No `TracerProvider` registered.** `@opentelemetry/api` defaults to a noop provider that produces non-recorded spans. Make sure your app calls `provider.register()` (or your vendor SDK's equivalent) before making requests.
-- **The upstream trace is not sampled.** By default the SDK respects upstream sampling decisions. Set `respectSamplingDecision: false` to propagate every request regardless of sampling.
+- **No `TracerProvider` registered.** `@opentelemetry/api` defaults to a noop provider that produces non-recorded spans. Ensure your app calls `provider.register()` (or your vendor SDK's equivalent) before making requests.
+- **Your tracing SDK's propagator doesn't emit W3C `traceparent`.** Sentry's propagator, for example, only emits it when `propagateTraceparent: true` is set. From version `2.112.3` the SDK logs a one-time warning naming the headers the propagator wrote — see [Using a vendor tracing SDK](#using-a-vendor-tracing-sdk).
+- **The upstream trace is not sampled** (versions before `2.112.3`). Older versions skip all trace headers when the upstream trace is not sampled. From `2.112.3`, non-sampled requests still carry `traceparent`, so log correlation keeps working by default. Set `respectSamplingDecision: false` to always send the full trace context.
 - **You're calling a non-Supabase host through a custom `fetch`.** Trace headers are only attached to Supabase domains (`*.supabase.co`, `*.supabase.in`, `localhost`).
 - **You're using the CDN (UMD) build.** Trace propagation isn't available there — the tracing runtime can't be loaded from a script tag.
+
+</TabPanel>
+
+<TabPanel id="swift" label="Swift">
+
+Requires `supabase-swift` `2.51.0` or later and `swift-tools-version: 6.1` or later (SwiftPM trait support).
+
+1. **Add the `OpenTelemetry` trait** to your dependency declaration in `Package.swift`:
+
+   ```swift
+   // Package.swift
+   .package(
+     url: "https://github.com/supabase/supabase-swift.git",
+     from: "2.51.0",
+     traits: ["OpenTelemetry"]
+   )
+   ```
+
+   No changes to `SupabaseClient` are required. After enabling the trait, the active OpenTelemetry span's trace context is automatically injected as a `traceparent` header on every outgoing request across PostgREST, Storage, Auth, Functions, and Realtime. When there is no active span, the header is not added.
+
+2. **Register a `TracerProvider`** at app start. The SDK reads from whatever provider you register globally:
+
+   ```swift
+   import Supabase
+   import OpenTelemetryApi
+   import OpenTelemetrySdk
+
+   let exporter = /* your OTLP / Jaeger / Zipkin exporter */
+   let spanProcessor = SimpleSpanProcessor(spanExporter: exporter)
+   let provider = TracerProviderBuilder()
+     .add(spanProcessor: spanProcessor)
+     .build()
+   OpenTelemetry.registerTracerProvider(tracerProvider: provider)
+   ```
+
+3. **Create your `SupabaseClient`**. Any active span is now propagated automatically:
+
+   ```swift
+   let supabase = SupabaseClient(
+     supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+     supabaseKey: "your-publishable-key"
+   )
+   ```
+
+</TabPanel>
+
+<TabPanel id="dart" label="Dart">
+
+Requires `supabase` `2.x` or later (Flutter or Dart-only).
+
+1. **Implement a `traceContextProvider`** that returns the current `TraceContext` from your tracing library. Return `null` when there is no active span.
+
+2. **Pass `TracePropagationOptions`** when creating the client:
+
+   ```dart
+   import 'package:supabase/supabase.dart';
+
+   final supabase = SupabaseClient(
+     'https://xyzcompany.supabase.co',
+     'your-publishable-key',
+     tracePropagationOptions: TracePropagationOptions(
+       enabled: true,
+       traceContextProvider: () {
+         final span = YourTracer.activeSpan;
+         if (span == null) return null;
+         return TraceContext(
+           traceparent: span.traceparent,
+           tracestate: span.tracestate,
+         );
+       },
+     ),
+   );
+   ```
+
+   For `supabase_flutter`, pass the same option through `Supabase.initialize`:
+
+   ```dart
+   await Supabase.initialize(
+     url: 'https://xyzcompany.supabase.co',
+     anonKey: 'your-publishable-key',
+     tracePropagationOptions: TracePropagationOptions(
+       enabled: true,
+       traceContextProvider: () => yourTraceContextProvider(),
+     ),
+   );
+   ```
+
+## Options
+
+| Option                    | Type                    | Default | Description                                                                                                                                                                       |
+| ------------------------- | ----------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enabled`                 | `bool`                  | `false` | Enable trace propagation.                                                                                                                                                         |
+| `respectSamplingDecision` | `bool`                  | `true`  | When `true`, skips propagation if the upstream trace is not sampled. Set to `false` to always attach a `trace_id` — useful for log correlation even when traces are not exported. |
+| `traceContextProvider`    | `TraceContextProvider?` | `null`  | Callback returning the current `TraceContext`. Return `null` when there is no active span.                                                                                        |
+
+Headers are only injected on requests targeting Supabase hosts (`*.supabase.co`, `*.supabase.in`, your project host, and loopback addresses for local development). Third-party hosts never receive trace headers.
+
+</TabPanel>
+
+</Tabs>
+
+## Correlating with Supabase logs
+
+After trace context is flowing through, the `trace_id` appears in:
+
+- **API Gateway logs** — every request to PostgREST, Auth, Storage, and Realtime
+- **Edge Function logs** — invocations and any structured logs emitted from within the function
+
+If you forward Supabase logs to a third-party backend via [Log Drains](/docs/guides/monitoring-and-debugging/log-drains), you can join Supabase logs to your own client and server traces using the shared `trace_id`. This is especially useful for self-hosted setups where you already operate your own OpenTelemetry collector — Supabase logs become first-class citizens in your existing tracing UI.
