@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertTriangle, BookOpen, ChartLine, ChevronDown, Sparkles, Wrench } from 'lucide-react'
 import Link from 'next/link'
@@ -25,18 +26,32 @@ import {
 import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { RestartProjectDialog } from '@/components/interfaces/ErrorHandling/RestartProjectDialog'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-const RESOURCE_WARNINGS_POLL_INTERVAL = 1000 * 60
+const TRANSITIONAL_PROJECT_STATUSES = [
+  PROJECT_STATUS.RESTARTING,
+  PROJECT_STATUS.RESTORING,
+  PROJECT_STATUS.PAUSING,
+  PROJECT_STATUS.RESIZING,
+  PROJECT_STATUS.UPGRADING,
+  PROJECT_STATUS.COMING_UP,
+]
 
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const [showRestartDialog, setShowRestartDialog] = useState(false)
+  const { can: canRestartProject } = useAsyncCheckPermissions(
+    PermissionAction.INFRA_EXECUTE,
+    'reboot'
+  )
   const router = useRouter()
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
@@ -50,10 +65,7 @@ export const ResourceExhaustionWarningBanner = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
-  const { data: resourceWarnings } = useResourceWarningsQuery(
-    { ref: ref },
-    { staleTime: RESOURCE_WARNINGS_POLL_INTERVAL, refetchInterval: RESOURCE_WARNINGS_POLL_INTERVAL }
-  )
+  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
@@ -122,7 +134,12 @@ export const ResourceExhaustionWarningBanner = () => {
   // True for a single compute warning, or when all active warnings are compute-related
   const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)
 
-  const isMemoryExhaustion = activeWarnings.includes('memory_and_swap_exhaustion')
+  // A restart cannot help while the project is already moving between states, and firing one
+  // off a stale warning would queue a second reboot on top of the one in flight
+  const isProjectTransitioning =
+    project?.status !== undefined && TRANSITIONAL_PROJECT_STATUSES.includes(project.status)
+  const canRestartDatabase = activeWarnings.includes('memory_and_swap_exhaustion')
+  const showRestartButton = canRestartDatabase && !isProjectTransitioning
 
   const correctionUrl = getResourceWarningCorrectionUrl({
     metric,
@@ -268,9 +285,17 @@ export const ResourceExhaustionWarningBanner = () => {
               Ask AI Assistant
             </Button>
           ) : null}
-          {isMemoryExhaustion && (
-            <Button
+          {showRestartButton && (
+            <ButtonTooltip
               variant="default"
+              disabled={!canRestartProject}
+              tooltip={{
+                content: {
+                  text: canRestartProject
+                    ? undefined
+                    : 'You need additional permissions to restart this database',
+                },
+              }}
               onClick={() => {
                 track('resource_exhaustion_banner_restart_clicked', {
                   warningTypes: activeWarnings,
@@ -279,7 +304,7 @@ export const ResourceExhaustionWarningBanner = () => {
               }}
             >
               Restart database
-            </Button>
+            </ButtonTooltip>
           )}
           {correctionUrl !== undefined && (
             <Button
