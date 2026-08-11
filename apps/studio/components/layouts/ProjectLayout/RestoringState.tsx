@@ -20,12 +20,14 @@ import {
 } from '@/lib/project-transition-state'
 import { getRestoreLongRunningThresholdMinutes } from '@/lib/restore-estimate'
 
+const POLL_INTERVAL_MS = 4000
+
 export const RestoringState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const [loading, setLoading] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
+  const [hasLeftHealthyState, setHasLeftHealthyState] = useState(false)
   const restoreStateStartStorageKey = ref
     ? LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(ref)
     : null
@@ -42,19 +44,22 @@ export const RestoringState = () => {
 
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
 
-  const { data: projectStatusData, isSuccess: isProjectStatusSuccess } = useProjectStatusQuery(
+  const { data: projectStatusData } = useProjectStatusQuery(
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
       refetchInterval: (query) => {
-        const data = query.state.data
-        return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-          data?.status === PROJECT_STATUS.RESTORE_FAILED
-          ? false
-          : 4000
+        const status = query.state.data?.status
+        if (status === PROJECT_STATUS.RESTORE_FAILED) return false
+        if (status === PROJECT_STATUS.ACTIVE_HEALTHY && hasLeftHealthyState) return false
+        return POLL_INTERVAL_MS
       },
     }
   )
+
+  const projectStatus = projectStatusData?.status
+  const hasRestoreFailed = projectStatus === PROJECT_STATUS.RESTORE_FAILED
+  const isCompleted = hasLeftHealthyState && projectStatus === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
     onSuccess: (res) => {
@@ -77,28 +82,31 @@ export const RestoringState = () => {
   }
 
   const onConfirm = async () => {
-    if (!project) return console.error('Project is required')
+    if (!ref) return console.error('Project ref is required')
     setLoading(true)
-    if (ref) await invalidateProjectDetailsQuery(ref)
+    try {
+      await invalidateProjectDetailsQuery(ref)
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
-    if (!isProjectStatusSuccess) return
-
-    if (projectStatusData.status === PROJECT_STATUS.ACTIVE_HEALTHY) {
-      if (restoreStateStartStorageKey) {
-        clearPersistedTransitionStartTime(restoreStateStartStorageKey)
-      }
-      setIsCompleted(true)
-    } else if (projectStatusData.status === PROJECT_STATUS.RESTORE_FAILED) {
-      if (restoreStateStartStorageKey) {
-        clearPersistedTransitionStartTime(restoreStateStartStorageKey)
-      }
-      if (ref) void invalidateProjectDetailsQuery(ref)
+    if (projectStatus !== undefined && projectStatus !== PROJECT_STATUS.ACTIVE_HEALTHY) {
+      setHasLeftHealthyState(true)
     }
+  }, [projectStatus])
+
+  useEffect(() => {
+    if (!isCompleted && !hasRestoreFailed) return
+
+    if (restoreStateStartStorageKey) {
+      clearPersistedTransitionStartTime(restoreStateStartStorageKey)
+    }
+    if (hasRestoreFailed && ref) void invalidateProjectDetailsQuery(ref)
   }, [
-    isProjectStatusSuccess,
-    projectStatusData,
+    isCompleted,
+    hasRestoreFailed,
     restoreStateStartStorageKey,
     ref,
     invalidateProjectDetailsQuery,
