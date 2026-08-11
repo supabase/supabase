@@ -36,7 +36,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
   const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
   const { selectFeaturePreview } = useFeaturePreviewModal()
 
-  const [live, setLive] = useState(isDatabaseConnectionsEnabled)
+  const [live, setLive] = useState(true)
   const [now, setNow] = useState(() => dayjs.utc())
 
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleToggleLive, {
@@ -91,7 +91,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
 
   // [Joshen] Just to trigger a UI re-render for the duration to be "live"
   useEffect(() => {
-    if (!live) return
+    if (!live || !isDatabaseConnectionsEnabled) return
     const interval = setInterval(() => setNow(dayjs.utc()), 1000)
     return () => clearInterval(interval)
   }, [live])
@@ -102,9 +102,9 @@ export const DatabaseConnections: NextPageWithLayout = () => {
         <div className="flex items-center gap-x-2">
           <h1 className="w-max">Database Connections</h1>
           <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS} />
-          {live && (
+          {isDatabaseConnectionsEnabled && live && (
             <Tooltip>
-              <TooltipTrigger>
+              <TooltipTrigger className="flex items-center">
                 <Badge variant="success">
                   <span className="h-1.5 w-1.5 bg-brand rounded-full animate-pulse" />
                   <span>Live</span>
