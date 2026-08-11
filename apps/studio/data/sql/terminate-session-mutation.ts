@@ -1,4 +1,4 @@
-import { getAbortQuerySQL } from '@supabase/pg-meta'
+import { getTerminateSessionSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -17,7 +17,7 @@ export async function terminateSession({
   projectRef,
   connectionString,
 }: SessionTerminateVariables) {
-  const sql = getAbortQuerySQL({ pid })
+  const sql = getTerminateSessionSQL({ pid })
   const { result } = await executeSql({
     projectRef,
     connectionString,

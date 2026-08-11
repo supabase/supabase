@@ -4,6 +4,6 @@ export const getCancelQuerySQL = ({ pid }: { pid: number }): SafeSqlFragment => 
   return safeSql`select pg_cancel_backend(${literal(pid)})`
 }
 
-export const getAbortQuerySQL = ({ pid }: { pid: number }): SafeSqlFragment => {
+export const getTerminateSessionSQL = ({ pid }: { pid: number }): SafeSqlFragment => {
   return safeSql`select pg_terminate_backend(${literal(pid)})`
 }
