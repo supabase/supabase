@@ -509,15 +509,15 @@ const NoncurrentVersionRow = ({
         />
       </TableCell>
       <TableCell className="relative px-4 py-1.5" colSpan={2}>
-        {/* Tree connector: vertical line */}
+        {/* Tree connector: vertical line — solid color to avoid overlap artifacts */}
         <div
           className={cn(
-            'absolute left-[23px] w-px bg-border-stronger pointer-events-none',
+            'absolute left-[23px] w-px bg-[hsl(0_0%_80%)] dark:bg-[hsl(0_0%_30%)] pointer-events-none',
             isLast ? 'top-0 h-1/2' : 'inset-y-0'
           )}
         />
         {/* Tree connector: horizontal branch */}
-        <div className="absolute left-[23px] top-1/2 h-px w-[8px] -translate-y-px bg-border-stronger pointer-events-none" />
+        <div className="absolute left-[23px] top-1/2 h-px w-[8px] -translate-y-px bg-[hsl(0_0%_80%)] dark:bg-[hsl(0_0%_30%)] pointer-events-none" />
         {/* Content aligned after horizontal branch with gap */}
         <div className="flex items-center gap-x-2 pl-[36px]">
           <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
