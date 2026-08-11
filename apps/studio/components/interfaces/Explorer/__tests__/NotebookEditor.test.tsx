@@ -36,7 +36,7 @@ function makeNotebook(id: string, overrides: Partial<Notebook> = {}): Notebook {
     favorite: false,
     owner_id: 7,
     project_id: 42,
-    content: { schema_version: '1.0', cells: [] },
+    content: { schema_version: 1, cells: [] },
     ...overrides,
   }
 }

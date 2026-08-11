@@ -7,7 +7,7 @@ import z from 'zod'
 
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
 import {
   buildClickhouseLogsSchemaSection,
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
@@ -176,11 +176,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let aiOptInLevel: AiOptInLevel = IS_PLATFORM ? 'disabled' : 'schema'
 
     if (IS_PLATFORM && orgSlug && authorization && projectRef) {
-      const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-      })
-      aiOptInLevel = orgAIOptInLevel
+      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
+      aiOptInLevel = aiDetails.aiOptInLevel
     }
 
     const {
