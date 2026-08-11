@@ -257,7 +257,7 @@ from opentelemetry.sdk.trace import TracerProvider
 
 from supabase import AsyncClient
 
-trace.set_tracer_provider(TracerProvider()) 
+trace.set_tracer_provider(TracerProvider())
 tracer = trace.get_tracer(__name__)
 
 async def query(client: AsyncClient):
