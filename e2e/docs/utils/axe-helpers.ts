@@ -137,7 +137,11 @@ export async function scanOutsideArticle(
       document.body.querySelectorAll('*').length -
       selectors.reduce(
         (sum, selector) =>
-          sum + (document.querySelector(selector)?.querySelectorAll('*').length ?? 0) + 1,
+          sum +
+          [...document.querySelectorAll(selector)].reduce(
+            (nodes, root) => nodes + root.querySelectorAll('*').length + 1,
+            0
+          ),
         0
       ),
     exclude

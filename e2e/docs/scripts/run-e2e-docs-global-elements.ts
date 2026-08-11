@@ -59,6 +59,11 @@ async function main() {
     }
   )
 
+  child.on('error', (error) => {
+    console.error(`Failed to start Playwright: ${error.message}`)
+    process.exitCode = 1
+  })
+
   child.on('exit', (code, signal) => {
     if (signal) {
       process.kill(process.pid, signal)

@@ -247,9 +247,13 @@ to failing on an unrelated change.
 icon-only and unnamed, which shows up at mobile width. Promote the rule once
 those are named.
 
-Runs live in their own config (`playwright.global-elements.config.ts`) and
-report folder (`playwright-report-global-elements/`), so `pnpm e2e:docs` on a
-content pull request never picks them up.
+Runs live in their own config, so `pnpm e2e:docs` on a content pull request
+never picks them up. The two suites keep separate reports:
+
+| Suite           | Command                         | Report folder                        |
+| --------------- | ------------------------------- | ------------------------------------ |
+| Per-page        | `pnpm e2e:docs`                 | `playwright-report/`                 |
+| Global elements | `pnpm e2e:docs:global-elements` | `playwright-report-global-elements/` |
 
 Not covered:
 
@@ -287,8 +291,20 @@ Draft pull requests stay skipped until you mark them ready for review. Manual
 `workflow_dispatch` runs require a `page_paths` input and accept an optional
 `base_url`, which defaults to production.
 
-The global element suite runs from `.github/workflows/docs-e2e-global-elements.yml` on pull
-requests that touch docs layout code or `e2e/docs`. That check isn't required on
-master, so it uses a `paths` trigger and simply never starts on other pull
-requests. It scans the Vercel preview when `apps/docs` changed, production when
-only the harness changed, and skips when a change to those elements has no preview to test.
+The global element suite runs from `.github/workflows/docs-e2e-global-elements.yml`
+on pull requests that touch `apps/docs/app/**`, `apps/docs/components/**`,
+`apps/docs/features/ui/**`, `apps/docs/layouts/**`, `e2e/docs/**`,
+`pnpm-lock.yaml`, or the workflow itself. That check isn't required on master, so
+it uses a `paths` trigger and simply never starts on other pull requests. It
+scans the Vercel preview when `apps/docs` changed, production when only the
+harness changed, and skips when a change to those elements has no preview to
+test.
+
+Fork pull requests run without repository secrets, so the preview wait is
+limited to same-repository pull requests and a fork's docs change resolves no
+preview. The job skips with a warning rather than scanning stale production
+markup. To cover a fork change, run the workflow manually against its preview:
+
+```bash
+gh workflow run docs-e2e-global-elements.yml -f base_url=<preview-url>
+```

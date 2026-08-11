@@ -9,7 +9,13 @@ export const VIEWPORTS = {
 
 export type ViewportName = keyof typeof VIEWPORTS
 
-// `viewports` lists where an element renders. It defaults to both.
+interface GlobalElementConfig {
+  selector: string
+  label: string
+  // Where the element renders. Defaults to both viewports.
+  viewports?: readonly ViewportName[]
+}
+
 export const GLOBAL_ELEMENTS = {
   topNav: { selector: '[data-test="sb-docs-top-nav"]', label: 'top navigation bar' },
   sidebarNav: {
@@ -87,7 +93,7 @@ export function elementsForViewport(
   viewport: ViewportName
 ): GlobalElement[] {
   return elements.filter((name) => {
-    const viewports = (GLOBAL_ELEMENTS[name] as { viewports?: readonly ViewportName[] }).viewports
+    const { viewports } = GLOBAL_ELEMENTS[name] as GlobalElementConfig
     return !viewports || viewports.includes(viewport)
   })
 }

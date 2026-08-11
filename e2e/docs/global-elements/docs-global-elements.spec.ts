@@ -96,9 +96,6 @@ async function scanAndAssert(
 }
 
 test.describe('Docs global elements', () => {
-  // Without this, every test in this file runs on one worker.
-  test.describe.configure({ mode: 'parallel' })
-
   for (const { path, layout, elements } of GLOBAL_ELEMENT_PAGES) {
     for (const viewport of Object.keys(VIEWPORTS) as ViewportName[]) {
       const surface = `${path} at ${viewport}`
@@ -111,7 +108,6 @@ test.describe('Docs global elements', () => {
         await page.setViewportSize(VIEWPORTS[viewport])
 
         const status = await load(page, testInfo, path, surface)
-        if (status && status >= 400) return
 
         await settleForAxe(page)
 
@@ -144,7 +140,6 @@ test.describe('Docs global elements', () => {
     await page.setViewportSize(VIEWPORTS.mobile)
 
     const status = await load(page, testInfo, path, surface)
-    if (status && status >= 400) return
 
     await renderedLocator(page, GLOBAL_ELEMENTS.menuTrigger.selector).click()
     await expect(
