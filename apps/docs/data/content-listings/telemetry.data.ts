@@ -62,6 +62,11 @@ export const telemetryMonitoring: ContentListingGroup = {
       description: 'Correlate browser requests end-to-end using W3C Trace Context.',
     },
     {
+      title: 'Query optimization',
+      href: '/guides/database/query-optimization',
+      description: 'Find and fix slow queries using indexes and query plan analysis.',
+    },
+    {
       title: 'Sentry integration',
       href: '/guides/monitoring-and-debugging/sentry-monitoring',
       description: 'Send errors to Sentry for alerting and grouping.',
