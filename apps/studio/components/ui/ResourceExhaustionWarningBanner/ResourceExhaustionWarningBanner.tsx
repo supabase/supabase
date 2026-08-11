@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { AlertTriangle, BookOpen, ChartLine, ChevronDown, Sparkles, Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
 import { COMPUTE_DISK } from 'shared-data'
 import {
   Alert,
@@ -22,6 +23,7 @@ import {
   isComputeUpgradeWarning,
 } from './ResourceExhaustionWarningBanner.utils'
 import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
+import { RestartProjectDialog } from '@/components/interfaces/ErrorHandling/RestartProjectDialog'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -30,8 +32,11 @@ import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
+const RESOURCE_WARNINGS_POLL_INTERVAL = 1000 * 60
+
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
+  const [showRestartDialog, setShowRestartDialog] = useState(false)
   const router = useRouter()
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
@@ -45,7 +50,10 @@ export const ResourceExhaustionWarningBanner = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
-  const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
+  const { data: resourceWarnings } = useResourceWarningsQuery(
+    { ref: ref },
+    { staleTime: RESOURCE_WARNINGS_POLL_INTERVAL, refetchInterval: RESOURCE_WARNINGS_POLL_INTERVAL }
+  )
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
     (warning) => warning.project === ref
@@ -113,6 +121,8 @@ export const ResourceExhaustionWarningBanner = () => {
 
   // True for a single compute warning, or when all active warnings are compute-related
   const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)
+
+  const isMemoryExhaustion = activeWarnings.includes('memory_and_swap_exhaustion')
 
   const correctionUrl = getResourceWarningCorrectionUrl({
     metric,
@@ -193,86 +203,106 @@ export const ResourceExhaustionWarningBanner = () => {
   }
 
   return (
-    <Alert
-      variant={isCritical ? 'destructive' : 'warning'}
-      className={cn(
-        'flex items-center justify-between',
-        'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]'
-      )}
-    >
-      <AlertTriangle />
-      <div className="">
-        <AlertTitle>{title}</AlertTitle>
-        <AlertDescription>{description}</AlertDescription>
-      </div>
-      <div className="flex items-center gap-x-2">
-        {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="default"
-                icon={<Wrench size={14} />}
-                iconRight={<ChevronDown size={14} />}
-              >
-                Troubleshoot
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {metricsHref !== undefined && (
-                <DropdownMenuItem asChild>
-                  <Link href={metricsHref} className="flex items-center gap-x-2 cursor-pointer">
-                    <ChartLine size={14} />
-                    View metrics
-                  </Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem asChild>
-                <a
-                  href={learnMoreUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-x-2 cursor-pointer"
-                >
-                  <BookOpen size={14} />
-                  Documentation
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center gap-x-2 cursor-pointer"
-                onClick={handleAskAI}
-              >
-                <Sparkles size={14} />
-                Ask AI Assistant
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : learnMoreUrl !== undefined ? (
-          <Button asChild variant="default" icon={<BookOpen size={14} />}>
-            <a href={learnMoreUrl} target="_blank" rel="noreferrer">
-              Learn more
-            </a>
-          </Button>
-        ) : aiPrompt !== undefined ? (
-          <Button variant="default" onClick={handleAskAI}>
-            Ask AI Assistant
-          </Button>
-        ) : null}
-        {correctionUrl !== undefined && (
-          <Button
-            asChild
-            variant="primary"
-            disabled={isComputeUpgradeMetric && isOrgLoading}
-            onClick={() =>
-              track('resource_exhaustion_banner_upgrade_clicked', {
-                warningTypes: activeWarnings,
-                destination: correctionUrl,
-              })
-            }
-          >
-            <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
-          </Button>
+    <>
+      <Alert
+        variant={isCritical ? 'destructive' : 'warning'}
+        className={cn(
+          'flex items-center justify-between',
+          'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]'
         )}
-      </div>
-    </Alert>
+      >
+        <AlertTriangle />
+        <div className="">
+          <AlertTitle>{title}</AlertTitle>
+          <AlertDescription>{description}</AlertDescription>
+        </div>
+        <div className="flex items-center gap-x-2">
+          {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="default"
+                  icon={<Wrench size={14} />}
+                  iconRight={<ChevronDown size={14} />}
+                >
+                  Troubleshoot
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {metricsHref !== undefined && (
+                  <DropdownMenuItem asChild>
+                    <Link href={metricsHref} className="flex items-center gap-x-2 cursor-pointer">
+                      <ChartLine size={14} />
+                      View metrics
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem asChild>
+                  <a
+                    href={learnMoreUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-x-2 cursor-pointer"
+                  >
+                    <BookOpen size={14} />
+                    Documentation
+                  </a>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="flex items-center gap-x-2 cursor-pointer"
+                  onClick={handleAskAI}
+                >
+                  <Sparkles size={14} />
+                  Ask AI Assistant
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : learnMoreUrl !== undefined ? (
+            <Button asChild variant="default" icon={<BookOpen size={14} />}>
+              <a href={learnMoreUrl} target="_blank" rel="noreferrer">
+                Learn more
+              </a>
+            </Button>
+          ) : aiPrompt !== undefined ? (
+            <Button variant="default" onClick={handleAskAI}>
+              Ask AI Assistant
+            </Button>
+          ) : null}
+          {isMemoryExhaustion && (
+            <Button
+              variant="default"
+              onClick={() => {
+                track('resource_exhaustion_banner_restart_clicked', {
+                  warningTypes: activeWarnings,
+                })
+                setShowRestartDialog(true)
+              }}
+            >
+              Restart database
+            </Button>
+          )}
+          {correctionUrl !== undefined && (
+            <Button
+              asChild
+              variant="primary"
+              disabled={isComputeUpgradeMetric && isOrgLoading}
+              onClick={() =>
+                track('resource_exhaustion_banner_upgrade_clicked', {
+                  warningTypes: activeWarnings,
+                  destination: correctionUrl,
+                })
+              }
+            >
+              <Link href={correctionUrl}>{buttonText ?? 'Check'}</Link>
+            </Button>
+          )}
+        </div>
+      </Alert>
+      <RestartProjectDialog
+        visible={showRestartDialog}
+        onClose={() => setShowRestartDialog(false)}
+        restartType="database"
+      />
+    </>
   )
 }
