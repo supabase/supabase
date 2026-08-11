@@ -272,7 +272,7 @@ describe('ai/tools/notebook-tools', () => {
         path: '/platform/projects/:ref/content',
         response: async ({ request }) => {
           sentBody = (await request.json()) as Record<string, unknown>
-          return HttpResponse.json({ id: 'notebook-1', name: 'Signup funnel' })
+          return HttpResponse.json(null)
         },
       })
 
@@ -299,11 +299,15 @@ describe('ai/tools/notebook-tools', () => {
       )
     })
 
-    it('should return the id of the created notebook', async () => {
+    it('should return the id it generated and sent, since a successful create response has no body', async () => {
+      let sentBody: Record<string, unknown> | undefined
       addAPIMock({
         method: 'put',
         path: '/platform/projects/:ref/content',
-        response: () => HttpResponse.json({ id: 'notebook-1', name: 'Signup funnel' }),
+        response: async ({ request }) => {
+          sentBody = (await request.json()) as Record<string, unknown>
+          return HttpResponse.json(null)
+        },
       })
 
       const tools = getNotebookTools({ projectRef: 'test-project' })
@@ -314,7 +318,8 @@ describe('ai/tools/notebook-tools', () => {
         { toolCallId: 'test', messages: [] }
       )
 
-      expect(result).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+      expect(typeof sentBody?.id).toBe('string')
+      expect(result).toEqual({ id: sentBody?.id, name: 'Signup funnel' })
     })
   })
 })

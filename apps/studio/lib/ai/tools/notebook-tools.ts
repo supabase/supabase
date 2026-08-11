@@ -127,7 +127,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           authHeaders
         )
 
-        return { id: result?.id, name }
+        return { id: result.id, name }
       },
     }),
   }

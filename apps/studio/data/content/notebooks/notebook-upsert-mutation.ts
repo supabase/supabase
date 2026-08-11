@@ -50,18 +50,16 @@ export async function createNotebook(
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
-  const payload = buildNotebookUpsertPayload({
-    id: crypto.randomUUID(),
-    name,
-    description,
-    content,
-  })
+  const id = crypto.randomUUID()
+  const payload = buildNotebookUpsertPayload({ id, name, description, content })
 
-  return upsertContent(
+  await upsertContent(
     { projectRef, payload: payload as unknown as UpsertContentPayload },
     signal,
     headersInit
   )
+
+  return { id }
 }
 
 export type CreateNotebookData = Awaited<ReturnType<typeof createNotebook>>
