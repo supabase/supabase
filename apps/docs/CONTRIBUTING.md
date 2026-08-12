@@ -21,7 +21,14 @@ To make docs as clear as possible:
 
 ## AI agent skills for docs authoring
 
-If you're using Claude Code or Cursor, this repo ships four skills that back the stages of the "Write the docs" authoring checklist below. They're checked into `.agents/skills/`, with pointers in `.claude/skills/` and `.cursor/skills/` — both agents pick them up automatically once you're working in this repo, no manual install step needed.
+If you're using Claude Code or Cursor, this repo ships four skills that back the stages of the "Write the docs" authoring checklist below.
+
+Canonical files live in `.agents/skills/`. Git symlinks in `.claude/skills/` and `.cursor/skills/` point at them (same pattern as `vitest`):
+
+- Claude Code discovers skills from `.claude/skills/` and follows those symlinks. It does not scan `.agents/skills/` directly.
+- Cursor discovers skills from `.agents/skills/` and `.cursor/skills/`.
+
+No install step: no `npx skills add`, plugin, or copy into `~/.claude/skills/`. Open this repo and invoke a skill by name (`/write-the-docs`, `/ask-the-docs`, `/pm-the-docs`, `/review-the-docs`). If Claude Code does not list them, check that `.claude/skills/write-the-docs` is a symlink, not a plain text file. Windows clones may need git symlink support enabled, then a re-checkout.
 
 | Skill | Checklist stage | Use for |
 | --- | --- | --- |
