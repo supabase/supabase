@@ -63,7 +63,7 @@ Both **Time-box user sessions** and **Inactivity timeout** are measured in hours
 
 <Admonition type="caution">
 
-The `sessions_timebox` and `sessions_inactivity_timeout` properties of the [Management API](/docs/reference/api/v1-update-auth-service-config) are also measured in hours, not seconds. Send `sessions_inactivity_timeout: 4` for a four-hour timeout. Sending `14400` sets a timeout of 14,400 hours, or around 1.6 years, so sessions appear to never time out.
+The `sessions_timebox` and `sessions_inactivity_timeout` properties of the [Management API](/docs/reference/api/v1-update-auth-service-config) are also measured in hours, not seconds. Send `{"sessions_inactivity_timeout": 4}` for a four-hour timeout. Sending `14400` sets a timeout of 14,400 hours, or around 1.6 years, so sessions appear to never time out.
 
 </Admonition>
 
