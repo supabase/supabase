@@ -427,11 +427,9 @@ const ArchivedVersionListRow = ({
       </p>
     </div>
 
-    {version.wasCurrentAtArchive && (
-      <Badge variant="default" className="shrink-0 font-mono text-[10px]">
-        Was current
-      </Badge>
-    )}
+    <span className="shrink-0 font-mono text-xs text-foreground-lighter">
+      {version.versionId.slice(0, 8)}
+    </span>
 
     <ArchivedVersionActionsMenu
       version={version}

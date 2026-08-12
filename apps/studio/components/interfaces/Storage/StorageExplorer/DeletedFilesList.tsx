@@ -5,7 +5,6 @@ import { ChevronDown, ChevronRight, RotateCcw, Trash2 } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Badge,
   Checkbox,
   cn,
   Table,
@@ -547,16 +546,7 @@ const ArchivedVersionTableRow = ({
         <div className="absolute left-[23px] top-1/2 h-px w-[8px] -translate-y-px bg-[hsl(0_0%_80%)] dark:bg-[hsl(0_0%_30%)] pointer-events-none" />
         {/* Content aligned after horizontal branch with gap */}
         <div className="flex items-center gap-x-2 pl-[36px]">
-          {version.wasCurrentAtArchive ? (
-            <Badge variant="default" className="font-mono text-[10px]">
-              Was current
-            </Badge>
-          ) : (
-            <>
-              <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
-              <span className="text-foreground-muted text-xs">({version.action})</span>
-            </>
-          )}
+          <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
         </div>
       </TableCell>
       <TableCell className="px-4 py-1.5 text-foreground-lighter text-xs">
