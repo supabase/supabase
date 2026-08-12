@@ -1,3 +1,4 @@
 {
+  "installCommand": "if [ -n \"$DF_FIREWALL_TOKEN\" ]; then pnpm config set //firewall.depthfirst.com/npm/:_authToken \"$DF_FIREWALL_TOKEN\" && pnpm config set registry https://firewall.depthfirst.com/npm/; fi && pnpm install",
   "buildCommand": "pnpm build"
 }

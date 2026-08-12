@@ -184,10 +184,23 @@ function buildTanstackConfig(): VercelConfig {
   }
 }
 
-// Empty config = no overrides; Vercel falls back to the dashboard preset.
-const passthrough: VercelConfig = {}
+// Dependency Firewall: when DF_FIREWALL_TOKEN is set as a Vercel Environment
+// Variable, route the install through depthfirst's supply-chain-scanning npm
+// proxy instead of the public registry (falls back to the public registry
+// when the variable is unset, e.g. Preview deployments without it configured).
+// Lives here instead of the dashboard's Install Command override so it's
+// version-controlled and applies identically to both build modes below.
+const installCommand =
+  'if [ -n "$DF_FIREWALL_TOKEN" ]; then pnpm config set //firewall.depthfirst.com/npm/:_authToken "$DF_FIREWALL_TOKEN" && pnpm config set registry https://firewall.depthfirst.com/npm/; fi && pnpm install'
 
-export const config: VercelConfig = isTanstack ? buildTanstackConfig() : passthrough
+// Only the install command is overridden here; everything else (build
+// command, framework preset, output directory) still falls back to the
+// dashboard-configured Next.js preset.
+const passthrough: VercelConfig = { installCommand }
+
+export const config: VercelConfig = isTanstack
+  ? { ...buildTanstackConfig(), installCommand }
+  : passthrough
 
 // Belt-and-braces: local @vercel/config CLI reads module.default, but the
 // docs claim Vercel's platform looks for a named `config` export. Export
