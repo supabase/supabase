@@ -441,7 +441,6 @@ export const dataset: AssistantEvalCase[] = [
           name: 'list_notebooks',
           input: {
             sort_by: { equals: 'inserted_at' },
-            limit: { equals: 1 },
           },
         },
       ],
