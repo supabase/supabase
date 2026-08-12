@@ -12,17 +12,32 @@ interface QueryResultChartProps {
 }
 
 // [Joshen] Will need to implement log scale - refer to QueryBlock.tsx `effectiveLogScale`
+// [Joshen] Will also need to implement error handling where appropriate (e.g if query errors)
+
+const toChartValue = (value: unknown): string | number => {
+  if (typeof value === 'number' || typeof value === 'string') return value
+  if (value === null || value === undefined) return ''
+  return String(value)
+}
 
 export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
   const { chart } = cell
   const { type, x_column, y_column, cumulative, show_labels } = chart ?? {}
 
   const hasConfig = !!x_column && !!y_column
+  const chartRows = useMemo(() => {
+    const xKey = x_column ?? ''
+    const yKey = y_column ?? ''
+    return (result?.rows ?? []).map((row) => ({
+      [xKey]: toChartValue(row[xKey]),
+      [yKey]: toChartValue(row[yKey]),
+    }))
+  }, [result, x_column, y_column])
   const cumulativeResults = useMemo(
-    () => getCumulativeResults({ rows: result?.rows ?? [] }, { yKey: y_column ?? '' }),
-    [result, y_column]
+    () => getCumulativeResults({ rows: chartRows }, { yKey: y_column ?? '' }),
+    [chartRows, y_column]
   )
-  const resultToRender = cumulative ? cumulativeResults : (result?.rows ?? [])
+  const resultToRender = cumulative ? cumulativeResults : chartRows
 
   if (!result || (result?.rows && result.rows.length === 0)) {
     return (

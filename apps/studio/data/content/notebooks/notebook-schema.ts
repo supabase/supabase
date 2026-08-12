@@ -18,7 +18,7 @@ const chartConfigSchema = z.object({
   x_column: z.string(),
   y_column: z.string(),
   cumulative: z.boolean(),
-  scale: z.enum(['linear', 'log']),
+  scale: z.enum(['linear', 'log']).default('linear'),
   show_labels: z.boolean(),
 })
 
@@ -51,7 +51,7 @@ const databaseCellSchema = z.object({
   title: z.string().optional(),
   sql: z.string(),
   row_limit: z.number(),
-  view: z.enum(['table', 'chart']),
+  view: z.enum(['table', 'chart']).default('table').optional(),
   chart: chartConfigSchema.optional(),
 })
 

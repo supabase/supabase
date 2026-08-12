@@ -44,7 +44,9 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
-    const nextCells = cells.map((c) => (c.id === cell.id ? { ...c, view } : c))
+    const nextCells = cells.map((c) =>
+      c.id === cell.id && c._tag === 'database_cell' ? { ...c, view } : c
+    )
     snap.updateCells({ id: notebookId, cells: nextCells })
   }
 
@@ -93,7 +95,9 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
           <FormItemLayout isReactForm={false} label="View data as">
             <ToggleGroup
               value={view}
-              onValueChange={(view) => onChangeView(view as 'table' | 'chart')}
+              onValueChange={(value) => {
+                if (value === 'table' || value === 'chart') onChangeView(value)
+              }}
               variant="outline"
               type="single"
             >
@@ -116,7 +120,9 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
             <FormItemLayout isReactForm={false} label="Render chart as" className="px-3 mb-1">
               <ToggleGroup
                 value={type}
-                onValueChange={(type) => onUpdateChartConfig({ type: type as 'bar' | 'line' })}
+                onValueChange={(value) => {
+                  if (value === 'bar' || value === 'line') onUpdateChartConfig({ type: value })
+                }}
                 variant="outline"
                 type="single"
               >
