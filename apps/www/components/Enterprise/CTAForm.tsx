@@ -21,7 +21,12 @@ const UseCases: FC<Props> = (props) => {
           className="hidden md:flex"
           tabs={[
             {
-              label: <CustomerLogo title="Goodtape" logo="/images/customers/logos/on-light/good-tape.png" />,
+              label: (
+                <CustomerLogo
+                  title="Goodtape"
+                  logo="/images/customers/logos/on-light/good-tape.png"
+                />
+              ),
               panel: (
                 <CustomerQuote
                   quote="My biggest regret is not having gone with Supabase from the beginning."
@@ -30,7 +35,9 @@ const UseCases: FC<Props> = (props) => {
               ),
             },
             {
-              label: <CustomerLogo title="Xendit" logo="/images/customers/logos/on-light/xendit.png" />,
+              label: (
+                <CustomerLogo title="Xendit" logo="/images/customers/logos/on-light/xendit.png" />
+              ),
               panel: (
                 <CustomerQuote
                   quote="The full solution was built and in production in less than one week."
@@ -39,7 +46,12 @@ const UseCases: FC<Props> = (props) => {
               ),
             },
             {
-              label: <CustomerLogo title="Chatbase" logo="/images/customers/logos/on-light/chatbase.png" />,
+              label: (
+                <CustomerLogo
+                  title="Chatbase"
+                  logo="/images/customers/logos/on-light/chatbase.png"
+                />
+              ),
               panel: (
                 <CustomerQuote
                   quote="Supabase is great because it has everything. I don’t need a different solution for authentication, a different solution for database, or a different solution for storage."
@@ -56,7 +68,12 @@ const UseCases: FC<Props> = (props) => {
         className="md:hidden mt-4"
         tabs={[
           {
-            label: <CustomerLogo title="Goodtape" logo="/images/customers/logos/on-light/good-tape.png" />,
+            label: (
+              <CustomerLogo
+                title="Goodtape"
+                logo="/images/customers/logos/on-light/good-tape.png"
+              />
+            ),
             panel: (
               <CustomerQuote
                 quote="My biggest regret is not having gone with Supabase from the beginning."
@@ -65,7 +82,9 @@ const UseCases: FC<Props> = (props) => {
             ),
           },
           {
-            label: <CustomerLogo title="Xendit" logo="/images/customers/logos/on-light/xendit.png" />,
+            label: (
+              <CustomerLogo title="Xendit" logo="/images/customers/logos/on-light/xendit.png" />
+            ),
             panel: (
               <CustomerQuote
                 quote="The full solution was built and in production in less than one week."
@@ -74,7 +93,9 @@ const UseCases: FC<Props> = (props) => {
             ),
           },
           {
-            label: <CustomerLogo title="Chatbase" logo="/images/customers/logos/on-light/chatbase.png" />,
+            label: (
+              <CustomerLogo title="Chatbase" logo="/images/customers/logos/on-light/chatbase.png" />
+            ),
             panel: (
               <CustomerQuote
                 quote="Supabase is great because it has everything. I don’t need a different solution for authentication, a different solution for database, or a different solution for storage."
