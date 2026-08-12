@@ -138,6 +138,8 @@ grant select on table public.weather_readings to anon, authenticated;
 
 To stop new tables from receiving the automatic grants in the first place, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges). To enable RLS automatically on every new table, see [Event triggers](/docs/guides/database/postgres/event-triggers).
 
+Write the tests for this table in the same change. See [Test your policies](#test-your-policies).
+
 ### Write a policy for each operation
 
 Write a separate policy for `select`, `insert`, `update`, and `delete`. Postgres does not accept multiple operations in one `for` clause, and a `for all` policy hides which operation each rule was meant to cover.
@@ -306,7 +308,9 @@ In older versions of Postgres, protect your views by revoking access from the `a
 
 ### Test your policies
 
-We recommend writing tests for every policy. A wrong policy fails quietly. Too permissive, and a query returns rows it shouldn't. Too strict, and it returns nothing and raises no error. Neither case surfaces as a failure, so tests are how you find out.
+We recommend writing tests for every policy, in the same change that sets the grants and creates the policies. Treat the tests as part of securing the table, not as a follow-up.
+
+A wrong policy fails quietly. Too permissive, and a query returns rows it shouldn't. Too strict, and it returns nothing and raises no error. Neither case surfaces as an error, so tests are how you find out.
 
 Supabase runs database tests with [pgTAP](/docs/guides/database/extensions/pgtap) through the CLI. Test files are `.sql` files under `supabase/tests/`.
 
