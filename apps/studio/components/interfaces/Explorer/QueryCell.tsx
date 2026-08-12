@@ -72,6 +72,8 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const onRunQuery = async () => {
     if (!project) return console.error('Project is required')
 
+    handleUpdateCell({ sql: value })
+
     executeQuery({
       projectRef: project?.ref,
       connectionString: project?.connectionString,

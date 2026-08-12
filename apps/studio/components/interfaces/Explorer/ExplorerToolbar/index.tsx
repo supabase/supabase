@@ -1,5 +1,5 @@
 import { Edit } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -59,9 +59,10 @@ const ExplorerToolbarTitle = ({
   const [isEditingTitle, setIsEditingTitle] = useState(false)
   const [value, setValue] = useState(title)
 
-  useEffect(() => {
-    if (isEditingTitle) setValue(title)
-  }, [isEditingTitle, title])
+  const handleStartEditing = () => {
+    setValue(title)
+    setIsEditingTitle(true)
+  }
 
   return (
     <div
@@ -88,7 +89,6 @@ const ExplorerToolbarTitle = ({
               e.preventDefault()
               e.stopPropagation()
               setIsEditingTitle(false)
-              setValue(title ?? '')
             } else if (e.key === 'Enter') {
               e.preventDefault()
               e.stopPropagation()
@@ -97,15 +97,17 @@ const ExplorerToolbarTitle = ({
             }
           }}
         />
-      ) : (
+      ) : onSaveTitle ? (
         <Button
           variant="text"
           className="group"
-          onClick={() => setIsEditingTitle(true)}
+          onClick={handleStartEditing}
           iconRight={<Edit className="opacity-0 group-hover:opacity-100 transition" />}
         >
-          {value}
+          {title}
         </Button>
+      ) : (
+        title
       )}
     </div>
   )

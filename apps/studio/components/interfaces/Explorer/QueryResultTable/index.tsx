@@ -92,12 +92,14 @@ const QueryError = ({
                 increase the statement timeout
               </InlineLink>
               {' or '}
-              <span
+              <button
+                type="button"
+                tabIndex={0}
                 className={cn(InlineLinkClassName, 'cursor-pointer')}
                 onClick={() => setShowConnect(true)}
               >
                 connect to your database directly
-              </span>
+              </button>
               .
             </p>
           </div>
@@ -127,13 +129,15 @@ const QueryError = ({
             {payloadTooLargeError && (
               <p className="text-sm text-foreground-light flex items-center gap-x-1">
                 Run this query by{' '}
-                <span
+                <button
+                  type="button"
+                  tabIndex={0}
                   onClick={() => setShowConnect(true)}
                   className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
                 >
                   connecting to your database directly
                   <ExternalLink size={12} />
-                </span>
+                </button>
                 .
               </p>
             )}
