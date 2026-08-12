@@ -44,10 +44,16 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           .max(100)
           .default(20)
           .describe('Max number of notebooks to return.'),
+        sort_by: z
+          .enum(['name', 'inserted_at'])
+          .optional()
+          .describe(
+            'Field to sort notebooks by. There is no "updated_at" sort — use "inserted_at" for creation order.'
+          ),
       }),
-      execute: async ({ cursor, limit }) => {
+      execute: async ({ cursor, limit, sort_by }) => {
         const { content, cursor: nextCursor } = await getContent(
-          { projectRef, type: 'notebook', limit, cursor },
+          { projectRef, type: 'notebook', limit, cursor, sort: sort_by },
           undefined,
           authHeaders
         )
