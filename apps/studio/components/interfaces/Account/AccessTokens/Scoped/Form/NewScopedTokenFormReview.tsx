@@ -15,7 +15,6 @@ import {
 import { useCapabilitySummary } from '../../hooks/useCapabilitySummary'
 import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import { failingResourceLine } from '../ExceedsRoleBadge'
-import { McpUnsupportedWarning } from '../McpUnsupportedWarning'
 import { CapabilityCategoryList, ResourceSummaryItem, RiskLevelSummary } from '../TokenSummaryRows'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
 import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
@@ -24,15 +23,12 @@ interface ReviewStepProps {
   values: TokenFormValues
   access: TokenAccessEvaluation
   permissionScopeMap: PermissionScopeMap | undefined
-  /** Switches the form back to step one in legacy (account-wide) token mode. */
-  onSelectLegacyToken: () => void
 }
 
 export const NewScopedTokenFormReview = ({
   values,
   access,
   permissionScopeMap,
-  onSelectLegacyToken,
 }: ReviewStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
   const selection = values.permissions
@@ -211,7 +207,6 @@ export const NewScopedTokenFormReview = ({
 
           <div className="flex flex-col gap-3">
             <h3 className="text-sm">MCP tools</h3>
-            <McpUnsupportedWarning onSelectLegacyToken={onSelectLegacyToken} />
             {mcpTools.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No MCP tools are enabled by the selected capabilities.

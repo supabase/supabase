@@ -122,7 +122,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -139,7 +139,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -153,7 +153,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.7.2 https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -175,7 +175,7 @@ cp -rf supabase/docker/. supabase-project
 cd supabase-project && cp .env.example .env
 
 # Record the base version so update.sh can upgrade this install later
-printf 'ref=self-hosted/v0.7.2\n' > .supabase-version
+printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -237,7 +237,7 @@ Review and change URL configuration variables:
 
   Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
 
-  - **Default setup:** The API gateway (Kong) listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
+  - **Default setup:** The API gateway (Envoy by default) listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
   - **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
 
 </Admonition>
@@ -305,7 +305,7 @@ sh run.sh stop
 
 <Admonition type="caution" title="Windows: CRLF line endings">
 
-  If the API gateway (Kong) fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
+  If the API gateway fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
 
 </Admonition>
 
@@ -463,10 +463,10 @@ Supabase is built from open source tools, each chosen or developed for productio
 If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, or equivalent open source license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves.
 
 <Image
-  alt="Diagram showing the architecture of Supabase. The API gateway (Kong) sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  alt="Diagram showing the architecture of self-hosted Supabase. The API gateway (Envoy) sits in front of 7 services: Auth, PostgREST, Realtime, Storage, Edge Runtime, postgres-meta, and Studio. The services connect to a single Postgres instance, with Studio reaching it through pg-meta. Supavisor pools connections to the same Postgres instance."
   src={{
-    dark: "/docs/img/supabase-architecture.svg",
-    light: "/docs/img/supabase-architecture--light.svg",
+    dark: "/docs/img/supabase-self-hosted-architecture.svg",
+    light: "/docs/img/supabase-self-hosted-architecture--light.svg",
   }}
 
   width={1600}
@@ -474,7 +474,7 @@ If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, o
 />
 
 - **[Studio](https://github.com/supabase/supabase/tree/master/apps/studio)** - A dashboard for managing your self-hosted Supabase project
-- **[Kong](https://github.com/Kong/kong)** - Kong API gateway
+- **[Envoy](https://www.envoyproxy.io/)** - API gateway (default; Kong available as an optional override)
 - **[Auth](https://github.com/supabase/auth)** - JWT-based authentication API for user sign-ups, logins, and session management
 - **[PostgREST](https://github.com/PostgREST/postgrest)** - Web server that turns your Postgres database directly into a RESTful API
 - **[Realtime](https://github.com/supabase/realtime)** - Elixir server that listens to Postgres database changes and broadcasts them to subscribed clients
