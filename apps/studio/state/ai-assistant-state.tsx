@@ -60,7 +60,7 @@ export type SupportChatMetadata = {
   isLifecycleSyncing: boolean
 }
 
-type ChatSession = {
+export type ChatSession = {
   id: string
   name: string
   messages: AssistantMessageType[]
@@ -86,6 +86,10 @@ type AiAssistantData = {
   model?: AssistantModel
   context: AiAssistantContext
 }
+
+type CreateChatOptions = { name?: string; initialMessage?: string }
+type NewChatOptions = CreateChatOptions &
+  Partial<Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>>
 
 // Data structure stored in IndexedDB
 type StoredAiAssistantState = {
@@ -389,11 +393,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       return state.activeChatId ? state.chats[state.activeChatId] : undefined
     },
 
-    newChat: (
-      options?: { name?: string; initialMessage?: string } & Partial<
-        Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
-      >
-    ) => {
+    createChat: (options?: CreateChatOptions) => {
       const chatId = uuidv4()
       const newChat: ChatSession = {
         id: chatId,
@@ -407,21 +407,23 @@ export const createAiAssistantState = (): AiAssistantState => {
         ...state.chats,
         [chatId]: newChat,
       }
-      state.activeChatId = chatId
 
-      // Create new chat instance
       const chatInstance = createChatInstance(state, { id: chatId, initialMessages: [] })
-
       state.chatInstances[chatId] = ref(chatInstance)
 
-      // If initialMessage is provided, append it to the chat instance
       if (options?.initialMessage) {
         chatInstance.sendMessage({
           text: options.initialMessage,
         })
       }
 
-      // Update non-chat related state based on options, falling back to current state, then initial
+      return chatId
+    },
+
+    newChat: (options?: NewChatOptions) => {
+      const chatId = state.createChat(options)
+      state.selectChat(chatId)
+
       const initialAiAssistantData = createInitialAiAssistantData()
       state.initialInput = options?.initialInput ?? initialAiAssistantData.initialInput
       state.sqlSnippets = options?.sqlSnippets ?? initialAiAssistantData.sqlSnippets
@@ -431,8 +433,8 @@ export const createAiAssistantState = (): AiAssistantState => {
       return chatId
     },
 
-    branchChat: (messageId: string) => {
-      const sourceChat = state.activeChat
+    createBranch: (sourceChatId: string, messageId: string) => {
+      const sourceChat = state.chats[sourceChatId]
       if (!sourceChat) return
 
       const messageIndex = sourceChat.messages.findIndex((msg) => msg.id === messageId)
@@ -456,11 +458,21 @@ export const createAiAssistantState = (): AiAssistantState => {
         ...state.chats,
         [chatId]: newChat,
       }
-      state.activeChatId = chatId
 
       state.chatInstances[chatId] = ref(
         createChatInstance(state, { id: chatId, initialMessages: branchedMessages })
       )
+
+      return chatId
+    },
+
+    branchChat: (messageId: string) => {
+      if (!state.activeChatId) return
+
+      const chatId = state.createBranch(state.activeChatId, messageId)
+      if (!chatId) return
+
+      state.selectChat(chatId)
 
       const initialAiAssistantData = createInitialAiAssistantData()
       state.initialInput = initialAiAssistantData.initialInput
@@ -493,35 +505,33 @@ export const createAiAssistantState = (): AiAssistantState => {
       })
     },
 
-    selectChat: (id: string) => {
-      if (id !== state.activeChatId) {
-        state.activeChatId = id
-        const chat = state.chats[id]
-        if (chat) {
-          if (!state.chatInstances[id]) {
-            state.chatInstances[id] = ref(
-              createChatInstance(state, { id, initialMessages: chat.messages })
-            )
-          }
-        }
+    ensureChatInstance: (id: string) => {
+      const chat = state.chats[id]
+      if (chat && !state.chatInstances[id]) {
+        state.chatInstances[id] = ref(
+          createChatInstance(state, { id, initialMessages: chat.messages })
+        )
       }
+    },
+
+    selectChat: (id: string) => {
+      if (!state.chats[id]) return
+
+      state.activeChatId = id
+      state.ensureChatInstance(id)
     },
 
     deleteChat: (id: string) => {
       const { [id]: _, ...remainingChats } = state.chats
       state.chats = remainingChats
+      delete state.chatInstances[id]
 
       if (id === state.activeChatId) {
         const remainingChatIds = Object.keys(remainingChats)
         state.activeChatId = remainingChatIds.length > 0 ? remainingChatIds[0] : undefined
 
         if (state.activeChatId) {
-          const chat = state.chats[state.activeChatId]
-          if (!state.chatInstances[state.activeChatId]) {
-            state.chatInstances[state.activeChatId] = ref(
-              createChatInstance(state, { id: state.activeChatId, initialMessages: chat.messages })
-            )
-          }
+          state.ensureChatInstance(state.activeChatId)
         }
       }
     },
@@ -534,19 +544,25 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
     },
 
-    clearMessages: () => {
-      const chat = state.activeChat
+    clearMessages: (chatId = state.activeChatId) => {
+      if (!chatId) return
+
+      const chat = state.chats[chatId]
       if (chat) {
         chat.messages = []
         chat.updatedAt = new Date()
-        state.suggestions = undefined
-        state.sqlSnippets = []
-        state.initialInput = ''
+        if (chatId === state.activeChatId) {
+          state.suggestions = undefined
+          state.sqlSnippets = []
+          state.initialInput = ''
+        }
       }
     },
 
-    deleteMessagesAfter: (id: string, { includeSelf = true } = {}) => {
-      const chat = state.activeChat
+    deleteMessagesAfter: (id: string, { includeSelf = true, chatId = state.activeChatId } = {}) => {
+      if (!chatId) return
+
+      const chat = state.chats[chatId]
       if (!chat) return
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === id)
@@ -558,8 +574,10 @@ export const createAiAssistantState = (): AiAssistantState => {
       chat.updatedAt = new Date()
     },
 
-    updateMessage: (updatedMessage: MessageType) => {
-      const chat = state.activeChat
+    updateMessage: (updatedMessage: MessageType, chatId = state.activeChatId) => {
+      if (!chatId) return
+
+      const chat = state.chats[chatId]
       if (!chat) return
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
@@ -650,19 +668,18 @@ export type AiAssistantState = AiAssistantData & {
   messageSpanIds: Record<string, string>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
-  newChat: (
-    options?: { name?: string; initialMessage?: string } & Partial<
-      Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
-    >
-  ) => string
+  createChat: (options?: CreateChatOptions) => string
+  newChat: (options?: NewChatOptions) => string
+  createBranch: (sourceChatId: string, messageId: string) => string | undefined
   branchChat: (messageId: string) => string | undefined
   setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => void
+  ensureChatInstance: (id: string) => void
   selectChat: (id: string) => void
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
-  clearMessages: () => void
-  deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean }) => void
-  updateMessage: (message: MessageType) => void
+  clearMessages: (chatId?: string) => void
+  deleteMessagesAfter: (id: string, options?: { includeSelf?: boolean; chatId?: string }) => void
+  updateMessage: (message: MessageType, chatId?: string) => void
   setSqlSnippets: (snippets: SqlSnippet[]) => void
   clearSqlSnippets: () => void
   loadPersistedState: (persistedState: StoredAiAssistantState) => void
