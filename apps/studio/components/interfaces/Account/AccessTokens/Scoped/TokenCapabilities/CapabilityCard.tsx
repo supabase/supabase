@@ -1,4 +1,4 @@
-import { AccordionContent, AccordionItem, AccordionTrigger, Badge } from 'ui'
+import { AccordionContent, AccordionItem, AccordionTrigger, Badge, cn } from 'ui'
 
 import { PERMISSION_MODE_LABEL } from '../../AccessToken.permissions'
 import type { EntryAccess } from '../../AccessToken.roles'
@@ -12,6 +12,9 @@ interface CapabilityCardProps {
   /** Accordion tiers wrap the header in a trigger button; the ≤2 tier renders it inert. */
   collapsible: boolean
   accessEntries: Record<string, EntryAccess>
+  /** Position within the continuous bordered list — controls corner rounding and shared edges. */
+  isFirst?: boolean
+  isLast?: boolean
 }
 
 const CapabilityCardHeader = ({
@@ -22,47 +25,61 @@ const CapabilityCardHeader = ({
   const entryAccess = accessEntries[entry.key]
 
   return (
-    <div className="flex w-full flex-1 items-center justify-between gap-2">
-      <span className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-foreground">{entry.name}</span>
-        <Badge variant={mode === 'readwrite' ? 'warning' : 'default'}>
-          {PERMISSION_MODE_LABEL[mode]}
-        </Badge>
-        {entryAccess?.status === 'exceeds-role' && (
-          <ExceedsRoleBadge entry={entry} mode={mode} access={entryAccess} />
-        )}
-      </span>
-      <span className="shrink-0 text-xs text-foreground-lighter">
-        {endpoints.length} {pluralize(endpoints.length, 'endpoint')}
-        {mcpTools.length > 0 && ` · ${mcpTools.length} ${pluralize(mcpTools.length, 'tool')}`}
-      </span>
+    <div className="flex flex-1 items-center justify-between gap-2 pr-2">
+      <div className="flex min-w-0 flex-col gap-1">
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium text-foreground">{entry.name}</span>
+          {entryAccess?.status === 'exceeds-role' && (
+            <ExceedsRoleBadge entry={entry} mode={mode} access={entryAccess} />
+          )}
+        </span>
+        <span className="text-xs text-foreground-lighter">
+          {endpoints.length} {pluralize(endpoints.length, 'endpoint')} and {mcpTools.length} MCP{' '}
+          {pluralize(mcpTools.length, 'tool')}
+        </span>
+      </div>
+      <Badge variant={mode === 'readwrite' ? 'warning' : 'default'} className="shrink-0">
+        {PERMISSION_MODE_LABEL[mode]}
+      </Badge>
     </div>
   )
 }
 
-export const CapabilityCard = ({ capability, collapsible, accessEntries }: CapabilityCardProps) => {
+export const CapabilityCard = ({
+  capability,
+  collapsible,
+  accessEntries,
+  isFirst = true,
+  isLast = true,
+}: CapabilityCardProps) => {
   const body = (
     <CapabilityCardBody endpoints={capability.endpoints} mcpTools={capability.mcpTools} />
+  )
+  const positionClassName = cn(
+    'border',
+    !isLast && 'border-b-0',
+    isFirst && 'rounded-t-md',
+    isLast && 'rounded-b-md'
   )
 
   if (!collapsible) {
     return (
-      <div className="rounded-md border">
-        <div className="px-3 py-2">
+      <div className={positionClassName}>
+        <div className="bg-surface-300 px-4 py-3">
           <CapabilityCardHeader capability={capability} accessEntries={accessEntries} />
         </div>
-        <div className="border-t p-3">{body}</div>
+        <div className="px-4 pb-4">{body}</div>
       </div>
     )
   }
 
   return (
-    <AccordionItem value={capability.entry.key} className="rounded-md border">
-      <AccordionTrigger className="px-3 py-2 font-normal hover:no-underline">
+    <AccordionItem value={capability.entry.key} className={positionClassName}>
+      <AccordionTrigger className="bg-surface-300 px-4 py-3 transition first:rounded-t last:rounded-b hover:no-underline">
         <CapabilityCardHeader capability={capability} accessEntries={accessEntries} />
       </AccordionTrigger>
-      <AccordionContent className="border-t">
-        <div className="p-3">{body}</div>
+      <AccordionContent className="*:pb-0">
+        <div className="px-4 pb-4">{body}</div>
       </AccordionContent>
     </AccordionItem>
   )

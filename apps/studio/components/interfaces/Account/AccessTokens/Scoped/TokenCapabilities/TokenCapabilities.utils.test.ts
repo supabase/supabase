@@ -4,15 +4,12 @@ import { getCatalogEntry } from '../../AccessToken.permissions'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import {
   computeRiskBanner,
-  filterCapabilities,
   getCapabilityDensityTier,
   getNotGrantedCatalogEntries,
   getSharedPathPrefix,
   groupCapabilitiesByLevel,
   splitEndpointPath,
 } from './TokenCapabilities.utils'
-
-const endpoint = (method: string, path: string) => ({ method, path, raw: `${method} ${path}` })
 
 // 'project:database' is catalog-high and writable; 'project:advisors' is catalog-low and read-only.
 const databaseCapability = (
@@ -114,43 +111,6 @@ describe('getNotGrantedCatalogEntries', () => {
   it('excludes granted entries', () => {
     const notGranted = getNotGrantedCatalogEntries([databaseCapability('read')])
     expect(notGranted.map((e) => e.key)).not.toContain('project:database')
-  })
-})
-
-describe('filterCapabilities', () => {
-  const capabilities = [
-    databaseCapability('readwrite', [endpoint('GET', '/v1/projects/{ref}/database')]),
-    advisorsCapability('read'),
-  ]
-
-  it('returns everything, unmatched by path, when the query is empty', () => {
-    const result = filterCapabilities(capabilities, '', 'all')
-    expect(result.map((r) => r.capability.entry.key)).toEqual([
-      'project:database',
-      'project:advisors',
-    ])
-    expect(result.every((r) => !r.matchedByPath)).toBe(true)
-  })
-
-  it('matches by capability name', () => {
-    const result = filterCapabilities(capabilities, 'advisors', 'all')
-    expect(result.map((r) => r.capability.entry.key)).toEqual(['project:advisors'])
-    expect(result[0].matchedByPath).toBe(false)
-  })
-
-  it('matches by endpoint path and flags it as a path match', () => {
-    const result = filterCapabilities(capabilities, '/database', 'all')
-    expect(result.map((r) => r.capability.entry.key)).toEqual(['project:database'])
-    expect(result[0].matchedByPath).toBe(true)
-  })
-
-  it('applies the level filter before matching', () => {
-    expect(filterCapabilities(capabilities, '', 'read')).toHaveLength(1)
-    expect(filterCapabilities(capabilities, '', 'readwrite')).toHaveLength(1)
-  })
-
-  it('drops capabilities matching neither the name nor any endpoint path', () => {
-    expect(filterCapabilities(capabilities, 'storage', 'all')).toEqual([])
   })
 })
 
