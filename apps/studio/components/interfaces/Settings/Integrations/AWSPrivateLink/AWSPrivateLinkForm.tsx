@@ -25,6 +25,7 @@ import {
   SheetTitle,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { Input as CopyableInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -140,8 +141,8 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1">
-            <SheetSection className="space-y-4 flex-1">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+            <SheetSection className="space-y-4 flex-1 overflow-y-auto">
               {!isNew && account && (
                 <>
                   <Admonition
@@ -200,6 +201,28 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   />
                 </>
               )}
+              <FormField
+                control={form.control}
+                name="accountName"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Account Name"
+                    description="A name for this account connection."
+                  >
+                    <FormControl>
+                      <Input
+                        {...field}
+                        readOnly={!isNew}
+                        onFocus={(e) => {
+                          if (!isNew) {
+                            e.target.blur()
+                          }
+                        }}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
               {(showPrivateLinkReadReplica || !isNew) && (
                 <FormField
                   control={form.control}
@@ -263,28 +286,38 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                   </FormItemLayout>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="accountName"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Account Name"
-                    description="A name for this account connection."
-                  >
-                    <FormControl>
-                      <Input
-                        {...field}
-                        readOnly={!isNew}
-                        onFocus={(e) => {
-                          if (!isNew) {
-                            e.target.blur()
-                          }
-                        }}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+              {!isNew && account?.resource_access_manager_resource_config_id && (
+                <FormItemLayout
+                  label="Resource Configuration ID"
+                  description="The AWS VPC Lattice resource configuration ID for this association."
+                >
+                  <CopyableInput
+                    readOnly
+                    copy
+                    value={account.resource_access_manager_resource_config_id}
+                  />
+                </FormItemLayout>
+              )}
+              {!isNew && account?.resource_access_manager_resource_config_arn && (
+                <FormItemLayout
+                  label="Resource Configuration ARN"
+                  description="The ARN of the AWS VPC Lattice resource configuration."
+                >
+                  <CopyableInput
+                    readOnly
+                    copy
+                    value={account.resource_access_manager_resource_config_arn}
+                  />
+                </FormItemLayout>
+              )}
+              {!isNew && account?.resource_access_manager_share_arn && (
+                <FormItemLayout
+                  label="Resource Share ARN"
+                  description="The ARN of the AWS RAM resource share."
+                >
+                  <CopyableInput readOnly copy value={account.resource_access_manager_share_arn} />
+                </FormItemLayout>
+              )}
             </SheetSection>
 
             <SheetFooter>
