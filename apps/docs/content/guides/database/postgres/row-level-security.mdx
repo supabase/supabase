@@ -76,6 +76,8 @@ A missing grant raises a `42501` error before any policy runs. When a request fa
 
 ### Set the grants for a table
 
+Run these statements in the [SQL Editor](/dashboard/project/_/sql/new) for a one-off change, or in a [migration](/docs/guides/deployment/database-migrations) to keep the change reproducible across environments. Grants and RLS belong in the same migration.
+
 Set the grants to match what each role does in your app:
 
 1. Revoke the automatic grants from both client roles.
