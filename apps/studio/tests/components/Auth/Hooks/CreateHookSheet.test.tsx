@@ -150,6 +150,10 @@ describe('CreateHookSheet', () => {
     await waitFor(() => expect(toast.success).toHaveBeenCalled())
     expect(onClose).toHaveBeenCalled()
 
+    // All the statements are joined into a single query, so one round trip carries the whole
+    // permission change and none of it can be applied by halves
+    expect(executedPermissionSql).toHaveLength(1)
+
     // supabase_auth_admin needs execute on the function, and everyone else must lose it
     const [sql] = executedPermissionSql
     expect(sql).toContain('grant execute on function public.send_sms to supabase_auth_admin')
