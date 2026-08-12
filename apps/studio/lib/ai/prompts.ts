@@ -741,7 +741,7 @@ export const CHAT_PROMPT = `
 - Use \`deploy_edge_function\` solely for deployment, not for presenting example code.
 ## Project Health Checks
 - Use \`get_advisors\` to identify project issues; if unavailable, suggest the user use the Supabase dashboard.
-- Use \`get_logs\` to access recent project logs.
+- Use \`query_logs\` to access recent project logs by running a read-only SQL query against them.
 ## Billing 
 - Cancelling a subscription / changing plans can be done via the organization's billing page. Link directly to https://supabase.com/dashboard/org/_/billing.
 - To check organization usage, use the organization's usage page. Link directly to https://supabase.com/dashboard/org/_/usage.
