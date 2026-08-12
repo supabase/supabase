@@ -906,6 +906,9 @@ importers:
       '@aws-sdk/credential-providers':
         specifier: ^3.1041.0
         version: 3.1041.0
+      '@configcat/sdk':
+        specifier: ^1.1.0
+        version: 1.1.0
       '@dagrejs/dagre':
         specifier: ^1.0.4
         version: 1.0.4
@@ -2020,6 +2023,9 @@ importers:
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1
+      e2e-shared:
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1
@@ -2030,6 +2036,22 @@ importers:
       axe-core:
         specifier: ^4.12.1
         version: 4.12.1
+
+  e2e/shared:
+    dependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
 
   e2e/studio:
     dependencies:
@@ -2058,6 +2080,25 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.22.4
+
+  e2e/www:
+    dependencies:
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
+      e2e-shared:
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
 
   packages/ai-commands:
     dependencies:
@@ -3461,6 +3502,9 @@ packages:
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
     engines: {node: '>=0.1.90'}
+
+  '@configcat/sdk@1.1.0':
+    resolution: {integrity: sha512-oSueg7jIk6in+XreRjnV+U6lQfgu5W2w6TqtO1CjEcyR2zRrVC7fLLZoySHnRlPwExXrvbp4olDYWEbfj1zL0A==}
 
   '@contentlayer2/cli@0.4.3':
     resolution: {integrity: sha512-ZJ+Iiu2rVI50x60XoqnrsO/Q8eqFX5AlP1L0U/3ygaAas3tnOqTzQZ1UsxYQMpJzcLok24ddlhKfQKbCMUJPiQ==}
@@ -18978,6 +19022,8 @@ snapshots:
 
   '@colors/colors@1.5.0':
     optional: true
+
+  '@configcat/sdk@1.1.0': {}
 
   '@contentlayer2/cli@0.4.3(esbuild@0.28.1)(markdown-wasm@1.2.0)(supports-color@8.1.1)':
     dependencies:

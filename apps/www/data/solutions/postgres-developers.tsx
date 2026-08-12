@@ -391,7 +391,7 @@ const data: () => {
           ),
         },
         {
-          id: 'row-level-security',
+          id: 'full-sql-access',
           title: 'Full SQL access',
           icon: '',
           subheading: (
@@ -411,7 +411,7 @@ const data: () => {
                 dark: '/images/solutions/postgres-developers/sql-editor-dark.jpg',
                 light: '/images/solutions/postgres-developers/sql-editor-light.jpg',
               }}
-              alt="Row Level Security"
+              alt="SQL Editor"
               width={100}
               height={100}
               quality={100}

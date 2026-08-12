@@ -1,6 +1,17 @@
 module.exports = [
   {
     permanent: true,
+    source: '/images/customers/logos/light/:path*',
+    destination: '/images/customers/logos/on-dark/:path*',
+  },
+  // Legacy root wordmarks moved to on-light/. Keep dreambase-mark.png at logos/ root.
+  {
+    permanent: true,
+    source: '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png',
+    destination: '/images/customers/logos/on-light/:slug.png',
+  },
+  {
+    permanent: true,
     source: '/blog/pricing',
     destination: '/pricing',
   },
