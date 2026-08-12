@@ -557,11 +557,9 @@ rollback;
 
 For CLI setup and more pgTAP helpers, see [Testing your database](/docs/guides/database/testing).
 
-## RLS performance recommendations
+## Write policies that scale
 
-Every authorization system has an impact on performance. Postgres evaluates a policy expression against each candidate row, so the cost scales with the rows a query scans. This matters most for queries that scan every row in a table, like many `select` operations, including those using limit, offset, and ordering.
-
-Based on a series of [tests](https://github.com/GaryAustin1/RLS-Performance), these are the recommendations for RLS:
+Postgres evaluates a policy expression against each candidate row, so the cost scales with the rows a query scans. Three rules keep that cost from growing with your table. Apply all three to every policy you write.
 
 ### Add indexes
 
@@ -596,12 +594,6 @@ on team_members
 using btree (user_id);
 ```
 
-#### Benchmarks
-
-| Test                                                                                          | Before (ms) | After (ms) | % Improvement | Change                                                                                                   |
-| --------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------- |
-| [test1-indexed](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test1-indexed) | 171         | < 0.1      | 99.94%        | <details className="cursor-pointer">Before:<br/>No index<br/><br/>After:<br/>`user_id` indexed</details> |
-
 ### Call functions with `select`
 
 You can use `select` statement to improve policies that use functions. For example, instead of this:
@@ -628,44 +620,26 @@ You can only use this technique if the results of the query or function do not c
 
 </Admonition>
 
-#### Benchmarks
+### Specify roles in your policies
 
-| Test                                                                                                                              | Before (ms) | After (ms) | % Improvement | Change                                                                                                                                                                    |
-| --------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [test2a-wrappedSQL-uid](<https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2a-wrappedSQL-uid()>)                 | 179         | 9          | 94.97%        | <details className="cursor-pointer">Before:<br/>`auth.uid() = user_id` <br/><br/>After:<br/> `(select auth.uid()) = user_id`</details>                                    |
-| [test2b-wrappedSQL-isadmin](<https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2b-wrappedSQL-isadmin()>)         | 11,000      | 7          | 99.94%        | <details className="cursor-pointer">Before:<br/>`is_admin()` _table join_<br/><br/>After:<br/>`(select is_admin())` _table join_</details>                                |
-| [test2c-wrappedSQL-two-functions](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2c-wrappedSQL-two-functions) | 11,000      | 10         | 99.91%        | <details className="cursor-pointer">Before:<br/>`is_admin() OR auth.uid() = user_id`<br/><br/>After:<br/>`(select is_admin()) OR (select auth.uid() = user_id)`</details> |
-| [test2d-wrappedSQL-sd-fun](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2d-wrappedSQL-sd-fun)               | 178,000     | 12         | 99.993%       | <details className="cursor-pointer">Before:<br/>`has_role() = role` <br/><br/>After:<br/>(select has_role()) = role</details>                                             |
-| [test2e-wrappedSQL-sd-fun-array](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2e-wrappedSQL-sd-fun-array)   | 173000      | 16         | 99.991%       | <details className="cursor-pointer">Before:<br/>`team_id=any(user_teams())` <br/><br/>After:<br/>team_id=any(array(select user_teams()))</details>                        |
+Always name the role a policy applies to, using the `to` clause. Instead of this:
 
-### Add filters to every query
-
-Policies are "implicit where clauses," so it's common to run `select` statements without any filters. This is a bad pattern for performance. Instead of doing this (JS client example):
-
-{/* prettier-ignore */}
-```js
-const { data } = supabase
-  .from('table')
-  .select()
+```sql
+create policy "rls_test_select" on rls_test
+using ( auth.uid() = user_id );
 ```
 
-You should always add a filter:
+Use:
 
-{/* prettier-ignore */}
-```js
-const { data } = supabase
-  .from('table')
-  .select()
-  .eq('user_id', userId)
+```sql
+create policy "rls_test_select" on rls_test
+to authenticated
+using ( (select auth.uid()) = user_id );
 ```
 
-Even though this duplicates the contents of the Policy, Postgres can use the filter to construct a better query plan.
+This prevents the policy `( (select auth.uid()) = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
 
-#### Benchmarks
-
-| Test                                                                                              | Before (ms) | After (ms) | % Improvement | Change                                                                                                                                 |
-| ------------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| [test3-addfilter](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test3-addfilter) | 171         | 9          | 94.74%        | <details className="cursor-pointer">Before:<br/>`auth.uid() = user_id`<br/><br/>After:<br/>add `.eq` or `where` on `user_id`</details> |
+These three rules keep policies correct as a table grows. For the measured impact and for tuning beyond them, see [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance).
 
 ### Use security definer functions
 
@@ -714,79 +688,11 @@ A `security definer` function in an exposed schema is callable over the Data API
 
 </Admonition>
 
-### Minimize joins
+## Related content
 
-You can often rewrite your Policies to avoid joins between the source and the target table. Instead, try to organize your policy to fetch all the relevant data from the target table into an array or set, then you can use an `IN` or `ANY` operation in your filter.
-
-For example, this is an example of a slow policy which joins the source `test_table` to the target `team_user`:
-
-```sql
-create policy "rls_test_select" on test_table
-to authenticated
-using (
-  (select auth.uid()) in (
-    select user_id
-    from team_user
-    where team_user.team_id = team_id -- joins to the source "test_table.team_id"
-  )
-);
-```
-
-We can rewrite this to avoid this join, and instead select the filter criteria into a set:
-
-```sql
-create policy "rls_test_select" on test_table
-to authenticated
-using (
-  team_id in (
-    select team_id
-    from team_user
-    where user_id = (select auth.uid()) -- no join
-  )
-);
-```
-
-In this case you can also consider [using a `security definer` function](#use-security-definer-functions) to bypass RLS on the join table:
-
-<Admonition type="note">
-
-If the list exceeds 1000 items, a different approach may be needed or you may need to analyze the approach to ensure that the performance is acceptable.
-
-</Admonition>
-
-#### Benchmarks
-
-| Test                                                                                                | Before (ms) | After (ms) | % Improvement | Change                                                                                                                                            |
-| --------------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [test5-fixed-join](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test5-fixed-join) | 9,000       | 20         | 99.78%        | <details className="cursor-pointer">Before:<br/>`auth.uid()` in table join on col<br/><br/>After:<br/>col in table join on `auth.uid()`</details> |
-
-### Specify roles in your policies
-
-Always use the Role of inside your policies, specified by the `TO` operator. For example, instead of this query:
-
-```sql
-create policy "rls_test_select" on rls_test
-using ( auth.uid() = user_id );
-```
-
-Use:
-
-```sql
-create policy "rls_test_select" on rls_test
-to authenticated
-using ( (select auth.uid()) = user_id );
-```
-
-This prevents the policy `( (select auth.uid()) = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
-
-#### Benchmarks
-
-| Test                                                                                          | Before (ms) | After (ms) | % Improvement | Change                                                                                                                           |
-| --------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role) | 170         | < 0.1      | 99.78%        | <details className="cursor-pointer">Before:<br/>No `TO` policy<br/><br/>After:<br/>`TO authenticated` (anon accessing)</details> |
-
-## More resources
-
-- [Testing your database](/docs/guides/database/testing)
-- [RLS Guide and Best Practices](https://github.com/orgs/supabase/discussions/14576)
-- Community repo on testing RLS using [pgTAP and dbdev](https://github.com/usebasejump/supabase-test-helpers/tree/main)
+- [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance): diagnose whether policies are your bottleneck, and tune ones that are already correct.
+- [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended): schema-wide RLS test helpers and a worked multi-tenant example.
+- [Testing your database](/docs/guides/database/testing): the CLI test workflow that `supabase test db` runs.
+- [Securing your API](/docs/guides/api/securing-your-api): grants, dedicated schemas, and pre-request checks around the Data API.
+- [Column Level Security](/docs/guides/database/postgres/column-level-security): restrict access to individual columns.
+- [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main): a community extension that adds user creation and role impersonation helpers to pgTAP.
