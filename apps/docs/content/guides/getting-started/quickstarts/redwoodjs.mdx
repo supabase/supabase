@@ -42,7 +42,7 @@ The [`yarn` package manager](https://yarnpkg.com) is required to create a Redwoo
 
 While TypeScript is recommended, if you want a JavaScript app, omit the `--ts` flag.
 
-RedwoodJS 8.x officially supports Node `20.x`. On Node 22 or later, `create-redwood-app` may prompt you to override the version check — select **Override error and continue install**, or switch to Node 20 with a version manager such as [`nvm`](https://github.com/nvm-sh/nvm).
+RedwoodJS 8.x officially supports Node `20.x`. On Node 22 or later, `create-redwood-app` may prompt you to override the version check. Select **Override error and continue install**, or switch to Node 20 with a version manager such as [`nvm`](https://github.com/nvm-sh/nvm).
 
 </Admonition>
 
@@ -63,10 +63,10 @@ In your `.env` file, add the following environment variables for your database c
 - The `DIRECT_URL` should use the Session mode connection string you copied in Step 2.
 
 ```bash name=.env
-# Transaction mode connection string — used by Prisma Client for app queries
+# Transaction mode connection string for Prisma Client app queries
 DATABASE_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres?pgbouncer=true&connection_limit=1"
 
-# Session mode connection string — used by Prisma Migrate
+# Session mode connection string for Prisma Migrate
 DIRECT_URL="postgres://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:5432/postgres"
 ```
 
