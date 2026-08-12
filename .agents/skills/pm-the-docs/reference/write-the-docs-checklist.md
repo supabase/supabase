@@ -1,6 +1,6 @@
 # Write the docs — checklist mirror
 
-> Mirrors Supabase's internal "Write the docs" process (tracked in Linear) as of 2026-08-10. Process specifics may evolve — treat this as a snapshot, not a live sync. If this looks stale or contradicts current practice, check with your docs team.
+> Mirrors Supabase's proposed "Write the docs" process as of 2026-08-10. Process specifics may evolve — treat this as a snapshot, not a live sync. If this looks stale or contradicts current practice, check with your docs team.
 
 A practical six-stage checklist and quality standard for planning, drafting, and reviewing product documentation.
 

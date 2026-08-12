@@ -21,7 +21,7 @@ To make docs as clear as possible:
 
 ## AI agent skills for docs authoring
 
-If you're using Claude Code or Cursor, this repo ships four skills that back the stages of the docs authoring checklist ("Write the docs") below. They're checked into `.agents/skills/`, with pointers in `.claude/skills/` and `.cursor/skills/` — both agents pick them up automatically once you're working in this repo, no manual install step needed.
+If you're using Claude Code or Cursor, this repo ships four skills that back the stages of the "Write the docs" authoring checklist below. They're checked into `.agents/skills/`, with pointers in `.claude/skills/` and `.cursor/skills/` — both agents pick them up automatically once you're working in this repo, no manual install step needed.
 
 | Skill | Checklist stage | Use for |
 | --- | --- | --- |
