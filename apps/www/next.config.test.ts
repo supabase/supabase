@@ -44,7 +44,7 @@ describe('next.config.mjs', () => {
           permanent: true,
         }),
         expect.objectContaining({
-          source: '/images/customers/logos/:slug((?!dreambase-mark)[^/.]+).png',
+          source: '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png',
           destination: '/images/customers/logos/on-light/:slug.png',
           permanent: true,
         }),
@@ -70,7 +70,7 @@ describe('next.config.mjs', () => {
     )
     const lightModeRedirect = redirects.find(
       (redirect) =>
-        redirect.source === '/images/customers/logos/:slug((?!dreambase-mark)[^/.]+).png'
+        redirect.source === '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png'
     )
 
     expect(darkModeRedirect).toBeDefined()
@@ -86,5 +86,8 @@ describe('next.config.mjs', () => {
       slug: 'good-tape',
     })
     expect(matchLegacyLight('/images/customers/logos/dreambase-mark.png')).toBe(false)
+    expect(matchLegacyLight('/images/customers/logos/dreambase-marketing.png')).toEqual({
+      slug: 'dreambase-marketing',
+    })
   })
 })
