@@ -568,7 +568,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
         <SheetFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button variant="danger" onClick={() => onDelete()}>
+              <Button variant="danger" disabled={isSaving} onClick={() => onDelete()}>
                 Delete hook
               </Button>
             </div>

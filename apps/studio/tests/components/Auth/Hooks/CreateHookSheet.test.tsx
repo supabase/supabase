@@ -40,10 +40,13 @@ const AUTH_CONFIG = {
 let executedPermissionSql: string[] = []
 
 /**
- * Mocks the SQL endpoint so the permission statements can succeed or fail independently of the
- * schema and function lookups the sheet makes while rendering.
+ * Mocks the SQL endpoint so the permission statements can succeed, fail, or be held open
+ * independently of the schema and function lookups the sheet makes while rendering.
  */
-const mockSqlEndpoint = ({ doPermissionsFail }: { doPermissionsFail: boolean }) => {
+const mockSqlEndpoint = ({
+  doPermissionsFail = false,
+  holdPermissionsUntil,
+}: { doPermissionsFail?: boolean; holdPermissionsUntil?: Promise<void> } = {}) => {
   addAPIMock({
     method: 'post',
     path: '/platform/pg-meta/:ref/query',
@@ -54,6 +57,7 @@ const mockSqlEndpoint = ({ doPermissionsFail }: { doPermissionsFail: boolean }) 
 
       if (query.includes('grant execute on function')) {
         executedPermissionSql.push(query)
+        if (holdPermissionsUntil !== undefined) await holdPermissionsUntil
         if (doPermissionsFail) {
           return HttpResponse.json(
             { message: 'permission denied for schema public' },
@@ -138,7 +142,7 @@ describe('CreateHookSheet', () => {
   })
 
   test('applies the permission statements after saving the hook', async () => {
-    mockSqlEndpoint({ doPermissionsFail: false })
+    mockSqlEndpoint()
     const { onClose, queryClient } = renderSheet()
 
     await saveHook(queryClient)
@@ -169,5 +173,29 @@ describe('CreateHookSheet', () => {
     expect(toast.success).not.toHaveBeenCalled()
     // The sheet stays open so the statements stay visible and the save can be retried
     expect(onClose).not.toHaveBeenCalled()
+  })
+
+  // The sheet now stays open while the statements run, so the destructive action in the footer
+  // has to stay out of reach until they settle.
+  test('keeps the footer actions disabled while the permission statements are in flight', async () => {
+    let releasePermissions = () => {}
+    const permissionsHeld = new Promise<void>((resolve) => {
+      releasePermissions = resolve
+    })
+    mockSqlEndpoint({ holdPermissionsUntil: permissionsHeld })
+
+    const { onClose, queryClient } = renderSheet()
+
+    await saveHook(queryClient)
+
+    const deleteButton = await screen.findByRole('button', { name: 'Delete hook' })
+    await waitFor(() => expect(deleteButton).toBeDisabled())
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+    expect(onClose).not.toHaveBeenCalled()
+
+    releasePermissions()
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+    expect(deleteButton).toBeEnabled()
   })
 })
