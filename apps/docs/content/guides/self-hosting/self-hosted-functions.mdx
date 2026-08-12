@@ -28,21 +28,36 @@ This returns `"Hello from Edge Functions!"`.
 
 ```sh
 mkdir -p volumes/functions/my-function &&
-touch volumes/functions/my-function/index.ts
+touch volumes/functions/my-function/index.ts &&
+touch volumes/functions/my-function/deno.json
 ```
 
 Add the following code to `index.ts`:
 
 ```typescript
-Deno.serve(async (req: Request) => {
-  const { name } = await req.json()
-  const message = `Hello, ${name}!`
+import { withSupabase } from '@supabase/server'
 
-  return new Response(JSON.stringify({ message }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req) => {
+    const { name } = await req.json()
+    const message = `Hello, ${name}!`
+
+    return Response.json({ message })
+  }),
+}
 ```
+
+And the import map to `deno.json`:
+
+```json
+{
+  "imports": {
+    "@supabase/server": "npm:@supabase/server@^1"
+  }
+}
+```
+
+The `auth` option controls who can call the function: `'none'` accepts every request, `'user'` requires a valid user JWT, and `'publishable'` / `'secret'` require an API key. See the [Edge Functions auth guide](/docs/guides/functions/auth) for details.
 
 ### Step 2: Restart the functions service to pick up the new function
 
@@ -134,24 +149,29 @@ The functions service is pre-configured with the following environment variables
 | `SUPABASE_SECRET_KEYS`      | `{"default":"sb_secret_...}`      | New secret API key                                |
 | `SUPABASE_JWKS`             | `{"keys":[{...}]}`                | JWKS used to verify JWTs issued by Auth           |
 
-Here's an example function that queries a table using `@supabase/supabase-js`:
+Here's an example function that queries a table using the admin client provided by `@supabase/server` (requires the same `deno.json` as above):
 
 ```typescript
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { withSupabase } from '@supabase/server'
 
-Deno.serve(async () => {
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  )
+export default {
+  fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
+    // ctx.supabaseAdmin bypasses RLS. This function requires a secret
+    // API key, so only server-to-server callers can reach it.
+    const { data, error } = await ctx.supabaseAdmin.from('todos').select('*')
 
-  const { data, error } = await supabase.from('todos').select('*')
-
-  return new Response(JSON.stringify({ data, error }), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    return Response.json({ data, error })
+  }),
+}
 ```
+
+`withSupabase` reads `SUPABASE_URL`, the API keys, and `SUPABASE_JWKS` from the environment variables above. You don't need to wire up `createClient` yourself.
+
+<Admonition type="note">
+
+`auth: 'user'` verifies caller JWTs against `SUPABASE_JWKS`. That variable is commented out in a fresh `docker-compose.yml`. Uncomment it by running `./utils/add-new-auth-keys.sh` from the `docker/` directory.
+
+</Admonition>
 
 ### Internal vs external URLs
 

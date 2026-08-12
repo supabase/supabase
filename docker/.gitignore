@@ -5,6 +5,10 @@ volumes/functions/**
 !volumes/functions/main/
 volumes/functions/main/**
 !volumes/functions/main/index.ts
+!volumes/functions/hello/
+volumes/functions/hello/**
+!volumes/functions/hello/index.ts
+!volumes/functions/hello/deno.json
 .env
 test.http
 docker-compose.override.yml
