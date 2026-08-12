@@ -258,7 +258,7 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded-sm shrink-0 px-1.5 bg-control-raised'
+    const badgeClasses = 'rounded-sm shrink-0 px-1.5 bg-surface-75 dark:bg-white/5'
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
