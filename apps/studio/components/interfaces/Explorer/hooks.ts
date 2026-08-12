@@ -1,4 +1,6 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import { useRouter } from 'next/router'
+import { uuid } from 'zod/v4'
 
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
@@ -31,7 +33,7 @@ export const useCreateNotebook = () => {
         cells: [
           {
             _tag: 'markdown_cell',
-            id: '1',
+            id: generateUuid(),
             text: `
 # Title
 A brief description on what this notebook is about
@@ -39,7 +41,7 @@ A brief description on what this notebook is about
           },
           {
             _tag: 'markdown_cell',
-            id: '2',
+            id: generateUuid(),
             text: `
 ## Section
 This is a sample paragraph to demonstrate the Markdown cells
@@ -47,6 +49,12 @@ This is a sample paragraph to demonstrate the Markdown cells
 2. List item 2
 3. List item 3
             `,
+          },
+          {
+            _tag: 'database_cell',
+            id: generateUuid(),
+            unchecked_sql: untrustedSql('select * from colors;'),
+            row_limit: 100,
           },
         ],
       },

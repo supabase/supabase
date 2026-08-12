@@ -12,6 +12,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
+import { untrustedSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { Edit, Notebook, NotebookText, Play, Save } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
@@ -20,6 +21,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { MarkdownCell } from './MarkdownCell'
+import { QueryCell } from './QueryCell'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
@@ -51,10 +53,22 @@ export const NotebookEditor = () => {
     setIsEditingTitle(false)
   }
 
-  const handleUpdateCellText = (cellId: string, text: string) => {
+  const handleUpdateMarkdown = (cellId: string, text: string) => {
     if (!id) return
 
     const nextCells = cells.map((cell) => (cell.id === cellId ? { ...cell, text } : cell))
+    snap.updateCells({ id, cells: nextCells })
+  }
+
+  const handleUpdateSQL = (cellId: string, sql: string) => {
+    if (!id) return
+
+    const nextCells = cells.map((cell) =>
+      cell.id === cellId && cell._tag === 'database_cell'
+        ? { ...cell, unchecked_sql: untrustedSql(sql) }
+        : cell
+    )
+
     snap.updateCells({ id, cells: nextCells })
   }
 
@@ -163,7 +177,7 @@ export const NotebookEditor = () => {
                 items={cells.map((cell) => cell.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="flex flex-col gap-y-2">
+                <div className="flex flex-col gap-y-3">
                   {cells.map((cell) => {
                     switch (cell._tag) {
                       case 'markdown_cell':
@@ -171,10 +185,17 @@ export const NotebookEditor = () => {
                           <MarkdownCell
                             key={cell.id}
                             cell={cell}
-                            onCommitChanges={(text) => handleUpdateCellText(cell.id, text)}
+                            onCommitChanges={(text) => handleUpdateMarkdown(cell.id, text)}
                           />
                         )
                       case 'database_cell':
+                        return (
+                          <QueryCell
+                            key={cell.id}
+                            cell={cell}
+                            onCommitChanges={(sql) => handleUpdateSQL(cell.id, sql)}
+                          />
+                        )
                       case 'log_cell':
                         // [Joshen] Will eventually hook it up
                         return null

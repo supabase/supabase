@@ -23,7 +23,7 @@ export const SortableSection = ({
     <div
       ref={setNodeRef}
       style={style}
-      className="relative will-change-transform flex items-start gap-x-2"
+      className="relative will-change-transform flex items-start gap-x-4"
     >
       <button
         type="button"
