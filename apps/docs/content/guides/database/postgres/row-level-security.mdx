@@ -306,18 +306,19 @@ In older versions of Postgres, protect your views by revoking access from the `a
 
 ### Test your policies
 
-A wrong policy fails quietly. Too permissive, and a query returns rows it shouldn't. Too strict, and it returns nothing and raises no error. Test both directions before you ship a policy.
+We recommend writing tests for every policy. A wrong policy fails quietly. Too permissive, and a query returns rows it shouldn't. Too strict, and it returns nothing and raises no error. Neither case surfaces as a failure, so tests are how you find out.
 
 Supabase runs database tests with [pgTAP](/docs/guides/database/extensions/pgtap) through the CLI. Test files are `.sql` files under `supabase/tests/`.
 
-1. Create the tests directory and a test file:
+1. Create a test file:
 
    ```bash
-   mkdir -p supabase/tests
-   touch supabase/tests/profiles_rls.test.sql
+   supabase test new profiles_rls
    ```
 
-2. Write the tests. Cover `select`, `insert`, `update`, and `delete` twice each, once for a request the policy allows and once for a request it denies. Cover `anon` as well as `authenticated`.
+2. Write the tests. Cover `select`, `insert`, `update`, and `delete` twice each, once for a request the policy allows and once for a request it denies, for `anon` as well as `authenticated`. A table with four policies needs at least eight assertions.
+
+   [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) removes most of the setup below. It adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`, so you don't hand-roll user seeding or role switching. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) for schema-wide assertions and a worked multi-tenant example.
 
 3. Run the suite:
 
@@ -334,21 +335,20 @@ Match the assertion to the way the denial happens:
 - A `using` clause that filters the target row out raises nothing. The update or delete matches zero rows instead. Assert that no row changed, not that an error was raised.
 - An allowed write needs an assertion on the resulting row. The absence of an error doesn't prove that anything changed.
 
-Add `returning` to an allowed write so a single assertion proves the row changed. A denied write returns no rows, so the same shape asserts the denial.
+Add `returning` to a write so one assertion covers both directions. An allowed write returns the changed row, and a write the policy filters out returns nothing.
 
-This example tests a `profiles` table where `authenticated` holds every privilege, `anon` holds none, and each user reads and writes only their own row:
+This example shows each of those techniques against a `profiles` table where `authenticated` holds every privilege, `anon` holds none, and each user reads and writes only their own row. Extend it to the remaining operations:
 
 ```sql supabase/tests/profiles_rls.test.sql
 begin;
-select plan(11);
+select plan(4);
 
--- Seed two users. The rows come later, through the policies under test.
 insert into auth.users (id, email)
 values
   ('11111111-1111-1111-1111-111111111111', 'owner@example.com'),
   ('22222222-2222-2222-2222-222222222222', 'other@example.com');
 
--- Signed-out visitors hold no grant, so the request stops before any policy runs.
+-- anon holds no grant, so the request stops before any policy runs.
 set local role anon;
 select throws_ok(
   $$select * from profiles$$,
@@ -356,15 +356,8 @@ select throws_ok(
   null,
   'anon cannot read profiles'
 );
-select throws_ok(
-  $$insert into profiles (id, user_id)
-    values (gen_random_uuid(), '11111111-1111-1111-1111-111111111111')$$,
-  '42501',
-  null,
-  'anon cannot insert a profile'
-);
 
--- The owner reads and writes their own row.
+-- The owner writes their own row. returning proves the row changed.
 set local role authenticated;
 set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
 select results_eq(
@@ -378,25 +371,6 @@ select results_eq(
   array['owner.png'],
   'the owner creates their own profile'
 );
-select results_eq(
-  $$select avatar_url from profiles$$,
-  array['owner.png'],
-  'the owner reads their own profile'
-);
-select results_eq(
-  $$update profiles set avatar_url = 'updated.png' returning avatar_url$$,
-  array['updated.png'],
-  'the owner updates their own profile'
-);
-
--- The with check clause rejects the row, which raises.
-select throws_ok(
-  $$insert into profiles (id, user_id)
-    values (gen_random_uuid(), '22222222-2222-2222-2222-222222222222')$$,
-  '42501',
-  null,
-  'the owner cannot create a profile for someone else'
-);
 
 -- A signed-in stranger holds the grant, so the policy is what stops them. The
 -- using clause filters the row out, so these match nothing and raise nothing.
@@ -408,23 +382,6 @@ select is_empty(
 select is_empty(
   $$update profiles set avatar_url = 'stolen.png' returning avatar_url$$,
   'another user updates no profiles'
-);
-select is_empty(
-  $$delete from profiles returning id$$,
-  'another user deletes no profiles'
-);
-
--- The row is still there, still holding the owner's value.
-set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
-select results_eq(
-  $$select avatar_url from profiles$$,
-  array['updated.png'],
-  'the other user changed nothing'
-);
-select results_eq(
-  $$delete from profiles returning avatar_url$$,
-  array['updated.png'],
-  'the owner deletes their own profile'
 );
 
 select * from finish();
