@@ -31,7 +31,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
     expect(result).toHaveProperty('search_docs', SEARCH_DOCS)
     // A couple of the deterministic mocks, to confirm the merge
     expect(result).toHaveProperty('list_tables')
-    expect(result).toHaveProperty('get_logs')
+    expect(result).toHaveProperty('query_logs')
   })
 
   // This is the regression guard: if the eval's MCP wiring breaks (contract
