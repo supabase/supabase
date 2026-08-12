@@ -2,12 +2,12 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import {
   AlertCircle,
-  ChevronDown,
+  ArrowRight,
   ChevronRight,
   Copy,
   Download,
-  Info,
   LoaderCircle,
+  MoreVertical,
   RotateCcw,
   Trash2,
   X,
@@ -16,6 +16,7 @@ import { useState, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   cn,
   Collapsible,
@@ -24,6 +25,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from 'ui'
 
@@ -40,11 +46,11 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { hasVersioningHistory, isBucketVersioned } from '../StorageProtection.constants'
+import { hasVersioningHistory } from '../StorageProtection.constants'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
-import { VersionHistory } from './VersionHistory'
+import { shortVersion, VersionHistory, VersionThumbnail } from './VersionHistory'
 
 const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
@@ -153,7 +159,6 @@ export const PreviewPane = () => {
 
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
-  const isVersioningActive = isBucketVersioned(selectedBucket?.id)
   const showVersions = hasVersioningHistory(selectedBucket?.id)
   const { data: versionsData } = useObjectVersionsQuery({
     projectRef,
@@ -161,6 +166,7 @@ export const PreviewPane = () => {
     objectName: file?.name,
   })
   const versionCount = versionsData?.length
+  const currentVersion = versionsData?.find((v) => v.isCurrent)
 
   const [previewedVersion, setPreviewedVersion] = useState<ObjectVersion>()
 
@@ -179,7 +185,7 @@ export const PreviewPane = () => {
   const createdAt = file.created_at ? new Date(file.created_at).toLocaleString() : 'Unknown'
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
-  const isPreviewingOlderVersion = previewedVersion !== undefined && !previewedVersion.isCurrent
+  const isComparing = previewedVersion !== undefined && !previewedVersion.isCurrent
 
   const handleRestore = () => {
     if (!projectRef || !selectedBucket?.id || !previewedVersion) return
@@ -191,166 +197,48 @@ export const PreviewPane = () => {
     })
   }
 
-  const previewThumbnail = (
-    // Viewport-height aware. ~144px of chrome sits above the preview (close
-    // button + surrounding padding + filename summary), so the preview height
-    // is derived from what's left of the viewport rather than raw vh: 40% of
-    // the remaining space, floored at 120px and capped at 180px. The floor
-    // guarantees the sections below always have room to scroll; the cap keeps
-    // the preview from dominating on tall viewports; and subtracting the
-    // chrome upfront makes the shrink kick in noticeably earlier than a plain
-    // vh clamp would.
-    <div
-      className="relative shrink-0 border border-overlay"
-      style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
-    >
-      <div className="flex h-full w-full items-center">
+  const previewSlot = isComparing && previewedVersion ? (
+    <VersionCompareWidget
+      mimeType={mimeType}
+      selectedVersion={previewedVersion}
+      currentVersion={currentVersion}
+      versionCount={versionCount}
+      isRestoring={isRestoring}
+      onRestore={handleRestore}
+      onDismiss={() => setPreviewedVersion(undefined)}
+    />
+  ) : (
+    <div className="border-b border-overlay p-3">
+      <div
+        // Viewport-height aware, since ~144px of chrome sits above (header +
+        // this padding), so the preview height is derived from what's left
+        // of the viewport rather than raw vh: 40% of the remaining space,
+        // floored at 120px and capped at 180px. The floor guarantees the
+        // sections below always have room to scroll; the cap keeps the
+        // preview from dominating on tall viewports.
+        className="flex items-center justify-center overflow-hidden rounded-md border border-overlay"
+        style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
+      >
         <PreviewFile item={file} />
       </div>
-      {isPreviewingOlderVersion && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-x-2 border-t border-overlay bg-surface-100/95 px-3 py-1.5">
-          <p className="text-xs text-foreground-light">
-            Previewing version{' '}
-            <span className="font-mono text-foreground">
-              {previewedVersion.versionId.slice(0, 6)}…
-            </span>
-            <br />
-            {dayjs(previewedVersion.createdAt).format('MMM D, HH:mm')}
-          </p>
-          <Button
-            variant="default"
-            size="tiny"
-            icon={<RotateCcw size={14} />}
-            loading={isRestoring}
-            onClick={handleRestore}
-          >
-            Restore
-          </Button>
-        </div>
-      )}
-    </div>
-  )
-
-  const filenameSummary = (
-    <div className="mt-4 space-y-1">
-      <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
-      {file.isCorrupted && (
-        <div className="flex items-center space-x-2">
-          <AlertCircle size={14} className="text-foreground-light" />
-          <p className="text-sm text-foreground-light">
-            File is corrupted, please delete and reupload this file again
-          </p>
-        </div>
-      )}
-      {mimeType && (
-        <p className="text-sm text-foreground-light">
-          {mimeType}
-          {size && <span> · {size}</span>}
-          {showVersions && versionCount !== undefined && <span> · {versionCount} versions</span>}
-        </p>
-      )}
+      <div className="mt-2 flex items-center justify-between gap-x-2">
+        <span className="truncate font-mono text-xs text-foreground-lighter">
+          Current · {dayjs(file.updated_at ?? file.created_at).format('MMM D, HH:mm')}
+        </span>
+        <Badge variant="success">Current</Badge>
+      </div>
     </div>
   )
 
   const detailsSectionBody = (
-    <div className="space-y-4 pt-3">
-      <div className="space-y-2">
-        <div>
-          <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
-          <p className="text-sm text-foreground-light">{createdAt}</p>
-        </div>
-        <div>
-          <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
-          <p className="text-sm text-foreground-light">{updatedAt}</p>
-        </div>
+    <div className="space-y-2 pt-3">
+      <div>
+        <label className="mb-1 text-xs text-foreground-lighter">Added on</label>
+        <p className="text-sm text-foreground-light">{createdAt}</p>
       </div>
-
-      <div className="flex space-x-2 border-b border-overlay pb-4">
-        <Button
-          variant="default"
-          icon={<Download />}
-          disabled={file.isCorrupted}
-          onClick={() => downloadFile(file)}
-        >
-          Download
-        </Button>
-        {selectedBucket.public ? (
-          <Button
-            variant="outline"
-            icon={<Copy />}
-            onClick={() => onCopyUrl(file.path!)}
-            disabled={file.isCorrupted}
-          >
-            Get URL
-          </Button>
-        ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                icon={<Copy />}
-                iconRight={<ChevronDown />}
-                disabled={file.isCorrupted}
-              >
-                Get URL
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="center">
-              <DropdownMenuItem
-                key="expires-one-week"
-                onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}
-              >
-                Expire in 1 week
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="expires-one-month"
-                onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.MONTH)}
-              >
-                Expire in 1 month
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="expires-one-year"
-                onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.YEAR)}
-              >
-                Expire in 1 year
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="custom-expiry"
-                onClick={() => setSelectedFileCustomExpiry(file)}
-              >
-                Custom expiry
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-      <div className="space-y-2">
-        <ButtonTooltip
-          variant="outline"
-          disabled={!canUpdateFiles}
-          size="tiny"
-          icon={<Trash2 />}
-          onClick={() => setSelectedItemsToDelete([file])}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: !canUpdateFiles
-                ? 'You need additional permissions to delete this file'
-                : undefined,
-            },
-          }}
-        >
-          Delete file
-        </ButtonTooltip>
-        {isVersioningActive && (
-          <p className="flex items-start gap-1.5 text-xs text-foreground-lighter">
-            <Info size={14} className="mt-0.5 shrink-0" />
-            <span>
-              Deleting this file will soft-delete the object and all its versions. You can restore
-              them from the deleted versions view.
-            </span>
-          </p>
-        )}
+      <div>
+        <label className="mb-1 text-xs text-foreground-lighter">Last modified</label>
+        <p className="text-sm text-foreground-light">{updatedAt}</p>
       </div>
     </div>
   )
@@ -361,38 +249,268 @@ export const PreviewPane = () => {
       className="flex h-full flex-col border-l border-overlay bg-surface-100"
       style={{ width }}
     >
-      <div className="flex w-full justify-end px-4 pt-4 text-foreground-lighter transition-colors hover:text-foreground">
-        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
-      </div>
-
-      {/* Sticky (via flex-shrink control) preview + filename block. The
-          scrollable sections below get whatever vertical space remains. */}
-      <div className="flex shrink-0 flex-col px-4 pb-4">
-        {previewThumbnail}
-        {filenameSummary}
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-        <PreviewSection title="Details" defaultOpen>
-          {detailsSectionBody}
-        </PreviewSection>
-        {showVersions && (
-          <PreviewSection title="Versions" count={versionCount} defaultOpen>
-            <div className="pt-3">
-              <VersionHistory
-                projectRef={projectRef}
-                bucketId={selectedBucket?.id}
-                objectName={file.name}
-                previewedVersionId={previewedVersion?.versionId}
-                onPreview={setPreviewedVersion}
-              />
+      <div className="flex items-center gap-x-2 border-b border-overlay px-4 py-2.5">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+          <p className="truncate font-mono text-xs text-foreground-lighter">
+            {mimeType}
+            {size && <> · {size}</>}
+            {showVersions && versionCount !== undefined && <> · {versionCount} versions</>}
+          </p>
+          {file.isCorrupted && (
+            <div className="mt-1 flex items-center gap-x-1.5">
+              <AlertCircle size={12} className="shrink-0 text-foreground-light" />
+              <p className="text-xs text-foreground-light">File is corrupted</p>
             </div>
-          </PreviewSection>
-        )}
+          )}
+        </div>
+        <div className="flex shrink-0 items-center gap-x-1">
+          <FileActionsMenu
+            file={file}
+            isPublicBucket={!!selectedBucket.public}
+            canUpdateFiles={canUpdateFiles}
+            onDownload={() => downloadFile(file)}
+            onCopyUrl={onCopyUrl}
+            onCustomExpiry={() => setSelectedFileCustomExpiry(file)}
+            onDelete={() => setSelectedItemsToDelete([file])}
+          />
+          <span aria-hidden className="h-[18px] w-px bg-border" />
+          <button
+            type="button"
+            className="flex h-[26px] w-[26px] items-center justify-center rounded-md text-foreground-lighter transition-colors hover:text-foreground"
+            onClick={() => setSelectedFilePreview(undefined)}
+            aria-label="Close preview"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        {previewSlot}
+
+        <div className="px-4">
+          <PreviewSection title="Details">{detailsSectionBody}</PreviewSection>
+          {showVersions && (
+            <PreviewSection title="Versions" count={versionCount} defaultOpen>
+              <div className="pt-3">
+                <VersionHistory
+                  projectRef={projectRef}
+                  bucketId={selectedBucket?.id}
+                  objectName={file.name}
+                  mimeType={mimeType}
+                  previewedVersionId={previewedVersion?.versionId}
+                  onPreview={setPreviewedVersion}
+                />
+              </div>
+            </PreviewSection>
+          )}
+        </div>
       </div>
     </div>
   )
 }
+
+// ── File-level actions menu ──────────────────────────────────────────────
+
+interface FileActionsMenuProps {
+  file: StorageItem
+  isPublicBucket: boolean
+  canUpdateFiles: boolean
+  onDownload: () => void
+  onCopyUrl: (path: string, expiry?: URL_EXPIRY_DURATION) => void
+  onCustomExpiry: () => void
+  onDelete: () => void
+}
+
+/**
+ * Every current-file action collapsed into one kebab, next to the close
+ * button — Download and Get URL no longer need their own row further down
+ * the panel.
+ */
+const FileActionsMenu = ({
+  file,
+  isPublicBucket,
+  canUpdateFiles,
+  onDownload,
+  onCopyUrl,
+  onCustomExpiry,
+  onDelete,
+}: FileActionsMenuProps) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button
+        variant="default"
+        size="tiny"
+        className="h-[26px] w-[26px] px-0"
+        icon={<MoreVertical size={14} />}
+        aria-label={`Actions for ${file.name}`}
+      />
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="end">
+      <DropdownMenuItem className="gap-x-2" disabled={file.isCorrupted} onClick={onDownload}>
+        <Download size={14} />
+        Download
+      </DropdownMenuItem>
+      {isPublicBucket ? (
+        <DropdownMenuItem
+          className="gap-x-2"
+          disabled={file.isCorrupted}
+          onClick={() => onCopyUrl(file.path!)}
+        >
+          <Copy size={14} />
+          Get URL
+        </DropdownMenuItem>
+      ) : (
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="gap-x-2" disabled={file.isCorrupted}>
+            <Copy size={14} />
+            Get URL
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent>
+              <DropdownMenuItem onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}>
+                Expire in 1 week
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.MONTH)}>
+                Expire in 1 month
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.YEAR)}>
+                Expire in 1 year
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onCustomExpiry}>Custom expiry</DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+      )}
+      {canUpdateFiles && (
+        <>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="gap-x-2 text-destructive focus:text-destructive"
+            onClick={onDelete}
+          >
+            <Trash2 size={14} />
+            Delete file
+          </DropdownMenuItem>
+        </>
+      )}
+    </DropdownMenuContent>
+  </DropdownMenu>
+)
+
+// ── Compare + restore widget ─────────────────────────────────────────────
+
+interface VersionCompareWidgetProps {
+  mimeType?: string
+  selectedVersion: ObjectVersion
+  currentVersion?: ObjectVersion
+  versionCount?: number
+  isRestoring: boolean
+  onRestore: () => void
+  onDismiss: () => void
+}
+
+/**
+ * Replaces the top preview slot the moment a noncurrent version is selected
+ * — a side-by-side comparison and the restore confirmation in one, so there's
+ * no modal and no silent preview swap. Dismissing (the × in its own corner)
+ * returns the slot to the plain current-file preview.
+ */
+const VersionCompareWidget = ({
+  mimeType,
+  selectedVersion,
+  currentVersion,
+  versionCount,
+  isRestoring,
+  onRestore,
+  onDismiss,
+}: VersionCompareWidgetProps) => {
+  const label = shortVersion(selectedVersion.versionId)
+  // Restoring copies the selected version's content into a brand new current
+  // version — nothing is overwritten, so the total version count grows by one.
+  const keepCount = versionCount !== undefined ? versionCount + 1 : undefined
+
+  return (
+    <div className="space-y-3 border-b border-overlay bg-brand-200/30 p-3">
+      <div className="flex items-center gap-x-1.5">
+        <RotateCcw size={13} className="shrink-0 text-brand" />
+        <p className="truncate text-sm font-medium text-foreground">
+          Restore {dayjs(selectedVersion.createdAt).format('MMM D, HH:mm')}?
+        </p>
+        <button
+          type="button"
+          className="ml-auto shrink-0 text-foreground-lighter transition-colors hover:text-foreground"
+          onClick={onDismiss}
+          aria-label="Cancel comparison"
+        >
+          <X size={13} />
+        </button>
+      </div>
+
+      <div className="flex items-center gap-x-2">
+        <div className="flex-1 space-y-1.5">
+          <div className="flex h-24 items-center justify-center rounded-md border border-brand-400 bg-surface-200">
+            <VersionThumbnail mimeType={mimeType} isCurrent={false} size={20} />
+          </div>
+          <p className="truncate text-center font-mono text-[11px] text-brand">
+            {dayjs(selectedVersion.createdAt).format('MMM D')} ·{' '}
+            {formatBytes(selectedVersion.size)}
+          </p>
+        </div>
+        <ArrowRight size={14} className="shrink-0 text-foreground-lighter" />
+        <div className="flex-1 space-y-1.5">
+          <div className="flex h-24 items-center justify-center rounded-md border border-overlay bg-surface-200">
+            <VersionThumbnail mimeType={mimeType} isCurrent size={20} />
+          </div>
+          <p className="truncate text-center font-mono text-[11px] text-foreground-lighter">
+            Current{currentVersion && <> · {formatBytes(currentVersion.size)}</>}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-x-1.5">
+        <Button
+          variant="primary"
+          className="flex-1"
+          icon={<RotateCcw size={14} />}
+          loading={isRestoring}
+          onClick={onRestore}
+        >
+          Restore as current
+        </Button>
+        <ButtonTooltip
+          variant="default"
+          className="px-2"
+          icon={<Download size={14} />}
+          onClick={() => toast.success(`Downloading ${label}`)}
+          tooltip={{ content: { side: 'top', text: 'Download' } }}
+        />
+        <ButtonTooltip
+          variant="default"
+          className="px-2"
+          icon={<Copy size={14} />}
+          onClick={() => toast.success(`Copied URL for ${label}`)}
+          tooltip={{ content: { side: 'top', text: 'Get URL' } }}
+        />
+      </div>
+
+      <p className="text-xs leading-relaxed text-foreground-lighter">
+        {currentVersion && <>{dayjs(currentVersion.createdAt).format('MMM D')} </>}becomes a
+        noncurrent version — nothing is deleted
+        {keepCount !== undefined && (
+          <>
+            , and you keep <span className="font-medium text-foreground-light">{keepCount}</span>{' '}
+            versions
+          </>
+        )}
+        .
+      </p>
+    </div>
+  )
+}
+
+// ── Collapsible section ───────────────────────────────────────────────────
 
 interface PreviewSectionProps {
   title: string

@@ -1,6 +1,17 @@
 import dayjs from 'dayjs'
-import { Copy, Download, MoreVertical, RotateCcw, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import {
+  Copy,
+  Download,
+  File,
+  Film,
+  Image as ImageIcon,
+  Info,
+  MoreVertical,
+  Music,
+  RotateCcw,
+  Trash2,
+} from 'lucide-react'
+import { useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -30,21 +41,25 @@ import { formatBytes } from '@/lib/helpers'
 
 import { BroomSparklesIcon } from '../BroomSparklesIcon'
 import { getMockBucketProtection, type ExpirationMode } from '../StorageProtection.constants'
+import { computeVersionFate, type VersionFate } from './VersionHistory.utils'
 
 interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
   objectName: string
+  /** Drives the row thumbnail glyph — falls back to a generic file icon. */
+  mimeType?: string
   previewedVersionId?: string
   onPreview?: (version: ObjectVersion) => void
 }
 
-const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
+export const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
 
 export const VersionHistory = ({
   projectRef,
   bucketId,
   objectName,
+  mimeType,
   previewedVersionId,
   onPreview,
 }: VersionHistoryProps) => {
@@ -87,70 +102,29 @@ export const VersionHistory = ({
   const hasExpiryDays = expiryDays !== null && expiryDays > 0
   const hasPolicy = hasCap || hasExpiryDays
 
-  const usageRatio = hasCap ? noncurrentCount / cap : 0
-  const isNearingCap = hasCap && usageRatio >= 0.8
-  const isAtCap = hasCap && noncurrentCount >= cap
-
-  // Pre-compute each noncurrent version's chronological position (1-based,
-  // oldest = 1) and whether it would be evicted by the cap rule (the oldest
-  // `count - cap` versions when count exceeds cap). Numbering runs oldest→
-  // newest so reading the list top-to-bottom matches the numbering intuition:
-  // the bottom row (oldest, closest to eviction) is #1 and each row above it
-  // increments toward the newest noncurrent.
+  // Pre-compute each noncurrent version's fate (Kept / Expires in Nd /
+  // Expires on next upload / Expiring now). `versions` arrives newest-first,
+  // so the oldest noncurrent version sits at chronoIndex 0.
   const noncurrentVersions = versions.filter((v) => !v.isCurrent)
-  const versionMeta = new Map<string, { position: number; capExceeded: boolean }>()
+  const fateByVersionId = new Map<string, VersionFate>()
   noncurrentVersions.forEach((v, i) => {
-    // `versions` arrives newest-first, so oldest sits at index count - 1.
     const chronoIndex = noncurrentCount - 1 - i
-    versionMeta.set(v.versionId, {
-      position: chronoIndex + 1,
-      capExceeded: hasCap && chronoIndex < noncurrentCount - cap,
-    })
+    fateByVersionId.set(
+      v.versionId,
+      computeVersionFate({
+        daysOld: dayjs().diff(dayjs(v.createdAt), 'day'),
+        chronoIndex,
+        noncurrentCount,
+        expiryDays,
+        cap,
+        mode,
+      })
+    )
   })
 
   return (
     <div className="space-y-4">
-      {hasPolicy && (
-        <div className="space-y-1.5">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            {hasCap && (
-              <Badge variant={isAtCap ? 'warning' : 'default'}>
-                {noncurrentCount} / {cap} noncurrent
-              </Badge>
-            )}
-            {hasExpiryDays && <Badge variant="default">{expiryDays}d retention</Badge>}
-          </div>
-          <p className="text-xs text-foreground-lighter">
-            {hasCap && hasExpiryDays ? (
-              mode === 'and' ? (
-                <>
-                  Versions are removed only when they exceed <strong>both</strong> the cap and the
-                  retention window.
-                </>
-              ) : (
-                <>
-                  Versions are removed as soon as they exceed <strong>either</strong> the cap or the
-                  retention window.
-                </>
-              )
-            ) : hasCap ? (
-              <>Older versions are removed once the cap is reached.</>
-            ) : (
-              <>Versions older than the retention window are removed.</>
-            )}
-          </p>
-          {isAtCap && (
-            <p className="text-xs text-warning-600">
-              The next overwrite will auto-expire the oldest version.
-            </p>
-          )}
-          {!isAtCap && isNearingCap && (
-            <p className="text-xs text-foreground-lighter">
-              Nearing cap. Older versions auto-expire once the limit is reached.
-            </p>
-          )}
-        </div>
-      )}
+      {hasPolicy && <PolicyRow cap={cap} expiryDays={expiryDays} mode={mode} />}
 
       {bucketProtection.versioning === 'suspended' && (
         <Admonition
@@ -161,55 +135,55 @@ export const VersionHistory = ({
       )}
 
       {isSuccess && (
-        <ol className="flex flex-col">
+        <ol className="flex flex-col gap-y-0.5">
           {versions.map((version) => {
             const isSelected = previewedVersionId === version.versionId
-            const meta = version.isCurrent ? undefined : versionMeta.get(version.versionId)
+            const fate = version.isCurrent ? undefined : fateByVersionId.get(version.versionId)
             return (
               <li
                 key={version.versionId}
                 role="button"
                 tabIndex={0}
-                className="group -mx-2 cursor-pointer px-2 pb-4"
-                onClick={() => onPreview?.(version)}
+                className={cn(
+                  'group -mx-2 flex items-center gap-x-2.5 rounded-md px-2 py-1.5',
+                  onPreview && !version.isCurrent && 'cursor-pointer',
+                  isSelected ? 'bg-brand-200' : 'hover:bg-surface-200'
+                )}
+                onClick={() => !version.isCurrent && onPreview?.(version)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') onPreview?.(version)
+                  if ((e.key === 'Enter' || e.key === ' ') && !version.isCurrent) onPreview?.(version)
                 }}
               >
-                <div className="flex items-center justify-between gap-x-2">
-                  <div className="flex items-center gap-x-2">
-                    <span
-                      className={cn(
-                        'text-sm',
-                        isSelected ? 'text-brand' : 'text-foreground',
-                        onPreview && 'group-hover:underline'
-                      )}
-                    >
-                      {dayjs(version.createdAt).format('MMM D, HH:mm')}
-                    </span>
-                    {version.isCurrent && <Badge variant="success">Current</Badge>}
-                    {meta && hasPolicy && (
-                      <VersionExpiryIndicator
-                        version={version}
-                        position={meta.position}
-                        capExceeded={meta.capExceeded}
-                        expiryDays={expiryDays}
-                        cap={cap}
-                        mode={mode}
-                      />
-                    )}
-                  </div>
+                <VersionThumbnail mimeType={mimeType} isCurrent={version.isCurrent} />
 
-                  <VersionActionsMenu
-                    version={version}
-                    isRestoring={isRestoring}
-                    onRestore={() => handleRestore(version)}
-                    onDelete={() => setVersionToDelete(version)}
-                  />
+                <div className="min-w-0 flex-1">
+                  <p
+                    className={cn(
+                      'truncate text-sm text-foreground',
+                      onPreview && !version.isCurrent && 'group-hover:underline'
+                    )}
+                  >
+                    {dayjs(version.createdAt).format('MMM D, HH:mm')}
+                  </p>
+                  <p className="truncate font-mono text-xs text-foreground-lighter">
+                    {formatBytes(version.size)}
+                  </p>
                 </div>
-                <p className="mt-0.5 text-xs text-foreground-lighter">
-                  {formatBytes(version.size)}
-                </p>
+
+                {version.isCurrent ? (
+                  <Badge variant="success">Current</Badge>
+                ) : isSelected ? (
+                  <Badge variant="success">Comparing</Badge>
+                ) : (
+                  fate && <VersionFateLabel fate={fate} />
+                )}
+
+                <VersionActionsMenu
+                  version={version}
+                  isRestoring={isRestoring}
+                  onRestore={() => handleRestore(version)}
+                  onDelete={() => setVersionToDelete(version)}
+                />
               </li>
             )
           })}
@@ -245,6 +219,49 @@ export const VersionHistory = ({
       </ConfirmationModal>
     </div>
   )
+}
+
+// ── Version thumbnail ───────────────────────────────────────────────────
+
+interface VersionThumbnailProps {
+  mimeType?: string
+  isCurrent: boolean
+  size?: number
+}
+
+/**
+ * A small rounded glyph identifying a version's file type, shown to the left
+ * of every row and in the compare widget. Versions don't have their own
+ * historical thumbnail in this prototype, so every noncurrent row shares the
+ * same type-based glyph — the current version gets a distinct restore glyph
+ * in brand color instead, matching the design handoff's convention.
+ */
+export const VersionThumbnail = ({ mimeType, isCurrent, size = 14 }: VersionThumbnailProps) => (
+  <span
+    className={cn(
+      'flex h-7 w-7 shrink-0 items-center justify-center rounded-md border',
+      isCurrent ? 'border-brand-400 bg-surface-200' : 'border-overlay bg-surface-100'
+    )}
+  >
+    {isCurrent ? (
+      <RotateCcw size={size} className="text-brand" />
+    ) : (
+      <MimeTypeIcon mimeType={mimeType} size={size} />
+    )}
+  </span>
+)
+
+const MimeTypeIcon = ({ mimeType, size }: { mimeType?: string; size: number }) => {
+  if (mimeType?.includes('image')) {
+    return <ImageIcon size={size} className="text-foreground-lighter" />
+  }
+  if (mimeType?.includes('audio')) {
+    return <Music size={size} className="text-foreground-lighter" />
+  }
+  if (mimeType?.includes('video')) {
+    return <Film size={size} className="text-foreground-lighter" />
+  }
+  return <File size={size} className="text-foreground-lighter" />
 }
 
 // ── Per-version actions dropdown ────────────────────────────────────────
@@ -312,83 +329,154 @@ const VersionActionsMenu = ({
   )
 }
 
-// ── Per-version expiry indicator ────────────────────────────────────────
+// ── Per-version fate label ──────────────────────────────────────────────
 
-interface VersionExpiryIndicatorProps {
-  version: ObjectVersion
-  /** 1-based chronological position — 1 = oldest noncurrent, N = newest. */
-  position: number
-  /** True when this version sits in the "would be evicted by cap" tail. */
-  capExceeded: boolean
-  expiryDays: number | null
+/**
+ * The one line a row shows for its removal outlook. Never a hover-only
+ * detail — the label itself is the state, per the "never promise a date
+ * that isn't certain yet" rule in `computeVersionFate`.
+ */
+const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
+  switch (fate.type) {
+    case 'kept':
+      return <span className="shrink-0 text-xs text-foreground-lighter">Kept</span>
+    case 'expires-in':
+      return (
+        <span className="shrink-0 text-xs text-foreground-lighter">
+          Expires in <span className="text-foreground-light">{fate.days}d</span>
+        </span>
+      )
+    case 'expires-on-next-upload':
+      return <span className="shrink-0 text-xs text-warning-600">Expires on next upload</span>
+    case 'expiring-now':
+      return <span className="shrink-0 text-xs text-destructive">Expiring now</span>
+  }
+}
+
+// ── Policy row ───────────────────────────────────────────────────────────
+
+interface PolicyRowProps {
   cap: number | null
+  expiryDays: number | null
   mode: ExpirationMode
 }
 
-const VersionExpiryIndicator = ({
-  version,
-  position,
-  capExceeded,
-  expiryDays,
-  cap,
-  mode,
-}: VersionExpiryIndicatorProps) => {
-  const hasDaysRule = expiryDays !== null && expiryDays > 0
-  const hasCapRule = cap !== null && cap > 0
-
-  const daysOld = dayjs().diff(dayjs(version.createdAt), 'day')
-  const daysRemaining = hasDaysRule ? expiryDays - daysOld : null
-  const exceedsDays = hasDaysRule && daysOld >= expiryDays
-
-  // Whether this version would expire under the combined policy
-  const wouldExpire =
-    hasDaysRule && hasCapRule
-      ? mode === 'and'
-        ? exceedsDays && capExceeded
-        : exceedsDays || capExceeded
-      : exceedsDays || capExceeded
-
-  const daysLabel = hasDaysRule
-    ? daysRemaining !== null && daysRemaining > 0
-      ? `Expires in ${daysRemaining}d`
-      : `Past ${expiryDays}d limit`
-    : null
-
-  if (daysLabel === null && !hasCapRule) return null
-
-  const isWarning = wouldExpire
-  const isSoonToExpire = !wouldExpire && daysRemaining !== null && daysRemaining <= 7
-  const emphasize = isWarning || isSoonToExpire
-
-  const combineLabel =
-    hasDaysRule && hasCapRule
-      ? mode === 'and'
-        ? 'Removed when both rules apply.'
-        : 'Removed as soon as either rule applies.'
-      : null
+/**
+ * Collapses the retention policy to one inline row: a broom-and-sparkles
+ * icon, one or two mono tokens (`30d`, `3 kept`), a greyscale BOTH/EITHER
+ * badge only when both rules are configured, and an info icon whose tooltip
+ * spells out the full rule. One line of plain-language explanation sits
+ * below it.
+ */
+const PolicyRow = ({ cap, expiryDays, mode }: PolicyRowProps) => {
+  const hasCap = cap !== null && cap > 0
+  const hasExpiryDays = expiryDays !== null && expiryDays > 0
+  const hasBoth = hasCap && hasExpiryDays
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span
-          className={cn(
-            'inline-flex shrink-0 cursor-help',
-            emphasize ? 'text-warning-600' : 'text-foreground-lighter'
-          )}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <BroomSparklesIcon size={14} />
-        </span>
-      </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-64 space-y-1">
-        {daysLabel !== null && <p>{daysLabel}</p>}
-        {hasCapRule && (
-          <p>
-            Position {position} of {cap} noncurrent
-          </p>
+    <div className="space-y-1.5">
+      <div className="flex items-center gap-x-1.5">
+        <BroomSparklesIcon size={13} className="shrink-0 text-foreground-lighter" />
+        {hasExpiryDays && <PolicyToken>{expiryDays}d</PolicyToken>}
+        {hasBoth && <PolicyOperatorBadge mode={mode} />}
+        {hasCap && <PolicyToken>{cap} kept</PolicyToken>}
+        {hasExpiryDays && !hasCap && (
+          <span className="font-mono text-[11px] text-foreground-lighter">no cap</span>
         )}
-        {combineLabel && <p className="text-foreground-lighter">{combineLabel}</p>}
-      </TooltipContent>
-    </Tooltip>
+        {hasCap && !hasExpiryDays && (
+          <span className="font-mono text-[11px] text-foreground-lighter">no age limit</span>
+        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="ml-auto shrink-0 cursor-help text-foreground-lighter">
+              <Info size={13} />
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-64">
+            <PolicyFullRule cap={cap} expiryDays={expiryDays} mode={mode} />
+          </TooltipContent>
+        </Tooltip>
+      </div>
+      <p className="text-xs leading-relaxed text-foreground-lighter">
+        <PolicyExplanation cap={cap} expiryDays={expiryDays} mode={mode} />
+      </p>
+    </div>
+  )
+}
+
+const PolicyToken = ({ children }: { children: ReactNode }) => (
+  <span className="rounded-sm bg-surface-300 px-1.5 py-0.5 font-mono text-[11px] text-foreground-light">
+    {children}
+  </span>
+)
+
+const PolicyOperatorBadge = ({ mode }: { mode: ExpirationMode }) => (
+  <span
+    className={cn(
+      'rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-foreground-lighter',
+      mode === 'and' ? 'border border-strong bg-surface-300' : 'border border-dashed border-strong'
+    )}
+  >
+    {mode === 'and' ? 'Both' : 'Either'}
+  </span>
+)
+
+const PolicyExplanation = ({ cap, expiryDays, mode }: PolicyRowProps) => {
+  const hasCap = cap !== null && cap > 0
+  const hasExpiryDays = expiryDays !== null && expiryDays > 0
+
+  if (hasCap && hasExpiryDays) {
+    return mode === 'and' ? (
+      <>
+        Versions beyond the {cap} newest are on a {expiryDays}-day clock. The rest are kept
+        until newer uploads push them past the cap.
+      </>
+    ) : (
+      <>
+        A version goes as soon as it passes {expiryDays}d or falls beyond the {cap} newest —
+        whichever comes first.
+      </>
+    )
+  }
+
+  if (hasExpiryDays) {
+    return (
+      <>
+        Age is the only rule, so every version has a fixed expiry date from the day it stopped
+        being current.
+      </>
+    )
+  }
+
+  return <>Age is irrelevant — nothing expires until a new upload pushes the oldest past the cap.</>
+}
+
+const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRowProps) => {
+  const hasCap = cap !== null && cap > 0
+  const hasExpiryDays = expiryDays !== null && expiryDays > 0
+
+  if (hasCap && hasExpiryDays) {
+    return mode === 'and' ? (
+      <>
+        A noncurrent version is permanently deleted only once it's both older than{' '}
+        {expiryDays} days and beyond the {cap} newest noncurrent versions.
+      </>
+    ) : (
+      <>
+        A noncurrent version is permanently deleted as soon as it's either older than{' '}
+        {expiryDays} days or beyond the {cap} newest noncurrent versions.
+      </>
+    )
+  }
+
+  if (hasExpiryDays) {
+    return <>A noncurrent version is permanently deleted once it's older than {expiryDays} days.</>
+  }
+
+  return (
+    <>
+      Only the {cap} newest noncurrent versions are kept. Older ones are deleted on the next
+      upload.
+    </>
   )
 }
