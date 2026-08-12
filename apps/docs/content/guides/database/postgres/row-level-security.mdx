@@ -316,7 +316,7 @@ Supabase runs database tests with [pgTAP](/docs/guides/database/extensions/pgtap
    supabase test new profiles_rls
    ```
 
-2. Write the tests. Cover `select`, `insert`, `update`, and `delete` twice each, once for a request the policy allows and once for a request it denies, for `anon` as well as `authenticated`. A table with four policies needs at least eight assertions.
+2. Write the tests. Cover `select`, `insert`, `update`, and `delete` twice each, once for a request the policy allows and once for a request it denies, for `anon` as well as `authenticated`.
 
    [`supabase-test-helpers`](https://github.com/usebasejump/supabase-test-helpers/tree/main) removes most of the setup below. It adds `tests.create_supabase_user()`, `tests.authenticate_as()`, and `tests.rls_enabled()`, so you don't hand-roll user seeding or role switching. See [Advanced pgTAP testing](/docs/guides/local-development/testing/pgtap-extended) for schema-wide assertions and a worked multi-tenant example.
 
