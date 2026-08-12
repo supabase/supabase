@@ -11,6 +11,7 @@ import {
   RotateCcw,
   Trash2,
 } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
@@ -31,6 +32,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import {
   useObjectVersionDeleteMutation,
   useObjectVersionRestoreMutation,
@@ -338,8 +340,11 @@ const VersionActionsMenu = ({
  */
 const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
   switch (fate.type) {
+    // No date can be promised yet — showing "Kept" on every row that isn't
+    // otherwise flagged just repeats what the absence of a warning already
+    // says, so this state renders nothing.
     case 'kept':
-      return <span className="shrink-0 text-xs text-foreground-lighter">Kept</span>
+      return null
     case 'expires-in':
       return (
         <span className="shrink-0 text-xs text-foreground-lighter">
@@ -347,7 +352,12 @@ const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
         </span>
       )
     case 'expires-on-next-upload':
-      return <span className="shrink-0 text-xs text-warning-600">Expires on next upload</span>
+      return (
+        <span className="shrink-0 text-xs text-warning-600">
+          Expires on next upload
+          {fate.daysRemaining !== undefined && <> + expires in {fate.daysRemaining}d</>}
+        </span>
+      )
     case 'expiring-now':
       return <span className="shrink-0 text-xs text-destructive">Expiring now</span>
   }
@@ -363,23 +373,28 @@ interface PolicyRowProps {
 
 /**
  * Collapses the retention policy to one inline row: a broom-and-sparkles
- * icon, one or two mono tokens (`30d`, `3 kept`), a greyscale BOTH/EITHER
- * badge only when both rules are configured, and an info icon whose tooltip
- * spells out the full rule. One line of plain-language explanation sits
- * below it.
+ * icon, one or two mono chips (`30d`, `3 retained`), a greyscale BOTH/EITHER
+ * chip only when both rules are configured, and an info icon whose tooltip
+ * spells out the full rule and links to where the policy is set. One line
+ * of plain-language explanation sits below it.
  */
 const PolicyRow = ({ cap, expiryDays, mode }: PolicyRowProps) => {
   const hasCap = cap !== null && cap > 0
   const hasExpiryDays = expiryDays !== null && expiryDays > 0
   const hasBoth = hasCap && hasExpiryDays
 
+  const [, setShowEditBucketModal] = useQueryState(
+    'edit',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+
   return (
     <div className="space-y-1.5">
       <div className="flex items-center gap-x-1.5">
         <BroomSparklesIcon size={13} className="shrink-0 text-foreground-lighter" />
-        {hasExpiryDays && <PolicyToken>{expiryDays}d</PolicyToken>}
-        {hasBoth && <PolicyOperatorBadge mode={mode} />}
-        {hasCap && <PolicyToken>{cap} kept</PolicyToken>}
+        {hasExpiryDays && <PolicyChip>{expiryDays}d</PolicyChip>}
+        {hasBoth && <PolicyOperatorChip mode={mode} />}
+        {hasCap && <PolicyChip>{cap} retained</PolicyChip>}
         {hasExpiryDays && !hasCap && (
           <span className="font-mono text-[11px] text-foreground-lighter">no cap</span>
         )}
@@ -392,8 +407,18 @@ const PolicyRow = ({ cap, expiryDays, mode }: PolicyRowProps) => {
               <Info size={13} />
             </span>
           </TooltipTrigger>
-          <TooltipContent side="top" className="max-w-64">
-            <PolicyFullRule cap={cap} expiryDays={expiryDays} mode={mode} />
+          <TooltipContent side="top" className="max-w-64 space-y-1.5">
+            <p className="font-medium text-foreground">Expiration policy</p>
+            <p className="text-foreground-light">
+              <PolicyFullRule cap={cap} expiryDays={expiryDays} mode={mode} />
+            </p>
+            <button
+              type="button"
+              className={cn(InlineLinkClassName, 'block text-foreground-light')}
+              onClick={() => setShowEditBucketModal(true)}
+            >
+              Edit bucket settings
+            </button>
           </TooltipContent>
         </Tooltip>
       </div>
@@ -404,17 +429,25 @@ const PolicyRow = ({ cap, expiryDays, mode }: PolicyRowProps) => {
   )
 }
 
-const PolicyToken = ({ children }: { children: ReactNode }) => (
-  <span className="rounded-sm bg-surface-300 px-1.5 py-0.5 font-mono text-[11px] text-foreground-light">
+// Shared chip styling so the day/retained tokens and the BOTH/EITHER operator
+// badge all read as one family — same border, radius, padding and size.
+// EITHER (the looser operator) is the only one that gets a dashed border.
+const POLICY_CHIP_CLASSNAME = 'rounded-sm border px-1.5 py-0.5 font-mono text-[10.5px]'
+
+const PolicyChip = ({ children }: { children: ReactNode }) => (
+  <span
+    className={cn(POLICY_CHIP_CLASSNAME, 'border-strong bg-surface-300 text-foreground-light')}
+  >
     {children}
   </span>
 )
 
-const PolicyOperatorBadge = ({ mode }: { mode: ExpirationMode }) => (
+const PolicyOperatorChip = ({ mode }: { mode: ExpirationMode }) => (
   <span
     className={cn(
-      'rounded-sm px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-foreground-lighter',
-      mode === 'and' ? 'border border-strong bg-surface-300' : 'border border-dashed border-strong'
+      POLICY_CHIP_CLASSNAME,
+      'uppercase tracking-wide text-foreground-lighter',
+      mode === 'and' ? 'border-strong bg-surface-300' : 'border-dashed border-strong'
     )}
   >
     {mode === 'and' ? 'Both' : 'Either'}

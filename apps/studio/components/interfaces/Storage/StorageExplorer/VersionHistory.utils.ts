@@ -3,7 +3,11 @@ import type { ExpirationMode } from '../StorageProtection.constants'
 export type VersionFate =
   | { type: 'kept' }
   | { type: 'expires-in'; days: number }
-  | { type: 'expires-on-next-upload' }
+  // `daysRemaining` is set whenever an age rule is also configured — the cap
+  // is what's actually forcing the removal, but the age countdown is still
+  // useful context (it's the date this version would hit anyway if the cap
+  // never got there first).
+  | { type: 'expires-on-next-upload'; daysRemaining?: number }
   | { type: 'expiring-now' }
 
 export interface ComputeVersionFateOptions {
@@ -75,6 +79,6 @@ export const computeVersionFate = ({
 
   // mode === 'or'
   if (ageExceeded || capExceeded) return { type: 'expiring-now' }
-  if (atCapBoundary) return { type: 'expires-on-next-upload' }
+  if (atCapBoundary) return { type: 'expires-on-next-upload', daysRemaining: daysRemaining! }
   return { type: 'expires-in', days: daysRemaining! }
 }

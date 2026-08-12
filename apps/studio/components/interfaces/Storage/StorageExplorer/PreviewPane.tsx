@@ -252,10 +252,9 @@ export const PreviewPane = () => {
       <div className="flex items-center gap-x-2 border-b border-overlay px-4 py-2.5">
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
-          <p className="truncate font-mono text-xs text-foreground-lighter">
+          <p className="mt-0.5 truncate font-mono text-xs text-foreground-lighter">
             {mimeType}
             {size && <> · {size}</>}
-            {showVersions && versionCount !== undefined && <> · {versionCount} versions</>}
           </p>
           {file.isCorrupted && (
             <div className="mt-1 flex items-center gap-x-1.5">

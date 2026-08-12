@@ -99,7 +99,7 @@ describe('computeVersionFate', () => {
       ).toEqual({ type: 'expires-in', days: 27 })
       expect(
         computeVersionFate({ ...base, daysOld: 6, chronoIndex: 1, noncurrentCount: 4 })
-      ).toEqual({ type: 'expires-on-next-upload' })
+      ).toEqual({ type: 'expires-on-next-upload', daysRemaining: 24 })
       expect(
         computeVersionFate({ ...base, daysOld: 9, chronoIndex: 0, noncurrentCount: 4 })
       ).toEqual({ type: 'expiring-now' })
