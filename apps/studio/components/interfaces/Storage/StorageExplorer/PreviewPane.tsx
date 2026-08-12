@@ -221,7 +221,7 @@ export const PreviewPane = () => {
         </div>
         <div className="mt-2 flex flex-col">
           <div className="flex gap-1.5">
-            <span className="truncate font-mono text-xs text-foreground-lighter overflow-visible">
+            <span className="truncate text-xs text-foreground-lighter overflow-visible">
               <div className="shrink-1">
                 <p className="truncate text-sm font-medium text-foreground" title={file.name}>
                   {file.name}
