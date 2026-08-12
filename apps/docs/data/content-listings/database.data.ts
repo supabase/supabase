@@ -105,17 +105,16 @@ export const databaseMultigresWhatYouGet: ContentListingGroup = {
     {
       title: 'Automatic failover',
       description:
-        'If a node goes down, another node in the cluster is promoted to take over, typically within seconds, without you having to intervene.',
+        'If a node fails, another in the cluster is promoted within seconds, without you having to intervene.',
     },
     {
       title: 'No connection changes',
       description:
-        "Your project still exposes a single connection string. The cluster's internal coordination is transparent to your application.",
+        'Use the same connection string. Coordination is transparent to your application.',
     },
     {
       title: 'Consensus-backed durability',
-      description:
-        "The cluster's nodes agree on which writes are durable before a write is acknowledged back to your application, rather than relying on a single node's disk and asynchronous replication catching up afterwards.",
+      description: 'Writes are acknowledged only after the cluster agrees they are durable.',
     },
   ],
 }
