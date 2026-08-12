@@ -70,7 +70,15 @@ Once you have enabled RLS, no data will be accessible via the [API](/docs/guides
 
 Postgres runs two checks before a client touches a table. Grants decide whether a role can run an operation on the table at all. Policies decide which rows that operation applies to. Set both for every table you expose.
 
-On existing projects, a new table in `public` receives `select`, `insert`, `update`, and `delete` for `anon`, `authenticated`, and `service_role` automatically. Both client roles start out able to write to your table, and adding policies doesn't take those grants back. A table protected only by policies still hands `anon` an insert path if you never revoke the grant.
+On existing projects, a new table in `public` starts with every privilege already granted to all three roles:
+
+| Role            | Granted automatically                  | What it should keep                                     |
+| --------------- | -------------------------------------- | ------------------------------------------------------- |
+| `anon`          | `select`, `insert`, `update`, `delete` | Only what signed-out visitors are meant to read         |
+| `authenticated` | `select`, `insert`, `update`, `delete` | Only the operations your app exposes to signed-in users |
+| `service_role`  | `select`, `insert`, `update`, `delete` | Full access. It bypasses RLS, so keep it server-side    |
+
+Adding policies doesn't take those grants back. A table protected only by policies still hands `anon` an insert path if you never revoke the grant.
 
 A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy.
 
