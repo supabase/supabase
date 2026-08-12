@@ -33,8 +33,7 @@ This returns:
 
 ```sh
 mkdir -p volumes/functions/my-function &&
-touch volumes/functions/my-function/index.ts &&
-touch volumes/functions/my-function/deno.json
+touch volumes/functions/my-function/index.ts
 ```
 
 Add the following code to `index.ts`:
@@ -49,16 +48,6 @@ export default {
 
     return Response.json({ message })
   }),
-}
-```
-
-And the import map to `deno.json`:
-
-```json
-{
-  "imports": {
-    "@supabase/server": "npm:@supabase/server@^1"
-  }
 }
 ```
 
@@ -154,7 +143,7 @@ The functions service is pre-configured with the following environment variables
 | `SUPABASE_SECRET_KEYS`      | `{"default":"sb_secret_...}`      | New secret API key                                |
 | `SUPABASE_JWKS`             | `{"keys":[{...}]}`                | JWKS used to verify JWTs issued by Auth           |
 
-Here's an example function that queries a table using the admin client provided by `@supabase/server` (requires the same `deno.json` as above):
+Here's an example function that queries a table using the admin client provided by `@supabase/server`:
 
 ```typescript
 import { withSupabase } from '@supabase/server'
