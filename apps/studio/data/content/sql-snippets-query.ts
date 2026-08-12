@@ -40,7 +40,7 @@ export async function getSqlSnippets(
         type,
         cursor,
         visibility,
-        favorite: typeof favorite === 'boolean' ? (favorite ? 'true' : 'false') : undefined,
+        favorite: favorite?.toString(),
         name,
         limit: SNIPPET_PAGE_LIMIT.toString(),
         sort_by: sort,
