@@ -5,16 +5,14 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { TOKEN_DENIED_REMEDIATION } from '../AccessToken.constants'
-import {
-  computeOverallRisk,
-  PERMISSION_MODE_LABEL,
-  scopesToSelection,
-  type ResourceAccessMode,
-} from '../AccessToken.permissions'
+import { scopesToSelection, type ResourceAccessMode } from '../AccessToken.permissions'
 import { useCapabilitySummary } from '../hooks/useCapabilitySummary'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
-import { CapabilityCategoryList, ResourceSummaryItem, RiskLevelSummary } from './TokenSummaryRows'
+import { CapabilitiesSection } from './TokenCapabilities/CapabilitiesSection'
+import { RiskBanner } from './TokenCapabilities/RiskBanner'
+import { computeRiskBanner } from './TokenCapabilities/TokenCapabilities.utils'
+import { ResourceSummaryItem } from './TokenSummaryRows'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
@@ -82,13 +80,17 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
   const boundResourcesDeletedText = `Every ${resourceNoun} this token was bound to has been deleted`
 
   const risk = useMemo(
-    () => computeOverallRisk(access.effectiveSelection, resourceAccess),
-    [access.effectiveSelection, resourceAccess]
+    () =>
+      computeRiskBanner({
+        effectiveSelection: access.effectiveSelection,
+        resourceAccess,
+        organizationSlugs: tokenOrganizationSlugs,
+        projectRefs: tokenProjectRefs,
+      }),
+    [access.effectiveSelection, resourceAccess, tokenOrganizationSlugs, tokenProjectRefs]
   )
 
-  const hasCapabilities = grantedScopes.length > 0
-
-  const { activeByCategory, mcpTools, capabilityGroups } = useCapabilitySummary({
+  const { capabilities } = useCapabilitySummary({
     selection,
     grantedScopes,
     permissionScopeMap,
@@ -222,18 +224,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             </div>
           </div>,
         ],
-        [
-          'Capabilities',
-          hasCapabilities ? (
-            <CapabilityCategoryList categories={activeByCategory} accessEntries={access.entries} />
-          ) : (
-            <span className="text-foreground-lighter">No capabilities selected</span>
-          ),
-        ],
-        [
-          'Risk level',
-          <RiskLevelSummary key="risk" risk={risk} showRoleCaveat={hasExceedingCapabilities} />,
-        ],
       ]
     : []
 
@@ -300,6 +290,9 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                     description="A token only works with permissions you currently hold. Permissions marked below will be denied until your role includes them."
                   />
                 )}
+
+                <RiskBanner risk={risk} showRoleCaveat={hasExceedingCapabilities} />
+
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm">Token summary</h3>
                   <dl className="divide-y rounded-md border bg-surface-300">
@@ -312,62 +305,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                   </dl>
                 </div>
 
-                {hasCapabilities && (
-                  <>
-                    <div className="flex flex-col gap-3">
-                      <h3 className="text-sm">Management API endpoints enabled</h3>
-                      {capabilityGroups.length === 0 ? (
-                        <p className="text-xs text-foreground-light">
-                          No Management API endpoints are enabled by the selected capabilities.
-                        </p>
-                      ) : (
-                        capabilityGroups.map(({ entry, mode, endpoints }) => (
-                          <div key={entry.key} className="rounded-md border">
-                            <div className="flex items-center justify-between border-b bg-surface-100 px-3 py-2">
-                              <span className="text-xs text-foreground">{entry.name}</span>
-                              <span className="text-[11px] font-mono uppercase text-foreground-lighter">
-                                {PERMISSION_MODE_LABEL[mode]}
-                              </span>
-                            </div>
-                            <div className="divide-y">
-                              {endpoints.map(([method, path]) => (
-                                <div
-                                  key={`${method} ${path}`}
-                                  className="flex items-center gap-2 px-3 py-1.5 font-mono text-xs"
-                                >
-                                  <span className="w-14 shrink-0 text-foreground-light">
-                                    {method}
-                                  </span>
-                                  <span className="text-foreground">{path}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-
-                    <div className="flex flex-col gap-3">
-                      <h3 className="text-sm">MCP tools</h3>
-                      {mcpTools.length === 0 ? (
-                        <p className="text-xs text-foreground-light">
-                          No MCP tools are enabled by the selected capabilities.
-                        </p>
-                      ) : (
-                        <div className="flex flex-wrap gap-2">
-                          {mcpTools.map((tool) => (
-                            <span
-                              key={tool}
-                              className="rounded border bg-surface-100 px-2 py-1 font-mono text-xs text-foreground-light"
-                            >
-                              {tool}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-sm">Capabilities</h3>
+                  <CapabilitiesSection capabilities={capabilities} accessEntries={access.entries} />
+                </div>
               </>
             )}
           </div>
