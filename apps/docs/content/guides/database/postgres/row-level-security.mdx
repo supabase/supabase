@@ -72,6 +72,10 @@ Postgres runs two checks before a client touches a table. Grants decide whether 
 
 On existing projects, a new table in `public` receives `select`, `insert`, `update`, and `delete` for `anon`, `authenticated`, and `service_role` automatically. Both client roles start out able to write to your table, and adding policies doesn't take those grants back. A table protected only by policies still hands `anon` an insert path if you never revoke the grant.
 
+A missing grant raises a `42501` error before any policy runs. When a request fails that your policy should allow, check the grants before you change the policy.
+
+### Set the grants for a table
+
 Set the grants to match what each role does in your app:
 
 1. Revoke the automatic grants from both client roles.
@@ -89,14 +93,14 @@ Set the grants to match what each role does in your app:
 
 3. Enable RLS on the table and write policies that decide which rows each role reaches.
 
-Data that clients read but never write, such as a feed a backend job populates, gets no write grant at all:
+For data that clients read but never write, such as a feed a backend job populates, grant no writes in step 2:
 
 ```sql
 revoke all on table public.weather_readings from anon, authenticated;
 grant select on table public.weather_readings to anon, authenticated;
 ```
 
-A missing grant raises a `42501` error before any policy runs, so check the grants first when a request fails that your policy should allow. To stop new tables from receiving the automatic grants, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
+To stop new tables from receiving the automatic grants in the first place, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
 
 ## Auto-enable RLS for new tables
 
