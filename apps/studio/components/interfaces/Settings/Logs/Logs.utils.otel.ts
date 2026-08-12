@@ -259,17 +259,81 @@ const genOtelSelectColumns = (table: LogsTableName): SafeLogSqlFragment => {
   return joinSqlFragments(columns, ', ')
 }
 
+// The real columns every list row needs, with no `log_attributes` access.
+const LIST_COLUMNS: SafeLogSqlFragment = safeSql`id, timestamp, event_message`
+
+// `log_attributes` is a Map(String,String), stored as parallel key/value arrays,
+// so reading ANY key decompresses the whole map — one key costs what the entire
+// map costs. It dominates row size, which makes it the difference between a
+// cheap list query and one that can exhaust the server's memory while sorting.
+//
+// So the projection is all-or-nothing: dropping some keys saves nothing. A list
+// query either avoids the map entirely (and fetches attributes for the rendered
+// page separately, via `genAttributeHydrationQueryOtel`) or may as well keep
+// them inline.
+const touchesAttributes = (fragment: SafeLogSqlFragment): boolean =>
+  fragment.includes('log_attributes')
+
+/**
+ * True when the list query for this table/filter combination can use the lean
+ * projection, and therefore needs a follow-up hydration query to render its
+ * attribute-derived columns.
+ *
+ * False when the table has no attribute columns (nothing to hydrate), or when
+ * the WHERE clause already reads `log_attributes` — a status/method/path filter,
+ * the `database` filter, or the pg_cron base condition. Those queries pay the
+ * map's cost in WHERE no matter what, so splitting would add a round trip and
+ * save nothing.
+ */
+export const otelListNeedsHydration = (table: LogsTableName, filters: Filters): boolean => {
+  if ((OTEL_SOURCES[table].columns?.length ?? 0) === 0) return false
+  return !touchesAttributes(genOtelWhere(table, filters))
+}
+
 export const genDefaultQueryOtel = (
   table: LogsTableName,
   filters: Filters,
   limit: number = 100
 ): SafeLogSqlFragment => {
+  const columns = otelListNeedsHydration(table, filters)
+    ? LIST_COLUMNS
+    : genOtelSelectColumns(table)
+
   return safeSql`-- Logs Preview Query (otel) [${lit(table)}]
-SELECT ${genOtelSelectColumns(table)}
+SELECT ${columns}
 FROM logs
 ${genOtelWhere(table, filters)}
 ORDER BY timestamp DESC
 LIMIT ${lit(limit)}`
+}
+
+/**
+ * Fetches the attribute-derived columns for one already-rendered page of rows.
+ *
+ * The caller bounds this to the page's own timestamp span via the endpoint's
+ * `iso_timestamp_*` params — that bracket is what prunes the scan. `id` is not
+ * part of the table's sort key, so an `id IN (...)` lookup on its own would read
+ * the whole selected range and give back everything the lean projection saved.
+ *
+ * Returns null when there is nothing to fetch, so the caller can skip the
+ * request entirely.
+ */
+export const genAttributeHydrationQueryOtel = (
+  table: LogsTableName,
+  ids: string[]
+): SafeLogSqlFragment | null => {
+  const desc = OTEL_SOURCES[table]
+  if (!desc.columns?.length || ids.length === 0) return null
+
+  const idList = joinSqlFragments(
+    ids.map((id) => lit(id)),
+    ', '
+  )
+  return safeSql`-- Logs Attribute Hydration Query (otel) [${lit(table)}]
+SELECT id, ${joinSqlFragments(desc.columns, ', ')}
+FROM logs
+WHERE source = ${lit(desc.source)} AND id IN (${idList})
+LIMIT ${lit(ids.length)}`
 }
 
 export const genCountQueryOtel = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
