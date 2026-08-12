@@ -1,4 +1,4 @@
-import { ChevronRight, Minus, MoreVertical, StopCircle } from 'lucide-react'
+import { ChevronRight, CircleX, Minus, MoreVertical, StopCircle } from 'lucide-react'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
@@ -17,6 +17,7 @@ import {
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   HoverCard,
   HoverCardContent,
@@ -27,6 +28,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import {
@@ -45,7 +47,8 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
-import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
+import { useQueryCancelMutation } from '@/data/sql/cancel-query-mutation'
+import { useSessionTerminateMutation } from '@/data/sql/terminate-session-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 import { useTrack } from '@/lib/telemetry/track'
@@ -120,9 +123,13 @@ export const ActivityRow = ({
   })
   const superuserRoles = roles?.filter((role) => role.isSuperuser).map((role) => role.name)
 
-  const { mutateAsync: abortQuery } = useQueryAbortMutation({
+  const { mutateAsync: cancelQuery } = useQueryCancelMutation({
+    onError: () => {}, // [Joshen] Error handled at call site
+  })
+
+  const { mutateAsync: terminateSession } = useSessionTerminateMutation({
     onSuccess: () => {
-      toast.success(`Successfully aborted query (ID: ${activity.pid})`)
+      toast.success(`Successfully terminated session (ID: ${activity.pid})`)
     },
   })
 
@@ -140,12 +147,44 @@ export const ActivityRow = ({
         activity.state === 'idle in transaction (aborted)') &&
         durationSeconds >= WARN_DURATION_IDLE_TXN))
 
+  const onCancelQuery = async () => {
+    const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
+    track('query_cancel_button_clicked', {
+      activityState: activity.state,
+      isBlocking,
+    })
+
+    const toastId = toast.loading(`Cancelling query (ID: ${activity.pid})`)
+    try {
+      await cancelQuery({
+        pid: activity.pid,
+        backendStart: activity.backend_start,
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+      })
+      toast.success(`Successfully cancelled query (ID: ${activity.pid})`, { id: toastId })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      toast.error(`Failed to cancel query: ${errorMessage}`, { id: toastId })
+    }
+  }
+
+  const onSelectTerminate = () => {
+    const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
+    track('session_terminate_button_clicked', {
+      activityState: activity.state,
+      isBlocking,
+    })
+    setShowTerminateConfirmDialog(true)
+  }
+
   const onConfirmTerminate = async () => {
     const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
     track('session_terminate_submitted', { activityState: activity.state, isBlocking })
     try {
-      await abortQuery({
+      await terminateSession({
         pid: activity.pid,
+        backendStart: activity.backend_start,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
       })
@@ -394,24 +433,39 @@ export const ActivityRow = ({
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={superuserRoles?.includes(activity.role_name)}
-                onClick={() => {
-                  const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
-                  track('session_terminate_button_clicked', {
-                    activityState: activity.state,
-                    isBlocking,
-                  })
-                  setShowTerminateConfirmDialog(true)
-                }}
+                disabled={
+                  activity.state !== 'active' || superuserRoles?.includes(activity.role_name)
+                }
+                onClick={onCancelQuery}
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: 'Unable to terminate queries run by superuser roles',
+                    text:
+                      activity.state !== 'active'
+                        ? 'No running queries to cancel'
+                        : 'Unable to terminate queries run by superuser roles',
+                  },
+                }}
+              >
+                <CircleX size={12} />
+                <span>Cancel query</span>
+              </DropdownMenuItemTooltip>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={superuserRoles?.includes(activity.role_name)}
+                onClick={onSelectTerminate}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: 'Unable to terminate sessions owned by superuser roles',
                   },
                 }}
               >
                 <StopCircle size={12} />
-                <span>Terminate</span>
+                <span>Terminate session</span>
               </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -421,17 +475,33 @@ export const ActivityRow = ({
       <AlertDialog open={showTerminateConfirmDialog} onOpenChange={setShowTerminateConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm to terminate this process?</AlertDialogTitle>
+            <AlertDialogTitle>Confirm to terminate this session?</AlertDialogTitle>
+            {activity.state === 'active' && (
+              <Admonition
+                type="warning"
+                className="border-x-0 rounded-none border-t-0"
+                title="This session is currently running a query"
+                description="Cancelling it may solve the problem without closing the connection."
+              />
+            )}
             <AlertDialogDescription>
-              This will force the query to stop running.
+              Ending this session will close its connection and roll back any open transaction. The
+              application will need to reconnect.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant="warning" onClick={onConfirmTerminate}>
-              Terminate
-            </AlertDialogAction>
+          <AlertDialogFooter className={cn(activity.state === 'active' && 'sm:justify-between')}>
+            <AlertDialogCancel>Back</AlertDialogCancel>
+            <div className="flex items-center gap-x-2">
+              {activity.state === 'active' && (
+                <AlertDialogAction variant="default" onClick={onCancelQuery}>
+                  Cancel query
+                </AlertDialogAction>
+              )}
+              <AlertDialogAction variant="warning" onClick={onConfirmTerminate}>
+                Terminate
+              </AlertDialogAction>
+            </div>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -13,11 +13,10 @@ const getAdvisorsInputSchema = z.object({
   type: z.enum(['security', 'performance']).optional(),
 })
 
-const getLogsInputSchema = z.object({
-  limit: z.number().min(1).max(100).optional(),
-  level: z.enum(['debug', 'info', 'warning', 'error']).optional(),
-  source: z.enum(['postgres', 'auth', 'storage', 'edge_function']).optional(),
-  search: z.string().optional(),
+const queryLogsInputSchema = z.object({
+  sql: z.string().min(1),
+  iso_timestamp_start: z.string().optional(),
+  iso_timestamp_end: z.string().optional(),
 })
 
 const listPoliciesInputSchema = z.object({
@@ -218,40 +217,13 @@ function createMockGetAdvisorsTool() {
   })
 }
 
-function createMockGetLogsTool() {
+function createMockQueryLogsTool() {
   return tool({
-    description: 'Fetches recent project logs for debugging or health checks (mocked).',
-    inputSchema: getLogsInputSchema,
-    execute: async ({
-      limit = 10,
-      level,
-      source,
-      search,
-    }: {
-      limit?: number
-      level?: 'debug' | 'info' | 'warning' | 'error'
-      source?: 'postgres' | 'auth' | 'storage' | 'edge_function'
-      search?: string
-    }) => {
-      let filtered = MOCK_LOGS_DATA
-
-      if (level) {
-        filtered = filtered.filter((entry) => entry.level === level)
-      }
-
-      if (source) {
-        filtered = filtered.filter((entry) => entry.source === source)
-      }
-
-      if (search) {
-        const needle = search.toLowerCase()
-        filtered = filtered.filter((entry) =>
-          `${entry.message} ${entry.target}`.toLowerCase().includes(needle)
-        )
-      }
-
-      return filtered.slice(0, limit)
-    },
+    description:
+      'Runs a read-only SQL query against recent project logs for debugging or health checks (mocked).',
+    inputSchema: queryLogsInputSchema,
+    // Deterministic mock: returns static log data regardless of the SQL passed.
+    execute: async () => MOCK_LOGS_DATA,
   })
 }
 
@@ -335,7 +307,7 @@ export async function getMockTools(overrides: MockToolOverrides | undefined, sig
     list_extensions: createMockListExtensionsTool(),
     list_edge_functions: createMockListEdgeFunctionsTool(),
     get_advisors: createMockGetAdvisorsTool(),
-    get_logs: createMockGetLogsTool(),
+    query_logs: createMockQueryLogsTool(),
     list_policies: createMockListPoliciesTool(),
   }
 }

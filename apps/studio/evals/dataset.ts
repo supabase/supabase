@@ -11,7 +11,7 @@ export const dataset: AssistantEvalCase[] = [
       prompt: 'Check if my project is having issues right now and tell me what to fix first.',
     },
     expected: {
-      requiredTools: ['get_advisors', 'get_logs'],
+      requiredTools: ['get_advisors', 'query_logs'],
     },
     metadata: { category: ['debugging', 'rls_policies'] },
   },

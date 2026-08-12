@@ -985,8 +985,8 @@ importers:
         specifier: 'catalog:'
         version: 2.112.3
       '@supabase/mcp-server-supabase':
-        specifier: ^0.7.0
-        version: 0.7.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
+        specifier: ^0.10.0
+        version: 0.10.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -2023,6 +2023,9 @@ importers:
       '@playwright/test':
         specifier: ^1.59.1
         version: 1.59.1
+      e2e-shared:
+        specifier: workspace:*
+        version: link:../shared
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1
@@ -2033,6 +2036,22 @@ importers:
       axe-core:
         specifier: ^4.12.1
         version: 4.12.1
+
+  e2e/shared:
+    dependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
 
   e2e/studio:
     dependencies:
@@ -2061,6 +2080,25 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.22.4
+
+  e2e/www:
+    dependencies:
+      '@playwright/test':
+        specifier: ^1.59.1
+        version: 1.59.1
+      e2e-shared:
+        specifier: workspace:*
+        version: link:../shared
+    devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
 
   packages/ai-commands:
     dependencies:
@@ -3825,10 +3863,6 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
-
-  '@eslint-community/regexpp@4.12.1':
-    resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
-    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
   '@eslint-community/regexpp@4.12.2':
     resolution: {integrity: sha512-EriSTlt5OC9/7SXkRSCAhfSxxoSUgBm33OH+IkwbdpgoqsSsUg7y3uh+IICI/Qg4BBWr3U2i39RpmycbxMq4ew==}
@@ -7681,15 +7715,15 @@ packages:
     resolution: {integrity: sha512-gfv481mTOVWtZIJgXupxZpni2V2UWPf6jeF/jOK7HdMHdH+mt6sU0sHHwf0POsPip8ltlulu9OUHgwVzl5ddRw==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/mcp-server-supabase@0.7.0':
-    resolution: {integrity: sha512-t0sOS27T5mDxp6jUYSh3zuyjWhYZarbXCPUO7HTVSyPq2smY6d5UM4Lko81eawYCSRDE8qwDZOKnVkXwCS4RSg==}
+  '@supabase/mcp-server-supabase@0.10.0':
+    resolution: {integrity: sha512-CVnB+4wBFsQeYwr5phNZyG33nNPUVBAJFB99vn55Z5Zn5+sxopybBPeYtrz8J9rqLkXad/xb7Xow4sz0JMq/XQ==}
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
       zod: ^3.25.0 || ^4.0.0
 
-  '@supabase/mcp-utils@0.4.0':
-    resolution: {integrity: sha512-mJ06GYLLZGW4zfz4yl08P2wrx0ORqW5iIAFyqvWJAInIjoa3w7EfJs/h+RbvCE+x7UYuSQeDUXpLJc4lJWDBKA==}
+  '@supabase/mcp-utils@0.6.0':
+    resolution: {integrity: sha512-4r7RTEMZgFw4VqTgsQrM0KUWXdEOASPHEjIfuBaGb0SXPHIIe6W8xBnocidjtfQnKagxMJb0RXY4rqwwShJ2zw==}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
       zod: ^3.25.0 || ^4.0.0
@@ -11264,10 +11298,6 @@ packages:
     resolution: {integrity: sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A==}
     engines: {node: '>=4'}
     hasBin: true
-
-  esquery@1.5.0:
-    resolution: {integrity: sha512-YQLXUplAwJgCydQ78IMJywZCceoqk1oH01OERdSAJc/7U2AylwjhSCLDEtqwg811idIS/9fIU5GjG73IgjKMVg==}
-    engines: {node: '>=0.10'}
 
   esquery@1.7.0:
     resolution: {integrity: sha512-Ap6G0WQwcU/LHsvLwON1fAQX9Zp0A2Y6Y/cJBl9r/JbW90Zyg4/zbG6zzKa2OTALELarYHmKu0GhpM5EO+7T0g==}
@@ -19344,8 +19374,6 @@ snapshots:
       eslint: 9.37.0(jiti@2.7.0)(supports-color@8.1.1)
       eslint-visitor-keys: 3.4.3
 
-  '@eslint-community/regexpp@4.12.1': {}
-
   '@eslint-community/regexpp@4.12.2': {}
 
   '@eslint/compat@2.1.0(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))':
@@ -23693,18 +23721,18 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.7.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@0.10.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
       '@modelcontextprotocol/sdk': 1.29.0(supports-color@8.1.1)(zod@3.25.76)
-      '@supabase/mcp-utils': 0.4.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
+      '@supabase/mcp-utils': 0.6.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)
       common-tags: 1.8.2
       gqlmin: 0.3.1
       graphql: 16.11.0
       openapi-fetch: 0.13.8
       zod: 3.25.76
 
-  '@supabase/mcp-utils@0.4.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)':
+  '@supabase/mcp-utils@0.6.0(@modelcontextprotocol/sdk@1.29.0(supports-color@8.1.1)(zod@3.25.76))(zod@3.25.76)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.29.0(supports-color@8.1.1)(zod@3.25.76)
       zod: 3.25.76
@@ -27684,8 +27712,8 @@ snapshots:
 
   eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1):
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))
-      '@eslint-community/regexpp': 4.12.1
+      '@eslint-community/eslint-utils': 4.10.1(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))
+      '@eslint-community/regexpp': 4.12.2
       '@eslint/config-array': 0.21.0(supports-color@8.1.1)
       '@eslint/config-helpers': 0.4.0
       '@eslint/core': 0.16.0
@@ -27705,7 +27733,7 @@ snapshots:
       eslint-scope: 8.4.0
       eslint-visitor-keys: 4.2.1
       espree: 10.4.0
-      esquery: 1.5.0
+      esquery: 1.7.0
       esutils: 2.0.3
       fast-deep-equal: 3.1.3
       file-entry-cache: 8.0.0
@@ -27738,10 +27766,6 @@ snapshots:
       eslint-visitor-keys: 4.2.1
 
   esprima@4.0.1: {}
-
-  esquery@1.5.0:
-    dependencies:
-      estraverse: 5.3.0
 
   esquery@1.7.0:
     dependencies:
