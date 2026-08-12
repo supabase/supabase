@@ -308,11 +308,26 @@ In older versions of Postgres, protect your views by revoking access from the `a
 
 ### Test your policies
 
-We recommend writing tests for every policy, in the same change that sets the grants and creates the policies. Treat the tests as part of securing the table, not as a follow-up.
+We recommend writing tests for every policy, in the same change that sets the grants and creates the policies. Tests are a fundamental part of a secure setup, and they give you a repeatable way to prove a policy behaves the way you intended.
 
 A wrong policy fails quietly. Too permissive, and a query returns rows it shouldn't. Too strict, and it returns nothing and raises no error. Neither case surfaces as an error, so tests are how you find out.
 
 Supabase runs database tests with [pgTAP](/docs/guides/database/extensions/pgtap) through the CLI. Test files are `.sql` files under `supabase/tests/`.
+
+#### How policy tests work
+
+Switch role and identity between cases with `set local role` and `set local request.jwt.claim.sub`, so each assertion runs as the user it describes.
+
+Match the assertion to the way the denial happens:
+
+- A missing grant raises `42501`. Assert it with `throws_ok`.
+- A `with check` violation raises `42501`. Assert it with `throws_ok`.
+- A `using` clause that filters the target row out raises nothing. The update or delete matches zero rows instead. Assert that no row changed, not that an error was raised.
+- An allowed write needs an assertion on the resulting row. The absence of an error doesn't prove that anything changed.
+
+Add `returning` to a write so one assertion covers both directions. An allowed write returns the changed row, and a write the policy filters out returns nothing.
+
+#### Write and run the tests
 
 1. Create a test file:
 
@@ -329,17 +344,6 @@ Supabase runs database tests with [pgTAP](/docs/guides/database/extensions/pgtap
    ```bash
    supabase test db
    ```
-
-Switch role and identity between cases with `set local role` and `set local request.jwt.claim.sub`, so each assertion runs as the user it describes.
-
-Match the assertion to the way the denial happens:
-
-- A missing grant raises `42501`. Assert it with `throws_ok`.
-- A `with check` violation raises `42501`. Assert it with `throws_ok`.
-- A `using` clause that filters the target row out raises nothing. The update or delete matches zero rows instead. Assert that no row changed, not that an error was raised.
-- An allowed write needs an assertion on the resulting row. The absence of an error doesn't prove that anything changed.
-
-Add `returning` to a write so one assertion covers both directions. An allowed write returns the changed row, and a write the policy filters out returns nothing.
 
 This example shows each of those techniques against a `profiles` table where `authenticated` holds every privilege, `anon` holds none, and each user reads and writes only their own row. Extend it to the remaining operations:
 
