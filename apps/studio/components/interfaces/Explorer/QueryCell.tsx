@@ -108,10 +108,9 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
           <ExplorerToolbarIcon>
             <CodeSquare size={14} />
           </ExplorerToolbarIcon>
-          <ExplorerToolbarTitle
-            title={title}
-            onSaveTitle={(newTitle) => handleUpdateCell({ title: newTitle })}
-          />
+          <ExplorerToolbarTitle onSaveTitle={(newTitle) => handleUpdateCell({ title: newTitle })}>
+            {title}
+          </ExplorerToolbarTitle>
           <ExplorerToolbarActions>
             <ExplorerToolbarAction
               disabled={(result?.rows ?? []).length === 0}

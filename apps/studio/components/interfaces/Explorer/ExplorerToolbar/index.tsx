@@ -44,14 +44,14 @@ const ExplorerToolbarIcon = ({
 )
 ExplorerToolbarIcon.displayName = 'ExplorerToolbarIcon'
 
-export type ExplorerToolbarTitleProps = React.ComponentProps<'div'> & {
-  title: string
+export type ExplorerToolbarTitleProps = Omit<React.ComponentProps<'div'>, 'children'> & {
+  children: string
   onSaveTitle?: (value: string) => void
 }
 
 /** Flexible title region for static text or an editable resource name. */
 const ExplorerToolbarTitle = ({
-  title,
+  children: title,
   className,
   onSaveTitle,
   ...props
