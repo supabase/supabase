@@ -13,7 +13,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 import { toast } from 'sonner'
 import {
@@ -165,6 +165,7 @@ export const PreviewPane = () => {
   const versionCount = versionsData?.length
   const currentVersion = versionsData?.find((v) => v.isCurrent)
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [previewedVersion, setPreviewedVersion] = useState<ObjectVersion>()
   const [showPermanentDeleteConfirm, setShowPermanentDeleteConfirm] = useState(false)
 
@@ -193,6 +194,14 @@ export const PreviewPane = () => {
       objectName: file.name,
       versionId: previewedVersion.versionId,
     })
+  }
+
+  // Selecting a version swaps the top of the panel for the compare widget —
+  // scroll back up so that widget is actually in view, since the version
+  // list further down is very likely what's currently scrolled to.
+  const handlePreviewVersion = (version: ObjectVersion) => {
+    setPreviewedVersion(version)
+    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const previewSlot =
@@ -387,7 +396,7 @@ export const PreviewPane = () => {
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div ref={scrollContainerRef} className="min-h-0 flex-1 overflow-y-auto">
         {previewSlot}
 
         <div className="px-4 space-y-3 pt-3">
@@ -400,7 +409,7 @@ export const PreviewPane = () => {
                 objectName={file.name}
                 mimeType={mimeType}
                 previewedVersionId={previewedVersion?.versionId}
-                onPreview={setPreviewedVersion}
+                onPreview={handlePreviewVersion}
                 clearPreview={() => setPreviewedVersion(undefined)}
               />
             </PreviewSection>
