@@ -3,7 +3,14 @@ import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalRespons
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
@@ -375,6 +382,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
+    isInitialized: false,
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -382,6 +390,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     resetAiAssistantPanel: () => {
       Object.assign(state, createInitialAiAssistantData())
+      state.isInitialized = false
     },
 
     setModel: (model: AssistantModel) => {
@@ -675,6 +684,7 @@ export type AiAssistantState = AiAssistantData & {
   chatInstances: Record<string, Chat<MessageType>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
+  isInitialized: boolean
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   createChat: (options?: CreateChatOptions) => string
@@ -705,6 +715,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
     let isMounted = true
+    state.isInitialized = false
 
     async function loadAndInitializeState() {
       if (!project?.ref || typeof window === 'undefined') {
@@ -733,6 +744,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       // 4. Ensure an active chat exists and handle URL overrides
       ensureActiveChatOrInitialize(state)
+      state.isInitialized = true
     }
 
     loadAndInitializeState()
@@ -790,6 +802,13 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
   return useSnapshot(state, options)
+}
+
+export const useAiAssistantChatList = (): ChatSession[] => {
+  const state = useContext(AiAssistantStateContext)
+  const [, rerender] = useReducer((count) => count + 1, 0)
+  useEffect(() => subscribe(state.chats, rerender), [state])
+  return Object.values(state.chats)
 }
 
 export const useAiAssistantState = () => {

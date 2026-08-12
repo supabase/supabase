@@ -1,4 +1,4 @@
-import { Eye, GitBranch, NotebookText, ScrollText, Table2 } from 'lucide-react'
+import { Eye, GitBranch, MessageSquare, NotebookText, ScrollText, Table2 } from 'lucide-react'
 import { cn, SQL_ICON } from 'ui'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
@@ -26,7 +26,7 @@ export const LogsSnippetIcon = ({
 )
 
 interface EntityTypeIconProps {
-  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p' | 'notebook'
+  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p' | 'notebook' | 'chat'
   size?: number
   strokeWidth?: number
   isActive?: boolean
@@ -105,6 +105,10 @@ export const EntityTypeIcon = ({
 
   if (type === 'notebook') {
     return <NotebookText size={size} strokeWidth={strokeWidth} className={''} />
+  }
+
+  if (type === 'chat') {
+    return <MessageSquare size={size} strokeWidth={strokeWidth} />
   }
 
   return (
