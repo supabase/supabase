@@ -43,7 +43,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
@@ -211,22 +211,39 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
     return permissionChanges
   }, [hook, postgresValues.schema, postgresValues.functionName])
 
+  const handleHookSaved = () => {
+    toast.success(`Successfully ${isCreating ? 'created' : 'updated'} ${hookType}.`)
+    onClose()
+  }
+
+  // These statements are what let supabase_auth_admin execute the hook, and what stop anon and
+  // authenticated from calling it. Run them through the mutation so a failure is surfaced and
+  // the sheet stays open on the statements, rather than resolving after we've already reported
+  // success and closed.
+  const { mutate: applyPermissions, isPending: isApplyingPermissions } = useExecuteSqlMutation({
+    onSuccess: handleHookSaved,
+    onError: (error) => {
+      toast.error(`${hookType} was saved, but its permissions failed to apply: ${error.message}`)
+    },
+  })
+
   const { mutate: updateAuthHooks, isPending: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
     onSuccess: () => {
-      toast.success(`Successfully ${isCreating ? 'created' : 'updated'} ${hookType}.`)
       if (statements.length > 0) {
-        executeSql({
+        return applyPermissions({
           projectRef,
-          connectionString: project!.connectionString,
+          connectionString: project?.connectionString,
           sql: joinSqlFragments(statements, '\n'),
         })
       }
-      onClose()
+      handleHookSaved()
     },
     onError: (error) => {
       toast.error(`Failed to create hook: ${error.message}`)
     },
   })
+
+  const isSaving = isUpdatingAuthHooks || isApplyingPermissions
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
@@ -557,15 +574,10 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} variant="default" onClick={confirmOnClose}>
+          <Button disabled={isSaving} variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button
-            form={FORM_ID}
-            type="submit"
-            disabled={isUpdatingAuthHooks}
-            loading={isUpdatingAuthHooks}
-          >
+          <Button form={FORM_ID} type="submit" disabled={isSaving} loading={isSaving}>
             {isCreating ? 'Create hook' : 'Update hook'}
           </Button>
         </SheetFooter>
