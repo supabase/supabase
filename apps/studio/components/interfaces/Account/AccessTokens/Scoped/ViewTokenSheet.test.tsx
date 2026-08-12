@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
   MOCK_ORG,
+  MOCK_PROJECT,
   mockPermissionsApi,
   mockScopedTokenEnvironment,
   ownerRows,
@@ -139,5 +140,101 @@ describe('ViewTokenSheet', () => {
       (await screen.findAllByText(/Every project this token was bound to has been deleted/)).length
     ).toBeGreaterThan(0)
     expect(screen.queryByText('This token no longer has access')).toBeNull()
+  })
+
+  test('renders capability cards with attributed endpoints, MCP tools, and a risk banner', async () => {
+    mockPermissionsApi(ownerRows(MOCK_ORG.slug))
+    mockToken({
+      ...TOKEN_BASE,
+      scope: 'project',
+      project_refs: [MOCK_PROJECT.ref],
+      permissions: ['advisors_read', 'database_read', 'database_write'],
+    })
+    addAPIMock({
+      method: 'get',
+      // @ts-expect-error Studio API is missing from types
+      path: '/scoped-access-token-permissions',
+      response: () =>
+        HttpResponse.json({
+          scopes: {},
+          endpoints: {
+            'GET /v1/projects/{ref}/advisors/security': [['advisors_read']],
+            'GET /v1/projects/{ref}/database': [['database_read']],
+            'POST /v1/projects/{ref}/database/query': [['database_write']],
+          },
+          mcp_tools: {
+            get_advisors: [['advisors_read']],
+            execute_sql: [['database_write']],
+          },
+        }),
+    })
+    renderSheet()
+
+    // ≤2 capabilities render fully expanded — both cards are visible without interaction.
+    expect(await screen.findByText('Advisors')).toBeInTheDocument()
+    expect(screen.getByText('Database')).toBeInTheDocument()
+    expect(screen.getByText('Read-write')).toBeInTheDocument()
+    expect(screen.getByText('Read')).toBeInTheDocument()
+
+    expect(screen.getByTitle('/v1/projects/{ref}/advisors/security')).toBeInTheDocument()
+    expect(screen.getByTitle('/v1/projects/{ref}/database')).toBeInTheDocument()
+    expect(screen.getByTitle('/v1/projects/{ref}/database/query')).toBeInTheDocument()
+    // Non-GET methods get a tinted badge; GET stays plain — both still render as text.
+    expect(screen.getByText('POST')).toBeInTheDocument()
+
+    expect(screen.getByText('get_advisors')).toBeInTheDocument()
+    expect(screen.getByText('execute_sql')).toBeInTheDocument()
+    // MCP tools have no description field yet — stubbed visibly rather than fabricated.
+    expect(screen.getAllByText('No description available').length).toBe(2)
+
+    // project:database is catalog-high risk and granted read-write — max() over capabilities.
+    expect(screen.getByText('High risk')).toBeInTheDocument()
+    expect(
+      screen.getByText('Read-write on 1 capability, read on 1, across 1 project.')
+    ).toBeInTheDocument()
+  })
+
+  test('switches to the dense, filterable view at 9+ granted capabilities', async () => {
+    mockPermissionsApi(ownerRows(MOCK_ORG.slug))
+    mockToken({
+      ...TOKEN_BASE,
+      scope: 'project',
+      project_refs: [MOCK_PROJECT.ref],
+      permissions: [
+        'advisors_read',
+        'database_read',
+        'database_write',
+        'backups_read',
+        'custom_domain_read',
+        'edge_functions_read',
+        'storage_read',
+        'realtime_config_read',
+        'vanity_subdomain_read',
+        'infra_add_ons_read',
+      ],
+    })
+    renderSheet()
+
+    expect(
+      await screen.findByPlaceholderText('Filter by capability or endpoint...')
+    ).toBeInTheDocument()
+    expect(screen.getByText('Read-write · 1')).toBeInTheDocument()
+    expect(screen.getByText('Read-only · 8')).toBeInTheDocument()
+    expect(screen.getByText(/Not granted · \d+/)).toBeInTheDocument()
+    // Read-only previews only 3 of the 8 rows until "Show N more" is clicked.
+    expect(screen.getByText('Show 5 more')).toBeInTheDocument()
+    expect(screen.queryByText('Storage')).toBeNull()
+
+    fireEvent.click(screen.getByText('Show 5 more'))
+    expect(screen.getByText('Storage')).toBeInTheDocument()
+    expect(screen.getByText('Backups')).toBeInTheDocument()
+
+    // Filtering re-derives the read-only bucket, so a narrowed result isn't re-truncated.
+    fireEvent.change(screen.getByPlaceholderText('Filter by capability or endpoint...'), {
+      target: { value: 'storage' },
+    })
+
+    expect(screen.getByText('Storage')).toBeInTheDocument()
+    expect(screen.queryByText('Backups')).toBeNull()
   })
 })

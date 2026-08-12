@@ -4,6 +4,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import {
   computeOverallRisk,
+  PERMISSION_CATALOG_BY_CATEGORY,
   PERMISSION_MODE_LABEL,
   selectionToScopes,
 } from '../../AccessToken.permissions'
@@ -88,11 +89,32 @@ export const NewScopedTokenFormReview = ({
 
   const hasCapabilities = grantedScopes.length > 0
 
-  const { activeByCategory, mcpTools, capabilityGroups } = useCapabilitySummary({
+  const { capabilities } = useCapabilitySummary({
     selection,
     grantedScopes,
     permissionScopeMap,
   })
+
+  const activeByCategory = useMemo(
+    () =>
+      PERMISSION_CATALOG_BY_CATEGORY.map((category) => ({
+        ...category,
+        entries: category.entries
+          .map((entry) => ({ entry, mode: selection[entry.key] ?? 'none' }))
+          .filter(({ mode }) => mode !== 'none'),
+      })).filter((category) => category.entries.length > 0),
+    [selection]
+  )
+
+  const mcpTools = useMemo(
+    () => Array.from(new Set(capabilities.flatMap((capability) => capability.mcpTools))),
+    [capabilities]
+  )
+
+  const capabilityGroups = useMemo(
+    () => capabilities.filter((capability) => capability.endpoints.length > 0),
+    [capabilities]
+  )
 
   const rows: [string, React.ReactNode][] = [
     ['Name', values.tokenName || <span className="text-foreground-lighter">Untitled token</span>],
@@ -190,13 +212,15 @@ export const NewScopedTokenFormReview = ({
                     </span>
                   </div>
                   <div className="divide-y">
-                    {endpoints.map(([method, path]) => (
+                    {endpoints.map((endpoint) => (
                       <div
-                        key={`${method} ${path}`}
+                        key={endpoint.raw}
                         className="flex items-center gap-2 px-3 py-1.5 font-mono text-xs"
                       >
-                        <span className="w-14 shrink-0 text-foreground-light">{method}</span>
-                        <span className="text-foreground">{path}</span>
+                        <span className="w-14 shrink-0 text-foreground-light">
+                          {endpoint.method}
+                        </span>
+                        <span className="text-foreground">{endpoint.path}</span>
                       </div>
                     ))}
                   </div>
