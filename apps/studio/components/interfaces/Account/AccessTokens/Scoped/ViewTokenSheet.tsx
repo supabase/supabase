@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { Box, Boxes } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -12,7 +13,6 @@ import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
 import { CapabilitiesSection } from './TokenCapabilities/CapabilitiesSection'
 import { RiskBanner } from './TokenCapabilities/RiskBanner'
 import { computeRiskBanner } from './TokenCapabilities/TokenCapabilities.utils'
-import { ResourceSummaryItem } from './TokenSummaryRows'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
@@ -202,26 +202,34 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         ],
         [
           'Resource access',
-          <div key="resource-access" className="space-y-2">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              {resourceSummary.title}
-            </p>
-            <div className="divide-y">
-              {resourceSummary.items.length === 0 && hasNoBoundResources && (
-                <p className="py-2 text-sm text-foreground-lighter">{boundResourcesDeletedText}</p>
-              )}
-              {resourceSummary.items.length === 0 && !hasNoBoundResources && (
-                <p className="py-2 text-sm text-foreground-lighter">-</p>
-              )}
-              {resourceSummary.items.map((item) => (
-                <ResourceSummaryItem
-                  key={item.key}
-                  label={item.label}
-                  sublabel={item.sublabel}
-                  isInaccessible={item.isInaccessible}
-                />
-              ))}
-            </div>
+          <div
+            key="resource-access"
+            className="flex flex-wrap justify-start gap-1.5 sm:justify-end"
+          >
+            {resourceSummary.items.length === 0 && hasNoBoundResources && (
+              <span className="text-sm text-foreground-lighter">{boundResourcesDeletedText}</span>
+            )}
+            {resourceSummary.items.length === 0 && !hasNoBoundResources && (
+              <span className="text-sm text-foreground-lighter">-</span>
+            )}
+            {resourceSummary.items.map((item) => (
+              <div
+                key={item.key}
+                className={cn(
+                  'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-[13px]',
+                  item.isInaccessible
+                    ? 'border-destructive-500 text-destructive'
+                    : 'border-strong text-foreground'
+                )}
+              >
+                {resourceAccess === 'organization' ? (
+                  <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
+                ) : resourceAccess === 'project' ? (
+                  <Box size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
+                ) : null}
+                {item.label}
+              </div>
+            ))}
           </div>,
         ],
       ]
@@ -291,18 +299,36 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                   />
                 )}
 
-                <RiskBanner risk={risk} showRoleCaveat={hasExceedingCapabilities} />
-
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm">Token summary</h3>
                   <dl className="divide-y rounded-md border bg-surface-300">
                     {rows.map(([key, value]) => (
-                      <div key={key} className="grid grid-cols-3 gap-4 px-4 py-3">
-                        <dt className="text-sm text-foreground-lighter">{key}</dt>
-                        <dd className="col-span-2 text-sm text-foreground">{value}</dd>
+                      <div
+                        key={key}
+                        className={cn(
+                          'flex justify-between gap-4 px-4 py-3',
+                          key === 'Resource access'
+                            ? 'flex-col items-start sm:flex-row sm:items-start'
+                            : 'items-center'
+                        )}
+                      >
+                        <dt className="shrink-0 text-sm text-foreground-lighter">{key}</dt>
+                        <dd
+                          className={cn(
+                            'text-sm text-foreground',
+                            key === 'Resource access' && 'w-full min-w-0 sm:w-auto sm:flex-1'
+                          )}
+                        >
+                          {value}
+                        </dd>
                       </div>
                     ))}
                   </dl>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <h3 className="text-sm">Risk assessment</h3>
+                  <RiskBanner risk={risk} showRoleCaveat={hasExceedingCapabilities} />
                 </div>
 
                 <div className="flex flex-col gap-3">
