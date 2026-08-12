@@ -66,6 +66,10 @@ if [ ! -d "$STATIC_DIR" ]; then
     exit 1
 fi
 
+# R2 can return transient PutObject failures. Retry uploads more than the AWS CLI default.
+export AWS_RETRY_MODE="${AWS_RETRY_MODE:-standard}"
+export AWS_MAX_ATTEMPTS="${AWS_MAX_ATTEMPTS:-10}"
+
 # Upload files with cache configuration and custom endpoint
 echo -e "${YELLOW}Uploading static files to R2...${NC}"
 aws s3 sync "$STATIC_DIR" "s3://$BUCKET_NAME/$SITE_NAME/${VERCEL_GIT_COMMIT_SHA:0:12}/_next/static" \
