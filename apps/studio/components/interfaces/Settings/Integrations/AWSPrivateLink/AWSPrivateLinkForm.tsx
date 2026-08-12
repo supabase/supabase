@@ -77,14 +77,14 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
       : account?.status === 'READY'
         ? 'Connection is ready to accept'
         : account?.status === 'CREATING'
-          ? 'This account connection is being created'
+          ? 'This association is being created'
           : account?.status === 'DELETING'
-            ? 'This account is being deleted'
+            ? 'This association is being deleted'
             : account?.status === 'ASSOCIATION_REQUEST_EXPIRED'
-              ? 'Account acceptance request has expired'
+              ? 'Association acceptance request has expired'
               : account?.status === 'CREATION_FAILED'
-                ? 'Failed to create account'
-                : 'This account needs to be accepted by the AWS account owner.'
+                ? 'Failed to create association'
+                : 'This association needs to be accepted by the AWS account owner.'
 
   const description =
     account?.status === 'ASSOCIATION_ACCEPTED'
@@ -92,9 +92,9 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
       : account?.status === 'READY'
         ? 'It may be waiting acceptance from the AWS account owner. Association requests are automatically deleted if not accepted within 12 hours.'
         : account?.status === 'ASSOCIATION_REQUEST_EXPIRED'
-          ? 'Reconnect this account to initiate a new connection request'
+          ? 'Reconnect this association to initiate a new connection request'
           : account?.status === 'CREATION_FAILED'
-            ? 'Reconnect this account to initiate a new connection request'
+            ? 'Reconnect this association to initiate a new connection request'
             : ''
 
   const onSubmit = (values: FormValues) => {
@@ -113,7 +113,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
         {
           onSuccess: () => {
             form.reset(defaultValues)
-            toast.success('Successfully added AWS account')
+            toast.success('Successfully added association')
             onOpenChange(false)
           },
         }
@@ -134,7 +134,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader>
-          <SheetTitle>{isNew ? 'Add AWS Account' : 'AWS Account Details'}</SheetTitle>
+          <SheetTitle>{isNew ? 'Add Association' : 'Association Details'}</SheetTitle>
           <SheetDescription>
             Connect to your Supabase project from your AWS VPC using AWS PrivateLink.{' '}
             <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
@@ -206,8 +206,8 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                 name="accountName"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="Account Name"
-                    description="A name for this account connection."
+                    label="Association Description"
+                    description="A description for this association."
                   >
                     <FormControl>
                       <Input
@@ -326,7 +326,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
               </Button>
               {isNew && (
                 <Button type="submit" loading={isPending}>
-                  Add Account
+                  Add Association
                 </Button>
               )}
             </SheetFooter>
