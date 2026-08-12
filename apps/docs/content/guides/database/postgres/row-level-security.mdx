@@ -428,18 +428,19 @@ A wrong policy fails quietly. Too permissive, and a query returns rows it should
 
 Supabase runs database tests with [pgTAP](/docs/guides/database/extensions/pgtap) through the CLI. Test files are `.sql` files under `supabase/tests/`.
 
-### How policy tests work
+### Anatomy of a policy test
 
-Switch role and identity between cases with `set local role` and `set local request.jwt.claim.sub`, so each assertion runs as the user it describes.
+Each case sets an identity, runs one statement as that identity, and asserts the outcome. Three things decide whether the assertion means anything.
 
-Match the assertion to the way the denial happens:
+**Identity.** Switch role and identity between cases with `set local role` and `set local request.jwt.claim.sub`, so each assertion runs as the user it describes. Without the switch, every case runs as the same role and proves nothing about access.
+
+**Denials.** A denied request doesn't always raise an error, so match the assertion to the way the denial happens:
 
 - A missing grant raises `42501`. Assert it with `throws_ok`.
 - A `with check` violation raises `42501`. Assert it with `throws_ok`.
-- A `using` clause that filters the target row out raises nothing. The update or delete matches zero rows instead. Assert that no row changed, not that an error was raised.
-- An allowed write needs an assertion on the resulting row. The absence of an error doesn't prove that anything changed.
+- A `using` clause that filters the target row out raises nothing. The update or delete matches zero rows instead. Assert that no row changed.
 
-Add `returning` to an allowed write so a single assertion proves the row changed. A denied write returns no rows, so the same shape asserts the denial.
+**Allowed writes.** The absence of an error doesn't prove that anything changed. Add `returning` to the statement so one assertion covers both directions. An allowed write returns the changed row, and a write the policy filters out returns nothing.
 
 ### Write and run the tests
 
