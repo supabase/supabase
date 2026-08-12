@@ -50,13 +50,6 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
-// Same viewport-relative shrink as the default preview's clamp below, scaled
-// down for the compare widget's two side-by-side thumbnails. Approximate —
-// it doesn't know about the optional public-bucket admonition that can push
-// the panel down further on the page above it — but the floor keeps both
-// thumbnails usable even on a short viewport with that banner showing.
-const COMPARE_THUMBNAIL_HEIGHT = 'clamp(64px, calc((100vh - 144px) * 0.22), 96px)'
-
 export const PreviewFile = ({ item }: { item: StorageItem }) => {
   const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
   const folderPath = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
@@ -398,10 +391,7 @@ export const PreviewPane = () => {
         {previewSlot}
 
         <div className="px-4 space-y-3 pt-3">
-          {/* Comparing a version is a focused mode — the "Added on"/"Last
-              modified" fields for the current file aren't relevant to the
-              decision at hand, so they make way for the version list. */}
-          {!isComparing && detailsSectionBody}
+          {detailsSectionBody}
           {isVersionedBucket && (
             <PreviewSection title="Versions" count={versionCount} defaultOpen>
               <VersionHistory
@@ -452,12 +442,10 @@ interface VersionCompareWidgetProps {
 }
 
 /**
- * Replaces the top preview slot the moment a noncurrent version is selected,
- * putting the whole panel into a focused comparison mode: this widget stays
- * pinned to the top of the scroll area (`sticky`, within the panel's own
- * scroll container — not the viewport) while the version list scrolls
- * underneath it. Dismissing (the × in its own corner) returns the slot to the
- * plain current-file preview.
+ * Replaces the top preview slot the moment a noncurrent version is selected
+ * — a side-by-side comparison and the restore confirmation in one, so there's
+ * no modal and no silent preview swap. Dismissing (the × in its own corner)
+ * returns the slot to the plain current-file preview.
  */
 const VersionCompareWidget = ({
   mimeType,
@@ -470,7 +458,7 @@ const VersionCompareWidget = ({
   const label = shortVersion(selectedVersion.versionId)
 
   return (
-    <div className="sticky top-0 z-10 space-y-3 border-b border-overlay bg-brand-200 p-3 shadow-sm">
+    <div className="space-y-3 border-b border-overlay bg-brand-200/30 p-3">
       <div className="flex items-center gap-x-1.5">
         <RotateCcw size={13} className="shrink-0 text-brand" />
         <p className="truncate text-sm font-medium text-foreground">
@@ -488,10 +476,7 @@ const VersionCompareWidget = ({
 
       <div className="flex items-center gap-x-2">
         <div className="flex-1 space-y-1.5">
-          <div
-            className="flex items-center justify-center rounded-md border border-brand-400 bg-surface-200"
-            style={{ height: COMPARE_THUMBNAIL_HEIGHT }}
-          >
+          <div className="flex h-24 items-center justify-center rounded-md border border-brand-400 bg-surface-200">
             <VersionThumbnail mimeType={mimeType} isCurrent={false} size={20} />
           </div>
           <p className="truncate text-center font-mono text-[11px] text-brand">
@@ -500,10 +485,7 @@ const VersionCompareWidget = ({
         </div>
         <ArrowRight size={14} className="shrink-0 text-foreground-lighter" />
         <div className="flex-1 space-y-1.5">
-          <div
-            className="flex items-center justify-center rounded-md border border-overlay bg-surface-200"
-            style={{ height: COMPARE_THUMBNAIL_HEIGHT }}
-          >
+          <div className="flex h-24 items-center justify-center rounded-md border border-overlay bg-surface-200">
             <VersionThumbnail mimeType={mimeType} isCurrent size={20} />
           </div>
           <p className="truncate text-center font-mono text-[11px] text-foreground-lighter">
