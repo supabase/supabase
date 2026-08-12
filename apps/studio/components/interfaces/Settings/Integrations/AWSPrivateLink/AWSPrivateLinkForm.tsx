@@ -134,7 +134,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader>
-          <SheetTitle>{isNew ? 'Add Association' : 'Association Details'}</SheetTitle>
+          <SheetTitle>{isNew ? 'Add association' : 'Association details'}</SheetTitle>
           <SheetDescription>
             Connect to your Supabase project from your AWS VPC using AWS PrivateLink.{' '}
             <InlineLink href={`${DOCS_URL}/guides/platform/privatelink`}>Learn more</InlineLink>
@@ -326,7 +326,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
               </Button>
               {isNew && (
                 <Button type="submit" loading={isPending}>
-                  Add Association
+                  Add association
                 </Button>
               )}
             </SheetFooter>
