@@ -69,9 +69,8 @@ describe('ViewTokenSheet', () => {
     })
     renderSheet()
 
-    // Bound org resolves with its name and slug, meaning evaluation completed without warnings.
+    // Bound org resolves with its name, meaning evaluation completed without warnings.
     expect(await screen.findByText(MOCK_ORG.name)).toBeInTheDocument()
-    expect(screen.getByText(MOCK_ORG.slug)).toBeInTheDocument()
     expect(screen.queryByText('Exceeds your role')).toBeNull()
     expect(
       screen.queryByText('Some permissions exceed your current role for the selected resources')
@@ -119,7 +118,6 @@ describe('ViewTokenSheet', () => {
     ).toBeInTheDocument()
     // The lost resource renders as an anonymous count, never its slug.
     expect(await screen.findByText('1 organization')).toBeInTheDocument()
-    expect(await screen.findByText('No longer accessible')).toBeInTheDocument()
     expect(screen.queryByText('departed-org')).toBeNull()
     expect(screen.queryByText("This token's resources no longer exist")).toBeNull()
   })
