@@ -148,6 +148,8 @@ Deno.serve(async (req: Request) => {
   const memoryLimitMb = 150
   const workerTimeoutMs = 1 * 60 * 1000
   const noModuleCache = false
+  // Using a common Import Map for all functions 
+  // to use a scope 'deno.json' it must be dinamically resolved base on the 'service_name'
   const importMapPath = `/home/deno/functions/deno.jsonc`
   const envVarsObj = Deno.env.toObject()
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
