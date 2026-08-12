@@ -1,6 +1,8 @@
 import React from 'react'
 import { Button, cn } from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+
 export type ExplorerToolbarProps = React.ComponentProps<'div'>
 
 /**
@@ -15,7 +17,7 @@ const ExplorerToolbar = ({ className, role = 'toolbar', ...props }: ExplorerTool
     data-slot="explorer-toolbar"
     role={role}
     className={cn(
-      'flex h-10 w-full shrink-0 items-center gap-2 border-b bg-transparent px-3 md:min-h-[var(--header-height,2.5rem)]',
+      'flex h-10 w-full shrink-0 items-center gap-2 border-b bg-transparent px-3',
       className
     )}
     {...props}
@@ -70,7 +72,9 @@ ExplorerToolbarActions.displayName = 'ExplorerToolbarActions'
 export type ExplorerToolbarActionProps = Omit<
   React.ComponentPropsWithRef<typeof Button>,
   'size' | 'variant'
->
+> & {
+  tooltip?: string
+}
 
 /**
  * The standard tiny, text-style button used for a direct toolbar action.
@@ -80,18 +84,20 @@ const ExplorerToolbarAction = ({
   children,
   className,
   ref,
+  tooltip,
   ...props
 }: ExplorerToolbarActionProps) => (
-  <Button
+  <ButtonTooltip
     ref={ref}
     data-slot="explorer-toolbar-action"
     variant="text"
     size="tiny"
     className={cn(children == null && 'w-7 px-0', className)}
+    tooltip={{ content: { side: 'bottom', text: tooltip } }}
     {...props}
   >
     {children}
-  </Button>
+  </ButtonTooltip>
 )
 ExplorerToolbarAction.displayName = 'ExplorerToolbarAction'
 

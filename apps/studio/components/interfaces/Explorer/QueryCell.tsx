@@ -1,8 +1,20 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
-import { Eye, EyeOff, Play, Settings2 } from 'lucide-react'
+import { CodeSquare, Eye, EyeOff, Play, Settings2 } from 'lucide-react'
 import { useState } from 'react'
-import { SQL_ICON } from 'ui'
 
+import {
+  ExplorerQuery,
+  ExplorerQueryEditor,
+  ExplorerQueryFooter,
+  ExplorerQueryResults,
+} from './ExplorerQuery'
+import {
+  ExplorerToolbar,
+  ExplorerToolbarAction,
+  ExplorerToolbarActions,
+  ExplorerToolbarIcon,
+  ExplorerToolbarTitle,
+} from './ExplorerToolbar'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
@@ -24,8 +36,7 @@ interface QueryCellProps {
 export const QueryCell = ({ cell, onCommitChanges }: QueryCellProps) => {
   const { data: project } = useSelectedProjectQuery()
 
-  const title = 'Snippet Title'
-  const { row_limit } = cell
+  const { title = 'Untitled snippet', row_limit } = cell
 
   const [showQuery, setShowQuery] = useState(true)
   const [value, setValue] = useState<string>(cell.unchecked_sql)
@@ -34,7 +45,11 @@ export const QueryCell = ({ cell, onCommitChanges }: QueryCellProps) => {
   const valueRef = useLatest(value)
   const onCommitChangesRef = useLatest(onCommitChanges)
 
-  const { mutateAsync: executeQuery, isPending: isExecuting } = useExecuteSqlMutation({
+  const {
+    mutateAsync: executeQuery,
+    isSuccess,
+    isPending: isExecuting,
+  } = useExecuteSqlMutation({
     onSuccess: (data) => setResults(data.result),
     onError: () => {},
   })
@@ -55,63 +70,54 @@ export const QueryCell = ({ cell, onCommitChanges }: QueryCellProps) => {
 
   return (
     <SortableSection gripClassName="mt-2.5" id={cell.id}>
-      <div className="w-full border rounded bg-surface-200 max-w-6xl mx-auto">
-        <div className="border-b px-3 py-1 flex items-center justify-between">
-          <div className="flex items-center gap-x-2">
-            <SQL_ICON size={14} className="fill-foreground-light w-5 h-4 shrink-0 grow-0 " />
-            <p className="text-sm">{title}</p>
-          </div>
-          <div className="flex items-center gap-x-1">
-            {/* [Joshen] We might be able to re-use BlockViewConfiguration */}
-            <ButtonTooltip
-              variant="text"
-              icon={<Settings2 />}
-              className="px-1"
-              tooltip={{ content: { side: 'bottom', text: 'Display settings' } }}
-            />
-            <ButtonTooltip
-              variant="text"
+      <ExplorerQuery>
+        <ExplorerToolbar>
+          <ExplorerToolbarIcon>
+            <CodeSquare size={14} />
+          </ExplorerToolbarIcon>
+          <ExplorerToolbarTitle>{title}</ExplorerToolbarTitle>
+          <ExplorerToolbarActions>
+            <ExplorerToolbarAction icon={<Settings2 />} tooltip="Display settings" />
+            <ExplorerToolbarAction
               icon={showQuery ? <EyeOff /> : <Eye />}
-              className="px-1"
+              tooltip={showQuery ? 'Hide query' : 'Show query'}
               onClick={() => setShowQuery((prev) => !prev)}
-              tooltip={{
-                content: { side: 'bottom', text: showQuery ? 'Hide query' : 'Show query' },
+            />
+            <ExplorerToolbarAction
+              loading={isExecuting}
+              icon={<Play />}
+              tooltip="Run query"
+              onClick={onRunQuery}
+            />
+          </ExplorerToolbarActions>
+        </ExplorerToolbar>
+
+        {showQuery && (
+          <ExplorerQueryEditor>
+            <CodeEditor
+              language="pgsql"
+              value={value}
+              onInputChange={(v) => setValue(v ?? '')}
+              className="h-32"
+              onMount={(editor) => {
+                editor.onDidBlurEditorWidget(handleCommit)
               }}
             />
-            <ButtonTooltip
-              variant="text"
-              icon={<Play />}
-              className="px-1"
-              loading={isExecuting}
-              onClick={onRunQuery}
-              tooltip={{ content: { side: 'bottom', text: 'Run query' } }}
-            />
-          </div>
-        </div>
+          </ExplorerQueryEditor>
+        )}
 
-        <div className="bg-surface-100">
-          {showQuery && (
-            <div className="border-b">
-              <CodeEditor
-                language="pgsql"
-                value={value}
-                onInputChange={(v) => setValue(v ?? '')}
-                className="h-32"
-                onMount={(editor) => {
-                  editor.onDidBlurEditorWidget(handleCommit)
-                }}
-              />
-            </div>
+        <ExplorerQueryResults className="flex items-center justify-center">
+          {results.length === 0 && !isSuccess && (
+            <p className="text-xs text-foreground-lighter">Run the query to see results</p>
           )}
-          <div className="h-32 flex items-center justify-center">Results</div>
-        </div>
+        </ExplorerQueryResults>
 
-        <div className="border-t px-3 py-1 flex items-center gap-x-2 text-xs font-mono text-foreground-lighter">
+        <ExplorerQueryFooter className="flex items-center gap-x-2">
           <p>{results.length.toLocaleString()} rows</p>
           <p>·</p>
           <p>Limit {row_limit} rows</p>
-        </div>
-      </div>
+        </ExplorerQueryFooter>
+      </ExplorerQuery>
     </SortableSection>
   )
 }
