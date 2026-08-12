@@ -1,7 +1,7 @@
 import { proxy, ref } from 'valtio/vanilla'
 import { describe, expect, it } from 'vitest'
 
-import { sanitizeForCloning } from './ai-assistant-state'
+import { createAiAssistantState, sanitizeForCloning } from './ai-assistant-state'
 
 describe('AI assistant chat message sync', () => {
   // FE-3954: syncing the live array into valtio corrupted it with Proxies, breaking structuredClone in addToolApprovalResponse
@@ -42,5 +42,54 @@ describe('AI assistant chat message sync', () => {
     const replacedMessage = { ...lastMessage, parts: updatedParts }
 
     expect(() => structuredClone(replacedMessage)).not.toThrow()
+  })
+})
+
+describe('AI assistant chat surface isolation', () => {
+  it('creates chats without changing the sidebar selection', () => {
+    const state = createAiAssistantState()
+    const sidebarChatId = state.newChat({ name: 'Sidebar chat' })
+
+    const explorerChatId = state.createChat({ name: 'Explorer chat' })
+
+    expect(explorerChatId).not.toBe(sidebarChatId)
+    expect(state.activeChatId).toBe(sidebarChatId)
+    expect(state.chats[explorerChatId]?.name).toBe('Explorer chat')
+  })
+
+  it('branches a specified chat without changing the sidebar selection', () => {
+    const state = createAiAssistantState()
+    const sidebarChatId = state.newChat({ name: 'Sidebar chat' })
+    const explorerChatId = state.createChat({ name: 'Explorer chat' })
+    state.chats[explorerChatId].messages = [
+      { id: 'message-1', role: 'user', parts: [{ type: 'text', text: 'Hello' }] },
+    ]
+
+    const branchId = state.createBranch(explorerChatId, 'message-1')
+
+    expect(branchId).toBeDefined()
+    expect(state.activeChatId).toBe(sidebarChatId)
+    expect(state.chats[branchId!]?.branchedFrom).toEqual({
+      chatId: explorerChatId,
+      messageId: 'message-1',
+    })
+  })
+
+  it('mutates an explicit chat without changing or clearing the sidebar chat', () => {
+    const state = createAiAssistantState()
+    const sidebarChatId = state.newChat({ name: 'Sidebar chat' })
+    const explorerChatId = state.createChat({ name: 'Explorer chat' })
+    state.chats[sidebarChatId].messages = [
+      { id: 'sidebar-message', role: 'user', parts: [{ type: 'text', text: 'Keep me' }] },
+    ]
+    state.chats[explorerChatId].messages = [
+      { id: 'explorer-message', role: 'user', parts: [{ type: 'text', text: 'Clear me' }] },
+    ]
+
+    state.clearMessages(explorerChatId)
+
+    expect(state.activeChatId).toBe(sidebarChatId)
+    expect(state.chats[sidebarChatId].messages).toHaveLength(1)
+    expect(state.chats[explorerChatId].messages).toHaveLength(0)
   })
 })
