@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
 import {
+  deleteCurrentTrashVersionPermanently,
   deleteNoncurrentVersionPermanently,
   deleteMockTrashObjectsPermanently,
   getMockTrashObjects,
@@ -127,6 +128,43 @@ export const useTrashVersionDeleteMutation = ({
   return useMutation<void, Error, TrashVersionVariables>({
     mutationFn: async (variables) => {
       deleteNoncurrentVersionPermanently(variables.objectId, variables.versionId)
+      await mockDelay(undefined, 400)
+    },
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({
+        queryKey: storageKeys.trash(variables.projectRef, variables.bucketId),
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    onError(error, variables, context) {
+      if (onError === undefined) toast.error(`Failed to delete version: ${error.message}`)
+      else onError(error, variables, context)
+    },
+    ...options,
+  })
+}
+
+type TrashCurrentVersionVariables = {
+  projectRef: string
+  bucketId: string
+  objectId: string
+}
+
+/**
+ * Permanently deletes the version that was live at the moment its object was
+ * archived — the one row of the merged version list that isn't itself in
+ * `TrashObject.noncurrentVersions`. See `deleteCurrentTrashVersionPermanently`
+ * for what happens to the rest of the group.
+ */
+export const useTrashCurrentVersionDeleteMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: UseMutationOptions<void, Error, TrashCurrentVersionVariables> = {}) => {
+  const queryClient = useQueryClient()
+  return useMutation<void, Error, TrashCurrentVersionVariables>({
+    mutationFn: async (variables) => {
+      deleteCurrentTrashVersionPermanently(variables.objectId)
       await mockDelay(undefined, 400)
     },
     async onSuccess(data, variables, context) {

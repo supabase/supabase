@@ -5,6 +5,7 @@ import { ChevronDown, ChevronRight, RotateCcw, Trash2 } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
 import {
+  Badge,
   Checkbox,
   cn,
   Table,
@@ -27,21 +28,21 @@ import {
   useBucketTrashDeleteMutation,
   useBucketTrashQuery,
   useBucketTrashRestoreMutation,
+  useTrashCurrentVersionDeleteMutation,
   useTrashVersionDeleteMutation,
-  useTrashVersionRestoreMutation,
 } from '@/data/storage/protection/bucket-trash-query'
-import {
-  type DeletedObjectVersion,
-  type TrashObject,
-} from '@/data/storage/protection/protection-mocks'
+import { type TrashObject } from '@/data/storage/protection/protection-mocks'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 
 import { toggleSelectAll, toggleSelection } from '../Trash/Trash.utils'
 import { useDeletedFilesContext } from './DeletedFilesContext'
-
-/** Composite key for a version row — unambiguous vs. top-level object ids. */
-const versionKey = (objectId: string, versionId: string) => `${objectId}::${versionId}`
+import {
+  getMergedArchivedVersions,
+  splitDeletedSelection,
+  versionKey,
+  type ArchivedVersionRow,
+} from './DeletedFilesList.utils'
 
 interface DeletedFilesListProps {
   bucketId: string
@@ -67,7 +68,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
   const [fileToDelete, setFileToDelete] = useState<TrashObject>()
   const [versionToDelete, setVersionToDelete] = useState<{
     parentObject: TrashObject
-    version: DeletedObjectVersion
+    version: ArchivedVersionRow
   }>()
   const {
     data: objects,
@@ -77,12 +78,13 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     isSuccess,
   } = useBucketTrashQuery({ projectRef: ref, bucketId })
 
-  // ── Object-level mutations ──────────────────────────────────────────
+  // ── Group-level mutations — restoring un-archives the whole file, whether
+  // triggered from the top-level row or from an individual version row below
+  // it (see `handleVersionRestore`). Deleting permanently here removes the
+  // group and every version under it. ──────────────────────────────────────
 
   const { mutate: restoreObjects, isPending: isRestoring } = useBucketTrashRestoreMutation({
     onSuccess: (_data, variables) => {
-      const count = variables.objectIds.length
-      toast.success(count === 1 ? 'File restored' : `${count} files restored`)
       if (variables.objectIds.includes(selectedDeletedFile?.id ?? '')) {
         setSelectedDeletedFile(undefined)
       }
@@ -102,30 +104,32 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     },
   })
 
-  // ── Version-level mutations ─────────────────────────────────────────
-
-  const { mutate: restoreVersion, isPending: isRestoringVersion } = useTrashVersionRestoreMutation({
-    onSuccess: (_data, variables) => {
-      toast.success(`Version ${variables.versionId.slice(0, 8)} restored`)
-      // Clear version preview if we just restored the previewed version
-      if (selectedDeletedVersion?.version.versionId === variables.versionId) {
-        setSelectedDeletedVersion(undefined)
-      }
-      // Remove from selection
-      const key = versionKey(variables.objectId, variables.versionId)
-      setSelectedDeletedIds(selectedDeletedIds.filter((id) => id !== key))
-    },
-  })
+  // ── Version-level mutations — only for permanently deleting one version
+  // out of the group; there's no version-level restore endpoint since
+  // restoring any version un-archives the whole group (see above). Which
+  // mutation a delete dispatches to depends on whether the row is the
+  // synthetic "was current at archive" one or a genuine noncurrent version. ─
 
   const { mutate: deleteVersionPermanently, isPending: isDeletingVersion } =
     useTrashVersionDeleteMutation({
       onSuccess: (_data, variables) => {
         toast.success(`Version ${variables.versionId.slice(0, 8)} permanently deleted`)
         setVersionToDelete(undefined)
-        if (selectedDeletedVersion?.version.versionId === variables.versionId) {
-          setSelectedDeletedVersion(undefined)
-        }
         const key = versionKey(variables.objectId, variables.versionId)
+        setSelectedDeletedIds(selectedDeletedIds.filter((id) => id !== key))
+      },
+    })
+
+  const { mutate: deleteCurrentVersionPermanently, isPending: isDeletingCurrentVersion } =
+    useTrashCurrentVersionDeleteMutation({
+      onSuccess: (_data, variables) => {
+        toast.success('Version permanently deleted')
+        setVersionToDelete(undefined)
+        // The synthetic "was current at archive" row's versionId is the
+        // object's own id (see `getMergedArchivedVersions`) — only that one
+        // key stops being valid; every other version under this object is
+        // untouched by this mutation.
+        const key = versionKey(variables.objectId, variables.objectId)
         setSelectedDeletedIds(selectedDeletedIds.filter((id) => id !== key))
       },
     })
@@ -143,7 +147,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
   if (isError) {
     return (
       <div className="p-4">
-        <AlertError error={error} subject="Failed to retrieve deleted versions" />
+        <AlertError error={error} subject="Failed to retrieve archived files" />
       </div>
     )
   }
@@ -158,11 +162,11 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
       <div className="p-4">
         <Admonition
           type="default"
-          title={searchString.length > 0 ? 'No matching deleted versions' : 'No deleted versions'}
+          title={searchString.length > 0 ? 'No matching archived files' : 'No archived files'}
           description={
             searchString.length > 0
-              ? 'No deleted versions match your search.'
-              : 'Deleted versions appear here and can be restored until an expiration policy removes them.'
+              ? 'No archived files match your search.'
+              : 'Files and their version history appear here once archived (soft-deleted), and can be restored until an expiration policy removes them.'
           }
         />
       </div>
@@ -173,8 +177,8 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
 
   const orderedIds = filtered.flatMap((o) => {
     const ids = [o.id]
-    if (expandedVersionIds.has(o.id) && o.noncurrentVersions) {
-      for (const v of o.noncurrentVersions) {
+    if (expandedVersionIds.has(o.id)) {
+      for (const v of getMergedArchivedVersions(o)) {
         ids.push(versionKey(o.id, v.versionId))
       }
     }
@@ -206,20 +210,28 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
 
   const handleRestore = (object: TrashObject) => {
     if (!ref) return
-    restoreObjects({ projectRef: ref, bucketId, objectIds: [object.id] })
+    restoreObjects(
+      { projectRef: ref, bucketId, objectIds: [object.id] },
+      { onSuccess: () => toast.success('File restored') }
+    )
   }
 
-  const handleVersionRestore = (parent: TrashObject, version: DeletedObjectVersion) => {
+  const handleVersionRestore = (parent: TrashObject, version: ArchivedVersionRow) => {
     if (!ref) return
-    restoreVersion({
-      projectRef: ref,
-      bucketId,
-      objectId: parent.id,
-      versionId: version.versionId,
-    })
+    restoreObjects(
+      { projectRef: ref, bucketId, objectIds: [parent.id] },
+      {
+        onSuccess: () =>
+          toast.success(
+            version.wasCurrentAtArchive
+              ? 'File restored'
+              : `File restored — version ${version.versionId.slice(0, 8)} is now the current version`
+          ),
+      }
+    )
   }
 
-  const handleVersionDelete = (parent: TrashObject, version: DeletedObjectVersion) => {
+  const handleVersionDelete = (parent: TrashObject, version: ArchivedVersionRow) => {
     setVersionToDelete({ parentObject: parent, version })
   }
 
@@ -235,10 +247,6 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     })
   }
 
-  const totalVersionCount = (object: TrashObject) => {
-    return 1 + (object.noncurrentVersions?.length ?? 0)
-  }
-
   // ── Preview handlers ────────────────────────────────────────────────
 
   const handleSelectObject = (object: TrashObject) => {
@@ -246,7 +254,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
     setSelectedDeletedVersion(undefined)
   }
 
-  const handleSelectVersion = (parent: TrashObject, version: DeletedObjectVersion) => {
+  const handleSelectVersion = (parent: TrashObject, version: ArchivedVersionRow) => {
     setSelectedDeletedVersion({ parentObject: parent, version })
     setSelectedDeletedFile(undefined)
   }
@@ -261,12 +269,12 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                 checked={isAllSelected}
                 className={cn(isSomeSelected && 'opacity-60')}
                 onClick={handleToggleAll}
-                aria-label="Select all deleted versions"
+                aria-label="Select all archived files"
               />
             </TableHead>
             <TableHead>Object</TableHead>
             <TableHead>Original location</TableHead>
-            <TableHead>Deleted</TableHead>
+            <TableHead>Archived</TableHead>
             <TableHead className="text-right">Size</TableHead>
             <TableHead />
           </TableRow>
@@ -276,8 +284,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
             const isChecked = selectedDeletedIds.includes(object.id)
             const isPreviewed =
               selectedDeletedFile?.id === object.id && selectedDeletedVersion === undefined
-            const hasVersions =
-              object.noncurrentVersions !== undefined && object.noncurrentVersions.length > 0
+            const mergedVersions = getMergedArchivedVersions(object)
             const isExpanded = expandedVersionIds.has(object.id)
 
             return (
@@ -303,24 +310,20 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                   </TableCell>
                   <TableCell className="px-4 py-2">
                     <div className="flex items-center gap-x-2">
-                      {hasVersions && (
-                        <button
-                          className="flex items-center text-foreground-lighter hover:text-foreground transition-colors"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            toggleExpanded(object.id)
-                          }}
-                          aria-label={isExpanded ? 'Collapse versions' : 'Expand versions'}
-                        >
-                          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                        </button>
-                      )}
+                      <button
+                        className="flex items-center text-foreground-lighter hover:text-foreground transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          toggleExpanded(object.id)
+                        }}
+                        aria-label={isExpanded ? 'Collapse versions' : 'Expand versions'}
+                      >
+                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      </button>
                       <span className="text-foreground">{object.name}</span>
-                      {hasVersions && (
-                        <span className="text-xs text-foreground-muted">
-                          {totalVersionCount(object)} versions
-                        </span>
-                      )}
+                      <span className="text-xs text-foreground-muted">
+                        {mergedVersions.length} version{mergedVersions.length === 1 ? '' : 's'}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="px-4 py-2 font-mono text-xs text-foreground-lighter">
@@ -351,7 +354,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                             side: 'bottom',
                             text: !canUpdateFiles
                               ? 'You need additional permissions to restore files'
-                              : 'Restore all versions',
+                              : 'Restore latest version',
                           },
                         }}
                       />
@@ -374,26 +377,28 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
                   </TableCell>
                 </TableRow>
 
-                {hasVersions &&
-                  isExpanded &&
-                  object.noncurrentVersions!.map((version, index) => {
+                {isExpanded &&
+                  mergedVersions.map((version, index) => {
                     const key = versionKey(object.id, version.versionId)
                     const isVersionChecked = selectedDeletedIds.includes(key)
                     const isVersionPreviewed =
                       selectedDeletedVersion?.version.versionId === version.versionId &&
                       selectedDeletedVersion?.parentObject.id === object.id
-                    const isLastVersion = index === object.noncurrentVersions!.length - 1
+                    const isLastVersion = index === mergedVersions.length - 1
+                    const isDeletingThisVersion = version.wasCurrentAtArchive
+                      ? isDeletingCurrentVersion
+                      : isDeletingVersion
 
                     return (
-                      <NoncurrentVersionRow
+                      <ArchivedVersionTableRow
                         key={version.versionId}
                         version={version}
-                        parentObject={object}
                         isChecked={isVersionChecked}
                         isPreviewed={isVersionPreviewed}
                         isLast={isLastVersion}
                         canUpdateFiles={canUpdateFiles}
-                        isRestoring={isRestoringVersion}
+                        isRestoring={isRestoring}
+                        isDeleting={isDeletingThisVersion}
                         onToggleSelect={(isShiftHeld) => handleToggle(key, isShiftHeld)}
                         onClick={() => handleSelectVersion(object, version)}
                         onRestore={() => handleVersionRestore(object, version)}
@@ -437,57 +442,79 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
         title="Permanently delete version"
         confirmLabel="Delete permanently"
         confirmLabelLoading="Deleting..."
-        loading={isDeletingVersion}
+        loading={isDeletingVersion || isDeletingCurrentVersion}
         onCancel={() => setVersionToDelete(undefined)}
         onConfirm={() => {
           if (!ref || !versionToDelete) return
-          deleteVersionPermanently({
-            projectRef: ref,
-            bucketId,
-            objectId: versionToDelete.parentObject.id,
-            versionId: versionToDelete.version.versionId,
-          })
+          if (versionToDelete.version.wasCurrentAtArchive) {
+            deleteCurrentVersionPermanently({
+              projectRef: ref,
+              bucketId,
+              objectId: versionToDelete.parentObject.id,
+            })
+          } else {
+            deleteVersionPermanently({
+              projectRef: ref,
+              bucketId,
+              objectId: versionToDelete.parentObject.id,
+              versionId: versionToDelete.version.versionId,
+            })
+          }
         }}
       >
         <p className="text-sm text-foreground-light">
-          Version{' '}
-          <span className="font-mono text-foreground">
-            {versionToDelete?.version.versionId.slice(0, 8)}
-          </span>{' '}
-          of {versionToDelete?.parentObject.name} will be permanently deleted. This action cannot be
-          undone.
+          {versionToDelete?.version.wasCurrentAtArchive ? (
+            <>
+              The version of {versionToDelete?.parentObject.name} that was current when it was
+              archived will be permanently deleted
+              {(versionToDelete?.parentObject.noncurrentVersions?.length ?? 0) > 0
+                ? ' — its next most recent version becomes the one shown here'
+                : ', leaving nothing left to restore'}
+              . This action cannot be undone.
+            </>
+          ) : (
+            <>
+              Version{' '}
+              <span className="font-mono text-foreground">
+                {versionToDelete?.version.versionId.slice(0, 8)}
+              </span>{' '}
+              of {versionToDelete?.parentObject.name} will be permanently deleted. This action
+              cannot be undone.
+            </>
+          )}
         </p>
       </ConfirmationModal>
     </>
   )
 }
 
-interface NoncurrentVersionRowProps {
-  version: DeletedObjectVersion
-  parentObject: TrashObject
+interface ArchivedVersionTableRowProps {
+  version: ArchivedVersionRow
   isChecked: boolean
   isPreviewed: boolean
   isLast: boolean
   canUpdateFiles: boolean
   isRestoring: boolean
+  isDeleting: boolean
   onToggleSelect: (isShiftHeld: boolean) => void
   onClick: () => void
   onRestore: () => void
   onDelete: () => void
 }
 
-const NoncurrentVersionRow = ({
+const ArchivedVersionTableRow = ({
   version,
   canUpdateFiles,
   isChecked,
   isPreviewed,
   isLast,
   isRestoring,
+  isDeleting,
   onToggleSelect,
   onClick,
   onRestore,
   onDelete,
-}: NoncurrentVersionRowProps) => {
+}: ArchivedVersionTableRowProps) => {
   const shortId = `${version.versionId.slice(0, 8)}`
 
   return (
@@ -520,8 +547,16 @@ const NoncurrentVersionRow = ({
         <div className="absolute left-[23px] top-1/2 h-px w-[8px] -translate-y-px bg-[hsl(0_0%_80%)] dark:bg-[hsl(0_0%_30%)] pointer-events-none" />
         {/* Content aligned after horizontal branch with gap */}
         <div className="flex items-center gap-x-2 pl-[36px]">
-          <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
-          <span className="text-foreground-muted text-xs">({version.action})</span>
+          {version.wasCurrentAtArchive ? (
+            <Badge variant="default" className="font-mono text-[10px]">
+              Was current
+            </Badge>
+          ) : (
+            <>
+              <span className="text-foreground-lighter font-mono text-xs">{shortId}</span>
+              <span className="text-foreground-muted text-xs">({version.action})</span>
+            </>
+          )}
         </div>
       </TableCell>
       <TableCell className="px-4 py-1.5 text-foreground-lighter text-xs">
@@ -544,7 +579,9 @@ const NoncurrentVersionRow = ({
                 side: 'bottom',
                 text: !canUpdateFiles
                   ? 'You need additional permissions to restore files'
-                  : 'Restore to current',
+                  : version.wasCurrentAtArchive
+                    ? 'Restore latest version'
+                    : 'Restore — this version becomes current',
               },
             }}
           />
@@ -552,6 +589,7 @@ const NoncurrentVersionRow = ({
             variant="danger"
             size="tiny"
             icon={<Trash2 size={12} />}
+            loading={isDeleting}
             disabled={!canUpdateFiles}
             onClick={onDelete}
             tooltip={{

@@ -448,12 +448,37 @@ export const deleteNoncurrentVersionPermanently = (
 }
 
 /**
- * Restores a noncurrent version from trash. In a real implementation this
- * would promote it to the current version of the live object. For the
- * prototype we simply remove it from the trash entry.
+ * Permanently deletes the version that was live the moment this object was
+ * archived — the one row of the merged version list that isn't in
+ * `noncurrentVersions` (it's represented by the object's own `size`/
+ * `deletedAt` instead, since that's the delete marker's abstracted-away
+ * predecessor). The next most recent noncurrent version, if any, is promoted
+ * to take its place; if there wasn't one, there's nothing left worth keeping
+ * archived, so the whole group is dropped — equivalent to a full permanent
+ * delete.
  */
-export const restoreNoncurrentVersion = (objectId: string, versionId: string): TrashObject[] => {
-  return deleteNoncurrentVersionPermanently(objectId, versionId)
+export const deleteCurrentTrashVersionPermanently = (objectId: string): TrashObject[] => {
+  trashObjects = trashObjects.flatMap((obj) => {
+    if (obj.id !== objectId) return [obj]
+    const [next, ...rest] = obj.noncurrentVersions ?? []
+    if (!next) return []
+    return [{ ...obj, size: next.size, noncurrentVersions: rest }]
+  })
+  return [...trashObjects]
+}
+
+/**
+ * Restores a single version from trash. Every version in an archived
+ * object's history sits behind the same delete marker, so restoring any one
+ * of them — not just the one that was live when it was archived — un-archives
+ * the whole group and removes that marker; there's no such thing as
+ * restoring just one version while the rest stays archived. `versionId` only
+ * distinguishes which version the caller wants surfaced as current in its
+ * own toast copy — the mock itself doesn't have a live object store to
+ * promote it into, so it's otherwise unused here.
+ */
+export const restoreNoncurrentVersion = (objectId: string, _versionId: string): TrashObject[] => {
+  return restoreMockTrashObjects([objectId])
 }
 
 export interface BucketRetentionSummary {

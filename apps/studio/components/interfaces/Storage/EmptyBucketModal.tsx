@@ -79,7 +79,7 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
             <Admonition
               type="warning"
               title="This bucket has retained versions"
-              description="Emptying will also permanently delete every noncurrent version and every file currently in the deleted files trash, whether or not versioning is still active. Nothing will be recoverable."
+              description="Emptying will also permanently delete every noncurrent version and every archived (soft-deleted) file, whether or not versioning is still active. Nothing will be recoverable."
             />
           )}
         </DialogSection>

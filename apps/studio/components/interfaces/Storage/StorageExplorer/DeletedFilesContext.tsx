@@ -9,14 +9,13 @@ import {
   type SetStateAction,
 } from 'react'
 
-import {
-  type DeletedObjectVersion,
-  type TrashObject,
-} from '@/data/storage/protection/protection-mocks'
+import { type TrashObject } from '@/data/storage/protection/protection-mocks'
+
+import { type ArchivedVersionRow } from './DeletedFilesList.utils'
 
 export interface SelectedDeletedVersion {
   parentObject: TrashObject
-  version: DeletedObjectVersion
+  version: ArchivedVersionRow
 }
 
 interface DeletedFilesContextValue {

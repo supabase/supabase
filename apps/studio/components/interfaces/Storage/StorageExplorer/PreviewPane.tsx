@@ -552,7 +552,7 @@ interface PreviewSectionProps {
  * expands to reveal its body. Header borders separate sections cleanly when
  * multiple are stacked.
  */
-const PreviewSection = ({ title, count, defaultOpen = false, children }: PreviewSectionProps) => {
+export const PreviewSection = ({ title, count, defaultOpen = false, children }: PreviewSectionProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen)
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>

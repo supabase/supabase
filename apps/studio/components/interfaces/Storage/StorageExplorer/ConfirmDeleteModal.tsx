@@ -40,8 +40,8 @@ export const ConfirmDeleteModal = () => {
   const alertDescription =
     isSingleFile && hasVersioningHistory(selectedBucket?.id) ? (
       <>
-        {description} This soft-deletes the object and all its versions — you can restore them
-        from the deleted versions view.
+        {description} This archives the object and all its versions — you can restore them from
+        the archived files view.
       </>
     ) : (
       description

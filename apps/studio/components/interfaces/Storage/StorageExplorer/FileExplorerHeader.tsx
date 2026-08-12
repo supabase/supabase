@@ -357,7 +357,7 @@ export const FileExplorerHeader = ({
                     ]
                   : undefined
               }
-              placeholder={isShowingDeleted ? 'Search deleted versions...' : searchPlaceholder}
+              placeholder={isShowingDeleted ? 'Search archived files...' : searchPlaceholder}
               type="text"
               value={itemSearchString}
               onChange={onSearchChange}
@@ -366,16 +366,16 @@ export const FileExplorerHeader = ({
             {isVersioned && (
               <div className="flex items-center gap-1.5">
                 <Switch
-                  id="show-deleted-versions"
+                  id="show-archived"
                   size="small"
                   checked={isShowingDeleted}
                   onCheckedChange={setIsShowingDeleted}
                 />
                 <Label
-                  htmlFor="show-deleted-versions"
+                  htmlFor="show-archived"
                   className="text-xs cursor-pointer whitespace-nowrap text-foreground-light"
                 >
-                  Show deleted versions
+                  Show archived
                 </Label>
               </div>
             )}
