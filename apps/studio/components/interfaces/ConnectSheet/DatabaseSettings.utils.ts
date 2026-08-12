@@ -248,7 +248,7 @@ export const buildConnectionStringPooler = ({
   isHighAvailability,
 }: {
   deploymentMode: DeploymentMode
-  connectionInfo: { db_host: string; db_port: number | string }
+  connectionInfo: { db_host: string; db_port: number | string; db_host_direct?: string }
   connectionStringsShared: { direct: ConnectionStrings; pooler: ConnectionStrings }
   connectionStringsDedicated?: { direct: ConnectionStrings; pooler: ConnectionStrings }
   ipv4Addon: boolean
@@ -257,9 +257,12 @@ export const buildConnectionStringPooler = ({
   if (deploymentMode.isSelfHosted) {
     const dbHost = connectionInfo.db_host
     const dbPort = connectionInfo.db_port || 5432
+    // Pooler (Supavisor) is exposed at the gateway host; the direct connection
+    // points at Postgres itself, which the operator can host elsewhere.
+    const directHost = connectionInfo.db_host_direct || dbHost
     const sessionPool = getSelfHostedPoolerStrings(dbHost, dbPort)
     const transactionPool = getSelfHostedPoolerStrings(dbHost, 6543)
-    const directConn = getSelfHostedDirectStrings(dbHost, dbPort)
+    const directConn = getSelfHostedDirectStrings(directHost, dbPort)
     return {
       transactionShared: transactionPool.uri,
       sessionShared: sessionPool.uri,

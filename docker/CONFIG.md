@@ -87,7 +87,7 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | `DEFAULT_PROJECT_NAME` | string | Self-hosted | Name shown for the single default project on the dashboard. | Mapped from `STUDIO_DEFAULT_PROJECT` in `.env.example`. Default: `Default Project`. |
 | `HOSTNAME` | string | Both | Network interface Next.js binds to inside the container. | Set to `0.0.0.0` so the container is reachable from outside. |
 | `POSTGRES_DB` | string | Self-hosted | Postgres database name used for Studio's internal connections. | Default: `postgres`. |
-| `POSTGRES_HOST` | string | Self-hosted | Postgres host (service name in compose network). | Default: `db`. |
+| `POSTGRES_HOST` | string | Self-hosted | Postgres host used for Studio's internal connections. When set to a value other than the default `db`, it's also advertised in the direct connection string shown in the dashboard (for running Postgres outside the compose network). | Default: `db` (compose service name). |
 | `POSTGRES_PASSWORD` | string | Both | Postgres password for the `POSTGRES_USER_READ_WRITE` role. | Supports `_FILE` suffix for Docker secrets. |
 | `POSTGRES_PORT` | integer | Self-hosted | Postgres TCP port. | Default: `5432`. |
 | `POSTGRES_USER_READ_ONLY` | string | | Postgres role used by the local MCP server when running in read-only mode. | Default: `supabase_read_only_user`. This role has no password by default, so read-only MCP will fail to connect. To enable, assign a password matching `POSTGRES_PASSWORD`. |

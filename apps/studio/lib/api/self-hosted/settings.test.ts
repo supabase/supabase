@@ -47,6 +47,8 @@ describe('api/self-hosted/settings', () => {
 
       expect(settings.cloud_provider).toBe('AWS')
       expect(settings.db_host).toBe('localhost')
+      // POSTGRES_HOST unset → internal default `db` → falls back to db_host
+      expect(settings.db_host_direct).toBe('localhost')
       expect(settings.db_name).toBe('postgres')
       expect(settings.db_port).toBe(5432)
       expect(settings.db_user).toBe('postgres')
@@ -113,6 +115,19 @@ describe('api/self-hosted/settings', () => {
       const settings = getSettings()
 
       expect(settings.name).toBe('Default Project')
+    })
+
+    it('should advertise POSTGRES_HOST in db_host_direct when set to a real host', async () => {
+      vi.stubEnv('POSTGRES_HOST', 'mydb.example.com')
+
+      // Re-import so ./constants picks up the stubbed env
+      vi.resetModules()
+      const { getProjectSettings: getSettings } = await import('./settings')
+      const settings = getSettings()
+
+      // Direct connection points at Postgres; db_host stays the gateway host
+      expect(settings.db_host_direct).toBe('mydb.example.com')
+      expect(settings.db_host).toBe('localhost')
     })
 
     it('should have correct db_ip_addr_config', () => {

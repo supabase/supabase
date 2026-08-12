@@ -15,6 +15,9 @@ type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_co
 }
 export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
   app_config?: ProjectAppConfig
+  // Self-hosted only: host for the direct connection string, which can differ
+  // from db_host (the public gateway) when Postgres runs elsewhere.
+  db_host_direct?: string
 }
 
 export async function getProjectSettings(

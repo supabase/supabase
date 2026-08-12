@@ -167,6 +167,42 @@ describe('buildConnectionStringPooler', () => {
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
   })
 
+  test('self-hosted: direct uses db_host_direct while pooler stays on db_host', () => {
+    const result = buildConnectionStringPooler({
+      deploymentMode: selfHosted,
+      // Postgres runs elsewhere (e.g. a managed host), Supavisor at the gateway
+      connectionInfo: {
+        db_host: 'supabase.example.com',
+        db_host_direct: 'mydb.example.com',
+        db_port: 5432,
+      },
+      connectionStringsShared: sharedPlatform,
+      ipv4Addon: false,
+      isHighAvailability: false,
+    })
+
+    // Pooler strings keep the gateway host
+    expect(result.transactionShared).toContain('@supabase.example.com:6543/postgres')
+    expect(result.sessionShared).toContain('@supabase.example.com:5432/postgres')
+    // Direct string points at the Postgres host
+    expect(result.direct).toBe(
+      'postgresql://postgres:[YOUR-PASSWORD]@mydb.example.com:5432/postgres'
+    )
+  })
+
+  test('self-hosted: direct falls back to db_host when db_host_direct is unset', () => {
+    const result = buildConnectionStringPooler({
+      deploymentMode: selfHosted,
+      connectionInfo: { db_host: 'supabase.example.com', db_port: 5432 },
+      connectionStringsShared: sharedPlatform,
+      ipv4Addon: false,
+      isHighAvailability: false,
+    })
+    expect(result.direct).toBe(
+      'postgresql://postgres:[YOUR-PASSWORD]@supabase.example.com:5432/postgres'
+    )
+  })
+
   test('self-hosted: falls back to port 5432 when db_port is unset', () => {
     const result = buildConnectionStringPooler({
       deploymentMode: selfHosted,
