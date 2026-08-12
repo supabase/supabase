@@ -31,6 +31,9 @@ import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { BroomSparklesIcon } from '../BroomSparklesIcon'
+import { getMockBucketProtection, type ExpirationMode } from '../StorageProtection.constants'
+import { computeVersionFate, type VersionFate } from './VersionHistory.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import {
@@ -41,10 +44,6 @@ import {
 import { type ObjectVersion } from '@/data/storage/protection/protection-mocks'
 import { formatBytes } from '@/lib/helpers'
 
-import { BroomSparklesIcon } from '../BroomSparklesIcon'
-import { getMockBucketProtection, type ExpirationMode } from '../StorageProtection.constants'
-import { computeVersionFate, type VersionFate } from './VersionHistory.utils'
-
 interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
@@ -53,6 +52,7 @@ interface VersionHistoryProps {
   mimeType?: string
   previewedVersionId?: string
   onPreview?: (version: ObjectVersion) => void
+  clearPreview: () => void
 }
 
 export const shortVersion = (versionId: string) => `${versionId.slice(0, 6)}…${versionId.slice(-2)}`
@@ -64,6 +64,7 @@ export const VersionHistory = ({
   mimeType,
   previewedVersionId,
   onPreview,
+  clearPreview,
 }: VersionHistoryProps) => {
   const {
     data: versions,
@@ -141,19 +142,20 @@ export const VersionHistory = ({
           {versions.map((version) => {
             const isSelected = previewedVersionId === version.versionId
             const fate = version.isCurrent ? undefined : fateByVersionId.get(version.versionId)
+
             return (
               <li
                 key={version.versionId}
                 role="button"
                 tabIndex={0}
                 className={cn(
-                  'group -mx-2 flex items-center gap-x-2.5 rounded-md px-2 py-1.5',
-                  onPreview && !version.isCurrent && 'cursor-pointer',
+                  'group -mx-2 flex items-center gap-x-2.5 rounded-md px-2 py-1.5 cursor-pointer',
                   isSelected ? 'bg-brand-200' : 'hover:bg-surface-200'
                 )}
-                onClick={() => !version.isCurrent && onPreview?.(version)}
+                onClick={() => (version.isCurrent ? clearPreview() : onPreview?.(version))}
                 onKeyDown={(e) => {
-                  if ((e.key === 'Enter' || e.key === ' ') && !version.isCurrent) onPreview?.(version)
+                  if (e.key === 'Enter' || e.key === ' ')
+                    version.isCurrent ? clearPreview : onPreview?.(version)
                 }}
               >
                 <VersionThumbnail mimeType={mimeType} isCurrent={version.isCurrent} />
@@ -162,7 +164,7 @@ export const VersionHistory = ({
                   <p
                     className={cn(
                       'truncate text-sm text-foreground',
-                      onPreview && !version.isCurrent && 'group-hover:underline'
+                      onPreview && 'group-hover:underline'
                     )}
                   >
                     {dayjs(version.createdAt).format('MMM D, HH:mm')}
@@ -390,41 +392,39 @@ const PolicyRow = ({ cap, expiryDays, mode }: PolicyRowProps) => {
 
   return (
     <div className="space-y-1.5">
-      <div className="flex items-center gap-x-1.5">
-        <BroomSparklesIcon size={13} className="shrink-0 text-foreground-lighter" />
-        {hasExpiryDays && <PolicyChip>{expiryDays}d</PolicyChip>}
-        {hasBoth && <PolicyOperatorChip mode={mode} />}
-        {hasCap && <PolicyChip>{cap} retained</PolicyChip>}
-        {hasExpiryDays && !hasCap && (
-          <span className="font-mono text-[11px] text-foreground-lighter">no cap</span>
-        )}
-        {hasCap && !hasExpiryDays && (
-          <span className="font-mono text-[11px] text-foreground-lighter">no age limit</span>
-        )}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <span className="ml-auto shrink-0 cursor-help text-foreground-lighter">
-              <Info size={13} />
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side="top" className="max-w-64 space-y-1.5">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center gap-x-2">
+            <BroomSparklesIcon size={16} className="shrink-0 text-foreground-lighter mr-1" />
+            <div className="flex items-center gap-x-1">
+              {hasExpiryDays && <PolicyChip>{expiryDays}d</PolicyChip>}
+              {hasBoth && <PolicyOperatorChip mode={mode} />}
+              {hasCap && <PolicyChip>{cap} noncurrent v. retained</PolicyChip>}
+            </div>
+            {hasExpiryDays && !hasCap && (
+              <span className="font-mono text-[11px] text-foreground-lighter">
+                — no retention cap
+              </span>
+            )}
+            {hasCap && !hasExpiryDays && (
+              <span className="font-mono text-[11px] text-foreground-lighter">— no age limit</span>
+            )}
+            <Info size={13} className="text-foreground-lighter" />
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-64 space-y-1.5 pt-2.5">
+          <div className="flex items-center gap-x-1">
+            <BroomSparklesIcon size={16} className="shrink-0 mr-1" />
             <p className="font-medium text-foreground">Expiration policy</p>
-            <p className="text-foreground-light">
-              <PolicyFullRule cap={cap} expiryDays={expiryDays} mode={mode} />
-            </p>
-            <button
-              type="button"
-              className={cn(InlineLinkClassName, 'block text-foreground-light')}
-              onClick={() => setShowEditBucketModal(true)}
-            >
-              Edit bucket settings
-            </button>
-          </TooltipContent>
-        </Tooltip>
-      </div>
-      <p className="text-xs leading-relaxed text-foreground-lighter">
-        <PolicyExplanation cap={cap} expiryDays={expiryDays} mode={mode} />
-      </p>
+          </div>
+          <p className="text-foreground-light">
+            <PolicyFullRule cap={cap} expiryDays={expiryDays} mode={mode} />
+          </p>
+          <Button variant="default" onClick={() => setShowEditBucketModal(true)}>
+            View bucket settings
+          </Button>
+        </TooltipContent>
+      </Tooltip>
     </div>
   )
 }
@@ -435,9 +435,7 @@ const PolicyRow = ({ cap, expiryDays, mode }: PolicyRowProps) => {
 const POLICY_CHIP_CLASSNAME = 'rounded-sm border px-1.5 py-0.5 font-mono text-[10.5px]'
 
 const PolicyChip = ({ children }: { children: ReactNode }) => (
-  <span
-    className={cn(POLICY_CHIP_CLASSNAME, 'border-strong bg-surface-300 text-foreground-light')}
-  >
+  <span className={cn(POLICY_CHIP_CLASSNAME, 'border-strong bg-surface-300 text-foreground-light')}>
     {children}
   </span>
 )
@@ -446,43 +444,13 @@ const PolicyOperatorChip = ({ mode }: { mode: ExpirationMode }) => (
   <span
     className={cn(
       POLICY_CHIP_CLASSNAME,
-      'uppercase tracking-wide text-foreground-lighter',
-      mode === 'and' ? 'border-strong bg-surface-300' : 'border-dashed border-strong'
+      'uppercase tracking-wide text-foreground-lighter border-dashed',
+      mode === 'and' ? 'border-strong bg-surface-300' : 'border-strong'
     )}
   >
     {mode === 'and' ? 'Both' : 'Either'}
   </span>
 )
-
-const PolicyExplanation = ({ cap, expiryDays, mode }: PolicyRowProps) => {
-  const hasCap = cap !== null && cap > 0
-  const hasExpiryDays = expiryDays !== null && expiryDays > 0
-
-  if (hasCap && hasExpiryDays) {
-    return mode === 'and' ? (
-      <>
-        Versions beyond the {cap} newest are on a {expiryDays}-day clock. The rest are kept
-        until newer uploads push them past the cap.
-      </>
-    ) : (
-      <>
-        A version goes as soon as it passes {expiryDays}d or falls beyond the {cap} newest —
-        whichever comes first.
-      </>
-    )
-  }
-
-  if (hasExpiryDays) {
-    return (
-      <>
-        Age is the only rule, so every version has a fixed expiry date from the day it stopped
-        being current.
-      </>
-    )
-  }
-
-  return <>Age is irrelevant — nothing expires until a new upload pushes the oldest past the cap.</>
-}
 
 const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRowProps) => {
   const hasCap = cap !== null && cap > 0
@@ -491,13 +459,13 @@ const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRowProps) => {
   if (hasCap && hasExpiryDays) {
     return mode === 'and' ? (
       <>
-        A noncurrent version is permanently deleted only once it's both older than{' '}
+        A noncurrent version is permanently deleted only once it's <em>both</em> older than{' '}
         {expiryDays} days and beyond the {cap} newest noncurrent versions.
       </>
     ) : (
       <>
-        A noncurrent version is permanently deleted as soon as it's either older than{' '}
-        {expiryDays} days or beyond the {cap} newest noncurrent versions.
+        A noncurrent version is permanently deleted as soon as it's <em>either</em> older than{' '}
+        {expiryDays} days <em>or</em> beyond the {cap} newest noncurrent versions.
       </>
     )
   }
@@ -508,8 +476,7 @@ const PolicyFullRule = ({ cap, expiryDays, mode }: PolicyRowProps) => {
 
   return (
     <>
-      Only the {cap} newest noncurrent versions are kept. Older ones are deleted on the next
-      upload.
+      Only the {cap} newest noncurrent versions are kept. Older ones are deleted on the next upload.
     </>
   )
 }
