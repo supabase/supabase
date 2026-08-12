@@ -11,6 +11,8 @@ interface QueryResultChartProps {
   result?: QueryResult
 }
 
+// [Joshen] Will need to implement log scale - refer to QueryBlock.tsx `effectiveLogScale`
+
 export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
   const { chart } = cell
   const { type, x_column, y_column, cumulative, show_labels } = chart ?? {}

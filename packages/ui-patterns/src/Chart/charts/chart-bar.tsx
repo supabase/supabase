@@ -22,10 +22,14 @@ const CHART_COLORS = {
   BRAND_HOVER: 'hsl(var(--brand-500))',
 }
 
-export type ChartBarTick = {
-  timestamp: string
-  [key: string]: string | number
-}
+export type ChartBarTick =
+  | {
+      timestamp: string
+      [key: string]: string | number
+    }
+  | {
+      [key: string]: string | number
+    }
 
 export type ChartHighlight = {
   handleMouseDown: (e: { activeLabel?: string; coordinates?: string }) => void
@@ -45,6 +49,7 @@ export type ChartHighlightAction = {
 
 export interface ChartBarProps {
   data: ChartBarTick[]
+  xKey?: string
   dataKey: string
   config?: ChartConfig
   onBarClick?: (datum: ChartBarTick, tooltipData?: CategoricalChartState) => void
@@ -59,6 +64,7 @@ export interface ChartBarProps {
   cursor?: string
   showGrid?: boolean
   showYAxis?: boolean
+  showXAxis?: boolean
   YAxisProps?: {
     tick?: boolean
     tickFormatter?: (value: any) => string
@@ -69,6 +75,7 @@ export interface ChartBarProps {
 
 export const ChartBar = ({
   data,
+  xKey = 'timestamp',
   dataKey,
   config,
   onBarClick,
@@ -83,6 +90,7 @@ export const ChartBar = ({
   cursor,
   showGrid = false,
   showYAxis = false,
+  showXAxis = false,
   YAxisProps,
 }: ChartBarProps) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
@@ -106,6 +114,18 @@ export const ChartBar = ({
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
   const chartCursor = cursor || (chartHighlight ? 'crosshair' : 'default')
+
+  const xAxisConfig = {
+    angle: 0,
+    dataKey: xKey,
+    tick: showXAxis
+      ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+      : false,
+    hide: !showXAxis,
+    interval: 'preserveStartEnd' as const,
+    axisLine: { stroke: CHART_COLORS.AXIS },
+    tickLine: { stroke: CHART_COLORS.AXIS },
+  }
 
   const yAxisConfig = {
     tick: showYAxis
@@ -143,7 +163,7 @@ export const ChartBar = ({
             }
 
             if (chartHighlight) {
-              const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+              const activeTimestamp = data[e.activeTooltipIndex]?.[xKey]
               chartHighlight.handleMouseMove({
                 activeLabel: activeTimestamp?.toString(),
                 coordinates: e.activeLabel,
@@ -152,7 +172,7 @@ export const ChartBar = ({
           }}
           onMouseDown={(e: any) => {
             if (chartHighlight && e.activeTooltipIndex !== undefined) {
-              const activeTimestamp = data[e.activeTooltipIndex]?.timestamp
+              const activeTimestamp = data[e.activeTooltipIndex]?.[xKey]
               chartHighlight.handleMouseDown({
                 activeLabel: activeTimestamp?.toString(),
                 coordinates: e.activeLabel,
@@ -180,18 +200,14 @@ export const ChartBar = ({
         >
           {showGrid && <CartesianGrid vertical={false} stroke={CHART_COLORS.AXIS} />}
           <YAxis {...yAxisConfig} />
-          <XAxis
-            dataKey="timestamp"
-            interval={data.length - 2}
-            tick={false}
-            axisLine={{ stroke: CHART_COLORS.AXIS }}
-            tickLine={{ stroke: CHART_COLORS.AXIS }}
-          />
+          <XAxis {...xAxisConfig} />
           <ChartTooltip
             content={
               <ChartTooltipContent
                 className="text-foreground-light -mt-5"
-                labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
+                labelFormatter={(v: string) =>
+                  xKey === 'timestamp' ? dayjs(v).format(DateTimeFormat) : 'Value'
+                }
               />
             }
           />
@@ -217,10 +233,11 @@ export const ChartBar = ({
           </Bar>
         </RechartBarChart>
       </ChartContainer>
-      {data && data.length > 0 && (
+
+      {xKey === 'timestamp' && data && data.length > 0 && (
         <div className="text-foreground-lighter -mt-6 flex items-center justify-between text-[10px] font-mono">
-          <span>{dayjs(data[0]['timestamp']).format(DateTimeFormat)}</span>
-          <span>{dayjs(data[data.length - 1]?.['timestamp']).format(DateTimeFormat)}</span>
+          <span>{dayjs(data[0][xKey]).format(DateTimeFormat)}</span>
+          <span>{dayjs(data[data.length - 1]?.[xKey]).format(DateTimeFormat)}</span>
         </div>
       )}
     </div>
