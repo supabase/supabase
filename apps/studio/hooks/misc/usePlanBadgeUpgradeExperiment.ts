@@ -11,11 +11,16 @@ import { useProfile } from '@/lib/profile'
 import type { Organization } from '@/types'
 
 // PostHog flag key (camelCase, matches other flag naming in the codebase).
+//
+// Sunset: this flag and everything in this file are experiment scaffolding. Once the
+// readout lands, either delete the file and inline the winning behavior in
+// `OrganizationDropdown`, or delete both if `control` wins. Nothing else should start
+// depending on this hook in the meantime.
 export const PLAN_BADGE_UPGRADE_FLAG_NAME = 'planBadgeUpgrade'
 
 // snake_case experiment ID so the auto-fired exposure event name matches the
 // `[experiment_id]_experiment_exposed` typed event registered in telemetry-constants.ts.
-const PLAN_BADGE_UPGRADE_EXPERIMENT_ID = 'plan_badge_upgrade'
+export const PLAN_BADGE_UPGRADE_EXPERIMENT_ID = 'plan_badge_upgrade'
 
 // localStorage key prefix for the seeded variant (see hook docs). Keyed per org slug
 // because eligibility folds in that org's plan.
@@ -77,14 +82,16 @@ interface UsePlanBadgeUpgradeExperimentOptions {
 
 /**
  * Shared experiment state for the "make the Free plan badge a clickable upgrade entry
- * point" test (GROWTH-775). Separate from the `upgradeCtaPlacement` experiment so it can
- * run without disturbing that already-live experiment's buckets.
+ * point" test (GROWTH-775).
  *
  * `variant` is the resolved arm, gated on the experiment flag plus
  * `isPlanBadgeUpgradeEligible` — orgs that can't convert through the plan panel never
  * receive a variant, so the clickable badge never renders for them.
  *
- * First-paint correctness (mirrors `useUpgradeCtaExperiment`): PostHog flags are fetched
+ * Read it with `trackExposure: false` from surfaces that need the arm for attribution but
+ * don't show the badge — the billing panel does this to emit the conversion event.
+ *
+ * First-paint correctness: PostHog flags are fetched
  * async on every load, so the variant is unknown at first paint. To avoid the badge's
  * affordance popping in or flashing, we persist the last resolved variant per org and seed
  * from it synchronously. The seed is used only until the live flag + org resolve, then the

@@ -3457,33 +3457,68 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
- * User clicked the Free plan badge next to the organization name (in the org dropdown) to
- * start the upgrade flow.
+ * User was exposed to the plan badge upgrade experiment.
+ * Fires once per session per enrolled user in any variant (including control), so the
+ * conversion analysis has a baseline cohort.
  * GROWTH experiment: `planBadgeUpgrade` (GROWTH-775).
  *
  * @group Events
- * @source studio
- */
-export interface PlanBadgeUpgradeClickedEvent {
-  action: 'plan_badge_upgrade_clicked'
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
- * User was exposed to the plan badge upgrade experiment.
- * Fires once per session per free-plan user enrolled in any variant (including control),
- * so the conversion analysis has a baseline cohort.
- *
- * @group Events
+ * @page Any authenticated dashboard route — the org dropdown is in the global header
  * @source studio
  */
 export interface PlanBadgeUpgradeExperimentExposedEvent {
   action: 'plan_badge_upgrade_experiment_exposed'
   properties: {
     /**
-     * The experiment variant shown to the user
+     * The experiment variant the user is enrolled in. `captureExperimentExposure` also
+     * attaches an `experiment_id` property at send time — it isn't declared here because
+     * this event is sent through `posthogClient`, not `useTrack`.
      */
     variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the Free plan badge next to the organization name (in the org dropdown) to
+ * start the upgrade flow. Only reachable in the `test` arm, so this measures click-through
+ * on the treatment rather than comparing arms — `plan_badge_upgrade_experiment_converted`
+ * is the arm-comparable metric.
+ * GROWTH experiment: `planBadgeUpgrade` (GROWTH-775).
+ *
+ * @group Events
+ * @page Any authenticated dashboard route — the org dropdown is in the global header
+ * @source studio
+ */
+export interface PlanBadgeUpgradeClickedEvent {
+  action: 'plan_badge_upgrade_clicked'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * An enrolled user completed a paid subscription upgrade. This is the experiment's
+ * conversion event: it fires for both arms on any successful upgrade, whichever entry point
+ * the user took, so lift is measurable against the exposure cohort. Kept separate from the
+ * generic upgrade tracking so the experiment signal can be isolated.
+ * GROWTH experiment: `planBadgeUpgrade` (GROWTH-775).
+ *
+ * @group Events
+ * @page /org/[slug]/billing
+ * @source studio
+ */
+export interface PlanBadgeUpgradeExperimentConvertedEvent {
+  action: 'plan_badge_upgrade_experiment_converted'
+  properties: {
+    /** The experiment variant the user was enrolled in when they upgraded */
+    variant: 'control' | 'test'
+    /** The plan the user upgraded to, e.g. `Pro` */
+    upgradedToPlan: string
+    /** Whether the user reached the plan panel through the experiment's badge link */
+    viaPlanBadge: boolean
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3906,8 +3941,9 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | PlanBadgeUpgradeClickedEvent
   | PlanBadgeUpgradeExperimentExposedEvent
+  | PlanBadgeUpgradeClickedEvent
+  | PlanBadgeUpgradeExperimentConvertedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent

@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OrganizationDropdown } from './OrganizationDropdown'
@@ -10,11 +11,17 @@ const {
   mockUseOrganizationsQuery,
   mockUseSelectedOrganizationQuery,
   mockUsePlanBadgeUpgradeExperiment,
+  mockTrack,
 } = vi.hoisted(() => ({
   mockUseIsFeatureEnabled: vi.fn(),
   mockUseOrganizationsQuery: vi.fn(),
   mockUseSelectedOrganizationQuery: vi.fn(),
   mockUsePlanBadgeUpgradeExperiment: vi.fn(),
+  mockTrack: vi.fn(),
+}))
+
+vi.mock('@/lib/telemetry/track', () => ({
+  useTrack: () => mockTrack,
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
@@ -106,6 +113,18 @@ describe('OrganizationDropdown', () => {
     )
     // The org name link should not point to the upgrade funnel.
     expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
+  })
+
+  it('tracks the badge click with the arm it fired from', async () => {
+    mockUsePlanBadgeUpgradeExperiment.mockReturnValue({ isFreePlan: true, variant: 'test' })
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    render(<OrganizationDropdown />)
+    await userEvent.click(screen.getByRole('link', { name: /free/i }))
+
+    expect(mockTrack).toHaveBeenCalledWith('plan_badge_upgrade_clicked', { variant: 'test' })
   })
 
   it('keeps the plan badge non-clickable in the control arm', () => {

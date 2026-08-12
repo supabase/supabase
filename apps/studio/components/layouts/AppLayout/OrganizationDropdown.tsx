@@ -124,7 +124,7 @@ export const OrganizationDropdown = ({
             href={`/org/${slug}/billing?panel=subscriptionPlan&source=org_plan_badge`}
             className="ml-2 shrink-0"
             aria-label={`Upgrade from the ${selectedOrganization?.plan.name} plan`}
-            onClick={() => track('plan_badge_upgrade_clicked')}
+            onClick={() => track('plan_badge_upgrade_clicked', { variant: 'test' })}
           >
             <Badge
               variant="default"
