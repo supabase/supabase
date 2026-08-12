@@ -63,8 +63,12 @@ describe('getNextRun', () => {
       expect(asIso(getNextRun('1 second', lastRun))).toBe('2026-08-11T10:00:01.000Z')
     })
 
+    // secondsPattern separates the two parts with \s+, so the schedule validator admits any
+    // run of whitespace. The previous implementation split on a single space and read the
+    // unit as an empty string.
     it('is case and whitespace insensitive', () => {
       expect(asIso(getNextRun('  30 SECONDS  ', lastRun))).toBe('2026-08-11T10:00:30.000Z')
+      expect(asIso(getNextRun('30  seconds', lastRun))).toBe('2026-08-11T10:00:30.000Z')
     })
 
     it('returns undefined when the job has never run', () => {
