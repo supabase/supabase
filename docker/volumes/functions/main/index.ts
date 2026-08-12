@@ -148,7 +148,7 @@ Deno.serve(async (req: Request) => {
   const memoryLimitMb = 150
   const workerTimeoutMs = 1 * 60 * 1000
   const noModuleCache = false
-  const importMapPath = null
+  const importMapPath = `/home/deno/functions/deno.jsonc`
   const envVarsObj = Deno.env.toObject()
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
