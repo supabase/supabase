@@ -90,7 +90,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
     account?.status === 'ASSOCIATION_ACCEPTED'
       ? 'The resource share has been accepted by the AWS account owner and the connection is established.'
       : account?.status === 'READY'
-        ? 'It may be waiting acceptance from the AWS account owner. Association requests are automatically deleted if not accepted within 12 hours.'
+        ? 'It may be waiting acceptance from the AWS account owner. Association requests expire and can no longer be accepted in AWS if not accepted within 12 hours.'
         : account?.status === 'ASSOCIATION_REQUEST_EXPIRED'
           ? 'Reconnect this association to initiate a new connection request'
           : account?.status === 'CREATION_FAILED'
