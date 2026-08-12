@@ -17,10 +17,15 @@ On managed Supabase platform, Edge Functions are deployed across multiple region
 The default `hello` function is located at `volumes/functions/hello/index.ts`. You can invoke it immediately after starting your stack:
 
 ```sh
-curl http://<your-domain>/functions/v1/hello
+curl http://<your-domain>/functions/v1/hello \
+   --header 'apiKey: <sb_publishable/sb_secret key>'
 ```
 
-This returns `"Hello from Edge Functions!"`.
+This returns:
+
+```json
+{ "message": "Hello from Edge Functions!" }
+```
 
 ## Create a new function
 
