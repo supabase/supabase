@@ -2,12 +2,13 @@ import { useMutation } from '@tanstack/react-query'
 import { useFlag } from 'common'
 import { toast } from 'sonner'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
+import { analyticsLiteral, safeSql } from './safe-analytics-sql'
 import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type getUnifiedLogsVariables = {
@@ -31,17 +32,21 @@ export async function retrieveUnifiedLogs({
 
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search, hoursAgo)
   const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
-  const sql = `${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${limit}`
+  // `safeSql` (not a plain template literal) keeps the SafeLogSqlFragment brand
+  // intact, and `analyticsLiteral` rejects a non-finite limit instead of
+  // emitting `LIMIT NaN`. Mirrors the row-list query in
+  // `unified-logs-infinite-query.ts`.
+  const sql = safeSql`${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(limit)}`
 
-  const endpoint = logsAllEndpointUrl(useOtel)
-  const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint: logsAllEndpointUrl(useOtel),
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
   })
 
-  if (error) handleError(error)
-
-  const resultData = data?.result ?? []
+  const resultData = (data as { result?: any[] } | undefined)?.result ?? []
 
   const result = resultData.map((row: any) => {
     const ts = String(row.timestamp ?? '')
