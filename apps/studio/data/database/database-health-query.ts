@@ -200,7 +200,7 @@ export async function getDatabaseHealth(
 export type DatabaseHealthData = Awaited<ReturnType<typeof getDatabaseHealth>>
 export type DatabaseHealthError = ResponseError
 
-export const useDatabaseHealthQuery = <TData = DatabaseHealthData,>(
+export const useDatabaseHealthQuery = <TData = DatabaseHealthData>(
   { projectRef, connectionString }: DatabaseHealthVariables,
   {
     enabled = true,
