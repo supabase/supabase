@@ -276,7 +276,7 @@ const data: () => {
       customers: [
         {
           name: 'eXp Realty',
-          logo: '/images/customers/logos/exprealty.png',
+          logo: '/images/customers/logos/on-light/exprealty.png',
           highlights: [
             'Saved $3M+ annually across multiple systems',
             '70+ vibe-coded applications in production',
@@ -290,7 +290,7 @@ const data: () => {
         },
         {
           name: 'Accenture Innovation Labs',
-          logo: '/images/customers/logos/accenture.svg',
+          logo: '/images/customers/logos/on-light/accenture.svg',
           highlights: [
             'Prototype-to-production in hours, not months',
             'Avoiding AWS complexity and auto-shutdown policies',

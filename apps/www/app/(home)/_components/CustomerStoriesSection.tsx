@@ -10,7 +10,7 @@ import SectionContainer from '@/components/Layouts/SectionContainer'
 const customerStories = [
   {
     name: 'Firecrawl',
-    logo: '/images/customers/logos/firecrawl.png',
+    logo: '/images/customers/logos/on-light/firecrawl.png',
     icon: '/images/customers/logos/firecrawl-icon.svg',
     tagline: 'Switched from Pinecone to Supabase Vector to boost efficiency and accuracy.',
     quote:
@@ -28,7 +28,7 @@ const customerStories = [
   },
   {
     name: 'Rally',
-    logo: '/images/customers/logos/rally.png',
+    logo: '/images/customers/logos/on-light/rally.png',
     icon: '/images/customers/logos/rally-icon.svg',
     rawIcon: true,
     tagline: 'From first line of code to fully licensed fintech in three months.',
@@ -45,7 +45,7 @@ const customerStories = [
   },
   {
     name: 'Hyper',
-    logo: '/images/customers/logos/hyper.png',
+    logo: '/images/customers/logos/on-light/hyper.png',
     icon: '/images/customers/logos/hyper-icon.svg',
     tagline: 'An AI-native marketing platform with agents that operate across the entire workflow.',
     quote:
@@ -60,7 +60,7 @@ const customerStories = [
   },
   {
     name: 'E2B',
-    logo: '/images/customers/logos/e2b.png',
+    logo: '/images/customers/logos/on-light/e2b.png',
     icon: '/images/customers/logos/e2b-icon.svg',
     tagline: 'Secure, scalable execution of AI-generated code in the cloud.',
     quote:
@@ -78,7 +78,7 @@ const customerStories = [
   },
   {
     name: 'Mobbin',
-    logo: '/images/customers/logos/mobbin.png',
+    logo: '/images/customers/logos/on-light/mobbin.png',
     icon: '/images/customers/logos/mobbin-icon.svg',
     tagline: 'Migrated 200,000 users from Firebase for a better authentication experience.',
     quote:
