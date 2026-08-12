@@ -1,7 +1,7 @@
-import { untrustedSql } from '@supabase/pg-meta'
+import { untrustedSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import * as z from 'zod'
 
-import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import { untrustedLogSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { isoDateTimeString } from '@/lib/iso-datetime'
 
 const isoDateTimeSchema = z.string().transform((raw, ctx) => {
@@ -45,6 +45,7 @@ const markdownCellSchema = z.object({
 const databaseCellSchema = z.object({
   _tag: z.literal('database_cell'),
   id: z.string(),
+  title: z.string().optional(),
   sql: z.string(),
   row_limit: z.number(),
   chart: chartConfigSchema.optional(),
@@ -53,6 +54,7 @@ const databaseCellSchema = z.object({
 const logCellSchema = z.object({
   _tag: z.literal('log_cell'),
   id: z.string(),
+  title: z.string().optional(),
   sql: z.string(),
   time_range: timeRangeSchema,
   chart: chartConfigSchema.optional(),
@@ -73,6 +75,36 @@ export const notebookSchema = z.object({
 
 export type NotebookWire = z.infer<typeof notebookSchema>
 export type CellWire = z.infer<typeof cellSchema>
+
+// Cells for the create/update PUT body (data/content/notebooks/notebook-upsert-mutation.ts).
+// An existing cell being kept or edited carries its real backend-assigned `id` so the
+// backend can diff it against the previous version; a newly inserted cell has no `id` at
+// all — the backend generates one on write. `sql` must already be a SafeSqlFragment /
+// SafeLogSqlFragment — i.e. promoted at the point of user action per the
+// safe-sql-execution skill — never a raw string or an UntrustedSqlFragment/unchecked_sql,
+// since neither proves this specific save was user-authored.
+const writableCellSchema = z.discriminatedUnion('_tag', [
+  markdownCellSchema.extend({ id: z.string().optional() }),
+  databaseCellSchema.extend({ id: z.string().optional() }),
+  logCellSchema.extend({ id: z.string().optional() }),
+])
+
+export const writableNotebookSchema = z.object({
+  schema_version: z.literal(1),
+  cells: z.array(writableCellSchema),
+})
+
+type WithSafeSql<C extends { _tag: string }> = C extends { _tag: 'database_cell' }
+  ? Omit<C, 'sql'> & { sql: SafeSqlFragment }
+  : C extends { _tag: 'log_cell' }
+    ? Omit<C, 'sql'> & { sql: SafeLogSqlFragment }
+    : C
+
+export type WritableCell = WithSafeSql<z.infer<typeof writableCellSchema>>
+
+export type WritableNotebook = Omit<z.infer<typeof writableNotebookSchema>, 'cells'> & {
+  cells: Array<WritableCell>
+}
 
 // Agents have restrictions on writing IDs to preserve guarantees about ID
 // uniqueness.

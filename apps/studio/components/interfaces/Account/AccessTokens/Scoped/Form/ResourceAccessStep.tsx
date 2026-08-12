@@ -121,7 +121,7 @@ export const ResourceAccessStep = ({
             label="Resource access"
             description={
               <p className="text-foreground-lighter text-sm">
-                Need a token with full access to your account or one for the Supabase MCP server?{' '}
+                Need a token with full access to your account?{' '}
                 <button
                   type="button"
                   tabIndex={0}

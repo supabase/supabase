@@ -178,10 +178,6 @@ export const NewScopedTokenForm = ({
             values={formValues}
             access={access}
             permissionScopeMap={permissionScopeMap}
-            onSelectLegacyToken={() => {
-              handleSelectLegacyMode()
-              setStep('form')
-            }}
           />
         )}
       </ScrollArea>

@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "Supabase UI Library",
-  "homepage": "https://supabase.com/ui",
+  "name": "Supabase Library",
+  "homepage": "https://supabase.com/library",
   "items": [
     {
       "name": "password-based-auth-nextjs",
