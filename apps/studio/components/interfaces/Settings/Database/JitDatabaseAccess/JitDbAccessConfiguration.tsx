@@ -382,12 +382,13 @@ export const JitDbAccessConfiguration = () => {
               layout="responsive"
               title={unavailableTitle}
               description={
-                unavailableReason === 'temporarily_unavailable' ? (
-                  unavailableDescription
-                ) : (
+                unavailableReason === 'postgres_upgrade_required' ||
+                unavailableReason === 'ssl_enforcement_required' ? (
                   <>
                     {projectReference} {unavailableDescription}
                   </>
+                ) : (
+                  unavailableDescription
                 )
               }
               actions={
