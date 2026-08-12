@@ -67,6 +67,17 @@ export type ApplyNotebookOperationsResult =
   | { success: true; notebook: NotebookOperationsResult }
   | { success: false; error: NotebookOperationError }
 
+export function describeNotebookOperationError(error: NotebookOperationError): string {
+  switch (error._tag) {
+    case 'unknown_cell_id':
+      return `No cell with id "${error.cell_id}" exists in this notebook.`
+    case 'conflicting_operations':
+      return `More than one operation targets cell "${error.cell_id}".`
+    case 'empty_result':
+      return 'This update would leave the notebook with no cells.'
+  }
+}
+
 function targetCellId(operation: NotebookOperation): string | undefined {
   switch (operation._tag) {
     case 'insert_cell':
