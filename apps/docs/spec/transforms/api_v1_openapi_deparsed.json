@@ -15237,7 +15237,8 @@
           },
           "sessions_inactivity_timeout": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "description": "Hours without a session refresh before the session is rejected on the next refresh. Use 0 for never. Same unit as the Dashboard Auth Sessions setting (not seconds)."
           },
           "sessions_single_per_user": {
             "type": "boolean",
@@ -15249,7 +15250,8 @@
           },
           "sessions_timebox": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "description": "Maximum session lifetime in hours from session creation. Use 0 for never. Same unit as the Dashboard Auth Sessions setting (not seconds)."
           },
           "site_url": {
             "type": "string",
@@ -15887,12 +15889,14 @@
           "sessions_timebox": {
             "type": "number",
             "minimum": 0,
-            "nullable": true
+            "nullable": true,
+            "description": "Maximum session lifetime in hours from session creation. Use 0 for never. Same unit as the Dashboard Auth Sessions setting (not seconds)."
           },
           "sessions_inactivity_timeout": {
             "type": "number",
             "minimum": 0,
-            "nullable": true
+            "nullable": true,
+            "description": "Hours without a session refresh before the session is rejected on the next refresh. Use 0 for never. Same unit as the Dashboard Auth Sessions setting (not seconds)."
           },
           "sessions_single_per_user": {
             "type": "boolean",
