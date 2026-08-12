@@ -94,3 +94,28 @@ export const databaseNextSteps: ContentListingGroup = {
     },
   ],
 }
+
+export const databaseMultigresWhatYouGet: ContentListingGroup = {
+  id: 'database-multigres-what-you-get',
+  heading: 'What you get',
+  description:
+    'When you enable Multigres on a project, your database runs as a small cluster instead of a single instance:',
+  type: 'grid',
+  items: [
+    {
+      title: 'Automatic failover',
+      description:
+        'If a node goes down, another node in the cluster is promoted to take over, typically within seconds, without you having to intervene.',
+    },
+    {
+      title: 'No connection changes',
+      description:
+        "Your project still exposes a single connection string. The cluster's internal coordination is transparent to your application.",
+    },
+    {
+      title: 'Consensus-backed durability',
+      description:
+        "The cluster's nodes agree on which writes are durable before a write is acknowledged back to your application, rather than relying on a single node's disk and asynchronous replication catching up afterwards.",
+    },
+  ],
+}

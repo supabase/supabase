@@ -1,0 +1,61 @@
+---
+id: 'multigres'
+title: 'Multigres'
+subtitle: 'Multi-node high availability for your Postgres database'
+description: 'Run your Supabase project across multiple Postgres nodes with automatic failover, using the Multigres integration.'
+---
+
+<Admonition type="caution">
+
+Multigres is in [Public Alpha](/docs/guides/getting-started/features#feature-status). It's free during the Alpha for organizations on a paid plan, for up to two projects. You won't be billed for it yet, but pricing may change once it leaves Alpha. Use it at your own risk: it isn't covered by the [uptime SLA](/sla), and Supabase isn't targeting production or mission-critical workloads with it during this stage.
+
+</Admonition>
+
+Multigres runs your Postgres database across multiple nodes instead of one, so your project keeps serving reads and writes if a node fails. It's Supabase's integration of [Multigres](https://multigres.com), an open-source project that brings the same distributed-systems approach the Vitess project brought to MySQL to Postgres instead.
+
+<ContentListings id="database-multigres-what-you-get" />
+
+{/* gap-fill: this section paraphrases the PRFAQ's core value prop (Linear project "Multigres - Supabase Integration", PRFAQ doc "PRFAQ - Multigres (HA @ SELECT)") in plain language per the ticket's "no K8s/operator language" requirement. The PRFAQ's own framing goes further (zero-data-loss guarantees, enterprise reliability positioning) than what's confirmed as shipped for Alpha; kept intentionally more modest here since the PRD explicitly states Alpha does not target mission-critical workloads. */}
+
+## Eligibility
+
+During the Public Alpha:
+
+- Multigres is available to organizations on a paid plan. It isn't available on the Free plan.
+- Availability is being rolled out gradually, so the option to enable it may not yet appear for every eligible organization.
+- Up to two projects per eligible organization can use Multigres for free during the Alpha.
+
+{/* gap-fill: the "up to two" figure matches the shipped project-creation UI copy (apps/studio/components/interfaces/ProjectCreation/HighAvailabilityInput.tsx, merged in PR #48375), not the "one free project per org" figure in this ticket's (MUL-452) acceptance criteria or MUL-1071 (still Backlog, open question: "current assumption is one"). Per the write-the-docs skill's rule that code wins for behavior claims, and per explicit confirmation from the requester, this page states "two." Reconcile before Phase 2 ships if MUL-1071 resolves differently. */}
+
+## Enabling it
+
+For eligible organizations, an administrator can turn on Multigres when creating a new project. A full walkthrough of the creation flow, including what happens for organizations that aren't eligible or have reached their free project limit, is coming once that experience is finalized.
+
+{/* gap-fill: full "Enabling it" content is Phase 2 of MUL-452, explicitly blocked on MUL-1071 (Backlog as of this draft), which still has open questions on eligibility gating, the Alpha warning/acknowledgment flow, and where Alpha/pricing status stays visible after creation. Don't expand this section until that spec resolves. */}
+
+## What's not included in the alpha
+
+Some Supabase features and project operations aren't yet available on Multigres-backed projects:
+
+- **Realtime.** Multigres doesn't yet support the logical replication that Realtime depends on, so Realtime is unavailable.
+- **Point-in-Time Recovery.** Only the standard daily backups are available.
+- **Cross-region read replicas.** Multigres projects run in a single region during the Alpha.
+- **OrioleDB.** A project can use Multigres or [OrioleDB](/docs/guides/database/orioledb), not both.
+- **Resizing after creation.** Compute size, disk, and the number of replicas can't be changed after a Multigres project is created.
+- **Sharding and custom durability policies.** These are on the longer-term roadmap but aren't part of the Alpha.
+
+<Admonition type="caution">
+
+Enabling Multigres migrates your project's database to run on Multigres. There's currently no managed path to move it back to a standard Postgres project, so treat this as a one-way decision until that path exists.
+
+</Admonition>
+
+{/* gap-fill: the "no managed path back" fact and the full "not included" list both come from the PRD ("Multigres Alpha (MVP) Launch" Notion doc: "Not in Alpha" list, and the PRFAQ's "One-way doors" section: "once a customer enables HA on Supabase, their database will be migrated to Multigres, but there is not planned managed migration path back"), not from the Linear ticket, which doesn't mention either. Flagging since it's a significant risk a reader would want surfaced clearly. */}
+
+## Compatibility
+
+Multigres aims for full compatibility with standard Postgres, but there are some differences to be aware of. See [Multigres compatibility](/docs/guides/database/multigres/compatibility) for details.
+
+## Resources
+
+- [Multigres documentation](https://multigres.com/docs) — architecture, self-hosted deployment, and other technical depth that goes beyond the hosted Supabase integration covered on this page.
