@@ -162,9 +162,14 @@ export const JitDbAccessConfiguration = () => {
       ? jitDbAccessConfiguration?.appliedSuccessfully
       : false
   const isJitDbAccessUnavailable = jitDbAccessConfiguration?.state === 'unavailable'
-  const unavailableReason = isJitDbAccessUnavailable
-    ? jitDbAccessConfiguration.unavailableReason
-    : undefined
+  const unavailableReason = (
+    isJitDbAccessUnavailable ? jitDbAccessConfiguration.unavailableReason : undefined
+  ) as
+    | 'postgres_upgrade_required'
+    | 'ssl_enforcement_required'
+    | 'manual_migration_required'
+    | 'temporarily_unavailable'
+    | undefined
 
   const roleOptions = useMemo(() => getAssignableJitRoleOptions(databaseRoles), [databaseRoles])
 
