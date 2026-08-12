@@ -33,7 +33,7 @@ import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
-const SORT_GRIP_CLASS = 'absolute -left-6 top-1.5'
+const SORT_GRIP_CLASS = 'absolute -left-10'
 
 export const ProjectHome = () => {
   const { enableBranching } = useParams()
