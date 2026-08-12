@@ -1,0 +1,226 @@
+---
+title = "Realtime: Postgres Changes Troubleshooting"
+topics = [
+  "database",
+  "realtime",
+]
+keywords = [ "postgres changes", "rls", "replica identity", "subscription", "websocket" ] # any strings (topics are automatically added so no need to duplicate)
+---
+
+A Realtime subscription connects, a row changes in the database, and nothing arrives on the client. No error, no event — silence. This is one of the more common issues developers run into with Supabase Realtime, and the cause is almost always one of a handful of things.
+
+The order below reflects how often each one turns out to be the actual problem. Check RLS early, even if the subscription code looks fine — it's the single biggest source of "silently missing" events, by a wide margin.
+
+For a broader index of Realtime-specific issues, see the [Troubleshooting](/docs/guides/troubleshooting) directory.
+
+## Step 1: Is the table in the Realtime publication?
+
+Realtime doesn't watch every table by default. Each one has to be added to a publication called `supabase_realtime`. If it isn't, Realtime has no visibility into that table at all — no matter how the client subscription is set up.
+
+```sql
+select * from pg_publication_tables where pubname = 'supabase_realtime';
+```
+
+If the table's missing from the results:
+
+```sql
+alter publication supabase_realtime add table your_table;
+```
+
+Or toggle it on from **Database → Replication** in the dashboard.
+
+This gets overlooked on a table created recently — creating the table and enabling Realtime on it are two separate steps:
+
+```sql
+alter publication supabase_realtime add table messages;
+```
+
+## Step 2: Is RLS quietly blocking the row?
+
+This is the most common cause, and it's the one that wastes the most time, because nothing errors. The event doesn't show up.
+
+Realtime enforces RLS the same way a normal query would — as the subscribing client's role. `SUBSCRIBED` only means the WebSocket connected. It says nothing about whether that client is allowed to see the data.
+
+Test it directly with either options:
+
+Using the same credentials the client uses, try to select the row that changed:
+
+```js
+const { data, error } = await supabase
+  .from('messages')
+  .select('*')
+  .eq('id', theRowIdThatChanged);
+
+console.log({ data, error });
+```
+
+Or on the dashboard, open Table Editor, and try to view the row as the subscribing user's role.
+
+Empty `data`? That's the answer. The policy is blocking this row for this user, and Realtime is doing exactly what it's supposed to.
+
+A fix might look like:
+
+```sql
+create policy "Users can view messages in their rooms"
+on messages for select
+using (
+  exists (
+    select 1 from room_members
+    where room_members.room_id = messages.room_id
+    and room_members.user_id = auth.uid()
+  )
+);
+```
+
+One trap specific to `UPDATE` events: RLS generally has to allow both the old and new row state. If a policy only permits `status = 'active'`, and an update flips the status to `archived`, the event can fail to deliver — the row was visible a second ago, but the new state no longer passes the check.
+
+See [Row Level Security](/docs/guides/database/postgres/row-level-security) for the underlying model, and [why a select can return an empty data array](./why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx), which is directly relevant to the test above.
+
+## Step 3: Missing fields in `payload.old`?
+
+If events are arriving but `payload.old` is mostly empty or `null`, that's a replica identity problem, not a delivery problem.
+
+By default, Postgres only sends the primary key in the "old row" for `UPDATE` and `DELETE`. If your code compares old vs. new values, that's not enough:
+
+```sql
+alter table messages replica identity full;
+```
+
+A typical case: a `status` column moves from `pending` to `completed`, and the client checks
+
+```js
+if (payload.old.status !== payload.new.status) {
+  notifyUser();
+}
+```
+
+Without `replica identity full`, `payload.old.status` is `undefined`, and this comparison quietly fails.
+
+## Step 4: Check the subscription code itself
+
+Once publication and RLS are ruled out, look at the subscription config. Table name, schema, filter syntax — small mismatches here are common.
+
+- Table name matches exactly, including case
+- Schema is correct (`public`, unless you're using a custom one)
+- Filter syntax is right: `room_id=eq.abc123`, not `room_id = abc123`
+
+```js
+const channel = supabase
+  .channel('room-messages')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'messages',
+      filter: `room_id=eq.${roomId}`,
+    },
+    (payload) => {
+      console.log('Got an update:', payload.new);
+    }
+  )
+  .subscribe((status) => {
+    console.log('Subscription status:', status);
+  });
+```
+
+Log the status callback. Don't assume `.subscribe()` worked.
+
+- `SUBSCRIBED` — connected
+- `CHANNEL_ERROR` — check the error payload
+- `CLOSED` — channel got shut down
+- `TIMED_OUT` — connection issue; see [Realtime connections giving `TIMED_OUT` errors](./realtime-connections-timed_out-status)
+
+A channel stuck at `CHANNEL_ERROR` is a different problem than one that connects fine but never fires. Figure out which one you're dealing with before going further.
+
+## Step 5: Stale or duplicate subscriptions
+
+This one is almost always a React/Next.js problem.
+
+A component re-renders, `roomId` changes, and the old channel doesn't get cleaned up. Now you've got two subscriptions running, or one listening against a stale parameter. It doesn't always look broken — sometimes it looks like duplicate events, or events for the wrong room.
+
+```js
+useEffect(() => {
+  const channel = supabase
+    .channel(`room:${roomId}`)
+    .on(
+      'postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'messages', filter: `room_id=eq.${roomId}` },
+      (payload) => console.log(payload.new)
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, [roomId]);
+```
+
+That cleanup line is the part people skip. Without it, the old channel keeps running against the previous `roomId` in the background, and nothing in the UI tells you it's happening. See [Next.js 13/14 stale data when changing RLS or table data](./nextjs-1314-stale-data-when-changing-rls-or-table-data-85b8oQ) for an adjacent version of the same bug.
+
+## Step 6: Writing right after `SUBSCRIBED`
+
+There's a confirmed timing gap between the client reporting `SUBSCRIBED` and the backend's replication listener being ready to stream. A write made in that gap can get missed.
+
+This shows up most in automated tests, where subscribe and write happen back-to-back:
+
+```js
+// Risky — writing immediately after subscribing
+const channel = supabase.channel('test-channel').on(/* ... */).subscribe();
+await supabase.from('messages').insert({ text: 'hello' });
+```
+
+The reliable fix isn't a fixed delay — it's waiting for the backend to confirm the `postgres_changes` extension is listening, via the `system` message it emits:
+
+```js
+supabase
+  .channel('room1')
+  .on('system', '*', (payload) => {
+    if (payload.extension === 'postgres_changes' && payload.status === 'ok') {
+      console.log('changes are ready', payload); // safe to write now
+    }
+  })
+  .on('postgres_changes', { event: '*', schema: '*' }, (payload) => {
+    console.log('Change received!', payload);
+  })
+  .subscribe();
+```
+
+No need to `await` anything here — react to the message inside the handler (e.g. set a flag) before triggering the write. This `system` message isn't formally documented yet.
+
+If you can't wire this up right now, a short fixed delay after `SUBSCRIBED` is a weaker fallback:
+
+```js
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await supabase.from('messages').insert({ text: 'hello' });
+  }
+});
+```
+
+## Step 7: Is Realtime enabled?
+
+Sometimes the answer is straightforward. Check:
+
+- **Project Settings → Realtime** — enabled at the project level?
+- **Database → Replication** — toggle on for this specific table?
+
+Check this again after a project's been paused and restarted — the replication slot can need to reconnect. If the project's under heavier load than usual, also check the Realtime "Concurrent Peak Connections" quota — hitting that limit can look a lot like a broken subscription.
+
+## Step 8: Read the Realtime logs
+
+Still stuck? **Logs → Realtime** in the dashboard. Look for connection drops, replication errors, rate limiting.
+
+For more detail than the default logs give you, see [Debug Realtime with Logger and Log Levels](./realtime-debugging-with-logger). If the connection seems to drop intermittently rather than failing outright, check [Realtime: Handling Silent Disconnections in Background Applications](./realtime-handling-silent-disconnections-in-backgrounded-applications-592794) and [Understanding and Monitoring Realtime Heartbeats](./realtime-heartbeat-messages).
+
+One thing to design around regardless: Realtime doesn't guarantee every message gets delivered. Network blips and reconnects can drop an event here and there. If a missed update matters, treat the Realtime event as a signal to re-fetch state — not as the only source of truth. Then a dropped event is an inconvenience, not a bug.
+
+## Still nothing?
+
+Rule out the network layer:
+
+- Corporate firewall or proxy blocking WebSocket connections
+- Outdated `supabase-js` version — check recent release notes
+
+Hopefully this guide is helpful to you in resolving these types of issues.
