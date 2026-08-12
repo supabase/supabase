@@ -16,7 +16,7 @@
     "isbot": "^5.1.36",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "react-router": "^7.17.0",
+    "react-router": "^7.18.2",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*"
   },
