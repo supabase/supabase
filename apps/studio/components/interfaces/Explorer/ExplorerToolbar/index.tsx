@@ -73,6 +73,8 @@ const ExplorerToolbarTitle = ({
         <Input
           autoFocus
           size="tiny"
+          containerClassName="max-w-64 has-[[data-slot=input-group-control]:focus-visible]:ring-0"
+          className="outline-none"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onBlur={() => {
