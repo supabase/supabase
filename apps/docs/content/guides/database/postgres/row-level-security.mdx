@@ -5,7 +5,7 @@ description: 'Secure your data using Postgres Row Level Security.'
 subtitle: 'Secure your data using Postgres Row Level Security.'
 ---
 
-When you need granular authorization rules, nothing beats Postgres's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html).
+Postgres [Row Level Security (RLS)](https://www.postgresql.org/docs/current/ddl-rowsecurity.html) gives you granular authorization rules that run inside the database.
 
 ## Row Level Security in Supabase
 
@@ -31,15 +31,15 @@ Policies alone don't do this. See [Grants and policies](#grants-and-policies).
 
 </Admonition>
 
-RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be combined with [Supabase Auth](/docs/guides/auth) for end-to-end user security from the browser to the database.
+You write RLS rules in SQL, so a rule can express whatever access logic your app needs. Combine RLS with [Supabase Auth](/docs/guides/auth) for end-to-end user security from the browser to the database.
 
 RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through third-party tooling.
 
 ## Policies
 
-[Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are Postgres's rule engine. Policies are easy to understand once you get the hang of them. Each policy is attached to a table, and the policy is executed every time a table is accessed.
+[Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are Postgres's rule engine. Each policy is attached to a table, and the policy is executed every time a table is accessed.
 
-You can just think of them as adding a `WHERE` clause to every query. For example a policy like this ...
+Think of a policy as adding a `WHERE` clause to every query. For example a policy like this ...
 
 ```sql
 create policy "Individuals can view their own todos."
@@ -217,7 +217,7 @@ Using the `anon` Postgres role is different from an [anonymous user](/docs/guide
 
 Policies are SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
 
-Supabase provides some [helpers](#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic policies:
+Supabase provides some [helpers](#helper-functions) that simplify RLS if you're using Supabase Auth. The examples below use these helpers.
 
 ### SELECT policies
 
@@ -247,15 +247,16 @@ Alternatively, if you only wanted users to be able to see their own profiles:
 
 ```sql
 create policy "User can see their own profile only."
-on profiles
-for select using ( (select auth.uid()) = user_id );
+on profiles for select
+to authenticated
+using ( (select auth.uid()) = user_id );
 ```
 
 ### INSERT policies
 
 You can specify insert policies with the `with check` clause. The `with check` expression ensures that any new row data adheres to the policy constraints.
 
-Say you have a table called `profiles` in the public schema and you only want users to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
+Say you have a table called `profiles` in the public schema and you only want users to create a profile for themselves. In that case, check that their user ID matches the value they are trying to insert:
 
 ```sql
 -- 1. Create table
@@ -408,7 +409,7 @@ Supabase provides special "Service" keys, which can be used to bypass RLS. These
 
 <Admonition type="note">
 
-Supabase will adhere to the RLS policy of the signed-in user, even if the client library is initialized with a Service Key.
+A Service Key bypasses RLS only when the request carries no user access token. If the request carries one, it runs under the RLS policies of that signed-in user, even when the client library was initialized with a Service Key.
 
 </Admonition>
 
@@ -418,7 +419,7 @@ You can also create new [Postgres Roles](/docs/guides/database/postgres/roles) w
 alter role "role_name" with bypassrls;
 ```
 
-This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privilege.
+This can be useful for system-level access. **Never** share login credentials for any Postgres Role with this privilege.
 
 ## Test your policies
 
@@ -558,9 +559,9 @@ For CLI setup and more pgTAP helpers, see [Testing your database](/docs/guides/d
 
 ## RLS performance recommendations
 
-Every authorization system has an impact on performance. While row level security is powerful, the performance impact is important to keep in mind. This is especially true for queries that scan every row in a table - like many `select` operations, including those using limit, offset, and ordering.
+Every authorization system has an impact on performance. Postgres evaluates a policy expression against each candidate row, so the cost scales with the rows a query scans. This matters most for queries that scan every row in a table, like many `select` operations, including those using limit, offset, and ordering.
 
-Based on a series of [tests](https://github.com/GaryAustin1/RLS-Performance), we have a few recommendations for RLS:
+Based on a series of [tests](https://github.com/GaryAustin1/RLS-Performance), these are the recommendations for RLS:
 
 ### Add indexes
 
@@ -688,10 +689,11 @@ create function private.has_good_role()
 returns boolean
 language plpgsql
 security definer -- will run as the creator
+set search_path = '' -- every name inside must be schema-qualified
 as $$
 begin
   return exists (
-    select 1 from roles_table
+    select 1 from public.roles_table
     where (select auth.uid()) = user_id and role = 'good_role'
   );
 end;
@@ -704,9 +706,11 @@ to authenticated
 using ( (select private.has_good_role()) );
 ```
 
+Set `search_path = ''` on every `security definer` function and schema-qualify the names inside it. Without a pinned `search_path`, a caller can point an unqualified name at their own object and run it with the function owner's privileges.
+
 <Admonition type="caution">
 
-Security-definer functions should never be created in a schema in the "Exposed schemas" inside your [API settings](/dashboard/project/_/settings/api)`.
+A `security definer` function in an exposed schema is callable over the Data API with the creator's privileges. Never create one in a schema listed under "Exposed schemas" in your [API settings](/dashboard/project/_/settings/api).
 
 </Admonition>
 
