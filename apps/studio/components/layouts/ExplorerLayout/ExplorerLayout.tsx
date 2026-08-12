@@ -12,7 +12,7 @@ import { type ExplorerResourceType } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
-import { useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
+import { useCreateChat, useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -87,6 +87,7 @@ const HomeTabButton = () => {
 
 const NewTabButton = () => {
   const { createNotebook } = useCreateNotebook()
+  const { createChat } = useCreateChat()
 
   return (
     <DropdownMenu>
@@ -110,7 +111,7 @@ const NewTabButton = () => {
           <NotebookText size={14} />
           <span>New notebook</span>
         </DropdownMenuItem>
-        <DropdownMenuItem disabled className="gap-x-2">
+        <DropdownMenuItem className="gap-x-2" onClick={() => createChat()}>
           <MessageCirclePlus size={14} />
           <span>New chat</span>
         </DropdownMenuItem>

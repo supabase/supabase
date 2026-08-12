@@ -1,8 +1,11 @@
 import { useRouter } from 'next/router'
 
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
+import type { AssistantModel } from '@/state/ai-assistant-state'
+import { useAiAssistantState } from '@/state/ai-assistant-state'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 
@@ -61,4 +64,48 @@ This is a sample paragraph to demonstrate the Markdown cells
   }
 
   return { createNotebook }
+}
+
+export const useCreateChat = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const aiAssistantState = useAiAssistantState()
+
+  const openChat = (id: string) => {
+    if (!project) {
+      console.error('Project is required')
+      return undefined
+    }
+
+    router.push(`/project/${project.ref}/explorer/chat/${id}`)
+  }
+
+  const createChat = ({
+    name,
+    initialMessage,
+    model,
+  }: {
+    name?: string
+    initialMessage?: string
+    model?: AssistantModel
+  } = {}) => {
+    if (!project) {
+      console.error('Project is required')
+      return undefined
+    }
+
+    aiAssistantState.setContext({
+      projectRef: project.ref,
+      orgSlug: organization?.slug,
+      connectionString: project.connectionString ?? '',
+    })
+    if (model) aiAssistantState.setModel(model)
+
+    const id = aiAssistantState.createChat({ name, initialMessage })
+    router.push(`/project/${project.ref}/explorer/chat/${id}`)
+    return id
+  }
+
+  return { createChat, openChat }
 }
