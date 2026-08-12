@@ -4,8 +4,7 @@ import { useParams } from 'common'
 import { Check, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { toast } from 'sonner'
 import { Button, cn, Dialog, DialogContent } from 'ui'
@@ -29,10 +28,6 @@ import { useConfirmPendingSubscriptionChangeMutation } from '@/data/subscription
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
 import { OrgPlan, SubscriptionTier } from '@/data/subscriptions/types'
-import {
-  usePlanBadgeUpgradeExperiment,
-  type PlanBadgeUpgradeVariant,
-} from '@/hooks/misc/usePlanBadgeUpgradeExperiment'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   DOCS_URL,
@@ -41,7 +36,6 @@ import {
   STRIPE_PUBLIC_KEY,
 } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
-import { useTrack } from '@/lib/telemetry/track'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -93,9 +87,7 @@ export const SubscriptionPlanUpdateDialog = ({
   onUseAsDefaultBillingAddressChange,
 }: Props) => {
   const { slug } = useParams()
-  const router = useRouter()
   const { resolvedTheme } = useTheme()
-  const track = useTrack()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [paymentIntentSecret, setPaymentIntentSecret] = useState<string | null>(null)
@@ -134,28 +126,8 @@ export const SubscriptionPlanUpdateDialog = ({
     [selectedTier]
   )
 
-  // GROWTH-775 conversion tracking. Read without exposure — the badge doesn't render here,
-  // and this surface is reached from every upgrade entry point, not just the experiment's.
-  const { variant: planBadgeVariant } = usePlanBadgeUpgradeExperiment({ trackExposure: false })
-  // The org drops out of the experiment the moment the plan changes (eligibility requires
-  // the free plan), so latch the arm while the user is still enrolled.
-  const enrolledVariantRef = useRef<PlanBadgeUpgradeVariant | undefined>(undefined)
-  useEffect(() => {
-    if (planBadgeVariant !== undefined) enrolledVariantRef.current = planBadgeVariant
-  }, [planBadgeVariant])
-
   const onSuccessfulPlanChange = () => {
     setPaymentConfirmationLoading(false)
-
-    const enrolledVariant = enrolledVariantRef.current
-    if (enrolledVariant !== undefined && changeType !== 'downgrade') {
-      track('plan_badge_upgrade_experiment_converted', {
-        variant: enrolledVariant,
-        upgradedToPlan: subscriptionPlanMeta?.name ?? selectedTier ?? 'unknown',
-        viaPlanBadge: router.query.source === 'org_plan_badge',
-      })
-    }
-
     toast.success(
       `Successfully ${changeType === 'downgrade' ? 'downgraded' : 'upgraded'} subscription to ${subscriptionPlanMeta?.name}!`
     )

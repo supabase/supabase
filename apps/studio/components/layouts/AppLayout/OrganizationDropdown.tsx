@@ -3,7 +3,6 @@ import { Boxes } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useWindowSize } from 'react-use'
 import { Badge, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -17,12 +16,16 @@ import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { usePlanBadgeUpgradeExperiment } from '@/hooks/misc/usePlanBadgeUpgradeExperiment'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExposure'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
 
-// Tailwind's `md`, matching the `hidden md:flex` on the header this renders in.
-const MD_BREAKPOINT = 768
+// GROWTH-775. Delete this block and the `trailingContent` branch below once the readout
+// lands — either inline the linked badge for everyone, or revert to the plain one.
+const PLAN_BADGE_UPGRADE_EXPERIMENT_ID = 'plan_badge_upgrade'
+type PlanBadgeUpgradeVariant = 'control' | 'test'
 
 interface OrganizationDropdownProps {
   embedded?: boolean
@@ -49,22 +52,19 @@ export const OrganizationDropdown = ({
   const slug = selectedOrganization?.slug
   const orgName = selectedOrganization?.name
 
-  // GROWTH-775 experiment: in the `test` arm the Free plan badge becomes a clickable
-  // entry point into the upgrade funnel. The hook only returns a variant for orgs that can
-  // actually convert through the plan panel, so everyone else keeps the plain badge.
-  //
-  // The badge only exists in the desktop header — `embedded` renders just the command list,
-  // and the header itself is `hidden md:flex`. Firing exposure from those enrols users who
-  // can never see the treatment, which dilutes both arms.
-  //
-  // Reading the width directly rather than via `useBreakpoint`, whose state starts at
-  // `false` (i.e. "not below the breakpoint") until its layout effect runs — on a remount
-  // with flags already cached that reads as "desktop" and fires exposure on mobile.
-  const { width: viewportWidth } = useWindowSize()
-  const { variant: planBadgeVariant } = usePlanBadgeUpgradeExperiment({
-    trackExposure: !embedded && viewportWidth >= MD_BREAKPOINT,
-  })
-  const showPlanBadgeUpgrade = planBadgeVariant === 'test' && !!selectedOrganization && !!slug
+  // GROWTH-775 experiment: in the `test` arm the Free plan badge links into the upgrade
+  // funnel. Partner-managed orgs are excluded — they change plans at the partner, and
+  // PlanUpdateSidePanel disables every paid tier for them, so they can't convert here.
+  const planBadgeFlag = usePHFlag<PlanBadgeUpgradeVariant | false>('planBadgeUpgrade')
+  const isUpgradableOrg =
+    selectedOrganization?.plan.id === 'free' &&
+    selectedOrganization.managed_by === MANAGED_BY.SUPABASE &&
+    !selectedOrganization.billing_partner
+  const isInPlanBadgeExperiment = planBadgeFlag === 'control' || planBadgeFlag === 'test'
+  const planBadgeVariant = isUpgradableOrg && isInPlanBadgeExperiment ? planBadgeFlag : undefined
+  useTrackExperimentExposure(PLAN_BADGE_UPGRADE_EXPERIMENT_ID, planBadgeVariant)
+
+  const showPlanBadgeUpgrade = planBadgeVariant === 'test' && !!slug
 
   const [open, setOpen] = useState(false)
   const close = useEmbeddedCloseHandler(embedded, onClose, setOpen)
@@ -124,7 +124,7 @@ export const OrganizationDropdown = ({
             href={`/org/${slug}/billing?panel=subscriptionPlan&source=org_plan_badge`}
             className="ml-2 shrink-0"
             aria-label={`Upgrade from the ${selectedOrganization?.plan.name} plan`}
-            onClick={() => track('plan_badge_upgrade_clicked', { variant: 'test' })}
+            onClick={() => track('plan_badge_upgrade_clicked')}
           >
             <Badge
               variant="default"

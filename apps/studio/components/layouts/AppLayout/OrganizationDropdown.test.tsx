@@ -1,5 +1,4 @@
 import { screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { OrganizationDropdown } from './OrganizationDropdown'
@@ -10,26 +9,20 @@ const {
   mockUseIsFeatureEnabled,
   mockUseOrganizationsQuery,
   mockUseSelectedOrganizationQuery,
-  mockUsePlanBadgeUpgradeExperiment,
-  mockTrack,
+  mockUsePHFlag,
 } = vi.hoisted(() => ({
   mockUseIsFeatureEnabled: vi.fn(),
   mockUseOrganizationsQuery: vi.fn(),
   mockUseSelectedOrganizationQuery: vi.fn(),
-  mockUsePlanBadgeUpgradeExperiment: vi.fn(),
-  mockTrack: vi.fn(),
-}))
-
-vi.mock('@/lib/telemetry/track', () => ({
-  useTrack: () => mockTrack,
+  mockUsePHFlag: vi.fn(),
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
 }))
 
-vi.mock('@/hooks/misc/usePlanBadgeUpgradeExperiment', () => ({
-  usePlanBadgeUpgradeExperiment: mockUsePlanBadgeUpgradeExperiment,
+vi.mock('@/hooks/ui/useFlag', () => ({
+  usePHFlag: mockUsePHFlag,
 }))
 
 vi.mock('@/data/organizations/organizations-query', () => ({
@@ -45,19 +38,12 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
 
-// `useWindowSize` reads `window.innerWidth` when it initializes, so set this before render.
-const DESKTOP_VIEWPORT_WIDTH = 1024
-const setViewportWidth = (width: number) => {
-  Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: width })
-}
-
 describe('OrganizationDropdown', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    setViewportWidth(DESKTOP_VIEWPORT_WIDTH)
     mockUseIsFeatureEnabled.mockReturnValue(false)
     // Default to the control arm so the plan badge stays inline (non-clickable).
-    mockUsePlanBadgeUpgradeExperiment.mockReturnValue({ isFreePlan: true, variant: 'control' })
+    mockUsePHFlag.mockReturnValue('control')
     mockUseOrganizationsQuery.mockReturnValue({
       data: [
         createMockOrganization({ slug: 'org-one', name: 'Org One' }),
@@ -99,79 +85,50 @@ describe('OrganizationDropdown', () => {
   })
 
   it('renders the plan badge as an upgrade link in the experiment test arm', () => {
-    mockUsePlanBadgeUpgradeExperiment.mockReturnValue({ isFreePlan: true, variant: 'test' })
+    mockUsePHFlag.mockReturnValue('test')
     mockUseSelectedOrganizationQuery.mockReturnValue({
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
 
     render(<OrganizationDropdown />)
 
-    const badgeLink = screen.getByRole('link', { name: /free/i })
-    expect(badgeLink).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /upgrade from the free plan/i })).toHaveAttribute(
       'href',
       '/org/org-one/billing?panel=subscriptionPlan&source=org_plan_badge'
     )
-    // The org name link should not point to the upgrade funnel.
     expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
   })
 
-  it('tracks the badge click with the arm it fired from', async () => {
-    mockUsePlanBadgeUpgradeExperiment.mockReturnValue({ isFreePlan: true, variant: 'test' })
+  it('keeps the plan badge inline for a partner-managed org in the test arm', () => {
+    mockUsePHFlag.mockReturnValue('test')
     mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+      data: createMockOrganization({
+        slug: 'org-one',
+        name: 'Org One',
+        managed_by: MANAGED_BY.VERCEL_MARKETPLACE,
+      }),
     })
 
     render(<OrganizationDropdown />)
-    await userEvent.click(screen.getByRole('link', { name: /free/i }))
 
-    expect(mockTrack).toHaveBeenCalledWith('plan_badge_upgrade_clicked', { variant: 'test' })
+    // Partner-managed orgs can't change plans here, so they never get the upgrade link.
+    const upgradeLink = screen
+      .getAllByRole('link')
+      .find((link) => link.getAttribute('href')?.includes('panel=subscriptionPlan'))
+    expect(upgradeLink).toBeUndefined()
   })
 
   it('keeps the plan badge non-clickable in the control arm', () => {
-    mockUsePlanBadgeUpgradeExperiment.mockReturnValue({ isFreePlan: true, variant: 'control' })
     mockUseSelectedOrganizationQuery.mockReturnValue({
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
 
     render(<OrganizationDropdown />)
 
-    // No standalone upgrade link — the badge stays inline within the org name link, which
-    // still points at the org overview rather than the upgrade funnel.
     const upgradeLink = screen
       .getAllByRole('link')
       .find((link) => link.getAttribute('href')?.includes('panel=subscriptionPlan'))
     expect(upgradeLink).toBeUndefined()
     expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
-  })
-
-  it('tracks exposure from the desktop header, the only place the badge renders', () => {
-    mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
-    })
-
-    render(<OrganizationDropdown />)
-
-    expect(mockUsePlanBadgeUpgradeExperiment).toHaveBeenCalledWith({ trackExposure: true })
-  })
-
-  it('does not track exposure when embedded, since the badge is not rendered there', () => {
-    mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
-    })
-
-    render(<OrganizationDropdown embedded />)
-
-    expect(mockUsePlanBadgeUpgradeExperiment).toHaveBeenCalledWith({ trackExposure: false })
-  })
-
-  it('does not track exposure below md, where the header is hidden', () => {
-    setViewportWidth(390)
-    mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
-    })
-
-    render(<OrganizationDropdown />)
-
-    expect(mockUsePlanBadgeUpgradeExperiment).toHaveBeenCalledWith({ trackExposure: false })
   })
 })
