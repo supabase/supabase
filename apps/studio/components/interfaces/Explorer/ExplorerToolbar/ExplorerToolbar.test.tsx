@@ -1,7 +1,8 @@
-import { render, screen, within } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
 
+import { customRender as render } from '@/tests/lib/custom-render'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
