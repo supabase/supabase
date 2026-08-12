@@ -4,18 +4,24 @@ import type { EntryAccess } from '../../AccessToken.roles'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import { CapabilityCard } from './CapabilityCard'
 import { DenseCapabilities } from './DenseCapabilities'
-import { getCapabilityDensityTier } from './TokenCapabilities.utils'
+import { getCapabilityDensityTier, type CapabilityLevelFilter } from './TokenCapabilities.utils'
 
 interface CapabilitiesSectionProps {
   capabilities: CapabilitySummaryEntry[]
   accessEntries: Record<string, EntryAccess>
+  /** Dense tier's All/Read/Read-write control, rendered by the caller next to the section title. */
+  levelFilter: CapabilityLevelFilter
 }
 
 /**
  * Switches capability presentation on granted count: a handful render fully expanded, a moderate
  * number collapse into an accordion, and a large grant switches to the dense, filterable view.
  */
-export const CapabilitiesSection = ({ capabilities, accessEntries }: CapabilitiesSectionProps) => {
+export const CapabilitiesSection = ({
+  capabilities,
+  accessEntries,
+  levelFilter,
+}: CapabilitiesSectionProps) => {
   if (capabilities.length === 0) {
     return <span className="text-sm text-foreground-lighter">No capabilities selected</span>
   }
@@ -24,13 +30,15 @@ export const CapabilitiesSection = ({ capabilities, accessEntries }: Capabilitie
 
   if (tier === 'expanded') {
     return (
-      <div className="flex flex-col gap-3">
-        {capabilities.map((capability) => (
+      <div>
+        {capabilities.map((capability, index) => (
           <CapabilityCard
             key={capability.entry.key}
             capability={capability}
             collapsible={false}
             accessEntries={accessEntries}
+            isFirst={index === 0}
+            isLast={index === capabilities.length - 1}
           />
         ))}
       </div>
@@ -39,18 +47,26 @@ export const CapabilitiesSection = ({ capabilities, accessEntries }: Capabilitie
 
   if (tier === 'accordion') {
     return (
-      <Accordion type="multiple" className="flex flex-col gap-3">
-        {capabilities.map((capability) => (
+      <Accordion type="multiple">
+        {capabilities.map((capability, index) => (
           <CapabilityCard
             key={capability.entry.key}
             capability={capability}
             collapsible
             accessEntries={accessEntries}
+            isFirst={index === 0}
+            isLast={index === capabilities.length - 1}
           />
         ))}
       </Accordion>
     )
   }
 
-  return <DenseCapabilities capabilities={capabilities} accessEntries={accessEntries} />
+  return (
+    <DenseCapabilities
+      capabilities={capabilities}
+      accessEntries={accessEntries}
+      levelFilter={levelFilter}
+    />
+  )
 }

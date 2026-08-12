@@ -213,10 +213,7 @@ describe('ViewTokenSheet', () => {
     })
     renderSheet()
 
-    expect(
-      await screen.findByPlaceholderText('Filter by capability or endpoint...')
-    ).toBeInTheDocument()
-    expect(screen.getByText('Read-write · 1')).toBeInTheDocument()
+    expect(await screen.findByText('Read-write · 1')).toBeInTheDocument()
     expect(screen.getByText('Read-only · 8')).toBeInTheDocument()
     expect(screen.getByText(/Not granted · \d+/)).toBeInTheDocument()
     // Read-only previews only 3 of the 8 rows until "Show N more" is clicked.
@@ -227,12 +224,13 @@ describe('ViewTokenSheet', () => {
     expect(screen.getByText('Storage')).toBeInTheDocument()
     expect(screen.getByText('Backups')).toBeInTheDocument()
 
-    // Filtering re-derives the read-only bucket, so a narrowed result isn't re-truncated.
-    fireEvent.change(screen.getByPlaceholderText('Filter by capability or endpoint...'), {
-      target: { value: 'storage' },
-    })
+    // The All/Read/Read-write toggle sits next to the "Capabilities" title, not a text filter.
+    fireEvent.click(screen.getByRole('radio', { name: 'Read-write' }))
+    expect(screen.getByText('Read-write · 1')).toBeInTheDocument()
+    expect(screen.queryByText(/Read-only · /)).toBeNull()
 
-    expect(screen.getByText('Storage')).toBeInTheDocument()
-    expect(screen.queryByText('Backups')).toBeNull()
+    fireEvent.click(screen.getByRole('radio', { name: 'Read' }))
+    expect(screen.queryByText(/Read-write · /)).toBeNull()
+    expect(screen.getByText('Read-only · 8')).toBeInTheDocument()
   })
 })

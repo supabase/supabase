@@ -65,34 +65,6 @@ export const getNotGrantedCatalogEntries = (
 
 export type CapabilityLevelFilter = 'all' | 'read' | 'readwrite'
 
-export interface FilteredCapability {
-  capability: CapabilitySummaryEntry
-  /** True when the match came from an endpoint path rather than just the capability name. */
-  matchedByPath: boolean
-}
-
-/** Local, in-memory filter for dense mode: matches capability name or any enabled endpoint path. */
-export const filterCapabilities = (
-  capabilities: CapabilitySummaryEntry[],
-  query: string,
-  levelFilter: CapabilityLevelFilter
-): FilteredCapability[] => {
-  const normalizedQuery = query.trim().toLowerCase()
-
-  return capabilities
-    .filter((capability) => levelFilter === 'all' || capability.mode === levelFilter)
-    .flatMap((capability) => {
-      if (normalizedQuery === '') return [{ capability, matchedByPath: false }]
-
-      const nameMatches = capability.entry.name.toLowerCase().includes(normalizedQuery)
-      const matchedByPath = capability.endpoints.some((endpoint) =>
-        endpoint.path.toLowerCase().includes(normalizedQuery)
-      )
-      if (!nameMatches && !matchedByPath) return []
-      return [{ capability, matchedByPath }]
-    })
-}
-
 const RISK_RANK: Record<RiskLevel, number> = { low: 1, medium: 2, high: 3 }
 const RANK_TO_RISK: Record<number, RiskLevel> = { 1: 'low', 2: 'medium', 3: 'high' }
 

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { Box, Boxes } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
+import { cn, ScrollArea, Sheet, SheetContent, SheetHeader, ToggleGroup, ToggleGroupItem } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -12,7 +12,11 @@ import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
 import { CapabilitiesSection } from './TokenCapabilities/CapabilitiesSection'
 import { RiskBanner } from './TokenCapabilities/RiskBanner'
-import { computeRiskBanner } from './TokenCapabilities/TokenCapabilities.utils'
+import {
+  computeRiskBanner,
+  getCapabilityDensityTier,
+  type CapabilityLevelFilter,
+} from './TokenCapabilities/TokenCapabilities.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
@@ -95,6 +99,8 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     grantedScopes,
     permissionScopeMap,
   })
+  const capabilityTier = getCapabilityDensityTier(capabilities.length)
+  const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
 
   // Accessible resources render with their name and ref/slug. Resources the user has lost access
   // to are aggregated into an anonymous count — their identifiers aren't shown.
@@ -240,7 +246,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
               <div
                 key={item.key}
                 className={cn(
-                  'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-1 text-[13px]',
+                  'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-sm',
                   item.isInaccessible
                     ? 'border-destructive-500 text-destructive'
                     : 'border-strong text-foreground'
@@ -328,6 +334,11 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                 )}
 
                 <div className="flex flex-col gap-3">
+                  <h3 className="text-sm">Risk assessment</h3>
+                  <RiskBanner risk={risk} showRoleCaveat={hasExceedingCapabilities} />
+                </div>
+
+                <div className="flex flex-col gap-3">
                   <h3 className="text-sm">Token summary</h3>
                   <dl className="divide-y rounded-md border bg-surface-300">
                     {rows.map(([key, value]) => (
@@ -358,13 +369,29 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-sm">Risk assessment</h3>
-                  <RiskBanner risk={risk} showRoleCaveat={hasExceedingCapabilities} />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <h3 className="text-sm">Capabilities</h3>
-                  <CapabilitiesSection capabilities={capabilities} accessEntries={access.entries} />
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm">Capabilities</h3>
+                    {capabilityTier === 'dense' && (
+                      <ToggleGroup
+                        type="single"
+                        variant="outline"
+                        size="sm"
+                        value={levelFilter}
+                        onValueChange={(value) => {
+                          if (value) setLevelFilter(value as CapabilityLevelFilter)
+                        }}
+                      >
+                        <ToggleGroupItem value="all">All</ToggleGroupItem>
+                        <ToggleGroupItem value="read">Read</ToggleGroupItem>
+                        <ToggleGroupItem value="readwrite">Read-write</ToggleGroupItem>
+                      </ToggleGroup>
+                    )}
+                  </div>
+                  <CapabilitiesSection
+                    capabilities={capabilities}
+                    accessEntries={access.entries}
+                    levelFilter={levelFilter}
+                  />
                 </div>
               </>
             )}

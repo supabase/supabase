@@ -1,12 +1,11 @@
 import { useState } from 'react'
-import { Accordion, Badge, Input, ToggleGroup, ToggleGroupItem } from 'ui'
+import { Accordion, Badge } from 'ui'
 
 import type { EntryAccess } from '../../AccessToken.roles'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import { CapabilityCard } from './CapabilityCard'
 import { DENSE_READONLY_PREVIEW_ROWS } from './TokenCapabilities.constants'
 import {
-  filterCapabilities,
   getNotGrantedCatalogEntries,
   groupCapabilitiesByLevel,
   type CapabilityLevelFilter,
@@ -15,91 +14,72 @@ import {
 interface DenseCapabilitiesProps {
   capabilities: CapabilitySummaryEntry[]
   accessEntries: Record<string, EntryAccess>
+  /** Which level group(s) to show — the All/Read/Read-write control lives next to the section title. */
+  levelFilter: CapabilityLevelFilter
 }
 
 /**
- * 9+ capabilities: a text/path filter and read/read-write segmented control narrow a level-grouped
- * list. Read-write is pinned first and never truncated; read-only previews a few rows. A path match
- * auto-expands its parent capability on top of whatever the user has manually opened.
+ * 9+ capabilities: a level-grouped list. Read-write is pinned first and never truncated;
+ * read-only previews a few rows.
  */
-export const DenseCapabilities = ({ capabilities, accessEntries }: DenseCapabilitiesProps) => {
-  const [query, setQuery] = useState('')
-  const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
-  const [manuallyOpenKeys, setManuallyOpenKeys] = useState<string[]>([])
+export const DenseCapabilities = ({
+  capabilities,
+  accessEntries,
+  levelFilter,
+}: DenseCapabilitiesProps) => {
+  const [openKeys, setOpenKeys] = useState<string[]>([])
   const [showAllReadOnly, setShowAllReadOnly] = useState(false)
 
-  const filtered = filterCapabilities(capabilities, query, levelFilter)
-  const forcedOpenKeys = filtered
-    .filter((match) => match.matchedByPath)
-    .map((match) => match.capability.entry.key)
-  const openKeys = Array.from(new Set([...manuallyOpenKeys, ...forcedOpenKeys]))
-
-  const { readwrite, read } = groupCapabilitiesByLevel(filtered.map((match) => match.capability))
+  const { readwrite, read } = groupCapabilitiesByLevel(capabilities)
   const notGranted = getNotGrantedCatalogEntries(capabilities)
+
+  const showReadWrite = levelFilter !== 'read' && readwrite.length > 0
+  const showRead = levelFilter !== 'readwrite' && read.length > 0
 
   const visibleRead = showAllReadOnly ? read : read.slice(0, DENSE_READONLY_PREVIEW_ROWS)
   const hiddenReadCount = read.length - visibleRead.length
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Input
-          size="tiny"
-          placeholder="Filter by capability or endpoint..."
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          className="max-w-xs"
-        />
-        <ToggleGroup
-          type="single"
-          variant="outline"
-          size="sm"
-          value={levelFilter}
-          onValueChange={(value) => {
-            if (value) setLevelFilter(value as CapabilityLevelFilter)
-          }}
-        >
-          <ToggleGroupItem value="all">All</ToggleGroupItem>
-          <ToggleGroupItem value="read">Read</ToggleGroupItem>
-          <ToggleGroupItem value="readwrite">Read-write</ToggleGroupItem>
-        </ToggleGroup>
-      </div>
-
-      {readwrite.length === 0 && read.length === 0 && (
-        <p className="text-xs text-foreground-lighter">No capabilities match your filter.</p>
+      {!showReadWrite && !showRead && (
+        <p className="text-xs text-foreground-lighter">No capabilities match this filter.</p>
       )}
 
-      <Accordion type="multiple" value={openKeys} onValueChange={setManuallyOpenKeys}>
-        {readwrite.length > 0 && (
+      <Accordion type="multiple" value={openKeys} onValueChange={setOpenKeys}>
+        {showReadWrite && (
           <div className="flex flex-col gap-2">
             <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
               Read-write · {readwrite.length}
             </p>
-            <div className="flex flex-col gap-2 rounded-md border border-warning-400 p-2">
-              {readwrite.map((capability) => (
+            <div>
+              {readwrite.map((capability, index) => (
                 <CapabilityCard
                   key={capability.entry.key}
                   capability={capability}
                   collapsible
                   accessEntries={accessEntries}
+                  isFirst={index === 0}
+                  isLast={index === readwrite.length - 1}
                 />
               ))}
             </div>
           </div>
         )}
 
-        {read.length > 0 && (
+        {showRead && (
           <div className="mt-4 flex flex-col gap-2">
             <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
               Read-only · {read.length}
             </p>
-            <div className="flex flex-col gap-2">
-              {visibleRead.map((capability) => (
+            <div>
+              {visibleRead.map((capability, index) => (
                 <CapabilityCard
                   key={capability.entry.key}
                   capability={capability}
                   collapsible
                   accessEntries={accessEntries}
+                  isFirst={index === 0}
+                  isLast={index === visibleRead.length - 1}
                 />
               ))}
             </div>
