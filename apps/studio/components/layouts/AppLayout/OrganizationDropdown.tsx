@@ -1,8 +1,9 @@
-import { useBreakpoint, useParams } from 'common'
+import { useParams } from 'common'
 import { Boxes } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { useWindowSize } from 'react-use'
 import { Badge, cn } from 'ui'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -19,6 +20,9 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { usePlanBadgeUpgradeExperiment } from '@/hooks/misc/usePlanBadgeUpgradeExperiment'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
+
+// Tailwind's `md`, matching the `hidden md:flex` on the header this renders in.
+const MD_BREAKPOINT = 768
 
 interface OrganizationDropdownProps {
   embedded?: boolean
@@ -52,9 +56,13 @@ export const OrganizationDropdown = ({
   // The badge only exists in the desktop header — `embedded` renders just the command list,
   // and the header itself is `hidden md:flex`. Firing exposure from those enrols users who
   // can never see the treatment, which dilutes both arms.
-  const isBelowMd = useBreakpoint('md')
+  //
+  // Reading the width directly rather than via `useBreakpoint`, whose state starts at
+  // `false` (i.e. "not below the breakpoint") until its layout effect runs — on a remount
+  // with flags already cached that reads as "desktop" and fires exposure on mobile.
+  const { width: viewportWidth } = useWindowSize()
   const { variant: planBadgeVariant } = usePlanBadgeUpgradeExperiment({
-    trackExposure: !embedded && !isBelowMd,
+    trackExposure: !embedded && viewportWidth >= MD_BREAKPOINT,
   })
   const showPlanBadgeUpgrade = planBadgeVariant === 'test' && !!selectedOrganization && !!slug
 

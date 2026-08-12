@@ -7,6 +7,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useTrackExperimentExposure } from '@/hooks/misc/useTrackExperimentExposure'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { useProfile } from '@/lib/profile'
 import type { Organization } from '@/types'
 
 // PostHog flag key (camelCase, matches other flag naming in the codebase).
@@ -25,25 +26,21 @@ export type PlanBadgeUpgradeVariant = 'control' | 'test'
 const VALID_VARIANTS: PlanBadgeUpgradeVariant[] = ['control', 'test']
 
 /**
- * Whether this org can actually complete an upgrade through the dashboard's plan panel,
- * which is what the badge links to. Anyone who can't is excluded from the experiment
- * entirely — not just from the treatment — so they don't sit in the exposure cohort as
- * guaranteed non-converters.
+ * Whether this org can complete an upgrade through the dashboard's plan panel, which is
+ * what the badge links to. Anyone who can't is excluded from the experiment entirely — not
+ * just from the treatment — so they don't sit in the exposure cohort as guaranteed
+ * non-converters.
+ *
+ * Org-level only, so it resolves as soon as the organization query does. The user-level
+ * half of eligibility (`billing:all`) resolves separately — see `isPlanBadgeUpgradeEligible`.
  *
  * Mirrors the eligibility `UpgradePlanButton` applies before linking to the same panel;
  * the one case deliberately left in is a free-plan member without `BILLING_WRITE`, since
  * `PlanUpdateSidePanel` renders `RequestUpgradeToBillingOwners` per plan card for them —
  * that's a real next action, not a dead end.
  */
-export const isPlanBadgeUpgradeEligible = (
-  organization: Organization | undefined,
-  billingAll: boolean
-) => {
+export const isOrganizationUpgradableInDashboard = (organization: Organization | undefined) => {
   if (organization?.plan?.id !== 'free') return false
-
-  // With `billing:all` disabled, /org/[slug]/billing renders `UnknownInterface`, so the
-  // badge would link to a dead end. `UpgradePlanButton` falls back to the support form.
-  if (!billingAll) return false
 
   // Partner-managed orgs change plans through Vercel / AWS Marketplace / Stripe Projects.
   // `PlanUpdateSidePanel` shows a `PartnerManagedResource` notice and disables every paid
@@ -53,6 +50,22 @@ export const isPlanBadgeUpgradeEligible = (
 
   return true
 }
+
+/**
+ * Full eligibility: the org can be upgraded in-dashboard *and* this user can reach the
+ * billing page at all. With `billing:all` disabled, `/org/[slug]/billing` renders
+ * `UnknownInterface`, so the badge would link to a dead end — `UpgradePlanButton` falls
+ * back to the support form in that case.
+ *
+ * Note `billingAll` reads from the profile, which loads independently of the organization
+ * query and defaults to `true` while pending. Callers must not treat this as definitive
+ * until the profile has resolved, or a user with billing disabled can be enrolled during
+ * the gap.
+ */
+export const isPlanBadgeUpgradeEligible = (
+  organization: Organization | undefined,
+  billingAll: boolean
+) => isOrganizationUpgradableInDashboard(organization) && billingAll
 
 interface UsePlanBadgeUpgradeExperimentOptions {
   /**
@@ -91,17 +104,25 @@ export const usePlanBadgeUpgradeExperiment = ({
   const flagStore = useFeatureFlags()
   const flagValue = usePHFlag<PlanBadgeUpgradeVariant | false>(PLAN_BADGE_UPGRADE_FLAG_NAME)
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
+  const { isLoading: isProfileLoading } = useProfile()
 
   const flagsLoaded = flagStore.hasLoaded === true
   const orgKnown = !isOrgPending
+  // `billingAll` defaults to `true` while the profile is in flight, and the profile loads
+  // independently of the org query. Without this the flag store can resolve first and enrol
+  // a user whose `billing:all` is actually off.
+  const featuresKnown = !isProfileLoading
+  const isResolved = flagsLoaded && orgKnown && featuresKnown
+
   const isFreePlan = organization?.plan?.id === 'free'
+  const isOrgUpgradable = isOrganizationUpgradableInDashboard(organization)
   const isEligible = isPlanBadgeUpgradeEligible(organization, billingAll)
   const isInExperiment =
     typeof flagValue === 'string' && VALID_VARIANTS.includes(flagValue as PlanBadgeUpgradeVariant)
 
   // The definitive variant for a confirmed eligible user in the experiment.
   const liveVariant =
-    isEligible && isInExperiment ? (flagValue as PlanBadgeUpgradeVariant) : undefined
+    isResolved && isEligible && isInExperiment ? (flagValue as PlanBadgeUpgradeVariant) : undefined
 
   // Synchronous seed from the last resolved variant for this org. Read via useMemo so it
   // re-reads when the org slug changes (e.g. navigating between orgs without a remount).
@@ -117,15 +138,20 @@ export const usePlanBadgeUpgradeExperiment = ({
     }
   }, [seedKey])
 
+  // Each "confirmed ineligible" branch is checked against the query that establishes it, so
+  // a stale seed is beaten as soon as *that* answer lands rather than waiting for all of them.
   let variant: PlanBadgeUpgradeVariant | undefined
   if (!IS_PLATFORM) {
     // No billing/plans on self-hosted, so there is nothing to upgrade to — never show.
     variant = undefined
-  } else if (flagsLoaded && orgKnown) {
+  } else if (isResolved) {
     // Fully resolved — source of truth.
     variant = liveVariant
-  } else if (orgKnown && !isEligible) {
-    // Confirmed ineligible — never show, even if a stale seed says otherwise.
+  } else if (orgKnown && !isOrgUpgradable) {
+    // Confirmed paid or partner-managed — never show, even if a stale seed says otherwise.
+    variant = undefined
+  } else if (featuresKnown && !billingAll) {
+    // Confirmed no access to billing — same.
     variant = undefined
   } else {
     // Eligible, or still loading — trust the last known value to avoid a first-paint shift.
@@ -136,9 +162,9 @@ export const usePlanBadgeUpgradeExperiment = ({
   // to this org can seed from it. Only matters before the live value resolves, so we don't
   // need it in component state.
   useEffect(() => {
-    if (!IS_PLATFORM || !flagsLoaded || !orgKnown) return
+    if (!IS_PLATFORM || !isResolved) return
     safeLocalStorage.setItem(seedKey, JSON.stringify(liveVariant ?? null))
-  }, [flagsLoaded, orgKnown, liveVariant, seedKey])
+  }, [isResolved, liveVariant, seedKey])
 
   useTrackExperimentExposure(
     PLAN_BADGE_UPGRADE_EXPERIMENT_ID,

@@ -38,9 +38,16 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
     organization.managed_by === MANAGED_BY.SUPABASE ? null : <div data-testid="partner-icon" />,
 }))
 
+// `useWindowSize` reads `window.innerWidth` when it initializes, so set this before render.
+const DESKTOP_VIEWPORT_WIDTH = 1024
+const setViewportWidth = (width: number) => {
+  Object.defineProperty(window, 'innerWidth', { configurable: true, writable: true, value: width })
+}
+
 describe('OrganizationDropdown', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    setViewportWidth(DESKTOP_VIEWPORT_WIDTH)
     mockUseIsFeatureEnabled.mockReturnValue(false)
     // Default to the control arm so the plan badge stays inline (non-clickable).
     mockUsePlanBadgeUpgradeExperiment.mockReturnValue({ isFreePlan: true, variant: 'control' })
@@ -118,7 +125,7 @@ describe('OrganizationDropdown', () => {
     expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
   })
 
-  it('tracks exposure from the header, which is the only place the badge renders', () => {
+  it('tracks exposure from the desktop header, the only place the badge renders', () => {
     mockUseSelectedOrganizationQuery.mockReturnValue({
       data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
     })
@@ -134,6 +141,17 @@ describe('OrganizationDropdown', () => {
     })
 
     render(<OrganizationDropdown embedded />)
+
+    expect(mockUsePlanBadgeUpgradeExperiment).toHaveBeenCalledWith({ trackExposure: false })
+  })
+
+  it('does not track exposure below md, where the header is hidden', () => {
+    setViewportWidth(390)
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    render(<OrganizationDropdown />)
 
     expect(mockUsePlanBadgeUpgradeExperiment).toHaveBeenCalledWith({ trackExposure: false })
   })
