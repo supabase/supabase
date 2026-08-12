@@ -112,9 +112,11 @@ export const useNotebooks = (projectRef: string) => {
 }
 
 export const useCurrentNotebook = () => {
-  const { id } = useParams()
+  const { id, ref } = useParams()
   const snapshot = useNotebooksStateSnapshot()
   const currentNotebook = id ? snapshot.notebooks[id] : undefined
+
+  if (!currentNotebook || currentNotebook.projectRef !== ref) return undefined
 
   return currentNotebook
 }
