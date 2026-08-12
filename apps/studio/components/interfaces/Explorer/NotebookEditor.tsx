@@ -12,7 +12,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
-import { untrustedSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { Edit, Notebook, NotebookText, Play, Save } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
@@ -23,21 +22,20 @@ import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const NotebookEditor = () => {
   const { id } = useParams()
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
-  const stateNotebook = id ? snap.notebooks[id] : undefined
 
-  const { name, content } = stateNotebook?.notebook ?? {}
+  const currentNotebook = useCurrentNotebook()
+  const { name, content } = currentNotebook?.notebook ?? {}
+  const cells = content?.cells ?? []
 
   const [titleValue, setTitleValue] = useState<string>(name ?? '')
   const [isEditingTitle, setIsEditingTitle] = useState(false)
-
-  const cells = content?.cells ?? []
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -51,25 +49,6 @@ export const NotebookEditor = () => {
       tabs.updateTab(createTabId('notebook', { id }), { label: trimmedName })
     }
     setIsEditingTitle(false)
-  }
-
-  const handleUpdateMarkdown = (cellId: string, text: string) => {
-    if (!id) return
-
-    const nextCells = cells.map((cell) => (cell.id === cellId ? { ...cell, text } : cell))
-    snap.updateCells({ id, cells: nextCells })
-  }
-
-  const handleUpdateSQL = (cellId: string, sql: string) => {
-    if (!id) return
-
-    const nextCells = cells.map((cell) =>
-      cell.id === cellId && cell._tag === 'database_cell'
-        ? { ...cell, unchecked_sql: untrustedSql(sql) }
-        : cell
-    )
-
-    snap.updateCells({ id, cells: nextCells })
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -157,7 +136,7 @@ export const NotebookEditor = () => {
       </div>
 
       <div className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
-        <div className="p-4">
+        <div className="p-4 pb-10">
           {cells.length === 0 && (
             <EmptyStatePresentational
               icon={<Notebook className="text-foreground-lighter" />}
@@ -181,21 +160,11 @@ export const NotebookEditor = () => {
                   {cells.map((cell) => {
                     switch (cell._tag) {
                       case 'markdown_cell':
-                        return (
-                          <MarkdownCell
-                            key={cell.id}
-                            cell={cell}
-                            onCommitChanges={(text) => handleUpdateMarkdown(cell.id, text)}
-                          />
-                        )
+                        return <MarkdownCell key={cell.id} cell={cell} />
+
                       case 'database_cell':
-                        return (
-                          <QueryCell
-                            key={cell.id}
-                            cell={cell}
-                            onCommitChanges={(sql) => handleUpdateSQL(cell.id, sql)}
-                          />
-                        )
+                        return <QueryCell key={cell.id} cell={cell} />
+
                       case 'log_cell':
                         // [Joshen] Will eventually hook it up
                         return null

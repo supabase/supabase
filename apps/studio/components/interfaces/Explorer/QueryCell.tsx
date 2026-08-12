@@ -1,6 +1,7 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { CodeSquare, Eye, EyeOff, Play, Settings2 } from 'lucide-react'
 import { useState } from 'react'
+import { cn } from 'ui'
 
 import {
   ExplorerQuery,
@@ -8,6 +9,7 @@ import {
   ExplorerQueryFooter,
   ExplorerQueryResults,
 } from './ExplorerQuery'
+import { type QueryResult } from './ExplorerQuery/ExplorerQuery.types'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -15,48 +17,57 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { QueryResultTable } from './QueryResultTable'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { type ResponseError } from '@/types'
 
 interface QueryCellProps {
   cell: DatabaseCellSchema
-  onCommitChanges: (sql: string) => void
 }
 
-// [Joshen] Note that this is visually quite similar to ReportBlock.tsx, but functionally
-// rather different, so am opting to spin up a new UI component rather than trying to extend
-// ReportBlock.tsx, so that its easier to clean up when we sunset custom reports. But will based
-// the functionality off ReportBlocks quite closely.
+/**
+ * [Joshen] Aiming to keep PRs small so the following are deliberating missing for now:
+ * - Auto limit logic
+ * - Database selection logic
+ * - Data display logic
+ *
+ * QueryCell atm minimally supports running queries and rendering results
+ */
 
-export const QueryCell = ({ cell, onCommitChanges }: QueryCellProps) => {
+export const QueryCell = ({ cell }: QueryCellProps) => {
+  const snap = useNotebooksStateSnapshot()
+  const currentNotebook = useCurrentNotebook()
   const { data: project } = useSelectedProjectQuery()
+  const cells = currentNotebook?.notebook.content?.cells ?? []
 
   const { title = 'Untitled snippet', row_limit } = cell
 
   const [showQuery, setShowQuery] = useState(true)
   const [value, setValue] = useState<string>(cell.unchecked_sql)
-  const [results, setResults] = useState<Object[]>([])
+  const [result, setResult] = useState<QueryResult>()
 
   const valueRef = useLatest(value)
-  const onCommitChangesRef = useLatest(onCommitChanges)
 
-  const {
-    mutateAsync: executeQuery,
-    isSuccess,
-    isPending: isExecuting,
-  } = useExecuteSqlMutation({
-    onSuccess: (data) => setResults(data.result),
-    onError: () => {},
+  const { mutateAsync: executeQuery, isPending: isExecuting } = useExecuteSqlMutation({
+    onSuccess: (data) =>
+      setResult({
+        rows: data.result,
+        error: undefined,
+        autoLimit: undefined,
+      }),
+    onError: (error) =>
+      setResult({
+        rows: undefined,
+        error: error as unknown as ResponseError,
+        autoLimit: undefined,
+      }),
   })
-
-  const handleCommit = () => {
-    onCommitChangesRef.current(valueRef.current)
-  }
 
   const onRunQuery = async () => {
     if (!project) return console.error('Project is required')
@@ -68,16 +79,45 @@ export const QueryCell = ({ cell, onCommitChanges }: QueryCellProps) => {
     })
   }
 
+  const handleUpdateCell = (payload: { sql: string } | { title: string }) => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!notebookId) return
+
+    const nextCells = cells.map((c) => {
+      if (c.id !== cell.id || c._tag !== 'database_cell') {
+        return c
+      }
+
+      if ('sql' in payload) {
+        return { ...c, unchecked_sql: untrustedSql(payload.sql) }
+      }
+
+      const trimmedTitle = payload.title.trim()
+      return trimmedTitle ? { ...c, title: trimmedTitle } : c
+    })
+
+    snap.updateCells({ id: notebookId, cells: nextCells })
+  }
+
+  const handleUpdateCellRef = useLatest(handleUpdateCell)
+
   return (
     <SortableSection gripClassName="mt-2.5" id={cell.id}>
-      <ExplorerQuery>
+      <ExplorerQuery className="max-w-4xl mx-auto">
         <ExplorerToolbar>
           <ExplorerToolbarIcon>
             <CodeSquare size={14} />
           </ExplorerToolbarIcon>
-          <ExplorerToolbarTitle>{title}</ExplorerToolbarTitle>
+          <ExplorerToolbarTitle
+            title={title}
+            onSaveTitle={(newTitle) => handleUpdateCell({ title: newTitle })}
+          />
           <ExplorerToolbarActions>
-            <ExplorerToolbarAction icon={<Settings2 />} tooltip="Display settings" />
+            <ExplorerToolbarAction
+              disabled={(result?.rows ?? []).length === 0}
+              icon={<Settings2 />}
+              tooltip="Result settings"
+            />
             <ExplorerToolbarAction
               icon={showQuery ? <EyeOff /> : <Eye />}
               tooltip={showQuery ? 'Hide query' : 'Show query'}
@@ -99,21 +139,28 @@ export const QueryCell = ({ cell, onCommitChanges }: QueryCellProps) => {
               value={value}
               onInputChange={(v) => setValue(v ?? '')}
               className="h-32"
+              actions={{ runQuery: { enabled: true, callback: onRunQuery } }}
               onMount={(editor) => {
-                editor.onDidBlurEditorWidget(handleCommit)
+                editor.onDidBlurEditorWidget(() =>
+                  handleUpdateCellRef.current({ sql: valueRef.current })
+                )
               }}
             />
           </ExplorerQueryEditor>
         )}
 
-        <ExplorerQueryResults className="flex items-center justify-center">
-          {results.length === 0 && !isSuccess && (
-            <p className="text-xs text-foreground-lighter">Run the query to see results</p>
+        <ExplorerQueryResults
+          className={cn(
+            (result?.rows ?? []).length === 0
+              ? 'flex items-center justify-center'
+              : 'overflow-x-auto'
           )}
+        >
+          <QueryResultTable result={result} />
         </ExplorerQueryResults>
 
         <ExplorerQueryFooter className="flex items-center gap-x-2">
-          <p>{results.length.toLocaleString()} rows</p>
+          <p>{(result?.rows ?? []).length.toLocaleString()} rows</p>
           <p>·</p>
           <p>Limit {row_limit} rows</p>
         </ExplorerQueryFooter>

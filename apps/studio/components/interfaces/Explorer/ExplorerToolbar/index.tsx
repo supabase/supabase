@@ -1,5 +1,7 @@
-import React from 'react'
+import { Edit } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
@@ -42,16 +44,70 @@ const ExplorerToolbarIcon = ({
 )
 ExplorerToolbarIcon.displayName = 'ExplorerToolbarIcon'
 
-export type ExplorerToolbarTitleProps = React.ComponentProps<'div'>
+export type ExplorerToolbarTitleProps = React.ComponentProps<'div'> & {
+  title: string
+  onSaveTitle?: (value: string) => void
+}
 
 /** Flexible title region for static text or an editable resource name. */
-const ExplorerToolbarTitle = ({ className, ...props }: ExplorerToolbarTitleProps) => (
-  <div
-    data-slot="explorer-toolbar-title"
-    className={cn('min-w-0 flex-1 truncate text-sm', className)}
-    {...props}
-  />
-)
+const ExplorerToolbarTitle = ({
+  title,
+  className,
+  onSaveTitle,
+  ...props
+}: ExplorerToolbarTitleProps) => {
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [value, setValue] = useState(title)
+
+  useEffect(() => {
+    if (isEditingTitle) setValue(title)
+  }, [isEditingTitle, title])
+
+  return (
+    <div
+      data-slot="explorer-toolbar-title"
+      className={cn('min-w-0 flex-1 truncate text-sm', className)}
+      {...props}
+    >
+      {isEditingTitle ? (
+        <Input
+          autoFocus
+          size="tiny"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            if (isEditingTitle) {
+              setIsEditingTitle(false)
+              onSaveTitle?.(value)
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsEditingTitle(false)
+              setValue(title ?? '')
+            } else if (e.key === 'Enter') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsEditingTitle(false)
+              onSaveTitle?.(value)
+            }
+          }}
+        />
+      ) : (
+        <Button
+          variant="text"
+          className="group"
+          onClick={() => setIsEditingTitle(true)}
+          iconRight={<Edit className="opacity-0 group-hover:opacity-100 transition" />}
+        >
+          {value}
+        </Button>
+      )}
+    </div>
+  )
+}
 ExplorerToolbarTitle.displayName = 'ExplorerToolbarTitle'
 
 export type ExplorerToolbarActionsProps = React.ComponentProps<'div'>

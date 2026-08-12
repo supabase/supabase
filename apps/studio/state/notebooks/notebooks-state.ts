@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { useMemo } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 import { proxyMap } from 'valtio/utils'
@@ -108,4 +109,12 @@ export const useNotebooks = (projectRef: string) => {
         .map((x) => x.notebook),
     [projectRef, snapshot.notebooks]
   )
+}
+
+export const useCurrentNotebook = () => {
+  const { id } = useParams()
+  const snapshot = useNotebooksStateSnapshot()
+  const currentNotebook = id ? snapshot.notebooks[id] : undefined
+
+  return currentNotebook
 }
