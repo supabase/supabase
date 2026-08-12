@@ -85,11 +85,41 @@ describe('AI assistant chat surface isolation', () => {
     state.chats[explorerChatId].messages = [
       { id: 'explorer-message', role: 'user', parts: [{ type: 'text', text: 'Clear me' }] },
     ]
+    state.chatInstances[explorerChatId].messages = [
+      { id: 'explorer-message', role: 'user', parts: [{ type: 'text', text: 'Clear me' }] },
+    ]
 
     state.clearMessages(explorerChatId)
 
     expect(state.activeChatId).toBe(sidebarChatId)
     expect(state.chats[sidebarChatId].messages).toHaveLength(1)
     expect(state.chats[explorerChatId].messages).toHaveLength(0)
+    expect(state.chatInstances[explorerChatId].messages).toHaveLength(0)
+  })
+
+  it('keeps explicit chat message edits synchronized with the live chat instance', () => {
+    const state = createAiAssistantState()
+    const chatId = state.createChat({ name: 'Explorer chat' })
+    const messages = [
+      { id: 'message-1', role: 'user' as const, parts: [{ type: 'text' as const, text: 'First' }] },
+      {
+        id: 'message-2',
+        role: 'user' as const,
+        parts: [{ type: 'text' as const, text: 'Second' }],
+      },
+    ]
+    state.chats[chatId].messages = messages
+    state.chatInstances[chatId].messages = messages
+
+    state.deleteMessagesAfter('message-2', { chatId })
+    state.updateMessage(
+      { id: 'message-1', role: 'user', parts: [{ type: 'text', text: 'Updated' }] },
+      chatId
+    )
+
+    expect(state.chats[chatId].messages).toEqual([
+      { id: 'message-1', role: 'user', parts: [{ type: 'text', text: 'Updated' }] },
+    ])
+    expect(state.chatInstances[chatId].messages).toEqual(state.chats[chatId].messages)
   })
 })

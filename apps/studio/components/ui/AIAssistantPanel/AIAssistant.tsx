@@ -19,6 +19,14 @@ interface AIAssistantProps {
   className?: string
 }
 
+type CurrentQuerySnippet = Exclude<SqlSnippet, string>
+
+const isSameSnippet = (snippet: SqlSnippet, currentQuery: CurrentQuerySnippet) =>
+  typeof snippet !== 'string' &&
+  snippet.label === currentQuery.label &&
+  snippet.content === currentQuery.content &&
+  snippet.source === currentQuery.source
+
 export const AIAssistant = ({ className }: AIAssistantProps) => {
   const router = useRouter()
   const { id: entityId, source: sourceParam } = useParams()
@@ -42,10 +50,24 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     : undefined
 
   useEffect(() => {
-    if (shortcutsEnabled && isInSQLEditor && !!snippetContent) {
-      state.setSqlSnippets([
-        { label: 'Current Query', content: snippetContent, source: openSnippetSource },
-      ])
+    if (!shortcutsEnabled || !isInSQLEditor || !snippetContent) return
+
+    const currentQuery = {
+      label: 'Current Query',
+      content: snippetContent,
+      source: openSnippetSource,
+    }
+    state.setSqlSnippets([currentQuery])
+
+    return () => {
+      const currentSnippets = state.sqlSnippets
+      const remainingSnippets = currentSnippets?.filter(
+        (snippet) => !isSameSnippet(snippet, currentQuery)
+      )
+
+      if (currentSnippets && remainingSnippets?.length !== currentSnippets.length) {
+        state.setSqlSnippets(remainingSnippets ?? [])
+      }
     }
   }, [shortcutsEnabled, isInSQLEditor, snippetContent, openSnippetSource, state])
 

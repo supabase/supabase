@@ -550,6 +550,8 @@ export const createAiAssistantState = (): AiAssistantState => {
       const chat = state.chats[chatId]
       if (chat) {
         chat.messages = []
+        const chatInstance = state.chatInstances[chatId]
+        if (chatInstance) chatInstance.messages = []
         chat.updatedAt = new Date()
         if (chatId === state.activeChatId) {
           state.suggestions = undefined
@@ -571,6 +573,14 @@ export const createAiAssistantState = (): AiAssistantState => {
       // Delete all messages from the target message (optionally including) to the end
       const startIndex = includeSelf ? messageIndex : messageIndex + 1
       chat.messages.splice(startIndex)
+      const chatInstance = state.chatInstances[chatId]
+      const instanceMessageIndex = chatInstance?.messages.findIndex((message) => message.id === id)
+      if (chatInstance && instanceMessageIndex !== undefined && instanceMessageIndex !== -1) {
+        chatInstance.messages = chatInstance.messages.slice(
+          0,
+          includeSelf ? instanceMessageIndex : instanceMessageIndex + 1
+        )
+      }
       chat.updatedAt = new Date()
     },
 
@@ -583,7 +593,17 @@ export const createAiAssistantState = (): AiAssistantState => {
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
         // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
-        chat.messages[messageIndex] = sanitizeForCloning(updatedMessage)
+        const clonedMessage = sanitizeForCloning(updatedMessage)
+        chat.messages[messageIndex] = clonedMessage
+        const chatInstance = state.chatInstances[chatId]
+        const instanceMessageIndex = chatInstance?.messages.findIndex(
+          (message) => message.id === updatedMessage.id
+        )
+        if (chatInstance && instanceMessageIndex !== undefined && instanceMessageIndex !== -1) {
+          chatInstance.messages = chatInstance.messages.map((message, index) =>
+            index === instanceMessageIndex ? sanitizeForCloning(updatedMessage) : message
+          )
+        }
         chat.updatedAt = new Date()
       }
     },
@@ -638,18 +658,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
 
       // Initialize chat instance for the active chat
-      if (
-        state.activeChatId &&
-        state.chats[state.activeChatId] &&
-        !state.chatInstances[state.activeChatId]
-      ) {
-        state.chatInstances[state.activeChatId] = ref(
-          createChatInstance(state, {
-            id: state.activeChatId,
-            initialMessages: state.chats[state.activeChatId].messages,
-          })
-        )
-      }
+      if (state.activeChatId) state.ensureChatInstance(state.activeChatId)
     },
 
     clearStorage: async () => {

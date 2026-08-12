@@ -146,12 +146,6 @@ export const AssistantChat = ({
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
 
-  // Keep latest selected organization to avoid stale values in useChat transport
-  const selectedOrganizationRef = useRef(selectedOrganization)
-  useEffect(() => {
-    selectedOrganizationRef.current = selectedOrganization
-  }, [selectedOrganization])
-
   const [value, setValue] = useState<string>(composerContext?.initialInput || '')
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [isResubmitting, setIsResubmitting] = useState(false)
@@ -178,12 +172,18 @@ export const AssistantChat = ({
   useEffect(() => {
     state.setContext({
       projectRef: project?.ref,
-      orgSlug: selectedOrganizationRef.current?.slug,
+      orgSlug: selectedOrganization?.slug,
       connectionString: project?.connectionString ?? '',
     })
-  }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
+  }, [project?.ref, project?.connectionString, selectedOrganization?.slug, state])
 
   const track = useTrack()
+
+  useEffect(() => {
+    state.ensureChatInstance(chatId)
+  }, [chatId, state])
+
+  const chatInstance = snap.chatInstances[chatId]
 
   const {
     messages: chatMessages,
@@ -196,7 +196,7 @@ export const AssistantChat = ({
     regenerate,
   } = useChat({
     id: chatId,
-    ...(snap.chatInstances[chatId] ? { chat: snap.chatInstances[chatId] } : {}),
+    ...(chatInstance ? { chat: chatInstance } : {}),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     onError: onErrorChat,
   })
