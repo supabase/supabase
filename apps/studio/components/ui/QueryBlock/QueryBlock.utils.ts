@@ -47,7 +47,10 @@ export const formatLogTick = (value: number): string => {
   return value.toLocaleString()
 }
 
-export const getCumulativeResults = (results: { rows: readonly any[] }, config: ChartConfig) => {
+export const getCumulativeResults = (
+  results: { rows: readonly any[] },
+  config: { yKey: string }
+) => {
   if (!results?.rows?.length) {
     return []
   }

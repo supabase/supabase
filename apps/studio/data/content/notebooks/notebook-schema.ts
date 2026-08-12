@@ -14,9 +14,12 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
 })
 
 const chartConfigSchema = z.object({
+  type: z.enum(['bar', 'line']),
   x_column: z.string(),
   y_column: z.string(),
   cumulative: z.boolean(),
+  scale: z.enum(['linear', 'log']),
+  show_labels: z.boolean(),
 })
 
 const absoluteTimeRangeSchema = z.object({
@@ -48,6 +51,7 @@ const databaseCellSchema = z.object({
   title: z.string().optional(),
   sql: z.string(),
   row_limit: z.number(),
+  view: z.enum(['table', 'chart']),
   chart: chartConfigSchema.optional(),
 })
 

@@ -1,5 +1,5 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
-import { CodeSquare, Eye, EyeOff, Play, Settings2 } from 'lucide-react'
+import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'ui'
 
@@ -18,6 +18,8 @@ import {
 } from '../ExplorerToolbar'
 import { QueryResultTable } from '../QueryResultTable'
 import { type QueryResult } from '../types'
+import { DisplaySettingsButton } from './DisplaySettingsButton'
+import { QueryResultChart } from './QueryResultChart'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
@@ -46,11 +48,12 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const { data: project } = useSelectedProjectQuery()
   const cells = currentNotebook?.notebook.content?.cells ?? []
 
-  const { title = 'Untitled snippet', row_limit } = cell
+  const { title = 'Untitled snippet', row_limit, view } = cell
 
   const [showQuery, setShowQuery] = useState(true)
   const [value, setValue] = useState<string>(cell.unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
+  const columns = Object.keys(result?.rows?.[0] ?? {})
 
   const valueRef = useLatest(value)
 
@@ -114,10 +117,10 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
             {title}
           </ExplorerToolbarTitle>
           <ExplorerToolbarActions>
-            <ExplorerToolbarAction
+            <DisplaySettingsButton
+              cell={cell}
+              columns={columns}
               disabled={(result?.rows ?? []).length === 0}
-              icon={<Settings2 />}
-              tooltip="Result settings"
             />
             <ExplorerToolbarAction
               icon={showQuery ? <EyeOff /> : <Eye />}
@@ -152,12 +155,13 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
 
         <ExplorerQueryResults
           className={cn(
-            (result?.rows ?? []).length === 0
+            (result?.rows ?? []).length === 0 && view === 'table'
               ? 'flex items-center justify-center'
               : 'overflow-x-auto'
           )}
         >
-          <QueryResultTable result={result} />
+          {view === 'table' && <QueryResultTable result={result} />}
+          {view === 'chart' && <QueryResultChart cell={cell} result={result} />}
         </ExplorerQueryResults>
 
         <ExplorerQueryFooter className="flex items-center gap-x-2">
