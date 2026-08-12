@@ -10,6 +10,18 @@ module.exports = [
     source: '/images/customers/logos/:slug((?!dreambase-mark\\.png)[^/.]+).png',
     destination: '/images/customers/logos/on-light/:slug.png',
   },
+  // The two svg wordmarks that moved with them. Listed individually so the
+  // `{slug}-icon.svg` chips, which stayed at the logos/ root, keep resolving.
+  {
+    permanent: true,
+    source: '/images/customers/logos/accenture.svg',
+    destination: '/images/customers/logos/on-light/accenture.svg',
+  },
+  {
+    permanent: true,
+    source: '/images/customers/logos/stigg.svg',
+    destination: '/images/customers/logos/on-light/stigg.svg',
+  },
   {
     permanent: true,
     source: '/blog/pricing',

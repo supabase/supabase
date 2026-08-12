@@ -90,4 +90,25 @@ describe('next.config.mjs', () => {
       slug: 'dreambase-marketing',
     })
   })
+
+  it('redirects legacy svg wordmarks while leaving icon chips at the logos root', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const redirects = (await config.redirects?.()) || []
+
+    const logoRedirects = redirects.filter((redirect) =>
+      redirect.source.startsWith('/images/customers/logos')
+    )
+    const isRedirected = (url: string) =>
+      logoRedirects.some((redirect) => getPathMatch(redirect.source)(url) !== false)
+
+    // Wordmarks that moved from logos/ to logos/on-light/ have to keep resolving.
+    expect(isRedirected('/images/customers/logos/accenture.svg')).toBe(true)
+    expect(isRedirected('/images/customers/logos/stigg.svg')).toBe(true)
+    // hyper.svg moved out of logos/light/, which the :path* rule already covers.
+    expect(isRedirected('/images/customers/logos/light/hyper.svg')).toBe(true)
+
+    // Icon chips and dreambase-mark.png deliberately stayed put, so they must not redirect.
+    expect(isRedirected('/images/customers/logos/chatbase-icon.svg')).toBe(false)
+    expect(isRedirected('/images/customers/logos/dreambase-mark.png')).toBe(false)
+  })
 })
