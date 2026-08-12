@@ -117,4 +117,24 @@ describe('OrganizationDropdown', () => {
     expect(upgradeLink).toBeUndefined()
     expect(screen.getByRole('link', { name: /org one/i })).toHaveAttribute('href', '/org/org-one')
   })
+
+  it('tracks exposure from the header, which is the only place the badge renders', () => {
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    render(<OrganizationDropdown />)
+
+    expect(mockUsePlanBadgeUpgradeExperiment).toHaveBeenCalledWith({ trackExposure: true })
+  })
+
+  it('does not track exposure when embedded, since the badge is not rendered there', () => {
+    mockUseSelectedOrganizationQuery.mockReturnValue({
+      data: createMockOrganization({ slug: 'org-one', name: 'Org One' }),
+    })
+
+    render(<OrganizationDropdown embedded />)
+
+    expect(mockUsePlanBadgeUpgradeExperiment).toHaveBeenCalledWith({ trackExposure: false })
+  })
 })

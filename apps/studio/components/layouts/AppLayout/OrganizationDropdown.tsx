@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useBreakpoint, useParams } from 'common'
 import { Boxes } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -46,9 +46,16 @@ export const OrganizationDropdown = ({
   const orgName = selectedOrganization?.name
 
   // GROWTH-775 experiment: in the `test` arm the Free plan badge becomes a clickable
-  // entry point into the upgrade funnel. The hook only returns `test` for confirmed
-  // free-plan users, so paid users always keep the plain (non-clickable) badge.
-  const { variant: planBadgeVariant } = usePlanBadgeUpgradeExperiment()
+  // entry point into the upgrade funnel. The hook only returns a variant for orgs that can
+  // actually convert through the plan panel, so everyone else keeps the plain badge.
+  //
+  // The badge only exists in the desktop header — `embedded` renders just the command list,
+  // and the header itself is `hidden md:flex`. Firing exposure from those enrols users who
+  // can never see the treatment, which dilutes both arms.
+  const isBelowMd = useBreakpoint('md')
+  const { variant: planBadgeVariant } = usePlanBadgeUpgradeExperiment({
+    trackExposure: !embedded && !isBelowMd,
+  })
   const showPlanBadgeUpgrade = planBadgeVariant === 'test' && !!selectedOrganization && !!slug
 
   const [open, setOpen] = useState(false)
@@ -108,6 +115,7 @@ export const OrganizationDropdown = ({
           <Link
             href={`/org/${slug}/billing?panel=subscriptionPlan&source=org_plan_badge`}
             className="ml-2 shrink-0"
+            aria-label={`Upgrade from the ${selectedOrganization?.plan.name} plan`}
             onClick={() => track('plan_badge_upgrade_clicked')}
           >
             <Badge
