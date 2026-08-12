@@ -120,14 +120,14 @@ const data: () => {
         logo: (
           <>
             <Image
-              src="/images/customers/logos/deriv.png"
+              src="/images/customers/logos/on-light/deriv.png"
               alt="Deriv"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/deriv.png"
+              src="/images/customers/logos/on-dark/deriv.png"
               alt="Deriv"
               width={128}
               height={48}
@@ -261,7 +261,7 @@ const data: () => {
       customers: [
         {
           name: 'Deriv',
-          logo: '/images/customers/logos/deriv.png',
+          logo: '/images/customers/logos/on-light/deriv.png',
           highlights: [
             'Accelerating online trading with scalable Postgres',
             'Automation, integrations, and ecosystem',
@@ -270,7 +270,7 @@ const data: () => {
         },
         {
           name: 'Bree',
-          logo: '/images/customers/logos/bree.png',
+          logo: '/images/customers/logos/on-light/bree.png',
           highlights: [
             '10X performance gains when switching from Fauna',
             'Greater developer velocity and AI-ready foundation',
@@ -279,7 +279,7 @@ const data: () => {
         },
         {
           name: 'Next Door Lending',
-          logo: '/images/customers/logos/next-door-lending.png',
+          logo: '/images/customers/logos/on-light/next-door-lending.png',
           highlights: [
             'Top 10 mortgage broker with Supabase',
             'Leveraged Postgres for lending workflows',
@@ -288,13 +288,13 @@ const data: () => {
         },
         {
           name: 'Rally',
-          logo: '/images/customers/logos/rally.png',
+          logo: '/images/customers/logos/on-light/rally.png',
           highlights: ['Building financial applications on Supabase'],
           cta: { label: 'Read the case study', href: '/customers/rally' },
         },
         {
           name: 'Xendit',
-          logo: '/images/customers/logos/xendit.png',
+          logo: '/images/customers/logos/on-light/xendit.png',
           highlights: [
             'Full solution shipped to production in less than one week',
             'Payment processor with transaction verification',

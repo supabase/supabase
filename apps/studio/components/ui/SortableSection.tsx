@@ -1,14 +1,13 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { GripVertical } from 'lucide-react'
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties, PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
-type SortableSectionProps = {
-  id: string
-  children: ReactNode
-}
-
-export const SortableSection = ({ id, children }: SortableSectionProps) => {
+export const SortableSection = ({
+  id,
+  children,
+  gripClassName,
+}: PropsWithChildren<{ id: string; gripClassName?: string }>) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   })
@@ -21,13 +20,18 @@ export const SortableSection = ({ id, children }: SortableSectionProps) => {
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="relative will-change-transform">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative will-change-transform flex items-start gap-x-2"
+    >
       <button
         type="button"
         aria-label="Drag to reorder section"
         className={cn(
-          'absolute -left-6 top-2 text-foreground-muted hover:text-foreground cursor-grab active:cursor-grabbing',
-          'rounded-sm focus-ring'
+          'text-foreground-muted hover:text-foreground cursor-grab active:cursor-grabbing',
+          'rounded-sm focus-ring',
+          gripClassName
         )}
         {...attributes}
         {...listeners}
@@ -35,7 +39,7 @@ export const SortableSection = ({ id, children }: SortableSectionProps) => {
       >
         <GripVertical size={14} />
       </button>
-      <div className={cn(isDragging && 'opacity-70')}>{children}</div>
+      <div className={cn('w-full', isDragging && 'opacity-70')}>{children}</div>
     </div>
   )
 }
