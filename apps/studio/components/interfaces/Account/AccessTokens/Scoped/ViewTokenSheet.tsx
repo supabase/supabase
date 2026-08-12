@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Box, Boxes } from 'lucide-react'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -162,6 +162,29 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     access.inaccessibleOrgSlugs,
   ])
 
+  // Vertically centering the row only reads right when its badges fit on a single line — with
+  // wrapped badges the label should sit at the top instead. Measured, not guessed from item count,
+  // since wrapping depends on the sheet's width and each badge's label length.
+  const resourceAccessRef = useRef<HTMLDivElement>(null)
+  const [isResourceAccessWrapped, setIsResourceAccessWrapped] = useState(false)
+
+  useEffect(() => {
+    const container = resourceAccessRef.current
+    if (!container) return
+
+    const checkWrapped = () => {
+      const firstBadge = container.firstElementChild as HTMLElement | null
+      setIsResourceAccessWrapped(
+        firstBadge !== null && container.clientHeight > firstBadge.clientHeight + 2
+      )
+    }
+
+    checkWrapped()
+    const observer = new ResizeObserver(checkWrapped)
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [resourceSummary])
+
   const rows: [string, React.ReactNode][] = token
     ? [
         [
@@ -204,6 +227,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           'Resource access',
           <div
             key="resource-access"
+            ref={resourceAccessRef}
             className="flex flex-wrap justify-start gap-1.5 sm:justify-end"
           >
             {resourceSummary.items.length === 0 && hasNoBoundResources && (
@@ -242,7 +266,11 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         size="default"
         className="flex h-full flex-col gap-0 sm:w-[656px] lg:w-[800px]"
       >
-        <SheetHeader className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}>
+        <SheetHeader
+          className={cn(
+            'flex flex-col md:flex-row justify-between gap-4 items-start md:items-center border-b'
+          )}
+        >
           <p className="truncate" title={`View access for ${token?.name}`}>
             View access for {token?.name}
           </p>
@@ -308,7 +336,10 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                         className={cn(
                           'flex justify-between gap-4 px-4 py-3',
                           key === 'Resource access'
-                            ? 'flex-col items-start sm:flex-row sm:items-start'
+                            ? cn(
+                                'flex-col items-start sm:flex-row',
+                                isResourceAccessWrapped ? 'sm:items-start' : 'sm:items-center'
+                              )
                             : 'items-center'
                         )}
                       >
