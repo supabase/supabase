@@ -9,7 +9,6 @@ import {
   ExplorerQueryFooter,
   ExplorerQueryResults,
 } from './ExplorerQuery'
-import { type QueryResult } from './ExplorerQuery/ExplorerQuery.types'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -18,6 +17,7 @@ import {
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
 import { QueryResultTable } from './QueryResultTable'
+import { type QueryResult } from './types'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'

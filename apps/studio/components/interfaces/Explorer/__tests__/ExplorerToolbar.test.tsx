@@ -8,7 +8,7 @@ import {
   ExplorerToolbarActions,
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
-} from './index'
+} from '../ExplorerToolbar'
 import { customRender as render } from '@/tests/lib/custom-render'
 
 describe('ExplorerToolbar', () => {
