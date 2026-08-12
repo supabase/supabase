@@ -45,6 +45,7 @@ const markdownCellSchema = z.object({
 const databaseCellSchema = z.object({
   _tag: z.literal('database_cell'),
   id: z.string(),
+  title: z.string().optional(),
   sql: z.string(),
   row_limit: z.number(),
   chart: chartConfigSchema.optional(),
@@ -53,6 +54,7 @@ const databaseCellSchema = z.object({
 const logCellSchema = z.object({
   _tag: z.literal('log_cell'),
   id: z.string(),
+  title: z.string().optional(),
   sql: z.string(),
   time_range: timeRangeSchema,
   chart: chartConfigSchema.optional(),
