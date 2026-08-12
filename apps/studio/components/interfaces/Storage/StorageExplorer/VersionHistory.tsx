@@ -149,8 +149,8 @@ export const VersionHistory = ({
                 role="button"
                 tabIndex={0}
                 className={cn(
-                  'group -mx-2 flex items-center gap-x-2.5 rounded-md px-2 py-1.5 cursor-pointer',
-                  isSelected ? 'bg-brand-200' : 'hover:bg-surface-200'
+                  'group -mx-2 flex items-center gap-x-2.5 rounded-md px-2 py-1.5 border border-transparent cursor-pointer',
+                  isSelected ? 'bg-brand-200 border-brand-500' : 'hover:bg-surface-200'
                 )}
                 onClick={() => (version.isCurrent ? clearPreview() : onPreview?.(version))}
                 onKeyDown={(e) => {
@@ -302,14 +302,14 @@ const VersionActionsMenu = ({
             onClick={() => toast.success(`Downloading ${label}`)}
           >
             <Download size={14} />
-            Download
+            Download version
           </DropdownMenuItem>
           <DropdownMenuItem
             className="gap-x-2"
             onClick={() => toast.success(`Copied URL for ${label}`)}
           >
             <Copy size={14} />
-            Get URL
+            Get version URL
           </DropdownMenuItem>
           {!version.isCurrent && (
             <>
@@ -355,10 +355,12 @@ const VersionFateLabel = ({ fate }: { fate: VersionFate }) => {
       )
     case 'expires-on-next-upload':
       return (
-        <span className="shrink-0 text-xs text-warning-600">
-          Expires on next upload
-          {fate.daysRemaining !== undefined && <> + expires in {fate.daysRemaining}d</>}
-        </span>
+        <div className="flex flex-col items-end">
+          <span className="shrink-0 text-xs text-warning-600">Expires on next upload</span>
+          {fate.daysRemaining !== undefined && (
+            <span className="shrink-0 text-xs text-warning-600">or in {fate.daysRemaining}d</span>
+          )}
+        </div>
       )
     case 'expiring-now':
       return <span className="shrink-0 text-xs text-destructive">Expiring now</span>

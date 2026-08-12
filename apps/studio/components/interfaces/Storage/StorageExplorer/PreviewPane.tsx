@@ -2,7 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import {
   AlertCircle,
+  Archive,
   ArrowRight,
+  ChevronDown,
   ChevronRight,
   Copy,
   Download,
@@ -26,6 +28,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
@@ -163,6 +166,7 @@ export const PreviewPane = () => {
   const currentVersion = versionsData?.find((v) => v.isCurrent)
 
   const [previewedVersion, setPreviewedVersion] = useState<ObjectVersion>()
+  const [showPermanentDeleteConfirm, setShowPermanentDeleteConfirm] = useState(false)
 
   const { mutate: restoreVersion, isPending: isRestoring } = useObjectVersionRestoreMutation({
     onSuccess: () => {
@@ -217,15 +221,19 @@ export const PreviewPane = () => {
         </div>
         <div className="mt-2 flex flex-col">
           <div className="flex gap-1.5">
-            <span className="truncate font-mono text-xs text-foreground-lighter">
+            <span className="truncate font-mono text-xs text-foreground-lighter overflow-visible">
               <div className="shrink-1">
                 <p className="truncate text-sm font-medium text-foreground" title={file.name}>
                   {file.name}
                 </p>
-                <p className="mt-0.5 truncate text-xs text-foreground-light flex items-center gap-x-1.5 flex-wrap">
+                <p className="mt-0.5 truncate text-xs text-foreground-light flex items-center gap-x-1.5 flex-wrap overflow-visible">
                   {mimeType}
                   {size && <>, {size}</>}
-                  {isVersionedBucket && currentVersion && <Badge variant="success">Current</Badge>}
+                  {isVersionedBucket && currentVersion && (
+                    <Badge variant="success" className="-my-1">
+                      Current
+                    </Badge>
+                  )}
                 </p>
                 {file.isCorrupted && (
                   <div className="mt-1 flex items-center gap-x-1.5">
@@ -236,37 +244,37 @@ export const PreviewPane = () => {
               </div>
             </span>
           </div>
-          <div className="flex items-center gap-x-1 shrink-0">
+          <div className="flex items-center gap-x-1 shrink-0 mt-3">
             <ButtonTooltip
-              variant="text"
-              size="tiny"
-              className="h-7 w-7 p-0"
+              variant="outline"
+              className="px-2"
               icon={<Download size={14} />}
-              disabled={file.isCorrupted}
               onClick={() => downloadFile(file)}
-              tooltip={{ content: { side: 'top', text: 'Download' } }}
+              tooltip={{ content: { side: 'top', text: 'Download current' } }}
             />
             {isPublicBucket ? (
-              <ButtonTooltip
-                variant="text"
+              <Button
+                variant="outline"
                 size="tiny"
-                className="h-7 w-7 p-0"
                 icon={<Copy size={14} />}
                 disabled={file.isCorrupted}
                 onClick={() => onCopyUrl(file.path!)}
-                tooltip={{ content: { side: 'top', text: 'Copy URL' } }}
-              />
+              >
+                Copy URL
+              </Button>
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="text"
+                    variant="outline"
                     size="tiny"
-                    className="h-7 w-7 p-0"
                     icon={<Copy size={14} />}
+                    iconRight={<ChevronDown size={14} />}
                     disabled={file.isCorrupted}
                     aria-label={`Copy URL for ${file.name}`}
-                  />
+                  >
+                    Copy URL
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => onCopyUrl(file.path!, URL_EXPIRY_DURATION.WEEK)}>
@@ -286,20 +294,56 @@ export const PreviewPane = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            {canUpdateFiles && (
-              <ButtonTooltip
-                variant="text"
+            {canUpdateFiles && isVersionedBucket && (
+              <div className="flex">
+                <Button
+                  variant="outline"
+                  size="tiny"
+                  className="rounded-r-none"
+                  icon={<Archive size={14} />}
+                  onClick={() => setSelectedItemsToDelete([file])}
+                >
+                  Archive
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="tiny"
+                      className="shrink-0 rounded-l-none border-l-transparent px-1.5 -ml-px"
+                      icon={<ChevronDown size={14} />}
+                      aria-label="More delete options"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      className="flex flex-col w-full items-start gap-1.5"
+                      onClick={() => setShowPermanentDeleteConfirm(true)}
+                    >
+                      <div className="flex items-center space-x-1 text-foreground">
+                        <Trash2
+                          size={14}
+                          className="shrink-0 text-destructive focus:text-destructive"
+                        />
+                        <p>Delete permanently</p>
+                      </div>
+                      <p className="block text-foreground-light">
+                        Also deletes all versions of this file. This cannot be undone.
+                      </p>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
+            {canUpdateFiles && !isVersionedBucket && (
+              <Button
+                variant="outline"
                 size="tiny"
-                className="h-7 w-7 p-0"
                 icon={<Trash2 size={14} />}
                 onClick={() => setSelectedItemsToDelete([file])}
-                tooltip={{
-                  content: {
-                    side: 'top',
-                    text: isVersionedBucket ? 'Archive File' : 'Delete File',
-                  },
-                }}
-              />
+              >
+                Delete File
+              </Button>
             )}
           </div>
         </div>
@@ -363,6 +407,24 @@ export const PreviewPane = () => {
           )}
         </div>
       </div>
+
+      <ConfirmationModal
+        variant="destructive"
+        visible={showPermanentDeleteConfirm}
+        title={<span className="wrap-break-word">Permanently delete {file.name}</span>}
+        confirmLabel="Delete permanently"
+        onCancel={() => setShowPermanentDeleteConfirm(false)}
+        onConfirm={() => {
+          toast.success(`Permanently deleted ${file.name}`)
+          setShowPermanentDeleteConfirm(false)
+        }}
+        alert={{
+          base: { variant: 'destructive' },
+          title: 'This action cannot be undone',
+          description:
+            'This permanently deletes the file and all of its noncurrent versions — none of them can be restored afterwards.',
+        }}
+      />
     </div>
   )
 }
@@ -440,21 +502,21 @@ const VersionCompareWidget = ({
           loading={isRestoring}
           onClick={onRestore}
         >
-          Restore as current
+          Restore version as current
         </Button>
         <ButtonTooltip
           variant="default"
           className="px-2"
           icon={<Download size={14} />}
           onClick={() => toast.success(`Downloading ${label}`)}
-          tooltip={{ content: { side: 'top', text: 'Download' } }}
+          tooltip={{ content: { side: 'top', text: 'Download version' } }}
         />
         <ButtonTooltip
           variant="default"
           className="px-2"
           icon={<Copy size={14} />}
           onClick={() => toast.success(`Copied URL for ${label}`)}
-          tooltip={{ content: { side: 'top', text: 'Get URL' } }}
+          tooltip={{ content: { side: 'top', text: 'Get version URL' } }}
         />
       </div>
 
@@ -484,7 +546,7 @@ interface PreviewSectionProps {
 const PreviewSection = ({ title, count, defaultOpen = false, children }: PreviewSectionProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen)
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="border-t border-overlay">
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger asChild>
         <button
           type="button"
