@@ -78,6 +78,16 @@ const ExplorerQueryFooter = ({ className, ...props }: ExplorerQueryFooterProps) 
 )
 ExplorerQueryFooter.displayName = 'ExplorerQueryFooter'
 
+export type {
+  QueryDisplay,
+  QueryResultChartConfig,
+  QueryResultColumn,
+  QueryResultData,
+  QueryResultRow,
+  QueryResultState,
+  QueryResultTableConfig,
+} from './ExplorerQuery.types'
+
 export {
   ExplorerQuery,
   ExplorerQueryEditor,
