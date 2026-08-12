@@ -84,13 +84,20 @@ guessing (see below).
 access. There are no unnesting joins:
 
 ```sql
+-- edge requests with method and path
 select
   log_attributes['request.method'] as method,
   log_attributes['request.path'] as path,
   log_attributes['response.status_code'] as status
 from logs
 where source = 'edge_logs'
+order by timestamp desc
+limit 100
 ```
+
+**Before you write that, read [Reading the map is all-or-nothing](#reading-the-map-is-all-or-nothing).**
+It is by far the most expensive thing you can do to a logs query, and the cost is
+invisible from the syntax.
 
 The key keeps the dotted path that BigQuery expressed through nested structs, with
 the `metadata` root dropped: BigQuery `metadata.request.method` becomes
@@ -104,6 +111,94 @@ Common keys by source:
 - `auth_logs`: `level`, `status`, `path`, `msg`, `error`
 - `function_edge_logs`: `response.status_code`, `request.method`, `request.pathname`, `function_id`, `execution_id`, `execution_time_ms`
 - `function_logs`: `event_type`, `function_id`, `execution_id`, `level`
+
+### Reading the map is all-or-nothing
+
+`Map(String, String)` is stored as two parallel arrays — one of keys, one of
+values. ClickHouse cannot read one entry out of that: **any subscript
+decompresses both arrays in full.** Reading a single key costs exactly what
+reading the whole map costs.
+
+The map also dominates row size. On a high-volume `edge_logs` source it measured
+149 GiB against 11 GiB for `event_message` — around 93% of row bytes, averaging
+54 keys per row. The practical effect, measured on one hour of one project:
+
+| the query selects                             | bytes read    |
+| --------------------------------------------- | ------------- |
+| the whole `log_attributes` map                | 22.00 GiB     |
+| just `log_attributes['response.status_code']` | **22.00 GiB** |
+| no `log_attributes` at all                    | **1.50 GiB**  |
+
+Three rules follow, and they are the difference between a cheap query and one
+that can exhaust the server's memory while sorting:
+
+- **Trimming keys saves nothing.** Going from five keys to one is a no-op. A
+  query either avoids the map entirely or may as well select all of it.
+- **A row list should not touch the map.** Select `id, timestamp, event_message`
+  and fetch attributes for the rendered page in a second query (see below).
+- **This applies to `where` too, not just `select`.** A predicate on
+  `log_attributes['...']` reads the map for every row that passes the `source`
+  and time filters. If a filter already reads the map, the projection is free —
+  splitting the query buys nothing at that point.
+
+#### Fetch attributes for a page, not for a scan
+
+When you do need attributes alongside a list, get the rows first, then fetch
+attributes for just that page — bounded by the page's own timestamp span:
+
+```sql
+-- 1. the list: no map access
+select id, timestamp, event_message
+from logs
+where source = 'edge_logs'
+order by timestamp desc
+limit 100;
+```
+
+```sql
+-- 2. attributes for the page just returned
+select id, log_attributes['request.method'] as method
+from logs
+where source = 'edge_logs'
+  and timestamp >= :page_min_ts   -- from the rows above
+  and timestamp <= :page_max_ts
+  and id in (:ids)
+limit 100
+```
+
+The timestamp bracket is what prunes, and it is not optional: **`id` is not part
+of the sort key**, so `where id in (...)` on its own scans the entire window and
+gives back everything step 1 saved. Measured, this pattern costs ~50 MB for a
+page against 22 GiB inline.
+
+### Point lookups need a source and a time bracket
+
+The same trap, for a single row. `id` alone is never enough:
+
+```sql
+-- wrong: scans the whole selected range
+select id, timestamp, log_attributes from logs where id = 'abc' limit 1;
+```
+
+The table's sort key is `(project, source, timestamp)`. Add `source` — it narrows
+the sorted range before the time bound even applies — and bracket the timestamp
+tightly around the row you already have client-side:
+
+```sql
+-- right: source narrows the range, the caller bounds ±1 minute around the row
+select id, timestamp, log_attributes
+from logs
+where id = 'abc' and source = 'edge_logs'
+limit 1;
+```
+
+### Window size multiplies map cost
+
+Whenever a query reads the map, its cost scales with the time range. This matters
+most for queries that _must_ read it — `mapKeys` reads the map by definition, so a
+key-discovery query over 7 days costs ~168× the same query over one hour, for a
+result that barely changes. Prefer the narrowest window that answers the
+question, and widen only when a narrow one comes back empty.
 
 ### Numeric fields are strings
 
@@ -135,6 +230,10 @@ limit 100;
 rank them by frequency. (The Studio codebase does exactly this for the Field
 Reference drawer and to feed real keys to the AI rewrite.)
 
+`mapKeys` reads the map by definition, so this is one of the most expensive
+queries you can run — keep the window narrow. Key _names_ are stable, so an hour
+of a busy source returns the same set a week would.
+
 ## ClickHouse vs BigQuery functions
 
 These are the substitutions that trip people up most:
@@ -160,9 +259,11 @@ reads far more data than you need.
 - **Start every query with an identifying comment** (e.g. `-- errors since last deploy`). It labels the query in logs and review, and makes each of several queries in a file easy to tell apart.
 - **Always include a `LIMIT`.** Even for aggregates while you iterate.
 - **Always query `from logs where source = '...'`.** There is no per-service table (no `edge_logs`, `postgres_logs`, etc. table) — there is one `logs` table, and `source` scopes it to a service. Filtering by `source` is required, not just an optimization.
-- **Keep the time range tight.** A smaller window returns results faster.
+- **Keep the time range tight.** A smaller window returns results faster — and when the query reads `log_attributes`, cost scales with the window.
+- **Never reference `log_attributes` in a row list.** Reading one key costs what the whole map costs, so a list query either avoids it entirely or pays for all of it. See [Reading the map is all-or-nothing](#reading-the-map-is-all-or-nothing).
 - **Filter on the real columns** (`source`, `timestamp`) before reaching into
   `log_attributes`.
+- **Never look up by `id` alone.** `id` is not in the sort key — add `source` and a tight timestamp bracket, or the lookup scans the whole window.
 - **Order by `timestamp desc`** to see the most recent logs first.
 - **Use `count()`**, not `count(*)` or `select *`.
 
