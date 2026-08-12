@@ -76,18 +76,19 @@ dozen nodes, split it.
 Short, focused docs under `reference/`. Read whichever apply to the task
 at hand — they cite each other where context matters.
 
-| File                                                                               | What's inside                                                                                                                                          |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`reference/adding-features.md`](./reference/adding-features.md)                   | Best-practices guidance for adding features to `apps/docs`. Inventory existing code first, pick the smallest viable shape, reuse pipelines.            |
-| [`reference/docs-app-direction.md`](./reference/docs-app-direction.md)             | Refactoring vision and working norms — what new work should align with.                                                                                |
-| [`reference/known-issues.md`](./reference/known-issues.md)                         | Living list of broken, fragile, or in-flux systems. Check before depending on anything (federated docs, search, Sentry, reference-page architecture).  |
-| [`reference/app-map.md`](./reference/app-map.md)                                   | Architecture cheat sheet — directories, the two-pipeline (MDX runtime + markdown export) model, heading/typography contract, telemetry, lint entries.  |
-| [`reference/build-pipeline.md`](./reference/build-pipeline.md)                     | Turborepo + pnpm lifecycle steps for building `apps/docs` — codegen, prebuild, postbuild, Vercel deploy. Mermaid diagram included.                     |
-| [`reference/llm-agent-surface.md`](./reference/llm-agent-surface.md)               | Audience routing (humans vs agents vs crawlers), `llms.txt`, content negotiation, bulk exports, two-pipeline parity for embedded content (AI prompts). |
-| [`reference/federated-docs.md`](./reference/federated-docs.md)                     | How docs pulls markdown from external repos at build time. Routes, `pageMap`, remark/rehype plugins, link transforms, known failure modes.             |
-| [`reference/ci-and-lint.md`](./reference/ci-and-lint.md)                           | GitHub Actions on every PR — `docs_lint`, `Docs Tests`, typecheck, prettier, Vercel preview gate. Where to add a check before creating a new one.      |
-| [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI download → Redocly bundle → codegen → `ApiEndpointSection`; why not to swap in Scalar/Redoc.                                    |
-| [`reference/gotchas.md`](./reference/gotchas.md)                                   | Specific traps to watch for. One-liner per item.                                                                                                       |
+| File                                                                               | What's inside                                                                                                                                         |
+| ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`reference/adding-features.md`](./reference/adding-features.md)                   | Best-practices guidance for adding features to `apps/docs`. Inventory existing code first, pick the smallest viable shape, reuse pipelines.           |
+| [`reference/docs-app-direction.md`](./reference/docs-app-direction.md)             | Refactoring vision and working norms — what new work should align with.                                                                               |
+| [`reference/known-issues.md`](./reference/known-issues.md)                         | Living list of broken, fragile, or in-flux systems. Check before depending on anything (federated docs, search, Sentry, reference-page architecture). |
+| [`reference/app-map.md`](./reference/app-map.md)                                   | Architecture cheat sheet — directories, the two-pipeline (MDX runtime + markdown export) model, heading/typography contract, telemetry, lint entries. |
+| [`reference/build-pipeline.md`](./reference/build-pipeline.md)                     | Turborepo + pnpm lifecycle steps for building `apps/docs` — codegen, prebuild, postbuild, Vercel deploy. Mermaid diagram included.                    |
+| [`reference/llm-agent-surface.md`](./reference/llm-agent-surface.md)               | Audience routing, `llms.txt`, content negotiation, bulk exports.                                                                                      |
+| [`reference/llm-agent-parity.md`](./reference/llm-agent-parity.md)                 | HTML↔markdown fidelity (e.g. AI prompts), search caveat, agent onboarding guides, in-flux wiring.                                                     |
+| [`reference/federated-docs.md`](./reference/federated-docs.md)                     | How docs pulls markdown from external repos at build time. Routes, `pageMap`, remark/rehype plugins, link transforms, known failure modes.            |
+| [`reference/ci-and-lint.md`](./reference/ci-and-lint.md)                           | GitHub Actions on every PR — `docs_lint`, `Docs Tests`, typecheck, prettier, Vercel preview gate. Where to add a check before creating a new one.     |
+| [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI download → Redocly bundle → codegen → `ApiEndpointSection`; why not to swap in Scalar/Redoc.                                   |
+| [`reference/gotchas.md`](./reference/gotchas.md)                                   | Specific traps to watch for. One-liner per item.                                                                                                      |
 
 ## How to use during a chat
 

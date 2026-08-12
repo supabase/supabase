@@ -1,8 +1,9 @@
 # LLM and agent consumption surface
 
 How `apps/docs` exposes machine-readable content and how that relates to
-`apps/www`. For the markdown export pipeline itself, see
-[`app-map.md`](./app-map.md) "The two pipelines."
+`apps/www`. For markdown export fidelity and agent onboarding pages, see
+[`llm-agent-parity.md`](./llm-agent-parity.md). For the markdown export
+pipeline itself, see [`app-map.md`](./app-map.md) "The two pipelines."
 
 **Verify against live code** — several pieces here span two apps and
 change independently.
@@ -67,15 +68,15 @@ flowchart TB
 
 ## Entry points
 
-| URL                                      | Owner       | Source                                                                              |
-| ---------------------------------------- | ----------- | ----------------------------------------------------------------------------------- |
-| `/llms.txt`                              | `apps/www`  | `app/llms.txt/route.ts` — index of guide sections + reference links                 |
-| `/llms-full.txt`                         | `apps/www`  | `app/llms-full.txt/route.ts` — concatenated guides + reference + product overviews  |
-| `/docs/guides/<path>.md`                 | `apps/docs` | Middleware → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/` |
-| `/docs/markdown/reference/<lib>.md`      | `apps/docs` | Static file from `public/markdown/reference/` (build output)                        |
-| `/docs/docs.tar.gz`                      | `apps/docs` | `internals/generate-gz-archive.ts` tarballs all of `public/markdown/`               |
-| `/docs/api/graphql` (`searchDocs`)       | `apps/docs` | Vector search over embedded doc sections — see caveat below                         |
-| `/docs/reference/<sdk>/<section>` (bots) | `apps/docs` | `isbot()` → `app/api/crawlers/route.ts` (simplified HTML, not markdown)             |
+| URL                                      | Owner       | Source                                                                                        |
+| ---------------------------------------- | ----------- | --------------------------------------------------------------------------------------------- |
+| `/llms.txt`                              | `apps/www`  | `app/llms.txt/route.ts` — index of guide sections + reference links                           |
+| `/llms-full.txt`                         | `apps/www`  | `app/llms-full.txt/route.ts` — concatenated guides + reference + product overviews            |
+| `/docs/guides/<path>.md`                 | `apps/docs` | Middleware → `app/api/guides-md/[...slug]/route.ts` reads `public/markdown/guides/`           |
+| `/docs/markdown/reference/<lib>.md`      | `apps/docs` | Static file from `public/markdown/reference/` (build output)                                  |
+| `/docs/docs.tar.gz`                      | `apps/docs` | `internals/generate-gz-archive.ts` tarballs all of `public/markdown/`                         |
+| `/docs/api/graphql` (`searchDocs`)       | `apps/docs` | Vector search over embedded doc sections — see [`llm-agent-parity.md`](./llm-agent-parity.md) |
+| `/docs/reference/<sdk>/<section>` (bots) | `apps/docs` | `isbot()` → `app/api/crawlers/route.ts` (simplified HTML, not markdown)                       |
 
 Homepage alternate link points agents at the full dump:
 `https://supabase.com/llms-full.txt` (`apps/docs/app/page.tsx`).
@@ -153,52 +154,6 @@ Each guide page advertises its markdown alternate in metadata via
 404 responses from `guides-md` are also markdown and include
 `searchDocs` suggestions — useful when an agent fetches a stale URL.
 
-## Two-pipeline parity for embedded content
-
-Content that renders on the HTML page is **not** automatically present
-in the `.md` export. Both pipelines must implement the same semantics.
-
-Example: framework quickstart **AI prompt blocks** (see
-supabase/supabase#47543). Each quickstart includes a bare partial:
-
-```mdx
-<$Partial path="ai/quickstart_prompt_nextjs.mdx" />
-```
-
-The partial is a self-closing `<AiPrompt>` with the prompt as a **prop**
-(not children — expression children are skipped by the guides markdown
-pipeline):
-
-```mdx
-<AiPrompt
-  prompt={
-    'Help me add Supabase to my Next.js project. Create a Supabase project at\ndatabase.new and run the instruments table SQL. Then:\n1. …'
-  }
-/>
-```
-
-| Pipeline     | Path                                                         |
-| ------------ | ------------------------------------------------------------ |
-| **HTML**     | `features/ui/AiPrompt.tsx` → `PromptPanel` (copy + expand)   |
-| **Markdown** | `internals/markdown-schema/AiPrompt.ts` reads `props.prompt` |
-
-`propsFrom()` stores the raw JS expression source. Prettier formats the
-prop as a multiline **single-quoted** string; the schema handler must
-decode that literal (trim + escapes), not only `JSON.parse` double-quoted
-JSON. Symptom if decoding is wrong: generated `.md` keeps surrounding
-quotes and literal `\n`.
-
-`$Partial` variable substitution (`lib/partials.utils.ts`, wired in both
-`partialsRemark` and `inlinePartials`) remains required for other nested
-partials — it is no longer the AI-prompt path.
-
-When adding content aimed at both humans and agents, always verify:
-
-```bash
-cd apps/docs && pnpm build:guides-markdown
-# then inspect public/markdown/guides/<same-path>.md for **AI Prompt**
-```
-
 ## Bulk vs per-page retrieval
 
 | Strategy                            | Best for                                          |
@@ -213,43 +168,10 @@ Reference pages do **not** use the same `Accept: text/markdown`
 negotiation as guides. Reference markdown comes from the static export
 and `llms-full.txt`, not from middleware negotiation.
 
-## Programmatic search
-
-`/docs/api/graphql` exposes `searchDocs`, backed by embeddings generated
-offline via `scripts/search/generate-embeddings.ts`. Agents can request
-full `content` in results.
-
-**Caveat:** search infrastructure is decoupled from the markdown export
-pipeline and is considered fragile. See
-[`known-issues.md`](./known-issues.md) "Search infrastructure is
-decoupled and considered broken" before building features on top of it.
-
-## Agent onboarding content
-
-First-party guides under `content/guides/ai-tools/`:
-
-| Page             | Purpose                           |
-| ---------------- | --------------------------------- |
-| `mcp.mdx`        | Supabase MCP server setup         |
-| `plugins.mdx`    | One-click MCP + skills bundle     |
-| `byo-mcp.mdx`    | Build your own MCP server         |
-| `ai-skills.mdx`  | Index of installable agent skills |
-| `ai-prompts.mdx` | Curated IDE prompts               |
-
-The skills index is **federated** from `supabase/agent-skills` at
-runtime (`AiSkills.utils.ts`). See [`federated-docs.md`](./federated-docs.md).
-
-## In-flux / stale wiring
-
-- `apps/docs/.gitignore` lists `public/llms/` as generated by
-  `build:llms`, but **`build:llms` is not in `package.json`** today.
-  Per-source `llms/*.txt` links in `/llms.txt` may point at assets whose
-  generation path is unclear — verify before depending on them.
-- `llms-full.txt` fetches reference markdown from
-  `${NEXT_PUBLIC_DOCS_URL}/markdown/reference/<slug>.md` at runtime.
-
 ## Related
 
+- [`llm-agent-parity.md`](./llm-agent-parity.md) — two-pipeline fidelity,
+  search caveat, agent onboarding pages, in-flux wiring.
 - [`app-map.md`](./app-map.md) — two-pipeline model, directory layout.
 - [`build-pipeline.md`](./build-pipeline.md) — prebuild steps that
   produce markdown exports and the tarball.

@@ -16,15 +16,15 @@ A practical six-stage checklist and quality standard for planning, drafting, and
 
 ## 1. Frame
 
-*Skills:* `ask-the-docs` to see how the surface works today; `pm-the-docs` for audience, stage, and cross-cutting scope calls.
+_Skills:_ `ask-the-docs` to see how the surface works today; `pm-the-docs` for audience, stage, and cross-cutting scope calls.
 
 - [ ] P: State the product stage (private/public alpha, beta, GA)
 - [ ] P: Name the audience and the job they are trying to do
-- [ ] P: Write one line on *why* the feature exists (the problem it solves), not only what it does
+- [ ] P: Write one line on _why_ the feature exists (the problem it solves), not only what it does
 
 ## 2. Shape
 
-*Skill:* `ask-the-docs` for IA placement, architecture, and where content lives.
+_Skill:_ `ask-the-docs` for IA placement, architecture, and where content lives.
 
 - [ ] P: Pick the content type(s): tutorial (learning), how-to (a task), reference (lookup), explanation (the why). Do not mix types on one page (refer to [Diátaxis](https://diataxis.fr/))
 - [ ] P: Decide where the page lives in the existing IA and what links in and out (avoid orphan pages)
@@ -32,7 +32,7 @@ A practical six-stage checklist and quality standard for planning, drafting, and
 
 ## 3. Draft
 
-*Skill:* `write-the-docs` to draft net-new content grounded in Linear and the code.
+_Skill:_ `write-the-docs` to draft net-new content grounded in Linear and the code.
 
 - [ ] P: Lead with the why and the outcome, then the how/what (product story first)
 - [ ] P: Include at least one runnable, copy-pasteable example that you have actually run
@@ -41,14 +41,14 @@ A practical six-stage checklist and quality standard for planning, drafting, and
 
 ## 4. Self-review against the bar
 
-*Skill:* `review-the-docs` on your own branch before opening the PR.
+_Skill:_ [`review-the-docs`](../review-the-docs/SKILL.md) [Local self-review](../review-the-docs/SKILL.md#local-self-review-no-open-pr) on your own branch before opening the PR.
 
 - [ ] P/E: Check the draft against "What good looks like" above before opening the PR
 - [ ] P/E: Follow authoring-experience standards and tooling when available
 
 ## 5. PR review
 
-*Skill:* `review-the-docs` to triage, classify, verify the build, and report.
+_Skill:_ `review-the-docs` to triage, classify, verify the build, and report.
 
 - [ ] P/E: Open the PR and request review per the rules of engagement
 - [ ] Docs: Review against the published bar

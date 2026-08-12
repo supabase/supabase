@@ -1,10 +1,18 @@
 # Style guide fallback
 
-`Priorities/04-Product-Led-Docs-Model/Style-Guide/` in Nik's Obsidian vault is where the docs style guide will live once one exists (tracked under the product-led docs model priority — see the [`pm-the-docs`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/pm-the-docs-full/SKILL.md) skill). As of this skill's authoring, that folder is empty.
+There is no separate published style guide yet beyond what already lives in
+this repo. Use the public sources below, in order:
 
-Until it's populated:
-
-1. Check the folder first — don't assume it's still empty.
-2. If still empty, find the nearest comparable existing page under `apps/docs/content/` (same product area, similar content type — reference vs. guide vs. quickstart) and follow its voice, heading structure, and code-sample conventions.
-3. State which page you followed as precedent, in the handoff summary — e.g. "no style guide yet — following the precedent of `guides/storage/uploads.mdx`."
-4. Once a real style guide exists, prefer it over precedent-matching and drop this fallback step.
+1. Read [`apps/docs/CONTRIBUTING.md`](../../../../apps/docs/CONTRIBUTING.md)
+   for authoring conventions (voice, structure, document types).
+2. Read [`apps/docs/WORD_LIST.md`](../../../../apps/docs/WORD_LIST.md) for
+   preferred spelling, capitalization, and terminology.
+3. If those don't cover the case, find the nearest comparable existing page
+   under `apps/docs/content/` (same product area, similar content type —
+   reference vs. guide vs. quickstart) and follow its voice, heading
+   structure, and code-sample conventions.
+4. State which page you followed as precedent in the handoff summary — e.g.
+   "no dedicated style guide yet — following the precedent of
+   `guides/storage/uploads.mdx`."
+5. When a dedicated style guide is added to the repo later, prefer it over
+   precedent-matching and drop this fallback step.
