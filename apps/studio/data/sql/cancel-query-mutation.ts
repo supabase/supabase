@@ -1,4 +1,4 @@
-import { getAbortQuerySQL } from '@supabase/pg-meta'
+import { getCancelQuerySQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -6,31 +6,36 @@ import { sqlKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
-export type QueryAbortVariables = {
+type QueryCancelVariables = {
   pid: number
   projectRef?: string
   connectionString?: string | null
 }
 
-export async function abortQuery({ pid, projectRef, connectionString }: QueryAbortVariables) {
-  const sql = getAbortQuerySQL({ pid })
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+async function cancelQuery({ pid, projectRef, connectionString }: QueryCancelVariables) {
+  const sql = getCancelQuerySQL({ pid })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['cancel-query'],
+  })
   return result
 }
 
-type QueryAbortData = Awaited<ReturnType<typeof abortQuery>>
+type QueryCancelData = Awaited<ReturnType<typeof cancelQuery>>
 
-export const useQueryAbortMutation = ({
+export const useQueryCancelMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<QueryAbortData, ResponseError, QueryAbortVariables>,
+  UseCustomMutationOptions<QueryCancelData, ResponseError, QueryCancelVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<QueryAbortData, ResponseError, QueryAbortVariables>({
-    mutationFn: (vars) => abortQuery(vars),
+  return useMutation<QueryCancelData, ResponseError, QueryCancelVariables>({
+    mutationFn: (vars) => cancelQuery(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: sqlKeys.ongoingQueries(projectRef) })
@@ -38,7 +43,7 @@ export const useQueryAbortMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to abort query: ${data.message}`)
+        toast.error(`Failed to cancel query: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
