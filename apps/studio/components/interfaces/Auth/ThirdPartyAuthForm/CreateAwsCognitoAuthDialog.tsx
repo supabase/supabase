@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { Trash } from 'lucide-react'
 import { useEffect } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -90,7 +90,7 @@ export const CreateAwsCognitoAuthIntegrationDialog = ({
     })
   }
 
-  const awsRegion = form.watch('awsRegion')
+  const awsRegion = useWatch({ control: form.control, name: 'awsRegion' })
 
   return (
     <Dialog open={visible} onOpenChange={() => onClose()}>

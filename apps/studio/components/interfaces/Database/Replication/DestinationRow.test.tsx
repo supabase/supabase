@@ -72,7 +72,11 @@ const addDestinationMock = () =>
         id: DESTINATION_ID,
         name: 'My BigQuery Destination',
         config: {
-          big_query: { project_id: 'gcp-proj', dataset_id: 'analytics', service_account_key: '{}' },
+          big_query: {
+            project_id: 'gcp-proj',
+            dataset_id: 'analytics',
+            connection_pool_size: 5,
+          },
         },
       }),
   })
@@ -92,7 +96,10 @@ const addPipelinesMock = () =>
             destination_id: DESTINATION_ID,
             destination_name: 'My BigQuery Destination',
             replicator_id: 9001,
-            config: { publication_name: 'supabase_realtime' },
+            config: {
+              publication_name: 'supabase_realtime',
+              table_sync_copy: { type: 'include_all_tables' },
+            },
           },
         ],
       }),
@@ -227,6 +234,9 @@ describe('DestinationRow', () => {
     addPipelineStatusMock('started')
     addReplicationStatusMock(0, [
       {
+        id: 1,
+        schema: 'public',
+        name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
         state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },
@@ -249,6 +259,9 @@ describe('DestinationRow', () => {
     addPipelineStatusMock('stopped')
     addReplicationStatusMock(0, [
       {
+        id: 1,
+        schema: 'public',
+        name: 'orders',
         table_id: 1,
         table_name: 'public.orders',
         state: { name: 'error', reason: 'table not found', retry_policy: { policy: 'no_retry' } },

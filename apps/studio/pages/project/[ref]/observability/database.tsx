@@ -17,6 +17,7 @@ import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import { ReportChartUpsell } from '@/components/interfaces/Reports/v2/ReportChartUpsell'
 import { POOLING_OPTIMIZATIONS } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -135,10 +136,7 @@ const DatabaseUsage = () => {
   )
   const entitledFeatures = getEntitlementSetValues()
 
-  const isSpendCapEnabled =
-    entitledFeatures.includes('database') &&
-    !org?.usage_billing_enabled &&
-    project?.cloud_provider !== 'FLY'
+  const isSpendCapEnabled = entitledFeatures.includes('database') && !org?.usage_billing_enabled
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
@@ -373,9 +371,7 @@ const DatabaseUsage = () => {
                   <div className="ml-auto">
                     {project?.cloud_provider === 'AWS' ? (
                       <Button asChild variant="default">
-                        <Link href={`/project/${ref}/settings/compute-and-disk`}>
-                          Increase disk size
-                        </Link>
+                        <Link href={getInfrastructurePath(ref)}>Increase disk size</Link>
                       </Button>
                     ) : (
                       <ButtonTooltip

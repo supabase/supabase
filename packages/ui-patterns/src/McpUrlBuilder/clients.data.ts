@@ -6,6 +6,7 @@ import type {
   FactoryMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
+  KimiMcpConfig,
   McpClientBaseConfig,
   McpClientConfig,
   McpClientDeepLinkOptions,
@@ -153,6 +154,24 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     },
   },
   {
+    key: 'kimi',
+    label: 'Kimi Code',
+    icon: 'kimi',
+    hasDistinctDarkIcon: true,
+    configFile: '.kimi-code/mcp.json',
+    externalDocsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/mcp.html',
+    transformConfig: (config): KimiMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            transport: 'http',
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
     key: 'gemini-cli',
     label: 'Gemini CLI',
     icon: 'gemini-cli',
@@ -220,6 +239,17 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
         },
       }
     },
+  },
+  {
+    key: 'warp',
+    label: 'Warp',
+    icon: 'warp',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.warp/.mcp.json',
+    externalDocsUrl: 'https://docs.warp.dev/agents/capabilities/mcp',
+    // No transformConfig: Warp natively supports remote MCP servers and accepts
+    // the standard `mcpServers` config, so the base `{ mcpServers: { supabase: { url } } }`
+    // shape works both in `~/.warp/.mcp.json` and when pasted into Warp's "+ Add" input.
   },
   {
     key: 'goose',
@@ -375,7 +405,7 @@ export const MCP_CLIENT_GROUPS = [
   },
   {
     heading: 'IDE',
-    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf'],
+    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf', 'kimi', 'warp'],
   },
 ] as const
 

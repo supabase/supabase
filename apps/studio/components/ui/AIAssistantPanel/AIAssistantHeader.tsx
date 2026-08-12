@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ShortcutPills, ShortcutTooltip } from '../ShortcutTooltip'

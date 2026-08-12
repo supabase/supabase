@@ -10,7 +10,7 @@ import { ProfileContext, type ProfileContextType } from '@/lib/profile'
 
 type AdapterProps = Partial<Parameters<typeof NuqsTestingAdapter>[0]>
 
-const CustomWrapper = ({
+export const CustomWrapper = ({
   children,
   queryClient,
   nuqs,

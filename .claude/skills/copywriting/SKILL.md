@@ -1,6 +1,6 @@
 ---
 name: copywriting
-description: Write or audit UI copy (buttons, labels, empty states, error messages, tooltips, form text) anywhere in the monorepo. Always check this before shipping or reviewing user-facing text.
+description: Write or audit UI copy (buttons, labels, empty states, error messages, tooltips, form text) anywhere in the monorepo. Load it before shipping or reviewing any user-facing text — including when copy is incidental to the task, like a new feature that adds buttons, toasts, dialogs, or validation messages.
 ---
 
 # Copywriting

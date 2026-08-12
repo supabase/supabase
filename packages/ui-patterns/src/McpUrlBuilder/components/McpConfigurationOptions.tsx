@@ -50,15 +50,15 @@ export function McpConfigurationOptions({
         <div className="flex items-center gap-2">
           <Label className="text-sm">Feature Groups</Label>
           <InfoTooltip>
-            Only enable a subset of features. Helps keep the number of tools within MCP client
-            limits
+            Choose which MCP tools to include. Storage is off by default to keep tool counts
+            manageable.
           </InfoTooltip>
         </div>
 
         <MultiSelector values={selectedFeatures} onValuesChange={onFeaturesChange}>
           <MultiSelectorTrigger
             className="w-full"
-            label="All features except Storage enabled by default"
+            label="Select features"
             badgeLimit="wrap"
             showIcon={true}
           />

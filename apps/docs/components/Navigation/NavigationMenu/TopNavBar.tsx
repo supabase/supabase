@@ -57,6 +57,7 @@ const TopNavBar: FC = () => {
                 }
               />
               <button
+                tabIndex={0}
                 title="Menu dropdown button"
                 className={cn(
                   buttonVariants({ variant: 'default' }),

@@ -34,6 +34,7 @@ const Player = () => {
         </span>
       </Link>
       <button
+        tabIndex={0}
         onClick={isPlaying ? controls.pause : controls.play}
         className="relative outline-border-muted w-7 h-7 opacity-70 hover:opacity-100 rounded-full flex items-center justify-center text-foreground-muted hover:text-foreground-lighter transition-opacity"
         style={{

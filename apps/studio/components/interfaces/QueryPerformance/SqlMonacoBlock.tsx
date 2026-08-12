@@ -9,6 +9,10 @@ type SqlMonacoBlockProps = {
   wrapperClassName?: string
 }
 
+// [Joshen] This is technically a duplicate of CodeBlock from `ui-patterns`
+// Should decide which is the preferred and consolidate - although rendering CodeEditor
+// is much heavier due to Monaco Editor. I'd rather we use CodeBlock (or improve that)
+// for read-only rendering of code contents
 export const SqlMonacoBlock = ({ value, wrapperClassName }: SqlMonacoBlockProps) => {
   const [copied, setCopied] = useState(false)
 

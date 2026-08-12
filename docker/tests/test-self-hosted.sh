@@ -167,7 +167,7 @@ else
     check "Create user (admin)" "true" "false"
 fi
 
-# Public signup (optional — depends on email autoconfirm setting)
+# Public signup (optional - depends on email autoconfirm setting)
 signup_email="smoke-signup-$$@example.com"
 signup_resp=$(http_body "$BASE_URL/auth/v1/signup" \
     -H "apikey: $ANON_KEY" \
@@ -308,7 +308,7 @@ if [ "$create_bucket_status" = "200" ]; then
 
         if [ -n "$signed_path" ]; then
             check "Create signed URL" "true" "true"
-            # Fetch signed URL without any auth headers (goes through Kong)
+            # Fetch signed URL without any auth headers (goes through the API gateway)
             signed_content=$(curl -s "$BASE_URL/storage/v1$signed_path")
             check "Fetch signed URL (no auth)" "signed url test content" "$signed_content"
         else

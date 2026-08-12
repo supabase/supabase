@@ -2,26 +2,34 @@ import { safeSql, untrustedSql } from '@supabase/pg-meta'
 import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
-import { untitledSnippetTitle } from './SQLEditor.constants'
-import type { IStandaloneCodeEditor } from './SQLEditor.types'
+import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
+import { DiffType, type IStandaloneCodeEditor } from './SQLEditor.types'
 import {
   analyzeQueryIssues,
   appendEnableRLSStatements,
   applyAutoLimit,
   assembleCompletionDiff,
+  buildCompletionRequestBody,
+  buildDebugChatArgs,
   buildDebugPromptText,
   buildExecuteParams,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   computeErrorHighlightLine,
+  createSqlSnippetSkeletonV2,
+  deriveSnippetIdentity,
+  extractDebugContext,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
   getEditorSql,
   hasActiveEnsureRLSTrigger,
   hasBlockingIssues,
   isUpdateWithoutWhere,
+  planDiffRequestApplication,
   resolveConnectionString,
+  resolveDiffKeyAction,
   shouldAutoGenerateTitle,
+  sqlSourceToDialect,
   trimTrailingSemicolons,
 } from './SQLEditor.utils'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
@@ -287,6 +295,324 @@ describe('SQLEditor.utils.ts:buildExecuteParams', () => {
     expect(params.isRoleImpersonationEnabled).toBe(false)
     expect(params.isStatementTimeoutDisabled).toBe(true)
     expect(params.contextualInvalidation).toBe(true)
+  })
+})
+
+describe('SQLEditor.utils.ts:deriveSnippetIdentity', () => {
+  test('uses the generated id when there is no url id, loading reflects the snippets map like any other id', () => {
+    const result = deriveSnippetIdentity({
+      urlId: undefined,
+      generatedId: 'generated-id',
+      snippets: {},
+    })
+    expect(result).toEqual({ id: 'generated-id', isLoading: true })
+  })
+  test('uses the generated id and is not loading once it appears in the snippets map', () => {
+    const result = deriveSnippetIdentity({
+      urlId: undefined,
+      generatedId: 'generated-id',
+      snippets: { 'generated-id': { snippet: { content: { some: 'content' } } } },
+    })
+    expect(result).toEqual({ id: 'generated-id', isLoading: false })
+  })
+  test('uses the generated id and is never loading when the url id is "new"', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'new',
+      generatedId: 'generated-id',
+      snippets: { 'generated-id': { snippet: { content: undefined } } },
+    })
+    expect(result).toEqual({ id: 'generated-id', isLoading: false })
+  })
+  test('uses the url id and is loading when the snippet is not yet in the store', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: {},
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
+  test('uses the url id and is loading when the snippet has no content yet', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: { 'existing-id': { snippet: { content: undefined } } },
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
+  test('uses the url id and is not loading once the snippet content has arrived', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: { 'existing-id': { snippet: { content: { some: 'content' } } } },
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: false })
+  })
+})
+
+const buildDebugSnippet = (uncheckedSql: string) => ({
+  snippet: { content: { unchecked_sql: untrustedSql(uncheckedSql) } },
+})
+
+describe('SQLEditor.utils.ts:extractDebugContext', () => {
+  test('strips the AI disclaimer comment and trims the sql', () => {
+    const snippet = buildDebugSnippet(`${sqlAiDisclaimerComment}\n\nselect 1;`)
+    const result = { error: { message: 'relation does not exist' } }
+    expect(extractDebugContext(snippet, result)).toEqual({
+      sql: 'select 1;',
+      errorMessage: 'relation does not exist',
+    })
+  })
+  test('falls back to an empty sql when the snippet is undefined', () => {
+    expect(extractDebugContext(undefined, { error: { message: 'boom' } })).toEqual({
+      sql: '',
+      errorMessage: 'boom',
+    })
+  })
+  test('falls back to an empty sql when the snippet has no content yet', () => {
+    expect(
+      extractDebugContext({ snippet: { content: undefined } }, { error: { message: 'boom' } })
+    ).toEqual({ sql: '', errorMessage: 'boom' })
+  })
+  test('falls back to "Unknown error" when the result is undefined', () => {
+    const snippet = buildDebugSnippet('select 1;')
+    expect(extractDebugContext(snippet, undefined)).toEqual({
+      sql: 'select 1;',
+      errorMessage: 'Unknown error',
+    })
+  })
+  test('falls back to "Unknown error" when the result has no error message', () => {
+    const snippet = buildDebugSnippet('select 1;')
+    expect(extractDebugContext(snippet, {})).toEqual({
+      sql: 'select 1;',
+      errorMessage: 'Unknown error',
+    })
+  })
+})
+
+describe('SQLEditor.utils.ts:buildDebugChatArgs', () => {
+  test('builds the newChat payload from the snippet sql and error message', () => {
+    const snippet = buildDebugSnippet('select 1;')
+    const result = { error: { message: 'relation does not exist' } }
+    expect(buildDebugChatArgs(snippet, result, 'database')).toEqual({
+      name: 'Debug SQL snippet',
+      sqlSnippets: [{ label: 'Current Query', content: 'select 1;', source: 'database' }],
+      initialInput:
+        'Help me to debug the attached sql snippet which gives the following error: \n\nrelation does not exist',
+    })
+  })
+
+  // The attachment is what puts sqlSource on the message the user then submits, so
+  // the debug flow has to attach a sourced snippet, not a bare string.
+  test('attaches the query with its source and names the dialect', () => {
+    const snippet = buildDebugSnippet('select count(*) from logs;')
+    const result = { error: { message: 'Unknown expression identifier' } }
+    expect(buildDebugChatArgs(snippet, result, 'logs').sqlSnippets).toEqual([
+      { label: 'Current Query', content: 'select count(*) from logs;', source: 'logs' },
+    ])
+    expect(buildDebugChatArgs(snippet, result, 'logs').initialInput).toEqual(
+      'Help me to debug the attached sql snippet which gives the following error: \n\nUnknown expression identifier\n\nThis query runs against the Supabase logs table on a ClickHouse-backed engine, not Postgres.'
+    )
+  })
+})
+
+describe('SQLEditor.utils.ts:buildCompletionRequestBody', () => {
+  test('builds the base request body with no extra options', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: 'postgresql://example',
+        orgSlug: 'acme',
+      })
+    ).toEqual({
+      projectRef: 'default',
+      connectionString: 'postgresql://example',
+      language: 'sql',
+      orgSlug: 'acme',
+    })
+  })
+  test('merges options on top of the base fields', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: 'postgresql://example',
+        orgSlug: 'acme',
+        options: { completionMetadata: { prompt: 'add a where clause' } },
+      })
+    ).toEqual({
+      projectRef: 'default',
+      connectionString: 'postgresql://example',
+      language: 'sql',
+      orgSlug: 'acme',
+      completionMetadata: { prompt: 'add a where clause' },
+    })
+  })
+  test('omits dialect when not provided, so the route keeps its Postgres default', () => {
+    const body = buildCompletionRequestBody({
+      projectRef: 'default',
+      connectionString: null,
+      orgSlug: 'acme',
+    })
+    expect(body).not.toHaveProperty('dialect')
+  })
+  test('includes the dialect when provided', () => {
+    expect(
+      buildCompletionRequestBody({
+        projectRef: 'default',
+        connectionString: null,
+        orgSlug: 'acme',
+        dialect: 'clickhouse',
+      }).dialect
+    ).toBe('clickhouse')
+  })
+})
+
+describe('SQLEditor.utils.ts:sqlSourceToDialect', () => {
+  test('logs snippets get ClickHouse, database snippets get Postgres', () => {
+    expect(sqlSourceToDialect('logs')).toBe('clickhouse')
+    expect(sqlSourceToDialect('database')).toBe('postgres')
+  })
+})
+
+describe('SQLEditor.utils.ts:createSqlSnippetSkeletonV2', () => {
+  const baseArgs = { name: 'Untitled', sql: 'select 1', owner_id: 1, project_id: 1 }
+
+  test('defaults to a database (sql) snippet', () => {
+    const snippet = createSqlSnippetSkeletonV2(baseArgs)
+    expect(snippet.type).toBe('sql')
+    expect(snippet.content?.unchecked_sql).toBe('select 1')
+    expect(snippet.status).toBe('new')
+  })
+
+  test('builds a database snippet when source is explicitly "database"', () => {
+    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'database' })
+    expect(snippet.type).toBe('sql')
+  })
+
+  test('builds a logs (log_sql) snippet when source is "logs"', () => {
+    const snippet = createSqlSnippetSkeletonV2({ ...baseArgs, source: 'logs' })
+    expect(snippet.type).toBe('log_sql')
+    expect(snippet.content?.unchecked_sql).toBe('select 1')
+  })
+
+  test('sets content_id to the snippet id for both sources', () => {
+    const db = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'db-id' })
+    const logs = createSqlSnippetSkeletonV2({ ...baseArgs, idOverride: 'logs-id', source: 'logs' })
+    expect(db.content?.content_id).toBe('db-id')
+    expect(logs.content?.content_id).toBe('logs-id')
+  })
+})
+
+describe('SQLEditor.utils.ts:planDiffRequestApplication', () => {
+  test('replaces the editor content when it is empty', () => {
+    const plan = planDiffRequestApplication({
+      existingValue: '',
+      request: { diffType: DiffType.Modification, sql: 'select 1;' },
+    })
+    expect(plan).toEqual({ kind: 'replace', text: 'select 1;' })
+  })
+  test('opens a diff against the existing content when it is not empty', () => {
+    const plan = planDiffRequestApplication({
+      existingValue: 'select 0;',
+      request: { diffType: DiffType.Modification, sql: 'select 1;' },
+    })
+    expect(plan).toEqual({
+      kind: 'diff',
+      diff: { original: 'select 0;', modified: 'select 1;' },
+      diffType: DiffType.Modification,
+    })
+  })
+  test('carries through the requested diff type', () => {
+    const plan = planDiffRequestApplication({
+      existingValue: 'select 0;',
+      request: { diffType: DiffType.NewSnippet, sql: 'select 1;' },
+    })
+    expect(plan).toEqual({
+      kind: 'diff',
+      diff: { original: 'select 0;', modified: 'select 1;' },
+      diffType: DiffType.NewSnippet,
+    })
+  })
+})
+
+const keyEvent = (overrides: Partial<Pick<KeyboardEvent, 'key' | 'metaKey' | 'ctrlKey'>> = {}) => ({
+  key: 'a',
+  metaKey: false,
+  ctrlKey: false,
+  ...overrides,
+})
+
+describe('SQLEditor.utils.ts:resolveDiffKeyAction', () => {
+  test('does nothing when neither a diff nor the prompt is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
+      isDiffOpen: false,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('does nothing for keys other than Enter/Escape', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'a' }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('accepts on Cmd+Enter on macOS when a diff is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', metaKey: true }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'accept' })
+  })
+  test('accepts on Ctrl+Enter on Windows when a diff is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', ctrlKey: true }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'windows',
+    })
+    expect(action).toEqual({ type: 'accept' })
+  })
+  test('does not accept on Ctrl+Enter on macOS (wrong modifier for the OS)', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', ctrlKey: true }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('does not accept on Enter without the modifier key', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter' }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('does not accept on Cmd+Enter when the diff is not open, even if the prompt is', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Enter', metaKey: true }), {
+      isDiffOpen: false,
+      isPromptOpen: true,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'none' })
+  })
+  test('escapes with shouldDiscard true when a diff is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
+      isDiffOpen: true,
+      isPromptOpen: false,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'escape', shouldDiscard: true })
+  })
+  test('escapes with shouldDiscard false when only the prompt is open', () => {
+    const action = resolveDiffKeyAction(keyEvent({ key: 'Escape' }), {
+      isDiffOpen: false,
+      isPromptOpen: true,
+      os: 'macos',
+    })
+    expect(action).toEqual({ type: 'escape', shouldDiscard: false })
   })
 })
 
@@ -1151,9 +1477,21 @@ describe('SQLEditor.utils:assembleCompletionDiff', () => {
 
 describe('SQLEditor.utils:buildDebugPromptText', () => {
   it('builds the debug prompt with the error message and SQL block', () => {
-    const result = buildDebugPromptText('select 1;', 'relation does not exist')
+    const result = buildDebugPromptText('select 1;', 'relation does not exist', 'database')
     expect(result).toContain('relation does not exist')
     expect(result).toContain('```sql\nselect 1;\n```')
+    expect(result).not.toContain('ClickHouse')
+  })
+
+  // This text is copyable and gets pasted into external models, so it has to name
+  // the dialect itself rather than relying on the message metadata.
+  it('names the dialect for a logs snippet', () => {
+    const sql = "select count() from logs where source = 'edge_logs'"
+    const result = buildDebugPromptText(sql, 'Unknown expression identifier', 'logs')
+    expect(result).toContain('Unknown expression identifier')
+    expect(result).toContain('ClickHouse')
+    expect(result).toContain('not Postgres')
+    expect(result).toContain('```clickhouse\n' + sql + '\n```')
   })
 })
 

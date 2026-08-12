@@ -173,6 +173,10 @@ export const SnowflakeFields = ({
                       <Button
                         variant="default"
                         className="w-7"
+                        title={showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+                        aria-label={
+                          showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'
+                        }
                         icon={showPrivateKeyPassphrase ? <Eye /> : <EyeOff />}
                         onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
                       />

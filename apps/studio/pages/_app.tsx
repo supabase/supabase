@@ -1,5 +1,4 @@
 import '@/styles/code.css'
-import '@/styles/focus.css'
 import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'

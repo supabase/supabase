@@ -1,8 +1,10 @@
 ---
 name: telemetry-standards
-description: PostHog event tracking standards for Supabase Studio. Use when reviewing
-  PRs for telemetry compliance or implementing new event tracking. Covers event naming,
-  property conventions, approved patterns, and implementation guide.
+description: PostHog event tracking standards for Supabase Studio. Use when adding
+  useTrack() calls, defining events in packages/common/telemetry-constants.ts,
+  implementing tracking for a new feature, or reviewing PRs for telemetry compliance.
+  Covers event naming, property conventions, approved patterns, and implementation
+  guide.
 ---
 
 # Telemetry Standards for Supabase Studio
@@ -19,16 +21,19 @@ opened, clicked, submitted, created, removed, updated, intended, evaluated, adde
 enabled, disabled, copied, exposed, failed, converted, closed, completed, applied, sent, moved
 
 **Flag these:**
+
 - Unapproved verbs (saved, viewed, seen, pressed, etc.)
 - Wrong order: `click_product_card` → should be `product_card_clicked`
 - Wrong casing: `productCardClicked` → should be `product_card_clicked`
 
 **Good examples:**
+
 - `product_card_clicked`
 - `backup_button_clicked`
 - `sql_query_submitted`
 
 **Common mistakes with corrections:**
+
 - `database_saved` → `save_button_clicked` or `database_updated` (unapproved verb)
 - `click_backup_button` → `backup_button_clicked` (wrong order)
 - `dashboardViewed` → don't track passive views on page load
@@ -39,10 +44,12 @@ enabled, disabled, copied, exposed, failed, converted, closed, completed, applie
 **Casing:** camelCase preferred for new events. The codebase has existing snake_case properties (e.g., `schema_name`, `table_name`) — when adding properties to an existing event, match its established convention.
 
 **Names must be self-explanatory:**
+
 - `{ productType: 'database', planTier: 'pro' }`
 - `{ assistantType: 'sql', suggestionType: 'optimization' }`
 
 **Flag these:**
+
 - Generic names: `label`, `value`, `name`, `data`
 - PascalCase properties
 - Inconsistent names across similar events (e.g., `assistantType` in one event, `aiType` in a related event)
@@ -117,6 +124,7 @@ When reviewing a PR, flag these as **required changes:**
 5. **Inaccurate docs** — `@page`/`@source` descriptions that don't match the actual implementation
 
 When a PR adds user-facing interactions (buttons, forms, toggles, modals) **without** tracking, suggest:
+
 - "This adds a user interaction that may benefit from tracking."
 - Propose the event name following `[object]_[verb]` convention
 - Propose the `useTrack()` call with suggested properties

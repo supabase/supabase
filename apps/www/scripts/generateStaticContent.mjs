@@ -378,198 +378,140 @@ try {
   console.warn('Error generating RSS feed:', error)
 }
 
-// Changelog RSS → public/changelog-rss.xml (same GitHub App + category as lib/changelog-github.ts)
-try {
-  const appId = process.env.GITHUB_CHANGELOG_APP_ID
-  const installationId = process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID
-  const privateKey = process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY
+// Changelog RSS + changelog.md → sourced from supabase/changelog entries/*.md (private repo).
+// Missing secret: warns and skips outside Vercel, but fails Vercel builds so they can't
+// publish stale generated changelog files. Generic CI (typecheck/lint on GitHub Actions)
+// has no access to this secret and isn't publishing anything, so it only warns too.
+async function generateChangelogContent() {
+  const appId = process.env.CHANGELOG_SYNC_APP_ID
+  const installationId = process.env.CHANGELOG_SYNC_APP_INSTALLATION_ID
+  const privateKey = process.env.CHANGELOG_SYNC_APP_PRIVATE_KEY
 
   if (!appId || !installationId || !privateKey) {
-    console.warn('Skipping changelog RSS: missing GITHUB_CHANGELOG_APP_* env vars')
-  } else {
-    const { createAppAuth } = await import('@octokit/auth-app')
-    const { Octokit } = await import('@octokit/core')
-    const { paginateGraphql } = await import('@octokit/plugin-paginate-graphql')
-
-    const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug, changelogEntrySlug } =
-      await import('../lib/changelog-rss.mjs')
-    const rewritesPath = path.join(__dirname, 'data/changelog-deleted-discussions.json')
-    const rewrites = JSON.parse(await fs.readFile(rewritesPath, 'utf8'))
-    const discussionDisplayDate = (item) => {
-      const dateRewrite = rewrites.find(
-        (r) => item.title && r.title && item.title.includes(r.title)
-      )
-      return dateRewrite ? dateRewrite.createdAt : item.createdAt
+    if (process.env.VERCEL) {
+      throw new Error('CHANGELOG_SYNC_APP_* env vars not set — cannot generate changelog content')
     }
+    console.warn('⚠️  CHANGELOG_SYNC_APP_* env vars not set — skipping changelog RSS/md generation')
+    return
+  }
 
-    const CHANGELOG_CATEGORY_ID = 'DIC_kwDODMpXOc4CAFUr'
+  const { getPublishedChangelogEntries, fetchChangelogEntryFilesFromTarball, CHANGE_TYPE_LABELS } =
+    await import('../lib/changelog-entries-core.mjs')
+  const { generateChangelogRssXml, generateChangelogTagRssXml, labelToFileSlug } = await import(
+    '../lib/changelog-rss.mjs'
+  )
+  const { createAppAuth } = await import('@octokit/auth-app')
+  const { Octokit } = await import('@octokit/core')
+  const octokit = new Octokit({
+    authStrategy: createAppAuth,
+    auth: { appId, installationId, privateKey: privateKey.replace(/\\n/g, '\n') },
+  })
 
-    const changelogQuery = `
-    query changelogDiscussionMetadata($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
-      repository(owner: $owner, name: $repo) {
-        discussions(
-          first: 100
-          after: $cursor
-          categoryId: $categoryId
-          orderBy: { field: CREATED_AT, direction: DESC }
-        ) {
-          nodes {
-            number
-            title
-            body
-            createdAt
-            url
-            labels(first: 25) {
-              nodes {
-                name
-              }
-            }
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    }
-  `
+  // Single tarball request — fetching each entry file individually trips
+  // GitHub's secondary rate limit once the entries directory gets large.
+  const files = await fetchChangelogEntryFilesFromTarball(octokit, {
+    owner: 'supabase',
+    repo: 'changelog',
+    entriesPath: 'entries',
+  })
+  const entries = getPublishedChangelogEntries(files)
 
-    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
-    const octokit = new ExtendedOctokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId,
-        installationId,
-        privateKey: privateKey.replace(/\\n/g, '\n'),
-      },
+  const rssEntries = entries.map((entry) => ({
+    slug: entry.slug,
+    title: entry.frontmatter.title,
+    sortDate: entry.sortDate,
+    affectedProducts: entry.frontmatter.affected_products ?? [],
+  }))
+
+  const changelogXml = generateChangelogRssXml(rssEntries)
+  const changelogRssPath = path.join(__dirname, '../public/changelog-rss.xml')
+  await fs.writeFile(changelogRssPath, changelogXml.trim(), 'utf8')
+  console.log(`✅ Generated changelog RSS with ${entries.length} entries`)
+
+  // Per-tag feeds → public/changelog-rss/<label-slug>.xml
+  const productTagsPath = path.join(__dirname, '../data/changelog-product-tags.json')
+  const productTags = JSON.parse(await fs.readFile(productTagsPath, 'utf8'))
+  const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
+  // Clear first so a renamed/removed product tag doesn't leave a stale feed file behind.
+  await fs.rm(tagFeedsDir, { recursive: true, force: true })
+  await fs.mkdir(tagFeedsDir, { recursive: true })
+  const tagFilenames = productTags.map(({ label }) => `${labelToFileSlug(label)}.xml`)
+  const tagResults = await Promise.allSettled(
+    productTags.map(async ({ label }) => {
+      const fileSlug = labelToFileSlug(label)
+      const tagXml = generateChangelogTagRssXml(rssEntries, { displayLabel: label })
+      await fs.writeFile(path.join(tagFeedsDir, `${fileSlug}.xml`), tagXml.trim(), 'utf8')
     })
-
-    const collected = []
-    let cursor = null
-    let hasNextPage = true
-    while (hasNextPage) {
-      const {
-        repository: {
-          discussions: { nodes, pageInfo },
-        },
-      } = await octokit.graphql(changelogQuery, {
-        owner: 'supabase',
-        repo: 'supabase',
-        categoryId: CHANGELOG_CATEGORY_ID,
-        cursor,
-      })
-      collected.push(...nodes)
-      hasNextPage = pageInfo.hasNextPage
-      cursor = pageInfo.endCursor
+  )
+  const failedTagFeeds = tagResults.flatMap((result, i) =>
+    result.status === 'rejected' ? [{ file: tagFilenames[i], reason: result.reason }] : []
+  )
+  const succeeded = tagResults.length - failedTagFeeds.length
+  console.log(`✅ Generated ${succeeded}/${productTags.length} per-tag changelog RSS feeds`)
+  if (failedTagFeeds.length > 0) {
+    for (const { file, reason } of failedTagFeeds) {
+      console.error(`Failed to write changelog-rss/${file}:`, reason)
     }
-
-    const entries = collected.map((item) => ({
-      number: item.number,
-      slug: changelogEntrySlug(item.number, item.title),
-      title: item.title,
-      url: item.url,
-      sortDate: discussionDisplayDate({ title: item.title, createdAt: item.createdAt }),
-      labels: (item.labels?.nodes ?? []).map((l) => l.name.toLowerCase()),
-      body: item.body ?? '',
-    }))
-
-    const changelogXml = generateChangelogRssXml(entries)
-    const changelogRssPath = path.join(__dirname, '../public/changelog-rss.xml')
-    await fs.writeFile(changelogRssPath, changelogXml.trim(), 'utf8')
-    const visibleCount = entries.filter((e) => !e.title.includes('[d]')).length
-    console.log(`✅ Generated changelog RSS with ${visibleCount} entries`)
-
-    // Per-tag feeds → public/changelog-rss/<label-slug>.xml
-    const productTagsPath = path.join(__dirname, '../data/changelog-product-tags.json')
-    const productTags = JSON.parse(await fs.readFile(productTagsPath, 'utf8'))
-    const tagFeedsDir = path.join(__dirname, '../public/changelog-rss')
-    await fs.mkdir(tagFeedsDir, { recursive: true })
-    const tagResults = await Promise.allSettled(
-      productTags.map(async ({ slug, label }) => {
-        const fileSlug = labelToFileSlug(label)
-        const tagXml = generateChangelogTagRssXml(entries, {
-          githubLabelSlug: slug,
-          displayLabel: label,
-        })
-        await fs.writeFile(path.join(tagFeedsDir, `${fileSlug}.xml`), tagXml.trim(), 'utf8')
-      })
+    throw new Error(
+      `Failed to generate ${failedTagFeeds.length}/${productTags.length} per-tag changelog RSS feeds`
     )
-    const succeeded = tagResults.filter((r) => r.status === 'fulfilled').length
-    console.log(`✅ Generated ${succeeded}/${productTags.length} per-tag changelog RSS feeds`)
+  }
 
-    // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
-    const visibleEntries = entries.filter((entry) => !entry.title.includes('[d]'))
+  // LLM-friendly changelog markdown index (RSS remains canonical syndication format).
+  const mdSections = entries.map((entry) => {
+    const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
+    const changeType = CHANGE_TYPE_LABELS[entry.frontmatter.change_type] ?? entry.frontmatter.change_type
+    const products = (entry.frontmatter.affected_products ?? []).join(', ')
+    const meta = [
+      date,
+      changeType,
+      products,
+      `[supabase.com/changelog/${entry.slug}](https://supabase.com/changelog/${entry.slug})`,
+    ]
+      .filter(Boolean)
+      .join(' · ')
+    return [`## ${entry.frontmatter.title}`, meta, entry.summary].filter(Boolean).join('\n\n')
+  })
+  const changelogMd = `# Supabase Changelog\n\n${mdSections.join('\n\n---\n\n')}\n`
+  const changelogMdPath = path.join(__dirname, '../public/changelog.md')
+  await fs.writeFile(changelogMdPath, changelogMd, 'utf8')
+  console.log(`✅ Generated changelog.md (${entries.length} entries)`)
 
-    /**
-     * Extracts the first meaningful paragraph from a markdown body.
-     * Skips headings, code fences, HTML blocks, and empty lines.
-     */
-    const extractSummary = (body) => {
-      if (!body) return ''
-      for (const para of body.split(/\n{2,}/)) {
-        const trimmed = para.trim()
-        if (
-          !trimmed ||
-          trimmed.startsWith('#') ||
-          trimmed.startsWith('```') ||
-          trimmed.startsWith('<') ||
-          trimmed.startsWith('|') ||
-          trimmed.startsWith('---')
-        ) continue
-        const oneLiner = trimmed.replace(/\n/g, ' ')
-        return oneLiner.length > 200 ? oneLiner.slice(0, 200).replace(/\s+\S*$/, '') + '…' : oneLiner
-      }
-      return ''
-    }
-
-    const mdSections = visibleEntries.map((entry) => {
-      const date = dayjs(entry.sortDate).isValid() ? dayjs(entry.sortDate).format('YYYY-MM-DD') : ''
-      const labels = (entry.labels ?? []).join(', ')
-      const meta = [date, labels, `[supabase.com/changelog/${entry.slug}](https://supabase.com/changelog/${entry.slug})`]
-        .filter(Boolean)
-        .join(' · ')
-      const summary = extractSummary(entry.body)
-      return [`## ${entry.title}`, meta, summary].filter(Boolean).join('\n\n')
-    })
-    const changelogMd = `# Supabase Changelog\n\n${mdSections.join('\n\n---\n\n')}\n`
-    const changelogMdPath = path.join(__dirname, '../public/changelog.md')
-    await fs.writeFile(changelogMdPath, changelogMd, 'utf8')
-    console.log(`✅ Generated changelog.md (${visibleEntries.length} entries)`)
-
-    // One markdown file per entry → /changelog/<number>.md (same content shape as the web page body).
-    const changelogEntryMdDir = path.join(__dirname, '../public/changelog')
-    await fs.mkdir(changelogEntryMdDir, { recursive: true })
-    for (const entry of visibleEntries) {
-      const published = dayjs(entry.sortDate).isValid()
-        ? dayjs(entry.sortDate).format('YYYY-MM-DD')
-        : ''
-      const titleLine = String(entry.title ?? '')
-        .replace(/\n/g, ' ')
-        .trim()
-      const labelsYaml = (entry.labels ?? []).map((l) => `  - ${l}`).join('\n')
-      const pageUrl = `https://supabase.com/changelog/${entry.slug}`
-      const entryMd = `---
-number: ${entry.number}
+  // One markdown file per entry → /changelog/<slug>.md (Body section only — internal notes never included).
+  const changelogEntryMdDir = path.join(__dirname, '../public/changelog')
+  // Clear first so a renamed/unpublished entry doesn't leave a stale file behind.
+  await fs.rm(changelogEntryMdDir, { recursive: true, force: true })
+  await fs.mkdir(changelogEntryMdDir, { recursive: true })
+  for (const entry of entries) {
+    const published = dayjs(entry.sortDate).isValid()
+      ? dayjs(entry.sortDate).format('YYYY-MM-DD')
+      : ''
+    const titleLine = String(entry.frontmatter.title ?? '')
+      .replace(/\n/g, ' ')
+      .trim()
+    const productsYaml = (entry.frontmatter.affected_products ?? [])
+      .map((p) => `  - ${p}`)
+      .join('\n')
+    const pageUrl = `https://supabase.com/changelog/${entry.slug}`
+    const entryMd = `---
 slug: ${entry.slug}
 published: ${published}
-discussion: ${entry.url}
-labels:
-${labelsYaml || '  []'}
+change_type: ${entry.frontmatter.change_type}
+affected_products:
+${productsYaml || '  []'}
 page: ${pageUrl}
 ---
 
 # ${titleLine}
 
-${entry.body ?? ''}
+${entry.bodySection}
 `
-      await fs.writeFile(
-        path.join(changelogEntryMdDir, `${entry.slug}.md`),
-        entryMd.trim() + '\n',
-        'utf8'
-      )
-    }
-    console.log(`✅ Generated changelog/*.md (${visibleEntries.length} files)`)
+    await fs.writeFile(
+      path.join(changelogEntryMdDir, `${entry.slug}.md`),
+      entryMd.trim() + '\n',
+      'utf8'
+    )
   }
-} catch (error) {
-  console.warn('Error generating changelog RSS:', error)
+  console.log(`✅ Generated changelog/*.md (${entries.length} files)`)
 }
+await generateChangelogContent()
