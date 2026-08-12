@@ -11,20 +11,23 @@ When you need granular authorization rules, nothing beats Postgres's [Row Level 
 
 <Admonition type="danger">
 
-Supabase allows convenient and secure data access from the browser, as long as you enable RLS.
+A table in an exposed schema without RLS is readable and writable by anyone with your publishable key. RLS _must_ always be enabled on any table stored in an exposed schema. By default, this is the `public` schema.
 
-RLS _must_ always be enabled on any tables stored in an exposed schema. By default, this is the `public` schema.
-
-RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create one in raw SQL or with the SQL editor, remember to enable RLS yourself and grant only the permissions each Postgres role needs.
+RLS is enabled by default on tables created with the Table Editor in the dashboard. If you create a table in raw SQL or with the SQL editor, enable RLS yourself and leave each role only the privileges it needs:
 
 ```sql
-GRANT SELECT ON <schema_name>.<table_name> TO anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON <schema_name>.<table_name> TO service_role;
+-- Take back the privileges granted automatically to client roles.
+revoke all on table <schema_name>.<table_name> from anon, authenticated;
+
+-- Grant back only what each role needs.
+grant select on table <schema_name>.<table_name> to anon, authenticated;
+grant insert, update, delete on table <schema_name>.<table_name> to authenticated;
 
 alter table <schema_name>.<table_name>
 enable row level security;
 ```
+
+Policies alone don't do this. See [Grants and policies](#grants-and-policies).
 
 </Admonition>
 
@@ -62,6 +65,38 @@ alter table "table_name" enable row level security;
 ```
 
 Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using a publishable key, until you create policies.
+
+## Grants and policies
+
+Postgres runs two checks before a client touches a table. Grants decide whether a role can run an operation on the table at all. Policies decide which rows that operation applies to. Set both for every table you expose.
+
+On existing projects, a new table in `public` receives `select`, `insert`, `update`, and `delete` for `anon`, `authenticated`, and `service_role` automatically. Both client roles start out able to write to your table, and adding policies doesn't take those grants back. A table protected only by policies still hands `anon` an insert path if you never revoke the grant.
+
+Set the grants to match what each role does in your app:
+
+1. Revoke the automatic grants from both client roles.
+
+   ```sql
+   revoke all on table public.reports from anon, authenticated;
+   ```
+
+2. Grant back only the privileges the role needs.
+
+   ```sql
+   -- Signed-in users manage reports. Signed-out visitors get nothing.
+   grant select, insert, update, delete on table public.reports to authenticated;
+   ```
+
+3. Enable RLS on the table and write policies that decide which rows each role reaches.
+
+Data that clients read but never write, such as a feed a backend job populates, gets no write grant at all:
+
+```sql
+revoke all on table public.weather_readings from anon, authenticated;
+grant select on table public.weather_readings to anon, authenticated;
+```
+
+A missing grant raises a `42501` error before any policy runs, so check the grants first when a request fails that your policy should allow. To stop new tables from receiving the automatic grants, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
 
 ## Auto-enable RLS for new tables
 
@@ -369,6 +404,135 @@ alter role "role_name" with bypassrls;
 
 This can be useful for system-level access. You should _never_ share login credentials for any Postgres Role with this privilege.
 
+## Test your policies
+
+A wrong policy fails quietly. Too permissive, and a query returns rows it shouldn't. Too strict, and it returns nothing and raises no error. Test both directions before you ship a policy.
+
+Supabase runs database tests with [pgTAP](/docs/guides/database/extensions/pgtap) through the CLI. Test files are `.sql` files under `supabase/tests/`.
+
+1. Create the tests directory and a test file:
+
+   ```bash
+   mkdir -p supabase/tests
+   touch supabase/tests/profiles_rls.test.sql
+   ```
+
+2. Write the tests. Cover `select`, `insert`, `update`, and `delete` twice each, once for a request the policy allows and once for a request it denies. Cover `anon` as well as `authenticated`.
+
+3. Run the suite:
+
+   ```bash
+   supabase test db
+   ```
+
+Switch role and identity between cases with `set local role` and `set local request.jwt.claim.sub`, so each assertion runs as the user it describes.
+
+Match the assertion to the way the denial happens:
+
+- A missing grant raises `42501`. Assert it with `throws_ok`.
+- A `with check` violation raises `42501`. Assert it with `throws_ok`.
+- A `using` clause that filters the target row out raises nothing. The update or delete matches zero rows instead. Assert that no row changed, not that an error was raised.
+- An allowed write needs an assertion on the resulting row. The absence of an error doesn't prove that anything changed.
+
+Add `returning` to an allowed write so a single assertion proves the row changed. A denied write returns no rows, so the same shape asserts the denial.
+
+This example tests a `profiles` table where `authenticated` holds every privilege, `anon` holds none, and each user reads and writes only their own row:
+
+```sql supabase/tests/profiles_rls.test.sql
+begin;
+select plan(11);
+
+-- Seed two users. The rows come later, through the policies under test.
+insert into auth.users (id, email)
+values
+  ('11111111-1111-1111-1111-111111111111', 'owner@example.com'),
+  ('22222222-2222-2222-2222-222222222222', 'other@example.com');
+
+-- Signed-out visitors hold no grant, so the request stops before any policy runs.
+set local role anon;
+select throws_ok(
+  $$select * from profiles$$,
+  '42501',
+  null,
+  'anon cannot read profiles'
+);
+select throws_ok(
+  $$insert into profiles (id, user_id)
+    values (gen_random_uuid(), '11111111-1111-1111-1111-111111111111')$$,
+  '42501',
+  null,
+  'anon cannot insert a profile'
+);
+
+-- The owner reads and writes their own row.
+set local role authenticated;
+set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
+select results_eq(
+  $$insert into profiles (id, user_id, avatar_url)
+    values (
+      gen_random_uuid(),
+      '11111111-1111-1111-1111-111111111111',
+      'owner.png'
+    )
+    returning avatar_url$$,
+  array['owner.png'],
+  'the owner creates their own profile'
+);
+select results_eq(
+  $$select avatar_url from profiles$$,
+  array['owner.png'],
+  'the owner reads their own profile'
+);
+select results_eq(
+  $$update profiles set avatar_url = 'updated.png' returning avatar_url$$,
+  array['updated.png'],
+  'the owner updates their own profile'
+);
+
+-- The with check clause rejects the row, which raises.
+select throws_ok(
+  $$insert into profiles (id, user_id)
+    values (gen_random_uuid(), '22222222-2222-2222-2222-222222222222')$$,
+  '42501',
+  null,
+  'the owner cannot create a profile for someone else'
+);
+
+-- A signed-in stranger holds the grant, so the policy is what stops them. The
+-- using clause filters the row out, so these match nothing and raise nothing.
+set local request.jwt.claim.sub = '22222222-2222-2222-2222-222222222222';
+select is_empty(
+  $$select * from profiles$$,
+  'another user reads no profiles'
+);
+select is_empty(
+  $$update profiles set avatar_url = 'stolen.png' returning avatar_url$$,
+  'another user updates no profiles'
+);
+select is_empty(
+  $$delete from profiles returning id$$,
+  'another user deletes no profiles'
+);
+
+-- The row is still there, still holding the owner's value.
+set local request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
+select results_eq(
+  $$select avatar_url from profiles$$,
+  array['updated.png'],
+  'the other user changed nothing'
+);
+select results_eq(
+  $$delete from profiles returning avatar_url$$,
+  array['updated.png'],
+  'the owner deletes their own profile'
+);
+
+select * from finish();
+rollback;
+```
+
+For CLI setup and more pgTAP helpers, see [Testing your database](/docs/guides/database/testing).
+
 ## RLS performance recommendations
 
 Every authorization system has an impact on performance. While row level security is powerful, the performance impact is important to keep in mind. This is especially true for queries that scan every row in a table - like many `select` operations, including those using limit, offset, and ordering.
@@ -377,7 +541,7 @@ Based on a series of [tests](https://github.com/GaryAustin1/RLS-Performance), we
 
 ### Add indexes
 
-Make sure you've added [indexes](/docs/guides/database/postgres/indexes) on any columns used within the Policies which are not already indexed (or primary keys). For a Policy like this:
+Add an [index](/docs/guides/database/postgres/indexes) on every column your policies filter on. Postgres evaluates the policy against each candidate row, so an unindexed filter column turns a read into a sequential scan. For a policy like this:
 
 ```sql
 create policy "rls_test_select" on test_table
@@ -390,6 +554,21 @@ You can add an index like:
 ```sql
 create index userid
 on test_table
+using btree (user_id);
+```
+
+A column counts as indexed only when it comes first in a `btree` index. Postgres can't use a multi-column index to filter on a column that isn't the leading one, so a composite primary key indexes its first column and no others. A membership table keyed on `(team_id, user_id)` has no index on `user_id`:
+
+```sql
+create table team_members (
+  team_id uuid references teams (id),
+  user_id uuid references auth.users (id),
+  primary key (team_id, user_id)
+);
+
+-- The primary key covers team_id. A policy filtering on user_id needs its own index.
+create index team_members_user_id_idx
+on team_members
 using btree (user_id);
 ```
 
