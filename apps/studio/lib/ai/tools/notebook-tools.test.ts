@@ -138,6 +138,33 @@ describe('ai/tools/notebook-tools', () => {
         cursor: 'next-page',
       })
     })
+
+    it('should forward sort_by as the content API sort_by query param', async () => {
+      let capturedRequest: Request | undefined
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content',
+        response: ({ request }) => {
+          capturedRequest = request
+          return HttpResponse.json<GetUserContentResponse>({
+            cursor: undefined,
+            data: [],
+          } as unknown as GetUserContentResponse)
+        },
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      await tools.list_notebooks.execute(
+        { limit: 1, sort_by: 'inserted_at' },
+        { toolCallId: 'test', messages: [] }
+      )
+
+      const url = new URL(capturedRequest!.url)
+      expect(url.searchParams.get('sort_by')).toBe('inserted_at')
+    })
   })
 
   describe('get_notebook', () => {
