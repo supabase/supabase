@@ -8,16 +8,16 @@ import {
   ExplorerQueryEditor,
   ExplorerQueryFooter,
   ExplorerQueryResults,
-} from './ExplorerQuery'
+} from '../ExplorerQuery'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
   ExplorerToolbarActions,
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
-} from './ExplorerToolbar'
-import { QueryResultTable } from './QueryResultTable'
-import { type QueryResult } from './types'
+} from '../ExplorerToolbar'
+import { QueryResultTable } from '../QueryResultTable'
+import { type QueryResult } from '../types'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
