@@ -206,7 +206,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                 name="accountName"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="Association Description"
+                    label="Association description"
                     description="A description for this association."
                   >
                     <FormControl>
@@ -268,7 +268,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                 name="awsAccountId"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="AWS Account ID"
+                    label="AWS account ID"
                     description="The ID of the AWS account you want to connect to."
                   >
                     <FormControl>
