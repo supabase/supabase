@@ -21,23 +21,18 @@ To make docs as clear as possible:
 
 ## AI agent skills for docs authoring
 
-If you're using Claude Code or Cursor, this repo ships four skills that back the stages of the "Write the docs" authoring checklist below.
+If you're using Claude Code or Cursor, this repo ships four skills that back the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) authoring checklist.
 
-Canonical files live in `.agents/skills/`. Git symlinks in `.claude/skills/` and `.cursor/skills/` point at them (same pattern as `vitest`):
-
-- Claude Code discovers skills from `.claude/skills/` and follows those symlinks. It does not scan `.agents/skills/` directly.
-- Cursor discovers skills from `.agents/skills/` and `.cursor/skills/`.
-
-No install step: no `npx skills add`, plugin, or copy into `~/.claude/skills/`. Open this repo and invoke a skill by name (`/write-the-docs`, `/ask-the-docs`, `/pm-the-docs`, `/review-the-docs`). If Claude Code does not list them, check that `.claude/skills/write-the-docs` is a symlink, not a plain text file. Windows clones may need git symlink support enabled, then a re-checkout.
+Invoke a skill by name: `/write-the-docs`, `/ask-the-docs`, `/pm-the-docs`, `/review-the-docs`.
 
 | Skill | Checklist stage | Use for |
 | --- | --- | --- |
 | [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / Shape | Audience, product-stage, and cross-cutting scope calls |
 | [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / Shape | `apps/docs` architecture, IA placement, and where content lives |
-| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in Linear and the code |
-| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft against the bar, and PR triage/verification |
+| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Drafting net-new content grounded in the code |
+| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft and PR triage/verification |
 
-The full checklist and quality bar these skills back is mirrored at [`.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md`](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md).
+The canonical files live in `.agents/skills/`, with Git symlinks in `.claude/skills/` and `.cursor/skills/`.
 
 ## Document types
 
