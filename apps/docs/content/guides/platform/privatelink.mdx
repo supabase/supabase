@@ -7,7 +7,6 @@ description: 'Secure private network connectivity to your Supabase database usin
 <Admonition type="note">
 
 PrivateLink is available only to Team and Enterprise customers.
-Contact support if you would like to create a PrivateLink connection for a read-only replica.
 
 </Admonition>
 
@@ -37,19 +36,24 @@ To use PrivateLink with your Supabase project:
 
 ## Getting started
 
-### Step 1: Add AWS account
+### Step 1: Add association
 
 Navigate to your project's Integrations section to set up PrivateLink:
 
 1. Go to your Supabase project dashboard
 2. Navigate to [**Settings** > **Integrations**](/dashboard/project/_/settings/integrations)
 3. Find the **AWS PrivateLink** section
-4. Click **Add Account**
-5. Enter your AWS Account ID
-6. Provide a description for the account (recommended)
-7. Click **Add Account** to submit
+4. Click **Add Association**
+5. Provide an association description (recommended)
+6. Select the database target: the primary database or a specific read replica
+7. Enter your AWS Account ID
+8. Click **Add Association** to submit
 
-After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS Account ID. This process may take a few moments. Once complete, the account will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted.
+Each database, whether the primary or a read replica, needs its own association. Create a separate association for every database you want to reach over PrivateLink.
+
+After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS Account ID. This process may take a few moments. Once complete, the association will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted.
+
+Once ready, select **View Association** to see the VPC Lattice resource configuration ID and ARNs for the association. This is useful for confirming which resource configuration corresponds to which database when a project has multiple associations, for example one for the primary database and one for each read replica.
 
 ### Step 2: Accept resource share
 
@@ -174,7 +178,7 @@ For maximum security, you can restrict public database access in your project se
 
 ## Limitations
 
-- **Read Replicas**: To establish PrivateLink with a Read Replica, reach out to your account rep.
+- **Service Scope**: PrivateLink only supports database connections (Postgres and PgBouncer). Other Supabase services (API, Storage, Auth, Realtime) will continue to operate over public internet connections.
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
 
 ## Compatibility
