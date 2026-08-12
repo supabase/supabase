@@ -1,6 +1,11 @@
 module.exports = [
   {
     permanent: true,
+    source: '/images/customers/logos/light/:path*',
+    destination: '/images/customers/logos/on-dark/:path*',
+  },
+  {
+    permanent: true,
     source: '/blog/pricing',
     destination: '/pricing',
   },

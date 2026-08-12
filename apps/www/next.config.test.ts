@@ -37,6 +37,11 @@ describe('next.config.mjs', () => {
     )
     expect(redirects).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({
+          source: '/images/customers/logos/light/:path*',
+          destination: '/images/customers/logos/on-dark/:path*',
+          permanent: true,
+        }),
         expect.objectContaining({ source: '/ui', destination: '/library', permanent: true }),
         expect.objectContaining({
           source: '/ui/:path*',

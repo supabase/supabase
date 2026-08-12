@@ -50,7 +50,7 @@ const ContactSales = () => {
               tabs={[
                 {
                   label: (
-                    <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />
+                    <CustomerLogo title="Goodtape" logo="/images/customers/logos/on-light/good-tape.png" />
                   ),
                   panel: (
                     <CustomerQuote
@@ -60,7 +60,7 @@ const ContactSales = () => {
                   ),
                 },
                 {
-                  label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
+                  label: <CustomerLogo title="Xendit" logo="/images/customers/logos/on-light/xendit.png" />,
                   panel: (
                     <CustomerQuote
                       quote="The full solution was built and in production in less than one week."
@@ -70,7 +70,7 @@ const ContactSales = () => {
                 },
                 {
                   label: (
-                    <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />
+                    <CustomerLogo title="Chatbase" logo="/images/customers/logos/on-light/chatbase.png" />
                   ),
                   panel: (
                     <CustomerQuote
@@ -89,7 +89,7 @@ const ContactSales = () => {
             tabs={[
               {
                 label: (
-                  <CustomerLogo title="Goodtape" logo="/images/customers/logos/good-tape.png" />
+                  <CustomerLogo title="Goodtape" logo="/images/customers/logos/on-light/good-tape.png" />
                 ),
                 panel: (
                   <CustomerQuote
@@ -99,7 +99,7 @@ const ContactSales = () => {
                 ),
               },
               {
-                label: <CustomerLogo title="Xendit" logo="/images/customers/logos/xendit.png" />,
+                label: <CustomerLogo title="Xendit" logo="/images/customers/logos/on-light/xendit.png" />,
                 panel: (
                   <CustomerQuote
                     quote="The full solution was built and in production in less than one week."
@@ -109,7 +109,7 @@ const ContactSales = () => {
               },
               {
                 label: (
-                  <CustomerLogo title="Chatbase" logo="/images/customers/logos/chatbase.png" />
+                  <CustomerLogo title="Chatbase" logo="/images/customers/logos/on-light/chatbase.png" />
                 ),
                 panel: (
                   <CustomerQuote

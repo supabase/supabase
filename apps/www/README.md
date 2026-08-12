@@ -12,7 +12,7 @@ To get started copy the example env file using `cp .env.local.example .env.local
 
 - **Resize images**: All new images should be resized to only the maximum resolution needed when rendering on the frontend. Don't upload images larger than what will be displayed.
 - **Compress images**: All new images should be compressed before committing. Use tools like Clop or ImageOptim to reduce file size without noticeable quality loss.
-- **Image locations**: Store blog post images in `apps/www/public/images/blog/`. Event images go in `apps/www/public/images/events/`.
+- **Image locations**: Store blog post images in `apps/www/public/images/blog/`. Event images go in `apps/www/public/images/events/`. Customer logos go in `apps/www/public/images/customers/logos/on-light/` and `on-dark/` (see Customer Stories below).
 
 ### OG image generation
 
@@ -196,6 +196,19 @@ Customer stories are defined in MDX files (`apps/www/_customers/*.mdx`) and use 
 
 Do not include an `og_image` field in customer story frontmatter. It will be ignored. OG images are always generated dynamically.
 
+**Logos**
+
+Customer logos are monochrome, transparent PNGs (SVG breaks OG image generation). Put each theme variant in the folder named for the background it sits on:
+
+| Folder                              | Mark        | Frontmatter    | Shown in   |
+| ----------------------------------- | ----------- | -------------- | ---------- |
+| `/images/customers/logos/on-light/` | Dark/black  | `logo`         | Light mode |
+| `/images/customers/logos/on-dark/`  | Light/white | `logo_inverse` | Dark mode  |
+
+Do not use coloured brand marks. Preview `/customers` in both themes before merging.
+
+Icon-only assets (homepage chips, etc.) stay at `/images/customers/logos/{slug}-icon.svg`.
+
 **Example** (in `apps/www/_customers/company-abc.mdx`):
 
 ```yaml
@@ -203,7 +216,8 @@ Do not include an `og_image` field in customer story frontmatter. It will be ign
 name: Company ABC
 title: Company ABC built their platform with Supabase
 # DO NOT include og_image - it's generated automatically
-logo: /images/customers/logos/company-abc.png
+logo: /images/customers/logos/on-light/company-abc.png
+logo_inverse: /images/customers/logos/on-dark/company-abc.png
 ---
 ```
 
@@ -221,8 +235,9 @@ logo: /images/customers/logos/company-abc.png
   title: 'Company ABC built their platform with Supabase',
   description: '...',
   organization: 'Company ABC',
-  imgUrl: 'images/customers/logos/company-abc.png', // Full path from public/
-  logo: '/images/customers/logos/company-abc.png',
+  imgUrl: 'images/customers/logos/on-light/company-abc.png', // Full path from public/
+  logo: '/images/customers/logos/on-light/company-abc.png',
+  logo_inverse: '/images/customers/logos/on-dark/company-abc.png',
   url: '/customers/company-abc',
 }
 ```
