@@ -175,6 +175,12 @@ export const LogsPreviewer = ({
     refresh,
   } = useLogsPreview({ projectRef, table, filterOverride })
 
+  // The selected row is already in the loaded pages, so its timestamp is known
+  // without another request — it bounds the single-log lookup to a tight window
+  // instead of the whole selected range. Undefined for a deep-linked log that
+  // isn't in a loaded page, which falls back to the search range.
+  const selectedLogTimestamp = logData.find((x) => x.id === selectedLogId)?.timestamp
+
   const {
     data: selectedLog,
     isLoading: isSelectedLogLoading,
@@ -184,6 +190,7 @@ export const LogsPreviewer = ({
     id: selectedLogId ?? undefined,
     queryType,
     paramsToMerge: params,
+    logTimestampMicros: selectedLogTimestamp,
   })
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(timestampStart)
