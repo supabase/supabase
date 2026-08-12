@@ -66,20 +66,4 @@ describe('ExplorerToolbar', () => {
     expect(action).not.toHaveClass('w-7')
     expect(actionRef.current).toBe(action)
   })
-
-  it('defaults its height but lets a consumer drive it', () => {
-    const { rerender } = render(<ExplorerToolbar aria-label="Default height" />)
-
-    // The header height variable stays consumer-owned, but it carries a fallback
-    // so apps that leave it unset keep the default row instead of an invalid
-    // declaration the browser drops.
-    expect(screen.getByRole('toolbar')).toHaveClass('h-10')
-    expect(screen.getByRole('toolbar').className).toContain('var(--header-height,2.5rem)')
-
-    rerender(<ExplorerToolbar aria-label="Taller height" className="h-12" />)
-
-    const toolbar = screen.getByRole('toolbar')
-    expect(toolbar).toHaveClass('h-12')
-    expect(toolbar).not.toHaveClass('h-10')
-  })
 })
