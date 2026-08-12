@@ -4,26 +4,34 @@ import { toast } from 'sonner'
 
 import { sqlKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { ResponseError, type UseCustomMutationOptions } from '@/types'
 
 type SessionTerminateVariables = {
   pid: number
+  /** Pass the pid's last-known backend_start to guard against a reused pid matching an unrelated session */
+  backendStart?: string
   projectRef?: string
   connectionString?: string | null
 }
 
 export async function terminateSession({
   pid,
+  backendStart,
   projectRef,
   connectionString,
 }: SessionTerminateVariables) {
-  const sql = getTerminateSessionSQL({ pid })
+  const sql = getTerminateSessionSQL({ pid, backendStart })
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
     queryKey: ['terminate-session'],
   })
+  if (backendStart !== undefined && result.length === 0) {
+    throw new ResponseError(
+      `Session (PID: ${pid}) has already changed since this list was loaded. Refresh and try again.`
+    )
+  }
   return result
 }
 
