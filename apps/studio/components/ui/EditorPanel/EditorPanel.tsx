@@ -40,6 +40,7 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { containsUnknownFunction, isReadOnlySelect } from '../AIAssistantPanel/AIAssistant.utils'
 import { AIEditor } from '../AIEditor'
 import { ButtonTooltip } from '../ButtonTooltip'
+import { DataGridResults } from '../DataGridResults'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { formatSqlError } from './EditorPanel.utils'
 import { SaveSnippetDialog } from './SaveSnippetDialog'
@@ -47,7 +48,6 @@ import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/Explai
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
-import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentIdQuery } from '@/data/content/content-id-query'
@@ -563,7 +563,7 @@ export const EditorPanel = () => {
           >
             {showResults && (
               <div className="border-t flex-1 overflow-hidden">
-                <Results rows={results} />
+                <DataGridResults rows={results} />
               </div>
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">

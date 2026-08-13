@@ -4,10 +4,10 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { Results } from './Results'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
+import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { getSqlErrorLines } from '@/data/sql/utils'
@@ -185,7 +185,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       )
     }
 
-    return <Results rows={result.rows} />
+    return <DataGridResults rows={result.rows} />
   }
 )
 

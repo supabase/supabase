@@ -1,7 +1,9 @@
+// [Joshen] Temporary eslint-disable
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { screen } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 
-import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { DataGridResults as Results } from '../index'
 import { customRender as render } from '@/tests/lib/custom-render'
 
 let contextMenuMountCount = 0

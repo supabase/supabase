@@ -1,6 +1,6 @@
 import { Copy, Expand } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
-import DataGrid, { CalculatedColumn } from 'react-data-grid'
+import DataGrid, { CalculatedColumn, RenderCellProps } from 'react-data-grid'
 import {
   ContextMenu,
   ContextMenuContent,
@@ -10,20 +10,23 @@ import {
 } from 'ui'
 
 import { CellDetailPanel } from './CellDetailPanel'
-import { ResultCell } from './ResultCell'
 import {
   calculateResultColumnWidth,
   formatClipboardValue,
   RESULT_COLUMN_MIN_WIDTH,
-} from './Results.utils'
+  type ResultRow,
+} from './DataGridResults.utils'
+import { ResultCell } from './ResultCell'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
-export const Results = ({ rows }: { rows: readonly any[] }) => {
-  const [expandedCell, setExpandedCell] = useState<{ column: string; value: any } | null>(null)
-  const contextMenuCellRef = useRef<{ column: string; value: any } | null>(null)
+export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
+  const [expandedCell, setExpandedCell] = useState<{ column: string; value: unknown } | null>(
+    null
+  )
+  const contextMenuCellRef = useRef<{ column: string; value: unknown } | null>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
 
-  const handleContextMenu = useCallback((e: React.MouseEvent, column: string, value: any) => {
+  const handleContextMenu = useCallback((e: React.MouseEvent, column: string, value: unknown) => {
     contextMenuCellRef.current = { column, value }
 
     if (triggerRef.current) {
@@ -45,7 +48,7 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
     return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
   }
 
-  const columns: CalculatedColumn<any>[] = useMemo(
+  const columns: CalculatedColumn<ResultRow>[] = useMemo(
     () =>
       Object.keys(rows?.[0] ?? []).map((key, idx) => {
         return {
@@ -62,7 +65,7 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
           frozen: false,
           sortable: false,
           isLastFrozenColumn: false,
-          renderCell: ({ row }: { row: any }) => (
+          renderCell: ({ row }: RenderCellProps<ResultRow>) => (
             <ResultCell
               column={key}
               value={row[key]}

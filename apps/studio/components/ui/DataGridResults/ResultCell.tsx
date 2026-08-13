@@ -1,7 +1,7 @@
 import { Expand } from 'lucide-react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { formatCellValue, isLargeValue } from './Results.utils'
+import { formatCellValue, isLargeValue } from './DataGridResults.utils'
 
 interface ResultCellProps {
   column: string

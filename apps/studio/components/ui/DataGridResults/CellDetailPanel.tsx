@@ -8,7 +8,7 @@ import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 
 interface CellDetailPanelProps {
   column: string
-  value: any
+  value: unknown
   visible: boolean
   onClose: () => void
 }
