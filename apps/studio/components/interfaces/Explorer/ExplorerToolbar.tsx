@@ -100,9 +100,9 @@ const ExplorerToolbarTitle = ({
       ) : onSaveTitle ? (
         <Button
           variant="text"
-          className="group"
+          className="group/title"
           onClick={handleStartEditing}
-          iconRight={<Edit className="opacity-0 group-hover:opacity-100 transition" />}
+          iconRight={<Edit className="opacity-0 group-hover/title:opacity-100 transition" />}
         >
           {title}
         </Button>
