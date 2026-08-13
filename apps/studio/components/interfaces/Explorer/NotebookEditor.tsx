@@ -62,10 +62,10 @@ export const NotebookEditor = () => {
 
   const onSelectAddCell = (type: 'markdown' | 'query') => {
     const notebookId = currentNotebook?.notebook.id
-    const lastCellId = cells[cells.length - 1]?.id
-    if (!notebookId || !lastCellId) return
+    if (!notebookId) return
 
     const cell = type === 'markdown' ? createMarkdownCellSkeleton() : createQueryCellSkeleton()
+    const lastCellId = cells[cells.length - 1]?.id
 
     snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
@@ -109,8 +109,12 @@ export const NotebookEditor = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button variant="default">Add query cell</Button>
-                <Button variant="default">Add markdown cell</Button>
+                <Button variant="default" onClick={() => onSelectAddCell('query')}>
+                  Add query cell
+                </Button>
+                <Button variant="default" onClick={() => onSelectAddCell('markdown')}>
+                  Add markdown cell
+                </Button>
               </div>
             </EmptyStatePresentational>
           )}

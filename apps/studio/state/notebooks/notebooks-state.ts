@@ -95,17 +95,26 @@ export const notebooksState = proxy({
   },
 
   /**
-   * Insert a cell right after `cellId` in a notebook's cell array (or at the
-   * end if `cellId` isn't found). The caller builds the cell to insert (e.g.
-   * via `createMarkdownCellSkeleton`/`createQueryCellSkeleton`) since deciding
+   * Insert a cell right after `cellId` in a notebook's cell array — or at the
+   * end, if `cellId` is omitted or isn't found (e.g. an empty notebook has no
+   * cell to insert after). The caller builds the cell to insert (e.g. via
+   * `createMarkdownCellSkeleton`/`createQueryCellSkeleton`) since deciding
    * what kind of cell to create is a UI concern, not a state one.
    */
-  insertCellAfter: ({ id, cellId, cell }: { id: string; cellId: string; cell: Notebooks.Cell }) => {
+  insertCellAfter: ({
+    id,
+    cellId,
+    cell,
+  }: {
+    id: string
+    cellId?: string
+    cell: Notebooks.Cell
+  }) => {
     const stateNotebook = notebooksState.notebooks[id]
     if (!stateNotebook?.notebook.content) return
 
     const cells = stateNotebook.notebook.content.cells
-    const insertAt = cells.findIndex((c) => c.id === cellId)
+    const insertAt = cellId ? cells.findIndex((c) => c.id === cellId) : -1
     const nextCells = [...cells]
     nextCells.splice(insertAt === -1 ? cells.length : insertAt + 1, 0, cell)
 
