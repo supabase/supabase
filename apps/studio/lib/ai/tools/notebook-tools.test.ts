@@ -47,10 +47,15 @@ const NOTEBOOK_CONTENT = {
 
 describe('ai/tools/notebook-tools', () => {
   describe('getNotebookTools', () => {
-    it('should return list_notebooks, get_notebook, and create_notebook tools', () => {
+    it('should return list_notebooks, get_notebook, create_notebook, and update_notebook tools', () => {
       const tools = getNotebookTools()
 
-      expect(Object.keys(tools)).toEqual(['list_notebooks', 'get_notebook', 'create_notebook'])
+      expect(Object.keys(tools)).toEqual([
+        'list_notebooks',
+        'get_notebook',
+        'create_notebook',
+        'update_notebook',
+      ])
     })
 
     it('should not require approval to read notebooks', () => {
@@ -60,10 +65,11 @@ describe('ai/tools/notebook-tools', () => {
       expect(tools.get_notebook.needsApproval).toBeUndefined()
     })
 
-    it('should require approval to create a notebook', () => {
+    it('should require approval to create or update a notebook', () => {
       const tools = getNotebookTools()
 
       expect(tools.create_notebook.needsApproval).toBe(true)
+      expect(tools.update_notebook.needsApproval).toBe(true)
     })
   })
 
@@ -131,6 +137,33 @@ describe('ai/tools/notebook-tools', () => {
         ],
         cursor: 'next-page',
       })
+    })
+
+    it('should forward sort_by as the content API sort_by query param', async () => {
+      let capturedRequest: Request | undefined
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content',
+        response: ({ request }) => {
+          capturedRequest = request
+          return HttpResponse.json<GetUserContentResponse>({
+            cursor: undefined,
+            data: [],
+          } as unknown as GetUserContentResponse)
+        },
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.list_notebooks.execute) throw new Error('execute is undefined')
+
+      await tools.list_notebooks.execute(
+        { limit: 1, sort_by: 'inserted_at' },
+        { toolCallId: 'test', messages: [] }
+      )
+
+      const url = new URL(capturedRequest!.url)
+      expect(url.searchParams.get('sort_by')).toBe('inserted_at')
     })
   })
 
@@ -320,6 +353,87 @@ describe('ai/tools/notebook-tools', () => {
 
       expect(typeof sentBody?.id).toBe('string')
       expect(result).toEqual({ id: sentBody?.id, name: 'Signup funnel' })
+    })
+  })
+
+  describe('update_notebook', () => {
+    function mockGetNotebook() {
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref/content/item/:id',
+        response: () =>
+          HttpResponse.json<GetUserContentByIdResponse>({
+            id: 'notebook-1',
+            name: 'Signup funnel',
+            description: undefined,
+            visibility: 'project',
+            favorite: false,
+            folder_id: null,
+            inserted_at: '2026-01-01T00:00:00.000Z',
+            updated_at: '2026-01-01T00:00:00.000Z',
+            owner_id: 1,
+            project_id: 1,
+            type: 'notebook',
+            content: NOTEBOOK_CONTENT,
+          } as unknown as GetUserContentByIdResponse),
+      })
+    }
+
+    it('should re-fetch the notebook, apply the operations, and PUT the resolved content', async () => {
+      mockGetNotebook()
+      let sentBody: Record<string, unknown> | undefined
+      addAPIMock({
+        method: 'put',
+        path: '/platform/projects/:ref/content',
+        response: async ({ request }) => {
+          sentBody = (await request.json()) as Record<string, unknown>
+          return new HttpResponse(null)
+        },
+      })
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
+
+      const result = await tools.update_notebook.execute(
+        {
+          id: 'notebook-1',
+          operations: [
+            { _tag: 'delete_cell', cell_id: 'cell-3' },
+            {
+              _tag: 'insert_cell',
+              after_cell_id: 'cell-1',
+              cell: { _tag: 'markdown_cell', text: '# New section' },
+            },
+          ],
+        },
+        { toolCallId: 'test', messages: [] }
+      )
+
+      expect(sentBody?.id).toBe('notebook-1')
+      expect(sentBody?.type).toBe('notebook')
+
+      const content = sentBody?.content as { cells: Array<Record<string, unknown>> }
+      expect(content.cells.map((cell) => cell.id ?? cell.text)).toEqual([
+        'cell-1',
+        '# New section',
+        'cell-2',
+      ])
+      expect(content.cells[2].sql).toBe('select * from auth.users limit 100')
+      expect(result).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+    })
+
+    it('should throw a descriptive error instead of PUTting when an operation targets an unknown cell id', async () => {
+      mockGetNotebook()
+
+      const tools = getNotebookTools({ projectRef: 'test-project' })
+      if (!tools.update_notebook.execute) throw new Error('execute is undefined')
+
+      await expect(
+        tools.update_notebook.execute(
+          { id: 'notebook-1', operations: [{ _tag: 'delete_cell', cell_id: 'missing-cell' }] },
+          { toolCallId: 'test', messages: [] }
+        )
+      ).rejects.toThrow('No cell with id "missing-cell"')
     })
   })
 })
