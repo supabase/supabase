@@ -63,11 +63,15 @@ export const QueryEditor = ({
   onResultChange,
   onDisplayChange,
 }: QueryEditorProps) => {
-  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
-  const [showQuery, setShowQuery] = useState(true)
   const sqlRef = useLatest(sql)
+  const onSqlCommitRef = useLatest(onSqlCommit)
+
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
+
   const view = display?.view ?? 'table'
   const columns = Object.keys(result?.rows?.[0] ?? {})
+
+  const [showQuery, setShowQuery] = useState(true)
 
   const { mutate: executeSql, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess: (data) => onResultChange({ rows: data.result }),
@@ -141,9 +145,7 @@ export const QueryEditor = ({
             options={{ minimap: { enabled: false }, padding: { top: 8 } }}
             onInputChange={(value) => onSqlChange(value ?? '')}
             onMount={(editor) => {
-              if (onSqlCommit) {
-                editor.onDidBlurEditorWidget(() => onSqlCommit(sqlRef.current))
-              }
+              editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
             }}
           />
         </ExplorerQueryEditor>
