@@ -26,7 +26,18 @@ export const LogsSnippetIcon = ({
 )
 
 interface EntityTypeIconProps {
-  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p' | 'notebook' | 'query' | 'explorer-home'
+  type:
+    | 'sql'
+    | 'schema'
+    | 'new'
+    | 'r'
+    | 'v'
+    | 'm'
+    | 'f'
+    | 'p'
+    | 'notebook'
+    | 'query'
+    | 'explorer-home'
   size?: number
   strokeWidth?: number
   isActive?: boolean
