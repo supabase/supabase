@@ -2,6 +2,7 @@ services:
   supavisor: !reset null
 
   pgbouncer:
+    container_name: supabase-pgbouncer
     image: edoburu/pgbouncer:v1.25.2-p0
     restart: unless-stopped
     ports:
