@@ -3,11 +3,17 @@ import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
 import { type QueryResult } from '@/components/interfaces/Explorer/types'
+import {
+  cellSourceSchema,
+  createDefaultCellSource,
+  type CellSource,
+} from '@/data/query-sources/query-source-registry'
 
 export type ExplorerQueryDraft = {
   id: string
   projectRef: string
   name: string
+  source: CellSource
   uncheckedSql: UntrustedSqlFragment
   updatedAt: number
 }
@@ -18,6 +24,7 @@ export type ExplorerQueryResult = QueryResult & {
 
 type PersistedExplorerQueryDraft = {
   name: string
+  source: CellSource
   sql: string
   updatedAt: number
 }
@@ -35,18 +42,27 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
     if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
 
     return Object.fromEntries(
-      Object.entries(parsed).filter((entry): entry is [string, PersistedExplorerQueryDraft] => {
-        const draft = entry[1]
-        return (
-          draft !== null &&
-          typeof draft === 'object' &&
-          'name' in draft &&
-          typeof draft.name === 'string' &&
-          'sql' in draft &&
-          typeof draft.sql === 'string' &&
-          'updatedAt' in draft &&
-          typeof draft.updatedAt === 'number'
-        )
+      Object.entries(parsed).flatMap(([id, value]) => {
+        if (
+          value === null ||
+          typeof value !== 'object' ||
+          !('name' in value) ||
+          typeof value.name !== 'string' ||
+          !('sql' in value) ||
+          typeof value.sql !== 'string' ||
+          !('updatedAt' in value) ||
+          typeof value.updatedAt !== 'number'
+        ) {
+          return []
+        }
+
+        const parsedSource =
+          'source' in value ? cellSourceSchema.safeParse(value.source) : { success: false as const }
+        const source = parsedSource.success
+          ? parsedSource.data
+          : createDefaultCellSource('database')
+
+        return [[id, { name: value.name, source, sql: value.sql, updatedAt: value.updatedAt }]]
       })
     )
   } catch {
@@ -74,23 +90,26 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       projectRef,
       name = 'Untitled query',
       sql = '',
+      source = createDefaultCellSource('database'),
     }: {
       id: string
       projectRef: string
       name?: string
       sql?: string
+      source?: CellSource
     }) => {
       const draft: ExplorerQueryDraft = {
         id,
         projectRef,
         name,
+        source: cellSourceSchema.parse(source),
         uncheckedSql: untrustedSql(sql),
         updatedAt: Date.now(),
       }
       state.drafts[id] = draft
 
       const persisted = readPersistedDrafts(storage, projectRef)
-      persisted[id] = { name, sql, updatedAt: draft.updatedAt }
+      persisted[id] = { name, source: draft.source, sql, updatedAt: draft.updatedAt }
       writePersistedDrafts(storage, projectRef, persisted)
 
       return id
@@ -106,23 +125,39 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
         id,
         projectRef,
         name: persisted.name,
+        source: persisted.source,
         uncheckedSql: untrustedSql(persisted.sql),
         updatedAt: persisted.updatedAt,
       }
       return true
     },
 
-    updateDraft: ({ id, name, sql }: { id: string; name?: string; sql?: string }) => {
+    updateDraft: ({
+      id,
+      name,
+      source,
+      sql,
+    }: {
+      id: string
+      name?: string
+      source?: CellSource
+      sql?: string
+    }) => {
       const draft = state.drafts[id]
       if (!draft) return
 
       if (name !== undefined) draft.name = name
+      if (source !== undefined) {
+        draft.source = cellSourceSchema.parse(source)
+        delete state.results[id]
+      }
       if (sql !== undefined) draft.uncheckedSql = untrustedSql(sql)
       draft.updatedAt = Date.now()
 
       const persisted = readPersistedDrafts(storage, draft.projectRef)
       persisted[id] = {
         name: draft.name,
+        source: draft.source,
         sql: draft.uncheckedSql,
         updatedAt: draft.updatedAt,
       }
