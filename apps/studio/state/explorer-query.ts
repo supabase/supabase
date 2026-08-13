@@ -5,24 +5,53 @@ import { z } from 'zod'
 
 import { type QueryResult } from '@/components/interfaces/Explorer/types'
 import {
+  type DatabaseSourceParameters,
+  type LogsSourceParameters,
+} from '@/data/content/notebooks/notebook-schema'
+import { untrustedLogSql, type UntrustedLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import {
   createDefaultSourceBinding,
   querySourceBindingSchema,
+  toQuerySourceBinding,
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 
-export type ExplorerQueryDraft = {
+type ExplorerQueryDraftBase = {
   id: string
   projectRef: string
   name: string
-  source: QuerySourceBinding
-  uncheckedSql: UntrustedSqlFragment
   updatedAt: number
 }
+
+/**
+ * A standalone Explorer query draft. Tagged by backend rather than carrying a separate
+ * `source` object, mirroring how notebook cells store their binding: the tag narrows
+ * `uncheckedSql` to that backend's brand, so a Postgres draft's text can never be handed
+ * to the analytics wire boundary (or vice versa) without failing to compile.
+ */
+export type DatabaseQueryDraft = ExplorerQueryDraftBase &
+  DatabaseSourceParameters & {
+    _tag: 'database'
+    uncheckedSql: UntrustedSqlFragment
+  }
+
+export type LogsQueryDraft = ExplorerQueryDraftBase &
+  LogsSourceParameters & {
+    _tag: 'logs'
+    uncheckedSql: UntrustedLogSqlFragment
+  }
+
+export type ExplorerQueryDraft = DatabaseQueryDraft | LogsQueryDraft
 
 export type ExplorerQueryResult = QueryResult & {
   executedAt: number
 }
 
+/**
+ * Drafts persist their binding under a single `source` key. This is browser-local storage,
+ * not the notebook wire contract, so nesting costs nothing here and lets the whole binding
+ * be validated in one `safeParse`.
+ */
 type PersistedExplorerQueryDraft = {
   name: string
   source: QuerySourceBinding
@@ -44,6 +73,39 @@ const persistedDraftSchema = z.object({
   updatedAt: z.number(),
   source: z.unknown().optional(),
 })
+
+/**
+ * Rebuilds a draft from its persisted form, branding the SQL for the backend the binding
+ * names. The single place a stored string re-enters the type system as untrusted SQL, which
+ * is what keeps the brand correlated with the backend rather than assumed.
+ */
+const toDraft = ({
+  id,
+  projectRef,
+  persisted,
+}: {
+  id: string
+  projectRef: string
+  persisted: PersistedExplorerQueryDraft
+}): ExplorerQueryDraft => {
+  const base = { id, projectRef, name: persisted.name, updatedAt: persisted.updatedAt }
+
+  if (persisted.source._tag === 'logs') {
+    return {
+      ...base,
+      _tag: 'logs',
+      time_range: persisted.source.time_range,
+      uncheckedSql: untrustedLogSql(persisted.sql),
+    }
+  }
+
+  return {
+    ...base,
+    _tag: 'database',
+    database_identifier: persisted.source.database_identifier,
+    uncheckedSql: untrustedSql(persisted.sql),
+  }
+}
 
 const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
   const raw = storage.getItem(LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS(projectRef))
@@ -103,6 +165,17 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
     { timeout: ReturnType<typeof setTimeout>; persist: () => void }
   >()
 
+  const persistDraft = (draft: ExplorerQueryDraft) => {
+    const persisted = readPersistedDrafts(storage, draft.projectRef)
+    persisted[draft.id] = {
+      name: draft.name,
+      source: toQuerySourceBinding(draft),
+      sql: draft.uncheckedSql,
+      updatedAt: draft.updatedAt,
+    }
+    writePersistedDrafts(storage, draft.projectRef, persisted)
+  }
+
   const state = proxy({
     drafts: {} as Record<string, ExplorerQueryDraft>,
     results: {} as Record<string, ExplorerQueryResult>,
@@ -120,19 +193,19 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       sql?: string
       source?: QuerySourceBinding
     }) => {
-      const draft: ExplorerQueryDraft = {
+      const draft = toDraft({
         id,
         projectRef,
-        name,
-        source: querySourceBindingSchema.parse(source),
-        uncheckedSql: untrustedSql(sql),
-        updatedAt: Date.now(),
-      }
-      state.drafts[id] = draft
+        persisted: {
+          name,
+          source: querySourceBindingSchema.parse(source),
+          sql,
+          updatedAt: Date.now(),
+        },
+      })
 
-      const persisted = readPersistedDrafts(storage, projectRef)
-      persisted[id] = { name, source: draft.source, sql, updatedAt: draft.updatedAt }
-      writePersistedDrafts(storage, projectRef, persisted)
+      state.drafts[id] = draft
+      persistDraft(draft)
 
       return id
     },
@@ -143,17 +216,22 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       const persisted = readPersistedDrafts(storage, projectRef)[id]
       if (!persisted) return false
 
-      state.drafts[id] = {
-        id,
-        projectRef,
-        name: persisted.name,
-        source: persisted.source,
-        uncheckedSql: untrustedSql(persisted.sql),
-        updatedAt: persisted.updatedAt,
-      }
+      state.drafts[id] = toDraft({ id, projectRef, persisted })
       return true
     },
 
+    /**
+     * Applies an edit to a draft. The draft is rebuilt rather than mutated in place, since
+     * a backend change changes which brand its SQL carries; a stale result from the old
+     * backend is dropped, because another engine returns unrelated columns.
+     *
+     * NOTE — see `changeCellSource`: keeping the query text across a backend change is very
+     * likely not what the user wants, since the dialects differ, and is kept for now only
+     * because it destroys nothing. Worth revisiting alongside the notebook-cell behavior.
+     *
+     * A rename or a source change is a discrete action, so it writes through immediately;
+     * SQL keystrokes are debounced by `EXPLORER_QUERY_PERSIST_DELAY`.
+     */
     updateDraft: ({
       id,
       name,
@@ -168,29 +246,28 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       const draft = state.drafts[id]
       if (!draft) return
 
-      if (name !== undefined) draft.name = name
-      if (source !== undefined) {
-        draft.source = querySourceBindingSchema.parse(source)
-        delete state.results[id]
-      }
-      if (sql !== undefined) draft.uncheckedSql = untrustedSql(sql)
-      draft.updatedAt = Date.now()
+      const nextSource = source === undefined ? undefined : querySourceBindingSchema.parse(source)
+      if (nextSource !== undefined && nextSource._tag !== draft._tag) delete state.results[id]
+
+      state.drafts[id] = toDraft({
+        id,
+        projectRef: draft.projectRef,
+        persisted: {
+          name: name ?? draft.name,
+          source: nextSource ?? toQuerySourceBinding(draft),
+          sql: sql ?? draft.uncheckedSql,
+          updatedAt: Date.now(),
+        },
+      })
 
       const persist = () => {
         const pending = pendingPersistence.get(id)
         if (pending) clearTimeout(pending.timeout)
         pendingPersistence.delete(id)
+
         const currentDraft = state.drafts[id]
         if (!currentDraft) return
-
-        const persisted = readPersistedDrafts(storage, currentDraft.projectRef)
-        persisted[id] = {
-          name: currentDraft.name,
-          source: currentDraft.source,
-          sql: currentDraft.uncheckedSql,
-          updatedAt: currentDraft.updatedAt,
-        }
-        writePersistedDrafts(storage, currentDraft.projectRef, persisted)
+        persistDraft(currentDraft)
       }
 
       const pending = pendingPersistence.get(id)

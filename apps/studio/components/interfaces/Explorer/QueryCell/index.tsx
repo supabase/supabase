@@ -4,7 +4,7 @@ import { type Snapshot } from 'valtio'
 
 import { AddCellDropdown } from '../AddCellDropdown'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
-import { QueryEditor } from '../QueryEditor'
+import { QueryEditor, type ExplorerQueryModel } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { SortableSection } from '@/components/ui/SortableSection'
 import {
@@ -38,13 +38,19 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const currentNotebook = useCurrentNotebook()
 
   const { id, title: cellTitle, view, chart, unchecked_sql } = cell
-  const rowLimit = 'row_limit' in cell ? cell.row_limit : undefined
-  const source = getQuerySourceBinding(cell)
 
   const [sql, setSql] = useState<string>(unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
 
   const title = cellTitle ?? 'Untitled snippet'
+  const query: ExplorerQueryModel =
+    cell._tag === 'log_cell'
+      ? { ...getQuerySourceBinding(cell), uncheckedSql: untrustedLogSql(sql) }
+      : {
+          ...getQuerySourceBinding(cell),
+          uncheckedSql: untrustedSql(sql),
+          rowLimit: cell.row_limit,
+        }
   const display: QueryDisplay = {
     view: view ?? 'table',
     chart: chart ? { ...chart, y_columns: [...chart.y_columns] } : undefined,
@@ -133,10 +139,8 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
         id={id}
         variant="embedded"
         title={title}
-        sql={sql}
-        source={source}
+        query={query}
         result={result}
-        rowLimit={rowLimit}
         display={cell._tag === 'database_cell' ? display : undefined}
         onTitleChange={(title) => handleUpdateCell({ title })}
         onSqlChange={setSql}

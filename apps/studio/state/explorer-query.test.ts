@@ -17,6 +17,11 @@ const createMemoryStorage = () => {
   }
 }
 
+const LOGS_SOURCE = {
+  _tag: 'logs',
+  time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' },
+} as const
+
 describe('explorer query drafts', () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
@@ -32,36 +37,59 @@ describe('explorer query drafts', () => {
 
     expect(secondState.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
     expect(secondState.drafts['query-1']).toMatchObject({
+      _tag: 'database',
       name: 'Active users',
-      source: { _tag: 'database' },
       uncheckedSql: 'select * from users',
       projectRef: 'project-a',
     })
     expect(secondState.restoreDraft({ id: 'query-1', projectRef: 'project-b' })).toBe(false)
   })
 
-  it('persists source parameters and clears stale results when they change', () => {
+  it('persists source parameters and clears stale results when the backend changes', () => {
     const storage = createMemoryStorage()
     const state = createExplorerQueryState(storage)
 
     state.createDraft({ id: 'query-1', projectRef: 'project-a', sql: 'select 1' })
     state.setResult({ id: 'query-1', result: { rows: [{ value: 1 }], executedAt: 1 } })
-    state.updateDraft({
-      id: 'query-1',
-      source: {
-        _tag: 'logs',
-        time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' },
-      },
-    })
+    state.updateDraft({ id: 'query-1', source: LOGS_SOURCE })
 
     expect(state.results['query-1']).toBeUndefined()
 
     const restored = createExplorerQueryState(storage)
     expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(restored.drafts['query-1'].source).toEqual({
+    expect(restored.drafts['query-1']).toMatchObject(LOGS_SOURCE)
+  })
+
+  it('carries the query text over when the backend changes, rebranded for the new dialect', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a', sql: 'select * from users' })
+    state.updateDraft({ id: 'query-1', source: LOGS_SOURCE })
+
+    expect(state.drafts['query-1']).toMatchObject({
       _tag: 'logs',
-      time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' },
+      uncheckedSql: 'select * from users',
     })
+  })
+
+  it('keeps the query when only the parameters of the same backend change', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a', sql: 'select * from users' })
+    state.setResult({ id: 'query-1', result: { rows: [{ value: 1 }], executedAt: 1 } })
+    state.updateDraft({
+      id: 'query-1',
+      source: { _tag: 'database', database_identifier: 'replica-1' },
+    })
+
+    expect(state.drafts['query-1']).toMatchObject({
+      _tag: 'database',
+      database_identifier: 'replica-1',
+      uncheckedSql: 'select * from users',
+    })
+    expect(state.results['query-1']).toBeDefined()
   })
 
   it('restores pre-source drafts as database queries', () => {
@@ -75,7 +103,7 @@ describe('explorer query drafts', () => {
 
     const state = createExplorerQueryState(storage)
     expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(state.drafts['query-1'].source).toEqual({ _tag: 'database' })
+    expect(state.drafts['query-1']._tag).toBe('database')
   })
 
   it('ignores a malformed root value', () => {
@@ -115,7 +143,10 @@ describe('explorer query drafts', () => {
 
     const state = createExplorerQueryState(storage)
     expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(state.drafts['query-1'].source).toEqual({ _tag: 'database' })
+    expect(state.drafts['query-1']).toMatchObject({
+      _tag: 'database',
+      uncheckedSql: 'select 1',
+    })
   })
 
   it('debounces SQL persistence while updating in-memory state immediately', () => {
