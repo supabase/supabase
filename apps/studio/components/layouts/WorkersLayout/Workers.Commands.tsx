@@ -3,6 +3,7 @@ import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { PRODUCT_NAME } from '@/lib/constants/workers'
 
 export function useWorkersGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -12,7 +13,7 @@ export function useWorkersGotoCommands(options?: CommandOptions) {
     [
       {
         id: 'nav-workers',
-        name: 'Workers',
+        name: PRODUCT_NAME,
         route: `/project/${ref}/workers`,
         defaultHidden: true,
       },

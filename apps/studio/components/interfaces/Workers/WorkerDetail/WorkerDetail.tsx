@@ -13,7 +13,6 @@ import {
   BreadcrumbSeparator,
   Button,
   Card,
-  copyToClipboard,
   NavMenu,
   NavMenuItem,
   Popover,
@@ -37,12 +36,12 @@ import {
 import { PageNav } from 'ui-patterns/PageNav'
 
 import { RuntimeBadge } from '../RuntimeBadge'
-import { workerGatewayUrl } from '../Workers.constants'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { WorkerStatePill } from '../WorkerStatePill'
 import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { WorkerSettingsTab } from './WorkerSettingsTab'
+import { PRODUCT_NAME } from '@/lib/constants/workers'
 import {
   ensureProjectSeeded,
   resumeWorker,
@@ -89,13 +88,12 @@ export const WorkerDetail = () => {
           Worker "{workerName}" does not exist in this project
         </p>
         <Button asChild variant="default">
-          <Link href={`/project/${projectRef}/workers`}>Back to workers</Link>
+          <Link href={`/project/${projectRef}/workers`}>Back to {PRODUCT_NAME}</Link>
         </Button>
       </div>
     )
   }
 
-  const gatewayUrl = workerGatewayUrl(worker.name)
   const isActive = worker.state === 'active'
   const isSuspended = worker.state === 'suspended'
 
@@ -145,7 +143,7 @@ export const WorkerDetail = () => {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href={`/project/${projectRef}/workers`}>Workers</Link>
+              <Link href={`/project/${projectRef}/workers`}>{PRODUCT_NAME}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

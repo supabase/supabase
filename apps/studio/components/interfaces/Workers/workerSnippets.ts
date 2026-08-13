@@ -1,5 +1,6 @@
 import { getRuntimeMeta, getSizeMeta, workerGatewayUrl } from './Workers.constants'
 import type { WorkerAccess, WorkerRuntime, WorkerSize } from './Workers.types'
+import { CLI_NAME, PRODUCT_NAME } from '@/lib/constants/workers'
 
 export interface WorkerSnippetInput {
   name: string
@@ -32,17 +33,14 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
   const size = getSizeMeta(input.size)
 
   const cli = [
-    `supabase workers deploy ${name} \\`,
-    `  --runtime ${runtime.cli} \\`,
-    `  --size ${input.size} \\`,
-    `  --access ${input.access} \\`,
-    `  --instances ${input.instances}`,
+    `supabase ${CLI_NAME} new ${name} --runtime ${runtime.cli}`,
+    `supabase ${CLI_NAME} push ${name}`,
   ].join('\n')
 
   const configToml = [
     `# supabase/config.toml`,
     ``,
-    `[workers.${name}]`,
+    `[${CLI_NAME}.${name}]`,
     `runtime   = "${runtime.cli}"`,
     `size      = "${input.size}"        # ${size.memory} / ${size.vcpu}`,
     `access    = "${input.access}"`,
@@ -89,10 +87,10 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
   ].join('\n')
 
   const aiPrompt = [
-    `Deploy a Supabase Worker named "${name}".`,
+    `Deploy a Supabase ${PRODUCT_NAME} worker named "${name}".`,
     `Use the ${runtime.label} runtime on a ${input.size} instance (${size.memory} / ${size.vcpu}),`,
     `${input.access} access, ${input.instances} instance${input.instances === 1 ? '' : 's'}.`,
-    `Write the config to supabase/config.toml and run \`supabase workers deploy ${name}\`.`,
+    `Write the config to supabase/config.toml and run \`supabase ${CLI_NAME} push ${name}\`.`,
   ].join(' ')
 
   return { aiPrompt, configToml, cli, curl, javascript, python }
@@ -103,12 +101,14 @@ export interface WorkerCliCommand {
   command: string
 }
 
-/** The "Develop locally" CLI commands for a worker (download / deploy / delete). */
+/** The "Develop locally" CLI commands for a worker (pull / push / logs / delete). */
 export function buildWorkerCliCommands(name: string): WorkerCliCommand[] {
   const slug = safeName(name)
   return [
-    { comment: 'Download the worker', command: `supabase workers download ${slug}` },
-    { comment: 'Deploy a new version', command: `supabase workers deploy ${slug}` },
-    { comment: 'Delete the worker', command: `supabase workers delete ${slug}` },
+    { comment: 'Recreate the source locally', command: `supabase ${CLI_NAME} pull ${slug}` },
+    { comment: 'Run it locally on a port', command: `supabase ${CLI_NAME} serve ${slug}` },
+    { comment: 'Deploy a new version', command: `supabase ${CLI_NAME} push ${slug}` },
+    { comment: 'Stream logs', command: `supabase ${CLI_NAME} logs ${slug} --follow` },
+    { comment: 'Delete the worker', command: `supabase ${CLI_NAME} delete ${slug}` },
   ]
 }

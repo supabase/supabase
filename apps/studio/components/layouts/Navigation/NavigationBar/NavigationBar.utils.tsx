@@ -10,6 +10,7 @@ import type { Project } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PRODUCT_NAME } from '@/lib/constants/workers'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RouteContext {
@@ -137,6 +138,13 @@ export const generateProductRoutes = (
           },
         ]
       : []),
+    {
+      key: 'workers',
+      label: PRODUCT_NAME,
+      disabled: !isProjectActive,
+      icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
+    },
     ...(realtimeEnabled
       ? [
           {
@@ -149,13 +157,6 @@ export const generateProductRoutes = (
           },
         ]
       : []),
-    {
-      key: 'workers',
-      label: 'Workers',
-      disabled: !isProjectActive,
-      icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
-    },
   ]
 }
 
