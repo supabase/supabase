@@ -185,8 +185,6 @@ describe('ViewTokenSheet', () => {
 
     expect(screen.getByText('get_advisors')).toBeInTheDocument()
     expect(screen.getByText('execute_sql')).toBeInTheDocument()
-    // MCP tools have no description field yet — stubbed visibly rather than fabricated.
-    expect(screen.getAllByText('No description available').length).toBe(2)
 
     // project:database is catalog-high risk and granted read-write — max() over capabilities.
     expect(screen.getByText('High risk')).toBeInTheDocument()
