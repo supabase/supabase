@@ -115,7 +115,7 @@ export const QueryEditor = ({
   const handleRunQuery = (sqlToRun: string = sql) => {
     if (!project || isBusy || sqlToRun.trim().length === 0) return
 
-    onSqlCommit?.(sqlToRun)
+    onSqlCommit?.(sql)
 
     if (sourceBinding.type === 'logs') {
       if (!isOtelLogsEnabled) {
