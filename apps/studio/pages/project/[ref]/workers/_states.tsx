@@ -79,7 +79,7 @@ const WorkerStatesShowcase: NextPageWithLayout = () => {
           Settings — sample
         </h2>
         <div className="rounded-md border border-default p-5">
-          <WorkerSettingsTab worker={STATE_FIXTURES[1]} />
+          <WorkerSettingsTab projectRef={projectRef} worker={STATE_FIXTURES[1]} />
         </div>
       </section>
     </div>

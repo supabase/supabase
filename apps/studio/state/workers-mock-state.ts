@@ -9,10 +9,8 @@ import type {
   WorkerAccess,
   WorkerErrorReason,
   WorkerLifecycleEvent,
-  WorkerMetrics,
   WorkerRuntime,
   WorkerSize,
-  WorkerState,
 } from '@/components/interfaces/Workers/Workers.types'
 
 /**
@@ -338,62 +336,6 @@ export function simulateTraffic(projectRef: string, id: string): number {
 /** Find a worker by name (detail pages resolve by name, not id). */
 export function findWorkerByName(projectRef: string, name: string): Worker | undefined {
   return workersState.byProject[projectRef]?.workers.find((w) => w.name === name)
-}
-
-/** Deterministic pseudo-random from a string, so mock metrics don't jitter. */
-function hashString(input: string): number {
-  let hash = 2166136261
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i)
-    hash = Math.imul(hash, 16777619)
-  }
-  return (hash >>> 0) / 0xffffffff
-}
-
-/**
- * Mock last-24h metrics derived deterministically from the worker's name and
- * state, so the Overview tab is stable across renders.
- */
-export function getWorkerMetrics(worker: Pick<Worker, 'name' | 'state' | 'instances'>): WorkerMetrics {
-  const seed = hashString(worker.name)
-  const base = Math.floor(2000 + seed * 40000) * worker.instances
-
-  if (worker.state === 'errored') {
-    const requests = Math.floor(base * 0.4)
-    const errors = Math.floor(requests * (0.2 + seed * 0.3))
-    return {
-      requests24h: requests,
-      errors24h: errors,
-      errorRate: requests === 0 ? 0 : errors / requests,
-      avgLatencyMs: Math.floor(60 + seed * 120),
-      p99LatencyMs: Math.floor(400 + seed * 600),
-      cpuPercent: Math.floor(10 + seed * 20),
-      memoryPercent: Math.floor(30 + seed * 40),
-    }
-  }
-
-  if (worker.state === 'suspended' || worker.state === 'killed') {
-    return {
-      requests24h: 0,
-      errors24h: 0,
-      errorRate: 0,
-      avgLatencyMs: 0,
-      p99LatencyMs: 0,
-      cpuPercent: 0,
-      memoryPercent: 0,
-    }
-  }
-
-  const errors = Math.floor(base * (0.001 + seed * 0.004))
-  return {
-    requests24h: base,
-    errors24h: errors,
-    errorRate: base === 0 ? 0 : errors / base,
-    avgLatencyMs: Math.floor(24 + seed * 40),
-    p99LatencyMs: Math.floor(120 + seed * 180),
-    cpuPercent: Math.floor(20 + seed * 45),
-    memoryPercent: Math.floor(35 + seed * 45),
-  }
 }
 
 export const useWorkersSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>

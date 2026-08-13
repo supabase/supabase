@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
+import { Badge } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -34,7 +35,12 @@ const WorkersPage: NextPageWithLayout = () => {
       <PageHeader size="large">
         <PageHeaderMeta>
           <PageHeaderSummary>
-            <PageHeaderTitle>Workers</PageHeaderTitle>
+            <PageHeaderTitle>
+              <span className="flex items-center gap-3">
+                Workers
+                <Badge variant="warning">Private Alpha</Badge>
+              </span>
+            </PageHeaderTitle>
             <PageHeaderDescription>
               Run managed compute in microVMs next to your database
             </PageHeaderDescription>

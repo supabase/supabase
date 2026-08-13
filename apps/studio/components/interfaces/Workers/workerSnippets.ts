@@ -18,6 +18,10 @@ export interface WorkerSnippets {
   cli: string
   /** `curl` invocation against the deployed worker. */
   curl: string
+  /** JavaScript (fetch) invocation. */
+  javascript: string
+  /** Python (requests) invocation. */
+  python: string
 }
 
 const safeName = (name: string) => (name.trim().length > 0 ? name.trim() : 'my-worker')
@@ -58,6 +62,32 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `  --data '{"name":"world"}'`,
   ].join('\n')
 
+  const keyPlaceholder = input.access === 'public' ? '[YOUR ANON KEY]' : '[YOUR SERVICE ROLE KEY]'
+  const url = workerGatewayUrl(name)
+
+  const javascript = [
+    `const res = await fetch('${url}', {`,
+    `  method: 'POST',`,
+    `  headers: {`,
+    `    Authorization: 'Bearer ${keyPlaceholder}',`,
+    `    'Content-Type': 'application/json',`,
+    `  },`,
+    `  body: JSON.stringify({ name: 'world' }),`,
+    `})`,
+    `const data = await res.json()`,
+  ].join('\n')
+
+  const python = [
+    `import requests`,
+    ``,
+    `res = requests.post(`,
+    `    "${url}",`,
+    `    headers={"Authorization": "Bearer ${keyPlaceholder}"},`,
+    `    json={"name": "world"},`,
+    `)`,
+    `print(res.json())`,
+  ].join('\n')
+
   const aiPrompt = [
     `Deploy a Supabase Worker named "${name}".`,
     `Use the ${runtime.label} runtime on a ${input.size} instance (${size.memory} / ${size.vcpu}),`,
@@ -65,5 +95,20 @@ export function buildWorkerSnippets(input: WorkerSnippetInput): WorkerSnippets {
     `Write the config to supabase/config.toml and run \`supabase workers deploy ${name}\`.`,
   ].join(' ')
 
-  return { aiPrompt, configToml, cli, curl }
+  return { aiPrompt, configToml, cli, curl, javascript, python }
+}
+
+export interface WorkerCliCommand {
+  comment: string
+  command: string
+}
+
+/** The "Develop locally" CLI commands for a worker (download / deploy / delete). */
+export function buildWorkerCliCommands(name: string): WorkerCliCommand[] {
+  const slug = safeName(name)
+  return [
+    { comment: 'Download the worker', command: `supabase workers download ${slug}` },
+    { comment: 'Deploy a new version', command: `supabase workers deploy ${slug}` },
+    { comment: 'Delete the worker', command: `supabase workers delete ${slug}` },
+  ]
 }

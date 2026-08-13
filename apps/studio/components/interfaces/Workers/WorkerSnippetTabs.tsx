@@ -4,13 +4,15 @@ import { cn, copyToClipboard } from 'ui'
 
 import { buildWorkerSnippets, type WorkerSnippetInput } from './workerSnippets'
 
-export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'curl'
+export type WorkerSnippetTab = 'ai' | 'config' | 'cli' | 'curl' | 'js' | 'python'
 
 const TAB_LABEL: Record<WorkerSnippetTab, string> = {
   ai: 'AI',
   config: 'config.toml',
   cli: 'CLI',
-  curl: 'curl',
+  curl: 'cURL',
+  js: 'JavaScript',
+  python: 'Python',
 }
 
 interface WorkerSnippetTabsProps {
@@ -37,6 +39,8 @@ export const WorkerSnippetTabs = ({
     config: snippets.configToml,
     cli: snippets.cli,
     curl: snippets.curl,
+    js: snippets.javascript,
+    python: snippets.python,
   }
   const activeTab = tabs.includes(active) ? active : tabs[0]
   const value = snippetByTab[activeTab]
