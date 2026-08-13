@@ -27,6 +27,7 @@ export const CapabilityLevelToggle = ({ value, onChange }: CapabilityLevelToggle
           type="button"
           size="tiny"
           variant={value === optionValue ? 'secondary' : 'default'}
+          aria-pressed={value === optionValue}
           className={cn(
             index === 0 && 'rounded-r-none border-r-0',
             index === OPTIONS.length - 1 && 'rounded-l-none border-l-0',
