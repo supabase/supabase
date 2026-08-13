@@ -30,6 +30,7 @@ services:
       DB_NAME: ${POSTGRES_DB}
       LISTEN_PORT: 6432
       AUTH_TYPE: scram-sha-256
+      # POOL_MODE can be: session, transaction, or statement
       POOL_MODE: transaction
       DEFAULT_POOL_SIZE: ${POOLER_DEFAULT_POOL_SIZE}
       MAX_CLIENT_CONN: ${POOLER_MAX_CLIENT_CONN}
