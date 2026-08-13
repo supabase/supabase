@@ -19,8 +19,10 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
   const cells = currentNotebook?.notebook.content?.cells ?? []
+
   const [sql, setSql] = useState<string>(cell.unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
+
   const title = cell.title ?? 'Untitled snippet'
   const display: QueryDisplay = {
     view: cell.view ?? 'table',
