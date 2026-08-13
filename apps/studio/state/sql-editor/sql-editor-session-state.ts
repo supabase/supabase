@@ -1,6 +1,6 @@
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
-import type { LogDateRange } from '@/components/interfaces/SQLEditor/querySource'
+import type { LogTimeRange } from '@/data/query-sources/query-source-registry'
 
 /**
  * Ephemeral, per-session SQL editor state that is NOT persisted: query results,
@@ -37,9 +37,9 @@ export const sqlEditorSessionState = proxy({
    * and resets on reload. An unset snippet has no entry; read sites fall back to
    * `DEFAULT_LOG_DATE_RANGE`.
    */
-  logRange: {} as { [snippetId: string]: LogDateRange },
+  logRange: {} as { [snippetId: string]: LogTimeRange },
 
-  setLogRange: (id: string, range: LogDateRange) => {
+  setLogRange: (id: string, range: LogTimeRange) => {
     sqlEditorSessionState.logRange[id] = range
   },
 

@@ -106,24 +106,27 @@ describe('querySource.ts:datePickerValueToLogDateRange', () => {
       const helper = EXPLORER_DATEPICKER_HELPERS.find((h) => h.text === text)
       expect(helper, `preset "${text}" exists`).toBeDefined()
       expect(datePickerValueToLogDateRange(valueFromHelper(helper!))).toEqual({
-        kind: 'relative',
-        last,
+        type: 'relative',
+        ...last,
       })
     }
   })
 
   it('parses dynamic helpers ("2h", "30m", "7d") into relative ranges', () => {
     expect(datePickerValueToLogDateRange(valueFromHelper(dynamicHelper('2h')))).toEqual({
-      kind: 'relative',
-      last: { amount: 2, unit: 'hour' },
+      type: 'relative',
+      amount: 2,
+      unit: 'hour',
     })
     expect(datePickerValueToLogDateRange(valueFromHelper(dynamicHelper('30m')))).toEqual({
-      kind: 'relative',
-      last: { amount: 30, unit: 'minute' },
+      type: 'relative',
+      amount: 30,
+      unit: 'minute',
     })
     expect(datePickerValueToLogDateRange(valueFromHelper(dynamicHelper('7d')))).toEqual({
-      kind: 'relative',
-      last: { amount: 7, unit: 'day' },
+      type: 'relative',
+      amount: 7,
+      unit: 'day',
     })
   })
 
@@ -132,8 +135,9 @@ describe('querySource.ts:datePickerValueToLogDateRange', () => {
     const value = valueFromHelper(lastHour)
     expect(value.to).toBe('')
     expect(datePickerValueToLogDateRange(value)).toEqual({
-      kind: 'relative',
-      last: { amount: 1, unit: 'hour' },
+      type: 'relative',
+      amount: 1,
+      unit: 'hour',
     })
   })
 
@@ -151,7 +155,7 @@ describe('querySource.ts:datePickerValueToLogDateRange', () => {
     })
 
     expect(result).toEqual({
-      kind: 'absolute',
+      type: 'absolute',
       from,
       to: dayjs(now).toISOString(),
     })
@@ -161,7 +165,7 @@ describe('querySource.ts:datePickerValueToLogDateRange', () => {
     const from = '2025-01-01T00:00:00.000Z'
     const to = '2025-01-02T00:00:00.000Z'
     expect(datePickerValueToLogDateRange({ from, to, isHelper: false })).toEqual({
-      kind: 'absolute',
+      type: 'absolute',
       from,
       to,
     })
@@ -182,8 +186,9 @@ describe('querySource.ts:logDateRangeToDatePickerValue', () => {
 
   it('renders a relative range exactly as the picker would emit the helper', () => {
     const value = logDateRangeToDatePickerValue({
-      kind: 'relative',
-      last: { amount: 1, unit: 'hour' },
+      type: 'relative',
+      amount: 1,
+      unit: 'hour',
     })
     expect(value).toEqual({
       from: dayjs().subtract(1, 'hour').toISOString(),
@@ -194,19 +199,19 @@ describe('querySource.ts:logDateRangeToDatePickerValue', () => {
   })
 
   it('pluralizes the label for amounts greater than one', () => {
-    expect(
-      logDateRangeToDatePickerValue({ kind: 'relative', last: { amount: 3, unit: 'day' } }).text
-    ).toBe('Last 3 days')
+    expect(logDateRangeToDatePickerValue({ type: 'relative', amount: 3, unit: 'day' }).text).toBe(
+      'Last 3 days'
+    )
   })
 
   it('round-trips through datePickerValueToLogDateRange', () => {
-    const range: LogDateRange = { kind: 'relative', last: { amount: 30, unit: 'minute' } }
+    const range: LogDateRange = { type: 'relative', amount: 30, unit: 'minute' }
     expect(datePickerValueToLogDateRange(logDateRangeToDatePickerValue(range))).toEqual(range)
   })
 
   it('passes an absolute range through as a non-helper value', () => {
     const range: LogDateRange = {
-      kind: 'absolute',
+      type: 'absolute',
       from: isoDateTimeString('2025-01-01T00:00:00.000Z')!,
       to: isoDateTimeString('2025-01-02T00:00:00.000Z')!,
     }
@@ -228,7 +233,7 @@ describe('querySource.ts:resolveLogRunRange', () => {
     const now = new Date('2025-06-15T08:30:00.000Z')
     vi.setSystemTime(now)
 
-    expect(resolveLogRunRange({ kind: 'relative', last: { amount: 2, unit: 'hour' } })).toEqual({
+    expect(resolveLogRunRange({ type: 'relative', amount: 2, unit: 'hour' })).toEqual({
       from: dayjs(now).subtract(2, 'hour').toISOString(),
       to: dayjs(now).toISOString(),
     })
@@ -237,10 +242,10 @@ describe('querySource.ts:resolveLogRunRange', () => {
   it('re-resolves the same relative range differently as time advances', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2025-06-15T08:00:00.000Z'))
-    const first = resolveLogRunRange({ kind: 'relative', last: { amount: 1, unit: 'hour' } })
+    const first = resolveLogRunRange({ type: 'relative', amount: 1, unit: 'hour' })
 
     vi.setSystemTime(new Date('2025-06-15T10:00:00.000Z'))
-    const second = resolveLogRunRange({ kind: 'relative', last: { amount: 1, unit: 'hour' } })
+    const second = resolveLogRunRange({ type: 'relative', amount: 1, unit: 'hour' })
 
     expect(first).not.toEqual(second)
     expect(second.to).toBe(dayjs('2025-06-15T10:00:00.000Z').toISOString())
@@ -249,7 +254,7 @@ describe('querySource.ts:resolveLogRunRange', () => {
   it('passes an absolute range through unchanged', () => {
     const from = isoDateTimeString('2025-01-01T00:00:00.000Z')!
     const to = isoDateTimeString('2025-01-02T00:00:00.000Z')!
-    expect(resolveLogRunRange({ kind: 'absolute', from, to })).toEqual({
+    expect(resolveLogRunRange({ type: 'absolute', from, to })).toEqual({
       from: '2025-01-01T00:00:00.000Z',
       to: '2025-01-02T00:00:00.000Z',
     })
@@ -266,22 +271,22 @@ describe('querySource.ts:logDateRangesEqual', () => {
       text: lastHourPreset.text,
     })
 
-    expect(
-      logDateRangesEqual(presetRange, { kind: 'relative', last: { amount: 1, unit: 'hour' } })
-    ).toBe(true)
+    expect(logDateRangesEqual(presetRange, { type: 'relative', amount: 1, unit: 'hour' })).toBe(
+      true
+    )
   })
 
   it('does not match relative ranges with a different amount or unit', () => {
     expect(
       logDateRangesEqual(
-        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
-        { kind: 'relative', last: { amount: 3, unit: 'hour' } }
+        { type: 'relative', amount: 1, unit: 'hour' },
+        { type: 'relative', amount: 3, unit: 'hour' }
       )
     ).toBe(false)
     expect(
       logDateRangesEqual(
-        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
-        { kind: 'relative', last: { amount: 1, unit: 'day' } }
+        { type: 'relative', amount: 1, unit: 'hour' },
+        { type: 'relative', amount: 1, unit: 'day' }
       )
     ).toBe(false)
   })
@@ -289,7 +294,7 @@ describe('querySource.ts:logDateRangesEqual', () => {
   it('matches absolute ranges on their ISO endpoints', () => {
     const from = isoDateTimeString('2025-01-01T00:00:00.000Z')!
     const to = isoDateTimeString('2025-01-02T00:00:00.000Z')!
-    expect(logDateRangesEqual({ kind: 'absolute', from, to }, { kind: 'absolute', from, to })).toBe(
+    expect(logDateRangesEqual({ type: 'absolute', from, to }, { type: 'absolute', from, to })).toBe(
       true
     )
   })
@@ -299,9 +304,9 @@ describe('querySource.ts:logDateRangesEqual', () => {
     const to = isoDateTimeString('2025-01-02T00:00:00.000Z')!
     expect(
       logDateRangesEqual(
-        { kind: 'relative', last: { amount: 1, unit: 'hour' } },
+        { type: 'relative', amount: 1, unit: 'hour' },
         {
-          kind: 'absolute',
+          type: 'absolute',
           from,
           to,
         }

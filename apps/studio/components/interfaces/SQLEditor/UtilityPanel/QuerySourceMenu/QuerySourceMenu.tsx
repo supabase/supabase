@@ -1,6 +1,6 @@
-import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
-import { Check, ChevronDown, Database, ScrollText } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -17,26 +17,22 @@ import {
   type QuerySource,
   type SqlSnippetSource,
 } from '../../querySource'
-import { DatabaseSubMenu } from './DatabaseSubMenu'
-import { LogsCustomRangeDialog } from './LogsCustomRangeDialog'
 import { resolveSourceSwitch } from './QuerySourceMenu.utils'
 import { RowLimitSubMenu } from './RowLimitSubMenu'
 import { RunAsSubMenu } from './RunAsSubMenu'
-import { TimeRangeSubMenu } from './TimeRangeSubMenu'
+import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
+import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
+import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
+import { QuerySourceIcon } from '@/components/interfaces/QuerySources/QuerySourceIcon'
 import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
+import { QUERY_SOURCE_LABELS, QUERY_SOURCES } from '@/data/query-sources/query-source-registry'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
-
-const SOURCE_LABEL: Record<SqlSnippetSource, string> = {
-  database: 'Database',
-  logs: 'Logs',
-}
-
-const SourceIcon = ({ source, ...props }: { source: SqlSnippetSource; className?: string }) =>
-  source === 'logs' ? <ScrollText {...props} /> : <Database {...props} />
 
 type QuerySourceMenuProps = {
   id: string
@@ -67,6 +63,11 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
   const router = useRouter()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
+  const databaseSelector = useDatabaseSelectorStateSnapshot()
+  const [lastSelectedDatabase, setLastSelectedDatabase] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref ?? ''),
+    ''
+  )
 
   const [isCustomRangeOpen, setIsCustomRangeOpen] = useState(false)
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
@@ -79,6 +80,14 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
   // A snippet materializes in the store on its first keystroke; until then a
   // `/sql/new` tab is a blank scaffold with nothing to preserve.
   const isBlankNewTab = snapV2.snippets[id] === undefined
+  const databaseIdentifier =
+    lastSelectedDatabase.length > 0
+      ? lastSelectedDatabase
+      : (databaseSelector.selectedDatabaseId ?? ref)
+
+  const selectableSources = QUERY_SOURCES.filter(
+    (source) => source.type !== 'logs' || canCreateLogsSnippet || isLogs
+  )
 
   const switchSource = (target: SqlSnippetSource) => {
     const next = resolveSourceSwitch({ ref, target, currentSource, isBlankNewTab })
@@ -102,61 +111,60 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
     )
   }
 
+  const updateDatabaseIdentifier = (identifier: string) => {
+    databaseSelector.setSelectedDatabaseId(identifier)
+    setLastSelectedDatabase(identifier)
+    sessionSnap.resetResult(id)
+  }
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="default"
-            aria-label={`Query source: ${SOURCE_LABEL[currentSource]}`}
-            icon={<SourceIcon source={currentSource} className="text-foreground-light" />}
+            aria-label={`Query source: ${QUERY_SOURCE_LABELS[currentSource]}`}
+            icon={<QuerySourceIcon source={currentSource} className="text-foreground-light" />}
             iconRight={<ChevronDown size={14} className="text-foreground-light" />}
           >
-            {SOURCE_LABEL[currentSource]}
+            {QUERY_SOURCE_LABELS[currentSource]}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
-          <DropdownMenuItem
-            className="justify-between"
-            onSelect={(e) => {
-              e.preventDefault()
-              switchSource('database')
-            }}
-          >
-            <span className="flex items-center gap-x-2">
-              <Database size={14} className="text-foreground-light" />
-              Database
-            </span>
-            {!isLogs && <Check size={14} />}
-          </DropdownMenuItem>
-          {(canCreateLogsSnippet || isLogs) && (
+          {selectableSources.map((source) => (
             <DropdownMenuItem
+              key={source.id}
               className="justify-between"
               onSelect={(e) => {
                 e.preventDefault()
-                switchSource('logs')
+                switchSource(source.id)
               }}
             >
               <span className="flex items-center gap-x-2">
-                <ScrollText size={14} className="text-foreground-light" />
-                Logs
+                <QuerySourceIcon source={source.id} className="text-foreground-light" />
+                {QUERY_SOURCE_LABELS[source.id]}
               </span>
-              {isLogs && <Check size={14} />}
+              {currentSource === source.id && <Check size={14} />}
             </DropdownMenuItem>
-          )}
+          ))}
 
           <DropdownMenuSeparator />
 
           {runSource.type === 'logs' ? (
-            <TimeRangeSubMenu
-              id={id}
+            <LogsTimeRangeSubMenu
               range={runSource.dateRange}
+              onRangeChange={(range) => sessionSnap.setLogRange(id, range)}
               onOpenCustomRange={() => setIsCustomRangeOpen(true)}
               onShowUpgrade={() => setShowUpgradePrompt(true)}
             />
           ) : (
             <>
-              {IS_PLATFORM && <DatabaseSubMenu id={id} />}
+              {IS_PLATFORM && (
+                <DatabaseParametersSubMenu
+                  identifier={databaseIdentifier}
+                  onIdentifierChange={updateDatabaseIdentifier}
+                />
+              )}
               <RunAsSubMenu />
               <RowLimitSubMenu />
             </>

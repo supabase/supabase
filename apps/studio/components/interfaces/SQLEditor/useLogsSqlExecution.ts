@@ -3,8 +3,8 @@ import { useCallback } from 'react'
 
 import { DEFAULT_LOG_DATE_RANGE, resolveLogRunRange } from './querySource'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
-import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { useTrack } from '@/lib/telemetry/track'
 import {
   getSqlEditorSessionSnapshot,
@@ -50,7 +50,7 @@ export function useLogsSqlExecution({ id }: UseLogsSqlExecutionArgs) {
         getSqlEditorSessionSnapshot().logRange[id] ?? DEFAULT_LOG_DATE_RANGE
       )
 
-      mutate({ projectRef, sql, range, endpoint: logsAllEndpointUrl(true) })
+      mutate({ projectRef, sql, range, endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint })
 
       track('sql_editor_query_run_button_clicked', { source: 'logs' })
     },
