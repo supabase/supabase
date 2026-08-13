@@ -1,8 +1,9 @@
-// [Joshen] Temporary eslint-disable
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { screen } from '@testing-library/react'
+import { type ComponentProps } from 'react'
+import { type CalculatedColumn } from 'react-data-grid'
 import { expect, test, vi } from 'vitest'
 
+import { type ResultRow } from '../DataGridResults.utils'
 import { DataGridResults as Results } from '../index'
 import { customRender as render } from '@/tests/lib/custom-render'
 
@@ -12,7 +13,7 @@ vi.mock('ui', async () => {
   const actual = await vi.importActual<typeof import('ui')>('ui')
   return {
     ...actual,
-    ContextMenu: (props: any) => {
+    ContextMenu: (props: ComponentProps<typeof actual.ContextMenu>) => {
       contextMenuMountCount++
       return <actual.ContextMenu {...props} />
     },
@@ -20,20 +21,40 @@ vi.mock('ui', async () => {
 })
 
 vi.mock('react-data-grid', () => ({
-  default: ({ columns, rows }: any) => (
+  default: ({
+    columns,
+    rows,
+  }: {
+    columns: CalculatedColumn<ResultRow>[]
+    rows: readonly ResultRow[]
+  }) => (
     <div role="table">
       <div role="row">
-        {columns.map((col: any, colIdx: number) => (
+        {columns.map((col, colIdx) => (
           <div key={colIdx} role="columnheader">
-            {col.renderHeaderCell ? col.renderHeaderCell({}) : col.name}
+            {col.renderHeaderCell
+              ? col.renderHeaderCell({
+                  column: col,
+                  sortDirection: undefined,
+                  priority: undefined,
+                  tabIndex: -1,
+                })
+              : col.name}
           </div>
         ))}
       </div>
-      {rows.map((row: any, rowIdx: number) => (
+      {rows.map((row, rowIdx) => (
         <div key={rowIdx} role="row">
-          {columns.map((col: any, colIdx: number) => (
+          {columns.map((col, colIdx) => (
             <div key={colIdx} role="cell">
-              {col.renderCell?.({ row, rowIdx, isCellSelected: false })}
+              {col.renderCell?.({
+                column: col,
+                row,
+                rowIdx,
+                isCellEditable: false,
+                tabIndex: -1,
+                onRowChange: () => {},
+              })}
             </div>
           ))}
         </div>
