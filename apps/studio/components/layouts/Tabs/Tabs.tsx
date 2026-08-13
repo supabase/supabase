@@ -50,7 +50,7 @@ export const EditorTabs = ({
   newTabButton,
   isCollapseButtonHidden,
 }: EditorTabsProps) => {
-  const { ref, id } = useParams()
+  const { ref } = useParams()
   const router = useRouter()
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
 
@@ -92,10 +92,13 @@ export const EditorTabs = ({
   const onClearDashboardHistory = () => {
     if (editor === 'table') {
       setLastVisitedTable(undefined)
-    } else if (editor === 'sql') {
+    }
+    if (editor === 'sql') {
       setLastVisitedSnippet(undefined)
     }
   }
+
+  const editorTabIds = editorTabs.map((tab) => tab.id)
 
   // Runs `performClose` immediately unless one of the tabs' registered close
   // handlers asks to confirm first (e.g. a SQL snippet with unsaved edits), in
@@ -119,44 +122,35 @@ export const EditorTabs = ({
 
   const handleCloseAll = () => {
     if (editor) {
-      const tabsToClose =
-        editor === 'table'
-          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
-          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+      const tabsToClose = editorTabIds
 
       closeWithConfirmation(tabsToClose, () => {
         tabs.closeTabs(tabsToClose)
         onClearDashboardHistory()
-        router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+        let editorRoot = 'explorer'
+        if (editor === 'table') editorRoot = 'editor'
+        if (editor === 'sql') editorRoot = 'sql'
+        router.push(`/project/${ref}/${editorRoot}`)
       })
     }
   }
 
   const handleCloseOthers = (tabId: string) => {
     if (editor) {
-      const tabsToClose =
-        editor === 'table'
-          ? tabs.openTabs.filter((x) => !x.startsWith('sql') && x !== tabId)
-          : tabs.openTabs.filter((x) => x.startsWith('sql') && x !== tabId)
+      const tabsToClose = editorTabIds.filter((id) => id !== tabId)
 
       closeWithConfirmation(tabsToClose, () => {
         tabs.closeTabs(tabsToClose)
         onClearDashboardHistory()
 
-        const entityId = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
-        if (id !== entityId) {
-          router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${entityId}`)
-        }
+        if (tabs.activeTab !== tabId) tabs.handleTabNavigation(tabId, router)
       })
     }
   }
 
   const handleCloseRight = (tabId: string) => {
     if (editor) {
-      const openedTabs =
-        editor === 'table'
-          ? tabs.openTabs.filter((x) => !x.startsWith('sql'))
-          : tabs.openTabs.filter((x) => x.startsWith('sql'))
+      const openedTabs = editorTabIds
       const tabIdx = openedTabs.indexOf(tabId)
       const activeTabIdx = openedTabs.indexOf(tabs.activeTab!)
       const tabsToClose = openedTabs.slice(tabIdx + 1)
@@ -166,8 +160,7 @@ export const EditorTabs = ({
 
         const isActiveTabClosed = tabIdx < activeTabIdx
         if (isActiveTabClosed) {
-          const id = editor === 'table' ? tabId.split('-')[1] : tabId.split('sql-')[1]
-          router.push(`/project/${ref}/${editor === 'table' ? 'editor' : 'sql'}/${id}`)
+          tabs.handleTabNavigation(tabId, router)
         }
       })
     }
