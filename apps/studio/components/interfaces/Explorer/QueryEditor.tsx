@@ -134,12 +134,15 @@ export const QueryEditor = ({
       </ExplorerToolbar>
 
       {showQuery && (
-        <ExplorerQueryEditor className={variant === 'viewport' ? 'h-[45%] min-h-48' : undefined}>
+        <ExplorerQueryEditor
+          className={cn('relative', variant === 'viewport' ? 'h-[45%] min-h-48' : undefined)}
+        >
           <CodeEditor
             id={`explorer-query-${id}`}
             language="pgsql"
             value={sql}
             placeholder="select * from your_table limit 100;"
+            placeholderClassName="top-[13px]"
             className={variant === 'embedded' ? 'h-32' : undefined}
             actions={{ runQuery: { enabled: true, callback: handleRunQuery } }}
             options={{ minimap: { enabled: false }, padding: { top: 8 } }}
