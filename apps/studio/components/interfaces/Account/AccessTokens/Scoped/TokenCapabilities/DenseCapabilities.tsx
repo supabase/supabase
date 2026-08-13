@@ -4,7 +4,6 @@ import { Accordion, Badge } from 'ui'
 import type { EntryAccess } from '../../AccessToken.roles'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import { CapabilityCard } from './CapabilityCard'
-import { DENSE_READONLY_PREVIEW_ROWS } from './TokenCapabilities.constants'
 import {
   getNotGrantedCatalogEntries,
   groupCapabilitiesByLevel,
@@ -18,83 +17,40 @@ interface DenseCapabilitiesProps {
   levelFilter: CapabilityLevelFilter
 }
 
-/**
- * 9+ capabilities: a level-grouped list. Read-write is pinned first and never truncated;
- * read-only previews a few rows.
- */
+/** 9+ capabilities: a level-grouped list, read-write pinned first. */
 export const DenseCapabilities = ({
   capabilities,
   accessEntries,
   levelFilter,
 }: DenseCapabilitiesProps) => {
   const [openKeys, setOpenKeys] = useState<string[]>([])
-  const [showAllReadOnly, setShowAllReadOnly] = useState(false)
 
   const { readwrite, read } = groupCapabilitiesByLevel(capabilities)
   const notGranted = getNotGrantedCatalogEntries(capabilities)
 
-  const showReadWrite = levelFilter !== 'read' && readwrite.length > 0
-  const showRead = levelFilter !== 'readwrite' && read.length > 0
-
-  const visibleRead = showAllReadOnly ? read : read.slice(0, DENSE_READONLY_PREVIEW_ROWS)
-  const hiddenReadCount = read.length - visibleRead.length
+  const shown =
+    levelFilter === 'readwrite'
+      ? readwrite
+      : levelFilter === 'read'
+        ? read
+        : [...readwrite, ...read]
 
   return (
     <div className="flex flex-col gap-4">
-      {!showReadWrite && !showRead && (
+      {shown.length === 0 && (
         <p className="text-xs text-foreground-lighter">No capabilities match this filter.</p>
       )}
 
       <Accordion type="multiple" value={openKeys} onValueChange={setOpenKeys}>
-        {showReadWrite && (
-          <div className="flex flex-col gap-2">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              Read-write · {readwrite.length}
-            </p>
-            <div>
-              {readwrite.map((capability, index) => (
-                <CapabilityCard
-                  key={capability.entry.key}
-                  capability={capability}
-                  collapsible
-                  accessEntries={accessEntries}
-                  isFirst={index === 0}
-                  isLast={index === readwrite.length - 1}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {showRead && (
-          <div className="mt-4 flex flex-col gap-2">
-            <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-              Read-only · {read.length}
-            </p>
-            <div>
-              {visibleRead.map((capability, index) => (
-                <CapabilityCard
-                  key={capability.entry.key}
-                  capability={capability}
-                  collapsible
-                  accessEntries={accessEntries}
-                  isFirst={index === 0}
-                  isLast={index === visibleRead.length - 1}
-                />
-              ))}
-            </div>
-            {hiddenReadCount > 0 && (
-              <button
-                type="button"
-                tabIndex={0}
-                onClick={() => setShowAllReadOnly(true)}
-                className="self-start text-xs text-foreground-light hover:text-foreground"
-              >
-                Show {hiddenReadCount} more
-              </button>
-            )}
-          </div>
-        )}
+        {shown.map((capability, index) => (
+          <CapabilityCard
+            key={capability.entry.key}
+            capability={capability}
+            accessEntries={accessEntries}
+            isFirst={index === 0}
+            isLast={index === shown.length - 1}
+          />
+        ))}
       </Accordion>
 
       {notGranted.length > 0 && (

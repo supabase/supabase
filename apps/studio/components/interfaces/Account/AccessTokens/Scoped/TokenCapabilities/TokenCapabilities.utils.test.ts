@@ -30,13 +30,8 @@ const advisorsCapability = (mode: CapabilitySummaryEntry['mode']): CapabilitySum
 })
 
 describe('getCapabilityDensityTier', () => {
-  it('is expanded at 2 or fewer capabilities', () => {
-    expect(getCapabilityDensityTier(0)).toBe('expanded')
-    expect(getCapabilityDensityTier(2)).toBe('expanded')
-  })
-
-  it('is accordion between 3 and 8 capabilities', () => {
-    expect(getCapabilityDensityTier(3)).toBe('accordion')
+  it('is accordion at 8 or fewer capabilities', () => {
+    expect(getCapabilityDensityTier(0)).toBe('accordion')
     expect(getCapabilityDensityTier(8)).toBe('accordion')
   })
 

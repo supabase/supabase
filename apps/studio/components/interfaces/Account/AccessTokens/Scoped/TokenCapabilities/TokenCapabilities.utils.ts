@@ -7,19 +7,13 @@ import {
   type RiskLevel,
 } from '../../AccessToken.permissions'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
-import {
-  CAPABILITY_DENSITY_ACCORDION_MAX,
-  CAPABILITY_DENSITY_EXPANDED_MAX,
-} from './TokenCapabilities.constants'
+import { CAPABILITY_DENSITY_ACCORDION_MAX } from './TokenCapabilities.constants'
 import { pluralize } from '@/lib/helpers'
 
-export type CapabilityDensityTier = 'expanded' | 'accordion' | 'dense'
+export type CapabilityDensityTier = 'accordion' | 'dense'
 
-export const getCapabilityDensityTier = (count: number): CapabilityDensityTier => {
-  if (count <= CAPABILITY_DENSITY_EXPANDED_MAX) return 'expanded'
-  if (count <= CAPABILITY_DENSITY_ACCORDION_MAX) return 'accordion'
-  return 'dense'
-}
+export const getCapabilityDensityTier = (count: number): CapabilityDensityTier =>
+  count <= CAPABILITY_DENSITY_ACCORDION_MAX ? 'accordion' : 'dense'
 
 /**
  * Longest shared leading path segments across a group of endpoint paths, so the UI can mute the
