@@ -20,7 +20,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { REPLICA_STATUS } from '../Replication.constants'
+import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'

@@ -6,7 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DestinationIcon } from '../DestinationIcon'
 import { getStatusName } from '../Pipeline.utils'
-import { getStatusLabel } from '../ReadReplicas/ReadReplicas.utils'
+import { getStatusLabel } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
 import { getReplicationDestinationType } from './Nodes.utils'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'

@@ -1,4 +1,4 @@
-import { REPLICA_STATUS } from '../Replication.constants'
+import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { ReplicaInitializationStatus } from '@/data/read-replicas/replicas-status-query'
 
 export const getIsInTransition = ({

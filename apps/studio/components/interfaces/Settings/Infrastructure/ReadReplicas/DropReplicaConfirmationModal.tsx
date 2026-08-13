@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { REPLICA_STATUS } from '../Replication.constants'
+import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { replicaKeys } from '@/data/read-replicas/keys'
 import { useReadReplicaRemoveMutation } from '@/data/read-replicas/replica-remove-mutation'

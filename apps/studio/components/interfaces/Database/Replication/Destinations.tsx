@@ -30,7 +30,7 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
+import { ReadReplicaRow } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaRow'
 import { REPLICA_STATUS } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,

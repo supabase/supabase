@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { toast } from 'sonner'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { REPLICA_STATUS } from '../Replication.constants'
+import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
 import { replicaKeys } from '@/data/read-replicas/keys'
 import { Database } from '@/data/read-replicas/replicas-query'
