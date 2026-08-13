@@ -56,7 +56,7 @@ export const useAWSAccountCreateMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to create association: ${data.message}`)
+        toast.error(`Failed to create connection: ${data.message}`)
       } else {
         onError(data, variables, context)
       }
