@@ -23,6 +23,8 @@ interface QueryResultTableProps {
 // I'll eventually migrate the Results component over - just trying to avoid bloating
 // changes wherever possible
 
+// [Joshen] Should be shifted into QueryCell folder
+
 export const QueryResultTable = ({ result }: QueryResultTableProps) => {
   const { rows, error, autoLimit } = result ?? {}
 

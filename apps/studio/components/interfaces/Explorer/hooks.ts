@@ -46,6 +46,8 @@ This is a sample paragraph to demonstrate the Markdown cells
       {
         _tag: 'database_cell',
         id: generateUuid(),
+        view: 'table',
+        chart: undefined,
         unchecked_sql: untrustedSql('select * from colors;'),
         row_limit: 100,
       },
