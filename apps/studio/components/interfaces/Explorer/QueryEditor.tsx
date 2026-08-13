@@ -46,7 +46,7 @@ export type QueryEditorProps = {
   sql: string
   source?: CellSource
   result?: QueryResult
-  rowLimit: number
+  rowLimit?: number
   display?: QueryDisplay
   toolbarActions?: ReactNode
   onTitleChange: (title: string) => void
@@ -238,8 +238,12 @@ export const QueryEditor = ({
 
       <ExplorerQueryFooter className="flex items-center gap-x-2">
         <p>{(result?.rows ?? []).length.toLocaleString()} rows</p>
-        <p>·</p>
-        <p>Limit {rowLimit} rows</p>
+        {rowLimit && (
+          <>
+            <p>·</p>
+            <p>Limit {rowLimit} rows</p>
+          </>
+        )}
       </ExplorerQueryFooter>
     </Shell>
   )

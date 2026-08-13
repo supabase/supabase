@@ -61,6 +61,7 @@ const logCellSchema = z.object({
   title: z.string().optional(),
   sql: z.string(),
   time_range: timeRangeSchema,
+  view: z.enum(['table', 'chart']).default('table').optional(),
   chart: chartConfigSchema.optional(),
 })
 

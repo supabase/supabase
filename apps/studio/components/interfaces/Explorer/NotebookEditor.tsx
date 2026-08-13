@@ -106,11 +106,8 @@ export const NotebookEditor = () => {
                         return <MarkdownCell key={cell.id} cell={cell} />
 
                       case 'database_cell':
-                        return <QueryCell key={cell.id} cell={cell} />
-
                       case 'log_cell':
-                        // [Joshen] Will eventually hook it up
-                        return null
+                        return <QueryCell key={cell.id} cell={cell} />
                     }
                   })}
                 </div>
