@@ -25,7 +25,7 @@ describe('getConnectionStatusUi', () => {
       'CREATING',
       {
         badge: 'Creating',
-        badgeVariant: 'warning',
+        badgeVariant: 'default',
         title: 'This connection is being created',
       },
     ],

@@ -28,7 +28,7 @@ const CONNECTION_STATUS_UI: Record<PrivateLinkConnectionStatus, ConnectionStatus
     title: 'This connection is being created',
     description: '',
     badge: 'Creating',
-    badgeVariant: 'warning',
+    badgeVariant: 'default',
   },
   DELETING: {
     title: 'This connection is being deleted',
