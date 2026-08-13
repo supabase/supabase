@@ -1,3 +1,4 @@
+import dayjs from 'dayjs'
 import * as z from 'zod'
 
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
@@ -79,22 +80,40 @@ const isoDateTimeSchema = z.string().refine((value) => isoDateTimeString(value) 
   message: 'must be a valid ISO-8601 datetime',
 })
 
-export const logTimeRangeSchema = z.discriminatedUnion('type', [
-  z
-    .object({
-      type: z.literal('relative'),
-      amount: z.number().int().positive(),
-      unit: z.enum(['minute', 'hour', 'day']),
-    })
-    .strict(),
-  z
-    .object({
-      type: z.literal('absolute'),
-      from: isoDateTimeSchema,
-      to: isoDateTimeSchema,
-    })
-    .strict(),
-])
+export const logTimeRangeSchema = z
+  .discriminatedUnion('type', [
+    z
+      .object({
+        type: z.literal('relative'),
+        amount: z.number().int().positive(),
+        unit: z.enum(['minute', 'hour', 'day']),
+      })
+      .strict(),
+    z
+      .object({
+        type: z.literal('absolute'),
+        from: isoDateTimeSchema,
+        to: isoDateTimeSchema,
+      })
+      .strict(),
+  ])
+  .refine(
+    (range) => {
+      if (range.type !== 'absolute') return true
+
+      const from = dayjs(range.from)
+      const to = dayjs(range.to)
+      // An unparseable endpoint is already reported against its own field; the
+      // ordering rule stays quiet so it doesn't add a second, misleading issue.
+      if (!from.isValid() || !to.isValid()) return true
+
+      return to.isAfter(from)
+    },
+    {
+      message: 'must be later than the start of the range',
+      path: ['to'],
+    }
+  )
 
 export const cellSourceSchema = z.discriminatedUnion('type', [
   z
