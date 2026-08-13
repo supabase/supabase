@@ -187,7 +187,8 @@ describe('ViewTokenSheet', () => {
     expect(screen.getByText('execute_sql')).toBeInTheDocument()
 
     // project:database is catalog-high risk and granted read-write — max() over capabilities.
-    expect(screen.getByText('High risk')).toBeInTheDocument()
+    // "High risk" appears twice: the risk banner title, and Database's own Risk Level badge.
+    expect(screen.getAllByText('High risk').length).toBe(2)
     expect(
       screen.getByText('Read-write on 1 capability, read on 1, across 1 project.')
     ).toBeInTheDocument()

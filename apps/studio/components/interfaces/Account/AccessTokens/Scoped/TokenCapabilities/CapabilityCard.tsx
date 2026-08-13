@@ -49,7 +49,11 @@ export const CapabilityCard = ({
   isLast = true,
 }: CapabilityCardProps) => {
   const body = (
-    <CapabilityCardBody endpoints={capability.endpoints} mcpTools={capability.mcpTools} />
+    <CapabilityCardBody
+      entry={capability.entry}
+      endpoints={capability.endpoints}
+      mcpTools={capability.mcpTools}
+    />
   )
   const positionClassName = cn(
     'border',
