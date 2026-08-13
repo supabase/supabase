@@ -1,3 +1,9 @@
+# PgBouncer override for self-hosted Supabase
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose-pgbouncer.yml up -d
+#
+
 services:
   supavisor: !reset null
 
