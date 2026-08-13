@@ -422,8 +422,10 @@ export function createTabsState(projectRef: string) {
 
       store.activeTab = id
 
-      // Add to recent items when navigating to a non-preview, non-new tab
-      if (!tab.isPreview) store.addRecentItem(tab)
+      // Add to recent items when navigating to a non-preview, non-new tab.
+      // Pinned tabs (e.g. Explorer's Home) are a fixed destination, not content
+      // to revisit, so they're excluded regardless of preview state.
+      if (!tab.isPreview && tab.closable !== false) store.addRecentItem(tab)
 
       switch (tab.type) {
         case 'sql':
