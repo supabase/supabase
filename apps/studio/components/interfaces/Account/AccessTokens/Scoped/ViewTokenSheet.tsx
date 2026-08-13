@@ -199,7 +199,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           token.created_at ? (
             <TimestampInfo
               utcTimestamp={token.created_at}
-              label={dayjs(token.created_at).format('DD MMM YYYY')}
+              label={dayjs(token.created_at).fromNow()}
               className="text-sm"
             />
           ) : (
@@ -223,7 +223,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           token.expires_at ? (
             <TimestampInfo
               utcTimestamp={token.expires_at}
-              label={dayjs(token.expires_at).format('DD MMM YYYY')}
+              label={dayjs(token.expires_at).fromNow()}
               className="text-sm"
             />
           ) : (
