@@ -120,6 +120,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
           <ExplorerToolbarActions>
             <DisplaySettingsButton
               cell={cell}
+              result={result}
               columns={columns}
               disabled={(result?.rows ?? []).length === 0}
             />

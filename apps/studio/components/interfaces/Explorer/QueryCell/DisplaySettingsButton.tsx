@@ -1,4 +1,5 @@
 import { BarChart2, Settings2, Table } from 'lucide-react'
+import { useEffect, useEffectEvent, useMemo } from 'react'
 import {
   Checkbox,
   Popover,
@@ -12,23 +13,34 @@ import {
   SelectValue,
   ToggleGroup,
   ToggleGroupItem,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { type Snapshot } from 'valtio'
 
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
+import { type QueryResult } from '../types'
+import { checkHasNonPositiveValues } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 interface DisplaySettingsButtonProps {
   cell: Snapshot<DatabaseCellSchema>
+  result?: QueryResult
   columns: string[]
   disabled: boolean
 }
 
 // [Joshen] TODO support multiple y axis charts
 
-export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettingsButtonProps) => {
+export const DisplaySettingsButton = ({
+  cell,
+  result,
+  columns,
+  disabled,
+}: DisplaySettingsButtonProps) => {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
   const cells = currentNotebook?.notebook.content?.cells ?? []
@@ -37,11 +49,21 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
   const {
     type = 'bar',
     x_column,
-    y_columns,
+    y_columns = [],
     cumulative = false,
     show_labels = false,
     scale = 'linear',
   } = chart ?? {}
+
+  const hasNonPositiveValues = useMemo(
+    () => checkHasNonPositiveValues(result?.rows ?? [], y_columns[0]),
+    [result, y_columns]
+  )
+
+  const canToggleLogScale = useMemo(() => {
+    if (y_columns.length === 0 || !result || (result.rows ?? []).length === 0) return false
+    return !hasNonPositiveValues
+  }, [hasNonPositiveValues, result, y_columns.length])
 
   const onChangeView = (view: 'table' | 'chart') => {
     const notebookId = currentNotebook?.notebook.id
@@ -84,12 +106,22 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
     snap.updateCells({ id: notebookId, cells: nextCells })
   }
 
+  const resetToLinearScale = useEffectEvent(() => {
+    onUpdateChartConfig({ scale: 'linear' })
+  })
+
+  useEffect(() => {
+    if (hasNonPositiveValues && scale === 'log') {
+      resetToLinearScale()
+    }
+  }, [hasNonPositiveValues, scale])
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <ExplorerToolbarAction disabled={disabled} icon={<Settings2 />} tooltip="Result settings" />
       </PopoverTrigger>
-      <PopoverContent side="bottom" className="flex flex-col gap-y-3 p-0 py-3">
+      <PopoverContent side="bottom" className="flex flex-col gap-y-3 p-0 py-3 mr-8">
         <div className="flex flex-col gap-y-3 px-3">
           <p className="text-xs tracking-tighter uppercase font-mono text-foreground-lighter">
             Result display settings
@@ -187,7 +219,24 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="linear">Linear</SelectItem>
-                    <SelectItem value="log">Logarithmic</SelectItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SelectItem
+                          disabled={!canToggleLogScale}
+                          value="log"
+                          className={!canToggleLogScale ? '!pointer-events-auto' : undefined}
+                        >
+                          Logarithmic
+                        </SelectItem>
+                      </TooltipTrigger>
+                      {!canToggleLogScale && (
+                        <TooltipContent side="right">
+                          {y_columns.length === 0
+                            ? 'Select a column for the Y axis first'
+                            : 'Data contains zero or negative values'}
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </SelectContent>
                 </Select>
               </FormItemLayout>
