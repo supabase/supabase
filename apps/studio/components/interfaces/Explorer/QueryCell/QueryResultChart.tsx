@@ -4,7 +4,7 @@ import { type Snapshot } from 'valtio'
 
 import { type QueryResult } from '../types'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
-import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
+import { formatLogTick, getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultChartProps {
@@ -23,7 +23,7 @@ const toChartValue = (value: unknown): string | number => {
 
 export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
   const { chart } = cell
-  const { type, x_column, y_columns = [], cumulative, show_labels } = chart ?? {}
+  const { type, x_column, y_columns = [], cumulative, show_labels, scale } = chart ?? {}
 
   const hasConfig = !!x_column && y_columns.length > 0
   const chartRows = useMemo(() => {
@@ -76,6 +76,11 @@ export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}
+                YAxisProps={{
+                  scale: scale === 'log' ? 'log' : 'auto',
+                  domain: scale === 'log' ? [1, 'auto'] : undefined,
+                  tickFormatter: scale === 'log' ? formatLogTick : undefined,
+                }}
               />
             )}
             {type === 'line' && (
@@ -86,6 +91,11 @@ export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}
+                YAxisProps={{
+                  scale: scale === 'log' ? 'log' : 'auto',
+                  domain: scale === 'log' ? [1, 'auto'] : undefined,
+                  tickFormatter: scale === 'log' ? formatLogTick : undefined,
+                }}
               />
             )}
           </div>
