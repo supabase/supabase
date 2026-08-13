@@ -807,8 +807,28 @@ export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnaps
 export const useAiAssistantChatList = (): ChatSession[] => {
   const state = useContext(AiAssistantStateContext)
   const [, rerender] = useReducer((count) => count + 1, 0)
-  useEffect(() => subscribe(state.chats, rerender), [state])
+  // Subscribe to the parent, not `state.chats` — createChat, createBranch, deleteChat and
+  // loadPersistedState all replace `state.chats` wholesale, which would leave a subscription
+  // to the old object silently stale.
+  useEffect(() => subscribe(state, rerender), [state])
   return Object.values(state.chats)
+}
+
+/**
+ * Resolves once the assistant state has hydrated from storage. `loadPersistedState` replaces
+ * `state.chats` wholesale, so anything that adds a chat has to wait for hydration or the new
+ * chat is dropped the moment the persisted state lands.
+ */
+export const whenAiAssistantInitialized = (state: AiAssistantState): Promise<void> => {
+  if (state.isInitialized) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const unsubscribe = subscribe(state, () => {
+      if (!state.isInitialized) return
+      unsubscribe()
+      resolve()
+    })
+  })
 }
 
 export const useAiAssistantState = () => {

@@ -6,7 +6,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
 import type { AssistantModel } from '@/state/ai-assistant-state'
-import { useAiAssistantState } from '@/state/ai-assistant-state'
+import { useAiAssistantState, whenAiAssistantInitialized } from '@/state/ai-assistant-state'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 import { Notebooks } from '@/types'
@@ -97,7 +97,7 @@ export const useCreateChat = () => {
     router.push(`/project/${project.ref}/explorer/chat/${id}`)
   }
 
-  const createChat = ({
+  const createChat = async ({
     name,
     initialMessage,
     model,
@@ -110,6 +110,10 @@ export const useCreateChat = () => {
       console.error('Project is required')
       return undefined
     }
+
+    // Hydration replaces the chat map and the selected model wholesale, so wait it out before
+    // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
+    await whenAiAssistantInitialized(aiAssistantState)
 
     aiAssistantState.setContext({
       projectRef: project.ref,
