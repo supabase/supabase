@@ -168,11 +168,14 @@ describe('ViewTokenSheet', () => {
     })
     renderSheet()
 
-    // ≤2 capabilities render fully expanded — both cards are visible without interaction.
+    // Capability cards are closed by default — expand both to see their endpoints and tools.
     expect(await screen.findByText('Advisors')).toBeInTheDocument()
     expect(screen.getByText('Database')).toBeInTheDocument()
     expect(screen.getByText('Read-write')).toBeInTheDocument()
     expect(screen.getByText('Read')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('Advisors'))
+    fireEvent.click(screen.getByText('Database'))
 
     expect(screen.getByTitle('/v1/projects/{ref}/advisors/security')).toBeInTheDocument()
     expect(screen.getByTitle('/v1/projects/{ref}/database')).toBeInTheDocument()
@@ -213,24 +216,19 @@ describe('ViewTokenSheet', () => {
     })
     renderSheet()
 
-    expect(await screen.findByText('Read-write · 1')).toBeInTheDocument()
-    expect(screen.getByText('Read-only · 8')).toBeInTheDocument()
+    expect(await screen.findByText('Database')).toBeInTheDocument()
     expect(screen.getByText(/Not granted · \d+/)).toBeInTheDocument()
-    // Read-only previews only 3 of the 8 rows until "Show N more" is clicked.
-    expect(screen.getByText('Show 5 more')).toBeInTheDocument()
-    expect(screen.queryByText('Storage')).toBeNull()
-
-    fireEvent.click(screen.getByText('Show 5 more'))
+    // All granted capabilities render immediately — no truncation.
     expect(screen.getByText('Storage')).toBeInTheDocument()
     expect(screen.getByText('Backups')).toBeInTheDocument()
 
     // The All/Read/Read-write toggle sits next to the "Capabilities" title, not a text filter.
     fireEvent.click(screen.getByRole('radio', { name: 'Read-write' }))
-    expect(screen.getByText('Read-write · 1')).toBeInTheDocument()
-    expect(screen.queryByText(/Read-only · /)).toBeNull()
+    expect(screen.getByText('Database')).toBeInTheDocument()
+    expect(screen.queryByText('Backups')).toBeNull()
 
     fireEvent.click(screen.getByRole('radio', { name: 'Read' }))
-    expect(screen.queryByText(/Read-write · /)).toBeNull()
-    expect(screen.getByText('Read-only · 8')).toBeInTheDocument()
+    expect(screen.queryByText('Database')).toBeNull()
+    expect(screen.getByText('Backups')).toBeInTheDocument()
   })
 })

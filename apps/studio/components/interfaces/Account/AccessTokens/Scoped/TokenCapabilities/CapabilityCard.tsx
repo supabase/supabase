@@ -9,8 +9,6 @@ import { pluralize } from '@/lib/helpers'
 
 interface CapabilityCardProps {
   capability: CapabilitySummaryEntry
-  /** Accordion tiers wrap the header in a trigger button; the ≤2 tier renders it inert. */
-  collapsible: boolean
   accessEntries: Record<string, EntryAccess>
   /** Position within the continuous bordered list — controls corner rounding and shared edges. */
   isFirst?: boolean
@@ -47,7 +45,6 @@ const CapabilityCardHeader = ({
 
 export const CapabilityCard = ({
   capability,
-  collapsible,
   accessEntries,
   isFirst = true,
   isLast = true,
@@ -61,17 +58,6 @@ export const CapabilityCard = ({
     isFirst && 'rounded-t-md',
     isLast && 'rounded-b-md'
   )
-
-  if (!collapsible) {
-    return (
-      <div className={positionClassName}>
-        <div className="bg-surface-300 px-4 py-3">
-          <CapabilityCardHeader capability={capability} accessEntries={accessEntries} />
-        </div>
-        <div className="px-4 pb-4">{body}</div>
-      </div>
-    )
-  }
 
   return (
     <AccordionItem value={capability.entry.key} className={positionClassName}>

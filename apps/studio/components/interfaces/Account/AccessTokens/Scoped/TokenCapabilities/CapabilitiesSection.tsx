@@ -14,8 +14,8 @@ interface CapabilitiesSectionProps {
 }
 
 /**
- * Switches capability presentation on granted count: a handful render fully expanded, a moderate
- * number collapse into an accordion, and a large grant switches to the dense, filterable view.
+ * Switches capability presentation on granted count: a moderate number render as a single
+ * closed-by-default accordion, and a large grant switches to the dense, filterable view.
  */
 export const CapabilitiesSection = ({
   capabilities,
@@ -28,23 +28,6 @@ export const CapabilitiesSection = ({
 
   const tier = getCapabilityDensityTier(capabilities.length)
 
-  if (tier === 'expanded') {
-    return (
-      <div>
-        {capabilities.map((capability, index) => (
-          <CapabilityCard
-            key={capability.entry.key}
-            capability={capability}
-            collapsible={false}
-            accessEntries={accessEntries}
-            isFirst={index === 0}
-            isLast={index === capabilities.length - 1}
-          />
-        ))}
-      </div>
-    )
-  }
-
   if (tier === 'accordion') {
     return (
       <Accordion type="multiple">
@@ -52,7 +35,6 @@ export const CapabilitiesSection = ({
           <CapabilityCard
             key={capability.entry.key}
             capability={capability}
-            collapsible
             accessEntries={accessEntries}
             isFirst={index === 0}
             isLast={index === capabilities.length - 1}
