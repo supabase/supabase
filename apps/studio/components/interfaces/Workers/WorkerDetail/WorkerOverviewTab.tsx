@@ -96,7 +96,7 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
   return (
     <>
       {/* Metrics breakdown band */}
-      <PageSection className="border-t border-b bg-surface-100/50 pb-8 pt-0">
+      <PageSection className="border-b bg-surface-100/50 pb-8 pt-0">
         <PageContainer size="full">
           <div className="flex flex-col gap-5">
             <PageSectionMeta className="items-center! pt-8">

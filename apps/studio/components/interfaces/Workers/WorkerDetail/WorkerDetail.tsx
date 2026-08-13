@@ -22,17 +22,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import {
-  PageHeader,
-  PageHeaderAside,
-  PageHeaderBreadcrumb,
-  PageHeaderDescription,
-  PageHeaderMeta,
-  PageHeaderNavigationTabs,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
+import { PageNav } from 'ui-patterns/PageNav'
 
 import { workerGatewayUrl } from '../Workers.constants'
 import { RuntimeBadge } from '../RuntimeBadge'
@@ -105,127 +97,129 @@ export const WorkerDetail = () => {
 
   return (
     <div className="w-full min-h-full flex flex-col items-stretch">
-      <PageHeader size="full">
-        <PageHeaderBreadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href={`/project/${projectRef}/workers`}>Workers</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{worker.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </PageHeaderBreadcrumb>
-
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>{worker.name}</PageHeaderTitle>
-            <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
-              <span className="flex items-center gap-2">
-                <span className="font-mono text-foreground-light">{gatewayUrl}</span>
-                <button
-                  type="button"
-                  aria-label="Copy URL"
-                  onClick={() => copyToClipboard(gatewayUrl)}
-                  className="text-foreground-lighter transition-colors hover:text-foreground"
-                >
-                  <Copy size={13} />
-                </button>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className="text-xs text-foreground-light transition-colors hover:text-foreground"
-                    >
-                      How to call
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="start" className="w-[440px] p-4">
-                    <WorkerSnippetTabs
-                      input={{
-                        name: worker.name,
-                        runtime: worker.runtime,
-                        size: worker.size,
-                        access: worker.access,
-                        instances: worker.instances,
-                      }}
-                      tabs={['curl', 'js', 'python']}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </span>
-              <WorkerStatePill state={worker.state} />
-              <RuntimeBadge runtime={worker.runtime} />
-              <span className="flex items-center gap-2 text-foreground-light">
-                <Clock size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Last deployed {dayjs(worker.updatedAt).format('MMM D, YYYY HH:mm')}
-              </span>
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-
-          <PageHeaderAside>
-            <div className="flex items-center gap-2">
+      <PageBreadcrumbs
+        actions={
+          <PageBreadcrumbsActions>
+            <Button
+              variant="default"
+              size="tiny"
+              icon={<Zap size={14} />}
+              disabled={!isActive}
+              onClick={handleSimulateTraffic}
+            >
+              Simulate traffic
+            </Button>
+            {isActive && (
               <Button
                 variant="default"
-                icon={<Zap size={14} />}
-                disabled={!isActive}
-                onClick={handleSimulateTraffic}
+                size="tiny"
+                icon={<Pause size={14} />}
+                onClick={() => suspendWorker(projectRef, worker.id)}
               >
-                Simulate traffic
+                Suspend
               </Button>
-              {isActive && (
-                <Button
-                  variant="default"
-                  icon={<Pause size={14} />}
-                  onClick={() => suspendWorker(projectRef, worker.id)}
-                >
-                  Suspend
-                </Button>
-              )}
-              {isSuspended && (
-                <Button
-                  variant="default"
-                  icon={<Play size={14} />}
-                  onClick={() => resumeWorker(projectRef, worker.id)}
-                >
-                  Resume
-                </Button>
-              )}
-            </div>
-          </PageHeaderAside>
-        </PageHeaderMeta>
-
-        <PageHeaderNavigationTabs>
-          <NavMenu>
-            {TAB_ORDER.map((item) =>
-              item === 'terminal' ? (
-                <NavMenuItem key="terminal" active={false}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="flex h-full cursor-not-allowed items-center gap-1.5 text-foreground-muted">
-                        Terminal
-                        <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
-                          Soon
-                        </span>
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">Coming soon in private alpha</TooltipContent>
-                  </Tooltip>
-                </NavMenuItem>
-              ) : (
-                <NavMenuItem key={item} active={tab === item}>
-                  <button type="button" onClick={() => setTab(item)}>
-                    {TAB_LABEL[item]}
-                  </button>
-                </NavMenuItem>
-              )
             )}
-          </NavMenu>
-        </PageHeaderNavigationTabs>
-      </PageHeader>
+            {isSuspended && (
+              <Button
+                variant="default"
+                size="tiny"
+                icon={<Play size={14} />}
+                onClick={() => resumeWorker(projectRef, worker.id)}
+              >
+                Resume
+              </Button>
+            )}
+          </PageBreadcrumbsActions>
+        }
+      >
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href={`/project/${projectRef}/workers`}>Workers</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>{worker.name}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
+      {/* Worker title + summary, aligned with the breadcrumb/nav gutters */}
+      <PageContainer size="full" className="px-4 py-6 xl:px-4">
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl text-foreground">{worker.name}</h1>
+          <div className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+            <span className="flex items-center gap-2">
+              <span className="font-mono text-foreground-light">{gatewayUrl}</span>
+              <button
+                type="button"
+                aria-label="Copy URL"
+                onClick={() => copyToClipboard(gatewayUrl)}
+                className="text-foreground-lighter transition-colors hover:text-foreground"
+              >
+                <Copy size={13} />
+              </button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="text-xs text-foreground-light transition-colors hover:text-foreground"
+                  >
+                    How to call
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-[440px] p-4">
+                  <WorkerSnippetTabs
+                    input={{
+                      name: worker.name,
+                      runtime: worker.runtime,
+                      size: worker.size,
+                      access: worker.access,
+                      instances: worker.instances,
+                    }}
+                    tabs={['curl', 'js', 'python']}
+                  />
+                </PopoverContent>
+              </Popover>
+            </span>
+            <WorkerStatePill state={worker.state} />
+            <RuntimeBadge runtime={worker.runtime} />
+            <span className="flex items-center gap-2 text-foreground-light">
+              <Clock size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+              Last deployed {dayjs(worker.updatedAt).format('MMM D, YYYY HH:mm')}
+            </span>
+          </div>
+        </div>
+      </PageContainer>
+
+      <PageNav>
+        <NavMenu>
+          {TAB_ORDER.map((item) =>
+            item === 'terminal' ? (
+              <NavMenuItem key="terminal" active={false}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex h-full cursor-not-allowed items-center gap-1.5 text-foreground-muted">
+                      Terminal
+                      <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
+                        Soon
+                      </span>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Coming soon in private alpha</TooltipContent>
+                </Tooltip>
+              </NavMenuItem>
+            ) : (
+              <NavMenuItem key={item} active={tab === item}>
+                <button type="button" onClick={() => setTab(item)}>
+                  {TAB_LABEL[item]}
+                </button>
+              </NavMenuItem>
+            )
+          )}
+        </NavMenu>
+      </PageNav>
 
       {tab === 'overview' && <WorkerOverviewTab projectRef={projectRef} worker={worker} />}
       {tab === 'logs' && (
