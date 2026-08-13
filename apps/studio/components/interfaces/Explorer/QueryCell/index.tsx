@@ -95,10 +95,13 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
     if (!notebookId) return
 
     const nextCells = cells.map((candidate) => {
-      if (candidate.id !== id || candidate._tag !== 'database_cell') return candidate
+      if (candidate.id !== id) return candidate
+      if (candidate._tag !== 'database_cell' && candidate._tag !== 'log_cell') return candidate
 
       if ('sql' in payload) {
-        return { ...candidate, unchecked_sql: untrustedSql(payload.sql) }
+        return candidate._tag === 'database_cell'
+          ? { ...candidate, unchecked_sql: untrustedSql(payload.sql) }
+          : { ...candidate, unchecked_sql: untrustedLogSql(payload.sql) }
       }
 
       if ('title' in payload) {
