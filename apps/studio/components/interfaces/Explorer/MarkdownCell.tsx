@@ -8,18 +8,21 @@ import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SortableSection } from '@/components/ui/SortableSection'
 import { type MarkdownCell as MarkdownCellSchema } from '@/data/content/notebooks/notebook-schema'
 import { useLatest } from '@/hooks/misc/useLatest'
+import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 interface MarkdownCellProps {
   cell: MarkdownCellSchema
-  onCommitChanges: (text: string) => void
 }
 
-export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
+export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
+  const snap = useNotebooksStateSnapshot()
+  const currentNotebook = useCurrentNotebook()
+  const cells = currentNotebook?.notebook.content?.cells ?? []
+
   const [value, setValue] = useState(cell.text)
   const [isEditing, setIsEditing] = useState(false)
 
   const valueRef = useLatest(value)
-  const onCommitChangesRef = useLatest(onCommitChanges)
 
   const handleStartEditing = () => {
     setValue(cell.text)
@@ -30,10 +33,16 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
     setIsEditing(false)
   }
 
-  const handleCommit = () => {
-    onCommitChangesRef.current(valueRef.current)
+  const handleUpdateMarkdown = (cellId: string, text: string) => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!notebookId) return
+
+    const nextCells = cells.map((c) => (c.id === cellId ? { ...c, text } : c))
+    snap.updateCells({ id: notebookId, cells: nextCells })
     setIsEditing(false)
   }
+
+  const handleUpdateMarkdownRef = useLatest(handleUpdateMarkdown)
 
   return (
     <SortableSection gripClassName="mt-2.5" id={cell.id}>
@@ -65,8 +74,12 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
                   '!inlineSuggestionVisible',
                 ].join(' && ')
               )
-              editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, handleCommit)
-              editor.onDidBlurEditorWidget(handleCommit)
+              editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () =>
+                handleUpdateMarkdownRef.current(cell.id, valueRef.current)
+              )
+              editor.onDidBlurEditorWidget(() =>
+                handleUpdateMarkdownRef.current(cell.id, valueRef.current)
+              )
             }}
           />
           <div className="border-t flex items-center justify-between pl-3 pr-1 py-1">
@@ -75,7 +88,11 @@ export const MarkdownCell = ({ cell, onCommitChanges }: MarkdownCellProps) => {
               <Button variant="text" onMouseDown={(e) => e.preventDefault()} onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button variant="text" onMouseDown={(e) => e.preventDefault()} onClick={handleCommit}>
+              <Button
+                variant="text"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => handleUpdateMarkdown(cell.id, value)}
+              >
                 Save
               </Button>
             </div>
