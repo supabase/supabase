@@ -14,7 +14,7 @@ comment on table interfaces_feedback is
 comment on column interfaces_feedback.feedback is
 'The free-form feedback text as submitted by the user.';
 comment on column interfaces_feedback.delete_token is
-'Server-generated capability token returned once by submit_interfaces_feedback(); presenting it via the x-feedback-token request header authorizes reading and deleting this row.';
+'Server-generated capability token returned once by submit_interfaces_feedback(); presenting it via the x-feedback-token request header authorizes reading and deleting this row. Rows submitted with a project_ref and/or user_id additionally require the matching x-feedback-project-ref / x-feedback-user-id headers.';
 comment on column interfaces_feedback.user_agent is
 'User agent of the submitting interface, e.g. SupabaseCLI/2.3.4. Also identifies which interface the feedback came from.';
 comment on column interfaces_feedback.project_ref is
@@ -22,21 +22,32 @@ comment on column interfaces_feedback.project_ref is
 
 alter table interfaces_feedback enable row level security;
 
--- The x-feedback-token request header is the capability check: policies can
+-- The x-feedback-* request headers are the capability check: policies can
 -- only compare row data against session context (never a query's WHERE
--- clause), so the token must arrive as a header. Text comparison avoids
--- uuid-cast errors on malformed input; a missing header matches nothing.
+-- clause), so the values must arrive as headers. The token is always
+-- required; project_ref and user_id are additionally required when (and only
+-- when) the row was submitted with them — a null column imposes no
+-- requirement. Text comparison avoids uuid-cast errors on malformed input;
+-- a missing header matches nothing it is required for.
 create policy "Token holders can read their own feedback"
 on interfaces_feedback
 as permissive for select
 to anon
-using (delete_token::text = lower(current_setting('request.headers', true)::json ->> 'x-feedback-token'));
+using (
+	delete_token::text = lower(current_setting('request.headers', true)::json ->> 'x-feedback-token')
+	and (project_ref is null or project_ref = current_setting('request.headers', true)::json ->> 'x-feedback-project-ref')
+	and (user_id is null or user_id::text = lower(current_setting('request.headers', true)::json ->> 'x-feedback-user-id'))
+);
 
 create policy "Token holders can delete their own feedback"
 on interfaces_feedback
 as permissive for delete
 to anon
-using (delete_token::text = lower(current_setting('request.headers', true)::json ->> 'x-feedback-token'));
+using (
+	delete_token::text = lower(current_setting('request.headers', true)::json ->> 'x-feedback-token')
+	and (project_ref is null or project_ref = current_setting('request.headers', true)::json ->> 'x-feedback-project-ref')
+	and (user_id is null or user_id::text = lower(current_setting('request.headers', true)::json ->> 'x-feedback-user-id'))
+);
 
 -- Submissions go exclusively through this function so the delete token is
 -- always server-generated and returned exactly once to the submitter. There
