@@ -221,11 +221,11 @@ describe('ViewTokenSheet', () => {
     expect(screen.getByText('Backups')).toBeInTheDocument()
 
     // The All/Read/Read-write toggle sits next to the "Capabilities" title, not a text filter.
-    fireEvent.click(screen.getByRole('radio', { name: 'Read-write' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Read-write' }))
     expect(screen.getByText('Database')).toBeInTheDocument()
     expect(screen.queryByText('Backups')).toBeNull()
 
-    fireEvent.click(screen.getByRole('radio', { name: 'Read' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Read' }))
     expect(screen.queryByText('Database')).toBeNull()
     expect(screen.getByText('Backups')).toBeInTheDocument()
   })
