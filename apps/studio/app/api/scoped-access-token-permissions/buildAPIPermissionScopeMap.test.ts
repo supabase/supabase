@@ -6,11 +6,8 @@ import {
   buildAPIPermissionScopeMap,
   getScopesAndEndpointsForAPI,
 } from './buildAPIPermissionScopeMap'
-import { buildMcpToolScopeMap, MCPToolEndpointMapping } from './MCPToolScopeMappings'
-import {
-  type EndpointMap,
-  type ScopeMap,
-} from '@/data/scoped-access-tokens/permission-scope-map-query'
+import { MCPToolScopeMappings } from './MCPToolScopeMappings'
+import { type ScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { mswServer } from '@/tests/lib/msw'
 
 describe('getScopesAndEndpointsForAPI', () => {
@@ -138,73 +135,54 @@ describe('addMCPToolsToScopes', () => {
   })
 })
 
-describe('buildMcpToolScopeMap', () => {
-  // Platform gates execute_sql on database:read OR database:write depending on the MCP session's
-  // read_only mode (mcp.controller.ts), and both alternatives are the same one endpoint's own
-  // alternative groups — a single conjunctive group would hide the tool from read-only tokens the
-  // platform accepts.
-  test('execute_sql derives the database:read alternative OR the database:write alternative', () => {
-    const endpoints: EndpointMap = {
-      'POST /v1/projects/{ref}/database/query': [['database_read'], ['database_write']],
-    }
+describe('MCPToolScopeMappings', () => {
+  // Transcribed straight from mcp.controller.ts: executeSql's outer guard is DATABASE_READ for
+  // every call (read or write) — DATABASE_WRITE is checked deeper inside
+  // executeProjectDatabaseQuery for writes only, not at this layer — so a single group is correct,
+  // not an OR with database_write.
+  test('execute_sql requires only database_read', () => {
+    expect(MCPToolScopeMappings.execute_sql).toEqual([['database_read']])
+  })
 
-    expect(buildMcpToolScopeMap(endpoints).execute_sql).toEqual([
-      ['database_read'],
-      ['database_write'],
+  test('single-scope tools derive a single conjunctive group', () => {
+    expect(MCPToolScopeMappings.apply_migration).toEqual([['database_migrations_write']])
+  })
+
+  test('tools without a platform call stay ungated ([[]]), not disabled ([])', () => {
+    expect(MCPToolScopeMappings.confirm_cost).toEqual([[]])
+    expect(MCPToolScopeMappings.search_docs).toEqual([[]])
+  })
+
+  // create_branch always creates a development branch (mcp.controller.ts only ever checks
+  // BRANCHING_DEVELOPMENT_CREATE), unlike the REST endpoint's annotation which also offers a
+  // production-create alternative — the two guards genuinely differ here.
+  test('create_branch requires only development create, unlike its REST endpoint', () => {
+    expect(MCPToolScopeMappings.create_branch).toEqual([['branching_development_create']])
+  })
+
+  // delete/merge/reset/rebase check whichever of development/production the target branch is
+  // (assertBranchFgaPermission), so both alternatives are offered.
+  test('branch mutation tools offer the development OR production alternative', () => {
+    expect(MCPToolScopeMappings.delete_branch).toEqual([
+      ['branching_development_delete'],
+      ['branching_production_delete'],
+    ])
+    expect(MCPToolScopeMappings.rebase_branch).toEqual([
+      ['branching_development_write'],
+      ['branching_production_write'],
     ])
   })
 
-  test('single-endpoint tools derive a single conjunctive group from that endpoint', () => {
-    const endpoints: EndpointMap = {
-      'POST /v1/projects/{ref}/database/migrations': [['database_migrations_write']],
-    }
-
-    expect(buildMcpToolScopeMap(endpoints).apply_migration).toEqual([['database_migrations_write']])
+  // get_cost calls getOrganization (organization_admin_read) + the generic account-wide
+  // listProjects (projects_read, not the org-scoped organization_projects_read) and needs both
+  // together — a single AND group, not two independent alternatives.
+  test('get_cost requires both organization and account-wide project read together', () => {
+    expect(MCPToolScopeMappings.get_cost).toEqual([['organization_admin_read', 'projects_read']])
   })
 
-  test('tools without a backing endpoint stay ungated ([[]]), not disabled ([])', () => {
-    const map = buildMcpToolScopeMap({})
-
-    expect(map.confirm_cost).toEqual([[]])
-    expect(map.search_docs).toEqual([[]])
-  })
-
-  // get_cost calls two endpoints (getOrganization + the org-scoped listProjects) and needs both,
-  // so their scopes must combine into one AND group rather than either one alone satisfying it.
-  test('get_cost requires the scopes of both its endpoints together', () => {
-    const endpoints: EndpointMap = {
-      'GET /v1/organizations/{slug}': [['organization_admin_read']],
-      'GET /v1/organizations/{slug}/projects': [['organization_projects_read']],
-    }
-
-    expect(buildMcpToolScopeMap(endpoints).get_cost).toEqual([
-      ['organization_admin_read', 'organization_projects_read'],
-    ])
-  })
-
-  // A group is an AND: satisfying it from only one of its two endpoints would weaken the
-  // requirement and report the tool enabled for an incomplete grant. Losing the endpoint from the
-  // fetched spec must drop the whole alternative instead.
-  test('a tool loses a whole alternative when one of its AND-ed endpoints is missing', () => {
-    const endpoints: EndpointMap = {
-      'GET /v1/organizations/{slug}': [['organization_admin_read']],
-    }
-
-    expect(buildMcpToolScopeMap(endpoints).get_cost).toEqual([])
-  })
-
-  // Guards the endpoint-key join: an endpoint missing from the fetched spec must not inject
-  // undefined into the payload or silently disable a gated tool by dropping all its groups, and
-  // every referenced endpoint must resolve to something under a spec that covers all of them.
   test('every derived group is non-empty strings, and only the ungated tools lack scopes', () => {
     const ungated = ['confirm_cost', 'search_docs']
-    const allEndpointKeys = new Set(Object.values(MCPToolEndpointMapping).flat(2))
-    const endpoints: EndpointMap = Object.fromEntries(
-      Array.from(allEndpointKeys).map((key) => [key, [[`scope_for:${key}`]]])
-    )
-
-    const map = buildMcpToolScopeMap(endpoints)
-    for (const [tool, groups] of Object.entries(map)) {
+    for (const [tool, groups] of Object.entries(MCPToolScopeMappings)) {
       expect(groups.length, `${tool} lost all its alternatives`).toBeGreaterThan(0)
       for (const group of groups) {
         if (!ungated.includes(tool))
@@ -217,9 +195,9 @@ describe('buildMcpToolScopeMap', () => {
 
   // Drift guard: the exact tool registry of @supabase/mcp-server-supabase@0.8.1, the version the
   // platform pins. When the platform bumps the MCP server, this list (and the mapping) must be
-  // re-derived from the controller's assertMcpOAuthScope calls.
+  // re-derived from the controller's assertFgaPermissions calls.
   test('covers exactly the tool registry of the deployed MCP server', () => {
-    expect(Object.keys(MCPToolEndpointMapping).sort()).toEqual([
+    expect(Object.keys(MCPToolScopeMappings).sort()).toEqual([
       'apply_migration',
       'confirm_cost',
       'create_branch',
@@ -317,19 +295,15 @@ describe('buildAPIPermissionScopeMap', () => {
     expect(Object.keys(map.endpoints)).toHaveLength(1)
   })
 
-  test('derives mcp_tools fresh from the fetched specs, independent across calls', async () => {
+  test('returns a copy of the tool mapping so callers cannot corrupt the module singleton', async () => {
     stubSpecs({ paths: {} }, { paths: {} })
 
     const map = await buildAPIPermissionScopeMap()
+    expect(map.mcp_tools).toEqual(MCPToolScopeMappings)
+    expect(map.mcp_tools).not.toBe(MCPToolScopeMappings)
 
-    // No endpoint in the spec backs execute_sql, so it's unsatisfiable...
-    expect(map.mcp_tools.execute_sql).toEqual([])
-    // ...while the ungated tools stay callable regardless.
-    expect(map.mcp_tools.confirm_cost).toEqual([[]])
-
-    // Mutating one call's result can't affect another — each call builds its own object.
-    map.mcp_tools.confirm_cost.push(['tampered'])
-    const secondMap = await buildAPIPermissionScopeMap()
-    expect(secondMap.mcp_tools.confirm_cost).toEqual([[]])
+    const before = structuredClone(MCPToolScopeMappings.execute_sql)
+    map.mcp_tools.execute_sql.push(['tampered'])
+    expect(MCPToolScopeMappings.execute_sql).toEqual(before)
   })
 })

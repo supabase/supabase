@@ -1,104 +1,109 @@
-import {
-  EndpointMap,
-  McpMap,
-  ScopeGroupAlternatives,
-} from '@/data/scoped-access-tokens/permission-scope-map-query'
+import { permissions } from '@supabase/shared-types'
 
-/*
- * Manually extracted from platform mcp controller code: the exact tool registry of
- * @supabase/mcp-server-supabase@0.8.1, the version the platform pins. Each tool maps to alternative
- * groups of Management API endpoints — a token can use the tool when it holds every scope required
- * by at least one alternative's endpoints (OR between alternatives, AND across the endpoints within
- * one), mirroring the ScopeGroupAlternatives semantics.
- *
- * Deriving a tool's requirement from the endpoint(s) it actually calls — rather than hand-picking
- * scopes — means the requirement can never drift from what those endpoints enforce; only this
- * endpoint list needs maintaining when the mcp-server version changes.
- */
-export const MCPToolEndpointMapping: Record<string, string[][]> = {
-  apply_migration: [['POST /v1/projects/{ref}/database/migrations']],
-  // Computes a local confirmation hash without calling the platform — no endpoint, so no gate.
-  confirm_cost: [[]],
-  create_branch: [['POST /v1/projects/{ref}/branches']],
-  create_project: [['POST /v1/projects']],
-  delete_branch: [['DELETE /v1/branches/{branch_id_or_ref}']],
-  deploy_edge_function: [['POST /v1/projects/{ref}/functions/deploy']],
-  execute_sql: [['POST /v1/projects/{ref}/database/query']],
-  generate_typescript_types: [['GET /v1/projects/{ref}/types/typescript']],
-  get_advisors: [['GET /v1/projects/{ref}/advisors/security']],
-  // Calls getOrganization + the org-scoped listProjects to price a project, so it needs both.
-  get_cost: [['GET /v1/organizations/{slug}', 'GET /v1/organizations/{slug}/projects']],
-  get_edge_function: [['GET /v1/projects/{ref}/functions/{function_slug}']],
-  get_logs: [['GET /v1/projects/{ref}/analytics/endpoints/logs.all']],
-  get_organization: [['GET /v1/organizations/{slug}']],
-  get_project: [['GET /v1/projects/{ref}']],
-  get_project_url: [['GET /v1/projects/{ref}']],
-  get_publishable_keys: [['GET /v1/projects/{ref}/api-keys']],
-  get_storage_config: [['GET /v1/projects/{ref}/config/storage']],
-  list_branches: [['GET /v1/projects/{ref}/branches']],
-  list_edge_functions: [['GET /v1/projects/{ref}/functions']],
-  // Runs through the read-only query endpoint (read_only forced true), not the general one.
-  list_extensions: [['POST /v1/projects/{ref}/database/query/read-only']],
-  list_migrations: [['GET /v1/projects/{ref}/database/migrations']],
-  list_organizations: [['GET /v1/organizations']],
-  list_projects: [['GET /v1/projects']],
-  list_storage_buckets: [['GET /v1/projects/{ref}/storage/buckets']],
-  // Runs through the read-only query endpoint (read_only forced true), not the general one.
-  list_tables: [['POST /v1/projects/{ref}/database/query/read-only']],
-  merge_branch: [['POST /v1/branches/{branch_id_or_ref}/merge']],
-  pause_project: [['POST /v1/projects/{ref}/pause']],
-  rebase_branch: [['POST /v1/branches/{branch_id_or_ref}/push']],
-  reset_branch: [['POST /v1/branches/{branch_id_or_ref}/reset']],
-  restore_project: [['POST /v1/projects/{ref}/restore']],
-  // Queries the public content API — no endpoint, so no gate.
-  search_docs: [[]],
-  update_storage_config: [['PATCH /v1/projects/{ref}/config/storage']],
-}
+import { McpMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
-/*
- * Combines two ScopeGroupAlternatives with logical AND: every alternative of `a` paired with every
- * alternative of `b`, preserving DNF (OR between alternatives, AND within a pair). An empty input —
- * no alternatives, the "satisfied by nobody" marker — makes the combination unsatisfiable too, which
- * is how a tool loses a whole alternative when one of its endpoints isn't found in the fetched spec,
- * rather than silently dropping just that endpoint's contribution.
- */
-const andCombine = (
-  a: ScopeGroupAlternatives,
-  b: ScopeGroupAlternatives
-): ScopeGroupAlternatives => {
-  if (a.length === 0 || b.length === 0) return []
-  const combined: ScopeGroupAlternatives = []
-  for (const groupA of a) {
-    for (const groupB of b) {
-      combined.push(Array.from(new Set([...groupA, ...groupB])))
-    }
+type ExtractIds<T> = {
+  [K in keyof T]: {
+    [P in keyof T[K]]: T[K][P] extends { id: infer I } ? I : never
   }
-  return combined
 }
+const FGA_PERMISSIONS = Object.fromEntries(
+  Object.entries(permissions.FgaPermissions).map(([group, groupPermissions]) => [
+    group,
+    Object.fromEntries(Object.entries(groupPermissions).map(([key, { id }]) => [key, id])),
+  ])
+) as ExtractIds<typeof permissions.FgaPermissions>
 
 /*
- * Resolves one alternative's endpoint keys against the live endpoints map, ANDing together the
- * scope groups each endpoint is annotated with. Folding starts from `[[]]` — one empty group, the
- * AND-identity — so an alternative with no endpoints (confirm_cost, search_docs) resolves to `[[]]`
- * (ungated) rather than `[]` (unsatisfiable).
+ * Transcribed directly from platform's MCP controller (mcp.controller.ts, the
+ * @supabase/mcp-server-supabase@0.8.1 version the platform pins): each tool's
+ * `assertFgaPermissions([...])` call(s). This is the actual runtime gate for MCP tool calls, and it
+ * is NOT always the same as the equivalent REST endpoint's `x-fga-permissions` annotation — see
+ * create_branch and get_cost below, where the two diverge — so it must be hand-maintained against
+ * the controller source rather than derived from the OpenAPI spec.
+ *
+ * Update this whenever the platform bumps @supabase/mcp-server-supabase or changes
+ * mcp.controller.ts.
  */
-const resolveAlternative = (
-  endpointKeys: string[],
-  endpoints: EndpointMap
-): ScopeGroupAlternatives =>
-  endpointKeys.reduce((acc, key) => andCombine(acc, endpoints[key] ?? []), [
-    [],
-  ] as ScopeGroupAlternatives)
+export const MCPToolScopeMappings: McpMap = {
+  // --- account ---
+  list_organizations: [[FGA_PERMISSIONS.USER.ORGANIZATIONS_READ]],
+  get_organization: [[FGA_PERMISSIONS.ORGANIZATION.ADMIN_READ]],
+  list_projects: [[FGA_PERMISSIONS.USER.PROJECTS_READ]],
+  get_project: [[FGA_PERMISSIONS.PROJECT.ADMIN_READ]],
+  create_project: [[FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE]],
+  pause_project: [[FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]],
+  restore_project: [[FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]],
 
-/**
- * Builds the MCP tool -> scope-group map by resolving MCPToolEndpointMapping against the endpoints
- * actually indexed from the fetched OpenAPI specs, so a tool's requirement is always exactly what
- * its backing endpoint(s) enforce.
- */
-export const buildMcpToolScopeMap = (endpoints: EndpointMap): McpMap =>
-  Object.fromEntries(
-    Object.entries(MCPToolEndpointMapping).map(([tool, alternatives]) => [
-      tool,
-      alternatives.flatMap((endpointKeys) => resolveAlternative(endpointKeys, endpoints)),
-    ])
-  )
+  // --- branching ---
+  // listBranches has no direct assertFgaPermissions call (uses getBranchReadAccess instead), but
+  // requires at least development or production read, matching the v1 list-branches gate.
+  list_branches: [
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ],
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_READ],
+  ],
+  // createBranch always creates a development branch, so — unlike the REST endpoint's annotation,
+  // which also offers a production-create alternative — only development create gates it.
+  create_branch: [[FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE]],
+  // delete/merge/reset/rebase all check whichever of development/production the target branch
+  // actually is (assertBranchFgaPermission), so both alternatives are offered.
+  delete_branch: [
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_DELETE],
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_DELETE],
+  ],
+  merge_branch: [
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE],
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE],
+  ],
+  reset_branch: [
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE],
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE],
+  ],
+  // Implemented via pushBranch, same dev/prod write check as merge/reset.
+  rebase_branch: [
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE],
+    [FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE],
+  ],
+
+  // --- database ---
+  // The controller's outer gate is DATABASE_READ for every call, read or write; writes are
+  // additionally gated by DATABASE_WRITE deeper inside executeProjectDatabaseQuery. Since this UI
+  // never grants database_write without database_read, one database_read group covers both.
+  execute_sql: [[FGA_PERMISSIONS.PROJECT.DATABASE_READ]],
+  // Both run through executeSql with read_only forced true, so they gate the same as execute_sql.
+  list_extensions: [[FGA_PERMISSIONS.PROJECT.DATABASE_READ]],
+  list_tables: [[FGA_PERMISSIONS.PROJECT.DATABASE_READ]],
+  list_migrations: [[FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_READ]],
+  apply_migration: [[FGA_PERMISSIONS.PROJECT.DATABASE_MIGRATIONS_WRITE]],
+
+  // --- debugging ---
+  get_logs: [[FGA_PERMISSIONS.PROJECT.ANALYTICS_LOGS_READ]],
+  // Security and performance advisors are gated identically.
+  get_advisors: [[FGA_PERMISSIONS.PROJECT.ADVISORS_READ]],
+
+  // --- development ---
+  generate_typescript_types: [[FGA_PERMISSIONS.PROJECT.DATABASE_READ]],
+  get_project_url: [[FGA_PERMISSIONS.PROJECT.ADMIN_READ]],
+  get_publishable_keys: [[FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ]],
+
+  // --- functions ---
+  list_edge_functions: [[FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ]],
+  get_edge_function: [[FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ]],
+  deploy_edge_function: [[FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE]],
+
+  // --- storage ---
+  get_storage_config: [[FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ]],
+  update_storage_config: [[FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE]],
+  list_storage_buckets: [[FGA_PERMISSIONS.PROJECT.STORAGE_READ]],
+
+  // --- built by the mcp-server-supabase package on top of the platform primitives above, not its
+  //     own controller assertion ---
+  // Calls getOrganization (ORGANIZATION.ADMIN_READ) + listProjects (USER.PROJECTS_READ) to price a
+  // project, and needs both together.
+  get_cost: [[FGA_PERMISSIONS.ORGANIZATION.ADMIN_READ, FGA_PERMISSIONS.USER.PROJECTS_READ]],
+
+  // Computes a local confirmation hash without calling the platform — no gate.
+  confirm_cost: [[]],
+  // Queries the public content API — no gate.
+  search_docs: [[]],
+}
