@@ -3,6 +3,7 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
+import { LogsAllDeprecationBanner } from '@/components/layouts/AppLayout/LogsAllDeprecationBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerTOSUpdate } from '@/components/ui/BannerStack/Banners/BannerTOSUpdate'
@@ -44,6 +45,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}
+        <LogsAllDeprecationBanner />
       </div>
       {children}
     </div>
