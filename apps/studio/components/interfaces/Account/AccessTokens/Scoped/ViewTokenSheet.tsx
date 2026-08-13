@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { Box, Boxes } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { cn, ScrollArea, Sheet, SheetContent, SheetHeader, ToggleGroup, ToggleGroupItem } from 'ui'
+import { cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -11,6 +11,7 @@ import { useCapabilitySummary } from '../hooks/useCapabilitySummary'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
 import { CapabilitiesSection } from './TokenCapabilities/CapabilitiesSection'
+import { CapabilityLevelToggle } from './TokenCapabilities/CapabilityLevelToggle'
 import { RiskBanner } from './TokenCapabilities/RiskBanner'
 import {
   computeRiskBanner,
@@ -372,19 +373,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm">Capabilities</h3>
                     {capabilityTier === 'dense' && (
-                      <ToggleGroup
-                        type="single"
-                        variant="outline"
-                        size="sm"
-                        value={levelFilter}
-                        onValueChange={(value) => {
-                          if (value) setLevelFilter(value as CapabilityLevelFilter)
-                        }}
-                      >
-                        <ToggleGroupItem value="all">All</ToggleGroupItem>
-                        <ToggleGroupItem value="read">Read</ToggleGroupItem>
-                        <ToggleGroupItem value="readwrite">Read-write</ToggleGroupItem>
-                      </ToggleGroup>
+                      <CapabilityLevelToggle value={levelFilter} onChange={setLevelFilter} />
                     )}
                   </div>
                   <CapabilitiesSection

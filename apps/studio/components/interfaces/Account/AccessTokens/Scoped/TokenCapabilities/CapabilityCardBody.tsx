@@ -31,12 +31,10 @@ export const CapabilityCardBody = ({ endpoints, mcpTools }: CapabilityCardBodyPr
   const hiddenEndpointCount = endpoints.length - visibleEndpoints.length
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mt-4">
       {endpoints.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-            API endpoints
-          </p>
+          <h3 className="text-xs tracking-wide text-foreground-lighter">API endpoints</h3>
           <div className="divide-y">
             {visibleEndpoints.map((endpoint) => (
               <EndpointRow
@@ -62,9 +60,7 @@ export const CapabilityCardBody = ({ endpoints, mcpTools }: CapabilityCardBodyPr
       )}
       {mcpTools.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-            MCP tools
-          </p>
+          <h3 className="text-xs tracking-wide text-foreground-lighter">MCP tools</h3>
           <div className="flex flex-wrap gap-1.5">
             {mcpTools.map((tool) => (
               <Badge key={tool} variant="default">
