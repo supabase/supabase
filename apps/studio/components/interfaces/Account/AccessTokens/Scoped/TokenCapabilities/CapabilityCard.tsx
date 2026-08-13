@@ -5,7 +5,7 @@ import type { EntryAccess } from '../../AccessToken.roles'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import { ExceedsRoleBadge } from '../ExceedsRoleBadge'
 import { CapabilityCardBody } from './CapabilityCardBody'
-import { pluralize } from '@/lib/helpers'
+import { formatCapabilityCounts } from './TokenCapabilities.utils'
 
 interface CapabilityCardProps {
   capability: CapabilitySummaryEntry
@@ -32,8 +32,7 @@ const CapabilityCardHeader = ({
           )}
         </span>
         <span className="text-xs text-foreground-lighter">
-          {endpoints.length} {pluralize(endpoints.length, 'endpoint')} and {mcpTools.length} MCP{' '}
-          {pluralize(mcpTools.length, 'tool')}
+          {formatCapabilityCounts(endpoints.length, mcpTools.length)}
         </span>
       </div>
       <Badge variant={mode === 'readwrite' ? 'warning' : 'default'} className="shrink-0">
