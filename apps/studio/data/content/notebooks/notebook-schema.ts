@@ -16,7 +16,7 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
 const chartConfigSchema = z.object({
   type: z.enum(['bar', 'line']),
   x_column: z.string(),
-  y_column: z.string(),
+  y_columns: z.array(z.string()),
   cumulative: z.boolean(),
   scale: z.enum(['linear', 'log']).default('linear'),
   show_labels: z.boolean(),

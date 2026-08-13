@@ -2,6 +2,7 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'ui'
+import { type Snapshot } from 'valtio'
 
 import {
   ExplorerQuery,
@@ -30,7 +31,7 @@ import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks
 import { type ResponseError } from '@/types'
 
 interface QueryCellProps {
-  cell: DatabaseCellSchema
+  cell: Snapshot<DatabaseCellSchema>
 }
 
 /**

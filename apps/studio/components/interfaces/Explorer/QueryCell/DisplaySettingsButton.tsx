@@ -14,16 +14,19 @@ import {
   ToggleGroupItem,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { type Snapshot } from 'valtio'
 
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 interface DisplaySettingsButtonProps {
-  cell: DatabaseCellSchema
+  cell: Snapshot<DatabaseCellSchema>
   columns: string[]
   disabled: boolean
 }
+
+// [Joshen] TODO support multiple y axis charts
 
 export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettingsButtonProps) => {
   const snap = useNotebooksStateSnapshot()
@@ -34,7 +37,7 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
   const {
     type = 'bar',
     x_column,
-    y_column,
+    y_columns,
     cumulative = false,
     show_labels = false,
     scale = 'linear',
@@ -54,7 +57,7 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
     payload:
       | { type: 'bar' | 'line' }
       | { x_column: string }
-      | { y_column: string }
+      | { y_columns: string[] }
       | { cumulative: boolean }
       | { show_labels: boolean }
       | { scale: 'linear' | 'log' }
@@ -70,7 +73,7 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
         chart: {
           type: c.chart?.type ?? 'bar',
           x_column: c.chart?.x_column ?? '',
-          y_column: c.chart?.y_column ?? '',
+          y_columns: c.chart?.y_columns ?? [],
           cumulative: c.chart?.cumulative ?? false,
           scale: c.chart?.scale ?? 'linear',
           show_labels: c.chart?.show_labels ?? false,
@@ -156,8 +159,8 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
 
               <FormItemLayout isReactForm={false} layout="flex-row-reverse" label="Y Axis">
                 <Select
-                  value={y_column}
-                  onValueChange={(y_column) => onUpdateChartConfig({ y_column })}
+                  value={y_columns?.[0]}
+                  onValueChange={(y_column) => onUpdateChartConfig({ y_columns: [y_column] })}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Select a column" />

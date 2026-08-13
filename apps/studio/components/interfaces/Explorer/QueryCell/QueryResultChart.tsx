@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
+import { type Snapshot } from 'valtio'
 
 import { type QueryResult } from '../types'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
@@ -7,7 +8,7 @@ import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.util
 import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultChartProps {
-  cell: DatabaseCellSchema
+  cell: Snapshot<DatabaseCellSchema>
   result?: QueryResult
 }
 
@@ -22,20 +23,21 @@ const toChartValue = (value: unknown): string | number => {
 
 export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
   const { chart } = cell
-  const { type, x_column, y_column, cumulative, show_labels } = chart ?? {}
+  const { type, x_column, y_columns = [], cumulative, show_labels } = chart ?? {}
 
-  const hasConfig = !!x_column && !!y_column
+  const hasConfig = !!x_column && y_columns.length > 0
   const chartRows = useMemo(() => {
     const xKey = x_column ?? ''
-    const yKey = y_column ?? ''
+    const yKey = y_columns[0] ?? ''
     return (result?.rows ?? []).map((row) => ({
       [xKey]: toChartValue(row[xKey]),
       [yKey]: toChartValue(row[yKey]),
     }))
-  }, [result, x_column, y_column])
+  }, [result, x_column, y_columns])
+
   const cumulativeResults = useMemo(
-    () => getCumulativeResults({ rows: chartRows }, { yKey: y_column ?? '' }),
-    [chartRows, y_column]
+    () => getCumulativeResults({ rows: chartRows }, { yKey: y_columns[0] ?? '' }),
+    [chartRows, y_columns]
   )
   const resultToRender = cumulative ? cumulativeResults : chartRows
 
@@ -70,7 +72,7 @@ export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
               <ChartBar
                 isFullHeight
                 xKey={x_column}
-                dataKey={y_column}
+                dataKey={y_columns[0]}
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}
@@ -80,7 +82,7 @@ export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
               <ChartLine
                 isFullHeight
                 xKey={x_column}
-                dataKey={y_column}
+                dataKey={y_columns[0]}
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}

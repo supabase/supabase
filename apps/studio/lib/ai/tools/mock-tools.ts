@@ -189,7 +189,7 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
           row_limit: 30,
           chart: {
             x_column: 'day',
-            y_column: 'signups',
+            y_columns: ['signups'],
             cumulative: false,
             type: 'line',
             scale: 'log',
