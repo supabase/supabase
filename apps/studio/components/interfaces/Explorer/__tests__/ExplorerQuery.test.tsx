@@ -2,14 +2,14 @@ import { render, screen } from '@testing-library/react'
 import { createRef } from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { ExplorerToolbar, ExplorerToolbarTitle } from '../ExplorerToolbar'
 import {
   ExplorerQuery,
   ExplorerQueryEditor,
   ExplorerQueryFooter,
   ExplorerQueryResults,
   ExplorerQueryViewport,
-} from './index'
+} from '../ExplorerQuery'
+import { ExplorerToolbar, ExplorerToolbarTitle } from '../ExplorerToolbar'
 
 describe('ExplorerQuery', () => {
   it('composes the toolbar, editor, results, and footer without owning their behavior', () => {
