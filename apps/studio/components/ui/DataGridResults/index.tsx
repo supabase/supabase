@@ -20,9 +20,7 @@ import { ResultCell } from './ResultCell'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
 export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
-  const [expandedCell, setExpandedCell] = useState<{ column: string; value: unknown } | null>(
-    null
-  )
+  const [expandedCell, setExpandedCell] = useState<{ column: string; value: unknown } | null>(null)
   const contextMenuCellRef = useRef<{ column: string; value: unknown } | null>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
 
