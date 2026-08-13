@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
+import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 import { Notebooks } from '@/types'
@@ -77,4 +78,23 @@ This is a sample paragraph to demonstrate the Markdown cells
   }
 
   return { createNotebook }
+}
+
+export const useCreateQuery = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const querySnap = useExplorerQueryStateSnapshot()
+
+  const createQuery = () => {
+    if (!project) return console.error('Project is required')
+
+    const id = generateUuid()
+    querySnap.createDraft({ id, projectRef: project.ref })
+
+    router.push(`/project/${project.ref}/explorer/query/${id}`)
+
+    return id
+  }
+
+  return { createQuery }
 }
