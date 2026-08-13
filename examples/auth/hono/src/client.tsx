@@ -1,8 +1,8 @@
+import type { AppType } from '.'
 import { createBrowserClient } from '@supabase/ssr'
 import { hc } from 'hono/client'
 import { useEffect, useState } from 'hono/jsx'
 import { render } from 'hono/jsx/dom'
-import type { AppType } from '.'
 
 const client = hc<AppType>('/')
 
@@ -15,7 +15,9 @@ function App() {
   const [user, setUser] = useState<null | { id: string }>(null)
   // Check client-side if user is logged in:
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth event:', event)
       if (event === 'SIGNED_OUT') {
         setUser(null)
@@ -23,6 +25,8 @@ function App() {
         setUser(session?.user!)
       }
     })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   return (
@@ -32,14 +36,9 @@ function App() {
       {!user ? (
         <SignIn />
       ) : (
-        <button
-          type="button"
-          onClick={() => {
-            window.location.href = '/signout'
-          }}
-        >
-          Sign out!
-        </button>
+        <form method="post" action="/signout">
+          <button type="submit">Sign out!</button>
+        </form>
       )}
       <h2>Example of API fetch()</h2>
       <UserDetailsButton />

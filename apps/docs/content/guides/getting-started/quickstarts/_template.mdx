@@ -89,10 +89,11 @@ sequentially from where its partial leaves off rather than copying numbers from 
      RLS and don't need one.
 
 8. **Start the app** — exact local URL and what the reader should see.
-9. `<$Partial path="quickstart_going_to_production.mdx" />` — every guide gets this,
-   immediately before Next steps. Its wording is deliberately neutral about which
-   tables the guide uses, so it stays true for both the `instruments` guides and
-   the direct-Postgres ones. `flutter.mdx` is the one guide that appends a
+9. **Production requirements** — `<$Partial path="quickstart_going_to_production.mdx" />`,
+   which supplies the `##` heading itself, so don't add one in the host file. Every
+   guide gets this, immediately before Next steps. Its wording is deliberately neutral
+   about which tables the guide uses, so it stays true for both the `instruments`
+   guides and the direct-Postgres ones. `flutter.mdx` is the one guide that appends a
    framework-specific `###` subsection under it, for the Android `INTERNET`
    permission.
 10. **Next steps** — canonical order: framework-specific Auth pointer (or the

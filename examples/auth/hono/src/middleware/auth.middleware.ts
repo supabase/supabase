@@ -30,11 +30,11 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
       supabaseEnv.VITE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
     if (!supabaseUrl) {
-      throw new Error('SUPABASE_URL missing!')
+      throw new Error('VITE_SUPABASE_URL missing!')
     }
 
     if (!supabasePublishableKey) {
-      throw new Error('SUPABASE_PUBLISHABLE_KEY missing!')
+      throw new Error('VITE_SUPABASE_PUBLISHABLE_KEY missing!')
     }
 
     const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {

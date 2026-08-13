@@ -1,7 +1,10 @@
 import { Hono } from 'hono'
+import { csrf } from 'hono/csrf'
+
 import { getSupabase, supabaseMiddleware } from './middleware/auth.middleware'
 
 const app = new Hono()
+app.use('*', csrf())
 app.use('*', supabaseMiddleware())
 
 const routes = app.get('/api/user', async (c) => {
@@ -22,11 +25,11 @@ const routes = app.get('/api/user', async (c) => {
   })
 })
 
-app.get('/signout', async (c) => {
+app.post('/signout', async (c) => {
   const supabase = getSupabase(c)
   await supabase.auth.signOut()
   console.log('Signed out server-side!')
-  return c.redirect('/')
+  return c.redirect('/', 303)
 })
 
 app.get('/instruments', async (c) => {
