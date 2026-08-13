@@ -26,22 +26,20 @@ export const EndpointRow = ({
   const isMutating = method !== 'GET'
 
   return (
-    <tr>
-      <td className="px-3 py-1.5 align-top" style={{ width: methodColumnWidth }}>
+    <div className="flex items-center gap-2 py-1.5" title={path}>
+      <span className="shrink-0" style={{ width: methodColumnWidth }}>
         {isMutating ? (
           <Badge variant="warning">{method}</Badge>
         ) : (
           <span className="font-mono text-xs text-foreground-lighter">{method}</span>
         )}
-      </td>
-      <td className="min-w-0 px-3 py-1.5" title={path}>
-        <div className="flex min-w-0 overflow-hidden whitespace-nowrap font-mono text-xs">
-          {prefix !== '' && (
-            <span className="overflow-hidden text-ellipsis text-foreground-lighter">{prefix}</span>
-          )}
-          <span className="shrink-0 text-foreground">{distinguishing}</span>
-        </div>
-      </td>
-    </tr>
+      </span>
+      <span className="flex min-w-0 overflow-hidden whitespace-nowrap font-mono text-xs">
+        {prefix !== '' && (
+          <span className="overflow-hidden text-ellipsis text-foreground-lighter">{prefix}</span>
+        )}
+        <span className="shrink-0 text-foreground">{distinguishing}</span>
+      </span>
+    </div>
   )
 }
