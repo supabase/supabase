@@ -985,26 +985,29 @@ withTestDatabase(
       table: 'documents',
     })
 
-    // The owner can see everything, so nothing is being hidden from it.
-    expect(zod.parse(await executeQuery(sql))).toEqual([])
+    // The role outlives the test database, so drop it even if an assertion throws.
+    try {
+      // The owner can see everything, so nothing is being hidden from it.
+      expect(zod.parse(await executeQuery(sql))).toEqual([])
 
-    await executeQuery(`set role ${role};`)
+      await executeQuery(`set role ${role};`)
 
-    const inaccessible = zod.parse(await executeQuery(sql))
-    const { sql: listSql, zod: listZod } = pgMeta.columns.list()
-    const listed = listZod
-      .parse(await executeQuery(listSql))
-      .filter(({ table }) => table === 'documents')
+      const inaccessible = zod.parse(await executeQuery(sql))
+      const { sql: listSql, zod: listZod } = pgMeta.columns.list()
+      const listed = listZod
+        .parse(await executeQuery(listSql))
+        .filter(({ table }) => table === 'documents')
 
-    await executeQuery(`
-    reset role;
-    revoke all on public.documents from ${role};
-    revoke usage on schema public from ${role};
-    drop role ${role};
-  `)
-
-    expect(inaccessible.map(({ name }) => name)).toEqual(['secret'])
-    // The two are complements: what `list` drops is exactly what this reports.
-    expect(listed.map(({ name }) => name)).toEqual(['id', 'title'])
+      expect(inaccessible.map(({ name }) => name)).toEqual(['secret'])
+      // The two are complements: what `list` drops is exactly what this reports.
+      expect(listed.map(({ name }) => name)).toEqual(['id', 'title'])
+    } finally {
+      await executeQuery(`
+      reset role;
+      revoke all on public.documents from ${role};
+      revoke usage on schema public from ${role};
+      drop role ${role};
+    `)
+    }
   }
 )
