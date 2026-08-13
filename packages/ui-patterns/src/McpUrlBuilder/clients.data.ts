@@ -225,7 +225,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
   {
     key: 'windsurf',
     label: 'Devin Desktop',
-    icon: 'windsurf',
+    icon: 'devin',
     hasDistinctDarkIcon: true,
     configFile: '~/.config/devin/mcp_config.json',
     externalDocsUrl: '',
