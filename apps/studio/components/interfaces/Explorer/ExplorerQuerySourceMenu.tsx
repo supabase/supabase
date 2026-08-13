@@ -1,5 +1,4 @@
 import { useFlag, useParams } from 'common'
-import dayjs from 'dayjs'
 import { Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -14,6 +13,7 @@ import {
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
+import { customDateRangeToLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { QuerySourceIcon } from '@/components/interfaces/QuerySources/QuerySourceIcon'
 import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
@@ -55,23 +55,13 @@ export const ExplorerQuerySourceMenu = ({
   )
 
   const applyCustomRange = ({ from, to }: { from: Date; to: Date }) => {
-    const fromIso = dayjs(from).startOf('day').toISOString()
-    if (maybeShowUpgradePromptIfNotEntitled(fromIso, entitledToLogDays)) {
+    const time_range = customDateRangeToLogTimeRange({ from, to })
+    if (maybeShowUpgradePromptIfNotEntitled(time_range.start, entitledToLogDays)) {
       setShowUpgradePrompt(true)
       return
     }
 
-    onSourceChange({
-      id: 'logs',
-      type: 'logs',
-      parameters: {
-        time_range: {
-          type: 'absolute',
-          from: fromIso,
-          to: dayjs(to).endOf('day').toISOString(),
-        },
-      },
-    })
+    onSourceChange({ id: 'logs', type: 'logs', parameters: { time_range } })
   }
 
   return (

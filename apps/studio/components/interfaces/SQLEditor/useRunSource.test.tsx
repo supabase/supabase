@@ -37,17 +37,13 @@ describe('useRunSource', () => {
   it('resolves a logs snippet to its session-stored range when one is set', () => {
     const id = 'logs-snippet-custom-range'
     seedSnippet({ id, source: 'logs' })
-    sqlEditorSessionState.setLogRange(id, {
-      type: 'relative',
-      amount: 2,
-      unit: 'hour',
-    })
+    sqlEditorSessionState.setLogRange(id, { _tag: 'relative_time_range', amount: 2, unit: 'hour' })
 
     const { result } = renderSqlEditorHook(() => useRunSource(id))
 
     expect(result.current).toEqual({
       type: 'logs',
-      dateRange: { type: 'relative', amount: 2, unit: 'hour' },
+      dateRange: { _tag: 'relative_time_range', amount: 2, unit: 'hour' },
     })
   })
 })

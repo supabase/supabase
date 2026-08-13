@@ -23,7 +23,7 @@ const renderSubMenu = ({
       <DropdownMenuTrigger>Open</DropdownMenuTrigger>
       <DropdownMenuContent>
         <LogsTimeRangeSubMenu
-          range={{ type: 'relative', amount: 1, unit: 'hour' }}
+          range={{ _tag: 'relative_time_range', amount: 1, unit: 'hour' }}
           onRangeChange={onRangeChange}
           onOpenCustomRange={onOpenCustomRange}
           onShowUpgrade={onShowUpgrade}

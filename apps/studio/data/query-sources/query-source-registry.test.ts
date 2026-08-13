@@ -4,7 +4,6 @@ import {
   cellSourceSchema,
   createDefaultCellSource,
   getQuerySource,
-  logTimeRangeSchema,
   QUERY_SOURCES,
 } from './query-source-registry'
 
@@ -25,7 +24,7 @@ describe('query source registry', () => {
       id: 'logs',
       type: 'logs',
       parameters: {
-        time_range: { type: 'relative', amount: 1, unit: 'hour' },
+        time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
       },
     })
     expect(first.parameters.time_range).not.toBe(second.parameters.time_range)
@@ -49,7 +48,7 @@ describe('query source registry', () => {
       cellSourceSchema.parse({
         id: 'database',
         type: 'database',
-        parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
+        parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
       })
     ).toThrow()
 
@@ -57,60 +56,24 @@ describe('query source registry', () => {
       cellSourceSchema.parse({
         id: 'logs',
         type: 'logs',
-        parameters: { time_range: { type: 'relative', amount: 2, unit: 'week' } },
+        parameters: { time_range: { _tag: 'relative_time_range', amount: 2, unit: 'fortnight' } },
       })
     ).toThrow()
   })
 
-  it('rejects absolute ranges that do not move forward in time', () => {
-    expect(
-      logTimeRangeSchema.safeParse({
-        type: 'absolute',
-        from: '2025-01-01T00:00:00.000Z',
-        to: '2025-01-02T00:00:00.000Z',
-      }).success
-    ).toBe(true)
-
-    const equal = logTimeRangeSchema.safeParse({
-      type: 'absolute',
-      from: '2025-01-01T00:00:00.000Z',
-      to: '2025-01-01T00:00:00.000Z',
-    })
-    expect(equal.success).toBe(false)
-    expect(equal.error?.issues[0].path).toEqual(['to'])
-
-    expect(
-      logTimeRangeSchema.safeParse({
-        type: 'absolute',
-        from: '2025-01-02T00:00:00.000Z',
-        to: '2025-01-01T00:00:00.000Z',
-      }).success
-    ).toBe(false)
-
+  it('refuses a cell source carrying an invalid absolute range', () => {
     expect(() =>
       cellSourceSchema.parse({
         id: 'logs',
         type: 'logs',
         parameters: {
           time_range: {
-            type: 'absolute',
-            from: '2025-01-02T00:00:00.000Z',
-            to: '2025-01-01T00:00:00.000Z',
+            _tag: 'absolute_time_range',
+            start: '2025-01-02T00:00:00.000Z',
+            end: '2025-01-01T00:00:00.000Z',
           },
         },
       })
     ).toThrow()
-  })
-
-  it('reports an invalid endpoint against its own field rather than the ordering rule', () => {
-    const result = logTimeRangeSchema.safeParse({
-      type: 'absolute',
-      from: 'not-a-date',
-      to: '2025-01-01T00:00:00.000Z',
-    })
-
-    expect(result.success).toBe(false)
-    expect(result.error?.issues).toHaveLength(1)
-    expect(result.error?.issues[0].path).toEqual(['from'])
   })
 })

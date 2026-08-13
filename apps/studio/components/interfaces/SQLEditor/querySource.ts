@@ -1,5 +1,6 @@
+import { type TimeRange } from '@/data/content/notebooks/notebook-schema'
 import type { Snippet } from '@/data/content/sql-folders-query'
-import { type LogTimeRange, type QuerySourceId } from '@/data/query-sources/query-source-registry'
+import { type QuerySourceId } from '@/data/query-sources/query-source-registry'
 
 /**
  * Domain view of where a snippet's query runs. Derived from the content TYPE:
@@ -61,4 +62,4 @@ export function resolveSnippetSource(
  * time range (session state, re-resolved at every run); a database run needs
  * nothing beyond the connection the execution pipeline already resolves.
  */
-export type QuerySource = { type: 'database' } | { type: 'logs'; dateRange: LogTimeRange }
+export type QuerySource = { type: 'database' } | { type: 'logs'; dateRange: TimeRange }
