@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getSqlErrorLines } from './UtilityTabResults.utils'
+import { getSqlErrorLines } from '../utils'
 
 describe('getSqlErrorLines', () => {
   it('returns formattedError lines when present', () => {
