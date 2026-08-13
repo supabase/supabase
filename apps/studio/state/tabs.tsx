@@ -19,10 +19,10 @@ import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
-  explorer: ['notebook'],
+  explorer: ['notebook', 'query'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql' | 'notebook'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'query'
 
 type CreateTabIdParams = {
   r: { id: number }
@@ -32,6 +32,7 @@ type CreateTabIdParams = {
   p: { id: number }
   sql: { id: string }
   notebook: { id: string }
+  query: { id: string }
   schema: { schema: string }
   view: never
   function: never
@@ -48,6 +49,7 @@ export interface Tab {
     tableId?: number
     sqlId?: string
     notebookId?: string
+    queryId?: string
     scrollTop?: number
     /**
      * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
@@ -111,6 +113,8 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    notebookId?: string
+    queryId?: string
     sqlSource?: SqlSnippetSource
   }
 }
@@ -391,6 +395,9 @@ export function createTabsState(projectRef: string) {
         case 'notebook':
           router.push(`/project/${router.query.ref}/explorer/notebook/${tab.metadata?.notebookId}`)
           break
+        case 'query':
+          router.push(`/project/${router.query.ref}/explorer/query/${tab.metadata?.queryId}`)
+          break
         case 'r':
         case 'v':
         case 'm':
@@ -525,6 +532,7 @@ export function createTabsState(projectRef: string) {
               router.push(`/project/${router.query.ref}/sql`)
               break
             case 'notebook':
+            case 'query':
               router.push(`/project/${router.query.ref}/explorer`)
               break
             case 'r':
@@ -553,17 +561,18 @@ export function createTabsState(projectRef: string) {
       router,
       onClearDashboardHistory,
     }: {
-      editor: 'sql' | 'table'
+      editor: 'sql' | 'table' | 'explorer'
       router: NextRouter
       onClearDashboardHistory: () => void
     }) => {
-      const tabsToClose =
-        editor === 'table'
-          ? store.openTabs.filter((x) => !x.startsWith('sql'))
-          : store.openTabs.filter((x) => x.startsWith('sql'))
-      store.removeTabs(tabsToClose)
+      const tabsToClose = store.openTabs.filter((id) => {
+        const tab = store.tabsMap[id]
+        return tab !== undefined && editorEntityTypes[editor].includes(tab.type)
+      })
+      store.closeTabs(tabsToClose)
       onClearDashboardHistory()
-      router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+      const editorPath = editor === 'table' ? 'editor' : editor
+      router.push(`/project/${router.query.ref}/${editorPath}`)
     },
     handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: NextRouter) => {
       // Make permanent if needed
@@ -647,7 +656,9 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
     case 'notebook':
-      return `notebook-${(params as CreateTabIdParams['sql']).id}`
+      return `notebook-${(params as CreateTabIdParams['notebook']).id}`
+    case 'query':
+      return `query-${(params as CreateTabIdParams['query']).id}`
     default:
       return ''
   }
