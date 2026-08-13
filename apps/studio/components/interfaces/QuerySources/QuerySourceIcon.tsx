@@ -4,9 +4,12 @@ import type { QuerySourceId } from '@/data/query-sources/query-source-registry'
 
 export const QuerySourceIcon = ({
   source,
-  ...props
+  className,
 }: {
   source: QuerySourceId
   className?: string
-  size?: number
-}) => (source === 'logs' ? <ScrollText {...props} /> : <Database {...props} />)
+}) => {
+  const props = { className, size: 16, strokeWidth: 2 }
+
+  return source === 'logs' ? <ScrollText {...props} /> : <Database {...props} />
+}
