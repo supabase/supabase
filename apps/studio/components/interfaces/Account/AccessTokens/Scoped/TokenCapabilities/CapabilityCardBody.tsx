@@ -1,8 +1,6 @@
-import { useState } from 'react'
 import { Badge } from 'ui'
 
 import { EndpointRow } from './EndpointRow'
-import { MAX_VISIBLE_ENDPOINT_ROWS } from './TokenCapabilities.constants'
 import { getSharedPathPrefix } from './TokenCapabilities.utils'
 import type { EnabledEndpoint } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
@@ -12,8 +10,6 @@ interface CapabilityCardBodyProps {
 }
 
 export const CapabilityCardBody = ({ endpoints, mcpTools }: CapabilityCardBodyProps) => {
-  const [showAllEndpoints, setShowAllEndpoints] = useState(false)
-
   if (endpoints.length === 0 && mcpTools.length === 0) {
     return (
       <p className="text-xs text-foreground-lighter">
@@ -24,11 +20,6 @@ export const CapabilityCardBody = ({ endpoints, mcpTools }: CapabilityCardBodyPr
 
   const sharedPrefix = getSharedPathPrefix(endpoints.map((endpoint) => endpoint.path))
   const methodColumnWidth = `${Math.max(0, ...endpoints.map((endpoint) => endpoint.method.length)) + 2}ch`
-  const visibleEndpoints = endpoints.slice(
-    0,
-    showAllEndpoints ? endpoints.length : MAX_VISIBLE_ENDPOINT_ROWS
-  )
-  const hiddenEndpointCount = endpoints.length - visibleEndpoints.length
 
   return (
     <div className="flex flex-col gap-4 mt-4">
@@ -36,7 +27,7 @@ export const CapabilityCardBody = ({ endpoints, mcpTools }: CapabilityCardBodyPr
         <div className="flex flex-col gap-1.5">
           <h3 className="text-xs tracking-wide text-foreground-lighter">API endpoints</h3>
           <div className="divide-y">
-            {visibleEndpoints.map((endpoint) => (
+            {endpoints.map((endpoint) => (
               <EndpointRow
                 key={endpoint.raw}
                 method={endpoint.method}
@@ -46,16 +37,6 @@ export const CapabilityCardBody = ({ endpoints, mcpTools }: CapabilityCardBodyPr
               />
             ))}
           </div>
-          {hiddenEndpointCount > 0 && (
-            <button
-              type="button"
-              tabIndex={0}
-              onClick={() => setShowAllEndpoints(true)}
-              className="self-start text-xs text-foreground-light hover:text-foreground"
-            >
-              Show all {endpoints.length}
-            </button>
-          )}
         </div>
       )}
       {mcpTools.length > 0 && (
