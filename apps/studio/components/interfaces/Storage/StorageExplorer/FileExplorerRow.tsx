@@ -46,14 +46,13 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
-// Faint skewed-stripe background applied to archived rows/folders so the row
-// reads as "not live" at a glance. Uses a neutral gray at low alpha so it
-// composites cleanly over both light and dark surface backgrounds without a
-// theme-aware token — the same pattern the tree connectors in
-// DeletedFilesList use for its cross-theme greys.
+// Very faint skewed-stripe background applied to archived rows/folders so
+// the row reads as "not live" at a glance without competing with the live
+// rows around it. Uses a neutral gray at low alpha so it composites cleanly
+// over both light and dark surface backgrounds without a theme-aware token.
 const ARCHIVED_STRIPES_STYLE: CSSProperties = {
   backgroundImage:
-    'repeating-linear-gradient(-45deg, rgba(120,120,120,0.09) 0 6px, transparent 6px 12px)',
+    'repeating-linear-gradient(-45deg, rgba(120,120,120,0.05) 0 1px, transparent 1px 7px)',
 }
 
 interface FileExplorerRowProps {
