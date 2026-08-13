@@ -105,6 +105,7 @@ export const QueryEditor = ({
           {toolbarActions}
           {display && onDisplayChange && (
             <DisplaySettingsButton
+              result={result}
               display={display}
               columns={columns}
               disabled={(result?.rows ?? []).length === 0}
