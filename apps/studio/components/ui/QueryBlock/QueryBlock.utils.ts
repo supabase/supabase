@@ -1,5 +1,7 @@
-export const checkHasNonPositiveValues = (data: Record<string, unknown>[], key: string): boolean =>
-  data.some((row) => (row[key] as number) <= 0)
+export const checkHasNonPositiveValues = (
+  data: readonly Record<string, unknown>[],
+  key: string
+): boolean => data.some((row) => (row[key] as number) <= 0)
 
 export const formatYAxisTick = (value: number): string => {
   if (Math.abs(value) >= 1_000_000) {

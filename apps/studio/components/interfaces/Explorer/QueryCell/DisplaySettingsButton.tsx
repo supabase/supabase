@@ -1,4 +1,5 @@
 import { BarChart2, Settings2, Table } from 'lucide-react'
+import { useEffect, useEffectEvent, useMemo } from 'react'
 import {
   Checkbox,
   Popover,
@@ -12,86 +13,90 @@ import {
   SelectValue,
   ToggleGroup,
   ToggleGroupItem,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { type Snapshot } from 'valtio'
 
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
-import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
-import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { type QueryChartConfig, type QueryDisplay, type QueryResult } from '../types'
+import { checkHasNonPositiveValues } from '@/components/ui/QueryBlock/QueryBlock.utils'
 
 interface DisplaySettingsButtonProps {
-  cell: Snapshot<DatabaseCellSchema>
+  display: QueryDisplay
+  result?: QueryResult
   columns: string[]
   disabled: boolean
+  onChange: (display: QueryDisplay) => void
 }
 
 // [Joshen] TODO support multiple y axis charts
 // [Joshen] TODO onUpdateChartConfig can likely be shifted into the notebook-state
 // so this component doesn't need to know about other cells
 
-export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettingsButtonProps) => {
-  const snap = useNotebooksStateSnapshot()
-  const currentNotebook = useCurrentNotebook()
-  const cells = currentNotebook?.notebook.content?.cells ?? []
-
-  const { view, chart } = cell
+export const DisplaySettingsButton = ({
+  display,
+  result,
+  columns,
+  disabled,
+  onChange,
+}: DisplaySettingsButtonProps) => {
+  const { view, chart } = display
   const {
     type = 'bar',
     x_column,
-    y_columns,
+    y_columns = [],
     cumulative = false,
     show_labels = false,
     scale = 'linear',
   } = chart ?? {}
 
+  const hasNonPositiveValues = useMemo(
+    () => checkHasNonPositiveValues(result?.rows ?? [], y_columns[0]),
+    [result, y_columns]
+  )
+
+  const canToggleLogScale = useMemo(() => {
+    if (y_columns.length === 0 || !result || (result.rows ?? []).length === 0) return false
+    return !hasNonPositiveValues
+  }, [hasNonPositiveValues, result, y_columns.length])
+
   const onChangeView = (view: 'table' | 'chart') => {
-    const notebookId = currentNotebook?.notebook.id
-    if (!notebookId) return
-
-    const nextCells = cells.map((c) =>
-      c.id === cell.id && c._tag === 'database_cell' ? { ...c, view } : c
-    )
-    snap.updateCells({ id: notebookId, cells: nextCells })
+    onChange({ ...display, view })
   }
 
-  const onUpdateChartConfig = (
-    payload:
-      | { type: 'bar' | 'line' }
-      | { x_column: string }
-      | { y_columns: string[] }
-      | { cumulative: boolean }
-      | { show_labels: boolean }
-      | { scale: 'linear' | 'log' }
-  ) => {
-    const notebookId = currentNotebook?.notebook.id
-    if (!notebookId) return
-
-    const nextCells = cells.map((c) => {
-      if (c.id !== cell.id || c._tag !== 'database_cell') return c
-
-      return {
-        ...c,
-        chart: {
-          type: c.chart?.type ?? 'bar',
-          x_column: c.chart?.x_column ?? '',
-          y_columns: c.chart?.y_columns ?? [],
-          cumulative: c.chart?.cumulative ?? false,
-          scale: c.chart?.scale ?? 'linear',
-          show_labels: c.chart?.show_labels ?? false,
-          ...payload,
-        },
-      }
+  const onUpdateChartConfig = (payload: Partial<QueryChartConfig>) => {
+    onChange({
+      ...display,
+      chart: {
+        type: chart?.type ?? 'bar',
+        x_column: chart?.x_column ?? '',
+        y_columns: chart?.y_columns ?? [],
+        cumulative: chart?.cumulative ?? false,
+        scale: chart?.scale ?? 'linear',
+        show_labels: chart?.show_labels ?? false,
+        ...payload,
+      },
     })
-    snap.updateCells({ id: notebookId, cells: nextCells })
   }
+
+  const resetToLinearScale = useEffectEvent(() => {
+    onUpdateChartConfig({ scale: 'linear' })
+  })
+
+  useEffect(() => {
+    if (hasNonPositiveValues && scale === 'log') {
+      resetToLinearScale()
+    }
+  }, [hasNonPositiveValues, scale])
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <ExplorerToolbarAction disabled={disabled} icon={<Settings2 />} tooltip="Result settings" />
       </PopoverTrigger>
-      <PopoverContent side="bottom" className="flex flex-col gap-y-3 p-0 py-3">
+      <PopoverContent side="bottom" className="flex flex-col gap-y-3 p-0 py-3 mr-8">
         <div className="flex flex-col gap-y-3 px-3">
           <p className="text-xs tracking-tighter uppercase font-mono text-foreground-lighter">
             Result display settings
@@ -189,7 +194,24 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="linear">Linear</SelectItem>
-                    <SelectItem value="log">Logarithmic</SelectItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SelectItem
+                          disabled={!canToggleLogScale}
+                          value="log"
+                          className={!canToggleLogScale ? '!pointer-events-auto' : undefined}
+                        >
+                          Logarithmic
+                        </SelectItem>
+                      </TooltipTrigger>
+                      {!canToggleLogScale && (
+                        <TooltipContent side="left">
+                          {y_columns.length === 0
+                            ? 'Select a column for the Y axis first'
+                            : 'Data contains zero or negative values'}
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   </SelectContent>
                 </Select>
               </FormItemLayout>

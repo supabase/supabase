@@ -13,7 +13,6 @@ import {
 } from '@dnd-kit/sortable'
 import { useParams } from 'common'
 import { FileText, Notebook, NotebookText, Play, Save, SquareCode } from 'lucide-react'
-import { useEffect, useEffectEvent } from 'react'
 import { AiIconAnimation, Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
@@ -69,19 +68,6 @@ export const NotebookEditor = () => {
 
     snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
-
-  const registerTab = useEffectEvent(() => {
-    if (!id) return
-    tabs.addTab({
-      id: createTabId('notebook', { id }),
-      type: 'notebook',
-      label: name ?? 'New Notebook',
-      metadata: { notebookId: id },
-      isPreview: false,
-    })
-  })
-
-  useEffect(() => registerTab(), [id])
 
   return (
     <div className="flex flex-col h-full bg-surface-100">
