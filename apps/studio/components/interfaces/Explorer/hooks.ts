@@ -7,7 +7,6 @@ import { useProfile } from '@/lib/profile'
 import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
-import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import { Notebooks } from '@/types'
 
 export const useCreateNotebook = () => {
@@ -85,20 +84,13 @@ export const useCreateQuery = () => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const querySnap = useExplorerQueryStateSnapshot()
-  const tabs = useTabsStateSnapshot()
 
   const createQuery = () => {
     if (!project) return console.error('Project is required')
 
     const id = crypto.randomUUID()
     querySnap.createDraft({ id, projectRef: project.ref })
-    tabs.addTab({
-      id: createTabId('query', { id }),
-      type: 'query',
-      label: 'Untitled query',
-      metadata: { queryId: id },
-      isPreview: false,
-    })
+
     router.push(`/project/${project.ref}/explorer/query/${id}`)
 
     return id

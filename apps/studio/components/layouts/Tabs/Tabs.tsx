@@ -177,123 +177,128 @@ export const EditorTabs = ({
         >
           {!isCollapseButtonHidden && <CollapseButton hideTabs={false} />}
 
-          {customTabs}
-
           <TabsList
-            ref={tabsListRef}
             className={cn(
               'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
-              'bg-surface-200 dark:bg-alternative border-none text-clip overflow-x-auto'
+              'bg-surface-200 dark:bg-alternative border-none text-clip'
             )}
           >
-            <SortableContext
-              items={editorTabs.map((tab) => tab.id)}
-              strategy={horizontalListSortingStrategy}
+            {/* Pinned outside the scrollable segment below, so it never scrolls out of view. */}
+            {customTabs}
+
+            <div
+              ref={tabsListRef}
+              className="flex items-center min-w-0 flex-1 h-full overflow-x-auto"
             >
-              {editorTabs.map((tab, index) => (
-                <ContextMenu key={tab.id}>
-                  <ContextMenuTrigger>
-                    <SortableTab
-                      key={tab.id}
-                      tab={tab}
-                      index={index}
-                      openTabs={openTabs}
-                      onClose={() => handleClose(tab.id)}
-                    />
-                  </ContextMenuTrigger>
-                  <ContextMenuContent>
-                    <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
-                    <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
-                      Close Others
-                    </ContextMenuItem>
-                    <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
-                      Close to the Right
-                    </ContextMenuItem>
-                    <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              ))}
-            </SortableContext>
-
-            {/* Non-draggable new tab */}
-            {hasNewTab && (
-              <div className="group/new-tab relative flex h-full items-center">
-                <TabsTrigger
-                  value="new"
-                  onKeyDown={(e) => {
-                    if (e.key !== 'Delete' && e.key !== 'Backspace') return
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleClose('new')
-                  }}
-                  className={cn(
-                    'flex items-center gap-2 px-3 text-xs',
-                    'bg-dash-sidebar/50 dark:bg-surface-100/50',
-                    'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                    'relative group h-full border-t-2 border-b-0!',
-                    'hover:bg-surface-300 dark:hover:bg-surface-100'
-                  )}
-                >
-                  <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
-                  <div className="flex items-center gap-0">
-                    <span>New</span>
-                  </div>
-                  {/* Reserve close-icon width; close is a sibling overlay. */}
-                  <span className="ml-1 inline-flex size-3 shrink-0" aria-hidden />
-                  <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-                </TabsTrigger>
-                <button
-                  type="button"
-                  tabIndex={0}
-                  aria-label="Close new tab"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    handleClose('new')
-                  }}
-                  onMouseDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  onPointerDown={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                  }}
-                  className={cn(
-                    'absolute top-1/2 right-3 z-10 flex -translate-y-1/2 items-center justify-center rounded-xs',
-                    'opacity-0 group-hover/new-tab:opacity-100 group-focus-within/new-tab:opacity-100 focus-visible:opacity-100',
-                    'hover:bg-200 focus-ring',
-                    'cursor-pointer'
-                  )}
-                >
-                  <X size={12} className="text-foreground-light" />
-                </button>
-              </div>
-            )}
-
-            <AnimatePresence initial={false}>
-              {!hasNewTab &&
-                (newTabButton ?? (
-                  <motion.button
-                    className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
-                    onClick={() =>
-                      router.push(
-                        `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-                      )
-                    }
-                    initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                    animate={{ opacity: 1, scale: 1, x: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Plus
-                      size={16}
-                      strokeWidth={1.5}
-                      className="text-foreground-lighter hover:text-foreground-light"
-                    />
-                  </motion.button>
+              <SortableContext
+                items={editorTabs.map((tab) => tab.id)}
+                strategy={horizontalListSortingStrategy}
+              >
+                {editorTabs.map((tab, index) => (
+                  <ContextMenu key={tab.id}>
+                    <ContextMenuTrigger>
+                      <SortableTab
+                        key={tab.id}
+                        tab={tab}
+                        index={index}
+                        openTabs={openTabs}
+                        onClose={() => handleClose(tab.id)}
+                      />
+                    </ContextMenuTrigger>
+                    <ContextMenuContent>
+                      <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
+                      <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
+                        Close Others
+                      </ContextMenuItem>
+                      <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
+                        Close to the Right
+                      </ContextMenuItem>
+                      <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
                 ))}
-            </AnimatePresence>
-            <div className="grow h-full border-b pr-6" />
+              </SortableContext>
+
+              {/* Non-draggable new tab */}
+              {hasNewTab && (
+                <div className="group/new-tab relative flex h-full items-center">
+                  <TabsTrigger
+                    value="new"
+                    onKeyDown={(e) => {
+                      if (e.key !== 'Delete' && e.key !== 'Backspace') return
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleClose('new')
+                    }}
+                    className={cn(
+                      'flex items-center gap-2 px-3 text-xs',
+                      'bg-dash-sidebar/50 dark:bg-surface-100/50',
+                      'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+                      'relative group h-full border-t-2 border-b-0!',
+                      'hover:bg-surface-300 dark:hover:bg-surface-100'
+                    )}
+                  >
+                    <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+                    <div className="flex items-center gap-0">
+                      <span>New</span>
+                    </div>
+                    {/* Reserve close-icon width; close is a sibling overlay. */}
+                    <span className="ml-1 inline-flex size-3 shrink-0" aria-hidden />
+                    <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+                  </TabsTrigger>
+                  <button
+                    type="button"
+                    tabIndex={0}
+                    aria-label="Close new tab"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      handleClose('new')
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    onPointerDown={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                    }}
+                    className={cn(
+                      'absolute top-1/2 right-3 z-10 flex -translate-y-1/2 items-center justify-center rounded-xs',
+                      'opacity-0 group-hover/new-tab:opacity-100 group-focus-within/new-tab:opacity-100 focus-visible:opacity-100',
+                      'hover:bg-200 focus-ring',
+                      'cursor-pointer'
+                    )}
+                  >
+                    <X size={12} className="text-foreground-light" />
+                  </button>
+                </div>
+              )}
+
+              <AnimatePresence initial={false}>
+                {!hasNewTab &&
+                  (newTabButton ?? (
+                    <motion.button
+                      className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
+                      onClick={() =>
+                        router.push(
+                          `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
+                        )
+                      }
+                      initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Plus
+                        size={16}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter hover:text-foreground-light"
+                      />
+                    </motion.button>
+                  ))}
+              </AnimatePresence>
+              <div className="grow h-full border-b pr-6" />
+            </div>
           </TabsList>
         </Tabs>
 

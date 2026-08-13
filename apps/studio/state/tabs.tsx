@@ -22,7 +22,19 @@ export const editorEntityTypes = {
   explorer: ['notebook', 'query'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'query'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'query' | 'explorer-home'
+
+/** Fixed id for Explorer's pinned, non-closable Home tab. */
+export const EXPLORER_HOME_TAB_ID = 'explorer-home'
+
+/** Tab descriptor for Explorer's Home tab — shared by its trigger and its page. */
+export const EXPLORER_HOME_TAB: Tab = {
+  id: EXPLORER_HOME_TAB_ID,
+  type: 'explorer-home',
+  label: 'Home',
+  isPreview: false,
+  closable: false,
+}
 
 type CreateTabIdParams = {
   r: { id: number }
@@ -37,6 +49,7 @@ type CreateTabIdParams = {
   view: never
   function: never
   new: never
+  'explorer-home': never
 }
 
 export interface Tab {
@@ -61,6 +74,12 @@ export interface Tab {
     sqlSource?: SqlSnippetSource
   }
   isPreview?: boolean
+  /**
+   * Whether the tab can be closed by the user (close button, keyboard shortcut,
+   * or a bulk close action). Defaults to `true` — absent on every tab except a
+   * pinned default (e.g. Explorer's Home tab), which sets this `false`.
+   */
+  closable?: boolean
   createdAt?: Date
   updatedAt?: Date
 }
@@ -288,6 +307,23 @@ export function createTabsState(projectRef: string) {
       store.previewTabId = tab.id
       store.activeTab = tab.id
     },
+    // Ensures a tab that's always present, first, and outside the draggable/
+    // closable set (e.g. Explorer's Home tab) exists in the store, without
+    // touching which tab is active. Safe to call from wherever the pinned
+    // tab's trigger renders, regardless of which page currently owns focus.
+    ensurePinnedTab: (tab: Tab) => {
+      if (store.tabsMap[tab.id]) return
+      store.tabsMap[tab.id] = tab
+      store.openTabs = [tab.id, ...store.openTabs]
+    },
+    // Ensures a pinned tab exists (see ensurePinnedTab) and marks it active,
+    // without recording it in Recent Items — it isn't content to revisit,
+    // just a fixed destination. Call this from the page it represents, on
+    // mount, mirroring how regular tabs call addTab from their own page.
+    activatePinnedTab: (tab: Tab) => {
+      store.ensurePinnedTab(tab)
+      store.activeTab = tab.id
+    },
     updateTab: (
       id: string,
       updates: { label?: string; scrollTop?: number; sqlSource?: SqlSnippetSource }
@@ -323,6 +359,8 @@ export function createTabsState(projectRef: string) {
     // this is used for removing tabs from the localstorage state
     // for handling a manual tab removal with a close action, use handleTabClose()
     removeTab: (id: string) => {
+      if (store.tabsMap[id]?.closable === false) return
+
       const idx = store.openTabs.indexOf(id)
       store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
       delete store.tabsMap[id]
@@ -398,6 +436,9 @@ export function createTabsState(projectRef: string) {
         case 'query':
           router.push(`/project/${router.query.ref}/explorer/query/${tab.metadata?.queryId}`)
           break
+        case 'explorer-home':
+          router.push(`/project/${router.query.ref}/explorer`)
+          break
         case 'r':
         case 'v':
         case 'm':
@@ -469,8 +510,8 @@ export function createTabsState(projectRef: string) {
     closeTabs: (ids: string[]) => {
       const closedTabs = ids
         .map((id) => store.tabsMap[id])
-        .filter((tab): tab is Tab => tab !== undefined)
-      store.removeTabs(ids)
+        .filter((tab): tab is Tab => tab !== undefined && tab.closable !== false)
+      store.removeTabs(closedTabs.map((tab) => tab.id))
       closedTabs.forEach((tab) => tabHandlers.get(tab.type)?.onClose?.(tab))
     },
 
