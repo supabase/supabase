@@ -13,8 +13,8 @@ import {
 } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import {
-  createDefaultCellSource,
-  type CellSource,
+  createDefaultSourceBinding,
+  type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
@@ -41,8 +41,8 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const rowLimit = 'row_limit' in cell ? cell.row_limit : undefined
   const source =
     cell._tag === 'database_cell'
-      ? createDefaultCellSource('database')
-      : createDefaultCellSource('logs')
+      ? createDefaultSourceBinding('database')
+      : createDefaultSourceBinding('logs')
 
   const [sql, setSql] = useState<string>(unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
@@ -53,7 +53,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
     chart: chart ? { ...chart, y_columns: [...chart.y_columns] } : undefined,
   }
 
-  const handleSourceChange = (source: CellSource) => {
+  const handleSourceChange = (source: QuerySourceBinding) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
@@ -61,7 +61,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
       id: notebookId,
       cellId: id,
       updater: (candidate) => {
-        if (source.type === 'database' && candidate._tag === 'log_cell') {
+        if (source._tag === 'database' && candidate._tag === 'log_cell') {
           const { _tag, time_range, unchecked_sql, ...rest } = candidate
           return {
             ...rest,
@@ -71,7 +71,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
           }
         }
 
-        if (source.type === 'logs' && candidate._tag === 'database_cell') {
+        if (source._tag === 'logs' && candidate._tag === 'database_cell') {
           const { _tag, row_limit, unchecked_sql, ...rest } = candidate
           return {
             ...rest,
