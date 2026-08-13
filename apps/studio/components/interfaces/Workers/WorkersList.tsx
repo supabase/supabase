@@ -1,10 +1,11 @@
-import { MoreVertical, Pause, Play, Plus, Trash2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, MoreVertical, Pause, Play, Plus, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Badge,
   Button,
   Card,
+  CardFooter,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -50,11 +51,14 @@ const ACCESS_FILTERS: { value: WorkerAccess | 'all'; label: string }[] = [
   { value: 'private', label: 'Private' },
 ]
 
+const PAGE_SIZE = 10
+
 export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [stateFilter, setStateFilter] = useState<WorkerState | 'all'>('all')
   const [accessFilter, setAccessFilter] = useState<WorkerAccess | 'all'>('all')
+  const [page, setPage] = useState(1)
 
   const filtered = workers.filter((worker) => {
     const matchesSearch = worker.name.toLowerCase().includes(search.trim().toLowerCase())
@@ -62,6 +66,15 @@ export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps)
     const matchesAccess = accessFilter === 'all' || worker.access === accessFilter
     return matchesSearch && matchesState && matchesAccess
   })
+
+  // Derive the page window; clamp so deletions/filters never strand us on an empty page.
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const startIndex = (currentPage - 1) * PAGE_SIZE
+  const paged = filtered.slice(startIndex, startIndex + PAGE_SIZE)
+
+  // Reset to the first page whenever the filters change the result set.
+  const resetToFirstPage = () => setPage(1)
 
   const openWorker = (name: string) => router.push(`/project/${projectRef}/workers/${name}`)
 
@@ -73,11 +86,17 @@ export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps)
           className="w-full md:w-64"
           placeholder="Search by name"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            resetToFirstPage()
+          }}
         />
         <Select
           value={stateFilter}
-          onValueChange={(value) => setStateFilter(value as WorkerState | 'all')}
+          onValueChange={(value) => {
+            setStateFilter(value as WorkerState | 'all')
+            resetToFirstPage()
+          }}
         >
           <SelectTrigger size="small" className="w-full md:w-40">
             <SelectValue />
@@ -92,7 +111,10 @@ export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps)
         </Select>
         <Select
           value={accessFilter}
-          onValueChange={(value) => setAccessFilter(value as WorkerAccess | 'all')}
+          onValueChange={(value) => {
+            setAccessFilter(value as WorkerAccess | 'all')
+            resetToFirstPage()
+          }}
         >
           <SelectTrigger size="small" className="w-full md:w-40">
             <SelectValue />
@@ -137,7 +159,7 @@ export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps)
                 </TableCell>
               </TableRow>
             )}
-            {filtered.map((worker) => {
+            {paged.map((worker) => {
               const isActive = worker.state === 'active'
               const isSuspended = worker.state === 'suspended'
               return (
@@ -228,6 +250,36 @@ export const WorkersList = ({ projectRef, workers, onCreate }: WorkersListProps)
             })}
           </TableBody>
         </Table>
+
+        {filtered.length > 0 && (
+          <CardFooter className="flex items-center justify-between border-t p-4">
+            <p className="text-sm text-foreground-muted">
+              Showing {startIndex + 1} to {startIndex + paged.length} of {filtered.length} worker
+              {filtered.length === 1 ? '' : 's'}
+            </p>
+            <div className="flex items-center gap-x-2" aria-label="Pagination">
+              <Button
+                icon={<ChevronLeft />}
+                aria-label="Previous page"
+                variant="default"
+                size="tiny"
+                disabled={currentPage === 1}
+                onClick={() => setPage(currentPage - 1)}
+              />
+              <span className="text-sm text-foreground-light tabular-nums">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                icon={<ChevronRight />}
+                aria-label="Next page"
+                variant="default"
+                size="tiny"
+                disabled={currentPage >= totalPages}
+                onClick={() => setPage(currentPage + 1)}
+              />
+            </div>
+          </CardFooter>
+        )}
       </Card>
     </div>
   )
