@@ -20,6 +20,11 @@ export type DatabaseSource = {
   type: 'database'
   endpoint: '/platform/pg-meta/{ref}/query'
   parameters: {
+    /**
+     * Query-owned database selection. The SQL editor still adapts its legacy
+     * global/local-storage selector into this shape; new consumers persist the
+     * identifier directly with their query.
+     */
     identifier?: string
   }
 }
@@ -63,7 +68,7 @@ export const QUERY_SOURCE_REGISTRY = {
 
 export type QuerySourceId = keyof typeof QUERY_SOURCE_REGISTRY
 
-export const QUERY_SOURCES = Object.values(QUERY_SOURCE_REGISTRY) as Source[]
+export const QUERY_SOURCES = Object.values(QUERY_SOURCE_REGISTRY) satisfies Source[]
 
 export const QUERY_SOURCE_LABELS: Record<QuerySourceId, string> = {
   database: 'Database',

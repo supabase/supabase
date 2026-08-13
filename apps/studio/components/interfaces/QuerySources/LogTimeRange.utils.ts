@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 
+import { generateDynamicHelper } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import type { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import type { ResolvedLogDateRange } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import {
@@ -44,15 +45,34 @@ export function datePickerValueToLogTimeRange(value: DatePickerValue): LogTimeRa
 
 export function logTimeRangeToDatePickerValue(range: LogTimeRange): DatePickerValue {
   if (range.type === 'relative') {
-    const text = `Last ${range.amount} ${range.unit}${range.amount === 1 ? '' : 's'}`
+    const helper = generateDynamicHelper(range.amount, range.unit)
     return {
-      from: dayjs().subtract(range.amount, range.unit).toISOString(),
-      to: dayjs().toISOString(),
+      from: helper.calcFrom(),
+      to: helper.calcTo(),
       isHelper: true,
-      text,
+      text: helper.text,
     }
   }
   return { from: range.from, to: range.to, isHelper: false }
+}
+
+export function customDateRangeToLogTimeRange({
+  from,
+  to,
+  now = new Date(),
+}: {
+  from: Date
+  to: Date
+  now?: Date
+}): Extract<LogTimeRange, { type: 'absolute' }> {
+  const nowValue = dayjs(now)
+  const requestedTo = dayjs(to).endOf('day')
+
+  return {
+    type: 'absolute',
+    from: dayjs(from).startOf('day').toISOString(),
+    to: requestedTo.isAfter(nowValue) ? nowValue.toISOString() : requestedTo.toISOString(),
+  }
 }
 
 export function logTimeRangesEqual(a: LogTimeRange, b: LogTimeRange): boolean {

@@ -35,7 +35,7 @@ export const sqlEditorSessionState = proxy({
    * The logs time range for a logs snippet, keyed by snippet id. Session state —
    * never written to snippet content — so it works on read-only shared snippets
    * and resets on reload. An unset snippet has no entry; read sites fall back to
-   * `DEFAULT_LOG_DATE_RANGE`.
+   * `DEFAULT_LOG_TIME_RANGE`.
    */
   logRange: {} as { [snippetId: string]: LogTimeRange },
 

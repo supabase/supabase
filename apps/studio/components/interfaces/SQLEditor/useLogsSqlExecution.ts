@@ -1,10 +1,13 @@
 import { useFlag, useParams } from 'common'
 import { useCallback } from 'react'
 
-import { DEFAULT_LOG_DATE_RANGE, resolveLogRunRange } from './querySource'
+import { resolveLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import { type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
-import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
+import {
+  DEFAULT_LOG_TIME_RANGE,
+  QUERY_SOURCE_REGISTRY,
+} from '@/data/query-sources/query-source-registry'
 import { useTrack } from '@/lib/telemetry/track'
 import {
   getSqlEditorSessionSnapshot,
@@ -46,8 +49,8 @@ export function useLogsSqlExecution({ id }: UseLogsSqlExecutionArgs) {
 
       // Re-read imperatively so a range picked immediately before the run is
       // honored; relative ranges re-resolve against `now` here.
-      const range = resolveLogRunRange(
-        getSqlEditorSessionSnapshot().logRange[id] ?? DEFAULT_LOG_DATE_RANGE
+      const range = resolveLogTimeRange(
+        getSqlEditorSessionSnapshot().logRange[id] ?? DEFAULT_LOG_TIME_RANGE
       )
 
       mutate({ projectRef, sql, range, endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint })

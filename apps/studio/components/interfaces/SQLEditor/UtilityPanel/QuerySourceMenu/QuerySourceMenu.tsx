@@ -1,8 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import dayjs from 'dayjs'
 import { Check, ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -12,11 +10,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import {
-  datePickerValueToLogDateRange,
-  type QuerySource,
-  type SqlSnippetSource,
-} from '../../querySource'
+import { type QuerySource, type SqlSnippetSource } from '../../querySource'
 import { resolveSourceSwitch } from './QuerySourceMenu.utils'
 import { RowLimitSubMenu } from './RowLimitSubMenu'
 import { RunAsSubMenu } from './RunAsSubMenu'
@@ -24,10 +18,9 @@ import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
 import { QuerySourceIcon } from '@/components/interfaces/QuerySources/QuerySourceIcon'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { useLogsCustomRange } from '@/components/interfaces/QuerySources/useLogsCustomRange'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { QUERY_SOURCE_LABELS, QUERY_SOURCES } from '@/data/query-sources/query-source-registry'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
@@ -69,11 +62,13 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
     ''
   )
 
-  const [isCustomRangeOpen, setIsCustomRangeOpen] = useState(false)
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-
-  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
-  const entitledToLogDays = getEntitlementNumericValue()
+  const {
+    isCustomRangeOpen,
+    setIsCustomRangeOpen,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleApplyCustomRange,
+  } = useLogsCustomRange({ onRangeChange: (range) => sessionSnap.setLogRange(id, range) })
 
   const currentSource = runSource.type
   const isLogs = currentSource === 'logs'
@@ -93,22 +88,6 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
     const next = resolveSourceSwitch({ ref, target, currentSource, isBlankNewTab })
     if (next === null) return
     router[next.method](next.url)
-  }
-
-  const applyCustomRange = ({ from, to }: { from: Date; to: Date }) => {
-    const fromIso = dayjs(from).startOf('day').toISOString()
-    if (maybeShowUpgradePromptIfNotEntitled(fromIso, entitledToLogDays)) {
-      setShowUpgradePrompt(true)
-      return
-    }
-    sessionSnap.setLogRange(
-      id,
-      datePickerValueToLogDateRange({
-        from: fromIso,
-        to: dayjs(to).endOf('day').toISOString(),
-        isHelper: false,
-      })
-    )
   }
 
   const updateDatabaseIdentifier = (identifier: string) => {
@@ -177,7 +156,7 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
           <LogsCustomRangeDialog
             open={isCustomRangeOpen}
             onOpenChange={setIsCustomRangeOpen}
-            onApply={applyCustomRange}
+            onApply={handleApplyCustomRange}
           />
           <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
         </>

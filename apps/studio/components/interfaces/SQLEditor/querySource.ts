@@ -1,15 +1,5 @@
-import {
-  datePickerValueToLogTimeRange,
-  logTimeRangesEqual,
-  logTimeRangeToDatePickerValue,
-  resolveLogTimeRange,
-} from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import type { Snippet } from '@/data/content/sql-folders-query'
-import {
-  DEFAULT_LOG_TIME_RANGE,
-  type LogTimeRange,
-  type QuerySourceId,
-} from '@/data/query-sources/query-source-registry'
+import { type LogTimeRange, type QuerySourceId } from '@/data/query-sources/query-source-registry'
 
 /**
  * Domain view of where a snippet's query runs. Derived from the content TYPE:
@@ -66,27 +56,9 @@ export function resolveSnippetSource(
 }
 
 /**
- * A log query's time range. Relative ranges are structural (amount + unit) and
- * re-resolve against `now` at every run — so a saved "last hour" always means the
- * hour before the run, not the hour before the snippet was opened. Absolute ranges
- * carry validated ISO datetimes and pass through unchanged.
- */
-export type LogDateRange = LogTimeRange
-
-/** The range a freshly opened logs snippet starts with: the last hour. */
-export const DEFAULT_LOG_DATE_RANGE: LogDateRange = DEFAULT_LOG_TIME_RANGE
-
-/**
  * The runtime query source for a snippet, pairing the database/logs discriminant
  * with the extra state each backend needs to run. A logs run carries the active
  * time range (session state, re-resolved at every run); a database run needs
  * nothing beyond the connection the execution pipeline already resolves.
  */
-export type QuerySource = { type: 'database' } | { type: 'logs'; dateRange: LogDateRange }
-
-// Compatibility exports for the SQL editor while source-neutral consumers adopt
-// the canonical names from QuerySources.
-export const datePickerValueToLogDateRange = datePickerValueToLogTimeRange
-export const logDateRangeToDatePickerValue = logTimeRangeToDatePickerValue
-export const logDateRangesEqual = logTimeRangesEqual
-export const resolveLogRunRange = resolveLogTimeRange
+export type QuerySource = { type: 'database' } | { type: 'logs'; dateRange: LogTimeRange }
