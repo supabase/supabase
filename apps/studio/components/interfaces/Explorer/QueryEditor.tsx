@@ -77,7 +77,7 @@ export const QueryEditor = ({
   const handleRunQuery = (sqlToRun: string = sql) => {
     if (!project || isLoadingProject || isExecuting || sqlToRun.trim().length === 0) return
 
-    onSqlCommit?.(sqlToRun)
+    onSqlCommit?.(sql)
 
     const safeSql = acceptUntrustedSql(untrustedSql(sqlToRun))
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
