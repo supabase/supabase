@@ -119,14 +119,14 @@ const data: () => {
         logo: (
           <>
             <Image
-              src="/images/customers/logos/juniver.png"
+              src="/images/customers/logos/on-light/juniver.png"
               alt="Juniver"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/juniver.png"
+              src="/images/customers/logos/on-dark/juniver.png"
               alt="Juniver"
               width={128}
               height={48}
@@ -261,7 +261,7 @@ const data: () => {
       customers: [
         {
           name: 'Juniver',
-          logo: '/images/customers/logos/juniver.png',
+          logo: '/images/customers/logos/on-light/juniver.png',
           highlights: [
             'Automated B2B workflows with Edge Functions and RLS',
             'Improved developer experience and performance',

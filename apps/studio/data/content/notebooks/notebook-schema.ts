@@ -14,9 +14,12 @@ const isoDateTimeSchema = z.string().transform((raw, ctx) => {
 })
 
 const chartConfigSchema = z.object({
+  type: z.enum(['bar', 'line']),
   x_column: z.string(),
-  y_column: z.string(),
+  y_columns: z.array(z.string()),
   cumulative: z.boolean(),
+  scale: z.enum(['linear', 'log']).default('linear'),
+  show_labels: z.boolean(),
 })
 
 const absoluteTimeRangeSchema = z.object({
@@ -45,14 +48,17 @@ const markdownCellSchema = z.object({
 const databaseCellSchema = z.object({
   _tag: z.literal('database_cell'),
   id: z.string(),
+  title: z.string().optional(),
   sql: z.string(),
   row_limit: z.number(),
+  view: z.enum(['table', 'chart']).default('table').optional(),
   chart: chartConfigSchema.optional(),
 })
 
 const logCellSchema = z.object({
   _tag: z.literal('log_cell'),
   id: z.string(),
+  title: z.string().optional(),
   sql: z.string(),
   time_range: timeRangeSchema,
   chart: chartConfigSchema.optional(),
