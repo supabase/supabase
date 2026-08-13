@@ -122,6 +122,30 @@ export const notebooksState = proxy({
   },
 
   /**
+   * Update a single cell in a notebook's cell array via an updater callback.
+   * The caller decides how the cell's content should change (e.g. field
+   * defaults, tag conversion) since that's a UI concern, not a state one —
+   * this only finds the cell by id and re-saves the array.
+   */
+  updateCell: ({
+    id,
+    cellId,
+    updater,
+  }: {
+    id: string
+    cellId: string
+    updater: (cell: Notebooks.Cell) => Notebooks.Cell
+  }) => {
+    const stateNotebook = notebooksState.notebooks[id]
+    if (!stateNotebook?.notebook.content) return
+
+    const nextCells = stateNotebook.notebook.content.cells.map((cell) =>
+      cell.id === cellId ? updater(cell) : cell
+    )
+    notebooksState.updateCells({ id, cells: nextCells })
+  },
+
+  /**
    * Remove a single cell from a notebook's cell array.
    */
   removeCell: ({ id, cellId }: { id: string; cellId: string }) => {
