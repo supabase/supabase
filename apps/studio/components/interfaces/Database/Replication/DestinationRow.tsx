@@ -151,7 +151,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
         <TableRow>
           <TableCell>
             <DestinationIcon
-              type={type ?? 'Read Replica'}
+              type={type ?? 'BigQuery'}
               size={18}
               className="text-foreground-light"
             />
