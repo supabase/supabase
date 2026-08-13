@@ -1,5 +1,9 @@
-import React from 'react'
+import { Edit } from 'lucide-react'
+import React, { useState } from 'react'
 import { Button, cn } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export type ExplorerToolbarProps = React.ComponentProps<'div'>
 
@@ -15,7 +19,7 @@ const ExplorerToolbar = ({ className, role = 'toolbar', ...props }: ExplorerTool
     data-slot="explorer-toolbar"
     role={role}
     className={cn(
-      'flex h-10 w-full shrink-0 items-center gap-2 border-b bg-transparent px-3 md:min-h-[var(--header-height,2.5rem)]',
+      'flex h-10 w-full shrink-0 items-center gap-2 border-b bg-transparent px-3',
       className
     )}
     {...props}
@@ -40,16 +44,74 @@ const ExplorerToolbarIcon = ({
 )
 ExplorerToolbarIcon.displayName = 'ExplorerToolbarIcon'
 
-export type ExplorerToolbarTitleProps = React.ComponentProps<'div'>
+export type ExplorerToolbarTitleProps = Omit<React.ComponentProps<'div'>, 'children'> & {
+  children: string
+  onSaveTitle?: (value: string) => void
+}
 
 /** Flexible title region for static text or an editable resource name. */
-const ExplorerToolbarTitle = ({ className, ...props }: ExplorerToolbarTitleProps) => (
-  <div
-    data-slot="explorer-toolbar-title"
-    className={cn('min-w-0 flex-1 truncate text-sm', className)}
-    {...props}
-  />
-)
+const ExplorerToolbarTitle = ({
+  children: title,
+  className,
+  onSaveTitle,
+  ...props
+}: ExplorerToolbarTitleProps) => {
+  const [isEditingTitle, setIsEditingTitle] = useState(false)
+  const [value, setValue] = useState(title)
+
+  const handleStartEditing = () => {
+    setValue(title)
+    setIsEditingTitle(true)
+  }
+
+  return (
+    <div
+      data-slot="explorer-toolbar-title"
+      className={cn('min-w-0 flex-1 truncate text-sm', className)}
+      {...props}
+    >
+      {isEditingTitle ? (
+        <Input
+          autoFocus
+          size="tiny"
+          containerClassName="max-w-64 has-[[data-slot=input-group-control]:focus-visible]:ring-0"
+          className="outline-none"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onBlur={() => {
+            if (isEditingTitle) {
+              setIsEditingTitle(false)
+              onSaveTitle?.(value)
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsEditingTitle(false)
+            } else if (e.key === 'Enter') {
+              e.preventDefault()
+              e.stopPropagation()
+              setIsEditingTitle(false)
+              onSaveTitle?.(value)
+            }
+          }}
+        />
+      ) : onSaveTitle ? (
+        <Button
+          variant="text"
+          className="group/title"
+          onClick={handleStartEditing}
+          iconRight={<Edit className="opacity-0 group-hover/title:opacity-100 transition" />}
+        >
+          {title}
+        </Button>
+      ) : (
+        title
+      )}
+    </div>
+  )
+}
 ExplorerToolbarTitle.displayName = 'ExplorerToolbarTitle'
 
 export type ExplorerToolbarActionsProps = React.ComponentProps<'div'>
@@ -70,7 +132,9 @@ ExplorerToolbarActions.displayName = 'ExplorerToolbarActions'
 export type ExplorerToolbarActionProps = Omit<
   React.ComponentPropsWithRef<typeof Button>,
   'size' | 'variant'
->
+> & {
+  tooltip?: string
+}
 
 /**
  * The standard tiny, text-style button used for a direct toolbar action.
@@ -80,18 +144,20 @@ const ExplorerToolbarAction = ({
   children,
   className,
   ref,
+  tooltip,
   ...props
 }: ExplorerToolbarActionProps) => (
-  <Button
+  <ButtonTooltip
     ref={ref}
     data-slot="explorer-toolbar-action"
     variant="text"
     size="tiny"
     className={cn(children == null && 'w-7 px-0', className)}
+    tooltip={{ content: { side: 'bottom', text: tooltip } }}
     {...props}
   >
     {children}
-  </Button>
+  </ButtonTooltip>
 )
 ExplorerToolbarAction.displayName = 'ExplorerToolbarAction'
 
