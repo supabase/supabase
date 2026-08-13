@@ -1,5 +1,6 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PGTable } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
@@ -15,6 +16,7 @@ import {
   SelectValue,
   SidePanel,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
@@ -32,6 +34,7 @@ import {
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import InformationBox from '@/components/ui/InformationBox'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { tableInaccessibleColumnsQueryOptions } from '@/data/tables/table-inaccessible-columns-query'
 import { useTableQuery } from '@/data/tables/table-retrieve-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
@@ -114,6 +117,21 @@ export const ForeignKeySelector = ({
       enabled: !!project?.ref && !!fk.schema && !!fk.table,
     }
   )
+
+  // Columns the connected role has no privilege on never reach `selectedTable`, so the
+  // referenced-column list can come up short with nothing to explain the gap.
+  const { data: inaccessibleColumns = [] } = useQuery(
+    tableInaccessibleColumnsQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: fk.schema,
+      name: fk.table,
+    })
+  )
+
+  const hasInaccessibleColumns = inaccessibleColumns.length > 0
+  const isSingleInaccessibleColumn = inaccessibleColumns.length === 1
+  const inaccessibleColumnNames = inaccessibleColumns.map((x) => x.name).join(', ')
 
   const disableApply = isLoadingSelectedTable || selectedTable === undefined || hasTypeErrors
 
@@ -488,6 +506,13 @@ export const ForeignKeySelector = ({
                         Add another column
                       </Button>
                       {errors.columns && <p className="text-red-900 text-sm">{errors.columns}</p>}
+                      {hasInaccessibleColumns && (
+                        <Admonition
+                          type="default"
+                          title="Some columns are not listed"
+                          description={`${inaccessibleColumnNames} ${isSingleInaccessibleColumn ? 'is' : 'are'} missing above because your database role has no privileges on ${isSingleInaccessibleColumn ? 'it' : 'them'}. Grant REFERENCES on ${fk.schema}.${fk.table} to reference ${isSingleInaccessibleColumn ? 'it' : 'them'} here.`}
+                        />
+                      )}
                       {hasTypeErrors && (
                         <Alert variant="warning">
                           <AlertTitle>Column types do not match</AlertTitle>

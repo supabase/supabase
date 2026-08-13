@@ -16,4 +16,6 @@ export const tableKeys = {
   ) => [...tableKeys.infiniteListPrefix(projectRef, schema), options],
   retrieve: (projectRef: string | undefined, name: string, schema: string) =>
     ['projects', projectRef, 'table', schema, name].filter(Boolean),
+  inaccessibleColumns: (projectRef: string | undefined, name: string, schema: string) =>
+    ['projects', projectRef, 'table', schema, name, 'inaccessible-columns'].filter(Boolean),
 }

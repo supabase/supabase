@@ -1,4 +1,19 @@
-import { safeSql, type SafeSqlFragment } from '../pg-format'
+import { literal, safeSql, type SafeSqlFragment } from '../pg-format'
+
+// The privilege gate that decides whether a column is visible to the connected role.
+// A column the role can neither read, write, nor reference -- and whose owner role it
+// is not a member of -- is dropped from the result entirely rather than flagged, so a
+// caller sees a short column list with no indication that anything is missing.
+// `getInaccessibleColumnsSql` below answers "what did that drop?", and shares this
+// fragment so the two can't drift apart.
+const COLUMN_VISIBILITY_PREDICATE = safeSql`(
+    pg_has_role(c.relowner, 'USAGE')
+    OR has_column_privilege(
+      c.oid,
+      a.attnum,
+      'SELECT, INSERT, UPDATE, REFERENCES'
+    )
+  )`
 
 // Columns of the underlying pg_class scan that callers are allowed to filter
 // on. The map owns the actual aliased reference (`c.oid` etc.), so callers
@@ -128,16 +143,44 @@ WHERE
   AND a.attnum > 0
   AND NOT a.attisdropped
   AND (c.relkind IN ('r', 'v', 'm', 'f', 'p'))
-  AND (
-    pg_has_role(c.relowner, 'USAGE')
-    OR has_column_privilege(
-      c.oid,
-      a.attnum,
-      'SELECT, INSERT, UPDATE, REFERENCES'
-    )
-  )
+  AND ${COLUMN_VISIBILITY_PREDICATE}
   ${filterClause}
 `
 }
 
 export const COLUMNS_SQL = getColumnsSql()
+
+/**
+ * The complement of the privilege filter in `getColumnsSql`: the columns of one
+ * relation that exist in the catalog but that column introspection omits because the
+ * connected role holds none of SELECT/INSERT/UPDATE/REFERENCES on them and does not
+ * belong to the relation's owner role.
+ *
+ * `pg_attribute` itself carries no privilege restriction, so this stays accurate for
+ * exactly the roles that can't see the columns it reports.
+ */
+export const getInaccessibleColumnsSql = ({
+  schema,
+  table,
+}: {
+  schema: string
+  table: string
+}): SafeSqlFragment => safeSql`
+SELECT
+  a.attname AS name,
+  a.attnum AS ordinal_position
+FROM
+  pg_attribute a
+  JOIN pg_class c ON c.oid = a.attrelid
+  JOIN pg_namespace nc ON nc.oid = c.relnamespace
+WHERE
+  nc.nspname = ${literal(schema)}
+  AND c.relname = ${literal(table)}
+  AND NOT pg_is_other_temp_schema(nc.oid)
+  AND a.attnum > 0
+  AND NOT a.attisdropped
+  AND (c.relkind IN ('r', 'v', 'm', 'f', 'p'))
+  AND NOT ${COLUMN_VISIBILITY_PREDICATE}
+ORDER BY
+  a.attnum
+`

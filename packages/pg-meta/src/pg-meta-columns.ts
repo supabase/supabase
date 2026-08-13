@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { ident, keyword, literal, rawSql, safeSql, type SafeSqlFragment } from './pg-format'
-import { COLUMNS_SQL } from './sql/columns'
+import { COLUMNS_SQL, getInaccessibleColumnsSql } from './sql/columns'
 
 const pgColumnZod = z.object({
   id: z.string(),
@@ -85,6 +85,30 @@ where
   return {
     sql,
     zod: pgColumnArrayZod,
+  }
+}
+
+const pgInaccessibleColumnZod = z.object({
+  name: z.string(),
+  ordinal_position: z.number(),
+})
+const pgInaccessibleColumnArrayZod = z.array(pgInaccessibleColumnZod)
+
+export type PGInaccessibleColumn = z.infer<typeof pgInaccessibleColumnZod>
+
+/**
+ * Lists the columns of a relation that `list`/`retrieve` silently omit because the
+ * connected role lacks any privilege on them. Callers that let a user pick a column
+ * use this to explain a gap in the list rather than leaving it looking like the
+ * column doesn't exist.
+ */
+function listInaccessible({ schema, table }: { schema: string; table: string }): {
+  sql: SafeSqlFragment
+  zod: typeof pgInaccessibleColumnArrayZod
+} {
+  return {
+    sql: safeSql`${getInaccessibleColumnsSql({ schema, table })};`,
+    zod: pgInaccessibleColumnArrayZod,
   }
 }
 
@@ -388,6 +412,7 @@ function remove(
 
 export default {
   list,
+  listInaccessible,
   retrieve,
   create,
   update,
