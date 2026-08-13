@@ -481,7 +481,7 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredTools: ['list_notebooks', 'get_notebook'],
       correctAnswer:
-        'Summarizes the notebook as intro text plus a single logs query for edge function failures over the last day. Does not claim the notebook contains a database query.',
+        'Summarizes the notebook as a markdown intro plus one log cell ("hello-world failures") that queries function_edge_logs for TypeError failures over the last day. Log cells hold SQL against a logs source, so describing that cell\'s SQL, columns, or time range is correct and acceptable. Does not attribute a third cell, or any Postgres database cell, to the notebook.',
     },
     metadata: {
       category: ['general_help'],
