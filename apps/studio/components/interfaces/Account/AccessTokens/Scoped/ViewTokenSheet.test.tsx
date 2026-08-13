@@ -180,7 +180,7 @@ describe('ViewTokenSheet', () => {
     expect(screen.getByTitle('/v1/projects/{ref}/advisors/security')).toBeInTheDocument()
     expect(screen.getByTitle('/v1/projects/{ref}/database')).toBeInTheDocument()
     expect(screen.getByTitle('/v1/projects/{ref}/database/query')).toBeInTheDocument()
-    // Non-GET methods get a tinted badge; GET stays plain — both still render as text.
+    // Every method renders as a badge; non-GET methods get the tinted warning variant.
     expect(screen.getByText('POST')).toBeInTheDocument()
 
     expect(screen.getByText('get_advisors')).toBeInTheDocument()

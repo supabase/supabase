@@ -4,6 +4,7 @@ import { getCatalogEntry } from '../../AccessToken.permissions'
 import type { CapabilitySummaryEntry } from '../../hooks/useCapabilitySummary'
 import {
   computeRiskBanner,
+  formatCapabilityCounts,
   getCapabilityDensityTier,
   getNotGrantedCatalogEntries,
   getSharedPathPrefix,
@@ -27,6 +28,29 @@ const advisorsCapability = (mode: CapabilitySummaryEntry['mode']): CapabilitySum
   mode,
   endpoints: [],
   mcpTools: [],
+})
+
+describe('formatCapabilityCounts', () => {
+  it('combines both counts when both are non-zero', () => {
+    expect(formatCapabilityCounts(3, 2)).toBe('3 endpoints and 2 MCP tools')
+  })
+
+  it('omits the endpoint side when it is zero', () => {
+    expect(formatCapabilityCounts(0, 2)).toBe('2 MCP tools')
+  })
+
+  it('omits the MCP tool side when it is zero', () => {
+    expect(formatCapabilityCounts(3, 0)).toBe('3 endpoints')
+  })
+
+  it('singularizes a count of one', () => {
+    expect(formatCapabilityCounts(1, 0)).toBe('1 endpoint')
+    expect(formatCapabilityCounts(0, 1)).toBe('1 MCP tool')
+  })
+
+  it('falls back to the endpoint count when both are zero', () => {
+    expect(formatCapabilityCounts(0, 0)).toBe('0 endpoints')
+  })
 })
 
 describe('getCapabilityDensityTier', () => {

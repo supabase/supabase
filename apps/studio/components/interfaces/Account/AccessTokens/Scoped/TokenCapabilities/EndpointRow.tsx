@@ -28,11 +28,7 @@ export const EndpointRow = ({
   return (
     <div className="flex items-center gap-2 py-1.5" title={path}>
       <span className="shrink-0" style={{ width: methodColumnWidth }}>
-        {isMutating ? (
-          <Badge variant="warning">{method}</Badge>
-        ) : (
-          <span className="font-mono text-xs text-foreground-lighter">{method}</span>
-        )}
+        <Badge variant={isMutating ? 'warning' : 'default'}>{method}</Badge>
       </span>
       <span className="flex min-w-0 overflow-hidden whitespace-nowrap font-mono text-xs">
         {prefix !== '' && (
