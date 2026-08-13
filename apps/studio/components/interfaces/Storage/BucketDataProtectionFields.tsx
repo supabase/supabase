@@ -96,8 +96,9 @@ export const BucketDataProtectionFields = ({
   // Turning versioning off never deletes anything by itself — a bucket that's
   // ever had it enabled can only be suspended, not returned to a plain
   // "disabled" state, so nothing needs a destructive confirmation here.
-  // Both expiration fields default to empty (no limit) — the user opts in to
-  // each condition deliberately rather than receiving prefilled defaults.
+  // The two expiration fields come prefilled with sensible starter values
+  // (see CreateBucketModal / EditBucketModal defaults) — clearing a field
+  // removes that condition from the policy.
   const handleVersioningToggle = (checked: boolean, onChange: (value: boolean) => void) => {
     onChange(checked)
   }

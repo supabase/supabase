@@ -126,6 +126,20 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     },
   })
 
+  // Prefill the two expiration inputs with sensible starter values when the
+  // bucket has never had versioning turned on — so toggling versioning on
+  // for the first time surfaces a policy ready to save, matching the create
+  // form's defaults. If versioning is already on (or has been in the past)
+  // respect the bucket's own values, including `null` which means the user
+  // explicitly opted out of that particular condition.
+  const hasEverBeenVersioned = bucketProtection.versioning !== 'disabled'
+  const defaultVersionExpiryDays = hasEverBeenVersioned
+    ? (bucketProtection.versionExpiryDays ?? ('' as const))
+    : 30
+  const defaultMaxNoncurrentVersions = hasEverBeenVersioned
+    ? (bucketProtection.maxNoncurrentVersions ?? ('' as const))
+    : 10
+
   const defaultValues = {
     name: bucket?.name ?? '',
     public: bucket?.public,
@@ -133,8 +147,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     formatted_size_limit: bucket?.file_size_limit ? (fileSizeLimit ?? 0) : undefined,
     allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
     enable_versioning: !!planLimits && bucketProtection.versioning === 'enabled',
-    version_expiry_days: bucketProtection.versionExpiryDays ?? ('' as const),
-    max_noncurrent_versions: bucketProtection.maxNoncurrentVersions ?? ('' as const),
+    version_expiry_days: defaultVersionExpiryDays,
+    max_noncurrent_versions: defaultMaxNoncurrentVersions,
     expiration_mode: bucketProtection.expirationMode,
   }
 

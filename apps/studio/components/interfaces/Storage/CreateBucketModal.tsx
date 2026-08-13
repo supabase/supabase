@@ -130,8 +130,11 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
       formatted_size_limit: undefined,
       allowed_mime_types: '',
       enable_versioning: false,
-      version_expiry_days: '',
-      max_noncurrent_versions: '',
+      // Prefill sensible defaults so the inputs aren't blank the moment
+      // versioning is toggled on. A no-policy bucket has to be an explicit
+      // opt-out — clear the field to remove that condition.
+      version_expiry_days: 30,
+      max_noncurrent_versions: 10,
       expiration_mode: 'and',
     },
   })
