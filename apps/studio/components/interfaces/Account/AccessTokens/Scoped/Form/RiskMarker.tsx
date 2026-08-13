@@ -75,7 +75,7 @@ export const RiskMarker = ({
           </div>
         )}
         {mcpTools.length > 0 && (
-          <div className="space-y-1">
+          <div className="space-y-1 mt-5">
             {/* getMcpToolsForScopes is associative, not conjunctive: these scopes contribute to
                 the listed tools, but a tool may need scopes from other capabilities too — the
                 review step's enabled-tools list is the authoritative view. Keep this heading
