@@ -6,6 +6,7 @@ Aaron Brooks
 Aaron Byrne
 Adam Mohammed
 Adam Mokan
+Adam Whitlock
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -311,6 +312,7 @@ Victor Farazdagi
 Warwick Mitchell
 Wen Bo Xie
 Wendie Cheung
+Yara Lacerda
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov

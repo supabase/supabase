@@ -1,5 +1,6 @@
+import { useParams } from 'common'
 import { useMemo } from 'react'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { proxy, snapshot, useSnapshot, type Snapshot } from 'valtio'
 import { proxyMap } from 'valtio/utils'
 
 import type { Notebook, StateNotebook } from './types'
@@ -81,12 +82,12 @@ export const notebooksState = proxy({
     skipSave,
   }: {
     id: string
-    cells: Notebooks.Cell[]
+    cells: Snapshot<Notebooks.Cell>[]
     skipSave?: boolean
   }) => {
     const stateNotebook = notebooksState.notebooks[id]
     if (!stateNotebook?.notebook.content) return
-    stateNotebook.notebook.content.cells = cells
+    stateNotebook.notebook.content.cells = cells as Notebooks.Cell[]
     stateNotebook.status = statusOnEdit(stateNotebook.status)
     if (!skipSave) notebooksState.needsSaving.set(id, false)
   },
@@ -108,4 +109,14 @@ export const useNotebooks = (projectRef: string) => {
         .map((x) => x.notebook),
     [projectRef, snapshot.notebooks]
   )
+}
+
+export const useCurrentNotebook = () => {
+  const { id, ref } = useParams()
+  const snapshot = useNotebooksStateSnapshot()
+  const currentNotebook = id ? snapshot.notebooks[id] : undefined
+
+  if (!currentNotebook || currentNotebook.projectRef !== ref) return undefined
+
+  return currentNotebook
 }

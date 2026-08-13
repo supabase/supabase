@@ -33,6 +33,7 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean
+  shortcutsEnabled?: boolean
   onNewChat: () => void
   onCloseAssistant: () => void
   showMetadataWarning: boolean
@@ -43,6 +44,7 @@ interface AIAssistantHeaderProps {
 
 export const AIAssistantHeader = ({
   isChatLoading,
+  shortcutsEnabled = true,
   onNewChat,
   onCloseAssistant,
   showMetadataWarning,
@@ -87,15 +89,15 @@ export const AIAssistantHeader = ({
   }
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID, handleCopyChatId, {
-    enabled: !isChatLoading,
+    enabled: shortcutsEnabled && !isChatLoading,
   })
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS, () => setIsOptInModalOpen(true), {
-    enabled: !isChatLoading,
+    enabled: shortcutsEnabled && !isChatLoading,
   })
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, toggleMaximise, {
-    enabled: !isChatLoading,
+    enabled: shortcutsEnabled && !isChatLoading,
   })
 
   return (
@@ -128,7 +130,7 @@ export const AIAssistantHeader = ({
 
         <div className="flex items-center gap-x-4 shrink-0">
           <div className="flex items-center">
-            <AIAssistantChatSelector />
+            <AIAssistantChatSelector shortcutsEnabled={shortcutsEnabled} />
 
             <ShortcutTooltip
               side="bottom"

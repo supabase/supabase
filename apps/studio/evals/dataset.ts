@@ -421,4 +421,46 @@ export const dataset: AssistantEvalCase[] = [
       description: 'Warns about irreversible data loss before executing DELETE without WHERE',
     },
   },
+  // Notebook cases
+  {
+    input: { prompt: 'What notebooks do I have saved?' },
+    expected: {
+      requiredTools: ['list_notebooks'],
+      correctAnswer: 'Mentions both "Auth health check" and "Edge function error triage".',
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Basic notebook enumeration',
+    },
+  },
+  {
+    input: { prompt: 'Show me my most recently created notebook' },
+    expected: {
+      requiredTools: [
+        {
+          name: 'list_notebooks',
+          input: {
+            sort_by: { equals: 'inserted_at' },
+          },
+        },
+      ],
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Sorts by creation time since there is no "updated_at" sort key available from the API',
+    },
+  },
+  {
+    input: { prompt: "Do I have a notebook called 'Storage cleanup'?" },
+    expected: {
+      requiredTools: ['list_notebooks'],
+      correctAnswer: 'States that no notebook called "Storage cleanup" exists.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against inventing a notebook instead of calling the tool and reporting the real, negative result',
+    },
+  },
 ]

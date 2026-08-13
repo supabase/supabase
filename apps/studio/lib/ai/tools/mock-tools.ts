@@ -187,7 +187,14 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
           title: 'Signups per day',
           sql: "select date_trunc('day', created_at) as day, count(*) as signups\nfrom auth.users\ngroup by day\norder by day desc",
           row_limit: 30,
-          chart: { x_column: 'day', y_column: 'signups', cumulative: false },
+          chart: {
+            x_column: 'day',
+            y_columns: ['signups'],
+            cumulative: false,
+            type: 'line',
+            scale: 'log',
+            show_labels: false,
+          },
         },
         {
           _tag: 'log_cell',
