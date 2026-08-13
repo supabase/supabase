@@ -445,7 +445,7 @@ fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
     -H "Content-Type: application/json" \
     -d '{}')
-check "Call hello function" '"Hello from Edge Functions!"' "$fn_resp"
+check "Call hello function" '{"message":"Hello from Edge Functions!"}' "$fn_resp"
 
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
