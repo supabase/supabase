@@ -6,7 +6,6 @@ import {
   useGenerateCustomReportsMenu,
   useGenerateObservabilityMenu,
 } from './ObservabilityMenu.utils'
-import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { routerMock } from '@/tests/lib/route-mock'
@@ -35,10 +34,6 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-vi.mock('@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus', () => ({
-  useSupamonitorStatus: vi.fn(),
-}))
-
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: vi.fn(),
 }))
@@ -53,10 +48,6 @@ describe('useGenerateObservabilityMenu', () => {
     routerMock.setCurrentUrl(`/project/${REF}/observability`)
     vi.mocked(useFlag).mockReturnValue(false)
     vi.mocked(useParams).mockReturnValue({ ref: REF })
-    vi.mocked(useSupamonitorStatus).mockReturnValue({
-      isSupamonitorEnabled: false,
-      isLoading: false,
-    })
     vi.mocked(useIsFeatureEnabled).mockReturnValue(true)
   })
 
@@ -84,30 +75,11 @@ describe('useGenerateObservabilityMenu', () => {
     expect(general?.items.some((item) => item.key === 'observability')).toBe(false)
   })
 
-  it('shows Query Performance when supamonitor is disabled', () => {
-    vi.mocked(useSupamonitorStatus).mockReturnValue({
-      isSupamonitorEnabled: false,
-      isLoading: false,
-    })
-
+  it('always includes Query Performance', () => {
     const { result } = renderHook(() => useGenerateObservabilityMenu())
     const general = result.current.find((section) => section.title === 'GENERAL')
 
     expect(general?.items.some((item) => item.key === 'query-performance')).toBe(true)
-    expect(general?.items.some((item) => item.key === 'query-insights')).toBe(false)
-  })
-
-  it('shows Query Insights when supamonitor is enabled', () => {
-    vi.mocked(useSupamonitorStatus).mockReturnValue({
-      isSupamonitorEnabled: true,
-      isLoading: false,
-    })
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const general = result.current.find((section) => section.title === 'GENERAL')
-
-    expect(general?.items.some((item) => item.key === 'query-insights')).toBe(true)
-    expect(general?.items.some((item) => item.key === 'query-performance')).toBe(false)
   })
 
   it('includes API Gateway and the PRODUCT section on platform', () => {
