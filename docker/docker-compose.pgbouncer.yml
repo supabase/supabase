@@ -17,7 +17,7 @@ services:
       db:
         condition: service_healthy
     environment:
-      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_USER: postgres
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_HOST: ${POSTGRES_HOST}
       DB_PORT: ${POSTGRES_PORT}
