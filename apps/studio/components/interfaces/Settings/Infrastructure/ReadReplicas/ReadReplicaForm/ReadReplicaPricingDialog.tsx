@@ -99,7 +99,9 @@ export const ReadReplicaPricingDialog = () => {
                       <TableRow>
                         <TableCell>Throughput</TableCell>
                         <TableCell>{throughput.label}</TableCell>
-                        <TableCell className="text-right font-mono">{throughput.cost}</TableCell>
+                        <TableCell className="text-right font-mono" translate="no">
+                          {throughput.cost}
+                        </TableCell>
                       </TableRow>
                     )}
                   </TableBody>

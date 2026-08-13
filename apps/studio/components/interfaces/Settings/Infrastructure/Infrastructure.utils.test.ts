@@ -24,6 +24,12 @@ describe('getReadReplicaPath', () => {
       '/project/project-ref/settings/infrastructure/replica/replica-1'
     )
   })
+
+  it('falls back to the default project placeholder', () => {
+    expect(getReadReplicaPath(undefined, 'replica-1')).toBe(
+      '/project/_/settings/infrastructure/replica/replica-1'
+    )
+  })
 })
 
 describe('getAddReadReplicaPath', () => {
@@ -31,5 +37,9 @@ describe('getAddReadReplicaPath', () => {
     expect(getAddReadReplicaPath('project-ref')).toBe(
       '/project/project-ref/settings/infrastructure?addReplica=true'
     )
+  })
+
+  it('falls back to the default project placeholder', () => {
+    expect(getAddReadReplicaPath()).toBe('/project/_/settings/infrastructure?addReplica=true')
   })
 })

@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useMemo } from 'react'
 
 import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
 import {
@@ -20,10 +19,7 @@ export const useCheckEligibilityDeployReplica = () => {
   const { hasAccess: hasReadReplicaAccess } = useCheckEntitlements('instances.read_replicas')
   const isAWSProvider = project?.cloud_provider === 'AWS'
   const isWalgEnabled = project?.is_physical_backups_enabled
-  const isNotOnHigherPlan = useMemo(
-    () => !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? ''),
-    [org]
-  )
+  const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? '')
   const isProWithSpendCapEnabled = org?.plan.id === 'pro' && !org.usage_billing_enabled
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
@@ -48,12 +44,14 @@ export const useCheckEligibilityDeployReplica = () => {
   const isReachedMaxReplicas =
     (databases ?? []).filter((db) => db.identifier !== projectRef).length >= maxNumberOfReplicas
 
-  const currentPgVersion = Number(
+  const parsedPgVersion = Number(
     (project?.dbVersion ?? '').split('supabase-postgres-')[1]?.split('.')[0]
   )
+  const currentPgVersion = Number.isNaN(parsedPgVersion) ? undefined : parsedPgVersion
 
   const canDeployReplica =
     !isReachedMaxReplicas &&
+    currentPgVersion !== undefined &&
     currentPgVersion >= 15 &&
     isAWSProvider &&
     hasReadReplicaAccess &&
@@ -68,7 +66,7 @@ export const useCheckEligibilityDeployReplica = () => {
     hasOverdueInvoices,
     isAWSProvider,
     isAwsK8s,
-    isPgVersionBelow15: currentPgVersion < 15,
+    isPgVersionBelow15: currentPgVersion === undefined || currentPgVersion < 15,
     isBelowSmallCompute,
     isWalgNotEnabled: !isWalgEnabled,
     isProWithSpendCapEnabled,
