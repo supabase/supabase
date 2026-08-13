@@ -1,7 +1,8 @@
 import type { PGPolicy } from '@supabase/pg-meta'
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { describe, expect, it } from 'vitest'
 
-import { generateUpdatePolicyPayload } from './PolicyEditorPanel.utils'
+import { generateCreatePolicyQuery, generateUpdatePolicyPayload } from './PolicyEditorPanel.utils'
 
 type PolicyFixture = Pick<PGPolicy, 'name' | 'roles' | 'command' | 'definition' | 'check'>
 
@@ -98,5 +99,79 @@ describe('generateUpdatePolicyPayload', () => {
       roles: ['anon', 'authenticated'],
     })
     expect(payload).toEqual({ name: 'renamed_policy', roles: ['anon', 'authenticated'] })
+  })
+})
+
+describe('generateCreatePolicyQuery', () => {
+  const baseArgs = {
+    name: 'my_policy',
+    schema: 'public',
+    table: 'my_table',
+    behavior: 'permissive',
+    roles: safeSql`authenticated`,
+    // The panel prefills editors with two leading spaces of indentation
+    using: safeSql`  user_id = auth.uid()`,
+  }
+
+  it('omits the with check clause when there is no check expression', () => {
+    const sql = generateCreatePolicyQuery({ ...baseArgs, command: 'select' })
+    expect(sql).toContain('using (')
+    expect(sql).not.toContain('with check')
+  })
+
+  it('omits the with check clause when the check expression is only whitespace', () => {
+    const sql = generateCreatePolicyQuery({
+      ...baseArgs,
+      command: 'update',
+      check: safeSql`\n\n`,
+    })
+    expect(sql).not.toContain('with check')
+  })
+
+  it('omits the with check clause for SELECT policies', () => {
+    const sql = generateCreatePolicyQuery({
+      ...baseArgs,
+      command: 'select',
+      check: safeSql`  user_id = auth.uid()`,
+    })
+    expect(sql).not.toContain('with check')
+  })
+
+  it('omits the with check clause for DELETE policies', () => {
+    const sql = generateCreatePolicyQuery({
+      ...baseArgs,
+      command: 'delete',
+      check: safeSql`  user_id = auth.uid()`,
+    })
+    expect(sql).not.toContain('with check')
+  })
+
+  it('includes the with check clause for UPDATE policies', () => {
+    const sql = generateCreatePolicyQuery({
+      ...baseArgs,
+      command: 'update',
+      check: safeSql`  user_id = auth.uid()`,
+    })
+    expect(sql).toContain('with check (  user_id = auth.uid())')
+  })
+
+  it('includes the with check clause for ALL policies', () => {
+    const sql = generateCreatePolicyQuery({
+      ...baseArgs,
+      command: 'all',
+      check: safeSql`  true`,
+    })
+    expect(sql).toContain('with check (  true)')
+  })
+
+  it('uses only a with check clause for INSERT policies', () => {
+    const sql = generateCreatePolicyQuery({
+      ...baseArgs,
+      command: 'insert',
+      using: undefined,
+      check: safeSql`  true`,
+    })
+    expect(sql).toContain('with check (  true)')
+    expect(sql).not.toContain('using')
   })
 })

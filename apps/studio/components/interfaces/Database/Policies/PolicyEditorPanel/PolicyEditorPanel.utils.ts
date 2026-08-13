@@ -78,7 +78,9 @@ export const generateCreatePolicyQuery = ({
     return safeSql`${skeleton} with check (${check ?? safeSql``});`
   }
   const withUsing = safeSql`${skeleton} using (${using ?? safeSql``})`
-  if ((check ?? '').length > 0) {
+  // Postgres only accepts WITH CHECK for UPDATE and ALL here, and an empty
+  // expression is a syntax error, so a blank editor must not emit the clause
+  if (['update', 'all'].includes(command) && (check ?? '').trim().length > 0) {
     return safeSql`${withUsing} with check (${check ?? safeSql``});`
   }
   return safeSql`${withUsing};`
