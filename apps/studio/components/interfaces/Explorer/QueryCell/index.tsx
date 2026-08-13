@@ -28,9 +28,6 @@ interface QueryCellProps {
  * - Database selection logic
  *
  * QueryCell atm minimally supports running queries and rendering results
- *
- * [Joshen] TODO: handleUpdateCell might be able to shift into notebook-state, so component
- * doesn't need to have context of the other cells
  */
 
 type QueryCellUpdate = { sql: string } | { title: string } | { display: QueryDisplay }
@@ -39,7 +36,6 @@ type QueryCellUpdate = { sql: string } | { title: string } | { display: QueryDis
 export const QueryCell = ({ cell }: QueryCellProps) => {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
-  const cells = currentNotebook?.notebook.content?.cells ?? []
 
   const { id, title: cellTitle, view, chart, unchecked_sql } = cell
   const rowLimit = 'row_limit' in cell ? cell.row_limit : undefined
@@ -61,62 +57,67 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
-    const nextCells = cells.map((candidate) => {
-      if (candidate.id !== id) return candidate
-
-      if (source.type === 'database' && candidate._tag === 'log_cell') {
-        const { _tag, time_range, unchecked_sql, ...rest } = candidate
-        return {
-          ...rest,
-          _tag: 'database_cell' as const,
-          row_limit: 100,
-          unchecked_sql: untrustedSql(unchecked_sql),
+    snap.updateCell({
+      id: notebookId,
+      cellId: id,
+      updater: (candidate) => {
+        if (source.type === 'database' && candidate._tag === 'log_cell') {
+          const { _tag, time_range, unchecked_sql, ...rest } = candidate
+          return {
+            ...rest,
+            _tag: 'database_cell' as const,
+            row_limit: 100,
+            unchecked_sql: untrustedSql(unchecked_sql),
+          }
         }
-      }
 
-      if (source.type === 'logs' && candidate._tag === 'database_cell') {
-        const { _tag, row_limit, unchecked_sql, ...rest } = candidate
-        return {
-          ...rest,
-          _tag: 'log_cell' as const,
-          time_range: { _tag: 'relative_time_range' as const, unit: 'hour' as const, amount: 1 },
-          unchecked_sql: untrustedLogSql(unchecked_sql),
+        if (source.type === 'logs' && candidate._tag === 'database_cell') {
+          const { _tag, row_limit, unchecked_sql, ...rest } = candidate
+          return {
+            ...rest,
+            _tag: 'log_cell' as const,
+            time_range: {
+              _tag: 'relative_time_range' as const,
+              unit: 'hour' as const,
+              amount: 1,
+            },
+            unchecked_sql: untrustedLogSql(unchecked_sql),
+          }
         }
-      }
 
-      return candidate
+        return candidate
+      },
     })
-
-    snap.updateCells({ id: notebookId, cells: nextCells })
   }
 
   const handleUpdateCell = (payload: QueryCellUpdate) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
-    const nextCells = cells.map((candidate) => {
-      if (candidate.id !== id) return candidate
-      if (candidate._tag !== 'database_cell' && candidate._tag !== 'log_cell') return candidate
+    snap.updateCell({
+      id: notebookId,
+      cellId: id,
+      updater: (candidate) => {
+        if (candidate._tag !== 'database_cell' && candidate._tag !== 'log_cell') return candidate
 
-      if ('sql' in payload) {
-        return candidate._tag === 'database_cell'
-          ? { ...candidate, unchecked_sql: untrustedSql(payload.sql) }
-          : { ...candidate, unchecked_sql: untrustedLogSql(payload.sql) }
-      }
+        if ('sql' in payload) {
+          return candidate._tag === 'database_cell'
+            ? { ...candidate, unchecked_sql: untrustedSql(payload.sql) }
+            : { ...candidate, unchecked_sql: untrustedLogSql(payload.sql) }
+        }
 
-      if ('title' in payload) {
-        const nextTitle = payload.title.trim()
-        return nextTitle ? { ...candidate, title: nextTitle } : candidate
-      }
+        if ('title' in payload) {
+          const nextTitle = payload.title.trim()
+          return nextTitle ? { ...candidate, title: nextTitle } : candidate
+        }
 
-      return {
-        ...candidate,
-        view: payload.display.view,
-        chart: payload.display.chart,
-      }
+        return {
+          ...candidate,
+          view: payload.display.view,
+          chart: payload.display.chart,
+        }
+      },
     })
-
-    snap.updateCells({ id: notebookId, cells: nextCells })
   }
 
   return (
