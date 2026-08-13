@@ -111,7 +111,7 @@ const HomeTabButton = () => {
         className="text-foreground-lighter transition-colors group-hover:text-foreground-light group-data-[state=active]:text-foreground"
       />
       <span className="sr-only">Open Explorer home</span>
-      {/* <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" /> */}
+      <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
     </TabsTrigger>
   )
 }
