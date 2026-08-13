@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Home, MessageCirclePlus, NotebookText, Plus } from 'lucide-react'
+import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ReactNode, useState } from 'react'
@@ -12,7 +12,8 @@ import { type ExplorerResourceType } from './ExplorerLayout.constants'
 import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
-import { useCreateNotebook } from '@/components/interfaces/Explorer/hooks'
+import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
+import { useCreateNotebook, useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
@@ -49,6 +50,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
         </div>
       }
     >
+      <ExplorerQueryTabCoordinator />
       <div className="flex flex-col h-full">
         <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
           <EditorTabs
@@ -87,6 +89,7 @@ const HomeTabButton = () => {
 
 const NewTabButton = () => {
   const { createNotebook } = useCreateNotebook()
+  const { createQuery } = useCreateQuery()
 
   return (
     <DropdownMenu>
@@ -106,6 +109,10 @@ const NewTabButton = () => {
         </motion.button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
+        <DropdownMenuItem className="gap-x-2" onClick={() => createQuery()}>
+          <SquareCode size={14} />
+          <span>New query</span>
+        </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createNotebook()}>
           <NotebookText size={14} />
           <span>New notebook</span>
