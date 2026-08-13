@@ -20,8 +20,8 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { DropReplicaConfirmationModal } from './DropReplicaConfirmationModal'
+import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
 import { useReplicationLagQuery } from '@/data/read-replicas/replica-lag-query'
