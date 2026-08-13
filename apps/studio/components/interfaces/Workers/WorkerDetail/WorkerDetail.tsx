@@ -1,5 +1,6 @@
 import { useParams } from 'common'
-import { Pause, Play, Zap } from 'lucide-react'
+import dayjs from 'dayjs'
+import { Clock, Copy, Pause, Play, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
@@ -11,13 +12,32 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Button,
+  copyToClipboard,
   NavMenu,
   NavMenuItem,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
-import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import { PageNav } from 'ui-patterns/PageNav'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderBreadcrumb,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderNavigationTabs,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 
+import { workerGatewayUrl } from '../Workers.constants'
+import { RuntimeBadge } from '../RuntimeBadge'
+import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
+import { WorkerStatePill } from '../WorkerStatePill'
 import { WorkerLogsTab } from './WorkerLogsTab'
 import { WorkerOverviewTab } from './WorkerOverviewTab'
 import { WorkerSettingsTab } from './WorkerSettingsTab'
@@ -29,13 +49,12 @@ import {
   useProjectWorkers,
 } from '@/state/workers-mock-state'
 
-type WorkerTab = 'overview' | 'logs' | 'terminal' | 'settings'
-const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'terminal', 'settings']
+type WorkerTab = 'overview' | 'logs' | 'settings'
+const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
 
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
   logs: 'Logs',
-  terminal: 'Terminal',
   settings: 'Settings',
 }
 
@@ -71,6 +90,7 @@ export const WorkerDetail = () => {
     )
   }
 
+  const gatewayUrl = workerGatewayUrl(worker.name)
   const isActive = worker.state === 'active'
   const isSuspended = worker.state === 'suspended'
 
@@ -81,92 +101,130 @@ export const WorkerDetail = () => {
   }
 
   return (
-    <div className="w-full">
-      <PageBreadcrumbs
-        actions={
-          <PageBreadcrumbsActions>
-            <Button
-              variant="default"
-              size="tiny"
-              icon={<Zap size={14} />}
-              disabled={!isActive}
-              onClick={handleSimulateTraffic}
-            >
-              Simulate traffic
-            </Button>
-            {isActive && (
-              <Button
-                variant="default"
-                size="tiny"
-                icon={<Pause size={14} />}
-                onClick={() => suspendWorker(projectRef, worker.id)}
-              >
-                Suspend
-              </Button>
-            )}
-            {isSuspended && (
-              <Button
-                variant="default"
-                size="tiny"
-                icon={<Play size={14} />}
-                onClick={() => resumeWorker(projectRef, worker.id)}
-              >
-                Resume
-              </Button>
-            )}
-          </PageBreadcrumbsActions>
-        }
-      >
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href={`/project/${projectRef}/workers`}>Workers</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{worker.name}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </PageBreadcrumbs>
+    <div className="w-full min-h-full flex flex-col items-stretch">
+      <PageHeader size="full">
+        <PageHeaderBreadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href={`/project/${projectRef}/workers`}>Workers</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{worker.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </PageHeaderBreadcrumb>
 
-      <PageNav>
-        <NavMenu>
-          {WORKER_TABS.map((item) => (
-            <NavMenuItem key={item} active={tab === item}>
-              <button
-                type="button"
-                aria-pressed={tab === item}
-                className="flex h-full items-center gap-1.5 bg-transparent text-inherit"
-                onClick={() => setTab(item)}
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{worker.name}</PageHeaderTitle>
+            <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
+              <span className="flex items-center gap-2">
+                <span className="font-mono text-foreground-light">{gatewayUrl}</span>
+                <button
+                  type="button"
+                  aria-label="Copy URL"
+                  onClick={() => copyToClipboard(gatewayUrl)}
+                  className="text-foreground-lighter transition-colors hover:text-foreground"
+                >
+                  <Copy size={13} />
+                </button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-xs text-foreground-light transition-colors hover:text-foreground"
+                    >
+                      How to call
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-[440px] p-4">
+                    <WorkerSnippetTabs
+                      input={{
+                        name: worker.name,
+                        runtime: worker.runtime,
+                        size: worker.size,
+                        access: worker.access,
+                        instances: worker.instances,
+                      }}
+                      tabs={['curl', 'js', 'python']}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </span>
+              <WorkerStatePill state={worker.state} />
+              <RuntimeBadge runtime={worker.runtime} />
+              <span className="flex items-center gap-2 text-foreground-light">
+                <Clock size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                Last deployed {dayjs(worker.updatedAt).format('MMM D, YYYY HH:mm')}
+              </span>
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+
+          <PageHeaderAside>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="default"
+                icon={<Zap size={14} />}
+                disabled={!isActive}
+                onClick={handleSimulateTraffic}
               >
-                {TAB_LABEL[item]}
-                {item === 'terminal' && (
-                  <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
-                    Soon
+                Simulate traffic
+              </Button>
+              {isActive && (
+                <Button
+                  variant="default"
+                  icon={<Pause size={14} />}
+                  onClick={() => suspendWorker(projectRef, worker.id)}
+                >
+                  Suspend
+                </Button>
+              )}
+              {isSuspended && (
+                <Button
+                  variant="default"
+                  icon={<Play size={14} />}
+                  onClick={() => resumeWorker(projectRef, worker.id)}
+                >
+                  Resume
+                </Button>
+              )}
+            </div>
+          </PageHeaderAside>
+        </PageHeaderMeta>
+
+        <PageHeaderNavigationTabs>
+          <NavMenu>
+            {WORKER_TABS.map((item) => (
+              <NavMenuItem key={item} active={tab === item}>
+                <button type="button" onClick={() => setTab(item)}>
+                  {TAB_LABEL[item]}
+                </button>
+              </NavMenuItem>
+            ))}
+            <NavMenuItem active={false}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="flex h-full cursor-not-allowed items-center gap-1.5 text-foreground-muted">
+                    Terminal
+                    <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
+                      Soon
+                    </span>
                   </span>
-                )}
-              </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Coming soon in private alpha</TooltipContent>
+              </Tooltip>
             </NavMenuItem>
-          ))}
-        </NavMenu>
-      </PageNav>
+          </NavMenu>
+        </PageHeaderNavigationTabs>
+      </PageHeader>
 
       {tab === 'overview' && <WorkerOverviewTab projectRef={projectRef} worker={worker} />}
       {tab === 'logs' && (
         <PageContainer size="full" className="px-0 xl:px-0">
           <WorkerLogsTab projectRef={projectRef} workerName={worker.name} />
-        </PageContainer>
-      )}
-      {tab === 'terminal' && (
-        <PageContainer size="small" className="py-8">
-          <div className="rounded-md border border-default bg-surface-100 px-6 py-12 text-center">
-            <p className="text-sm text-foreground">Terminal is coming soon</p>
-            <p className="mx-auto mt-1 max-w-md text-sm text-foreground-lighter">
-              An interactive shell into your worker's microVM is in private alpha. It'll let you run
-              commands, inspect the filesystem, and tail processes without redeploying.
-            </p>
-          </div>
         </PageContainer>
       )}
       {tab === 'settings' && <WorkerSettingsTab projectRef={projectRef} worker={worker} />}

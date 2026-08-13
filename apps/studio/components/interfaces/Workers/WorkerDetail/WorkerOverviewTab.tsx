@@ -1,7 +1,6 @@
-import dayjs from 'dayjs'
-import { BarChart2, Check, Clock, Copy, ExternalLink, RotateCw } from 'lucide-react'
+import { BarChart2, Check, ExternalLink, RotateCw } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Button, copyToClipboard, Popover, PopoverContent, PopoverTrigger } from 'ui'
+import { Button } from 'ui'
 import {
   Chart,
   ChartCard,
@@ -15,13 +14,6 @@ import {
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  PageHeader,
-  PageHeaderDescription,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
-import {
   PageSection,
   PageSectionAside,
   PageSectionContent,
@@ -31,11 +23,8 @@ import {
 } from 'ui-patterns/PageSection'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { WORKER_ERROR_REASON_LABEL, workerGatewayUrl } from '../Workers.constants'
+import { WORKER_ERROR_REASON_LABEL } from '../Workers.constants'
 import type { Worker } from '../Workers.types'
-import { RuntimeBadge } from '../RuntimeBadge'
-import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
-import { WorkerStatePill } from '../WorkerStatePill'
 import {
   CHART_INTERVALS,
   CPU_TIME_CHART_CONFIG,
@@ -101,61 +90,11 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
     [metrics]
   )
 
-  const gatewayUrl = workerGatewayUrl(worker.name)
   const isErrored = worker.state === 'errored'
   const hasNoData = invocation.length === 0
 
   return (
     <>
-      <PageHeader size="small" className="pb-8">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>{worker.name}</PageHeaderTitle>
-            <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
-              <span className="flex items-center gap-2">
-                <span className="font-mono text-foreground-light">{gatewayUrl}</span>
-                <button
-                  type="button"
-                  aria-label="Copy URL"
-                  onClick={() => copyToClipboard(gatewayUrl)}
-                  className="text-foreground-lighter transition-colors hover:text-foreground"
-                >
-                  <Copy size={13} />
-                </button>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className="text-xs text-foreground-light transition-colors hover:text-foreground"
-                    >
-                      How to call
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent align="start" className="w-[440px] p-4">
-                    <WorkerSnippetTabs
-                      input={{
-                        name: worker.name,
-                        runtime: worker.runtime,
-                        size: worker.size,
-                        access: worker.access,
-                        instances: worker.instances,
-                      }}
-                      tabs={['curl', 'js', 'python']}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </span>
-              <WorkerStatePill state={worker.state} />
-              <RuntimeBadge runtime={worker.runtime} />
-              <span className="flex items-center gap-2 text-foreground-light">
-                <Clock size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                Last deployed {dayjs(worker.updatedAt).format('MMM D, YYYY HH:mm')}
-              </span>
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
-
       {/* Metrics breakdown band */}
       <PageSection className="border-t border-b bg-surface-100/50 pb-8 pt-0">
         <PageContainer size="full">
