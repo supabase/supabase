@@ -1,11 +1,14 @@
 import { forwardRef } from 'react'
-import { Alert, AlertDescription, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
 
 import { TYPE_LABEL, TYPE_TO_VARIANT } from './Admonition.constants'
 import type { AdmonitionLayout, AdmonitionProps, AdmonitionType } from './Admonition.types'
 import { AdmonitionTypeIcon } from './AdmonitionIcons'
 
 export type { AdmonitionLayout, AdmonitionProps, AdmonitionType }
+
+const admonitionBodyClassName =
+  '!mb-0 [&_p]:!mt-0 [&_p]:!mb-1.5 [&_p:last-child]:!mb-0 [&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5'
 
 export const Admonition = forwardRef<
   React.ComponentRef<typeof Alert>,
@@ -66,33 +69,36 @@ export const Admonition = forwardRef<
               ]
             )}
           >
-            <div
-              {...childProps?.description}
-              className={cn(
-                'text-foreground-light',
-                // Exclude the title <p> so these MDX body resets don't override its mb-0.5
-                // ([&_p]:!mb-1.5 beats !mb-0.5 on specificity: class+element vs class).
-                '[&_p:not([data-admonition-title])]:!mt-0 [&_p:not([data-admonition-title])]:!mb-1.5 [&_p:not([data-admonition-title]):last-child]:!mb-0',
-                '[&_ul]:!my-1.5 [&_ol]:!my-1.5 [&_li]:!my-0.5',
-                childProps?.description?.className
-              )}
-            >
+            <div className={cn(showIcon && !title && description && 'my-0.5')}>
               {title && (
-                <p
+                <AlertTitle
                   {...childProps?.title}
-                  data-admonition-title
-                  className={cn('mb-0.5 font-medium text-foreground', childProps?.title?.className)}
+                  className={cn('text-foreground', childProps?.title?.className)}
                 >
                   {title}
-                </p>
+                </AlertTitle>
               )}
-              {description && <AlertDescription>{description}</AlertDescription>}
-              {children}
+              {description && (
+                <AlertDescription
+                  {...childProps?.description}
+                  className={cn(admonitionBodyClassName, childProps?.description?.className)}
+                >
+                  {description}
+                </AlertDescription>
+              )}
+              {children && (
+                <AlertDescription
+                  {...childProps?.description}
+                  className={cn(admonitionBodyClassName, childProps?.description?.className)}
+                >
+                  {children}
+                </AlertDescription>
+              )}
             </div>
             {actions && (
               <div
                 className={cn(
-                  'flex flex-row gap-3',
+                  'flex flex-row gap-2',
                   layout === 'vertical' && 'mt-3 items-start',
                   layout === 'horizontal' && 'items-center',
                   layout === 'responsive' && 'mt-3 items-start @md:mt-0 @md:items-center'

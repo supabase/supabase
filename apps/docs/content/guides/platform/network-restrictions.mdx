@@ -27,9 +27,9 @@ To configure network restrictions with the dashboard:
 
 To configure network restrictions with the CLI:
 
-1. [Install](/docs/guides/cli) the Supabase CLI 1.22.0+.
-1. [Log in](/docs/guides/cli/local-development#log-in-to-the-supabase-cli) to your Supabase account.
-1. If your project was created before December 23, 2022, [upgrade it to the latest Supabase version](/docs/guides/platform/migrating-and-upgrading-projects) before using network restrictions.
+1. [Install](/docs/guides/local-development) the Supabase CLI 1.22.0+.
+1. [Log in](/docs/guides/local-development/database-migrations#log-in-to-the-supabase-cli) to your Supabase account.
+1. If your project was created before December 23, 2022, [upgrade it to the latest Supabase version](/docs/guides/platform/upgrading) before using network restrictions.
 1. Ensure you have [Owner or Admin permissions](/docs/guides/platform/access-control#manage-team-members) for the project.
 
 ### Check restrictions
@@ -101,5 +101,5 @@ To remove all network restrictions:
 
 ## Limitations
 
-- Network restrictions apply to Postgres and the database pooler. They don't apply to HTTPS APIs such as PostgREST, Storage, and Auth, or to Supabase client libraries like [supabase-js](/docs/reference/javascript).
-- With network restrictions applied, Edge functions lose direct access to the database. Use [supabase-js](/docs/reference/javascript) to connect to the database from Edge Functions instead.
+- Network restrictions apply to Postgres and the database pooler. They don't apply to HTTPS APIs such as PostgREST, Storage, and Auth, or to Supabase client libraries like [supabase-js](/docs/reference/javascript/introduction).
+- With network restrictions applied, Edge functions lose direct access to the database. Use [supabase-js](/docs/reference/javascript/introduction) to connect to the database from Edge Functions instead.

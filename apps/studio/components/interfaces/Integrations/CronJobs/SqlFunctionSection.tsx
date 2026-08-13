@@ -1,4 +1,4 @@
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import { FormField, SheetSection } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -11,7 +11,7 @@ interface SqlFunctionSectionProps {
 }
 
 export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
-  const schema = form.watch('values.schema')
+  const schema = useWatch({ control: form.control, name: 'values.schema' })
 
   return (
     <SheetSection className="flex flex-col gap-3 2xl:flex-row 2xl:[&>div]:w-full">

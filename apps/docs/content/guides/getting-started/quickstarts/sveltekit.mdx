@@ -16,9 +16,11 @@ Create a SvelteKit app using the `npm create` command.
 npx sv create my-app
 ```
 
-## 4. Install Agent Skills (optional)
+## 4. Install Supabase's Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
 
 To install, run the following command in the root of your project:
 
@@ -38,7 +40,7 @@ cd my-app && npm install @supabase/supabase-js
 
 ## 6. Declare Supabase environment variables
 
-Create a `.env` file at the root of your project and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=sveltekit&tab=frameworks):
+Create a `.env` file at the root of your project and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=sveltekit&connectTab=frameworks):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=sveltekit">

@@ -7,10 +7,11 @@ import { cn } from 'ui'
 
 interface Props {
   title: string
+  /** Brand/company name for logo alt text when the logo is the only place that name appears. */
+  name?: string
   icon?: string | React.ReactNode
   children?: React.ReactNode
   header?: string
-  background?: boolean
   className?: string
   logo?: string
   logoInverse?: string
@@ -32,6 +33,7 @@ const IconBackground = ({
       'shrink-0',
       showIconBg ? 'bg-surface-75 border w-8 h-8 flex items-center justify-center rounded-sm' : ''
     )}
+    aria-hidden="true"
   >
     {children}
   </div>
@@ -41,18 +43,18 @@ const LogoComponent = ({
   logoImage,
   className,
   wrapperClassName,
-  title,
+  alt,
 }: {
-  title: string
   logoImage: string
   className?: string
   wrapperClassName?: string
+  alt: string
 }) => (
-  <div className={cn('relative box-content p-8 pb-0', wrapperClassName)}>
+  <div className={cn('relative box-content p-4 pb-0 md:p-6 md:pb-0', wrapperClassName)}>
     <div className="relative h-[33px] w-auto max-w-[145px]">
       <Image
         src={logoImage}
-        alt={title}
+        alt={alt}
         fill
         sizes="100%"
         className={cn('object-contain object-left', className)}
@@ -63,10 +65,10 @@ const LogoComponent = ({
 
 export const GlassPanel = ({
   title,
+  name,
   icon,
   children,
   header,
-  background = true,
   logo,
   logoInverse,
   hasLightIcon,
@@ -76,36 +78,34 @@ export const GlassPanel = ({
   className,
 }: Props) => {
   const { resolvedTheme } = useTheme()
+  const logoAlt = name ?? ''
 
   return (
     <div
       className={cn(
         'relative',
         'h-full',
-        'group',
         'cursor-pointer',
         'overflow-hidden',
         'border rounded-lg',
         'text-left',
-        background
-          ? 'hover:border-strong bg-surface-75'
-          : 'border-muted hover:border-default bg-transparent',
+        'bg-surface-75 hover:border-strong',
         'transition',
         className
       )}
     >
       {logoInverse && (
         <LogoComponent
-          title={title}
           logoImage={logoInverse}
+          alt={logoAlt}
           className="opacity-50"
           wrapperClassName="hidden dark:block"
         />
       )}
       {logo && (
         <LogoComponent
-          title={title}
           logoImage={logo}
+          alt={logoAlt}
           className="opacity-75"
           wrapperClassName={logoInverse ? 'block dark:hidden' : undefined}
         />
@@ -119,16 +119,12 @@ export const GlassPanel = ({
             "
         />
       )}
-      {/* <div
-        className="absolute left-0 top-0 w-[250px] h-[150px] transform scale-100 opacity-50 group-hover:scale-150 group-hover:opacity-100 transition-all duration-700 ease-out"
-        style={{ background: `radial-gradient(100% 100% at 0% 0%, #3EACCF18, transparent)` }}
-      /> */}
       <div
         className={cn(
-          'px-8 pb-8 relative',
+          'relative px-4.5 py-4 md:px-5.5 md:py-5.5',
           'flex flex-col h-full',
-          icon ? 'gap-6' : 'gap-2',
-          !header ? 'pt-8' : ''
+          icon ? 'gap-3' : 'gap-2',
+          header && 'pt-0'
         )}
       >
         <div className="flex items-center gap-3">
@@ -136,7 +132,7 @@ export const GlassPanel = ({
             <IconBackground showIconBg={showIconBg}>
               <img
                 className="w-5"
-                alt={title}
+                alt=""
                 src={`${icon}${
                   hasLightIcon && !resolvedTheme?.includes('dark') ? '-light' : ''
                 }.svg`}

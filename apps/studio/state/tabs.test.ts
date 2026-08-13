@@ -72,6 +72,46 @@ describe('tabs recent items', () => {
   })
 })
 
+describe('tabs sql source metadata', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('backfills sqlSource onto a tab and its recent item', () => {
+    const store = createTabsState('default')
+
+    store.addTab({
+      id: 'sql-a',
+      type: 'sql',
+      label: 'Logs query',
+      metadata: { sqlId: 'a', name: 'Logs query' },
+      isPreview: false,
+    })
+
+    // Persisted before the field existed → absent until backfilled from the snippet.
+    expect(store.tabsMap['sql-a'].metadata?.sqlSource).toBeUndefined()
+
+    store.updateTab('sql-a', { sqlSource: 'logs' })
+
+    expect(store.tabsMap['sql-a'].metadata?.sqlSource).toBe('logs')
+    expect(store.recentItems[0].metadata?.sqlSource).toBe('logs')
+  })
+
+  it('carries sqlSource from a tab into its recent item on creation', () => {
+    const store = createTabsState('default')
+
+    store.addTab({
+      id: 'sql-a',
+      type: 'sql',
+      label: 'Logs query',
+      metadata: { sqlId: 'a', name: 'Logs query', sqlSource: 'logs' },
+      isPreview: false,
+    })
+
+    expect(store.recentItems[0].metadata?.sqlSource).toBe('logs')
+  })
+})
+
 describe('tabs removal', () => {
   beforeEach(() => {
     localStorage.clear()

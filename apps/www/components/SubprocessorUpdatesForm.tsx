@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
+import { useState } from 'react'
 import { Button, Input, Label } from 'ui'
 
 const isValidEmail = (email: string): boolean => {
@@ -18,6 +19,7 @@ const SubprocessorUpdatesForm = () => {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -48,6 +50,7 @@ const SubprocessorUpdatesForm = () => {
       }
 
       setStatus('success')
+      sendTelemetryEvent({ action: 'www_subprocessor_updates_subscribed' })
     } catch (err: any) {
       setStatus('error')
       setErrorMessage(err.message || 'Something went wrong. Please try again.')

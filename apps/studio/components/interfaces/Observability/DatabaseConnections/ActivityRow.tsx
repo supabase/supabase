@@ -1,5 +1,5 @@
-import { Minus, MoreVertical, StopCircle } from 'lucide-react'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { ChevronRight, CircleX, Minus, MoreVertical, StopCircle } from 'lucide-react'
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { Fragment, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -17,6 +17,7 @@ import {
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   HoverCard,
   HoverCardContent,
@@ -27,6 +28,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import {
@@ -34,33 +36,78 @@ import {
   WARN_DURATION_ACTIVE_QUERY,
   WARN_DURATION_IDLE_TXN,
 } from './DatabaseConnections.constants'
-import { getBadgeVariant, getDuration } from './DatabaseConnections.utils'
+import {
+  getBadgeVariant,
+  getBlockChain,
+  getBlockingChain,
+  getDuration,
+} from './DatabaseConnections.utils'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
-import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
+import { useQueryCancelMutation } from '@/data/sql/cancel-query-mutation'
+import { useSessionTerminateMutation } from '@/data/sql/terminate-session-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import { useTrack } from '@/lib/telemetry/track'
 
-const getBlockChain = (pid: number, activities: DatabaseActivity[]) => {
-  const chain = [pid]
-  const visited = new Set([pid])
-  let current = activities.find((x) => x.pid === pid)
+export const GroupedActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
+  const { data: project } = useSelectedProjectQuery()
+  const [view] = useQueryState('view', parseAsString.withDefault(''))
 
-  while (current && current.blocked_by.length > 0) {
-    const nextPid = current.blocked_by[0]
-    if (visited.has(nextPid)) break
-    chain.push(nextPid)
-    visited.add(nextPid)
-    current = activities.find((x) => x.pid === nextPid)
-  }
+  const [expanded, setExpanded] = useState<boolean>(false)
 
-  return chain
+  const { data } = useDatabaseActivityQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const queriesBlockedBy = getBlockingChain(activity.pid, data ?? [])
+    .map((pid) => data?.find((x) => x.pid === pid))
+    .filter((x) => x !== undefined)
+
+  return (
+    <>
+      <ActivityRow
+        activity={activity}
+        expanded={expanded}
+        onExpand={
+          queriesBlockedBy.length > 0 && view === 'blockers'
+            ? () => setExpanded((prev) => !prev)
+            : undefined
+        }
+      />
+
+      {expanded &&
+        view === 'blockers' &&
+        queriesBlockedBy.map((x, index) => (
+          <ActivityRow
+            nested
+            activity={x}
+            isLast={index === queriesBlockedBy.length - 1}
+            key={`${activity.pid}-${x.pid}`}
+          />
+        ))}
+    </>
+  )
 }
 
-export const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
+export const ActivityRow = ({
+  activity,
+  expanded,
+  nested,
+  isLast,
+  onExpand,
+}: {
+  activity: DatabaseActivity
+  expanded?: boolean
+  nested?: boolean
+  isLast?: boolean
+  onExpand?: () => void
+}) => {
+  const track = useTrack()
   const { data: project } = useSelectedProjectQuery()
   const [showTerminateConfirmDialog, setShowTerminateConfirmDialog] = useState(false)
   const [selectedPid, setSelectedPid] = useQueryState('pid', parseAsInteger)
@@ -76,9 +123,13 @@ export const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
   })
   const superuserRoles = roles?.filter((role) => role.isSuperuser).map((role) => role.name)
 
-  const { mutateAsync: abortQuery } = useQueryAbortMutation({
+  const { mutateAsync: cancelQuery } = useQueryCancelMutation({
+    onError: () => {}, // [Joshen] Error handled at call site
+  })
+
+  const { mutateAsync: terminateSession } = useSessionTerminateMutation({
     onSuccess: () => {
-      toast.success(`Successfully aborted query (ID: ${activity.pid})`)
+      toast.success(`Successfully terminated session (ID: ${activity.pid})`)
     },
   })
 
@@ -96,10 +147,44 @@ export const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
         activity.state === 'idle in transaction (aborted)') &&
         durationSeconds >= WARN_DURATION_IDLE_TXN))
 
-  const onConfirmTerminate = async () => {
+  const onCancelQuery = async () => {
+    const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
+    track('query_cancel_button_clicked', {
+      activityState: activity.state,
+      isBlocking,
+    })
+
+    const toastId = toast.loading(`Cancelling query (ID: ${activity.pid})`)
     try {
-      await abortQuery({
+      await cancelQuery({
         pid: activity.pid,
+        backendStart: activity.backend_start,
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+      })
+      toast.success(`Successfully cancelled query (ID: ${activity.pid})`, { id: toastId })
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+      toast.error(`Failed to cancel query: ${errorMessage}`, { id: toastId })
+    }
+  }
+
+  const onSelectTerminate = () => {
+    const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
+    track('session_terminate_button_clicked', {
+      activityState: activity.state,
+      isBlocking,
+    })
+    setShowTerminateConfirmDialog(true)
+  }
+
+  const onConfirmTerminate = async () => {
+    const isBlocking = (data ?? []).some((x) => x.blocked_by.includes(activity.pid))
+    track('session_terminate_submitted', { activityState: activity.state, isBlocking })
+    try {
+      await terminateSession({
+        pid: activity.pid,
+        backendStart: activity.backend_start,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
       })
@@ -108,20 +193,69 @@ export const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
 
   return (
     <>
-      <TableRow id={activity.pid.toString()} key={activity.pid}>
+      <TableRow
+        id={activity.pid.toString()}
+        key={activity.pid}
+        className={cn('[&>td]:py-3', nested && 'bg-alternative')}
+      >
         <TableCell className="relative w-[70px]">
           {selectedPid === activity.pid && (
-            <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter"></div>
+            <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter" />
           )}
-          <Tooltip>
-            <TooltipTrigger>
-              <Badge variant={badgeVariant}>{activity.state}</Badge>
-            </TooltipTrigger>
-            {activity.state && (
-              <TooltipContent side="bottom">{QUERY_STATE_TOOLTIP[activity.state]}</TooltipContent>
+
+          {/* Absolute (not inline in the flex row) so top-0/bottom-0 ignore the cell's padding and touch the adjacent row */}
+          {nested &&
+            (isLast ? (
+              <div className="absolute left-[27px] top-0 h-1/2 w-14 border-l border-b border-stronger rounded-bl-md" />
+            ) : (
+              <>
+                <div className="absolute left-[27px] top-0 h-full border-l border-stronger" />
+                <div className="absolute left-[27px] top-1/2 w-14 border-b border-stronger" />
+              </>
+            ))}
+
+          {/* Starts right below the expand button (row's own py-3 top padding + button height), reaches bottom-0 to touch the first nested row's border */}
+          {!!onExpand && expanded && (
+            <div className="absolute left-[27px] top-[43px] bottom-0 border-l border-stronger" />
+          )}
+
+          <div className="flex items-center">
+            {nested && <div className="w-12 mr-1" />}
+
+            {!!onExpand && (
+              <Button
+                aria-label="Expand row"
+                variant="outline"
+                className="px-1 mr-3"
+                onClick={onExpand}
+                icon={<ChevronRight className={cn('transition', expanded && 'rotate-90')} />}
+              />
             )}
-          </Tooltip>
+
+            {!nested ? (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Badge variant={badgeVariant}>{activity.state}</Badge>
+                </TooltipTrigger>
+                {activity.state && (
+                  <TooltipContent side="bottom">
+                    {QUERY_STATE_TOOLTIP[activity.state]}
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger className="translate-x-4">
+                  <Badge variant="default">Waiting</Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  Waiting for previous query to complete
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
         </TableCell>
+
         <TableCell className="max-w-[300px]">
           <HoverCard openDelay={250} closeDelay={100}>
             <HoverCardTrigger>
@@ -299,17 +433,39 @@ export const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
             <DropdownMenuContent align="end" className="w-44">
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={superuserRoles?.includes(activity.role_name)}
-                onClick={() => setShowTerminateConfirmDialog(true)}
+                disabled={
+                  activity.state !== 'active' || superuserRoles?.includes(activity.role_name)
+                }
+                onClick={onCancelQuery}
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: 'Unable to terminate queries run by superuser roles',
+                    text:
+                      activity.state !== 'active'
+                        ? 'No running queries to cancel'
+                        : 'Unable to terminate queries run by superuser roles',
+                  },
+                }}
+              >
+                <CircleX size={12} />
+                <span>Cancel query</span>
+              </DropdownMenuItemTooltip>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItemTooltip
+                className="gap-x-2"
+                disabled={superuserRoles?.includes(activity.role_name)}
+                onClick={onSelectTerminate}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: 'Unable to terminate sessions owned by superuser roles',
                   },
                 }}
               >
                 <StopCircle size={12} />
-                <span>Terminate</span>
+                <span>Terminate session</span>
               </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -319,17 +475,33 @@ export const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
       <AlertDialog open={showTerminateConfirmDialog} onOpenChange={setShowTerminateConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm to terminate this process?</AlertDialogTitle>
+            <AlertDialogTitle>Confirm to terminate this session?</AlertDialogTitle>
+            {activity.state === 'active' && (
+              <Admonition
+                type="warning"
+                className="border-x-0 rounded-none border-t-0"
+                title="This session is currently running a query"
+                description="Cancelling it may solve the problem without closing the connection."
+              />
+            )}
             <AlertDialogDescription>
-              This will force the query to stop running.
+              Ending this session will close its connection and roll back any open transaction. The
+              application will need to reconnect.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant="warning" onClick={onConfirmTerminate}>
-              Terminate
-            </AlertDialogAction>
+          <AlertDialogFooter className={cn(activity.state === 'active' && 'sm:justify-between')}>
+            <AlertDialogCancel>Back</AlertDialogCancel>
+            <div className="flex items-center gap-x-2">
+              {activity.state === 'active' && (
+                <AlertDialogAction variant="default" onClick={onCancelQuery}>
+                  Cancel query
+                </AlertDialogAction>
+              )}
+              <AlertDialogAction variant="warning" onClick={onConfirmTerminate}>
+                Terminate
+              </AlertDialogAction>
+            </div>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

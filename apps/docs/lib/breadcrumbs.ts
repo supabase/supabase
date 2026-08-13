@@ -26,7 +26,7 @@ const SECTION_PATH_TO_KEY: Record<string, keyof typeof NavItems> = {
   security: 'security',
   'self-hosting': 'self_hosting',
   storage: 'storage',
-  telemetry: 'telemetry',
+  'monitoring-and-debugging': 'telemetry',
 }
 
 function getSectionMenu(pathname: string) {

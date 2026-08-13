@@ -21,7 +21,7 @@ import {
   TabsList,
   TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ComponentProps } from './component-props'
 import { SonnerExpandConfig } from './sonner-expand-config'
