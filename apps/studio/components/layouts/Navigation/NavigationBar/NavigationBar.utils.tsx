@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { Blocks, Box, Lightbulb, List, Settings, Telescope } from 'lucide-react'
 
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
@@ -149,6 +149,13 @@ export const generateProductRoutes = (
           },
         ]
       : []),
+    {
+      key: 'workers',
+      label: 'Workers',
+      disabled: !isProjectActive,
+      icon: <Box size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/workers`),
+    },
   ]
 }
 

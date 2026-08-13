@@ -6,6 +6,7 @@ import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
 import { useBillingGotoCommands } from './BillingLayout/Billing.Commands'
 import { useDatabaseGotoCommands } from './DatabaseLayout/Database.Commands'
 import { useFunctionsGotoCommands } from './EdgeFunctionsLayout/EdgeFunctions.Commands'
+import { useWorkersGotoCommands } from './WorkersLayout/Workers.Commands'
 import { useIntegrationsGotoCommands } from './IntegrationsLayout/Integrations.Commands'
 import { useLogsGotoCommands } from './LogsLayout/Logs.Commands'
 import { useProjectSettingsGotoCommands } from './ProjectSettingsLayout/ProjectSettings.Commands'
@@ -24,6 +25,7 @@ export function useLayoutNavCommands() {
   useAdvisorsGoToCommands({ enabled: isLoggedIn })
   useStorageGotoCommands({ enabled: isLoggedIn })
   useFunctionsGotoCommands({ enabled: isLoggedIn })
+  useWorkersGotoCommands({ enabled: isLoggedIn })
   useLogsGotoCommands({ enabled: isLoggedIn })
   useReportsGotoCommands({ enabled: isLoggedIn })
   useApiDocsGotoCommands({ enabled: isLoggedIn })
