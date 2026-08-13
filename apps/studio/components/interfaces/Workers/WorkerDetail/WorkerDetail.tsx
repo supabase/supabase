@@ -52,6 +52,9 @@ import {
 type WorkerTab = 'overview' | 'logs' | 'settings'
 const WORKER_TABS: WorkerTab[] = ['overview', 'logs', 'settings']
 
+// Display order for the nav — Terminal is a disabled placeholder second to last.
+const TAB_ORDER: Array<WorkerTab | 'terminal'> = ['overview', 'logs', 'terminal', 'settings']
+
 const TAB_LABEL: Record<WorkerTab, string> = {
   overview: 'Overview',
   logs: 'Logs',
@@ -197,26 +200,29 @@ export const WorkerDetail = () => {
 
         <PageHeaderNavigationTabs>
           <NavMenu>
-            {WORKER_TABS.map((item) => (
-              <NavMenuItem key={item} active={tab === item}>
-                <button type="button" onClick={() => setTab(item)}>
-                  {TAB_LABEL[item]}
-                </button>
-              </NavMenuItem>
-            ))}
-            <NavMenuItem active={false}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="flex h-full cursor-not-allowed items-center gap-1.5 text-foreground-muted">
-                    Terminal
-                    <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
-                      Soon
-                    </span>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Coming soon in private alpha</TooltipContent>
-              </Tooltip>
-            </NavMenuItem>
+            {TAB_ORDER.map((item) =>
+              item === 'terminal' ? (
+                <NavMenuItem key="terminal" active={false}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="flex h-full cursor-not-allowed items-center gap-1.5 text-foreground-muted">
+                        Terminal
+                        <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
+                          Soon
+                        </span>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Coming soon in private alpha</TooltipContent>
+                  </Tooltip>
+                </NavMenuItem>
+              ) : (
+                <NavMenuItem key={item} active={tab === item}>
+                  <button type="button" onClick={() => setTab(item)}>
+                    {TAB_LABEL[item]}
+                  </button>
+                </NavMenuItem>
+              )
+            )}
           </NavMenu>
         </PageHeaderNavigationTabs>
       </PageHeader>

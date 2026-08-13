@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useMemo, type PropsWithChildren } from 'react'
+import { Badge } from 'ui'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { ProductMenu } from '@/components/ui/ProductMenu'
@@ -43,6 +44,7 @@ const WorkersLayout = ({ children, title }: PropsWithChildren<WorkersLayoutProps
   return (
     <ProjectLayout
       product="Workers"
+      productMenuBadge={<Badge variant="warning">Private Alpha</Badge>}
       productMenu={<WorkersProductMenu />}
       isBlocking={false}
       browserTitle={{ entity: 'Workers', section: title }}
