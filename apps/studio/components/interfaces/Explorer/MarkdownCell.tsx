@@ -16,6 +16,8 @@ interface MarkdownCellProps {
   cell: MarkdownCellSchema
 }
 
+// [Joshen] handleUpdateMarkdown could be shifted into notebook-state as a updateCell action
+
 export const MarkdownCell = ({ cell }: MarkdownCellProps) => {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()

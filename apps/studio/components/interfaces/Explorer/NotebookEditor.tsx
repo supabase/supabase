@@ -12,7 +12,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useParams } from 'common'
-import { Notebook, NotebookText, Play, Save } from 'lucide-react'
+import { FileText, Notebook, NotebookText, Play, Save, SquareCode } from 'lucide-react'
 import { useEffect, useEffectEvent } from 'react'
 import { AiIconAnimation, Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -26,6 +26,8 @@ import {
 } from './ExplorerToolbar'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
+import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -56,6 +58,16 @@ export const NotebookEditor = () => {
     if (!id || !over || active.id === over.id) return
 
     snap.reorderCells({ id, activeCellId: active.id, overCellId: over.id })
+  }
+
+  const onSelectAddCell = (type: 'markdown' | 'query') => {
+    const notebookId = currentNotebook?.notebook.id
+    const lastCellId = cells[cells.length - 1]?.id
+    if (!notebookId || !lastCellId) return
+
+    const cell = type === 'markdown' ? createMarkdownCellSkeleton() : createQueryCellSkeleton()
+
+    snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
 
   const registerTab = useEffectEvent(() => {
@@ -103,28 +115,47 @@ export const NotebookEditor = () => {
             </EmptyStatePresentational>
           )}
           {cells.length > 0 && (
-            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-              <SortableContext
-                items={cells.map((cell) => cell.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="flex flex-col gap-y-4">
-                  {cells.map((cell) => {
-                    switch (cell._tag) {
-                      case 'markdown_cell':
-                        return <MarkdownCell key={cell.id} cell={cell} />
+            <>
+              <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+                <SortableContext
+                  items={cells.map((cell) => cell.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="flex flex-col gap-y-4">
+                    {cells.map((cell) => {
+                      switch (cell._tag) {
+                        case 'markdown_cell':
+                          return <MarkdownCell key={cell.id} cell={cell} />
 
-                      case 'database_cell':
-                        return <QueryCell key={cell.id} cell={cell} />
+                        case 'database_cell':
+                          return <QueryCell key={cell.id} cell={cell} />
 
-                      case 'log_cell':
-                        // [Joshen] Will eventually hook it up
-                        return null
-                    }
-                  })}
-                </div>
-              </SortableContext>
-            </DndContext>
+                        case 'log_cell':
+                          // [Joshen] Will eventually hook it up
+                          return null
+                      }
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
+
+              <div className="flex items-center justify-center gap-x-2 mt-4">
+                <ButtonTooltip
+                  variant="outline"
+                  icon={<SquareCode />}
+                  className="w-7"
+                  onClick={() => onSelectAddCell('query')}
+                  tooltip={{ content: { side: 'bottom', text: 'Add query cell' } }}
+                />
+                <ButtonTooltip
+                  variant="outline"
+                  icon={<FileText />}
+                  className="w-7"
+                  onClick={() => onSelectAddCell('markdown')}
+                  tooltip={{ content: { side: 'bottom', text: 'Add markdown cell' } }}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>
