@@ -75,6 +75,7 @@ export const QueryTab = () => {
       variant="viewport"
       title={draft.name}
       sql={draft.uncheckedSql}
+      source={draft.source}
       result={result}
       rowLimit={QUERY_ROW_LIMIT}
       onTitleChange={(value) => {
@@ -83,6 +84,7 @@ export const QueryTab = () => {
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}
       onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
+      onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
     />
   )
