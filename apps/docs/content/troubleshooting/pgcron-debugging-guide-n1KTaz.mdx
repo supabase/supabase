@@ -114,7 +114,7 @@ You can view your concurrent peak connection usage throughout the day at the bot
 
 Unfortunately, excessive resource strain can slow down or disrupt jobs.
 
-Go to the [reports page](/dashboard/project/_/observability/database) (or [Supabase Grafana](/docs/guides/telemetry/metrics/grafana-self-hosted) if you have it setup), and check for signs of resource exhaustion. If it's clear your database is under pressure, consider upgrading your compute add-on or following the advice from one of the optimization guides:
+Go to the [reports page](/dashboard/project/_/observability/database) (or [Supabase Grafana](/docs/guides/monitoring-and-debugging/metrics/grafana-self-hosted) if you have it setup), and check for signs of resource exhaustion. If it's clear your database is under pressure, consider upgrading your compute add-on or following the advice from one of the optimization guides:
 
 - [Connections](https://github.com/orgs/supabase/discussions/27141)
 - [Disk/IO](https://github.com/orgs/supabase/discussions/27003)
@@ -152,7 +152,7 @@ order by timestamp desc
 limit 100;
 ```
 
-If you're interested in modifying the query, there is an advanced [guide](https://github.com/orgs/supabase/discussions/26224) for navigating the Postgres logs and a general purpose [one](/docs/guides/telemetry/advanced-log-filtering) for applying filters.
+If you're interested in modifying the query, there is an advanced [guide](https://github.com/orgs/supabase/discussions/26224) for navigating the Postgres logs and a general purpose [one](/docs/guides/monitoring-and-debugging/advanced-log-filtering) for applying filters.
 
 <br />
 
