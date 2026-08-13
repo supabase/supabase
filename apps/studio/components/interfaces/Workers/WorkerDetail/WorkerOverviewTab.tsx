@@ -151,7 +151,7 @@ export const WorkerOverviewTab = ({ projectRef, worker }: WorkerOverviewTabProps
         </PageContainer>
       </PageSection>
 
-      <PageContainer size="small">
+      <PageContainer size="full">
         {/* Errors */}
         <PageSection>
           <PageSectionMeta>
