@@ -127,7 +127,7 @@ It is important to make sure you are running the latest release of pg_cron (1.6.
 
 #### Check the log explorer for more information
 
-Although pg_cron records errors in the `cron.job_run_details` table, in rare cases, more information can be found in the general Postgres logs. You can check the [Log Explorer](/dashboard/project/_/logs/explorer) for failure events with the following query
+Although `pg_cron` records errors in the `cron.job_run_details` table, in rare cases, more information can be found in the general Postgres logs. You can check the [Log Explorer](/dashboard/project/_/logs/explorer) for failure events with the following query
 
 ```sql
 select
@@ -190,7 +190,7 @@ You can then search for your custom messages in the [Logs Interface](/dashboard/
 
 #### Upgrading pg_cron version
 
-The current version of pg_cron on Supabase is 1.6.4. It comes with a [few bug fixes](https://github.com/citusdata/pg_cron/releases/tag/v1.6.4). You should consider upgrading to Postgres v15.6.1.122+ in the [General Settings](/dashboard/project/_/settings/general) to get the latest extension.
+The current version of `pg_cron` on Supabase is 1.6.4. It comes with a [few bug fixes](https://github.com/citusdata/pg_cron/releases/tag/v1.6.4). You should consider upgrading to Postgres v15.6.1.122+ in the [General Settings](/dashboard/project/_/settings/general) to get the latest extension.
 
 <br />
 
