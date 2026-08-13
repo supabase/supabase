@@ -26,7 +26,7 @@ export const WorkerLogsTab = ({ projectRef, workerName }: WorkerLogsTabProps) =>
   }
 
   return (
-    <div className="-mx-4 flex-1">
+    <div className="flex-1">
       <LogsPreviewer
         condensedLayout
         projectRef={projectRef}

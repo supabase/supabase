@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Clock, Copy, Pause, Play, Zap } from 'lucide-react'
+import { Clock, Container, Copy, Info, Pause, Play, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
@@ -12,6 +12,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
   Button,
+  Card,
   copyToClipboard,
   NavMenu,
   NavMenuItem,
@@ -24,10 +25,19 @@ import {
 } from 'ui'
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderIcon,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
 import { PageNav } from 'ui-patterns/PageNav'
 
-import { workerGatewayUrl } from '../Workers.constants'
 import { RuntimeBadge } from '../RuntimeBadge'
+import { workerGatewayUrl } from '../Workers.constants'
 import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { WorkerStatePill } from '../WorkerStatePill'
 import { WorkerLogsTab } from './WorkerLogsTab'
@@ -146,53 +156,47 @@ export const WorkerDetail = () => {
       </PageBreadcrumbs>
 
       {/* Worker title + summary, aligned with the breadcrumb/nav gutters */}
-      <PageContainer size="full" className="px-4 py-6 xl:px-4">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl text-foreground">{worker.name}</h1>
-          <div className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            <span className="flex items-center gap-2">
-              <span className="font-mono text-foreground-light">{gatewayUrl}</span>
-              <button
-                type="button"
-                aria-label="Copy URL"
-                onClick={() => copyToClipboard(gatewayUrl)}
-                className="text-foreground-lighter transition-colors hover:text-foreground"
-              >
-                <Copy size={13} />
-              </button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="text-xs text-foreground-light transition-colors hover:text-foreground"
-                  >
-                    How to call
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-[440px] p-4">
-                  <WorkerSnippetTabs
-                    input={{
-                      name: worker.name,
-                      runtime: worker.runtime,
-                      size: worker.size,
-                      access: worker.access,
-                      instances: worker.instances,
-                    }}
-                    tabs={['curl', 'js', 'python']}
-                  />
-                </PopoverContent>
-              </Popover>
-            </span>
-            <WorkerStatePill state={worker.state} />
-            <RuntimeBadge runtime={worker.runtime} />
-            <span className="flex items-center gap-2 text-foreground-light">
-              <Clock size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-              Last deployed {dayjs(worker.updatedAt).format('MMM D, YYYY HH:mm')}
-            </span>
-          </div>
-        </div>
-      </PageContainer>
-
+      <PageHeader className="py-8 [&>div]:px-4 [&>div]:xl:px-4">
+        <PageHeaderMeta className="px-0 xl:px-0">
+          <PageHeaderIcon>
+            <Card className="flex h-14 w-14 shrink-0 items-center justify-center">
+              <Container className="h-5 w-5" />
+            </Card>
+          </PageHeaderIcon>
+          <PageHeaderSummary>
+            <PageHeaderTitle>{worker.name}</PageHeaderTitle>
+            <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              <WorkerStatePill state={worker.state} />
+              <RuntimeBadge runtime={worker.runtime} />
+              <span className="flex items-center gap-2 text-foreground-light">
+                <Clock size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                Last deployed {dayjs(worker.updatedAt).format('MMM D, YYYY HH:mm')}
+              </span>
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="default" icon={<Copy size={14} />}>
+                  How to call
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent align="start" className="w-[440px] p-4">
+                <WorkerSnippetTabs
+                  input={{
+                    name: worker.name,
+                    runtime: worker.runtime,
+                    size: worker.size,
+                    access: worker.access,
+                    instances: worker.instances,
+                  }}
+                  tabs={['curl', 'js', 'python']}
+                />
+              </PopoverContent>
+            </Popover>
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
       <PageNav>
         <NavMenu>
           {TAB_ORDER.map((item) =>
@@ -200,14 +204,12 @@ export const WorkerDetail = () => {
               <NavMenuItem key="terminal" active={false}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="flex h-full cursor-not-allowed items-center gap-1.5 text-foreground-muted">
+                    <span className="flex h-full items-center gap-1 text-foreground-muted/70">
                       Terminal
-                      <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
-                        Soon
-                      </span>
+                      <Info size={12} />
                     </span>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom">Coming soon in private alpha</TooltipContent>
+                  <TooltipContent side="top">Coming soon</TooltipContent>
                 </Tooltip>
               </NavMenuItem>
             ) : (

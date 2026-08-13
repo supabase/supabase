@@ -8,13 +8,6 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  PageHeader,
-  PageHeaderDescription,
-  PageHeaderMeta,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
-import {
   PageSection,
   PageSectionContent,
   PageSectionDescription,
@@ -23,16 +16,16 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { RuntimeBadge } from '../RuntimeBadge'
 import {
-  LISTENING_PORT,
-  WORKERS_REGION_LABEL,
   getRuntimeMeta,
   getSizeMeta,
+  LISTENING_PORT,
+  WORKERS_REGION_LABEL,
 } from '../Workers.constants'
 import type { Worker } from '../Workers.types'
-import { RuntimeBadge } from '../RuntimeBadge'
-import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { buildWorkerCliCommands } from '../workerSnippets'
+import { WorkerSnippetTabs } from '../WorkerSnippetTabs'
 import { WORKERS_DOCS_URL, WORKERS_SKILL_MARKDOWN } from '@/lib/constants/workers'
 import { deleteWorker } from '@/state/workers-mock-state'
 
@@ -117,17 +110,6 @@ export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps
 
   return (
     <>
-      <PageHeader size="small" className="pb-8">
-        <PageHeaderMeta>
-          <PageHeaderSummary>
-            <PageHeaderTitle>Settings</PageHeaderTitle>
-            <PageHeaderDescription>
-              Configuration is fixed at deploy time. Redeploy to change it.
-            </PageHeaderDescription>
-          </PageHeaderSummary>
-        </PageHeaderMeta>
-      </PageHeader>
-
       <PageContainer size="small">
         {/* Container */}
         <PageSection>
@@ -148,7 +130,9 @@ export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps
                 <span className="font-mono text-xs text-foreground-light">{runtime.baseImage}</span>
               </SettingsRow>
               <SettingsRow label="Entrypoint">
-                <span className="font-mono text-xs text-foreground-light">{runtime.entrypoint}</span>
+                <span className="font-mono text-xs text-foreground-light">
+                  {runtime.entrypoint}
+                </span>
               </SettingsRow>
               <SettingsRow label="Listening port">
                 <span className="font-mono text-xs text-foreground-light">
@@ -181,8 +165,7 @@ export const WorkerSettingsTab = ({ projectRef, worker }: WorkerSettingsTabProps
               </SettingsRow>
               <SettingsRow label="Region">
                 <span className="text-foreground-light">
-                  {WORKERS_REGION_LABEL}{' '}
-                  <span className="text-foreground-lighter">(locked)</span>
+                  {WORKERS_REGION_LABEL} <span className="text-foreground-lighter">(locked)</span>
                 </span>
               </SettingsRow>
             </div>
