@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useQueryState } from 'nuqs'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
@@ -35,6 +36,10 @@ import {
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
+import {
+  recommendComputeParser,
+  subscribeRecommendCompute,
+} from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
 import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
@@ -166,6 +171,11 @@ export function DiskManagementForm({
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
+
+  const [recommendCompute, setRecommendCompute] = useQueryState(
+    'recommendCompute',
+    recommendComputeParser
+  )
 
   const modifiedComputeSize = useWatch({ control: form.control, name: 'computeSize' })
 
@@ -365,6 +375,51 @@ export function DiskManagementForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, isDiskAttributesSuccess])
+
+  // From Add read replica eligibility: pre-select compute and scroll to Scaling.
+  // Declared after form.reset so a cold-load with ?recommendCompute= does not get wiped.
+  useEffect(() => {
+    if (!recommendCompute || !isSuccess) return
+
+    form.setValue('computeSize', recommendCompute, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+    void form.trigger(['provisionedIOPS', 'throughput'])
+    setRecommendCompute(null)
+
+    const timeoutId = setTimeout(() => {
+      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 150)
+
+    return () => clearTimeout(timeoutId)
+  }, [form, isSuccess, recommendCompute, setRecommendCompute])
+
+  // In-page handoff from the Add read replica sheet (avoids URL write races on unmount).
+  useEffect(() => {
+    return subscribeRecommendCompute((size) => {
+      form.setValue('computeSize', size, {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
+      void form.trigger(['provisionedIOPS', 'throughput'])
+      window.setTimeout(() => {
+        computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 150)
+    })
+  }, [form])
+
+  // Deep links from billing / UpgradePlanButton (e.g. #compute).
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.location.hash !== '#compute') return
+
+    const timeoutId = setTimeout(() => {
+      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [])
 
   useEffect(() => {
     const fieldErrors = Object.keys(errors)

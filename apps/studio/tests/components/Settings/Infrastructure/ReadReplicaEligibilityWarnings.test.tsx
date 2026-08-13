@@ -16,7 +16,7 @@ vi.mock('@/data/database/enable-physical-backups-mutation', () => ({
   useEnablePhysicalBackupsMutation: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
-  useSelectedOrganizationQuery: () => ({ data: { slug: 'test-org' } }),
+  useSelectedOrganizationQuery: () => ({ data: { slug: 'test-org', plan: { id: 'pro' } } }),
 }))
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({ data: { dbVersion: 'supabase-postgres-15.1.0' } }),
@@ -52,6 +52,7 @@ describe('ReadReplicaEligibilityWarnings – below small compute', () => {
         "This is to ensure that read replicas can keep up with the primary databases' activities."
       )
     ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /change to small compute/i })).toBeInTheDocument()
   })
 })
 
@@ -67,7 +68,7 @@ describe('ReadReplicaEligibilityWarnings – max replicas reached', () => {
       screen.getByText('You can only deploy up to 4 read replicas at once')
     ).toBeInTheDocument()
     expect(screen.getByText(/you may deploy up to/i)).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /change compute size/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /change to xl compute/i })).toBeInTheDocument()
   })
 
   it('does NOT show the compute upsell when already at the default cap (XL+)', () => {
@@ -82,6 +83,6 @@ describe('ReadReplicaEligibilityWarnings – max replicas reached', () => {
     ).toBeInTheDocument()
     expect(screen.queryByText(/you may deploy up to/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/XL compute or higher/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /change compute size/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /change to xl compute/i })).not.toBeInTheDocument()
   })
 })
