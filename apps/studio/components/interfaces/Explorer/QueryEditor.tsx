@@ -79,10 +79,12 @@ export const QueryEditor = ({
   onResultChange,
   onDisplayChange,
 }: QueryEditorProps) => {
+  const sqlRef = useLatest(sql)
+  const onSqlCommitRef = useLatest(onSqlCommit)
+
   const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
-  const [showQuery, setShowQuery] = useState(true)
-  const sqlRef = useLatest(sql)
+
   const view = display?.view ?? 'table'
   const columns = Object.keys(result?.rows?.[0] ?? {})
   const sourceBinding = source ?? createDefaultCellSource('database')
@@ -97,6 +99,8 @@ export const QueryEditor = ({
         databaseIdentifier !== project.ref,
     }
   )
+
+  const [showQuery, setShowQuery] = useState(true)
 
   const { mutate: executeSql, isPending: isExecutingSql } = useExecuteSqlMutation({
     onSuccess: (data) => onResultChange({ rows: data.result }),
@@ -209,9 +213,7 @@ export const QueryEditor = ({
             options={{ minimap: { enabled: false }, padding: { top: 8 } }}
             onInputChange={(value) => onSqlChange(value ?? '')}
             onMount={(editor) => {
-              if (onSqlCommit) {
-                editor.onDidBlurEditorWidget(() => onSqlCommit(sqlRef.current))
-              }
+              editor.onDidBlurEditorWidget(() => onSqlCommitRef.current?.(sqlRef.current))
             }}
           />
         </ExplorerQueryEditor>
