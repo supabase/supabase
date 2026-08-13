@@ -2,6 +2,8 @@ import { untrustedSql } from '@supabase/pg-meta'
 import { useState } from 'react'
 import { type Snapshot } from 'valtio'
 
+import { AddCellDropdown } from '../AddCellDropdown'
+import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
 import { QueryEditor } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { SortableSection } from '@/components/ui/SortableSection'
@@ -11,6 +13,17 @@ import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks
 interface QueryCellProps {
   cell: Snapshot<DatabaseCellSchema>
 }
+
+/**
+ * [Joshen] Aiming to keep PRs small so the following are deliberating missing for now:
+ * - Auto limit logic
+ * - Database selection logic
+ *
+ * QueryCell atm minimally supports running queries and rendering results
+ *
+ * [Joshen] TODO: handleUpdateCell might be able to shift into notebook-state, so component
+ * doesn't need to have context of the other cells
+ */
 
 type QueryCellUpdate = { sql: string } | { title: string } | { display: QueryDisplay }
 
@@ -56,7 +69,12 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   }
 
   return (
-    <SortableSection gripClassName="mt-2.5" id={cell.id}>
+    <SortableSection
+      id={cell.id}
+      actions={<AddCellDropdown cellId={cell.id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell.id} />}
+      gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+    >
       <QueryEditor
         id={cell.id}
         variant="embedded"

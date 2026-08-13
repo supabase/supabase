@@ -7,13 +7,12 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { useParams } from 'common'
-import { Notebook, NotebookText, Play, Save } from 'lucide-react'
+import { FileText, Notebook, NotebookText, Play, Save, SquareCode } from 'lucide-react'
 import { AiIconAnimation, Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
@@ -26,6 +25,8 @@ import {
 } from './ExplorerToolbar'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
+import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -55,11 +56,17 @@ export const NotebookEditor = () => {
     const { active, over } = event
     if (!id || !over || active.id === over.id) return
 
-    const oldIndex = cells.findIndex((cell) => cell.id === active.id)
-    const newIndex = cells.findIndex((cell) => cell.id === over.id)
-    if (oldIndex === -1 || newIndex === -1) return
+    snap.reorderCells({ id, activeCellId: active.id, overCellId: over.id })
+  }
 
-    snap.updateCells({ id, cells: arrayMove([...cells], oldIndex, newIndex) })
+  const onSelectAddCell = (type: 'markdown' | 'query') => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!notebookId) return
+
+    const cell = type === 'markdown' ? createMarkdownCellSkeleton() : createQueryCellSkeleton()
+    const lastCellId = cells[cells.length - 1]?.id
+
+    snap.insertCellAfter({ id: notebookId, cellId: lastCellId, cell })
   }
 
   return (
@@ -88,34 +95,57 @@ export const NotebookEditor = () => {
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
             >
               <div className="flex items-center gap-x-2">
-                <Button variant="default">Add query cell</Button>
-                <Button variant="default">Add markdown cell</Button>
+                <Button variant="default" onClick={() => onSelectAddCell('query')}>
+                  Add query cell
+                </Button>
+                <Button variant="default" onClick={() => onSelectAddCell('markdown')}>
+                  Add markdown cell
+                </Button>
               </div>
             </EmptyStatePresentational>
           )}
           {cells.length > 0 && (
-            <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-              <SortableContext
-                items={cells.map((cell) => cell.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="flex flex-col gap-y-3">
-                  {cells.map((cell) => {
-                    switch (cell._tag) {
-                      case 'markdown_cell':
-                        return <MarkdownCell key={cell.id} cell={cell} />
+            <>
+              <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+                <SortableContext
+                  items={cells.map((cell) => cell.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="flex flex-col gap-y-4">
+                    {cells.map((cell) => {
+                      switch (cell._tag) {
+                        case 'markdown_cell':
+                          return <MarkdownCell key={cell.id} cell={cell} />
 
-                      case 'database_cell':
-                        return <QueryCell key={cell.id} cell={cell} />
+                        case 'database_cell':
+                          return <QueryCell key={cell.id} cell={cell} />
 
-                      case 'log_cell':
-                        // [Joshen] Will eventually hook it up
-                        return null
-                    }
-                  })}
-                </div>
-              </SortableContext>
-            </DndContext>
+                        case 'log_cell':
+                          // [Joshen] Will eventually hook it up
+                          return null
+                      }
+                    })}
+                  </div>
+                </SortableContext>
+              </DndContext>
+
+              <div className="flex items-center justify-center gap-x-2 mt-4">
+                <ButtonTooltip
+                  variant="outline"
+                  icon={<SquareCode />}
+                  className="w-7"
+                  onClick={() => onSelectAddCell('query')}
+                  tooltip={{ content: { side: 'bottom', text: 'Add query cell' } }}
+                />
+                <ButtonTooltip
+                  variant="outline"
+                  icon={<FileText />}
+                  className="w-7"
+                  onClick={() => onSelectAddCell('markdown')}
+                  tooltip={{ content: { side: 'bottom', text: 'Add markdown cell' } }}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>
