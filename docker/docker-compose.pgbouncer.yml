@@ -1,0 +1,28 @@
+services:
+  supavisor: !reset null
+
+  pgbouncer:
+    image: edoburu/pgbouncer:v1.25.2-p0
+    restart: unless-stopped
+    ports:
+      - ${POOLER_PROXY_PORT_TRANSACTION}:6432
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-h', 'localhost', '-p', '6432']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_NAME: ${POSTGRES_DB}
+      LISTEN_PORT: 6432
+      AUTH_TYPE: scram-sha-256
+      POOL_MODE: transaction
+      DEFAULT_POOL_SIZE: ${POOLER_DEFAULT_POOL_SIZE}
+      MAX_CLIENT_CONN: ${POOLER_MAX_CLIENT_CONN}
