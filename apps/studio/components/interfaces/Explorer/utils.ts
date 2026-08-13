@@ -1,5 +1,6 @@
 import { untrustedSql } from '@supabase/pg-meta'
 
+import { DEFAULT_CELL_ROW_LIMIT } from './QueryCell/QueryCell.utils'
 import { generateUuid } from '@/lib/api/snippets.browser'
 
 export const createQueryCellSkeleton = ({ sql }: { sql?: string } = {}) => {
@@ -9,7 +10,7 @@ export const createQueryCellSkeleton = ({ sql }: { sql?: string } = {}) => {
     view: 'table' as const,
     chart: undefined,
     unchecked_sql: untrustedSql(sql ?? ''),
-    row_limit: 100,
+    row_limit: DEFAULT_CELL_ROW_LIMIT,
   }
 }
 
