@@ -227,7 +227,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     label: 'Devin Desktop',
     icon: 'windsurf',
     hasDistinctDarkIcon: true,
-    configFile: '~/.codeium/windsurf/mcp_config.json',
+    configFile: '~/.config/devin/mcp_config.json',
     externalDocsUrl: '',
     transformConfig: (config): WindsurfMcpConfig => {
       return {
