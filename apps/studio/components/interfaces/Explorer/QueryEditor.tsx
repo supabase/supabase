@@ -173,6 +173,7 @@ export const QueryEditor = ({
           )}
           {display && onDisplayChange && (
             <DisplaySettingsButton
+              result={result}
               display={display}
               columns={columns}
               disabled={(result?.rows ?? []).length === 0}
