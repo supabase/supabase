@@ -27,6 +27,8 @@ interface DisplaySettingsButtonProps {
 }
 
 // [Joshen] TODO support multiple y axis charts
+// [Joshen] TODO onUpdateChartConfig can likely be shifted into the notebook-state
+// so this component doesn't need to know about other cells
 
 export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettingsButtonProps) => {
   const snap = useNotebooksStateSnapshot()

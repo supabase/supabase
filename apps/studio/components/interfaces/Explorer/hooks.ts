@@ -1,6 +1,6 @@
-import { untrustedSql } from '@supabase/pg-meta'
 import { useRouter } from 'next/router'
 
+import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
@@ -22,35 +22,28 @@ export const useCreateNotebook = () => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
 
-    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
-    const DEFAULT_CELLS = [
-      {
-        _tag: 'markdown_cell',
-        id: generateUuid(),
-        text: `
+    const sampleMdCell1 = createMarkdownCellSkeleton({
+      content: `
 # Title
 A brief description on what this notebook is about
-        `.trim(),
-      },
-      {
-        _tag: 'markdown_cell',
-        id: generateUuid(),
-        text: `
+`.trim(),
+    })
+    const sampleMdCell2 = createMarkdownCellSkeleton({
+      content: `
 ## Section
 This is a sample paragraph to demonstrate the Markdown cells
 1. List item 1
 2. List item 2
 3. List item 3
-            `,
-      },
-      {
-        _tag: 'database_cell',
-        id: generateUuid(),
-        view: 'table',
-        chart: undefined,
-        unchecked_sql: untrustedSql('select * from colors;'),
-        row_limit: 100,
-      },
+`.trim(),
+    })
+    const sampleQueryCell = createQueryCellSkeleton({ sql: 'select * from colors;' })
+
+    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
+    const DEFAULT_CELLS = [
+      sampleMdCell1,
+      sampleMdCell2,
+      sampleQueryCell,
     ] as Notebooks.Content['cells']
 
     const id = idOverride ?? generateUuid()

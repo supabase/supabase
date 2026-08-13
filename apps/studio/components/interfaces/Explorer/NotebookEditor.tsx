@@ -7,7 +7,6 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import {
-  arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
@@ -56,11 +55,7 @@ export const NotebookEditor = () => {
     const { active, over } = event
     if (!id || !over || active.id === over.id) return
 
-    const oldIndex = cells.findIndex((cell) => cell.id === active.id)
-    const newIndex = cells.findIndex((cell) => cell.id === over.id)
-    if (oldIndex === -1 || newIndex === -1) return
-
-    snap.updateCells({ id, cells: arrayMove([...cells], oldIndex, newIndex) })
+    snap.reorderCells({ id, activeCellId: active.id, overCellId: over.id })
   }
 
   const registerTab = useEffectEvent(() => {
@@ -113,7 +108,7 @@ export const NotebookEditor = () => {
                 items={cells.map((cell) => cell.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <div className="flex flex-col gap-y-3">
+                <div className="flex flex-col gap-y-4">
                   {cells.map((cell) => {
                     switch (cell._tag) {
                       case 'markdown_cell':

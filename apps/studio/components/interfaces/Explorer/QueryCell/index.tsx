@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { cn } from 'ui'
 import { type Snapshot } from 'valtio'
 
+import { AddCellDropdown } from '../AddCellDropdown'
 import {
   ExplorerQuery,
   ExplorerQueryEditor,
@@ -17,6 +18,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from '../ExplorerToolbar'
+import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
 import { QueryResultTable } from '../QueryResultTable'
 import { type QueryResult } from '../types'
 import { DisplaySettingsButton } from './DisplaySettingsButton'
@@ -38,9 +40,11 @@ interface QueryCellProps {
  * [Joshen] Aiming to keep PRs small so the following are deliberating missing for now:
  * - Auto limit logic
  * - Database selection logic
- * - Data display logic
  *
  * QueryCell atm minimally supports running queries and rendering results
+ *
+ * [Joshen] TODO: handleUpdateCell might be able to shift into notebook-state, so component
+ * doesn't need to have context of the other cells
  */
 
 export const QueryCell = ({ cell }: QueryCellProps) => {
@@ -108,7 +112,12 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
   const handleUpdateCellRef = useLatest(handleUpdateCell)
 
   return (
-    <SortableSection gripClassName="mt-2.5" id={cell.id}>
+    <SortableSection
+      id={cell.id}
+      actions={<AddCellDropdown cellId={cell.id} />}
+      gripDropdownContent={<MoveCellDropdownContent cellId={cell.id} />}
+      gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
+    >
       <ExplorerQuery className="max-w-4xl mx-auto">
         <ExplorerToolbar>
           <ExplorerToolbarIcon>
