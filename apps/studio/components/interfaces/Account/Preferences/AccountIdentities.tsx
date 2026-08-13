@@ -1,4 +1,5 @@
 import type { Provider } from '@supabase/auth-js'
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { Edit, Unlink } from 'lucide-react'
 import Link from 'next/link'
@@ -29,7 +30,8 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { parseRedirectMessage } from './AccountIdentities.utils'
+import { parseRedirectMessage, shouldShowAddPasswordRow } from './AccountIdentities.utils'
+import { AddPasswordRow } from './AddPasswordRow'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
@@ -60,7 +62,11 @@ export const AccountIdentities = () => {
     [enabledProviders]
   )
 
+  const isAddAccountPasswordEnabled = useFlag('enableAccountPassword')
+
   const identities = data?.identities ?? []
+  const showAddPasswordRow =
+    isAddAccountPasswordEnabled && shouldShowAddPasswordRow({ identities, email: data?.email })
   const isChangeExpired = data?.email_change_sent_at
     ? dayjs().utc().diff(dayjs(data?.email_change_sent_at).utc(), 'minute') > 10
     : false
@@ -142,6 +148,8 @@ export const AccountIdentities = () => {
           )}
           {isSuccess && (
             <div className="divide-y">
+              {showAddPasswordRow && !!data.email && <AddPasswordRow email={data.email} />}
+
               {identities.map((identity) => {
                 const { identity_id, provider } = identity
                 const username = identity.identity_data?.user_name
