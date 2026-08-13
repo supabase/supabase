@@ -11,7 +11,7 @@ import type { DatetimeHelper } from './Logs.types'
  */
 
 /** The relative-range units the picker and the logs domain both speak. */
-export type Unit = 'minute' | 'hour' | 'day' | 'week'
+export type Unit = 'minute' | 'hour' | 'day'
 
 export type ParsedCustomInput =
   | { type: 'number'; value: number }
@@ -38,7 +38,7 @@ export const parseCustomInput = (input: string): ParsedCustomInput => {
   }
 
   // Match if unitStr is a prefix of any unit name or its first letter
-  const units: Unit[] = ['minute', 'hour', 'day', 'week']
+  const units: Unit[] = ['minute', 'hour', 'day']
   const matchedUnit = units.find((u) => u.startsWith(unitStr) || u[0] === unitStr)
 
   if (!matchedUnit) return { type: 'invalid' }
@@ -55,7 +55,7 @@ export const generateDynamicHelper = (value: number, unit: Unit): DatetimeHelper
 }
 
 export const generateDynamicHelpers = (value: number): DatetimeHelper[] => {
-  const units: Unit[] = ['minute', 'hour', 'day', 'week']
+  const units: Unit[] = ['minute', 'hour', 'day']
   return units.map((unit) => generateDynamicHelper(value, unit))
 }
 

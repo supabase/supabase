@@ -20,14 +20,14 @@ function parseRelativeHelperLabel(
   const match = text
     .trim()
     .toLowerCase()
-    .match(/^last\s+(?:(\d+)\s+)?(minute|hour|day|week)s?$/)
+    .match(/^last\s+(?:(\d+)\s+)?(minute|hour|day)s?$/)
   if (!match) return null
 
   const amount = match[1] ? parseInt(match[1], 10) : 1
   if (!Number.isFinite(amount) || amount <= 0) return null
 
   const unit = match[2]
-  if (unit !== 'minute' && unit !== 'hour' && unit !== 'day' && unit !== 'week') return null
+  if (unit !== 'minute' && unit !== 'hour' && unit !== 'day') return null
   return { amount, unit }
 }
 

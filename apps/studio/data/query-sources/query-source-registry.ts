@@ -7,7 +7,7 @@ export type LogTimeRange =
   | {
       type: 'relative'
       amount: number
-      unit: 'minute' | 'hour' | 'day' | 'week'
+      unit: 'minute' | 'hour' | 'day'
     }
   | {
       type: 'absolute'
@@ -84,7 +84,7 @@ export const logTimeRangeSchema = z.discriminatedUnion('type', [
     .object({
       type: z.literal('relative'),
       amount: z.number().int().positive(),
-      unit: z.enum(['minute', 'hour', 'day', 'week']),
+      unit: z.enum(['minute', 'hour', 'day']),
     })
     .strict(),
   z

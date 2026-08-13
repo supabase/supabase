@@ -26,7 +26,6 @@ describe('LogTimeRange.utils', () => {
     ['30m', 30, 'minute'],
     ['2h', 2, 'hour'],
     ['7d', 7, 'day'],
-    ['2w', 2, 'week'],
   ] as const)('round-trips the picker helper for %s', (_, amount, unit) => {
     const helper = generateDynamicHelper(amount, unit)
     const pickerValue = {
@@ -84,8 +83,8 @@ describe('LogTimeRange.utils', () => {
   })
 
   it('resolves a relative range against the current time', () => {
-    expect(resolveLogTimeRange({ type: 'relative', amount: 2, unit: 'week' })).toEqual({
-      from: dayjs().subtract(2, 'week').toISOString(),
+    expect(resolveLogTimeRange({ type: 'relative', amount: 2, unit: 'day' })).toEqual({
+      from: dayjs().subtract(2, 'day').toISOString(),
       to: dayjs().toISOString(),
     })
   })

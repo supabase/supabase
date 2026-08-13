@@ -51,5 +51,13 @@ describe('query source registry', () => {
         parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
       })
     ).toThrow()
+
+    expect(() =>
+      cellSourceSchema.parse({
+        id: 'logs',
+        type: 'logs',
+        parameters: { time_range: { type: 'relative', amount: 2, unit: 'week' } },
+      })
+    ).toThrow()
   })
 })

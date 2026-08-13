@@ -34,14 +34,12 @@ describe('parseCustomInput', () => {
     expect(parseCustomInput('2h')).toEqual({ type: 'unit', value: 2, unit: 'hour' })
     expect(parseCustomInput('30m')).toEqual({ type: 'unit', value: 30, unit: 'minute' })
     expect(parseCustomInput('7d')).toEqual({ type: 'unit', value: 7, unit: 'day' })
-    expect(parseCustomInput('2w')).toEqual({ type: 'unit', value: 2, unit: 'week' })
   })
 
   test('parses number with space and unit letter', () => {
     expect(parseCustomInput('2 h')).toEqual({ type: 'unit', value: 2, unit: 'hour' })
     expect(parseCustomInput('30 m')).toEqual({ type: 'unit', value: 30, unit: 'minute' })
     expect(parseCustomInput('7 d')).toEqual({ type: 'unit', value: 7, unit: 'day' })
-    expect(parseCustomInput('2 w')).toEqual({ type: 'unit', value: 2, unit: 'week' })
   })
 
   test('parses number with full unit name prefix', () => {
@@ -51,14 +49,12 @@ describe('parseCustomInput', () => {
     expect(parseCustomInput('4days')).toEqual({ type: 'invalid' })
     expect(parseCustomInput('30min')).toEqual({ type: 'unit', value: 30, unit: 'minute' })
     expect(parseCustomInput('30minute')).toEqual({ type: 'unit', value: 30, unit: 'minute' })
-    expect(parseCustomInput('2week')).toEqual({ type: 'unit', value: 2, unit: 'week' })
   })
 
   test('is case insensitive', () => {
     expect(parseCustomInput('2H')).toEqual({ type: 'unit', value: 2, unit: 'hour' })
     expect(parseCustomInput('30M')).toEqual({ type: 'unit', value: 30, unit: 'minute' })
     expect(parseCustomInput('7D')).toEqual({ type: 'unit', value: 7, unit: 'day' })
-    expect(parseCustomInput('2W')).toEqual({ type: 'unit', value: 2, unit: 'week' })
   })
 
   test('returns invalid for non-matching unit', () => {
@@ -83,14 +79,12 @@ describe('generateDynamicHelper', () => {
     expect(generateDynamicHelper(1, 'minute').text).toBe('Last 1 minute')
     expect(generateDynamicHelper(1, 'hour').text).toBe('Last 1 hour')
     expect(generateDynamicHelper(1, 'day').text).toBe('Last 1 day')
-    expect(generateDynamicHelper(1, 'week').text).toBe('Last 1 week')
   })
 
   test('uses plural form when value > 1', () => {
     expect(generateDynamicHelper(2, 'minute').text).toBe('Last 2 minutes')
     expect(generateDynamicHelper(2, 'hour').text).toBe('Last 2 hours')
     expect(generateDynamicHelper(2, 'day').text).toBe('Last 2 days')
-    expect(generateDynamicHelper(2, 'week').text).toBe('Last 2 weeks')
   })
 
   test('calcFrom returns correct ISO string', () => {
@@ -104,11 +98,10 @@ describe('generateDynamicHelper', () => {
 describe('generateDynamicHelpers', () => {
   test('generates helpers for every supported relative unit', () => {
     const helpers = generateDynamicHelpers(5)
-    expect(helpers).toHaveLength(4)
+    expect(helpers).toHaveLength(3)
     expect(helpers[0].text).toBe('Last 5 minutes')
     expect(helpers[1].text).toBe('Last 5 hours')
     expect(helpers[2].text).toBe('Last 5 days')
-    expect(helpers[3].text).toBe('Last 5 weeks')
   })
 })
 
@@ -121,11 +114,10 @@ describe('generateHelpersFromInput', () => {
 
   test('returns a helper for every unit for number only input', () => {
     const helpers = generateHelpersFromInput('25')
-    expect(helpers).toHaveLength(4)
+    expect(helpers).toHaveLength(3)
     expect(helpers![0].text).toBe('Last 25 minutes')
     expect(helpers![1].text).toBe('Last 25 hours')
     expect(helpers![2].text).toBe('Last 25 days')
-    expect(helpers![3].text).toBe('Last 25 weeks')
   })
 
   test('returns single helper for unit input', () => {
