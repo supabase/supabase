@@ -620,6 +620,90 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/projects/{ref}/workers': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * [Alpha] List all workers
+     * @description Returns all workers you've previously deployed to the specified project.
+     */
+    get: operations['v2-list-all-workers']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/workers/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * [Alpha] Retrieve a worker
+     * @description Returns a worker along with its instance tally. Poll this after a deploy until `build_state` leaves `building`.
+     */
+    get: operations['v2-get-a-worker']
+    put?: never
+    post?: never
+    /**
+     * [Alpha] Delete a worker
+     * @description Tombstones the worker. Its instances and image are torn down asynchronously.
+     */
+    delete: operations['v2-delete-a-worker']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/workers/{name}/deploy': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * [Alpha] Deploy a worker
+     * @description Creates the worker if it does not exist, building from a context staged through the uploads endpoint. The build runs asynchronously: this answers 202 and the worker reaches `build_state` `active` or `failed` later.
+     */
+    post: operations['v2-deploy-a-worker']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/workers/{name}/uploads': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * [Alpha] Mint a presigned slot for a build-context upload
+     * @description PUT the `.tar.gz` build context to the returned `url` before `expires_at`, then deploy with the upload id as `context_upload_id`. The bytes go straight to storage — no management API request carries them.
+     */
+    post: operations['v2-create-worker-upload']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -1171,6 +1255,30 @@ export interface components {
         type: 'organization_invitation'
       }[]
     }
+    V2DeployWorkerRequest: {
+      data: {
+        attributes: {
+          /** @description Id of a build context staged through the uploads endpoint. Required unless `runtime` is set. */
+          context_upload_id?: string
+          spec: {
+            backend?: string
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+        }
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_worker'
+      }
+    }
     V2ListGitHubConnectionsResponse: {
       data: {
         attributes: {
@@ -1321,6 +1429,12 @@ export interface components {
            * @enum {string}
            */
           database_type: 'PRIMARY' | 'READ_REPLICA'
+          /** @description ARN of the AWS VPC Lattice resource configuration backing this PrivateLink share. */
+          resource_access_manager_resource_config_arn?: string
+          /** @description ID of the AWS VPC Lattice resource configuration backing this PrivateLink share. */
+          resource_access_manager_resource_config_id?: string
+          /** @description ARN of the AWS Resource Access Manager resource share for this association. */
+          resource_access_manager_share_arn?: string
           /**
            * Format: date-time
            * @description The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending.
@@ -1484,6 +1598,46 @@ export interface components {
         type: 'organization_role'
       }[]
     }
+    V2ListWorkersResponse: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            backend?: string
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Worker name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_worker'
+      }[]
+    }
     V2PreviewProjectTransferResponse: {
       data: {
         attributes: {
@@ -1522,6 +1676,12 @@ export interface components {
            * @enum {string}
            */
           database_type: 'PRIMARY' | 'READ_REPLICA'
+          /** @description ARN of the AWS VPC Lattice resource configuration backing this PrivateLink share. */
+          resource_access_manager_resource_config_arn?: string
+          /** @description ID of the AWS VPC Lattice resource configuration backing this PrivateLink share. */
+          resource_access_manager_resource_config_id?: string
+          /** @description ARN of the AWS Resource Access Manager resource share for this association. */
+          resource_access_manager_share_arn?: string
           /**
            * Format: date-time
            * @description The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending.
@@ -1721,6 +1881,68 @@ export interface components {
          * @enum {string}
          */
         type: 'project_transfer_input'
+      }
+    }
+    V2WorkerResponse: {
+      data: {
+        attributes: {
+          /** @enum {string} */
+          build_state: 'building' | 'active' | 'failed'
+          deleting?: boolean
+          image_version?: string
+          instances?: {
+            declared: number
+            live: number
+            ready: number
+            stale: number
+          }
+          instances_error?: string
+          secret_generation: string
+          spec: {
+            backend?: string
+            /** @example public */
+            exposure: string
+            /** @example 1 */
+            instances: number
+            /** @example node */
+            runtime?: string
+            /** @example 2gb-1vcpu */
+            size: string
+          }
+          state_reason?: string
+        }
+        /**
+         * @description Worker name.
+         * @example hello-world
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_worker'
+      }
+    }
+    V2WorkerUploadResponse: {
+      data: {
+        attributes: {
+          /** @description When the slot stops accepting the upload. */
+          expires_at: string
+          /** @example PUT */
+          method: string
+          /** @description Presigned destination for the `.tar.gz` build context. */
+          url: string
+        }
+        /**
+         * @description Upload id to pass to the deploy endpoint as `context_upload_id`.
+         * @example cafe0000000000000000000000000000
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_worker_upload'
       }
     }
   }
@@ -11582,6 +11804,257 @@ export interface operations {
               APIErrorObject: components['schemas']['APIErrorObject']
             }
           }
+        }
+      }
+    }
+  }
+  'v2-list-all-workers': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ListWorkersResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-get-a-worker': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WorkerResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-delete-a-worker': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-deploy-a-worker': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V2DeployWorkerRequest']
+      }
+    }
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WorkerResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-create-worker-upload': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2WorkerUploadResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
         }
       }
     }
