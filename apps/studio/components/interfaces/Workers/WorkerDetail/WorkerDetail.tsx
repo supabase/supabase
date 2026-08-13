@@ -156,7 +156,7 @@ export const WorkerDetail = () => {
       </PageBreadcrumbs>
 
       {/* Worker title + summary, aligned with the breadcrumb/nav gutters */}
-      <PageHeader className="py-8 [&>div]:px-4 [&>div]:xl:px-4">
+      <PageHeader className="py-4 [&>div]:px-4 [&>div]:xl:px-4">
         <PageHeaderMeta className="px-0 xl:px-0">
           <PageHeaderIcon>
             <Card className="flex h-14 w-14 shrink-0 items-center justify-center">
