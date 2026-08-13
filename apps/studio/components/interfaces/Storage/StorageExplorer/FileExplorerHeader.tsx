@@ -183,6 +183,8 @@ export const FileExplorerHeader = ({
     setSortBy: setPreferenceSortBy,
     sortByOrder,
     setSortByOrder: setPreferenceSortByOrder,
+    showArchivedInline,
+    setShowArchivedInline,
   } = useStoragePreference(projectRef)
 
   const breadcrumbs = columns.map((column) => column.name)
@@ -418,7 +420,7 @@ export const FileExplorerHeader = ({
                         icon={view === 'LIST' ? <List size={16} /> : <Columns size={16} />}
                       />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40 min-w-0">
+                    <DropdownMenuContent align="end" className="w-44 min-w-0">
                       {VIEW_OPTIONS.map((option) => (
                         <DropdownMenuItem key={option.key} onClick={() => setView(option.key)}>
                           <div className="flex items-center justify-between w-full">
@@ -427,6 +429,21 @@ export const FileExplorerHeader = ({
                           </div>
                         </DropdownMenuItem>
                       ))}
+                      {isVersioned && (
+                        <>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setShowArchivedInline(!showArchivedInline)}
+                          >
+                            <div className="flex items-center justify-between w-full">
+                              <p>Show archived</p>
+                              {showArchivedInline && (
+                                <Check size={16} className="text-brand" />
+                              )}
+                            </div>
+                          </DropdownMenuItem>
+                        </>
+                      )}
                       <DropdownMenuSeparator />
                       <DropdownMenuSub>
                         <DropdownMenuSubTrigger>Sort by</DropdownMenuSubTrigger>

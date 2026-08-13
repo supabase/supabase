@@ -38,6 +38,19 @@ export interface StorageItem {
   // UI specific properties, not from API
   isCorrupted: boolean
   path?: string
+  /**
+   * Set on a synthesized row that stands in for something in the archive
+   * store rather than the bucket's live tree. Present on both:
+   * - archived files at their original location (the "leaf" case), and
+   * - folders that would only exist because of an archived descendant
+   *   inside them (the "ancestor" case, when no live folder of the same
+   *   name is at that level).
+   * `trashObjectId` is set on the leaf so a click can route to the
+   * DeletedFilePreviewPane without another lookup.
+   */
+  archived?: {
+    trashObjectId?: string
+  }
 }
 
 export type StorageItemWithColumn = StorageItem & { columnIndex: number }

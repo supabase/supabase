@@ -47,7 +47,8 @@ export const StorageExplorer = () => {
     setSelectedItemsToMove,
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
-  const { isShowingDeleted, selectedDeletedIds } = useDeletedFilesContext()
+  const { isShowingDeleted, selectedDeletedIds, selectedDeletedFile, selectedDeletedVersion } =
+    useDeletedFilesContext()
   const { view } = useStoragePreference(projectRef)
 
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
@@ -177,7 +178,11 @@ export const StorageExplorer = () => {
             <div className="absolute inset-0 overflow-auto">
               <DeletedFilesList bucketId={selectedBucket.name} searchString={itemSearchString} />
             </div>
-            <DeletedFilePreviewPane />
+            {(selectedDeletedFile || selectedDeletedVersion) && (
+              <div className="absolute inset-y-0 right-0 z-10 shadow-lg">
+                <DeletedFilePreviewPane />
+              </div>
+            )}
           </div>
         ) : (
           <>
@@ -193,7 +198,15 @@ export const StorageExplorer = () => {
                 fetchMoreFolderContents({ index, column, searchString: itemSearchString })
               }
             />
-            <PreviewPane />
+            {/* Selecting an archived row while `Show archived` is on takes
+                over the normal preview slot with the archived file preview,
+                so restore/permanent-delete actions live in the same spot as
+                the live file's actions. */}
+            {selectedDeletedFile || selectedDeletedVersion ? (
+              <DeletedFilePreviewPane />
+            ) : (
+              <PreviewPane />
+            )}
           </>
         )}
       </div>

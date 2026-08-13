@@ -18,11 +18,14 @@ export type BucketTrashVariables = {
   bucketId?: string
 }
 
-export const useBucketTrashQuery = ({ projectRef, bucketId }: BucketTrashVariables) =>
+export const useBucketTrashQuery = (
+  { projectRef, bucketId }: BucketTrashVariables,
+  { enabled = true }: { enabled?: boolean } = {}
+) =>
   useQuery<TrashObject[], Error>({
     queryKey: storageKeys.trash(projectRef, bucketId),
     queryFn: () => mockDelay(getMockTrashObjects(bucketId ?? '')),
-    enabled: !!projectRef && !!bucketId,
+    enabled: enabled && !!projectRef && !!bucketId,
   })
 
 type TrashRestoreVariables = {

@@ -1,11 +1,14 @@
 import { noop } from 'lodash'
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { cn } from 'ui'
 
 import { STORAGE_ROW_STATUS, STORAGE_VIEWS } from '../Storage.constants'
+import { hasVersioningHistory } from '../StorageProtection.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
+import { getArchivedOverlayItems } from './archivedOverlay.utils'
 import { FileExplorerColumn } from './FileExplorerColumn'
 import { useStoragePreference } from './useStoragePreference'
+import { useBucketTrashQuery } from '@/data/storage/protection/bucket-trash-query'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export interface FileExplorerProps {
@@ -31,7 +34,33 @@ export const FileExplorer = ({
 }: FileExplorerProps) => {
   const fileExplorerRef = useRef<any>(null)
   const snap = useStorageExplorerStateSnapshot()
-  const { view } = useStoragePreference(snap.projectRef)
+  const { view, showArchivedInline } = useStoragePreference(snap.projectRef)
+
+  const isVersioned = hasVersioningHistory(snap.selectedBucket?.id)
+  const isOverlayEnabled = isVersioned && showArchivedInline
+
+  const { data: trashObjects = [] } = useBucketTrashQuery(
+    { projectRef: snap.projectRef, bucketId: snap.selectedBucket?.id },
+    { enabled: isOverlayEnabled }
+  )
+
+  const overlaidColumns = useMemo(() => {
+    if (!isOverlayEnabled) return columns
+    return columns.map((column) => {
+      // `column.path` is the folder path from the bucket root (e.g. "images/2024"
+      // or "" at the root). Split it into segments to line up with the
+      // archived item paths.
+      const folderSegments = column.path.split('/').filter((segment) => segment.length > 0)
+      const existingItemNames = new Set(column.items.map((item) => item.name))
+      const archivedItems = getArchivedOverlayItems({
+        folderSegments,
+        trashObjects,
+        existingItemNames,
+      })
+      if (archivedItems.length === 0) return column
+      return { ...column, items: [...column.items, ...archivedItems] }
+    })
+  }, [columns, trashObjects, isOverlayEnabled])
 
   useEffect(() => {
     if (fileExplorerRef) {
@@ -40,7 +69,7 @@ export const FileExplorer = ({
         fileExplorerRef.current.scrollLeft += scrollWidth - clientWidth
       }
     }
-  }, [columns])
+  }, [overlaidColumns])
 
   return (
     <div
@@ -56,7 +85,7 @@ export const FileExplorer = ({
         />
       ) : view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">
-          {columns.map((column, index) => (
+          {overlaidColumns.map((column, index) => (
             <FileExplorerColumn
               key={`column-${index}`}
               index={index}
@@ -72,11 +101,11 @@ export const FileExplorer = ({
         </div>
       ) : view === STORAGE_VIEWS.LIST ? (
         <>
-          {columns.length > 0 && (
+          {overlaidColumns.length > 0 && (
             <FileExplorerColumn
               fullWidth
-              index={columns.length - 1}
-              column={columns[columns.length - 1]}
+              index={overlaidColumns.length - 1}
+              column={overlaidColumns[overlaidColumns.length - 1]}
               selectedItems={selectedItems}
               itemSearchString={itemSearchString}
               onFilesUpload={onFilesUpload}

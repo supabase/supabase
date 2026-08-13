@@ -14,6 +14,15 @@ interface StoragePreference {
   sortBy: STORAGE_SORT_BY
   sortByOrder: STORAGE_SORT_BY_ORDER
   sortBucket: STORAGE_BUCKET_SORT
+  /**
+   * Overlays archived (soft-deleted) files in the normal file explorer view
+   * alongside live objects — dimmed and striped so they read as recoverable
+   * rather than active. Separate from the standalone archived view toggled
+   * via `deletedFiles` in the URL: the standalone view is the destination for
+   * bulk restore/delete, this one is for finding an archived file in the
+   * folder it used to live in.
+   */
+  showArchivedInline: boolean
 }
 
 const DEFAULT_PREFERENCES: StoragePreference = {
@@ -21,6 +30,7 @@ const DEFAULT_PREFERENCES: StoragePreference = {
   sortBy: STORAGE_SORT_BY.NAME,
   sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
   sortBucket: STORAGE_BUCKET_SORT.CREATED_AT,
+  showArchivedInline: false,
 }
 
 /**
@@ -71,14 +81,23 @@ export function useStoragePreference(projectRef: string) {
     [setPreference]
   )
 
+  const setShowArchivedInline = useCallback(
+    (showArchivedInline: boolean) => {
+      setPreference((prev) => ({ ...prev, showArchivedInline }))
+    },
+    [setPreference]
+  )
+
   return {
     view: preference.view,
     sortBy: preference.sortBy,
     sortByOrder: preference.sortByOrder,
     sortBucket: preference.sortBucket,
+    showArchivedInline: preference.showArchivedInline,
     setView,
     setSortBy,
     setSortByOrder,
     setSortBucket,
+    setShowArchivedInline,
   }
 }
