@@ -463,4 +463,47 @@ export const dataset: AssistantEvalCase[] = [
         'Guards against inventing a notebook instead of calling the tool and reporting the real, negative result',
     },
   },
+  {
+    input: { prompt: 'What queries does my Auth health check notebook run?' },
+    expected: {
+      requiredTools: ['list_notebooks', 'get_notebook'],
+      correctAnswer:
+        "Reports exactly two queries: a database query for signups per day from auth.users, and a logs query for auth errors against the auth_logs source scoped to the last hour. May (but does not have to) note that the remaining cell is markdown and runs no query. Accurate statements about a cell's configuration — the signups cell's 30-row limit or its line chart, the auth errors cell's relative time range — are acceptable. Does not attribute any query, table, or log source the notebook does not contain, and does not misstate the auth errors cell's time range.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Resolves a notebook name to an id via list_notebooks, then reads it — guards against paraphrasing cells into queries the notebook does not contain',
+    },
+  },
+  {
+    input: { prompt: "Summarize what's in my Edge function error triage notebook" },
+    expected: {
+      requiredTools: ['list_notebooks', 'get_notebook'],
+      correctAnswer:
+        'Summarizes the notebook as intro text plus a single logs query for edge function failures over the last day. Does not claim the notebook contains a database query.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Baseline read of a smaller, single-query notebook',
+    },
+  },
+  {
+    input: { prompt: 'Get the notebook with id 00000000-0000-0000-0000-000000000000' },
+    expected: {
+      requiredTools: [
+        {
+          name: 'get_notebook',
+          input: { id: { equals: '00000000-0000-0000-0000-000000000000' } },
+        },
+      ],
+      correctAnswer:
+        'States that no notebook with that id was found, and does not describe any notebook contents.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Exercises the not-found error path of get_notebook and guards against hallucinating contents for a notebook that does not exist',
+    },
+  },
 ]
