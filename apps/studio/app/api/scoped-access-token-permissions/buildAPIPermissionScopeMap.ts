@@ -1,9 +1,8 @@
-import { cloneDeep } from 'lodash'
 import z from 'zod'
 
 // We don't have an OpenAPI that describes mcp tools security requirements so
 // we have this hard coded file that must be updated when they change
-import { MCPToolScopeMappings } from './MCPToolScopeMappings'
+import { buildMcpToolScopeMap } from './MCPToolScopeMappings'
 import {
   EndpointMap,
   McpMap,
@@ -30,14 +29,13 @@ export const buildAPIPermissionScopeMap = async (): Promise<PermissionScopeMap> 
   const { scopes, endpoints } = getScopesAndEndpointsForAPI({
     paths: { ...apiV1Specs.paths, ...apiV2Specs.paths },
   })
-  addMCPToolsToScopes(scopes, MCPToolScopeMappings)
+  const mcpTools = buildMcpToolScopeMap(endpoints)
+  addMCPToolsToScopes(scopes, mcpTools)
 
   return {
     scopes,
     endpoints,
-    // Deep copy so a caller mutating the response can't corrupt the module-level mapping, which
-    // outlives every request in a long-running server.
-    mcp_tools: cloneDeep(MCPToolScopeMappings),
+    mcp_tools: mcpTools,
   }
 }
 
