@@ -375,6 +375,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     chatInstances: {},
     pendingSpanIds: {},
     messageSpanIds: {},
+    isInitialized: false,
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -382,6 +383,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     resetAiAssistantPanel: () => {
       Object.assign(state, createInitialAiAssistantData())
+      state.isInitialized = false
     },
 
     setModel: (model: AssistantModel) => {
@@ -675,6 +677,7 @@ export type AiAssistantState = AiAssistantData & {
   chatInstances: Record<string, Chat<MessageType>>
   pendingSpanIds: Record<string, string>
   messageSpanIds: Record<string, string>
+  isInitialized: boolean
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   createChat: (options?: CreateChatOptions) => string
@@ -705,6 +708,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
   // Effect to load state from IndexedDB on mount or projectRef change
   useEffect(() => {
     let isMounted = true
+    state.isInitialized = false
 
     async function loadAndInitializeState() {
       if (!project?.ref || typeof window === 'undefined') {
@@ -733,6 +737,7 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       // 4. Ensure an active chat exists and handle URL overrides
       ensureActiveChatOrInitialize(state)
+      state.isInitialized = true
     }
 
     loadAndInitializeState()
@@ -790,6 +795,23 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
   return useSnapshot(state, options)
+}
+
+/**
+ * Resolves once the assistant state has hydrated from storage. `loadPersistedState` replaces
+ * `state.chats` wholesale, so anything that adds a chat has to wait for hydration or the new
+ * chat is dropped the moment the persisted state lands.
+ */
+export const whenAiAssistantInitialized = (state: AiAssistantState): Promise<void> => {
+  if (state.isInitialized) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const unsubscribe = subscribe(state, () => {
+      if (!state.isInitialized) return
+      unsubscribe()
+      resolve()
+    })
+  })
 }
 
 export const useAiAssistantState = () => {
