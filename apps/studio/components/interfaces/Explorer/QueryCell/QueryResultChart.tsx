@@ -1,14 +1,12 @@
 import { useMemo } from 'react'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
-import { type Snapshot } from 'valtio'
 
-import { type QueryResult } from '../types'
+import { type QueryChartConfig, type QueryResult } from '../types'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
-import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultChartProps {
-  cell: Snapshot<DatabaseCellSchema>
+  chart?: QueryChartConfig
   result?: QueryResult
 }
 
@@ -21,8 +19,7 @@ const toChartValue = (value: unknown): string | number => {
   return String(value)
 }
 
-export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
-  const { chart } = cell
+export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
   const { type, x_column, y_columns = [], cumulative, show_labels } = chart ?? {}
 
   const hasConfig = !!x_column && y_columns.length > 0

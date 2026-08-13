@@ -14,26 +14,26 @@ import {
   ToggleGroupItem,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { type Snapshot } from 'valtio'
 
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
-import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
-import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { type QueryChartConfig, type QueryDisplay } from '../types'
 
 interface DisplaySettingsButtonProps {
-  cell: Snapshot<DatabaseCellSchema>
+  display: QueryDisplay
   columns: string[]
   disabled: boolean
+  onChange: (display: QueryDisplay) => void
 }
 
 // [Joshen] TODO support multiple y axis charts
 
-export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettingsButtonProps) => {
-  const snap = useNotebooksStateSnapshot()
-  const currentNotebook = useCurrentNotebook()
-  const cells = currentNotebook?.notebook.content?.cells ?? []
-
-  const { view, chart } = cell
+export const DisplaySettingsButton = ({
+  display,
+  columns,
+  disabled,
+  onChange,
+}: DisplaySettingsButtonProps) => {
+  const { view, chart } = display
   const {
     type = 'bar',
     x_column,
@@ -44,44 +44,22 @@ export const DisplaySettingsButton = ({ cell, columns, disabled }: DisplaySettin
   } = chart ?? {}
 
   const onChangeView = (view: 'table' | 'chart') => {
-    const notebookId = currentNotebook?.notebook.id
-    if (!notebookId) return
-
-    const nextCells = cells.map((c) =>
-      c.id === cell.id && c._tag === 'database_cell' ? { ...c, view } : c
-    )
-    snap.updateCells({ id: notebookId, cells: nextCells })
+    onChange({ ...display, view })
   }
 
-  const onUpdateChartConfig = (
-    payload:
-      | { type: 'bar' | 'line' }
-      | { x_column: string }
-      | { y_columns: string[] }
-      | { cumulative: boolean }
-      | { show_labels: boolean }
-      | { scale: 'linear' | 'log' }
-  ) => {
-    const notebookId = currentNotebook?.notebook.id
-    if (!notebookId) return
-
-    const nextCells = cells.map((c) => {
-      if (c.id !== cell.id || c._tag !== 'database_cell') return c
-
-      return {
-        ...c,
-        chart: {
-          type: c.chart?.type ?? 'bar',
-          x_column: c.chart?.x_column ?? '',
-          y_columns: c.chart?.y_columns ?? [],
-          cumulative: c.chart?.cumulative ?? false,
-          scale: c.chart?.scale ?? 'linear',
-          show_labels: c.chart?.show_labels ?? false,
-          ...payload,
-        },
-      }
+  const onUpdateChartConfig = (payload: Partial<QueryChartConfig>) => {
+    onChange({
+      ...display,
+      chart: {
+        type: chart?.type ?? 'bar',
+        x_column: chart?.x_column ?? '',
+        y_columns: chart?.y_columns ?? [],
+        cumulative: chart?.cumulative ?? false,
+        scale: chart?.scale ?? 'linear',
+        show_labels: chart?.show_labels ?? false,
+        ...payload,
+      },
     })
-    snap.updateCells({ id: notebookId, cells: nextCells })
   }
 
   return (
