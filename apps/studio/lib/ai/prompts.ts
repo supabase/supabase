@@ -1,3 +1,8 @@
+import {
+  buildClickhouseLogsSchemaSection,
+  CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
+} from '@/lib/ai/clickhouse-logs'
+
 export const RLS_PROMPT = `
 # PostgreSQL RLS in Supabase: Condensed Guide
 
@@ -768,6 +773,10 @@ export const NOTEBOOKS_PROMPT = `
 - When the request clearly calls for a notebook, call \`create_notebook\` or \`update_notebook\` directly; both tools handle user approval.
 - \`update_notebook\` requires \`expected_updated_at\`, the \`updated_at\` you got from \`get_notebook\`. If the notebook changed since, the call is rejected — call \`get_notebook\` again and reissue \`update_notebook\` against the current content.
 - When describing an existing notebook, report each query cell's configuration that changes what it returns — a log cell's time range, a database cell's row limit — and don't count markdown cells as queries.
+- Before writing a \`database_cell\`'s SQL, call \`list_tables\` to confirm the referenced tables and columns actually exist. Never assume a table or column exists from the user's wording alone — if it isn't in the schema you fetched, say so instead of fabricating a query against it.
+- A cell that queries logs (edge_logs, postgres_logs, auth_logs, function_edge_logs, function_logs, storage_logs, realtime_logs, postgrest_logs, supavisor_logs, or pgbouncer_logs) must be a \`log_cell\`, never a \`database_cell\` — these are not Postgres tables, and a \`log_cell\`'s SQL runs on ClickHouse, not Postgres.
+${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
+${buildClickhouseLogsSchemaSection()}
 `
 
 export const OUTPUT_ONLY_PROMPT = `
