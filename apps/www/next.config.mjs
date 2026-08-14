@@ -39,13 +39,21 @@ const scriptSrc = [
   "'self' 'unsafe-inline' 'unsafe-eval'",
   "https://frontend-assets.supabase.com",
   "https://ss.supabase.com",
+  "https://unpkg.com",
+  "https://platform.twitter.com",
   isPreview ? "https://ph.supabase.green": "https://ph.supabase.com",
   isPreview ? "https://*.vercel.app/" : "", // preview domain
   isPreview ? "https://vercel.live" : "", // debugger
 ].filter(Boolean).join(" ")
 
+const scriptElemSrc = [
+scriptSrc,
+  "https://ss.supabase.com",
+].join(" ")
+
 const cspString = [
   `script-src ${scriptSrc}`,
+  `script-src-elem ${scriptElemSrc}`,
   "object-src 'none'",
   "base-uri 'none'",
 ].join("; ")
