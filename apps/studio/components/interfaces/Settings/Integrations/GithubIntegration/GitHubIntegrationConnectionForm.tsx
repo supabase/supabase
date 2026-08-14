@@ -405,7 +405,9 @@ export const GitHubIntegrationConnectionForm = ({
                 description={
                   connection
                     ? 'Change the connected repository'
-                    : 'Select the repository to connect to your project'
+                    : gitHubAuthorization === null
+                      ? 'Connect GitHub to link a repository to this project'
+                      : 'Select the repository to connect to your project'
                 }
                 disabled={
                   (!connection && !canCreateGitHubConnection) ||
