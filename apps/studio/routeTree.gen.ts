@@ -106,7 +106,7 @@ import { Route as ProjectRefSqlExamplesRouteImport } from './routes/project/$ref
 import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$id'
 import { Route as ProjectRefSettingsLogDrainsRouteImport } from './routes/project/$ref/settings/log-drains'
 import { Route as ProjectRefSettingsIntegrationsRouteImport } from './routes/project/$ref/settings/integrations'
-import { Route as ProjectRefSettingsInfrastructureRouteImport } from './routes/project/$ref/settings/infrastructure'
+import { Route as ProjectRefSettingsInfrastructureIndexRouteImport } from './routes/project/$ref/settings/infrastructure/index'
 import { Route as ProjectRefSettingsGeneralRouteImport } from './routes/project/$ref/settings/general'
 import { Route as ProjectRefSettingsDashboardRouteImport } from './routes/project/$ref/settings/dashboard'
 import { Route as ProjectRefSettingsApiKeysRouteImport } from './routes/project/$ref/settings/api-keys'
@@ -824,10 +824,10 @@ const ProjectRefSettingsIntegrationsRoute =
     path: '/integrations',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
-const ProjectRefSettingsInfrastructureRoute =
-  ProjectRefSettingsInfrastructureRouteImport.update({
-    id: '/infrastructure',
-    path: '/infrastructure',
+const ProjectRefSettingsInfrastructureIndexRoute =
+  ProjectRefSettingsInfrastructureIndexRouteImport.update({
+    id: '/infrastructure/',
+    path: '/infrastructure/',
     getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
 const ProjectRefSettingsGeneralRoute =
@@ -1854,9 +1854,9 @@ const ProjectRefStorageAnalyticsBucketsBucketIdRoute =
   } as any)
 const ProjectRefSettingsInfrastructureReplicaReplicaIdRoute =
   ProjectRefSettingsInfrastructureReplicaReplicaIdRouteImport.update({
-    id: '/replica/$replicaId',
-    path: '/replica/$replicaId',
-    getParentRoute: () => ProjectRefSettingsInfrastructureRoute,
+    id: '/infrastructure/replica/$replicaId',
+    path: '/infrastructure/replica/$replicaId',
+    getParentRoute: () => ProjectRefSettingsRoute,
   } as any)
 const ProjectRefDatabaseReplicationReplicaReplicaIdRoute =
   ProjectRefDatabaseReplicationReplicaReplicaIdRouteImport.update({
@@ -2256,7 +2256,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
-  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRouteWithChildren
+  '/project/$ref/settings/infrastructure/': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
@@ -2557,7 +2557,7 @@ export interface FileRoutesByTo {
   '/project/$ref/settings/api': typeof ProjectRefSettingsApiRoute
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
-  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRouteWithChildren
+  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
@@ -2875,7 +2875,7 @@ export interface FileRoutesById {
   '/project/$ref/settings/api-keys': typeof ProjectRefSettingsApiKeysRouteWithChildren
   '/project/$ref/settings/dashboard': typeof ProjectRefSettingsDashboardRoute
   '/project/$ref/settings/general': typeof ProjectRefSettingsGeneralRoute
-  '/project/$ref/settings/infrastructure': typeof ProjectRefSettingsInfrastructureRouteWithChildren
+  '/project/$ref/settings/infrastructure/': typeof ProjectRefSettingsInfrastructureIndexRoute
   '/project/$ref/settings/integrations': typeof ProjectRefSettingsIntegrationsRoute
   '/project/$ref/settings/log-drains': typeof ProjectRefSettingsLogDrainsRoute
   '/project/$ref/sql/$id': typeof ProjectRefSqlIdRoute
@@ -3192,7 +3192,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/api-keys'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
-    | '/project/$ref/settings/infrastructure'
+    | '/project/$ref/settings/infrastructure/'
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
@@ -3810,7 +3810,7 @@ export interface FileRouteTypes {
     | '/project/$ref/settings/api-keys'
     | '/project/$ref/settings/dashboard'
     | '/project/$ref/settings/general'
-    | '/project/$ref/settings/infrastructure'
+    | '/project/$ref/settings/infrastructure/'
     | '/project/$ref/settings/integrations'
     | '/project/$ref/settings/log-drains'
     | '/project/$ref/sql/$id'
@@ -4761,11 +4761,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefSettingsIntegrationsRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
-    '/project/$ref/settings/infrastructure': {
-      id: '/project/$ref/settings/infrastructure'
+    '/project/$ref/settings/infrastructure/': {
+      id: '/project/$ref/settings/infrastructure/'
       path: '/infrastructure'
-      fullPath: '/project/$ref/settings/infrastructure'
-      preLoaderRoute: typeof ProjectRefSettingsInfrastructureRouteImport
+      fullPath: '/project/$ref/settings/infrastructure/'
+      preLoaderRoute: typeof ProjectRefSettingsInfrastructureIndexRouteImport
       parentRoute: typeof ProjectRefSettingsRoute
     }
     '/project/$ref/settings/general': {
@@ -6016,10 +6016,10 @@ declare module '@tanstack/react-router' {
     }
     '/project/$ref/settings/infrastructure/replica/$replicaId': {
       id: '/project/$ref/settings/infrastructure/replica/$replicaId'
-      path: '/replica/$replicaId'
+      path: '/infrastructure/replica/$replicaId'
       fullPath: '/project/$ref/settings/infrastructure/replica/$replicaId'
       preLoaderRoute: typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRouteImport
-      parentRoute: typeof ProjectRefSettingsInfrastructureRoute
+      parentRoute: typeof ProjectRefSettingsRoute
     }
     '/project/$ref/database/replication/replica/$replicaId': {
       id: '/project/$ref/database/replication/replica/$replicaId'
@@ -6816,28 +6816,14 @@ const ProjectRefSettingsApiKeysRouteWithChildren =
     ProjectRefSettingsApiKeysRouteChildren,
   )
 
-interface ProjectRefSettingsInfrastructureRouteChildren {
-  ProjectRefSettingsInfrastructureReplicaReplicaIdRoute: typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRoute
-}
-
-const ProjectRefSettingsInfrastructureRouteChildren: ProjectRefSettingsInfrastructureRouteChildren =
-  {
-    ProjectRefSettingsInfrastructureReplicaReplicaIdRoute:
-      ProjectRefSettingsInfrastructureReplicaReplicaIdRoute,
-  }
-
-const ProjectRefSettingsInfrastructureRouteWithChildren =
-  ProjectRefSettingsInfrastructureRoute._addFileChildren(
-    ProjectRefSettingsInfrastructureRouteChildren,
-  )
-
 interface ProjectRefSettingsRouteChildren {
   ProjectRefSettingsAddonsRoute: typeof ProjectRefSettingsAddonsRoute
   ProjectRefSettingsApiRoute: typeof ProjectRefSettingsApiRoute
   ProjectRefSettingsApiKeysRoute: typeof ProjectRefSettingsApiKeysRouteWithChildren
   ProjectRefSettingsDashboardRoute: typeof ProjectRefSettingsDashboardRoute
   ProjectRefSettingsGeneralRoute: typeof ProjectRefSettingsGeneralRoute
-  ProjectRefSettingsInfrastructureRoute: typeof ProjectRefSettingsInfrastructureRouteWithChildren
+  ProjectRefSettingsInfrastructureIndexRoute: typeof ProjectRefSettingsInfrastructureIndexRoute
+  ProjectRefSettingsInfrastructureReplicaReplicaIdRoute: typeof ProjectRefSettingsInfrastructureReplicaReplicaIdRoute
   ProjectRefSettingsIntegrationsRoute: typeof ProjectRefSettingsIntegrationsRoute
   ProjectRefSettingsLogDrainsRoute: typeof ProjectRefSettingsLogDrainsRoute
   ProjectRefSettingsBillingUsageRoute: typeof ProjectRefSettingsBillingUsageRoute
@@ -6853,8 +6839,10 @@ const ProjectRefSettingsRouteChildren: ProjectRefSettingsRouteChildren = {
   ProjectRefSettingsApiKeysRoute: ProjectRefSettingsApiKeysRouteWithChildren,
   ProjectRefSettingsDashboardRoute: ProjectRefSettingsDashboardRoute,
   ProjectRefSettingsGeneralRoute: ProjectRefSettingsGeneralRoute,
-  ProjectRefSettingsInfrastructureRoute:
-    ProjectRefSettingsInfrastructureRouteWithChildren,
+  ProjectRefSettingsInfrastructureIndexRoute:
+    ProjectRefSettingsInfrastructureIndexRoute,
+  ProjectRefSettingsInfrastructureReplicaReplicaIdRoute:
+    ProjectRefSettingsInfrastructureReplicaReplicaIdRoute,
   ProjectRefSettingsIntegrationsRoute: ProjectRefSettingsIntegrationsRoute,
   ProjectRefSettingsLogDrainsRoute: ProjectRefSettingsLogDrainsRoute,
   ProjectRefSettingsBillingUsageRoute: ProjectRefSettingsBillingUsageRoute,
