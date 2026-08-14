@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -43,7 +44,7 @@ export const TOTPFactors = () => {
           </PageSectionSummary>
           {canAddApp && (
             <PageSectionAside>
-              <Button variant="default" onClick={handleAddNewApp}>
+              <Button variant="primary" icon={<Plus />} onClick={handleAddNewApp}>
                 Add app
               </Button>
             </PageSectionAside>
@@ -53,11 +54,11 @@ export const TOTPFactors = () => {
           {shouldShowLockoutWarning && (
             <Admonition
               type="danger"
-              layout="horizontal"
+              layout="responsive"
               title="Avoid being locked out"
               description="Add a backup authenticator app now. Losing access to your only app will permanently lock you out of your account."
               actions={
-                <Button variant="default" onClick={handleAddNewApp}>
+                <Button variant="default" icon={<Plus />} onClick={handleAddNewApp}>
                   Add another app
                 </Button>
               }
@@ -94,7 +95,7 @@ export const TOTPFactors = () => {
                         variant="default"
                         onClick={() => setFactorToBeDeleted(factor.id)}
                       >
-                        Remove
+                        Delete{' '}
                       </Button>
                     </CardContent>
                   ))}
