@@ -1,5 +1,6 @@
 import { redirect, useFetcher, useSearchParams, type ActionFunctionArgs } from 'react-router'
 
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -10,25 +11,12 @@ import {
   CardTitle,
 } from '@/registry/default/components/ui/card'
 
-// Follows the `next` form value if it is a same-origin relative path, e.g. when
-// the OAuth consent screen sent the user here to sign in first.
-const safeNextPath = (next: FormDataEntryValue | null, origin: string, fallback: string) => {
-  if (typeof next !== 'string' || !next.startsWith('/')) return fallback
-
-  try {
-    const url = new URL(next, origin)
-    return url.origin === origin ? `${url.pathname}${url.search}${url.hash}` : fallback
-  } catch {
-    return fallback
-  }
-}
-
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { supabase } = createClient(request)
+  const { supabase, headers } = createClient(request)
   const origin = new URL(request.url).origin
 
   const formData = await request.formData()
-  const next = safeNextPath(formData.get('next'), origin, '/protected')
+  const next = safeNextPath(formData.get('next'), '/protected', origin)
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
@@ -38,7 +26,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   })
 
   if (data.url) {
-    return redirect(data.url)
+    return redirect(data.url, { headers })
   }
 
   if (error) {

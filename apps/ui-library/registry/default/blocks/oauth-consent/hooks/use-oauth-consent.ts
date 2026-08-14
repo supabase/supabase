@@ -2,6 +2,7 @@ import { isAuthSessionMissingError } from '@supabase/supabase-js'
 import type { OAuthAuthorizationDetails } from '@supabase/supabase-js'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 
 export type OAuthConsentDecision = 'approve' | 'deny'
@@ -11,21 +12,13 @@ export interface UseOAuthConsentOptions {
   signInPath?: string
 }
 
-const sameOriginPath = (path: string | null | undefined, fallback = '/') => {
-  if (!path?.startsWith('/')) return fallback
-
-  try {
-    const url = new URL(path, window.location.origin)
-    return url.origin === window.location.origin
-      ? `${url.pathname}${url.search}${url.hash}`
-      : fallback
-  } catch {
-    return fallback
-  }
+const withNextParam = (path: string, next: string) => {
+  const url = new URL(path, window.location.origin)
+  const searchParams = new URLSearchParams(url.search)
+  searchParams.set('next', next)
+  url.search = searchParams.toString()
+  return `${url.pathname}${url.search}${url.hash}`
 }
-
-const withNextParam = (path: string, next: string) =>
-  `${path}${path.includes('?') ? '&' : '?'}next=${encodeURIComponent(next)}`
 
 const useOAuthConsent = ({
   authorizationId,
@@ -68,7 +61,9 @@ const useOAuthConsent = ({
 
       if (!user) {
         const next = `${window.location.pathname}${window.location.search}`
-        window.location.replace(withNextParam(sameOriginPath(signInPath, '/auth/login'), next))
+        if (active) {
+          window.location.replace(withNextParam(safeNextPath(signInPath, '/auth/login'), next))
+        }
         return
       }
 
@@ -82,7 +77,9 @@ const useOAuthConsent = ({
       }
 
       if (!('authorization_id' in data)) {
-        window.location.replace(data.redirect_url)
+        if (active) {
+          window.location.replace(data.redirect_url)
+        }
         return
       }
 

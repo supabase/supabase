@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -12,22 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/registry/default/components/ui/card'
-
-// Follows the `next` query parameter if it is a same-origin relative path, e.g. when
-// the OAuth consent screen sent the user here to sign in first.
-const getNextPath = (fallback: string) => {
-  const next = new URLSearchParams(window.location.search).get('next')
-  if (!next?.startsWith('/')) return fallback
-
-  try {
-    const url = new URL(next, window.location.origin)
-    return url.origin === window.location.origin
-      ? `${url.pathname}${url.search}${url.hash}`
-      : fallback
-  } catch {
-    return fallback
-  }
-}
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [error, setError] = useState<string | null>(null)
@@ -40,10 +25,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     setError(null)
 
     try {
+      const next = new URLSearchParams(window.location.search).get('next')
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/oauth?next=${encodeURIComponent(getNextPath('/protected'))}`,
+          redirectTo: `${window.location.origin}/auth/oauth?next=${encodeURIComponent(safeNextPath(next, '/protected'))}`,
         },
       })
 

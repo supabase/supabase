@@ -29,12 +29,21 @@ After sign-in, your login page must send the visitor back to the path in `next`;
 ```ts
 // After sign-in succeeds:
 const next = new URLSearchParams(window.location.search).get('next')
-router.push(next?.startsWith('/') && !next.startsWith('//') ? next : '/protected')
+try {
+  const nextUrl = new URL(next ?? '/protected', window.location.origin)
+  router.push(
+    nextUrl.origin === window.location.origin
+      ? `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+      : '/protected'
+  )
+} catch {
+  router.push('/protected')
+}
 ```
 
 Set the `productName` prop to replace the `Your product` placeholder in the consent header.
 
-Your middleware must let unauthenticated requests reach `/oauth/consent`. The middleware in `lib/supabase/middleware.ts` skips any path starting with `/oauth`. Middleware that redirects to a login page before the consent route runs drops the authorization and ends the OAuth flow at your login screen.
+Your middleware must let unauthenticated requests reach `/oauth/consent`. The middleware in `lib/supabase/middleware.ts` exempts only `/oauth/consent`. Middleware that redirects to a login page before the consent route runs drops the authorization and ends the OAuth flow at your login screen.
 
 ### Getting started
 

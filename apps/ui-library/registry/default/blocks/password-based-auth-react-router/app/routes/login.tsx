@@ -1,5 +1,6 @@
 import { Link, redirect, useFetcher, useSearchParams, type ActionFunctionArgs } from 'react-router'
 
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -11,19 +12,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-
-// Follows the `next` form value if it is a same-origin relative path, e.g. when
-// the OAuth consent screen sent the user here to sign in first.
-const safeNextPath = (next: FormDataEntryValue | null, origin: string, fallback: string) => {
-  if (typeof next !== 'string' || !next.startsWith('/')) return fallback
-
-  try {
-    const url = new URL(next, origin)
-    return url.origin === origin ? `${url.pathname}${url.search}${url.hash}` : fallback
-  } catch {
-    return fallback
-  }
-}
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
@@ -46,7 +34,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // Update this route to redirect to an authenticated route. The user already has an active session.
-  return redirect(safeNextPath(formData.get('next'), origin, '/protected'), { headers })
+  return redirect(safeNextPath(formData.get('next'), '/protected', origin), { headers })
 }
 
 export default function Login() {

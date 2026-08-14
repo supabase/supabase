@@ -17,6 +17,7 @@ import realtimeChat from './default/blocks/realtime-chat/registry-item.json' wit
 import realtimeCursor from './default/blocks/realtime-cursor/registry-item.json' with { type: 'json' }
 import realtimeFlow from './default/blocks/realtime-flow/registry-item.json' with { type: 'json' }
 import realtimeMonaco from './default/blocks/realtime-monaco/registry-item.json' with { type: 'json' }
+import safeNextPath from './default/blocks/safe-next-path/registry-item.json' with { type: 'json' }
 import socialAuthNextjs from './default/blocks/social-auth-nextjs/registry-item.json' with { type: 'json' }
 import socialAuthReactRouter from './default/blocks/social-auth-react-router/registry-item.json' with { type: 'json' }
 import socialAuthReact from './default/blocks/social-auth-react/registry-item.json' with { type: 'json' }
@@ -47,6 +48,8 @@ const tanstackClient = clients.find((client) => client.name === 'supabase-client
 const reactRouterClient = clients.find((client) => client.name === 'supabase-client-react-router')
 
 export const blocks = [
+  safeNextPath as RegistryItem,
+
   registryItemAppend(passwordBasedAuthNextjs as RegistryItem, [nextjsClient!]),
   registryItemAppend(passwordBasedAuthReact as RegistryItem, [reactClient!]),
   registryItemAppend(passwordBasedAuthReactRouter as RegistryItem, [reactRouterClient!]),

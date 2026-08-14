@@ -28,10 +28,19 @@ After sign-in, your login route must send the visitor back to the path in `next`
 
 ```ts
 // In the login action, after sign-in succeeds:
+const origin = new URL(request.url).origin
 const next = formData.get('next')
-const redirectTo =
-  typeof next === 'string' && next.startsWith('/') && !next.startsWith('//') ? next : '/protected'
-return redirect(redirectTo, { headers })
+try {
+  const nextUrl = new URL(typeof next === 'string' ? next : '/protected', origin)
+  return redirect(
+    nextUrl.origin === origin
+      ? `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+      : '/protected',
+    { headers }
+  )
+} catch {
+  return redirect('/protected', { headers })
+}
 ```
 
 Set the `productName` prop to replace the `Your product` placeholder in the consent header.

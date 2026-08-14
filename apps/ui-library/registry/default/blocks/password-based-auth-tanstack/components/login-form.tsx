@@ -1,7 +1,8 @@
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -14,25 +15,11 @@ import {
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
 
-// Follows the `next` query parameter if it resolves to this application's origin.
-const getNextPath = () => {
-  const next = new URLSearchParams(window.location.search).get('next')
-  if (!next?.startsWith('/')) return null
-
-  try {
-    const url = new URL(next, window.location.origin)
-    return url.origin === window.location.origin ? `${url.pathname}${url.search}${url.hash}` : null
-  } catch {
-    return null
-  }
-}
-
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const navigate = useNavigate()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,13 +36,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       // Follow the `next` query parameter if it is a same-origin relative path, e.g. when
       // the OAuth consent screen sent the user here to sign in first. It may point outside
       // the typed route tree, so it needs a full navigation.
-      const next = getNextPath()
-      if (next) {
-        window.location.assign(next)
-        return
-      }
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      await navigate({ to: '/protected' })
+      const next = new URLSearchParams(window.location.search).get('next')
+      window.location.assign(safeNextPath(next, '/protected'))
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {

@@ -48,7 +48,15 @@ When the visitor has no session, the consent screen redirects to `signInPath` an
 ```ts
 // After sign-in succeeds:
 const next = new URLSearchParams(window.location.search).get('next')
-location.href = next?.startsWith('/') && !next.startsWith('//') ? next : '/protected'
+try {
+  const nextUrl = new URL(next ?? '/protected', window.location.origin)
+  location.href =
+    nextUrl.origin === window.location.origin
+      ? `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+      : '/protected'
+} catch {
+  location.href = '/protected'
+}
 ```
 
 Set the `productName` prop to replace the `Your product` placeholder in the consent header.

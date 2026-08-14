@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
+import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-next-path'
 import { createClient } from '@/registry/default/clients/react/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -12,22 +13,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-
-// Follows the `next` query parameter if it is a same-origin relative path, e.g. when
-// the OAuth consent screen sent the user here to sign in first.
-const getNextPath = (fallback: string) => {
-  const next = new URLSearchParams(window.location.search).get('next')
-  if (!next?.startsWith('/')) return fallback
-
-  try {
-    const url = new URL(next, window.location.origin)
-    return url.origin === window.location.origin
-      ? `${url.pathname}${url.search}${url.hash}`
-      : fallback
-  } catch {
-    return fallback
-  }
-}
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -48,7 +33,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      location.href = getNextPath('/protected')
+      const next = new URLSearchParams(window.location.search).get('next')
+      location.href = safeNextPath(next, '/protected')
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
