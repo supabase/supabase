@@ -16,6 +16,7 @@ import {
 } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
+import { PrivateLinkPreviewPanel } from '@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview'
 import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -141,6 +142,7 @@ export const DefaultLayout = ({
 
             <BannerStack />
             <StudioMobileSheetNav />
+            <PrivateLinkPreviewPanel />
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>

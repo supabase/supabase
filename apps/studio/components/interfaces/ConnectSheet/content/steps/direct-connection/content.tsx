@@ -1,7 +1,9 @@
 import { useParams } from 'common'
 import { Check, KeyRound } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { Input as CopyableInput } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { buildConnectionStringPooler, getConnectionStrings } from '../../../DatabaseSettings.utils'
@@ -29,6 +31,10 @@ import {
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
+import {
+  PRIVATE_LINK_PREVIEW_HOSTNAME,
+  usePrivateLinkPreview,
+} from '@/components/interfaces/Settings/Integrations/AWSPrivateLink/preview'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
@@ -153,6 +159,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const track = useTrack()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const isHighAvailability = useIsHighAvailability()
+  const { showPrivateHostname } = usePrivateLinkPreview()
   const [temporaryDatabasePassword, setTemporaryDatabasePassword] = useState('')
 
   const connectionSource = state.connectionSource
@@ -245,6 +252,15 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
 
   return (
     <div className="flex flex-col gap-3">
+      {showPrivateHostname && (
+        <Admonition
+          type="note"
+          title="Private hostname"
+          description="Use this hostname on the PrivateLink path. Vercel may inject it for you; this is the Studio-owned variant."
+        >
+          <CopyableInput readOnly copy value={PRIVATE_LINK_PREVIEW_HOSTNAME} />
+        </Admonition>
+      )}
       <div className="overflow-hidden rounded-lg border bg-surface-75">
         {showStringTitleRow && (
           <div className="flex items-center justify-between gap-2 border-b bg-surface-100 py-2 pl-4 pr-2">

@@ -19,6 +19,9 @@ export type AWSAccount =
     resource_access_manager_resource_config_id?: string
     resource_access_manager_resource_config_arn?: string
     resource_access_manager_share_arn?: string
+    // Prototype-only until the associations API exposes partner metadata and IAM role.
+    partner?: 'vercel'
+    destination_iam_role_arn?: string
   }
 
 async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: AbortSignal) {
