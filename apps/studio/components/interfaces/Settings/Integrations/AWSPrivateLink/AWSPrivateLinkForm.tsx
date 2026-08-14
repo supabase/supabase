@@ -1,7 +1,7 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useFlag } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -27,7 +27,9 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as CopyableInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
 
+import { getConnectionStatusUi } from './AWSPrivateLink.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAWSAccountCreateMutation } from '@/data/aws-accounts/aws-account-create-mutation'
 import type { AWSAccount } from '@/data/aws-accounts/aws-accounts-query'
@@ -36,16 +38,23 @@ import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/rep
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
+const FORM_ID = 'privatelink-connection-form'
+
+const FormSchema = z.object({
+  awsAccountId: z
+    .string()
+    .trim()
+    .regex(/^\d{12}$/, 'Enter a 12-digit AWS account ID'),
+  databaseIdentifier: z.string().min(1, 'Select a database'),
+  accountName: z.string(),
+})
+
+type FormValues = z.infer<typeof FormSchema>
+
 interface AWSPrivateLinkFormProps {
   account?: AWSAccount
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-interface FormValues {
-  awsAccountId: string
-  accountName: string
-  databaseIdentifier: string
 }
 
 export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
@@ -62,40 +71,23 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
   const { mutate: createAccount, isPending } = useAWSAccountCreateMutation()
 
   const readReplicas = databases.filter((database) => database.identifier !== project?.ref)
+  const showDatabaseTarget = showPrivateLinkReadReplica || !isNew
+  const statusUi = getConnectionStatusUi(account?.status)
 
-  const defaultValues = {
-    awsAccountId: account?.aws_account_id ?? '',
-    accountName: account?.account_name ?? '',
-    databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
-  }
-
-  const form = useForm<FormValues>({ defaultValues })
-
-  const title =
-    account?.status === 'ASSOCIATION_ACCEPTED'
-      ? 'This connection is active'
-      : account?.status === 'READY'
-        ? 'Connection is ready to accept'
-        : account?.status === 'CREATING'
-          ? 'This connection is being created'
-          : account?.status === 'DELETING'
-            ? 'This connection is being deleted'
-            : account?.status === 'ASSOCIATION_REQUEST_EXPIRED'
-              ? 'This request has expired'
-              : account?.status === 'CREATION_FAILED'
-                ? "Couldn't create this connection"
-                : 'This connection needs to be accepted by the AWS account owner.'
-
-  const description =
-    account?.status === 'ASSOCIATION_ACCEPTED'
-      ? 'The AWS account owner has accepted the resource share.'
-      : account?.status === 'READY'
-        ? 'It may be waiting acceptance from the AWS account owner. Requests expire after 12 hours.'
-        : account?.status === 'ASSOCIATION_REQUEST_EXPIRED'
-          ? 'Add a new connection to try again.'
-          : account?.status === 'CREATION_FAILED'
-            ? 'Add a new connection to try again.'
-            : ''
+  const form = useForm<FormValues>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      awsAccountId: '',
+      databaseIdentifier: '',
+      accountName: '',
+    },
+    values: {
+      awsAccountId: account?.aws_account_id ?? '',
+      databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
+      accountName: account?.account_name ?? '',
+    },
+    resetOptions: { keepDirtyValues: true },
+  })
 
   const onSubmit = (values: FormValues) => {
     if (!project) return
@@ -104,7 +96,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
         {
           projectRef: project.ref,
           awsAccountId: values.awsAccountId,
-          accountName: values.accountName,
+          accountName: values.accountName.trim() || undefined,
           databaseIdentifier:
             values.databaseIdentifier && values.databaseIdentifier !== project.ref
               ? values.databaseIdentifier
@@ -112,7 +104,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
         },
         {
           onSuccess: () => {
-            form.reset(defaultValues)
+            form.reset()
             toast.success('Connection added')
             onOpenChange(false)
           },
@@ -121,17 +113,13 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
     }
   }
 
-  // Reset form when account changes
-  useEffect(() => {
-    form.reset({
-      awsAccountId: account?.aws_account_id ?? '',
-      accountName: account?.account_name ?? '',
-      databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
-    })
-  }, [account, form, project?.ref])
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) form.reset()
+    onOpenChange(nextOpen)
+  }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>{isNew ? 'Add connection' : 'Connection details'}</SheetTitle>
@@ -143,96 +131,72 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+          <form
+            id={FORM_ID}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col flex-1 min-h-0"
+          >
             <SheetSection className="space-y-4 flex-1 overflow-y-auto">
               {!isNew && account && (
-                <>
-                  <Admonition
-                    showIcon={false}
-                    type="default"
-                    childProps={{ title: { className: 'flex-row gap-x-2 items-center' } }}
-                    // @ts-ignore
-                    title={
-                      <>
-                        <span>{title}</span>
-                        <Badge
-                          className="ml-2"
-                          variant={
-                            account.status === 'ASSOCIATION_ACCEPTED'
-                              ? 'success'
-                              : account.status === 'READY'
-                                ? 'success'
-                                : account.status === 'CREATING'
-                                  ? 'warning'
-                                  : account.status === 'CREATION_FAILED' ||
-                                      account.status === 'ASSOCIATION_REQUEST_EXPIRED'
-                                    ? 'destructive'
-                                    : 'warning'
-                          }
+                <Admonition
+                  showIcon={false}
+                  type="default"
+                  childProps={{ title: { className: 'flex-row gap-x-2 items-center' } }}
+                  // @ts-ignore
+                  title={
+                    <>
+                      <span>{statusUi.title}</span>
+                      <Badge className="ml-2" variant={statusUi.badgeVariant}>
+                        {statusUi.badge}
+                      </Badge>
+                    </>
+                  }
+                  description={statusUi.description}
+                  actions={
+                    account.status === 'READY' && (
+                      <Button variant="default" className="w-min" icon={<ExternalLink />}>
+                        <Link
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={`${DOCS_URL}/guides/platform/privatelink#step-2-accept-resource-share`}
                         >
-                          {account.status === 'ASSOCIATION_ACCEPTED'
-                            ? 'Connected'
-                            : account.status === 'READY'
-                              ? 'Ready'
-                              : account.status === 'CREATING'
-                                ? 'Creating'
-                                : account.status === 'CREATION_FAILED'
-                                  ? 'Failed'
-                                  : account.status === 'ASSOCIATION_REQUEST_EXPIRED'
-                                    ? 'Expired'
-                                    : account.status === 'DELETING'
-                                      ? 'Deleting'
-                                      : 'Unknown'}
-                        </Badge>
-                      </>
-                    }
-                    description={description}
-                    actions={
-                      account.status === 'READY' && (
-                        <Button variant="default" className="w-min" icon={<ExternalLink />}>
-                          <Link
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`${DOCS_URL}/guides/platform/privatelink#step-2-accept-resource-share`}
-                          >
-                            How to accept
-                          </Link>
-                        </Button>
-                      )
-                    }
-                  />
-                </>
+                          How to accept
+                        </Link>
+                      </Button>
+                    )
+                  }
+                />
               )}
               <FormField
                 control={form.control}
-                name="accountName"
+                name="awsAccountId"
                 render={({ field }) => (
                   <FormItemLayout
-                    label="Description"
-                    description="A description for this connection."
+                    label="AWS account ID"
+                    description="12-digit ID of the destination account."
                   >
                     <FormControl>
                       <Input
                         {...field}
                         readOnly={!isNew}
+                        autoFocus={isNew}
+                        placeholder="123456789012"
                         onFocus={(e) => {
-                          if (!isNew) {
-                            e.target.blur()
-                          }
+                          if (!isNew) e.target.blur()
                         }}
                       />
                     </FormControl>
                   </FormItemLayout>
                 )}
               />
-              {(showPrivateLinkReadReplica || !isNew) && (
+              {showDatabaseTarget && (
                 <FormField
                   control={form.control}
                   name="databaseIdentifier"
                   render={({ field }) => (
                     <FormItemLayout
-                      label="Database target"
-                      description="Each database needs its own connection. The same AWS account can connect to both primary and replica databases."
+                      label="Database"
+                      description="Each database needs its own connection."
                     >
                       <FormControl>
                         <Select
@@ -267,21 +231,15 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
               )}
               <FormField
                 control={form.control}
-                name="awsAccountId"
+                name="accountName"
                 render={({ field }) => (
-                  <FormItemLayout
-                    label="AWS account ID"
-                    description="The ID of the AWS account you want to connect to."
-                  >
+                  <FormItemLayout label="Description" labelOptional="Optional">
                     <FormControl>
                       <Input
                         {...field}
                         readOnly={!isNew}
-                        autoFocus={isNew}
                         onFocus={(e) => {
-                          if (!isNew) {
-                            e.target.blur()
-                          }
+                          if (!isNew) e.target.blur()
                         }}
                       />
                     </FormControl>
@@ -289,10 +247,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                 )}
               />
               {!isNew && account?.resource_access_manager_resource_config_id && (
-                <FormItemLayout
-                  label="Resource Configuration ID"
-                  description="The AWS VPC Lattice resource configuration ID for this connection."
-                >
+                <FormItemLayout label="Resource configuration ID">
                   <CopyableInput
                     readOnly
                     copy
@@ -301,10 +256,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                 </FormItemLayout>
               )}
               {!isNew && account?.resource_access_manager_resource_config_arn && (
-                <FormItemLayout
-                  label="Resource Configuration ARN"
-                  description="The ARN of the AWS VPC Lattice resource configuration."
-                >
+                <FormItemLayout label="Resource configuration ARN">
                   <CopyableInput
                     readOnly
                     copy
@@ -313,21 +265,23 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                 </FormItemLayout>
               )}
               {!isNew && account?.resource_access_manager_share_arn && (
-                <FormItemLayout
-                  label="Resource Share ARN"
-                  description="The ARN of the AWS RAM resource share."
-                >
+                <FormItemLayout label="Resource share ARN">
                   <CopyableInput readOnly copy value={account.resource_access_manager_share_arn} />
                 </FormItemLayout>
               )}
             </SheetSection>
 
             <SheetFooter>
-              <Button variant="default" disabled={isPending} onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="default"
+                disabled={isPending}
+                onClick={() => handleOpenChange(false)}
+              >
                 Cancel
               </Button>
               {isNew && (
-                <Button type="submit" loading={isPending}>
+                <Button form={FORM_ID} type="submit" loading={isPending}>
                   Add connection
                 </Button>
               )}
