@@ -32,6 +32,15 @@ interface DestinationTypeOption {
   enabled: boolean
 }
 
+const STAGE_BADGE_VARIANT: Record<
+  NonNullable<DestinationTypeOption['stage']>,
+  'warning' | 'destructive' | 'default'
+> = {
+  'Early Access': 'warning',
+  Deprecated: 'destructive',
+  'Public Alpha': 'default',
+}
+
 export const DestinationTypeSelection = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
@@ -162,15 +171,7 @@ export const DestinationTypeSelection = () => {
                 <div className="flex items-center gap-x-2">
                   <span className="text-sm text-foreground">{selectedOption.label}</span>
                   {selectedOption.stage && (
-                    <Badge
-                      variant={
-                        selectedOption.stage === 'Early Access'
-                          ? 'warning'
-                          : selectedOption.stage === 'Deprecated'
-                            ? 'destructive'
-                            : 'default'
-                      }
-                    >
+                    <Badge variant={STAGE_BADGE_VARIANT[selectedOption.stage]}>
                       {selectedOption.stage}
                     </Badge>
                   )}
@@ -196,15 +197,7 @@ export const DestinationTypeSelection = () => {
                         <div className="flex items-center gap-x-2">
                           <span className="text-foreground">{option.label}</span>
                           {option.stage && (
-                            <Badge
-                              variant={
-                                option.stage === 'Early Access'
-                                  ? 'warning'
-                                  : option.stage === 'Deprecated'
-                                    ? 'destructive'
-                                    : 'default'
-                              }
-                            >
+                            <Badge variant={STAGE_BADGE_VARIANT[option.stage]}>
                               {option.stage}
                             </Badge>
                           )}
