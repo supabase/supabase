@@ -98,17 +98,27 @@ describe('next.config.mjs', () => {
     const logoRedirects = redirects.filter((redirect) =>
       redirect.source.startsWith('/images/customers/logos')
     )
-    const isRedirected = (url: string) =>
-      logoRedirects.some((redirect) => getPathMatch(redirect.source)(url) !== false)
+    const redirectFor = (url: string) =>
+      logoRedirects.find((redirect) => getPathMatch(redirect.source)(url) !== false)
 
-    // Wordmarks that moved from logos/ to logos/on-light/ have to keep resolving.
-    expect(isRedirected('/images/customers/logos/accenture.svg')).toBe(true)
-    expect(isRedirected('/images/customers/logos/stigg.svg')).toBe(true)
+    // Wordmarks that moved from logos/ to logos/on-light/ have to keep resolving, and
+    // land on the file's new home rather than merely matching some rule.
+    expect(redirectFor('/images/customers/logos/accenture.svg')).toMatchObject({
+      destination: '/images/customers/logos/on-light/accenture.svg',
+      permanent: true,
+    })
+    expect(redirectFor('/images/customers/logos/stigg.svg')).toMatchObject({
+      destination: '/images/customers/logos/on-light/stigg.svg',
+      permanent: true,
+    })
     // hyper.svg moved out of logos/light/, which the :path* rule already covers.
-    expect(isRedirected('/images/customers/logos/light/hyper.svg')).toBe(true)
+    expect(redirectFor('/images/customers/logos/light/hyper.svg')).toMatchObject({
+      destination: '/images/customers/logos/on-dark/:path*',
+      permanent: true,
+    })
 
     // Icon chips and dreambase-mark.png deliberately stayed put, so they must not redirect.
-    expect(isRedirected('/images/customers/logos/chatbase-icon.svg')).toBe(false)
-    expect(isRedirected('/images/customers/logos/dreambase-mark.png')).toBe(false)
+    expect(redirectFor('/images/customers/logos/chatbase-icon.svg')).toBeUndefined()
+    expect(redirectFor('/images/customers/logos/dreambase-mark.png')).toBeUndefined()
   })
 })
