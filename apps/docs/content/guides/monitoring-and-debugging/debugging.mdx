@@ -6,6 +6,12 @@ description: 'Isolate and fix Supabase issues by reading the error, isolating th
 
 Debug by evidence, not by guessing. A Supabase error almost always surfaces at one layer but originates at another, so the fastest path to a fix is finding _where_ the problem is, not pattern-matching the symptom. Retrying a failed request rarely helps; isolating the layer does.
 
+<Admonition type="note">
+
+If you are using an AI agent with the Supabase MCP server, `query_logs` runs custom ClickHouse queries on hosted project logs and `get_logs` queries by service name on local and self-hosted projects. The `supabase` skill (`npx skills add supabase`) gives the agent this debugging workflow and routes it to the guides in this section.
+
+</Admonition>
+
 ## Follow these debugging steps
 
 Work through these steps in order, skipping straight to a fix before you have evidence for the cause is the most common way to waste time on a bug.
