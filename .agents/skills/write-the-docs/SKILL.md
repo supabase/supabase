@@ -48,6 +48,16 @@ When in doubt, ask `ask-the-docs` rather than guessing — this classification i
 - Place the page using existing IA precedent; for a placement call that isn't obvious, consult [`audit-docs-ia`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/audit-docs-ia/SKILL.md)'s nav/IA knowledge rather than guessing a nav slot.
 - **Wire it into navigation, not just onto disk.** Placement (which section) and nav enablement (whether it actually shows up) are separate — confirm the current nav-registration mechanism via `ask-the-docs`/`audit-docs-ia` rather than assuming a page is discoverable just because the file exists in the right folder.
 - Ground every behavior claim in Phase 1's code read (the linked PR when there is one); ground every "why this matters" framing in the PRD/PM context; mark inferred material inline (e.g. an HTML comment or a flagged line in the handoff summary) so a reviewer can find it fast.
+- **Write for timelessness.** Avoid future promises and time-dependent language ([Google's timeless documentation principle](https://developers.google.com/style/timeless-documentation)):
+  - ❌ "Feature X is coming soon" / "will be available" / "once finalized"
+  - ✅ Either document what exists now, or wait until it ships
+  - ❌ "being rolled out gradually" without concrete criteria
+  - ✅ "available to organizations on [specific plan]" with clear eligibility
+  - ❌ "This page is a placeholder. Detailed notes are coming soon."
+  - ✅ Either ship complete content or don't ship the page yet
+- **Keep it concise and avoid redundancy.** If you're restating the same point in multiple ways (e.g. "It's free" + "You won't be billed" + "No charge during Alpha"), consolidate. If a caution admonition already stated a risk, don't restate it verbatim later in the body.
+- **No single-item lists.** If there's only one resource, example, or limitation, use a paragraph instead of a bullet list. Single-item lists signal incomplete content.
+- **Strip internal business context before the final draft.** HTML comments flagging PRD intent, roadmap speculation, internal ticket discussions, or "gap-fill" notes must be removed from MDX before handoff. Open-source docs shouldn't expose internal planning. Flag assumptions and open questions for reviewers in the PR description instead, not in the shipped content.
 
 ## Phase 2.5 — Review checklist
 
@@ -60,6 +70,10 @@ Before handing off, confirm:
 - [ ] Content type confirmed as Guide/Troubleshooting (not something that belongs in generated Reference instead)
 - [ ] Nav placement and nav enablement both wired, not just the placement
 - [ ] Internal links resolve; first-use of new terms/acronyms is defined
+- [ ] No future promises or "coming soon" language (timeless documentation principle)
+- [ ] No redundant statements (same point restated in admonition and body, or multiple ways of saying "free")
+- [ ] No single-item bullet lists (use paragraphs instead)
+- [ ] Internal gap-fill and business context comments removed from MDX (keep only in PR description if needed for review)
 
 ## Phase 3 — Handoff
 
@@ -71,6 +85,7 @@ This skill stops at a reviewable draft. It does not open worktrees or PRs itself
 ## Additional resources
 
 - Style / terminology: [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md), [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md), [reference/style-fallback.md](reference/style-fallback.md)
+- Common pitfalls to avoid: [reference/common-pitfalls.md](reference/common-pitfalls.md)
 - Content-type gate detail: [reference/content-type-gate.md](reference/content-type-gate.md)
 - "Write the docs" checklist (Draft stage): [`pm-the-docs`](../pm-the-docs/SKILL.md)'s [reference/write-the-docs-checklist.md](../pm-the-docs/reference/write-the-docs-checklist.md)
 - Docs-app architecture/placement: [`ask-the-docs`](../ask-the-docs/SKILL.md), [`audit-docs-ia`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/audit-docs-ia/SKILL.md)
