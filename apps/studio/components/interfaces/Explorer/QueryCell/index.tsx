@@ -30,7 +30,11 @@ interface QueryCellProps {
  * QueryCell atm minimally supports running queries and rendering results
  */
 
-type QueryCellUpdate = { sql: string } | { title: string } | { display: QueryDisplay }
+type QueryCellUpdate =
+  | { sql: string }
+  | { title: string }
+  | { display: QueryDisplay }
+  | { row_limit: number }
 
 /** Notebook adapter around the shared QueryEditor. */
 export const QueryCell = ({ cell }: QueryCellProps) => {
@@ -113,6 +117,12 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
           return nextTitle ? { ...candidate, title: nextTitle } : candidate
         }
 
+        if ('row_limit' in payload) {
+          return candidate._tag === 'database_cell'
+            ? { ...candidate, row_limit: payload.row_limit }
+            : candidate
+        }
+
         return {
           ...candidate,
           view: payload.display.view,
@@ -143,6 +153,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
         onSqlCommit={(sql) => handleUpdateCell({ sql })}
         onSourceChange={handleSourceChange}
         onResultChange={setResult}
+        onRowLimitChange={(row_limit) => handleUpdateCell({ row_limit })}
         onDisplayChange={
           cell._tag === 'database_cell' ? (display) => handleUpdateCell({ display }) : undefined
         }

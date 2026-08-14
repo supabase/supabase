@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import { RowLimitSubMenu } from '../SQLEditor/UtilityPanel/QuerySourceMenu/RowLimitSubMenu'
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
@@ -23,6 +24,8 @@ import {
 } from '@/data/query-sources/query-source-registry'
 
 export type ExplorerQuerySourceMenuProps = {
+  rowLimit?: number
+  onRowLimitChange?: (val: number) => void
   source: QuerySourceBinding
   onSourceChange: (source: QuerySourceBinding) => void
 }
@@ -37,6 +40,8 @@ export type ExplorerQuerySourceMenuProps = {
  * has SQL to preserve or discard and a fresh draft does not.
  */
 export const ExplorerQuerySourceMenu = ({
+  rowLimit = 100,
+  onRowLimitChange,
   source,
   onSourceChange,
 }: ExplorerQuerySourceMenuProps) => {
@@ -97,12 +102,20 @@ export const ExplorerQuerySourceMenu = ({
           <DropdownMenuSeparator />
 
           {source._tag === 'database' ? (
-            <DatabaseParametersSubMenu
-              identifier={source.database_identifier ?? ref}
-              onIdentifierChange={(database_identifier) =>
-                onSourceChange({ _tag: 'database', database_identifier })
-              }
-            />
+            <>
+              <DatabaseParametersSubMenu
+                identifier={source.database_identifier ?? ref}
+                onIdentifierChange={(database_identifier) =>
+                  onSourceChange({ _tag: 'database', database_identifier })
+                }
+              />
+              {onRowLimitChange && (
+                <RowLimitSubMenu
+                  value={rowLimit}
+                  onValueChange={(val) => onRowLimitChange(Number(val))}
+                />
+              )}
+            </>
           ) : (
             <LogsTimeRangeSubMenu
               range={source.time_range}

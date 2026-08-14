@@ -149,7 +149,10 @@ export const QuerySourceMenu = ({ id, runSource, canCreateLogsSnippet }: QuerySo
                 />
               )}
               <RunAsSubMenu />
-              <RowLimitSubMenu />
+              <RowLimitSubMenu
+                value={sessionSnap.limit}
+                onValueChange={(val) => sessionSnap.setLimit(Number(val))}
+              />
             </>
           )}
         </DropdownMenuContent>
