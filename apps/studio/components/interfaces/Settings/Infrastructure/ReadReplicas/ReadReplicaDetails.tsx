@@ -17,7 +17,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { REPLICA_STATUS } from '../Replication.constants'
+import { REPLICA_STATUS } from './ReadReplicas.constants'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'

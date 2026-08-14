@@ -43,7 +43,7 @@ export const ReadReplicaForm = ({
 
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
     ([_, name]) => name === AWS_REGIONS_DEFAULT
-  ) ?? ['ap-southeast-1']
+  ) ?? ['SOUTHEAST_ASIA']
   const { can: canDeployReplica } = useCheckEligibilityDeployReplica()
 
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
@@ -61,7 +61,7 @@ export const ReadReplicaForm = ({
   const { mutate: setUpReplica, isPending: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
       const region = AVAILABLE_REPLICA_REGIONS.find((r) => r.key === selectedRegion)?.name
-      toast.success(`Spinning up new replica in ${region ?? ' Unknown'}...`)
+      toast.success(`Spinning up new replica in ${region ?? 'Unknown'}...`)
       onSuccess?.()
       onClose()
     },
@@ -75,8 +75,9 @@ export const ReadReplicaForm = ({
       : AVAILABLE_REPLICA_REGIONS
 
   const onSubmit = async () => {
-    const regionKey = AWS_REGIONS[selectedRegion as AWS_REGIONS_KEYS].code
     if (!projectRef) return console.error('Project is required')
+
+    const regionKey = AWS_REGIONS[selectedRegion as AWS_REGIONS_KEYS]?.code
     if (!regionKey) return toast.error('Unable to deploy replica: Unsupported region selected')
 
     const primary = data?.find((db) => db.identifier === projectRef)

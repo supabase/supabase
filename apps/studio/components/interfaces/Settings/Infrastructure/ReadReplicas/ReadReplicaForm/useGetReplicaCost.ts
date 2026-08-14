@@ -65,15 +65,21 @@ export const useGetReplicaCost = () => {
     },
     disk: {
       type,
-      label: `${((size_gb ?? 0) * 1.25).toLocaleString()} GB (${type})`,
+      label:
+        size_gb !== undefined && size_gb !== null && type !== undefined && type !== null
+          ? `${(size_gb * 1.25).toLocaleString()} GB (${type})`
+          : undefined,
       cost: formatCurrency(additionalCostDiskSize),
     },
     iops: {
-      label: `${iops?.toLocaleString()} IOPS`,
+      label: iops !== undefined && iops !== null ? `${iops.toLocaleString()} IOPS` : undefined,
       cost: formatCurrency(+additionalCostIOPS),
     },
     throughput: {
-      label: `${throughput_mbps?.toLocaleString()} MB/s`,
+      label:
+        throughput_mbps !== undefined && throughput_mbps !== null
+          ? `${throughput_mbps.toLocaleString()} MB/s`
+          : undefined,
       cost: formatCurrency(+additionalCostThroughput),
     },
   }

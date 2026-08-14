@@ -1,13 +1,13 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { ReadReplicaEligibilityWarnings } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicaForm/ReadReplicaEligibilityWarnings'
-import { useCheckEligibilityDeployReplica } from '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicaForm/useCheckEligibilityDeployReplica'
+import { ReadReplicaEligibilityWarnings } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm/ReadReplicaEligibilityWarnings'
+import { useCheckEligibilityDeployReplica } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm/useCheckEligibilityDeployReplica'
 import { READ_REPLICAS_MAX_COUNT } from '@/data/read-replicas/replicas-query'
 import { customRender } from '@/tests/lib/custom-render'
 
 vi.mock(
-  '@/components/interfaces/Database/Replication/DestinationPanel/ReadReplicaForm/useCheckEligibilityDeployReplica'
+  '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm/useCheckEligibilityDeployReplica'
 )
 vi.mock('@/data/projects/project-detail-query', () => ({
   useProjectDetailQuery: () => ({ data: undefined, isSuccess: false }),
