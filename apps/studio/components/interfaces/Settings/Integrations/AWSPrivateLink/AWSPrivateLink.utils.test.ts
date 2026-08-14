@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getConnectionStatusUi, type PrivateLinkConnectionStatus } from './AWSPrivateLink.utils'
+import {
+  getConnectionsAttentionCopy,
+  getConnectionStatusUi,
+  type PrivateLinkConnectionStatus,
+} from './AWSPrivateLink.utils'
 
 describe('getConnectionStatusUi', () => {
   it.each([
@@ -65,5 +69,27 @@ describe('getConnectionStatusUi', () => {
     expect(ui.badge).toBe('Unknown')
     expect(ui.badgeVariant).toBe('default')
     expect(ui.title).toBe("Couldn't determine this connection's status")
+  })
+})
+
+describe('getConnectionsAttentionCopy', () => {
+  it('returns null when nothing needs attention', () => {
+    expect(getConnectionsAttentionCopy({ waitingCount: 0, expiredCount: 0 })).toBeNull()
+  })
+
+  it('returns waiting copy for a single ready connection', () => {
+    const copy = getConnectionsAttentionCopy({ waitingCount: 1, expiredCount: 0 })
+
+    expect(copy?.type).toBe('warning')
+    expect(copy?.title).toBe('Waiting for the AWS account owner')
+    expect(copy?.showAcceptLink).toBe(true)
+  })
+
+  it('returns expired copy when only expired connections remain', () => {
+    const copy = getConnectionsAttentionCopy({ waitingCount: 0, expiredCount: 2 })
+
+    expect(copy?.type).toBe('destructive')
+    expect(copy?.title).toBe('Connection requests expired')
+    expect(copy?.showAcceptLink).toBe(false)
   })
 })

@@ -55,9 +55,15 @@ interface AWSPrivateLinkFormProps {
   account?: AWSAccount
   open: boolean
   onOpenChange: (open: boolean) => void
+  onDelete?: () => void
 }
 
-export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLinkFormProps) => {
+export const AWSPrivateLinkForm = ({
+  account,
+  open,
+  onOpenChange,
+  onDelete,
+}: AWSPrivateLinkFormProps) => {
   const isNew = !account
   const { data: project } = useSelectedProjectQuery()
   const showPrivateLinkReadReplica = useFlag('privatelinkReadReplica')
@@ -272,19 +278,30 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
               )}
             </SheetSection>
 
-            <SheetFooter>
-              <Button
-                type="button"
-                variant="default"
-                disabled={isPending}
-                onClick={() => handleOpenChange(false)}
-              >
-                Cancel
-              </Button>
-              {isNew && (
-                <Button form={FORM_ID} type="submit" loading={isPending}>
-                  Add connection
-                </Button>
+            <SheetFooter className={!isNew ? 'sm:justify-between' : undefined}>
+              {!isNew ? (
+                <>
+                  <Button type="button" variant="danger" onClick={onDelete}>
+                    Delete
+                  </Button>
+                  <Button type="button" variant="default" onClick={() => handleOpenChange(false)}>
+                    Close
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    type="button"
+                    variant="default"
+                    disabled={isPending}
+                    onClick={() => handleOpenChange(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button form={FORM_ID} type="submit" loading={isPending}>
+                    Add connection
+                  </Button>
+                </>
               )}
             </SheetFooter>
           </form>

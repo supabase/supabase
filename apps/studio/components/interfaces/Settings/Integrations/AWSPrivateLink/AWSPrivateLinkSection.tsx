@@ -1,7 +1,19 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, cn } from 'ui'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  Card,
+  CardContent,
+  cn,
+} from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -13,6 +25,7 @@ import {
 
 import { IntegrationSectionIcon } from '../IntegrationsSettings'
 import { AWSPrivateLinkAccountItem } from './AWSPrivateLinkAccountItem'
+import { AWSPrivateLinkAttentionAdmonition } from './AWSPrivateLinkAttentionAdmonition'
 import { AWSPrivateLinkForm } from './AWSPrivateLinkForm'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
@@ -36,6 +49,7 @@ export const AWSPrivateLinkSection = () => {
     onSuccess: () => {
       toast.success('Connection will be deleted shortly')
       setShowDeleteModal(false)
+      setShowForm(false)
       setSelectedAccount(undefined)
     },
   })
@@ -71,6 +85,13 @@ export const AWSPrivateLinkSection = () => {
     }
   }
 
+  const deleteDatabaseCopy =
+    selectedAccount?.database_type === 'READ_REPLICA'
+      ? selectedAccount.database_identifier
+        ? `the read replica (ID: ${formatDatabaseID(selectedAccount.database_identifier)})`
+        : 'a read replica'
+      : 'the primary database'
+
   return (
     <>
       <PageSection>
@@ -103,6 +124,7 @@ export const AWSPrivateLinkSection = () => {
                   Add connection
                 </Button>
               </div>
+              <AWSPrivateLinkAttentionAdmonition accounts={accounts} className="mb-3" />
               {(accounts?.length ?? 0) > 0 ? (
                 <ResourceList>
                   {accounts?.map((account) => (
@@ -126,31 +148,36 @@ export const AWSPrivateLinkSection = () => {
         </PageSectionContent>
       </PageSection>
 
-      <AWSPrivateLinkForm account={selectedAccount} open={showForm} onOpenChange={setShowForm} />
+      <AWSPrivateLinkForm
+        account={selectedAccount}
+        open={showForm}
+        onOpenChange={setShowForm}
+        onDelete={() => setShowDeleteModal(true)}
+      />
 
-      <ConfirmationModal
-        variant="destructive"
-        visible={showDeleteModal}
-        title="Delete connection"
-        confirmLabel="Delete"
-        loading={isDeleting}
-        onCancel={() => setShowDeleteModal(false)}
-        onConfirm={onConfirmDelete}
+      <AlertDialog
+        open={showDeleteModal}
+        onOpenChange={(open) => {
+          if (!open && !isDeleting) setShowDeleteModal(false)
+        }}
       >
-        <p className="text-sm text-foreground-light">
-          This removes the PrivateLink connection for {selectedAccount?.aws_account_id}.
-          Applications using this private path will lose access.
-        </p>
-        <p className="text-sm text-foreground-lighter mt-1">
-          Database:{' '}
-          {selectedAccount &&
-            ` ${
-              selectedAccount.database_type === 'READ_REPLICA'
-                ? `Read replica (ID: ${selectedAccount.database_identifier ? formatDatabaseID(selectedAccount.database_identifier) : 'Unknown identifier'})`
-                : 'Primary database'
-            }`}
-        </p>
-      </ConfirmationModal>
+        <AlertDialogContent size="small">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete connection</AlertDialogTitle>
+            <AlertDialogDescription>
+              This removes the PrivateLink connection for{' '}
+              <code className="text-code-inline">{selectedAccount?.aws_account_id}</code> on{' '}
+              {deleteDatabaseCopy}. Applications using this private path will lose access.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="danger" loading={isDeleting} onClick={onConfirmDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
