@@ -1,14 +1,12 @@
 import { useMemo } from 'react'
 import { Chart, ChartBar, ChartCard, ChartContent, ChartLine } from 'ui-patterns/Chart'
-import { type Snapshot } from 'valtio'
 
-import { type QueryResult } from '../types'
+import { type QueryChartConfig, type QueryResult } from '../types'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
-import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
-import { type DatabaseCell as DatabaseCellSchema } from '@/data/content/notebooks/notebook-schema'
+import { formatLogTick, getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 
 interface QueryResultChartProps {
-  cell: Snapshot<DatabaseCellSchema>
+  chart?: QueryChartConfig
   result?: QueryResult
 }
 
@@ -21,9 +19,8 @@ const toChartValue = (value: unknown): string | number => {
   return String(value)
 }
 
-export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
-  const { chart } = cell
-  const { type, x_column, y_columns = [], cumulative, show_labels } = chart ?? {}
+export const QueryResultChart = ({ chart, result }: QueryResultChartProps) => {
+  const { type, x_column, y_columns = [], cumulative, show_labels, scale } = chart ?? {}
 
   const hasConfig = !!x_column && y_columns.length > 0
   const chartRows = useMemo(() => {
@@ -76,6 +73,11 @@ export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}
+                YAxisProps={{
+                  scale: scale === 'log' ? 'log' : 'auto',
+                  domain: scale === 'log' ? [1, 'auto'] : undefined,
+                  tickFormatter: scale === 'log' ? formatLogTick : undefined,
+                }}
               />
             )}
             {type === 'line' && (
@@ -86,6 +88,11 @@ export const QueryResultChart = ({ cell, result }: QueryResultChartProps) => {
                 showXAxis={show_labels}
                 showYAxis={show_labels}
                 data={resultToRender}
+                YAxisProps={{
+                  scale: scale === 'log' ? 'log' : 'auto',
+                  domain: scale === 'log' ? [1, 'auto'] : undefined,
+                  tickFormatter: scale === 'log' ? formatLogTick : undefined,
+                }}
               />
             )}
           </div>

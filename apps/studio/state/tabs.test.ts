@@ -1,7 +1,7 @@
 import type { NextRouter } from 'next/router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createTabsState, type Tab } from './tabs'
+import { createTabId, createTabsState, type Tab } from './tabs'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 const fakeRouter = () => ({ query: { ref: 'default' }, push: vi.fn() }) as unknown as NextRouter
@@ -12,6 +12,52 @@ const sqlTab = (id: string): Tab => ({
   label: id,
   isPreview: false,
   metadata: { sqlId: id },
+})
+
+describe('Explorer chat tabs', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('creates stable chat tab ids and navigates to the chat route', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    const id = createTabId('chat', { id: 'assistant-chat-id' })
+
+    store.addTab({
+      id,
+      type: 'chat',
+      label: 'Investigate errors',
+      metadata: { chatId: 'assistant-chat-id' },
+      isPreview: false,
+    })
+    store.handleTabNavigation(id, router)
+
+    expect(id).toBe('chat-assistant-chat-id')
+    expect(router.push).toHaveBeenCalledWith('/project/default/explorer/chat/assistant-chat-id')
+  })
+
+  it('returns to Explorer home when the final chat tab closes', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    const id = createTabId('chat', { id: 'assistant-chat-id' })
+
+    store.addTab({
+      id,
+      type: 'chat',
+      label: 'Investigate errors',
+      metadata: { chatId: 'assistant-chat-id' },
+      isPreview: false,
+    })
+    store.handleTabClose({
+      id,
+      router,
+      editor: 'explorer',
+      onClearDashboardHistory: () => {},
+    })
+
+    expect(router.push).toHaveBeenCalledWith('/project/default/explorer')
+  })
 })
 
 describe('tabs recent items', () => {
@@ -305,5 +351,27 @@ describe('tabs close handlers', () => {
 
     expect(store.getTabStatusIndicator('sql')).toBeUndefined()
     expect(store.handlerRegistrationVersion).toBeGreaterThan(afterRegister)
+  })
+})
+
+describe('explorer query tabs', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('navigates to a query tab using its Explorer route', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    store.addTab({
+      id: 'query-query-1',
+      type: 'query',
+      label: 'Untitled query',
+      metadata: { queryId: 'query-1' },
+      isPreview: false,
+    })
+
+    store.handleTabNavigation('query-query-1', router)
+
+    expect(router.push).toHaveBeenCalledWith('/project/default/explorer/query/query-1')
   })
 })

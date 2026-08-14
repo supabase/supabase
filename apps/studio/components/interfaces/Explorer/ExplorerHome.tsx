@@ -1,15 +1,15 @@
-import { untrustedSql } from '@supabase/pg-meta'
 import { MessageCirclePlus, NotebookText, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 
-import { useCreateNotebook } from './hooks'
+import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
-import { generateUuid } from '@/lib/api/snippets.browser'
-import { AssistantModel } from '@/state/ai-assistant-state'
+import type { AssistantModel } from '@/state/ai-assistant-state'
 
 export const ExplorerHome = () => {
   const { createNotebook } = useCreateNotebook()
+  const { createQuery } = useCreateQuery()
+  const { createChat } = useCreateChat()
 
   const [value, setValue] = useState<string>('')
   const [selectedModel, setSelectedModal] = useState<AssistantModel>('gpt-5.4-nano')
@@ -35,7 +35,7 @@ export const ExplorerHome = () => {
           onValueChange={(e) => setValue(e.target.value)}
           selectedModel={selectedModel}
           onSelectModel={setSelectedModal}
-          onSubmit={() => {}}
+          onSubmit={(message) => createChat({ initialMessage: message, model: selectedModel })}
         />
 
         <section className="mt-6">
@@ -52,19 +52,7 @@ export const ExplorerHome = () => {
               title="Run SQL"
               description="Write and run an ad-hoc query"
               bgColor="bg-blue-500"
-              onClick={() =>
-                createNotebook({
-                  name: 'SQL query',
-                  cells: [
-                    {
-                      _tag: 'database_cell',
-                      id: generateUuid(),
-                      unchecked_sql: untrustedSql(''),
-                      row_limit: 100,
-                    },
-                  ],
-                })
-              }
+              onClick={createQuery}
             />
           </div>
         </section>
