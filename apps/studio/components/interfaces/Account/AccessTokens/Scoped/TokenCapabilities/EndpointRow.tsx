@@ -60,6 +60,7 @@ export const EndpointRow = ({
   return (
     <button
       type="button"
+      tabIndex={0}
       onClick={handleCopy}
       onMouseEnter={handleRevealStart}
       onMouseLeave={handleRevealEnd}
