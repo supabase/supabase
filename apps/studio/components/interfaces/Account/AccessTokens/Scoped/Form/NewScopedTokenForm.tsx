@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import {
   Button,
   Form,
+  InfoIcon,
   Popover,
   PopoverAnchor,
   PopoverContent,
@@ -14,7 +15,7 @@ import {
   SheetClose,
   SheetFooter,
 } from 'ui'
-import { Admonition, AdmonitionTypeIcon } from 'ui-patterns/Admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
 import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
@@ -237,7 +238,7 @@ export const NewScopedTokenForm = ({
                 onInteractOutside={() => setIsCreateHintDismissed(true)}
                 onEscapeKeyDown={() => setIsCreateHintDismissed(true)}
               >
-                <AdmonitionTypeIcon type="default" className="size-5" />
+                <InfoIcon className="h-5 w-5 shrink-0" />
                 <p className="text-xs text-foreground-light">
                   Access can't be changed after creation
                 </p>
