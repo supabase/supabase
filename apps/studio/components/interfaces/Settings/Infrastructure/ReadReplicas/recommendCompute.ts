@@ -24,9 +24,14 @@ type RecommendComputeListener = (size: RecommendedComputeForReadReplicas) => voi
  * query-param write can land.
  */
 let recommendComputeListener: RecommendComputeListener | null = null
+let pendingRecommendCompute: RecommendedComputeForReadReplicas | null = null
 
 export function subscribeRecommendCompute(listener: RecommendComputeListener) {
   recommendComputeListener = listener
+  if (pendingRecommendCompute) {
+    listener(pendingRecommendCompute)
+    pendingRecommendCompute = null
+  }
   return () => {
     if (recommendComputeListener === listener) {
       recommendComputeListener = null
@@ -34,9 +39,10 @@ export function subscribeRecommendCompute(listener: RecommendComputeListener) {
   }
 }
 
-/** Returns true when a subscriber received the recommendation. */
 export function requestRecommendCompute(size: RecommendedComputeForReadReplicas) {
-  if (!recommendComputeListener) return false
+  if (!recommendComputeListener) {
+    pendingRecommendCompute = size
+    return
+  }
   recommendComputeListener(size)
-  return true
 }

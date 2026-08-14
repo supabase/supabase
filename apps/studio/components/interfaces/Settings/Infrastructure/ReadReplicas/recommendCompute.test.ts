@@ -7,20 +7,26 @@ import {
 
 describe('recommendCompute bridge', () => {
   afterEach(() => {
-    // Clear any leftover subscriber between tests.
+    // Clear any leftover subscriber or queued recommendation between tests.
     subscribeRecommendCompute(() => {})()
   })
 
   it('delivers the recommended size to the active subscriber', () => {
     const listener = vi.fn()
-    const unsubscribe = subscribeRecommendCompute(listener)
+    subscribeRecommendCompute(listener)
 
-    expect(requestRecommendCompute('ci_small')).toBe(true)
+    requestRecommendCompute('ci_small')
     expect(listener).toHaveBeenCalledWith('ci_small')
+  })
 
-    unsubscribe()
-    expect(requestRecommendCompute('ci_xlarge')).toBe(false)
-    expect(listener).toHaveBeenCalledTimes(1)
+  it('queues a recommendation until a subscriber mounts', () => {
+    const listener = vi.fn()
+
+    requestRecommendCompute('ci_xlarge')
+    expect(listener).not.toHaveBeenCalled()
+
+    subscribeRecommendCompute(listener)
+    expect(listener).toHaveBeenCalledWith('ci_xlarge')
   })
 
   it('replaces the previous subscriber', () => {
@@ -30,7 +36,7 @@ describe('recommendCompute bridge', () => {
     subscribeRecommendCompute(first)
     subscribeRecommendCompute(second)
 
-    expect(requestRecommendCompute('ci_xlarge')).toBe(true)
+    requestRecommendCompute('ci_xlarge')
 
     expect(first).not.toHaveBeenCalled()
     expect(second).toHaveBeenCalledWith('ci_xlarge')

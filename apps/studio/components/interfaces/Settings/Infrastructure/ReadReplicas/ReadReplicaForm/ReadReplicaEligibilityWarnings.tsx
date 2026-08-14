@@ -80,11 +80,8 @@ export const ReadReplicaEligibilityWarnings = () => {
   const handleRecommendCompute = (size: RecommendedComputeForReadReplicas) => {
     // Notify the infrastructure form before closing the sheet. Closing first
     // unmounts this component and previously dropped a follow-up URL write.
-    const delivered = requestRecommendCompute(size)
+    requestRecommendCompute(size)
     setAddReplica(false)
-    if (!delivered) {
-      toast.error('Could not open compute settings. Scroll to Scaling and choose a size manually.')
-    }
   }
 
   if (hasOverdueInvoices) {
