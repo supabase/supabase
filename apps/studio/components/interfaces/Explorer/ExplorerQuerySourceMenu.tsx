@@ -1,6 +1,5 @@
 import { useFlag, useParams } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
-import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -13,9 +12,8 @@ import {
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
-import { customDateRangeToLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { QuerySourceIcon } from '@/components/interfaces/QuerySources/QuerySourceIcon'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { useLogsCustomRange } from '@/components/interfaces/QuerySources/useLogsCustomRange'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import {
   createDefaultCellSource,
@@ -23,7 +21,6 @@ import {
   QUERY_SOURCES,
   type CellSource,
 } from '@/data/query-sources/query-source-registry'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 export type ExplorerQuerySourceMenuProps = {
   source: CellSource
@@ -42,10 +39,16 @@ export const ExplorerQuerySourceMenu = ({
   const { ref } = useParams()
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
-  const [isCustomRangeOpen, setIsCustomRangeOpen] = useState(false)
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
-  const entitledToLogDays = getEntitlementNumericValue()
+  const {
+    isCustomRangeOpen,
+    setIsCustomRangeOpen,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleApplyCustomRange,
+  } = useLogsCustomRange({
+    onRangeChange: (timeRange) =>
+      onSourceChange({ id: 'logs', type: 'logs', parameters: { time_range: timeRange } }),
+  })
 
   const availableSources = QUERY_SOURCES.filter(
     (candidate) =>
@@ -53,16 +56,6 @@ export const ExplorerQuerySourceMenu = ({
       (isLogsSourceEnabled && isOtelLogsEnabled) ||
       source.type === 'logs'
   )
-
-  const applyCustomRange = ({ from, to }: { from: Date; to: Date }) => {
-    const time_range = customDateRangeToLogTimeRange({ from, to })
-    if (maybeShowUpgradePromptIfNotEntitled(time_range.start, entitledToLogDays)) {
-      setShowUpgradePrompt(true)
-      return
-    }
-
-    onSourceChange({ id: 'logs', type: 'logs', parameters: { time_range } })
-  }
 
   return (
     <>
@@ -133,7 +126,7 @@ export const ExplorerQuerySourceMenu = ({
           <LogsCustomRangeDialog
             open={isCustomRangeOpen}
             onOpenChange={setIsCustomRangeOpen}
-            onApply={applyCustomRange}
+            onApply={handleApplyCustomRange}
           />
           <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
         </>

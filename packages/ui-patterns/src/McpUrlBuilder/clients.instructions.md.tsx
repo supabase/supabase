@@ -188,37 +188,6 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
-  windsurf: {
-    primary: () => (
-      <blockquote data={{ callout: 'warning' }}>
-        <paragraph>
-          Ensure you are running Windsurf version <inlineCode value="0.1.37" /> or higher.
-        </paragraph>
-      </blockquote>
-    ),
-    alternate: () => (
-      <paragraph>
-        Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
-        the mcp-remote package as a proxy.
-      </paragraph>
-    ),
-  },
-  warp: {
-    alternate: () => (
-      <>
-        <paragraph>
-          Warp supports remote MCP servers natively, so no local proxy is needed. You can also add
-          the server from the UI: open the MCP servers page (<strong>Settings</strong> &gt;{' '}
-          <strong>Agents</strong> &gt; <strong>MCP Servers</strong>, or search for MCP in the
-          command palette), click <strong>+ Add</strong>, and paste the same JSON.
-        </paragraph>
-        <paragraph>
-          After adding the server, Warp opens a browser window to complete the Supabase OAuth flow
-          and stores the credentials securely on your device.
-        </paragraph>
-      </>
-    ),
-  },
   goose: {
     primary: ({ url }) => (
       <>
