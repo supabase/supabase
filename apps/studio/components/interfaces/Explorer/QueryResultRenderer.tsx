@@ -1,12 +1,13 @@
 import { QueryResultChart } from './QueryResultChart'
 import { QueryResultError } from './QueryResultError'
-import { type QueryChartConfig, type QueryResult } from './types'
+import { type QueryResult } from './types'
 import { DataGridResults } from '@/components/ui/DataGridResults'
+import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface QueryResultRendererProps {
   result?: QueryResult
   view?: 'table' | 'chart'
-  chart?: QueryChartConfig
+  chart?: ChartConfig
 }
 
 export const QueryResultRenderer = ({ result, view, chart }: QueryResultRendererProps) => {
