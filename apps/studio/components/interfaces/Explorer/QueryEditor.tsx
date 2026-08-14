@@ -1,4 +1,4 @@
-import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
+import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import { CodeSquare, Eye, EyeOff, Play } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
@@ -25,12 +25,20 @@ import { QueryResultChart } from './QueryCell/QueryResultChart'
 import { QueryResultTable } from './QueryResultTable'
 import { type QueryDisplay, type QueryResult } from './types'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import {
+  type DatabaseSourceParameters,
+  type LogsSourceParameters,
+} from '@/data/content/notebooks/notebook-schema'
 import { isValidConnString } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
-import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import {
-  createDefaultSourceBinding,
+  acceptUntrustedLogsSql,
+  untrustedLogSql,
+  type UntrustedLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
+import {
   QUERY_SOURCE_REGISTRY,
+  toQuerySourceBinding,
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -39,14 +47,29 @@ import { applyAutoLimit } from '@/data/sql/utils'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
+/**
+ * The query this editor is showing, tagged by backend. The tag correlates the SQL's
+ * dialect brand with that backend's parameters, so a single `_tag` check inside
+ * `handleRunQuery` narrows both at once and there is no path that sends a query to the
+ * wrong wire boundary.
+ */
+export type ExplorerQueryModel =
+  | ({
+      _tag: 'database'
+      uncheckedSql: UntrustedSqlFragment
+      rowLimit?: number
+    } & DatabaseSourceParameters)
+  | ({
+      _tag: 'logs'
+      uncheckedSql: UntrustedLogSqlFragment
+    } & LogsSourceParameters)
+
 export type QueryEditorProps = {
   id: string
   variant: 'embedded' | 'viewport'
   title: string
-  sql: string
-  source?: QuerySourceBinding
+  query: ExplorerQueryModel
   result?: QueryResult
-  rowLimit?: number
   display?: QueryDisplay
   toolbarActions?: ReactNode
   onTitleChange: (title: string) => void
@@ -66,10 +89,8 @@ export const QueryEditor = ({
   id,
   variant,
   title,
-  sql,
-  source,
+  query,
   result,
-  rowLimit,
   display,
   toolbarActions,
   onTitleChange,
@@ -79,7 +100,8 @@ export const QueryEditor = ({
   onResultChange,
   onDisplayChange,
 }: QueryEditorProps) => {
-  const sqlRef = useLatest(sql)
+  const sql = query.uncheckedSql
+  const sqlRef = useLatest<string>(sql)
   const onSqlCommitRef = useLatest(onSqlCommit)
 
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
@@ -87,12 +109,10 @@ export const QueryEditor = ({
 
   const view = display?.view ?? 'table'
   const columns = Object.keys(result?.rows?.[0] ?? {})
-  const sourceBinding = source ?? createDefaultSourceBinding('database')
+  const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
+  const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
 
   const [showQuery, setShowQuery] = useState(true)
-
-  const databaseIdentifier =
-    sourceBinding._tag === 'database' ? sourceBinding.database_identifier : undefined
 
   const { data: databases, isPending: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef: project?.ref },
@@ -119,12 +139,19 @@ export const QueryEditor = ({
   const isExecuting = isExecutingSql || isExecutingLogs
   const isBusy = isLoadingProject || isResolvingDatabase || isExecuting
 
-  const handleRunQuery = (sqlToRun: string = sql) => {
-    if (!project || isBusy || sqlToRun.trim().length === 0) return
+  /**
+   * The user's run gesture, and therefore the promotion point for this query's SQL. The
+   * raw text comes straight off the editor, so it is (re)branded untrusted here — the
+   * editor boundary — and promoted in the same handler. Which pair of helpers applies is
+   * decided by `query._tag`, the same discriminant that picks the execution endpoint, so
+   * Postgres SQL cannot reach the analytics wire or vice versa.
+   */
+  const handleRunQuery = (rawSql: string = sql) => {
+    if (!project || isBusy || rawSql.trim().length === 0) return
 
-    onSqlCommit?.(sql)
+    onSqlCommit?.(rawSql)
 
-    if (sourceBinding._tag === 'logs') {
+    if (query._tag === 'logs') {
       if (!isOtelLogsEnabled) {
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
@@ -134,14 +161,14 @@ export const QueryEditor = ({
 
       executeLogsSql({
         projectRef: project.ref,
-        sql: acceptUntrustedLogsSql(untrustedLogSql(sqlToRun)),
-        range: resolveLogTimeRange(sourceBinding.time_range),
+        sql: acceptUntrustedLogsSql(untrustedLogSql(rawSql)),
+        range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
       })
       return
     }
 
-    const safeSql = acceptUntrustedSql(untrustedSql(sqlToRun))
+    const safeSql = acceptUntrustedSql(untrustedSql(rawSql))
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
     const connectionString =
       databaseIdentifier === undefined || databaseIdentifier === project.ref
@@ -175,8 +202,11 @@ export const QueryEditor = ({
         <ExplorerToolbarTitle onSaveTitle={onTitleChange}>{title}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
           {toolbarActions}
-          {source && onSourceChange && (
-            <ExplorerQuerySourceMenu source={source} onSourceChange={onSourceChange} />
+          {onSourceChange && (
+            <ExplorerQuerySourceMenu
+              source={toQuerySourceBinding(query)}
+              onSourceChange={onSourceChange}
+            />
           )}
           {display && onDisplayChange && (
             <DisplaySettingsButton
