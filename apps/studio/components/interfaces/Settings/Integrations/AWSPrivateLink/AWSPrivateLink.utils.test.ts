@@ -4,6 +4,7 @@ import {
   getConnectionsAttention,
   getConnectionsAttentionCopy,
   getConnectionStatusUi,
+  getConnectionTitle,
   type PrivateLinkConnectionStatus,
 } from './AWSPrivateLink.utils'
 
@@ -23,6 +24,21 @@ describe('getConnectionStatusUi', () => {
 
   it('returns unknown copy when status is missing', () => {
     expect(getConnectionStatusUi()).toEqual({ badge: 'Unknown', badgeVariant: 'default' })
+  })
+})
+
+describe('getConnectionTitle', () => {
+  it('uses the customer nickname when present', () => {
+    expect(
+      getConnectionTitle({
+        account_name: 'Production VPC',
+        aws_account_id: '123456789012',
+      })
+    ).toBe('Production VPC')
+  })
+
+  it('falls back to the AWS account ID for an unnamed connection', () => {
+    expect(getConnectionTitle({ aws_account_id: '123456789012' })).toBe('123456789012')
   })
 })
 

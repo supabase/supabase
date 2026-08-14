@@ -46,6 +46,14 @@ export function getConnectionStatusUi(status?: PrivateLinkConnectionStatus): Con
   return CONNECTION_STATUS_UI[status] ?? UNKNOWN_STATUS_UI
 }
 
+export function getConnectionTitle(
+  account: Pick<AWSAccount, 'account_name' | 'aws_account_id'>
+): string {
+  const nickname = account.account_name?.trim()
+  if (nickname) return nickname
+  return account.aws_account_id
+}
+
 export type ConnectionsAttention = {
   waitingCount: number
   expiredCount: number

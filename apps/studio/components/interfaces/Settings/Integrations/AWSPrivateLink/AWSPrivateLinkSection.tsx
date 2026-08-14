@@ -68,11 +68,6 @@ export const AWSPrivateLinkSection = () => {
     setShowForm(true)
   }
 
-  const onDeleteAccount = (account: AWSAccount) => {
-    setSelectedAccount(account)
-    setShowDeleteModal(true)
-  }
-
   const onConfirmDelete = () => {
     if (selectedAccount && project) {
       deleteAccount({
@@ -102,7 +97,7 @@ export const AWSPrivateLinkSection = () => {
             <PageSectionSummary>
               <PageSectionTitle>AWS PrivateLink</PageSectionTitle>
               <PageSectionDescription>
-                Connect to this project from your AWS VPC without using the public internet.
+                Private connectivity from a connected AWS VPC, without the public internet.
               </PageSectionDescription>
             </PageSectionSummary>
           </div>
@@ -111,7 +106,7 @@ export const AWSPrivateLinkSection = () => {
           <div className="space-y-6">
             {promptPlanUpgrade && (
               <UpgradeToPro
-                layout="vertical"
+                layout="responsive"
                 primaryText="Available on Team and Enterprise plans"
                 secondaryText="Upgrade to add a PrivateLink connection."
                 buttonText="Upgrade to Team"
@@ -131,9 +126,8 @@ export const AWSPrivateLinkSection = () => {
                   {accounts?.map((account) => (
                     <AWSPrivateLinkAccountItem
                       key={`${account.aws_account_id}-${account.database_identifier ?? 'primary'}`}
-                      {...account}
-                      onEdit={() => onEditAccount(account)}
-                      onDelete={() => onDeleteAccount(account)}
+                      account={account}
+                      onView={() => onEditAccount(account)}
                     />
                   ))}
                 </ResourceList>
