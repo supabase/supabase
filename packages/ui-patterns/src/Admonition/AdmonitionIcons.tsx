@@ -78,14 +78,21 @@ function getGlyph(type: AdmonitionType) {
   return <InfoIcon />
 }
 
-export function AdmonitionTypeIcon({ type }: { type: AdmonitionType }) {
+export function AdmonitionTypeIcon({
+  type,
+  className,
+}: {
+  type: AdmonitionType
+  className?: string
+}) {
   const visual = getIconVisual(type)
 
   return (
     <span
       className={cn(
         'inline-flex shrink-0 items-center justify-center size-[23px] p-1 rounded-sm [&>svg]:size-full',
-        ICON_BADGE_CLASS[visual]
+        ICON_BADGE_CLASS[visual],
+        className
       )}
     >
       {getGlyph(type)}
