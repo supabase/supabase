@@ -521,6 +521,35 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/analytics/endpoints/logs': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Gets all project's logs in a single log stream
+     * @description Executes an SQL or LQL query on the project's unified logs stream.
+     *
+     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
+     *     If both are not provided, only the last 1 minute of logs will be queried.
+     *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
+     *
+     *     Filter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.
+     *
+     *     Note: SQL must be written in **ClickHouse SQL dialect**.
+     *
+     */
+    get: operations['v1-get-project-logs']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/analytics/endpoints/logs.all': {
     parameters: {
       query?: never
@@ -530,6 +559,7 @@ export interface paths {
     }
     /**
      * Gets project's logs
+     * @deprecated
      * @description Executes a SQL query on the project's logs.
      *
      *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
@@ -539,7 +569,27 @@ export interface paths {
      *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.
      *
      */
-    get: operations['v1-get-project-logs']
+    get: operations['v1-get-project-logs-all']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/analytics/endpoints/metrics': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Scrape a project's metrics
+     * @description Prometheus scrape endpoint. Returns metrics of a customer project in the Prometheus open exposition format.
+     */
+    get: operations['v1-scrape-project-metrics']
     put?: never
     post?: never
     delete?: never
@@ -1315,6 +1365,66 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/database/jit/invite': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Invites an external user to a database for JIT access
+     * @description Invites the external user and sets initial roles that can be assumed and for how long
+     */
+    post: operations['v1-invite-external-jit-access']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/jit/invite/{invite_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Deletes the invite for an external user to a database for JIT access
+     * @description Revokes and deletes the invitation
+     */
+    delete: operations['v1-delete-invite-external-jit-access']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/database/jit/invite/accept': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Accepts invitation for JIT database access
+     * @description Accepts the invitation to JIT database access
+     */
+    post: operations['v1-accept-invite-external-jit-access']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/database/jit/list': {
     parameters: {
       query?: never
@@ -1342,25 +1452,13 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /**
-     * List applied migration versions
-     * @description Only available to selected partner OAuth apps
-     */
+    /** List applied migration versions */
     get: operations['v1-list-migration-history']
-    /**
-     * Upsert a database migration without applying
-     * @description Only available to selected partner OAuth apps
-     */
+    /** Upsert a database migration without applying */
     put: operations['v1-upsert-a-migration']
-    /**
-     * Apply a database migration
-     * @description Only available to selected partner OAuth apps
-     */
+    /** Apply a database migration */
     post: operations['v1-apply-a-migration']
-    /**
-     * Rollback database migrations and remove them from history table
-     * @description Only available to selected partner OAuth apps
-     */
+    /** Rollback database migrations and remove them from history table */
     delete: operations['v1-rollback-migrations']
     options?: never
     head?: never
@@ -1374,20 +1472,14 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /**
-     * Fetch an existing entry from migration history
-     * @description Only available to selected partner OAuth apps
-     */
+    /** Fetch an existing entry from migration history */
     get: operations['v1-get-a-migration']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
-    /**
-     * Patch an existing entry in migration history
-     * @description Only available to selected partner OAuth apps
-     */
+    /** Patch an existing entry in migration history */
     patch: operations['v1-patch-a-migration']
     trace?: never
   }
@@ -2114,6 +2206,15 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /** @example {
+     *       "email": "external-user@somedomain.xyz",
+     *       "token": ""
+     *     } */
+    AcceptInviteExternalUserJitAccessBody: {
+      /** Format: email */
+      email: string
+      token: string
+    }
     ActionRunResponse: {
       branch_id: string
       check_run_id: number | null
@@ -2749,7 +2850,6 @@ export interface components {
       domains?: {
         created_at?: string
         domain?: string
-        id: string
         updated_at?: string
       }[]
       id: string
@@ -2765,7 +2865,6 @@ export interface components {
           }
         }
         entity_id: string
-        id: string
         metadata_url?: string
         metadata_xml?: string
         /** @enum {string} */
@@ -2932,7 +3031,6 @@ export interface components {
       domains?: {
         created_at?: string
         domain?: string
-        id: string
         updated_at?: string
       }[]
       id: string
@@ -2948,7 +3046,6 @@ export interface components {
           }
         }
         entity_id: string
-        id: string
         metadata_url?: string
         metadata_xml?: string
         /** @enum {string} */
@@ -3053,7 +3150,7 @@ export interface components {
      *       }
      *     } */
     FunctionDeployBody: {
-      file?: string[]
+      file: string[]
       metadata: {
         entrypoint_path: string
         import_map_path?: string
@@ -3122,7 +3219,6 @@ export interface components {
       domains?: {
         created_at?: string
         domain?: string
-        id: string
         updated_at?: string
       }[]
       id: string
@@ -3138,7 +3234,6 @@ export interface components {
           }
         }
         entity_id: string
-        id: string
         metadata_url?: string
         metadata_xml?: string
         /** @enum {string} */
@@ -3151,6 +3246,63 @@ export interface components {
       updated_at?: string
     }
     /** @example {
+     *       "email": "external-user@somedomain.xyz",
+     *       "roles": [
+     *         {
+     *           "role": "postgres",
+     *           "expires_at": 1740787200,
+     *           "allowed_networks": {
+     *             "allowed_cidrs": [
+     *               {
+     *                 "cidr": "203.0.113.0/24"
+     *               }
+     *             ]
+     *           },
+     *           "branches_only": false
+     *         }
+     *       ]
+     *     } */
+    InviteExternalUserJitAccessBody: {
+      /** Format: email */
+      email: string
+      roles: {
+        allowed_networks?: {
+          allowed_cidrs?: {
+            /** Format: cidrv4 */
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            /** Format: cidrv6 */
+            cidr: string
+          }[]
+        }
+        branches_only?: boolean
+        expires_at?: number
+        role: string
+      }[]
+    }
+    InviteExternalUserJitResponse: {
+      /** Format: email */
+      email: string
+      /** Format: uuid */
+      invite_id: string
+      user_roles: {
+        allowed_networks?: {
+          allowed_cidrs?: {
+            /** Format: cidrv4 */
+            cidr: string
+          }[]
+          allowed_cidrs_v6?: {
+            /** Format: cidrv6 */
+            cidr: string
+          }[]
+        }
+        branches_only?: boolean
+        expires_at?: number
+        role: string
+      }[]
+    }
+    /** @example {
      *       "state": "enabled"
      *     } */
     JitAccessRequestRequest: {
@@ -3159,13 +3311,15 @@ export interface components {
     }
     JitAccessResponse: {
       /** Format: uuid */
-      user_id: string
+      user_id?: string
       user_roles: {
         allowed_networks?: {
           allowed_cidrs?: {
+            /** Format: cidrv4 */
             cidr: string
           }[]
           allowed_cidrs_v6?: {
+            /** Format: cidrv6 */
             cidr: string
           }[]
         }
@@ -3180,9 +3334,11 @@ export interface components {
       user_role: {
         allowed_networks?: {
           allowed_cidrs?: {
+            /** Format: cidrv4 */
             cidr: string
           }[]
           allowed_cidrs_v6?: {
+            /** Format: cidrv6 */
             cidr: string
           }[]
         }
@@ -3193,14 +3349,19 @@ export interface components {
     }
     JitListAccessResponse: {
       items: {
+        expires_at: null
+        invite_id: null
+        primary_email: string | null
         /** Format: uuid */
         user_id: string
         user_roles: {
           allowed_networks?: {
             allowed_cidrs?: {
+              /** Format: cidrv4 */
               cidr: string
             }[]
             allowed_cidrs_v6?: {
+              /** Format: cidrv6 */
               cidr: string
             }[]
           }
@@ -3210,22 +3371,6 @@ export interface components {
         }[]
       }[]
     }
-    JitStateResponse:
-      | {
-          appliedSuccessfully?: boolean
-          /** @enum {string} */
-          state: 'enabled' | 'disabled'
-        }
-      | {
-          /** @enum {string} */
-          state: 'unavailable'
-          /** @enum {string} */
-          unavailableReason:
-            | 'manual_migration_required'
-            | 'postgres_upgrade_required'
-            | 'ssl_enforcement_required'
-            | 'temporarily_unavailable'
-        }
     LegacyApiKeysResponse: {
       enabled: boolean
     }
@@ -3288,8 +3433,7 @@ export interface components {
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
             | 'etl_pipeline_default'
-          /** @description Any JSON-serializable value */
-          meta?: unknown
+          meta?: components['schemas']['ListProjectAddonsResponseJsonValue']
           name: string
           price: {
             amount: number
@@ -3341,8 +3485,7 @@ export interface components {
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
             | 'etl_pipeline_default'
-          /** @description Any JSON-serializable value */
-          meta?: unknown
+          meta?: components['schemas']['ListProjectAddonsResponseJsonValue']
           name: string
           price: {
             amount: number
@@ -3355,13 +3498,19 @@ export interface components {
         }
       }[]
     }
+    /** @description Any JSON-serializable value */
+    ListProjectAddonsResponseJsonValue:
+      | ((string | number | boolean) | null)
+      | components['schemas']['ListProjectAddonsResponseJsonValue'][]
+      | {
+          [key: string]: components['schemas']['ListProjectAddonsResponseJsonValue']
+        }
     ListProvidersResponse: {
       items: {
         created_at?: string
         domains?: {
           created_at?: string
           domain?: string
-          id: string
           updated_at?: string
         }[]
         id: string
@@ -3377,7 +3526,6 @@ export interface components {
             }
           }
           entity_id: string
-          id: string
           metadata_url?: string
           metadata_xml?: string
           /** @enum {string} */
@@ -3437,7 +3585,17 @@ export interface components {
     NetworkRestrictionsResponse: {
       /** Format: date-time */
       applied_at?: string
-      /** @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`. */
+      /**
+       * @description At any given point in time, this is the config that the user has requested be applied to their project. The `status` field indicates if it has been applied to the project, or is pending. When an updated config is received, the applied config is moved to `old_config`.
+       * @example {
+       *       "dbAllowedCidrs": [
+       *         "203.0.113.0/24"
+       *       ],
+       *       "dbAllowedCidrsV6": [
+       *         "2001:db8::/32"
+       *       ]
+       *     }
+       */
       config: {
         dbAllowedCidrs?: string[]
         dbAllowedCidrsV6?: string[]
@@ -3669,8 +3827,28 @@ export interface components {
        */
       slug: string
     }
+    /** @example {
+     *       "root_key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+     *     } */
     PgsodiumConfigResponse: {
+      /** @description The pgsodium root key: 32 bytes, hex-encoded (64 characters). */
       root_key: string
+    }
+    PlanGateErrorBody: {
+      /** @description Present on entitlement denials. Other errors with this status code (validation, billing state) carry only message. */
+      error?: {
+        /**
+         * @description Machine-readable marker for plan-gated denials
+         * @enum {string}
+         */
+        code: 'entitlement_required'
+        /** @description Entitlement feature key that failed the check */
+        feature: string
+        /** @description Billing page URL for the organization, present when the org is resolvable */
+        upgrade_url?: string
+      }
+      /** @description Human-readable explanation of the plan gate */
+      message: string
     }
     PostgresConfigResponse: {
       /** @description Default unit: s */
@@ -3694,6 +3872,7 @@ export interface components {
       maintenance_work_mem?: string
       max_connections?: number
       max_locks_per_transaction?: number
+      max_logical_replication_workers?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
@@ -3701,6 +3880,7 @@ export interface components {
       max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_sync_workers_per_subscription?: number
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
@@ -3720,6 +3900,8 @@ export interface components {
       db_extra_search_path: string
       /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
+      /** @description If `null`, the value is automatically configured to 10. */
+      db_pool_acquisition_timeout: number | null
       db_schema: string
       jwt_secret?: string
       max_rows: number
@@ -3807,7 +3989,6 @@ export interface components {
           }
         | {
             obj_name: string
-            /** @enum {string} */
             obj_type: 'table' | 'function'
             schema_name: string
             /** @enum {string} */
@@ -3906,7 +4087,7 @@ export interface components {
             | 'sa-east-1'
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -3944,7 +4125,7 @@ export interface components {
             | 'sa-east-1'
           name: string
           /** @enum {string} */
-          provider: 'AWS' | 'FLY' | 'AWS_K8S' | 'AWS_NIMBUS'
+          provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
           /** @enum {string} */
           status?: 'capacity' | 'other'
           /** @enum {string} */
@@ -4014,7 +4195,7 @@ export interface components {
       created_at: string
       /** Format: uuid */
       id: string
-      public_jwk?: unknown
+      public_jwk: unknown
       /** @enum {string} */
       status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
       /** Format: date-time */
@@ -4028,7 +4209,7 @@ export interface components {
         created_at: string
         /** Format: uuid */
         id: string
-        public_jwk?: unknown
+        public_jwk: unknown
         /** @enum {string} */
         status: 'in_use' | 'previously_used' | 'revoked' | 'standby'
         /** Format: date-time */
@@ -4129,6 +4310,9 @@ export interface components {
           maxTables: number
         }
         imageTransformation: {
+          enabled: boolean
+        }
+        purgeCache: {
           enabled: boolean
         }
         s3Protocol: {
@@ -4483,8 +4667,8 @@ export interface components {
     UpdateCustomHostnameResponse: {
       custom_hostname: string
       data: {
-        errors: unknown[]
-        messages: unknown[]
+        errors: components['schemas']['UpdateCustomHostnameResponseJsonValue'][]
+        messages: components['schemas']['UpdateCustomHostnameResponseJsonValue'][]
         result: {
           custom_origin_server: string
           hostname: string
@@ -4517,6 +4701,13 @@ export interface components {
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
     }
+    /** @description Any JSON-serializable value */
+    UpdateCustomHostnameResponseJsonValue:
+      | ((string | number | boolean) | null)
+      | components['schemas']['UpdateCustomHostnameResponseJsonValue'][]
+      | {
+          [key: string]: components['schemas']['UpdateCustomHostnameResponseJsonValue']
+        }
     /** @example {
      *       "user_id": "55555555-5555-4555-8555-555555555555",
      *       "roles": [
@@ -4538,9 +4729,11 @@ export interface components {
       roles: {
         allowed_networks?: {
           allowed_cidrs?: {
+            /** Format: cidrv4 */
             cidr: string
           }[]
           allowed_cidrs_v6?: {
+            /** Format: cidrv6 */
             cidr: string
           }[]
         }
@@ -4552,9 +4745,10 @@ export interface components {
       user_id: string
     }
     /** @example {
-     *       "root_key": "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+     *       "root_key": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
      *     } */
     UpdatePgsodiumConfigBody: {
+      /** @description The pgsodium root key: 32 bytes, hex-encoded (64 characters). */
       root_key: string
     }
     /** @example {
@@ -4585,6 +4779,7 @@ export interface components {
       maintenance_work_mem?: string
       max_connections?: number
       max_locks_per_transaction?: number
+      max_logical_replication_workers?: number
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
@@ -4592,6 +4787,7 @@ export interface components {
       max_slot_wal_keep_size?: string
       max_standby_archive_delay?: string
       max_standby_streaming_delay?: string
+      max_sync_workers_per_subscription?: number
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
@@ -4641,7 +4837,6 @@ export interface components {
       domains?: {
         created_at?: string
         domain?: string
-        id: string
         updated_at?: string
       }[]
       id: string
@@ -4657,7 +4852,6 @@ export interface components {
           }
         }
         entity_id: string
-        id: string
         metadata_url?: string
         metadata_xml?: string
         /** @enum {string} */
@@ -4752,6 +4946,9 @@ export interface components {
           maxTables: number
         }
         imageTransformation?: {
+          enabled: boolean
+        }
+        purgeCache?: {
           enabled: boolean
         }
         s3Protocol?: {
@@ -4875,6 +5072,8 @@ export interface components {
         | '48xlarge_optimized_memory'
         | '48xlarge_optimized_cpu'
         | '48xlarge_high_memory'
+      /** @description [Experimental] Whether to enable high availability for the project. */
+      high_availability?: boolean
       /**
        * @deprecated
        * @description This field is deprecated and is ignored in this request
@@ -4898,6 +5097,8 @@ export interface components {
        * @enum {string}
        */
       plan?: 'free' | 'pro'
+      /** @deprecated */
+      postgres_engine?: null
       /**
        * @deprecated
        * @description Region you want your server to reside in. Use region_selection instead.
@@ -4960,6 +5161,8 @@ export interface components {
             /** @enum {string} */
             type: 'smartGroup'
           }
+      /** @deprecated */
+      release_channel?: null
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -5047,6 +5250,7 @@ export interface components {
             | 'storage.image_transformations'
             | 'storage.vector_buckets'
             | 'storage.iceberg_catalog'
+            | 'storage.purge_cache'
             | 'security.audit_logs_days'
             | 'security.questionnaire'
             | 'security.soc2_report'
@@ -5096,6 +5300,8 @@ export interface components {
             | 'integrations.github_connections'
             | 'dedicated_pooler'
             | 'observability.dashboard_advanced_metrics'
+            | 'api.members.invitations'
+            | 'api.members.roles'
           /** @enum {string} */
           type: 'boolean' | 'numeric' | 'set'
         }
@@ -5109,6 +5315,7 @@ export interface components {
       version: string
     }[]
     V1OrganizationMemberResponse: {
+      avatar_url: string | null
       email?: string
       mfa_enabled: boolean
       role_name: string
@@ -5151,6 +5358,8 @@ export interface components {
       db_extra_search_path: string
       /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
+      /** @description If `null`, the value is automatically configured to 10. */
+      db_pool_acquisition_timeout: number | null
       db_schema: string
       max_rows: number
     }
@@ -5451,6 +5660,7 @@ export interface components {
     V1UpdatePostgrestConfigBody: {
       db_extra_search_path?: string
       db_pool?: number
+      db_pool_acquisition_timeout?: number
       db_schema?: string
       max_rows?: number
     }
@@ -5523,7 +5733,7 @@ export interface operations {
     parameters: {
       query?: {
         /** @description If set to false, schedule deletion with 1-hour grace period (only when soft deletion is enabled). */
-        force?: boolean
+        force?: string
       }
       header?: never
       path: {
@@ -5588,8 +5798,13 @@ export interface operations {
     parameters: {
       query?: {
         included_schemas?: string
-        /** @description Use pg-delta instead of Migra for diffing when true */
-        pgdelta?: boolean
+        /** @description Use pg-delta instead of Migra for diffing when true.
+         *     Boolean string.
+         *
+         *     Truthy values: `true`, `1`, `yes`, `on`, `y`, `enabled`
+         *
+         *     Falsy values: `false`, `0`, `no`, `off`, `n`, `disabled` */
+        pgdelta?: string
       }
       header?: never
       path: {
@@ -5760,6 +5975,7 @@ export interface operations {
         response_type: 'code' | 'token' | 'id_token token'
         scope?: string
         state?: string
+        target_flow?: string
       }
       header?: never
       path?: never
@@ -6908,6 +7124,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Usage exceeded. Enable additional usage to continue querying */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -6917,6 +7140,113 @@ export interface operations {
       }
       /** @description Rate limit exceeded */
       429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-get-project-logs-all': {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        /** @description Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details. */
+        sql?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Usage exceeded. Enable additional usage to continue querying */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-scrape-project-metrics': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Prometheus / OpenMetrics text exposition */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/openmetrics-text': string
+          'text/plain': string
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to fetch project's metrics */
+      500: {
         headers: {
           [name: string]: unknown
         }
@@ -7029,8 +7359,12 @@ export interface operations {
   'v1-get-project-api-keys': {
     parameters: {
       query?: {
-        /** @description Boolean string, true or false */
-        reveal?: boolean
+        /** @description Boolean string.
+         *
+         *     Truthy values: `true`, `1`, `yes`, `on`, `y`, `enabled`
+         *
+         *     Falsy values: `false`, `0`, `no`, `off`, `n`, `disabled` */
+        reveal?: string
       }
       header?: never
       path: {
@@ -7075,8 +7409,12 @@ export interface operations {
   'v1-create-project-api-key': {
     parameters: {
       query?: {
-        /** @description Boolean string, true or false */
-        reveal?: boolean
+        /** @description Boolean string.
+         *
+         *     Truthy values: `true`, `1`, `yes`, `on`, `y`, `enabled`
+         *
+         *     Falsy values: `false`, `0`, `no`, `off`, `n`, `disabled` */
+        reveal?: string
       }
       header?: never
       path: {
@@ -7125,8 +7463,12 @@ export interface operations {
   'v1-get-project-api-key': {
     parameters: {
       query?: {
-        /** @description Boolean string, true or false */
-        reveal?: boolean
+        /** @description Boolean string.
+         *
+         *     Truthy values: `true`, `1`, `yes`, `on`, `y`, `enabled`
+         *
+         *     Falsy values: `false`, `0`, `no`, `off`, `n`, `disabled` */
+        reveal?: string
       }
       header?: never
       path: {
@@ -7174,9 +7516,9 @@ export interface operations {
       query?: {
         reason?: string
         /** @description Boolean string, true or false */
-        reveal?: boolean
+        reveal?: string
         /** @description Boolean string, true or false */
-        was_compromised?: boolean
+        was_compromised?: string
       }
       header?: never
       path: {
@@ -7222,8 +7564,12 @@ export interface operations {
   'v1-update-project-api-key': {
     parameters: {
       query?: {
-        /** @description Boolean string, true or false */
-        reveal?: boolean
+        /** @description Boolean string.
+         *
+         *     Truthy values: `true`, `1`, `yes`, `on`, `y`, `enabled`
+         *
+         *     Falsy values: `false`, `0`, `no`, `off`, `n`, `disabled` */
+        reveal?: string
       }
       header?: never
       path: {
@@ -7316,8 +7662,12 @@ export interface operations {
   'v1-update-project-legacy-api-keys': {
     parameters: {
       query: {
-        /** @description Boolean string, true or false */
-        enabled: boolean
+        /** @description Boolean string.
+         *
+         *     Truthy values: `true`, `1`, `yes`, `on`, `y`, `enabled`
+         *
+         *     Falsy values: `false`, `0`, `no`, `off`, `n`, `disabled` */
+        enabled: string
       }
       header?: never
       path: {
@@ -9513,7 +9863,7 @@ export interface operations {
     parameters: {
       query?: {
         /** @description If true, also removes the custom domain add-on from the project subscription. */
-        remove_addon?: boolean
+        remove_addon?: string
       }
       header?: never
       path: {
@@ -9985,7 +10335,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -10060,7 +10412,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -10275,7 +10629,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Failed to upsert database migration */
+      /** @description Failed to update JIT access */
       500: {
         headers: {
           [name: string]: unknown
@@ -10379,6 +10733,142 @@ export interface operations {
         content?: never
       }
       /** @description Failed to remove JIT access */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-invite-external-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['InviteExternalUserJitAccessBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['InviteExternalUserJitResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to invite external user */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-delete-invite-external-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        invite_id: string
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to revoke invite for external user */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-accept-invite-external-jit-access': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AcceptInviteExternalUserJitAccessBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JitAccessResponse']
+        }
+      }
+      /** @description Failed to accept invitation */
       500: {
         headers: {
           [name: string]: unknown
@@ -11127,13 +11617,11 @@ export interface operations {
       query?: {
         entrypoint_path?: string
         ezbr_sha256?: string
-        /** @description Boolean string, true or false */
-        import_map?: boolean
+        import_map?: string
         import_map_path?: string
         name?: string
         slug?: string
-        /** @description Boolean string, true or false */
-        verify_jwt?: boolean
+        verify_jwt?: string
       }
       header?: never
       path: {
@@ -11301,13 +11789,11 @@ export interface operations {
       query?: {
         entrypoint_path?: string
         ezbr_sha256?: string
-        /** @description Boolean string, true or false */
-        import_map?: boolean
+        import_map?: string
         import_map_path?: string
         name?: string
         slug?: string
-        /** @description Boolean string, true or false */
-        verify_jwt?: boolean
+        verify_jwt?: string
       }
       header?: never
       path: {
@@ -11418,8 +11904,7 @@ export interface operations {
   'v1-deploy-a-function': {
     parameters: {
       query?: {
-        /** @description Boolean string, true or false */
-        bundleOnly?: boolean
+        bundleOnly?: string
         slug?: string
       }
       header?: never
@@ -11483,16 +11968,19 @@ export interface operations {
   'v1-get-services-health': {
     parameters: {
       query: {
-        services: (
-          | 'auth'
-          | 'db'
-          | 'db_postgres_user'
-          | 'pooler'
-          | 'realtime'
-          | 'rest'
-          | 'storage'
-          | 'pg_bouncer'
-        )[]
+        /** @description Comma-separated list of enums or array of enums. */
+        services:
+          | string
+          | (
+              | 'auth'
+              | 'db'
+              | 'db_postgres_user'
+              | 'pooler'
+              | 'realtime'
+              | 'rest'
+              | 'storage'
+              | 'pg_bouncer'
+            )[]
         timeout_ms?: number
       }
       header?: never
@@ -11559,7 +12047,21 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitStateResponse']
+          'application/json':
+            | {
+                appliedSuccessfully?: boolean
+                /** @enum {string} */
+                state: 'enabled' | 'disabled'
+              }
+            | {
+                /** @constant */
+                state: 'unavailable'
+                /** @enum {string} */
+                unavailableReason:
+                  | 'postgres_upgrade_required'
+                  | 'ssl_enforcement_required'
+                  | 'temporarily_unavailable'
+              }
         }
       }
       /** @description Unauthorized */
@@ -11613,7 +12115,21 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['JitStateResponse']
+          'application/json':
+            | {
+                appliedSuccessfully?: boolean
+                /** @enum {string} */
+                state: 'enabled' | 'disabled'
+              }
+            | {
+                /** @constant */
+                state: 'unavailable'
+                /** @enum {string} */
+                unavailableReason:
+                  | 'postgres_upgrade_required'
+                  | 'ssl_enforcement_required'
+                  | 'temporarily_unavailable'
+              }
         }
       }
       /** @description Unauthorized */
@@ -12291,7 +12807,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
@@ -13121,7 +13639,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -13230,7 +13750,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Unauthorized */
       401: {
@@ -13291,7 +13813,9 @@ export interface operations {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Unauthorized */
       401: {

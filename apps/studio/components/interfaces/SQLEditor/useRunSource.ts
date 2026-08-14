@@ -1,12 +1,8 @@
 import { useParams } from 'common'
 import { useMemo } from 'react'
 
-import {
-  DEFAULT_LOG_DATE_RANGE,
-  isLogsSource,
-  resolveSnippetSource,
-  type QuerySource,
-} from './querySource'
+import { isLogsSource, resolveSnippetSource, type QuerySource } from './querySource'
+import { DEFAULT_LOG_TIME_RANGE } from '@/data/query-sources/query-source-registry'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
@@ -33,7 +29,7 @@ export function useRunSource(id: string): QuerySource {
 
   return useMemo<QuerySource>(() => {
     if (isLogsSource(source)) {
-      return { type: 'logs', dateRange: logRange ?? DEFAULT_LOG_DATE_RANGE }
+      return { type: 'logs', dateRange: logRange ?? DEFAULT_LOG_TIME_RANGE }
     }
     return { type: 'database' }
   }, [source, logRange])
