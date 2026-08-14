@@ -3,7 +3,6 @@ import {
   Edit,
   Maximize,
   MessageCirclePlus,
-  Minimize,
   MoreVertical,
   Settings,
   X,
@@ -20,16 +19,15 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { ShortcutPills, ShortcutTooltip } from '../ShortcutTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
-import { AIOptInModal } from './AIOptInModal'
+import { AIAssistantMetadataWarning } from './AIAssistantMetadataWarning'
+import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean
@@ -53,10 +51,16 @@ export const AIAssistantHeader = ({
   aiOptInLevel,
 }: AIAssistantHeaderProps) => {
   const snap = useAiAssistantStateSnapshot()
-  const { isMaximised, toggleMaximise } = useSidebarManagerSnapshot()
+  const { openChat } = useCreateChat()
   const [value, setValue] = useState(snap.activeChat?.name)
   const [isEditingName, setIsEditingName] = useState(false)
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
+
+  const handleOpenInExplorer = () => {
+    if (!snap.activeChatId) return
+    openChat(snap.activeChatId)
+    onCloseAssistant()
+  }
 
   const handleCopyChatId = () => {
     copyToClipboard(snap.activeChatId ?? '', () => {
@@ -96,7 +100,7 @@ export const AIAssistantHeader = ({
     enabled: shortcutsEnabled && !isChatLoading,
   })
 
-  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, toggleMaximise, {
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, handleOpenInExplorer, {
     enabled: shortcutsEnabled && !isChatLoading,
   })
 
@@ -149,15 +153,15 @@ export const AIAssistantHeader = ({
 
             <ShortcutTooltip
               side="bottom"
-              label={isMaximised ? 'Minimize' : 'Maximize'}
+              label="Open in Explorer"
               shortcutId={SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE}
             >
               <Button
                 variant="text"
-                aria-label={isMaximised ? 'Minimize' : 'Maximize'}
+                aria-label="Open in Explorer"
                 size="tiny"
-                icon={isMaximised ? <Minimize /> : <Maximize />}
-                onClick={toggleMaximise}
+                icon={<Maximize />}
+                onClick={handleOpenInExplorer}
                 className="h-7 w-7 p-0"
               />
             </ShortcutTooltip>
@@ -218,43 +222,14 @@ export const AIAssistantHeader = ({
         </div>
       </div>
 
-      {showMetadataWarning && (
-        <Admonition
-          type="default"
-          title={
-            !updatedOptInSinceMCP
-              ? 'The Assistant has just been updated to help you better!'
-              : isHipaaProjectDisallowed
-                ? 'Project metadata is not shared due to HIPAA'
-                : aiOptInLevel === 'disabled'
-                  ? 'Project metadata is currently not shared'
-                  : 'Limited metadata is shared to the Assistant'
-          }
-          description={
-            !updatedOptInSinceMCP
-              ? 'You may now opt-in to share schema metadata and even logs for better results'
-              : isHipaaProjectDisallowed
-                ? 'Your organization has the HIPAA addon and will not send project metadata with your prompts for projects marked as HIPAA.'
-                : aiOptInLevel === 'disabled'
-                  ? 'The Assistant can provide better answers if you opt-in to share schema metadata.'
-                  : aiOptInLevel === 'schema'
-                    ? 'Sharing query data in addition to schema can further improve responses. Update AI settings to enable this.'
-                    : ''
-          }
-          className="border-0 border-b rounded-none bg-background"
-        >
-          {!isHipaaProjectDisallowed && (
-            <Button
-              variant="default"
-              className="w-fit mt-4"
-              onClick={() => setIsOptInModalOpen(true)}
-            >
-              Permission settings
-            </Button>
-          )}
-        </Admonition>
-      )}
-      <AIOptInModal visible={isOptInModalOpen} onCancel={() => setIsOptInModalOpen(false)} />
+      <AIAssistantMetadataWarning
+        visible={isOptInModalOpen}
+        onVisibleChange={setIsOptInModalOpen}
+        showMetadataWarning={showMetadataWarning}
+        updatedOptInSinceMCP={updatedOptInSinceMCP}
+        isHipaaProjectDisallowed={isHipaaProjectDisallowed}
+        aiOptInLevel={aiOptInLevel}
+      />
     </div>
   )
 }

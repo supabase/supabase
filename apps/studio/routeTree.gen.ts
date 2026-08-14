@@ -231,6 +231,7 @@ import { Route as ProjectRefFunctionsFunctionSlugDetailsRouteImport } from './ro
 import { Route as ProjectRefFunctionsFunctionSlugCodeRouteImport } from './routes/project/$ref/functions/$functionSlug/code'
 import { Route as ProjectRefExplorerQueryIdRouteImport } from './routes/project/$ref/explorer/query/$id'
 import { Route as ProjectRefExplorerNotebookIdRouteImport } from './routes/project/$ref/explorer/notebook/$id'
+import { Route as ProjectRefExplorerChatIdRouteImport } from './routes/project/$ref/explorer/chat/$id'
 import { Route as ProjectRefDatabaseTriggersEventRouteImport } from './routes/project/$ref/database/triggers/event'
 import { Route as ProjectRefDatabaseTriggersDataRouteImport } from './routes/project/$ref/database/triggers/data'
 import { Route as ProjectRefDatabaseTablesIdRouteImport } from './routes/project/$ref/database/tables/$id'
@@ -1529,6 +1530,12 @@ const ProjectRefExplorerNotebookIdRoute =
     path: '/notebook/$id',
     getParentRoute: () => ProjectRefExplorerRoute,
   } as any)
+const ProjectRefExplorerChatIdRoute =
+  ProjectRefExplorerChatIdRouteImport.update({
+    id: '/chat/$id',
+    path: '/chat/$id',
+    getParentRoute: () => ProjectRefExplorerRoute,
+  } as any)
 const ProjectRefDatabaseTriggersEventRoute =
   ProjectRefDatabaseTriggersEventRouteImport.update({
     id: '/event',
@@ -2289,6 +2296,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer/chat/$id': typeof ProjectRefExplorerChatIdRoute
   '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/explorer/query/$id': typeof ProjectRefExplorerQueryIdRoute
   '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
@@ -2587,6 +2595,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer/chat/$id': typeof ProjectRefExplorerChatIdRoute
   '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/explorer/query/$id': typeof ProjectRefExplorerQueryIdRoute
   '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
@@ -2901,6 +2910,7 @@ export interface FileRoutesById {
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
   '/project/$ref/database/triggers/event': typeof ProjectRefDatabaseTriggersEventRoute
+  '/project/$ref/explorer/chat/$id': typeof ProjectRefExplorerChatIdRoute
   '/project/$ref/explorer/notebook/$id': typeof ProjectRefExplorerNotebookIdRoute
   '/project/$ref/explorer/query/$id': typeof ProjectRefExplorerQueryIdRoute
   '/project/$ref/functions/$functionSlug/code': typeof ProjectRefFunctionsFunctionSlugCodeRoute
@@ -3214,6 +3224,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer/chat/$id'
     | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/explorer/query/$id'
     | '/project/$ref/functions/$functionSlug/code'
@@ -3512,6 +3523,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer/chat/$id'
     | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/explorer/query/$id'
     | '/project/$ref/functions/$functionSlug/code'
@@ -3825,6 +3837,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
     | '/project/$ref/database/triggers/event'
+    | '/project/$ref/explorer/chat/$id'
     | '/project/$ref/explorer/notebook/$id'
     | '/project/$ref/explorer/query/$id'
     | '/project/$ref/functions/$functionSlug/code'
@@ -5588,6 +5601,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefExplorerNotebookIdRouteImport
       parentRoute: typeof ProjectRefExplorerRoute
     }
+    '/project/$ref/explorer/chat/$id': {
+      id: '/project/$ref/explorer/chat/$id'
+      path: '/chat/$id'
+      fullPath: '/project/$ref/explorer/chat/$id'
+      preLoaderRoute: typeof ProjectRefExplorerChatIdRouteImport
+      parentRoute: typeof ProjectRefExplorerRoute
+    }
     '/project/$ref/database/triggers/event': {
       id: '/project/$ref/database/triggers/event'
       path: '/event'
@@ -6536,12 +6556,14 @@ const ProjectRefEditorRouteWithChildren =
 
 interface ProjectRefExplorerRouteChildren {
   ProjectRefExplorerIndexRoute: typeof ProjectRefExplorerIndexRoute
+  ProjectRefExplorerChatIdRoute: typeof ProjectRefExplorerChatIdRoute
   ProjectRefExplorerNotebookIdRoute: typeof ProjectRefExplorerNotebookIdRoute
   ProjectRefExplorerQueryIdRoute: typeof ProjectRefExplorerQueryIdRoute
 }
 
 const ProjectRefExplorerRouteChildren: ProjectRefExplorerRouteChildren = {
   ProjectRefExplorerIndexRoute: ProjectRefExplorerIndexRoute,
+  ProjectRefExplorerChatIdRoute: ProjectRefExplorerChatIdRoute,
   ProjectRefExplorerNotebookIdRoute: ProjectRefExplorerNotebookIdRoute,
   ProjectRefExplorerQueryIdRoute: ProjectRefExplorerQueryIdRoute,
 }

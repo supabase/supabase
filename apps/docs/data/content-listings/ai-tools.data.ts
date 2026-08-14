@@ -20,7 +20,7 @@ const ICON_ASSETS: Record<string, { icon: string; hasLightIcon?: boolean }> = {
   kimi: { icon: '/docs/img/icons/agent-kimi-icon', hasLightIcon: true },
   vscode: { icon: '/docs/img/icons/agent-vscode-icon', hasLightIcon: false },
   antigravity: { icon: '/docs/img/icons/agent-antigravity-icon', hasLightIcon: false },
-  windsurf: { icon: '/docs/img/icons/agent-windsurf-icon', hasLightIcon: true },
+  windsurf: { icon: '/docs/img/icons/agent-devin-icon', hasLightIcon: true },
   goose: { icon: '/docs/img/icons/agent-goose-icon', hasLightIcon: true },
   factory: { icon: '/docs/img/icons/agent-factory-icon', hasLightIcon: true },
   opencode: { icon: '/docs/img/icons/agent-opencode-icon', hasLightIcon: true },

@@ -1,7 +1,7 @@
 import type { NextRouter } from 'next/router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createTabsState, type Tab } from './tabs'
+import { createTabId, createTabsState, type Tab } from './tabs'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 const fakeRouter = () => ({ query: { ref: 'default' }, push: vi.fn() }) as unknown as NextRouter
@@ -12,6 +12,52 @@ const sqlTab = (id: string): Tab => ({
   label: id,
   isPreview: false,
   metadata: { sqlId: id },
+})
+
+describe('Explorer chat tabs', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('creates stable chat tab ids and navigates to the chat route', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    const id = createTabId('chat', { id: 'assistant-chat-id' })
+
+    store.addTab({
+      id,
+      type: 'chat',
+      label: 'Investigate errors',
+      metadata: { chatId: 'assistant-chat-id' },
+      isPreview: false,
+    })
+    store.handleTabNavigation(id, router)
+
+    expect(id).toBe('chat-assistant-chat-id')
+    expect(router.push).toHaveBeenCalledWith('/project/default/explorer/chat/assistant-chat-id')
+  })
+
+  it('returns to Explorer home when the final chat tab closes', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    const id = createTabId('chat', { id: 'assistant-chat-id' })
+
+    store.addTab({
+      id,
+      type: 'chat',
+      label: 'Investigate errors',
+      metadata: { chatId: 'assistant-chat-id' },
+      isPreview: false,
+    })
+    store.handleTabClose({
+      id,
+      router,
+      editor: 'explorer',
+      onClearDashboardHistory: () => {},
+    })
+
+    expect(router.push).toHaveBeenCalledWith('/project/default/explorer')
+  })
 })
 
 describe('tabs recent items', () => {
@@ -327,5 +373,58 @@ describe('explorer query tabs', () => {
     store.handleTabNavigation('query-query-1', router)
 
     expect(router.push).toHaveBeenCalledWith('/project/default/explorer/query/query-1')
+  })
+
+  it('keeps Explorer tabs open when closing all table editor tabs', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    store.addTab({
+      id: 'r-1',
+      type: ENTITY_TYPE.TABLE,
+      label: 'users',
+      metadata: { tableId: 1, schema: 'public' },
+      isPreview: false,
+    })
+    store.addTab({
+      id: 'query-query-1',
+      type: 'query',
+      label: 'Untitled query',
+      metadata: { queryId: 'query-1' },
+      isPreview: false,
+    })
+
+    store.handleTabCloseAll({
+      editor: 'table',
+      router,
+      onClearDashboardHistory: vi.fn(),
+    })
+
+    expect(store.openTabs).toEqual(['query-query-1'])
+    expect(store.tabsMap['query-query-1']).toBeDefined()
+  })
+
+  it('runs query cleanup for every query closed in bulk', () => {
+    const store = createTabsState('default')
+    store.addTab({
+      id: 'query-query-1',
+      type: 'query',
+      label: 'Query 1',
+      metadata: { queryId: 'query-1' },
+      isPreview: false,
+    })
+    store.addTab({
+      id: 'query-query-2',
+      type: 'query',
+      label: 'Query 2',
+      metadata: { queryId: 'query-2' },
+      isPreview: false,
+    })
+    const onClose = vi.fn()
+    store.registerTabTypeHandler('query', { onClose })
+
+    store.closeTabs(['query-query-1', 'query-query-2'])
+
+    expect(onClose).toHaveBeenCalledTimes(2)
+    expect(onClose.mock.calls.map(([tab]) => tab.metadata?.queryId)).toEqual(['query-1', 'query-2'])
   })
 })

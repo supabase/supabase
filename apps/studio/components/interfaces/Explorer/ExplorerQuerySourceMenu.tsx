@@ -43,7 +43,6 @@ export const ExplorerQuerySourceMenu = ({
   const { ref } = useParams()
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
-
   const {
     isCustomRangeOpen,
     setIsCustomRangeOpen,

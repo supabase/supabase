@@ -30,7 +30,6 @@ import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import { REPLICA_STATUS } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -39,6 +38,7 @@ import {
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
+import { ReadReplicaRow } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaRow'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'

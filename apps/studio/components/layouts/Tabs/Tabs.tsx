@@ -93,7 +93,8 @@ export const EditorTabs = ({
   const onClearDashboardHistory = () => {
     if (editor === 'table') {
       setLastVisitedTable(undefined)
-    } else if (editor === 'sql') {
+    }
+    if (editor === 'sql') {
       setLastVisitedSnippet(undefined)
     }
   }
@@ -138,7 +139,8 @@ export const EditorTabs = ({
       closeWithConfirmation(tabsToClose, () => {
         tabs.closeTabs(tabsToClose)
         onClearDashboardHistory()
-        tabs.handleTabNavigation(tabId, router)
+
+        if (tabs.activeTab !== tabId) tabs.handleTabNavigation(tabId, router)
       })
     }
   }

@@ -1,10 +1,11 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, type Mock } from 'vitest'
 
 import { LogsTimeRangeSubMenu } from './LogsTimeRangeSubMenu'
+import { type TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { customRender } from '@/tests/lib/custom-render'
 
 mockAnimationsApi()
@@ -14,16 +15,22 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 }))
 
 const renderSubMenu = ({
-  onRangeChange = vi.fn(),
-  onOpenCustomRange = vi.fn(),
-  onShowUpgrade = vi.fn(),
+  onRangeChange = vi.fn<(range: TimeRange) => void>(),
+  onOpenCustomRange = vi.fn<() => void>(),
+  onShowUpgrade = vi.fn<() => void>(),
+  range = { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
+}: {
+  onRangeChange?: Mock<(range: TimeRange) => void>
+  onOpenCustomRange?: Mock<() => void>
+  onShowUpgrade?: Mock<() => void>
+  range?: TimeRange
 } = {}) => {
   customRender(
     <DropdownMenu defaultOpen>
       <DropdownMenuTrigger>Open</DropdownMenuTrigger>
       <DropdownMenuContent>
         <LogsTimeRangeSubMenu
-          range={{ _tag: 'relative_time_range', amount: 1, unit: 'hour' }}
+          range={range}
           onRangeChange={onRangeChange}
           onOpenCustomRange={onOpenCustomRange}
           onShowUpgrade={onShowUpgrade}
@@ -53,5 +60,14 @@ describe('LogsTimeRangeSubMenu', () => {
     await userEvent.click(await screen.findByText('Custom range…'))
 
     expect(onOpenCustomRange).toHaveBeenCalledOnce()
+  })
+
+  it('marks the structurally matching preset as selected', async () => {
+    renderSubMenu({ range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } })
+
+    await userEvent.hover(await screen.findByText('Time range'))
+
+    await waitFor(() => expect(screen.getAllByText('Last 3 hours')).toHaveLength(2))
+    expect(document.querySelector('.lucide-check')).toBeInTheDocument()
   })
 })
