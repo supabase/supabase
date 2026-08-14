@@ -4,13 +4,13 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { Results } from '../SQLEditor/UtilityPanel/Results'
-import { getSqlErrorLines } from '../SQLEditor/UtilityPanel/UtilityTabResults.utils'
 import { type QueryResult } from './types'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
+import { DataGridResults } from '@/components/ui/DataGridResults'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { getSqlErrorLines } from '@/data/sql/utils'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
@@ -186,5 +186,5 @@ const QueryError = ({
 
 // [Joshen] Eventually migrate the Results component here from SQL Editor
 const QueryResults = ({ rows }: { rows: NonNullable<QueryResult['rows']> }) => {
-  return <Results rows={rows} />
+  return <DataGridResults rows={rows} />
 }

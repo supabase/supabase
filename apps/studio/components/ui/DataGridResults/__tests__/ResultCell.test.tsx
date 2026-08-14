@@ -2,7 +2,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { expect, test, vi } from 'vitest'
 
-import { ResultCell } from '@/components/interfaces/SQLEditor/UtilityPanel/ResultCell'
+import { ResultCell } from '../ResultCell'
 import { customRender as render } from '@/tests/lib/custom-render'
 
 const noop = () => {}
