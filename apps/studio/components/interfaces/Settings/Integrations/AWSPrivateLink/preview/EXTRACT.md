@@ -38,7 +38,7 @@ Includes the floating presenter (`PrivateLinkPreviewPanel`), scenario mocks, Ver
 - Vercel-initiated partner cue on a PrivateLink row (`partner: 'vercel'`)
 - Marketplace Vercel card (`acme-app`) with and without a PrivateLink pointer footer
 - Optional destination IAM role on the add sheet (UI only, not POSTed)
-- Nav `managed_by` fake for Marketplace, Marketplace plus PrivateLink, and B5 only (org + project switcher). Tooltip stays “Managed via Vercel Marketplace.” Not used for Vercel-initiated / mixed rows / Empty
+- Nav `managed_by` fake for Marketplace, Marketplace plus PrivateLink, and B5 only (org + project switcher). Tooltip stays “Managed via Vercel Marketplace”. Not used for Vercel-initiated / mixed rows / Empty
 - B6 private hostname in Connect, restrict-public-access copy on Network Restrictions
 - B5 presenter note only. No fake Vercel dashboard
 - Post-add toast: static “Connection added”. Accept copy lives on the list admonition
