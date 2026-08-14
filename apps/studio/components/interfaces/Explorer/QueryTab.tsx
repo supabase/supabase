@@ -17,10 +17,11 @@ export const QueryTab = () => {
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
-  const [hasRestored, setHasRestored] = useState(false)
+  const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
   const result = draft && id ? querySnap.results[id] : undefined
+  const queryKey = id && ref ? `${ref}:${id}` : undefined
 
   useEffect(() => {
     if (!id || !ref) return
@@ -36,12 +37,16 @@ export const QueryTab = () => {
         isPreview: false,
       })
     }
-    setHasRestored(true)
+    setRestoredQueryKey(`${ref}:${id}`)
   }, [id, ref, tabs])
 
-  if (!hasRestored) {
+  if (!queryKey || restoredQueryKey !== queryKey) {
     return (
-      <div className="flex h-full items-center justify-center bg-surface-100">
+      <div
+        role="status"
+        aria-label="Loading query"
+        className="flex h-full items-center justify-center bg-surface-100"
+      >
         <Loader2 className="animate-spin text-foreground-muted" size={18} />
       </div>
     )
@@ -75,6 +80,7 @@ export const QueryTab = () => {
       variant="viewport"
       title={draft.name}
       sql={draft.uncheckedSql}
+      source={draft.source}
       result={result}
       rowLimit={QUERY_ROW_LIMIT}
       onTitleChange={(value) => {
@@ -83,6 +89,7 @@ export const QueryTab = () => {
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}
       onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
+      onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
     />
   )

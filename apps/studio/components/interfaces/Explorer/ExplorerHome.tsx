@@ -1,14 +1,15 @@
 import { MessageCirclePlus, NotebookText, SquareCode } from 'lucide-react'
 import { useState } from 'react'
 
-import { useCreateNotebook, useCreateQuery } from './hooks'
+import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
-import { AssistantModel } from '@/state/ai-assistant-state'
+import type { AssistantModel } from '@/state/ai-assistant-state'
 
 export const ExplorerHome = () => {
   const { createNotebook } = useCreateNotebook()
   const { createQuery } = useCreateQuery()
+  const { createChat } = useCreateChat()
 
   const [value, setValue] = useState<string>('')
   const [selectedModel, setSelectedModal] = useState<AssistantModel>('gpt-5.4-nano')
@@ -34,7 +35,7 @@ export const ExplorerHome = () => {
           onValueChange={(e) => setValue(e.target.value)}
           selectedModel={selectedModel}
           onSelectModel={setSelectedModal}
-          onSubmit={() => {}}
+          onSubmit={(message) => createChat({ initialMessage: message, model: selectedModel })}
         />
 
         <section className="mt-6">

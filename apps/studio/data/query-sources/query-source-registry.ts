@@ -1,20 +1,7 @@
-import dayjs from 'dayjs'
 import * as z from 'zod'
 
+import { timeRangeSchema, type TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
-import { isoDateTimeString } from '@/lib/iso-datetime'
-
-export type LogTimeRange =
-  | {
-      type: 'relative'
-      amount: number
-      unit: 'minute' | 'hour' | 'day'
-    }
-  | {
-      type: 'absolute'
-      from: string
-      to: string
-    }
 
 export type DatabaseSource = {
   id: 'database'
@@ -35,7 +22,7 @@ export type LogsSource = {
   type: 'logs'
   endpoint: ReturnType<typeof logsAllEndpointUrl>
   parameters: {
-    time_range: LogTimeRange
+    time_range: TimeRange
   }
 }
 
@@ -46,8 +33,8 @@ export type CellSourceOf<S extends Source> = Pick<S, 'type' | 'id' | 'parameters
 
 export type CellSource = CellSourceOf<DatabaseSource> | CellSourceOf<LogsSource>
 
-export const DEFAULT_LOG_TIME_RANGE: LogTimeRange = {
-  type: 'relative',
+export const DEFAULT_LOG_TIME_RANGE: TimeRange = {
+  _tag: 'relative_time_range',
   amount: 1,
   unit: 'hour',
 }
@@ -76,45 +63,6 @@ export const QUERY_SOURCE_LABELS: Record<QuerySourceId, string> = {
   logs: 'Logs',
 }
 
-const isoDateTimeSchema = z.string().refine((value) => isoDateTimeString(value) !== null, {
-  message: 'must be a valid ISO-8601 datetime',
-})
-
-export const logTimeRangeSchema = z
-  .discriminatedUnion('type', [
-    z
-      .object({
-        type: z.literal('relative'),
-        amount: z.number().int().positive(),
-        unit: z.enum(['minute', 'hour', 'day']),
-      })
-      .strict(),
-    z
-      .object({
-        type: z.literal('absolute'),
-        from: isoDateTimeSchema,
-        to: isoDateTimeSchema,
-      })
-      .strict(),
-  ])
-  .refine(
-    (range) => {
-      if (range.type !== 'absolute') return true
-
-      const from = dayjs(range.from)
-      const to = dayjs(range.to)
-      // An unparseable endpoint is already reported against its own field; the
-      // ordering rule stays quiet so it doesn't add a second, misleading issue.
-      if (!from.isValid() || !to.isValid()) return true
-
-      return to.isAfter(from)
-    },
-    {
-      message: 'must be later than the start of the range',
-      path: ['to'],
-    }
-  )
-
 export const cellSourceSchema = z.discriminatedUnion('type', [
   z
     .object({
@@ -127,7 +75,7 @@ export const cellSourceSchema = z.discriminatedUnion('type', [
     .object({
       id: z.literal('logs'),
       type: z.literal('logs'),
-      parameters: z.object({ time_range: logTimeRangeSchema }).strict(),
+      parameters: z.object({ time_range: timeRangeSchema }).strict(),
     })
     .strict(),
 ])

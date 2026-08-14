@@ -1,9 +1,12 @@
-import { untrustedSql } from '@supabase/pg-meta'
 import { useRouter } from 'next/router'
 
+import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
+import type { AssistantModel } from '@/state/ai-assistant-state'
+import { useAiAssistantState, whenAiAssistantInitialized } from '@/state/ai-assistant-state'
 import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
@@ -23,35 +26,28 @@ export const useCreateNotebook = () => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
 
-    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
-    const DEFAULT_CELLS = [
-      {
-        _tag: 'markdown_cell',
-        id: generateUuid(),
-        text: `
+    const sampleMdCell1 = createMarkdownCellSkeleton({
+      content: `
 # Title
 A brief description on what this notebook is about
-        `.trim(),
-      },
-      {
-        _tag: 'markdown_cell',
-        id: generateUuid(),
-        text: `
+`.trim(),
+    })
+    const sampleMdCell2 = createMarkdownCellSkeleton({
+      content: `
 ## Section
 This is a sample paragraph to demonstrate the Markdown cells
 1. List item 1
 2. List item 2
 3. List item 3
-            `,
-      },
-      {
-        _tag: 'database_cell',
-        id: generateUuid(),
-        view: 'table',
-        chart: undefined,
-        unchecked_sql: untrustedSql('select * from colors;'),
-        row_limit: 100,
-      },
+`.trim(),
+    })
+    const sampleQueryCell = createQueryCellSkeleton({ sql: 'select * from colors;' })
+
+    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
+    const DEFAULT_CELLS = [
+      sampleMdCell1,
+      sampleMdCell2,
+      sampleQueryCell,
     ] as Notebooks.Content['cells']
 
     const id = idOverride ?? generateUuid()
@@ -78,6 +74,54 @@ This is a sample paragraph to demonstrate the Markdown cells
   }
 
   return { createNotebook }
+}
+
+export const useCreateChat = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
+  const aiAssistantState = useAiAssistantState()
+
+  const openChat = (id: string) => {
+    if (!project) {
+      console.error('Project is required')
+      return undefined
+    }
+
+    router.push(`/project/${project.ref}/explorer/chat/${id}`)
+  }
+
+  const createChat = async ({
+    name,
+    initialMessage,
+    model,
+  }: {
+    name?: string
+    initialMessage?: string
+    model?: AssistantModel
+  } = {}) => {
+    if (!project) {
+      console.error('Project is required')
+      return undefined
+    }
+
+    // Hydration replaces the chat map and the selected model wholesale, so wait it out before
+    // creating anything — otherwise the new chat is dropped as soon as the persisted state lands.
+    await whenAiAssistantInitialized(aiAssistantState)
+
+    aiAssistantState.setContext({
+      projectRef: project.ref,
+      orgSlug: organization?.slug,
+      connectionString: project.connectionString ?? '',
+    })
+    if (model) aiAssistantState.setModel(model)
+
+    const id = aiAssistantState.createChat({ name, initialMessage })
+    router.push(`/project/${project.ref}/explorer/chat/${id}`)
+    return id
+  }
+
+  return { createChat, openChat }
 }
 
 export const useCreateQuery = () => {

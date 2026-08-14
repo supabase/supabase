@@ -99,7 +99,7 @@ describe('useLogsSqlExecution', () => {
   it('resolves a relative session range to a from/to window around now', async () => {
     const captured = mockLogsAllOtel([])
     sqlEditorSessionState.setLogRange(SNIPPET_ID, {
-      type: 'relative',
+      _tag: 'relative_time_range',
       amount: 2,
       unit: 'hour',
     })

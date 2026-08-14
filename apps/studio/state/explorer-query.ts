@@ -1,13 +1,20 @@
 import { untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
+import { z } from 'zod'
 
 import { type QueryResult } from '@/components/interfaces/Explorer/types'
+import {
+  cellSourceSchema,
+  createDefaultCellSource,
+  type CellSource,
+} from '@/data/query-sources/query-source-registry'
 
 export type ExplorerQueryDraft = {
   id: string
   projectRef: string
   name: string
+  source: CellSource
   uncheckedSql: UntrustedSqlFragment
   updatedAt: number
 }
@@ -18,6 +25,7 @@ export type ExplorerQueryResult = QueryResult & {
 
 type PersistedExplorerQueryDraft = {
   name: string
+  source: CellSource
   sql: string
   updatedAt: number
 }
@@ -26,27 +34,46 @@ type PersistedExplorerQueryDrafts = Record<string, PersistedExplorerQueryDraft>
 
 type StorageLike = Pick<typeof safeLocalStorage, 'getItem' | 'setItem' | 'removeItem'>
 
+export const EXPLORER_QUERY_PERSIST_DELAY = 300
+export const MAX_PERSISTED_EXPLORER_QUERY_DRAFTS = 50
+
+const persistedDraftsSchema = z.record(z.string(), z.unknown())
+const persistedDraftSchema = z.object({
+  name: z.string(),
+  sql: z.string(),
+  updatedAt: z.number(),
+  source: z.unknown().optional(),
+})
+
 const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
   const raw = storage.getItem(LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS(projectRef))
   if (!raw) return {} as PersistedExplorerQueryDrafts
 
   try {
-    const parsed = JSON.parse(raw)
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {}
+    const parsed = persistedDraftsSchema.safeParse(JSON.parse(raw))
+    if (!parsed.success) return {}
 
     return Object.fromEntries(
-      Object.entries(parsed).filter((entry): entry is [string, PersistedExplorerQueryDraft] => {
-        const draft = entry[1]
-        return (
-          draft !== null &&
-          typeof draft === 'object' &&
-          'name' in draft &&
-          typeof draft.name === 'string' &&
-          'sql' in draft &&
-          typeof draft.sql === 'string' &&
-          'updatedAt' in draft &&
-          typeof draft.updatedAt === 'number'
-        )
+      Object.entries(parsed.data).flatMap(([id, value]) => {
+        const draft = persistedDraftSchema.safeParse(value)
+        if (!draft.success) return []
+
+        const parsedSource = cellSourceSchema.safeParse(draft.data.source)
+        const source = parsedSource.success
+          ? parsedSource.data
+          : createDefaultCellSource('database')
+
+        return [
+          [
+            id,
+            {
+              name: draft.data.name,
+              source,
+              sql: draft.data.sql,
+              updatedAt: draft.data.updatedAt,
+            },
+          ],
+        ]
       })
     )
   } catch {
@@ -60,11 +87,22 @@ const writePersistedDrafts = (
   drafts: PersistedExplorerQueryDrafts
 ) => {
   const key = LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS(projectRef)
-  if (Object.keys(drafts).length === 0) storage.removeItem(key)
-  else storage.setItem(key, JSON.stringify(drafts))
+  const retainedDrafts = Object.fromEntries(
+    Object.entries(drafts)
+      .sort(([, a], [, b]) => b.updatedAt - a.updatedAt)
+      .slice(0, MAX_PERSISTED_EXPLORER_QUERY_DRAFTS)
+  )
+
+  if (Object.keys(retainedDrafts).length === 0) storage.removeItem(key)
+  else storage.setItem(key, JSON.stringify(retainedDrafts))
 }
 
 export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage) => {
+  const pendingPersistence = new Map<
+    string,
+    { timeout: ReturnType<typeof setTimeout>; persist: () => void }
+  >()
+
   const state = proxy({
     drafts: {} as Record<string, ExplorerQueryDraft>,
     results: {} as Record<string, ExplorerQueryResult>,
@@ -74,23 +112,26 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       projectRef,
       name = 'Untitled query',
       sql = '',
+      source = createDefaultCellSource('database'),
     }: {
       id: string
       projectRef: string
       name?: string
       sql?: string
+      source?: CellSource
     }) => {
       const draft: ExplorerQueryDraft = {
         id,
         projectRef,
         name,
+        source: cellSourceSchema.parse(source),
         uncheckedSql: untrustedSql(sql),
         updatedAt: Date.now(),
       }
       state.drafts[id] = draft
 
       const persisted = readPersistedDrafts(storage, projectRef)
-      persisted[id] = { name, sql, updatedAt: draft.updatedAt }
+      persisted[id] = { name, source: draft.source, sql, updatedAt: draft.updatedAt }
       writePersistedDrafts(storage, projectRef, persisted)
 
       return id
@@ -106,30 +147,74 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
         id,
         projectRef,
         name: persisted.name,
+        source: persisted.source,
         uncheckedSql: untrustedSql(persisted.sql),
         updatedAt: persisted.updatedAt,
       }
       return true
     },
 
-    updateDraft: ({ id, name, sql }: { id: string; name?: string; sql?: string }) => {
+    updateDraft: ({
+      id,
+      name,
+      source,
+      sql,
+    }: {
+      id: string
+      name?: string
+      source?: CellSource
+      sql?: string
+    }) => {
       const draft = state.drafts[id]
       if (!draft) return
 
       if (name !== undefined) draft.name = name
+      if (source !== undefined) {
+        draft.source = cellSourceSchema.parse(source)
+        delete state.results[id]
+      }
       if (sql !== undefined) draft.uncheckedSql = untrustedSql(sql)
       draft.updatedAt = Date.now()
 
-      const persisted = readPersistedDrafts(storage, draft.projectRef)
-      persisted[id] = {
-        name: draft.name,
-        sql: draft.uncheckedSql,
-        updatedAt: draft.updatedAt,
+      const persist = () => {
+        const pending = pendingPersistence.get(id)
+        if (pending) clearTimeout(pending.timeout)
+        pendingPersistence.delete(id)
+        const currentDraft = state.drafts[id]
+        if (!currentDraft) return
+
+        const persisted = readPersistedDrafts(storage, currentDraft.projectRef)
+        persisted[id] = {
+          name: currentDraft.name,
+          source: currentDraft.source,
+          sql: currentDraft.uncheckedSql,
+          updatedAt: currentDraft.updatedAt,
+        }
+        writePersistedDrafts(storage, currentDraft.projectRef, persisted)
       }
-      writePersistedDrafts(storage, draft.projectRef, persisted)
+
+      const pending = pendingPersistence.get(id)
+      if (pending) clearTimeout(pending.timeout)
+
+      if (name !== undefined || source !== undefined) persist()
+      else {
+        const timeout = setTimeout(persist, EXPLORER_QUERY_PERSIST_DELAY)
+        pendingPersistence.set(id, { timeout, persist })
+      }
+    },
+
+    flushPendingPersistence: ({ projectRef }: { projectRef?: string } = {}) => {
+      for (const [id, pending] of [...pendingPersistence]) {
+        if (projectRef !== undefined && state.drafts[id]?.projectRef !== projectRef) continue
+        pending.persist()
+      }
     },
 
     removeDraft: ({ id, projectRef }: { id: string; projectRef: string }) => {
+      const pending = pendingPersistence.get(id)
+      if (pending) clearTimeout(pending.timeout)
+      pendingPersistence.delete(id)
+
       if (state.drafts[id]?.projectRef === projectRef) {
         delete state.drafts[id]
         delete state.results[id]

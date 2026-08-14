@@ -33,7 +33,7 @@ import {
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
 import { metricColor } from './InstanceNode.utils'
-import { REPLICA_STATUS } from '@/components/interfaces/Database/Replication/Replication.constants'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { SparkBar } from '@/components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
