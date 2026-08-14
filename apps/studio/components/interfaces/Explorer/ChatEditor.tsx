@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent } from 'react'
 import { Button } from 'ui'
 
+import { ExplorerChatToolbar } from './ExplorerChatToolbar'
 import { useCreateChat } from './hooks'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AssistantChat } from '@/components/ui/AIAssistantPanel/AssistantChat'
@@ -94,6 +95,9 @@ export const ChatEditor = () => {
       onNewChat={() => createChat()}
       onSelectChat={openChat}
       onBranchChat={handleBranchChat}
+      renderHeader={(headerProps) => (
+        <ExplorerChatToolbar {...headerProps} chatId={id} shortcutsEnabled={shortcutsEnabled} />
+      )}
     />
   )
 }

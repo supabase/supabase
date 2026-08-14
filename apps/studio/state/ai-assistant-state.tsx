@@ -3,7 +3,14 @@ import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalRespons
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
@@ -795,6 +802,16 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 export const useAiAssistantStateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) => {
   const state = useContext(AiAssistantStateContext)
   return useSnapshot(state, options)
+}
+
+export const useAiAssistantChatList = (): ChatSession[] => {
+  const state = useContext(AiAssistantStateContext)
+  const [, rerender] = useReducer((count) => count + 1, 0)
+  // Subscribe to the parent, not `state.chats` — createChat, createBranch, deleteChat and
+  // loadPersistedState all replace `state.chats` wholesale, which would leave a subscription
+  // to the old object silently stale.
+  useEffect(() => subscribe(state, rerender), [state])
+  return Object.values(state.chats)
 }
 
 /**
