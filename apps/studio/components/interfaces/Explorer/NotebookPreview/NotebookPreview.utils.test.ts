@@ -1,9 +1,11 @@
+import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
 import {
   formatNotebookDiffSummary,
   formatTimeRange,
   getCellLabel,
+  getCellMetadataLine,
   getEntryKey,
   summarizeNotebookDiff,
 } from './NotebookPreview.utils'
@@ -19,12 +21,20 @@ const wireMarkdownCell = (id: string, text = 'hello'): CellWire => ({
 
 const agentMarkdownCell = (text = 'hello'): AgentCell => ({ _tag: 'markdown_cell', text })
 
-const wireDatabaseCell = (id: string, title?: string): CellWire => ({
+const wireDatabaseCell = (id: string, title?: string, database_identifier?: string): CellWire => ({
   _tag: 'database_cell',
   id,
   title,
   sql: 'select 1',
   row_limit: 100,
+  database_identifier,
+})
+
+const wireLogCell = (id: string): CellWire => ({
+  _tag: 'log_cell',
+  id,
+  sql: 'select 1',
+  time_range: { _tag: 'relative_time_range', unit: 'day', amount: 7 },
 })
 
 describe('getEntryKey', () => {
@@ -86,13 +96,35 @@ describe('formatTimeRange', () => {
   })
 
   it('formats an absolute range as a start → end pair', () => {
-    const formatted = formatTimeRange({
-      _tag: 'absolute_time_range',
-      start: isoDateTimeString('2026-01-01T00:00:00.000Z')!,
-      end: isoDateTimeString('2026-01-02T00:00:00.000Z')!,
-    })
-    expect(formatted).toContain('→')
-    expect(formatted).toContain('2026')
+    const start = isoDateTimeString('2026-01-01T13:00:00.000Z')!
+    const end = isoDateTimeString('2026-01-02T09:30:00.000Z')!
+
+    const formatted = formatTimeRange({ _tag: 'absolute_time_range', start, end })
+
+    // Bounds are asserted via dayjs rather than a hardcoded string so this doesn't depend on
+    // the test runner's local timezone (formatTimeRange formats in local time).
+    const expectedBound = (value: string) => dayjs(value).format('MMM D, YYYY h:mm A')
+    expect(formatted).toBe(`${expectedBound(start)} → ${expectedBound(end)}`)
+  })
+})
+
+describe('getCellMetadataLine', () => {
+  it('returns null for markdown cells', () => {
+    expect(getCellMetadataLine(wireMarkdownCell('cell-1'))).toBeNull()
+  })
+
+  it('returns null for a database cell with no database_identifier', () => {
+    expect(getCellMetadataLine(wireDatabaseCell('cell-1'))).toBeNull()
+  })
+
+  it('labels a database cell with a database_identifier', () => {
+    expect(getCellMetadataLine(wireDatabaseCell('cell-1', 'Signups', 'replica-3'))).toBe(
+      'Database: replica-3'
+    )
+  })
+
+  it('labels a log cell with its formatted time range', () => {
+    expect(getCellMetadataLine(wireLogCell('cell-1'))).toBe('Time range: Last 7 days')
   })
 })
 

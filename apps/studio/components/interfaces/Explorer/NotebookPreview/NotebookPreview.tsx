@@ -14,8 +14,6 @@ export interface NotebookPreviewProps {
   mode: 'create' | 'update'
 }
 
-// Long notebooks stay skimmable behind a "show more" affordance rather than a fixed scroll
-// area, mirroring AdvisorPanelBody's "Show N more issues" pattern.
 const VISIBLE_ENTRY_LIMIT = 5
 
 /**

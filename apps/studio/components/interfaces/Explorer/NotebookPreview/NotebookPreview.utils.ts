@@ -71,6 +71,22 @@ export function formatTimeRange(range: TimeRange): string {
   return `${format(range.start)} → ${format(range.end)}`
 }
 
+/**
+ * Plain-text metadata line for a query cell (its source parameters, not its SQL) — `null`
+ * when the cell has none. A `replace_cell` can change only this and leave `sql` identical,
+ * so it's compared independently of the source text rather than folded into it.
+ */
+export function getCellMetadataLine(cell: CellWire | AgentCell): string | null {
+  switch (cell._tag) {
+    case 'markdown_cell':
+      return null
+    case 'database_cell':
+      return cell.database_identifier ? `Database: ${cell.database_identifier}` : null
+    case 'log_cell':
+      return `Time range: ${formatTimeRange(cell.time_range)}`
+  }
+}
+
 export type NotebookDiffSummary =
   | { mode: 'create'; cellCount: number }
   | { mode: 'update'; counts: { added: number; removed: number; replaced: number; moved: number } }

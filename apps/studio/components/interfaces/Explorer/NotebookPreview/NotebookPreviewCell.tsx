@@ -3,9 +3,9 @@ import { Badge, Button, cn } from 'ui'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import {
-  formatTimeRange,
   getCellCodeBlockLanguage,
   getCellLabel,
+  getCellMetadataLine,
   getCellMonacoLanguage,
   getCellSourceText,
 } from './NotebookPreview.utils'
@@ -83,35 +83,42 @@ const AddedCell = ({ cell }: { cell: AgentCell }) => (
       language={getCellCodeBlockLanguage(cell)}
       value={getCellSourceText(cell)}
     />
-    <CellMetadata cell={cell} />
+    <MetadataLine text={getCellMetadataLine(cell)} />
   </ContentCell>
 )
 
-const ReplacedCell = ({ before, after }: { before: CellWire; after: AgentCell }) => (
-  <ContentCell badge={{ variant: 'warning', label: 'Replaced' }} label={getCellLabel(after)}>
-    <DiffEditor
-      original={getCellSourceText(before)}
-      modified={getCellSourceText(after)}
-      language={getCellMonacoLanguage(after)}
-      height={240}
-    />
-  </ContentCell>
-)
+/**
+ * A `replace_cell` can change only the source parameters (`database_identifier`,
+ * `time_range`) and leave `sql`/`text` identical — the `DiffEditor` above would then show no
+ * change at all, so the metadata is compared independently and rendered as its own
+ * before → after line whenever it differs.
+ */
+const ReplacedCell = ({ before, after }: { before: CellWire; after: AgentCell }) => {
+  const beforeMetadata = getCellMetadataLine(before)
+  const afterMetadata = getCellMetadataLine(after)
 
-/** Plain-text metadata lines for query cells — never rendered as a link or attribute. */
-const CellMetadata = ({ cell }: { cell: AgentCell }) => {
-  if (cell._tag === 'database_cell' && cell.database_identifier) {
-    return <p className="text-xs text-foreground-lighter">Database: {cell.database_identifier}</p>
-  }
-  if (cell._tag === 'log_cell') {
-    return (
-      <p className="text-xs text-foreground-lighter">
-        Time range: {formatTimeRange(cell.time_range)}
-      </p>
-    )
-  }
-  return null
+  return (
+    <ContentCell badge={{ variant: 'warning', label: 'Replaced' }} label={getCellLabel(after)}>
+      <DiffEditor
+        original={getCellSourceText(before)}
+        modified={getCellSourceText(after)}
+        language={getCellMonacoLanguage(after)}
+        height={240}
+      />
+      {beforeMetadata !== afterMetadata ? (
+        <MetadataLine
+          text={`${beforeMetadata ?? 'No metadata'} → ${afterMetadata ?? 'No metadata'}`}
+        />
+      ) : (
+        <MetadataLine text={afterMetadata} />
+      )}
+    </ContentCell>
+  )
 }
+
+/** A plain-text metadata line for a query cell — never rendered as a link or attribute. */
+const MetadataLine = ({ text }: { text: string | null }) =>
+  text ? <p className="text-xs text-foreground-lighter">{text}</p> : null
 
 interface ExpandableCodeBlockProps {
   language: CodeBlockLang

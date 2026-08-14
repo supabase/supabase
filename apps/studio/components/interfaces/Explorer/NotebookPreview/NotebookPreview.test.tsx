@@ -14,6 +14,21 @@ const wireMarkdownCell = (id: string, text: string): CellWire => ({
 
 const agentMarkdownCell = (text: string): AgentCell => ({ _tag: 'markdown_cell', text })
 
+const wireDatabaseCell = (id: string, database_identifier?: string): CellWire => ({
+  _tag: 'database_cell',
+  id,
+  sql: 'select 1',
+  row_limit: 100,
+  database_identifier,
+})
+
+const agentDatabaseCell = (database_identifier?: string): AgentCell => ({
+  _tag: 'database_cell',
+  sql: 'select 1',
+  row_limit: 100,
+  database_identifier,
+})
+
 describe('NotebookPreview', () => {
   // The whole safety argument for this feature reduces to this: agent-authored markdown text
   // is rendered as literal source (via CodeBlock), never interpreted into real DOM nodes. A
@@ -41,6 +56,21 @@ describe('NotebookPreview', () => {
     render(<NotebookPreview entries={entries} mode="create" />)
 
     expect(screen.getByText('2 cells')).toBeInTheDocument()
+  })
+
+  it('surfaces a metadata-only change on a replaced cell even when the sql is unchanged', () => {
+    const entries: NotebookCellDiffEntry[] = [
+      {
+        _tag: 'replaced',
+        before: wireDatabaseCell('cell-1', 'primary'),
+        after: agentDatabaseCell('replica-3'),
+        operationIndex: 0,
+      },
+    ]
+
+    render(<NotebookPreview entries={entries} mode="update" />)
+
+    expect(screen.getByText('Database: primary → Database: replica-3')).toBeInTheDocument()
   })
 
   it('hides entries past the limit behind a "Show N more" button', async () => {
