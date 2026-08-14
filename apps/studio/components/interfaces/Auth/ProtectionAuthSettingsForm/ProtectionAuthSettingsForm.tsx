@@ -53,7 +53,6 @@ const baseSchema = z.object({
   DISABLE_SIGNUP: z.boolean(),
   EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
   SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
-  SITE_URL: z.string().min(1, 'Must have a Site URL'),
   SESSIONS_TIMEBOX: z
     .preprocess(
       (val) => (val === '' || val == null ? undefined : val),
@@ -138,7 +137,6 @@ export const ProtectionAuthSettingsForm = () => {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
       SECURITY_MANUAL_LINKING_ENABLED: false,
-      SITE_URL: '',
       SECURITY_CAPTCHA_ENABLED: false,
       SECURITY_CAPTCHA_SECRET: '',
       SECURITY_CAPTCHA_PROVIDER: 'hcaptcha',
@@ -163,7 +161,6 @@ export const ProtectionAuthSettingsForm = () => {
           DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
           EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
           SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
-          SITE_URL: authConfig.SITE_URL || '',
           SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
           SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
           SECURITY_CAPTCHA_PROVIDER,
@@ -180,7 +177,6 @@ export const ProtectionAuthSettingsForm = () => {
           DISABLE_SIGNUP: !authConfig.DISABLE_SIGNUP,
           EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig.EXTERNAL_ANONYMOUS_USERS_ENABLED || false,
           SECURITY_MANUAL_LINKING_ENABLED: authConfig.SECURITY_MANUAL_LINKING_ENABLED || false,
-          SITE_URL: authConfig.SITE_URL || '',
           SECURITY_CAPTCHA_ENABLED: authConfig.SECURITY_CAPTCHA_ENABLED,
           SECURITY_CAPTCHA_SECRET: authConfig.SECURITY_CAPTCHA_SECRET || '',
           SECURITY_CAPTCHA_PROVIDER,
