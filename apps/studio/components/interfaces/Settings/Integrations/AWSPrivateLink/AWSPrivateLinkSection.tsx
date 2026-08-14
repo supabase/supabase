@@ -34,7 +34,7 @@ export const AWSPrivateLinkSection = () => {
 
   const { mutate: deleteAccount, isPending: isDeleting } = useAWSAccountDeleteMutation({
     onSuccess: () => {
-      toast.success('Connection will be deleted shortly')
+      toast.success('Association will be deleted shortly')
       setShowDeleteModal(false)
       setSelectedAccount(undefined)
     },
@@ -80,7 +80,9 @@ export const AWSPrivateLinkSection = () => {
             <PageSectionSummary>
               <PageSectionTitle>AWS PrivateLink</PageSectionTitle>
               <PageSectionDescription>
-                Connect to this project from your AWS VPC without using the public internet.
+                Connect to your Supabase project from your AWS VPC using AWS PrivateLink. Create a
+                private connection between your AWS VPC and your Supabase project without traffic
+                traversing the public internet.
               </PageSectionDescription>
             </PageSectionSummary>
           </div>
@@ -90,17 +92,17 @@ export const AWSPrivateLinkSection = () => {
             {promptPlanUpgrade && (
               <UpgradeToPro
                 layout="vertical"
-                primaryText="Available on Team and Enterprise plans"
-                secondaryText="Upgrade to add a PrivateLink connection."
+                primaryText="Only available on Team or Enterprise Plan and above"
+                secondaryText="Connect your AWS VPC privately to your Supabase project using AWS PrivateLink."
                 buttonText="Upgrade to Team"
                 source="aws-privatelink-integration"
               />
             )}
             <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-foreground">Connections</h3>
+                <h3 className="text-sm font-medium text-foreground">Associations</h3>
                 <Button variant="default" onClick={onAddAccount}>
-                  Add connection
+                  Add association
                 </Button>
               </div>
               {(accounts?.length ?? 0) > 0 ? (
@@ -117,7 +119,7 @@ export const AWSPrivateLinkSection = () => {
               ) : (
                 <Card>
                   <CardContent>
-                    <p className="text-foreground-lighter text-sm">No connections yet</p>
+                    <p className="text-foreground-lighter text-sm">No associations connected</p>
                   </CardContent>
                 </Card>
               )}
@@ -131,15 +133,14 @@ export const AWSPrivateLinkSection = () => {
       <ConfirmationModal
         variant="destructive"
         visible={showDeleteModal}
-        title="Delete connection"
+        title="Confirm to delete association"
         confirmLabel="Delete"
         loading={isDeleting}
         onCancel={() => setShowDeleteModal(false)}
         onConfirm={onConfirmDelete}
       >
         <p className="text-sm text-foreground-light">
-          This removes the PrivateLink connection for {selectedAccount?.aws_account_id}.
-          Applications using this private path will lose access.
+          Are you sure you want to delete the association for {selectedAccount?.aws_account_id}?
         </p>
         <p className="text-sm text-foreground-lighter mt-1">
           Database:{' '}

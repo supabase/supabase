@@ -13,7 +13,6 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { getConnectionStatusUi } from './AWSPrivateLink.utils'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 interface AWSPrivateLinkAccountItemProps {
@@ -52,7 +51,25 @@ export const AWSPrivateLinkAccountItem = ({
     database_type === 'READ_REPLICA'
       ? `Read replica (ID: ${database_identifier ? formatDatabaseID(database_identifier) : 'Unknown identifier'})`
       : 'Primary database'
-  const statusUi = getConnectionStatusUi(status)
+
+  const getStatusBadge = () => {
+    switch (status) {
+      case 'ASSOCIATION_ACCEPTED':
+        return <Badge variant="success">Connected</Badge>
+      case 'READY':
+        return <Badge variant="success">Ready</Badge>
+      case 'CREATING':
+        return <Badge variant="warning">Creating</Badge>
+      case 'DELETING':
+        return <Badge variant="destructive">Deleting</Badge>
+      case 'ASSOCIATION_REQUEST_EXPIRED':
+        return <Badge variant="destructive">Expired</Badge>
+      case 'CREATION_FAILED':
+        return <Badge variant="destructive">Failed</Badge>
+      default:
+        return <Badge>Unknown</Badge>
+    }
+  }
 
   return (
     <CardContent className="flex items-center justify-between text-sm gap-4">
@@ -83,7 +100,7 @@ export const AWSPrivateLinkAccountItem = ({
         )}
       </div>
 
-      <Badge variant={statusUi.badgeVariant}>{statusUi.badge}</Badge>
+      {getStatusBadge()}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -92,12 +109,12 @@ export const AWSPrivateLinkAccountItem = ({
         <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem onClick={onEdit} className="gap-x-2">
             <Edit size={14} />
-            <span>View connection</span>
+            <span>View association</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onDelete} className="gap-x-2">
             <Trash size={14} />
-            <span>Delete connection</span>
+            <span>Delete association</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
