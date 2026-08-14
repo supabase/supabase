@@ -5,16 +5,16 @@ import { z } from 'zod'
 
 import { type QueryResult } from '@/components/interfaces/Explorer/types'
 import {
-  cellSourceSchema,
-  createDefaultCellSource,
-  type CellSource,
+  createDefaultSourceBinding,
+  querySourceBindingSchema,
+  type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 
 export type ExplorerQueryDraft = {
   id: string
   projectRef: string
   name: string
-  source: CellSource
+  source: QuerySourceBinding
   uncheckedSql: UntrustedSqlFragment
   updatedAt: number
 }
@@ -25,7 +25,7 @@ export type ExplorerQueryResult = QueryResult & {
 
 type PersistedExplorerQueryDraft = {
   name: string
-  source: CellSource
+  source: QuerySourceBinding
   sql: string
   updatedAt: number
 }
@@ -58,10 +58,10 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
         const draft = persistedDraftSchema.safeParse(value)
         if (!draft.success) return []
 
-        const parsedSource = cellSourceSchema.safeParse(draft.data.source)
+        const parsedSource = querySourceBindingSchema.safeParse(draft.data.source)
         const source = parsedSource.success
           ? parsedSource.data
-          : createDefaultCellSource('database')
+          : createDefaultSourceBinding('database')
 
         return [
           [
@@ -112,19 +112,19 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       projectRef,
       name = 'Untitled query',
       sql = '',
-      source = createDefaultCellSource('database'),
+      source = createDefaultSourceBinding('database'),
     }: {
       id: string
       projectRef: string
       name?: string
       sql?: string
-      source?: CellSource
+      source?: QuerySourceBinding
     }) => {
       const draft: ExplorerQueryDraft = {
         id,
         projectRef,
         name,
-        source: cellSourceSchema.parse(source),
+        source: querySourceBindingSchema.parse(source),
         uncheckedSql: untrustedSql(sql),
         updatedAt: Date.now(),
       }
@@ -162,7 +162,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
     }: {
       id: string
       name?: string
-      source?: CellSource
+      source?: QuerySourceBinding
       sql?: string
     }) => {
       const draft = state.drafts[id]
@@ -170,7 +170,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
 
       if (name !== undefined) draft.name = name
       if (source !== undefined) {
-        draft.source = cellSourceSchema.parse(source)
+        draft.source = querySourceBindingSchema.parse(source)
         delete state.results[id]
       }
       if (sql !== undefined) draft.uncheckedSql = untrustedSql(sql)

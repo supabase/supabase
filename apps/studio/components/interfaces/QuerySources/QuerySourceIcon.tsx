@@ -1,12 +1,12 @@
 import { Database, ScrollText } from 'lucide-react'
 
-import type { QuerySourceId } from '@/data/query-sources/query-source-registry'
+import type { QuerySourceTag } from '@/data/query-sources/query-source-registry'
 
 export const QuerySourceIcon = ({
   source,
   className,
 }: {
-  source: QuerySourceId
+  source: QuerySourceTag
   className?: string
 }) => {
   const props = { className, size: 16, strokeWidth: 2 }

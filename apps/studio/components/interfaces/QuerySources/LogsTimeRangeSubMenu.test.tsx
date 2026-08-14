@@ -18,7 +18,7 @@ const renderSubMenu = ({
   onRangeChange = vi.fn<(range: TimeRange) => void>(),
   onOpenCustomRange = vi.fn<() => void>(),
   onShowUpgrade = vi.fn<() => void>(),
-  range = { _tag: 'relative_time_range', amount: 1, unit: 'hour' } as TimeRange,
+  range = { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
 }: {
   onRangeChange?: Mock<(range: TimeRange) => void>
   onOpenCustomRange?: Mock<() => void>
