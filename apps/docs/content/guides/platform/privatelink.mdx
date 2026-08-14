@@ -51,9 +51,9 @@ Navigate to your project's Integrations section to set up PrivateLink:
 
 Each database, whether the primary or a read replica, needs its own connection. Create a separate connection for every database you want to reach over PrivateLink.
 
-After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS account ID. This process may take a few moments. Once complete, the connection will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted. You must accept the resource share within 12 hours, or the request expires and can no longer be accepted in AWS. You'll need to create a new connection to try again.
+After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS account ID. This process may take a few moments. Once complete, the connection will show a "Waiting" status, indicating that the resource share has been sent to your AWS account and still needs to be accepted. You must accept the resource share within 12 hours, or the request expires and can no longer be accepted in AWS. You'll need to create a new connection to try again.
 
-Once ready, select **View connection** to see the VPC Lattice resource configuration ID and ARNs for the connection. This is useful for confirming which resource configuration corresponds to which database when a project has multiple connections, for example one for the primary database and one for each read replica.
+Select **View connection** to see the VPC Lattice resource configuration ID and ARNs for the connection. This is useful for confirming which resource configuration corresponds to which database when a project has multiple connections, for example one for the primary database and one for each read replica.
 
 ### Step 2: Accept resource share
 

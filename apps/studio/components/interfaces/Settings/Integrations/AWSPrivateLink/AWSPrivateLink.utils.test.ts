@@ -15,8 +15,8 @@ describe('getConnectionStatusUi', () => {
     [
       'READY',
       {
-        badge: 'Ready',
-        badgeVariant: 'success',
+        badge: 'Waiting',
+        badgeVariant: 'warning',
         title: 'Waiting for the AWS account owner to accept',
         description: 'This request expires after 12 hours.',
       },
@@ -25,7 +25,7 @@ describe('getConnectionStatusUi', () => {
       'CREATING',
       {
         badge: 'Creating',
-        badgeVariant: 'warning',
+        badgeVariant: 'default',
         title: 'This connection is being created',
       },
     ],
@@ -33,7 +33,7 @@ describe('getConnectionStatusUi', () => {
       'DELETING',
       {
         badge: 'Deleting',
-        badgeVariant: 'destructive',
+        badgeVariant: 'warning',
         title: 'This connection is being deleted',
       },
     ],
