@@ -126,10 +126,6 @@ const AddPasswordForm = ({ email, onClose }: { email: string; onClose: () => voi
                       />
                     }
                     {...field}
-                    onBlur={() => {
-                      field.onBlur()
-                      setPasswordHidden(true)
-                    }}
                   />
                 </FormControl>
               </FormItemLayout>
