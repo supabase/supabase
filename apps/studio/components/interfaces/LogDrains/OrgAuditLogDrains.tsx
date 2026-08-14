@@ -157,7 +157,7 @@ export function OrgAuditLogDrains() {
                 disabled={!canManageLogDrains}
                 onClick={handleAddDestinationClick}
                 variant="primary"
-                className="rounded-r-none px-3 hover:z-10 focus-visible:z-10"
+                className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
               >
                 Add destination
               </Button>
@@ -167,7 +167,7 @@ export function OrgAuditLogDrains() {
                 <Button
                   variant="primary"
                   title="Choose destination type"
-                  className="-ml-px rounded-l-none px-[4px] py-[5px] focus-visible:z-10"
+                  className="-ml-px rounded-l-none px-[4px] py-[5px] focus-visible:z-10 focus-visible:rounded-l-sm"
                   icon={<ChevronDown />}
                 />
               </DropdownMenuTrigger>

@@ -419,7 +419,7 @@ export const ReplicationPipelineStatus = () => {
                 <Button
                   size="tiny"
                   variant="default"
-                  className="rounded-r-none hover:z-10 focus-visible:z-10"
+                  className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
                   loading={isAnyRestartInProgress}
@@ -435,7 +435,7 @@ export const ReplicationPipelineStatus = () => {
                     <Button
                       variant="default"
                       icon={<ChevronDown />}
-                      className="w-7 rounded-l-none -ml-px focus-visible:z-10"
+                      className="w-7 rounded-l-none -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                       disabled={showDisabledState || isPipelineError}
                     />
                   </DropdownMenuTrigger>

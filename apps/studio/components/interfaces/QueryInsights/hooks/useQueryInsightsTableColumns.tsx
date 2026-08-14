@@ -511,7 +511,7 @@ export function useQueryInsightsTableColumns({
                   <Button
                     variant="primary"
                     size="tiny"
-                    className="rounded-r-none border-r-0 focus-visible:z-10"
+                    className="rounded-r-none border-r-0 focus-visible:z-10 focus-visible:rounded-r-sm"
                     onClick={() => {
                       setSelectedTriageRow(props.rowIdx)
                       setSheetView('indexes')
@@ -524,7 +524,7 @@ export function useQueryInsightsTableColumns({
                       <Button
                         variant="primary"
                         size="tiny"
-                        className="rounded-l-none px-1 focus-visible:z-10"
+                        className="rounded-l-none px-1 focus-visible:z-10 focus-visible:rounded-l-sm"
                         icon={<ChevronDown size={12} />}
                       />
                     </DropdownMenuTrigger>

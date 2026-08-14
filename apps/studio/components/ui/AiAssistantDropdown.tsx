@@ -134,7 +134,7 @@ export function AiAssistantDropdown({
         onClick={handleOpenAssistant}
         icon={<AiIconAnimation size={iconOnly ? 16 : 14} loading={loading} />}
         className={cn(
-          'rounded-r-none border-r-0 focus-visible:z-10',
+          'rounded-r-none border-r-0 focus-visible:z-10 focus-visible:rounded-r-sm',
           iconOnly && 'px-1.5',
           className
         )}
@@ -150,7 +150,10 @@ export function AiAssistantDropdown({
             variant={variant}
             size={size}
             disabled={disabled}
-            className={cn('rounded-l-none px-1 focus-visible:z-10', iconOnly && 'px-1')}
+            className={cn(
+              'rounded-l-none px-1 focus-visible:z-10 focus-visible:rounded-l-sm',
+              iconOnly && 'px-1'
+            )}
             icon={<ChevronDown size={12} />}
           />
         </DropdownMenuTrigger>
