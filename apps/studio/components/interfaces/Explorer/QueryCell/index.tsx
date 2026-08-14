@@ -17,6 +17,7 @@ import {
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
+import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 
 interface QueryCellProps {
   cell: Snapshot<DatabaseCellSchema | LogCellSchema>
@@ -47,6 +48,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
 
   const [sql, setSql] = useState<string>(unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
+  const roleImpersonationState = useLocalRoleImpersonationState()
 
   const title = cellTitle ?? 'Untitled snippet'
   const display: QueryDisplay = {
@@ -147,6 +149,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
         source={source}
         result={result}
         rowLimit={rowLimit}
+        roleImpersonationState={roleImpersonationState}
         display={cell._tag === 'database_cell' ? display : undefined}
         onTitleChange={(title) => handleUpdateCell({ title })}
         onSqlChange={setSql}

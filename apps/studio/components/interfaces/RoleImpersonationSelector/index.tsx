@@ -7,7 +7,10 @@ import { UserImpersonationSelector } from './UserImpersonationSelector'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
 import { PostgrestRole } from '@/lib/role-impersonation'
-import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
+import {
+  type RoleImpersonationController,
+  useRoleImpersonationStateSnapshot,
+} from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationSelectorProps {
   header?: string
@@ -17,25 +20,38 @@ export interface RoleImpersonationSelectorProps {
   orientation?: 'horizontal' | 'vertical'
 }
 
-export const RoleImpersonationSelector = ({
-  header = 'Impersonate a database role',
+/**
+ * Tightly coupled with the global role impersonation store
+ * Use RoleImpersonationSelectorInterface to control the logic externally
+ */
+export const RoleImpersonationSelector = (props: RoleImpersonationSelectorProps) => {
+  // valtio's Snapshot<> type is deep-readonly (incl. nested arrays), which isn't
+  // structurally assignable to RoleImpersonationController's plain array fields — same
+  // rationale as the cast in useGetImpersonatedRoleState.
+  const state = useRoleImpersonationStateSnapshot() as unknown as RoleImpersonationController
+
+  return <RoleImpersonationSelectorInterface {...props} state={state} />
+}
+
+type RoleImpersonationSelectorInterfaceProps = RoleImpersonationSelectorProps & {
+  state: RoleImpersonationController
+}
+
+export const RoleImpersonationSelectorInterface = ({
+  state,
+  orientation,
   serviceRoleLabel = 'Postgres',
   disallowAuthenticatedOption = false,
-  orientation = 'horizontal',
-}: RoleImpersonationSelectorProps) => {
+  header = 'Impersonate a database role',
+}: RoleImpersonationSelectorInterfaceProps) => {
   const isVertical = orientation === 'vertical'
-  const state = useRoleImpersonationStateSnapshot()
 
-  const [selectedOption, setSelectedOption] = useState<PostgrestRole | undefined>(() => {
-    if (
-      state.role?.type === 'postgrest' &&
-      (state.role.role === 'anon' || state.role.role === 'authenticated')
-    ) {
-      return state.role.role
-    }
-
-    return 'service_role'
-  })
+  const [selectedOption, setSelectedOption] = useState<PostgrestRole>(() =>
+    state.role?.type === 'postgrest' &&
+    (state.role.role === 'anon' || state.role.role === 'authenticated')
+      ? state.role.role
+      : 'service_role'
+  )
 
   const isAuthenticatedOptionFullySelected = Boolean(
     selectedOption === 'authenticated' &&
@@ -155,7 +171,7 @@ export const RoleImpersonationSelector = ({
 
       {selectedOption === 'authenticated' && (
         <CardContent className="p-0">
-          <UserImpersonationSelector />
+          <UserImpersonationSelector state={state} />
         </CardContent>
       )}
     </Card>

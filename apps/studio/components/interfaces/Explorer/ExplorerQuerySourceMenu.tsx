@@ -10,6 +10,7 @@ import {
 } from 'ui'
 
 import { RowLimitSubMenu } from '../SQLEditor/UtilityPanel/QuerySourceMenu/RowLimitSubMenu'
+import { RunAsSubMenu } from '../SQLEditor/UtilityPanel/QuerySourceMenu/RunAsSubMenu'
 import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/DatabaseParametersSubMenu'
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
@@ -22,10 +23,12 @@ import {
   QUERY_SOURCES,
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
+import { type RoleImpersonationController } from '@/state/role-impersonation-state'
 
 export type ExplorerQuerySourceMenuProps = {
   rowLimit?: number
   onRowLimitChange?: (val: number) => void
+  roleImpersonationState?: RoleImpersonationController
   source: QuerySourceBinding
   onSourceChange: (source: QuerySourceBinding) => void
 }
@@ -42,6 +45,7 @@ export type ExplorerQuerySourceMenuProps = {
 export const ExplorerQuerySourceMenu = ({
   rowLimit = 100,
   onRowLimitChange,
+  roleImpersonationState,
   source,
   onSourceChange,
 }: ExplorerQuerySourceMenuProps) => {
@@ -109,6 +113,9 @@ export const ExplorerQuerySourceMenu = ({
                   onSourceChange({ _tag: 'database', database_identifier })
                 }
               />
+              {roleImpersonationState !== undefined && (
+                <RunAsSubMenu controlled state={roleImpersonationState} />
+              )}
               {onRowLimitChange !== undefined && (
                 <RowLimitSubMenu
                   value={rowLimit}

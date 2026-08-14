@@ -38,6 +38,11 @@ import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import {
+  isRoleImpersonationEnabled,
+  type RoleImpersonationController,
+} from '@/state/role-impersonation-state'
 
 export type QueryEditorProps = {
   id: string
@@ -47,6 +52,7 @@ export type QueryEditorProps = {
   source?: QuerySourceBinding
   result?: QueryResult
   rowLimit?: number
+  roleImpersonationState?: RoleImpersonationController
   display?: QueryDisplay
   toolbarActions?: ReactNode
   onTitleChange: (title: string) => void
@@ -71,6 +77,7 @@ export const QueryEditor = ({
   source,
   result,
   rowLimit,
+  roleImpersonationState,
   display,
   toolbarActions,
   onTitleChange,
@@ -159,10 +166,11 @@ export const QueryEditor = ({
     executeSql({
       projectRef: project.ref,
       connectionString,
-      sql: limitedSql.sql,
+      sql: wrapWithRoleImpersonation(limitedSql.sql, roleImpersonationState),
       autoLimit: limitedSql.appendAutoLimit ? rowLimit : undefined,
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     })
   }
 
@@ -181,6 +189,7 @@ export const QueryEditor = ({
             <ExplorerQuerySourceMenu
               rowLimit={rowLimit}
               onRowLimitChange={onRowLimitChange}
+              roleImpersonationState={roleImpersonationState}
               source={source}
               onSourceChange={onSourceChange}
             />
