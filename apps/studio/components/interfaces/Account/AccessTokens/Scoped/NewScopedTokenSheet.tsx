@@ -11,9 +11,14 @@ import {
 } from 'ui'
 
 import { selectionToScopes } from '../AccessToken.permissions'
+import { ExperimentalTokenDropdown } from '../Classic/ExperimentalTokenDropdown'
 import { NewScopedTokenForm } from './Form/NewScopedTokenForm'
 import { getExpiryDate, type TokenFormValues } from './Form/NewScopedTokenForm.utils'
 import { NewScopedTokenSuccess } from './Form/NewScopedTokenSuccess'
+import {
+  useAccessTokenCreateMutation,
+  type NewAccessToken,
+} from '@/data/access-tokens/access-tokens-create-mutation'
 import {
   useScopedAccessTokenCreateMutation,
   type NewScopedAccessToken,
@@ -21,20 +26,53 @@ import {
 } from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
 import { useTrack } from '@/lib/telemetry/track'
 
-export const NewScopedTokenSheet = () => {
+interface NewScopedTokenSheetProps {
+  /** Called with the created token when one is generated through the experimental API dialog. */
+  onCreateExperimentalToken: (token: NewAccessToken) => void
+}
+
+export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedTokenSheetProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const track = useTrack()
-  const { mutate: createToken, isPending } = useScopedAccessTokenCreateMutation()
+  const { mutate: createToken, isPending: isCreatingScopedToken } =
+    useScopedAccessTokenCreateMutation()
+  const { mutate: createClassicToken, isPending: isCreatingClassicToken } =
+    useAccessTokenCreateMutation()
 
   const [step, setStep] = useState<'form' | 'success'>('form')
-  const [createdToken, setCreatedToken] = useState<NewScopedAccessToken | undefined>()
+  const [createdToken, setCreatedToken] = useState<
+    NewScopedAccessToken | NewAccessToken | undefined
+  >()
+
+  const showCreatedToken = (data: NewScopedAccessToken | NewAccessToken) => {
+    toast.success('Access token created successfully')
+    setCreatedToken(data)
+    setStep('success')
+  }
 
   const handleCreate = (values: TokenFormValues) => {
-    const permissions = selectionToScopes(values.permissions)
-    if (permissions.length === 0) return
-
     const expires_at =
       values.expiresAt === 'custom' ? values.customExpiryDate : getExpiryDate(values.expiresAt)
+
+    // 'account' access creates a classic (account-wide) token via the legacy endpoint.
+    if (values.resourceAccess === 'account') {
+      createClassicToken(
+        { name: values.tokenName.trim(), expires_at },
+        {
+          onSuccess: (data) => {
+            track('access_token_created', {
+              tokenType: 'classic',
+              expiryPreset: values.expiresAt,
+            })
+            showCreatedToken(data)
+          },
+        }
+      )
+      return
+    }
+
+    const permissions = selectionToScopes(values.permissions)
+    if (permissions.length === 0) return
 
     const payload: ScopedAccessTokenCreateVariables = {
       name: values.tokenName.trim(),
@@ -54,9 +92,7 @@ export const NewScopedTokenSheet = () => {
           resourceAccess: values.resourceAccess,
           permissionCount: permissions.length,
         })
-        toast.success('Access token created successfully')
-        setCreatedToken(data)
-        setStep('success')
+        showCreatedToken(data)
       },
     })
   }
@@ -71,9 +107,14 @@ export const NewScopedTokenSheet = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
-      <SheetTrigger asChild>
-        <Button variant="primary">Generate new token</Button>
-      </SheetTrigger>
+      <div className="flex items-center">
+        <SheetTrigger asChild>
+          <Button variant="primary" className="rounded-r-none px-3 hover:z-10 focus-visible:z-10">
+            Generate new token
+          </Button>
+        </SheetTrigger>
+        <ExperimentalTokenDropdown onCreateToken={onCreateExperimentalToken} />
+      </div>
       <SheetContent
         showClose={false}
         size="default"
@@ -82,7 +123,7 @@ export const NewScopedTokenSheet = () => {
         <SheetHeader>
           <SheetTitle>{step === 'success' ? 'Token created' : 'Generate token'}</SheetTitle>
           <SheetDescription className="sr-only">
-            Generate a new scoped access token in two steps: configure, then review.
+            Configure and create a new access token.
           </SheetDescription>
         </SheetHeader>
         {step === 'success' && createdToken ? (
@@ -93,7 +134,7 @@ export const NewScopedTokenSheet = () => {
           />
         ) : (
           <NewScopedTokenForm
-            isPending={isPending}
+            isPending={isCreatingScopedToken || isCreatingClassicToken}
             onCreateToken={handleCreate}
             onCancel={() => handleOpenChange(false, true)}
           />

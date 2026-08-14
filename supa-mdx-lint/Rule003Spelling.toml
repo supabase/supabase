@@ -73,6 +73,7 @@ allow_list = [
     "[Ee]x",
     "[Ee]xecutables?",
     "[Ee]xfiltrat(e|ed|es|ing)?",
+    "[Ff]astpath",
     "[Ff]atals",
     "[Ff]ootguns?",
     "[Ff]rontend",

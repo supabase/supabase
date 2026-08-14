@@ -241,6 +241,17 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     },
   },
   {
+    key: 'warp',
+    label: 'Warp',
+    icon: 'warp',
+    hasDistinctDarkIcon: true,
+    configFile: '~/.warp/.mcp.json',
+    externalDocsUrl: 'https://docs.warp.dev/agents/capabilities/mcp',
+    // No transformConfig: Warp natively supports remote MCP servers and accepts
+    // the standard `mcpServers` config, so the base `{ mcpServers: { supabase: { url } } }`
+    // shape works both in `~/.warp/.mcp.json` and when pasted into Warp's "+ Add" input.
+  },
+  {
     key: 'goose',
     label: 'Goose',
     icon: 'goose',
@@ -394,7 +405,7 @@ export const MCP_CLIENT_GROUPS = [
   },
   {
     heading: 'IDE',
-    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf', 'kimi'],
+    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf', 'kimi', 'warp'],
   },
 ] as const
 

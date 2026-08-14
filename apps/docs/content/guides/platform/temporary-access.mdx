@@ -9,7 +9,7 @@ Enabling temporary access only applies to connections to Postgres and Supavisor 
 
 <Admonition type="note">
 
-Projects need to be at least on Postgres 17.6.1.081 (or higher) to enable temporary access. You can find the Postgres version of your project on the [infrastructure settings](/dashboard/project/_/settings/infrastructure) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
+Projects need to be at least on Postgres 17.6.1.081 (or higher) to enable temporary access. You can find the Postgres version of your project on the [General Settings](/dashboard/project/_/settings/general) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
 
 </Admonition>
 
@@ -51,7 +51,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit-acce
 
 Once temporary access has been enabled, project users must be authorized and mapped to Postgres roles they are allowed to access. Each user can be authorized to "assume" one or more Postgres roles using temporary access.
 
-When a user is authorized to assume a Postgres role, the user's access token (Personal Access Token (PAT) or Scoped PAT) will be used as the password for the Postgres role.
+When a user is authorized to assume a Postgres role, the user's Personal Access Token (PAT) will be used as the password for the Postgres role.
 
 <Admonition type="note">
 
