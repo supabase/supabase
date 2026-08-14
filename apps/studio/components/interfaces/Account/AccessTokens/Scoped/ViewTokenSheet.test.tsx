@@ -177,9 +177,16 @@ describe('ViewTokenSheet', () => {
     fireEvent.click(screen.getByText('Advisors'))
     fireEvent.click(screen.getByText('Database'))
 
-    expect(screen.getByTitle('/v1/projects/{ref}/advisors/security')).toBeInTheDocument()
-    expect(screen.getByTitle('/v1/projects/{ref}/database')).toBeInTheDocument()
-    expect(screen.getByTitle('/v1/projects/{ref}/database/query')).toBeInTheDocument()
+    // Endpoint rows are copy buttons, so their accessible name carries the method and path.
+    expect(
+      screen.getByRole('button', { name: 'Copy GET /v1/projects/{ref}/advisors/security' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Copy GET /v1/projects/{ref}/database' })
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Copy POST /v1/projects/{ref}/database/query' })
+    ).toBeInTheDocument()
     // Every method renders as a badge; non-GET methods get the tinted warning variant.
     expect(screen.getByText('POST')).toBeInTheDocument()
 
