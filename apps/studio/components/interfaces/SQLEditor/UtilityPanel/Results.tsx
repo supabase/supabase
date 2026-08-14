@@ -2,6 +2,7 @@ import { Copy, Expand } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import {
+  cn,
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
@@ -18,7 +19,13 @@ import {
 } from './Results.utils'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
-export const Results = ({ rows }: { rows: readonly any[] }) => {
+interface ResultsProps {
+  rows: readonly any[]
+  /** Lets embedded result tables match the typography of their containing surface. */
+  headerClassName?: string
+}
+
+export const Results = ({ rows, headerClassName }: ResultsProps) => {
   const [expandedCell, setExpandedCell] = useState<{ column: string; value: any } | null>(null)
   const contextMenuCellRef = useRef<{ column: string; value: any } | null>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
@@ -42,7 +49,16 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
   }, [])
 
   const columnRender = (name: string) => {
-    return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
+    return (
+      <div
+        className={cn(
+          'flex h-full items-center justify-center',
+          headerClassName ?? 'font-mono text-xs'
+        )}
+      >
+        {name}
+      </div>
+    )
   }
 
   const columns: CalculatedColumn<any>[] = useMemo(
