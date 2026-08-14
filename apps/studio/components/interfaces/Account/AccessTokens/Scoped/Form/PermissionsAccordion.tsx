@@ -7,19 +7,24 @@ import {
   type PermissionMode,
   type PermissionSelection,
 } from '../../AccessToken.permissions'
+import type { TokenAccessEvaluation } from '../../AccessToken.roles'
 import { PermissionRow } from './PermissionRow'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
+import { DOCS_URL } from '@/lib/constants'
 
 interface PermissionsAccordionProps {
   selection: PermissionSelection
   onChange: (key: string, mode: PermissionMode) => void
   permissionScopeMap: PermissionScopeMap | undefined
+  access?: TokenAccessEvaluation
 }
 
 export const PermissionsAccordion = ({
   selection,
   onChange,
   permissionScopeMap,
+  access,
 }: PermissionsAccordionProps) => {
   const [openCategories, setOpenCategories] = useState<string[]>([])
 
@@ -28,7 +33,12 @@ export const PermissionsAccordion = ({
       <div>
         <h3 className="text-sm text-foreground">Permissions</h3>
         <p className="text-foreground-lighter text-sm">
-          Grant the minimum access this token needs. Everything defaults to None.
+          Grant the minimum access this token needs. Everything defaults to None. Permissions follow
+          your role in the organizations and projects you're a member of — see{' '}
+          <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
+            access control
+          </InlineLink>{' '}
+          for how roles work.
         </p>
       </div>
 
@@ -72,6 +82,7 @@ export const PermissionsAccordion = ({
                         mode={selection[entry.key] ?? 'none'}
                         onChange={(mode) => onChange(entry.key, mode)}
                         permissionScopeMap={permissionScopeMap}
+                        entryAccess={access?.entries[entry.key]}
                       />
                     </div>
                   ))}

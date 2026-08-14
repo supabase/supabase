@@ -117,12 +117,10 @@ check_logs db \
 check_logs auth \
     'db worker started'
 
-check_logs_if_running kong \
-    'init.lua.*declarative config loaded'
-
-check_logs_if_running api-gw \
-     'Envoy configuration generated successfully' \
-     'Starting Envoy...'
+# API gateway: Envoy by default, or Kong when the kong override is enabled.
+# The service is named api-gw in both cases, so accept either startup marker.
+check_logs api-gw \
+    'init\.lua.*declarative config loaded|Envoy configuration generated successfully'
 
 check_logs rest \
     'Schema cache loaded in.*milliseconds'

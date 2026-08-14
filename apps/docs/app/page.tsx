@@ -177,7 +177,7 @@ const additionalResources = [
     title: 'AI tools',
     description: 'Develop with Supabase AI-first using plugins, MCP, and skills.',
     icon: 'ai-tools',
-    href: '/guides/ai',
+    href: '/guides/ai-tools',
   },
   {
     title: 'Platform guides',
@@ -204,10 +204,10 @@ const additionalResources = [
     href: '/guides/integrations',
   },
   {
-    title: 'Supabase UI',
+    title: 'Supabase Library',
     description: 'A collection of pre-built Supabase components to speed up your project.',
     icon: 'ui',
-    href: 'https://supabase.com/ui',
+    href: 'https://supabase.com/library',
     external: true,
   },
   {

@@ -1,71 +1,62 @@
 import dayjs from 'dayjs'
 import { useMemo } from 'react'
-import { Badge, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import {
   computeOverallRisk,
-  PERMISSION_CATALOG_BY_CATEGORY,
+  PERMISSION_MODE_LABEL,
   selectionToScopes,
-  type OverallRisk,
-  type PermissionCatalogEntry,
-  type PermissionMode,
-  type RiskLevel,
 } from '../../AccessToken.permissions'
-import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
-import { McpUnsupportedWarning } from '../McpUnsupportedWarning'
-import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
 import {
-  getEnabledEndpointsForCapability,
-  getEnabledMcpTools,
-  PermissionScopeMap,
-} from '@/data/scoped-access-tokens/permission-scope-map-query'
+  groupFailingResources,
+  TOKEN_ROLE_LABEL,
+  type TokenAccessEvaluation,
+} from '../../AccessToken.roles'
+import { useCapabilitySummary } from '../../hooks/useCapabilitySummary'
+import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
+import { failingResourceLine } from '../ExceedsRoleBadge'
+import { CapabilityCategoryList, ResourceSummaryItem, RiskLevelSummary } from '../TokenSummaryRows'
+import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
+import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
 interface ReviewStepProps {
   values: TokenFormValues
+  access: TokenAccessEvaluation
   permissionScopeMap: PermissionScopeMap | undefined
-  /** Switches the form back to step one in legacy (account-wide) token mode. */
-  onSelectLegacyToken: () => void
-}
-
-const RISK_TONE_VARIANT: Record<
-  OverallRisk['tone'],
-  'default' | 'success' | 'warning' | 'destructive'
-> = {
-  default: 'default',
-  low: 'success',
-  medium: 'warning',
-  high: 'destructive',
-}
-
-const modeLabel = (mode: PermissionMode) =>
-  mode === 'readwrite' ? 'Read-write' : mode === 'read' ? 'Read' : 'None'
-
-const RISK_DOT_CLASS: Record<RiskLevel, string> = {
-  low: 'bg-brand-600',
-  medium: 'bg-warning-600',
-  high: 'bg-destructive-600',
 }
 
 export const NewScopedTokenFormReview = ({
   values,
+  access,
   permissionScopeMap,
-  onSelectLegacyToken,
 }: ReviewStepProps) => {
   const { organizations, projects } = useOrgAndProjectData()
   const selection = values.permissions
   const grantedScopes = useMemo(() => selectionToScopes(selection), [selection])
+
+  const hasExceedingCapabilities = access.exceedingEntryKeys.length > 0
+
+  // Exceeded permissions grouped by the resource where they fail, so the admonition reads per
+  // org/project rather than as one flat permission list.
+  const exceedingByResource = useMemo(
+    () => groupFailingResources(access, selection),
+    [access, selection]
+  )
+
   const risk = useMemo(
-    () => computeOverallRisk(selection, values.resourceAccess),
-    [selection, values.resourceAccess]
+    () => computeOverallRisk(access.effectiveSelection, values.resourceAccess),
+    [access.effectiveSelection, values.resourceAccess]
   )
 
   const resourceSummary = useMemo(() => {
     if (values.resourceAccess === 'project') {
       const selectedProjects = projects.filter((p) => values.projectRefs.includes(p.ref))
       return {
-        title: 'Project',
-        items: selectedProjects.length > 0 ? selectedProjects.map((p) => p.name) : ['-'],
+        title: 'Projects',
+        items:
+          selectedProjects.length > 0
+            ? selectedProjects.map((p) => ({ key: p.ref, label: p.name, sublabel: p.ref }))
+            : [{ key: 'none', label: '-', sublabel: undefined }],
       }
     }
     if (values.resourceAccess === 'organization') {
@@ -73,11 +64,17 @@ export const NewScopedTokenFormReview = ({
         values.organizationSlugs.includes(o.slug)
       )
       return {
-        title: 'Organization',
-        items: selectedOrganizations.length > 0 ? selectedOrganizations.map((o) => o.name) : ['-'],
+        title: 'Organizations',
+        items:
+          selectedOrganizations.length > 0
+            ? selectedOrganizations.map((o) => ({ key: o.slug, label: o.name, sublabel: o.slug }))
+            : [{ key: 'none', label: '-', sublabel: undefined }],
       }
     }
-    return { title: 'Account', items: ['Account-level access'] }
+    return {
+      title: 'Account',
+      items: [{ key: 'account', label: 'Account-level access', sublabel: undefined }],
+    }
   }, [values, projects, organizations])
 
   const expiresSummary = useMemo(() => {
@@ -89,43 +86,13 @@ export const NewScopedTokenFormReview = ({
     return EXPIRY_OPTIONS.find((o) => o.value === values.expiresAt)?.label ?? values.expiresAt
   }, [values])
 
-  const activeByCategory = useMemo(
-    () =>
-      PERMISSION_CATALOG_BY_CATEGORY.map((category) => ({
-        ...category,
-        entries: category.entries
-          .map((entry) => ({ entry, mode: selection[entry.key] ?? 'none' }))
-          .filter(({ mode }) => mode !== 'none'),
-      })).filter((category) => category.entries.length > 0),
-    [selection]
-  )
-
   const hasCapabilities = grantedScopes.length > 0
 
-  const mcpTools = useMemo(
-    () => getEnabledMcpTools({ grantedScopes, permissionScopeMap }),
-    [grantedScopes, permissionScopeMap]
-  )
-
-  const capabilityGroups = useMemo(() => {
-    const groups: { entry: PermissionCatalogEntry; mode: PermissionMode; endpoints: string[][] }[] =
-      []
-    for (const category of activeByCategory) {
-      for (const { entry, mode } of category.entries) {
-        const capabilityScopes =
-          mode === 'readwrite' ? [...entry.readScopes, ...entry.writeScopes] : entry.readScopes
-        const endpoints = getEnabledEndpointsForCapability({
-          capabilityScopes,
-          allGrantedScopes: grantedScopes,
-          permissionScopeMap,
-        })
-        if (endpoints.length > 0) {
-          groups.push({ entry, mode, endpoints: endpoints.map((e) => [e.method, e.path]) })
-        }
-      }
-    }
-    return groups
-  }, [activeByCategory, grantedScopes, permissionScopeMap])
+  const { activeByCategory, mcpTools, capabilityGroups } = useCapabilitySummary({
+    selection,
+    grantedScopes,
+    permissionScopeMap,
+  })
 
   const rows: [string, React.ReactNode][] = [
     ['Name', values.tokenName || <span className="text-foreground-lighter">Untitled token</span>],
@@ -138,9 +105,7 @@ export const NewScopedTokenFormReview = ({
         </p>
         <div className="divide-y">
           {resourceSummary.items.map((item) => (
-            <p key={item} className="py-2 text-sm text-foreground">
-              {item}
-            </p>
+            <ResourceSummaryItem key={item.key} label={item.label} sublabel={item.sublabel} />
           ))}
         </div>
       </div>,
@@ -148,66 +113,51 @@ export const NewScopedTokenFormReview = ({
     [
       'Capabilities',
       hasCapabilities ? (
-        <div className="space-y-4">
-          {activeByCategory.map((category) => (
-            <div key={category.key} className="space-y-2">
-              <p className="text-[11px] font-mono uppercase tracking-wide text-foreground-lighter">
-                {category.name}
-              </p>
-              <div className="divide-y">
-                {category.entries.map(({ entry, mode }) => (
-                  <div
-                    key={entry.key}
-                    className="flex items-center justify-between gap-2 text-sm py-2"
-                  >
-                    <span className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          'h-1.5 w-1.5 shrink-0 rounded-full',
-                          RISK_DOT_CLASS[entry.risk]
-                        )}
-                      />
-                      <span className="text-foreground text-wrap">{entry.name}</span>
-                    </span>
-                    <span className="text-foreground-lighter text-xs font-mono uppercase font-normal text-right">
-                      {modeLabel(mode)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <CapabilityCategoryList categories={activeByCategory} accessEntries={access.entries} />
       ) : (
         <span className="text-foreground-lighter">No capabilities selected</span>
       ),
     ],
     [
       'Risk level',
-      <span key="risk" className="flex flex-wrap items-center gap-2">
-        <span className="flex">
-          <Badge variant={RISK_TONE_VARIANT[risk.tone]}>{risk.level} Risk</Badge>
-        </span>
-        <span className="text-sm text-foreground leading-px">
-          {risk.text.replace(`${risk.level} — `, '')}
-        </span>
-      </span>,
+      <RiskLevelSummary key="risk" risk={risk} showRoleCaveat={hasExceedingCapabilities} />,
     ],
   ]
 
   return (
     <div className="space-y-6 px-5 sm:px-6 py-6">
-      {hasCapabilities ? (
-        <Admonition
-          type="warning"
-          title="Token access can't be updated after creation"
-          description="To change its access, delete this token and create a new one."
-        />
-      ) : (
+      {!hasCapabilities && (
         <Admonition
           type="warning"
           title="This token has no capabilities"
           description="Go back and grant at least one permission before creating it."
+        />
+      )}
+      {hasExceedingCapabilities && (
+        <Admonition
+          type="warning"
+          title="Some permissions exceed your current role for the selected resources"
+          description={
+            <div className="space-y-2">
+              <p>
+                A token only works with permissions you currently hold. Requests with these
+                permissions will be denied until your role includes them:
+              </p>
+              {exceedingByResource.map((group) => (
+                <div key={`${group.type}:${group.resource.id}`}>
+                  <p className="font-medium">{failingResourceLine(group.resource)}</p>
+                  <ul className="list-disc pl-4">
+                    {group.entries.map((groupEntry) => (
+                      <li key={groupEntry.key}>
+                        {groupEntry.name} ({PERMISSION_MODE_LABEL[groupEntry.mode]}) — requires{' '}
+                        {TOKEN_ROLE_LABEL[groupEntry.requiredRole]}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          }
         />
       )}
       <div className="flex flex-col gap-3">
@@ -236,7 +186,7 @@ export const NewScopedTokenFormReview = ({
                   <div className="flex items-center justify-between border-b bg-surface-100 px-3 py-2">
                     <span className="text-xs text-foreground">{entry.name}</span>
                     <span className="text-[11px] font-mono uppercase text-foreground-lighter">
-                      {mode === 'readwrite' ? 'Read-write' : 'Read'}
+                      {PERMISSION_MODE_LABEL[mode]}
                     </span>
                   </div>
                   <div className="divide-y">
@@ -257,7 +207,6 @@ export const NewScopedTokenFormReview = ({
 
           <div className="flex flex-col gap-3">
             <h3 className="text-sm">MCP tools</h3>
-            <McpUnsupportedWarning onSelectLegacyToken={onSelectLegacyToken} />
             {mcpTools.length === 0 ? (
               <p className="text-xs text-foreground-light">
                 No MCP tools are enabled by the selected capabilities.

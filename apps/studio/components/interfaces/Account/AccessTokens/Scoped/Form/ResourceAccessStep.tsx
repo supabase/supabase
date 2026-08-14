@@ -24,9 +24,11 @@ import {
 } from 'ui-patterns/multi-select'
 
 import type { ResourceAccessMode } from '../../AccessToken.permissions'
+import { getIsProjectScopedOnly } from '../../AccessToken.roles'
 import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
 import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
 import { Organization } from '@/types'
 
@@ -89,6 +91,20 @@ export const ResourceAccessStep = ({
   const resourceAccess = useWatch({ control, name: 'resourceAccess' })
   const organizationSlugs = useWatch({ control, name: 'organizationSlugs', defaultValue: [] })
 
+  // Users invited to specific projects (rather than the whole org) can't select that org for an
+  // org-wide token. Skipped while permissions are still loading so nothing gets disabled by
+  // mistake. The project list itself needs no permission filter — /platform/projects is already
+  // scoped server-side to what the user can access.
+  const { data: permissions } = usePermissionsQuery()
+  const projectScopedOrgSlugs = useMemo(() => {
+    if (permissions === undefined) return new Set<string>()
+    return new Set(
+      organizations
+        .map((org) => org.slug)
+        .filter((slug) => getIsProjectScopedOnly(permissions, slug))
+    )
+  }, [permissions, organizations])
+
   const projectsForOrg = useMemo(
     () => projects.filter((project) => organizationSlugs.includes(project.organization_slug)),
     [projects, organizationSlugs]
@@ -105,12 +121,12 @@ export const ResourceAccessStep = ({
             label="Resource access"
             description={
               <p className="text-foreground-lighter text-sm">
-                Need a token with full access to your account or one for the Supabase MCP server?{' '}
+                Need a token with full access to your account?{' '}
                 <button
                   type="button"
+                  tabIndex={0}
                   className={InlineLinkClassName}
                   onClick={onSelectLegacyToken}
-                  tabIndex={0}
                 >
                   Create legacy token
                 </button>
@@ -198,7 +214,7 @@ export const ResourceAccessStep = ({
                 <MultiSelector
                   onValuesChange={field.onChange}
                   values={field.value}
-                  disabled={!organizationSlugs}
+                  disabled={organizationSlugs.length === 0}
                   className="w-full"
                 >
                   <MultiSelectorTrigger
@@ -257,11 +273,26 @@ export const ResourceAccessStep = ({
                 <MultiSelectorContent>
                   <MultiSelectorInput placeholder="Search organizations" showResetIcon />
                   <MultiSelectorList>
-                    {organizations.map((organization) => (
-                      <MultiSelectorItem key={organization.slug} value={organization.slug}>
-                        {organization.name}
-                      </MultiSelectorItem>
-                    ))}
+                    {organizations.map((organization) => {
+                      const isProjectScopedOnly = projectScopedOrgSlugs.has(organization.slug)
+                      return (
+                        <MultiSelectorItem
+                          key={organization.slug}
+                          value={organization.slug}
+                          disabled={isProjectScopedOnly}
+                        >
+                          <span className="flex flex-col gap-0.5">
+                            <span>{organization.name}</span>
+                            {isProjectScopedOnly && (
+                              <span className="text-foreground-lighter">
+                                Your access is limited to specific projects. Create a project-scoped
+                                token instead.
+                              </span>
+                            )}
+                          </span>
+                        </MultiSelectorItem>
+                      )
+                    })}
                   </MultiSelectorList>
                 </MultiSelectorContent>
               </MultiSelector>

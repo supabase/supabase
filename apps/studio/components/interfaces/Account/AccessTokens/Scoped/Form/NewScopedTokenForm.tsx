@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { CLASSIC_TOKEN_WARNING } from '../../AccessToken.constants'
 import { countConfigured, PermissionMode } from '../../AccessToken.permissions'
+import { useTokenAccessEvaluation } from '../../hooks/useTokenAccessEvaluation'
 import { DEFAULT_EXPIRY, TokenFormSchema, TokenFormValues } from './NewScopedTokenForm.utils'
 import { NewScopedTokenFormReview } from './NewScopedTokenFormReview'
 import { PermissionsAccordion } from './PermissionsAccordion'
@@ -49,10 +50,24 @@ export const NewScopedTokenForm = ({
   const resourceSectionRef = useRef<HTMLDivElement>(null)
   const resourceAccess = useWatch({ control: form.control, name: 'resourceAccess' })
   const selection = useWatch({ control: form.control, name: 'permissions' })
+  const organizationSlugs = useWatch({
+    control: form.control,
+    name: 'organizationSlugs',
+    defaultValue: [],
+  })
+  const projectRefs = useWatch({ control: form.control, name: 'projectRefs', defaultValue: [] })
   const configuredCount = useWatch({
     control: form.control,
     name: 'permissions',
     compute: (selection) => countConfigured(selection),
+  })
+
+  const access = useTokenAccessEvaluation({
+    selection,
+    resourceAccess,
+    organizationSlugs,
+    projectRefs,
+    enabled: resourceAccess !== 'account',
   })
 
   const { data: permissionScopeMap, isError } = useGetEnabledEndpointsForCapability()
@@ -140,6 +155,7 @@ export const NewScopedTokenForm = ({
                     selection={selection}
                     onChange={handlePermissionChange}
                     permissionScopeMap={permissionScopeMap}
+                    access={access}
                   />
                   {showMissingPermissionsWarning && (
                     <div className="space-y-3 px-5 sm:px-6 pb-6">
@@ -160,11 +176,8 @@ export const NewScopedTokenForm = ({
         ) : (
           <NewScopedTokenFormReview
             values={formValues}
+            access={access}
             permissionScopeMap={permissionScopeMap}
-            onSelectLegacyToken={() => {
-              handleSelectLegacyMode()
-              setStep('form')
-            }}
           />
         )}
       </ScrollArea>
@@ -174,11 +187,16 @@ export const NewScopedTokenForm = ({
         ) : (
           <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
         )}
-        <div className="flex gap-2">
+        <div className="flex items-center gap-3">
           {step === 'review' && (
-            <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
-              Back
-            </Button>
+            <>
+              <span className="text-xs text-foreground-lighter">
+                Access can't be changed after creation
+              </span>
+              <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
+                Back
+              </Button>
+            </>
           )}
           <SheetClose asChild disabled={isPending}>
             <Button variant="default">Cancel</Button>

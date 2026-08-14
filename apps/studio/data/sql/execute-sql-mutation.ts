@@ -12,6 +12,7 @@ import {
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
 import { handleError as handleErrorFetchers, post } from '@/data/fetchers'
+import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
 import { sqlEventParser } from '@/lib/sql-event-parser'
 import { useTrack } from '@/lib/telemetry/track'
@@ -159,7 +160,7 @@ export async function executeSql<T = any>(
 
     const key =
       queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ?? ''
-    const result = await post('/platform/pg-meta/{ref}/query', {
+    const result = await post(QUERY_SOURCE_REGISTRY.database.endpoint, {
       ...options,
       body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
       params: {

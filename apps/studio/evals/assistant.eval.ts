@@ -37,6 +37,7 @@ Eval('Assistant', {
     try {
       const result = await generateAssistantResponse({
         ...modelResponse.modelParams,
+        isExplorerEnabled: true,
         messages: [
           {
             id: '1',

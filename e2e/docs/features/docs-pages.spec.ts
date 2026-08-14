@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { TestInfo } from '@playwright/test'
 
+import { parsePagePaths } from '../../shared/paths.ts'
 import {
   attachScanReport,
   blockingViolations,
@@ -11,15 +12,15 @@ import {
   settleForAxe,
   shouldEnforceAll,
   unloadedResult,
+  violationIds,
 } from '../utils/axe-helpers.js'
 import {
   articleSelectorForPagePath,
   browserLikeUserAgent,
   collectDocsOwnedLinks,
-  parseDocsE2EPagePaths,
 } from '../utils/docs-links.js'
 
-const pagePaths = parseDocsE2EPagePaths(process.env.DOCS_E2E_PAGE_PATHS)
+const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
 
 function annotate(testInfo: TestInfo, description: string) {
   testInfo.annotations.push({ type: 'warning', description })
@@ -27,10 +28,7 @@ function annotate(testInfo: TestInfo, description: string) {
 }
 
 test.describe('Docs owned pages', () => {
-  // playwright.config.ts sets fullyParallel: false, and Playwright shards
-  // work by file rather than by test in that mode — without this, every test
-  // in this single spec file runs on one worker no matter what --workers is
-  // passed. Opt this describe block into parallel scheduling explicitly.
+  // Without this, every test in this file runs on one worker.
   test.describe.configure({ mode: 'parallel' })
 
   test('resolved page list must not be empty', () => {
@@ -140,7 +138,7 @@ test.describe('Docs owned pages', () => {
       const enforced = shouldEnforceAll() ? 'all WCAG 2.1 A/AA rules' : ENFORCED_RULES.join(', ')
 
       expect(
-        blocking,
+        violationIds(blocking),
         `${pagePath} has blocking a11y violations (${enforced}):\n${formatViolations(blocking)}`
       ).toEqual([])
     })
