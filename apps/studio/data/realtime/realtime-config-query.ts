@@ -12,6 +12,7 @@ export type RealtimeConfigurationVariables = {
 export const REALTIME_DEFAULT_CONFIG = {
   private_only: false,
   connection_pool: 2,
+  postgres_changes_pool: 2,
   max_concurrent_users: 200,
   max_events_per_second: 100,
   max_bytes_per_second: 100000,

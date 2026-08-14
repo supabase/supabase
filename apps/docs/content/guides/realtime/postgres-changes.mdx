@@ -3631,6 +3631,7 @@ For most applications this is plenty. To get the best performance:
 
 - Use [filters](#available-filters) and [column selection](#selecting-specific-columns) to send each client only the events and columns it needs.
 - Keep authorization cheap by writing , indexed [RLS policies](/docs/guides/database/postgres/row-level-security).
+- Raise `Postgres Changes connection pool size` in [Realtime Settings](/docs/guides/realtime/settings) if many clients subscribe at the same time. Realtime uses this pool to write subscriptions to your database, so a pool that's too small makes subscriptions queue and eventually time out.
 
 Use the estimator below to gauge the maximum throughput for your instance, and run your own benchmarks to confirm it fits your use case:
 

@@ -64,7 +64,9 @@ The number of connections varies based on your compute add-on size and configura
 
 <Admonition type="note">
 
-You can customize `Authorization Pool Size` through the `Database connection pool size` parameter in your Realtime configuration. If not specified, the default values shown in the table will be used.
+You can customize `Authorization Pool Size` through the `Database connection pool size` parameter, and `Subscription management` through the `Postgres Changes connection pool size` parameter, in your Realtime configuration. If not specified, the default values shown in the table are used.
+
+Both pools open connections against the same database, so size them together. Raising `Subscription management` increases how many Postgres Changes subscriptions Realtime can create at once, which helps when many clients subscribe simultaneously, such as after a deployment or a network reconnect.
 
 </Admonition>
 

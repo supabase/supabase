@@ -14,6 +14,7 @@ export async function updateRealtimeConfiguration({
   ref,
   private_only,
   connection_pool,
+  postgres_changes_pool,
   max_concurrent_users,
   max_events_per_second,
   max_bytes_per_second,
@@ -30,6 +31,7 @@ export async function updateRealtimeConfiguration({
     body: {
       private_only,
       connection_pool,
+      postgres_changes_pool,
       max_concurrent_users,
       max_events_per_second,
       max_bytes_per_second,
