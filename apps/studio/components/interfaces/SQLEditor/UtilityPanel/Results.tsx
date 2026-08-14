@@ -11,7 +11,11 @@ import {
 
 import { CellDetailPanel } from './CellDetailPanel'
 import { ResultCell } from './ResultCell'
-import { formatClipboardValue } from './Results.utils'
+import {
+  calculateResultColumnWidth,
+  formatClipboardValue,
+  RESULT_COLUMN_MIN_WIDTH,
+} from './Results.utils'
 import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
 
 export const Results = ({ rows }: { rows: readonly any[] }) => {
@@ -41,22 +45,9 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
     return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
   }
 
-  const EST_CHAR_WIDTH = 8.25
-  const MIN_COLUMN_WIDTH = 100
-  const MAX_COLUMN_WIDTH = 500
-
   const columns: CalculatedColumn<any>[] = useMemo(
     () =>
       Object.keys(rows?.[0] ?? []).map((key, idx) => {
-        const maxColumnValueLength = rows
-          .map((row) => String(row[key]).length)
-          .reduce((a, b) => Math.max(a, b), 0)
-
-        const columnWidth = Math.max(
-          Math.min(maxColumnValueLength * EST_CHAR_WIDTH, MAX_COLUMN_WIDTH),
-          MIN_COLUMN_WIDTH
-        )
-
         return {
           idx,
           key,
@@ -64,8 +55,8 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
           resizable: true,
           parent: undefined,
           level: 0,
-          width: columnWidth,
-          minWidth: MIN_COLUMN_WIDTH,
+          width: calculateResultColumnWidth(key, rows),
+          minWidth: RESULT_COLUMN_MIN_WIDTH,
           maxWidth: undefined,
           draggable: false,
           frozen: false,
@@ -88,11 +79,9 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
   return (
     <>
       {rows.length === 0 ? (
-        <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
-          <p className="m-0 border-0 px-4 py-3 font-mono text-sm text-foreground-light">
-            Success. No rows returned
-          </p>
-        </div>
+        <p className="px-4 py-3 font-mono text-sm text-foreground-light">
+          Success. No rows returned
+        </p>
       ) : (
         <>
           <ContextMenu modal={false}>

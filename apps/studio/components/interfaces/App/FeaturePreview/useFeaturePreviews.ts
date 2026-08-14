@@ -1,6 +1,8 @@
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useMemo } from 'react'
 
+import { type BannerId } from '@/components/ui/BannerStack/BannerStackProvider'
+
 export type FeaturePreview = {
   key: string
   name: string
@@ -12,6 +14,12 @@ export type FeaturePreview = {
   isDefaultOptIn: boolean
   /** Visibility in the feature preview modal (For feature flagging a feature preview) */
   enabled: boolean
+  /**
+   * Forces the preview on for this user, whatever they previously chose — for a
+   * preview that has become the default behavior. Overrides both `isDefaultOptIn`
+   * and a stored opt-out, and takes away the ability to turn the preview back off.
+   */
+  isForced?: boolean
   /** Optional category that the feature preview falls under, defaults to "Others" in the UI otherwise */
   category?: 'observability' | 'database'
   /**
@@ -19,16 +27,17 @@ export type FeaturePreview = {
    * feature has no single destination (e.g. a global layout change).
    */
   getRoute?: (ref?: string) => string
+  bannerId?: BannerId
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
-  const isSqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
   const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
 
   const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
+  const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
   return useMemo(() => {
     const previews: FeaturePreview[] = [
@@ -111,7 +120,11 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         isNew: true,
         isPlatformOnly: true,
         isDefaultOptIn: false,
-        enabled: isSqlEditorManualSaveEnabled,
+        enabled: true,
+        // Manual saving is becoming the default for the SQL Editor. The preview
+        // stays listed so users who lose their local storage can opt back in
+        // before the rollout reaches them.
+        isForced: isSqlEditorManualSaveForced,
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
@@ -123,16 +136,17 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         isDefaultOptIn: false,
         enabled: isDatabaseConnectionsEnabled,
         getRoute: (ref?: string) => `/project/${ref}/observability/connections`,
+        bannerId: 'database-connections-banner',
       },
     ]
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
   }, [
     unifiedLogsDefaultOptIn,
+    isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
     isMarketplaceEnabled,
-    isSqlEditorManualSaveEnabled,
     isDatabaseConnectionsEnabled,
   ])
 }

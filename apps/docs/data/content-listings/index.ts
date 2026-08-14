@@ -23,10 +23,8 @@ import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realt
 import { resourcesMigrate, resourcesOverview, resourcesPostgres } from './resources.data'
 import {
   selfHostingCommunity,
-  selfHostingGetHelp,
   selfHostingGetStarted,
-  selfHostingResolveIssues,
-  selfHostingShareExperience,
+  selfHostingSupport,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 import { telemetryDebugging, telemetryMonitoring } from './telemetry.data'
@@ -59,9 +57,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   resourcesPostgres,
   selfHostingGetStarted,
   selfHostingCommunity,
-  selfHostingResolveIssues,
-  selfHostingGetHelp,
-  selfHostingShareExperience,
+  selfHostingSupport,
   storageGetStarted,
   storageExamples,
   storageResources,

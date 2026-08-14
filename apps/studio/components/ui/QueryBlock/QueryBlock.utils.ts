@@ -1,7 +1,7 @@
-import type { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-
-export const checkHasNonPositiveValues = (data: Record<string, unknown>[], key: string): boolean =>
-  data.some((row) => (row[key] as number) <= 0)
+export const checkHasNonPositiveValues = (
+  data: readonly Record<string, unknown>[],
+  key: string
+): boolean => data.some((row) => (row[key] as number) <= 0)
 
 export const formatYAxisTick = (value: number): string => {
   if (Math.abs(value) >= 1_000_000) {
@@ -47,7 +47,10 @@ export const formatLogTick = (value: number): string => {
   return value.toLocaleString()
 }
 
-export const getCumulativeResults = (results: { rows: readonly any[] }, config: ChartConfig) => {
+export const getCumulativeResults = (
+  results: { rows: readonly any[] },
+  config: { yKey: string }
+) => {
   if (!results?.rows?.length) {
     return []
   }

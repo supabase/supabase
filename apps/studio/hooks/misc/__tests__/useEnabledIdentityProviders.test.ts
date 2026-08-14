@@ -24,15 +24,20 @@ vi.mock('common', async (importOriginal) => ({
   useFlag: mockUseFlag,
 }))
 
+function mockFeatures({ github = false, chatgpt = true }: { github?: boolean; chatgpt?: boolean }) {
+  mockIsFeatureEnabled.mockReturnValue({
+    dashboardAuthSignInWithGithub: github,
+    dashboardAuthSignInWithChatgpt: chatgpt,
+  })
+}
+
 describe('useEnabledIdentityProviders', () => {
   beforeEach(() => {
     mockUseFlag.mockReset()
   })
 
   it('returns every provider when all flags are enabled', () => {
-    mockIsFeatureEnabled.mockReturnValue({
-      dashboardAuthSignInWithGithub: true,
-    })
+    mockFeatures({ github: true, chatgpt: true })
     mockUseLocalStorageQuery.mockReturnValue([true])
     mockUseFlag.mockReturnValue(true)
 
@@ -42,9 +47,7 @@ describe('useEnabledIdentityProviders', () => {
   })
 
   it('returns no providers when all flags are disabled', () => {
-    mockIsFeatureEnabled.mockReturnValue({
-      dashboardAuthSignInWithGithub: false,
-    })
+    mockFeatures({ github: false, chatgpt: false })
     mockUseLocalStorageQuery.mockReturnValue([false])
     mockUseFlag.mockReturnValue(false)
 
@@ -54,7 +57,7 @@ describe('useEnabledIdentityProviders', () => {
   })
 
   it('includes ChatGPT when localStorage is true and configcat is true', () => {
-    mockIsFeatureEnabled.mockReturnValue({ dashboardAuthSignInWithGithub: false })
+    mockFeatures({ chatgpt: true })
     mockUseLocalStorageQuery.mockReturnValue([true])
     mockUseFlag.mockReturnValue(true)
 
@@ -64,7 +67,7 @@ describe('useEnabledIdentityProviders', () => {
   })
 
   it('includes ChatGPT when localStorage is true and configcat is false', () => {
-    mockIsFeatureEnabled.mockReturnValue({ dashboardAuthSignInWithGithub: false })
+    mockFeatures({ chatgpt: true })
     mockUseLocalStorageQuery.mockReturnValue([true])
     mockUseFlag.mockReturnValue(false)
 
@@ -74,7 +77,7 @@ describe('useEnabledIdentityProviders', () => {
   })
 
   it('includes ChatGPT when localStorage is false and configcat is true', () => {
-    mockIsFeatureEnabled.mockReturnValue({ dashboardAuthSignInWithGithub: false })
+    mockFeatures({ chatgpt: true })
     mockUseLocalStorageQuery.mockReturnValue([false])
     mockUseFlag.mockReturnValue(true)
 
@@ -84,7 +87,7 @@ describe('useEnabledIdentityProviders', () => {
   })
 
   it('excludes ChatGPT when localStorage is false and configcat is false', () => {
-    mockIsFeatureEnabled.mockReturnValue({ dashboardAuthSignInWithGithub: false })
+    mockFeatures({ chatgpt: true })
     mockUseLocalStorageQuery.mockReturnValue([false])
     mockUseFlag.mockReturnValue(false)
 
@@ -93,8 +96,38 @@ describe('useEnabledIdentityProviders', () => {
     expect(result.current).toEqual([])
   })
 
+  it('excludes ChatGPT when its feature flag is disabled but configcat is true', () => {
+    mockFeatures({ chatgpt: false })
+    mockUseLocalStorageQuery.mockReturnValue([false])
+    mockUseFlag.mockReturnValue(true)
+
+    const { result } = renderHook(() => useEnabledIdentityProviders())
+
+    expect(result.current).toEqual([])
+  })
+
+  it('excludes ChatGPT when its feature flag is disabled but localStorage is opted in', () => {
+    mockFeatures({ chatgpt: false })
+    mockUseLocalStorageQuery.mockReturnValue([true])
+    mockUseFlag.mockReturnValue(false)
+
+    const { result } = renderHook(() => useEnabledIdentityProviders())
+
+    expect(result.current).toEqual([])
+  })
+
+  it('excludes ChatGPT when its feature flag is disabled and both rollout gates are on', () => {
+    mockFeatures({ github: true, chatgpt: false })
+    mockUseLocalStorageQuery.mockReturnValue([true])
+    mockUseFlag.mockReturnValue(true)
+
+    const { result } = renderHook(() => useEnabledIdentityProviders())
+
+    expect(result.current).toEqual([GITHUB_IDENTITY_PROVIDER])
+  })
+
   it('includes GitHub when its feature flag is enabled', () => {
-    mockIsFeatureEnabled.mockReturnValue({ dashboardAuthSignInWithGithub: true })
+    mockFeatures({ github: true, chatgpt: true })
     mockUseLocalStorageQuery.mockReturnValue([false])
     mockUseFlag.mockReturnValue(false)
 
@@ -104,7 +137,7 @@ describe('useEnabledIdentityProviders', () => {
   })
 
   it('excludes GitHub when its feature flag is disabled', () => {
-    mockIsFeatureEnabled.mockReturnValue({ dashboardAuthSignInWithGithub: false })
+    mockFeatures({ github: false, chatgpt: true })
     mockUseLocalStorageQuery.mockReturnValue([false])
     mockUseFlag.mockReturnValue(false)
 

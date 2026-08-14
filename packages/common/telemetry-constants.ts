@@ -1401,30 +1401,6 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
 }
 
 /**
- * User clicks on Metrics API banner CTA button in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface MetricsApiBannerCtaButtonClickedEvent {
-  action: 'metrics_api_banner_cta_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * User clicked the dismiss button on a banner in studio Observability pages.
- *
- * @group Events
- * @source studio
- * @page /observability/*
- */
-export interface MetricsApiBannerDismissButtonClickedEvent {
-  action: 'metrics_api_banner_dismiss_button_clicked'
-  groups: TelemetryGroups
-}
-
-/**
  * User clicks on the Unified Logs banner CTA button in studio project pages.
  *
  * @group Events
@@ -1505,6 +1481,33 @@ export interface DatabaseConnectionsLiveModeClickedEvent {
   action: 'database_connections_live_mode_clicked'
   properties: {
     newState: 'enabled' | 'disabled'
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the dismiss button on the Database Connections banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBannerDismissButtonClickedEvent {
+  action: 'database_connections_banner_dismiss_button_clicked'
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the CTA button on the Database Connections banner in studio project pages.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface DatabaseConnectionsBannerCtaButtonClickedEvent {
+  action: 'database_connections_banner_cta_button_clicked'
+  properties: {
+    isEnabled: boolean
   }
   groups: TelemetryGroups
 }
@@ -1595,6 +1598,25 @@ export interface SessionTerminateSubmittedEvent {
     activityState: DatabaseActivityState
     /**
      * Whether the terminated session was itself blocking one or more other sessions.
+     */
+    isBlocking: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User clicked the Cancel query menu item for a database session in the Database Connections activity table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface QueryCancelButtonClickedEvent {
+  action: 'query_cancel_button_clicked'
+  properties: {
+    activityState: DatabaseActivityState
+    /**
+     * Whether the session whose query is being cancelled was itself blocking one or more other sessions.
      */
     isBlocking: boolean
   }
@@ -1850,7 +1872,7 @@ export interface AssistantMessageRatingSubmittedEvent {
  *
  * @group Events
  * @source supabase-ui
- * @page /ui/docs/{framework}/{templateTitle}
+ * @page /library/docs/{framework}/{templateTitle}
  */
 export interface SupabaseUiCommandCopyButtonClickedEvent {
   action: 'supabase_ui_command_copy_button_clicked'
@@ -3398,7 +3420,7 @@ export interface AccessTokenCreatedEvent {
   properties: {
     tokenType: 'classic' | 'scoped'
     expiryPreset: string
-    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    resourceAccess?: 'project' | 'organization' | 'account'
     permissionCount?: number
   }
   groups: Omit<TelemetryGroups, 'project'>
@@ -3754,8 +3776,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | MetricsApiBannerCtaButtonClickedEvent
-  | MetricsApiBannerDismissButtonClickedEvent
   | UnifiedLogsBannerCtaButtonClickedEvent
   | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
@@ -3765,8 +3785,11 @@ export type TelemetryEvent =
   | DatabaseConnectionsOverviewMetricCardClickedEvent
   | DatabaseConnectionsFilterUpdatedEvent
   | DatabaseConnectionsBlockerViewClickedEvent
+  | DatabaseConnectionsBannerDismissButtonClickedEvent
+  | DatabaseConnectionsBannerCtaButtonClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
+  | QueryCancelButtonClickedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent

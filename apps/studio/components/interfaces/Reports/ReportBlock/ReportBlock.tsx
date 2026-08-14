@@ -9,6 +9,7 @@ import { applyAutoLimit } from '../../SQLEditor/SQLEditor.utils'
 import { BURSTABLE_IO_METRIC_KEYS, DEPRECATED_REPORTS } from '../Reports.constants'
 import { ChartBlock } from './ChartBlock'
 import { DeprecatedChartBlock } from './DeprecatedChartBlock'
+import { LogsSnippetReportBlock } from './LogsSnippetReportBlock'
 import { UnavailableChartBlock } from './UnavailableChartBlock'
 import { hasBurstableIO } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
@@ -79,8 +80,11 @@ export const ReportBlock = ({
     }
   )
 
+  const isLogsSnippet = data?.type === 'log_sql'
+
   const autoLimit = 100
-  const sql = isSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
+  const sql =
+    isSnippet && !isLogsSnippet ? (data?.content as SqlSnippets.Content)?.unchecked_sql : undefined
   // acceptUntrustedSql is usually not allowed outside a user-action event
   // handler, but it's explicitly fine here: adding this block to a report is
   // itself the user action that approves running its SQL.
@@ -125,7 +129,7 @@ export const ReportBlock = ({
         sql: formattedSql,
       })
     },
-    enabled: !isLoadingContent && contentError == null,
+    enabled: !isLoadingContent && contentError == null && !isLogsSnippet,
     refetchOnWindowFocus: false,
   })
 
@@ -150,6 +154,25 @@ export const ReportBlock = ({
       refetch()
     }
   }, [isRefreshing, refetch])
+
+  if (isLogsSnippet) {
+    return (
+      <LogsSnippetReportBlock
+        label={item.label}
+        actions={
+          !disableUpdate ? (
+            <ButtonTooltip
+              variant="text"
+              icon={<X />}
+              className="w-7 h-7"
+              onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
+              tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+            />
+          ) : null
+        }
+      />
+    )
+  }
 
   return (
     <>

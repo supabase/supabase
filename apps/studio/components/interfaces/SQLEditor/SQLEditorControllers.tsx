@@ -191,7 +191,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const isExecuting = isExecutingDb || isExecutingLogs
 
-  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt })
+  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt, sqlSource: runSource.type })
   const { acceptAiHandler, discardAiHandler } = ai
 
   useSqlEditorShortcuts({

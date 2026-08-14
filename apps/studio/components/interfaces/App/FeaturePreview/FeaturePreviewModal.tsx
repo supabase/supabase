@@ -42,6 +42,8 @@ import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -62,6 +64,7 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 export const FeaturePreviewModal = () => {
   const router = useRouter()
   const { ref } = useParams()
+  const { dismissBanner } = useBannerStack()
   const featurePreviews = useFeaturePreviews()
   const {
     showFeaturePreviewModal,
@@ -81,6 +84,7 @@ export const FeaturePreviewModal = () => {
     allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
     allFeaturePreviews[0]
   const isSelectedFeatureEnabled = flags[selectedFeature?.key]
+  const canDisableSelectedFeature = selectedFeature?.isForced !== true
 
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
@@ -113,6 +117,7 @@ export const FeaturePreviewModal = () => {
       toast.success(`${selectedFeature.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })
+      if (selectedFeature.bannerId) dismissBanner(selectedFeature.bannerId)
     } else {
       toggleFeaturePreviewModal(false)
       toast.success(`${selectedFeature.name} enabled`, {
@@ -226,11 +231,25 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    {isSelectedFeatureEnabled ? (
-                      <Button variant="default" onClick={() => toggleFeature()}>
+                    {isSelectedFeatureEnabled && (
+                      <ButtonTooltip
+                        variant="default"
+                        disabled={!canDisableSelectedFeature}
+                        onClick={() => toggleFeature()}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            className: 'max-w-64 text-center',
+                            text: canDisableSelectedFeature
+                              ? undefined
+                              : 'This feature is now the default and can no longer be turned off',
+                          },
+                        }}
+                      >
                         Disable feature
-                      </Button>
-                    ) : (
+                      </ButtonTooltip>
+                    )}
+                    {!isSelectedFeatureEnabled && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button variant="default" onClick={() => toggleFeature()}>

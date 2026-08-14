@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { SchemaSelector } from './SchemaSelector'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 
@@ -41,6 +41,30 @@ const mockProjectAndSchemas = ({ highAvailability }: { highAvailability: boolean
   })
 }
 
+const mockProjectAndFailingSchemas = () => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    // @ts-expect-error partial project response
+    response: {
+      cloud_provider: 'localhost',
+      id: 1,
+      inserted_at: '2021-08-02T06:40:40.646Z',
+      name: 'Default Project',
+      organization_id: 1,
+      ref: 'default',
+      region: 'local',
+      status: 'ACTIVE_HEALTHY',
+    },
+  })
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: () =>
+      HttpResponse.json<APIErrorBody>({ message: 'Service unavailable' }, { status: 503 }),
+  })
+}
+
 const renderAndOpenSelector = async () => {
   customRender(<SchemaSelector selectedSchemaName="public" onSelectSchema={vi.fn()} />)
 
@@ -65,5 +89,17 @@ describe('SchemaSelector', () => {
     await renderAndOpenSelector()
 
     expect(screen.getByRole('option', { name: 'multigres' })).toBeInTheDocument()
+  })
+
+  it('offers to restart the database when schemas fail to load', async () => {
+    mockProjectAndFailingSchemas()
+
+    customRender(<SchemaSelector selectedSchemaName="public" onSelectSchema={vi.fn()} />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Restart database' }))
+
+    expect(
+      await screen.findByText(/are you sure you want to restart your database/i)
+    ).toBeInTheDocument()
   })
 })

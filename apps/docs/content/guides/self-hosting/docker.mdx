@@ -80,6 +80,7 @@ The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
 - Install prerequisites (`git`, `openssl`, `jq`) and Docker Engine if not already present
 - Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
 - Create a project directory (`supabase-project` by default) and copy the configuration files into it
+- Record the installed release version in `.supabase-version` for future `update.sh` upgrades
 - Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
 - Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and enables the matching entries in `docker-compose.yml`)
 - Pull the Docker images
@@ -105,7 +106,7 @@ Not on Linux, or want to do it manually? See [Manual installation](#manual-insta
 
 ### Manual installation
 
-This path gets the Docker Compose configuration onto your server; you'll configure secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase).
+This path gets the Docker Compose configuration onto your server, pinned to a specific tag. You'll set up secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase). For a newer release, use the [latest tag](https://github.com/supabase/supabase/tags).
 
 <Tabs
 scrollable
@@ -121,7 +122,7 @@ A shallow clone of the full Supabase repository. Works on any OS with `git` inst
 
 ```sh
 # Get the code
-git clone --depth 1 https://github.com/supabase/supabase
+git clone --depth 1 --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
 
 # Make your new supabase project directory
 mkdir supabase-project
@@ -137,6 +138,9 @@ cp -rf supabase/docker/. supabase-project
 # Switch to the project directory and create a .env from the example
 cd supabase-project && cp .env.example .env
 
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
+
 # Pull the latest images
 docker compose pull
 ```
@@ -149,7 +153,7 @@ Only downloads the `docker/` directory from the repository, saving bandwidth and
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout --depth=1 --quiet https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet --branch self-hosted/v0.8.0 https://github.com/supabase/supabase
 cd supabase
 git sparse-checkout init --cone
 git sparse-checkout set docker
@@ -169,6 +173,9 @@ cp -rf supabase/docker/. supabase-project
 
 # Switch to the project directory and create a .env from the example
 cd supabase-project && cp .env.example .env
+
+# Record the base version so update.sh can upgrade this install later
+printf 'ref=self-hosted/v0.8.0\n' > .supabase-version
 
 # Pull the latest images
 docker compose pull
@@ -230,7 +237,7 @@ Review and change URL configuration variables:
 
   Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
 
-  - **Default setup:** The API gateway (Kong) listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
+  - **Default setup:** The API gateway (Envoy by default) listens on port `8000`, so the full URL is `http://<your-domain>:8000`.
   - **Behind a [reverse proxy](/docs/guides/self-hosting/self-hosted-proxy-https):** the proxy terminates TLS on port `443`, so the URL becomes `https://<your-domain>`.
 
 </Admonition>
@@ -298,7 +305,7 @@ sh run.sh stop
 
 <Admonition type="caution" title="Windows: CRLF line endings">
 
-  If the API gateway (Kong) fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
+  If the API gateway fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
 
 </Admonition>
 
@@ -408,17 +415,19 @@ The `config add` / `config remove` commands manage the `COMPOSE_FILE` [variable]
 
 ## Updating
 
-We publish stable releases of the Docker Compose setup approximately once a month. The versions in each release are tested together, so they may lag behind the latest images on Docker Hub. To update, apply the latest changes from the repository, then stop and start the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is **not guaranteed**. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
+We publish stable snapshots of the Docker Compose setup approximately once a month. The images are tested together, so they may lag behind the latest updates on [Docker Hub](https://hub.docker.com/u/supabase). If you want to run different versions of individual services, you can change the image tags in the compose files, but compatibility is **not guaranteed**.
 
-To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md). Make sure to also check the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
+To follow the updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
 
-After updating the configuration, stop and start the stack or individual services to pick up the changes. This may result in downtime for your applications and users.
+The `update.sh` script updates an existing deployment in place. By default, it pulls the [latest](https://github.com/supabase/supabase/tags) `self-hosted/v*` configuration and merges it over your files with a three-way merge.
 
-For example, you'd like to update or rollback the Studio image. Follow the steps below:
+Refer to [Update your self-hosted deployment](/docs/guides/self-hosting/updating) for the full walkthrough - breaking changes, conflict resolution, pinning a release, and older installs without a recorded version.
+
+To change or roll back a single service's image instead of updating everything - for example, Studio:
 
 1. Check the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) images on [Supabase Docker Hub](https://hub.docker.com/u/supabase)
-2. Find the latest version (tag) number. It looks something like `2026.04.27-sha-5f60601`
-3. Update the Studio `image` configuration in the `docker-compose.yml` file. It should look like this: `image: supabase/studio:2026.04.27-sha-5f60601`
+2. Find the version (tag) you want. It looks something like `2026.04.27-sha-5f60601`
+3. Update the Studio `image` in `docker-compose.yml`: `image: supabase/studio:2026.04.27-sha-5f60601`
 4. Run `sh run.sh pull` to pull the new image, then `sh run.sh recreate studio` to update Studio without taking down the rest of the stack.
 
 ## Uninstalling
@@ -454,10 +463,10 @@ Supabase is built from open source tools, each chosen or developed for productio
 If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, or equivalent open source license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves.
 
 <Image
-  alt="Diagram showing the architecture of Supabase. The API gateway (Kong) sits in front of 7 services: GoTrue, PostgREST, Realtime, Storage, pg_meta, Functions, and pg_graphql. All the services talk to a single Postgres instance."
+  alt="Diagram showing the architecture of self-hosted Supabase. The API gateway (Envoy) sits in front of 7 services: Auth, PostgREST, Realtime, Storage, Edge Runtime, postgres-meta, and Studio. The services connect to a single Postgres instance, with Studio reaching it through pg-meta. Supavisor pools connections to the same Postgres instance."
   src={{
-    dark: "/docs/img/supabase-architecture.svg",
-    light: "/docs/img/supabase-architecture--light.svg",
+    dark: "/docs/img/supabase-self-hosted-architecture.svg",
+    light: "/docs/img/supabase-self-hosted-architecture--light.svg",
   }}
 
   width={1600}
@@ -465,7 +474,7 @@ If the tools and communities already exist, with an MIT, Apache 2, PostgreSQL, o
 />
 
 - **[Studio](https://github.com/supabase/supabase/tree/master/apps/studio)** - A dashboard for managing your self-hosted Supabase project
-- **[Kong](https://github.com/Kong/kong)** - Kong API gateway
+- **[Envoy](https://www.envoyproxy.io/)** - API gateway (default; Kong available as an optional override)
 - **[Auth](https://github.com/supabase/auth)** - JWT-based authentication API for user sign-ups, logins, and session management
 - **[PostgREST](https://github.com/PostgREST/postgrest)** - Web server that turns your Postgres database directly into a RESTful API
 - **[Realtime](https://github.com/supabase/realtime)** - Elixir server that listens to Postgres database changes and broadcasts them to subscribed clients

@@ -308,7 +308,7 @@ if [ "$create_bucket_status" = "200" ]; then
 
         if [ -n "$signed_path" ]; then
             check "Create signed URL" "true" "true"
-            # Fetch signed URL without any auth headers (goes through Kong)
+            # Fetch signed URL without any auth headers (goes through the API gateway)
             signed_content=$(curl -s "$BASE_URL/storage/v1$signed_path")
             check "Fetch signed URL (no auth)" "signed url test content" "$signed_content"
         else

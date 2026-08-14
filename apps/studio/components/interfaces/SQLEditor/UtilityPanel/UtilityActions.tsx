@@ -27,7 +27,9 @@ import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
 import { useIsSqlEditorManualSaveEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
@@ -153,13 +155,23 @@ export const UtilityActions = ({
               </DropdownMenuItem>
             </>
           )}
-          <DropdownMenuItem className="justify-between" onClick={prettifyQuery} disabled={isLogs}>
+          <DropdownMenuItemTooltip
+            className="justify-between"
+            onClick={prettifyQuery}
+            disabled={isLogs}
+            tooltip={{
+              content: {
+                side: 'left',
+                text: isLogs ? 'Can only prettify database queries' : undefined,
+              },
+            }}
+          >
             <span className="flex items-center gap-x-2">
               <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
               Prettify SQL
             </span>
             {formatKeys && <KeyboardShortcut keys={formatKeys} />}
-          </DropdownMenuItem>
+          </DropdownMenuItemTooltip>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -215,24 +227,28 @@ export const UtilityActions = ({
           </Tooltip>
         )}
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="text"
-              onClick={prettifyQuery}
-              disabled={isLogs}
-              className="px-1"
-              icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
-              aria-label="Prettify SQL"
-            />
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="p-1 pl-2.5">
-            <div className="flex items-center gap-2.5">
-              <span>Prettify SQL</span>
-              {formatKeys && <KeyboardShortcut keys={formatKeys} />}
-            </div>
-          </TooltipContent>
-        </Tooltip>
+        <ButtonTooltip
+          variant="text"
+          onClick={prettifyQuery}
+          disabled={isLogs}
+          className="px-1"
+          icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
+          aria-label="Prettify SQL"
+          tooltip={{
+            content: {
+              side: 'bottom',
+              className: isLogs ? undefined : 'p-1 pl-2.5',
+              text: isLogs ? (
+                'Can only prettify database queries'
+              ) : (
+                <div className="flex items-center gap-2.5">
+                  <span>Prettify SQL</span>
+                  {formatKeys && <KeyboardShortcut keys={formatKeys} />}
+                </div>
+              ),
+            },
+          }}
+        />
       </div>
 
       <div className="flex items-center gap-x-2">
