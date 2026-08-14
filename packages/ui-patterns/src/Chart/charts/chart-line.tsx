@@ -84,6 +84,9 @@ export interface ChartLineProps {
   referenceLines?: ChartReferenceLine[]
 }
 
+// [Joshen] JFYI - shouldn't rely on xKey's value to determine if its a time-based format
+// Preferably provide an additional param like xFormat to be more deterministic
+
 export const ChartLine = ({
   data,
   xKey = 'timestamp',
@@ -305,7 +308,7 @@ export const ChartLine = ({
                 fillOpacity={fillOpacity}
                 stroke={lineColor}
                 strokeWidth={strokeWidth}
-                stackId={`stack-${key}`}
+                stackId={keysToRender.length > 1 ? `stack-${key}` : undefined}
               />
             )
           })}

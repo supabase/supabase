@@ -1,12 +1,13 @@
-import { untrustedSql } from '@supabase/pg-meta'
 import { useRouter } from 'next/router'
 
+import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { useProfile } from '@/lib/profile'
 import type { AssistantModel } from '@/state/ai-assistant-state'
 import { useAiAssistantState, whenAiAssistantInitialized } from '@/state/ai-assistant-state'
+import { useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { type Notebook } from '@/state/notebooks/types'
 import { Notebooks } from '@/types'
@@ -25,35 +26,28 @@ export const useCreateNotebook = () => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
 
-    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
-    const DEFAULT_CELLS = [
-      {
-        _tag: 'markdown_cell',
-        id: generateUuid(),
-        text: `
+    const sampleMdCell1 = createMarkdownCellSkeleton({
+      content: `
 # Title
 A brief description on what this notebook is about
-        `.trim(),
-      },
-      {
-        _tag: 'markdown_cell',
-        id: generateUuid(),
-        text: `
+`.trim(),
+    })
+    const sampleMdCell2 = createMarkdownCellSkeleton({
+      content: `
 ## Section
 This is a sample paragraph to demonstrate the Markdown cells
 1. List item 1
 2. List item 2
 3. List item 3
-            `,
-      },
-      {
-        _tag: 'database_cell',
-        id: generateUuid(),
-        view: 'table',
-        chart: undefined,
-        unchecked_sql: untrustedSql('select * from colors;'),
-        row_limit: 100,
-      },
+`.trim(),
+    })
+    const sampleQueryCell = createQueryCellSkeleton({ sql: 'select * from colors;' })
+
+    // [Joshen] Just adding sample data to play around with, keep for now - clean up at the end
+    const DEFAULT_CELLS = [
+      sampleMdCell1,
+      sampleMdCell2,
+      sampleQueryCell,
     ] as Notebooks.Content['cells']
 
     const id = idOverride ?? generateUuid()
@@ -128,4 +122,23 @@ export const useCreateChat = () => {
   }
 
   return { createChat, openChat }
+}
+
+export const useCreateQuery = () => {
+  const router = useRouter()
+  const { data: project } = useSelectedProjectQuery()
+  const querySnap = useExplorerQueryStateSnapshot()
+
+  const createQuery = () => {
+    if (!project) return console.error('Project is required')
+
+    const id = generateUuid()
+    querySnap.createDraft({ id, projectRef: project.ref })
+
+    router.push(`/project/${project.ref}/explorer/query/${id}`)
+
+    return id
+  }
+
+  return { createQuery }
 }

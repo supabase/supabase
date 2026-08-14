@@ -353,3 +353,25 @@ describe('tabs close handlers', () => {
     expect(store.handlerRegistrationVersion).toBeGreaterThan(afterRegister)
   })
 })
+
+describe('explorer query tabs', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  it('navigates to a query tab using its Explorer route', () => {
+    const store = createTabsState('default')
+    const router = fakeRouter()
+    store.addTab({
+      id: 'query-query-1',
+      type: 'query',
+      label: 'Untitled query',
+      metadata: { queryId: 'query-1' },
+      isPreview: false,
+    })
+
+    store.handleTabNavigation('query-query-1', router)
+
+    expect(router.push).toHaveBeenCalledWith('/project/default/explorer/query/query-1')
+  })
+})
