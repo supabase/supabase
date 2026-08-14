@@ -680,8 +680,8 @@ export const ProjectCreationForm = ({
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code, push it
+                              to GitHub, Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"
