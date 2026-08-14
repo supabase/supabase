@@ -151,7 +151,7 @@ export const ReadReplicaEligibilityWarnings = () => {
     return (
       <Admonition type="warning" title="Project required to at least be on a Small compute">
         <p>
-          This is to ensure that read replicas can keep up with the primary databases' activities.
+          This is to ensure that read replicas can keep up with the primary database’s activities.
         </p>
         <div className="flex items-center gap-x-2 mt-2">
           {isFreePlan ? (
