@@ -182,6 +182,7 @@ describe('ai/tools/mock-tools getMockTools', () => {
       const result = await mockTools.update_notebook.execute(
         {
           id: AUTH_HEALTH_NOTEBOOK_ID,
+          expected_updated_at: before.updated_at,
           operations: [
             {
               _tag: 'insert_cell',
@@ -218,10 +219,16 @@ describe('ai/tools/mock-tools getMockTools', () => {
       if (!mockTools.get_notebook.execute) throw new Error('execute is undefined')
       if (!mockTools.update_notebook.execute) throw new Error('execute is undefined')
 
+      const before = await mockTools.get_notebook.execute(
+        { id: EDGE_FUNCTION_NOTEBOOK_ID },
+        { toolCallId: 'test', messages: [] }
+      )
+
       await expect(
         mockTools.update_notebook.execute(
           {
             id: EDGE_FUNCTION_NOTEBOOK_ID,
+            expected_updated_at: before.updated_at,
             operations: [{ _tag: 'delete_cell', cell_id: 'does-not-exist' }],
           },
           { toolCallId: 'test', messages: [] }
