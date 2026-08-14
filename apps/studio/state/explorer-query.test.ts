@@ -51,7 +51,7 @@ describe('explorer query drafts', () => {
       source: {
         id: 'logs',
         type: 'logs',
-        parameters: { time_range: { type: 'relative', amount: 3, unit: 'hour' } },
+        parameters: { time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } },
       },
     })
 
@@ -62,7 +62,7 @@ describe('explorer query drafts', () => {
     expect(restored.drafts['query-1'].source).toEqual({
       id: 'logs',
       type: 'logs',
-      parameters: { time_range: { type: 'relative', amount: 3, unit: 'hour' } },
+      parameters: { time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } },
     })
   })
 

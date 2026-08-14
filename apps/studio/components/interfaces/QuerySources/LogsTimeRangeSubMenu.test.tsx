@@ -5,7 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import { describe, expect, it, vi, type Mock } from 'vitest'
 
 import { LogsTimeRangeSubMenu } from './LogsTimeRangeSubMenu'
-import type { LogTimeRange } from '@/data/query-sources/query-source-registry'
+import { type TimeRange } from '@/data/content/notebooks/notebook-schema'
 import { customRender } from '@/tests/lib/custom-render'
 
 mockAnimationsApi()
@@ -15,15 +15,15 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 }))
 
 const renderSubMenu = ({
-  onRangeChange = vi.fn<(range: LogTimeRange) => void>(),
+  onRangeChange = vi.fn<(range: TimeRange) => void>(),
   onOpenCustomRange = vi.fn<() => void>(),
   onShowUpgrade = vi.fn<() => void>(),
-  range = { type: 'relative', amount: 1, unit: 'hour' } as LogTimeRange,
+  range = { _tag: 'relative_time_range', amount: 1, unit: 'hour' } as TimeRange,
 }: {
-  onRangeChange?: Mock<(range: LogTimeRange) => void>
+  onRangeChange?: Mock<(range: TimeRange) => void>
   onOpenCustomRange?: Mock<() => void>
   onShowUpgrade?: Mock<() => void>
-  range?: LogTimeRange
+  range?: TimeRange
 } = {}) => {
   customRender(
     <DropdownMenu defaultOpen>
@@ -63,7 +63,7 @@ describe('LogsTimeRangeSubMenu', () => {
   })
 
   it('marks the structurally matching preset as selected', async () => {
-    renderSubMenu({ range: { type: 'relative', amount: 3, unit: 'hour' } })
+    renderSubMenu({ range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } })
 
     await userEvent.hover(await screen.findByText('Time range'))
 

@@ -56,7 +56,7 @@ describe('ExplorerQuerySourceMenu', () => {
         source={{
           id: 'logs',
           type: 'logs',
-          parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
+          parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
         }}
         onSourceChange={onSourceChange}
       />
@@ -80,7 +80,7 @@ describe('ExplorerQuerySourceMenu', () => {
         source={{
           id: 'logs',
           type: 'logs',
-          parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
+          parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
         }}
         onSourceChange={onSourceChange}
       />
@@ -93,7 +93,7 @@ describe('ExplorerQuerySourceMenu', () => {
     expect(onSourceChange).toHaveBeenCalledWith({
       id: 'logs',
       type: 'logs',
-      parameters: { time_range: { type: 'relative', amount: 3, unit: 'hour' } },
+      parameters: { time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } },
     })
   })
 
@@ -113,7 +113,7 @@ describe('ExplorerQuerySourceMenu', () => {
       {
         id: 'logs',
         type: 'logs',
-        parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
+        parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
       },
       { sqlEditorLogsSource: false, otelLegacyLogs: false }
     )

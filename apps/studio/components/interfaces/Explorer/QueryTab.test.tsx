@@ -48,7 +48,7 @@ const createDraft = (
         id: 'logs'
         type: 'logs'
         parameters: {
-          time_range: { type: 'relative'; amount: number; unit: 'hour' }
+          time_range: { _tag: 'relative_time_range'; amount: number; unit: 'hour' }
         }
       }
 ) => {
@@ -85,7 +85,7 @@ describe('QueryTab execution', () => {
     createDraft({
       id: 'logs',
       type: 'logs',
-      parameters: { time_range: { type: 'relative', amount: 1, unit: 'hour' } },
+      parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
     })
     const requests: Request[] = []
     addAPIMock({
@@ -154,7 +154,7 @@ describe('QueryTab execution', () => {
     createDraft({
       id: 'logs',
       type: 'logs',
-      parameters: { time_range: { type: 'relative', amount: 2, unit: 'hour' } },
+      parameters: { time_range: { _tag: 'relative_time_range', amount: 2, unit: 'hour' } },
     })
     const bodies: Array<{ iso_timestamp_start: string; iso_timestamp_end: string }> = []
     addAPIMock({
