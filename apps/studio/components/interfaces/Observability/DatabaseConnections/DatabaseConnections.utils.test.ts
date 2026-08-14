@@ -31,6 +31,7 @@ const activity = (overrides: ActivityOverrides = {}): DatabaseActivity => ({
   application_name: 'test',
   blocked_by: [],
   query: 'select 1',
+  backend_start: NOW,
   query_start: null,
   transaction_start: null,
   state_change: null,

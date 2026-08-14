@@ -13,14 +13,28 @@ import { proxy, subscribe, useSnapshot } from 'valtio'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
-import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { EditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
+import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
+  explorer: ['notebook', 'query', 'chat'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'query' | 'chat' | 'explorer-home'
+
+/** Fixed id for Explorer's pinned, non-closable Home tab. */
+export const EXPLORER_HOME_TAB_ID = 'explorer-home'
+
+/** Tab descriptor for Explorer's Home tab — shared by its trigger and its page. */
+export const EXPLORER_HOME_TAB: Tab = {
+  id: EXPLORER_HOME_TAB_ID,
+  type: 'explorer-home',
+  label: 'Home',
+  isPreview: false,
+  closable: false,
+}
 
 type CreateTabIdParams = {
   r: { id: number }
@@ -29,10 +43,14 @@ type CreateTabIdParams = {
   f: { id: number }
   p: { id: number }
   sql: { id: string }
+  notebook: { id: string }
+  query: { id: string }
+  chat: { id: string }
   schema: { schema: string }
   view: never
   function: never
   new: never
+  'explorer-home': never
 }
 
 export interface Tab {
@@ -44,6 +62,9 @@ export interface Tab {
     name?: string
     tableId?: number
     sqlId?: string
+    notebookId?: string
+    queryId?: string
+    chatId?: string
     scrollTop?: number
     /**
      * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
@@ -55,6 +76,12 @@ export interface Tab {
     sqlSource?: SqlSnippetSource
   }
   isPreview?: boolean
+  /**
+   * Whether the tab can be closed by the user (close button, keyboard shortcut,
+   * or a bulk close action). Defaults to `true` — absent on every tab except a
+   * pinned default (e.g. Explorer's Home tab), which sets this `false`.
+   */
+  closable?: boolean
   createdAt?: Date
   updatedAt?: Date
 }
@@ -107,6 +134,9 @@ export interface RecentItem {
     name?: string
     tableId?: number
     sqlId?: string
+    notebookId?: string
+    queryId?: string
+    chatId?: string
     sqlSource?: SqlSnippetSource
   }
 }
@@ -280,6 +310,23 @@ export function createTabsState(projectRef: string) {
       store.previewTabId = tab.id
       store.activeTab = tab.id
     },
+    // Ensures a tab that's always present, first, and outside the draggable/
+    // closable set (e.g. Explorer's Home tab) exists in the store, without
+    // touching which tab is active. Safe to call from wherever the pinned
+    // tab's trigger renders, regardless of which page currently owns focus.
+    ensurePinnedTab: (tab: Tab) => {
+      if (store.tabsMap[tab.id]) return
+      store.tabsMap[tab.id] = tab
+      store.openTabs = [tab.id, ...store.openTabs]
+    },
+    // Ensures a pinned tab exists (see ensurePinnedTab) and marks it active,
+    // without recording it in Recent Items — it isn't content to revisit,
+    // just a fixed destination. Call this from the page it represents, on
+    // mount, mirroring how regular tabs call addTab from their own page.
+    activatePinnedTab: (tab: Tab) => {
+      store.ensurePinnedTab(tab)
+      store.activeTab = tab.id
+    },
     updateTab: (
       id: string,
       updates: { label?: string; scrollTop?: number; sqlSource?: SqlSnippetSource }
@@ -315,6 +362,8 @@ export function createTabsState(projectRef: string) {
     // this is used for removing tabs from the localstorage state
     // for handling a manual tab removal with a close action, use handleTabClose()
     removeTab: (id: string) => {
+      if (store.tabsMap[id]?.closable === false) return
+
       const idx = store.openTabs.indexOf(id)
       store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
       delete store.tabsMap[id]
@@ -376,13 +425,27 @@ export function createTabsState(projectRef: string) {
 
       store.activeTab = id
 
-      // Add to recent items when navigating to a non-preview, non-new tab
-      if (!tab.isPreview) store.addRecentItem(tab)
+      // Add to recent items when navigating to a non-preview, non-new tab.
+      // Pinned tabs (e.g. Explorer's Home) are a fixed destination, not content
+      // to revisit, so they're excluded regardless of preview state.
+      if (!tab.isPreview && tab.closable !== false) store.addRecentItem(tab)
 
       switch (tab.type) {
         case 'sql':
           const schema = (router.query.schema as string) || 'public'
           router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
+          break
+        case 'notebook':
+          router.push(`/project/${router.query.ref}/explorer/notebook/${tab.metadata?.notebookId}`)
+          break
+        case 'query':
+          router.push(`/project/${router.query.ref}/explorer/query/${tab.metadata?.queryId}`)
+          break
+        case 'chat':
+          router.push(`/project/${router.query.ref}/explorer/chat/${tab.metadata?.chatId}`)
+          break
+        case 'explorer-home':
+          router.push(`/project/${router.query.ref}/explorer`)
           break
         case 'r':
         case 'v':
@@ -455,8 +518,8 @@ export function createTabsState(projectRef: string) {
     closeTabs: (ids: string[]) => {
       const closedTabs = ids
         .map((id) => store.tabsMap[id])
-        .filter((tab): tab is Tab => tab !== undefined)
-      store.removeTabs(ids)
+        .filter((tab): tab is Tab => tab !== undefined && tab.closable !== false)
+      store.removeTabs(closedTabs.map((tab) => tab.id))
       closedTabs.forEach((tab) => tabHandlers.get(tab.type)?.onClose?.(tab))
     },
 
@@ -469,7 +532,7 @@ export function createTabsState(projectRef: string) {
     }: {
       id: string
       router: NextRouter
-      editor?: 'sql' | 'table'
+      editor?: EditorType
       onClose?: (id: string) => void
       onClearDashboardHistory: () => void
     }) => {
@@ -517,6 +580,11 @@ export function createTabsState(projectRef: string) {
             case 'sql':
               router.push(`/project/${router.query.ref}/sql`)
               break
+            case 'notebook':
+            case 'query':
+            case 'chat':
+              router.push(`/project/${router.query.ref}/explorer`)
+              break
             case 'r':
             case 'v':
             case 'm':
@@ -543,17 +611,18 @@ export function createTabsState(projectRef: string) {
       router,
       onClearDashboardHistory,
     }: {
-      editor: 'sql' | 'table'
+      editor: 'sql' | 'table' | 'explorer'
       router: NextRouter
       onClearDashboardHistory: () => void
     }) => {
-      const tabsToClose =
-        editor === 'table'
-          ? store.openTabs.filter((x) => !x.startsWith('sql'))
-          : store.openTabs.filter((x) => x.startsWith('sql'))
-      store.removeTabs(tabsToClose)
+      const tabsToClose = store.openTabs.filter((id) => {
+        const tab = store.tabsMap[id]
+        return tab !== undefined && editorEntityTypes[editor].includes(tab.type)
+      })
+      store.closeTabs(tabsToClose)
       onClearDashboardHistory()
-      router.push(`/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}`)
+      const editorPath = editor === 'table' ? 'editor' : editor
+      router.push(`/project/${router.query.ref}/${editorPath}`)
     },
     handleTabDragEnd: (oldIndex: number, newIndex: number, tabId: string, router: NextRouter) => {
       // Make permanent if needed
@@ -636,6 +705,12 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `p-${(params as CreateTabIdParams['p']).id}`
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
+    case 'notebook':
+      return `notebook-${(params as CreateTabIdParams['notebook']).id}`
+    case 'query':
+      return `query-${(params as CreateTabIdParams['query']).id}`
+    case 'chat':
+      return `chat-${(params as CreateTabIdParams['chat']).id}`
     default:
       return ''
   }

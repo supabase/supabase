@@ -26,7 +26,7 @@ export const toolSetValidationSchema = z.record(
     'list_branches',
     'search_docs',
     'get_advisors',
-    'get_logs',
+    'query_logs',
 
     // Local tools
     'execute_sql',
@@ -37,6 +37,10 @@ export const toolSetValidationSchema = z.record(
     'list_policies',
     'list_reports',
     'get_report',
+    'list_notebooks',
+    'get_notebook',
+    'create_notebook',
+    'update_notebook',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
@@ -88,6 +92,10 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_policies: TOOL_CATEGORIES.SCHEMA,
   list_reports: TOOL_CATEGORIES.SCHEMA,
   get_report: TOOL_CATEGORIES.SCHEMA,
+  list_notebooks: TOOL_CATEGORIES.SCHEMA,
+  get_notebook: TOOL_CATEGORIES.SCHEMA,
+  create_notebook: TOOL_CATEGORIES.SCHEMA,
+  update_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,
@@ -95,7 +103,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
-  get_logs: TOOL_CATEGORIES.LOG,
+  query_logs: TOOL_CATEGORIES.LOG,
 }
 
 /**

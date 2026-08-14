@@ -154,6 +154,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
               ) : (
                 <ButtonTooltip
                   type="submit"
+                  variant={canSubmit ? 'primary' : 'default'}
                   aria-label="Send message"
                   icon={<ArrowUp />}
                   disabled={!canSubmit}
