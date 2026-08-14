@@ -117,7 +117,7 @@ const InfrastructureReadReplicaPage: NextPageWithLayout = () => {
           href: getInfrastructurePath(ref),
         },
         {
-          label: `Read Replica - ${regionLabel}`,
+          label: regionLabel ? `Read Replica - ${regionLabel}` : 'Read Replica',
         },
       ]}
       secondaryActions={
@@ -125,6 +125,7 @@ const InfrastructureReadReplicaPage: NextPageWithLayout = () => {
           variant="default"
           className="w-7"
           icon={<Trash />}
+          disabled={!replica}
           tooltip={{
             content: { side: 'bottom', text: 'Drop replica' },
           }}
