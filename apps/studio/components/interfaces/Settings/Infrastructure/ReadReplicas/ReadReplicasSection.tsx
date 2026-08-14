@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { Database } from 'icons'
 import { Plus } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Card, CardContent, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
@@ -44,12 +44,15 @@ export const ReadReplicasSection = () => {
     isPending: isDatabasesLoading,
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
-  } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-
-  const readReplicas = useMemo(
-    () => databases.filter((x) => x.identifier !== projectRef),
-    [databases, projectRef]
+  } = useReadReplicasQuery(
+    { projectRef },
+    {
+      enabled: infrastructureReadReplicas,
+      refetchInterval: infrastructureReadReplicas ? statusRefetchInterval : false,
+    }
   )
+
+  const readReplicas = databases.filter((database) => database.identifier !== projectRef)
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
 
   useEffect(() => {
@@ -60,9 +63,11 @@ export const ReadReplicasSection = () => {
       REPLICA_STATUS.ACTIVE_UNHEALTHY,
       REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
     ]
-    const replicasInTransition = readReplicas.filter((db) => !fixedStatuses.includes(db.status))
+    const replicasInTransition = databases.filter(
+      (database) => database.identifier !== projectRef && !fixedStatuses.includes(database.status)
+    )
     if (replicasInTransition.length === 0) setStatusRefetchInterval(false)
-  }, [isDatabasesSuccess, readReplicas])
+  }, [isDatabasesSuccess, databases, projectRef])
 
   if (!infrastructureReadReplicas) return null
 
