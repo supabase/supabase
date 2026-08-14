@@ -109,7 +109,7 @@ export const ExplorerQuerySourceMenu = ({
                   onSourceChange({ _tag: 'database', database_identifier })
                 }
               />
-              {onRowLimitChange && (
+              {onRowLimitChange !== undefined && (
                 <RowLimitSubMenu
                   value={rowLimit}
                   onValueChange={(val) => onRowLimitChange(Number(val))}
