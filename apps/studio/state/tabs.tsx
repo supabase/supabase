@@ -19,10 +19,10 @@ import type { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p'],
   sql: ['sql'],
-  explorer: ['notebook', 'query'],
+  explorer: ['notebook', 'query', 'chat'],
 }
 
-export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'query' | 'explorer-home'
+export type TabType = ENTITY_TYPE | 'sql' | 'notebook' | 'query' | 'chat' | 'explorer-home'
 
 /** Fixed id for Explorer's pinned, non-closable Home tab. */
 export const EXPLORER_HOME_TAB_ID = 'explorer-home'
@@ -45,6 +45,7 @@ type CreateTabIdParams = {
   sql: { id: string }
   notebook: { id: string }
   query: { id: string }
+  chat: { id: string }
   schema: { schema: string }
   view: never
   function: never
@@ -63,6 +64,7 @@ export interface Tab {
     sqlId?: string
     notebookId?: string
     queryId?: string
+    chatId?: string
     scrollTop?: number
     /**
      * For SQL tabs, which backend the snippet queries (`'database'` | `'logs'`),
@@ -134,6 +136,7 @@ export interface RecentItem {
     sqlId?: string
     notebookId?: string
     queryId?: string
+    chatId?: string
     sqlSource?: SqlSnippetSource
   }
 }
@@ -438,6 +441,9 @@ export function createTabsState(projectRef: string) {
         case 'query':
           router.push(`/project/${router.query.ref}/explorer/query/${tab.metadata?.queryId}`)
           break
+        case 'chat':
+          router.push(`/project/${router.query.ref}/explorer/chat/${tab.metadata?.chatId}`)
+          break
         case 'explorer-home':
           router.push(`/project/${router.query.ref}/explorer`)
           break
@@ -576,6 +582,7 @@ export function createTabsState(projectRef: string) {
               break
             case 'notebook':
             case 'query':
+            case 'chat':
               router.push(`/project/${router.query.ref}/explorer`)
               break
             case 'r':
@@ -702,6 +709,8 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
       return `notebook-${(params as CreateTabIdParams['notebook']).id}`
     case 'query':
       return `query-${(params as CreateTabIdParams['query']).id}`
+    case 'chat':
+      return `chat-${(params as CreateTabIdParams['chat']).id}`
     default:
       return ''
   }

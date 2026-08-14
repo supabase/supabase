@@ -17,7 +17,11 @@ import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
-import { useCreateNotebook, useCreateQuery } from '@/components/interfaces/Explorer/hooks'
+import {
+  useCreateChat,
+  useCreateNotebook,
+  useCreateQuery,
+} from '@/components/interfaces/Explorer/hooks'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -119,6 +123,7 @@ const HomeTabButton = () => {
 const NewTabButton = () => {
   const { createNotebook } = useCreateNotebook()
   const { createQuery } = useCreateQuery()
+  const { createChat } = useCreateChat()
 
   return (
     <DropdownMenu>
@@ -146,7 +151,7 @@ const NewTabButton = () => {
           <NotebookText size={14} />
           <span>New notebook</span>
         </DropdownMenuItem>
-        <DropdownMenuItem disabled className="gap-x-2">
+        <DropdownMenuItem className="gap-x-2" onClick={() => createChat()}>
           <MessageCirclePlus size={14} />
           <span>New chat</span>
         </DropdownMenuItem>
