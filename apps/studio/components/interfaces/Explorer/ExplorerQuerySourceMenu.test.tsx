@@ -54,9 +54,8 @@ describe('ExplorerQuerySourceMenu', () => {
     customRender(
       <ExplorerQuerySourceMenu
         source={{
-          id: 'logs',
-          type: 'logs',
-          parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
+          _tag: 'logs',
+          time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
         }}
         onSourceChange={onSourceChange}
       />
@@ -65,11 +64,7 @@ describe('ExplorerQuerySourceMenu', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Query source: Logs' }))
     await userEvent.click(screen.getByText('Database'))
 
-    expect(onSourceChange).toHaveBeenCalledWith({
-      id: 'database',
-      type: 'database',
-      parameters: {},
-    })
+    expect(onSourceChange).toHaveBeenCalledWith({ _tag: 'database' })
   })
 
   it('emits the selected log time range as source parameters', async () => {
@@ -78,9 +73,8 @@ describe('ExplorerQuerySourceMenu', () => {
     customRender(
       <ExplorerQuerySourceMenu
         source={{
-          id: 'logs',
-          type: 'logs',
-          parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
+          _tag: 'logs',
+          time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
         }}
         onSourceChange={onSourceChange}
       />
@@ -91,17 +85,13 @@ describe('ExplorerQuerySourceMenu', () => {
     await userEvent.click(await screen.findByText('Last 3 hours'))
 
     expect(onSourceChange).toHaveBeenCalledWith({
-      id: 'logs',
-      type: 'logs',
-      parameters: { time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } },
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' },
     })
   })
 
   it('does not offer logs when source flags are disabled for a database query', async () => {
-    renderWithFlags(
-      { id: 'database', type: 'database', parameters: {} },
-      { sqlEditorLogsSource: false, otelLegacyLogs: false }
-    )
+    renderWithFlags({ _tag: 'database' }, { sqlEditorLogsSource: false, otelLegacyLogs: false })
 
     await userEvent.click(screen.getByRole('button', { name: 'Query source: Database' }))
 
@@ -111,9 +101,8 @@ describe('ExplorerQuerySourceMenu', () => {
   it('keeps logs available when an existing query already uses it', async () => {
     renderWithFlags(
       {
-        id: 'logs',
-        type: 'logs',
-        parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
+        _tag: 'logs',
+        time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
       },
       { sqlEditorLogsSource: false, otelLegacyLogs: false }
     )

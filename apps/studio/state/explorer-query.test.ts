@@ -33,7 +33,7 @@ describe('explorer query drafts', () => {
     expect(secondState.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
     expect(secondState.drafts['query-1']).toMatchObject({
       name: 'Active users',
-      source: { id: 'database', type: 'database', parameters: {} },
+      source: { _tag: 'database' },
       uncheckedSql: 'select * from users',
       projectRef: 'project-a',
     })
@@ -49,9 +49,8 @@ describe('explorer query drafts', () => {
     state.updateDraft({
       id: 'query-1',
       source: {
-        id: 'logs',
-        type: 'logs',
-        parameters: { time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } },
+        _tag: 'logs',
+        time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' },
       },
     })
 
@@ -60,9 +59,8 @@ describe('explorer query drafts', () => {
     const restored = createExplorerQueryState(storage)
     expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
     expect(restored.drafts['query-1'].source).toEqual({
-      id: 'logs',
-      type: 'logs',
-      parameters: { time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' } },
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 3, unit: 'hour' },
     })
   })
 
@@ -77,11 +75,7 @@ describe('explorer query drafts', () => {
 
     const state = createExplorerQueryState(storage)
     expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(state.drafts['query-1'].source).toEqual({
-      id: 'database',
-      type: 'database',
-      parameters: {},
-    })
+    expect(state.drafts['query-1'].source).toEqual({ _tag: 'database' })
   })
 
   it('ignores a malformed root value', () => {
@@ -121,11 +115,7 @@ describe('explorer query drafts', () => {
 
     const state = createExplorerQueryState(storage)
     expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
-    expect(state.drafts['query-1'].source).toEqual({
-      id: 'database',
-      type: 'database',
-      parameters: {},
-    })
+    expect(state.drafts['query-1'].source).toEqual({ _tag: 'database' })
   })
 
   it('debounces SQL persistence while updating in-memory state immediately', () => {

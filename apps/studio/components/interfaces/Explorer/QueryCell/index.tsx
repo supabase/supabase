@@ -13,8 +13,8 @@ import {
 } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import {
-  createDefaultCellSource,
-  type CellSource,
+  getQuerySourceBinding,
+  type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
@@ -39,10 +39,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
 
   const { id, title: cellTitle, view, chart, unchecked_sql } = cell
   const rowLimit = 'row_limit' in cell ? cell.row_limit : undefined
-  const source =
-    cell._tag === 'database_cell'
-      ? createDefaultCellSource('database')
-      : createDefaultCellSource('logs')
+  const source = getQuerySourceBinding(cell)
 
   const [sql, setSql] = useState<string>(unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
@@ -53,7 +50,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
     chart: chart ? { ...chart, y_columns: [...chart.y_columns] } : undefined,
   }
 
-  const handleSourceChange = (source: CellSource) => {
+  const handleSourceChange = (source: QuerySourceBinding) => {
     const notebookId = currentNotebook?.notebook.id
     if (!notebookId) return
 
@@ -61,28 +58,33 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
       id: notebookId,
       cellId: id,
       updater: (candidate) => {
-        if (source.type === 'database' && candidate._tag === 'log_cell') {
+        if (source._tag === 'database' && candidate._tag === 'log_cell') {
           const { _tag, time_range, unchecked_sql, ...rest } = candidate
           return {
             ...rest,
             _tag: 'database_cell' as const,
             row_limit: 100,
+            database_identifier: source.database_identifier,
             unchecked_sql: untrustedSql(unchecked_sql),
           }
         }
 
-        if (source.type === 'logs' && candidate._tag === 'database_cell') {
-          const { _tag, row_limit, unchecked_sql, ...rest } = candidate
+        if (source._tag === 'logs' && candidate._tag === 'database_cell') {
+          const { _tag, row_limit, database_identifier, unchecked_sql, ...rest } = candidate
           return {
             ...rest,
             _tag: 'log_cell' as const,
-            time_range: {
-              _tag: 'relative_time_range' as const,
-              unit: 'hour' as const,
-              amount: 1,
-            },
+            time_range: source.time_range,
             unchecked_sql: untrustedLogSql(unchecked_sql),
           }
+        }
+
+        if (source._tag === 'database' && candidate._tag === 'database_cell') {
+          return { ...candidate, database_identifier: source.database_identifier }
+        }
+
+        if (source._tag === 'logs' && candidate._tag === 'log_cell') {
+          return { ...candidate, time_range: source.time_range }
         }
 
         return candidate

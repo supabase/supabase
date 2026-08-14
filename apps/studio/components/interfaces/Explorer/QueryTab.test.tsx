@@ -43,13 +43,10 @@ const renderQueryTab = () =>
 
 const createDraft = (
   source:
-    | { id: 'database'; type: 'database'; parameters: { identifier?: string } }
+    | { _tag: 'database'; database_identifier?: string }
     | {
-        id: 'logs'
-        type: 'logs'
-        parameters: {
-          time_range: { _tag: 'relative_time_range'; amount: number; unit: 'hour' }
-        }
+        _tag: 'logs'
+        time_range: { _tag: 'relative_time_range'; amount: number; unit: 'hour' }
       }
 ) => {
   explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
@@ -83,9 +80,8 @@ describe('QueryTab execution', () => {
   it('records an unavailable error and skips the logs endpoint when the flag is off', async () => {
     testContext.flags.otelLegacyLogs = false
     createDraft({
-      id: 'logs',
-      type: 'logs',
-      parameters: { time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' } },
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
     })
     const requests: Request[] = []
     addAPIMock({
@@ -109,11 +105,7 @@ describe('QueryTab execution', () => {
   })
 
   it('waits for replicas, then fails closed when the selected database is absent', async () => {
-    createDraft({
-      id: 'database',
-      type: 'database',
-      parameters: { identifier: 'missing-replica' },
-    })
+    createDraft({ _tag: 'database', database_identifier: 'missing-replica' })
     let releaseReplicas: () => void = () => undefined
     const replicasPending = new Promise<void>((resolve) => {
       releaseReplicas = resolve
@@ -152,9 +144,8 @@ describe('QueryTab execution', () => {
 
   it('resolves a relative logs range before sending the request', async () => {
     createDraft({
-      id: 'logs',
-      type: 'logs',
-      parameters: { time_range: { _tag: 'relative_time_range', amount: 2, unit: 'hour' } },
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 2, unit: 'hour' },
     })
     const bodies: Array<{ iso_timestamp_start: string; iso_timestamp_end: string }> = []
     addAPIMock({

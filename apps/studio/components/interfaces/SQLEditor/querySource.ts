@@ -1,6 +1,5 @@
-import { type TimeRange } from '@/data/content/notebooks/notebook-schema'
 import type { Snippet } from '@/data/content/sql-folders-query'
-import { type QuerySourceId } from '@/data/query-sources/query-source-registry'
+import { type QuerySourceTag } from '@/data/query-sources/query-source-registry'
 
 /**
  * Domain view of where a snippet's query runs. Derived from the content TYPE:
@@ -9,7 +8,7 @@ import { type QuerySourceId } from '@/data/query-sources/query-source-registry'
  * immutable — switching backends means creating a new snippet, not toggling this
  * value.
  */
-export type SqlSnippetSource = QuerySourceId
+export type SqlSnippetSource = QuerySourceTag
 
 /**
  * The single reader every surface (AI, reports, tabs, nav, execution) uses to
@@ -55,11 +54,3 @@ export function resolveSnippetSource(
 ): SqlSnippetSource {
   return snippet !== undefined ? getSnippetSource(snippet) : parseSqlSnippetSource(sourceParam)
 }
-
-/**
- * The runtime query source for a snippet, pairing the database/logs discriminant
- * with the extra state each backend needs to run. A logs run carries the active
- * time range (session state, re-resolved at every run); a database run needs
- * nothing beyond the connection the execution pipeline already resolves.
- */
-export type QuerySource = { type: 'database' } | { type: 'logs'; dateRange: TimeRange }

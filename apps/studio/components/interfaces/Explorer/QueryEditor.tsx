@@ -29,9 +29,9 @@ import { isValidConnString } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import {
-  createDefaultCellSource,
+  createDefaultSourceBinding,
   QUERY_SOURCE_REGISTRY,
-  type CellSource,
+  type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
@@ -44,7 +44,7 @@ export type QueryEditorProps = {
   variant: 'embedded' | 'viewport'
   title: string
   sql: string
-  source?: CellSource
+  source?: QuerySourceBinding
   result?: QueryResult
   rowLimit?: number
   display?: QueryDisplay
@@ -52,7 +52,7 @@ export type QueryEditorProps = {
   onTitleChange: (title: string) => void
   onSqlChange: (sql: string) => void
   onSqlCommit?: (sql: string) => void
-  onSourceChange?: (source: CellSource) => void
+  onSourceChange?: (source: QuerySourceBinding) => void
   onResultChange: (result: QueryResult) => void
   onDisplayChange?: (display: QueryDisplay) => void
 }
@@ -87,12 +87,12 @@ export const QueryEditor = ({
 
   const view = display?.view ?? 'table'
   const columns = Object.keys(result?.rows?.[0] ?? {})
-  const sourceBinding = source ?? createDefaultCellSource('database')
+  const sourceBinding = source ?? createDefaultSourceBinding('database')
 
   const [showQuery, setShowQuery] = useState(true)
 
   const databaseIdentifier =
-    sourceBinding.type === 'database' ? sourceBinding.parameters.identifier : undefined
+    sourceBinding._tag === 'database' ? sourceBinding.database_identifier : undefined
 
   const { data: databases, isPending: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef: project?.ref },
@@ -124,7 +124,7 @@ export const QueryEditor = ({
 
     onSqlCommit?.(sql)
 
-    if (sourceBinding.type === 'logs') {
+    if (sourceBinding._tag === 'logs') {
       if (!isOtelLogsEnabled) {
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
@@ -135,7 +135,7 @@ export const QueryEditor = ({
       executeLogsSql({
         projectRef: project.ref,
         sql: acceptUntrustedLogsSql(untrustedLogSql(sqlToRun)),
-        range: resolveLogTimeRange(sourceBinding.parameters.time_range),
+        range: resolveLogTimeRange(sourceBinding.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
       })
       return
