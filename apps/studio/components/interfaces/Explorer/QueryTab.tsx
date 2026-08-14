@@ -7,6 +7,7 @@ import { Button } from 'ui'
 import { QueryEditor } from './QueryEditor'
 import { type QueryResult } from './types'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
+import { useLocalRoleImpersonationState } from '@/state/role-impersonation-state'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
@@ -15,6 +16,7 @@ export const QueryTab = () => {
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
+  const roleImpersonationState = useLocalRoleImpersonationState()
 
   const [rowLimit, setRowLimit] = useState<number>(100)
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
@@ -84,6 +86,7 @@ export const QueryTab = () => {
       source={draft.source}
       result={result}
       rowLimit={rowLimit}
+      roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
         const name = value.trim() || 'Untitled query'
         explorerQueryState.updateDraft({ id, name })
