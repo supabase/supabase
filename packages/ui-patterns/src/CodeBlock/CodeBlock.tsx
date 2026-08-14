@@ -16,6 +16,7 @@ import ini from 'react-syntax-highlighter/dist/cjs/languages/hljs/ini'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
+import markdown from 'react-syntax-highlighter/dist/cjs/languages/hljs/markdown'
 import pgsql from 'react-syntax-highlighter/dist/cjs/languages/hljs/pgsql'
 import php from 'react-syntax-highlighter/dist/cjs/languages/hljs/php'
 import {
@@ -52,6 +53,7 @@ const codeBlockLangs = [
   'yaml',
   'toml',
   'html',
+  'markdown',
 ] as const
 
 export type CodeBlockLang = (typeof codeBlockLangs)[number]
@@ -175,6 +177,7 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('html', xml)
   SyntaxHighlighter.registerLanguage('toml', ini)
   SyntaxHighlighter.registerLanguage('yaml', yaml)
+  SyntaxHighlighter.registerLanguage('markdown', markdown)
 
   const large = false
   // don't show line numbers if bash == lang
