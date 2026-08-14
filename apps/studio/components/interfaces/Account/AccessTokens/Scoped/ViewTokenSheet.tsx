@@ -1,6 +1,5 @@
 import dayjs from 'dayjs'
-import { Box, Boxes } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { cn, ScrollArea, Sheet, SheetContent, SheetHeader } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -18,6 +17,12 @@ import {
   getCapabilityDensityTier,
   type CapabilityLevelFilter,
 } from './TokenCapabilities/TokenCapabilities.utils'
+import {
+  ResourceAccessPills,
+  TokenSummaryList,
+  type ResourceAccessPillItem,
+  type TokenSummaryRow,
+} from './TokenSummaryList'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
@@ -103,9 +108,9 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
   const capabilityTier = getCapabilityDensityTier(capabilities.length)
   const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
 
-  // Accessible resources render with their name and ref/slug. Resources the user has lost access
-  // to are aggregated into an anonymous count — their identifiers aren't shown.
-  const resourceSummary = useMemo(() => {
+  // Accessible resources render with their name. Resources the user has lost access to are
+  // aggregated into an anonymous count — their identifiers aren't shown.
+  const resourceItems = useMemo<ResourceAccessPillItem[]>(() => {
     const inaccessibleCountItem = (lostCount: number, noun: string) =>
       lostCount === 0
         ? []
@@ -113,7 +118,6 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
             {
               key: 'inaccessible',
               label: `${lostCount} ${pluralize(lostCount, noun)}`,
-              sublabel: undefined,
               isInaccessible: true,
             },
           ]
@@ -123,42 +127,26 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
       const accessible = tokenProjectRefs.flatMap((ref) => {
         const name = projectsByRef.get(ref)?.name
         if (name === undefined) return []
-        return [{ key: ref, label: name, sublabel: ref, isInaccessible: false }]
+        return [{ key: ref, label: name }]
       })
-      return {
-        title: 'Projects',
-        items: [
-          ...accessible,
-          ...inaccessibleCountItem(access.inaccessibleProjectRefs.length, 'project'),
-        ],
-      }
+      return [
+        ...accessible,
+        ...inaccessibleCountItem(access.inaccessibleProjectRefs.length, 'project'),
+      ]
     }
     if (resourceAccess === 'organization') {
       const organizationsBySlug = new Map(organizations.map((org) => [org.slug, org]))
       const accessible = tokenOrganizationSlugs.flatMap((slug) => {
         const name = organizationsBySlug.get(slug)?.name
         if (name === undefined) return []
-        return [{ key: slug, label: name, sublabel: slug, isInaccessible: false }]
+        return [{ key: slug, label: name }]
       })
-      return {
-        title: 'Organizations',
-        items: [
-          ...accessible,
-          ...inaccessibleCountItem(access.inaccessibleOrgSlugs.length, 'organization'),
-        ],
-      }
+      return [
+        ...accessible,
+        ...inaccessibleCountItem(access.inaccessibleOrgSlugs.length, 'organization'),
+      ]
     }
-    return {
-      title: 'Account',
-      items: [
-        {
-          key: 'account',
-          label: 'Account-level access',
-          sublabel: undefined,
-          isInaccessible: false,
-        },
-      ],
-    }
+    return [{ key: 'account', label: 'Account-level access' }]
   }, [
     resourceAccess,
     tokenProjectRefs,
@@ -169,34 +157,12 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     access.inaccessibleOrgSlugs,
   ])
 
-  // Vertically centering the row only reads right when its badges fit on a single line — with
-  // wrapped badges the label should sit at the top instead. Measured, not guessed from item count,
-  // since wrapping depends on the sheet's width and each badge's label length.
-  const resourceAccessRef = useRef<HTMLDivElement>(null)
-  const [isResourceAccessWrapped, setIsResourceAccessWrapped] = useState(false)
-
-  useEffect(() => {
-    const container = resourceAccessRef.current
-    if (!container) return
-
-    const checkWrapped = () => {
-      const firstBadge = container.firstElementChild as HTMLElement | null
-      setIsResourceAccessWrapped(
-        firstBadge !== null && container.clientHeight > firstBadge.clientHeight + 2
-      )
-    }
-
-    checkWrapped()
-    const observer = new ResizeObserver(checkWrapped)
-    observer.observe(container)
-    return () => observer.disconnect()
-  }, [resourceSummary])
-
-  const rows: [string, React.ReactNode][] = token
+  const rows: TokenSummaryRow[] = token
     ? [
-        [
-          'Created',
-          token.created_at ? (
+        {
+          key: 'created',
+          label: 'Created',
+          value: token.created_at ? (
             <TimestampInfo
               utcTimestamp={token.created_at}
               label={dayjs(token.created_at).fromNow()}
@@ -205,10 +171,11 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           ) : (
             <span className="text-foreground-lighter">Unknown</span>
           ),
-        ],
-        [
-          'Last used',
-          token.last_used_at ? (
+        },
+        {
+          key: 'last-used',
+          label: 'Last used',
+          value: token.last_used_at ? (
             <TimestampInfo
               utcTimestamp={token.last_used_at}
               label={dayjs(token.last_used_at).fromNow()}
@@ -217,10 +184,11 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           ) : (
             <span className="text-foreground-lighter">Never</span>
           ),
-        ],
-        [
-          'Expires',
-          token.expires_at ? (
+        },
+        {
+          key: 'expires',
+          label: 'Expires',
+          value: token.expires_at ? (
             <TimestampInfo
               utcTimestamp={token.expires_at}
               label={dayjs(token.expires_at).fromNow()}
@@ -229,40 +197,19 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           ) : (
             <span className="text-foreground-lighter">Never</span>
           ),
-        ],
-        [
-          'Resource access',
-          <div
-            key="resource-access"
-            ref={resourceAccessRef}
-            className="flex flex-wrap justify-start gap-1.5 sm:justify-end"
-          >
-            {resourceSummary.items.length === 0 && hasNoBoundResources && (
-              <span className="text-sm text-foreground-lighter">{boundResourcesDeletedText}</span>
-            )}
-            {resourceSummary.items.length === 0 && !hasNoBoundResources && (
-              <span className="text-sm text-foreground-lighter">-</span>
-            )}
-            {resourceSummary.items.map((item) => (
-              <div
-                key={item.key}
-                className={cn(
-                  'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border bg-surface-75 text-foreground-light px-3 py-1 text-sm',
-                  item.isInaccessible
-                    ? 'border-destructive-500 text-destructive'
-                    : 'border-strong text-foreground'
-                )}
-              >
-                {resourceAccess === 'organization' ? (
-                  <Boxes size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-                ) : resourceAccess === 'project' ? (
-                  <Box size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
-                ) : null}
-                {item.label}
-              </div>
-            ))}
-          </div>,
-        ],
+        },
+        {
+          key: 'resource-access',
+          label: 'Resource access',
+          isWrappable: true,
+          value: (
+            <ResourceAccessPills
+              resourceAccess={resourceAccess}
+              items={resourceItems}
+              emptyText={hasNoBoundResources ? boundResourcesDeletedText : '-'}
+            />
+          ),
+        },
       ]
     : []
 
@@ -341,32 +288,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm">Token summary</h3>
-                  <dl className="divide-y rounded-md border bg-surface-300">
-                    {rows.map(([key, value]) => (
-                      <div
-                        key={key}
-                        className={cn(
-                          'flex justify-between gap-4 px-4 py-3',
-                          key === 'Resource access'
-                            ? cn(
-                                'flex-col items-start sm:flex-row',
-                                isResourceAccessWrapped ? 'sm:items-start' : 'sm:items-center'
-                              )
-                            : 'items-center'
-                        )}
-                      >
-                        <dt className="shrink-0 text-sm text-foreground-lighter">{key}</dt>
-                        <dd
-                          className={cn(
-                            'text-sm text-foreground',
-                            key === 'Resource access' && 'w-full min-w-0 sm:w-auto sm:flex-1'
-                          )}
-                        >
-                          {value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
+                  <TokenSummaryList rows={rows} />
                 </div>
 
                 <div className="flex flex-col gap-3">

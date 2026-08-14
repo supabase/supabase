@@ -2,19 +2,13 @@ import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import {
   RISK_LEVEL_LABEL,
+  RISK_TONE_VARIANT,
   type PermissionCatalogEntry,
-  type RiskLevel,
 } from '../../AccessToken.permissions'
 import {
   getMcpToolsForScopes,
   PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
-
-const RISK_VARIANT: Record<RiskLevel, 'success' | 'warning' | 'destructive'> = {
-  low: 'success',
-  medium: 'warning',
-  high: 'destructive',
-}
 
 interface RiskMarkerProps {
   entry: PermissionCatalogEntry
@@ -32,7 +26,7 @@ export const RiskMarker = ({
 }: RiskMarkerProps) => {
   const marker = (
     <Badge
-      variant={RISK_VARIANT[entry.risk]}
+      variant={RISK_TONE_VARIANT[entry.risk]}
       className={cn(withTooltip && 'cursor-help', className)}
     >
       {RISK_LEVEL_LABEL[entry.risk]}
@@ -52,7 +46,7 @@ export const RiskMarker = ({
         <span tabIndex={0}>{marker}</span>
       </TooltipTrigger>
       <TooltipContent side="top" align="center" className="w-72 space-y-2 p-3">
-        <Badge variant={RISK_VARIANT[entry.risk]}>{RISK_LEVEL_LABEL[entry.risk]}</Badge>
+        <Badge variant={RISK_TONE_VARIANT[entry.risk]}>{RISK_LEVEL_LABEL[entry.risk]}</Badge>
         <p className="text-xs text-foreground-light">{entry.riskReason}</p>
         {(entry.allowsRead.length > 0 || entry.allowsWrite.length > 0) && (
           <div className="flex flex-col gap-5 mt-5">
