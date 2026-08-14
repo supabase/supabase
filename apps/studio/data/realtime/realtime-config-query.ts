@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import type { components } from 'api-types'
 
 import { realtimeKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
@@ -9,9 +10,14 @@ export type RealtimeConfigurationVariables = {
   projectRef?: string
 }
 
+export type RealtimeConfiguration = components['schemas']['RealtimeConfigResponse'] & {
+  postgres_changes_pool?: number
+}
+
 export const REALTIME_DEFAULT_CONFIG = {
   private_only: false,
   connection_pool: 2,
+  postgres_changes_pool: 2,
   max_concurrent_users: 200,
   max_events_per_second: 100,
   max_bytes_per_second: 100000,
@@ -25,7 +31,7 @@ export const REALTIME_DEFAULT_CONFIG = {
 export async function getRealtimeConfiguration(
   { projectRef }: RealtimeConfigurationVariables,
   signal?: AbortSignal
-) {
+): Promise<RealtimeConfiguration | typeof REALTIME_DEFAULT_CONFIG | undefined> {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { data, error } = await get(`/platform/projects/{ref}/config/realtime`, {
