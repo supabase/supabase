@@ -83,7 +83,12 @@ export const ReadReplicasSection = () => {
           </PageSectionSummary>
           <PageSectionAside>
             <DocsButton href={`${DOCS_URL}/guides/platform/read-replicas`} />
-            <Button variant="primary" icon={<Plus />} onClick={() => setAddReplica(true)}>
+            <Button
+              type="button"
+              variant="primary"
+              icon={<Plus />}
+              onClick={() => setAddReplica(true)}
+            >
               Add read replica
             </Button>
           </PageSectionAside>
@@ -129,7 +134,12 @@ export const ReadReplicasSection = () => {
               title="No read replicas"
               description="All reads and writes currently go to the primary."
             >
-              <Button variant="default" icon={<Plus />} onClick={() => setAddReplica(true)}>
+              <Button
+                type="button"
+                variant="default"
+                icon={<Plus />}
+                onClick={() => setAddReplica(true)}
+              >
                 Add read replica
               </Button>
             </EmptyStatePresentational>
