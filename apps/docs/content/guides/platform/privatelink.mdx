@@ -36,24 +36,24 @@ To use PrivateLink with your Supabase project:
 
 ## Getting started
 
-### Step 1: Add association
+### Step 1: Add connection
 
 Navigate to your project's Integrations section to set up PrivateLink:
 
 1. Go to your Supabase project dashboard
 2. Navigate to [**Settings** > **Integrations**](/dashboard/project/_/settings/integrations)
 3. Find the **AWS PrivateLink** section
-4. Click **Add association**
-5. Provide an association description (recommended)
+4. Click **Add connection**
+5. Provide a description (recommended)
 6. Select the database target: the primary database or a specific read replica
 7. Enter your AWS account ID
-8. Click **Add association** to submit
+8. Click **Add connection** to submit
 
-Each database, whether the primary or a read replica, needs its own association. Create a separate association for every database you want to reach over PrivateLink.
+Each database, whether the primary or a read replica, needs its own connection. Create a separate connection for every database you want to reach over PrivateLink.
 
-After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS account ID. This process may take a few moments. Once complete, the association will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted. You must accept the resource share within 12 hours, or the request expires and can no longer be accepted in AWS. You'll need to create a new association to try again.
+After submission, Supabase creates a VPC Lattice Resource Configuration for your project and sends an AWS Resource Share to the specified AWS account ID. This process may take a few moments. Once complete, the connection will show a "Ready" status, indicating that the resource share has been sent to your AWS account and is ready to be accepted. You must accept the resource share within 12 hours, or the request expires and can no longer be accepted in AWS. You'll need to create a new connection to try again.
 
-Once ready, select **View Association** to see the VPC Lattice resource configuration ID and ARNs for the association. This is useful for confirming which resource configuration corresponds to which database when a project has multiple associations, for example one for the primary database and one for each read replica.
+Once ready, select **View connection** to see the VPC Lattice resource configuration ID and ARNs for the connection. This is useful for confirming which resource configuration corresponds to which database when a project has multiple connections, for example one for the primary database and one for each read replica.
 
 ### Step 2: Accept resource share
 
@@ -65,7 +65,7 @@ Supabase will send you an AWS Resource Share containing the VPC Lattice Resource
 3. Go to [Shared with me > Resource shares](https://console.aws.amazon.com/ram/home#SharedResourceShares)
 4. Locate the resource share from Supabase.
    - The resource share has the format `sspl-[project_ref]-[random alphanumeric string]`
-   - If your project has multiple associations, for example one for the primary database and one for each read replica, match the share's ARN to the **Resource Share ARN** shown for that association in **View Association** to confirm you're accepting the correct one
+   - If your project has multiple connections, for example one for the primary database and one for each read replica, match the share's ARN to the **Resource share ARN** shown for that connection in **View connection** to confirm you're accepting the correct one
 5. Click on the resource share name to view details. Review the list of resource shares - it should only include resources of type vpc-lattice:ResourceConfiguration.
 6. Click **Accept resource share**
 7. Confirm the acceptance in the dialog box
@@ -100,7 +100,7 @@ In your AWS account, you have two options to establish connectivity:
 5. Under Type, select **Resources**
 6. In the **Resource configurations** section select the appropriate resource configuration
    - The resource configuration name will be in the format `[organisation]-[project-ref]-rc`
-   - If you have multiple associations, match the **Resource Configuration ID** shown for that association in **View Association** to confirm you select the configuration for the correct database
+   - If you have multiple connections, match the **Resource configuration ID** shown for that connection in **View connection** to confirm you select the configuration for the correct database
 7. Select your VPC from the dropdown. This should match the VPC you selected for your security group in Step 3
 8. Enable the **Enable DNS name** option if you want to use a DNS record instead of the endpoints IP address(es)
 9. Choose the appropriate subnets for your network
@@ -121,7 +121,7 @@ In your AWS account, you have two options to establish connectivity:
 4. In the service network details, go to the **Resource configuration associations** tab
 5. Click **Create associations**
 6. Select the appropriate **Resource configuration** from the dropdown
-   - If you have multiple associations, match the **Resource Configuration ID** shown for that association in **View Association** to confirm you select the configuration for the correct database
+   - If you have multiple connections, match the **Resource configuration ID** shown for that connection in **View connection** to confirm you select the configuration for the correct database
 7. Click **Save changes**
 8. After creation, you will see the resource configuration in the Resource configurations section of your service network with the status "Active"
 9. For connectivity, click on the association details and the domain name will be listed in the **DNS entries** section
