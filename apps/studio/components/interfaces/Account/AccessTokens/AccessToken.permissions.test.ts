@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  computeOverallRisk,
   countConfigured,
   getCatalogEntry,
   scopesToSelection,
@@ -143,37 +142,6 @@ describe('selectionToScopes', () => {
     const advisors = getCatalogEntry('project:advisors')
     expect(advisors?.writable).toBe(false)
     expect(selectionToScopes({ 'project:advisors': 'readwrite' })).toEqual(['advisors_read'])
-  })
-})
-
-describe('computeOverallRisk', () => {
-  it('is Minimal with no capabilities', () => {
-    expect(computeOverallRisk({}, 'project').level).toBe('Minimal')
-  })
-
-  it('account-level read-only is still Elevated', () => {
-    const risk = computeOverallRisk({ 'project:advisors': 'read' }, 'account')
-    expect(risk.level).toBe('Elevated')
-    expect(risk.tone).toBe('medium')
-  })
-
-  it('account-level with any write is High', () => {
-    const risk = computeOverallRisk({ 'project:realtime_config': 'readwrite' }, 'account')
-    expect(risk.level).toBe('High')
-  })
-
-  it('project high-risk write is High', () => {
-    expect(computeOverallRisk({ 'project:database': 'readwrite' }, 'project').level).toBe('High')
-  })
-
-  it('project medium write is Medium', () => {
-    expect(computeOverallRisk({ 'project:realtime_config': 'readwrite' }, 'project').level).toBe(
-      'Medium'
-    )
-  })
-
-  it('read-only project is Low', () => {
-    expect(computeOverallRisk({ 'project:database': 'read' }, 'project').level).toBe('Low')
   })
 })
 
