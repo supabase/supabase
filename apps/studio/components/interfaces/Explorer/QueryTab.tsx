@@ -9,15 +9,16 @@ import { type QueryResult } from './types'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
-const QUERY_ROW_LIMIT = 100
-
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
 export const QueryTab = () => {
   const { id, ref } = useParams()
   const router = useRouter()
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
+
+  const [rowLimit, setRowLimit] = useState<number>(100)
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
+
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
   const result = draft && id ? querySnap.results[id] : undefined
@@ -82,7 +83,7 @@ export const QueryTab = () => {
       sql={draft.uncheckedSql}
       source={draft.source}
       result={result}
-      rowLimit={QUERY_ROW_LIMIT}
+      rowLimit={rowLimit}
       onTitleChange={(value) => {
         const name = value.trim() || 'Untitled query'
         explorerQueryState.updateDraft({ id, name })
@@ -91,6 +92,7 @@ export const QueryTab = () => {
       onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
       onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
+      onRowLimitChange={setRowLimit}
     />
   )
 }
