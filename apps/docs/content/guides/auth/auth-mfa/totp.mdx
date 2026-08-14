@@ -36,7 +36,7 @@ In the **setup flow**, a session already at AAL1 calls the Enroll API, which ret
 
 In the **login flow**, the user signs in (upgrading the session to AAL1) and the List Factors API is called. If the user has one or more factors, they open their authenticator and enter a code, which follows the same Challenge and Verify path to reach AAL2. If they have no factors enrolled, they are sent through the setup flow first.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is free to use and is enabled on all Supabase projects by default.
 
@@ -47,7 +47,7 @@ In the **login flow**, the user signs in (upgrading the session to AAL1) and the
 An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
 
 1. Right after login or sign up.
-   This lets users quickly set up MFA immediately after they log in or create an
+   This lets users set up MFA immediately after they log in or create an
    account. We recommend encouraging all users to set up MFA if that makes sense
    for your application. Many applications offer this as an opt-in step in an
    effort to reduce onboarding friction.

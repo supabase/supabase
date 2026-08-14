@@ -11,7 +11,7 @@ export const dataset: AssistantEvalCase[] = [
       prompt: 'Check if my project is having issues right now and tell me what to fix first.',
     },
     expected: {
-      requiredTools: ['get_advisors', 'get_logs'],
+      requiredTools: ['get_advisors', 'query_logs'],
     },
     metadata: { category: ['debugging', 'rls_policies'] },
   },
@@ -419,6 +419,91 @@ export const dataset: AssistantEvalCase[] = [
     metadata: {
       category: ['sql_generation'],
       description: 'Warns about irreversible data loss before executing DELETE without WHERE',
+    },
+  },
+  // Notebook cases
+  {
+    input: { prompt: 'What notebooks do I have saved?' },
+    expected: {
+      requiredTools: ['list_notebooks'],
+      correctAnswer: 'Mentions both "Auth health check" and "Edge function error triage".',
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Basic notebook enumeration',
+    },
+  },
+  {
+    input: { prompt: 'Show me my most recently created notebook' },
+    expected: {
+      requiredTools: [
+        {
+          name: 'list_notebooks',
+          input: {
+            sort_by: { equals: 'inserted_at' },
+          },
+        },
+      ],
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Sorts by creation time since there is no "updated_at" sort key available from the API',
+    },
+  },
+  {
+    input: { prompt: "Do I have a notebook called 'Storage cleanup'?" },
+    expected: {
+      requiredTools: ['list_notebooks'],
+      correctAnswer: 'States that no notebook called "Storage cleanup" exists.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Guards against inventing a notebook instead of calling the tool and reporting the real, negative result',
+    },
+  },
+  {
+    input: { prompt: 'What queries does my Auth health check notebook run?' },
+    expected: {
+      requiredTools: ['list_notebooks', 'get_notebook'],
+      correctAnswer:
+        "Reports exactly two queries: a database query for signups per day from auth.users, and a logs query for auth errors against the auth_logs source scoped to the last hour. May (but does not have to) note that the remaining cell is markdown and runs no query. Accurate statements about a cell's configuration — the signups cell's 30-row limit or its line chart, the auth errors cell's relative time range — are acceptable. Does not attribute any query, table, or log source the notebook does not contain, and does not misstate the auth errors cell's time range.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Resolves a notebook name to an id via list_notebooks, then reads it — guards against paraphrasing cells into queries the notebook does not contain',
+    },
+  },
+  {
+    input: { prompt: "Summarize what's in my Edge function error triage notebook" },
+    expected: {
+      requiredTools: ['list_notebooks', 'get_notebook'],
+      correctAnswer:
+        'Summarizes the notebook as a markdown intro plus one log cell ("hello-world failures") that queries function_edge_logs for TypeError failures over the last day. Log cells hold SQL against a logs source, so describing that cell\'s SQL, columns, or time range is correct and acceptable. Does not attribute a third cell, or any Postgres database cell, to the notebook.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Baseline read of a smaller, single-query notebook',
+    },
+  },
+  {
+    input: { prompt: 'Get the notebook with id 00000000-0000-0000-0000-000000000000' },
+    expected: {
+      requiredTools: [
+        {
+          name: 'get_notebook',
+          input: { id: { equals: '00000000-0000-0000-0000-000000000000' } },
+        },
+      ],
+      correctAnswer:
+        'States that no notebook with that id was found, and does not describe any notebook contents.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Exercises the not-found error path of get_notebook and guards against hallucinating contents for a notebook that does not exist',
     },
   },
 ]

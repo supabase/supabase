@@ -1,5 +1,5 @@
-import { useParams } from 'common'
-import { CircleHelpIcon, Undo2 } from 'lucide-react'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { CircleHelpIcon, Undo2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Badge, Button, cn } from 'ui'
 
@@ -8,6 +8,8 @@ import {
   useUnifiedLogsPreview,
 } from '../App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { IS_PLATFORM } from '@/lib/constants'
 
 interface UnifiedLogsBannerProps {
   className?: string
@@ -19,6 +21,15 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
 
   const { selectFeaturePreview } = useFeaturePreviewModal()
   const { enable, disable, isDefaultOptIn, isEnabled } = useUnifiedLogsPreview()
+  const [isDismissed, setIsDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED,
+    false
+  )
+
+  if (!IS_PLATFORM) return null
+
+  // Keep the "Go back" banner visible even after dismissal so manually opted-in users can switch back
+  if (isDismissed && !(isEnabled && !isDefaultOptIn)) return null
 
   const cardClassName = cn(
     'rounded-lg border p-4 space-y-3 text-left',
@@ -57,8 +68,16 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
 
   return (
     <div className={cardClassName}>
-      <div className="flex justify-start">
+      <div className="flex items-start justify-between">
         <Badge variant="success">New</Badge>
+        <Button
+          variant="text"
+          size="tiny"
+          icon={<X size={14} strokeWidth={1.5} />}
+          onClick={() => setIsDismissed(true)}
+          className="opacity-75 hover:opacity-100 -mt-1 -mr-1 px-1"
+          aria-label="Dismiss banner"
+        />
       </div>
       <h3 className="font-medium text-sm text-foreground">Introducing unified logs</h3>
       <div className="flex justify-start items-start gap-x-2">

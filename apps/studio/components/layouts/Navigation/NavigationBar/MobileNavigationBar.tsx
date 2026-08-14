@@ -3,7 +3,7 @@ import { ChevronLeft, Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
-import { MobileSheetNav } from 'ui-patterns'
+import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
 
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'

@@ -22,7 +22,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { PublicationSkeleton } from './PublicationSkeleton'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import InformationBox from '@/components/ui/InformationBox'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -21,13 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { convertPoolSize, isAllocationUnit } from './PerformanceSettingsForm.utils'
 import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -103,7 +104,7 @@ export const PerformanceSettingsForm = () => {
     defaultValues: { API_MAX_REQUEST_DURATION: 10 },
   })
 
-  const databaseForm = useForm({
+  const databaseForm = useForm<z.infer<typeof DatabaseFormSchema>>({
     resolver: zodResolver(DatabaseFormSchema),
     defaultValues: {
       DB_MAX_POOL_SIZE: 10,
@@ -111,7 +112,7 @@ export const PerformanceSettingsForm = () => {
     },
   })
 
-  const chosenUnit = databaseForm.watch('DB_MAX_POOL_SIZE_UNIT')
+  const chosenUnit = useWatch({ control: databaseForm.control, name: 'DB_MAX_POOL_SIZE_UNIT' })
 
   const onSubmitRequestDurationForm = (values: any) => {
     if (!project?.ref) return console.error('Project ref is required')
@@ -315,28 +316,22 @@ export const PerformanceSettingsForm = () => {
                         <Select
                           value={field.value}
                           onValueChange={(value) => {
+                            if (!isAllocationUnit(value)) return
+
                             const values = databaseForm.getValues()
+                            const currentUnit = values.DB_MAX_POOL_SIZE_UNIT
                             field.onChange(value)
 
-                            if (values.DB_MAX_POOL_SIZE_UNIT !== value) {
-                              const currentValue = values.DB_MAX_POOL_SIZE!
-
-                              let preservedPoolSize: number
-                              if (value === 'percent') {
-                                // convert from absolute number to roughly the same percentage
-                                preservedPoolSize = Math.ceil(
-                                  (Math.min(maxConnectionLimit, currentValue) /
-                                    maxConnectionLimit) *
-                                    100
-                                )
-                              } else {
-                                // convert from percentage to roughly the same connection number
-                                preservedPoolSize = Math.floor(
-                                  maxConnectionLimit * (Math.min(100, currentValue) / 100)
-                                )
-                              }
-
-                              databaseForm.setValue('DB_MAX_POOL_SIZE', preservedPoolSize)
+                            if (currentUnit !== value) {
+                              databaseForm.setValue(
+                                'DB_MAX_POOL_SIZE',
+                                convertPoolSize({
+                                  fromUnit: currentUnit,
+                                  toUnit: value,
+                                  currentValue: values.DB_MAX_POOL_SIZE!,
+                                  maxConnectionLimit,
+                                })
+                              )
                             }
                           }}
                         >

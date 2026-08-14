@@ -37,5 +37,3 @@ export const ResetDbPassword = ({ disabled = false }) => {
     </PageSection>
   )
 }
-
-export default ResetDbPassword

@@ -1,7 +1,6 @@
 import { BoxPlus } from 'icons'
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode } from 'react'
 import {
   Button,
   Card,
@@ -13,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ShimmeringCard } from './ShimmeringCard'
 import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'
@@ -66,10 +65,9 @@ export const LoadingTableView = () => {
   )
 }
 
-export const LoadingCardView = ({ prependCard }: { prependCard?: ReactNode }) => {
+export const LoadingCardView = () => {
   return (
     <ul className="w-full mx-auto grid grid-cols-1 gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-      {prependCard}
       <ShimmeringCard />
       <ShimmeringCard />
     </ul>

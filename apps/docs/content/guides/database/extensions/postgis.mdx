@@ -190,9 +190,40 @@ val data = supabase.from("restaurants").insert(listOf(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+[Table("restaurants")]
+class Restaurant : BaseModel
+{
+    [PrimaryKey("id", false)]
+    public long Id { get; set; }
+
+    [Column("name")]
+    public string Name { get; set; }
+
+    [Column("location")]
+    public string Location { get; set; }
+}
+```
+
+```c#
+var restaurants = new List<Restaurant>
+{
+    new Restaurant { Name = "Supa Burger", Location = "POINT(-73.946823 40.807416)" },
+    new Restaurant { Name = "Supa Pizza", Location = "POINT(-73.94581 40.807475)" },
+    new Restaurant { Name = "Supa Taco", Location = "POINT(-73.945826 40.80629)" }
+};
+
+await supabase.From<Restaurant>().Insert(restaurants);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
-Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, just a single space.
+Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, only a single space.
 
 At this point, if you go into your Supabase dashboard and look at the data, you will notice that the value of the `location` column looks something like this.
 
@@ -291,6 +322,19 @@ val data = supabase.postgrest.rpc(
         put("lon", -73.946713)
     }
 )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("nearby_restaurants", new Dictionary<string, object>
+{
+    { "lat", 40.807313 },
+    { "long", -73.946713 }
+});
 ```
 
 </TabPanel>
@@ -423,6 +467,21 @@ val data = supabase.postgrest.rpc(
         put("max_lon", -73.945)
     }
 )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("restaurants_in_view", new Dictionary<string, object>
+{
+    { "min_lat", 40.807 },
+    { "min_long", -73.946 },
+    { "max_lat", 40.808 },
+    { "max_long", -73.945 }
+});
 ```
 
 </TabPanel>

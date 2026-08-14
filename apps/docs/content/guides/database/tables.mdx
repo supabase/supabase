@@ -309,6 +309,44 @@ supabase
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+[Table("movies")]
+class Movie : BaseModel
+{
+    [PrimaryKey("id", false)]
+    public long Id { get; set; }
+
+    [Column("name")]
+    public string Name { get; set; }
+
+    [Column("description")]
+    public string Description { get; set; }
+}
+```
+
+```c#
+var movies = new List<Movie>
+{
+    new Movie
+    {
+        Name = "The Empire Strikes Back",
+        Description = "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."
+    },
+    new Movie
+    {
+        Name = "Return of the Jedi",
+        Description = "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
+    }
+};
+
+await supabase.From<Movie>().Insert(movies);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ### Bulk data loading
@@ -452,6 +490,12 @@ create table private.salaries (
 );
 ```
 
+<Admonition type="note">
+
+If you want to access a custom schema through the Supabase Data API, you need to expose it and grant the appropriate permissions. See [Using Custom Schemas](/docs/guides/api/using-custom-schemas) for detailed steps. For security best practices around schema exposure, see [Securing your API](/docs/guides/api/securing-your-api).
+
+</Admonition>
+
 ## Views
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
@@ -579,7 +623,7 @@ from
 where courses.code != 'PG101';
 ```
 
-Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter just the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
+Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
 
 #### Logical organization
 

@@ -1,18 +1,17 @@
 import { useParams } from 'common'
 import { uniq } from 'lodash'
 import { Loader2 } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
 import { useSelectedAnalyticsBucket } from '../useSelectedAnalyticsBucket'
 import { HIDE_REPLICATION_USER_FLOW } from './AnalyticsBucketDetails.constants'
+import { ExtensionNeedsUpgrade, ExtensionNotInstalled, WrapperMissing } from './BucketCallouts'
 import { BucketHeader } from './BucketHeader'
 import { CreateTableInstructions } from './CreateTable/CreateTableInstructions'
 import { NamespaceWithTables } from './NamespaceWithTables'
@@ -30,18 +29,10 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
-import {
-  DatabaseExtension,
-  useDatabaseExtensionsQuery,
-} from '@/data/database-extensions/database-extensions-query'
-import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
-import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
+import { AlertError } from '@/components/ui/AlertError'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
-import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 
 export const AnalyticBucketDetails = () => {
   const router = useRouter()
@@ -66,30 +57,14 @@ export const AnalyticBucketDetails = () => {
   const [pollIntervalNamespaces, setPollIntervalNamespaces] = useState(0)
   const [pollIntervalNamespaceTables, setPollIntervalNamespaceTables] = useState(0)
 
-  const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation()
-
   const {
     publication,
-    pipeline,
     icebergWrapper: wrapperInstance,
     isLoadingWrapperInstance,
   } = useAnalyticsBucketAssociatedEntities({
     projectRef,
     bucketId: bucket?.name,
   })
-  const { data, isSuccess: isSuccessPipelineStatus } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
-    {
-      refetchInterval: (query) => {
-        const data = query.state.data
-        if (data?.status.name !== 'started') return 4000
-        else return false
-      },
-    }
-  )
-  const pipelineStatus = data?.status.name
-  const isPipelineRunning = pipelineStatus === 'started'
-  const isPipelineStopped = ['failed', 'stopped'].includes(pipelineStatus ?? '')
 
   const wrapperValues = convertKVStringArrayToJson(wrapperInstance?.server_options ?? [])
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
@@ -224,69 +199,20 @@ export const AnalyticBucketDetails = () => {
                     ) : null}
                   </>
                 ) : (
-                  <>
-                    {!!pipeline && !!isSuccessPipelineStatus && !isPipelineRunning && (
-                      <Admonition
-                        type="note"
-                        layout="horizontal"
-                        className="[&>div]:pl-10 [&>div]:translate-y-[-3px]"
-                        childProps={{ title: { className: 'block capitalize-sentence' } }}
-                        showIcon={isPipelineStopped}
-                        title={
-                          isPipelineStopped
-                            ? `Replication on the bucket has ${pipelineStatus}`
-                            : `${pipelineStatus} replication on the bucket...`
-                        }
-                        description={
-                          isPipelineStopped
-                            ? 'Data changes from Postgres tables is currently not streaming to their corresponding analytics bucket table'
-                            : 'Data changes from Postgres tables will resume streaming once pipeline has started'
-                        }
-                        actions={
-                          <div className="flex items-center gap-x-2">
-                            <Button asChild variant="default">
-                              <Link
-                                href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
-                              >
-                                View pipeline
-                              </Link>
-                            </Button>
-                            {isPipelineStopped && (
-                              <Button
-                                variant="default"
-                                loading={isStartingPipeline}
-                                onClick={async () => {
-                                  if (projectRef) {
-                                    await startPipeline({ projectRef, pipelineId: pipeline.id })
-                                  }
-                                }}
-                              >
-                                Restart
-                              </Button>
-                            )}
-                          </div>
-                        }
-                      >
-                        {!isPipelineStopped && (
-                          <Loader2 size={18} className="absolute top-1.5 left-[3px] animate-spin" />
-                        )}
-                      </Admonition>
-                    )}
-                    <div className="flex flex-col gap-y-10">
-                      {namespaces.map(({ namespace, schema, tables }) => (
-                        <NamespaceWithTables
-                          key={namespace}
-                          namespace={namespace}
-                          sourceType="direct"
-                          schema={schema}
-                          tables={tables as any}
-                          wrapperValues={wrapperValues}
-                          pollIntervalNamespaceTables={pollIntervalNamespaceTables}
-                          setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
-                        />
-                      ))}
-                    </div>
-                  </>
+                  <div className="flex flex-col gap-y-10">
+                    {namespaces.map(({ namespace, schema, tables }) => (
+                      <NamespaceWithTables
+                        key={namespace}
+                        namespace={namespace}
+                        sourceType="direct"
+                        schema={schema}
+                        tables={tables as any}
+                        wrapperValues={wrapperValues}
+                        pollIntervalNamespaceTables={pollIntervalNamespaceTables}
+                        setPollIntervalNamespaceTables={setPollIntervalNamespaceTables}
+                      />
+                    ))}
+                  </div>
                 )}
               </ScaffoldSection>
 
@@ -326,128 +252,6 @@ export const AnalyticBucketDetails = () => {
         onClose={() => setShowDeleteModal(false)}
         onSuccess={() => router.push(`/project/${projectRef}/storage/analytics`)}
       />
-    </>
-  )
-}
-
-const ExtensionNotInstalled = ({
-  bucketName,
-  projectRef,
-  wrapperMeta,
-  wrappersExtension,
-}: {
-  bucketName?: string
-  projectRef: string
-  wrapperMeta: WrapperMeta
-  wrappersExtension: DatabaseExtension
-}) => {
-  const databaseNeedsUpgrading =
-    (wrappersExtension?.default_version ?? '') < (wrapperMeta?.minimumExtensionVersion ?? '')
-
-  return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Missing required extension">
-          <p>
-            The Wrappers extension is required in order to query analytics tables.{' '}
-            {databaseNeedsUpgrading &&
-              'Please first upgrade your database and then install the extension.'}{' '}
-            <InlineLink
-              href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-foreground-lighter hover:text-foreground transition-colors"
-            >
-              Learn more
-            </InlineLink>
-          </p>
-          <Button variant="default" asChild className="mt-2" onClick={() => {}}>
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'Install extension'}
-            </Link>
-          </Button>
-        </Admonition>
-      </ScaffoldSection>
-      <SimpleConfigurationDetails bucketName={bucketName} />
-    </>
-  )
-}
-
-const ExtensionNeedsUpgrade = ({
-  bucketName,
-  projectRef,
-  wrapperMeta,
-  wrappersExtension,
-}: {
-  bucketName?: string
-  projectRef: string
-  wrapperMeta: WrapperMeta
-  wrappersExtension: DatabaseExtension
-}) => {
-  // [Joshen] Default version is what's on the DB, so if the installed version is already the default version
-  // but still doesnt meet the minimum extension version, then DB upgrade is required
-  const databaseNeedsUpgrading =
-    wrappersExtension?.installed_version === wrappersExtension?.default_version
-
-  return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Outdated extension version">
-          <p>
-            The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
-            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-            {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'first upgrade your database, and then '}update the extension
-            by disabling and enabling the Wrappers extension.
-          </p>
-          <p>
-            Before reinstalling the wrapper extension, you must first remove all existing wrappers.
-            Afterward, you can recreate the wrappers.
-          </p>
-          <Button asChild variant="default">
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
-                  : `/project/${projectRef}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'Extensions'}
-            </Link>
-          </Button>
-        </Admonition>
-      </ScaffoldSection>
-      <SimpleConfigurationDetails bucketName={bucketName} />
-    </>
-  )
-}
-
-const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
-    useIcebergWrapperCreateMutation()
-
-  const onSetupWrapper = async () => {
-    if (!bucketName) return console.error('Bucket name is required')
-    await createIcebergWrapper({ bucketName })
-  }
-
-  return (
-    <>
-      <ScaffoldSection isFullWidth>
-        <Admonition type="warning" title="Missing integration">
-          <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
-          <Button variant="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
-            Install wrapper
-          </Button>
-        </Admonition>
-      </ScaffoldSection>
-      <SimpleConfigurationDetails bucketName={bucketName} />
     </>
   )
 }

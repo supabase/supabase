@@ -55,7 +55,7 @@ export const useViewDeleteMutation = ({
       const { id, projectRef, schema } = variables
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
-        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, schema) }),
+        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, [schema]) }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
       ])
 

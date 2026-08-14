@@ -1,9 +1,9 @@
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import pgMeta, { type PGPolicy } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
+import { executeSql } from '../sql/execute-sql-mutation'
 import { databasePoliciesKeys } from './keys'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
-import { get, handleError } from '@/data/fetchers'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -11,37 +11,27 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 type DatabasePoliciesVariables = {
   projectRef?: string
   connectionString?: string | null
-  schema?: string
+  schemas?: string[]
 }
 
 export async function getDatabasePolicies(
-  { projectRef, connectionString, schema }: DatabasePoliciesVariables,
-  signal?: AbortSignal,
-  headersInit?: HeadersInit
+  { projectRef, connectionString, schemas }: DatabasePoliciesVariables,
+  signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers(headersInit)
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/policies', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-        excluded_schemas: '',
-      },
+  const { sql } = pgMeta.policies.list({ includedSchemas: schemas })
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['policies', schemas],
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data
+  return result as PGPolicy[]
 }
 
 export type DatabasePoliciesData = Awaited<ReturnType<typeof getDatabasePolicies>>
@@ -52,16 +42,16 @@ function markSavedPolicySafe(policy: DatabasePoliciesData[number]): Policy {
 }
 
 export const useDatabasePoliciesQuery = <TData = Policy[]>(
-  { projectRef, connectionString, schema }: DatabasePoliciesVariables,
+  { projectRef, connectionString, schemas }: DatabasePoliciesVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<Policy[], DatabasePoliciesError, TData> = {}
 ) => {
   const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<Policy[], DatabasePoliciesError, TData>({
-    queryKey: databasePoliciesKeys.list(projectRef, schema),
+    queryKey: databasePoliciesKeys.list(projectRef, schemas),
     queryFn: ({ signal }) =>
-      getDatabasePolicies({ projectRef, connectionString, schema }, signal).then((data) =>
+      getDatabasePolicies({ projectRef, connectionString, schemas }, signal).then((data) =>
         data.map(markSavedPolicySafe)
       ),
     enabled: enabled && typeof projectRef !== 'undefined' && isActive,

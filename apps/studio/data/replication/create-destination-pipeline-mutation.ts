@@ -2,15 +2,20 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
+import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
+import type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+export type { TableSyncCopyConfig } from '@/components/interfaces/Database/Replication/TableSyncCopy.utils'
 
 export type DestinationConfig =
   | { bigQuery: BigQueryDestinationConfig }
   | { iceberg: IcebergDestinationConfig }
   | { ducklake: DucklakeDestinationConfig }
   | { snowflake: SnowflakeDestinationConfig }
+  | { clickHouse: ClickHouseDestinationConfig }
 
 export type BigQueryDestinationConfig = {
   projectId: string
@@ -66,9 +71,20 @@ function isDucklakeSupabaseConfig(
   return 'catalogProjectRef' in config
 }
 
+const maybeOmitBlankSecret = (value: string | undefined, omitBlankSecrets: boolean) => {
+  if (omitBlankSecrets) return optionalSecret(value)
+
+  return value
+}
+
 // Maps the studio-side DuckLake config to the snake_case `{ ducklake: ... }` payload accepted
 // by the platform API. Shared by the create / update / validate mutations.
-export function buildDucklakeApiConfig(config: DucklakeDestinationConfig) {
+export function buildDucklakeApiConfig(
+  config: DucklakeDestinationConfig,
+  options: { omitBlankSecrets?: boolean } = {}
+) {
+  const omitBlankSecrets = options.omitBlankSecrets ?? false
+
   if (isDucklakeSupabaseConfig(config)) {
     return {
       ducklake: {
@@ -92,11 +108,11 @@ export function buildDucklakeApiConfig(config: DucklakeDestinationConfig) {
 
   return {
     ducklake: {
-      catalog_url: config.catalogUrl,
+      catalog_url: maybeOmitBlankSecret(config.catalogUrl, omitBlankSecrets),
       data_path: config.dataPath,
       pool_size: config.poolSize,
-      s3_access_key_id: config.s3AccessKeyId,
-      s3_secret_access_key: config.s3SecretAccessKey,
+      s3_access_key_id: maybeOmitBlankSecret(config.s3AccessKeyId, omitBlankSecrets),
+      s3_secret_access_key: maybeOmitBlankSecret(config.s3SecretAccessKey, omitBlankSecrets),
       s3_region: config.s3Region,
       s3_endpoint: config.s3Endpoint,
       s3_url_style: config.s3UrlStyle,
@@ -116,22 +132,57 @@ export type SnowflakeDestinationConfig = {
   role?: string
 }
 
+export type ClickHouseDestinationConfig = {
+  url: string
+  user: string
+  password?: string
+  database: string
+  engine?: 'merge_tree' | 'replacing_merge_tree'
+}
+
 export type BatchConfig = {
   maxFillMs?: number
+  maxBytes?: number
+  memoryBudgetRatio?: number
 }
+
+export type PipelineConfig = {
+  publicationName: string
+  batch?: BatchConfig
+  maxTableSyncWorkers?: number
+  maxCopyConnectionsPerTable?: number
+  invalidatedSlotBehavior?: 'error' | 'recreate'
+  tableSyncCopy: TableSyncCopyConfig
+}
+
+export const buildPipelineApiConfig = ({
+  publicationName,
+  batch,
+  maxTableSyncWorkers,
+  maxCopyConnectionsPerTable,
+  invalidatedSlotBehavior,
+  tableSyncCopy,
+}: PipelineConfig) => ({
+  publication_name: publicationName,
+  max_table_sync_workers: maxTableSyncWorkers,
+  max_copy_connections_per_table: maxCopyConnectionsPerTable,
+  invalidated_slot_behavior: invalidatedSlotBehavior,
+  table_sync_copy: tableSyncCopy,
+  batch: batch
+    ? {
+        max_fill_ms: batch.maxFillMs,
+        max_bytes: batch.maxBytes,
+        memory_budget_ratio: batch.memoryBudgetRatio,
+      }
+    : undefined,
+})
 
 export type CreateDestinationPipelineParams = {
   projectRef: string
   destinationName: string
   destinationConfig: DestinationConfig
   sourceId: number
-  pipelineConfig: {
-    publicationName: string
-    batch?: BatchConfig
-    maxTableSyncWorkers?: number
-    maxCopyConnectionsPerTable?: number
-    invalidatedSlotBehavior?: 'error' | 'recreate'
-  }
+  pipelineConfig: PipelineConfig
 }
 
 async function createDestinationPipeline(
@@ -139,13 +190,7 @@ async function createDestinationPipeline(
     projectRef,
     destinationName: destinationName,
     destinationConfig,
-    pipelineConfig: {
-      publicationName,
-      batch,
-      maxTableSyncWorkers,
-      maxCopyConnectionsPerTable,
-      invalidatedSlotBehavior,
-    },
+    pipelineConfig,
     sourceId,
   }: CreateDestinationPipelineParams,
   signal?: AbortSignal
@@ -210,20 +255,26 @@ async function createDestinationPipeline(
         schema,
         role,
       },
-    } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+    } as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+  } else if ('clickHouse' in destinationConfig) {
+    const { url, user, password, database, engine } = destinationConfig.clickHouse
+
+    destination_config = {
+      clickhouse: {
+        url,
+        user,
+        password,
+        database,
+        engine,
+      },
+    } as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else {
     throw new Error(
-      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
     )
   }
 
-  const pipeline_config = {
-    publication_name: publicationName,
-    max_table_sync_workers: maxTableSyncWorkers,
-    max_copy_connections_per_table: maxCopyConnectionsPerTable,
-    invalidated_slot_behavior: invalidatedSlotBehavior,
-    batch: batch ? { max_fill_ms: batch.maxFillMs } : undefined,
-  }
+  const pipeline_config = buildPipelineApiConfig(pipelineConfig)
 
   const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
     params: { path: { ref: projectRef } },

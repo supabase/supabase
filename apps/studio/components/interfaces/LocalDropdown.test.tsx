@@ -70,7 +70,9 @@ vi.mock('ui', async () => {
       children,
       ...props
     }: React.ButtonHTMLAttributes<HTMLButtonElement> & { children?: ReactNode }) => (
-      <button {...props}>{children}</button>
+      <button tabIndex={0} {...props}>
+        {children}
+      </button>
     ),
     cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
     DropdownMenu: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -92,6 +94,7 @@ vi.mock('ui', async () => {
         <div>{children}</div>
       ) : (
         <button
+          tabIndex={0}
           onClick={() => {
             onClick?.()
             onSelect?.()
@@ -125,7 +128,11 @@ vi.mock('ui', async () => {
     }: {
       children: ReactNode
       onClick?: () => void
-    }) => <button onClick={onClick}>{children}</button>,
+    }) => (
+      <button tabIndex={0} onClick={onClick}>
+        {children}
+      </button>
+    ),
     Tooltip: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     TooltipContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
     TooltipTrigger: ({ children }: { children: ReactNode }) => <div>{children}</div>,

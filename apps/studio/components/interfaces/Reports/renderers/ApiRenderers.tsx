@@ -35,7 +35,7 @@ import {
   TextFormatter,
 } from '@/components/interfaces/Settings/Logs/LogsFormatters'
 import Table from '@/components/to-be-cleaned/Table'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import BarChart from '@/components/ui/Charts/BarChart'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'

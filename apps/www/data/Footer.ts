@@ -93,8 +93,8 @@ const footerData = [
         url: '/partners',
       },
       {
-        text: 'Integrations',
-        url: '/partners/integrations',
+        text: 'Partner Catalog',
+        url: '/partners/catalog',
       },
       {
         text: 'Brand Assets',
@@ -103,10 +103,6 @@ const footerData = [
       {
         text: 'Security & Compliance',
         url: '/security',
-      },
-      {
-        text: 'DPA',
-        url: '/legal/dpa',
       },
       {
         text: 'SOC2',
@@ -126,8 +122,8 @@ const footerData = [
         url: '/docs',
       },
       {
-        text: 'Supabase UI',
-        url: 'https://supabase.com/ui',
+        text: 'Supabase Library',
+        url: 'https://supabase.com/library',
       },
       {
         text: 'Changelog',
@@ -180,12 +176,8 @@ const footerData = [
         url: '/ga',
       },
       {
-        text: 'Legal',
+        text: 'Legal Hub',
         url: '/legal',
-      },
-      {
-        text: 'Terms of Service',
-        url: '/terms',
       },
       {
         text: 'Privacy Policy',
@@ -198,14 +190,6 @@ const footerData = [
       {
         text: 'Acceptable Use Policy',
         url: '/aup',
-      },
-      {
-        text: 'Support Policy',
-        url: '/support-policy',
-      },
-      {
-        text: 'Service Level Agreement',
-        url: '/sla',
       },
       {
         text: 'Humans.txt',

@@ -1,3 +1,4 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import {
@@ -11,11 +12,24 @@ import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
+
+  const { can: canReadOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'oauth_apps',
+    undefined,
+    {
+      organizationSlug: org?.slug,
+      projectRef: null,
+    }
+  )
 
   const {
     data: allIntegrations = EMPTY_ARR,
@@ -69,7 +83,7 @@ export const useInstalledIntegrations = () => {
     connectionString: project?.connectionString,
   })
 
-  const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
+  const isHooksEnabled = schemas.some((schema) => schema.name === 'supabase_functions')
 
   const installedIntegrations = useMemo(() => {
     return allIntegrations
@@ -101,25 +115,25 @@ export const useInstalledIntegrations = () => {
     extensionsError ||
     schemasError ||
     availableIntegrationsError ||
-    (hasOAuthIntegration ? oauthDataError : null)
+    (canReadOAuthApps && hasOAuthIntegration ? oauthDataError : null)
   const isLoading =
     isSchemasLoading ||
     isFDWLoading ||
     isExtensionsLoading ||
     isAvailableIntegrationsLoading ||
-    (hasOAuthIntegration && isOAuthDataLoading)
+    (hasOAuthIntegration && canReadOAuthApps && isOAuthDataLoading)
   const isError =
     isErrorFDWs ||
     isErrorExtensions ||
     isErrorSchemas ||
     isErrorAvailableIntegrations ||
-    (hasOAuthIntegration && isErrorOAuthData)
+    (hasOAuthIntegration && canReadOAuthApps && isErrorOAuthData)
   const isSuccess =
     isSuccessFDWs &&
     isSuccessExtensions &&
     isSuccessSchemas &&
     isSuccessAvailableIntegrations &&
-    (!hasOAuthIntegration || isSuccessOAuthData)
+    (!hasOAuthIntegration || !canReadOAuthApps || isSuccessOAuthData)
 
   return {
     // show all integrations at once instead of showing partial results

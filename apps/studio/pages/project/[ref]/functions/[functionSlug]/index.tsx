@@ -13,11 +13,11 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { EdgeFunctionOverview } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview'
 import { EdgeFunctionRecentInvocations } from '@/components/interfaces/Functions/EdgeFunctionRecentInvocations'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import AreaChart from '@/components/ui/Charts/AreaChart'
 import StackedBarChart from '@/components/ui/Charts/StackedBarChart'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import {
   FunctionsCombinedStatsVariables,
   useFunctionsCombinedStatsQuery,

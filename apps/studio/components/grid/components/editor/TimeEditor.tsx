@@ -42,7 +42,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
 
   return (
     <input
-      className="sb-grid-time-editor"
+      className="h-full w-full px-2"
       ref={autoFocusAndSelect}
       defaultValue={value ?? ''}
       onChange={onChange}

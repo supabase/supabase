@@ -113,8 +113,8 @@ const ProgressRing = ({
   )
 }
 
-// The upgrade CTA placement experiment variant this card represents. Used as the telemetry
-// `source` + `placement` value. Kept as a constant so the tracking stays explicit.
+// The upgrade CTA surface this card represents. Used as the telemetry `source` +
+// `placement` value. Kept as a constant so the tracking stays explicit.
 const PLACEMENT = 'org_projects_list'
 
 const CompactMetricRow = ({
@@ -179,10 +179,10 @@ const SkeletonMetricRow = ({ label }: { label: string }) => (
 )
 
 /**
- * Renders the upgrade CTA's plan-usage card as the first tile in the org project list
- * (the `org_projects_list` experiment variant). The parent is responsible for gating on
- * the experiment variant + free plan — this component only renders the visual sections
- * once usage data is available. Shaped like a `ProjectCard` so it reads as another tile.
+ * Renders the upgrade CTA's plan-usage card in the org project list (the
+ * `org_projects_list` CTA placement). The parent is responsible for gating on free plan —
+ * this component only renders the visual sections once usage data is available. Shaped
+ * like a `ProjectCard` so it reads as another tile.
  */
 export const PlanUsageCard = () => {
   const track = useTrack()

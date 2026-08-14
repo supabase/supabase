@@ -3,6 +3,7 @@ import { RowsChangeData } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useTableRowOperations } from '../../hooks/useTableRowOperations'
+import { getStableRowIdentifiers } from '../../utils/queueOperationUtils'
 import { SupaRow } from '@/components/grid/types'
 import { convertByteaToHex } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -33,7 +34,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
 
       const identifiers = {} as Dictionary<any>
 
-      isTableLike(snap.originalTable) &&
+      if (isTableLike(snap.originalTable)) {
         snap.originalTable.primary_keys.forEach((column) => {
           const col = snap.originalTable.columns.find((c) => c.name === column.name)
           identifiers[column.name] =
@@ -41,8 +42,10 @@ export function useOnRowsChange(rows: SupaRow[]) {
               ? convertByteaToHex(previousRow[column.name])
               : previousRow[column.name]
         })
+      }
+      const stableIdentifiers = getStableRowIdentifiers(previousRow, identifiers)
 
-      if (Object.keys(identifiers).length === 0) {
+      if (Object.keys(stableIdentifiers).length === 0) {
         return toast('Unable to update row as table has no primary keys', {
           description: (
             <div>
@@ -62,7 +65,7 @@ export function useOnRowsChange(rows: SupaRow[]) {
         tableId: snap.table.id,
         table: snap.originalTable,
         row: previousRow,
-        rowIdentifiers: identifiers,
+        rowIdentifiers: stableIdentifiers,
         columnName: changedColumn,
         oldValue: previousRow[changedColumn],
         newValue: rowData[changedColumn],

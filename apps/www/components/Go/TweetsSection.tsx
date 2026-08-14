@@ -68,7 +68,7 @@ function DesktopMarquee() {
           </div>
         ))}
       </div>
-      <div className="absolute pointer-events-none w-full h-full inset-0 top-auto lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_50%,hsl(var(--background-default))_100%)]" />
+      <div className="absolute pointer-events-none w-full h-full inset-0 top-auto lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_50%,var(--background-default)_100%)]" />
     </div>
   )
 }

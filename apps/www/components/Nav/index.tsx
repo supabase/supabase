@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -130,7 +130,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                           <NavigationMenuTrigger
                             className={cn(
                               buttonVariants({ variant: 'text', size: 'small' }),
-                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! data-radix-collection-item:focus-visible:ring-2 data-radix-collection-item:focus-visible:ring-foreground-lighter data-radix-collection-item:focus-visible:text-foreground px-2 h-auto'
+                              'bg-transparent! hover:text-brand-link data-open:text-brand-link! focus-ring focus-visible:text-foreground px-2 h-auto'
                             )}
                           >
                             {menuItem.title}

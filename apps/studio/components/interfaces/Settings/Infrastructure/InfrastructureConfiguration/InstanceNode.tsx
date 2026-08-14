@@ -19,7 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import {
   ERROR_STATES,
@@ -29,12 +29,12 @@ import {
   NODE_WIDTH,
   PrimaryNodeData,
   REGION_NODE_HEIGHT,
-  REPLICA_STATUS,
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
 import { metricColor } from './InstanceNode.utils'
-import SparkBar from '@/components/ui/SparkBar'
+import { REPLICA_STATUS } from '@/components/interfaces/Database/Replication/Replication.constants'
+import { SparkBar } from '@/components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
   ReplicaInitializationStatus,

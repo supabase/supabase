@@ -7,6 +7,8 @@ const mocks = vi.hoisted(() => ({
   identify: vi.fn(),
   useUser: vi.fn(),
   useOrganizationsQuery: vi.fn(),
+  setUser: vi.fn(),
+  setTag: vi.fn(),
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -34,7 +36,8 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 }))
 
 vi.mock('@sentry/nextjs', () => ({
-  setUser: vi.fn(),
+  setUser: (...args: unknown[]) => mocks.setUser(...args),
+  setTag: (...args: unknown[]) => mocks.setTag(...args),
 }))
 
 const USER_ID = 'user-abc-123'
@@ -48,6 +51,8 @@ describe('Telemetry — posthog identify mirroring', () => {
     mocks.identify.mockReset()
     mocks.useUser.mockReset()
     mocks.useOrganizationsQuery.mockReset()
+    mocks.setUser.mockReset()
+    mocks.setTag.mockReset()
   })
 
   it('fires identify with both org_count and signup_timestamp when user and orgs are loaded', async () => {
@@ -144,5 +149,34 @@ describe('Telemetry — posthog identify mirroring', () => {
     render(<Telemetry />)
     await new Promise((r) => setTimeout(r, 10))
     expect(mocks.identify).not.toHaveBeenCalled()
+  })
+})
+
+describe('Telemetry — Sentry user identification', () => {
+  beforeEach(() => {
+    mocks.identify.mockReset()
+    mocks.useUser.mockReset()
+    mocks.useOrganizationsQuery.mockReset()
+    mocks.setUser.mockReset()
+  })
+
+  it('sets the raw (un-hashed) user id on Sentry', async () => {
+    mocks.useUser.mockReturnValue({ id: USER_ID, created_at: CREATED_AT })
+    mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
+
+    render(<Telemetry />)
+
+    await waitFor(() => {
+      expect(mocks.setUser).toHaveBeenCalledWith({ id: USER_ID })
+    })
+  })
+
+  it('does not set a Sentry user when the user is not logged in', async () => {
+    mocks.useUser.mockReturnValue(null)
+    mocks.useOrganizationsQuery.mockReturnValue({ data: orgs(1) })
+
+    render(<Telemetry />)
+    await new Promise((r) => setTimeout(r, 10))
+    expect(mocks.setUser).not.toHaveBeenCalled()
   })
 })

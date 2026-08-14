@@ -102,75 +102,54 @@ describe('generateProductRoutes', () => {
 
 describe('generateOtherRoutes', () => {
   it('always includes advisors, logs, and integrations', () => {
-    const routes = generateOtherRoutes(REF, activeProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, activeProject)
     expect(keys(routes)).toContain('advisors')
     expect(keys(routes)).toContain('logs')
     expect(keys(routes)).toContain('integrations')
   })
 
-  it('includes observability on platform when reports are enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      showReports: true,
-    })
+  it('includes observability when reports are enabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: true })
     expect(keys(routes)).toContain('observability')
   })
 
-  it('excludes observability on platform when reports are disabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      showReports: false,
-    })
+  it('excludes observability when reports are disabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: false })
     expect(keys(routes)).not.toContain('observability')
   })
 
-  it('excludes observability in self-hosted mode even when reports are enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: false,
-      showReports: true,
-    })
-    expect(keys(routes)).not.toContain('observability')
-  })
-
-  it('excludes observability in self-hosted mode when reports are disabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: false,
-      showReports: false,
-    })
-    expect(keys(routes)).not.toContain('observability')
+  it('links observability to the query performance page in self-hosted mode', () => {
+    // NEXT_PUBLIC_IS_PLATFORM is false in .env.test, so IS_PLATFORM is false here
+    const routes = generateOtherRoutes(REF, activeProject, { showReports: true })
+    const observabilityRoute = routes.find((r) => r.key === 'observability')
+    expect(observabilityRoute?.link).toBe(`/project/${REF}/query-performance`)
   })
 
   it('does not include API Docs nav item', () => {
-    const routes = generateOtherRoutes(REF, activeProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, activeProject)
     expect(keys(routes)).not.toContain('api')
   })
 
   it('links logs to unified logs page when unifiedLogs is enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      unifiedLogs: true,
-    })
+    const routes = generateOtherRoutes(REF, activeProject, { unifiedLogs: true })
     const logsRoute = routes.find((r) => r.key === 'logs')
     expect(logsRoute?.link).toBe(`/project/${REF}/logs`)
   })
 
   it('links logs to explorer page by default', () => {
-    const routes = generateOtherRoutes(REF, activeProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, activeProject)
     const logsRoute = routes.find((r) => r.key === 'logs')
     expect(logsRoute?.link).toBe(`/project/${REF}/logs/explorer`)
   })
 
   it('points links to building URL when project is building', () => {
-    const routes = generateOtherRoutes(REF, buildingProject, {
-      isPlatform: true,
-      showReports: true,
-    })
+    const routes = generateOtherRoutes(REF, buildingProject, { showReports: true })
     const observabilityRoute = routes.find((r) => r.key === 'observability')
     expect(observabilityRoute?.link).toBe(`/project/${REF}`)
   })
 
   it('marks routes as disabled when project is not active', () => {
-    const routes = generateOtherRoutes(REF, inactiveProject, { isPlatform: true })
+    const routes = generateOtherRoutes(REF, inactiveProject)
     const advisorsRoute = routes.find((r) => r.key === 'advisors')
     expect(advisorsRoute?.disabled).toBe(true)
   })

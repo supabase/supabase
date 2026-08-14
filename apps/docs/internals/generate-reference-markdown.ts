@@ -33,8 +33,11 @@ type LegacyFn = {
   examples?: Example[]
 }
 
+type TypeComment = { shortText?: string; text?: string; examples?: Example[] }
+
 type TypeSpec = {
-  methods: Record<string, { comment?: { shortText?: string; examples?: Example[] } }>
+  methods: Record<string, { comment?: TypeComment }>
+  variables: Record<string, { comment?: TypeComment }>
 }
 
 type RefBase = {
@@ -99,13 +102,19 @@ const REFERENCES: Ref[] = [
     contentDir: path.join(process.cwd(), 'content/reference/javascript/v2'),
   },
   {
-    kind: 'sdk-legacy',
+    kind: 'sdk-new',
     title: 'Dart Client Library Reference',
     outFile: 'dart.md',
     mdxDir: path.join(MDX_ROOT, 'dart'),
-    sectionsPath: path.join(GENERATED, 'dart.v2.sections.json'),
-    functionsPath: path.join(GENERATED, 'dart.v2.functions.json'),
+    contentDir: path.join(process.cwd(), 'content/reference/dart/v2'),
     feature: 'sdk:dart',
+  },
+  {
+    kind: 'sdk-new',
+    title: 'Supabase Server SDK Reference',
+    outFile: 'server.md',
+    mdxDir: path.join(MDX_ROOT, 'server'),
+    contentDir: path.join(process.cwd(), 'content/reference/server/v1'),
   },
   {
     kind: 'sdk-legacy',
@@ -282,6 +291,7 @@ async function renderSdkNew(ref: SdkNewRef): Promise<string> {
   ])
   const fnsById = new Map(functions.map((fn) => [fn.id, fn]))
   const methods = typeSpec.methods ?? {}
+  const variables = typeSpec.variables ?? {}
 
   const parts: string[] = [`# ${ref.title}`]
   for (const section of flatten(sections)) {
@@ -297,11 +307,18 @@ async function renderSdkNew(ref: SdkNewRef): Promise<string> {
     if (section.type !== 'function' || !section.id) continue
     const fn = fnsById.get(section.id)
     if (!fn) continue
-    const tsm = fn.$ref ? methods[fn.$ref] : undefined
+    // Mirror the site's getTypeSpec fallback: TypeDoc consts and type aliases
+    // (e.g. server's error/type exports) live under `variables`, not `methods`.
+    const tsm = fn.$ref ? (methods[fn.$ref] ?? variables[fn.$ref]) : undefined
+    // The site joins shortText + text for the full description; some entries
+    // (e.g. deprecated type aliases) carry content only in `text`.
+    const commentBody = [tsm?.comment?.shortText, tsm?.comment?.text]
+      .filter((s): s is string => !!s?.trim())
+      .join('\n\n')
     parts.push(
       renderFunctionSection({
         title: fn.title || section.title || fn.id,
-        description: fn.description ?? tsm?.comment?.shortText,
+        description: fn.description ?? (commentBody || undefined),
         notes: fn.notes,
         examples: fn.examples ?? tsm?.comment?.examples,
       })

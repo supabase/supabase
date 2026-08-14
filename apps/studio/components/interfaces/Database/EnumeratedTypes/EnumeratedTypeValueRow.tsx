@@ -52,6 +52,7 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
                   isDisabled ? 'text-foreground-lighter cursor-default!' : 'text-foreground'
                 }`}
                 type="button"
+                tabIndex={isDisabled ? -1 : 0}
                 disabled={isDisabled}
               >
                 <GripVertical size={16} strokeWidth={1.5} />

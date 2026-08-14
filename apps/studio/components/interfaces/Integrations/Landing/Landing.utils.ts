@@ -1,4 +1,5 @@
 import { parseSchemaComment } from '@stripe/sync-engine/supabase'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -19,6 +20,7 @@ import {
   usePartnerIntegrationsQuery,
 } from '@/data/partners/integration-status-query'
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { ResponseError } from '@/types'
 
@@ -28,12 +30,28 @@ export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
   return checkIsInstalled(parsedSchema.status)
 }
 
-type ProjectOAuthIntegrationData = {
+export type ProjectOAuthIntegrationData = {
   apiKeys: APIKey[]
   edgeFunctionSecrets: ProjectSecret[]
-  authConfig: ProjectAuthConfigData | undefined
+  authConfig: ProjectAuthConfigData | null
   partnerIntegrations: IntegrationStatus[]
   oauthApps: AuthorizedApp[]
+}
+
+const isPermissionError = (error: unknown): error is ResponseError =>
+  error instanceof ResponseError && error.code === 403
+
+/**
+ * Reinterprets a 403 from an existing query as a fallback value, for graceful degradation of the
+ * marketplace UI for users in roles that don't have access to certain resources.
+ */
+function permissionSafeData<TData, TDefault>(
+  data: TData | undefined,
+  error: ResponseError | null,
+  defaultVal: TDefault
+): TData | TDefault {
+  if (isPermissionError(error)) return defaultVal
+  return data ?? defaultVal
 }
 
 /**
@@ -51,42 +69,75 @@ export const useProjectOAuthIntegrationData = (
   isSuccess: boolean
 } => {
   const { data: org } = useSelectedOrganizationQuery({ enabled })
+
+  // Any error here has to be terminal on mount. An errored query holds no data, so it never counts
+  // as fresh and refetches on every consumer mount — and consumers that gate rendering on
+  // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
+  // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
+  // are unaffected by this.
+  const { can: canReadOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'oauth_apps',
+    undefined,
+    {
+      organizationSlug: org?.slug,
+      projectRef: null,
+    }
+  )
+
+  const sharedOptions = { enabled, retryOnMount: false }
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, { enabled }),
-    edgeFunctionSecrets: useSecretsQuery({ projectRef }, { enabled }),
-    authConfig: useAuthConfigQuery({ projectRef }, { enabled }),
-    partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, { enabled }),
-    oauthApps: useAuthorizedAppsQuery({ slug: org?.slug }, { enabled: !!org }),
+    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
+    edgeFunctionSecrets: useSecretsQuery({ projectRef }, sharedOptions),
+    authConfig: useAuthConfigQuery({ projectRef }, sharedOptions),
+    partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, sharedOptions),
+    oauthApps: useAuthorizedAppsQuery(
+      { slug: org?.slug },
+      { ...sharedOptions, enabled: canReadOAuthApps && enabled && !!org }
+    ),
   }
 
-  // memoize to prevent object creation from triggering a re-render when the result data is used
-  // as a dependency.
   const data = useMemo(() => {
     return {
-      apiKeys: queries.apiKeys.data ?? [],
-      edgeFunctionSecrets: queries.edgeFunctionSecrets.data ?? [],
-      authConfig: queries.authConfig.data,
-      partnerIntegrations: queries.partnerIntegrations.data ?? [],
-      oauthApps: queries.oauthApps.data ?? [],
+      apiKeys: permissionSafeData(queries.apiKeys.data, queries.apiKeys.error, []),
+      edgeFunctionSecrets: permissionSafeData(
+        queries.edgeFunctionSecrets.data,
+        queries.edgeFunctionSecrets.error,
+        []
+      ),
+      authConfig: permissionSafeData(queries.authConfig.data, queries.authConfig.error, null),
+      partnerIntegrations: permissionSafeData(
+        queries.partnerIntegrations.data,
+        queries.partnerIntegrations.error,
+        []
+      ),
+      oauthApps: permissionSafeData(queries.oauthApps.data, queries.oauthApps.error, []),
     }
   }, [
     queries.apiKeys.data,
+    queries.apiKeys.error,
     queries.edgeFunctionSecrets.data,
+    queries.edgeFunctionSecrets.error,
     queries.authConfig.data,
+    queries.authConfig.error,
     queries.partnerIntegrations.data,
+    queries.partnerIntegrations.error,
     queries.oauthApps.data,
+    queries.oauthApps.error,
   ])
+
+  // A 403 is intentionally handled (the resource degrades to its fallback), so it should not
+  // surface as an error to consumers, and a query that 403s still counts as "settled".
+  const queryList = Object.values(queries)
+  const unhandledErrors = queryList.map((q) => q.error).filter((e) => !!e && !isPermissionError(e))
 
   return {
     data,
-    error:
-      Object.values(queries)
-        .map((q) => q.error)
-        .find((e) => !!e) || null,
-    isError: Object.values(queries).some((x) => x.isError),
-    isLoading: Object.values(queries).some((x) => x.isLoading),
-    isPending: Object.values(queries).some((x) => x.isPending),
-    isSuccess: Object.values(queries).every((x) => x.isSuccess),
+    error: unhandledErrors[0] ?? null,
+    isError: unhandledErrors.length > 0,
+    isLoading: queryList.some((q) => q.isLoading),
+    isPending: queryList.some((q) => q.isPending),
+    isSuccess: queryList.every((q) => q.isSuccess || isPermissionError(q.error)),
   }
 }
 
@@ -140,7 +191,7 @@ export const isOAuthInstalled = ({
     )
   }
 
-  if (integration.id === 'grafana') {
+  if (integration.id === 'grafana' || integration.id === 'grafana-cloud') {
     // Grafana is not yet sending integration status, so just use presence of API key.
     return (
       isOAuthAppAuthorized(projectData, integration) ||

@@ -22,7 +22,6 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { isEdgeFunction } from './EditHookPanel'
 import { WebhookFormValues } from './EditHookPanel.constants'
 import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 import { HTTPHeaders } from './HTTPHeaders'
@@ -38,6 +37,7 @@ import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-quer
 import { useTableNamesQuery } from '@/data/tables/table-names-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildDatabaseEdgeFunctionUrl, isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
@@ -50,7 +50,6 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
   const { data: keys = [] } = useAPIKeysQuery(
@@ -75,7 +74,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
   useEffect(() => {
     if (!isSuccessEdgeFunctions) return
 
-    const isEdgeFunctionSelected = isEdgeFunction({ ref, restUrlTld, url: httpUrl })
+    const isEdgeFunctionSelected = isEdgeFunctionUrl(httpUrl, ref ?? '', restUrl)
 
     if (httpUrl && isEdgeFunctionSelected) {
       const fnSlug = httpUrl.split('/').at(-1)
@@ -98,8 +97,16 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
         form.setValue('httpHeaders', updatedHttpHeaders)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpUrl, isSuccessEdgeFunctions])
+  }, [
+    form,
+    functions,
+    httpHeaders,
+    httpUrl,
+    isSuccessEdgeFunctions,
+    legacyServiceRole,
+    ref,
+    restUrl,
+  ])
 
   return (
     <div>
@@ -235,9 +242,13 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                       } else if (functionType === 'supabase_function') {
                         // Default to first edge function in the list
                         const fnSlug = functions[0]?.slug
-                        const defaultFunctionUrl = `https://${ref}.supabase.${restUrlTld}/functions/v1/${fnSlug}`
+                        const defaultFunctionUrl = buildDatabaseEdgeFunctionUrl(
+                          fnSlug ?? '',
+                          ref ?? '',
+                          restUrl
+                        )
                         const currentUrl = form.getValues('http_url')
-                        if (!isEdgeFunction({ ref, restUrlTld, url: currentUrl })) {
+                        if (!isEdgeFunctionUrl(currentUrl, ref ?? '', restUrl)) {
                           form.setValue('http_url', defaultFunctionUrl, { shouldDirty: false })
                         }
                       }

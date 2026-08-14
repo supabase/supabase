@@ -25,6 +25,7 @@ export const DATABASE_NAV_SHORTCUT_IDS = {
   NAV_DATABASE_COLUMN_PRIVILEGES: 'nav.database-column-privileges',
   NAV_DATABASE_SETTINGS: 'nav.database-settings',
   NAV_DATABASE_REPLICATION: 'nav.database-replication',
+  NAV_DATABASE_POLICIES: 'nav.database-policies',
 }
 
 export type DatabaseNavShortcutId =
@@ -126,6 +127,13 @@ export const databaseNavRegistry: RegistryDefinations<DatabaseNavShortcutId> = {
     id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_REPLICATION,
     label: 'Go to Replication',
     sequence: ['D', 'L'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE,
+  },
+  [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_POLICIES]: {
+    id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_POLICIES,
+    label: 'Go to Policies',
+    sequence: ['D', 'A'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE,
   },

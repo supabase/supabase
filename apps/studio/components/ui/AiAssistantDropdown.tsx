@@ -133,7 +133,11 @@ export function AiAssistantDropdown({
         disabled={disabled}
         onClick={handleOpenAssistant}
         icon={<AiIconAnimation size={iconOnly ? 16 : 14} loading={loading} />}
-        className={cn('rounded-r-none border-r-0', iconOnly && 'px-1.5', className)}
+        className={cn(
+          'rounded-r-none border-r-0 focus-visible:z-10',
+          iconOnly && 'px-1.5',
+          className
+        )}
       >
         {!iconOnly && label}
       </Button>
@@ -142,10 +146,11 @@ export function AiAssistantDropdown({
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button
+            aria-label="More actions"
             variant={variant}
             size={size}
             disabled={disabled}
-            className={cn('rounded-l-none px-1', iconOnly && 'px-1')}
+            className={cn('rounded-l-none px-1 focus-visible:z-10', iconOnly && 'px-1')}
             icon={<ChevronDown size={12} />}
           />
         </DropdownMenuTrigger>

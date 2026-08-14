@@ -91,6 +91,7 @@ export const SupabaseGrid = ({
         customHeader={customHeader}
         isRefetching={isRefetching}
         tableQueriesEnabled={tableQueriesEnabled}
+        rows={rows}
       />
 
       {msSqlWarning.warning !== null && <msSqlWarning.Component />}

@@ -1,5 +1,5 @@
 import { Badge, Button } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { BackupsEmpty } from '../BackupsEmpty'
 import Panel from '@/components/ui/Panel'

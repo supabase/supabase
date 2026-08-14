@@ -2,11 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import {
   folderStatusOnSaveStart,
+  hasUnsavedChanges,
   isFolderEditing,
   isFolderSaving,
   isNewFolder,
   isSaveFailed,
   isSaving,
+  statusOnEdit,
   statusOnSaveError,
   statusOnSaveStart,
   statusOnSaveSuccess,
@@ -60,6 +62,20 @@ describe('isSaveFailed', () => {
   )
 })
 
+describe('hasUnsavedChanges', () => {
+  it('is false only for a clean, saved snippet', () => {
+    expect(hasUnsavedChanges('saved')).toBe(false)
+    expect(hasUnsavedChanges(undefined)).toBe(false)
+  })
+
+  it.each(['new', 'new_saving', 'new_save_failed', 'unsaved', 'saving', 'save_failed'] as const)(
+    'is true for unsaved/in-flight/failed status %s',
+    (status) => {
+      expect(hasUnsavedChanges(status)).toBe(true)
+    }
+  )
+})
+
 describe('statusOnSaveStart', () => {
   it('keeps never-persisted snippets in the new family', () => {
     expect(statusOnSaveStart('new')).toBe('new_saving')
@@ -90,6 +106,24 @@ describe('statusOnSaveError', () => {
     expect(statusOnSaveError('saving')).toBe('save_failed')
     expect(statusOnSaveError('saved')).toBe('save_failed')
     expect(statusOnSaveError(undefined)).toBe('save_failed')
+  })
+})
+
+describe('statusOnEdit', () => {
+  it('marks a persisted, clean snippet as unsaved', () => {
+    expect(statusOnEdit('saved')).toBe('unsaved')
+  })
+
+  it('leaves every already-dirty or in-flight status unchanged', () => {
+    for (const status of [...NEVER_PERSISTED, 'unsaved', 'saving', 'save_failed'] as const) {
+      expect(statusOnEdit(status)).toBe(status)
+    }
+  })
+
+  it('keeps hasUnsavedChanges true after an edit', () => {
+    for (const status of [...NEVER_PERSISTED, ...PERSISTED] as const) {
+      expect(hasUnsavedChanges(statusOnEdit(status))).toBe(true)
+    }
   })
 })
 

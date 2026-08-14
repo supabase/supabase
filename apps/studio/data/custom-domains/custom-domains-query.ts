@@ -110,7 +110,7 @@ export const useCustomDomainsQuery = <TData = CustomDomainsData>(
     ...options
   }: UseCustomQueryOptions<CustomDomainsData, CustomDomainsError, TData> = {}
 ) => {
-  const { data } = useProjectAddonsQuery({ projectRef })
+  const { data } = useProjectAddonsQuery({ projectRef }, { enabled: enabled !== false })
   const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
 
   return useQuery<CustomDomainsData, CustomDomainsError, TData>({

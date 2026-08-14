@@ -1,9 +1,21 @@
 import assert from 'node:assert'
-import { tool } from 'ai'
+import { tool, type ToolCallOptions, type ToolSet } from 'ai'
 import { z } from 'zod'
 
 import { getStudioTools } from '../tools/studio-tools'
-import { getMcpTools } from '@/lib/ai/tools/mcp-tools'
+import { getNotebookTools } from './notebook-tools'
+import {
+  applyNotebookOperations,
+  describeNotebookOperationError,
+  type NotebookOperation,
+  type OperationResultCell,
+} from '@/data/content/notebooks/notebook-operations'
+import type {
+  AgentNotebook,
+  CellWire,
+  NotebookWire,
+} from '@/data/content/notebooks/notebook-schema'
+import { createInProcessSupabaseMCPClient } from '@/lib/ai/supabase-mcp'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -13,11 +25,10 @@ const getAdvisorsInputSchema = z.object({
   type: z.enum(['security', 'performance']).optional(),
 })
 
-const getLogsInputSchema = z.object({
-  limit: z.number().min(1).max(100).optional(),
-  level: z.enum(['debug', 'info', 'warning', 'error']).optional(),
-  source: z.enum(['postgres', 'auth', 'storage', 'edge_function']).optional(),
-  search: z.string().optional(),
+const queryLogsInputSchema = z.object({
+  sql: z.string().min(1),
+  iso_timestamp_start: z.string().optional(),
+  iso_timestamp_end: z.string().optional(),
 })
 
 const listPoliciesInputSchema = z.object({
@@ -144,6 +155,82 @@ const MOCK_LOGS_DATA = [
   },
 ]
 
+type MockNotebook = {
+  id: string
+  name: string
+  description?: string
+  visibility: 'project'
+  updated_at: string
+  content: NotebookWire
+}
+
+const MOCK_NOTEBOOK_TIMESTAMP = '2024-06-20T14:30:00Z'
+
+export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
+  {
+    id: '6f1d3a54-8c2b-4d19-9f60-2a7b5c8e1d40',
+    name: 'Auth health check',
+    description: 'Daily signups plus any auth errors from the last hour.',
+    visibility: 'project',
+    updated_at: MOCK_NOTEBOOK_TIMESTAMP,
+    content: {
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'markdown_cell',
+          id: 'c1a0b8e2-3f47-4a52-9d18-6b0c4e2f7a91',
+          text: '# Auth health\n\nRun this daily: signup volume, then anything the auth service logged as an error.',
+        },
+        {
+          _tag: 'database_cell',
+          id: 'd2b1c9f3-4a58-4b63-8e29-7c1d5f3a8b02',
+          title: 'Signups per day',
+          sql: "select date_trunc('day', created_at) as day, count(*) as signups\nfrom auth.users\ngroup by day\norder by day desc",
+          row_limit: 30,
+          chart: {
+            x_column: 'day',
+            y_columns: ['signups'],
+            cumulative: false,
+            type: 'line',
+            scale: 'log',
+            show_labels: false,
+          },
+        },
+        {
+          _tag: 'log_cell',
+          id: 'e3c2d0a4-5b69-4c74-9f3a-8d2e6a4b9c13',
+          title: 'Auth errors',
+          sql: "select timestamp, event_message\nfrom auth_logs\nwhere event_message like '%error%'\norder by timestamp desc",
+          time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 },
+        },
+      ],
+    },
+  },
+  {
+    id: '9a4e7b21-6d0c-4f38-8b57-3e1f9c6a2d84',
+    name: 'Edge function error triage',
+    visibility: 'project',
+    updated_at: MOCK_NOTEBOOK_TIMESTAMP,
+    content: {
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'markdown_cell',
+          id: 'f4d3e1b5-7c80-4d85-8a4b-9e3f7b5c0d24',
+          text: '# Edge function errors\n\nFailures from the last day, newest first.',
+        },
+        {
+          _tag: 'log_cell',
+          id: '0a5e4f2c-8d91-4e96-9b5c-af408c6d1e35',
+          title: 'hello-world failures',
+          sql: "select timestamp, event_message\nfrom function_edge_logs\nwhere event_message like '%TypeError%'\norder by timestamp desc",
+          time_range: { _tag: 'relative_time_range', unit: 'day', amount: 1 },
+        },
+      ],
+    },
+  },
+]
+
 function createMockedStudioTools() {
   const studioTools = getStudioTools()
 
@@ -218,40 +305,13 @@ function createMockGetAdvisorsTool() {
   })
 }
 
-function createMockGetLogsTool() {
+function createMockQueryLogsTool() {
   return tool({
-    description: 'Fetches recent project logs for debugging or health checks (mocked).',
-    inputSchema: getLogsInputSchema,
-    execute: async ({
-      limit = 10,
-      level,
-      source,
-      search,
-    }: {
-      limit?: number
-      level?: 'debug' | 'info' | 'warning' | 'error'
-      source?: 'postgres' | 'auth' | 'storage' | 'edge_function'
-      search?: string
-    }) => {
-      let filtered = MOCK_LOGS_DATA
-
-      if (level) {
-        filtered = filtered.filter((entry) => entry.level === level)
-      }
-
-      if (source) {
-        filtered = filtered.filter((entry) => entry.source === source)
-      }
-
-      if (search) {
-        const needle = search.toLowerCase()
-        filtered = filtered.filter((entry) =>
-          `${entry.message} ${entry.target}`.toLowerCase().includes(needle)
-        )
-      }
-
-      return filtered.slice(0, limit)
-    },
+    description:
+      'Runs a read-only SQL query against recent project logs for debugging or health checks (mocked).',
+    inputSchema: queryLogsInputSchema,
+    // Deterministic mock: returns static log data regardless of the SQL passed.
+    execute: async () => MOCK_LOGS_DATA,
   })
 }
 
@@ -295,6 +355,152 @@ function createMockListPoliciesTool() {
   })
 }
 
+function createMockNotebookStore() {
+  const notebooks = new Map(MOCK_NOTEBOOKS_DATA.map((notebook) => [notebook.id, notebook]))
+
+  let notebookCount = 0
+  let cellCount = 0
+
+  const assignCellIds = (cells: OperationResultCell[]): CellWire[] =>
+    cells.map((cell): CellWire => {
+      if ('id' in cell) return cell
+      const id = `mock-cell-${++cellCount}`
+      switch (cell._tag) {
+        case 'markdown_cell':
+          return { ...cell, id }
+        case 'database_cell':
+          return { ...cell, id }
+        case 'log_cell':
+          return { ...cell, id }
+      }
+    })
+
+  return {
+    list: () => [...notebooks.values()],
+    get: (id: string) => notebooks.get(id),
+    create: ({
+      name,
+      description,
+      content,
+    }: {
+      name: string
+      description?: string
+      content: AgentNotebook
+    }) => {
+      const notebook: MockNotebook = {
+        id: `mock-notebook-${++notebookCount}`,
+        name,
+        description,
+        visibility: 'project',
+        updated_at: MOCK_NOTEBOOK_TIMESTAMP,
+        content: { schema_version: content.schema_version, cells: assignCellIds(content.cells) },
+      }
+      notebooks.set(notebook.id, notebook)
+      return notebook
+    },
+    replaceCells: (id: string, cells: OperationResultCell[]) => {
+      const existing = notebooks.get(id)
+      if (!existing) return
+      notebooks.set(id, {
+        ...existing,
+        content: { schema_version: existing.content.schema_version, cells: assignCellIds(cells) },
+      })
+    },
+  }
+}
+
+type MockNotebookStore = ReturnType<typeof createMockNotebookStore>
+
+// All four notebook tools are real, locally-defined ai-SDK tools, so wrap them and
+// override only execute/needsApproval — evals must validate the model's arguments
+// against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
+// agent-authored cell ids, update_notebook's real operations schema, etc).
+function createMockNotebookTools(store: MockNotebookStore) {
+  const { list_notebooks, get_notebook, create_notebook, update_notebook } = getNotebookTools()
+
+  return {
+    list_notebooks: {
+      ...list_notebooks,
+      execute: async (
+        { limit = 20 }: { cursor?: string; limit?: number },
+        _options: ToolCallOptions
+      ) => ({
+        notebooks: store
+          .list()
+          .slice(0, limit)
+          .map((notebook) => ({
+            id: notebook.id,
+            name: notebook.name,
+            description: notebook.description,
+            visibility: notebook.visibility,
+            updated_at: notebook.updated_at,
+            cell_count: notebook.content.cells.length,
+          })),
+        // The in-memory store never paginates: one page holds everything.
+        cursor: undefined,
+      }),
+    },
+    get_notebook: {
+      ...get_notebook,
+      execute: async ({ id }: { id: string }, _options: ToolCallOptions) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        return {
+          id: notebook.id,
+          name: notebook.name,
+          description: notebook.description,
+          visibility: notebook.visibility,
+          cells: notebook.content.cells,
+        }
+      },
+    },
+    create_notebook: {
+      ...create_notebook,
+      // The eval harness can't answer an approval gate (generate-assistant-response
+      // drops tool parts in 'approval-requested' state when cleaning messages), so the
+      // real needsApproval: true would stall the eval turn — same override as
+      // execute_sql/deploy_edge_function above. Because that gate is gone, this mock
+      // deliberately skips acceptUntrustedSql/acceptUntrustedLogsSql promotion: nothing
+      // here is executed or sent anywhere, cells are stored as plain data in a Map.
+      needsApproval: false,
+      execute: async (
+        {
+          name,
+          description,
+          content,
+        }: {
+          name: string
+          description?: string
+          content: AgentNotebook
+        },
+        _options: ToolCallOptions
+      ) => {
+        const created = store.create({ name, description, content })
+        return { id: created.id, name: created.name }
+      },
+    },
+    update_notebook: {
+      ...update_notebook,
+      // Same reasoning as create_notebook's override above.
+      needsApproval: false,
+      execute: async (
+        { id, operations }: { id: string; operations: NotebookOperation[] },
+        _options: ToolCallOptions
+      ) => {
+        const notebook = store.get(id)
+        if (!notebook) throw new Error(`Notebook ${id} not found.`)
+
+        const result = applyNotebookOperations(notebook.content, operations)
+        if (!result.success) throw new Error(describeNotebookOperationError(result.error))
+
+        store.replaceCells(id, result.notebook.cells)
+        return { id, name: notebook.name }
+      },
+    },
+  }
+}
+
 export type MockToolOverrides = {
   list_tables?: Record<string, typeof MOCK_TABLES_DATA>
 }
@@ -306,14 +512,26 @@ export type MockToolOverrides = {
  *
  * Note: search_docs uses the real implementation
  */
-export async function getMockTools(overrides?: MockToolOverrides) {
+export async function getMockTools(overrides: MockToolOverrides | undefined, signal: AbortSignal) {
   const mockedStudioTools = createMockedStudioTools()
+  const notebookStore = createMockNotebookStore()
 
-  const { search_docs } = await getMcpTools({
+  // Every tool here is a deterministic mock except `search_docs`, which uses the
+  // real implementation. We source it from an in-process MCP server directly
+  // (rather than `getMcpTools`) so the eval harness stays hermetic and decoupled
+  // from the assistant's transport gate (`USE_REMOTE_MCP`): the in-process server
+  // needs no live remote endpoint or real access token. See AI-897 for how to
+  // point evals at the remote MCP server instead.
+  const mcpClient = await createInProcessSupabaseMCPClient({
     accessToken: 'mock-access-token',
     projectRef: 'mock-project-ref',
-    aiOptInLevel: 'schema_and_log_and_data',
   })
+  // The caller owns this signal and aborts it once generation is done, which
+  // closes the client opened here (search_docs executes during generation, so
+  // the connection must stay open until then).
+  signal.addEventListener('abort', () => void mcpClient.close().catch(() => {}), { once: true })
+
+  const { search_docs } = (await mcpClient.tools()) as ToolSet
 
   assert(search_docs, 'search_docs tool not available from MCP server')
 
@@ -324,7 +542,8 @@ export async function getMockTools(overrides?: MockToolOverrides) {
     list_extensions: createMockListExtensionsTool(),
     list_edge_functions: createMockListEdgeFunctionsTool(),
     get_advisors: createMockGetAdvisorsTool(),
-    get_logs: createMockGetLogsTool(),
+    query_logs: createMockQueryLogsTool(),
     list_policies: createMockListPoliciesTool(),
+    ...createMockNotebookTools(notebookStore),
   }
 }

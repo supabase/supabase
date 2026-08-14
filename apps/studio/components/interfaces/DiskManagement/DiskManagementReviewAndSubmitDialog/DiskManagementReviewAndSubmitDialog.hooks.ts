@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
+import { useFormState, useWatch, type UseFormReturn } from 'react-hook-form'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -18,10 +19,55 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 
+const COMPUTE_SIZES_BELOW_LARGE: Array<ComputeInstanceAddonVariantId> = [
+  'ci_nano',
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+]
+
+export function shouldShowComputeBillingBadge({
+  isDirty,
+  hasComputeSizeError,
+  oldPrice,
+  newPrice,
+}: {
+  isDirty: boolean
+  hasComputeSizeError: boolean
+  oldPrice: string | number
+  newPrice: string | number
+}) {
+  return isDirty && !hasComputeSizeError && Number(oldPrice) !== Number(newPrice)
+}
+
 export function useDiskManagementReviewChanges(
   form: UseFormReturn<DiskStorageSchemaType>,
   numReplicas: number
 ) {
+  const [
+    computeSize,
+    totalSize,
+    storageType,
+    provisionedIOPS,
+    throughput,
+    growthPercent,
+    minIncrementGb,
+    maxSizeGb,
+  ] = useWatch({
+    control: form.control,
+    name: [
+      'computeSize',
+      'totalSize',
+      'storageType',
+      'provisionedIOPS',
+      'throughput',
+      'growthPercent',
+      'minIncrementGb',
+      'maxSizeGb',
+    ],
+  })
+  const { isDirty, errors, defaultValues } = useFormState({ control: form.control })
+
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
@@ -40,29 +86,29 @@ export function useDiskManagementReviewChanges(
 
   const computeSizePrice = calculateComputeSizePrice({
     availableOptions,
-    oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
-    newComputeSize: form.getValues('computeSize'),
+    oldComputeSize: defaultValues?.computeSize || 'ci_micro',
+    newComputeSize: computeSize,
     plan: planId,
   })
   const diskSizePrice = calculateDiskSizePrice({
     planId,
-    oldSize: form.formState.defaultValues?.totalSize || 0,
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
-    newSize: form.getValues('totalSize'),
-    newStorageType: form.getValues('storageType') as DiskType,
+    oldSize: defaultValues?.totalSize || 0,
+    oldStorageType: defaultValues?.storageType as DiskType,
+    newSize: totalSize,
+    newStorageType: storageType as DiskType,
     numReplicas,
   })
   const iopsPrice = calculateIOPSPrice({
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
-    oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
-    newStorageType: form.getValues('storageType') as DiskType,
-    newProvisionedIOPS: form.getValues('provisionedIOPS'),
+    oldStorageType: defaultValues?.storageType as DiskType,
+    oldProvisionedIOPS: defaultValues?.provisionedIOPS || 0,
+    newStorageType: storageType as DiskType,
+    newProvisionedIOPS: provisionedIOPS,
     numReplicas,
   })
   const throughputPrice = calculateThroughputPrice({
-    storageType: form.getValues('storageType') as DiskType,
-    newThroughput: form.getValues('throughput') || 0,
-    oldThroughput: form.formState.defaultValues?.throughput || 0,
+    storageType: storageType as DiskType,
+    newThroughput: throughput || 0,
+    oldThroughput: defaultValues?.throughput || 0,
     numReplicas,
   })
 
@@ -78,49 +124,55 @@ export function useDiskManagementReviewChanges(
     Number(iopsPrice.newPrice) +
     Number(throughputPrice.newPrice)
 
+  const advancedBeforePrice = Number(iopsPrice.oldPrice) + Number(throughputPrice.oldPrice)
+  const advancedAfterPrice = Number(iopsPrice.newPrice) + Number(throughputPrice.newPrice)
+
+  const showComputeBillingBadge = shouldShowComputeBillingBadge({
+    isDirty,
+    hasComputeSizeError: !!errors.computeSize,
+    oldPrice: computeSizePrice.oldPrice,
+    newPrice: computeSizePrice.newPrice,
+  })
+
+  const showDiskBillingBadge =
+    isDirty &&
+    !errors.totalSize &&
+    Number(diskSizePrice.oldPrice) !== Number(diskSizePrice.newPrice)
+
+  const showAdvancedBillingBadge =
+    isDirty &&
+    advancedBeforePrice !== advancedAfterPrice &&
+    !errors.provisionedIOPS &&
+    !errors.throughput
+
   // --- Change flags ---
 
-  const hasComputeChanges =
-    form.formState.defaultValues?.computeSize !== form.getValues('computeSize')
+  const hasComputeChanges = defaultValues?.computeSize !== computeSize
 
   const hasTotalSizeChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
+    !isAwsK8sProject && !isAwsNimbus && defaultValues?.totalSize !== totalSize
 
   const hasStorageTypeChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.storageType !== form.getValues('storageType')
+    !isAwsK8sProject && !isAwsNimbus && defaultValues?.storageType !== storageType
 
   const hasThroughputChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.throughput !== form.getValues('throughput')
+    !isAwsK8sProject && !isAwsNimbus && defaultValues?.throughput !== throughput
 
   const hasIOPSChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS')
+    !isAwsK8sProject && !isAwsNimbus && defaultValues?.provisionedIOPS !== provisionedIOPS
 
   const hasGrowthPercentChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent')
+    !isAwsK8sProject && !isAwsNimbus && defaultValues?.growthPercent !== growthPercent
 
   const hasMinIncrementChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.minIncrementGb !== form.getValues('minIncrementGb')
+    !isAwsK8sProject && !isAwsNimbus && defaultValues?.minIncrementGb !== minIncrementGb
 
   const hasMaxSizeChanges =
-    !isAwsK8sProject &&
-    !isAwsNimbus &&
-    form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb')
+    !isAwsK8sProject && !isAwsNimbus && defaultValues?.maxSizeGb !== maxSizeGb
 
   // --- Derived predicates ---
 
-  const storageTypeAfter = form.getValues('storageType') as DiskType
+  const storageTypeAfter = storageType as DiskType
 
   // Show hero whenever any line-item price actually changes, not just compute
   const anyBillableDiskChange =
@@ -128,8 +180,16 @@ export function useDiskManagementReviewChanges(
     Number(iopsPrice.newPrice) !== Number(iopsPrice.oldPrice) ||
     Number(throughputPrice.newPrice) !== Number(throughputPrice.oldPrice)
 
-  // Show cooldown warning whenever any disk attribute that enforces the 4-hour lock changes
+  // Show cooldown warning whenever any disk attribute that counts toward the 24-hour modification limit changes
   const anyDiskAttributeChange = hasIOPSChanges || hasStorageTypeChanges || hasTotalSizeChanges
+
+  // Show extended downtime warning when resizing to/from a size below large
+  const hasExtendedDowntimeRisk =
+    hasComputeChanges &&
+    (COMPUTE_SIZES_BELOW_LARGE.includes(
+      (defaultValues?.computeSize ?? 'ci_nano') as ComputeInstanceAddonVariantId
+    ) ||
+      COMPUTE_SIZES_BELOW_LARGE.includes(computeSize as ComputeInstanceAddonVariantId))
 
   // Throughput is only a user-configurable, separately-billed attribute for GP3. For IO2 it is
   // derived from provisioned IOPS (0.256 MiB/s per IOPS) and isn't surfaced as its own value, so
@@ -153,10 +213,8 @@ export function useDiskManagementReviewChanges(
 
   // --- Labels ---
 
-  const oldComputeLabel = mapAddOnVariantIdToComputeSize(
-    form.formState.defaultValues?.computeSize ?? 'ci_nano'
-  )
-  const newComputeLabel = mapAddOnVariantIdToComputeSize(form.getValues('computeSize'))
+  const oldComputeLabel = mapAddOnVariantIdToComputeSize(defaultValues?.computeSize ?? 'ci_nano')
+  const newComputeLabel = mapAddOnVariantIdToComputeSize(computeSize)
 
   return {
     // prices
@@ -166,6 +224,11 @@ export function useDiskManagementReviewChanges(
     throughputPrice,
     totalBeforePrice,
     totalAfterPrice,
+    advancedBeforePrice,
+    advancedAfterPrice,
+    showComputeBillingBadge,
+    showDiskBillingBadge,
+    showAdvancedBillingBadge,
     // change flags
     hasComputeChanges,
     hasTotalSizeChanges,
@@ -180,6 +243,7 @@ export function useDiskManagementReviewChanges(
     anyDiskAttributeChange,
     showThroughputRow,
     hasAnyBreakdownRows,
+    hasExtendedDowntimeRisk,
     // labels
     oldComputeLabel,
     newComputeLabel,

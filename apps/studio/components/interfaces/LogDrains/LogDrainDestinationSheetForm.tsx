@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -51,6 +51,7 @@ import {
   logDrainHeaderEntriesSchema,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
+import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
@@ -347,12 +348,7 @@ export function LogDrainDestinationSheetForm({
     )
   }, [defaultValues, mode])
 
-  const sentryEnabled = useFlag('SentryLogDrain')
-  const s3Enabled = useFlag('S3logdrain')
-  const axiomEnabled = useFlag('axiomLogDrain')
-  const otlpEnabled = useFlag('otlpLogDrain')
-  const last9Enabled = useFlag('Last9LogDrain')
-  const syslogEnabled = useFlag('syslogLogDrain')
+  const enabledLogDrainTypes = useEnabledLogDrainTypes()
 
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -397,8 +393,8 @@ export function LogDrainDestinationSheetForm({
     values: formValues,
   })
 
-  const type = form.watch('type')
-  const tls = form.watch('tls')
+  const type = useWatch({ control: form.control, name: 'type' })
+  const tls = useWatch({ control: form.control, name: 'tls' })
 
   useEffect(() => {
     if (mode === 'create' && !open) {
@@ -415,12 +411,7 @@ export function LogDrainDestinationSheetForm({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        tabIndex={undefined}
-        showClose={false}
-        size="lg"
-        className="overflow-y-auto flex flex-col"
-      >
+      <SheetContent showClose={false} size="lg" className="overflow-y-auto flex flex-col">
         <SheetHeader>
           <SheetTitle>Add destination</SheetTitle>
         </SheetHeader>
@@ -474,15 +465,7 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger>
                       <SelectContent>
-                        {LOG_DRAIN_TYPES.filter((t) => {
-                          if (t.value === 'sentry') return sentryEnabled
-                          if (t.value === 's3') return s3Enabled
-                          if (t.value === 'axiom') return axiomEnabled
-                          if (t.value === 'otlp') return otlpEnabled
-                          if (t.value === 'last9') return last9Enabled
-                          if (t.value === 'syslog') return syslogEnabled
-                          return true
-                        }).map((type) => (
+                        {enabledLogDrainTypes.map((type) => (
                           <SelectItem
                             value={type.value}
                             key={type.value}

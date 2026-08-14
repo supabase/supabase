@@ -1,11 +1,10 @@
 'use client'
 
-import { createContext, useContext, type ReactNode } from 'react'
-import { cn } from 'ui'
-
 import GuidesTableOfContents from '~/components/GuidesSidebar'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { type GuideFrontmatter } from '~/lib/docs'
+import { createContext, useContext, type ReactNode } from 'react'
+import { cn } from 'ui'
 
 interface GuideContextValue {
   meta?: GuideFrontmatter
@@ -39,7 +38,7 @@ export function Guide({ meta, children, className }: GuideProps) {
               'relative',
               'transition-all ease-out',
               'duration-100',
-              hideToc ? 'col-span-12' : 'col-span-12 md:col-span-9'
+              hideToc ? 'col-span-12' : 'col-span-12 md:col-span-8'
             )}
           >
             {children}
@@ -49,16 +48,17 @@ export function Guide({ meta, children, className }: GuideProps) {
               video={meta?.tocVideo}
               className={cn(
                 'hidden md:flex',
-                'col-span-3 self-start',
+                'md:col-span-3 md:col-start-10',
+                'self-start',
                 'sticky',
                 /**
                  * --header-height: height of nav
                  * 1px: height of nav border
-                 * 2rem: content padding
+                 * 3rem: content padding
                  */
-                'top-[calc(var(--header-height)+1px+2rem)]',
-                // 3rem accounts for 2rem of top padding + 1rem of extra breathing room
-                'max-h-[calc(100vh-var(--header-height)-3rem)]'
+                'top-[calc(var(--header-height)+1px+3rem)]',
+                // 4rem accounts for 3rem of top padding + 1rem of extra breathing room
+                'max-h-[calc(100vh-var(--header-height)-4rem)]'
               )}
             />
           )}

@@ -12,13 +12,13 @@ import {
   ChartLine,
   ChartLoadingState,
   ChartMetric,
-  GenericSkeletonLoader,
-} from 'ui-patterns'
+} from 'ui-patterns/Chart'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { REPLICA_STATUS } from '../Replication.constants'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
-import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'

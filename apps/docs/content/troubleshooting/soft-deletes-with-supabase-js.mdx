@@ -75,7 +75,7 @@ This effectively un-deletes the record.
 
 ## Benefits of using views for soft deletes
 
-- **Cleaner Queries:** No need to add `WHERE deleted_at IS NULL` to every query. Just query the view (`active_items`).
+- **Cleaner Queries:** No need to add `WHERE deleted_at IS NULL` to every query. Query the view (`active_items`) instead.
 - **Separation of Concerns:** Views abstract the logic of filtering deleted records from your application code.
 - **Efficiency:** Postgres handles the filtering in the view, reducing the complexity in your app.
 

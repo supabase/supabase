@@ -7,7 +7,7 @@ keywords = [ "io", "disk", "database", "grafana" ]
 database_id = "0056cd40-df04-4045-bbfb-c245cb15b85d"
 ---
 
-> [Supabase Grafana Installation Guide](/docs/guides/telemetry/metrics/grafana-self-hosted)
+> [Supabase Grafana Installation Guide](/docs/guides/monitoring-and-debugging/metrics/grafana-self-hosted)
 
 There are two primary values that matter for IO:
 
@@ -52,7 +52,7 @@ If a database exhibited some of these metrics for prolonged periods, then there 
 - Scale the database to get more IO if possible
 - Optimize queries/tables or refactor database/app to reduce IO
 - Spin-up a [read-replica](/dashboard/project/_/settings/infrastructure)
-- Modify IO configs in the [Compute and Disk settings](/dashboard/project/_/settings/compute-and-disk)
+- Modify IO configs in the [Infrastructure settings](/dashboard/project/_/settings/infrastructure)
 - [Partitions](/docs/guides/database/partitions): Generally should be used on very large tables to minimize data pulled from disk
 
 Other useful Supabase Grafana guides:
@@ -61,10 +61,10 @@ Other useful Supabase Grafana guides:
 - [Memory](https://github.com/orgs/supabase/discussions/27021)
 - [CPU](https://github.com/orgs/supabase/discussions/27022)
 
-### Esoteric factors
+## Esoteric factors
 
 **Webhooks**:
-Supabase webhooks use the pg_net extension to handle requests. The `net.http_request_queue` table isn't indexed to keep write costs low. However, if you upload millions of rows to a webhook-enabled table too quickly, it can significantly increase the read costs for the extension.
+Supabase webhooks use the pg_net extension to handle requests. The `net.http_request_queue` table isn't indexed to keep write costs low. However, if you upload millions of rows to a webhook-enabled table in rapid succession, it can significantly increase the read costs for the extension.
 
 To check if reads are becoming expensive, run:
 

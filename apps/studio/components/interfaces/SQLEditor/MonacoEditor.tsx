@@ -1,27 +1,20 @@
 import { Monaco, OnMount } from '@monaco-editor/react'
-import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { noop } from 'lodash'
-import { useRouter } from 'next/router'
-import { RefObject, useEffect, useRef, useState } from 'react'
-import { Admonition } from 'ui-patterns'
+import { RefObject, useRef } from 'react'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { useSnippetEditor } from './useSnippetEditor'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProfile } from '@/lib/profile'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
-import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
-import { canEditSnippet } from '@/state/sql-editor/sql-editor-rules'
-import { useTabsStateSnapshot } from '@/state/tabs'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 
 export type MonacoEditorProps = {
   id: string
@@ -31,8 +24,6 @@ export type MonacoEditorProps = {
   monacoRef: RefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
-  executeExplainQuery: () => void
-  showExplainAction?: boolean
   prettifyQuery: () => void
   onHasSelection: (value: boolean) => void
   onMount?: (editor: IStandaloneCodeEditor) => void
@@ -55,20 +46,11 @@ export const MonacoEditor = ({
   placeholder = '',
   className,
   executeQuery,
-  executeExplainQuery,
-  showExplainAction = true,
   prettifyQuery,
   onHasSelection,
   onPrompt,
   onMount,
 }: MonacoEditorProps) => {
-  const router = useRouter()
-  const { profile } = useProfile()
-  const { ref, content } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-
-  const snapV2 = useSqlEditorV2StateSnapshot()
-  const tabsSnap = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar, toggleSidebar } = useSidebarManagerSnapshot()
 
@@ -77,14 +59,14 @@ export const MonacoEditor = ({
     true
   )
 
-  const [value, setValue] = useState('')
-  const debouncedValue = useDebounce(value, 1000)
+  const { snippet, disableEdit, handleEditorChange } = useSnippetEditor({ id, snippetName })
 
-  const snippet = snapV2.snippets[id]
-  const disableEdit = !!snippet && !canEditSnippet(snippet.snippet, profile?.id)
-
-  const executeExplainQueryRef = useRef(executeExplainQuery)
-  executeExplainQueryRef.current = executeExplainQuery
+  // The Monaco save action is registered once on mount, but `snippet` starts
+  // undefined for a new/deep-linked snippet and is only created on first edit.
+  // Read it through a ref so Cmd/Ctrl+S sees the latest value, not the stale
+  // mount-time closure.
+  const snippetRef = useRef(snippet)
+  snippetRef.current = snippet
 
   const prettifyQueryRef = useRef(prettifyQuery)
   prettifyQueryRef.current = prettifyQuery
@@ -92,6 +74,10 @@ export const MonacoEditor = ({
   const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
   const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
   aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
+
+  const { requestSave } = useSqlEditorSaveCoordinator()
+  const requestSaveRef = useRef(requestSave)
+  requestSaveRef.current = requestSave
 
   const handleEditorOnMount: OnMount = (editor, monaco) => {
     const model = editor.getModel()
@@ -122,19 +108,6 @@ export const MonacoEditor = ({
       ].join(' && ')
     )
 
-    if (showExplainAction) {
-      editor.addAction({
-        id: 'run-explain-query',
-        label: 'Run EXPLAIN ANALYZE',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 1,
-        run: () => {
-          executeExplainQueryRef.current()
-        },
-      })
-    }
-
     editor.addAction({
       id: 'save-query',
       label: 'Save Query',
@@ -142,7 +115,8 @@ export const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+        const currentSnippet = snippetRef.current
+        if (currentSnippet) requestSaveRef.current(currentSnippet.snippet.id)
       },
     })
 
@@ -209,46 +183,6 @@ export const MonacoEditor = ({
 
     onMount?.(editor)
   }
-
-  function handleEditorChange(value: string | undefined) {
-    tabsSnap.makeActiveTabPermanent()
-    if (id && value) {
-      if (!snippet && ref && profile !== undefined && project !== undefined) {
-        const snippet = createSqlSnippetSkeletonV2({
-          idOverride: id,
-          name: snippetName,
-          sql: value,
-          owner_id: profile?.id,
-          project_id: project?.id,
-        })
-        snapV2.addSnippet({ projectRef: ref, snippet })
-        // When the editor was seeded from a `content` deep-link, replace rather
-        // than push. The caller navigated to `/sql/new?content=...` (a long,
-        // one-shot URL); replacing collapses it out of history so Back returns to
-        // the originating page instead of a wasted step that re-seeds the snippet.
-        if (router.query.content !== undefined) {
-          router.replace(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-        } else {
-          router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-        }
-      }
-      setValue(value)
-    }
-  }
-
-  useEffect(() => {
-    if (debouncedValue.length > 0 && snippet) {
-      const shouldInvalidate = wasNeverPersisted(snippet.snippet.status)
-      snapV2.setSql({ id, sql: value, shouldInvalidate })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedValue])
-
-  // if an SQL query is passed by the content parameter, set the editor value to its content. This
-  // is usually used for sending the user to SQL editor from other pages with SQL.
-  useEffect(() => {
-    if (content && content.length > 0) handleEditorChange(content)
-  }, [])
 
   return (
     <>

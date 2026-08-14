@@ -1,9 +1,13 @@
 import { useFlag, useParams } from 'common'
+import { ArrowUpRight } from 'lucide-react'
+import { createElement } from 'react'
 
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+const ExternalLinkIcon = createElement(ArrowUpRight, { strokeWidth: 1, className: 'h-4 w-4' })
 
 export interface GenerateAuthMenuOptions {
   ref?: string
@@ -87,9 +91,10 @@ export function generateAuthMenu(options: GenerateAuthMenuOptions): ProductMenuG
         {
           name: 'Policies',
           key: 'policies',
-          url: `${baseUrl}/policies`,
+          url: `/project/${ref}/database/policies`,
+          rightIcon: ExternalLinkIcon,
           items: [],
-          shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
+          // shortcutId: SHORTCUT_IDS.NAV_AUTH_POLICIES,
         },
         ...(isPlatform
           ? [

@@ -150,7 +150,7 @@ const buildMockChartData = (intervalKey: string) => {
 const EXECUTION_TIME_CHART_CONFIG = {
   avg_execution_time: {
     label: 'Average Execution Time',
-    color: 'hsl(var(--foreground-default))',
+    color: 'var(--foreground-default)',
   },
   max_execution_time: {
     label: 'Max Execution Time',
@@ -261,6 +261,7 @@ export default function PageLayoutEdgeFunction() {
           {pages.map((page) => (
             <NavMenuItem key={page.id} active={activePage === page.id}>
               <button
+                tabIndex={0}
                 type="button"
                 aria-pressed={activePage === page.id}
                 className="h-full cursor-pointer appearance-none bg-transparent text-inherit"
@@ -485,7 +486,7 @@ function OverviewPage() {
                         {
                           y: averageExecutionTime,
                           label: 'average',
-                          stroke: 'hsl(var(--foreground-default))',
+                          stroke: 'var(--foreground-default)',
                           strokeWidth: 1.5,
                         },
                       ]}
@@ -538,7 +539,7 @@ function OverviewPage() {
                           {
                             y: averageCpuTime,
                             label: 'average',
-                            stroke: 'hsl(var(--foreground-default))',
+                            stroke: 'var(--foreground-default)',
                             strokeWidth: 1.5,
                           },
                         ]}
@@ -589,7 +590,7 @@ function OverviewPage() {
                           {
                             y: averageMemoryUsage,
                             label: 'average',
-                            stroke: 'hsl(var(--foreground-default))',
+                            stroke: 'var(--foreground-default)',
                             strokeWidth: 1.5,
                           },
                         ]}

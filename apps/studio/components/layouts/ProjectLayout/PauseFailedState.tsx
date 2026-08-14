@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
@@ -152,10 +153,13 @@ export const PauseFailedState = () => {
       </div>
 
       <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
-        <DialogContent size="medium">
+        <DialogContent size="medium" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
-            <DialogTitle>Back up your database</DialogTitle>
+            <DialogTitle>Back up your database with the Supabase CLI</DialogTitle>
           </DialogHeader>
+
+          <DialogSectionSeparator />
+
           <DialogSection>
             <LogicalBackupCliInstructions showResetPassword={false} />
           </DialogSection>

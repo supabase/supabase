@@ -2,13 +2,15 @@ import { usePrevious } from '@uidotdev/usehooks'
 import { useParams } from 'common/hooks/useParams'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useEffectEvent } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 
+import { getSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import { useEditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
 import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
@@ -17,8 +19,8 @@ import { useSqlSnippetByIdQuery } from '@/data/content/content-id-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
-import { useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
+import { useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
 
@@ -31,7 +33,7 @@ const SqlEditor: NextPageWithLayout = () => {
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { history, setLastVisitedSnippet } = useDashboardHistory()
+  const { history, setLastVisitedSnippet, clearSnippetsFromHistory } = useDashboardHistory()
 
   const allSnippets = useSnippets(ref!)
   const snippet = allSnippets.find((x) => x.id === id)
@@ -62,6 +64,8 @@ const SqlEditor: NextPageWithLayout = () => {
   // More details: https://github.com/supabase/supabase/pull/39389
   const snippetMissingImmediatelyAfterCreating =
     !!snippet && snippetMissing && previousRoute === 'new' && wasNeverPersisted(snippet.status)
+
+  const isSnippetDeleted = snippetMissing && !snippetMissingImmediatelyAfterCreating
 
   useEffect(() => {
     if (ref && data && project) {
@@ -104,12 +108,56 @@ const SqlEditor: NextPageWithLayout = () => {
       metadata: {
         sqlId: id,
         name: snippet?.name,
+        // The snippet may not be loaded yet at tab-creation time; the effect
+        // below backfills the source once it is. Source is immutable, so once
+        // set it never needs updating again.
+        ...(snippet !== undefined && { sqlSource: getSnippetSource(snippet) }),
       },
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, id])
 
-  if ((snippetMissing || invalidId) && !snippetMissingImmediatelyAfterCreating) {
+  // Backfill the tab's source once the snippet loads. Covers both a freshly
+  // created tab whose snippet arrived after creation and tabs persisted before
+  // `sqlSource` existed (absent → filled from the loaded snippet type). Reads the
+  // latest tabs snapshot via useEffectEvent so the effect only re-runs on id/snippet.
+  const backfillTabSource = useEffectEvent(() => {
+    if (!id || id === 'new' || snippet === undefined) return
+
+    const tabId = createTabId('sql', { id })
+    const tab = tabs.tabsMap[tabId]
+    if (tab !== undefined && tab.metadata?.sqlSource === undefined) {
+      tabs.updateTab(tabId, { sqlSource: getSnippetSource(snippet) })
+    }
+  })
+  useEffect(() => {
+    backfillTabSource()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't correctly ignore useEffectEvent yet)
+  }, [id, snippet])
+
+  // The snippet no longer exists (e.g. deleted from another tab or session): clean up
+  // any stale tab and dashboard history references so navigation doesn't resurrect it,
+  // then fall back to a new snippet instead of rendering a dead state
+  useEffect(() => {
+    if (!ref || !id || id === 'new') return
+    if (!isSnippetDeleted) return
+
+    const staleTabId = createTabId('sql', { id })
+    if (tabs.hasTab(staleTabId)) tabs.removeTab(staleTabId)
+    if (snippet !== undefined) snapV2.removeSnippet(id)
+    clearSnippetsFromHistory([id])
+
+    toast(`The SQL snippet you were trying to open no longer exists. Opened a new query instead.`)
+    router.replace(`/project/${ref}/sql/new`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSnippetDeleted, id, ref])
+
+  // Render nothing while the effect above redirects away from the deleted snippet
+  if (isSnippetDeleted) {
+    return null
+  }
+
+  if (invalidId) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="w-[400px]">

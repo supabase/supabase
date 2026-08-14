@@ -1,6 +1,6 @@
 import { ChevronLeft, X } from 'lucide-react'
 import { Badge } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {

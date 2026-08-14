@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
-import { Button, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Button, cn, Tabs, TabsList, TabsTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -364,34 +364,22 @@ export const QueryInsightsTable = ({
 
           <div className="flex items-center">
             {mode === 'triage' ? (
-              <Tabs_Shadcn_ value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
-                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
-                  <TabsTrigger_Shadcn_
-                    value="all"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+              <Tabs value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
+                <TabsList className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
+                  <TabsTrigger value="all" className="text-xs py-3 border-b font-mono uppercase">
                     All{triageItems.length > 0 && ` (${triageItems.length})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="error"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="error" className="text-xs py-3 border-b font-mono uppercase">
                     Errors{errorCount > 0 && ` (${errorCount})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="index"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="index" className="text-xs py-3 border-b font-mono uppercase">
                     Index{indexCount > 0 && ` (${indexCount})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="slow"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="slow" className="text-xs py-3 border-b font-mono uppercase">
                     Slow{slowCount > 0 && ` (${slowCount})`}
-                  </TabsTrigger_Shadcn_>
-                </TabsList_Shadcn_>
-              </Tabs_Shadcn_>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             ) : (
               <Input
                 size="tiny"

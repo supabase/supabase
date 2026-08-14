@@ -78,25 +78,11 @@ describe('formatLogTick', () => {
 
 describe('getCumulativeResults', () => {
   it('returns empty array when results are empty', () => {
-    expect(
-      getCumulativeResults(
-        { rows: [] },
-        { type: 'bar', xKey: 'x', yKey: 'y', cumulative: false, showLabels: false, showGrid: false }
-      )
-    ).toEqual([])
+    expect(getCumulativeResults({ rows: [] }, { yKey: 'y' })).toEqual([])
   })
 
   it('returns empty array when results are undefined', () => {
-    expect(
-      getCumulativeResults(undefined as any, {
-        type: 'bar',
-        xKey: 'x',
-        yKey: 'y',
-        cumulative: false,
-        showLabels: false,
-        showGrid: false,
-      })
-    ).toEqual([])
+    expect(getCumulativeResults(undefined as any, { yKey: 'y' })).toEqual([])
   })
 
   it('accumulates yKey values across rows', () => {
@@ -155,5 +141,53 @@ describe('getCumulativeResults', () => {
     }
     const output = getCumulativeResults(results, config)
     expect(output).toEqual([{ x: 'a', y: 42 }])
+  })
+
+  // Postgres returns `bigint`, `numeric`, `money` and `count(*)` columns as
+  // strings, so the running total must sum numerically rather than concatenate.
+  it('sums numeric string yKey values instead of concatenating them', () => {
+    const results = {
+      rows: [
+        { x: 'a', y: '10' },
+        { x: 'b', y: '20' },
+        { x: 'c', y: '30' },
+      ],
+    }
+    const config = {
+      type: 'bar' as const,
+      xKey: 'x',
+      yKey: 'y',
+      cumulative: true,
+      showLabels: false,
+      showGrid: false,
+    }
+    const output = getCumulativeResults(results, config)
+    expect(output).toEqual([
+      { x: 'a', y: 10 },
+      { x: 'b', y: 30 },
+      { x: 'c', y: 60 },
+    ])
+  })
+
+  it('treats null/undefined and non-numeric yKey values as 0', () => {
+    const results = {
+      rows: [
+        { x: 'a', y: null },
+        { x: 'b', y: '5' },
+        { x: 'c', y: undefined },
+        { x: 'd', y: 'not-a-number' },
+        { x: 'e', y: 4 },
+      ],
+    }
+    const config = {
+      type: 'bar' as const,
+      xKey: 'x',
+      yKey: 'y',
+      cumulative: true,
+      showLabels: false,
+      showGrid: false,
+    }
+    const output = getCumulativeResults(results, config)
+    expect(output.map((row: { y: number }) => row.y)).toEqual([0, 5, 5, 5, 9])
   })
 })

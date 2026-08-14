@@ -4,9 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 declare global {
   interface Window {
-    devTelemetry?: () => void
+    devToolbar?: () => void
   }
 }
+
+const flags = vi.hoisted(() => ({ devToolbarDefaultOn: false }))
 
 // Mock common package
 vi.mock('common', async () => {
@@ -16,6 +18,7 @@ vi.mock('common', async () => {
       posthog: {},
       configcat: {},
     }),
+    useFlag: (name: string) => (name === 'devToolbarDefaultOn' ? flags.devToolbarDefaultOn : false),
     posthogClient: {
       subscribeToEvents: vi.fn(() => () => {}),
     },
@@ -27,7 +30,7 @@ const originalEnv = process.env.NEXT_PUBLIC_ENVIRONMENT
 
 /**
  * Helper to render the full component tree as used in production.
- * The Provider sets up window.devTelemetry and manages state.
+ * The Provider sets up window.devToolbar and manages state.
  * The Trigger shows the activity icon in the header.
  * The Toolbar is the actual panel/sheet.
  */
@@ -73,7 +76,8 @@ describe('DevToolbar', () => {
     })
 
     localStorage.clear()
-    delete window.devTelemetry
+    flags.devToolbarDefaultOn = false
+    delete window.devToolbar
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
@@ -101,11 +105,11 @@ describe('DevToolbar', () => {
       expect(container.querySelector('button')).toBeNull()
     })
 
-    it('does not register window.devTelemetry', async () => {
+    it('does not register window.devToolbar', async () => {
       vi.resetModules()
       await renderFullToolbar()
 
-      expect(window.devTelemetry).toBeUndefined()
+      expect(window.devToolbar).toBeUndefined()
     })
   })
 
@@ -122,12 +126,12 @@ describe('DevToolbar', () => {
       expect(container.querySelector('button')).toBeNull()
     })
 
-    it('registers window.devTelemetry function', async () => {
+    it('registers window.devToolbar function', async () => {
       vi.resetModules()
       await renderFullToolbar()
 
-      expect(window.devTelemetry).toBeDefined()
-      expect(typeof window.devTelemetry).toBe('function')
+      expect(window.devToolbar).toBeDefined()
+      expect(typeof window.devToolbar).toBe('function')
     })
   })
 
@@ -218,7 +222,41 @@ describe('DevToolbar', () => {
     })
   })
 
-  describe('window.devTelemetry function', () => {
+  describe('when devToolbarDefaultOn flag is enabled', () => {
+    it('renders the trigger without calling window.devToolbar in local', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      expect(triggerButton).toBeInTheDocument()
+    })
+
+    it('renders the trigger without calling window.devToolbar in staging', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'staging'
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      await renderFullToolbar()
+
+      const triggerButton = screen.getByRole('button')
+      expect(triggerButton).toBeInTheDocument()
+    })
+
+    it('does not render the trigger in production even when flag is on', async () => {
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'prod'
+      flags.devToolbarDefaultOn = true
+
+      vi.resetModules()
+      const { container } = await renderFullToolbar()
+
+      expect(container.querySelector('button')).toBeNull()
+    })
+  })
+
+  describe('window.devToolbar function', () => {
     beforeEach(() => {
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
     })
@@ -230,9 +268,9 @@ describe('DevToolbar', () => {
       // Trigger should not be visible initially
       expect(screen.queryByRole('button')).not.toBeInTheDocument()
 
-      // Call devTelemetry to enable
+      // Call devToolbar to enable
       act(() => {
-        window.devTelemetry?.()
+        window.devToolbar?.()
       })
 
       // Re-import and rerender to pick up state change
@@ -256,17 +294,17 @@ describe('DevToolbar', () => {
   })
 
   describe('cleanup', () => {
-    it('removes window.devTelemetry on unmount', async () => {
+    it('removes window.devToolbar on unmount', async () => {
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'local'
 
       vi.resetModules()
       const result = await renderFullToolbar()
 
-      expect(window.devTelemetry).toBeDefined()
+      expect(window.devToolbar).toBeDefined()
 
       result.unmount()
 
-      expect(window.devTelemetry).toBeUndefined()
+      expect(window.devToolbar).toBeUndefined()
     })
   })
 

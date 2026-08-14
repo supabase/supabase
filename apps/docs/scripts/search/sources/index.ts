@@ -52,13 +52,15 @@ export async function fetchJsLibReferenceSource() {
 }
 
 export async function fetchDartLibReferenceSource() {
-  return new ClientLibReferenceLoader(
-    'dart-lib',
-    '/reference/dart',
-    { title: 'Dart Reference', language: 'Dart' },
-    'spec/supabase_dart_v2.yml',
-    'spec/common-client-libs-sections.json'
-  ).load()
+  // Dart v2 is driven by the new reference pipeline. Ingest search sources from
+  // the generated `content/reference/dart/v2/` outputs so embeddings never
+  // drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'dart-lib',
+    path: '/reference/dart',
+    meta: { title: 'Dart Reference', language: 'Dart' },
+    contentDir: 'content/reference/dart/v2',
+  })
 }
 
 export async function fetchPythonLibReferenceSource() {

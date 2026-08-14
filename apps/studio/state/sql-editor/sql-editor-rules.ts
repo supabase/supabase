@@ -32,7 +32,7 @@ export function validateMoveToFolder({
 }: {
   visibility?: SnippetWithContent['visibility']
   folderId?: string | null
-}): { ok: boolean; error?: string } {
+}): { ok: true } | { ok: false; error: string } {
   if (visibility === 'project' && !!folderId) {
     return { ok: false, error: 'Shared snippet cannot be within a folder' }
   }
@@ -51,7 +51,7 @@ export function buildUpsertPayload(snippet: LoadedSnippet, id: string): UpsertCo
     snippet
   return {
     id,
-    type: 'sql',
+    type: snippet.type,
     name: name ?? 'Untitled',
     description: description ?? '',
     visibility: visibility ?? 'user',

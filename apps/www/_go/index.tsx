@@ -22,18 +22,24 @@ import stripeExecDinner from './events/stripe-sessions-2026/exec-dinner'
 import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-thank-you'
 import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-scheduler'
 import stripeParty from './events/stripe-sessions-2026/party'
+import vercelShipSydneyContest from './events/vercel-ship-sydney-2026/contest'
+import vercelShipSydneyContestThankYou from './events/vercel-ship-sydney-2026/contest-thank-you'
 import awsActivateOffer from './lead-gen/aws-activate-offer'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
+import supabasePipelinesNewDestinations from './pre-release/supabase-pipelines-new-destinations'
+import supabasePipelinesNewDestinationsThankYou from './pre-release/supabase-pipelines-new-destinations-thank-you'
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
   awsActivateOffer, // maintain forever
   exampleLeadGen, // sample lead gen page
   byocEarlyAccess, // maintain until PM says to remove
+  supabasePipelinesNewDestinations, // maintain while Pipelines destination early access is active
+  supabasePipelinesNewDestinationsThankYou, // maintain while Pipelines destination early access is active
   amoe, // maintain forever
   amoeThankYou, // maintain forever
   contestRules, // maintain forever
@@ -59,6 +65,8 @@ const pages: GoPageInput[] = [
   selectPartnerDay, // remove after Select 2026
   selectPartnerDayThankYou, // remove after Select 2026
   startupGrindContest, // remove after May 31, 2026
+  vercelShipSydneyContest, // remove after July 31, 2026
+  vercelShipSydneyContestThankYou, // remove after July 31, 2026
   supabaseStripeProjects,
 ]
 

@@ -2,10 +2,10 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -14,6 +14,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AlertError } from '@/components/ui/AlertError'
@@ -68,7 +69,9 @@ export const AuditLogsForm = () => {
     defaultValues: { AUDIT_LOG_DISABLE_POSTGRES: false },
   })
   const { isDirty } = form.formState
-  const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = form.watch()
+  const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = useWatch({
+    control: form.control,
+  })
   const currentlyDisabled = authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false
   const isDisabling = !currentlyDisabled && formValueDisablePostgres
 

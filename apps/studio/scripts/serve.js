@@ -39,7 +39,25 @@ for (const [k, v] of Object.entries(parsed)) {
   )
 }
 
-const { default: handler } = await import(path.join(studioRoot, 'dist/server/server.js'))
+// Initialize server-side Sentry now that .env values are in process.env (the
+// instrument module reads process.env.NEXT_PUBLIC_SENTRY_DSN at call time).
+// Imported dynamically here rather than via a `--import` flag so it runs after
+// the env-loading block above. Non-fatal if the SDK isn't present.
+try {
+  await import(path.join(studioRoot, 'instrument.server.mjs'))
+} catch (err) {
+  console.warn('[serve] Sentry server init skipped:', err?.message ?? err)
+}
+const { wrapFetchWithSentry } = await import('@sentry/tanstackstart-react').catch(() => ({
+  wrapFetchWithSentry: (fetchHandler) => fetchHandler,
+}))
+
+const { default: rawHandler } = await import(path.join(studioRoot, 'dist/server/server.js'))
+// Wrap so request-scoped errors (incl. ones swallowed into a 500) are captured.
+const handler = {
+  ...rawHandler,
+  fetch: wrapFetchWithSentry(rawHandler.fetch.bind(rawHandler)),
+}
 
 const mimeByExt = new Map([
   ['.js', 'application/javascript; charset=utf-8'],
@@ -164,9 +182,22 @@ async function pipeWebResponse(response, res) {
   })
 }
 
+// Security headers for the self-hosted server. Mirrors the non-platform branch
+// of next.config.ts `headers()` (self-hosted is always IS_PLATFORM=false, so the
+// CSP is just `frame-ancestors 'none'` and there's no HSTS). The platform CSP is
+// applied at the edge via vercel.ts instead; see security-headers.ts. Set before
+// any response is written so both the static and handler paths inherit them.
+const SECURITY_HEADERS = [
+  ['X-Frame-Options', 'DENY'],
+  ['X-Content-Type-Options', 'nosniff'],
+  ['Content-Security-Policy', "frame-ancestors 'none';"],
+  ['Referrer-Policy', 'strict-origin-when-cross-origin'],
+]
+
 const port = Number(process.env.PORT || 8082)
 createServer(async (req, res) => {
   try {
+    for (const [key, value] of SECURITY_HEADERS) res.setHeader(key, value)
     if (await serveStatic(req, res)) return
     const response = await handler.fetch(toWebRequest(req))
     await pipeWebResponse(response, res)

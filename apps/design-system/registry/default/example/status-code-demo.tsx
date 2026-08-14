@@ -1,4 +1,4 @@
-import { StatusCode } from 'ui-patterns'
+import { StatusCode } from 'ui-patterns/StatusCode'
 
 export default function StatusCodeDemo() {
   return (

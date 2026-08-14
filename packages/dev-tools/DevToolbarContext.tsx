@@ -1,6 +1,6 @@
 'use client'
 
-import { ensurePlatformSuffix, posthogClient, type ClientTelemetryEvent } from 'common'
+import { ensurePlatformSuffix, posthogClient, useFlag, type ClientTelemetryEvent } from 'common'
 import {
   createContext,
   useCallback,
@@ -32,7 +32,7 @@ const SSE_BACKOFF_MULTIPLIER = 2
 
 declare global {
   interface Window {
-    devTelemetry?: () => void
+    devToolbar?: () => void
   }
 }
 
@@ -47,6 +47,8 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
   const [isEnabled, setIsEnabled] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [events, setEvents] = useState<DevTelemetryEvent[]>([])
+
+  const isDefaultOn = useFlag('devToolbarDefaultOn')
 
   const sseRetryDelayRef = useRef(SSE_INITIAL_RETRY_MS)
   const sseRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -66,11 +68,11 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     try {
       stored = localStorage.getItem(STORAGE_KEY)
     } catch {}
-    if (stored === 'true') {
+    if (stored === 'true' || isDefaultOn) {
       setIsEnabled(true)
     }
 
-    window.devTelemetry = () => {
+    window.devToolbar = () => {
       try {
         localStorage.setItem(STORAGE_KEY, 'true')
       } catch {}
@@ -78,9 +80,9 @@ export function DevToolbarProvider({ children, apiUrl }: DevToolbarProviderProps
     }
 
     return () => {
-      delete window.devTelemetry
+      delete window.devToolbar
     }
-  }, [])
+  }, [isDefaultOn])
 
   const appendEvent = useCallback((event: DevTelemetryEvent) => {
     setEvents((prev) => {

@@ -228,7 +228,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                  bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
                 "
               />
             </div>
@@ -294,7 +294,7 @@ const data: () => {
           ),
           className: 'border-l-0! sm:border-l!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -391,7 +391,7 @@ const data: () => {
           ),
         },
         {
-          id: 'row-level-security',
+          id: 'full-sql-access',
           title: 'Full SQL access',
           icon: '',
           subheading: (
@@ -411,7 +411,7 @@ const data: () => {
                 dark: '/images/solutions/postgres-developers/sql-editor-dark.jpg',
                 light: '/images/solutions/postgres-developers/sql-editor-light.jpg',
               }}
-              alt="Row Level Security"
+              alt="SQL Editor"
               width={100}
               height={100}
               quality={100}
@@ -644,7 +644,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
                 "
               />
               <Image
@@ -675,7 +675,7 @@ const data: () => {
             <RealtimeLogs
               isActive={false}
               isInView={true}
-              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]!"
+              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,var(--background-default)_0%,transparent_100%)]!"
             />
           ),
         },

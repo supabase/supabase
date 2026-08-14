@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -16,15 +17,17 @@ import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import { ReportChartUpsell } from '@/components/interfaces/Reports/v2/ReportChartUpsell'
 import { POOLING_OPTIMIZATIONS } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { analyticsKeys } from '@/data/analytics/keys'
@@ -64,6 +67,8 @@ DatabaseReport.getLayout = (page) => (
 
 export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
+
+const REPORT_TITLE = 'Database'
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -131,10 +136,7 @@ const DatabaseUsage = () => {
   )
   const entitledFeatures = getEntitlementSetValues()
 
-  const isSpendCapEnabled =
-    entitledFeatures.includes('database') &&
-    !org?.usage_billing_enabled &&
-    project?.cloud_provider !== 'FLY'
+  const isSpendCapEnabled = entitledFeatures.includes('database') && !org?.usage_billing_enabled
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
@@ -227,10 +229,11 @@ const DatabaseUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector title="Database" />
+      <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <>
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"
@@ -275,7 +278,7 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
-          </>
+          </div>
         }
       >
         {selectedDateRange &&
@@ -368,9 +371,7 @@ const DatabaseUsage = () => {
                   <div className="ml-auto">
                     {project?.cloud_provider === 'AWS' ? (
                       <Button asChild variant="default">
-                        <Link href={`/project/${ref}/settings/compute-and-disk`}>
-                          Increase disk size
-                        </Link>
+                        <Link href={getInfrastructurePath(ref)}>Increase disk size</Link>
                       </Button>
                     ) : (
                       <ButtonTooltip

@@ -47,7 +47,7 @@ delete from logs
 where created_at < now() - interval '90 days';
 ```
 
-This acquires a `ROW EXCLUSIVE` lock on the table, which still allows other `SELECT`, `INSERT`, `UPDATE`, and `DELETE` statements to run concurrently. For small row counts, the operation completes quickly and has minimal impact.
+This acquires a `ROW EXCLUSIVE` lock on the table, which still allows other `SELECT`, `INSERT`, `UPDATE`, and `DELETE` statements to run concurrently. For small row counts, the operation completes with minimal impact.
 
 ### Large deletes
 
@@ -89,7 +89,7 @@ create view active_orders as
   select * from orders where deleted_at is null;
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Combine soft deletes with a scheduled hard-delete job (using [pg_cron](/docs/guides/database/extensions/pg_cron)) to permanently remove old soft-deleted rows in batches during low-traffic periods.
 
@@ -147,7 +147,7 @@ Dropping a regular index takes an `ACCESS EXCLUSIVE` lock on the index but **not
 drop index if exists idx_users_legacy_field;
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The `inspect` command in the [Supabase CLI](/docs/reference/cli/supabase-inspect-db-index-stats) can help you identify unused indexes:
 
@@ -188,7 +188,7 @@ If autovacuum is not keeping up, you can trigger a manual vacuum:
 vacuum (verbose) logs;
 ```
 
-For reclaiming disk space (not just marking tuples as reusable), use `VACUUM FULL` — but be aware this rewrites the entire table and takes an `ACCESS EXCLUSIVE` lock:
+To reclaim disk space rather than only marking tuples as reusable, use `VACUUM FULL`. Note that this rewrites the entire table and takes an `ACCESS EXCLUSIVE` lock:
 
 ```sql
 -- This locks the table for the duration — use during maintenance windows only

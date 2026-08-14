@@ -124,7 +124,10 @@ const renderTemplateEditor = ({
   })
   useAsyncCheckPermissionsMock.mockReturnValue({ can: canUpdateConfig })
   useAuthConfigUpdateMutationMock.mockReturnValue({ mutate: updateAuthConfigMock })
-  useAuthTemplateResetMutationMock.mockReturnValue({ mutate: resetTemplateMock })
+  useAuthTemplateResetMutationMock.mockImplementation((options = {}) => ({
+    mutateAsync: (vars: unknown) => resetTemplateMock(vars, options),
+    isPending: false,
+  }))
 
   return render(<TemplateEditor template={confirmationTemplate} />)
 }
@@ -252,5 +255,23 @@ describe('TemplateEditor reset to default', () => {
     renderTemplateEditor({ hasCustomBody: true, canUpdateConfig: false })
 
     expect(screen.getByRole('button', { name: 'Reset template' })).toBeDisabled()
+  })
+
+  it('keeps the dialog open and shows an inline error when reset fails', async () => {
+    const user = userEvent.setup()
+    resetTemplateMock.mockImplementation(async () => {
+      throw new Error('Reset endpoint unavailable')
+    })
+
+    renderTemplateEditor({ hasCustomBody: true })
+
+    await user.click(screen.getByRole('button', { name: 'Reset template' }))
+    const dialog = await screen.findByRole('alertdialog')
+    await user.click(within(dialog).getByRole('button', { name: 'Reset' }))
+
+    expect(await within(dialog).findByText('Reset endpoint unavailable')).toBeInTheDocument()
+    expect(within(dialog).getByText('Unable to reset email template')).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: 'Reset' })).toBeInTheDocument()
+    expect(toast.error).not.toHaveBeenCalled()
   })
 })

@@ -21,7 +21,7 @@ import {
 } from './QueryBlock.utils'
 import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -348,12 +348,12 @@ export const QueryBlock = ({
                       )
                     }
                   />
-                  <Bar radius={1} dataKey={yKey} fill="hsl(var(--chart-1))">
+                  <Bar radius={1} dataKey={yKey} fill="var(--chart-1)">
                     {chartData?.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
                         className="transition-all duration-100"
-                        fill="hsl(var(--chart-1))"
+                        fill="var(--chart-1)"
                         opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
                         enableBackground={12}
                       />

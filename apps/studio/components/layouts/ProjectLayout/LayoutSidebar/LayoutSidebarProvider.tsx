@@ -5,7 +5,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useEffectEvent, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'

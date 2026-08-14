@@ -5,6 +5,7 @@ import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -15,8 +16,9 @@ import { useSharedAPIReport } from '@/components/interfaces/Reports/SharedAPIRep
 import { ReportChartV2 } from '@/components/interfaces/Reports/v2/ReportChartV2'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { realtimeReports } from '@/data/reports/v2/realtime.config'
@@ -42,6 +44,8 @@ RealtimeReport.getLayout = (page) => (
 
 export type UpdateDateRange = (from: string, to: string) => void
 export default RealtimeReport
+
+const REPORT_TITLE = 'Realtime'
 
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -140,11 +144,12 @@ const RealtimeUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      <ReportHeader showDatabaseSelector={false} title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-3 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.realtime} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"

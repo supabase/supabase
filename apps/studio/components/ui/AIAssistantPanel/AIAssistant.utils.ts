@@ -2,6 +2,10 @@ import { isToolUIPart, type UIMessage } from 'ai'
 import { toast } from 'sonner'
 
 import { SAFE_FUNCTIONS } from './AiAssistant.constants'
+import {
+  isLogsSource,
+  sqlSourceToFenceLanguage,
+} from '@/components/interfaces/SQLEditor/querySource'
 import { authKeys } from '@/data/auth/keys'
 import { databaseExtensionsKeys } from '@/data/database-extensions/keys'
 import { databaseIndexesKeys } from '@/data/database-indexes/keys'
@@ -12,6 +16,7 @@ import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
 import { handleError } from '@/data/fetchers'
 import { tableKeys } from '@/data/tables/keys'
 import { tryParseJson } from '@/lib/helpers'
+import type { SqlSnippet } from '@/state/ai-assistant-state'
 import { ResponseError } from '@/types'
 
 export type MutationCategory = 'functions' | 'rls-policies'
@@ -127,7 +132,7 @@ export const getContextualInvalidationKeys = ({
     (
       {
         'auth/users': [authKeys.usersInfinite(ref)],
-        'auth/policies': [databasePoliciesKeys.list(ref)],
+        'database/policies': [databasePoliciesKeys.list(ref)],
         'database/functions': [databaseKeys.databaseFunctions(ref)],
         'database/tables': [
           tableKeys.list(ref, schema, { includeColumns: true }),
@@ -158,4 +163,42 @@ export const onErrorChat = (error: Error) => {
       toast.error('An unknown error occurred')
     }
   }
+}
+
+export function containsLogsSnippets(snippets: readonly SqlSnippet[] | undefined): boolean {
+  return (snippets ?? []).some(
+    (snippet) => typeof snippet !== 'string' && isLogsSource(snippet.source)
+  )
+}
+
+export const getSnippetLabel = (snippet: SqlSnippet, index: number): string =>
+  typeof snippet === 'string' ? `Snippet ${index + 1}` : snippet.label
+
+export const getSnippetContent = (snippet: SqlSnippet): string =>
+  typeof snippet === 'string' ? snippet : snippet.content
+
+/**
+ * The fence language an attached query is written into the message with. A logs query
+ * is fenced as `clickhouse` so the model can tell which attachment is ClickHouse
+ * against the `logs` table — a single message can carry both dialects.
+ *
+ * It also keeps the two apart in the rendered message: MessageMarkdown treats a `sql`
+ * fence as runnable Postgres (`DisplayBlockRenderer`, branded with `untrustedSql`),
+ * which a ClickHouse query must never be offered as.
+ */
+function getSnippetFenceLanguage(snippet: SqlSnippet): 'sql' | 'clickhouse' {
+  return sqlSourceToFenceLanguage(typeof snippet === 'string' ? undefined : snippet.source)
+}
+
+/**
+ * Renders attached queries as the fenced code blocks appended to the message text,
+ * each labelled with its own dialect.
+ */
+export function formatAttachedSnippets(snippets: readonly SqlSnippet[]): string {
+  return snippets
+    .map(
+      (snippet) =>
+        '```' + getSnippetFenceLanguage(snippet) + '\n' + getSnippetContent(snippet) + '\n```'
+    )
+    .join('\n')
 }

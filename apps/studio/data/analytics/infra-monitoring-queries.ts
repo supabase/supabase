@@ -221,6 +221,3 @@ export function mapResponseToAnalyticsData(
     },
   }
 }
-
-/** @deprecated Use mapResponseToAnalyticsData instead */
-export const mapMultiResponseToAnalyticsData = mapResponseToAnalyticsData

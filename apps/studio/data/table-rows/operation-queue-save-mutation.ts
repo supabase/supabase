@@ -11,8 +11,21 @@ import type { PendingAddRow } from '@/components/grid/types'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import { QueuedOperation, QueuedOperationType } from '@/state/table-editor-operation-queue.types'
+import {
+  isEditCellContentOperation,
+  QueuedOperation,
+  QueuedOperationType,
+  type EditCellContentOperation,
+} from '@/state/table-editor-operation-queue.types'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
+
+function getEditCellOperationRowKey(operation: EditCellContentOperation): string {
+  const rowIdentifiersKey = JSON.stringify(
+    Object.entries(operation.payload.rowIdentifiers).sort(([a], [b]) => a.localeCompare(b))
+  )
+
+  return `${operation.tableId}:${rowIdentifiersKey}`
+}
 
 export type OperationQueueSaveVariables = {
   projectRef: string
@@ -81,6 +94,55 @@ function sortOperations(operations: readonly QueuedOperation[]): QueuedOperation
   })
 }
 
+function stripTrailingSemicolon(sql: SafeSqlFragment): SafeSqlFragment {
+  return (sql.endsWith(';') ? sql.slice(0, -1) : sql) as SafeSqlFragment
+}
+
+export function getOperationSqlStatements(
+  operations: readonly QueuedOperation[]
+): Array<SafeSqlFragment> {
+  const statements: Array<SafeSqlFragment> = []
+  const editCellOperationsByRow = new Map<string, EditCellContentOperation[]>()
+
+  for (const operation of sortOperations(operations)) {
+    if (!isEditCellContentOperation(operation)) {
+      statements.push(stripTrailingSemicolon(getOperationSql(operation)))
+      continue
+    }
+
+    const key = getEditCellOperationRowKey(operation)
+    const existing = editCellOperationsByRow.get(key)
+    if (existing) {
+      existing.push(operation)
+      continue
+    }
+    editCellOperationsByRow.set(key, [operation])
+  }
+
+  for (const editCellOperations of editCellOperationsByRow.values()) {
+    const firstOperation = editCellOperations[0]
+    const { table, rowIdentifiers } = firstOperation.payload
+
+    statements.push(
+      stripTrailingSemicolon(
+        getTableRowUpdateSql({
+          table: { id: table.id, name: table.name, schema: table.schema },
+          configuration: { identifiers: rowIdentifiers },
+          payload: Object.fromEntries(
+            editCellOperations.map(({ payload }) => [payload.columnName, payload.newValue])
+          ),
+          enumArrayColumns: [
+            ...new Set(editCellOperations.flatMap(({ payload }) => payload.enumArrayColumns ?? [])),
+          ],
+          returning: false,
+        })
+      )
+    )
+  }
+
+  return statements
+}
+
 /**
  * Saves all queued operations in a single database transaction.
  * If any operation fails, the entire transaction is rolled back.
@@ -95,11 +157,7 @@ export async function saveOperationQueue({
     return { result: [] }
   }
 
-  const sortedOperations = sortOperations(operations)
-  const statements: Array<SafeSqlFragment> = sortedOperations.map((op) => {
-    const sql = getOperationSql(op)
-    return (sql.endsWith(';') ? sql.slice(0, -1) : sql) as SafeSqlFragment
-  })
+  const statements = getOperationSqlStatements(operations)
 
   const transactionSql = wrapWithTransaction(safeSql`${joinSqlFragments(statements, ';\n')};`)
 

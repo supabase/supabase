@@ -1,0 +1,380 @@
+import type { PGTable } from '@supabase/pg-meta'
+import { ident, safeSql } from '@supabase/pg-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { Search, X } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { Button } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderAside,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { Policies } from '@/components/interfaces/Database/Policies/Policies'
+import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/Policies.constants'
+import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
+import { PolicyEditorPanel } from '@/components/interfaces/Database/Policies/PolicyEditorPanel'
+import {
+  generatePolicyUpdateSQL,
+  type Policy,
+} from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { getExposedSchemas } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import type { NextPageWithLayout } from '@/types'
+
+/**
+ * Filter tables by table name and policy name
+ *
+ * @param tables list of table
+ * @param policies list of policy
+ * @param searchString filter keywords
+ *
+ * @returns list of table
+ */
+const getTableFilterState = (tables: PGTable[], policies: Array<Policy>, searchString?: string) => {
+  const sortedTables = tables.slice().sort((a, b) => a.name.localeCompare(b.name))
+  const visibleTableIds = new Set<number>()
+
+  if (!searchString) {
+    sortedTables.forEach((table) => visibleTableIds.add(table.id))
+    return { tables: sortedTables, visibleTableIds }
+  }
+
+  const filter = searchString.toLowerCase()
+  const matchingPolicyKeys = new Set(
+    policies
+      .filter((policy: Policy) => policy.name.toLowerCase().includes(filter))
+      .map((policy) => `${policy.schema}.${policy.table}`)
+  )
+
+  sortedTables.forEach((table) => {
+    const matches =
+      table.name.toLowerCase().includes(filter) ||
+      table.id.toString() === filter ||
+      matchingPolicyKeys.has(`${table.schema}.${table.name}`)
+
+    if (matches) {
+      visibleTableIds.add(table.id)
+    }
+  })
+
+  return { tables: sortedTables, visibleTableIds }
+}
+
+const DatabasePoliciesPage: NextPageWithLayout = () => {
+  const [schema, setSchema] = useQueryState(
+    'schema',
+    parseAsString.withDefault('public').withOptions({ history: 'replace' })
+  )
+  const [searchString, setSearchString] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
+  )
+  const deferredSearchString = useDeferredValue(searchString)
+
+  const [selectedIdToEdit, setSelectedIdToEdit] = useQueryState(
+    'edit',
+    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+  )
+
+  const { ref: projectRef } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: dbSchema } = useProjectPostgrestConfigQuery(
+    { projectRef: project?.ref },
+    { select: ({ db_schema }) => db_schema }
+  )
+
+  const isInlineEditorEnabled = useIsInlineEditorEnabled()
+
+  const { openSidebar } = useSidebarManagerSnapshot()
+  const {
+    setValue: setEditorPanelValue,
+    setTemplates: setEditorPanelTemplates,
+    setInitialPrompt: setEditorPanelInitialPrompt,
+  } = useEditorPanelStateSnapshot()
+
+  const [selectedTable, setSelectedTable] = useState<string>()
+  const [showCreatePolicy, setShowCreatePolicy] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search policies' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearchString(''))
+
+  const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
+
+  const [isAutoEnableRLSMinimized] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
+    false
+  )
+
+  const {
+    data: policies = [],
+    isPending: isLoadingPolicies,
+    isError: isPoliciesError,
+    isSuccess: isPoliciesSuccess,
+    error: policiesError,
+  } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schemas: [schema],
+  })
+  const selectedPolicyToEdit = policies.find((policy) => policy.id.toString() === selectedIdToEdit)
+
+  const {
+    data: tables,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: schema,
+  })
+
+  const { tables: tablesWithVisibility, visibleTableIds } = useMemo(
+    () => getTableFilterState(tables ?? [], policies ?? [], searchString),
+    [tables, policies, searchString]
+  )
+  const exposedSchemas = getExposedSchemas(dbSchema)
+
+  const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_READ,
+    'policies'
+  )
+
+  const handleSelectCreatePolicy = useCallback(
+    (table: string) => {
+      setSelectedTable(table)
+      setSelectedIdToEdit(null)
+      setShowCreatePolicy(true)
+
+      if (isInlineEditorEnabled) {
+        const defaultSql = safeSql`create policy "replace_with_policy_name"
+  on ${ident(schema)}.${ident(table)}
+  for select
+  to authenticated
+  using (
+    true  -- Write your policy condition here
+);`
+
+        setEditorPanelInitialPrompt('Create a new RLS policy that...')
+        setEditorPanelValue(defaultSql)
+        setEditorPanelTemplates([])
+        openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+      } else {
+        setShowCreatePolicy(true)
+      }
+    },
+    [isInlineEditorEnabled, openSidebar, schema]
+  )
+
+  const handleSelectEditPolicy = useCallback(
+    (policy: Policy) => {
+      setSelectedTable(undefined)
+
+      if (isInlineEditorEnabled) {
+        setEditorPanelInitialPrompt(`Update the RLS policy with name "${policy.name}" that...`)
+        setEditorPanelValue(generatePolicyUpdateSQL(policy))
+        const templates = getGeneralPolicyTemplates(policy.schema, policy.table).map(
+          (template) => ({
+            name: template.templateName,
+            description: template.description,
+            content: template.statement,
+          })
+        )
+        setEditorPanelTemplates(templates)
+        openSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+      } else {
+        setSelectedIdToEdit(policy.id.toString())
+      }
+    },
+    [isInlineEditorEnabled, openSidebar]
+  )
+
+  const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
+
+  useEffect(() => {
+    if (selectedIdToEdit && isPoliciesSuccess && !selectedPolicyToEdit) {
+      toast(`Policy ID ${selectedIdToEdit} cannot be found`)
+      setSelectedIdToEdit(null)
+    }
+  }, [selectedIdToEdit, selectedPolicyToEdit, isPoliciesSuccess, setSelectedIdToEdit])
+
+  const isUpdatingPolicy = !!selectedIdToEdit
+
+  if (isPermissionsLoaded && !canReadPolicies) {
+    return <NoPermission isFullPage resourceText="view this project's RLS policies" />
+  }
+
+  return (
+    <>
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Policies</PageHeaderTitle>
+            <PageHeaderDescription>
+              Manage Row Level Security policies for your tables
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            {isAutoEnableRLSMinimized && <AutoEnableRLSNotice iconOnly />}
+            <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="large">
+        <PageSection>
+          {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
+
+          <PageSectionContent>
+            <div className="mb-4 flex flex-row gap-x-2">
+              <Shortcut
+                id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+                onTrigger={() => setSchemaSelectorOpen(true)}
+                side="bottom"
+                tooltipOpen={schemaSelectorOpen ? false : undefined}
+              >
+                <SchemaSelector
+                  className="w-full lg:w-[180px]"
+                  size="tiny"
+                  align="end"
+                  showError={false}
+                  selectedSchemaName={schema}
+                  open={schemaSelectorOpen}
+                  onOpenChange={setSchemaSelectorOpen}
+                  onSelectSchema={(schemaName) => {
+                    setSchema(schemaName)
+                    setSearchString('')
+                  }}
+                />
+              </Shortcut>
+              <Input
+                ref={searchInputRef}
+                size="tiny"
+                placeholder="Filter tables and policies"
+                className="block w-full lg:w-52"
+                containerClassName="[&>div>svg]:-mt-0.5"
+                value={searchString || ''}
+                onChange={(e) => {
+                  const str = e.target.value
+                  setSearchString(str)
+                }}
+                onKeyDown={onSearchInputEscape(searchString || '', setSearchString)}
+                icon={<Search size={14} />}
+                actions={
+                  searchString ? (
+                    <Button
+                      size="tiny"
+                      variant="text"
+                      aria-label="Clear filter"
+                      className="p-0 h-5 w-5"
+                      icon={<X />}
+                      onClick={() => setSearchString('')}
+                    />
+                  ) : null
+                }
+              />
+            </div>
+
+            {isLoading && <GenericSkeletonLoader />}
+
+            {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
+
+            {isSuccess && (
+              <PoliciesDataProvider
+                policies={policies ?? []}
+                isPoliciesLoading={isLoadingPolicies}
+                isPoliciesError={isPoliciesError}
+                policiesError={policiesError ?? undefined}
+                exposedSchemas={exposedSchemas}
+              >
+                <Policies
+                  search={deferredSearchString}
+                  schema={schema}
+                  tables={tablesWithVisibility}
+                  hasTables={(tables ?? []).length > 0}
+                  isLocked={isSchemaLocked}
+                  visibleTableIds={visibleTableIds}
+                  onSelectCreatePolicy={handleSelectCreatePolicy}
+                  onSelectEditPolicy={handleSelectEditPolicy}
+                  onResetSearch={handleResetSearch}
+                />
+              </PoliciesDataProvider>
+            )}
+
+            <PolicyEditorPanel
+              visible={showCreatePolicy || (isUpdatingPolicy && !!selectedPolicyToEdit)}
+              schema={schema}
+              searchString={searchString}
+              selectedTable={isUpdatingPolicy ? undefined : selectedTable}
+              selectedPolicy={isUpdatingPolicy ? selectedPolicyToEdit : undefined}
+              onSelectCancel={() => {
+                setSelectedTable(undefined)
+                if (isUpdatingPolicy) {
+                  setSelectedIdToEdit(null)
+                } else {
+                  setShowCreatePolicy(false)
+                }
+              }}
+              authContext="database"
+            />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    </>
+  )
+}
+
+DatabasePoliciesPage.getLayout = (page) => (
+  <DefaultLayout>
+    <DatabaseLayout title="Policies">{page}</DatabaseLayout>
+  </DefaultLayout>
+)
+
+export default DatabasePoliciesPage
