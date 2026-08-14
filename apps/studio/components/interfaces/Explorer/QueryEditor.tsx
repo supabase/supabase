@@ -21,8 +21,7 @@ import {
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
 import { DisplaySettingsButton } from './QueryCell/DisplaySettingsButton'
-import { QueryResultChart } from './QueryCell/QueryResultChart'
-import { QueryResultTable } from './QueryResultTable'
+import { QueryResultRenderer } from './QueryResultRenderer'
 import { type QueryDisplay, type QueryResult } from './types'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import {
@@ -257,13 +256,10 @@ export const QueryEditor = ({
 
       <ExplorerQueryResults
         className={cn(
-          (result?.rows ?? []).length === 0 && view === 'table'
-            ? 'items-center justify-center'
-            : 'overflow-x-auto'
+          (result?.rows ?? []).length === 0 ? 'items-center justify-center' : 'overflow-x-auto'
         )}
       >
-        {view === 'table' && <QueryResultTable result={result} />}
-        {view === 'chart' && <QueryResultChart chart={display?.chart} result={result} />}
+        <QueryResultRenderer view={view} result={result} chart={display?.chart} />
       </ExplorerQueryResults>
 
       <ExplorerQueryFooter className="flex items-center gap-x-2">
