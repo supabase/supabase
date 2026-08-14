@@ -1,23 +1,25 @@
+import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
-import { UseFormReturn } from 'react-hook-form'
-
-import { InputVariants } from '@ui/components/shadcn/ui/input'
-import { useParams } from 'common'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
+import { UseFormReturn, useWatch } from 'react-hook-form'
+import {
+  FormControl,
+  FormField,
+  FormInputGroupInput,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { calculateThroughputPrice } from '../DiskManagement.utils'
-import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import {
   DISK_LIMITS,
   DiskType,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
 } from '../ui/DiskManagement.constants'
 import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
-import FormMessage from '../ui/FormMessage'
-import { InputPostTab } from '../ui/InputPostTab'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 
 type ThroughputFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -27,20 +29,14 @@ type ThroughputFieldProps = {
 export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
   const { ref: projectRef } = useParams()
 
-  const { control, formState, setValue, getValues, watch } = form
+  const { control, formState, setValue, getValues } = form
 
-  const watchedStorageType = watch('storageType')
-  const watchedTotalSize = watch('totalSize')
-  const watchedComputeSize = watch('computeSize')
+  const watchedStorageType = useWatch({ control, name: 'storageType' })
+  const watchedTotalSize = useWatch({ control, name: 'totalSize' })
+  const watchedComputeSize = useWatch({ control, name: 'computeSize' })
   const throughput_mbps = formState.defaultValues?.throughput
 
-  const { isPending: isLoading, error } = useDiskAttributesQuery({ projectRef })
-
-  const throughputPrice = calculateThroughputPrice({
-    storageType: form.getValues('storageType') as DiskType,
-    newThroughput: form.getValues('throughput') || 0,
-    oldThroughput: form.formState.defaultValues?.throughput || 0,
-  })
+  useDiskAttributesQuery({ projectRef })
 
   const disableIopsInput =
     RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
@@ -74,13 +70,14 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
           transition={{ duration: 0.1 }}
           style={{ overflow: 'hidden' }}
         >
-          <FormField_Shadcn_
+          <FormField
             name="throughput"
             control={control}
             render={({ field }) => (
               <FormItemLayout
                 label="Throughput"
-                layout="horizontal"
+                layout="flex-row-reverse"
+                id={field.name}
                 description={
                   <span className="flex flex-col gap-y-2">
                     <p>Higher throughput suits applications with high data transfer needs.</p>
@@ -96,52 +93,29 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                   </span>
                 }
                 labelOptional={
-                  <>
-                    <BillingChangeBadge
-                      show={
-                        formState.isDirty &&
-                        formState.dirtyFields.throughput &&
-                        !formState.errors.throughput
-                      }
-                      beforePrice={Number(throughputPrice.oldPrice)}
-                      afterPrice={Number(throughputPrice.newPrice)}
-                      className="mb-2"
-                    />
-                    <p className="text-foreground-lighter">
-                      Amount of data read/written per second.
-                    </p>
-                  </>
+                  <p className="text-foreground-lighter">Amount of data read/written per second.</p>
                 }
               >
-                <InputPostTab label="MB/s">
-                  {isLoading ? (
-                    <div
-                      className={cn(
-                        InputVariants({ size: 'small' }),
-                        'w-32 font-mono rounded-r-none'
-                      )}
-                    >
-                      <Skeleton className="w-10 h-4" />
-                    </div>
-                  ) : (
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
-                        type="number"
-                        {...field}
-                        value={field.value}
-                        onChange={(e) => {
-                          setValue('throughput', e.target.valueAsNumber, {
-                            shouldDirty: true,
-                            shouldValidate: true,
-                          })
-                        }}
-                        className="flex-grow font-mono rounded-r-none max-w-32"
-                        disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
-                      />
-                    </FormControl_Shadcn_>
-                  )}
-                </InputPostTab>
-                {error && <FormMessage type="error" message={error.message} />}
+                <FormControl className="max-w-32">
+                  <InputGroup>
+                    <FormInputGroupInput
+                      type="number"
+                      {...field}
+                      id={field.name}
+                      value={field.value}
+                      onChange={(e) => {
+                        setValue('throughput', e.target.valueAsNumber, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }}
+                      disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
+                    />
+                    <InputGroupAddon align="inline-end">
+                      <InputGroupText>MB/s</InputGroupText>
+                    </InputGroupAddon>
+                  </InputGroup>
+                </FormControl>
               </FormItemLayout>
             )}
           />

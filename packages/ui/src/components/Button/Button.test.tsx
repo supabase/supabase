@@ -1,5 +1,4 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import Link from 'next/link'
 import React from 'react'
 import { describe, expect, it } from 'vitest'
 
@@ -75,14 +74,11 @@ describe('#Button', () => {
     expect(screen.queryByRole('button')).toHaveClass('w-full')
   })
 
-  it("shouldn't crash when wrapped with next/link", () => {
-    expect(() =>
-      render(
-        <Button asChild>
-          <Link href="https://supabase.com">Button</Link>
-        </Button>
-      )
-    ).not.toThrow()
+  it('should hide decorative icons from assistive technology', () => {
+    render(<Button icon={<svg data-testid="button-icon" />}>Save</Button>)
+
+    expect(screen.getByTestId('button-icon').parentElement).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument()
   })
 
   it('should forward ref', () => {

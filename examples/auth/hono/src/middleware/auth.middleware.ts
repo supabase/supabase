@@ -4,9 +4,11 @@ import type { Context, MiddlewareHandler } from 'hono'
 import { env } from 'hono/adapter'
 import { setCookie } from 'hono/cookie'
 
+import type { Database } from '../database.types'
+
 declare module 'hono' {
   interface ContextVariableMap {
-    supabase: SupabaseClient
+    supabase: SupabaseClient<Database>
   }
 }
 
@@ -23,17 +25,17 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
     const supabaseEnv = env<SupabaseEnv>(c)
     const supabaseUrl = supabaseEnv.SUPABASE_URL
-    const supabaseAnonKey = supabaseEnv.SUPABASE_PUBLISHABLE_KEY
+    const supabasePublishableKey = supabaseEnv.SUPABASE_PUBLISHABLE_KEY
 
     if (!supabaseUrl) {
       throw new Error('SUPABASE_URL missing!')
     }
 
-    if (!supabaseAnonKey) {
+    if (!supabasePublishableKey) {
       throw new Error('SUPABASE_PUBLISHABLE_KEY missing!')
     }
 
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
       cookies: {
         getAll() {
           return parseCookieHeader(c.req.header('Cookie') ?? '')

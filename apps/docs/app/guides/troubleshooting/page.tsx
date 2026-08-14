@@ -1,5 +1,3 @@
-import { type Metadata } from 'next'
-
 import { TroubleshootingPreview } from '~/features/docs/Troubleshooting.ui'
 import {
   TroubleshootingFilter,
@@ -16,6 +14,7 @@ import { TROUBLESHOOTING_CONTAINER_ID } from '~/features/docs/Troubleshooting.ut
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { type Metadata } from 'next'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -26,7 +25,7 @@ export default async function GlobalTroubleshootingPage() {
   const errors = await getAllTroubleshootingErrors()
 
   return (
-    <SidebarSkeleton hideSideNav className="w-full max-w-screen-lg mx-auto">
+    <SidebarSkeleton hideSideNav className="w-full max-w-(--breakpoint-lg) mx-auto">
       <div className="py-8 px-5">
         <h1 className="text-4xl tracking-tight mb-7">Troubleshooting</h1>
         <p className="text-lg text-foreground-light">

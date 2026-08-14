@@ -1,4 +1,4 @@
-import { handleError, post } from 'data/fetchers'
+import { handleError, post } from '@/data/fetchers'
 
 interface getTemporaryAPIKeyVariables {
   projectRef?: string

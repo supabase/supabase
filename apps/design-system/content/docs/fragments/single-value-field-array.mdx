@@ -1,0 +1,41 @@
+---
+title: Single Value Field Array
+description: A shared form fragment for repeated single text inputs.
+component: true
+fragment: true
+---
+
+<ComponentPreview
+  name="single-value-field-array-demo"
+  description="A shared form fragment for repeated single text inputs."
+  peekCode
+  showDottedGrid
+  wide
+/>
+
+## Usage
+
+Use `SingleValueFieldArray` when each row is a single text input backed by `react-hook-form`, such as redirect URIs, SSO domains, or repeated attribute mapping values.
+
+```tsx
+import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
+```
+
+```tsx
+<SingleValueFieldArray
+  control={form.control}
+  name="redirectUris"
+  valueFieldName="value"
+  createEmptyRow={() => ({ value: '' })}
+  placeholder="https://example.com/callback"
+  addLabel="Add redirect URI"
+/>
+```
+
+`SingleValueFieldArray` owns the row add/remove behavior and renders the per-input form messages for you. Compose it inside `FormItemLayout` when you want the standard label, description, and message treatment around the entire section.
+
+## When to use it
+
+- Use `SingleValueFieldArray` for repeated single text values such as redirect URIs and domains.
+- Use [Key/Value Field Array](./key-value-field-array) when each row is two text inputs.
+- Build a custom row UI instead when each row mixes different controls, such as a text input paired with a `Select`.

@@ -51,7 +51,7 @@ These events are surfaced through logs and observability tools, allowing you to 
 
 ### CPUTime
 
-**What it means:** The worker consumed more CPU time than allowed. CPU time measures actual processing cycles used by your code, excluding time spent waiting for I/O or sleeping. Currently limited to 200 milliseconds.
+**What it means:** The worker consumed more CPU time than allowed. CPU time measures actual processing cycles used by your code, excluding time spent waiting for I/O or sleeping. Currently limited to 2000 milliseconds.
 
 **When it happens:** Your function is performing too much computation. This includes complex calculations, data processing, encryption, or other CPU-intensive operations.
 
@@ -80,11 +80,11 @@ These events are surfaced through logs and observability tools, allowing you to 
 
 ### EarlyDrop
 
-**What it means:** The runtime detected that the function has completed all its work and can be shut down early, before reaching any resource limits. This is actually the most common shutdown reason and typically indicates efficient function execution.
+**What it means:** The runtime detected that the function has completed all its work and can be shut down early, before reaching any resource limits. This is the most common shutdown reason and typically indicates efficient function execution.
 
 **When it happens:** Your function has finished processing the request, sent the response, and has no remaining async work (pending promises, timers, or callbacks). The runtime recognizes that the worker can be safely terminated without waiting for timeouts or other limits.
 
-**Why this is good:** `EarlyDrop` means your function is running efficiently. It completed quickly, didn't exhaust resources, and the runtime could reclaim the worker for other requests. Most well-designed functions should end with `EarlyDrop`.
+**Why this is good:** `EarlyDrop` means your function is running efficiently. It completed without exhausting resources, and the runtime could reclaim the worker for other requests. Most well-designed functions should end with `EarlyDrop`.
 
 **What to do:**
 

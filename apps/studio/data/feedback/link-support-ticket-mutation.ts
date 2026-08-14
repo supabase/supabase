@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { ExtendedSupportCategories } from 'components/interfaces/Support/Support.constants'
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
+import { handleError, patch } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type LinkSupportTicketVariables = {
   conversation_id: string

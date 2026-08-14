@@ -13,7 +13,7 @@ info:
   libraries:
     - name: 'C#'
       id: 'csharp'
-      version: '1.0.0'
+      version: '1.5.0'
 
 functions:
   - id: initializing
@@ -93,26 +93,23 @@ functions:
               }
           }
 
-          void Initialize()
-          {
-              // Get All Messages
-              var response = await client.Table<Message>().Get();
-              List<Message> models = response.Models;
+          // Get All Messages
+          var response = await supabase.From<Message>().Get();
+          List<Message> models = response.Models;
 
-              // Insert
-              var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
-              await client.Table<Message>().Insert();
+          // Insert
+          var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
+          await supabase.From<Message>().Insert(newMessage);
 
-              // Update
-              var model = response.Models.First();
-              model.UserName = "elrhomariyounes";
-              await model.Update();
+          // Update
+          var model = response.Models.First();
+          model.UserName = "elrhomariyounes";
+          await model.Update<Message>();
 
-              // Delete
-              await response.Models.Last().Delete();
+          // Delete
+          await response.Models.Last().Delete<Message>();
 
-              // etc.
-          }
+          // etc.
           ```
   - id: sign-up
     title: 'SignUp()'
@@ -226,6 +223,14 @@ functions:
           ```c#
           await supabase.Auth.SignOut();
           ```
+      - id: sign-out-with-scope
+        name: Sign out with a scope
+        description: |
+          By default, `SignOut()` uses the `Global` scope, which revokes every session for the user. Pass `SignOutScope.Local` to sign out only the current session, or `SignOutScope.Others` to keep the current session and revoke all the rest.
+        code: |
+          ```c#
+          await supabase.Auth.SignOut(SignOutScope.Local);
+          ```
   - id: verify-otp
     title: 'VerifyOtp()'
     notes: |
@@ -328,7 +333,7 @@ functions:
               }
           });
           ```
-  - id: auth-reset-password-for-email
+  - id: reset-password-for-email
     title: 'ResetPasswordForEmail()'
     description: |
       Sends a reset request to an email address.
@@ -337,12 +342,461 @@ functions:
 
     examples:
       - id: reset-password
-        name: Reset password for Flutter
+        name: Reset password for email
         isSpotlight: true
         code: |
           ```c#
           await supabase.Auth.ResetPasswordForEmail("joseph@supabase.io");
           ```
+  - id: sign-in-anonymously
+    title: 'SignInAnonymously()'
+    description: |
+      Creates a new anonymous user.
+    notes: |
+      - Returns an anonymous user with a session. The user's `IsAnonymous` claim is set to `true`.
+      - You can later convert an anonymous user into a permanent one by calling [`UpdateUser()`](/docs/reference/csharp/update-user) with an email or phone number, or by linking an OAuth identity with [`LinkIdentity()`](/docs/reference/csharp/link-identity).
+      - Enable anonymous sign-ins in [your project's auth settings](https://supabase.com/dashboard/project/_/settings/auth).
+    examples:
+      - id: create-an-anonymous-user
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.SignInAnonymously();
+          ```
+      - id: create-an-anonymous-user-with-metadata
+        name: With user metadata
+        code: |
+          ```c#
+          var options = new SignInAnonymouslyOptions
+          {
+            Data = new Dictionary<string, object> { { "display_name", "Anonymous" } }
+          };
+
+          var session = await supabase.Auth.SignInAnonymously(options);
+          ```
+
+  - id: sign-in-with-id-token
+    title: 'SignInWithIdToken()'
+    description: |
+      Signs in a user using an ID token issued by a supported OIDC provider.
+    notes: |
+      - The ID token is verified for validity before a session is established.
+      - Supported providers are `Provider.Google`, `Provider.Apple`, `Provider.Azure`, and `Provider.Facebook`.
+      - If the ID token contains an `at_hash` claim, pass the matching `accessToken`. If it contains a `nonce` claim, pass the `nonce` used to obtain the token.
+    examples:
+      - id: sign-in-with-google-id-token
+        name: Sign in with a Google ID token
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.SignInWithIdToken(Provider.Google, idToken);
+          ```
+      - id: sign-in-with-nonce
+        name: With a nonce
+        code: |
+          ```c#
+          var session = await supabase.Auth.SignInWithIdToken(Provider.Apple, idToken, nonce: nonce);
+          ```
+
+  - id: sign-in-with-sso
+    title: 'SignInWithSSO()'
+    description: |
+      Signs in a user through enterprise single sign-on (SSO).
+    notes: |
+      - Before you can use SSO, register your identity provider with the [Supabase CLI](https://supabase.com/docs/guides/auth/enterprise-sso/auth-sso-saml).
+      - You can sign in either by email domain or by the provider's ID (a `Guid`).
+      - The call returns a URL. Redirect the user to it to complete sign-in with their identity provider.
+    examples:
+      - id: sign-in-with-email-domain
+        name: Sign in with an email domain
+        isSpotlight: true
+        code: |
+          ```c#
+          var response = await supabase.Auth.SignInWithSSO("acme.com");
+
+          // Redirect the user to complete sign-in.
+          var ssoUrl = response.Uri;
+          ```
+      - id: sign-in-with-provider-id
+        name: Sign in with a provider ID
+        code: |
+          ```c#
+          var response = await supabase.Auth.SignInWithSSO(providerId);
+          var ssoUrl = response.Uri;
+          ```
+
+  - id: refresh-session
+    title: 'RefreshSession()'
+    description: |
+      Refreshes the current session and returns the new session data.
+    notes: |
+      - Requires a signed-in user.
+      - The SDK refreshes tokens automatically in the background. Call this only when you need to force a refresh.
+    examples:
+      - id: refresh-the-session
+        name: Refresh the session
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.RefreshSession();
+          ```
+
+  - id: link-identity
+    title: 'LinkIdentity()'
+    description: |
+      Links an OAuth identity to the signed-in user.
+    notes: |
+      - Requires a signed-in user, and uses the PKCE flow.
+      - Enable [manual linking](https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta) in your project before using this method.
+      - The call returns a URL. Redirect the user to it to authorize the new identity.
+    examples:
+      - id: link-an-identity
+        name: Link an identity
+        isSpotlight: true
+        code: |
+          ```c#
+          var state = await supabase.Auth.LinkIdentity(Provider.Github, new SignInOptions());
+
+          // Redirect the user to authorize the linked provider.
+          var authorizeUrl = state.Uri;
+          ```
+
+  - id: unlink-identity
+    title: 'UnlinkIdentity()'
+    description: |
+      Unlinks an identity from the signed-in user.
+    notes: |
+      - Requires a signed-in user with more than one linked identity.
+      - Once unlinked, the user can no longer sign in with that identity.
+      - Retrieve the user's identities from `supabase.Auth.CurrentUser.Identities`.
+    examples:
+      - id: unlink-an-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```c#
+          var identity = supabase.Auth.CurrentUser.Identities.First();
+          await supabase.Auth.UnlinkIdentity(identity);
+          ```
+
+  - id: exchange-code-for-session
+    title: 'ExchangeCodeForSession()'
+    description: |
+      Exchanges an auth code for a session as part of the PKCE flow.
+    notes: |
+      - Used to complete a PKCE sign-in flow (for example after an OAuth redirect or a password reset).
+      - Pass the code verifier you generated at the start of the flow along with the auth code returned in the redirect.
+    examples:
+      - id: exchange-an-auth-code
+        name: Exchange an auth code
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.ExchangeCodeForSession(codeVerifier, authCode);
+          ```
+
+  - id: send-password-reauthentication
+    title: 'Reauthenticate()'
+    description: |
+      Sends a reauthentication nonce to the signed-in user's email or phone number.
+    notes: |
+      - Requires a signed-in user.
+      - Use this before updating a password when [secure password change](https://supabase.com/docs/guides/auth/passwords#secure-password-change) is enabled. Pass the nonce the user receives to [`UpdateUser()`](/docs/reference/csharp/update-user).
+    examples:
+      - id: send-a-reauthentication-nonce
+        name: Send a reauthentication nonce
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase.Auth.Reauthenticate();
+          ```
+
+  - id: mfa-enroll
+    title: 'Enroll()'
+    description: |
+      Starts the enrollment process for a new multi-factor authentication (MFA) factor.
+    notes: |
+      - Creates a new `unverified` factor. Present the returned QR code or secret to the user, then verify it with [`Verify()`](/docs/reference/csharp/mfa-verify) or [`ChallengeAndVerify()`](/docs/reference/csharp/mfa-challenge-and-verify).
+      - Only Time-based One-Time Password (TOTP) factors are supported. Set `FactorType` to `"totp"`.
+    examples:
+      - id: enroll-a-factor
+        name: Enroll a factor
+        isSpotlight: true
+        code: |
+          ```c#
+          var response = await supabase.Auth.Enroll(new MfaEnrollParams
+          {
+            FactorType = "totp",
+            FriendlyName = "My Authenticator App"
+          });
+
+          // Present the QR code to the user so they can add it to their authenticator app.
+          var qrCode = response.Totp.QrCode;
+          ```
+
+  - id: mfa-challenge
+    title: 'Challenge()'
+    description: |
+      Creates a challenge for an enrolled MFA factor.
+    notes: |
+      - Pair the returned challenge with [`Verify()`](/docs/reference/csharp/mfa-verify) to complete verification.
+      - Use [`ChallengeAndVerify()`](/docs/reference/csharp/mfa-challenge-and-verify) to create and verify a challenge in a single call.
+    examples:
+      - id: create-a-challenge
+        name: Create a challenge
+        isSpotlight: true
+        code: |
+          ```c#
+          var response = await supabase.Auth.Challenge(new MfaChallengeParams
+          {
+            FactorId = factorId
+          });
+          ```
+
+  - id: mfa-verify
+    title: 'Verify()'
+    description: |
+      Verifies a code against an MFA challenge.
+    notes: |
+      - The code is the one the user reads from their authenticator app.
+      - On success, the session's assurance level is promoted to `aal2`.
+    examples:
+      - id: verify-a-challenge
+        name: Verify a challenge
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.Verify(new MfaVerifyParams
+          {
+            FactorId = factorId,
+            ChallengeId = challengeId,
+            Code = "123456"
+          });
+          ```
+
+  - id: mfa-challenge-and-verify
+    title: 'ChallengeAndVerify()'
+    description: |
+      Creates a challenge and immediately verifies it with the given code.
+    notes: |
+      - A convenience method that combines [`Challenge()`](/docs/reference/csharp/mfa-challenge) and [`Verify()`](/docs/reference/csharp/mfa-verify).
+      - The code is the one the user reads from their authenticator app.
+    examples:
+      - id: create-and-verify-a-challenge
+        name: Create and verify a challenge
+        isSpotlight: true
+        code: |
+          ```c#
+          var session = await supabase.Auth.ChallengeAndVerify(new MfaChallengeAndVerifyParams
+          {
+            FactorId = factorId,
+            Code = "123456"
+          });
+          ```
+
+  - id: mfa-unenroll
+    title: 'Unenroll()'
+    description: |
+      Removes an MFA factor from the signed-in user.
+    notes: |
+      - Unenrolling a `verified` factor requires an `aal2` session.
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase.Auth.Unenroll(new MfaUnenrollParams
+          {
+            FactorId = factorId
+          });
+          ```
+
+  - id: mfa-get-authenticator-assurance-level
+    title: 'GetAuthenticatorAssuranceLevel()'
+    description: |
+      Returns the Authenticator Assurance Level (AAL) for the active session.
+    notes: |
+      - `aal1` (or `null`) means the user signed in with a single factor (password, OTP, magic link, or social login).
+      - `aal2` means the user also verified an MFA factor.
+      - Use this to decide whether to prompt the user to complete an MFA challenge.
+    examples:
+      - id: get-the-assurance-level
+        name: Get the assurance level
+        isSpotlight: true
+        code: |
+          ```c#
+          var response = await supabase.Auth.GetAuthenticatorAssuranceLevel();
+          ```
+
+  - id: get-user-by-id
+    title: 'AdminAuth().GetUserById()'
+    description: |
+      Retrieves a user by their ID.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+    examples:
+      - id: retrieve-a-user
+        name: Retrieve a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var user = await admin.GetUserById(userId);
+          ```
+
+  - id: list-users
+    title: 'AdminAuth().ListUsers()'
+    description: |
+      Retrieves a list of users.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+      - Supports filtering, sorting, and pagination.
+    examples:
+      - id: list-all-users
+        name: List all users
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var users = await admin.ListUsers();
+          ```
+      - id: paginate-users
+        name: Paginate users
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var users = await admin.ListUsers(page: 1, perPage: 20);
+          ```
+
+  - id: create-user
+    title: 'AdminAuth().CreateUser()'
+    description: |
+      Creates a user.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+      - To send an invite link instead of setting a password directly, use [`InviteUserByEmail()`](/docs/reference/csharp/invite-user-by-email).
+    examples:
+      - id: create-a-user
+        name: Create a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var user = await admin.CreateUser("user@example.com", "password", new AdminUserAttributes
+          {
+            EmailConfirm = true
+          });
+          ```
+
+  - id: delete-user
+    title: 'AdminAuth().DeleteUser()'
+    description: |
+      Deletes a user by their ID.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+    examples:
+      - id: delete-a-user
+        name: Delete a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.DeleteUser(userId);
+          ```
+
+  - id: invite-user-by-email
+    title: 'AdminAuth().InviteUserByEmail()'
+    description: |
+      Sends an invite link to an email address.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+    examples:
+      - id: invite-a-user
+        name: Invite a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.InviteUserByEmail("user@example.com");
+          ```
+
+  - id: generate-link
+    title: 'AdminAuth().GenerateLink()'
+    description: |
+      Generates an email link for signup, invite, magic link, recovery, or email change flows.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+      - Use the typed options classes—such as `GenerateLinkSignupOptions`—to build the request for each link type.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var response = await admin.GenerateLink(new GenerateLinkSignupOptions("user@example.com", "password"));
+          ```
+
+  - id: update-user-by-id
+    title: 'AdminAuth().UpdateUserById()'
+    description: |
+      Updates a user by their ID.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+    examples:
+      - id: update-a-user
+        name: Update a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var user = await admin.UpdateUserById(userId, new AdminUserAttributes
+          {
+            Email = "new-email@example.com"
+          });
+          ```
+
+  - id: mfa-list-factors-admin
+    title: 'AdminAuth().ListFactors()'
+    description: |
+      Lists the MFA factors enrolled for a user.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+    examples:
+      - id: list-factors-for-a-user
+        name: List factors for a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          var response = await admin.ListFactors(new MfaAdminListFactorsParams
+          {
+            UserId = userId
+          });
+          ```
+
+  - id: mfa-delete-factor
+    title: 'AdminAuth().DeleteFactor()'
+    description: |
+      Deletes an MFA factor from a user.
+    notes: |
+      - This is an admin method. Call it with your service role key, and only from a trusted server environment—never from a client app.
+    examples:
+      - id: delete-a-factor-for-a-user
+        name: Delete a factor for a user
+        isSpotlight: true
+        code: |
+          ```c#
+          var admin = supabase.AdminAuth(SUPABASE_SERVICE_KEY);
+          await admin.DeleteFactor(new MfaAdminDeleteFactorParams
+          {
+            UserId = userId,
+            Id = factorId
+          });
+          ```
+
   - id: invoke
     title: 'invoke()'
     description: |
@@ -667,17 +1121,17 @@ functions:
           ```
 
   - id: rpc
-    title: 'Stored Procedures: Rpc()'
+    title: 'Database Functions: Rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      You can call functions as a "Remote Procedure Call".
 
       That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
       It's especially useful when the logic rarely changes - like password resets and updates.
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
+      - id: call-a-database-function
+        name: Call a database function
         isSpotlight: true
-        description: This is an example invoking a stored procedure.
+        description: This is an example invoking a database function.
         code: |
           ```c#
           await supabase.Rpc("hello_world", null);
@@ -848,7 +1302,7 @@ functions:
         isSpotlight: true
         code: |
           ```c#
-          var channel = await supabase.From<City>().On(ChannelEventType.All, (sender, change) => { });
+          var channel = await supabase.From<City>().On(ListenType.All, (sender, change) => { });
           channel.Unsubscribe();
 
           // OR
@@ -978,7 +1432,7 @@ functions:
         name: Delete bucket
         isSpotlight: true
         code: |
-          ```dart
+          ```c#
           var result = await supabase.Storage.DeleteBucket("avatars");
           ```
 
@@ -1049,6 +1503,24 @@ functions:
             .Move("public/fancy-avatar.png", "private/fancy-avatar.png");
           ```
 
+  - id: from-copy
+    description: |
+      Copies an existing file to a new path in the same bucket.
+    title: 'From().Copy()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select` and `insert`
+    examples:
+      - id: copy-file
+        name: Copy file
+        isSpotlight: true
+        code: |
+          ```c#
+          await supabase.Storage.From("avatars")
+            .Copy("public/fancy-avatar.png", "public/fancy-avatar-copy.png");
+          ```
+
   - id: from-create-signed-url
     description: |
       Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
@@ -1064,6 +1536,62 @@ functions:
         code: |
           ```c#
           var url = await supabase.Storage.From("avatars").CreateSignedUrl("public/fancy-avatar.png", 60);
+          ```
+
+  - id: from-create-signed-urls
+    description: |
+      Creates signed URLs for multiple files at once. Each URL can be used to download a file without requiring permissions, and is valid for a set number of seconds.
+    title: 'From().CreateSignedUrls()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```c#
+          var paths = new List<string> { "public/fancy-avatar.png", "public/fancy-avatar-2.png" };
+          var urls = await supabase.Storage.From("avatars").CreateSignedUrls(paths, 60);
+          ```
+
+  - id: from-create-signed-upload-url
+    description: |
+      Creates a signed URL that can be used to upload a file without requiring a logged-in user. This is useful for handing off uploads to an untrusted client.
+    title: 'From().CreateUploadSignedUrl()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `insert`
+      - Pair this with [`UploadToSignedUrl()`](/docs/reference/csharp/from-upload-to-signed-url) to perform the upload.
+    examples:
+      - id: create-signed-upload-url
+        name: Create Signed Upload URL
+        isSpotlight: true
+        code: |
+          ```c#
+          var signedUrl = await supabase.Storage.From("avatars").CreateUploadSignedUrl("fancy-avatar.png");
+          ```
+
+  - id: from-upload-to-signed-url
+    description: |
+      Uploads a file to a signed URL created with [`CreateUploadSignedUrl()`](/docs/reference/csharp/from-create-signed-upload-url).
+    title: 'From().UploadToSignedUrl()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `insert`
+    examples:
+      - id: upload-to-signed-url
+        name: Upload to a Signed URL
+        isSpotlight: true
+        code: |
+          ```c#
+          var imagePath = Path.Combine("Assets", "fancy-avatar.png");
+          var signedUrl = await supabase.Storage.From("avatars").CreateUploadSignedUrl("fancy-avatar.png");
+
+          await supabase.Storage.From("avatars").UploadToSignedUrl(imagePath, signedUrl);
           ```
 
   - id: from-get-public-url

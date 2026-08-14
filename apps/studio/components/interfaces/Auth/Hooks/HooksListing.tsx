@@ -1,16 +1,8 @@
 import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthHooksUpdateMutation } from 'data/auth/auth-hooks-update-mutation'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { cn } from 'ui'
-import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
   PageSection,
   PageSectionAside,
@@ -19,16 +11,22 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
+import { DeleteHookConfirmationDialog } from './DeleteHookConfirmationDialog'
 import { HookCard } from './HookCard'
 import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
-import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
+import { extractMethod, isValidHook } from './hooks.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+
   const {
     data: authConfig,
     error: authConfigError,
@@ -38,29 +36,9 @@ export const HooksListing = () => {
 
   const [hook, setHook] = useQueryState('hook', parseAsString)
 
-  const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
-
-  const { mutate: updateAuthHooks, isPending: isDeletingAuthHook } = useAuthHooksUpdateMutation({
-    onSuccess: async () => {
-      if (!selectedHookForDeletion) return
-
-      const { method } = selectedHookForDeletion
-      if (method.type === 'postgres') {
-        const revokeStatements = getRevokePermissionStatements(method.schema, method.functionName)
-        await executeSql({
-          projectRef,
-          connectionString: project!.connectionString,
-          sql: revokeStatements.join('\n'),
-        })
-      }
-      toast.success(`${selectedHookForDeletion.title} has been deleted.`)
-      setSelectedHookForDeletion(null)
-      setHook(null)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete hook: ${error.message}`)
-    },
-  })
+  const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook>()
+  const [addHookAsideOpen, setAddHookAsideOpen] = useState(false)
+  const [addHookEmptyOpen, setAddHookEmptyOpen] = useState(false)
 
   const hooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => {
     return {
@@ -72,6 +50,15 @@ export const HooksListing = () => {
       ),
     }
   })
+
+  const validHooks = hooks.filter((h) => isValidHook(h))
+  const hasValidHooks = validHooks.length > 0
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
+    () => (hasValidHooks ? setAddHookAsideOpen(true) : setAddHookEmptyOpen(true)),
+    { label: 'Add hook' }
+  )
 
   const selectedHook = hooks.find((h) => h.id === hook)
 
@@ -113,6 +100,8 @@ export const HooksListing = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <AddHookDropdown
+            open={addHookAsideOpen}
+            onOpenChange={setAddHookAsideOpen}
             onSelectHook={(title) => {
               const hook = hooks.find((h) => h.title === title)
               if (hook) setHook(hook.id)
@@ -121,15 +110,17 @@ export const HooksListing = () => {
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
-        {hooks.filter((h) => isValidHook(h)).length === 0 && (
+        {!hasValidHooks && (
           <EmptyStatePresentational
             title="Create an auth hook"
             description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
           >
             <AddHookDropdown
-              type="default"
+              variant="default"
               align="center"
               buttonText="Add a new hook"
+              open={addHookEmptyOpen}
+              onOpenChange={setAddHookEmptyOpen}
               onSelectHook={(title) => {
                 const hook = hooks.find((h) => h.title === title)
                 if (hook) setHook(hook.id)
@@ -139,13 +130,16 @@ export const HooksListing = () => {
         )}
 
         <div className="-space-y-px">
-          {hooks
-            .filter((h) => isValidHook(h))
-            .map((hook) => {
-              return (
-                <HookCard key={hook.enabledKey} hook={hook} onSelect={() => setHook(hook.id)} />
-              )
-            })}
+          {validHooks.map((hook) => {
+            return (
+              <HookCard
+                key={hook.enabledKey}
+                hook={hook}
+                onSelectEdit={() => setHook(hook.id)}
+                onSelectDelete={() => setSelectedHookForDeletion(hook)}
+              />
+            )
+          })}
         </div>
 
         <CreateHookSheet
@@ -159,54 +153,16 @@ export const HooksListing = () => {
           authConfig={authConfig!}
         />
 
-        <ConfirmationModal
-          visible={!!selectedHookForDeletion}
-          size="large"
-          variant="destructive"
-          loading={isDeletingAuthHook}
-          title={`Confirm to delete ${selectedHookForDeletion?.title}`}
-          className={cn('md:px-0', selectedHookForDeletion?.method.type === 'postgres' && 'pb-0')}
-          confirmLabel="Delete"
-          confirmLabelLoading="Deleting"
-          onCancel={() => setSelectedHookForDeletion(null)}
-          onConfirm={() => {
-            if (!selectedHookForDeletion) return
-            updateAuthHooks({
-              projectRef: projectRef!,
-              config: {
-                [selectedHookForDeletion.enabledKey]: false,
-                [selectedHookForDeletion.uriKey]: null,
-                [selectedHookForDeletion.secretsKey]: null,
-              },
-            })
+        <DeleteHookConfirmationDialog
+          hook={selectedHookForDeletion}
+          onOpenChange={(open) => {
+            if (!open) setSelectedHookForDeletion(undefined)
           }}
-        >
-          <div>
-            <p className="md:px-5 text-sm text-foreground-light">
-              Are you sure you want to delete the {selectedHookForDeletion?.title}?
-            </p>
-            {selectedHookForDeletion?.method.type === 'postgres' && (
-              <>
-                <p className="md:px-5 text-sm text-foreground-light">
-                  The following statements will be executed on the{' '}
-                  {selectedHookForDeletion?.method.schema}.
-                  {selectedHookForDeletion?.method.functionName} function:
-                </p>
-                <div className="mt-4 h-72">
-                  <CodeEditor
-                    isReadOnly
-                    id="deletion-hook-editor"
-                    language="pgsql"
-                    value={getRevokePermissionStatements(
-                      selectedHookForDeletion?.method.schema,
-                      selectedHookForDeletion?.method.functionName
-                    ).join('\n\n')}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        </ConfirmationModal>
+          onDeleteSuccess={() => {
+            setSelectedHookForDeletion(undefined)
+            setHook(null)
+          }}
+        />
       </PageSectionContent>
     </PageSection>
   )

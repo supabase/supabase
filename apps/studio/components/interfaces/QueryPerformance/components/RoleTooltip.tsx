@@ -1,5 +1,4 @@
-import { cn } from 'ui'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface RoleTooltipProps {
   htmlFor: string

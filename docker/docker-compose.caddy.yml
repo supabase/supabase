@@ -1,7 +1,13 @@
 services:
 
-  kong:
+  # Caddy terminates TLS and forwards to the API gateway (api-gw) on port 8000,
+  # so the gateway's own host port binding is removed here. This works for
+  # either gateway, since the service is named api-gw in both cases.
+  api-gw:
     ports: !reset []
+    # When using the Kong override uncomment the following:
+    #environment:
+    #  KONG_PORT_MAPS: "443:8000,443:8443"
 
   caddy:
     container_name: supabase-caddy
@@ -12,7 +18,9 @@ services:
       - "443:443"
       - "443:443/udp"
     depends_on:
-      kong:
+      api-gw:
+        condition: service_healthy
+      studio:
         condition: service_healthy
     environment:
       PROXY_DOMAIN: ${PROXY_DOMAIN}

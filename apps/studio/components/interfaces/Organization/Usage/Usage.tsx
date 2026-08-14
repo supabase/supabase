@@ -1,27 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import {
-  ScaffoldContainer,
-  ScaffoldHeader,
-  ScaffoldSection,
-  ScaffoldTitle,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import DateRangePicker from 'components/ui/DateRangePicker'
-import NoPermission from 'components/ui/NoPermission'
-import { OrganizationProjectSelector } from 'components/ui/OrganizationProjectSelector'
-import { useOrgDailyStatsQuery } from 'data/analytics/org-daily-stats-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import dayjs from 'dayjs'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { Check, ChevronDown } from 'lucide-react'
+import { ChartArea, Check, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import { Button, cn, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Button, cn, CommandGroup, CommandItem } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../BillingSettings/Restriction'
@@ -30,8 +15,26 @@ import Activity from './Activity'
 import Compute from './Compute'
 import Egress from './Egress'
 import OrgLogUsage from './OrgLogUsage'
+import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
+import {
+  ScaffoldContainer,
+  ScaffoldHeader,
+  ScaffoldSection,
+  ScaffoldTitle,
+} from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 
 export const Usage = () => {
   const { slug } = useParams()
@@ -40,6 +43,12 @@ export const Usage = () => {
 
   const [selectedProjectRef, setSelectedProjectRef] = useQueryState('projectRef')
   const [openProjectSelector, setOpenProjectSelector] = useState(false)
+
+  const { data: selectedProject, isPending: isLoadingSelectedProject } = useProjectDetailQuery({
+    ref: selectedProjectRef ?? undefined,
+  })
+  const isHighAvailability = resolveHighAvailability(selectedProject)
+  const canLoadUsage = !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -52,11 +61,7 @@ export const Usage = () => {
     isPending: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
-  } = useOrgSubscriptionQuery({ orgSlug: slug })
-
-  const { data: selectedProject } = useProjectDetailQuery({
-    ref: selectedProjectRef ?? undefined,
-  })
+  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canLoadUsage })
 
   const billingCycleStart = useMemo(() => {
     return dayjs.unix(subscription?.current_period_start ?? 0).utc()
@@ -106,12 +111,27 @@ export const Usage = () => {
     error: orgDailyStatsError,
     isPending: isLoadingOrgDailyStats,
     isError: isErrorOrgDailyStats,
-  } = useOrgDailyStatsQuery({
-    orgSlug: slug,
-    projectRef: selectedProjectRef ?? undefined,
-    startDate,
-    endDate,
-  })
+  } = useOrgDailyStatsQuery(
+    {
+      orgSlug: slug,
+      projectRef: selectedProjectRef ?? undefined,
+      startDate,
+      endDate,
+    },
+    { enabled: canLoadUsage }
+  )
+
+  if (isHighAvailability) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-6">
+        <HighAvailabilityDisabledEmptyState
+          icon={ChartArea}
+          title="Usage unavailable on High Availability projects"
+          description="Usage insights for High Availability projects are coming soon."
+        />
+      </div>
+    )
+  }
 
   return (
     <>
@@ -120,7 +140,7 @@ export const Usage = () => {
           <ScaffoldTitle>Usage</ScaffoldTitle>
         </ScaffoldHeader>
       </ScaffoldContainer>
-      <div className="sticky top-0 border-b bg-sidebar z-[1]">
+      <div className="sticky top-0 border-b bg-sidebar z-1">
         <ScaffoldContainer>
           <div className="py-4 flex items-center space-x-4">
             {isLoadingSubscription || isLoadingPermissions ? (
@@ -153,7 +173,7 @@ export const Usage = () => {
                     loading={isLoadingSubscription}
                     currentBillingPeriodStart={subscription?.current_period_start}
                     currentBillingPeriodEnd={subscription?.current_period_end}
-                    className="!w-48"
+                    className="w-48!"
                   />
 
                   <OrganizationProjectSelector
@@ -167,7 +187,7 @@ export const Usage = () => {
                       return (
                         <Button
                           block
-                          type="default"
+                          variant="default"
                           role="combobox"
                           size="tiny"
                           aria-expanded={open}
@@ -191,8 +211,8 @@ export const Usage = () => {
                       )
                     }}
                     renderActions={() => (
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
+                      <CommandGroup>
+                        <CommandItem
                           className="cursor-pointer flex items-center justify-between w-full"
                           onSelect={() => {
                             setOpenProjectSelector(false)
@@ -205,8 +225,8 @@ export const Usage = () => {
                         >
                           All projects
                           {!selectedProjectRef && <Check size={16} />}
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
+                        </CommandItem>
+                      </CommandGroup>
                     )}
                   />
                 </div>
@@ -348,6 +368,17 @@ export const Usage = () => {
           isLoadingOrgDailyStats={isLoadingOrgDailyStats}
         />
       )}
+
+      <Pipelines
+        orgSlug={slug as string}
+        projectRef={selectedProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+      />
     </>
   )
 }

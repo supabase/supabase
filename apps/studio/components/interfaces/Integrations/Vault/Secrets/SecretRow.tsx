@@ -1,14 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import dayjs from 'dayjs'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import type { VaultSecret } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -19,6 +14,11 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { SecretTableColumn } from './Secrets.types'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { VaultSecret } from '@/types'
 
 interface SecretRowProps {
   row: VaultSecret
@@ -55,7 +55,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
       <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
+            <Button title="Manage Secret" variant="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-40">
             <DropdownMenuItemTooltip
@@ -96,7 +96,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
     return (
       <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
         <Button
-          type="text"
+          variant="text"
           className="px-1.5"
           icon={
             isFetching && revealedValue === undefined ? (
@@ -109,7 +109,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
           }
           onClick={() => setRevealSecret(!revealSecret)}
         />
-        <div className="flex-grow min-w-0">
+        <div className="grow min-w-0">
           {revealSecret && revealedValue !== undefined ? (
             <Input copy readOnly size="tiny" className="font-mono" value={revealedValue} />
           ) : (

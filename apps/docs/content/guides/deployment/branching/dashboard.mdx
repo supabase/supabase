@@ -5,7 +5,7 @@ subtitle: 'Create, manage, review, and merge branches directly in the dashboard'
 
 You can create, manage, review, and merge Supabase branches directly via the dashboard. This is useful for quick testing, prototyping, or when you prefer to work in a no-code way. You can also connect a Supabase branch to a GitHub branch at a later time if needed.
 
-<Admonition type="note" label="Public Alpha">
+<Admonition type="note" title="Public Alpha">
 
 Branch management via the dashboard is currently in public alpha. Features and functionality may change.
 
@@ -29,6 +29,12 @@ This functionality is currently in beta and requires opting in. To opt in you mu
 1. Click **Enable feature**.
 
 ## Creating a branch
+
+<Admonition type="note">
+
+When using dashboard branching without a GitHub integration, the branch dropdown displays `main / PRODUCTION` on every project, but on a brand-new project the production branch hasn't been registered yet. The first "Create branch" click populates this row behind the scenes — technically enabling branching on the project — and requires Owner/Administrator access. After that one-time step, anyone with the Developer role can create, update, and delete preview branches.
+
+</Admonition>
 
 Once you've enabled the feature, you can create a new branch:
 

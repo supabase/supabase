@@ -71,7 +71,7 @@ const Index = () => {
                     </p>
                   </div>
                   <form method="get" action={`/brand-assets.zip`} className="mt-3">
-                    <Button htmlType="submit" type="default" iconRight={<Download />}>
+                    <Button type="submit" variant="default" iconRight={<Download />}>
                       Download logo kit
                     </Button>
                   </form>
@@ -110,7 +110,7 @@ const Index = () => {
                     action={`https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/supabase-brand-assets/connect-supabase/connect-supabase.zip`}
                     className="mt-3"
                   >
-                    <Button htmlType="submit" type="default" iconRight={<Download />}>
+                    <Button type="submit" variant="default" iconRight={<Download />}>
                       Download button kit
                     </Button>
                   </form>

@@ -5,97 +5,47 @@ subtitle: 'Install and run your own Supabase on your computer, server, or cloud 
 hideToc: true
 ---
 
-## Get started
+Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent you from using managed services, or want to run Supabase in an isolated environment.
 
-The fastest and recommended way to self-host Supabase is using Docker.
+<ContentListings id="self-hosting-get-started" />
 
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  <div className="md:col-span-6 xl:col-span-4 relative" key="/guides/self-hosting/docker">
-    <Link href="/guides/self-hosting/docker" passHref>
-      <GlassPanel icon={'/docs/img/icons/docker'} hasLightIcon={true}
-        title={
-            <span className="flex items-center gap-2">
-              Docker
-              <Badge variant="success">Official</Badge>
-            </span>
-          }
-        showIconBg={true}
-      >
-      Deploy Supabase within your own infrastructure using Docker Compose.
-      </GlassPanel>
-    </Link>
+<ContentListings id="self-hosting-community" />
 
-  </div>
-</div>
+## How self-hosted Supabase differs
 
-## Community-driven projects
+Self-hosted Supabase runs as a single project which means that Studio doesn't support multiple organizations or projects. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-There are several other options to deploy Supabase. If you're interested in helping these projects, visit our [Community](/contribute) page.
+Unlike the managed platform, which is fully hosted and operated by Supabase, branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable**.
 
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  {selfHostingCommunity.map((x) => (
-    <div className="md:col-span-6 xl:col-span-3" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel
-          title={
-            <span className="flex items-center gap-2">
-              {x.name}
-            </span>
-          }
-        >
-          {x.description}
-        </GlassPanel>
-      </Link>
-    </div>
+### Not the same as local development
 
-))}
+[Supabase CLI](/docs/guides/local-development/cli/getting-started) runs a local stack for development and testing. That stack is not a self-hosted deployment: it is not hardened for production and must not be exposed to external traffic.
 
-</div>
+To self-host, use [Docker](/docs/guides/self-hosting/docker) or one of the community deployment options.
 
-## About self-hosting
-
-Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent using managed services, or want to run Supabase in an isolated environment.
-
-### How self-hosted Supabase differs
-
-Self-hosted Supabase is different from:
-
-- **Supabase CLI** (local development), which is intended for development and testing only.
-- **Managed Supabase** platform, which is fully hosted and operated by Supabase.
-
-### Telemetry
-
-Self-hosted Supabase does not phone home or collect any telemetry.
-
-### Your responsibilities when self-hosting
+## Your responsibilities when self-hosting
 
 When you self-host, **you are responsible for**:
 
 - Server provisioning and maintenance
 - Security hardening and keeping OS and services updated
-- Maintaining the Postgres database
+- Service configuration and management
+- Postgres database maintenance
+- High availability and scalability
 - Backups and disaster recovery
 - Monitoring and uptime
+
+## Telemetry
+
+Self-hosted Supabase (run via Docker Compose) **does not phone home or collect any telemetry**.
+
+The **Supabase CLI**, a separate tool also used for [local development](/docs/guides/local-development/cli/getting-started), collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
 
 ## Support and community
 
 Self-hosted Supabase is community-supported.
 
-For resolving common issues:
-
-- [GitHub Discussions](https://github.com/orgs/supabase/discussions?discussions_q=is%3Aopen+label%3Aself-hosted) - Questions, feature requests, and workarounds
-- [GitHub Issues](https://github.com/supabase/supabase/issues?q=is%3Aissue%20state%3Aopen%20label%3Aself-hosted) - Known issues
-
-Get help and connect with other users:
-
-- [Discord](https://discord.supabase.com) - Real-time chat and community support
-  {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- [Reddit](https://www.reddit.com/r/Supabase/) - Official Supabase subreddit
-
-Share your self-hosting experience:
-
-- [GitHub Discussions](https://github.com/orgs/supabase/discussions/39820) - "Self-hosting: What's working (and what's not)?"
+<ContentListings id="self-hosting-support" />
 
 ### Enterprise self-hosting
 

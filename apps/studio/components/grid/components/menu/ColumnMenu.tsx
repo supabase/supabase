@@ -1,9 +1,7 @@
-import { useTableSort } from 'components/grid/hooks/useTableSort'
-import type { Sort } from 'components/grid/types'
-import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Lock, Trash, Unlock } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, Copy, Edit, Eye, Lock, Trash, Unlock } from 'lucide-react'
+import { useContext, useEffect, useState } from 'react'
 import type { CalculatedColumn } from 'react-data-grid'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
+import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -18,6 +16,14 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import type { Sort } from '@/components/grid/types'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import {
+  TableEditorTableStateContext,
+  useTableEditorTableStateSnapshot,
+} from '@/state/table-editor-table'
+
 interface ColumnMenuProps {
   column: CalculatedColumn<any, unknown>
   isEncrypted?: boolean
@@ -26,7 +32,11 @@ interface ColumnMenuProps {
 export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
   const tableEditorSnap = useTableEditorStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
+  const state = useContext(TableEditorTableStateContext)
   const { sorts, addOrUpdateSort, removeSort } = useTableSort()
+  const [tempRevealTimeouts, setTempRevealTimeouts] = useState<Map<string, NodeJS.Timeout>>(
+    new Map()
+  )
 
   const columnKey = column.key
   const columnName = column.name as string
@@ -50,6 +60,50 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
     const pgColumn = snap.originalTable.columns.find((c) => c.name === column.name)
     if (pgColumn) {
       tableEditorSnap.onDeleteColumn(pgColumn)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      tempRevealTimeouts.forEach((timeout) => clearTimeout(timeout))
+    }
+  }, [tempRevealTimeouts])
+
+  function onToggleSensitiveData() {
+    const isMasked = snap.sensitiveDataColumns.has(columnKey)
+    const isTemporarilyRevealed = snap.temporarilyRevealedColumns.has(columnKey)
+
+    if (isMasked && !isTemporarilyRevealed) {
+      // Temporarily reveal for 5 seconds (don't persist)
+      const existingTimeout = tempRevealTimeouts.get(columnKey)
+      if (existingTimeout) clearTimeout(existingTimeout)
+
+      state.temporarilyRevealedColumns.add(columnKey)
+
+      const timeout = setTimeout(() => {
+        state.temporarilyRevealedColumns.delete(columnKey)
+        setTempRevealTimeouts((prev) => {
+          const next = new Map(prev)
+          next.delete(columnKey)
+          return next
+        })
+      }, 5000)
+
+      setTempRevealTimeouts((prev) => new Map(prev).set(columnKey, timeout))
+      toast.info('Data will be hidden again in 5 seconds')
+    } else {
+      // Column is being revealed (either temp or persistent), toggle persistent mask
+      const existingTimeout = tempRevealTimeouts.get(columnKey)
+      if (existingTimeout) clearTimeout(existingTimeout)
+
+      state.toggleSensitiveDataColumn(columnKey)
+
+      state.temporarilyRevealedColumns.delete(columnKey)
+      setTempRevealTimeouts((prev) => {
+        const next = new Map(prev)
+        next.delete(columnKey)
+        return next
+      })
     }
   }
 
@@ -139,6 +193,18 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             </>
           )}
         </DropdownMenuItem>
+        {snap.sensitiveDataColumns.has(columnKey) && (
+          <DropdownMenuItem
+            className="space-x-2"
+            disabled={snap.temporarilyRevealedColumns.has(columnKey)}
+            onClick={onToggleSensitiveData}
+          >
+            <Eye size={14} strokeWidth={1.5} />
+            <span>
+              {snap.temporarilyRevealedColumns.has(columnKey) ? 'Data revealed (5s)' : 'Show data'}
+            </span>
+          </DropdownMenuItem>
+        )}
         {snap.editable && (
           <>
             <DropdownMenuSeparator />
@@ -158,11 +224,12 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         <DropdownMenuTrigger asChild>
           <Button
             className="opacity-50 flex"
-            type="text"
+            variant="text"
             style={{ padding: '3px' }}
             onClick={(e) => {
               e.stopPropagation()
             }}
+            aria-label={`Column ${column.name} actions`}
             icon={<ChevronDown />}
           />
         </DropdownMenuTrigger>

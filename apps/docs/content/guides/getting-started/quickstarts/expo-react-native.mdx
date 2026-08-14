@@ -2,191 +2,144 @@
 title: 'Use Supabase with Expo React Native'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Expo app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<AiPrompt id="expo-react-native" />
 
-  <StepHikeCompact.Step step={1}>
+<$Partial path="quickstart_db_setup.mdx" />
 
-    <$Partial path="quickstart_db_setup.mdx" />
+## 3. Create an Expo app
 
-  </StepHikeCompact.Step>
+Create a minimal Expo app using the `create-expo-app` command with the blank TypeScript template.
 
-  <StepHikeCompact.Step step={2}>
+```bash
+npx create-expo-app my-app --template blank-typescript
+```
 
-    <StepHikeCompact.Details title="Create an Expo app">
+## 4. Install Supabase's Agent Skills (optional)
 
-    Create a minimal Expo app using the `create-expo-app` command with the blank TypeScript template.
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-    <$Partial path="uiLibCta.mdx" />
+Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
 
-    </StepHikeCompact.Details>
+To install, run the following command in the root of your project:
 
-    <StepHikeCompact.Code>
+```bash
+npx skills add supabase/agent-skills
+```
 
-      ```bash name=Terminal
-      npx create-expo-app my-app --template blank-typescript
-      ```
+## 5. Install the Supabase client library
 
-    </StepHikeCompact.Code>
+The fastest way to get started is to use the `@supabase/supabase-js` client library which provides a convenient interface for working with Supabase from a React Native app.
 
-  </StepHikeCompact.Step>
+Navigate to the Expo app and install `supabase-js` along with the required dependencies for session storage and URL handling.
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+```bash
+cd my-app && npx expo install @supabase/supabase-js react-native-url-polyfill expo-sqlite
+```
 
-    The fastest way to get started is to use the `@supabase/supabase-js` client library which provides a convenient interface for working with Supabase from a React Native app.
+## 6. Declare Supabase environment variables
 
-    Navigate to the Expo app and install `supabase-js` along with the required dependencies for secure storage and URL handling.
+Create a `.env` file in the root of your project and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=exporeactnative).
 
-    </StepHikeCompact.Details>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=exporeactnative">
+    Open Connect panel
+  </a>
+</Button>
 
-    <StepHikeCompact.Code>
+Expo requires environment variables to be prefixed with `EXPO_PUBLIC_` to be accessible in your app code.
 
-      ```bash name=Terminal
-      cd my-app && npx expo install @supabase/supabase-js react-native-url-polyfill expo-sqlite
-      ```
+```text name=.env
+EXPO_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    </StepHikeCompact.Code>
+<$Partial path="api_settings.mdx" variables={{ "framework": "exporeactnative", "tab": "mobiles" }} />
 
-  </StepHikeCompact.Step>
+## 7. Initialize the Supabase client
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+Create a helper file at `lib/supabase.ts` to initialize the Supabase client using the environment variables.
 
-    Create a `.env` file in the root of your project and populate it with your Supabase connection variables.
+The code below uses Expo's localStorage polyfill to persist authentication sessions.
 
-    Expo requires environment variables to be prefixed with `EXPO_PUBLIC_` to be accessible in your app code.
+```ts name=lib/supabase.ts
+import 'react-native-url-polyfill/auto'
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
-    <ProjectConfigVariables variable="anon" />
+import { createClient } from '@supabase/supabase-js'
 
-    </StepHikeCompact.Details>
+import 'expo-sqlite/localStorage/install'
 
-    <StepHikeCompact.Code>
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
+const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
-      ```text name=.env
-      EXPO_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-      ```
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
+export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
+  auth: {
+    storage: localStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+})
+```
 
-    </StepHikeCompact.Code>
+## 8. Query data from the app
 
-  </StepHikeCompact.Step>
+Replace the contents of `App.tsx` with the following code to fetch and display the instruments from your database.
 
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Initialize the Supabase client">
+Use `useEffect` to fetch the data when the component mounts and display the query result using React Native components.
 
-    Create a helper file at `lib/supabase.ts` to initialize the Supabase client using the environment variables.
+```tsx name=App.tsx
+import { useEffect, useState } from 'react'
+import { FlatList, StyleSheet, Text, View } from 'react-native'
 
-    The code below uses Expo's localStorage polyfill to persist authentication sessions.
+import { supabase } from './lib/supabase'
 
-    </StepHikeCompact.Details>
+export default function App() {
+  const [instruments, setInstruments] = useState([])
 
-    <StepHikeCompact.Code>
+  useEffect(() => {
+    getInstruments()
+  }, [])
 
-      ```ts name=lib/supabase.ts
-      import 'react-native-url-polyfill/auto'
-      import { createClient } from '@supabase/supabase-js'
-      import 'expo-sqlite/localStorage/install';
+  async function getInstruments() {
+    const { data } = await supabase.from('instruments').select()
+    setInstruments(data)
+  }
 
-      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL
-      const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={instruments}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
+      />
+    </View>
+  )
+}
 
-      export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-          storage: localStorage,
-          autoRefreshToken: true,
-          persistSession: true,
-          detectSessionInUrl: false,
-        },
-      })
-      ```
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: 50,
+    paddingHorizontal: 16,
+  },
+  item: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+})
+```
 
-    </StepHikeCompact.Code>
+## 9. Start the app
 
-  </StepHikeCompact.Step>
+Run the development server and scan the QR code with the Expo Go app on your phone, or press `i` for iOS simulator or `a` for Android emulator.
 
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Query data from the app">
-
-    Replace the contents of `App.tsx` with the following code to fetch and display the instruments from your database.
-
-    Use `useEffect` to fetch the data when the component mounts and display the query result using React Native components.
-
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-
-      ```tsx name=App.tsx
-      import { useEffect, useState } from 'react'
-      import { StyleSheet, View, FlatList, Text } from 'react-native'
-      import { supabase } from './lib/supabase'
-
-      export default function App() {
-        const [instruments, setInstruments] = useState([])
-
-        useEffect(() => {
-          getInstruments()
-        }, [])
-
-        async function getInstruments() {
-          const { data } = await supabase.from('instruments').select()
-          setInstruments(data)
-        }
-
-        return (
-          <View style={styles.container}>
-            <FlatList
-              data={instruments}
-              keyExtractor={(item) => item.id.toString()}
-              renderItem={({ item }) => (
-                <Text style={styles.item}>{item.name}</Text>
-              )}
-            />
-          </View>
-        )
-      }
-
-      const styles = StyleSheet.create({
-        container: {
-          flex: 1,
-          backgroundColor: '#fff',
-          paddingTop: 50,
-          paddingHorizontal: 16,
-        },
-        item: {
-          padding: 16,
-          borderBottomWidth: 1,
-          borderBottomColor: '#ccc',
-        },
-      })
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the development server and scan the QR code with the Expo Go app on your phone, or press `i` for iOS simulator or `a` for Android emulator.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npx expo start
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
+```bash
+npx expo start
+```
 
 ## Next steps
 

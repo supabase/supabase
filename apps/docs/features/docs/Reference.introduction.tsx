@@ -1,22 +1,20 @@
-import { AlertTriangle } from 'lucide-react'
-import Link from 'next/link'
-
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, cn } from 'ui'
-
 import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import { ReferenceSectionWrapper } from '~/features/docs/Reference.ui.client'
 import commonClientLibSections from '~/spec/common-client-libs-sections.json' with { type: 'json' }
+import { AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
+import { Alert, AlertDescription, AlertTitle, cn } from 'ui'
 
 function hasIntro(sections: typeof commonClientLibSections, excludeName?: string) {
   return Boolean(
     sections[0]?.type === 'markdown' &&
-      sections[0]?.slug === 'introduction' &&
-      (!excludeName ||
-        !(
-          'excludes' in sections[0] &&
-          Array.isArray(sections[0].excludes) &&
-          sections[0].excludes?.includes(excludeName)
-        ))
+    sections[0]?.slug === 'introduction' &&
+    (!excludeName ||
+      !(
+        'excludes' in sections[0] &&
+        Array.isArray(sections[0].excludes) &&
+        sections[0].excludes?.includes(excludeName)
+      ))
   )
 }
 
@@ -54,16 +52,16 @@ export async function ClientLibIntroduction({
 
 export function OldVersionAlert({ libPath, className }: { libPath: string; className?: string }) {
   return (
-    <Alert_Shadcn_ variant="warning" className={cn('not-prose', className)}>
+    <Alert variant="warning" className={cn('not-prose', className)}>
       <AlertTriangle />
-      <AlertTitle_Shadcn_ className="font-medium">Version out of date</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      <AlertTitle className="font-medium">Version out of date</AlertTitle>
+      <AlertDescription>
         There&apos;s a newer version of this library! Migrate to the{' '}
         <Link href={`/reference/${libPath}`} className="underline underline-offset-2">
           newest version
         </Link>
         .
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }

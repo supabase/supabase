@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { afterAll, expect, test } from 'vitest'
 
-import { getPaginatedUsersSQL } from '../../../src/sql/studio/get-users-paginated'
+import { getPaginatedUsersSQL } from '../../../src/sql/studio/auth/get-users-paginated'
 import { cleanupRoot, createDatabaseWithAuthSchema, createTestDatabase } from '../../db/utils'
 
 afterAll(async () => {

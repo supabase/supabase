@@ -27,7 +27,7 @@ functions:
           ```swift
           import Supabase
 
-          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "publishable-or-anon-key")
+          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "your-publishable-key")
           ```
       - id: initialize-client-custom-options
         name: Initialize Client with custom options
@@ -37,7 +37,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: SupabaseClientOptions(
               db: .init(
                 schema: "public"
@@ -49,6 +49,25 @@ functions:
               global: .init(
                 headers: ["x-my-custom-header": "my-app-name"],
                 session: URLSession.myCustomSession
+              )
+            )
+          )
+          ```
+      - id: initialize-client-with-retries
+        name: Initialize Client with automatic retries
+        description: |
+          PostgREST requests automatically retry on transient errors (HTTP 408, 409, 503, 504 and network failures) with exponential backoff. Retries are enabled by default and can be disabled per client.
+        code: |
+          ```swift
+          import Supabase
+
+          let supabase = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+            supabaseKey: "your-publishable-key",
+            options: SupabaseClientOptions(
+              db: .init(
+                // Disable automatic retries for this client
+                retryEnabled: false
               )
             )
           )
@@ -67,7 +86,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: SupabaseClientOptions(
               global: SupabaseClientOptions.GlobalOptions(
                 logger: AppLogger()
@@ -83,7 +102,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: SupabaseClientOptions(
               db: .init(
                 // Provide a custom schema. Defaults to "public".
@@ -97,6 +116,26 @@ functions:
           Go to [Settings > API > Exposed schemas](/dashboard/project/_/settings/api) and add the schema which you want to expose to the API.
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
+      - id: initialize-client-with-opentelemetry
+        name: Initialize Client with OpenTelemetry tracing
+        description: |
+          Supabase Swift supports W3C `traceparent` header propagation via an opt-in SwiftPM package trait.
+          When enabled, the active OpenTelemetry span's trace context is automatically injected into every outgoing request across PostgREST, Storage, Auth, Functions, and Realtime — no additional runtime configuration needed.
+
+          Enable the `OpenTelemetry` trait in your `Package.swift` dependency declaration:
+        code: |
+          ```swift
+          // Package.swift
+          .package(
+            url: "https://github.com/supabase/supabase-swift.git",
+            from: "2.51.0",
+            traits: ["OpenTelemetry"]
+          )
+          ```
+        notes: |
+          - Requires swift-tools-version 6.1 or later (trait support).
+          - The trait is **off by default** — no OTel dependency is linked unless you opt in.
+          - When no span is active, the header is not added; it is always safe to call unconditionally.
   - id: auth-api
     title: 'Overview'
     notes: |
@@ -155,7 +194,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "publishable-or-anon-key")
+          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "your-publishable-key")
           let auth = supabase.auth
           ```
       - id: create-auth-client-with-custom-storage
@@ -165,7 +204,7 @@ functions:
           ```swift
           let supabase = SupabaseClient(
             supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
-            supabaseKey: "publishable-or-anon-key",
+            supabaseKey: "your-publishable-key",
             options: .init(
               auth: .init(
                 MyCustomLocalStorage()
@@ -267,7 +306,7 @@ functions:
         name: Sign up with a redirect URL
         description: |
           - You can provide a default redirect URL when initializing the client.
-          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```swift
           try await supabase.auth.signUp(
@@ -452,9 +491,9 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls).
-      - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
-      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSmsProvider=Twilio) for details about configuring WhatsApp sign in.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -624,7 +663,7 @@ functions:
       - name: captchaToken
         type: String
     notes: |
-      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/enterprise-sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
@@ -659,6 +698,88 @@ functions:
 
             // Open the URL using your preferred method to complete sign-in process.
             UIApplication.shared.open(url)
+          ```
+  - id: sign-in-with-web3
+    title: 'signInWithWeb3()'
+    description: |
+      Signs in a user via a signed Sign in with Ethereum (EIP-4361) or Sign in with Solana message.
+    notes: |
+      - Supports Ethereum (Sign-In with Ethereum) and Solana (Sign-In with Solana), both of which derive from the [EIP-4361](https://eips.ethereum.org/EIPS/eip-4361) standard.
+      - Your app is responsible for building the message and obtaining the signature from the user's wallet (e.g. via a WalletConnect session or native wallet SDK) before calling this method.
+      - For `Web3Chain.ethereum` the signature is a `0x`-prefixed hex encoded string. For `Web3Chain.solana` it is a base64 encoded string.
+    examples:
+      - id: sign-in-with-ethereum
+        name: Sign in with an Ethereum wallet
+        isSpotlight: true
+        description: |
+          Sign the EIP-4361 message with the user's Ethereum wallet, then pass the message and its hex encoded signature.
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInWithWeb3(
+            credentials: Web3Credentials(
+              chain: .ethereum,
+              message: siweMessage,
+              signature: signatureHex
+            )
+          )
+          ```
+      - id: sign-in-with-solana
+        name: Sign in with a Solana wallet
+        description: |
+          Sign the message with the user's Solana wallet, then pass the message and its base64 encoded signature.
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInWithWeb3(
+            credentials: Web3Credentials(
+              chain: .solana,
+              message: siwsMessage,
+              signature: signatureBase64
+            )
+          )
+          ```
+  - id: sign-in-with-passkey
+    title: 'signInWithPasskey()'
+    notes: |
+      Signs the user in with a passkey (WebAuthn). Available on iOS 16+, macOS 13+, and visionOS 1+.
+
+      - Drives the full WebAuthn ceremony end to end: fetches assertion options from the server, presents the native passkey UI via `AuthenticationServices`, and verifies the assertion.
+      - Does not require an existing session. On success the session is persisted and a `signedIn` auth change event is emitted.
+      - For lower-level control (custom authenticator, tvOS, watchOS), use `getPasskeyAuthenticationOptions()` + `verifyPasskeyAuthentication()` instead.
+      - Passkey support is **experimental**. Opt in with `@_spi(Experimental) import Supabase`. The API may change in future releases.
+      - Passkeys must be enabled for your project in the Dashboard under Authentication → Passkeys.
+    examples:
+      - id: sign-in-with-passkey
+        name: Sign in with a passkey
+        isSpotlight: true
+        code: |
+          ```swift
+          // iOS 16+/macOS 13+ only. Must opt in: @_spi(Experimental) import Supabase
+          let response = try await supabase.auth.signInWithPasskey(
+            presentationAnchor: view.window!
+          )
+          let session = response.session
+          let user = response.user
+          ```
+  - id: register-passkey
+    title: 'registerPasskey()'
+    notes: |
+      Registers a new passkey (WebAuthn credential) for the signed-in user. Available on iOS 16+, macOS 13+, and visionOS 1+.
+
+      - Drives the full WebAuthn ceremony end to end: fetches creation options from the server, presents the native passkey registration UI, and stores the credential.
+      - Requires an authenticated, non-anonymous user.
+      - For lower-level control, use `getPasskeyRegistrationOptions()` + `verifyPasskeyRegistration()` instead.
+      - Passkey support is **experimental**. Opt in with `@_spi(Experimental) import Supabase`.
+    examples:
+      - id: register-passkey
+        name: Register a passkey for the current user
+        isSpotlight: true
+        code: |
+          ```swift
+          // iOS 16+/macOS 13+ only. Must opt in: @_spi(Experimental) import Supabase
+          let passkey = try await supabase.auth.registerPasskey(
+            presentationAnchor: view.window!
+          )
+          print("Registered passkey \(passkey.id)")
           ```
   - id: sign-out
     title: 'signOut()'
@@ -1198,16 +1319,19 @@ functions:
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+      TOTP (time-based one-time password) is the stable 2nd factor. WebAuthn / passkey as a 2nd factor is **experimental** — opt in with `@_spi(Experimental) import Supabase`. The first-factor passkey API lives in the `auth` (not `auth.mfa`) namespace; see the [Auth Passkey](/docs/reference/swift/auth-passkey-api) section.
+
+      We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
       Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
   - id: mfa-enroll
     title: 'mfa.enroll()'
     notes: |
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Supported factor types: `totp` (stable) and `webauthn` (**experimental** — opt in with `@_spi(Experimental) import Supabase`). The returned `id` should be used to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/swift/auth-mfa-challengeandverify).
+      - For a one-call WebAuthn enrollment on iOS 16+/macOS 13+, use `mfa.enrollWebAuthnFactor(friendlyName:presentationAnchor:)` instead.
 
     examples:
       - id: enroll-totp-factor
@@ -1231,6 +1355,17 @@ functions:
           let secret = response.totp?.secret
           let uri = response.totp?.uri
           ```
+      - id: enroll-webauthn-factor
+        name: Enroll a WebAuthn (passkey) factor (iOS 16+/macOS 13+, experimental)
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          // enrollWebAuthnFactor drives the full ceremony: enroll → challenge → present native UI → verify.
+          let verifyResponse = try await supabase.auth.mfa.enrollWebAuthnFactor(
+            friendlyName: "My passkey",
+            presentationAnchor: view.window!
+          )
+          ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
     notes: |
@@ -1252,6 +1387,7 @@ functions:
     title: 'mfa.verify()'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/swift/auth-mfa-challenge) first.
+      - For WebAuthn factors on iOS 16+/macOS 13+, `mfa.verifyWebAuthnFactor(factorId:presentationAnchor:)` drives the full challenge + native UI + verify flow in one call (**experimental** — opt in with `@_spi(Experimental) import Supabase`).
     examples:
       - id: verify-challenge
         name: Verify a challenge for a factor
@@ -1264,6 +1400,17 @@ functions:
               challengeId: "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
               code: "123456"
             )
+          )
+          ```
+      - id: verify-webauthn-factor
+        name: Verify a WebAuthn factor (iOS 16+/macOS 13+, experimental)
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          // verifyWebAuthnFactor drives the full ceremony: challenge → present native UI → verify.
+          let session = try await supabase.auth.mfa.verifyWebAuthnFactor(
+            factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            presentationAnchor: view.window!
           )
           ```
   - id: mfa-challenge-and-verify
@@ -1328,11 +1475,162 @@ functions:
           ```swift
           let factors = try await supabase.auth.mfa.listFactors()
           ```
+  - id: passkey-api
+    title: 'Overview'
+    notes: |
+      Lower-level passkey methods for custom authenticator flows and platforms where `AuthenticationServices` is unavailable (tvOS, watchOS).
+
+      These methods handle the network side of the WebAuthn ceremony only — the caller is responsible for driving the platform authenticator between fetching options and submitting the credential response. For an end-to-end flow on iOS 16+/macOS 13+, prefer `signInWithPasskey(presentationAnchor:)` and `registerPasskey(presentationAnchor:)`.
+
+      Passkey support is **experimental**. Opt in with `@_spi(Experimental) import Supabase`. The API may change in future releases.
+  - id: passkey-list
+    title: 'listPasskeys()'
+    notes: |
+      Returns the list of passkeys registered to the signed-in user.
+    examples:
+      - id: list-passkeys
+        name: List the current user's passkeys
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let passkeys: [PasskeyListItem] = try await supabase.auth.listPasskeys()
+          ```
+  - id: passkey-update
+    title: 'renamePasskey(id:friendlyName:)'
+    notes: |
+      Updates the friendly name of a passkey. Limited to 120 characters.
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: ID of the passkey to rename.
+      - name: friendlyName
+        isOptional: false
+        type: String
+        description: New human readable name. Limited to 120 characters.
+    examples:
+      - id: rename-passkey
+        name: Rename a passkey
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let passkey = try await supabase.auth.renamePasskey(
+            id: "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            friendlyName: "Work laptop"
+          )
+          ```
+  - id: passkey-delete
+    title: 'deletePasskey(id:)'
+    notes: |
+      Removes a passkey from the signed-in user's account.
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: ID of the passkey to delete.
+    examples:
+      - id: delete-passkey
+        name: Delete a passkey
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          try await supabase.auth.deletePasskey(id: "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+  - id: passkey-start-registration
+    title: 'getPasskeyRegistrationOptions()'
+    notes: |
+      Fetches credential creation options to register a new passkey for the signed-in user.
+
+      - Pass the returned `options` (W3C `PublicKeyCredentialCreationOptions`) to the platform authenticator.
+      - After running the authenticator, submit the result with `verifyPasskeyRegistration(challengeId:credentialResponse:)`.
+    examples:
+      - id: start-passkey-registration
+        name: Get passkey registration options
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let options: PasskeyRegistrationOptions = try await supabase.auth.getPasskeyRegistrationOptions()
+          // Hand options.options to the platform authenticator.
+          ```
+  - id: passkey-verify-registration
+    title: 'verifyPasskeyRegistration(challengeId:credentialResponse:)'
+    notes: |
+      Stores a newly created passkey for the signed-in user.
+    params:
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The `challengeId` returned by `getPasskeyRegistrationOptions()`.
+      - name: credentialResponse
+        isOptional: false
+        type: AnyJSON
+        description: The W3C `RegistrationResponseJSON` credential produced by the authenticator.
+    examples:
+      - id: verify-passkey-registration
+        name: Verify a passkey registration
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let passkey: PasskeyListItem = try await supabase.auth.verifyPasskeyRegistration(
+            challengeId: options.challengeId,
+            credentialResponse: credential
+          )
+          ```
+  - id: passkey-start-authentication
+    title: 'getPasskeyAuthenticationOptions()'
+    notes: |
+      Fetches assertion options to authenticate with a passkey.
+
+      - Does not require an existing session.
+      - Pass the returned `options` (W3C `PublicKeyCredentialRequestOptions`) to the platform authenticator.
+      - After running the authenticator, submit the result with `verifyPasskeyAuthentication(challengeId:credentialResponse:)`.
+    examples:
+      - id: start-passkey-authentication
+        name: Get passkey authentication options
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let options: PasskeyAuthenticationOptions = try await supabase.auth.getPasskeyAuthenticationOptions()
+          // Hand options.options to the platform authenticator.
+          ```
+  - id: passkey-verify-authentication
+    title: 'verifyPasskeyAuthentication(challengeId:credentialResponse:)'
+    notes: |
+      Verifies a passkey assertion and establishes a session. On success the session is persisted and a `signedIn` auth change event is emitted.
+    params:
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The `challengeId` returned by `getPasskeyAuthenticationOptions()`.
+      - name: credentialResponse
+        isOptional: false
+        type: AnyJSON
+        description: The W3C `AuthenticationResponseJSON` assertion produced by the authenticator.
+    examples:
+      - id: verify-passkey-authentication
+        name: Verify a passkey sign in
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let response: AuthResponse = try await supabase.auth.verifyPasskeyAuthentication(
+            challengeId: options.challengeId,
+            credentialResponse: credential
+          )
+          let session = response.session
+          let user = response.user
+          ```
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -1343,7 +1641,7 @@ functions:
 
           let supabase = SupabaseClient(
             supabaseURL: supabaseURL,
-            supabaseKey: serviceRoleKey
+            supabaseKey: secretKey
           )
 
           // Access auth admin api
@@ -1459,12 +1757,68 @@ functions:
           )
           ```
 
+  - id: generate-link
+    title: 'generateLink()'
+    description: |
+      Generates an email link for a specific action without sending it. This is useful for custom admin functionality where you want to build the email or OTP flow yourself.
+    notes: |
+      - `GenerateLinkParams` exposes a static factory for each link type: `.signUp(email:password:redirectTo:)`, `.invite(email:redirectTo:)`, `.magicLink(email:redirectTo:)`, `.recovery(email:redirectTo:)`, `.emailChangeCurrent(email:newEmail:redirectTo:)`, and `.emailChangeNew(email:newEmail:redirectTo:)`.
+      - `generateLink()` creates the user for `.signUp` and `.invite` if one doesn't already exist.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.generateLink(
+            params: .signUp(
+              email: "email@example.com",
+              password: "secret"
+            )
+          )
+
+          let actionLink = response.properties.actionLink
+          ```
+      - id: generate-a-recovery-link
+        name: Generate a recovery link
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.generateLink(
+            params: .recovery(
+              email: "email@example.com",
+              redirectTo: URL(string: "https://example.com/reset-password")
+            )
+          )
+          ```
+
+  - id: auth-js-gotrueadminapi-signout
+    title: 'signOut()'
+    description: |
+      Signs out a specific user by revoking their session(s), using that user's access token (JWT).
+    notes: |
+      - Unlike `supabase.auth.signOut()`, this method takes the target user's access token (JWT), not a user ID.
+      - By default, `signOut()` uses the `.global` scope, which revokes every session for the user. Pass `.local` to revoke only the session tied to the given JWT, or `.others` to keep that session and revoke all the rest.
+    examples:
+      - id: sign-out-a-user
+        name: Sign out a user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.admin.signOut(jwt: jwt)
+          ```
+      - id: sign-out-a-user-with-scope
+        name: Sign out a user with a scope
+        code: |
+          ```swift
+          try await supabase.auth.admin.signOut(jwt: jwt, scope: .others)
+          ```
+
   - id: admin-oauth-list-clients
     title: 'admin.oauth.listClients()'
     description: |
       List all OAuth clients with optional pagination.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - Only works when the OAuth 2.1 server is enabled in your Supabase Auth configuration.
     overwriteParams:
@@ -1496,7 +1850,7 @@ functions:
     description: |
       Create a new OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - Only works when the OAuth 2.1 server is enabled in your Supabase Auth configuration.
     overwriteParams:
@@ -1524,7 +1878,7 @@ functions:
     description: |
       Get details of a specific OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
     overwriteParams:
       - name: clientId
@@ -1547,7 +1901,7 @@ functions:
     description: |
       Delete an OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - This action cannot be undone.
     overwriteParams:
@@ -1571,7 +1925,7 @@ functions:
     description: |
       Regenerate the secret for an OAuth client.
     notes: |
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - This method is part of the OAuth 2.1 server administration API.
       - The old secret will be immediately invalidated.
       - Make sure to update your application with the new secret.
@@ -3471,6 +3825,21 @@ functions:
             .in("name", values: ["Rio de Janeiro", "San Francisco"])
           ```
 
+  - id: notin
+    title: notIn()
+    description: |
+      Match only rows where `column` is not included in the `values` array. The negation of `in()`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .notIn("name", values: ["Rio de Janeiro", "San Francisco"])
+          ```
+
   - id: contains
     title: contains()
     description: |
@@ -4033,7 +4402,31 @@ functions:
             .execute()
           ```
         description: |
-          Ensure that the RPC call affects at most 10 rows. Useful for limiting the impact of stored procedures.
+          Ensure that the RPC call affects at most 10 rows. Useful for limiting the impact of functions.
+
+  - id: dry-run
+    title: dryRun()
+    description: |
+      Executes the mutation but rolls back the transaction instead of committing it, so no changes are persisted.
+    notes: |
+      - The mutation runs and its result (including side effects such as triggers) is returned in the response, but the transaction is rolled back afterward.
+      - Useful for testing mutations without touching real data.
+      - Requires PostgREST's `db-tx-end` setting to allow client-controlled transaction rollback.
+    examples:
+      - id: with-update
+        name: With `update()`
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase
+            .from("todos")
+            .update(["done": true])
+            .eq("id", value: 1)
+            .select()
+            .dryRun()
+            .execute()
+          // Row is not actually updated in the database.
+          ```
 
   - id: single
     title: single()
@@ -4076,6 +4469,28 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: maybe-single
+    title: maybeSingle()
+    description: |
+      Like `single()`, this sets the `application/vnd.pgrst.object+json` accept header so the server enforces a single result. Unlike `single()`, when the query does not match exactly one row the resulting `PGRST116` error is not thrown — the response `value` is `nil` instead.
+    notes: |
+      - PostgREST returns `PGRST116` both when zero rows match and when more than one row matches. `maybeSingle()` returns `nil` for either case; use `single()` for the strict variant that always throws when the query does not match exactly one row.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```swift
+          let todo: Todo? = try await supabase
+            .from("todos")
+            .select()
+            .eq("id", value: 42)
+            .maybeSingle()
+            .execute()
+            .value
+          ```
+
   - id: csv
     title: csv()
     examples:
@@ -4114,6 +4529,26 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+  - id: strip-nulls
+    title: stripNulls()
+    description: |
+      Strip null values from the response.
+    notes: |
+      - Requires PostgREST 11.2.0 or later.
+      - Cannot be combined with `.csv()`.
+    examples:
+      - id: strip-nulls
+        name: Strip null values
+        isSpotlight: true
+        code: |
+          ```swift
+          let data = try await supabase
+            .from("characters")
+            .select()
+            .stripNulls()
+            .execute()
+            .value
+          ```
   - id: explain
     title: Using Explain
     description: |
@@ -4124,6 +4559,8 @@ functions:
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
       Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    notes: |
+      The `format` parameter accepts an `ExplainFormat` value — either `.text` (default, human-readable) or `.json` (machine-readable JSON).
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -4203,6 +4640,21 @@ functions:
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
         isSpotlight: false
+
+      - id: get-execution-plan-json-format
+        name: Get the execution plan as JSON
+        code: |
+          ```swift
+          try await supabase
+            .from("instruments")
+            .select()
+            .explain(format: .json)
+            .execute()
+            .value
+          ```
+        description: |
+          Use `format: .json` to get a machine-readable JSON execution plan. The `ExplainFormat` type accepts `.text` (default) or `.json`.
+        isSpotlight: false
   - id: invoke
     title: invoke()
     description: |
@@ -4211,6 +4663,7 @@ functions:
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
       - When a region is specified, both the `x-region` header and `forceFunctionRegion` query parameter are set to ensure proper function routing.
+      - By default, function invocations use a 150-second idle timeout. You can override this per-call by passing `timeoutInterval` to `FunctionInvokeOptions`. This only controls the client's request timeout — it cannot extend function execution beyond the platform's [150-second gateway idle timeout](/docs/guides/functions/limits), after which a 504 Gateway Timeout is returned regardless of the value passed.
     examples:
       - id: invocation-with-decodable
         name: Invocation with `Decodable` response
@@ -4385,6 +4838,23 @@ functions:
               )
             )
           ```
+      - id: invocation-with-timeout-override
+        name: Invocation with a custom timeout
+        description: |
+          Override the default 150-second idle timeout for a single invocation by passing `timeoutInterval`.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"],
+                timeoutInterval: 30
+              )
+            )
+          ```
+
   - id: subscribe
     title: on().subscribe()
     notes: |
@@ -4393,6 +4863,7 @@ functions:
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
       - Use AsyncStream or callbacks for listening to changes.
+      - Presence and Postgres change callbacks must be registered **before** calling `subscribe()`. Attempting to add them after the channel is subscribing or subscribed will trigger a warning and the callback will be rejected.
     examples:
       - id: listen-to-broadcast
         name: Listen to broadcast messages
@@ -4915,7 +5386,7 @@ functions:
             .createBucket(
               "avatars",
               options: BucketOptions(
-                public: false,
+                isPublic: false,
                 allowedMimeTypes: ["image/png"],
                 fileSizeLimit: 1024
               )
@@ -4955,7 +5426,7 @@ functions:
             .updateBucket(
               "avatars",
               options: BucketOptions(
-                public: false,
+                isPublic: false,
                 fileSizeLimit: 1024,
                 allowedMimeTypes: ["image/png"]
               )
@@ -5114,12 +5585,13 @@ functions:
           let signedURL = try await supabase.storage
             .from("avatars")
             .createSignedURL(
-              path: "folder/avatar1.png", expiresIn: 60,
-              download: true
+              path: "folder/avatar1.png",
+              expiresIn: 60,
+              download: .withOriginalName
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          Use `.withOriginalName` to download with the original file name, or `.named("custom.png")` to specify a custom file name. The `download: Bool` overload still compiles but is disfavored.
 
   - id: from-create-signed-urls
     title: from.createSignedUrls()
@@ -5258,11 +5730,11 @@ functions:
             .from("public-bucket")
             .getPublicURL(
               path: "folder/avatar1.png",
-              download: true
+              download: .withOriginalName
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          Use `.withOriginalName` to download with the original file name, or `.named("custom.png")` to specify a custom file name. The `download: Bool` overload still compiles but is disfavored.
 
   - id: from-download
     title: from.download()

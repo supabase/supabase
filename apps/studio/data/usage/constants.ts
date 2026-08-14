@@ -8,5 +8,7 @@ export const VIOLATION_TYPE_LABELS: Record<string, string> = {
   exceed_realtime_connection_count_quota: 'Realtime Connection Count Exceeded',
   exceed_realtime_message_count_quota: 'Realtime Message Count Exceeded',
   exceed_storage_size_quota: 'Storage Size Exceeded',
+  exceed_log_ingestion_quota: 'Logs Ingest Exceeded',
+  exceed_log_query_quota: 'Logs Query Exceeded',
   overdue_payment: 'Overdue Payment',
 }

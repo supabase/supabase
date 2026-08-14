@@ -76,7 +76,8 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithKeycloak() {
@@ -121,6 +122,18 @@ suspend fun signInWithKeycloak() {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs in, call [`SignIn()`](/docs/reference/csharp/sign-in-with-oauth) with `Provider.KeyCloak` as the provider:
+
+```c#
+var state = await supabase.Auth.SignIn(Provider.KeyCloak, new SignInOptions { Scopes = "openid" });
+var signInUrl = state.Uri;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 <$Partial path="oauth_pkce_flow.mdx" />
@@ -161,12 +174,23 @@ When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) 
 
 ```kotlin
 import { createClient } from '@supabase/supabase-js';
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>');
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...');
 
 // ---cut---
 suspend fun signOut() {
 	supabase.auth.signOut()
 }
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+When your user signs out, call [SignOut()](/docs/reference/csharp/sign-out) to remove them from the browser session and any objects from local storage:
+
+```c#
+await supabase.Auth.SignOut();
 ```
 
 </TabPanel>

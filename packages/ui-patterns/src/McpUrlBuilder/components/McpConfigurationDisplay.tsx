@@ -1,73 +1,44 @@
 'use client'
 
-import { stringify as stringifyToml } from '@std/toml/stringify'
-import yaml from 'js-yaml'
 import { ExternalLink } from 'lucide-react'
 import Image from 'next/image'
 import { Button, cn } from 'ui'
-import { CodeBlock, type CodeBlockLang } from 'ui/src/components/CodeBlock'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import type { McpClient, McpClientConfig, McpOnCopyCallback } from '../types'
 import { getMcpButtonData } from '../utils/getMcpButtonData'
+import { serializeMcpConfig } from '../utils/serializeMcpConfig'
 
 interface McpConfigurationDisplayProps {
   selectedClient: McpClient
   clientConfig: McpClientConfig
   className?: string
   theme?: 'light' | 'dark'
-  basePath: string
   onCopyCallback: (type?: McpOnCopyCallback) => void
   onInstallCallback?: () => void
   isPlatform?: boolean
 }
-
-type ConfigFormat = CodeBlockLang | 'toml'
 
 export function McpConfigurationDisplay({
   selectedClient,
   clientConfig,
   className,
   theme = 'dark',
-  basePath,
   onCopyCallback,
   onInstallCallback,
   isPlatform,
 }: McpConfigurationDisplayProps) {
   const mcpButtonData = getMcpButtonData({
-    basePath,
     theme,
     client: selectedClient,
     clientConfig,
     isPlatform,
   })
 
-  // Extract file extension and determine format
-  const fileExtension = selectedClient.configFile?.split('.').pop()?.toLowerCase()
-  // If the file extension is not 'json', 'yaml', or 'toml', default to 'txt'
-  let configFormat: ConfigFormat | undefined
-  if (['json', 'yaml', 'toml'].includes(fileExtension ?? '')) {
-    configFormat = fileExtension as ConfigFormat
-  }
-
-  // Serialize config based on format
-  let configValue: string
-  switch (configFormat) {
-    case 'yaml':
-      configValue = yaml.dump(clientConfig, { indent: 2, lineWidth: -1 })
-      break
-    case 'toml':
-      configValue = stringifyToml(clientConfig as Record<string, any>).trim()
-      break
-    case 'json':
-      configValue = JSON.stringify(clientConfig, null, 2)
-      break
-    default:
-      configValue = String(clientConfig)
-  }
-
-  // Toml will default to undefined display language
+  const { lang, value: configValue } = serializeMcpConfig(selectedClient.configFile, clientConfig)
+  // TOML has no CodeBlock highlighter, so render it without a language.
   const displayLanguage: CodeBlockLang | undefined =
-    configFormat === 'toml' ? undefined : configFormat
+    lang === 'toml' ? undefined : (lang as CodeBlockLang)
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -76,7 +47,7 @@ export function McpConfigurationDisplay({
           <div className="text-xs text-foreground-light">
             {selectedClient.deepLinkDescription ?? 'Install in one click:'}
           </div>
-          <Button type="secondary" size="small" asChild>
+          <Button variant="secondary" size="small" asChild>
             <a
               href={mcpButtonData.deepLink}
               target="_blank"
@@ -86,7 +57,7 @@ export function McpConfigurationDisplay({
             >
               <Image
                 src={mcpButtonData.imageSrc}
-                alt=""
+                alt={`${selectedClient.label} icon`}
                 width={16}
                 height={16}
                 className="shrink-0"
@@ -109,7 +80,10 @@ export function McpConfigurationDisplay({
                 ? 'Or add'
                 : 'Add'}{' '}
             this configuration to{' '}
-            <code className="px-1 py-0.5 bg-surface-200 rounded">{selectedClient.configFile}</code>:
+            <code className="px-1 py-0.5 bg-surface-200 rounded-sm">
+              {selectedClient.configFile}
+            </code>
+            :
           </div>
           <CodeBlock
             value={configValue}

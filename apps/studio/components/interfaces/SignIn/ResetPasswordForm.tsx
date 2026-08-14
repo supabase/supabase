@@ -1,18 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth, getReturnToPath } from 'lib/gotrue'
 import { Eye, EyeOff } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, cn, Form_Shadcn_, FormControl_Shadcn_, FormField_Shadcn_, Separator } from 'ui'
+import { Button, cn, Form, FormControl, FormField, Separator } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, getReturnToPath } from '@/lib/gotrue'
 
 const passwordValidation = z
   .string()
@@ -55,6 +55,8 @@ export const ResetPasswordForm = () => {
     mode: 'onChange',
   })
 
+  const password = useWatch({ control: form.control, name: 'password' })
+
   const onResetPassword = async (data: FormData) => {
     const toastId = toast.loading('Saving password...')
     const { error } = await auth.updateUser({
@@ -75,15 +77,15 @@ export const ResetPasswordForm = () => {
   }
 
   return (
-    <Form_Shadcn_ {...form}>
-      <form onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
+    <Form {...form}>
+      <form method="POST" onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
         {requireCurrentPassword && (
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="currentPassword"
             render={({ field }) => (
               <FormItemLayout label="Current password">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <Input
                     id="currentPassword"
                     type={currentPasswordHidden ? 'password' : 'text'}
@@ -92,7 +94,7 @@ export const ResetPasswordForm = () => {
                     actions={
                       <Button
                         icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                        type="default"
+                        variant="default"
                         className="w-7"
                         onClick={() => setCurrentPasswordHidden((prev) => !prev)}
                       />
@@ -103,17 +105,17 @@ export const ResetPasswordForm = () => {
                       setCurrentPasswordHidden(true)
                     }}
                   />
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />
         )}
-        <FormField_Shadcn_
+        <FormField
           control={form.control}
           name="password"
           render={({ field }) => (
             <FormItemLayout label="Password">
-              <FormControl_Shadcn_>
+              <FormControl>
                 <Input
                   id="password"
                   type={passwordHidden ? 'password' : 'text'}
@@ -124,7 +126,7 @@ export const ResetPasswordForm = () => {
                   actions={
                     <Button
                       icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      type="default"
+                      variant="default"
                       className="w-7"
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />
@@ -135,25 +137,25 @@ export const ResetPasswordForm = () => {
                     setPasswordHidden(true)
                   }}
                 />
-              </FormControl_Shadcn_>
+              </FormControl>
             </FormItemLayout>
           )}
         />
 
         <div
           className={cn(
-            showConditions ? 'max-h-[500px]' : 'max-h-[0px]',
+            showConditions ? 'max-h-[500px]' : 'max-h-0',
             'transition-all duration-400 overflow-y-hidden'
           )}
         >
-          <PasswordConditionsHelper password={form.watch('password')} />
+          <PasswordConditionsHelper password={password} />
         </div>
 
         <Separator className="bg-border" />
 
         <Button
           block
-          htmlType="submit"
+          type="submit"
           size="medium"
           disabled={form.formState.isSubmitting}
           loading={form.formState.isSubmitting}
@@ -161,6 +163,6 @@ export const ResetPasswordForm = () => {
           Save new password
         </Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }

@@ -3,22 +3,22 @@ import { ArrowRight, ExternalLink, Github } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
+import { Badge, Button, cn } from 'ui'
 
-import { Markdown } from 'components/interfaces/Markdown'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type {
   Integration,
   IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { BASE_PATH } from 'lib/constants'
-import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
-import { Badge, Button, cn } from 'ui'
+} from '@/data/integrations/integrations.types'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { BASE_PATH } from '@/lib/constants'
+import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
 
-export interface IntegrationInstallationProps extends RefAttributes<HTMLLIElement> {
+interface IntegrationInstallationProps extends RefAttributes<HTMLLIElement> {
   title: string
   integration: Integration
   disabled?: boolean
@@ -72,27 +72,27 @@ const Avatar = ({ src }: { src: string | undefined }) => {
   )
 }
 
+const IntegrationIconBlock = ({ integration }: { integration: Integration }) => {
+  return (
+    <div className="bg-black text-white w-8 h-8 rounded-sm flex items-center justify-center">
+      <HandleIcon type={integration.integration.name} />
+    </div>
+  )
+}
+
 export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInstallationProps>(
   ({ integration, disabled, ...props }, ref) => {
-    const IntegrationIconBlock = () => {
-      return (
-        <div className="bg-black text-white w-8 h-8 rounded flex items-center justify-center">
-          <HandleIcon type={integration.integration.name} />
-        </div>
-      )
-    }
-
     return (
       <li
         ref={ref}
         key={integration.id}
-        className="bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg"
+        className="bg-surface-100 border shadow-xs flex justify-between items-center px-8 py-4 rounded-lg"
         {...props}
       >
         <div className="flex gap-6 items-center">
           <div className="flex gap-3 items-center">
             <div className="flex -space-x-1">
-              <IntegrationIconBlock />
+              <IntegrationIconBlock integration={integration} />
               <Avatar src={integration?.metadata?.account.avatar} />
             </div>
           </div>
@@ -118,7 +118,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
           </div>
         </div>
 
-        <Button asChild disabled={disabled} type="default" iconRight={<ExternalLink />}>
+        <Button asChild disabled={disabled} variant="default" iconRight={<ExternalLink />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -166,13 +166,13 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
             orientation === 'horizontal'
               ? 'flex items-center justify-between gap-2'
               : 'flex flex-col gap-3',
-            'bg-surface-100 border shadow-sm px-6 py-4 rounded-lg',
+            'bg-surface-100 border shadow-xs px-6 py-4 rounded-lg',
             className
           )}
         >
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-2">
-              <div className="flex-shrink-0 flex gap-x-2 items-center max-w-40 ">
+              <div className="shrink-0 flex gap-x-2 items-center max-w-40 ">
                 <HandleIcon type={'Supabase'} />
                 <span title={project?.name} className="text-sm truncate">
                   {project?.name}
@@ -181,14 +181,14 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
 
               <ArrowRight
                 size={14}
-                className="flex-shrink-0 text-foreground-lighter"
+                className="shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
               />
 
               <div className="flex-1 min-w-0 flex gap-2 items-center">
                 {!connection?.metadata?.framework ? (
-                  <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                    <HandleIcon type={type} className={'!w-2.5'} />
+                  <div className="bg-black text-white w-4 h-4 rounded-sm flex items-center justify-center">
+                    <HandleIcon type={type} className={'w-2.5!'} />
                   </div>
                 ) : (
                   <img
@@ -226,7 +226,7 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
             </div>
           </div>
 
-          <div className="flex-shrink-0">{actions}</div>
+          <div className="shrink-0">{actions}</div>
         </div>
       </li>
     )
@@ -243,7 +243,7 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
         key={connection.id}
         {...props}
         className={cn(
-          'bg-surface-100 border shadow-sm flex justify-between items-center px-8 py-4 rounded-lg'
+          'bg-surface-100 border shadow-xs flex justify-between items-center px-8 py-4 rounded-lg'
         )}
       >
         <div className="flex flex-col gap-1">
@@ -260,58 +260,87 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
           </span>
         </div>
 
-        <Button type="default">Connect</Button>
+        <Button variant="default">Connect</Button>
       </li>
     )
   }
 )
 
+type EmptyIntegrationConnectionProps = HTMLAttributes<HTMLDivElement> & {
+  showNode?: boolean
+  disabled?: boolean
+  icon?: ReactNode
+  disabledTooltip?: string
+} & ({ onClick: () => void; href?: never } | { href: string; onClick?: never })
+
 export const EmptyIntegrationConnection = forwardRef<
   HTMLDivElement,
-  HTMLAttributes<HTMLDivElement> & {
-    showNode?: boolean
-    onClick: () => void
-    disabled?: boolean
-  }
->(({ className, showNode = true, onClick, disabled, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      {...props}
-      className={cn(
-        showNode && 'ml-6 pl-8 mt-4 border-l',
-        'relative pb-2',
-        'last:border-l-transparent',
-        className
-      )}
-    >
-      {showNode && (
-        <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-14 -top-4 -left-px"></div>
-      )}
+  EmptyIntegrationConnectionProps
+>(
+  (
+    {
+      className,
+      showNode = true,
+      onClick,
+      href,
+      disabled,
+      icon,
+      disabledTooltip = 'Additional permissions required to add connection',
+      children,
+      ...props
+    },
+    ref
+  ) => {
+    const label = children ?? 'Add new project connection'
+
+    return (
       <div
+        ref={ref}
+        {...props}
         className={cn(
-          'w-full',
-          'border border-dashed bg-surface-100 border-overlay',
-          'flex h-20 px-10 rounded-lg justify-center items-center'
+          showNode && 'ml-6 pl-8 mt-4 border-l',
+          'relative',
+          'last:border-l-transparent',
+          className
         )}
       >
-        <ButtonTooltip
-          type="default"
-          disabled={disabled}
-          onClick={() => onClick()}
-          tooltip={{
-            content: {
-              side: 'bottom',
-              text: disabled ? 'Additional permissions required to add connection' : undefined,
-            },
-          }}
+        {showNode && (
+          <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-14 -top-4 -left-px"></div>
+        )}
+        <div
+          className={cn(
+            'w-full',
+            'border border-dashed bg-surface-100 border-overlay',
+            'flex h-20 px-10 rounded-lg justify-center items-center'
+          )}
         >
-          Add new project connection
-        </ButtonTooltip>
+          {href && !disabled ? (
+            <Button icon={icon} asChild variant="default">
+              <Link href={href} target="_blank" rel="noreferrer">
+                {label}
+              </Link>
+            </Button>
+          ) : (
+            <ButtonTooltip
+              icon={icon}
+              variant="default"
+              disabled={disabled}
+              onClick={onClick ? () => onClick() : undefined}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: disabled ? disabledTooltip : undefined,
+                },
+              }}
+            >
+              {label}
+            </ButtonTooltip>
+          )}
+        </div>
       </div>
-    </div>
-  )
-})
+    )
+  }
+)
 
 interface IntegrationConnectionHeader extends React.HTMLAttributes<HTMLDivElement> {
   name?: string
@@ -332,7 +361,7 @@ export const IntegrationConnectionHeader = forwardRef<HTMLDivElement, Integratio
         )}
       >
         {props.title && <h5 className="text-foreground">{props.title}</h5>}
-        <Markdown content={markdown} />
+        <Markdown content={markdown} className="[&>p]:my-0" />
       </div>
     )
   }

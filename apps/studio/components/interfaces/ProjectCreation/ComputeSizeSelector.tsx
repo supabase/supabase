@@ -1,24 +1,23 @@
 import { UseFormReturn } from 'react-hook-form'
-
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { DOCS_URL } from 'lib/constants'
 import { CloudProvider } from 'shared-data'
 import {
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  FormField,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { sizes } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ComputeSizeSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -27,11 +26,12 @@ interface ComputeSizeSelectorProps {
 export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="instanceSize"
         render={({ field }) => (
           <FormItemLayout
+            id="instanceSize"
             layout="horizontal"
             label="Compute size"
             description={
@@ -50,12 +50,15 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
               </>
             }
           >
-            <Select_Shadcn_ value={field.value} onValueChange={(value) => field.onChange(value)}>
-              <SelectTrigger_Shadcn_ className="[&>span>div>div>[data-field=instance-details]]:hidden">
-                <SelectValue_Shadcn_ placeholder="Select a compute size" />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
+            <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
+              <SelectTrigger
+                id="instanceSize"
+                className="[&>span>div>div>[data-field=instance-details]]:hidden"
+              >
+                <SelectValue placeholder="Select a compute size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
                   {sizes
                     .filter((option) =>
                       instanceSizeSpecs[option].cloud_providers.includes(
@@ -64,7 +67,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                     )
                     .map((option) => {
                       return (
-                        <SelectItem_Shadcn_ key={option} value={option}>
+                        <SelectItem key={option} value={option}>
                           <div className="flex flex-row gap-4 items-center">
                             <div className="w-14 flex items-center">
                               <ComputeBadge infraComputeSize={option} />
@@ -73,11 +76,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                             <div className="text-sm">
                               <span className="text-foreground">
                                 {instanceSizeSpecs[option].ram} RAM /{' '}
-                                {instanceSizeSpecs[option].cpu}{' '}
-                                {getCloudProviderArchitecture(
-                                  form.getValues('cloudProvider') as CloudProvider
-                                )}{' '}
-                                CPU
+                                {instanceSizeSpecs[option].cpu} CPU
                               </span>
                               <p
                                 translate="no"
@@ -89,17 +88,17 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
                               </p>
                             </div>
                           </div>
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       )
                     })}
-                  <SelectItem_Shadcn_ key={'disabled'} value={'disabled'} disabled>
+                  <SelectItem key={'disabled'} value={'disabled'} disabled>
                     <div className="flex items-center justify-center w-full">
                       <span>Larger instance sizes available after creation</span>
                     </div>
-                  </SelectItem_Shadcn_>
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+                  </SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         )}
       />

@@ -1,14 +1,10 @@
-import { ProfileImage } from 'components/ui/ProfileImage'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from 'lib/constants'
-import { useProfileNameAndPicture } from 'lib/profile'
-import { FlaskConical, Loader2, ScrollText, Settings } from 'lucide-react'
+import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useState } from 'react'
 import {
-  Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -19,12 +15,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   singleThemes,
-  Theme,
 } from 'ui'
 
+import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
+import { ProfileImage } from '@/components/ui/ProfileImage'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
 
-export function UserDropdown() {
+export function UserDropdown({
+  triggerClassName,
+  contentClassName,
+}: {
+  triggerClassName?: string
+  contentClassName?: string
+}) {
   const router = useRouter()
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
@@ -32,13 +43,30 @@ export function UserDropdown() {
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
+  const track = useTrack()
+
+  // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
+  // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
+  // also skips fetching organization data on routes where the CTA can't render.
+  const isOrgScopedRoute =
+    router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
+  const { showUpgradeCta } = useShowUpgradeCta({ enabled: isOrgScopedRoute })
+
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild className="border flex-shrink-0 px-3">
-        <Button
-          type="default"
+    <DropdownMenu
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open)
+        if (open) track('header_user_dropdown_opened')
+      }}
+    >
+      <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
+        <ButtonTooltip
+          variant="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
+          tooltip={{ content: { text: 'Account settings' } }}
         >
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
@@ -47,10 +75,10 @@ export function UserDropdown() {
           ) : (
             <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
           )}
-        </Button>
+        </ButtonTooltip>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="bottom" align="end" className={contentClassName}>
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">
@@ -74,7 +102,9 @@ export function UserDropdown() {
                 </span>
               )}
             </div>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
@@ -85,19 +115,18 @@ export function UserDropdown() {
                     }
                   }}
                 >
-                  <Settings size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-                  Account preferences
+                  <User2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex gap-2 cursor-pointer"
                 onClick={() => toggleFeaturePreviewModal(true)}
-                // onSelect={() => toggleFeaturePreviewModal(true)}
               >
                 <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
-              <DropdownMenuItem className="flex gap-2" asChild>
+              <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
                   href="https://supabase.com/changelog"
                   target="_blank"
@@ -111,6 +140,7 @@ export function UserDropdown() {
             </DropdownMenuGroup>
           </>
         )}
+
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup
@@ -119,7 +149,7 @@ export function UserDropdown() {
               setTheme(value)
             }}
           >
-            {singleThemes.map((theme: Theme) => (
+            {singleThemes.map((theme) => (
               <DropdownMenuRadioItem
                 key={theme.value}
                 value={theme.value}
@@ -130,6 +160,29 @@ export function UserDropdown() {
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          <TimezoneDropdown />
+        </DropdownMenuGroup>
+
+        {showUpgradeCta && (
+          <>
+            <DropdownMenuSeparator />
+            <div className="p-1">
+              <UpgradePlanButton
+                source="user_dropdown"
+                plan="Pro"
+                className="w-full justify-center"
+                onClick={() => {
+                  track('upgrade_cta_clicked', { placement: 'user_dropdown' })
+                  setIsOpen(false)
+                }}
+              />
+            </div>
+          </>
+        )}
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />

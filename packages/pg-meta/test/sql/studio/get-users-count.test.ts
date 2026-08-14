@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto'
 import { afterAll, expect, test } from 'vitest'
 
-import { getUsersCountSQL } from '../../../src/sql/studio/get-users-count'
+import { getUsersCountSQL } from '../../../src/sql/studio/auth/get-users-count'
 import { cleanupRoot, createDatabaseWithAuthSchema, createTestDatabase } from '../../db/utils'
 
 afterAll(async () => {

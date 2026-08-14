@@ -1,15 +1,15 @@
 import * as Sentry from '@sentry/nextjs'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+
+import { createSupportStorageClient } from './support-storage-client'
+import type { ExtendedSupportCategories } from './Support.constants'
 import type {
   GenerateAttachmentURLsData,
   GenerateAttachmentURLsVariables,
-} from 'data/support/generate-attachment-urls-mutation'
-import { getMirroredBreadcrumbs, getOwnershipOfBreadcrumbSnapshot } from 'lib/breadcrumbs'
-import { uuidv4 } from 'lib/helpers'
-import { sanitizeArrayOfObjects } from 'lib/sanitize'
-import { createSupportStorageClient } from './support-storage-client'
-import type { ExtendedSupportCategories } from './Support.constants'
+} from '@/data/support/generate-attachment-urls-mutation'
+import { getMirroredBreadcrumbs, getOwnershipOfBreadcrumbSnapshot } from '@/lib/breadcrumbs'
+import { uuidv4 } from '@/lib/helpers'
+import { sanitizeArrayOfObjects } from '@/lib/sanitize'
 
 export type DashboardBreadcrumb = Sentry.Breadcrumb
 

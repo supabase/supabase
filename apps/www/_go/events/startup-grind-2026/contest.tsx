@@ -44,7 +44,7 @@ const page: GoPageInput = {
             <li>Load data into a Supabase database</li>
             <li>Complete these steps by Monday, May 11, 2026 at 12:00 PM PST</li>
           </ol>
-          <Button asChild type="default" size="medium">
+          <Button asChild variant="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

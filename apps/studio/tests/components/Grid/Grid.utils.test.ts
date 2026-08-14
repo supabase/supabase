@@ -1,11 +1,32 @@
-import { formatFilterURLParams, formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { describe, test, expect } from 'vitest'
+import { copyToClipboard } from 'ui'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+
+import {
+  formatFilterURLParams,
+  formatSortURLParams,
+  handleCellKeyDown,
+} from '@/components/grid/SupabaseGrid.utils'
+
+const { toastError, toastSuccess } = vi.hoisted(() => ({
+  toastError: vi.fn(),
+  toastSuccess: vi.fn(),
+}))
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: toastError,
+    success: toastSuccess,
+  },
+}))
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
   test('should return an array of sort options based on URL params', () => {
     const mockInput = ['id:asc', 'name:desc']
-    const output = formatSortURLParams('fakeTable', mockInput)
+    const output = formatSortURLParams(
+      { name: 'fakeTable', columns: [{ name: 'id' }, { name: 'name' }] },
+      mockInput
+    )
     expect(output).toStrictEqual([
       { table: 'fakeTable', column: 'id', ascending: true },
       { table: 'fakeTable', column: 'name', ascending: false },
@@ -13,7 +34,10 @@ describe('SupabaseGrid.utils: formatSortURLParams', () => {
   })
   test('should reject any malformed sort options based on URL params', () => {
     const mockInput = ['id', 'name:asc', ':asc']
-    const output = formatSortURLParams('fakeTable', mockInput)
+    const output = formatSortURLParams(
+      { name: 'fakeTable', columns: [{ name: 'name' }] },
+      mockInput
+    )
     expect(output).toStrictEqual([
       {
         table: 'fakeTable',
@@ -21,6 +45,15 @@ describe('SupabaseGrid.utils: formatSortURLParams', () => {
         ascending: true,
       },
     ])
+  })
+
+  test('should reject any sort options with non-existent columns based on URL params', () => {
+    const mockInput = ['name2:asc']
+    const output = formatSortURLParams(
+      { name: 'fakeTable', columns: [{ name: 'name' }] },
+      mockInput
+    )
+    expect(output).toStrictEqual([])
   })
 })
 
@@ -69,5 +102,80 @@ describe('SupabaseGrid.utils: formatFilterURLParams', () => {
       operator: '~~*',
       value: '',
     })
+  })
+})
+
+describe('SupabaseGrid.utils: handleCellKeyDown', () => {
+  beforeEach(() => {
+    toastError.mockReset()
+    toastSuccess.mockReset()
+    vi.unstubAllGlobals()
+    vi.spyOn(window.document, 'hasFocus').mockReturnValue(true)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  test('should copy the selected cell value when Meta+C is pressed', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText },
+    })
+
+    const args = {
+      mode: 'SELECT',
+      column: { key: 'name' },
+      row: { name: 'hello from safari' },
+      rowIdx: 0,
+      selectCell: vi.fn(),
+    } as unknown as Parameters<typeof handleCellKeyDown>[0]
+
+    const event = {
+      key: 'C',
+      metaKey: true,
+      ctrlKey: false,
+      altKey: false,
+      nativeEvent: new KeyboardEvent('keydown', { key: 'C', metaKey: true }),
+      preventDefault: vi.fn(),
+      preventGridDefault: vi.fn(),
+    } as unknown as Parameters<typeof handleCellKeyDown>[1]
+
+    handleCellKeyDown(args, event)
+
+    await vi.waitFor(() => {
+      expect(writeText).toHaveBeenCalledWith('hello from safari')
+    })
+    expect(event.preventDefault).toHaveBeenCalled()
+    expect(event.preventGridDefault).toHaveBeenCalled()
+    await vi.waitFor(() => {
+      expect(toastSuccess).toHaveBeenCalledWith('Copied cell value to clipboard')
+    })
+  })
+})
+
+describe('shared clipboard util', () => {
+  beforeEach(() => {
+    vi.unstubAllGlobals()
+    vi.spyOn(window.document, 'hasFocus').mockReturnValue(true)
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
+  })
+
+  test('should invoke the callback after writing text to the clipboard', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    const onCopy = vi.fn()
+
+    vi.stubGlobal('navigator', {
+      clipboard: { writeText },
+    })
+
+    await copyToClipboard('hello from safari', onCopy)
+    expect(writeText).toHaveBeenCalledWith('hello from safari')
+    expect(onCopy).toHaveBeenCalled()
   })
 })

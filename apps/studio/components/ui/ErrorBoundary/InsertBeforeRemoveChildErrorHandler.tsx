@@ -1,10 +1,10 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { Blocks, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
-
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { detectBrowser } from 'lib/helpers'
 import { Button } from 'ui'
+
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { detectBrowser } from '@/lib/helpers'
 
 interface InsertBeforeRemoveChildErrorHandlerProps {
   message: string
@@ -54,7 +54,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
       </div>
 
       <div className="flex gap-x-2 justify-center items-center">
-        <Button asChild type="default" icon={<ExternalLink />}>
+        <Button asChild variant="default" icon={<ExternalLink />}>
           <a
             target="_blank"
             rel="noreferrer"
@@ -69,7 +69,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
             More information
           </a>
         </Button>
-        <Button type="outline" onClick={() => router.reload()}>
+        <Button variant="outline" onClick={() => router.reload()}>
           Refresh page
         </Button>
       </div>

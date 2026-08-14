@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { apiKeysKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type LegacyKeys = {
   api_key: string
@@ -48,13 +49,13 @@ interface APIKeysVariables {
   reveal?: boolean
 }
 
-type APIKey = LegacyKeys | SecretKeys | PublishableKeys
+export type APIKey = LegacyKeys | SecretKeys | PublishableKeys
 
 async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref: projectRef }, query: { reveal } },
+    params: { path: { ref: projectRef }, query: { reveal: reveal ? 'true' : 'false' } },
     signal,
   })
 
@@ -78,7 +79,18 @@ export const useAPIKeysQuery = <TData = APIKeysData>(
   })
 }
 
+const EmptyKey = {
+  anonKey: undefined,
+  serviceKey: undefined,
+  publishableKey: undefined,
+  secretKey: undefined,
+  allSecretKeys: [],
+}
+
 export const getKeys = (apiKeys: APIKey[] = []) => {
+  if (!Array.isArray(apiKeys)) {
+    return EmptyKey
+  }
   const anonKey = apiKeys.find((x) => x.name === 'anon')
   const serviceKey = apiKeys.find((x) => x.name === 'service_role')
 
@@ -89,4 +101,22 @@ export const getKeys = (apiKeys: APIKey[] = []) => {
   const allSecretKeys = apiKeys.filter((x) => x.type === 'secret')
 
   return { anonKey, serviceKey, publishableKey, secretKey, allSecretKeys }
+}
+
+const PlaceholderData: APIKeysData = []
+
+export const useAPIKeys = (
+  variables: APIKeysVariables,
+  options: UseCustomQueryOptions<APIKeysData, ResponseError, APIKeysData> = {}
+) => {
+  const select = useCallback(
+    (data: APIKeysData) => getKeys(options.enabled ? data : []),
+    [options.enabled]
+  )
+
+  return useAPIKeysQuery(variables, {
+    ...options,
+    placeholderData: PlaceholderData,
+    select,
+  })
 }

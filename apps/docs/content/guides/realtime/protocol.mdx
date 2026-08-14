@@ -35,7 +35,7 @@ Messages can be serialized in different formats. The Realtime protocol supports 
 
 ## 1.0.0
 
-Version 1.0.0 is extremely simple. It uses JSON as the serialization format for messages. The underlying WebSocket messages are all text frames.
+Version 1.0.0 is minimal. It uses JSON as the serialization format for messages. The underlying WebSocket messages are all text frames.
 
 Messages contain the following fields:
 
@@ -214,7 +214,8 @@ This is the initial message required to join a channel. The client sends this me
       "replay" : {
         "since": integer,
         "limit": integer
-      }
+      },
+      "replication_ready": boolean
     },
     "presence": {
       "enabled": boolean,
@@ -225,7 +226,8 @@ This is the initial message required to join a channel. The client sends this me
         "event": string,
         "schema": string,
         "table": string,
-        "filter": string
+        "filter": string,
+        "select": string[]
       }
     ]
     "private": boolean
@@ -242,6 +244,7 @@ This is the initial message required to join a channel. The client sends this me
     - `replay`: Configuration options for broadcast replay (Optional)
       - `since`: Replay messages since a specific timestamp in milliseconds
       - `limit`: Limit the number of replayed messages (Optional)
+    - `replication_ready`: When `true`, the server emits a `system` event once the Postgres replication connection backing this channel is established and ready to stream changes (Optional). See the [system](#system) event for the payload shape.
   - `presence`: Configuration options for presence tracking
     - `enabled`: Whether presence tracking is enabled for this channel
     - `key`: Key to be used for presence tracking, if not specified or empty, a UUID will be generated and used
@@ -249,7 +252,8 @@ This is the initial message required to join a channel. The client sends this me
     - `event`: Database change event to listen to, accepts `INSERT`, `UPDATE`, `DELETE`, or `*` to listen to all events.
     - `schema`: Schema of the table to listen to, accepts `*` wildcard to listen to all schemas
     - `table`: Table of the database to listen to, accepts `*` wildcard to listen to all tables
-    - `filter`: Filter to be used when pulling changes from database. Read more about filters in the usage docs for [Postgres Changes](/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes)
+    - `filter`: Filter to be used when pulling changes from the database. A filter is a `column=operator.value` expression (for example `id=eq.1` or `title=like.%foo%`). Multiple conditions can be combined with commas and are applied as an `AND` (for example `id=gt.0,id=lt.100`). Any operator can be negated with the `not.` prefix (for example `status=not.in.(draft,archived)`). Reserved characters (`,`, `(`, `)`) inside a value must be double-quoted PostgREST-style (for example `name=eq."a,b"`). See the [Postgres Changes subscription errors](#postgres-changes-subscription-errors) for the full list of supported operators, and the usage docs for [Postgres Changes](/docs/guides/realtime/postgres-changes?queryGroups=language&language=js#filtering-for-specific-changes).
+    - `select`: Optional array of column names to restrict the change payload to a subset of columns instead of receiving the full row. Reduces payload size and the data transferred per event. The listed columns must be selectable by the subscribing role. Not supported for wildcard (`*`) schema or table subscriptions — an explicit `schema` and `table` are required.
 - `access_token`: Optional access token for authentication, if not provided, the server will use the API key.
 
 Example on protocol version `2.0.0`:
@@ -413,7 +417,7 @@ user-event                // User Event
 }
 ```
 
-The payload encoding is just a hint for the client to know if the payload should be treated as JSON or not.
+The payload encoding is a hint for the client to know if the payload should be treated as JSON or not.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -478,7 +482,7 @@ Example on protocol version `2.0.0`:
 
 #### phx_error
 
-This message is sent by the server when an unexpected error occurs in the channel. Payload will be an empty object
+This message is sent by the server when the channel process terminates unexpectedly. Payload will be an empty object. See [Reconnection](#reconnection) for recovery guidance.
 
 ```json
 ["3", "3", "realtime:avatar-stack-demo", "phx_error", {}]
@@ -500,7 +504,7 @@ The server sends these messages in response to client requests that require ackn
 - `status`: The status of the response, can be `ok` or `error`.
 - `response`: The response data, which can vary based on the event that was replied to
 
-`phx_join` has a specific response structure outlined below.
+`phx_join` has a specific response structure outlined below. When a join is rejected, `status` is `"error"` — see [Join errors](#join-errors) for the full list of error codes and recovery actions.
 
 Contains the status of the join request and any additional information requested in the `phx_join` payload.
 
@@ -551,7 +555,7 @@ Example on protocol version `2.0.0`:
 
 #### system
 
-The server sends system messages to inform clients about the status of their Realtime channel subscriptions.
+The server sends system messages to inform clients about the status of their Realtime channel subscriptions. See [Channel-level system errors](#channel-level-system-errors) for the full list of messages and recovery actions.
 
 ```ts
 {
@@ -564,7 +568,7 @@ The server sends system messages to inform clients about the status of their Rea
 
 - `message`: A human-readable message describing the status of the subscription.
 - `status`: The status of the subscription, can be `ok`, `error`, or `timeout`.
-- `extension`: The extension that sent the message.
+- `extension`: The extension that sent the message. `postgres_changes` for Postgres Changes subscription status, or `system` for connection-level messages such as the replication-ready notification.
 - `channel`: The channel to which the message belongs, such as `realtime:room1`.
 
 Example on protocol version `2.0.0`:
@@ -579,6 +583,23 @@ Example on protocol version `2.0.0`:
     "message": "Subscribed to PostgreSQL",
     "status": "ok",
     "extension": "postgres_changes",
+    "channel": "main"
+  }
+]
+```
+
+When a channel is joined with `config.broadcast.replication_ready` set to `true`, the server sends a `system` message with `extension: "system"` once the Postgres replication connection backing the channel is ready to stream changes. `status` is `"ok"` with `message: "Replication connection established"` on success, or `"error"` if the connection is not established in time (which also closes the channel — see [Channel-level system errors](#channel-level-system-errors)).
+
+```json
+[
+  "14",
+  null,
+  "realtime:chat-room",
+  "system",
+  {
+    "message": "Replication connection established",
+    "status": "ok",
+    "extension": "system",
     "channel": "main"
   }
 ]
@@ -667,7 +688,7 @@ message                                       // User Event
 }
 ```
 
-The metadata field is JSON encoded. The payload encoding is just a hint for the client to know if the payload should be treated as JSON or not.
+The metadata field is JSON encoded. The payload encoding is a hint for the client to know if the payload should be treated as JSON or not.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -714,6 +735,8 @@ The server sends this message when a database change occurs in a subscribed sche
   - `record`: An object representing the new values after the change, with keys as column names and values as their corresponding values.
   - `old_record`: An object representing the old values before the change, with keys as column names and values as their corresponding values.
   - `errors`: Any errors that occurred during the change, if applicable.
+
+When the subscription was joined with a `select` array (see [phx_join](#phx_join)), `columns`, `record`, and `old_record` are restricted to the selected columns instead of the full row.
 
 ```json
 [
@@ -888,3 +911,101 @@ Example on protocol version `2.0.0`:
   }
 ]
 ```
+
+## Error handling
+
+Errors arrive on four channels:
+
+- A WebSocket close frame before the channel joins.
+- A `phx_reply` with `status: "error"` rejecting a `phx_join` or push.
+- A `system` event on a live channel — channel-level system errors are always followed by `phx_close`, while `postgres_changes` system errors are informational and leave the channel open.
+- A `phx_error` when the channel process terminates unexpectedly.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### Join errors
+
+When a `phx_join` is rejected, the `phx_reply` payload carries `response.reason` as `"<ErrorCode>: <human message>"`. The server adds a backoff delay before replying, so avoid aggressive client-side retry loops on join errors.
+
+```json
+{
+  "status": "error",
+  "response": { "reason": "InvalidJWTExpiration: Token has expired 300 seconds ago" }
+}
+```
+
+One exception: the `UnknownErrorOnChannel` code arrives as the bare human-readable string `"Unknown Error on Channel"` without the `<Code>: <message>` prefix. The JS client exposes the full `reason` string directly as the Error message without parsing it further.
+
+| Category             | Error codes                                                                                                        | Action                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
+| Auth — expired token | `InvalidJWTExpiration` (message contains `"expired"`)                                                              | Refresh token, rejoin           |
+| Auth — invalid token | `MalformedJWT`, `JwtSignatureError`, `Unauthorized`                                                                | Do not retry; surface to caller |
+| Rate limit           | `ConnectionRateLimitReached`, `ClientJoinRateLimitReached`, `ChannelRateLimitReached`                              | Backoff, reduce join frequency  |
+| Database             | `InitializingProjectConnection`, `IncreaseConnectionPool`, `DatabaseLackOfConnections`, `UnableToConnectToProject` | Retry with exponential backoff  |
+| Config               | `TopicNameRequired`, `TenantNotFound`, `RealtimeDisabledForTenant`, `RealtimeDisabledForConfiguration`             | Do not retry                    |
+| Transient            | `RealtimeRestarting`                                                                                               | Retry with backoff              |
+
+### Channel-level system errors
+
+`extension: "system"`, `status: "error"`. Match on the `message` field content — there is no machine-readable code field. Every channel-level system error is immediately followed by `phx_close`; the channel is closed. Client libraries should expose a way for users to subscribe to `system` events since there is no automatic handling.
+
+| Message contains                                     | Cause                                                                                              | Recovery                      |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------- |
+| `Too many messages per second`                       | Broadcast/event rate limit                                                                         | Throttle sends before rejoin  |
+| `Too many presence messages per second`              | Tenant presence rate limit                                                                         | Reduce presence frequency     |
+| `Client presence rate limit exceeded`                | Per-client presence window                                                                         | Longer cooldown before rejoin |
+| `Track message size exceeded`                        | Presence payload too large                                                                         | Shrink payload                |
+| `Token has expired`                                  | JWT expired mid-session                                                                            | Refresh token, rejoin         |
+| `Fields \`role\` and \`exp\` are required in JWT`    | Claims missing                                                                                     | Fix token issuance            |
+| `Server requested disconnect`                        | Operational disconnect                                                                             | Reconnect after delay         |
+| `Replication connection was not established in time` | Replication connection not ready before the deadline (only when `replication_ready` was requested) | Retry with backoff            |
+
+### Postgres Changes subscription errors
+
+`extension: "postgres_changes"`. These do **not** close the channel — broadcast and presence continue. `status: "ok"` with `message: "Subscribed to PostgreSQL"` confirms the subscription is live.
+
+| Scenario                                               | Server retries?   | Client action                                                              |
+| ------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------- |
+| Invalid filter operator                                | No                | Fix params and rejoin                                                      |
+| Missing `schema`/`table` params                        | No                | Fix params and rejoin                                                      |
+| Subscription insert failed (table/publication missing) | Yes, every 5–10 s | Surface as degraded state; wait or check Realtime is enabled for the table |
+| Database error during subscription                     | Yes, every 5–10 s | Surface as degraded state                                                  |
+| `"Too many database timeouts"`                         | No                | Reduce subscription load; retry later                                      |
+
+Supported filter operators: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `in`, `like`, `ilike`, `is`, `match`, `imatch`, `isdistinct`. Any operator can be negated with the `not.` prefix (for example `id=not.eq.5`). Multiple conditions are combined with commas and applied as an `AND` (for example `col1=eq.val,col2=gt.5`).
+
+The `ids` array on incoming `postgres_changes` payloads must match the subscription IDs returned in the `phx_join` reply. A mismatch means inconsistent server/client state — tear down and rejoin.
+
+### Broadcast errors
+
+Broadcast errors only affect **private channels**. When `config.broadcast.ack` is `false` (the default), all push failures — including size violations and RLS write denials — are silently dropped. RLS denials are always silent regardless of `ack`.
+
+When `ack` is `true`, the server replies on error with `response.error` (an atom string), not `response.reason`:
+
+```json
+{ "status": "error", "response": { "error": "payload_size_exceeded" } }
+```
+
+Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers.
+
+### Presence errors
+
+Push replies surface payload-shape errors with `reason: "Presence track payload must be a map"`. Other push-level failures (RLS write denied, unknown event type, internal errors) return `status: "error"` with no reason field.
+
+Presence rate-limit and size violations arrive as channel-level system errors (see above) and close the channel.
+
+### Access token refresh
+
+Refresh the JWT in-band on private channels without rejoining using the `access_token` event:
+
+```json
+["10", "1", "realtime:my-channel", "access_token", { "access_token": "<new-token>" }]
+```
+
+There is no reply on success. On failure, the server emits a `system` error and closes the channel. Tokens with the `sb_*` prefix are silently ignored by the server.
+
+### Reconnection
+
+`phx_error` (unexpected server-side channel process termination, empty payload) should trigger a rejoin with exponential backoff. The JS client uses `[1000, 2000, 5000, 10000]` ms (capped at 10 s) configurable via `reconnectAfterMs`.
+
+`phx_close` following a rate-limit system error requires throttling before rejoin. Following a token system error, refresh the token first. A `phx_close` with no preceding system error is a clean close — only rejoin if it was unexpected. See [Limits](/docs/guides/realtime/limits) for the per-tenant thresholds that trigger rate-limit errors.

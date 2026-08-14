@@ -106,7 +106,8 @@ Realtime has a cleanup process that will delete tables older than 3 days.
 
 ### Functions
 
-Realtime creates two functions on your database:
+Realtime creates some functions on your database:
 
 - `realtime.send` - Inserts an entry into `realtime.messages` table that will trigger the replication slot to broadcast the changes to the clients. It also captures errors to prevent the trigger from breaking.
+- `realtime.send_binary` - Similar to `realtime.send` but allows you to broadcast binaries.
 - `realtime.broadcast_changes` - uses `realtime.send` to broadcast the changes with a format that is compatible with Postgres Changes

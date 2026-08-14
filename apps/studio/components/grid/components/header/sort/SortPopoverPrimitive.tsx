@@ -1,30 +1,40 @@
-import { THRESHOLD_COUNT } from '@supabase/pg-meta/src/query/table-row-query'
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { useTableFilter } from 'components/grid/hooks/useTableFilter'
-import type { Sort } from 'components/grid/types'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { isEqual } from 'lodash'
 import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  useRoleImpersonationStateSnapshot,
-  type RoleImpersonationState,
-} from 'state/role-impersonation-state'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import {
-  Button,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DropdownControl } from '../../common/DropdownControl'
 import SortRow from './SortRow'
+import { getColumnFormat } from '@/components/grid/components/grid/ColumnHeader.utils'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import type { Sort } from '@/components/grid/types'
+import { getColumnType } from '@/components/grid/utils/gridColumns'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useRoleImpersonationStateSnapshot,
+  type RoleImpersonationState,
+} from '@/state/role-impersonation-state'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface SortPopoverPrimitiveProps {
   buttonText?: string
@@ -97,13 +107,14 @@ export const SortPopoverPrimitive = ({
     })
   }, [snap?.table?.columns, localSorts])
 
-  // Format the columns for the dropdown
+  // Prefer display labels that match column headers (format, with arrays as int4[]).
+  // Avoid raw dataType, which is "USER-DEFINED" for extension types like geography.
   const dropdownOptions = useMemo(() => {
     return (
       columns?.map((x) => ({
         value: x.name,
         label: x.name,
-        postLabel: x.dataType,
+        postLabel: getColumnFormat(getColumnType(x), x.format),
         disabled: x.dataType === 'json' || x.dataType === 'jsonb',
         tooltip:
           x.dataType === 'json' || x.dataType === 'jsonb'
@@ -214,27 +225,52 @@ export const SortPopoverPrimitive = ({
     }
   }, [sorts])
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
   return (
     <>
-      <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button type={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
+      <Popover modal={false} open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button variant={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
             {displayButtonText}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-96" side="bottom" align="center">
           <div className="space-y-2 py-2">
-            {localSorts.map((sort, index) => (
-              <SortRow
-                key={getSortRowKey(sort, index)}
-                index={index}
-                columnName={sort.column}
-                sort={sort}
-                onDelete={onDeleteSort}
-                onToggle={onToggleSort}
-                onDrag={onDragSort}
-              />
-            ))}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={(result) => {
+                if (result.over == null) return
+                const activeIndex = localSorts.findIndex((sort) => sort.column === result.active.id)
+                const overIndex = localSorts.findIndex((sort) => sort.column === result.over!.id)
+                if (activeIndex === -1 || overIndex === -1) return
+
+                setLocalSorts(arrayMove(localSorts, activeIndex, overIndex))
+              }}
+            >
+              <SortableContext
+                items={localSorts.map((sort) => sort.column)}
+                strategy={verticalListSortingStrategy}
+              >
+                {localSorts.map((sort, index) => (
+                  <SortRow
+                    key={getSortRowKey(sort, index)}
+                    index={index}
+                    columnName={sort.column}
+                    sort={sort}
+                    onDelete={onDeleteSort}
+                    onToggle={onToggleSort}
+                    onDrag={onDragSort}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
             {localSorts.length === 0 && (
               <div className="space-y-1 px-3">
                 <h5 className="text-xs text-foreground-light">No sorts applied to this view</h5>
@@ -244,7 +280,7 @@ export const SortPopoverPrimitive = ({
               </div>
             )}
 
-            <PopoverSeparator_Shadcn_ />
+            <PopoverSeparator />
             <div className="px-3 flex flex-row justify-between">
               {dropdownOptions && dropdownOptions.length > 0 ? (
                 <DropdownControl
@@ -255,9 +291,9 @@ export const SortPopoverPrimitive = ({
                 >
                   <Button
                     asChild
-                    type="dashed"
+                    variant="dashed"
                     iconRight={<ChevronDown size="14" className="text-foreground-light" />}
-                    className="sb-grid-dropdown__item-trigger"
+                    className="my-1"
                     data-testid="table-editor-pick-column-to-sort-button"
                   >
                     <span>Pick {localSorts.length > 1 ? 'another' : 'a'} column to sort by</span>
@@ -269,7 +305,7 @@ export const SortPopoverPrimitive = ({
               <div className="flex items-center">
                 <Button
                   disabled={!hasChanges}
-                  type="default"
+                  variant="default"
                   onClick={() => {
                     if (isLargeTable && localSorts.length > 0) {
                       // [Joshen] Note we're only checking PKs - unable to check indexes properly
@@ -288,8 +324,8 @@ export const SortPopoverPrimitive = ({
               </div>
             </div>
           </div>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
 
       <ConfirmationModal
         size="medium"

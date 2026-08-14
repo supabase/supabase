@@ -1,4 +1,5 @@
-import dynamic from 'next/dynamic'
+import { CubeIcon } from '@heroicons/react/outline'
+import { useBreakpoint } from 'common'
 import {
   Check,
   ClipboardCheck,
@@ -15,33 +16,29 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
-import { CubeIcon } from '@heroicons/react/outline'
-import { cn, IconPartners, Image } from 'ui'
+import dynamic from 'next/dynamic'
+import { PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { Image } from 'ui-patterns/Image'
 
+import { companyStats } from '../company-stats'
 import MainProducts from '../MainProducts'
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { DXSectionProps } from 'components/Solutions/DeveloperExperienceSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
 import {
   FrameworkLink,
-  type FrameworkLinkProps,
+  getEditors,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
-  getEditors,
 } from './solutions.utils'
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { MPCSectionProps } from 'components/Solutions/MPCSection'
-
-import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { useBreakpoint } from 'common'
-import { useSendTelemetryEvent } from 'lib/telemetry'
-import { companyStats } from '../company-stats'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import RealtimeLogs from '@/components/Products/Functions/RealtimeLogs'
+import type { DXSectionProps } from '@/components/Solutions/DeveloperExperienceSection'
+import type { FeatureGridProps } from '@/components/Solutions/FeatureGrid'
+import type { MPCSectionProps } from '@/components/Solutions/MPCSection'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -65,12 +62,12 @@ const data: () => {
 
   return {
     metadata: {
-      metaTitle: 'Supabase for Startups',
+      metaTitle: 'Supabase is for Startups',
       metaDescription: 'Build fast. Scale easily. Trust your stack.',
     },
     heroSection: {
       id: 'hero',
-      title: 'Supabase for Startups',
+      title: 'Supabase is for Startups',
       h1: (
         <>
           <span className="block text-foreground">Build fast. Scale easily.</span>
@@ -87,7 +84,7 @@ const data: () => {
       image: undefined,
       ctas: [
         {
-          label: 'Start your company',
+          label: 'Get started with Supabase',
           href: 'https://supabase.com/dashboard',
           type: 'primary' as any,
           onClick: () =>
@@ -218,9 +215,9 @@ const data: () => {
             </>
           ),
           className:
-            'flex-col lg:flex-row [&>div:first-child]:lg:!max-w-none [&>div:first-child]:lg:!mr-0 lg:!gap-0',
+            'flex-col lg:flex-row [&>div:first-child]:lg:max-w-none! [&>div:first-child]:lg:mr-0! lg:gap-0!',
           image: (
-            <div className="relative w-full lg:w-1/3 shrink-1 pt-8 px-4 lg:pr-0">
+            <div className="relative w-full lg:w-1/3 shrink pt-8 px-4 lg:pr-0">
               <div className="w-full h-full rounded-t-lg lg:rounded-tr-none overflow-hidden border-t border-l border-r lg:border-r-0 bg-surface-75">
                 <table className="min-w-full m-0">
                   <thead className="p-0">
@@ -258,7 +255,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                  bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
                 "
               />
             </div>
@@ -287,8 +284,8 @@ const data: () => {
               magic links, OAuth (Google, GitHub, Twitter, etc.), SAML, SSO, and phone/SMS OTP.
             </>
           ),
-          className: '!border-l-0 sm:!border-l sm:!border-t-0',
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          className: 'border-l-0! sm:border-l! sm:border-t-0!',
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'storage',
@@ -300,7 +297,7 @@ const data: () => {
               managing files, images, and videos.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -330,7 +327,7 @@ const data: () => {
               deployed globally for low-latency execution.
             </>
           ),
-          className: '!border-l-0 sm:!border-l lg:!border-l-0',
+          className: 'border-l-0! sm:border-l! lg:border-l-0!',
           image: <FunctionsVisual className="" />,
         },
         {
@@ -343,7 +340,7 @@ const data: () => {
               for AI/ML applications, enabling fast semantic search and embedding storage.
             </>
           ),
-          className: '!border-l-0 lg:!border-l',
+          className: 'border-l-0! lg:border-l!',
           image: (
             <Image
               draggable={false}
@@ -369,16 +366,16 @@ const data: () => {
               applications.
             </>
           ),
-          className: '!border-l-0 sm:!border-l',
+          className: 'border-l-0! sm:border-l!',
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
       ],
     },
     developerExperience: {
       id: 'developer-experience',
-      className: '[&_h2]:!max-w-sm',
+      className: '[&_h2]:max-w-sm!',
       title: (
         <>
           Developers can <span className="text-foreground">build faster</span> with Supabase
@@ -536,7 +533,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+                  bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
                 "
               />
               <Image
@@ -567,7 +564,7 @@ const data: () => {
             <RealtimeLogs
               isActive={false}
               isInView={true}
-              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:!bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]"
+              className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,var(--background-default)_0%,transparent_100%)]!"
             />
           ),
         },

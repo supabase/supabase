@@ -1,40 +1,43 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react'
-import { SupabaseEvent, SUPABASE_HOST } from '~/lib/eventsTypes'
+import { SUPABASE_HOST, SupabaseEvent } from '~/lib/eventsTypes'
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
 
 interface EventsContextValue {
-  // Events data
   allEvents: SupabaseEvent[]
   filteredEvents: SupabaseEvent[]
-  filteredOnDemandEvents: SupabaseEvent[]
-  staticEvents: SupabaseEvent[]
-  onDemandEvents: SupabaseEvent[]
-  lumaEvents: SupabaseEvent[]
   featuredEvent: SupabaseEvent | undefined
-
-  // Loading states
   isLoading: boolean
-
-  // Search & Filter
   searchQuery: string
   setSearchQuery: (query: string) => void
   selectedCategories: string[]
   toggleCategory: (category: string) => void
-
-  // Categories
   categories: { [key: string]: number }
+}
+
+// Maps Luma event tags to the app's category vocabulary. Keys are lowercased
+// for case-insensitive matching against the tag names returned by Luma.
+const LUMA_TAG_CATEGORY_MAP: Record<string, string> = {
+  hackathons: 'hackathon',
+  meetups: 'meetup',
+  events: 'conference',
 }
 
 const EventsContext = createContext<EventsContextValue | undefined>(undefined)
 
 interface EventsProviderProps {
   children: ReactNode
-  staticEvents: SupabaseEvent[]
-  onDemandEvents: SupabaseEvent[]
+  notionEvents: SupabaseEvent[]
+  mdxEvents: SupabaseEvent[]
+  onDemandMdxEvents: SupabaseEvent[]
 }
 
-export function EventsProvider({ children, staticEvents, onDemandEvents }: EventsProviderProps) {
+export function EventsProvider({
+  children,
+  notionEvents,
+  mdxEvents,
+  onDemandMdxEvents,
+}: EventsProviderProps) {
   const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -54,9 +57,25 @@ export function EventsProvider({ children, staticEvents, onDemandEvents }: Event
 
         if (data.success) {
           const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
-            let categories = []
-            const isMeetup = event.name.toLowerCase().includes('meetup')
-            if (isMeetup) categories.push('meetup')
+            // Categorize by the event's Luma tags: `Hackathons` → hackathon,
+            // `Meetups` → meetup, `Events` → conference. Untagged or unrecognized
+            // events fall back to the generic `conference` bucket.
+            const mappedCategories: string[] = (Array.isArray(event?.tags) ? event.tags : [])
+              .map((tag: string) => LUMA_TAG_CATEGORY_MAP[String(tag).trim().toLowerCase()])
+              .filter(Boolean)
+            const categories: string[] =
+              mappedCategories.length > 0 ? Array.from(new Set(mappedCategories)) : ['conference']
+
+            const rawUrl = event?.url || ''
+            let safeUrl: string | undefined
+            try {
+              const parsed = new URL(rawUrl)
+              if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                safeUrl = rawUrl
+              }
+            } catch {
+              // invalid URL
+            }
 
             return {
               slug: '',
@@ -67,20 +86,18 @@ export function EventsProvider({ children, staticEvents, onDemandEvents }: Event
               thumb: '',
               cover_url: event?.cover_url || '',
               path: '',
-              url: event?.url || '',
+              url: safeUrl ?? '',
               tags: categories,
               categories,
               timezone: event?.timezone || 'America/Los_Angeles',
               location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
                 [event?.city, event?.country].filter(Boolean)
               ),
-              hosts: isMeetup || event?.hosts?.length === 0 ? [SUPABASE_HOST] : event?.hosts || [],
-              source: 'luma',
+              // All Luma events are Supabase-hosted regardless of which calendar they're from.
+              hosts: [SUPABASE_HOST],
+              source: 'luma' as const,
               disable_page_build: true,
-              link: {
-                href: event?.url || '#',
-                target: '_blank',
-              },
+              link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,
             }
           })
           setLumaEvents(transformedEvents)
@@ -95,51 +112,53 @@ export function EventsProvider({ children, staticEvents, onDemandEvents }: Event
     fetchLumaEvents()
   }, [])
 
-  // Merge all events (static + luma)
+  // Merge Notion (server) + mdx (server) + Luma (client) events, showing only today and future.
   const allEvents = useMemo(() => {
-    return [...staticEvents, ...lumaEvents]
-  }, [staticEvents, lumaEvents])
+    const now = new Date()
+    const startOfToday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    )
+    return [...notionEvents, ...mdxEvents, ...lumaEvents].filter((event) => {
+      const eventDate = new Date(event.end_date || event.date)
+      return eventDate >= startOfToday
+    })
+  }, [notionEvents, mdxEvents, lumaEvents])
 
-  // Calculate categories with counts
-  // - Webinar: count only upcoming webinars (not on-demand)
-  // - On-demand: count only on-demand events
+  const isOnDemandView = selectedCategories.includes('on-demand')
+
   const categories = useMemo(() => {
-    const categoryCounts: { [key: string]: number } = { all: 0 }
+    const counts: { [key: string]: number } = { all: 0 }
 
-    // Count upcoming events (excluding on-demand)
     allEvents.forEach((event) => {
-      categoryCounts.all += 1
-
+      counts.all += 1
       event.categories?.forEach((category) => {
-        categoryCounts[category] = (categoryCounts[category] || 0) + 1
+        counts[category] = (counts[category] || 0) + 1
       })
     })
 
-    // Count on-demand events separately
-    onDemandEvents.forEach((event) => {
-      categoryCounts.all += 1
-      // Add to 'on-demand' category instead of 'webinar'
-      categoryCounts['on-demand'] = (categoryCounts['on-demand'] || 0) + 1
-    })
+    if (onDemandMdxEvents.length > 0) {
+      counts['on-demand'] = onDemandMdxEvents.length
+    }
 
-    return categoryCounts
-  }, [allEvents, onDemandEvents])
+    return counts
+  }, [allEvents, onDemandMdxEvents.length])
 
-  // Toggle category selection
   const toggleCategory = (category: string) => {
+    if (category === 'on-demand') {
+      setSelectedCategories((prev) => (prev.includes('on-demand') ? ['all'] : ['on-demand']))
+      return
+    }
+
     if (category === 'all') {
       setSelectedCategories(['all'])
       return
     }
 
     setSelectedCategories((prev) => {
-      // Remove 'all' if selecting a specific category
-      const withoutAll = prev.filter((c) => c !== 'all')
+      const withoutAll = prev.filter((c) => c !== 'all' && c !== 'on-demand')
 
-      // Toggle the category
       if (withoutAll.includes(category)) {
         const updated = withoutAll.filter((c) => c !== category)
-        // If no categories selected, default to 'all'
         return updated.length === 0 ? ['all'] : updated
       } else {
         return [...withoutAll, category]
@@ -147,23 +166,15 @@ export function EventsProvider({ children, staticEvents, onDemandEvents }: Event
     })
   }
 
-  // Filter upcoming events by search query and category
   const filteredEvents = useMemo(() => {
-    // If 'on-demand' is selected, don't show upcoming events
-    if (selectedCategories.includes('on-demand') && !selectedCategories.includes('all')) {
-      return []
-    }
+    let filtered = isOnDemandView ? onDemandMdxEvents : allEvents
 
-    let filtered = allEvents
-
-    // Filter by categories (multiple selection)
-    if (!selectedCategories.includes('all')) {
+    if (!isOnDemandView && !selectedCategories.includes('all')) {
       filtered = filtered.filter((event) =>
         event.categories?.some((cat) => selectedCategories.includes(cat))
       )
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       filtered = filtered.filter((event) => {
@@ -176,91 +187,29 @@ export function EventsProvider({ children, staticEvents, onDemandEvents }: Event
       })
     }
 
-    // Sort by date (upcoming events first)
-    return filtered.sort((a, b) => {
+    return [...filtered].sort((a, b) => {
       const dateA = new Date(a.date).getTime()
       const dateB = new Date(b.date).getTime()
-      return dateA - dateB
+      return isOnDemandView ? dateB - dateA : dateA - dateB
     })
-  }, [allEvents, selectedCategories, searchQuery])
+  }, [allEvents, onDemandMdxEvents, isOnDemandView, selectedCategories, searchQuery])
 
-  // Filter on-demand events separately by search query and category
-  const filteredOnDemandEvents = useMemo(() => {
-    // If specific categories are selected (not 'all' and not 'on-demand'), don't show on-demand events
-    if (!selectedCategories.includes('all') && !selectedCategories.includes('on-demand')) {
-      return []
-    }
-
-    let filtered = onDemandEvents
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter((event) => {
-        const titleMatch = event.title?.toLowerCase().includes(query)
-        const descriptionMatch = event.description?.toLowerCase().includes(query)
-        const locationMatch = event.location?.toLowerCase().includes(query)
-        const tagsMatch = event.tags?.some((tag) => tag.toLowerCase().includes(query))
-
-        return titleMatch || descriptionMatch || locationMatch || tagsMatch
-      })
-    }
-
-    return filtered
-  }, [onDemandEvents, selectedCategories, searchQuery])
-
-  // Featured event: nearest upcoming event, or if none, the most recent past event
   const featuredEvent = useMemo(() => {
     if (allEvents.length === 0) return undefined
 
-    const now = new Date()
-
-    // Separate upcoming and past events
-    const upcomingEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate >= now
-    })
-
-    const pastEvents = allEvents.filter((event) => {
-      const eventDate = new Date(event.end_date || event.date)
-      return eventDate < now
-    })
-
-    // If there are upcoming events, return the nearest one
-    if (upcomingEvents.length > 0) {
-      return upcomingEvents.sort((a, b) => {
-        const dateA = new Date(a.date).getTime()
-        const dateB = new Date(b.date).getTime()
-        return dateA - dateB
-      })[0]
-    }
-
-    // If no upcoming events, return the most recent past event
-    if (pastEvents.length > 0) {
-      return pastEvents.sort((a, b) => {
-        const dateA = new Date(a.date).getTime()
-        const dateB = new Date(b.date).getTime()
-        return dateB - dateA // Descending order for past events
-      })[0]
-    }
-
-    return undefined
-  }, [allEvents, isLoading])
+    return [...allEvents].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0]
+  }, [allEvents])
 
   const value: EventsContextValue = {
     allEvents,
     filteredEvents,
-    filteredOnDemandEvents,
-    staticEvents,
-    onDemandEvents,
-    lumaEvents,
+    featuredEvent,
     isLoading,
     searchQuery,
     setSearchQuery,
     selectedCategories,
     toggleCategory,
     categories,
-    featuredEvent,
   }
 
   return <EventsContext.Provider value={value}>{children}</EventsContext.Provider>

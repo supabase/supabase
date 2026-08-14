@@ -9,7 +9,7 @@ description: 'Learn how to use Supabase in your Refine App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/refine-user-management).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/supabase/supabase/tree/master/examples/user-management/refine-user-management).
 
 </Admonition>
 
@@ -65,12 +65,14 @@ VITE_SUPABASE_PUBLISHABLE_KEY=YOUR_SUPABASE_PUBLISHABLE_KEY
 
 The `supabaseClient` fetches calls to Supabase endpoints from the app. The client is instrumental in implementing authentication using Refine's auth provider methods and CRUD actions with appropriate data provider methods.
 
-One optional step is to update the CSS file `src/App.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/refine-user-management/src/App.css).
+### App styling (optional)
 
-In order to add login and user profile pages in this App, tweak the `<Refine />` component inside `App.tsx`.
+An optional step is to update the CSS file `src/App.css` to make the app look better.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/refine-user-management/src/App.css).
 
 ### The `<Refine />` component
+
+In order to add login and user profile pages in this App, tweak the `<Refine />` component inside `App.tsx`.
 
 The `App.tsx` file initially looks like this:
 
@@ -122,7 +124,7 @@ export default App
 
 Focus on the [`<Refine />`](https://refine.dev/docs/api-reference/core/components/refine-config/) component, which comes with props passed to it. Notice the `dataProvider` prop. It uses a `dataProvider()` function with `supabaseClient` passed as argument to generate the data provider object. The `authProvider` object also uses `supabaseClient` in implementing its methods. You can look it up in `src/authProvider.ts` file.
 
-## Customize `authProvider`
+### Customize `authProvider`
 
 If you examine the `authProvider` object you can notice that it has a `login` method that implements an OAuth and Email / Password strategy for authentication. This tutorial instead removes them and use Magic Links to allow users sign in with their email without using passwords.
 
@@ -195,9 +197,35 @@ This uses three Refine hooks, namely the [`useGetIdentity()`](https://refine.dev
 
 The `useForm()` hook is a higher-level hook built on top of Refine's `useForm()` core hook. It fully supports form state management, field validation and submission using React Hook Form. Behind the scenes, it invokes the `dataProvider.getOne` method to get the user profile data from the Supabase `/profiles` endpoint and also invokes `dataProvider.update` method when `onFinish()` is called.
 
+## Profile photos
+
+Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+
+### Create an upload widget
+
+Add a new component:
+
+Create and edit `src/components/avatar.tsx`:
+
+<$CodeSample
+path="/user-management/refine-user-management/src/components/avatar.tsx"
+lines={[[1, -1]]}
+meta="name=src/components/avatar.tsx"
+/>
+
+### Update the Account component
+
+With the Avatar component created, update `src/components/account.tsx` to include it:
+
+<$CodeSample
+path="/user-management/refine-user-management/src/components/account.tsx"
+lines={[[1, -1]]}
+meta="name=src/components/account.tsx"
+/>
+
 ### Launch!
 
-Now that you have all the components in place, define the routes for the pages in which they should be rendered.
+With all the components in place, define the routes for the pages in which they should be rendered.
 
 Add the routes for `/login` with the `<Auth />` component and the routes for `index` path with the `<Account />` component. So, the final `App.tsx`:
 
@@ -216,31 +244,5 @@ npm run dev
 And then open the browser to [localhost:5173](http://localhost:5173) and you should see the completed app.
 
 ![Supabase Refine](/docs/img/supabase-refine-demo.png)
-
-## Bonus: Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
-
-### Create an upload widget
-
-Create an avatar for the user so that they can upload a profile photo. Add a new component:
-
-Create and edit `src/components/avatar.tsx`:
-
-<$CodeSample
-path="/user-management/refine-user-management/src/components/avatar.tsx"
-lines={[[1, -1]]}
-meta="name=src/components/avatar.tsx"
-/>
-
-### Add the new widget
-
-And then add the widget to the Account page at `src/components/account.tsx`:
-
-<$CodeSample
-path="/user-management/refine-user-management/src/components/account.tsx"
-lines={[[1, -1]]}
-meta="name=src/components/account.tsx"
-/>
 
 At this stage, you have a fully functional application!

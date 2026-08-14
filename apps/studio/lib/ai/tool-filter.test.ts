@@ -3,10 +3,10 @@ import { describe, expect, it, vitest } from 'vitest'
 import { z } from 'zod'
 
 import {
+  createPrivacyMessageTool,
+  filterToolsByOptInLevel,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_MAP,
-  filterToolsByOptInLevel,
-  createPrivacyMessageTool,
   toolSetValidationSchema,
 } from './tool-filter'
 
@@ -34,7 +34,7 @@ describe('tool allowance by opt-in level', () => {
       list_policies: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
       // Log tools
       get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-      get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+      query_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     } as unknown as ToolSet
 
     const filtered = filterToolsByOptInLevel(mockTools, optInLevel as any)
@@ -61,7 +61,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).not.toContain('list_extensions')
     expect(tools).not.toContain('list_edge_functions')
     expect(tools).not.toContain('list_branches')
-    expect(tools).not.toContain('get_logs')
+    expect(tools).not.toContain('query_logs')
     expect(tools).not.toContain('get_advisors')
   })
 
@@ -77,7 +77,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).not.toContain('get_advisors')
-    expect(tools).not.toContain('get_logs')
+    expect(tools).not.toContain('query_logs')
   })
 
   it('should return UI, schema and log tools for schema_and_log opt-in level', () => {
@@ -92,7 +92,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
-    expect(tools).toContain('get_logs')
+    expect(tools).toContain('query_logs')
   })
 
   it('should return all tools for schema_and_log_and_data opt-in level', () => {
@@ -107,7 +107,7 @@ describe('tool allowance by opt-in level', () => {
     expect(tools).toContain('list_policies')
     expect(tools).toContain('search_docs')
     expect(tools).toContain('get_advisors')
-    expect(tools).toContain('get_logs')
+    expect(tools).toContain('query_logs')
   })
 })
 
@@ -126,7 +126,7 @@ describe('filterToolsByOptInLevel', () => {
     search_docs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Log tools
     get_advisors: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
-    get_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
+    query_logs: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
     // Unknown tool - should be filtered out entirely
     some_other_tool: { execute: vitest.fn().mockResolvedValue({ status: 'success' }) },
   } as unknown as ToolSet
@@ -182,7 +182,7 @@ describe('filterToolsByOptInLevel', () => {
       'list_branches',
       'list_policies',
       'get_advisors',
-      'get_logs',
+      'query_logs',
     ])
   })
 
@@ -196,14 +196,14 @@ describe('filterToolsByOptInLevel', () => {
       'list_branches',
       'list_policies',
       'get_advisors',
-      'get_logs',
+      'query_logs',
     ])
   })
 
   it('should stub log tools for schema opt-in level', async () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema')
 
-    await expectStubsFor(tools, ['get_advisors', 'get_logs'])
+    await expectStubsFor(tools, ['get_advisors', 'query_logs'])
   })
 
   // No execute_sql tool, so nothing additional to stub for schema_and_log opt-in level
@@ -276,7 +276,7 @@ describe('toolSetValidationSchema', () => {
       execute_sql: { inputSchema: z.object({}), execute: vitest.fn() },
       deploy_edge_function: { inputSchema: z.object({}), execute: vitest.fn() },
       rename_chat: { inputSchema: z.object({}), execute: vitest.fn() },
-      get_logs: { inputSchema: z.object({}), execute: vitest.fn() },
+      query_logs: { inputSchema: z.object({}), execute: vitest.fn() },
     }
 
     const validationResult = toolSetValidationSchema.safeParse(allExpectedTools)

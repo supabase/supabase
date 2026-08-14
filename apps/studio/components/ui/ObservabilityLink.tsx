@@ -1,5 +1,6 @@
-import { DOCS_URL } from 'lib/constants'
 import Link from 'next/link'
+
+import { DOCS_URL } from '@/lib/constants'
 
 export const ObservabilityLink = () => {
   return (

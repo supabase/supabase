@@ -1,9 +1,10 @@
 import ProductIcon from 'components/ProductIcon'
-import { Fragment, ReactNode } from 'react'
-import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { FeatureKey } from 'shared-data/pricing'
 import Link from 'next/link'
+import { Fragment, ReactNode } from 'react'
+import { FeatureKey } from 'shared-data/pricing'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 
 type PricingTooltips = {
   [key in FeatureKey]?: {
@@ -37,6 +38,9 @@ export const pricingTooltips: PricingTooltips = {
   },
   'database.egress': {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
+  },
+  'database.replication': {
+    main: 'Supabase Pipelines replicates Postgres tables to analytical destinations.\nBilling is based on configured pipeline hours and Postgres row data processed during initial sync and ongoing replication. Pipeline-hour billing ends when the pipeline is deleted.',
   },
   'storage.cachedEgress': {
     main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',

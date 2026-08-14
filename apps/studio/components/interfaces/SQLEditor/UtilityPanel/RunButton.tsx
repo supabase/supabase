@@ -1,7 +1,7 @@
-import { Command, CornerDownLeft, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { KeyboardShortcut } from 'ui'
 
-import { detectOS } from 'lib/helpers'
-import { Button } from 'ui'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface SqlRunButtonProps {
   isDisabled?: boolean
@@ -9,6 +9,13 @@ interface SqlRunButtonProps {
   hasSelection?: boolean
   className?: string
   onClick: () => void
+  /**
+   * Explanation shown in a tooltip while the button is disabled — e.g. why a
+   * logs query can't run on this project. A disabled `<button>` swallows pointer
+   * events, so the tooltip is rendered via `ButtonTooltip` (pointer-events-auto)
+   * to stay reachable.
+   */
+  disabledReason?: string
 }
 
 export const SqlRunButton = ({
@@ -17,37 +24,26 @@ export const SqlRunButton = ({
   hasSelection = false,
   className,
   onClick,
+  disabledReason,
 }: SqlRunButtonProps) => {
-  const os = detectOS()
-
-  function handleOnClick() {
-    onClick()
-  }
-
   return (
-    <Button
-      onClick={handleOnClick}
+    <ButtonTooltip
+      onClick={onClick}
       disabled={isDisabled}
-      type="primary"
+      variant="primary"
       size="tiny"
       data-testid="sql-run-button"
       iconRight={
         isExecuting ? (
           <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
         ) : (
-          <div className="flex items-center space-x-1">
-            {os === 'macos' ? (
-              <Command size={10} strokeWidth={1.5} />
-            ) : (
-              <p className="text-xs text-foreground-light">CTRL</p>
-            )}
-            <CornerDownLeft size={10} strokeWidth={1.5} />
-          </div>
+          <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
         )
       }
       className={className}
+      tooltip={{ content: { side: 'bottom', text: isDisabled ? disabledReason : undefined } }}
     >
       {hasSelection ? 'Run selected' : 'Run'}
-    </Button>
+    </ButtonTooltip>
   )
 }

@@ -1,6 +1,6 @@
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { ResponseError } from 'types'
 import { PGMQ_EXTENSION_NAME } from './constants'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { ResponseError } from '@/types'
 
 export type DatabaseQueuesVersionVariables = {
   projectRef?: string

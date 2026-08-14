@@ -438,7 +438,7 @@ export const days: AdventDay[] = [
   {
     title: 'Top 10 Launches of LWX',
     description: 'Our CEO takes a look at his favorite ships from LWX',
-    className: 'sm:aspect-[2/1] sm:col-span-1 sm:col-span-2 sm:aspect-[2/1] h-full',
+    className: 'sm:aspect-2/1 sm:col-span-1 sm:col-span-2 sm:aspect-2/1 h-full',
     is_shipped: true,
     icon: (
       <svg

@@ -7,11 +7,11 @@ export default function SonnerDemo() {
 
   return (
     <div className="flex gap-1">
-      <Button type="default" onClick={() => toast('Event has been created')}>
+      <Button variant="default" onClick={() => toast('Event has been created')}>
         Default
       </Button>
       <Button
-        type="default"
+        variant="default"
         onClick={() =>
           toast.message('Event has been created', {
             description: 'Monday, January 3rd at 6:00pm',
@@ -21,7 +21,7 @@ export default function SonnerDemo() {
         description
       </Button>
       <Button
-        type="default"
+        variant="default"
         onClick={() =>
           toast.success('Event has been created', {
             description: 'Sunday, December 03, 2023 at 9:00 AM',
@@ -30,26 +30,26 @@ export default function SonnerDemo() {
       >
         Success
       </Button>
-      <Button type="default" onClick={() => toast.success('Event has been created')}>
+      <Button variant="default" onClick={() => toast.success('Event has been created')}>
         Show Toast
       </Button>
       <Button
-        type="default"
+        variant="default"
         onClick={() => toast.info('Be at the area 10 minutes before the event time')}
       >
         Info
       </Button>
       <Button
-        type="warning"
+        variant="warning"
         onClick={() => toast.warning('Event start time cannot be earlier than 8am')}
       >
         Warning
       </Button>
-      <Button type="danger" onClick={() => toast.error('Event has not been created')}>
+      <Button variant="danger" onClick={() => toast.error('Event has not been created')}>
         Error
       </Button>
       <Button
-        type="primary"
+        variant="primary"
         onClick={() =>
           toast('Event has been created', {
             action: {
@@ -61,11 +61,11 @@ export default function SonnerDemo() {
       >
         Action
       </Button>
-      <Button type="default" onClick={() => toast.loading('Event has been created')}>
+      <Button variant="default" onClick={() => toast.loading('Event has been created')}>
         Loading
       </Button>
       <Button
-        type="default"
+        variant="default"
         onClick={() =>
           toast.promise(promise, {
             loading: 'Loading...',
@@ -80,12 +80,12 @@ export default function SonnerDemo() {
         Promise
       </Button>
       <Button
-        type="default"
+        variant="default"
         onClick={() =>
           toast(
             <>
               <div>A custom toast with default styling</div>
-              <Button type="default">Hello world</Button>
+              <Button variant="default">Hello world</Button>
             </>
           )
         }

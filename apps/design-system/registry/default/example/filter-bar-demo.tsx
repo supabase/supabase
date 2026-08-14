@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { Button, Calendar } from 'ui'
-import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns'
+import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns/FilterBar'
 
 function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
   const [date, setDate] = useState<DateRange | undefined>(
@@ -25,11 +25,11 @@ function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
         className="w-full"
       />
       <div className="flex justify-end gap-2 py-3 px-4 border-t">
-        <Button type="default" onClick={onCancel}>
+        <Button variant="default" onClick={onCancel}>
           Cancel
         </Button>
         <Button
-          type="primary"
+          variant="primary"
           onClick={() =>
             onChange(
               date?.from

@@ -1,15 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useLegacyAPIKeysStatusQuery } from 'data/api-keys/legacy-api-keys-status-query'
-import { useJWTSigningKeyDeleteMutation } from 'data/jwt-signing-keys/jwt-signing-key-delete-mutation'
-import { useJWTSigningKeyUpdateMutation } from 'data/jwt-signing-keys/jwt-signing-key-update-mutation'
-import { JWTSigningKey, useJWTSigningKeysQuery } from 'data/jwt-signing-keys/jwt-signing-keys-query'
-import { useLegacyJWTSigningKeyCreateMutation } from 'data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
-import { useLegacyJWTSigningKeyQuery } from 'data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { AnimatePresence } from 'framer-motion'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { AlertCircle, RotateCw, Timer } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -45,6 +36,19 @@ import { CreateKeyDialog } from './create-key-dialog'
 import { KeyDetailsDialog } from './key-details-dialog'
 import { RotateKeyDialog } from './rotate-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useJWTSigningKeyDeleteMutation } from '@/data/jwt-signing-keys/jwt-signing-key-delete-mutation'
+import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import {
+  JWTSigningKey,
+  useJWTSigningKeysQuery,
+} from '@/data/jwt-signing-keys/jwt-signing-keys-query'
+import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
+import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
@@ -163,7 +167,7 @@ export const JWTSecretKeysTable = () => {
 
   if (!canReadAPIKeys && !isLoadingCanReadAPIKeys) {
     return (
-      <div className="bg-surface-100 rounded-md border shadow-sm">
+      <div className="bg-surface-100 rounded-md border shadow-xs">
         <div className="flex items-center py-8 px-8 space-x-2">
           <AlertCircle size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
@@ -184,7 +188,7 @@ export const JWTSecretKeysTable = () => {
       <div className="-space-y-px">
         {!canReadAPIKeys ? null : legacyKey ? (
           <>
-            {standbyKey && (
+            {standbyKey ? (
               <ActionPanel
                 title="Rotate Signing Key"
                 description="Switch the standby key to in use. All new JSON Web Tokens issued by Supabase Auth will be signed with this key."
@@ -192,19 +196,18 @@ export const JWTSecretKeysTable = () => {
                 onClick={() => setShownDialog('rotate')}
                 loading={isUpdatingJWTSigningKey}
                 icon={<RotateCw className="size-4" />}
-                type="primary"
+                variant="primary"
               />
-            )}
-
-            {!standbyKey && (
+            ) : (
               <ActionPanel
                 title="Create standby key"
                 description="Set up a new key which you can switch to once it has been picked up by all components of your application."
                 buttonLabel="Create Standby Key"
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
-                type="primary"
+                variant="primary"
                 icon={<Timer className="size-4" />}
+                shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
             )}
           </>
@@ -393,48 +396,6 @@ export const JWTSecretKeysTable = () => {
           </Card>
         </div>
       )}
-
-      {/* TODO(hf): For launch <div>
-        <h2 className="text-xl mb-4">Resources</h2>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          <Card className="bg-surface-75 overflow-hidden">
-            <div className="flex">
-              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
-                <WhyRotateKeysIllustration />
-              </div>
-              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
-                <h4 className="text-sm">Why Rotate keys?</h4>
-                <p className="text-xs text-foreground-light mb-4 max-w-xs">
-                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
-                  time.
-                </p>
-                <Button type="outline" icon={<Book />}>
-                  View guide
-                </Button>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="bg-surface-75 overflow-hidden">
-            <div className="flex">
-              <div className="bg-surface-200 px-0 flex items-center justify-center w-[180px]">
-                <WhyUseStandbyKeysIllustration />
-              </div>
-              <div className="flex-1 pl-8 border-l h-full py-6 px-5">
-                <h4 className="text-sm">Why use a Standby key?</h4>
-                <p className="text-xs text-foreground-light mb-4 max-w-xs">
-                  Create Standby keys ahead of time which can then be promoted to 'In use' at any
-                  time.
-                </p>
-                <Button type="outline" icon={<Book />}>
-                  View guide
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div> */}
 
       <Dialog open={shownDialog === 'legacy'} onOpenChange={resetDialog}>
         <DialogContent className="sm:max-w-[425px]">

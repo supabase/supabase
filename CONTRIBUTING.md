@@ -2,10 +2,6 @@
 
 Thank you for contributing to Supabase! We’re a big, exciting open source project and we’d love to have you contribute! Here’s some resources and guidance to help you get started:
 
-[1. Getting Started](#getting-started)
-[2. Issues](#issues)
-[3. Pull Requests](#pull-requests)
-
 ## Getting Started
 
 To ensure a positive and inclusive environment, please read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) before contributing. For help setting up the code in this repo, please follow our [DEVELOPERS.md](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) file. For the [docs](https://supabase.com/docs) site, follow this [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md) guide.

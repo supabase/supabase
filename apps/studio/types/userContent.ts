@@ -1,4 +1,18 @@
-import { ChartConfig } from 'components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import type { UntrustedSqlFragment } from '@supabase/pg-meta'
+
+import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import type * as NotebookSchema from '@/data/content/notebooks/notebook-schema'
+import type { UntrustedLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+
+export namespace Notebooks {
+  export type Content = NotebookSchema.NotebookContent
+  export type Cell = NotebookSchema.Cell
+  export type MarkdownCell = NotebookSchema.MarkdownCell
+  export type DatabaseCell = NotebookSchema.DatabaseCell
+  export type LogCell = NotebookSchema.LogCell
+  export type TimeRange = NotebookSchema.TimeRange
+  export type ChartConfig = NotebookSchema.ChartConfig
+}
 
 export interface UserContent<
   T = Dashboards.Content | SqlSnippets.Content | LogSqlSnippets.Content,
@@ -34,7 +48,9 @@ export namespace SqlSnippets {
     content_id: string
 
     // A full SQL query - this will be hashed on the /content endpoint
-    sql: string
+    // Named unchecked_sql to highlight that this SQL must never be run automatically
+    // without user confirmation — it may originate from untrusted sources like URL params.
+    unchecked_sql: UntrustedSqlFragment
 
     // we can add some versioning to this schema in case we need to change the format.
     schema_version: string
@@ -119,8 +135,13 @@ export namespace LogSqlSnippets {
     // unique id of the sql snippet, possibly to used so snippets can support versioning
     content_id: string
 
-    // A full SQL query - this will be hashed on the /content endpoint
-    sql: string
+    // A full SQL query - this will be hashed on the /content endpoint.
+    // Named unchecked_sql (mirroring SqlSnippets.Content) to highlight that this SQL must
+    // never be run automatically without a user run gesture. The API stores/returns it as
+    // `sql`; the remap boundary in data/content/content-remap.ts brands it on the way in
+    // (untrustedLogSql) and strips the brand on the way out. Distinct from the Postgres
+    // brand so logs SQL and database SQL can never cross execution paths.
+    unchecked_sql: UntrustedLogSqlFragment
 
     // we can add some versioning to this schema in case we need to change the format.
     schema_version: string

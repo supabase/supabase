@@ -1,10 +1,3 @@
-import { AuditLogs } from 'components/interfaces/Account/AuditLogs'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
-import AppLayout from 'components/layouts/AppLayout/AppLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
-import type { NextPageWithLayout } from 'types'
-import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderDescription,
@@ -13,10 +6,16 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { AuditLogs } from '@/components/interfaces/Account/AuditLogs'
+import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import type { NextPageWithLayout } from '@/types'
+
 const Audit: NextPageWithLayout = () => {
   return (
     <>
-      <PageHeader size="small">
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Audit Logs</PageHeaderTitle>
@@ -26,19 +25,15 @@ const Audit: NextPageWithLayout = () => {
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
-      <PageContainer size="small" className="mt-8">
-        <AuditLogs />
-      </PageContainer>
+      <AuditLogs />
     </>
   )
 }
 
 Audit.getLayout = (page) => (
   <AppLayout>
-    <DefaultLayout hideMobileMenu headerTitle="Account">
-      <OrganizationLayout>
-        <AccountLayout title="Audit Logs">{page}</AccountLayout>
-      </OrganizationLayout>
+    <DefaultLayout headerTitle="Account">
+      <AccountLayout title="Audit Logs">{page}</AccountLayout>
     </DefaultLayout>
   </AppLayout>
 )

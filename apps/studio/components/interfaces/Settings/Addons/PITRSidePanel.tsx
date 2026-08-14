@@ -1,36 +1,38 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { formatCurrency } from 'lib/helpers'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { useAddonsPagePanel } from 'state/addons-page'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   CriticalIcon,
-  Radio,
+  RadioGroupCard,
+  RadioGroupCardItem,
   SidePanel,
 } from 'ui'
 
+import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import type { AddonVariantId } from '@/data/subscriptions/types'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { formatCurrency } from '@/lib/helpers'
+import { useAddonsPagePanel } from '@/state/addons-page'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -178,7 +180,7 @@ const PITRSidePanel = () => {
             in granularity.
           </p>
 
-          <div className="!mt-8 pb-4">
+          <div className="mt-8! pb-4">
             <div className="flex gap-3">
               {PITR_CATEGORY_OPTIONS.map((option) => {
                 const isSelected = selectedCategory === option.id
@@ -232,35 +234,33 @@ const PITRSidePanel = () => {
           </div>
 
           {selectedCategory === 'off' && subscriptionPitr !== undefined && isBranchingEnabled && (
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <CriticalIcon />
-              <AlertTitle_Shadcn_>
-                Are you sure you want to disable this while using Branching?
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Are you sure you want to disable this while using Branching?</AlertTitle>
+              <AlertDescription>
                 Without PITR, you might not be able to recover lost data if you accidentally merge a
                 branch that deletes a column or user data. We don't recommend this.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
 
           {blockDowngradeDueToHipaa ? (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_>PITR cannot be disabled on HIPAA projects</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+            <Alert>
+              <AlertTitle>PITR cannot be disabled on HIPAA projects</AlertTitle>
+              <AlertDescription>
                 PITR is enabled by default for all HIPAA projects and cannot be turned off. Contact
                 support for further assistance.
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
               <div className="mt-4">
-                <Button type="default" asChild>
+                <Button variant="default" asChild>
                   <SupportLink>Contact support</SupportLink>
                 </Button>
               </div>
-            </Alert_Shadcn_>
+            </Alert>
           ) : null}
 
           {selectedCategory === 'on' && (
-            <div className="!mt-8 pb-4">
+            <div className="mt-8! pb-4">
               {!hasAccessToPitrVariants ? (
                 <UpgradeToPro
                   className="mb-4"
@@ -279,49 +279,51 @@ const PITRSidePanel = () => {
                 />
               ) : null}
 
-              <Radio.Group
-                type="large-cards"
-                size="tiny"
+              <label className="block text-sm text-foreground-light mb-4" htmlFor="pitr">
+                Choose the duration of recovery
+              </label>
+              <RadioGroupCard
                 id="pitr"
-                label={<p className="text-sm">Choose the duration of recovery</p>}
-                onChange={(event: any) => setSelectedOption(event.target.value)}
+                className="flex flex-wrap gap-3"
+                value={selectedOption}
+                onValueChange={(value) => setSelectedOption(value)}
+                disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
               >
                 {availableOptions.map((option) => (
-                  <Radio
-                    name="pitr"
-                    disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
-                    className="col-span-4 !p-0"
+                  <RadioGroupCardItem
                     key={option.identifier}
-                    checked={selectedOption === option.identifier}
-                    label={<span className="text-sm">{option.name}</span>}
                     value={option.identifier}
-                  >
-                    <div className="w-full group">
-                      <div className="border-b border-default px-4 py-2">
-                        <p className="text-sm">{option.name}</p>
-                      </div>
-                      <div className="px-4 py-2">
-                        <p className="text-foreground-light">
-                          Allow database restorations to any time up to{' '}
-                          {option.identifier.split('_')[1]} days ago
-                        </p>
-                        <div className="flex items-center space-x-1 mt-2">
-                          <p className="text-foreground text-sm" translate="no">
-                            {formatCurrency(option.price)}
+                    id={option.identifier}
+                    label={
+                      <div className="w-full group">
+                        <div className="border-b border-default px-4 py-2">
+                          <p className="text-sm">{option.name}</p>
+                        </div>
+                        <div className="px-4 py-2">
+                          <p className="text-foreground-light">
+                            Allow database restorations to any time up to{' '}
+                            {option.identifier.split('_')[1]} days ago
                           </p>
-                          <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                          <div className="flex items-center space-x-1 mt-2">
+                            <p className="text-foreground text-sm" translate="no">
+                              {formatCurrency(option.price)}
+                            </p>
+                            <p className="text-foreground-light translate-y-px"> / month</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </Radio>
+                    }
+                    showIndicator={false}
+                  />
                 ))}
-              </Radio.Group>
+              </RadioGroupCard>
+              <TaxDisclaimer className="mt-3" />
             </div>
           )}
 
           {hasChanges && selectedOption !== 'pitr_0' && (
             <p className="text-sm text-foreground-light">
-              There are no immediate charges. The addon is billed at the end of your billing cycle
+              There are no immediate charges. The add-on is billed at the end of your billing cycle
               based on your usage and prorated to the hour.
             </p>
           )}

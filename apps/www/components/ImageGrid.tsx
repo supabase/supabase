@@ -1,8 +1,8 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { cn } from 'ui'
 
 interface iImages {
@@ -73,7 +73,7 @@ const ImageGrid = ({
 
   return (
     <div
-      className={`grid 
+      className={`grid
       gap-0.5 rounded-lg overflow-hidden
       items-center
     	${smBreakpoint[smCols]}
@@ -86,7 +86,7 @@ const ImageGrid = ({
           if (x.link) {
             return (
               <Link href={link}>
-                <div className="scale-100 transform cursor-pointer duration-100 ease-in-out hover:shadow-sm">
+                <div className="scale-100 transform cursor-pointer duration-100 ease-in-out hover:shadow-xs">
                   {children}
                 </div>
               </Link>
@@ -116,7 +116,7 @@ const ImageGrid = ({
               className={cn(
                 bg && 'bg-surface-200',
                 'w-full',
-                `col-span-1 flex items-center justify-center 
+                `col-span-1 flex items-center justify-center
                   ${x.link && 'hover:bg-overlay-hover'}
                   p-8 ${className}`
               )}
@@ -128,7 +128,7 @@ const ImageGrid = ({
                   fill
                   sizes="100%"
                   className={cn(
-                    'object-scale-down object-center bg-no-repeat',
+                    'object-scale-down object-center bg-no-repeat m-0',
                     !removeFilter && 'contrast-0 filter opacity-50'
                   )}
                 />

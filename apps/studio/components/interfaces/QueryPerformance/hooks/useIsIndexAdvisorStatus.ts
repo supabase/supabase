@@ -1,6 +1,6 @@
-import { getIndexAdvisorExtensions } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { getIndexAdvisorExtensions } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 /**
  * Hook to get both index advisor availability and enabled status

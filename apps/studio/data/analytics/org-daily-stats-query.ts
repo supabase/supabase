@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-
 import type { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { analyticsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export enum EgressType {
   REST = 'egress_rest',
@@ -46,6 +46,9 @@ export enum PricingMetric {
   LOG_INGESTION = 'LOG_INGESTION',
   LOG_QUERYING = 'LOG_QUERYING',
   LOG_STORAGE = 'LOG_STORAGE',
+  ETL_PIPELINE = 'ETL_PIPELINE',
+  ETL_REPLICATED_DATA = 'ETL_REPLICATED_DATA',
+  ETL_COPY_BACKFILL_DATA = 'ETL_COPY_BACKFILL_DATA',
 }
 
 export enum ComputeUsageMetric {

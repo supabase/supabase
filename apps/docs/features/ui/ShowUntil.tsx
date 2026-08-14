@@ -7,6 +7,9 @@ export function ShowUntil({ children, date }: { children: ReactNode; date: strin
   if (isNaN(untilDate.getTime()) || currentDate < untilDate) {
     return <>{children}</>
   } else {
+    console.error(
+      `[docs/features/ui/ShowUntil]: Component for ${date} expired, please update remove this note.`
+    )
     return null
   }
 }

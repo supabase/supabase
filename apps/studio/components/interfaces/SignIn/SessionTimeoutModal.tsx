@@ -1,11 +1,8 @@
-import { SupportCategories } from '@supabase/shared-types/out/constants'
 import * as Sentry from '@sentry/nextjs'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { safeLocalStorage, safeSessionStorage } from 'common'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
-
-import { InlineLink, InlineLinkClassName } from 'components/ui/InlineLink'
 import {
-  AlertCollapsible,
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -16,7 +13,10 @@ import {
   AlertDialogTitle,
   Button,
 } from 'ui'
+import { CollapsibleAlert } from 'ui-patterns/collapsible-alert'
+
 import { SupportLink } from '../Support/SupportLink'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 
 interface SessionTimeoutModalProps {
   visible: boolean
@@ -39,12 +39,8 @@ export const SessionTimeoutModal = ({
   }, [visible])
 
   const handleClearStorage = () => {
-    try {
-      localStorage.clear()
-      sessionStorage.clear()
-    } catch (e) {
-      toast.error('Failed to clear browser storage')
-    }
+    safeLocalStorage.clear()
+    safeSessionStorage.clear()
     window.location.reload()
   }
 
@@ -61,13 +57,13 @@ export const SessionTimeoutModal = ({
           <AlertDialogDescription asChild>
             <div className="space-y-4">
               <p>Please sign in again to continue.</p>
-              <AlertCollapsible trigger="Having trouble?">
+              <CollapsibleAlert trigger="Having trouble?">
                 <div className="space-y-3 text-foreground-light">
                   <p>
                     Try a different browser or disable extensions that block network requests. If
                     the problem persists:
                   </p>
-                  <Button type="default" size="tiny" onClick={handleClearStorage}>
+                  <Button variant="default" size="tiny" onClick={handleClearStorage}>
                     Clear site data and reload
                   </Button>
                   <p>
@@ -93,7 +89,7 @@ export const SessionTimeoutModal = ({
                     from your session to help us investigate.
                   </p>
                 </div>
-              </AlertCollapsible>
+              </CollapsibleAlert>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

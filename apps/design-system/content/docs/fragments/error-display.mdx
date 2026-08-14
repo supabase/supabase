@@ -1,0 +1,59 @@
+---
+title: Error Display
+description: A card component for surfacing API errors with optional troubleshooting steps and a support link.
+fragment: true
+---
+
+ErrorDisplay renders a styled error card with a warning header, a monospace error message block, an optional children slot for inline troubleshooting content, and a "Contact support" footer link that is always shown.
+
+<ComponentPreview name="error-display-demo" peekCode wide />
+
+Use ErrorDisplay as the base for any inline error state in the dashboard. For errors with known patterns, wire up [`ErrorMatcher`](https://github.com/supabase/supabase/tree/master/apps/studio/components/interfaces/ErrorHandling) on top to automatically inject matching troubleshooting steps.
+
+## Usage
+
+```tsx
+import { ErrorDisplay } from 'ui-patterns/ErrorDisplay'
+```
+
+```tsx
+<ErrorDisplay
+  title="Failed to load tables"
+  errorMessage="ERROR: CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT."
+  supportFormParams={{ projectRef: 'my-project' }}
+/>
+```
+
+## Examples
+
+### With troubleshooting steps
+
+Pass any content as `children` — typically a `TroubleshootingAccordion` — to render inline troubleshooting between the error message and the support footer.
+
+<ComponentPreview name="error-display-with-children" peekCode wide />
+
+## Props
+
+| Prop                | Type                 | Default             | Description                                                           |
+| ------------------- | -------------------- | ------------------- | --------------------------------------------------------------------- |
+| `title`             | `string`             | —                   | Displayed in the card header next to the warning icon.                |
+| `errorMessage`      | `string`             | —                   | Raw error string rendered in a monospace code block.                  |
+| `supportFormParams` | `SupportFormParams?` | `undefined`         | Typed params for the support form URL. The component builds the URL.  |
+| `supportLabel`      | `string?`            | `"Contact support"` | Override the support link label.                                      |
+| `children`          | `ReactNode`          | `undefined`         | Slot for troubleshooting content rendered between message and footer. |
+| `icon`              | `ReactNode`          | Warning triangle    | Override the header icon.                                             |
+| `onRender`          | `() => void?`        | —                   | Fired once on mount — use for telemetry.                              |
+| `onSupportClick`    | `() => void?`        | —                   | Fired when the support link is clicked — use for telemetry.           |
+| `className`         | `string?`            | —                   | Extra classes on the root `Card`.                                     |
+
+### SupportFormParams
+
+| Field        | Type      | Description                   |
+| ------------ | --------- | ----------------------------- |
+| `projectRef` | `string?` | Project reference slug        |
+| `orgSlug`    | `string?` | Organisation slug             |
+| `category`   | `string?` | Pre-selected support category |
+| `subject`    | `string?` | Pre-filled subject line       |
+| `message`    | `string?` | Pre-filled message body       |
+| `error`      | `string?` | Raw error string for context  |
+| `sid`        | `string?` | Sentry event ID               |

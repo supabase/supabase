@@ -1,3 +1,16 @@
-description = "Don't use '%s'. The sentence is more concise and/or the tone is more neutral without it."
+description = "Remove '%s' for a more concise, direct sentence."
 level = "WARNING"
-words = ["easily", "please", "simply", "that's it"]
+words = [
+    "actually",
+    "easily",
+    "easy",
+    "just",
+    "let's",
+    "obviously",
+    "of course",
+    "please",
+    "quickly",
+    "simple",
+    "simply",
+    "that's it",
+]

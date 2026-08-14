@@ -1,0 +1,45 @@
+description = "Use a direct, simpler phrase instead of '%s'."
+level = "WARNING"
+words = [
+    [
+        "in order to",
+        "to",
+    ],
+    [
+        "prior to",
+        "before",
+    ],
+    [
+        "subsequent to",
+        "after",
+    ],
+    [
+        "for the purpose of",
+        "to",
+    ],
+    [
+        "leverage",
+        "use",
+    ],
+    [
+        "whilst",
+        "while",
+    ],
+    [
+        "amongst",
+        "among",
+    ],
+    [
+        "facilitate",
+        "help",
+    ],
+    [
+        "endeavor",
+        "try",
+    ],
+    [
+        "endeavour",
+        "try",
+    ],
+    "aforementioned",
+]

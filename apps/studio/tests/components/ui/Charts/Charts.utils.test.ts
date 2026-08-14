@@ -1,13 +1,15 @@
 import { renderHook } from '@testing-library/react'
+import { describe, expect, it, test } from 'vitest'
+
 import {
   compactNumberFormatter,
   formatPercentage,
   isFloat,
+  millisecondFormatter,
   numberFormatter,
   precisionFormatter,
   useStacked,
-} from 'components/ui/Charts/Charts.utils'
-import { describe, expect, it, test } from 'vitest'
+} from '@/components/ui/Charts/Charts.utils'
 
 test('isFloat', () => {
   expect(isFloat(123)).toBe(false)
@@ -134,6 +136,34 @@ describe('compactNumberFormatter', () => {
   it('handles negative numbers', () => {
     expect(compactNumberFormatter(-1000)).toBe('-1K')
     expect(compactNumberFormatter(-1_500_000)).toBe('-1.5M')
+  })
+})
+
+describe('millisecondFormatter', () => {
+  it('appends the ms unit', () => {
+    expect(millisecondFormatter(0)).toBe('0ms')
+    expect(millisecondFormatter(123)).toBe('123ms')
+  })
+
+  it('adds thousands separators', () => {
+    expect(millisecondFormatter(1000)).toBe('1,000ms')
+    expect(millisecondFormatter(90000)).toBe('90,000ms')
+    expect(millisecondFormatter(1_234_567)).toBe('1,234,567ms')
+  })
+
+  it('rounds to whole milliseconds by default', () => {
+    expect(millisecondFormatter(1234.56)).toBe('1,235ms')
+    expect(millisecondFormatter(0.4)).toBe('0ms')
+  })
+
+  it('respects an explicit precision', () => {
+    expect(millisecondFormatter(1234.56, 2)).toBe('1,234.56ms')
+    expect(millisecondFormatter(84.3, 2)).toBe('84.30ms')
+  })
+
+  it('falls back to 0ms for non-finite values', () => {
+    expect(millisecondFormatter(NaN)).toBe('0ms')
+    expect(millisecondFormatter(Infinity)).toBe('0ms')
   })
 })
 

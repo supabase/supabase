@@ -1,76 +1,27 @@
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import type { NextPageWithLayout } from 'types'
-import AwsMarketplaceCreateNewOrg from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceCreateNewOrg'
-import { AwsMarketplaceLinkExistingOrg } from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceLinkExistingOrg'
-import AwsMarketplaceOnboardingPlaceholder from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboardingPlaceholder'
-import LinkAwsMarketplaceLayout from '../components/layouts/LinkAwsMarketplaceLayout'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldHeader,
-  ScaffoldTitle,
-} from '../components/layouts/Scaffold'
-import { useOrganizationsQuery } from '../data/organizations/organizations-query'
-import { useCloudMarketplaceContractLinkingEligibilityQuery } from '../components/interfaces/Organization/CloudMarketplace/cloud-marketplace-query'
-import AwsMarketplaceContractNotLinkable from '../components/interfaces/Organization/CloudMarketplace/AwsMarketplaceContractNotLinkable'
+import { AwsMarketplaceOnboardingScreen } from '@/components/interfaces/Organization/CloudMarketplace/AwsMarketplaceOnboarding'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import type { NextPageWithLayout } from '@/types'
 
-const AwsMarketplaceOnboarding: NextPageWithLayout = () => {
-  const {
-    query: { buyer_id: buyerId },
-  } = useRouter()
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Link AWS Marketplace', brand: 'Supabase' })
 
-  const {
-    data: organizations,
-    isFetched: isOrganizationsFetched,
-    isSuccess: wasOrganizationsRequestSuccessful,
-  } = useOrganizationsQuery()
+const AwsMarketplaceOnboardingPage: NextPageWithLayout = () => {
+  const router = useRouter()
+  const buyerId = typeof router.query.buyer_id === 'string' ? router.query.buyer_id : undefined
 
-  const {
-    data: contractLinkingEligibility,
-    isFetched: isContractLinkingEligibilityFetched,
-    isSuccess: wasEligibilityRequestSuccessful,
-  } = useCloudMarketplaceContractLinkingEligibilityQuery({
-    buyerId: buyerId as string,
-  })
-
-  const renderContent = () => {
-    if (!isOrganizationsFetched || !isContractLinkingEligibilityFetched) {
-      return <AwsMarketplaceOnboardingPlaceholder />
-    }
-
-    if (!wasOrganizationsRequestSuccessful || !wasEligibilityRequestSuccessful) {
-      return <p className="mt-4">Error loading AWS Marketplace setup page. Try again later.</p>
-    }
-
-    if (!contractLinkingEligibility.eligibility.is_eligible) {
-      return (
-        <AwsMarketplaceContractNotLinkable
-          reason={contractLinkingEligibility.eligibility.reasons[0]}
-        />
-      )
-    }
-
-    if (organizations?.length) {
-      return <AwsMarketplaceLinkExistingOrg organizations={organizations} />
-    }
-
-    return <AwsMarketplaceCreateNewOrg />
-  }
+  if (!router.isReady) return null
 
   return (
-    <ScaffoldContainer>
-      <ScaffoldHeader>
-        <ScaffoldTitle>AWS Marketplace Setup</ScaffoldTitle>
-      </ScaffoldHeader>
-      <ScaffoldDivider />
-      {renderContent()}
-    </ScaffoldContainer>
+    <>
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
+      <AwsMarketplaceOnboardingScreen buyerId={buyerId} />
+    </>
   )
 }
 
-AwsMarketplaceOnboarding.getLayout = (page) => (
-  <LinkAwsMarketplaceLayout>{page}</LinkAwsMarketplaceLayout>
-)
-
-export default AwsMarketplaceOnboarding
+export default withAuth(AwsMarketplaceOnboardingPage)

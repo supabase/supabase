@@ -1,23 +1,23 @@
-import * as Sentry from '@sentry/nextjs'
-import { fromMarkdown } from 'mdast-util-from-markdown'
-import { gfmFromMarkdown } from 'mdast-util-gfm'
-import { gfm } from 'micromark-extension-gfm'
-import { type Metadata, type ResolvingMetadata } from 'next'
-import { notFound } from 'next/navigation'
 import { readdir } from 'node:fs/promises'
 import { extname, join, relative, sep } from 'node:path'
-
+import * as Sentry from '@sentry/nextjs'
 import { extractMessageFromAnyError, FileNotFoundError } from '~/app/api/utils'
 import { pluckPromise } from '~/features/helpers.fn'
 import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown } from 'mdast-util-gfm'
+import { gfm } from 'micromark-extension-gfm'
+import { type Metadata, type ResolvingMetadata } from 'next'
+import { notFound } from 'next/navigation'
+
 import { newEditLink } from './GuidesMdx.template'
 import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
-import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -30,9 +30,10 @@ const PUBLISHED_SECTIONS = [
   'deployment',
   'functions',
   'getting-started',
-  // 'graphql', -- technically published, but completely federated
+  'graphql',
   'integrations',
   'local-development',
+  'monitoring-and-debugging',
   'platform',
   'queues',
   'realtime',
@@ -40,7 +41,6 @@ const PUBLISHED_SECTIONS = [
   'security',
   'self-hosting',
   'storage',
-  'telemetry',
 ] as const
 
 const getGuidesMarkdownInternal = async (slug: string[]) => {
@@ -77,13 +77,14 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       throw Error(`Type of frontmatter is not valid for path: ${fullPath}`)
     }
 
+    const { editLink: editLinkOverride, ...restMeta } = meta
     const editLink = newEditLink(
-      `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+      editLinkOverride ?? `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
     )
 
     return {
       pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
-      meta,
+      meta: restMeta,
       content,
       editLink,
     }
@@ -179,6 +180,10 @@ const genGuideMeta =
       alternates: {
         ...parentAlternates,
         canonical: meta.canonical || `${BASE_PATH}${pathname}`,
+        types: {
+          ...(parentAlternates?.types ?? {}),
+          'text/markdown': `${BASE_PATH}${pathname}.md`,
+        },
       },
       openGraph: {
         ...parentOg,

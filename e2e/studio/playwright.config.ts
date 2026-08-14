@@ -25,8 +25,18 @@ const createWebServerConfig = () => {
     return undefined
   }
 
+  // We have dedicated job steps on CI to start Supabase and Studio
+  if (!IS_CI) {
+    return {
+      command: 'pnpm --workspace-root run e2e:setup:selfhosted',
+      port: WEB_SERVER_PORT,
+      timeout: WEB_SERVER_TIMEOUT,
+      reuseExistingServer: true,
+    }
+  }
+
   return {
-    command: 'pnpm --workspace-root run e2e:setup:selfhosted',
+    command: 'pnpm --workspace-root run e2e:setup:selfhosted:start-studio',
     port: WEB_SERVER_PORT,
     timeout: WEB_SERVER_TIMEOUT,
     reuseExistingServer: true,
@@ -110,6 +120,9 @@ export default defineConfig({
         // Network configuration
         '--enable-features=NetworkService,NetworkServiceInProcess', // Uses modern network service in-process for better performance
       ],
+    },
+    contextOptions: {
+      reducedMotion: 'reduce',
     },
   },
   projects: [

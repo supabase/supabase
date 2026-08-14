@@ -1,0 +1,45 @@
+---
+title: TanStack DB
+description: Local-first, reactive collections backed by Supabase
+---
+
+A [TanStack/db](https://tanstack.com/db/latest) collection backed by [Supabase](https://supabase.com/). It wires up Supabase PostgREST queries, mutations, and real-time subscriptions so you get a reactive state that stays in sync with your Postgres database.
+
+## Installation
+
+Enter your Supabase project credentials to generate a personalized installation command. The block will include schemas and collections for all tables in your database.
+
+<TanstackDBGenerator />
+
+<Callout type="info">
+  Your credentials are only used to fetch your database schema. They are not stored or sent to any
+  server other than your Supabase project.
+</Callout>
+
+## What's included
+
+This block installs the following files:
+
+| File                         | Description                                        |
+| ---------------------------- | -------------------------------------------------- |
+| `lib/schemas.ts`             | Zod schemas for all your database tables           |
+| `lib/db.ts`                  | Supabase collections for type-safe CRUD operations |
+| `lib/supabase/client.ts`     | Browser Supabase client                            |
+| `lib/supabase/server.ts`     | Server-side Supabase client                        |
+| `lib/supabase/middleware.ts` | Middleware for session handling                    |
+| `app/providers.tsx`          | Provider component for TanStack DB                 |
+
+## Getting started
+
+After installing the block, add the required environment variables to your `.env.local` file:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+```
+
+## Further reading
+
+- [TanStack DB documentation](https://tanstack.com/db/latest)
+- [Supabase JavaScript client](https://supabase.com/docs/reference/javascript)
+- [Generating TypeScript types](https://supabase.com/docs/guides/api/rest/generating-types)

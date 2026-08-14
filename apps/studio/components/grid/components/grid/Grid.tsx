@@ -1,29 +1,36 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
-import { useTableFilterNew } from 'components/grid/hooks/useTableFilterNew'
-import { handleCopyCell } from 'components/grid/SupabaseGrid.utils'
-import { useIsTableFilterBarEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useCsvFileDrop } from 'hooks/ui/useCsvFileDrop'
-import { forwardRef, memo, Ref, useCallback, useMemo, useRef } from 'react'
-import DataGrid, { CalculatedColumn, DataGridHandle } from 'react-data-grid'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Button, cn } from 'ui'
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
+import type { PGColumn } from '@supabase/pg-meta'
+import { forwardRef, memo, Ref, useCallback, useMemo, useRef, useState } from 'react'
+import DataGrid, {
+  CalculatedColumn,
+  CellClickArgs,
+  CellMouseEvent,
+  DataGridHandle,
+} from 'react-data-grid'
+import { flushSync } from 'react-dom'
+import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ref as valtioRef } from 'valtio'
 
-import { useTableFilter } from '../../hooks/useTableFilter'
-import type { GridProps, SupaRow } from '../../types'
+import type { GridProps, SupaColumn, SupaRow } from '../../types'
 import { isPendingAddRow, isPendingDeleteRow } from '../../types'
+import { RowContextMenuContent } from '../menu/RowContextMenu'
+import { ColumnOverlayItem } from './ColumnOverlayItem'
 import { useOnRowsChange } from './Grid.utils'
 import { GridError } from './GridError'
-import RowRenderer from './RowRenderer'
+import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { handleCellKeyDown } from '@/components/grid/SupabaseGrid.utils'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
+import { formatForeignKeys } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useCsvFileDrop } from '@/hooks/ui/useCsvFileDrop'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
@@ -58,14 +65,10 @@ export const Grid = memo(
       },
       ref: Ref<DataGridHandle> | undefined
     ) => {
-      const newFilterBarEnabled = useIsTableFilterBarEnabled()
-
       const tableEditorSnap = useTableEditorStateSnapshot()
       const snap = useTableEditorTableStateSnapshot()
-      const { filters: oldFilters, clearFilters: clearOldFilters } = useTableFilter()
-      const { filters: newFilters, clearFilters: clearNewFilters } = useTableFilterNew()
+      const { filters, clearFilters } = useTableFilter()
 
-      const { data: org } = useSelectedOrganizationQuery()
       const { data: project } = useSelectedProjectQuery()
 
       const onRowsChange = useOnRowsChange(rows)
@@ -74,18 +77,11 @@ export const Grid = memo(
         snap.setSelectedRows(selectedRows)
       }
 
-      const selectedCellRef = useRef<{
-        rowIdx: number
-        row: SupaRow
-        column: CalculatedColumn<SupaRow, unknown>
-      } | null>(null)
-
       function onSelectedCellChange(args: {
         rowIdx: number
         row: SupaRow
         column: CalculatedColumn<SupaRow, unknown>
       }) {
-        selectedCellRef.current = args
         snap.setSelectedCellPosition({ idx: args.column.idx, rowIdx: args.rowIdx })
       }
 
@@ -94,21 +90,14 @@ export const Grid = memo(
       const tableEntityType = snap.originalTable?.entity_type
       const isForeignTable = tableEntityType === ENTITY_TYPE.FOREIGN_TABLE
       const isTableEmpty = (rows ?? []).length === 0
+      const canImportData = snap.editable && !isForeignTable
 
-      const { mutate: sendEvent } = useSendEventMutation()
+      const track = useTrack()
 
       const { isDraggedOver, onDragOver, onFileDrop } = useCsvFileDrop({
-        enabled: isTableEmpty && !isForeignTable,
+        enabled: isTableEmpty && canImportData,
         onFileDropped: (file) => tableEditorSnap.onImportData(valtioRef(file)),
-        onTelemetryEvent: (eventName) => {
-          sendEvent({
-            action: eventName,
-            groups: {
-              project: project?.ref ?? 'Unknown',
-              organization: org?.slug ?? 'Unknown',
-            },
-          })
-        },
+        onTelemetryEvent: (eventName) => track(eventName),
       })
 
       const { data } = useForeignKeyConstraintsQuery({
@@ -140,26 +129,14 @@ export const Grid = memo(
           tableEditorSnap.onEditForeignKeyColumnValue({
             foreignKey,
             row,
-            column: column as unknown as PostgresColumn,
+            column: column as unknown as PGColumn,
           })
         }
       }
 
       const removeAllFilters = useCallback(() => {
-        if (newFilterBarEnabled) {
-          clearNewFilters()
-        } else {
-          clearOldFilters()
-        }
-      }, [clearOldFilters, clearNewFilters, newFilterBarEnabled])
-
-      const filters = useMemo(() => {
-        if (newFilterBarEnabled) {
-          return newFilters
-        } else {
-          return oldFilters
-        }
-      }, [newFilters, oldFilters, newFilterBarEnabled])
+        clearFilters()
+      }, [clearFilters])
 
       // Compute columns with cellClass for dirty cells
       // This needs to be computed at render time so it reacts to operation queue changes
@@ -190,7 +167,7 @@ export const Grid = memo(
               // Check if this cell has pending changes
               const isDirty = tableEditorSnap.hasPendingCellChange(
                 snap.table.id,
-                rowIdentifiers,
+                getStableRowIdentifiers(row, rowIdentifiers),
                 col.key
               )
               return isDirty ? 'rdg-cell--dirty' : undefined
@@ -222,6 +199,75 @@ export const Grid = memo(
         }
       }, [rowClass])
 
+      const sensors = useSensors(
+        useSensor(PointerSensor, {
+          activationConstraint: {
+            delay: 150,
+            tolerance: 5,
+          },
+        })
+      )
+      const [draggedColumn, setDraggedColumn] = useState<SupaColumn | undefined>(undefined)
+      const contextMenuTriggerRef = useRef<HTMLDivElement>(null)
+      const [contextMenuKey, setContextMenuKey] = useState(0)
+      const [isContextMenuOpen, setIsContextMenuOpen] = useState(false)
+      const [contextMenuRow, setContextMenuRow] = useState<SupaRow | null>(null)
+      const [contextMenuCellPosition, setContextMenuCellPosition] = useState<{
+        idx: number
+        rowIdx: number
+      } | null>(null)
+
+      const openContextMenu = useCallback(
+        (
+          event: React.MouseEvent,
+          row: SupaRow,
+          position: {
+            idx: number
+            rowIdx: number
+          }
+        ) => {
+          const trigger = contextMenuTriggerRef.current
+          if (!trigger) return
+
+          trigger.style.left = `${event.clientX}px`
+          trigger.style.top = `${event.clientY}px`
+
+          flushSync(() => {
+            setContextMenuRow(row)
+            setContextMenuCellPosition(position)
+            setContextMenuKey((prev) => prev + 1)
+            setIsContextMenuOpen(true)
+          })
+        },
+        []
+      )
+
+      const handleCellClick = useCallback(
+        (_: CellClickArgs<SupaRow, unknown>, event: React.MouseEvent<HTMLElement>) => {
+          event.currentTarget.focus()
+        },
+        []
+      )
+
+      const handleCellContextMenu = useCallback(
+        (args: CellClickArgs<SupaRow, unknown>, event: CellMouseEvent) => {
+          event.preventDefault()
+          event.currentTarget.focus()
+          args.selectCell()
+          event.preventGridDefault()
+
+          const rowIdx = rows.findIndex(
+            (candidate) => candidate === args.row || candidate.idx === args.row.idx
+          )
+          if (rowIdx === -1) return
+
+          const position = { idx: args.column.idx, rowIdx }
+          snap.setSelectedCellPosition(position)
+          openContextMenu(event, args.row, position)
+        },
+        [openContextMenu, rows, snap]
+      )
+
       return (
         <div
           data-testid="table-editor-grid-container"
@@ -235,7 +281,7 @@ export const Grid = memo(
           {(rows ?? []).length === 0 && (
             <div
               className={cn(
-                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-[1] pointer-events-none'
+                'absolute w-full inset-0 flex flex-col items-center justify-center p-2 z-1 pointer-events-none'
               )}
             >
               {isLoading && !isDisabled && (
@@ -255,7 +301,7 @@ export const Grid = memo(
                       <p className="text-sm text-light">This page does not have any data</p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
-                          type="default"
+                          variant="default"
                           className="pointer-events-auto"
                           onClick={() => snap.setPage(1)}
                         >
@@ -278,21 +324,14 @@ export const Grid = memo(
                             started.
                           </p>
                         </div>
-                      ) : (
+                      ) : canImportData ? (
                         <div className="flex flex-col items-center gap-4 mt-4">
                           <Button
-                            type="default"
+                            variant="default"
                             className="pointer-events-auto"
                             onClick={() => {
                               tableEditorSnap.onImportData()
-                              sendEvent({
-                                action: 'import_data_button_clicked',
-                                properties: { tableType: 'Existing Table' },
-                                groups: {
-                                  project: project?.ref ?? 'Unknown',
-                                  organization: org?.slug ?? 'Unknown',
-                                },
-                              })
+                              track('import_data_button_clicked', { tableType: 'Existing Table' })
                             }}
                           >
                             Import data from CSV
@@ -301,7 +340,7 @@ export const Grid = memo(
                             or drag and drop a CSV file here
                           </p>
                         </div>
-                      )}
+                      ) : null}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center">
@@ -310,7 +349,7 @@ export const Grid = memo(
                       </p>
                       <div className="flex items-center space-x-2 mt-4">
                         <Button
-                          type="default"
+                          variant="default"
                           className="pointer-events-auto"
                           onClick={() => removeAllFilters()}
                         >
@@ -324,26 +363,83 @@ export const Grid = memo(
             </div>
           )}
 
-          <DataGrid
-            ref={ref}
-            className={`${gridClass} flex-grow`}
-            rowClass={computedRowClass}
-            columns={columnsWithDirtyCellClass}
-            rows={rows ?? []}
-            renderers={{ renderRow: RowRenderer }}
-            rowKeyGetter={rowKeyGetter}
-            selectedRows={snap.selectedRows}
-            onColumnResize={snap.updateColumnSize}
-            onRowsChange={onRowsChange}
-            onSelectedCellChange={onSelectedCellChange}
-            onSelectedRowsChange={onSelectedRowsChange}
-            onCellDoubleClick={(props) => {
-              if (typeof props.column.name === 'string') {
-                onRowDoubleClick(props.row, { name: props.column.name })
-              }
+          <DndContext
+            sensors={sensors}
+            onDragStart={({ active }) => {
+              // Update the dragged column state to show the drag overlay
+              const column = table.columns.find((col) => col.name === active.id)
+              setDraggedColumn(column)
             }}
-            onCellKeyDown={handleCopyCell}
-          />
+            onDragOver={({ active, over }) => {
+              // Dragged column is not over another column
+              if (over == null) return
+              // Dragged column is over itself
+              if (active.id === over.id) return
+              // Our ids are the columns keys (their names) so it's safe to either cast or call toString
+              snap.moveColumn(active.id.toString(), over.id.toString())
+            }}
+            onDragEnd={() => {
+              setDraggedColumn(undefined)
+            }}
+          >
+            <SortableContext
+              items={columnsWithDirtyCellClass.map((column) => column.key)}
+              strategy={horizontalListSortingStrategy}
+            >
+              <DropdownMenu
+                modal={false}
+                open={isContextMenuOpen}
+                onOpenChange={setIsContextMenuOpen}
+              >
+                <DropdownMenuTrigger asChild>
+                  <div ref={contextMenuTriggerRef} className="fixed pointer-events-none w-0 h-0" />
+                </DropdownMenuTrigger>
+                {contextMenuRow && (
+                  <RowContextMenuContent
+                    key={contextMenuKey}
+                    row={contextMenuRow}
+                    selectedCellPosition={contextMenuCellPosition}
+                  />
+                )}
+                <DataGrid
+                  ref={ref}
+                  className={cn(
+                    gridClass,
+                    'grow border-t-default! border-b-0!',
+                    isContextMenuOpen && 'rdg-context-menu-open'
+                  )}
+                  rowClass={computedRowClass}
+                  columns={columnsWithDirtyCellClass}
+                  rows={rows ?? []}
+                  rowKeyGetter={rowKeyGetter}
+                  selectedRows={snap.selectedRows}
+                  onColumnResize={snap.updateColumnSize}
+                  onRowsChange={onRowsChange}
+                  onSelectedCellChange={onSelectedCellChange}
+                  onSelectedRowsChange={onSelectedRowsChange}
+                  onCellClick={handleCellClick}
+                  onCellContextMenu={handleCellContextMenu}
+                  onCellDoubleClick={(props) => {
+                    if (typeof props.column.name === 'string') {
+                      onRowDoubleClick(props.row, { name: props.column.name })
+                    }
+                  }}
+                  onCellKeyDown={(args, event) =>
+                    handleCellKeyDown(args, event, {
+                      rows: rows ?? [],
+                      columns: snap.table.columns,
+                      onRowsChange,
+                      sensitiveDataColumns: snap.sensitiveDataColumns,
+                    })
+                  }
+                />
+              </DropdownMenu>
+              {/* The DragOverlay is necessary to avoid styling issues while dragging a column */}
+              <DragOverlay>
+                {draggedColumn ? <ColumnOverlayItem column={draggedColumn} /> : null}
+              </DragOverlay>
+            </SortableContext>
+          </DndContext>
         </div>
       )
     }

@@ -35,7 +35,7 @@ function ProductIcon({ icon, color }: ProductIcon) {
   return (
     <div
       className={[
-        'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md',
+        'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md',
         !color || color === 'black' ? 'bg-foreground text-background-alternative' : '',
         color && color === 'gray' ? 'bg-border-strong text-foreground-light' : '',
         color && color === 'green' ? 'bg-brand text-brand-100' : '',

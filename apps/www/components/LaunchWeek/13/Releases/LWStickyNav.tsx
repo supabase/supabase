@@ -1,6 +1,8 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { isBrowser } from 'common'
+import { ArrowUpRight, ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { WeekDayProps, mainDays } from './data'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import {
   Button,
   cn,
@@ -9,10 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { isBrowser } from 'common'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { ArrowUpRight, ChevronDown } from 'lucide-react'
+import { mainDays, WeekDayProps } from './data'
 
 const LWXStickyNav: FC = () => {
   const days = mainDays()
@@ -42,7 +42,7 @@ const LWXStickyNav: FC = () => {
     })
 
     links.current?.forEach((link) => {
-      link.classList.remove('!text-foreground')
+      link.classList.remove('text-foreground!')
 
       const sanitizedHref = decodeURI(link.getAttribute('href') ?? '')
         .split('#')
@@ -51,7 +51,7 @@ const LWXStickyNav: FC = () => {
       const isMatch = sanitizedHref === newActiveAnchor
 
       if (isMatch) {
-        link.classList.add('!text-foreground')
+        link.classList.add('text-foreground!')
       }
     })
   }
@@ -70,12 +70,12 @@ const LWXStickyNav: FC = () => {
   return (
     <div className="absolute inset-0 pointer-events-none w-full h-full">
       <nav className="sticky z-30 top-0 bg-default/30 dark:bg-default/90 backdrop-blur-md w-full border-b dark:border-muted h-[60px] flex items-center">
-        <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
+        <SectionContainer className="max-w-none! py-0! lg:container! flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="w-full flex items-center gap-4 md:gap-8">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   iconRight={<ChevronDown />}
                   className="md:hidden w-[200px] min-w-[150px] flex justify-between items-center py-2 pointer-events-auto"
                 >

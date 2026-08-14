@@ -169,10 +169,10 @@ const PageSectionMeta = ({ className, children, ...props }: PageSectionMetaProps
         data-slot="page-section-meta"
         className={cn(
           'flex flex-col @xl:flex-row @xl:justify-between @xl:items-center gap-4',
-          '[&>[data-slot="page-section-summary"]]:flex-1',
+          '*:data-[slot="page-section-summary"]:flex-1',
           // Center alignment with PageSectionAside in case no PageSectionDescription present
-          '[&>[data-slot="page-section-summary"]]:@xl:self-center',
-          '[&>[data-slot="page-section-aside"]]:shrink-0',
+          '*:data-[slot="page-section-summary"]:@xl:self-center',
+          '*:data-[slot="page-section-aside"]:shrink-0',
           className
         )}
         {...props}

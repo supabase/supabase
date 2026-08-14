@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { PROJECT_STATUS } from 'lib/constants'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export const ResizingState = () => {
   const { ref } = useParams()

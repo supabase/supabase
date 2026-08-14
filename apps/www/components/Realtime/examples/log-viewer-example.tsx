@@ -121,7 +121,7 @@ export default function App() {
     
     return (
       <div 
-        className={\`p-2 inline-block rounded px-2 py-1 font-medium text-neutral-100/50 text-center min-w-[60px] text-white \${colorClass}\`}
+        className={\`p-2 inline-block rounded-sm px-2 py-1 font-medium text-neutral-100/50 text-center min-w-[60px] text-white \${colorClass}\`}
       >
         {level}
       </div>
@@ -309,7 +309,7 @@ export default function App() {
 
       {/* Error message */}
       {error && (
-        <div className="p-4 bg-red-500 text-white m-4 rounded">
+        <div className="p-4 bg-red-500 text-white m-4 rounded-sm">
           Error: {error}
         </div>
       )}
@@ -327,7 +327,7 @@ export default function App() {
       {/* Main content */}
       <div className="flex-1 font-mono text-xs">
         <div className="h-full relative">
-          <div className="h-32 w-full z-10 absolute left-0 right-0 bottom-0 bg-gradient-to-t from-neutral-900 to-transparent" />
+          <div className="h-32 w-full z-10 absolute left-0 right-0 bottom-0 bg-linear-to-t from-neutral-900 to-transparent" />
           <AutoSizer>
             {({ width, height }) => (
               <InfiniteLoader

@@ -1,18 +1,19 @@
+import pgMeta from '@supabase/pg-meta'
+import type { PGFunctionUpdate } from '@supabase/pg-meta/src/pg-meta-functions'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import pgMeta from '@supabase/pg-meta'
-import { databaseKeys } from 'data/database/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
-import type { DatabaseFunction } from './database-functions-query'
+import type { SavedDatabaseFunction } from './database-functions-query'
+import { databaseKeys } from '@/data/database/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
   connectionString?: string | null
-  func: DatabaseFunction
-  payload: z.infer<typeof pgMeta.functions.pgFunctionCreateZod>
+  func: SavedDatabaseFunction
+  payload: PGFunctionUpdate
 }
 
 export async function updateDatabaseFunction({

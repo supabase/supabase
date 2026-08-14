@@ -80,6 +80,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
+
     const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
     // ---cut---
@@ -90,7 +91,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
     })
     ```
 
-    <Admonition type="note" label="Supported password hashing algorithms">
+    <Admonition type="note" title="Supported password hashing algorithms">
 
     Supabase supports bcrypt and Argon2 password hashes.
 
@@ -100,6 +101,7 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 
     ```ts
     import { createClient } from '@supabase/supabase-js'
+
     const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
     // ---cut---
@@ -112,7 +114,6 @@ Migrate existing users to Supabase Auth. This requires two main steps: first, ch
 1.  To sign in your migrated users, use the Supabase Auth [sign in methods](/docs/reference/javascript/auth-signinwithpassword).
 
     To check for edge cases where users aren't successfully migrated, use a fallback strategy. This ensures that users can continue to sign in seamlessly:
-
     1.  Try to sign in the user with Supabase Auth.
     1.  If the signin fails, try to sign in with Auth0.
     1.  If Auth0 signin succeeds, call the admin create user method again to create the user in Supabase Auth.
@@ -123,6 +124,7 @@ For passwordless signin via email or phone, check for users with verified email 
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -163,6 +165,7 @@ Both columns are accessible from the admin user methods. To create a user with c
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -199,7 +202,6 @@ create table private.user_metadata (
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
@@ -207,7 +209,7 @@ create table private.user_metadata (
 >
 
 <AccordionItem
-header={<span className="text-foreground">I have IDs assigned to existing users in my database, how can I maintain these IDs?</span>}
+header="I have IDs assigned to existing users in my database, how can I maintain these IDs?"
 id="custom-user-id"
 >
 
@@ -230,7 +232,7 @@ const { data, error } = await supabase.auth.admin.createUser({
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">How can I allow my users to retain their existing password?</span>}
+header="How can I allow my users to retain their existing password?"
 id="existing-password"
 >
 
@@ -239,7 +241,7 @@ Supabase Auth never stores passwords as plaintext. Since Supabase Auth supports 
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">My users have multi-factor authentication (MFA) enabled, how do I make sure they don't have to set up MFA again?</span>}
+header="My users have multi-factor authentication (MFA) enabled, how do I make sure they don't have to set up MFA again?"
 id="mfa"
 >
 
@@ -248,7 +250,7 @@ You can obtain an export of your users' MFA secrets by opening a support ticket 
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">How do I migrate existing SAML Single Sign-On (SSO) connections?</span>}
+header="How do I migrate existing SAML Single Sign-On (SSO) connections?"
 id="saml"
 >
 
@@ -257,7 +259,7 @@ Customers may need to link their identity provider with Supabase Auth separately
 </AccordionItem>
 
 <AccordionItem
-header={<span className="text-foreground">How do I migrate my Auth0 organizations to Supabase?</span>}
+header="How do I migrate my Auth0 organizations to Supabase?"
 id="migrate-org"
 >
 

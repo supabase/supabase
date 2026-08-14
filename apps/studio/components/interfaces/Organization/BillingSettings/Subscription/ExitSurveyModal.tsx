@@ -1,13 +1,25 @@
 import { useFlag, useParams } from 'common'
-import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
-import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
-import { getComputeSize, OrgProject } from 'data/projects/org-projects-infinite-query'
-import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Alert, Button, cn, Input, Modal } from 'ui'
+import {
+  Button,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  TextArea,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
+import { CANCELLATION_REASONS } from '@/components/interfaces/Billing/Billing.constants'
+import { useSendDowngradeFeedbackMutation } from '@/data/feedback/exit-survey-send'
+import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -22,16 +34,43 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const [message, setMessage] = useState('')
   const [selectedReason, setSelectedReason] = useState<string[]>([])
 
+  const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
+    useSendDowngradeFeedbackMutation({
+      // the user should not get a toast saying "submitting survey failed"
+      onError: () => {},
+    })
+
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onError: (error) => {
-        toast.error(`Failed to downgrade project: ${error.message}`)
+        toast.error(`Failed to downgrade project: ${error.message}`, {
+          duration: 10_000,
+          dismissible: true,
+        })
+      },
+      onSuccess: async () => {
+        toast.success(
+          hasProjectsWithComputeDowngrade
+            ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
+            : 'Successfully downgraded organization to the Free Plan',
+          { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
+        )
+
+        if (slug) {
+          sendExitSurvey({
+            orgSlug: slug,
+            reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
+            message,
+            exitAction: 'downgrade',
+          }).catch(() => {})
+        }
+
+        onClose(true)
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
       },
     }
   )
-  const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
-    useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 
   const projectsWithComputeDowngrade = projects.filter((project) => {
@@ -70,117 +109,104 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
     // Update the subscription first, followed by posting the exit survey if successful
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
-
-    updateOrgSubscription(
-      { slug, tier: 'tier_free' },
-      {
-        onSuccess: async () => {
-          try {
-            await sendExitSurvey({
-              orgSlug: slug,
-              reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
-              message,
-              exitAction: 'downgrade',
-            })
-          } catch (error) {
-            // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
-          } finally {
-            toast.success(
-              hasProjectsWithComputeDowngrade
-                ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
-                : 'Successfully downgraded organization to the Free Plan',
-              { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
-            )
-            onClose(true)
-            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-          }
-        },
-      }
-    )
+    updateOrgSubscription({ slug, tier: 'tier_free' })
   }
 
   return (
-    <Modal hideFooter size="xlarge" visible={visible} onCancel={onClose} header="Help us improve">
-      <Modal.Content>
-        <div className="space-y-4">
-          <p className="text-sm text-foreground-light">
-            What made you decide to downgrade your plan?
-          </p>
-          <div className="space-y-8 mt-6">
-            <div className="flex flex-wrap gap-2" data-toggle="buttons">
-              {shuffledReasons.map((option) => {
-                const active = selectedReason[0] === option.value
-                return (
-                  <label
-                    key={option.value}
-                    className={cn(
-                      'flex cursor-pointer items-center space-x-2 rounded-md py-1',
-                      'pl-2 pr-3 text-center text-sm',
-                      'shadow-sm transition-all duration-100',
-                      active
-                        ? `bg-foreground text-background opacity-100 hover:bg-opacity-75`
-                        : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
-                    )}
-                  >
-                    <input
-                      type="radio"
-                      name="options"
-                      value={option.value}
-                      className="hidden"
-                      checked={active}
-                      onChange={() => onSelectCancellationReason(option.value)}
-                    />
-                    <div>{option.value}</div>
-                  </label>
-                )
-              })}
+    <Dialog open={visible} onOpenChange={onClose}>
+      <DialogContent size="xlarge">
+        <DialogHeader>
+          <DialogTitle>Help us improve</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection>
+          <div className="flex flex-col space-y-4">
+            <p className="text-sm text-foreground-light">
+              What made you decide to downgrade your plan?
+            </p>
+            <div className="space-y-8 mt-6">
+              <div className="flex flex-wrap gap-2" data-toggle="buttons">
+                {shuffledReasons.map((option) => {
+                  const active = selectedReason[0] === option.value
+                  return (
+                    <label
+                      key={option.value}
+                      className={cn(
+                        'flex cursor-pointer items-center space-x-2 rounded-md py-1',
+                        'pl-2 pr-3 text-center text-sm',
+                        'shadow-xs transition-all duration-100',
+                        active
+                          ? `bg-foreground text-background opacity-100 hover:bg-foreground/75`
+                          : `bg-border-strong text-foreground opacity-75 hover:opacity-100`
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="options"
+                        value={option.value}
+                        className="hidden"
+                        checked={active}
+                        onChange={() => onSelectCancellationReason(option.value)}
+                      />
+                      <div>{option.value}</div>
+                    </label>
+                  )
+                })}
+              </div>
+              <div className="text-area-text-sm flex flex-col gap-y-2">
+                <label htmlFor="message" className="text-sm whitespace-pre-line wrap-break-word">
+                  {textareaLabel}
+                </label>
+                <TextArea
+                  id="message"
+                  name="message"
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value)}
+                  rows={3}
+                />
+              </div>
             </div>
-            <div className="text-area-text-sm flex flex-col gap-y-2">
-              <label className="text-sm whitespace-pre-line break-words">{textareaLabel}</label>
-              <Input.TextArea
-                id="message"
-                name="message"
-                value={message}
-                onChange={(event: any) => setMessage(event.target.value)}
-                rows={3}
+            {hasProjectsWithComputeDowngrade && (
+              <Admonition
+                type="warning"
+                layout="horizontal"
+                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
+                description={
+                  <>
+                    This is due to changes in compute instances from the downgrade. Affected
+                    projects include{' '}
+                    {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
+                  </>
+                }
               />
-            </div>
+            )}
           </div>
-          {hasProjectsWithComputeDowngrade && (
-            <Alert
-              withIcon
-              variant="warning"
-              title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
-            >
-              This is due to changes in compute instances from the downgrade. Affected projects
-              include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
-            </Alert>
-          )}
-        </div>
-      </Modal.Content>
 
-      <div className="flex items-center justify-between border-t px-4 py-4">
-        <p className="text-xs text-foreground-lighter">
-          The unused amount for the remaining time of your billing cycle will be refunded as credits
-        </p>
+          <div className="flex items-center justify-between border-t px-4 py-4">
+            <p className="text-xs text-foreground-lighter">
+              The unused amount for the remaining time of your billing cycle will be refunded as
+              credits
+            </p>
+          </div>
+        </DialogSection>
 
-        <div className="flex items-center space-x-2">
-          <Button type="default" onClick={() => onClose()}>
+        <DialogFooter>
+          <Button variant="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
             <Button
-              type="danger"
+              variant="danger"
               className="pointer-events-auto"
               loading={isSubmitting}
               disabled={subscriptionUpdateDisabled || isSubmitting}
               onClick={onSubmit}
             >
-              Confirm downgrade
+              Downgrade Now
             </Button>
           </ProjectUpdateDisabledTooltip>
-        </div>
-      </div>
-    </Modal>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -1,58 +1,81 @@
-import { keyBy } from 'lodash'
-import { useCallback, useMemo } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
-import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
-import ProjectLinker, {
-  ForeignProject,
-} from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
-import { Markdown } from 'components/interfaces/Markdown'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { BASE_PATH } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout, Organization } from 'types'
+import { keyBy } from 'lodash'
+import Head from 'next/head'
+import { useCallback, useMemo } from 'react'
+import { Card, CardContent } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-const VERCEL_ICON = (
-  <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />
-)
+import {
+  findVercelIntegrationByConfigurationId,
+  isVercelUrl,
+} from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
+import {
+  VERCEL_INTEGRATION_ICON,
+  VercelEnvVarsSyncDescription,
+  VercelIntegrationFooter,
+  VercelIntegrationInterstitialErrorState,
+  VercelIntegrationLogo,
+} from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
+import { ProjectLinker } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
+import type { ForeignProject } from '@/components/interfaces/Integrations/VercelGithub/VercelGithub.types'
+import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
+import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'
+import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
+import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
+import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { BASE_PATH } from '@/lib/constants'
+import { getErrorMessage } from '@/lib/get-error-message'
+import { hasVercelDeployButtonSignals } from '@/lib/integrations/vercel-install.utils'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useProfileNameAndPicture } from '@/lib/profile'
+import { EMPTY_ARR } from '@/lib/void'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { NextPageWithLayout, Organization } from '@/types'
 
-const VercelIntegration: NextPageWithLayout = () => {
-  const { slug, configurationId, next } = useParams()
+const PAGE_TITLE = buildStudioPageTitle({
+  section: 'Connect Vercel Project',
+  brand: 'Supabase',
+})
 
-  /**
-   * Fetch the list of organization based integration installations for Vercel.
-   *
-   * Array of integrations installed on all
-   */
-  const { data: integrationData } = useOrgIntegrationsQuery({ orgSlug: slug })
+const VercelChooseProjectPage: NextPageWithLayout = () => {
+  const { slug, configurationId, next, currentProjectId, externalId } = useParams()
+  const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
+  const displayName = primaryEmail ?? username ?? ''
+  const isDeployButtonFlow = hasVercelDeployButtonSignals({ currentProjectId, externalId })
 
-  const { data } = useOrganizationsQuery({ enabled: slug !== undefined })
+  const {
+    data: integrationData,
+    isPending: isLoadingIntegrationsQuery,
+    isError: isIntegrationsError,
+    error: integrationsError,
+  } = useOrgIntegrationsQuery({ orgSlug: slug })
 
-  const organization = data?.find((organization: Organization) => organization.slug === slug)
+  const {
+    data: organizationsData,
+    isPending: isLoadingOrganizationsQuery,
+    isError: isOrganizationsError,
+    error: organizationsError,
+  } = useOrganizationsQuery({ enabled: slug !== undefined })
 
-  const integration = integrationData?.find(
-    (x) =>
-      x.metadata !== undefined &&
-      'configuration_id' in x.metadata &&
-      x.metadata?.configuration_id === configurationId
+  const organization = organizationsData?.find(
+    (organization: Organization) => organization.slug === slug
   )
 
-  const { data: vercelProjectsData, isPending: isLoadingVercelProjectsData } =
-    useVercelProjectsQuery(
-      {
-        organization_integration_id: integration?.id,
-      },
-      { enabled: integration?.id !== undefined }
-    )
+  const integration = findVercelIntegrationByConfigurationId(integrationData, configurationId)
+
+  const {
+    data: vercelProjectsData,
+    isPending: isLoadingVercelProjectsData,
+    isError: isVercelProjectsError,
+    error: vercelProjectsError,
+  } = useVercelProjectsQuery(
+    {
+      organization_integration_id: integration?.id,
+    },
+    { enabled: integration?.id !== undefined }
+  )
 
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
   const vercelProjectsById = useMemo(() => keyBy(vercelProjects, 'id'), [vercelProjects])
@@ -68,7 +91,7 @@ const VercelIntegration: NextPageWithLayout = () => {
           src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
           width={21}
           height={21}
-          alt={`icon`}
+          alt="Framework icon"
         />
       )
     },
@@ -77,25 +100,29 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutate: createConnections, isPending: isCreatingConnection } =
-    useIntegrationVercelConnectionsCreateMutation({
-      onSuccess() {
-        if (next && isVercelUrl(next)) {
-          snapshot.setLoading(false)
-          window.location.href = next
-        }
-      },
-      onMutate() {
-        snapshot.setLoading(true)
-      },
-      onError(error) {
+  const {
+    mutate: createConnections,
+    isPending: isCreatingConnection,
+    error: createConnectionsError,
+    reset: resetCreateConnectionsError,
+  } = useIntegrationVercelConnectionsCreateMutation({
+    onSuccess() {
+      if (next && isVercelUrl(next)) {
         snapshot.setLoading(false)
-        toast.error(`Creating connection failed: ${error.message}`)
-      },
-    })
+        window.location.href = next
+      }
+    },
+    onMutate() {
+      snapshot.setLoading(true)
+    },
+  })
+  const actionError = createConnectionsError
+    ? `Creating connection failed: ${createConnectionsError.message}`
+    : undefined
 
   const onCreateConnections = useCallback(
-    (vars: any) => {
+    (vars: Parameters<typeof createConnections>[0]) => {
+      resetCreateConnectionsError()
       createConnections({
         ...vars,
         connection: {
@@ -111,57 +138,116 @@ const VercelIntegration: NextPageWithLayout = () => {
         },
       })
     },
-    [createConnections]
+    [createConnections, resetCreateConnectionsError]
   )
+
+  const showLoadingState =
+    isLoadingOrganizationsQuery ||
+    isLoadingIntegrationsQuery ||
+    (integration?.id !== undefined && isLoadingVercelProjectsData)
+
+  const isError = isOrganizationsError || isIntegrationsError || isVercelProjectsError
+  const errorMessage =
+    getErrorMessage(organizationsError) ??
+    getErrorMessage(integrationsError) ??
+    getErrorMessage(vercelProjectsError)
+  const integrationNotFound =
+    !isLoadingIntegrationsQuery && integrationData !== undefined && integration === undefined
 
   return (
     <>
-      <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
-        <ScaffoldColumn className="!max-w-[900px] mx-auto w-full">
-          <header>
-            <h2>Create your first Project Connection</h2>
-            <Markdown
-              className="text-foreground-lighter"
-              content={`
-This Supabase integration manages your environment variables automatically to provide the latest keys in the unlikely event that you will need to refresh your JWT token.
-`}
-            />
-          </header>
-          <ProjectLinker
-            slug={organization?.slug}
-            organizationIntegrationId={integration?.id}
-            foreignProjects={vercelProjects}
-            onCreateConnections={onCreateConnections}
-            installedConnections={integration?.connections}
-            isLoading={isCreatingConnection}
-            integrationIcon={VERCEL_ICON}
-            getForeignProjectIcon={getForeignProjectIcon}
-            choosePrompt="Choose Vercel Project"
-            onSkip={() => {
-              if (next && isVercelUrl(next)) {
-                window.location.href = next
-              }
-            }}
-            loadingForeignProjects={isLoadingVercelProjectsData}
-            mode="Vercel"
-          />
-          <Markdown
-            content={`
-The following environment variables will be added:
+      <Head>
+        <title>{PAGE_TITLE}</title>
+      </Head>
 
-${ENV_VAR_RAW_KEYS.map((x) => {
-  return `\n - \`${x}\``
-})}
-`}
-          />
-        </ScaffoldColumn>
-      </ScaffoldContainer>
+      <InterstitialLayout
+        logo={<VercelIntegrationLogo />}
+        title="Connect Vercel project"
+        description={<VercelEnvVarsSyncDescription />}
+        footer={<VercelIntegrationFooter />}
+      >
+        <div className="px-6 pb-6">
+          {showLoadingState ? (
+            <ChooseProjectLoadingState />
+          ) : isError ? (
+            <VercelIntegrationInterstitialErrorState
+              title="Unable to load project connection"
+              errorMessage={errorMessage}
+            />
+          ) : organization === undefined ? (
+            <VercelIntegrationInterstitialErrorState
+              title="Unable to load project connection"
+              errorMessage="Organization not found. Retry the installation from Vercel."
+            />
+          ) : integrationNotFound ? (
+            <VercelIntegrationInterstitialErrorState
+              title="Unable to load project connection"
+              errorMessage="Vercel integration not found for this organization. Retry the installation from Vercel."
+            />
+          ) : (
+            <div className="flex flex-col gap-5">
+              <InterstitialAccountRow
+                avatarUrl={avatarUrl}
+                displayName={displayName}
+                detail={organization.name}
+              />
+
+              <ProjectLinker
+                variant="interstitial"
+                slug={organization.slug}
+                organizationIntegrationId={integration?.id}
+                foreignProjects={vercelProjects}
+                onCreateConnections={onCreateConnections}
+                installedConnections={integration?.connections}
+                isLoading={isCreatingConnection}
+                integrationIcon={VERCEL_INTEGRATION_ICON}
+                getForeignProjectIcon={getForeignProjectIcon}
+                choosePrompt="Choose Vercel project"
+                defaultForeignProjectId={currentProjectId}
+                onSkip={
+                  isDeployButtonFlow
+                    ? undefined
+                    : () => {
+                        if (next && isVercelUrl(next)) {
+                          window.location.href = next
+                        }
+                      }
+                }
+                loadingForeignProjects={isLoadingVercelProjectsData}
+                mode="Vercel"
+                actionError={actionError}
+                onSelectionChange={resetCreateConnectionsError}
+              />
+            </div>
+          )}
+        </div>
+      </InterstitialLayout>
     </>
   )
 }
 
-VercelIntegration.getLayout = (page) => (
-  <VercelIntegrationWindowLayout>{page}</VercelIntegrationWindowLayout>
+const ChooseProjectLoadingState = () => (
+  <div className="flex flex-col gap-5">
+    <Card className="shadow-none">
+      <CardContent className="flex items-center gap-3 border-none px-4 py-3">
+        <ShimmeringLoader className="size-8 flex-shrink-0 rounded-full py-0" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <ShimmeringLoader className="h-3 w-20 py-0" />
+          <ShimmeringLoader className="h-4 w-40 max-w-full py-0" />
+          <ShimmeringLoader className="h-3 w-32 py-0" />
+        </div>
+      </CardContent>
+    </Card>
+    <section className="space-y-2" aria-label="Project loading">
+      <ShimmeringLoader className="h-3 w-24 py-0" />
+      <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />
+    </section>
+    <section className="space-y-2" aria-label="Vercel project loading">
+      <ShimmeringLoader className="h-3 w-24 py-0" />
+      <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />
+    </section>
+    <ShimmeringLoader className="h-10 w-full rounded-md py-0" />
+  </div>
 )
 
-export default VercelIntegration
+export default withAuth(VercelChooseProjectPage)

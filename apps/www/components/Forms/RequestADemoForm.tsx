@@ -1,9 +1,9 @@
-import { FC, useEffect, useState } from 'react'
-import Link from 'next/link'
-import { CircleAlert } from 'lucide-react'
-import { Button, cn, Input_Shadcn_, Label_Shadcn_, Separator, TextArea_Shadcn_ } from 'ui'
-import { Alert } from 'ui/src/components/shadcn/ui/alert'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { CircleAlert } from 'lucide-react'
+import Link from 'next/link'
+import { FC, useEffect, useState } from 'react'
+import { Button, cn, Input, Label, Separator, TextArea } from 'ui'
+import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 interface FormData {
   firstName: string
@@ -18,7 +18,7 @@ interface FormItem {
   placeholder: string
   required: boolean
   className?: string
-  component: typeof TextArea_Shadcn_ | typeof Input_Shadcn_
+  component: typeof TextArea | typeof Input
 }
 
 type FormConfig = {
@@ -36,7 +36,7 @@ const formConfig: FormConfig = {
     placeholder: 'First Name',
     required: true,
     className: 'md:col-span-1',
-    component: Input_Shadcn_,
+    component: Input,
   },
   secondName: {
     type: 'text',
@@ -44,7 +44,7 @@ const formConfig: FormConfig = {
     placeholder: 'Last Name',
     required: true,
     className: 'md:col-span-1',
-    component: Input_Shadcn_,
+    component: Input,
   },
   companyEmail: {
     type: 'text',
@@ -52,7 +52,7 @@ const formConfig: FormConfig = {
     placeholder: 'Company Email',
     required: true,
     className: '',
-    component: Input_Shadcn_,
+    component: Input,
   },
   message: {
     type: 'textarea',
@@ -60,7 +60,7 @@ const formConfig: FormConfig = {
     placeholder: 'Share more about what you want to accomplish',
     required: true,
     className: '[&_textarea]:min-h-[100px] [&_textarea]:bg-foreground/[.026]',
-    component: TextArea_Shadcn_,
+    component: TextArea,
   },
 }
 
@@ -220,10 +220,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
                   key={key}
                   className={cn('flex flex-col col-span-full gap-y-2', fieldValue.className)}
                 >
-                  <Label_Shadcn_
-                    htmlFor={fieldKey}
-                    className="text-foreground-light flex justify-between"
-                  >
+                  <Label htmlFor={fieldKey} className="text-foreground-light flex justify-between">
                     {fieldValue.label}
                     <div
                       className={cn(
@@ -233,7 +230,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
                     >
                       {errors[fieldKey]}
                     </div>
-                  </Label_Shadcn_>
+                  </Label>
                   <Component
                     type="text"
                     id={fieldKey}
@@ -259,7 +256,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
             <Separator className="col-span-full" />
             <Button
               block
-              htmlType="submit"
+              type="submit"
               size="small"
               className="col-span-full"
               disabled={isSubmitting}

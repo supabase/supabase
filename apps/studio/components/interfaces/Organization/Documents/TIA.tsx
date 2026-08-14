@@ -1,17 +1,15 @@
 import { Download } from 'lucide-react'
+import { Button } from 'ui'
 
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { Button } from 'ui'
+} from '@/components/layouts/Scaffold'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const TIA = () => {
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <ScaffoldSection className="py-12">
@@ -26,19 +24,13 @@ export const TIA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         <div className="@lg:flex items-center justify-center h-full">
-          <Button asChild type="default" iconRight={<Download />}>
+          <Button asChild variant="default" iconRight={<Download />}>
             <a
               href="https://supabase.com/downloads/docs/Supabase+TIA+250314.pdf"
               target="_blank"
               rel="noreferrer noopener"
               download={true}
-              onClick={() =>
-                sendEvent({
-                  action: 'document_view_button_clicked',
-                  properties: { documentName: 'TIA' },
-                  groups: { organization: organization?.slug ?? 'Unknown' },
-                })
-              }
+              onClick={() => track('document_view_button_clicked', { documentName: 'TIA' })}
             >
               Download TIA
             </a>

@@ -1,12 +1,13 @@
+import { ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
+
 import {
   ScaffoldContainer,
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import { CustomContentTypes } from 'hooks/custom-content/CustomContent.types'
-import { ExternalLink } from 'lucide-react'
-import { Button } from 'ui'
+} from '@/components/layouts/Scaffold'
+import { CustomContentTypes } from '@/hooks/custom-content/CustomContent.types'
 
 interface CustomDocumentProps {
   doc: CustomContentTypes['organizationLegalDocuments'][number]
@@ -24,7 +25,7 @@ export const CustomDocument = ({ doc }: CustomDocumentProps) => {
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <div className="@lg:flex items-center justify-center h-full">
-            <Button asChild type="default" iconRight={<ExternalLink />}>
+            <Button asChild variant="default" iconRight={<ExternalLink />}>
               <a download href={doc.action.url} target="_blank" rel="noreferrer noopener">
                 {doc.action.text}
               </a>

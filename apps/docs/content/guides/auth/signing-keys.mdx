@@ -14,29 +14,29 @@ When a JWT is issued by Supabase Auth, the key used to create its [signature](ht
 
 | System            | Type                                       | Description                                                                                                                                                                                                                                                                                                                                                                  |
 | ----------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Legacy            | JWT&nbsp;secret                            | Initially Supabase was designed to use a single shared secret key to sign all JWTs. This includes <span className="!whitespace-nowrap">the `anon` and `service_role`</span> keys, all user access tokens including some [Storage pre-signed URLs](/docs/reference/javascript/storage-from-createsignedurl). **No longer recommended.** Available for backward compatibility. |
+| Legacy            | JWT&nbsp;secret                            | Initially Supabase was designed to use a single shared secret key to sign all JWTs. This includes <span className="whitespace-nowrap!">the `anon` and `service_role`</span> keys, all user access tokens including some [Storage pre-signed URLs](/docs/reference/javascript/storage-from-createsignedurl). **No longer recommended.** Available for backward compatibility. |
 | Signing&nbsp;keys | Asymmetric&nbsp;key (RSA, Elliptic Curves) | A JWT signing key based on [public-key cryptography](https://en.wikipedia.org/wiki/Public-key_cryptography) (RSA, Elliptic Curves) that follows industry best practices and significantly improves the security, reliability and performance of your applications.                                                                                                           |
 | Signing&nbsp;keys | Shared&nbsp;secret&nbsp;key                | A JWT signing key based on a [shared secret](https://en.wikipedia.org/wiki/HMAC).                                                                                                                                                                                                                                                                                            |
 
 ### Benefits of the signing keys system
 
-We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/api/api-keys).
+We've designed the Signing keys system to address many problems the legacy system had. It goes hand-in-hand with the [publishable and secret API keys](/docs/guides/getting-started/api-keys).
 
-| Benefit                                     | Legacy JWT secret                                                                                                | JWT signing keys                                                                                                                                                                       |
-| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Performance                                 | Increased app latency as JWT validation is done by Auth server.                                                  | If using asymmetric signing key, JWT validation is fast and does not involve Auth server.                                                                                              |
-| Reliability                                 | To ensure secure revocation, Auth server is in the hot path of your application.                                 | If using asymmetric signing key, JWT validation is local and fast and does not involve Auth server.                                                                                    |
-| Security                                    | Requires changing of your application's backend components to fully revoke a compromised secret.                 | If using asymmetric signing key, revocation is automatic via the key discovery endpoint.                                                                                               |
-| Zero-downtime rotation                      | Downtime, sometimes being significant. Requires careful coordination with [API keys](/docs/guides/api/api-keys). | No downtime, as each rotation step is independent and reversible.                                                                                                                      |
-| Users signed out during rotation            | Currently active users get immediately signed out.                                                               | No users get signed out.                                                                                                                                                               |
-| Independence from API keys                  | `anon` and `service_role` must be rotated simultaneously.                                                        | [Publishable and secret API keys](/docs/guides/api/api-keys) no longer are based on the JWT signing key and can be independently managed.                                              |
-| Security compliance frameworks (SOC2, etc.) | Difficult to remain aligned as the secret can be extracted from Supabase.                                        | Easier alignment as the private key or shared secret can't be extracted. [Row Level Security](/docs/guides/database/postgres/row-level-security) has strong key revocation guarantees. |
+| Benefit                                     | Legacy JWT secret                                                                                                            | JWT signing keys                                                                                                                                                                       |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Performance                                 | Increased app latency as JWT validation is done by Auth server.                                                              | If using asymmetric signing key, JWT validation is fast and does not involve Auth server.                                                                                              |
+| Reliability                                 | To ensure secure revocation, Auth server is in the hot path of your application.                                             | If using asymmetric signing key, JWT validation is local and fast and does not involve Auth server.                                                                                    |
+| Security                                    | Requires changing of your application's backend components to fully revoke a compromised secret.                             | If using asymmetric signing key, revocation is automatic via the key discovery endpoint.                                                                                               |
+| Zero-downtime rotation                      | Downtime, sometimes being significant. Requires careful coordination with [API keys](/docs/guides/getting-started/api-keys). | No downtime, as each rotation step is independent and reversible.                                                                                                                      |
+| Users signed out during rotation            | Currently active users get immediately signed out.                                                                           | No users get signed out.                                                                                                                                                               |
+| Independence from API keys                  | `anon` and `service_role` must be rotated simultaneously.                                                                    | [Publishable and secret API keys](/docs/guides/getting-started/api-keys) no longer are based on the JWT signing key and can be independently managed.                                  |
+| Security compliance frameworks (SOC2, etc.) | Difficult to remain aligned as the secret can be extracted from Supabase.                                                    | Easier alignment as the private key or shared secret can't be extracted. [Row Level Security](/docs/guides/database/postgres/row-level-security) has strong key revocation guarantees. |
 
 ## Getting started
 
 You can start migrating away from the legacy JWT secret through the Supabase dashboard. This process does not cause downtime for your application.
 
-1. Start off by clicking the _Migrate JWT secret_ button on the [JWT signing keys](/dashboard/project/_/settings/jwt) page. This step will import the existing legacy JWT secret into the new JWT signing keys system. Once this process completes, you will no longer be able to rotate the legacy JWT secret using the old system.
+1. Start off by clicking the _Migrate JWT secret_ button on the [JWT signing keys](/dashboard/project/_/settings/jwt) page. This step will import the existing legacy JWT secret into the new JWT signing keys system.
 2. Simultaneously, we're creating a new asymmetric JWT signing key for you to rotate to. This key starts off as standby key -- meaning it's being advertised as a key that Supabase Auth will use in the future to create JWTs.
 3. If you're not ready to switch away from the legacy JWT secret right now, you can stop here without any issue. If you wish to use a different signing key -- either to use a different signing algorithm (RSA, Elliptic Curve or shared secret) or to import a private key or shared secret you already have -- feel free to move the standby key to _Previously used_ before finally moving it to _Revoked._
 4. If you do wish to start using the standby key for all new JWT use the _Rotate keys_ button. A few important notes:
@@ -58,7 +58,7 @@ Key rotation and revocation are one of the most important processes for maintain
 - The legacy JWT secret has been leaked in logs, committed to source control, or accidentally exposed in the frontend build of your application, a library, desktop or mobile app package, etc.
 - You suspect that a [member of your organization](/docs/guides/platform/access-control) has lost control of their devices, and a malicious actor may have accessed the JWT secret via the Supabase dashboard or by accessing your application's backend configuration.
 - You suspect that an ex-team-member of your organization may be a malicious actor, by abusing the power the legacy JWT secret provides.
-- Make sure you also switch to [publishable and secret API keys](/docs/guides/api/api-keys) and disable the `anon` and `service_role` keys.
+- Make sure you also switch to [publishable and secret API keys](/docs/guides/getting-started/api-keys) and disable the `anon` and `service_role` keys.
 - If you've imported a private key, and you're suspecting that this private key has been compromised on your end similarly.
 
 **Closer alignment to security best practices and compliance frameworks (SOC2, PCI-DSS, ISO27000, HIPAA, ...)**
@@ -74,39 +74,20 @@ Key rotation and revocation are one of the most important processes for maintain
 
 ### Lifetime of a signing key
 
-<div className="flex flex-row gap-6 items-center w-full">
-
-<Image
-  alt="Diagram showing the state transitions of a signing key"
-  src={{
-    light: '/docs/img/guides/auth-signing-keys/states.svg',
-    dark: '/docs/img/guides/auth-signing-keys/states.svg',
-  }}
-  containerClassName="max-w-[300px] min-w-[180px]"
-  width={336}
-  height={766}
-/>
-
-<div>
-
 A newly created key starts off as standby, before being rotated into in use (becoming the current key) while the existing current key becomes previously used.
 
 At any point you can move a key from the previously used or revoked states back to being a standby key, and rotate to it. This gives you the confidence to revert back to an older key if you identify problems with the rotation, such as forgetting to update a component of your application that is relying on a specific key (for example, the legacy JWT secret).
 
 Each action on a key is reversible (except permanent deletion).
 
-</div>
-
-</div>
-
 | Action                                                                           | Accepted JWT signatures                                                | Description                                                                                                                                                                                                                                                                                                                 |
 | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <span className="!whitespace-nowrap">Create a new key</span>                     | Current key only, new key has not created any JWTs yet.                | When you initially create a key, after choosing the signing algorithm or importing a private key you already have, it starts out in the standby state. If using an asymmetric key (RSA, Elliptic Curve) its public key will be available in the discovery endpoint. Supabase Auth does not use this key to create new JWTs. |
-| <span className="!whitespace-nowrap">Rotate keys</span>                          | Both keys in the rotation.                                             | Rotation only changes the key used by Supabase Auth to create new JWTs, but the trust relationship with both keys remains.                                                                                                                                                                                                  |
-| <span className="!whitespace-nowrap">Revoke key</span>                           | <span className="!whitespace-nowrap">Only from the current key.</span> | Once all regularly valid JWTs have expired (or sooner) revoke the previously used key to revoke trust in it.                                                                                                                                                                                                                |
-| <span className="!whitespace-nowrap">Move to standby</span> from revoked         | Current and previously revoked key.                                    | If you've made a mistake or need more time to adjust your application, you can move a revoked key to standby. Follow up with a rotation to ensure Auth starts using the originally revoked key again to make new JWTs.                                                                                                      |
-| <span className="!whitespace-nowrap">Move to standby</span> from previously used | Both keys.                                                             | This only prepares the key from the last rotation to be used by Auth to make new JWTs with it.                                                                                                                                                                                                                              |
-| <span className="!whitespace-nowrap">Delete key</span>                           | -                                                                      | Permanently destroys the private key or shared secret of a key, so it will not be possible to re-use or rotate again into it.                                                                                                                                                                                               |
+| <span className="whitespace-nowrap!">Create a new key</span>                     | Current key only, new key has not created any JWTs yet.                | When you initially create a key, after choosing the signing algorithm or importing a private key you already have, it starts out in the standby state. If using an asymmetric key (RSA, Elliptic Curve) its public key will be available in the discovery endpoint. Supabase Auth does not use this key to create new JWTs. |
+| <span className="whitespace-nowrap!">Rotate keys</span>                          | Both keys in the rotation.                                             | Rotation only changes the key used by Supabase Auth to create new JWTs, but the trust relationship with both keys remains.                                                                                                                                                                                                  |
+| <span className="whitespace-nowrap!">Revoke key</span>                           | <span className="whitespace-nowrap!">Only from the current key.</span> | Once all regularly valid JWTs have expired (or sooner) revoke the previously used key to revoke trust in it.                                                                                                                                                                                                                |
+| <span className="whitespace-nowrap!">Move to standby</span> from revoked         | Current and previously revoked key.                                    | If you've made a mistake or need more time to adjust your application, you can move a revoked key to standby. Follow up with a rotation to ensure Auth starts using the originally revoked key again to make new JWTs.                                                                                                      |
+| <span className="whitespace-nowrap!">Move to standby</span> from previously used | Both keys.                                                             | This only prepares the key from the last rotation to be used by Auth to make new JWTs with it.                                                                                                                                                                                                                              |
+| <span className="whitespace-nowrap!">Delete key</span>                           | -                                                                      | Permanently destroys the private key or shared secret of a key, so it will not be possible to re-use or rotate again into it.                                                                                                                                                                                               |
 
 ### Public key discovery and caching
 
@@ -135,12 +116,12 @@ Finally this multi-level cache is cleared every 20 minutes, or longer if you hav
 
 To strike the right balance between performance, security and ease-of-use, JWT signing keys are based on capabilities available in the [Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API).
 
-| Algorithm                                                                                                                                  | <span className="!whitespace-nowrap">JWT `alg`</span> | Information                                                                                                                                                                                                                                                                                                                                                                                   |
+| Algorithm                                                                                                                                  | <span className="whitespace-nowrap!">JWT `alg`</span> | Information                                                                                                                                                                                                                                                                                                                                                                                   |
 | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| <span className="!whitespace-nowrap">[NIST P-256 Curve](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography)</span><br/>(Asymmetric) | <span className="!whitespace-nowrap">`ES256`</span>   | Elliptic Curves are a faster alternative than RSA, while providing comparable security. Especially important for Auth use cases is the fact that signatures using the P-256 curve are significantly shorter than those created by RSA, which reduces data transfer sizes and helps in managing cookie size. Web Crypto and most other cryptography libraries and runtimes support this curve. |
-| <span className="!whitespace-nowrap">[RSA 2048](https://en.wikipedia.org/wiki/RSA_cryptosystem)</span><br/>(Asymmetric)                    | <span className="!whitespace-nowrap">`RS256`</span>   | RSA is the oldest and most widely supported public-key cryptosystem in use. While being easy to code by hand, it can be significantly slower than elliptic curves in certain aspects. We recommend using the P-256 elliptic curve instead.                                                                                                                                                    |
-| <span className="!whitespace-nowrap">[Ed25519 Curve](https://en.wikipedia.org/wiki/EdDSA#Ed25519)</span><br/>(Asymmetric)                  | <span className="!whitespace-nowrap">`EdDSA`</span>   | Coming soon. This algorithm is based on a different elliptic curve cryptosystem developed in the open, unlike the P-256 curve. Web Crypto or other crypto libraries may not support it in all runtimes, making it difficult to work with.                                                                                                                                                     |
-| <span className="!whitespace-nowrap">[HMAC with shared secret](https://en.wikipedia.org/wiki/HMAC)</span><br/>(Symmetric)                  | <span className="!whitespace-nowrap">`HS256`</span>   | **Not recommended for production applications.** A shared secret uses a message authentication code to verify the authenticity of a JSON Web Token. This requires that both the creator of the JWT (Auth) and the system verifying the JWT know the secret. As there is no public key counterpart, revoking this key might require deploying changes to your app's backend infrastructure.    |
+| <span className="whitespace-nowrap!">[NIST P-256 Curve](https://en.wikipedia.org/wiki/Elliptic-curve_cryptography)</span><br/>(Asymmetric) | <span className="whitespace-nowrap!">`ES256`</span>   | Elliptic Curves are a faster alternative than RSA, while providing comparable security. Especially important for Auth use cases is the fact that signatures using the P-256 curve are significantly shorter than those created by RSA, which reduces data transfer sizes and helps in managing cookie size. Web Crypto and most other cryptography libraries and runtimes support this curve. |
+| <span className="whitespace-nowrap!">[RSA 2048](https://en.wikipedia.org/wiki/RSA_cryptosystem)</span><br/>(Asymmetric)                    | <span className="whitespace-nowrap!">`RS256`</span>   | RSA is the oldest and most widely supported public-key cryptosystem in use. While being easy to code by hand, it can be significantly slower than elliptic curves in certain aspects. We recommend using the P-256 elliptic curve instead.                                                                                                                                                    |
+| <span className="whitespace-nowrap!">[Ed25519 Curve](https://en.wikipedia.org/wiki/EdDSA#Ed25519)</span><br/>(Asymmetric)                  | <span className="whitespace-nowrap!">`EdDSA`</span>   | Coming soon. This algorithm is based on a different elliptic curve cryptosystem developed in the open, unlike the P-256 curve. Web Crypto or other crypto libraries may not support it in all runtimes, making it difficult to work with.                                                                                                                                                     |
+| <span className="whitespace-nowrap!">[HMAC with shared secret](https://en.wikipedia.org/wiki/HMAC)</span><br/>(Symmetric)                  | <span className="whitespace-nowrap!">`HS256`</span>   | **Not recommended for production applications.** A shared secret uses a message authentication code to verify the authenticity of a JSON Web Token. This requires that both the creator of the JWT (Auth) and the system verifying the JWT know the secret. As there is no public key counterpart, revoking this key might require deploying changes to your app's backend infrastructure.    |
 
 <Admonition type="caution">
 
@@ -170,7 +151,7 @@ This guarantee provides your application with close alignment with security comp
 
 If you wish to make your own JWTs or have access to the private key or shared secret used by Supabase, you can create a new JWT signing key by importing a private key or setting a shared secret yourself.
 
-Use the [Supabase CLI](/docs/reference/cli/introduction) to quickly and securely generate a private key ready for import:
+Use the [Supabase CLI](/docs/reference/cli/introduction) to securely generate a private key ready for import:
 
 ```sh
 supabase gen signing-key --algorithm ES256
@@ -233,7 +214,7 @@ Finally, you can use your newly minted JWT by setting the `Authorization: Bearer
 
 <Admonition type="note">
 
-A separate `apikey` header is required to access your project's APIs. This can be a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/api/api-keys). Using your minted JWT is not possible in this header.
+A separate `apikey` header is required to access your project's APIs. This can be a [publishable, secret or the legacy `anon` or `service_role` keys](/docs/guides/getting-started/api-keys). Using your minted JWT is not possible in this header.
 
 </Admonition>
 
@@ -247,4 +228,46 @@ This is to ensure you have the ability, should you need it, to go back to the le
 
 ### Why does revoking the legacy JWT secret require disabling of `anon` and `service_role` API keys?
 
-Unfortunately `anon` and `service_role` are not just API keys, but are also valid JSON Web Tokens, signed by the legacy JWT secret. Revoking the legacy JWT secret means that your application no longer trusts any JWT signed with it. Therefore before you revoke the legacy JWT secret, you must disable the `anon` and `service_role` to ensure a consistent security setup.
+Unfortunately `anon` and `service_role` are not only API keys, but are also valid JSON Web Tokens, signed by the legacy JWT secret. Revoking the legacy JWT secret means that your application no longer trusts any JWT signed with it. Therefore before you revoke the legacy JWT secret, you must disable the `anon` and `service_role` to ensure a consistent security setup.
+
+### Using JWT-based `anon` key in a mobile, desktop, or CLI application and need to rotate a `service_role` JWT secret?
+
+If the JWT secret is secure, substitute the `service_role` JWT-based key with a new secret key which you can create in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. This prevents downtime for your application.
+
+### Why are `anon` and `service_role` JWT-based keys no longer recommended?
+
+Since the start of Supabase, the JWT-based `anon` and `service_role` keys were the right trade-off against simplicity and relative security for your project. Unfortunately they pose some real challenges in live applications, especially around rotation and security best practices.
+
+The main reasons for preferring the publishable and secret keys (`sb_publishable_...` and `sb_secret_...`) are to avoid the following shortcomings of the legacy JWT-based keys:
+
+- Tight coupling between the JWT secret (which itself can be compromised, if you mint your own JWTs), the `anon` (low privilege) and `service_role` (high privilege) and `authenticated` (issued by Supabase Auth) Postgres roles.
+- Inability to independently rotate each aspect of the keys, without downtime.
+- Inability to roll-back an unnecessary or problematic JWT secret rotation.
+- Publishing new versions of mobile applications can take days and often weeks in the app review phase with Apple's App Store and Google's Play Store. A forced rotation can cause weeks of downtime for mobile app users.
+- Users may continue using desktop, CLI and mobile apps with very old versions, making rotation impossible without a forced version upgrade.
+- JWTs had 10-year expiry duration, giving malicious actors more to work with.
+- JWTs were self-referential and full of redundant information not necessary for achieving their primary purpose.
+- JWTs are large, hard to parse, verify, and manipulate -- leading to insecure logging or bad security practices.
+- They were signed with a symmetric JWT secret.
+
+### Can you still use an old `anon` and `service-role` API keys after enabling the publishable and secret keys?
+
+Yes. This allows you to transition between the API keys with zero downtime by gradually swapping your clients while both sets of keys are active. See the next question for how to deactivate your keys once all your clients are switched over.
+
+### How to deactivate the `anon` and `service_role` JWT-based API keys after moving to publishable and secret keys?
+
+You can do this in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard. To prevent downtime in your application's components, use the last used indicators on the page to confirm that these are no longer used before deactivating.
+
+You can re-activate them should you need to.
+
+### How are publishable and secret keys implemented on the hosted platform?
+
+When your applications use the Supabase APIs they go through a component called the API Gateway on the Supabase hosted platform. This provides us (and therefore you) with the following features:
+
+- Observability and logging.
+- Performance and request routing (such as to read-replicas).
+- Security, for blocking malicious patterns or behavior on a global scale.
+
+This API Gateway component is able to verify the API key (sent in the `apikey` request header, or for WebSocket in a query param) against your project's publishable and secret key list. If the match is found, it mints a temporary, short-lived JWT that is then forwarded down to your project's servers.
+
+It may be possible to replicate similar behavior if you self-host by using programmable proxies such as [Kong](https://konghq.com/), [Envoy](https://www.envoyproxy.io/), [NGINX](https://nginx.org/) or similar.

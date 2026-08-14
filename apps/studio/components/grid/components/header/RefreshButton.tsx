@@ -1,10 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { RefreshCw } from 'lucide-react'
-
 import { useParams } from 'common'
-import { useTableIndexAdvisor } from 'components/grid/context/TableIndexAdvisorContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { tableRowKeys } from 'data/table-rows/keys'
+import { RefreshCw } from 'lucide-react'
+import { Button } from 'ui'
+
+import { useTableIndexAdvisor } from '@/components/grid/context/TableIndexAdvisorContext'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export type RefreshButtonProps = {
   tableId?: number
@@ -23,18 +25,20 @@ export const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => 
   }
 
   return (
-    <ButtonTooltip
-      type="outline"
-      loading={isRefetching}
-      icon={<RefreshCw />}
-      onClick={() => onClick()}
-      className="w-7 h-7 p-0"
-      tooltip={{
-        content: {
-          side: 'bottom',
-          text: 'Refresh table data',
-        },
-      }}
-    />
+    <Shortcut
+      id={SHORTCUT_IDS.TABLE_EDITOR_REFRESH}
+      onTrigger={onClick}
+      options={{ registerInCommandMenu: true }}
+      side="bottom"
+    >
+      <Button
+        variant="outline"
+        loading={isRefetching}
+        icon={<RefreshCw />}
+        onClick={() => onClick()}
+        className="w-7 p-0"
+        aria-label="Refresh table data"
+      />
+    </Shortcut>
   )
 }

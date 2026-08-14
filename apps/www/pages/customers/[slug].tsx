@@ -1,17 +1,21 @@
-import matter from 'gray-matter'
-import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
-
-import { MDXRemote } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button } from 'ui'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { breadcrumbs } from '~/lib/breadcrumbs'
 import { SITE_ORIGIN } from '~/lib/constants'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import matter from 'gray-matter'
+import { ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
+import Image from 'next/image'
+import Link from 'next/link'
+import { Button } from 'ui'
+
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 // table of contents extractor
 const toc = require('markdown-toc')
@@ -89,6 +93,11 @@ function CaseStudyPage(props: any) {
     url: `${SITE_ORIGIN}/customers/${slug}`,
   }
 
+  const breadcrumbItems = [
+    ...breadcrumbs.customersIndex,
+    { name: meta_title ?? title, url: `https://supabase.com/customers/${slug}` },
+  ]
+
   return (
     <>
       <NextSeo
@@ -112,13 +121,16 @@ function CaseStudyPage(props: any) {
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbItems)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
-        <div
-          className="
-            container mx-auto p-8 sm:py-16 sm:px-16
-            xl:px-20
-          "
-        >
+        <SectionContainer className="py-8 sm:py-16!">
           <div className="grid grid-cols-12 gap-4">
             <div className="hidden xl:block col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
@@ -164,9 +176,9 @@ function CaseStudyPage(props: any) {
                               object-contain
                               m-0
 
-                              [[data-theme*=dark]_&]:brightness-200
-                              [[data-theme*=dark]_&]:contrast-0
-                              [[data-theme*=dark]_&]:filter
+                              in-data-[theme*=dark]:brightness-200
+                              in-data-[theme*=dark]:contrast-0
+                              in-data-[theme*=dark]:filter
                             "
                           />
                         </div>
@@ -200,7 +212,7 @@ function CaseStudyPage(props: any) {
                         <div>
                           <p>Ready to get started?</p>
                           <div>
-                            <Button asChild type="default" iconRight={<ChevronRight />}>
+                            <Button asChild variant="default" iconRight={<ChevronRight />}>
                               <Link
                                 href="https://supabase.com/contact/enterprise"
                                 className="no-underline"
@@ -213,14 +225,14 @@ function CaseStudyPage(props: any) {
                       </div>
                     </div>
                     <div className="xm:col-span-7 col-span-12 lg:col-span-8 xl:col-span-8 ">
-                      <MDXRemote {...content} components={mdxComponents()} />
+                      <MDXClient {...content} components={mdxComponents()} />
                     </div>
                   </div>
                 </article>
               </div>
             </div>
           </div>
-        </div>
+        </SectionContainer>
 
         <CTABanner />
       </DefaultLayout>

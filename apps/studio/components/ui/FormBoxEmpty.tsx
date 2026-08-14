@@ -1,8 +1,8 @@
-import { ReactText } from 'react'
+import type { ReactNode } from 'react'
 
 interface Props {
-  icon: JSX.Element
-  text: ReactText
+  icon: ReactNode
+  text: ReactNode
 }
 
 const FormBoxEmpty = ({ icon, text }: Props) => {

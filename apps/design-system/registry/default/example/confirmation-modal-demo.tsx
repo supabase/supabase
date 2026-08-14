@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -24,7 +24,7 @@ export default function ConfirmationModalDemo() {
 
   return (
     <>
-      <Button type="default" onClick={() => setVisible(!visible)}>
+      <Button variant="default" onClick={() => setVisible(!visible)}>
         Show Confirmation Modal
       </Button>
       <ConfirmationModal
@@ -46,27 +46,27 @@ export default function ConfirmationModalDemo() {
           </p>
           {/* Dropdown for Postgres version */}
           <div className="pt-4">
-            <Form_Shadcn_ {...form}>
-              <FormField_Shadcn_
+            <Form {...form}>
+              <FormField
                 control={form.control}
                 name="postgresVersion"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Postgres version">
-                    <FormControl_Shadcn_>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="17.6.1.054">17.6.1.054</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="17.6.1.055">17.6.1.055</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="17.6.1.054">17.6.1.054</SelectItem>
+                          <SelectItem value="17.6.1.055">17.6.1.055</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-            </Form_Shadcn_>
+            </Form>
           </div>
         </div>
       </ConfirmationModal>

@@ -9,7 +9,7 @@ Edge Function instances can process background tasks outside of the request hand
 
 This allows you to:
 
-- Respond quickly to users while processing continues
+- Respond to users while processing continues
 - Handle async operations without blocking the response
 
 ---
@@ -19,29 +19,39 @@ This allows you to:
 You can use `EdgeRuntime.waitUntil(promise)` to explicitly mark background tasks. The Function instance continues to run until the promise provided to `waitUntil` completes.
 
 ```ts
+import { withSupabase } from 'npm:@supabase/server@^1'
+
 // Mark the asyncLongRunningTask's returned promise as a background task.
 // ⚠️ We are NOT using `await` because we don't want it to block!
 EdgeRuntime.waitUntil(asyncLongRunningTask())
 
-Deno.serve(async (req) => {
-  return new Response(...)
-})
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    return Response.json({ ok: true })
+  }),
+}
 ```
 
 You can call `EdgeRuntime.waitUntil` in the request handler too. This will not block the request.
 
 ```ts
-Deno.serve(async (req) => {
-  // Won't block the request, runs in background.
-  EdgeRuntime.waitUntil(asyncLongRunningTask())
+import { withSupabase } from 'npm:@supabase/server@^1'
 
-  return new Response(...)
-})
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    // Won't block the request, runs in background.
+    EdgeRuntime.waitUntil(asyncLongRunningTask())
+
+    return Response.json({ ok: true })
+  }),
+}
 ```
 
 You can listen to the `beforeunload` event handler to be notified when the Function is about to be shut down.
 
 ```tsx
+import { withSupabase } from 'npm:@supabase/server@^1'
+
 EdgeRuntime.waitUntil(asyncLongRunningTask())
 
 // Use beforeunload event handler to be notified when function is about to shutdown
@@ -50,9 +60,11 @@ addEventListener('beforeunload', (ev) => {
   // Save state or log the current progress
 })
 
-Deno.serve(async (req) => {
-  return new Response(...)
-})
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    return Response.json({ ok: true })
+  }),
+}
 ```
 
 ## Handling errors

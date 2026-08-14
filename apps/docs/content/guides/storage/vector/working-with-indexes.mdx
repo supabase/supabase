@@ -47,7 +47,7 @@ Think of an index as a table in a traditional database. It has a schema (dimensi
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
+const supabase = createClient('https://your-project-id.supabase.co', 'your-service-key')
 
 const bucket = supabase.storage.vectors.from('embeddings')
 
@@ -73,7 +73,7 @@ if (error) {
 ```python
 from supabase import create_client
 
-supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+supabase = create_client('https://your-project-id.supabase.co', 'your-service-key')
 
 bucket = supabase.storage.vectors().from_('embeddings')
 

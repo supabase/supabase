@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
-
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { useEffect, useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
-import type { FilterSet, Filters } from './Logs.types'
+
+import type { Filters, FilterSet } from './Logs.types'
 
 interface LogsFilterPopoverProps {
   options: FilterSet
@@ -56,7 +56,7 @@ const LogsFilterPopover = ({
     <Popover open={open} onOpenChange={handleToggle}>
       <PopoverTrigger asChild>
         <Button
-          type={isActive ? 'default' : 'outline'}
+          variant={isActive ? 'default' : 'outline'}
           onClick={handleToggle}
           className={cn(
             'min-w-20 border-dashed',
@@ -78,11 +78,11 @@ const LogsFilterPopover = ({
             setOpen(false)
           }}
         >
-          {options.options.map((x, i: number) => (
+          {options.options.map((x) => (
             <Label
               key={x.key}
               htmlFor={`${options.key}.${x.key}`}
-              className="flex items-start hover:bg-overlay-hover overflow-hidden p-2 m-1 rounded-sm gap-3 transition-all duration-150 ease-in-out"
+              className="flex items-start hover:bg-overlay-hover overflow-hidden p-2 m-1 rounded-xs gap-3 transition-all duration-150 ease-in-out"
             >
               <div>
                 <Checkbox
@@ -110,10 +110,10 @@ const LogsFilterPopover = ({
           ))}
 
           <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-            <Button size="tiny" type="default" onClick={handleReset} htmlType="button">
+            <Button size="tiny" variant="default" onClick={handleReset} type="button">
               Clear
             </Button>
-            <Button loading={isLoading} type="primary" htmlType="submit">
+            <Button loading={isLoading} variant="primary" type="submit">
               Apply
             </Button>
           </div>

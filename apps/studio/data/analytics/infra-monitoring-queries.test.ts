@@ -1,16 +1,12 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
+import { aggregate1MinTo2Min, mapResponseToAnalyticsData } from './infra-monitoring-queries'
 import type {
   InfraMonitoringMultiData,
   InfraMonitoringMultiResponse,
   InfraMonitoringSingleResponse,
 } from './infra-monitoring-query'
-import {
-  aggregate1MinTo2Min,
-  mapResponseToAnalyticsData,
-  mapMultiResponseToAnalyticsData,
-} from './infra-monitoring-queries'
 
 const mockMultiResponse: InfraMonitoringMultiResponse = {
   data: [
@@ -163,13 +159,6 @@ describe('mapResponseToAnalyticsData', () => {
       // Both should produce identical output
       expect(singleResult.disk_io_budget).toStrictEqual(multiResult.disk_io_budget)
     })
-  })
-})
-
-// Test deprecated alias still works
-describe('mapMultiResponseToAnalyticsData (deprecated)', () => {
-  it('is an alias for mapResponseToAnalyticsData', () => {
-    expect(mapMultiResponseToAnalyticsData).toBe(mapResponseToAnalyticsData)
   })
 })
 

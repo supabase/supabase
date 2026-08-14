@@ -884,5 +884,17 @@
         "type": "cli-command"
       }
     ]
+  },
+  {
+    "type": "category",
+    "title": "Telemetry",
+    "items": [
+      {
+        "id": "supabase-telemetry",
+        "title": "Manage CLI telemetry settings",
+        "slug": "supabase-telemetry",
+        "type": "cli-command"
+      }
+    ]
   }
 ]

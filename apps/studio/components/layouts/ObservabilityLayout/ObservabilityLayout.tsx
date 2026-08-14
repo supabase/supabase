@@ -1,20 +1,21 @@
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { useIndexAdvisorStatus } from 'components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
-import { BannerIndexAdvisor } from 'components/ui/BannerStack/Banners/BannerIndexAdvisor'
-import { BannerMetricsAPI } from 'components/ui/BannerStack/Banners/BannerMetricsAPI'
-import { useBannerStack } from 'components/ui/BannerStack/BannerStackProvider'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { withAuth } from 'hooks/misc/withAuth'
+import { LOCAL_STORAGE_KEYS, useFeatureFlags, useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
-import ObservabilityMenu from './ObservabilityMenu'
+import { ObservabilityMenu } from './ObservabilityMenu'
+import { useIsDatabaseConnectionsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
+import { BannerDatabaseConnections } from '@/components/ui/BannerStack/Banners/BannerDatabaseConnections'
+import { BannerIndexAdvisor } from '@/components/ui/BannerStack/Banners/BannerIndexAdvisor'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { withAuth } from '@/hooks/misc/withAuth'
 
 interface ObservabilityLayoutProps {
-  title?: string
+  title: string
 }
 
 const ObservabilityLayoutContent = ({
@@ -23,33 +24,45 @@ const ObservabilityLayoutContent = ({
 }: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
   const pathname = usePathname()
+  const { hasLoaded } = useFeatureFlags()
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
-
-  const [isMetricsBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.OBSERVABILITY_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
 
   const [isIndexAdvisorBannerDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.INDEX_ADVISOR_NOTICE_DISMISSED(ref ?? ''),
     false
   )
 
-  useEffect(() => {
-    if (!isMetricsBannerDismissed && IS_PLATFORM) {
-      addBanner({
-        id: 'metrics-api-banner',
-        isDismissed: false,
-        content: <BannerMetricsAPI />,
-        priority: 1,
-      })
-    } else {
-      dismissBanner('metrics-api-banner')
-    }
-  }, [isMetricsBannerDismissed, addBanner, dismissBanner])
+  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
+
+  const [isDatabaseConnectionsBannerDismissed, , { isSuccess: isLocalStorageReady }] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''), false)
 
   const prevPathnameRef = useRef(pathname)
+
+  useEffect(() => {
+    if (
+      !hasLoaded ||
+      !isLocalStorageReady ||
+      isDatabaseConnectionsBannerDismissed ||
+      isDatabaseConnectionsEnabled
+    )
+      return
+
+    addBanner({
+      id: 'database-connections-banner',
+      priority: 2,
+      isDismissed: false,
+      content: <BannerDatabaseConnections />,
+    })
+  }, [
+    hasLoaded,
+    addBanner,
+    dismissBanner,
+    isDatabaseConnectionsBannerDismissed,
+    isDatabaseConnectionsEnabled,
+    isLocalStorageReady,
+  ])
 
   useEffect(() => {
     const isQueryPerformancePage = pathname?.includes('/query-performance')
@@ -85,8 +98,8 @@ const ObservabilityLayoutContent = ({
   if (reportsAll) {
     return (
       <ProjectLayout
-        title={title}
         product="Observability"
+        browserTitle={{ section: title }}
         productMenu={<ObservabilityMenu />}
         isBlocking={false}
       >

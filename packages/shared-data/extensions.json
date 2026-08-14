@@ -18,15 +18,6 @@
     "product_url": null
   },
   {
-    "name": "amcheck",
-    "comment": "functions for verifying relation integrity",
-    "tags": ["Admin", "Utility"],
-    "link": "https://www.postgresql.org/docs/current/amcheck.html",
-    "github_url": null,
-    "product": null,
-    "product_url": null
-  },
-  {
     "name": "autoinc",
     "comment": "functions for autoincrementing fields",
     "tags": ["Utility"],
@@ -234,15 +225,6 @@
     "product_url": "/project/{ref}/integrations/cron"
   },
   {
-    "name": "pg_freespacemap",
-    "comment": "examine the free space map (FSM)",
-    "tags": ["Admin", "Utility"],
-    "link": "https://www.postgresql.org/docs/current/pgfreespacemap.html",
-    "github_url": null,
-    "product": null,
-    "product_url": null
-  },
-  {
     "name": "pg_graphql",
     "comment": "pg_graphql: GraphQL support",
     "tags": ["Utility"],
@@ -282,7 +264,7 @@
     "name": "pg_partman",
     "comment": "Automated partition management",
     "tags": ["Utility"],
-    "link": "/guides/database/extensions/pg_partman",
+    "link": "https://github.com/pgpartman/pg_partman",
     "github_url": "https://github.com/pgpartman/pg_partman",
     "product": null,
     "product_url": null
@@ -304,15 +286,6 @@
     "github_url": null,
     "product": "Query Performance",
     "product_url": "/project/{ref}/observability/query-performance"
-  },
-  {
-    "name": "pg_surgery",
-    "comment": "extension to perform surgery on a damaged relation",
-    "tags": ["Admin", "Utility"],
-    "link": "https://www.postgresql.org/docs/current/pgsurgery.html",
-    "github_url": null,
-    "product": null,
-    "product_url": null
   },
   {
     "name": "pg_trgm",

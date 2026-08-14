@@ -90,7 +90,7 @@ const gridStats: GridStat[] = [
 export const Devs = () => {
   return (
     <>
-      <section className="relative max-w-[60rem] h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
+      <section className="relative max-w-240 h-[240px] md:h-[360px] mx-auto border-x border-b w-[95%] md:w-full">
         {/* Grid background */}
         <AnimatedGridBackground
           cols={5}
@@ -116,7 +116,7 @@ export const Devs = () => {
         </div>
       </section>
 
-      <div className="relative max-w-[60rem] mx-auto border-x border-b px-4 lg:px-8 py-12 w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x border-b px-4 lg:px-8 py-12 w-[95%] md:w-full">
         <p className="text-lg text-foreground-light max-w-2xl">
           In 2025, developers around the world shipped faster, scaled further, and built things we
           never imagined. Here is what you accomplished on Supabase.
@@ -127,7 +127,7 @@ export const Devs = () => {
       {heroStats.map((stat) => (
         <div
           key={stat.headline}
-          className="relative max-w-[60rem] mx-auto border-x border-b p-8 bg-surface-75 w-[95%] md:w-full"
+          className="relative max-w-240 mx-auto border-x border-b p-8 bg-surface-75 w-[95%] md:w-full"
         >
           <div className="flex flex-col gap-2">
             <p className="text-4xl md:text-5xl font-mono font-medium text-brand tracking-tighter">
@@ -143,7 +143,7 @@ export const Devs = () => {
       ))}
 
       {/* Stats grid */}
-      <div className="relative max-w-[60rem] mx-auto border-x w-[95%] md:w-full">
+      <div className="relative max-w-240 mx-auto border-x w-[95%] md:w-full">
         <div className="grid grid-cols-2 lg:grid-cols-4">
           {(() => {
             const cols = 4
@@ -155,7 +155,7 @@ export const Devs = () => {
                 {gridStats.map((stat) => (
                   <div
                     key={stat.headline}
-                    className="p-8 border-r border-b border-muted [&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r [&:nth-child(4n)]:border-r-0"
+                    className="p-8 border-r border-b border-muted nth-[2n]:border-r-0 lg:nth-[2n]:border-r nth-[4n]:border-r-0"
                   >
                     <div className="flex flex-col gap-2">
                       <div className="flex flex-col">

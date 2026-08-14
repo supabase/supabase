@@ -10,25 +10,23 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
+import { Image } from 'ui-patterns/Image'
 
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { WhatItTakesSectionProps } from 'components/Solutions/WhatItTakesSection'
+import { getSharedSections } from './shared-sections'
 import {
   FrameworkLink,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import { getSharedSections } from './shared-sections'
-import { Image } from 'ui'
-
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { FeatureGridProps } from '@/components/Solutions/FeatureGrid'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import type { WhatItTakesSectionProps } from '@/components/Solutions/WhatItTakesSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const data: () => {
   metadata: Metadata
@@ -114,21 +112,21 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"For me, the biggest benefit of Supabase is developer experience. My expertise doesn\'t lie in databases and infrastructure."',
+        text: 'You have to expect, plan, and build for scale. We can scale exponentially with Supabase.',
         author: 'Nick Farrant',
         role: 'Founding Engineer, Juniver',
         link: '/customers/juniver',
         logo: (
           <>
             <Image
-              src="/images/customers/logos/juniver.png"
+              src="/images/customers/logos/on-light/juniver.png"
               alt="Juniver"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/juniver.png"
+              src="/images/customers/logos/on-dark/juniver.png"
               alt="Juniver"
               width={128}
               height={48}
@@ -263,7 +261,7 @@ const data: () => {
       customers: [
         {
           name: 'Juniver',
-          logo: '/images/customers/logos/juniver.png',
+          logo: '/images/customers/logos/on-light/juniver.png',
           highlights: [
             'Automated B2B workflows with Edge Functions and RLS',
             'Improved developer experience and performance',

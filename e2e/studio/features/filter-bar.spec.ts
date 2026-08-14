@@ -10,15 +10,17 @@ import {
   selectOperator,
   selectOperatorByClick,
   setupFilterBarPage,
+  switchProperty,
 } from '../utils/filter-bar-helpers.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { createApiResponseWaiter } from '../utils/wait-for-response.js'
+import { createApiResponseWaiter, waitForTableToLoad } from '../utils/wait-for-response.js'
 
 const tableNamePrefix = 'pw_filter_bar'
 
 function getDateValue(daysAgo: number): string {
-  const date = new Date(Date.now() - daysAgo * 86400000)
+  const date = new Date()
+  date.setDate(date.getDate() - daysAgo)
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
@@ -45,6 +47,54 @@ test.describe('Filter Bar', () => {
 
         await expect(page.getByTestId(`filter-condition-${columnName}`)).toBeVisible()
         await expect(page.getByTestId(`filter-operator-${columnName}`)).toBeFocused()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
+    test('selecting a column without a value does not trigger a row request', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_no_value_no_req`
+      const columnName = 'name'
+
+      await createTable(tableName, columnName, [{ name: 'Alice' }, { name: 'Bob' }])
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await expect(page.getByRole('gridcell', { name: 'Alice' })).toBeVisible()
+        await expect(page.getByRole('gridcell', { name: 'Bob' })).toBeVisible()
+
+        // Count any new table-rows requests fired after the column/operator are picked.
+        // A request here means the filter applied before a value was entered — the regression.
+        let tableRowsRequests = 0
+        const rowsListener = (request: { url: () => string }) => {
+          if (request.url().includes('query?key=table-rows-')) tableRowsRequests++
+        }
+        page.on('request', rowsListener)
+
+        try {
+          await selectColumnFilter(page, columnName)
+          await expect(page.getByTestId(`filter-condition-${columnName}`)).toBeVisible()
+
+          await selectOperator(page, columnName, '=')
+
+          // Allow any debounced request to fire before we assert.
+          await page.waitForTimeout(500)
+
+          expect(
+            tableRowsRequests,
+            'No table-rows request should fire until a filter value is entered'
+          ).toBe(0)
+
+          await expect(page.getByRole('gridcell', { name: 'Alice' })).toBeVisible()
+          await expect(page.getByRole('gridcell', { name: 'Bob' })).toBeVisible()
+        } finally {
+          page.off('request', rowsListener)
+        }
       } finally {
         await dropTable(tableName)
       }
@@ -166,7 +216,6 @@ test.describe('Filter Bar', () => {
         await freeformInput.click()
         await expect(freeformInput).toBeFocused()
 
-        // Tab should exit the filter bar (freeform input should lose focus)
         await page.keyboard.press('Tab')
 
         await expect(freeformInput).not.toBeFocused()
@@ -371,6 +420,38 @@ test.describe('Filter Bar', () => {
       }
     })
 
+    test('Enter on equals fallback applies filter and returns focus to freeform', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_op_default_equals`
+      const columnName = 'name'
+
+      await createTable(tableName, columnName, [{ name: 'forgecode' }, { name: 'other' }])
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await selectColumnFilter(page, columnName)
+
+        const operatorInput = page.getByTestId(`filter-operator-${columnName}`)
+        await operatorInput.fill('forgecode')
+
+        await expect(page.getByText('Equals: "forgecode"')).toBeVisible()
+
+        const rowsWaiter = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
+        await page.keyboard.press('Enter')
+        await rowsWaiter
+
+        await expect(getFilterBarInput(page)).toBeFocused()
+        await expect(page.getByRole('gridcell', { name: 'forgecode' })).toBeVisible()
+        await expect(page.getByRole('gridcell', { name: 'other' })).not.toBeVisible()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
     test('Backspace on empty operator removes condition', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_op_bksp`
       const columnName = 'name'
@@ -457,7 +538,10 @@ test.describe('Filter Bar', () => {
 
         const lastNameValue = page.getByTestId('filter-value-last_name')
         await lastNameValue.click()
-        await page.keyboard.press('Home')
+        // Drive the cursor to position 0 directly rather than via `Home` —
+        // macOS Chromium doesn't honor the Home key inside text inputs (the
+        // OS-level binding is Cmd+ArrowLeft / Fn+ArrowLeft).
+        await lastNameValue.evaluate((el) => (el as HTMLInputElement).setSelectionRange(0, 0))
 
         await page.keyboard.press('ArrowLeft')
 
@@ -511,14 +595,11 @@ test.describe('Filter Bar', () => {
         const valueInput = page.getByTestId(`filter-value-${columnName}`)
         await valueInput.fill('HelloWorld')
 
-        // Move cursor to middle (after "Hello") and insert text
-        await page.keyboard.press('Home')
-        for (let i = 0; i < 5; i++) {
-          await page.keyboard.press('ArrowRight')
-        }
+        // See "ArrowLeft at position 0" — macOS Chromium ignores the Home
+        // key inside text inputs, so set the cursor programmatically.
+        await valueInput.evaluate((el) => (el as HTMLInputElement).setSelectionRange(5, 5))
         await page.keyboard.type('_Middle_')
 
-        // Verify the text was inserted in the middle, not appended at the end
         await expect(valueInput).toHaveValue('Hello_Middle_World')
       } finally {
         await dropTable(tableName)
@@ -607,6 +688,8 @@ test.describe('Filter Bar', () => {
     test('filtering by Today shows only today rows', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_today`
       const todayValue = getDateValue(0)
+      const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -614,11 +697,18 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // Insert exact date strings computed from the test's `getDateValue`
+      // (JS local TZ) rather than `CURRENT_DATE` (postgres session TZ ≈ UTC).
+      // The studio's "Today" dropdown is built from JS local time too, so
+      // aligning the inserted rows with the filter's expected value keeps
+      // these tests deterministic across timezones — otherwise on non-UTC
+      // hosts the local "today" can land on a different day than postgres'
+      // CURRENT_DATE and the filter matches zero rows.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '1 day'),
-          (CURRENT_DATE - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${yesterdayValue}'),
+          ('${lastWeekValue}')`
       )
 
       try {
@@ -636,7 +726,9 @@ test.describe('Filter Bar', () => {
 
     test('filtering by Yesterday shows only yesterday rows', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_yest`
+      const todayValue = getDateValue(0)
       const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -644,11 +736,12 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // See "filtering by Today" — align inserts with JS-local getDateValue.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '1 day'),
-          (CURRENT_DATE - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${yesterdayValue}'),
+          ('${lastWeekValue}')`
       )
 
       try {
@@ -666,7 +759,10 @@ test.describe('Filter Bar', () => {
 
     test('filtering by Last 7 days with greater or equal operator', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_7d`
+      const todayValue = getDateValue(0)
+      const threeDaysAgoValue = getDateValue(3)
       const last7DaysValue = getDateValue(7)
+      const lastMonthValue = getDateValue(30)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -674,12 +770,13 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // See "filtering by Today" — align inserts with JS-local getDateValue.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '3 days'),
-          (CURRENT_DATE - INTERVAL '7 days'),
-          (CURRENT_DATE - INTERVAL '30 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${threeDaysAgoValue}'),
+          ('${last7DaysValue}'),
+          ('${lastMonthValue}')`
       )
 
       try {
@@ -698,6 +795,8 @@ test.describe('Filter Bar', () => {
     test('date less than operator filters correctly', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_date_lt`
       const todayValue = getDateValue(0)
+      const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -705,11 +804,12 @@ test.describe('Filter Bar', () => {
           created_at date
         )`
       )
+      // See "filtering by Today" — align inserts with JS-local getDateValue.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (CURRENT_DATE),
-          (CURRENT_DATE - INTERVAL '1 day'),
-          (CURRENT_DATE - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue}'),
+          ('${yesterdayValue}'),
+          ('${lastWeekValue}')`
       )
 
       try {
@@ -730,6 +830,8 @@ test.describe('Filter Bar', () => {
     test('timestamp column shows date preset dropdown options', async ({ page, ref }) => {
       const tableName = `${tableNamePrefix}_ts_today`
       const todayValue = getDateValue(0)
+      const yesterdayValue = getDateValue(1)
+      const lastWeekValue = getDateValue(7)
 
       await query(
         `CREATE TABLE IF NOT EXISTS ${tableName} (
@@ -737,11 +839,14 @@ test.describe('Filter Bar', () => {
           created_at timestamp
         )`
       )
+      // See "filtering by Today" — pin timestamps to mid-day of each
+      // JS-local date so the row falls on the correct calendar day from
+      // postgres's perspective regardless of the host timezone.
       await query(
-        `INSERT INTO ${tableName} (created_at) VALUES 
-          (NOW()),
-          (NOW() - INTERVAL '1 day'),
-          (NOW() - INTERVAL '7 days')`
+        `INSERT INTO ${tableName} (created_at) VALUES
+          ('${todayValue} 12:00:00'),
+          ('${yesterdayValue} 12:00:00'),
+          ('${lastWeekValue} 12:00:00')`
       )
 
       try {
@@ -777,7 +882,6 @@ test.describe('Filter Bar', () => {
         await selectColumnFilter(page, 'is_active')
         await selectOperator(page, 'is_active', '=')
 
-        // Navigate to 'false' option (second item) and select with Enter
         await page.keyboard.press('ArrowDown')
         await page.keyboard.press('Enter')
 
@@ -803,10 +907,88 @@ test.describe('Filter Bar', () => {
         await freeformInput.click()
         await expect(freeformInput).toBeFocused()
 
-        // Shift+Tab should exit the filter bar (freeform input should lose focus)
         await page.keyboard.press('Shift+Tab')
 
         await expect(freeformInput).not.toBeFocused()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+  })
+
+  test.describe('IS NULL Filters', () => {
+    test('IS NULL on a text column shows only null rows', async ({ page, ref }) => {
+      const tableName = `${tableNamePrefix}_is_null_txt`
+
+      await query(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id bigint generated by default as identity primary key,
+          name text
+        )`
+      )
+      await query(`INSERT INTO ${tableName} (name) VALUES ('Alice'), (NULL), ('Charlie')`)
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await addFilterWithDropdownValue(page, ref, 'name', 'is', 'null')
+
+        const rows = page.locator('[role="row"]')
+        // Header row + 1 data row with NULL
+        await expect(rows).toHaveCount(2)
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
+    test('IS NOT NULL on a text column shows only non-null rows', async ({ page, ref }) => {
+      const tableName = `${tableNamePrefix}_is_nnull_txt`
+
+      await query(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id bigint generated by default as identity primary key,
+          name text
+        )`
+      )
+      await query(`INSERT INTO ${tableName} (name) VALUES ('Alice'), (NULL), ('Charlie')`)
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await addFilterWithDropdownValue(page, ref, 'name', 'is', 'not null')
+
+        const rows = page.locator('[role="row"]')
+        // Header row + 2 data rows (Alice, Charlie)
+        await expect(rows).toHaveCount(3)
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
+    test('IS NULL on a timestamptz column shows only null rows', async ({ page, ref }) => {
+      const tableName = `${tableNamePrefix}_is_null_ts`
+
+      await query(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id bigint generated by default as identity primary key,
+          created_at timestamptz
+        )`
+      )
+      await query(
+        `INSERT INTO ${tableName} (created_at) VALUES (NOW()), (NULL), (NOW() - INTERVAL '1 day')`
+      )
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await addFilterWithDropdownValue(page, ref, 'created_at', 'is', 'null')
+
+        const rows = page.locator('[role="row"]')
+        // Header row + 1 data row with NULL
+        await expect(rows).toHaveCount(2)
       } finally {
         await dropTable(tableName)
       }
@@ -846,13 +1028,200 @@ test.describe('Filter Bar', () => {
         const removeButton = page.getByRole('button', { name: 'Remove filters' })
         await expect(removeButton).toBeVisible()
 
-        // Clicking "Remove filters" should clear filters and restore data
         await removeButton.click()
 
-        // Filter pill should be gone and data should be visible again
         await expect(page.getByTestId('filter-condition-name')).not.toBeVisible({ timeout: 10000 })
         await expect(page.getByRole('gridcell', { name: 'Alice' })).toBeVisible({ timeout: 10000 })
         await expect(page.getByRole('gridcell', { name: 'Bob' })).toBeVisible()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+  })
+
+  test.describe('Property Switching', () => {
+    test('clicking property label opens picker and selecting new column switches the filter', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_prop_switch`
+
+      await query(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id bigint generated by default as identity primary key,
+          first_name text,
+          last_name text
+        )`
+      )
+      await query(
+        `INSERT INTO ${tableName} (first_name, last_name) VALUES ('Alice', 'Smith'), ('Bob', 'Jones')`
+      )
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await addFilter(page, ref, 'first_name', '=', 'Alice')
+        await expect(page.getByTestId('filter-condition-first_name')).toBeVisible()
+
+        await switchProperty(page, 'first_name', 'last_name')
+
+        await expect(page.getByTestId('filter-condition-first_name')).not.toBeVisible()
+        await expect(page.getByTestId('filter-condition-last_name')).toBeVisible()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
+    test('switching between same-type columns preserves compatible operator and value', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_prop_compat`
+
+      await query(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id bigint generated by default as identity primary key,
+          first_name text,
+          last_name text
+        )`
+      )
+      await query(
+        `INSERT INTO ${tableName} (first_name, last_name) VALUES ('Alice', 'Smith'), ('Bob', 'Smith'), ('Alice', 'Jones')`
+      )
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await addFilter(page, ref, 'first_name', '=', 'Alice')
+        await expect(page.getByRole('gridcell', { name: 'Bob' })).not.toBeVisible()
+
+        // '=' is compatible with text→text, so operator and value ("Alice") are preserved
+        const rowsWaiter = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
+        await switchProperty(page, 'first_name', 'last_name')
+        await rowsWaiter
+
+        // last_name = Alice matches no rows (last names are Smith/Jones)
+        const rows = page.locator('[role="row"]')
+        await expect(rows).toHaveCount(1) // header only
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
+    test('switching to column with incompatible operator resets operator', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_prop_incompat`
+
+      await query(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id bigint generated by default as identity primary key,
+          name text,
+          is_active boolean
+        )`
+      )
+      await query(
+        `INSERT INTO ${tableName} (name, is_active) VALUES ('Alice', true), ('Bob', false)`
+      )
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        // '~~' (Like) only exists on text columns, not boolean
+        await selectColumnFilter(page, 'name')
+        await selectOperatorByClick(page, 'name', '~~')
+        const valueInput = page.getByTestId('filter-value-name')
+        await valueInput.fill('Alice')
+        await page.keyboard.press('Enter')
+
+        await switchProperty(page, 'name', 'is_active')
+
+        await expect(page.getByTestId('filter-operator-is_active')).toBeFocused()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+
+    test('Escape closes property picker without changing the filter', async ({ page, ref }) => {
+      const tableName = `${tableNamePrefix}_prop_esc`
+      const columnName = 'name'
+
+      await createTable(tableName, columnName, [{ name: 'Alice' }, { name: 'Bob' }])
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await addFilter(page, ref, columnName, '=', 'Alice')
+
+        const conditionEl = page.getByTestId(`filter-condition-${columnName}`)
+        await conditionEl.locator('span', { hasText: columnName }).first().click()
+
+        const searchInput = page.getByTestId(`filter-property-search-${columnName}`)
+        await expect(searchInput).toBeVisible()
+
+        await page.keyboard.press('Escape')
+
+        await expect(page.getByTestId(`filter-condition-${columnName}`)).toBeVisible()
+        await expect(searchInput).not.toBeVisible()
+      } finally {
+        await dropTable(tableName)
+      }
+    })
+  })
+
+  test.describe('Stale Filter Cleanup', () => {
+    test('stale filter on dropped column shows filter error with remove button', async ({
+      page,
+      ref,
+    }) => {
+      const tableName = `${tableNamePrefix}_stale_drop`
+
+      await query(
+        `CREATE TABLE IF NOT EXISTS ${tableName} (
+          id bigint generated by default as identity primary key,
+          first_name text,
+          last_name text
+        )`
+      )
+      await query(
+        `INSERT INTO ${tableName} (first_name, last_name) VALUES ('Alice', 'Smith'), ('Bob', 'Jones')`
+      )
+
+      try {
+        await setupFilterBarPage(page, ref, toUrl(`/project/${ref}/editor?schema=public`))
+        await navigateToTable(page, ref, tableName)
+
+        await addFilter(page, ref, 'first_name', '=', 'Alice')
+        await expect(page.getByTestId('filter-condition-first_name')).toBeVisible()
+        await expect(page.getByRole('gridcell', { name: 'Alice' })).toBeVisible()
+        await expect(page.getByRole('gridcell', { name: 'Bob' })).not.toBeVisible()
+
+        await query(`ALTER TABLE ${tableName} DROP COLUMN first_name`)
+
+        // Wait for the filter bar's debounced URL sync (500ms) before reloading
+        await page.waitForURL(/filter=/, { timeout: 5000 })
+        await page.reload({ waitUntil: 'networkidle' })
+
+        await expect(page.getByText('No results found — check your filter values')).toBeVisible({
+          timeout: 10000,
+        })
+        await expect(page.getByText('Failed to retrieve rows from table')).not.toBeVisible()
+
+        const removeButton = page.getByRole('button', { name: 'Remove filters' })
+        await expect(removeButton).toBeVisible()
+        await removeButton.click()
+
+        await expect(page.getByRole('gridcell', { name: 'Smith' })).toBeVisible({ timeout: 10000 })
+        await expect(page.getByRole('gridcell', { name: 'Jones' })).toBeVisible()
+
+        await expect(
+          page.getByText('No results found — check your filter values')
+        ).not.toBeVisible()
       } finally {
         await dropTable(tableName)
       }

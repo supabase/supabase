@@ -1,9 +1,10 @@
+import { ident, joinSqlFragments, keyword, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseIndexesKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseIndexCreateVariables = {
   projectRef: string
@@ -23,11 +24,11 @@ export async function createDatabaseIndex({
 }: DatabaseIndexCreateVariables) {
   const { schema, entity, type, columns } = payload
 
-  const sql = `
-  CREATE INDEX ON "${schema}"."${entity}" USING ${type} (${columns
-    .map((column) => `"${column}"`)
-    .join(', ')});
-  `.trim()
+  const columnList = joinSqlFragments(
+    columns.map((column) => ident(column)),
+    ', '
+  )
+  const sql = safeSql`CREATE INDEX ON ${ident(schema)}.${ident(entity)} USING ${keyword(type)} (${columnList});`
 
   const { result } = await executeSql({
     projectRef,

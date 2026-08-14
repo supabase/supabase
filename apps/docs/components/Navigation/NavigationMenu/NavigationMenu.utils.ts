@@ -1,10 +1,11 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
 import type { Json } from '~/features/helpers.types'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
 import { menuState } from '../../../hooks/useMenuState'
 
 export function getPathWithoutHash(relativePath: string) {
@@ -110,7 +111,7 @@ export const getMenuId = (pathname: string | null) => {
   pathname = (pathname ??= '').replace(/^\/guides\//, '')
 
   switch (true) {
-    case pathname.startsWith('ai'):
+    case pathname.startsWith('ai') && !pathname.startsWith('ai-tools'):
       return MenuId.Ai
     case pathname.startsWith('api'):
       return MenuId.Api
@@ -132,7 +133,9 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Integrations
     case pathname.startsWith('local-development'):
       return MenuId.LocalDevelopment
-    case pathname.startsWith('telemetry'):
+    case pathname.startsWith('ai-tools'):
+      return MenuId.AiTools
+    case pathname.startsWith('monitoring-and-debugging'):
       return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform

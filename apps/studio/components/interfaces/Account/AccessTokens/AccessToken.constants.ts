@@ -1,18 +1,26 @@
-import { components } from 'api-types'
 import { permissions } from '@supabase/shared-types'
+import { components } from 'api-types'
 
 export type ScopedAccessTokenPermission =
   components['schemas']['CreateScopedAccessTokenBody']['permissions'][number]
 
-export const NON_EXPIRING_TOKEN_VALUE = 'never'
 export const CUSTOM_EXPIRY_VALUE = 'custom'
+
+/** Shared tail for every "this token can no longer be used" message. */
+export const TOKEN_DENIED_REMEDIATION =
+  'Requests with this token will be denied. Delete this token and create a new one with the resources and permissions you need.'
+
+/** Warning shown on both entry points that create a classic (account-wide) token. */
+export const CLASSIC_TOKEN_WARNING = {
+  title: 'Access tokens can be used to control your whole account',
+  description: 'Be careful when sharing your tokens',
+} as const
 
 export const EXPIRES_AT_OPTIONS = {
   hour: { value: 'hour', label: '1 hour' },
   day: { value: 'day', label: '1 day' },
   week: { value: 'week', label: '7 days' },
   month: { value: 'month', label: '30 days' },
-  never: { value: NON_EXPIRING_TOKEN_VALUE, label: 'Never' },
   custom: { value: CUSTOM_EXPIRY_VALUE, label: 'Custom' },
 } as const
 

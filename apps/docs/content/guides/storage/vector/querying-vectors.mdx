@@ -1,6 +1,6 @@
 ---
 title: 'Querying Vectors'
-subtitle: 'Perform similarity search and retrieve vectors using JavaScript SDK or PostgreSQL.'
+subtitle: 'Perform similarity search and retrieve vectors using JavaScript SDK or Postgres.'
 ---
 
 <Admonition type="caution" title="This feature is in alpha">
@@ -11,7 +11,7 @@ Expect rapid changes, limited features, and possible breaking updates. [Share fe
 
 Vector similarity search finds vectors most similar to a query vector using distance metrics. You can query vectors using the JavaScript SDK or directly from Postgres using SQL.
 
-<Admonition type="tip" title="Comparison to pgvector">
+<Admonition type="note" title="Comparison to pgvector">
 
 Vector buckets and any [Foreign Data Wrappers (FDW)](/docs/guides/database/extensions/wrappers/overview) they use only support one similarity search algorithm, the `<===>` distance operator.
 
@@ -31,7 +31,7 @@ Vector buckets and any [Foreign Data Wrappers (FDW)](/docs/guides/database/exten
 ```typescript
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient('https://your-project.supabase.co', 'your-service-key')
+const supabase = createClient('https://your-project-id.supabase.co', 'your-service-key')
 
 const index = supabase.storage.vectors.from('embeddings').index('documents-openai')
 
@@ -63,7 +63,7 @@ if (error) {
 ```python
 from supabase import create_client
 
-supabase = create_client('https://your-project.supabase.co', 'your-service-key')
+supabase = create_client('https://your-project-id.supabase.co', 'your-service-key')
 
 index = supabase.storage.vectors().from_('embeddings').index('documents-openai')
 

@@ -2,12 +2,12 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { entityTypeKeys } from 'data/entity-types/keys'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { tableEditorKeys } from 'data/table-editor/keys'
-import { viewKeys } from 'data/views/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableKeys } from './keys'
+import { entityTypeKeys } from '@/data/entity-types/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { tableEditorKeys } from '@/data/table-editor/keys'
+import { viewKeys } from '@/data/views/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TableDeleteVariables = {
   projectRef: string
@@ -57,9 +57,12 @@ export const useTableDeleteMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
         queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, schema) }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.infiniteListPrefix(projectRef, schema),
+        }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
         // invalidate all views from this schema
-        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, schema) }),
+        queryClient.invalidateQueries({ queryKey: viewKeys.listBySchema(projectRef, [schema]) }),
       ])
 
       await onSuccess?.(data, variables, context)

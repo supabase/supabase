@@ -1,9 +1,9 @@
 import { Button } from '@ui/components/shadcn/ui/button'
 import { useMemo, useState } from 'react'
 import {
-  CommandInput,
-  CommandList,
   CommandMenu,
+  CommandMenuInput,
+  CommandMenuList,
   CommandMenuTrigger as CommandMenuTriggerPrimitive,
   CommandProvider,
   useRegisterCommands,
@@ -60,8 +60,8 @@ export default function CommandMenuDemo() {
     <CommandProvider openKey="">
       <div className="flex flex-col gap-2">
         <CommandMenu trigger={<CommandMenuTrigger />}>
-          <CommandInput />
-          <CommandList />
+          <CommandMenuInput />
+          <CommandMenuList />
         </CommandMenu>
         <Commands />
       </div>

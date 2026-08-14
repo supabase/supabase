@@ -1,7 +1,8 @@
-import { EnableExtensionModal } from 'components/interfaces/Database/Extensions/EnableExtensionModal'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useState } from 'react'
 import { Button } from 'ui'
+
+import { EnableExtensionModal } from '@/components/interfaces/Database/Extensions/EnableExtensionModal'
+import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 
 export const MissingExtensionAlert = ({ extension }: { extension: DatabaseExtension }) => {
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -10,7 +11,11 @@ export const MissingExtensionAlert = ({ extension }: { extension: DatabaseExtens
   if (!extensionInstalled) {
     return (
       <>
-        <Button type="primary" className="w-min" onClick={() => setShowEnableExtensionModal(true)}>
+        <Button
+          variant="primary"
+          className="w-min"
+          onClick={() => setShowEnableExtensionModal(true)}
+        >
           Enable {extension.name}
         </Button>
 

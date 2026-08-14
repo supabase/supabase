@@ -14,7 +14,9 @@ You can use RLS to create [Security Access Policies](https://www.postgresql.org/
 
 By default Storage does not allow any uploads to buckets without RLS policies. You selectively allow certain operations by creating RLS policies on the `storage.objects` table.
 
-You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can utilize these [helper functions](/docs/guides/storage/schema/helper-functions) .
+You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can use these [helper functions](/docs/guides/storage/schema/helper-functions) .
+
+If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()` documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
 
 <Admonition type="note">
 
@@ -81,6 +83,19 @@ create policy "Individual user Access"
 on storage.objects for select
 to authenticated
 using ( (select auth.jwt()->>'sub') = owner_id );
+```
+
+Allow anyone to access objects in the `avatars` bucket via publishable key. The `allow_any_operation()` filter is critical here as without it users would be able to list the bucket contents.
+
+<Admonition type="note">
+
+This is not needed for public buckets, as they are already publicly accessible
+
+</Admonition>
+
+```sql
+create policy "Avatar images are publicly accessible." on storage.objects
+  for select using (bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']));
 ```
 
 ---

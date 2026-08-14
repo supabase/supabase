@@ -1,10 +1,10 @@
+import { getCreateEnumeratedTypeSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import { wrapWithTransaction } from 'data/sql/utils/transaction'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { enumeratedTypesKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type EnumeratedTypeCreateVariables = {
   projectRef: string
@@ -23,12 +23,7 @@ export async function createEnumeratedType({
   description,
   values,
 }: EnumeratedTypeCreateVariables) {
-  const createSql = `create type "${schema}"."${name}" as enum (${values
-    .map((x) => `'${x}'`)
-    .join(', ')});`
-  const commentSql =
-    description !== undefined ? `comment on type "${schema}"."${name}" is '${description}';` : ''
-  const sql = wrapWithTransaction(`${createSql} ${commentSql}`)
+  const sql = getCreateEnumeratedTypeSQL({ schema, name, values, description })
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

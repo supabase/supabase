@@ -1,3 +1,8 @@
+import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
+import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
+import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
+import { BASE_PATH } from '~/lib/constants'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -5,12 +10,6 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import type { Metadata, ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
 import { visit } from 'unist-util-visit'
-
-import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
-import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
-import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH } from '~/lib/constants'
-import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 
@@ -96,6 +95,21 @@ async function generateStaticParamsForSdkVersion(sdkId: string, version: string)
     }))
 }
 
+// Spike (DOCS-1268): one static page per Management API endpoint, in addition
+// to the existing bare `/reference/api` monolith. Deliberately does not reuse
+// generateStaticParamsForSdkVersion's output shape — that function bakes in a
+// 'crawlers' path segment for a separate crawler-only mechanism unrelated to
+// these human-facing per-operation URLs.
+async function generateStaticParamsForApi() {
+  const flattenedSections = await getFlattenedSections('api', 'latest')
+
+  return (flattenedSections || [])
+    .filter((section) => section.type !== 'category' && !!section.slug)
+    .map((section) => ({
+      slug: ['api', section.slug],
+    }))
+}
+
 export async function generateReferenceStaticParams() {
   const sdkPages = clientSdkIds
     .flatMap((sdkId) =>
@@ -118,6 +132,7 @@ export async function generateReferenceStaticParams() {
     {
       slug: ['api'],
     },
+    ...(await generateStaticParamsForApi()),
   ]
 
   const selfHostingPages = selfHostingServices.map((service) => ({
@@ -179,9 +194,35 @@ export async function generateReferenceMetadata(
       description: 'CLI reference for the Supabase CLI',
     }
   } else if (isApiReference) {
+    const { path } = parsedPath
+    const operationSlug = path[0]
+
+    const flattenedSections = operationSlug
+      ? await getFlattenedSections('api', 'latest')
+      : undefined
+    const sectionTitle = flattenedSections?.find((section) => section.slug === operationSlug)?.title
+
+    const url = [BASE_PATH, 'reference', 'api', operationSlug].filter(Boolean).join('/')
+    const images = generateOpenGraphImageMeta({
+      type: 'API Reference',
+      title: `Management API${sectionTitle ? `: ${sectionTitle}` : ''}`,
+    })
+
     return {
-      title: 'Management API Reference | Supabase Docs',
-      description: 'Management API reference for the Supabase API',
+      title: `${sectionTitle ? `${sectionTitle} | ` : ''}Management API Reference | Supabase Docs`,
+      description: `Management API reference for the Supabase API${sectionTitle ? `: ${sectionTitle}` : ''}`,
+      ...(operationSlug
+        ? {
+            alternates: {
+              canonical: url,
+            },
+          }
+        : {}),
+      openGraph: {
+        ...parentOg,
+        url,
+        images,
+      },
     }
   } else if (isSelfHostingReference) {
     return {
@@ -270,3 +311,5 @@ export function normalizeMarkdown(markdownUnescaped: string): string {
 
   return content
 }
+
+export { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'

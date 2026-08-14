@@ -137,13 +137,15 @@ const page: GoPageInput = {
 
   For a copy of the winners list, send a request to:
 
-  [legal@supabase.com](mailto:legal@supabase.com)
+  [sweepstakes@supabase.com](mailto:sweepstakes@supabase.com)
 
   within sixty (60) days of the end of the Promotion.
 
+  To enter without purchase, use the [Alternative Mode of Entry](/go/legal/amoe).
+
   © 2026 Supabase Inc.
 
-  [Privacy Policy](https://supabase.com/privacy) · [Terms of Service](https://supabase.com/terms)
+  [Privacy Policy](https://supabase.com/privacy) · [Terms of Service](https://supabase.com/terms) · [Alternative Mode of Entry](/go/legal/amoe)
 `,
 }
 

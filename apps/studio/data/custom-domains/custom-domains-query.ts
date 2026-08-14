@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { customDomainKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type CustomDomainsVariables = {
   projectRef?: string
@@ -110,7 +110,7 @@ export const useCustomDomainsQuery = <TData = CustomDomainsData>(
     ...options
   }: UseCustomQueryOptions<CustomDomainsData, CustomDomainsError, TData> = {}
 ) => {
-  const { data } = useProjectAddonsQuery({ projectRef })
+  const { data } = useProjectAddonsQuery({ projectRef }, { enabled: enabled !== false })
   const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
 
   return useQuery<CustomDomainsData, CustomDomainsError, TData>({
