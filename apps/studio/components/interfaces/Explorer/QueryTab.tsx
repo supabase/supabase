@@ -4,8 +4,9 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
-import { QueryEditor } from './QueryEditor'
+import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
 import { type QueryResult } from './types'
+import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
@@ -75,15 +76,22 @@ export const QueryTab = () => {
     })
   }
 
+  const query: ExplorerQueryModel =
+    draft._tag === 'logs'
+      ? { ...toQuerySourceBinding(draft), uncheckedSql: draft.uncheckedSql }
+      : {
+          ...toQuerySourceBinding(draft),
+          uncheckedSql: draft.uncheckedSql,
+          rowLimit,
+        }
+
   return (
     <QueryEditor
       id={id}
       variant="viewport"
       title={draft.name}
-      sql={draft.uncheckedSql}
-      source={draft.source}
+      query={query}
       result={result}
-      rowLimit={rowLimit}
       onTitleChange={(value) => {
         const name = value.trim() || 'Untitled query'
         explorerQueryState.updateDraft({ id, name })

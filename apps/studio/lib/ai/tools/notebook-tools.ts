@@ -85,6 +85,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           name: notebook.name,
           description: notebook.description,
           visibility: notebook.visibility,
+          updated_at: notebook.updated_at,
           // Inlined rather than a shared helper: this discards the `unchecked_sql` brand for
           // display purposes only — the result is returned to the agent, never written back.
           cells: notebook.content.cells.map((cell) => {
@@ -149,16 +150,27 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
     }),
     update_notebook: tool({
       description:
-        'Asks the user to apply an ordered list of cell operations (insert, replace, delete, move) to an existing notebook. Requires user approval before updating. Re-fetches the notebook right before applying the operations; concurrent edits are last-write-wins.',
+        'Asks the user to apply an ordered list of cell operations (insert, replace, delete, move) to an existing notebook. Requires user approval before updating. Re-fetches the notebook right before applying the operations and rejects the update if it changed since expected_updated_at.',
       inputSchema: z.object({
         id: z.string().describe('The id of the notebook to update.'),
+        expected_updated_at: z
+          .string()
+          .describe(
+            'The `updated_at` you received from `get_notebook`. The update is rejected if the notebook changed since.'
+          ),
         operations: notebookOperationsSchema.describe(
           'An ordered list of operations to apply to the notebook, addressing existing cells by id.'
         ),
       }),
       needsApproval: true,
-      execute: async ({ id, operations }) => {
+      execute: async ({ id, expected_updated_at, operations }) => {
         const notebook = await getNotebook({ projectRef, id }, undefined, authHeaders)
+
+        if (notebook.updated_at !== expected_updated_at) {
+          throw new Error(
+            `Notebook "${id}" changed since expected_updated_at (${expected_updated_at}); it is now ${notebook.updated_at}. Call get_notebook again and reissue update_notebook against the current content.`
+          )
+        }
 
         // Inlined rather than a shared helper, right beside this tool's own
         // `needsApproval: true`: this discards each cell's `unchecked_sql` brand so

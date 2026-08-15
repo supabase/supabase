@@ -1,4 +1,3 @@
-import { untrustedSql } from '@supabase/pg-meta'
 import { useState } from 'react'
 import { type Snapshot } from 'valtio'
 
@@ -6,131 +5,82 @@ import { AddCellDropdown } from '../AddCellDropdown'
 import { MoveCellDropdownContent } from '../MoveCellDropdownContent'
 import { QueryEditor } from '../QueryEditor'
 import { type QueryDisplay, type QueryResult } from '../types'
+import {
+  changeCellSource,
+  cloneChartConfig,
+  cloneQueryCell,
+  getCellDisplay,
+  setCellRowLimit,
+  setCellSql,
+  toQueryModel,
+} from './QueryCell.utils'
 import { SortableSection } from '@/components/ui/SortableSection'
 import {
-  type DatabaseCell as DatabaseCellSchema,
-  type LogCell as LogCellSchema,
+  isQueryCell,
+  type QueryCell as QueryCellSchema,
 } from '@/data/content/notebooks/notebook-schema'
-import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
-import {
-  getQuerySourceBinding,
-  type QuerySourceBinding,
-} from '@/data/query-sources/query-source-registry'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 interface QueryCellProps {
-  cell: Snapshot<DatabaseCellSchema | LogCellSchema>
+  cell: Snapshot<QueryCellSchema>
 }
-
-/**
- * [Joshen] Aiming to keep PRs small so the following are deliberating missing for now:
- * - Auto limit logic
- * - Database selection logic
- *
- * QueryCell atm minimally supports running queries and rendering results
- */
-
-type QueryCellUpdate =
-  | { sql: string }
-  | { title: string }
-  | { display: QueryDisplay }
-  | { row_limit: number }
 
 /** Notebook adapter around the shared QueryEditor. */
 export const QueryCell = ({ cell }: QueryCellProps) => {
   const snap = useNotebooksStateSnapshot()
   const currentNotebook = useCurrentNotebook()
 
-  const { id, title: cellTitle, view, chart, unchecked_sql } = cell
-  const rowLimit = 'row_limit' in cell ? cell.row_limit : undefined
-  const source = getQuerySourceBinding(cell)
-
-  const [sql, setSql] = useState<string>(unchecked_sql)
+  const [sql, setSql] = useState<string>(cell.unchecked_sql)
   const [result, setResult] = useState<QueryResult>()
 
-  const title = cellTitle ?? 'Untitled snippet'
-  const display: QueryDisplay = {
-    view: view ?? 'table',
-    chart: chart ? { ...chart, y_columns: [...chart.y_columns] } : undefined,
+  const title = cell.title ?? 'Untitled query'
+
+  /**
+   * Applies an update to this cell. The updater runs against the cell as the store holds
+   * it rather than the snapshot this component rendered with, so a concurrent edit isn't
+   * clobbered; `isQueryCell` keeps the per-backend helpers off a markdown cell that
+   * somehow shares the id.
+   */
+  const updateQueryCell = (updater: (candidate: Snapshot<QueryCellSchema>) => QueryCellSchema) => {
+    const notebookId = currentNotebook?.notebook.id
+    if (!notebookId) return
+
+    snap.updateCell({
+      id: notebookId,
+      cellId: cell.id,
+      updater: (candidate) => (isQueryCell(candidate) ? updater(candidate) : candidate),
+    })
   }
 
   const handleSourceChange = (source: QuerySourceBinding) => {
-    const notebookId = currentNotebook?.notebook.id
-    if (!notebookId) return
+    // The query text carries over (see `changeCellSource`), so the editor's buffer stays
+    // valid — but a result the old backend produced does not, since another engine
+    // returns unrelated columns.
+    const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
+    if (isBackendChange) setResult(undefined)
 
-    snap.updateCell({
-      id: notebookId,
-      cellId: id,
-      updater: (candidate) => {
-        if (source._tag === 'database' && candidate._tag === 'log_cell') {
-          const { _tag, time_range, unchecked_sql, ...rest } = candidate
-          return {
-            ...rest,
-            _tag: 'database_cell' as const,
-            row_limit: 100,
-            database_identifier: source.database_identifier,
-            unchecked_sql: untrustedSql(unchecked_sql),
-          }
-        }
-
-        if (source._tag === 'logs' && candidate._tag === 'database_cell') {
-          const { _tag, row_limit, database_identifier, unchecked_sql, ...rest } = candidate
-          return {
-            ...rest,
-            _tag: 'log_cell' as const,
-            time_range: source.time_range,
-            unchecked_sql: untrustedLogSql(unchecked_sql),
-          }
-        }
-
-        if (source._tag === 'database' && candidate._tag === 'database_cell') {
-          return { ...candidate, database_identifier: source.database_identifier }
-        }
-
-        if (source._tag === 'logs' && candidate._tag === 'log_cell') {
-          return { ...candidate, time_range: source.time_range }
-        }
-
-        return candidate
-      },
-    })
+    updateQueryCell((candidate) => changeCellSource(candidate, source))
   }
 
-  const handleUpdateCell = (payload: QueryCellUpdate) => {
-    const notebookId = currentNotebook?.notebook.id
-    if (!notebookId) return
-
-    snap.updateCell({
-      id: notebookId,
-      cellId: id,
-      updater: (candidate) => {
-        if (candidate._tag !== 'database_cell' && candidate._tag !== 'log_cell') return candidate
-
-        if ('sql' in payload) {
-          return candidate._tag === 'database_cell'
-            ? { ...candidate, unchecked_sql: untrustedSql(payload.sql) }
-            : { ...candidate, unchecked_sql: untrustedLogSql(payload.sql) }
-        }
-
-        if ('title' in payload) {
-          const nextTitle = payload.title.trim()
-          return nextTitle ? { ...candidate, title: nextTitle } : candidate
-        }
-
-        if ('row_limit' in payload) {
-          return candidate._tag === 'database_cell'
-            ? { ...candidate, row_limit: payload.row_limit }
-            : candidate
-        }
-
-        return {
-          ...candidate,
-          view: payload.display.view,
-          chart: payload.display.chart,
-        }
-      },
-    })
+  const handleTitleChange = (value: string) => {
+    const nextTitle = value.trim()
+    if (!nextTitle) return
+    updateQueryCell((candidate) => ({ ...cloneQueryCell(candidate), title: nextTitle }))
   }
+
+  const handleSqlCommit = (value: string) =>
+    updateQueryCell((candidate) => setCellSql(candidate, value))
+
+  const handleDisplayChange = (display: QueryDisplay) =>
+    updateQueryCell((candidate) => ({
+      ...cloneQueryCell(candidate),
+      view: display.view,
+      chart: cloneChartConfig(display.chart),
+    }))
+
+  const handleRowLimitChange = (rowLimit: number) =>
+    updateQueryCell((candidate) => setCellRowLimit(candidate, rowLimit))
 
   return (
     <SortableSection
@@ -140,23 +90,19 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
       gripClassName="mt-2 opacity-0 group-hover:opacity-100 has-[[data-state=open]]:opacity-100 transition"
     >
       <QueryEditor
-        id={id}
+        id={cell.id}
         variant="embedded"
         title={title}
-        sql={sql}
-        source={source}
+        query={toQueryModel(cell, sql)}
         result={result}
-        rowLimit={rowLimit}
-        display={cell._tag === 'database_cell' ? display : undefined}
-        onTitleChange={(title) => handleUpdateCell({ title })}
+        display={getCellDisplay(cell)}
+        onTitleChange={handleTitleChange}
         onSqlChange={setSql}
-        onSqlCommit={(sql) => handleUpdateCell({ sql })}
+        onSqlCommit={handleSqlCommit}
         onSourceChange={handleSourceChange}
         onResultChange={setResult}
-        onRowLimitChange={(row_limit) => handleUpdateCell({ row_limit })}
-        onDisplayChange={
-          cell._tag === 'database_cell' ? (display) => handleUpdateCell({ display }) : undefined
-        }
+        onRowLimitChange={handleRowLimitChange}
+        onDisplayChange={handleDisplayChange}
       />
     </SortableSection>
   )
