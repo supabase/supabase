@@ -43,6 +43,7 @@ import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -83,6 +84,7 @@ export const FeaturePreviewModal = () => {
     allFeaturePreviews.find((preview) => preview.key === selectedFeatureKey) ??
     allFeaturePreviews[0]
   const isSelectedFeatureEnabled = flags[selectedFeature?.key]
+  const canDisableSelectedFeature = selectedFeature?.isForced !== true
 
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
@@ -229,11 +231,25 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    {isSelectedFeatureEnabled ? (
-                      <Button variant="default" onClick={() => toggleFeature()}>
+                    {isSelectedFeatureEnabled && (
+                      <ButtonTooltip
+                        variant="default"
+                        disabled={!canDisableSelectedFeature}
+                        onClick={() => toggleFeature()}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            className: 'max-w-64 text-center',
+                            text: canDisableSelectedFeature
+                              ? undefined
+                              : 'This feature is now the default and can no longer be turned off',
+                          },
+                        }}
+                      >
                         Disable feature
-                      </Button>
-                    ) : (
+                      </ButtonTooltip>
+                    )}
+                    {!isSelectedFeatureEnabled && (
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button variant="default" onClick={() => toggleFeature()}>

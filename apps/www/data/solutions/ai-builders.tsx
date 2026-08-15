@@ -617,7 +617,7 @@ const data: {
         ),
       },
       {
-        id: 'pico-instances',
+        id: 'nano-instances',
         icon: Timer,
         heading: (
           <>
@@ -657,7 +657,7 @@ const data: {
                 strokeLinejoin="round"
               />
             </svg>
-            Pico instances
+            Nano instances
           </>
         ),
         subheading: (

@@ -1605,6 +1605,25 @@ export interface SessionTerminateSubmittedEvent {
 }
 
 /**
+ * User clicked the Cancel query menu item for a database session in the Database Connections activity table.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/observability/connections
+ */
+export interface QueryCancelButtonClickedEvent {
+  action: 'query_cancel_button_clicked'
+  properties: {
+    activityState: DatabaseActivityState
+    /**
+     * Whether the session whose query is being cancelled was itself blocking one or more other sessions.
+     */
+    isBlocking: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * Index Advisor create indexes button clicked event.
  *
  * @group Events
@@ -1853,7 +1872,7 @@ export interface AssistantMessageRatingSubmittedEvent {
  *
  * @group Events
  * @source supabase-ui
- * @page /ui/docs/{framework}/{templateTitle}
+ * @page /library/docs/{framework}/{templateTitle}
  */
 export interface SupabaseUiCommandCopyButtonClickedEvent {
   action: 'supabase_ui_command_copy_button_clicked'
@@ -3401,7 +3420,7 @@ export interface AccessTokenCreatedEvent {
   properties: {
     tokenType: 'classic' | 'scoped'
     expiryPreset: string
-    resourceAccess?: 'all-orgs' | 'selected-orgs' | 'selected-projects'
+    resourceAccess?: 'project' | 'organization' | 'account'
     permissionCount?: number
   }
   groups: Omit<TelemetryGroups, 'project'>
@@ -3770,6 +3789,7 @@ export type TelemetryEvent =
   | DatabaseConnectionsBannerCtaButtonClickedEvent
   | SessionTerminateButtonClickedEvent
   | SessionTerminateSubmittedEvent
+  | QueryCancelButtonClickedEvent
   | IndexAdvisorCreateIndexesButtonClickedEvent
   | EdgeFunctionDeployButtonClickedEvent
   | EdgeFunctionDeployUpdatesConfirmClickedEvent

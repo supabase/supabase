@@ -49,9 +49,9 @@ export const LegacyLogsRewriteBanner = () => {
 
   const isLogsSnippetNeedingRewrite = useMemo(
     () =>
-      runSource.type === 'logs' &&
+      runSource._tag === 'logs' &&
       shouldOfferLegacyLogsRewrite({ sql: settledSql, isClickhouseLogsEnabled: isOtelLogsEnabled }),
-    [runSource.type, settledSql, isOtelLogsEnabled]
+    [runSource._tag, settledSql, isOtelLogsEnabled]
   )
 
   const { state, requestRewrite, dismiss } = useLegacyLogsRewrite({

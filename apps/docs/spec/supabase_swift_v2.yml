@@ -699,6 +699,44 @@ functions:
             // Open the URL using your preferred method to complete sign-in process.
             UIApplication.shared.open(url)
           ```
+  - id: sign-in-with-web3
+    title: 'signInWithWeb3()'
+    description: |
+      Signs in a user via a signed Sign in with Ethereum (EIP-4361) or Sign in with Solana message.
+    notes: |
+      - Supports Ethereum (Sign-In with Ethereum) and Solana (Sign-In with Solana), both of which derive from the [EIP-4361](https://eips.ethereum.org/EIPS/eip-4361) standard.
+      - Your app is responsible for building the message and obtaining the signature from the user's wallet (e.g. via a WalletConnect session or native wallet SDK) before calling this method.
+      - For `Web3Chain.ethereum` the signature is a `0x`-prefixed hex encoded string. For `Web3Chain.solana` it is a base64 encoded string.
+    examples:
+      - id: sign-in-with-ethereum
+        name: Sign in with an Ethereum wallet
+        isSpotlight: true
+        description: |
+          Sign the EIP-4361 message with the user's Ethereum wallet, then pass the message and its hex encoded signature.
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInWithWeb3(
+            credentials: Web3Credentials(
+              chain: .ethereum,
+              message: siweMessage,
+              signature: signatureHex
+            )
+          )
+          ```
+      - id: sign-in-with-solana
+        name: Sign in with a Solana wallet
+        description: |
+          Sign the message with the user's Solana wallet, then pass the message and its base64 encoded signature.
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInWithWeb3(
+            credentials: Web3Credentials(
+              chain: .solana,
+              message: siwsMessage,
+              signature: signatureBase64
+            )
+          )
+          ```
   - id: sign-in-with-passkey
     title: 'signInWithPasskey()'
     notes: |
@@ -1717,6 +1755,62 @@ functions:
             data: ["role": "admin"],
             redirectTo: URL(string: "https://example.com/welcome")
           )
+          ```
+
+  - id: generate-link
+    title: 'generateLink()'
+    description: |
+      Generates an email link for a specific action without sending it. This is useful for custom admin functionality where you want to build the email or OTP flow yourself.
+    notes: |
+      - `GenerateLinkParams` exposes a static factory for each link type: `.signUp(email:password:redirectTo:)`, `.invite(email:redirectTo:)`, `.magicLink(email:redirectTo:)`, `.recovery(email:redirectTo:)`, `.emailChangeCurrent(email:newEmail:redirectTo:)`, and `.emailChangeNew(email:newEmail:redirectTo:)`.
+      - `generateLink()` creates the user for `.signUp` and `.invite` if one doesn't already exist.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.generateLink(
+            params: .signUp(
+              email: "email@example.com",
+              password: "secret"
+            )
+          )
+
+          let actionLink = response.properties.actionLink
+          ```
+      - id: generate-a-recovery-link
+        name: Generate a recovery link
+        code: |
+          ```swift
+          let response = try await supabase.auth.admin.generateLink(
+            params: .recovery(
+              email: "email@example.com",
+              redirectTo: URL(string: "https://example.com/reset-password")
+            )
+          )
+          ```
+
+  - id: auth-js-gotrueadminapi-signout
+    title: 'signOut()'
+    description: |
+      Signs out a specific user by revoking their session(s), using that user's access token (JWT).
+    notes: |
+      - Unlike `supabase.auth.signOut()`, this method takes the target user's access token (JWT), not a user ID.
+      - By default, `signOut()` uses the `.global` scope, which revokes every session for the user. Pass `.local` to revoke only the session tied to the given JWT, or `.others` to keep that session and revoke all the rest.
+    examples:
+      - id: sign-out-a-user
+        name: Sign out a user
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.admin.signOut(jwt: jwt)
+          ```
+      - id: sign-out-a-user-with-scope
+        name: Sign out a user with a scope
+        code: |
+          ```swift
+          try await supabase.auth.admin.signOut(jwt: jwt, scope: .others)
           ```
 
   - id: admin-oauth-list-clients
@@ -3731,6 +3825,21 @@ functions:
             .in("name", values: ["Rio de Janeiro", "San Francisco"])
           ```
 
+  - id: notin
+    title: notIn()
+    description: |
+      Match only rows where `column` is not included in the `values` array. The negation of `in()`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase
+            .from("cities")
+            .select("name, country_id")
+            .notIn("name", values: ["Rio de Janeiro", "San Francisco"])
+          ```
+
   - id: contains
     title: contains()
     description: |
@@ -4295,6 +4404,30 @@ functions:
         description: |
           Ensure that the RPC call affects at most 10 rows. Useful for limiting the impact of functions.
 
+  - id: dry-run
+    title: dryRun()
+    description: |
+      Executes the mutation but rolls back the transaction instead of committing it, so no changes are persisted.
+    notes: |
+      - The mutation runs and its result (including side effects such as triggers) is returned in the response, but the transaction is rolled back afterward.
+      - Useful for testing mutations without touching real data.
+      - Requires PostgREST's `db-tx-end` setting to allow client-controlled transaction rollback.
+    examples:
+      - id: with-update
+        name: With `update()`
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase
+            .from("todos")
+            .update(["done": true])
+            .eq("id", value: 1)
+            .select()
+            .dryRun()
+            .execute()
+          // Row is not actually updated in the database.
+          ```
+
   - id: single
     title: single()
     description: |
@@ -4336,6 +4469,28 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
+  - id: maybe-single
+    title: maybeSingle()
+    description: |
+      Like `single()`, this sets the `application/vnd.pgrst.object+json` accept header so the server enforces a single result. Unlike `single()`, when the query does not match exactly one row the resulting `PGRST116` error is not thrown — the response `value` is `nil` instead.
+    notes: |
+      - PostgREST returns `PGRST116` both when zero rows match and when more than one row matches. `maybeSingle()` returns `nil` for either case; use `single()` for the strict variant that always throws when the query does not match exactly one row.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```swift
+          let todo: Todo? = try await supabase
+            .from("todos")
+            .select()
+            .eq("id", value: 42)
+            .maybeSingle()
+            .execute()
+            .value
+          ```
+
   - id: csv
     title: csv()
     examples:
@@ -4508,6 +4663,7 @@ functions:
       - Requires an Authorization header.
       - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
       - When a region is specified, both the `x-region` header and `forceFunctionRegion` query parameter are set to ensure proper function routing.
+      - By default, function invocations use a 150-second idle timeout. You can override this per-call by passing `timeoutInterval` to `FunctionInvokeOptions`. This only controls the client's request timeout — it cannot extend function execution beyond the platform's [150-second gateway idle timeout](/docs/guides/functions/limits), after which a 504 Gateway Timeout is returned regardless of the value passed.
     examples:
       - id: invocation-with-decodable
         name: Invocation with `Decodable` response
@@ -4682,6 +4838,23 @@ functions:
               )
             )
           ```
+      - id: invocation-with-timeout-override
+        name: Invocation with a custom timeout
+        description: |
+          Override the default 150-second idle timeout for a single invocation by passing `timeoutInterval`.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"],
+                timeoutInterval: 30
+              )
+            )
+          ```
+
   - id: subscribe
     title: on().subscribe()
     notes: |

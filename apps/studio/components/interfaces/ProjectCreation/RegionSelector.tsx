@@ -69,6 +69,8 @@ const getDisplayNameForSmartRegion = (name: string): string => {
   return name
 }
 
+const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
 export const RegionSelector = ({
   form,
   instanceSize,
@@ -104,7 +106,7 @@ export const RegionSelector = ({
   const allSmartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
   const restrictHighAvailabilityRegion =
-    highAvailability && highAvailabilityRegionCode !== undefined
+    highAvailability && !isLocal && highAvailabilityRegionCode !== undefined
   const smartRegions = highAvailability ? [] : allSmartRegions
 
   const recommendedSmartRegions = new Set(
@@ -131,9 +133,8 @@ export const RegionSelector = ({
   )
   const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
 
-  const showNonProdFields =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+  const isLocalEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+  const showNonProdFields = isLocalEnvironment || process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const allSelectableRegions = [...smartRegions, ...regionOptions]
 
@@ -220,6 +221,11 @@ export const RegionSelector = ({
                             <li>Central EU (Frankfurt)</li>
                             <li>Southeast Asia (Singapore)</li>
                           </ul>
+                          {isLocalEnvironment && (
+                            <p className="mt-1">
+                              Use Central EU (Frankfurt) unless you're on a personal dev stack.
+                            </p>
+                          )}
                         </div>
                       )
                     )}
