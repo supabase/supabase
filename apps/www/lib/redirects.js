@@ -1596,12 +1596,25 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/removesubscription',
-    destination: '/docs/reference/dart/v0/removesubscription',
+    destination: '/docs/reference/dart/removechannel',
   },
   {
     permanent: true,
     source: '/docs/reference/dart/getsubscriptions',
-    destination: '/docs/reference/dart/v0/getsubscriptions',
+    destination: '/docs/reference/dart/getchannels',
+  },
+  // The Dart reference kept no v0 archive, so anything already pointing into
+  // /v0/ needs bridging to the renamed page the way auth-signinwithprovider is
+  // above. Non-permanent so a cached 301 to the removed page can recover.
+  {
+    permanent: false,
+    source: '/docs/reference/dart/v0/removesubscription',
+    destination: '/docs/reference/dart/removechannel',
+  },
+  {
+    permanent: false,
+    source: '/docs/reference/dart/v0/getsubscriptions',
+    destination: '/docs/reference/dart/getchannels',
   },
   {
     permanent: true,
