@@ -1306,52 +1306,52 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/supabase-branches-list',
+    destination: '/docs/reference/cli/supabase-branches-list',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/supabase-branches-create',
+    destination: '/docs/reference/cli/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/supabase-branches-delete',
+    destination: '/docs/reference/cli/supabase-branches-delete',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/supabase-branches-create',
+    destination: '/docs/reference/cli/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/supabase-db-diff',
+    destination: '/docs/reference/cli/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/supabase-db-pull',
+    destination: '/docs/reference/cli/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/supabase-link',
+    destination: '/docs/reference/cli/supabase-link',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-changes',
-    destination: '/docs/reference/supabase-db-diff',
+    destination: '/docs/reference/cli/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-commit',
-    destination: '/docs/reference/supabase-db-pull',
+    destination: '/docs/reference/cli/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-gen-types-typescript',
-    destination: '/docs/reference/supabase-gen-types',
+    destination: '/docs/reference/cli/supabase-gen-types',
   },
 
   {
