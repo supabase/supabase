@@ -1440,70 +1440,70 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-getuser',
-    destination: '/docs/reference/javascript/v1/auth-api-getuser',
+    destination: '/docs/reference/javascript/auth-getuser',
   },
   // v1: /auth-api-resetpasswordforemail
   // v2: /auth-resetpasswordforemail
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
-    destination: '/docs/reference/javascript/v1/auth-api-resetpasswordforemail',
+    destination: '/docs/reference/javascript/auth-resetpasswordforemail',
   },
   // v1: /auth-api-verifyotp
   // v2: /auth-verifyotp
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-verifyotp',
-    destination: '/docs/reference/javascript/v1/auth-api-verifyotp',
+    destination: '/docs/reference/javascript/auth-verifyotp',
   },
   // v1: /auth-api-listusers
   // v2: /auth-admin-listusers
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-listusers',
-    destination: '/docs/reference/javascript/v1/auth-api-listusers',
+    destination: '/docs/reference/javascript/auth-admin-listusers',
   },
   // v1: /auth-api-createuser
   // v2: /auth-admin-createuser
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-createuser',
-    destination: '/docs/reference/javascript/v1/auth-api-createuser',
+    destination: '/docs/reference/javascript/auth-admin-createuser',
   },
   // v1: /auth-api-deleteuser
   // v2: /auth-admin-deleteuser
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-deleteuser',
-    destination: '/docs/reference/javascript/v1/auth-api-deleteuser',
+    destination: '/docs/reference/javascript/auth-admin-deleteuser',
   },
   // v1: /auth-api-generatelink
   // v2: /auth-admin-generatelink
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-generatelink',
-    destination: '/docs/reference/javascript/v1/auth-api-generatelink',
+    destination: '/docs/reference/javascript/auth-admin-generatelink',
   },
   // v1: /auth-api-inviteuserbyemail
   // v2: /auth-admin-inviteuserbyemail
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
-    destination: '/docs/reference/javascript/v1/auth-api-inviteuserbyemail',
+    destination: '/docs/reference/javascript/auth-admin-inviteuserbyemail',
   },
   // v1: /auth-api-getuserbyid
   // v2: /auth-admin-getuserbyid
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-getuserbyid',
-    destination: '/docs/reference/javascript/v1/auth-api-getuserbyid',
+    destination: '/docs/reference/javascript/auth-admin-getuserbyid',
   },
   // v1: /auth-api-updateuserbyid
   // v2: /auth-admin-updateuserbyid
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-updateuserbyid',
-    destination: '/docs/reference/javascript/v1/auth-api-updateuserbyid',
+    destination: '/docs/reference/javascript/auth-admin-updateuserbyid',
   },
   // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v1 docs instead
@@ -1524,7 +1524,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-sendmobileotp',
-    destination: '/docs/reference/javascript/v1/auth-api-sendmobileotp',
+    destination: '/docs/reference/javascript/auth-signinwithotp',
   },
 
   // realtime methods been replaced with new names
