@@ -366,7 +366,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/generating-types',
-    destination: '/docs/reference/javascript/generating-types',
+    destination: '/docs/guides/api/rest/generating-types',
   },
   {
     permanent: false,
@@ -2372,7 +2372,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/cli/using-environment-variables-in-config',
-    destination: '/docs/guides/cli/managing-config',
+    destination: '/docs/guides/local-development/managing-config',
   },
   {
     permanent: true,
@@ -2679,7 +2679,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/sign-in-with-apple',
-    destination: '/docs/reference/dart/sign-in-with-id-token',
+    destination: '/docs/reference/dart/auth-signinwithidtoken',
   },
   {
     permanent: true,
