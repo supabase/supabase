@@ -114,7 +114,7 @@ describe('ai/tools/notebook-tools', () => {
 
       const result = await tools.list_notebooks.execute(
         { limit: 20, cursor: 'prev-page' },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(capturedRequest?.headers.get('authorization')).toBe('Bearer token')
@@ -159,7 +159,7 @@ describe('ai/tools/notebook-tools', () => {
 
       await tools.list_notebooks.execute(
         { limit: 1, sort_by: 'inserted_at' },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       const url = new URL(capturedRequest!.url)
@@ -194,7 +194,7 @@ describe('ai/tools/notebook-tools', () => {
 
       const result = await tools.get_notebook.execute(
         { id: 'notebook-1' },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(result).toEqual({
@@ -248,7 +248,10 @@ describe('ai/tools/notebook-tools', () => {
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
-        tools.get_notebook.execute({ id: 'snippet-1' }, { toolCallId: 'test', messages: [] })
+        tools.get_notebook.execute(
+          { id: 'snippet-1' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
       ).rejects.toThrow('is not a notebook')
     })
 
@@ -263,7 +266,10 @@ describe('ai/tools/notebook-tools', () => {
       if (!tools.get_notebook.execute) throw new Error('execute is undefined')
 
       await expect(
-        tools.get_notebook.execute({ id: 'missing' }, { toolCallId: 'test', messages: [] })
+        tools.get_notebook.execute(
+          { id: 'missing' },
+          { toolCallId: 'test', messages: [], context: {} }
+        )
       ).rejects.toThrow()
     })
   })
@@ -317,7 +323,7 @@ describe('ai/tools/notebook-tools', () => {
 
       await tools.create_notebook.execute(
         { name: 'Signup funnel', content: VALID_AGENT_CONTENT },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(sentBody?.type).toBe('notebook')
@@ -351,7 +357,7 @@ describe('ai/tools/notebook-tools', () => {
 
       const result = await tools.create_notebook.execute(
         { name: 'Signup funnel', content: VALID_AGENT_CONTENT },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(typeof sentBody?.id).toBe('string')
@@ -410,7 +416,7 @@ describe('ai/tools/notebook-tools', () => {
             },
           ],
         },
-        { toolCallId: 'test', messages: [] }
+        { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(sentBody?.id).toBe('notebook-1')
@@ -439,7 +445,7 @@ describe('ai/tools/notebook-tools', () => {
             expected_updated_at: '2026-01-01T00:00:00.000Z',
             operations: [{ _tag: 'delete_cell', cell_id: 'missing-cell' }],
           },
-          { toolCallId: 'test', messages: [] }
+          { toolCallId: 'test', messages: [], context: {} }
         )
       ).rejects.toThrow('No cell with id "missing-cell"')
     })
@@ -457,7 +463,7 @@ describe('ai/tools/notebook-tools', () => {
             expected_updated_at: '2025-12-31T00:00:00.000Z',
             operations: [{ _tag: 'delete_cell', cell_id: 'cell-3' }],
           },
-          { toolCallId: 'test', messages: [] }
+          { toolCallId: 'test', messages: [], context: {} }
         )
       ).rejects.toThrow(/changed since expected_updated_at/)
     })
