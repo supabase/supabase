@@ -2368,11 +2368,6 @@ module.exports = [
     destination: '/docs/guides/database/extensions/pg_repack',
   },
   {
-    permanent: false,
-    source: '/docs/guides/database/extensions/pg_partman',
-    destination: '/docs/guides/database/extensions',
-  },
-  {
     permanent: true,
     source: '/docs/guides/ai/structured-unstructured-embeddings',
     destination: '/docs/guides/ai/structured-unstructured',
