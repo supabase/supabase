@@ -2894,17 +2894,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/functions/debugging',
-    destination: '/docs/functions/logging',
+    destination: '/docs/guides/functions/logging',
   },
   {
     permanent: true,
     source: '/docs/guides/functions/log-drains',
-    destination: '/docs/platform/log-drains',
+    destination: '/docs/guides/monitoring-and-debugging/log-drains',
   },
   {
     permanent: true,
     source: '/docs/guides/functions/functions-headers',
-    destination: '/docs/functions/logging',
+    destination: '/docs/guides/functions/logging',
   },
   {
     permanent: true,
