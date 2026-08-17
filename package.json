@@ -39,6 +39,7 @@
     "e2e:docs": "pnpm --prefix e2e/docs run e2e:docs",
     "e2e:docs:all": "pnpm --prefix e2e/docs run e2e:docs:all",
     "e2e:docs:a11y": "pnpm --prefix e2e/docs run e2e:docs:a11y",
+    "e2e:docs:global-elements": "pnpm --prefix e2e/docs run e2e:docs:global-elements",
     "e2e:docs:ui": "pnpm --prefix e2e/docs run e2e:ui",
     "e2e:docs:local-smoke": "pnpm --prefix e2e/docs run e2e:docs:local-smoke",
     "e2e:www": "pnpm --prefix e2e/www run e2e:www",

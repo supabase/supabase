@@ -1,6 +1,7 @@
 node_modules/
 /test-results/
 /playwright-report/
+/playwright-report-global-elements/
 /playwright-report-local-smoke/
 /blob-report/
 /playwright/.cache/

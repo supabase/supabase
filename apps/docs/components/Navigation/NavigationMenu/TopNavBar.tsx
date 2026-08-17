@@ -33,6 +33,7 @@ const TopNavBar: FC = () => {
     <>
       <nav
         aria-label="top bar"
+        data-testid="sb-docs-top-nav"
         className="w-full z-40 flex flex-col border-b backdrop-blur-sm backdrop-filter bg-default/75"
       >
         <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
@@ -59,6 +60,7 @@ const TopNavBar: FC = () => {
               <button
                 tabIndex={0}
                 title="Menu dropdown button"
+                data-testid="sb-docs-mobile-menu-trigger"
                 className={cn(
                   buttonVariants({ variant: 'default' }),
                   'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
