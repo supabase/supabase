@@ -741,7 +741,7 @@ export const CHAT_PROMPT = `
 - Use \`deploy_edge_function\` solely for deployment, not for presenting example code.
 ## Project Health Checks
 - Use \`get_advisors\` to identify project issues; if unavailable, suggest the user use the Supabase dashboard.
-- Use \`get_logs\` to access recent project logs.
+- Use \`query_logs\` to access recent project logs by running a read-only SQL query against them.
 ## Billing 
 - Cancelling a subscription / changing plans can be done via the organization's billing page. Link directly to https://supabase.com/dashboard/org/_/billing.
 - To check organization usage, use the organization's usage page. Link directly to https://supabase.com/dashboard/org/_/usage.
@@ -755,6 +755,19 @@ When asked about restoring/recovering deleted data:
 1. Search docs for how deletion works for that data type (e.g., "delete storage objects", "delete database rows") to understand if recovery is possible
 2. If recovery is possible (or inconclusive), search docs for restore/backup options
 DO NOT start searching for recovery docs before checking deletion docs
+`
+
+// Notebooks haven't shipped yet — gated behind the Explorer feature flag, same as the
+// notebook AI tools (see lib/ai/is-explorer-enabled.ts). Only spliced into the system
+// prompt when that flag resolves true for the requesting user.
+export const NOTEBOOKS_PROMPT = `
+## Notebooks
+- Use \`create_notebook\` for a saved, shareable, multi-step investigation or dashboard the user will revisit — e.g. "build me a signup funnel notebook" or "create a notebook to track auth errors".
+- Use \`update_notebook\` to edit an existing notebook — insert, replace, delete, or move cells — instead of recreating it from scratch.
+- Use \`execute_sql\` for a single ad-hoc question with no need to persist it.
+- When the request clearly calls for a notebook, call \`create_notebook\` or \`update_notebook\` directly; both tools handle user approval.
+- \`update_notebook\` requires \`expected_updated_at\`, the \`updated_at\` you got from \`get_notebook\`. If the notebook changed since, the call is rejected — call \`get_notebook\` again and reissue \`update_notebook\` against the current content.
+- When describing an existing notebook, report each query cell's configuration that changes what it returns — a log cell's time range, a database cell's row limit — and don't count markdown cells as queries.
 `
 
 export const OUTPUT_ONLY_PROMPT = `
@@ -784,15 +797,6 @@ When no code context is provided: return a complete, valid implementation.
 export const SQL_COMPLETION_INSTRUCTIONS = `
 # SQL identifier quoting
 Do not quote identifiers unless they actually require it (uppercase letters, reserved words, or special characters). Plain lowercase identifiers should not be quoted.
-`
-
-export const CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS = `
-# Supabase logs SQL (ClickHouse)
-You are writing SQL for Supabase logs, which run on a ClickHouse-backed engine. This is NOT Postgres and NOT BigQuery. Output valid ClickHouse SQL only.
-- All logs are in a single table named \`logs\`, keyed by a \`source\` column. There are no per-service tables (no \`edge_logs\`, \`postgres_logs\`, and so on) and no \`unnest\` joins.
-- Per-source fields live in the \`log_attributes\` Map(String, String), read as \`log_attributes['key']\`. Map values are strings, so wrap numeric ones in \`toInt32OrZero(...)\`.
-- Use ClickHouse functions, not Postgres or BigQuery ones. Use \`match(col, 'regex')\` or \`col ILIKE '%text%'\` instead of \`regexp_contains\`, \`count()\` instead of \`count(*)\`, and select the \`timestamp\` column directly instead of \`cast(timestamp as datetime)\`.
-- Do not quote identifiers with double quotes and do not append a trailing semicolon.
 `
 
 export const LIMITATIONS_PROMPT = `

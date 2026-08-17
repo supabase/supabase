@@ -139,6 +139,22 @@ val data = supabase.auth.signUpWith(Email) {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var session = await supabase.Auth.SignUp("valid.email@supabase.io", "example-password", new SignUpOptions
+{
+    Data = new Dictionary<string, object>
+    {
+        { "first_name", "John" },
+        { "age", 27 }
+    }
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
@@ -192,6 +208,16 @@ val user = supabase.auth.retrieveUserForCurrentSession()
 //Or you can use the user from the current session:
 val user = supabase.auth.currentUserOrNull()
 val metadata = user?.userMetadata
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var user = supabase.Auth.CurrentUser;
+var metadata = user?.UserMetadata;
 ```
 
 </TabPanel>

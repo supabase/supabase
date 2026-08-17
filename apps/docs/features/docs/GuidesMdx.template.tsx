@@ -95,6 +95,7 @@ const GuideTemplate = ({
           <article
             // Used to get headings for the table of contents
             id="sb-docs-guide-main-article"
+            data-testid="sb-docs-guide-main-article"
             className="prose max-w-none"
           >
             <header className="mb-8">

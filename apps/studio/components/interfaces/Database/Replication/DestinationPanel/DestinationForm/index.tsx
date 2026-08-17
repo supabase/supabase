@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { AWS_REGIONS } from 'shared-data'
 import { toast } from 'sonner'
@@ -83,7 +83,9 @@ interface DestinationFormProps {
   visible: boolean
   existingDestination?: ExistingDestination
   typeSelection?: ReactNode
+  checkIsDirtyRef?: RefObject<() => boolean>
   onClose: () => void
+  onCancel?: () => void
 }
 
 export const DestinationForm = ({
@@ -91,7 +93,9 @@ export const DestinationForm = ({
   visible,
   existingDestination,
   typeSelection,
+  checkIsDirtyRef,
   onClose,
+  onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
 
@@ -261,6 +265,10 @@ export const DestinationForm = ({
     defaultValues,
   })
 
+  // Always destructure formState values otherwise they won't be updated
+  // See https://react-hook-form.com/docs/useform/formstate
+  const { isDirty } = form.formState
+
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
@@ -409,11 +417,22 @@ export const DestinationForm = ({
   }
 
   useEffect(() => {
-    if (visible && !form.formState.isDirty) {
+    if (!checkIsDirtyRef) return
+
+    checkIsDirtyRef.current = () => isDirty
+    return () => {
+      checkIsDirtyRef.current = () => false
+    }
+  }, [checkIsDirtyRef, isDirty])
+
+  useEffect(() => {
+    // Reset when closed (including after discard) so reopening does not restore
+    // discarded values, and when open but pristine so async defaults can apply.
+    if (!visible || !isDirty) {
       form.reset(defaultValues)
       resetValidation()
     }
-  }, [visible, defaultValues, form, resetValidation])
+  }, [visible, defaultValues, form, isDirty, resetValidation])
 
   useEffect(() => {
     if (visible && projectRef && sourceId) {
@@ -505,18 +524,9 @@ export const DestinationForm = ({
                 ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
                   <DuckLakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
-                  <SnowflakeFields
-                    form={form}
-                    editMode={editMode}
-                    hasStoredPrivateKeyPassphrase={
-                      editMode && !!defaultValues.snowflakePrivateKeyPassphrase
-                    }
-                  />
+                  <SnowflakeFields form={form} editMode={editMode} />
                 ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
-                  <ClickHouseFields
-                    form={form}
-                    hasStoredPassword={editMode && !!defaultValues.clickhousePassword}
-                  />
+                  <ClickHouseFields form={form} editMode={editMode} />
                 ) : null}
 
                 <DialogSectionSeparator />
@@ -567,7 +577,7 @@ export const DestinationForm = ({
           )}
         </AnimatePresence>
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSaving} variant="default" onClick={onClose}>
+          <Button disabled={isSaving} variant="default" onClick={onCancel}>
             Cancel
           </Button>
           <Button disabled={isSubmitDisabled} loading={isSaving} form={formId} type="submit">

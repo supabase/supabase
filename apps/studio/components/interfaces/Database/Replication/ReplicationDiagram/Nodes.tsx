@@ -1,15 +1,14 @@
 import { Handle, Position } from '@xyflow/react'
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
-import { Snowflake } from 'lucide-react'
-import { ComponentType, PropsWithChildren, useMemo } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { DestinationIcon } from '../DestinationIcon'
 import { getStatusName } from '../Pipeline.utils'
-import { getStatusLabel } from '../ReadReplicas/ReadReplicas.utils'
 import { STATUS_REFRESH_FREQUENCY_MS } from '../Replication.constants'
-import { getReplicationDestinationType, type ReplicationDestinationType } from './Nodes.utils'
+import { getReplicationDestinationType } from './Nodes.utils'
+import { getStatusLabel } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.utils'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -19,17 +18,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
 
 export const NODE_WIDTH = 480
-
-const destinationIconByType: Record<
-  ReplicationDestinationType,
-  ComponentType<{ className?: string; size?: string | number }>
-> = {
-  BigQuery,
-  'Analytics Bucket': AnalyticsBucket,
-  DuckLake: Database,
-  Snowflake,
-  ClickHouse,
-}
 
 const NodeContainer = ({ className, children }: PropsWithChildren<{ className?: string }>) => {
   return (
@@ -98,11 +86,10 @@ export const ReplicationNode = ({ id }: { id: string }) => {
   const statusName = getStatusName(pipelineStatusData?.status)
 
   const type = getReplicationDestinationType(destination?.config)
-  const DestinationIcon = type ? destinationIconByType[type] : undefined
 
   return (
     <NodeContainer className="justify-start gap-x-3">
-      {DestinationIcon ? <DestinationIcon size={20} className="text-foreground-light" /> : null}
+      {type ? <DestinationIcon type={type} size={20} className="text-foreground-light" /> : null}
       <div className="text-sm flex flex-col gap-y-0.5">
         <div className="flex items-center">
           <p>{type}</p>
@@ -146,7 +133,7 @@ export const ReadReplicaNode = ({ id }: { id: string }) => {
 
   return (
     <NodeContainer className="justify-start gap-x-3">
-      <Database size={20} className="text-foreground-light" />
+      <DestinationIcon type="Read Replica" size={20} className="text-foreground-light" />
       <div className="flex flex-col gap-y-0.5">
         <div className="flex items-center">
           <p className="text-sm">Read Replica</p>

@@ -19,9 +19,8 @@ function SkipToContent({ href, children = 'Skip to content', className }: SkipTo
   return (
     <div
       className={cn(
-        // Opaque plate so default Button muted/selection fills composite like any other control.
-        // w-fit: plate is a block div by default and would otherwise span the full content column.
-        'fixed top-0 left-[10px] z-[100] w-fit rounded-md bg-background',
+        // w-fit: wrapper is a block div by default and would otherwise span the full content column.
+        'fixed top-0 left-[10px] z-[100] w-fit',
         '-translate-y-full focus-within:translate-y-[10px]',
         'transition-transform duration-200 ease-out',
         className

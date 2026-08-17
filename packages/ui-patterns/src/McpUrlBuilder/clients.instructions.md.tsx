@@ -188,21 +188,6 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
-  windsurf: {
-    primary: () => (
-      <blockquote data={{ callout: 'warning' }}>
-        <paragraph>
-          Ensure you are running Windsurf version <inlineCode value="0.1.37" /> or higher.
-        </paragraph>
-      </blockquote>
-    ),
-    alternate: () => (
-      <paragraph>
-        Windsurf does not currently support remote MCP servers over HTTP transport. You need to use
-        the mcp-remote package as a proxy.
-      </paragraph>
-    ),
-  },
   goose: {
     primary: ({ url }) => (
       <>

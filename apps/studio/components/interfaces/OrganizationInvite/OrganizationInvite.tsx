@@ -13,6 +13,7 @@ import {
 import { OrganizationInviteError } from './OrganizationInviteError'
 import {
   InterstitialAccountRow,
+  InterstitialActionError,
   InterstitialLayout,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
@@ -77,8 +78,6 @@ export const OrganizationInvite = () => {
     onSuccess: () => {
       router.push('/organizations')
     },
-    // [Joshen] Silence the default toast handler
-    onError: () => {},
   })
 
   async function handleJoinOrganization() {
@@ -197,13 +196,9 @@ export const OrganizationInvite = () => {
         <Button asChild variant="text" block>
           <Link href="/organizations">Decline</Link>
         </Button>
-        {joinError && (
-          <div className="mt-3 border-t border-muted pt-5">
-            <p role="alert" className="text-center text-xs text-destructive text-balance">
-              Failed to join organization: {joinError.message}
-            </p>
-          </div>
-        )}
+        <InterstitialActionError
+          error={joinError && `Failed to join organization: ${joinError.message}`}
+        />
       </div>
     </div>
   )

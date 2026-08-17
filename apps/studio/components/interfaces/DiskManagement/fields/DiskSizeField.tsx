@@ -38,7 +38,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
 
   const { error: diskAttributesError, isError: isDiskAttributesError } = useDiskAttributesQuery(
     { projectRef },
-    { enabled: project && project.cloud_provider !== 'FLY' }
+    { enabled: !!project }
   )
 
   const {

@@ -84,7 +84,10 @@ export const Activity = ({ live }: ActivityProps) => {
     )
   })
   const rootBlockers = (data ?? []).filter(
-    (x) => x.blocked_by.length === 0 && blockingPids.has(x.pid)
+    (x) =>
+      x.blocked_by.length === 0 &&
+      blockingPids.has(x.pid) &&
+      (rolesFilter.length === 0 || rolesFilter.includes(x.role_name))
   )
 
   const stateOptions = [

@@ -10,7 +10,7 @@ import {
   safeSql,
   type SafeSqlFragment,
 } from './pg-format'
-import { COLUMN_PRIVILEGES_SQL } from './sql/column-privileges'
+import { COLUMN_PRIVILEGES_SQL, getScopedColumnPrivilegesSql } from './sql/column-privileges'
 
 const pgColumnPrivilegeGrant = z.object({
   grantor: z.string(),
@@ -50,19 +50,60 @@ function list({
   includedSchemas,
   excludedSchemas,
   columnIds,
+  relationName,
   limit,
   offset,
+  scoped = false,
 }: {
   includeSystemSchemas?: boolean
   includedSchemas?: string[]
   excludedSchemas?: string[]
   columnIds?: string[]
+  /** Restricts to a single relation by name. Pair with `includedSchemas`. */
+  relationName?: string
   limit?: number
   offset?: number
+  scoped?: boolean
 } = {}): {
   sql: SafeSqlFragment
   zod: typeof pgColumnPrivilegesArrayZod
 } {
+  // Scoped path: the base query prunes pg_class to the requested relations
+  // before exploding ACLs across their columns, instead of exploding the whole
+  // catalog and filtering the aggregate.
+  if (scoped) {
+    const base = getScopedColumnPrivilegesSql({
+      includeSystemSchemas,
+      includedSchemas,
+      excludedSchemas,
+      relationName,
+      // `columnIds` are "<attrelid>.<attnum>" pairs. Their relation half narrows
+      // the base scan; the exact attnum half stays an outer predicate below.
+      relationIds: columnIds?.length
+        ? [...new Set(columnIds.map((columnId) => columnId.split('.')[0]))]
+        : undefined,
+    })
+
+    let sql = safeSql`
+  with column_privileges as (${base})
+  select *
+  from column_privileges
+  `
+    if (columnIds?.length) {
+      sql = safeSql`${sql} where column_id in (${joinSqlFragments(columnIds.map(literal), ',')})`
+    }
+    if (limit) {
+      sql = safeSql`${sql} limit ${literal(limit)}`
+    }
+    if (offset) {
+      sql = safeSql`${sql} offset ${literal(offset)}`
+    }
+    return {
+      sql,
+      zod: pgColumnPrivilegesArrayZod,
+    }
+  }
+
   let sql = safeSql`
   with column_privileges as (${COLUMN_PRIVILEGES_SQL})
   select *
@@ -78,6 +119,10 @@ function list({
   )
   if (filter) {
     conditions.push(safeSql`relation_schema ${filter}`)
+  }
+
+  if (relationName) {
+    conditions.push(safeSql`relation_name = ${literal(relationName)}`)
   }
 
   if (columnIds?.length) {

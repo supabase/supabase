@@ -29,11 +29,11 @@ import {
   NODE_WIDTH,
   PrimaryNodeData,
   REGION_NODE_HEIGHT,
-  REPLICA_STATUS,
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
 import { metricColor } from './InstanceNode.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { SparkBar } from '@/components/ui/SparkBar'
 import {
   DatabaseInitEstimations,

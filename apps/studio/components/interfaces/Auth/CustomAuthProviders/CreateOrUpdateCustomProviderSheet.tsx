@@ -250,12 +250,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
 
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
-      <SheetContent
-        size="lg"
-        showClose={false}
-        className="flex flex-col gap-0"
-        tabIndex={undefined}
-      >
+      <SheetContent size="lg" showClose={false} className="flex flex-col gap-0">
         <SheetHeader>
           <div className="flex flex-row gap-3 items-center">
             <SheetClose

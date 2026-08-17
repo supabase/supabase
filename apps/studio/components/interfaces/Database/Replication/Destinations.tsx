@@ -25,13 +25,12 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
-import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
+import { REPLICA_STATUS } from './Replication.constants'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -39,6 +38,7 @@ import {
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from './useIsETLPrivateAlpha'
+import { ReadReplicaRow } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaRow'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'

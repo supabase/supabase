@@ -4,39 +4,17 @@ description: 'Architecture and configuration of the Envoy API gateway for self-h
 subtitle: 'Architecture and configuration of the Envoy API gateway for self-hosted Supabase.'
 ---
 
-Self-hosted Supabase ships with an optional [Envoy](https://www.envoyproxy.io/)-based API gateway. It accepts incoming client requests, routes them to internal services (Auth, PostgREST, Realtime, Storage, Edge Functions, postgres-meta, Studio), and enforces API key authentication by translating opaque `sb_` keys into the internal credentials used by those services.
+Self-hosted Supabase uses an [Envoy](https://www.envoyproxy.io/)-based API gateway by default. It accepts incoming client requests, routes them to internal services (Auth, PostgREST, Realtime, Storage, Edge Functions, postgres-meta, Studio), and enforces API key authentication by translating opaque `sb_` keys into the internal credentials used by those services.
 
 This guide explains the architecture, configuration layout, and security posture of the Envoy gateway for operators who want to understand or customize it. It is not an Envoy tutorial - for reference on filters, routes, and clusters, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/).
 
-## Before you begin
-
-- Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
-- To enable opaque `sb_` key translation, see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys)
-
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-## Enabling the Envoy gateway
+## Using the gateway
 
-The Envoy gateway is provided as a Docker Compose override.
+Envoy is the default API gateway and runs automatically when you start the stack - no extra configuration is required.
 
-<Admonition type="note">
-
-If your stack is already running from the initial setup, bring it down first with `sh run.sh stop`.
-
-</Admonition>
-
-Enable the Envoy override, then start the stack:
-
-```sh
-sh run.sh config add envoy
-sh run.sh start
-```
-
-The override disables the default Kong gateway and starts Envoy on the same port (default `8000`). It also reconfigures the Functions service to wait for Envoy via a dependency.
-
-Envoy is registered as the `api-gw` service and also exposes `kong` as a network alias; the base Kong service likewise exposes `api-gw`. Either hostname resolves to whichever gateway is currently active, so internal configs that hardcode `kong:8000` (for example, in Edge Functions or Studio) keep working without changes.
-
-### Verify
+Envoy is registered as the `api-gw` service and also exposes `envoy` and `kong` as network aliases to help transition from legacy configurations.
 
 Confirm the gateway is routing requests and enforcing API keys:
 
@@ -231,16 +209,15 @@ If you customize the `cors:` block in `lds.template.yaml` to enable `allow_crede
 
 The gateway is configured with these production-oriented settings:
 
-| Setting                                               | Purpose                                                                                                                                                                                            |
-| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `normalize_path: true`, `merge_slashes: true`         | Prevents path-confusion bypass of RBAC prefix rules                                                                                                                                                |
-| `path_with_escaped_slashes_action: REJECT_REQUEST`    | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
-| `use_remote_address: true`                            | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
-| `headers_with_underscores_action: REJECT_REQUEST`     | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                                    |
-| `per_connection_buffer_limit_bytes: 32768`            | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
-| `max_active_downstream_connections: 30000`            | Overload manager limit on total downstream connections                                                                                                                                             |
-| Admin interface bound to `127.0.0.1:9901`             | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |
-| Image pinned to `envoyproxy/envoy:v1.37.2` (or newer) | Includes published security patches for Envoy 1.37.x                                                                                                                                               |
+| Setting                                            | Purpose                                                                                                                                                                                            |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `normalize_path: true`, `merge_slashes: true`      | Prevents path-confusion bypass of RBAC prefix rules                                                                                                                                                |
+| `path_with_escaped_slashes_action: REJECT_REQUEST` | Rejects requests that contain URL-encoded slashes in the path                                                                                                                                      |
+| `use_remote_address: true`                         | Treats Envoy as an edge proxy: uses the peer connection IP as the trusted client address (rather than trusting client-supplied `X-Forwarded-For`) and strips untrusted `x-envoy-*` request headers |
+| `headers_with_underscores_action: REJECT_REQUEST`  | Blocks header smuggling attacks that exploit underscore-vs-hyphen normalization                                                                                                                    |
+| `per_connection_buffer_limit_bytes: 32768`         | Caps per-connection buffer memory to 32 KiB                                                                                                                                                        |
+| `max_active_downstream_connections: 30000`         | Overload manager limit on total downstream connections                                                                                                                                             |
+| Admin interface bound to `127.0.0.1:9901`          | The admin API is reachable only from inside the container, not from other containers or the host                                                                                                   |
 
 <Admonition type="caution">
 
@@ -260,7 +237,7 @@ All routing, filter, and cluster changes are made in the YAML files under `./vol
 
 - **Adding or modifying routes.** Edit `lds.template.yaml`. Routes are ordered - place new routes before the catch-all `/` route to ensure they match. Keep per-route `basic_auth: disabled` for API routes and set an appropriate RBAC override if the route should bypass the global policy.
 - **Adding a new upstream service.** Add a cluster definition to `cds.yaml` with the service's DNS name and port, then reference it from a route's `cluster:` field.
-- **Adding a new environment variable.** Placeholders in the template use the `${VAR_NAME}` form. If you add a placeholder, update both `docker-compose.envoy.yml` (to pass the variable into the container) and `docker-entrypoint.sh` (to substitute it with `sed`).
+- **Adding a new environment variable.** Placeholders in the template use the `${VAR_NAME}` form. If you add a placeholder, update both the `api-gw` service in `docker-compose.yml` (to pass the variable into the container) and `docker-entrypoint.sh` (to substitute it with `sed`).
 - **Applying changes.** Envoy reads the rendered `lds.yaml` from the filesystem. Configuration changes require restarting the container so the entrypoint re-renders the template:
 
 ```sh
@@ -323,3 +300,4 @@ The access log format is a standard combined log with the request method, origin
 - [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys) - Background on opaque keys and asymmetric JWTs
 - [Configure Reverse Proxy and HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) - Caddy or Nginx in front of the gateway
 - [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/) - Filter, route, and cluster reference
+- [Self-hosted Supabase: Envoy becomes the default API gateway (Discussion #48048)](https://github.com/orgs/supabase/discussions/48048)
