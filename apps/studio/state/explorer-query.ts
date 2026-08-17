@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { type QueryResult } from '@/components/interfaces/Explorer/types'
+import { ROWS_PER_PAGE_OPTIONS } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import {
   type DatabaseSourceParameters,
   type LogsSourceParameters,
@@ -75,8 +76,22 @@ const persistedDraftSchema = z.object({
   sql: z.string(),
   updatedAt: z.number(),
   source: z.unknown().optional(),
-  rowLimit: z.number().optional(),
+  rowLimit: z.unknown().optional(),
 })
+
+const VALID_ROW_LIMITS = ROWS_PER_PAGE_OPTIONS.map((option) => option.value)
+
+/**
+ * Falls back to the default whenever a persisted row limit isn't one of the values the row
+ * limit menu can actually produce — e.g. a fractional or out-of-range number from corrupted
+ * or hand-edited storage. `undefined` (never persisted) passes through unchanged; `toDraft`
+ * applies the default for that case.
+ */
+const rowLimitSchema = z
+  .number()
+  .refine((value) => VALID_ROW_LIMITS.includes(value))
+  .catch(DEFAULT_CELL_ROW_LIMIT)
+  .optional()
 
 /**
  * Rebuilds a draft from its persisted form, branding the SQL for the backend the binding
@@ -130,6 +145,8 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
           ? parsedSource.data
           : createDefaultSourceBinding('database')
 
+        const rowLimit = rowLimitSchema.parse(draft.data.rowLimit)
+
         return [
           [
             id,
@@ -138,7 +155,7 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
               source,
               sql: draft.data.sql,
               updatedAt: draft.data.updatedAt,
-              rowLimit: draft.data.rowLimit,
+              rowLimit,
             },
           ],
         ]
