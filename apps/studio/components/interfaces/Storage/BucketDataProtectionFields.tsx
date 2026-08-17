@@ -306,25 +306,28 @@ interface ExpirationModeToggleProps {
 }
 
 const ExpirationModeToggle = ({ mode, onModeChange }: ExpirationModeToggleProps) => (
-  <FormItemLayout name="expiration_mode" label="Expire a noncurrent version when">
-    <FormControl>
-      <RadioGroupStacked
-        value={mode}
-        onValueChange={(value: ExpirationMode) => {
-          if (value) onModeChange(value)
-        }}
-      >
-        <RadioGroupStackedItem
-          value="and"
-          label="Both conditions are met"
-          description="It exceeds both the age limit and the retained-versions cap."
-        />
-        <RadioGroupStackedItem
-          value="or"
-          label="Either condition is met"
-          description="It exceeds either the age limit or the retained-versions cap."
-        />
-      </RadioGroupStacked>
-    </FormControl>
-  </FormItemLayout>
+  <div className="mt-2 flex w-full flex-col gap-y-2">
+    <label htmlFor="expiration_mode" className="text-sm text-foreground">
+      Expire a noncurrent version when
+    </label>
+    <RadioGroupStacked
+      id="expiration_mode"
+      className="w-full"
+      value={mode}
+      onValueChange={(value: ExpirationMode) => {
+        if (value) onModeChange(value)
+      }}
+    >
+      <RadioGroupStackedItem
+        value="and"
+        label="Both conditions are met"
+        description="It exceeds both the age limit and the retained-versions cap."
+      />
+      <RadioGroupStackedItem
+        value="or"
+        label="Either condition is met"
+        description="It exceeds either the age limit or the retained-versions cap."
+      />
+    </RadioGroupStacked>
+  </div>
 )
