@@ -12,6 +12,7 @@ import {
   getEnabledEndpoints,
   getEnabledEndpointsForCapability,
   getEnabledMcpTools,
+  getEnabledMcpToolsForCapability,
   normalizePermissionScopeMap,
   type PermissionScopeMap,
 } from '@/data/scoped-access-tokens/permission-scope-map-query'
@@ -339,5 +340,66 @@ describe('getEnabledEndpointsForCapability', () => {
         })
       )
     ).toEqual(['PUT /api/upgrade'])
+  })
+})
+
+describe('getEnabledMcpToolsForCapability', () => {
+  it('attributes a tool to each capability whose scope is in a fully-granted group', () => {
+    const permissionScopeMap = scopeMap({
+      mcp_tools: {
+        list_branches: [['branching_development_read'], ['branching_production_read']],
+      },
+    })
+    const allGrantedScopes = ['branching_development_read', 'branching_production_read']
+
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['branching_development_read'],
+        allGrantedScopes,
+        permissionScopeMap,
+      })
+    ).toEqual(['list_branches'])
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['branching_production_read'],
+        allGrantedScopes,
+        permissionScopeMap,
+      })
+    ).toEqual(['list_branches'])
+  })
+
+  it('does not attribute a tool to a capability whose own group is unsatisfied', () => {
+    const enabled = getEnabledMcpToolsForCapability({
+      capabilityScopes: ['branching_production_read'],
+      allGrantedScopes: ['branching_development_read'],
+      permissionScopeMap: scopeMap({
+        mcp_tools: {
+          list_branches: [['branching_development_read'], ['branching_production_read']],
+        },
+      }),
+    })
+
+    expect(enabled).toEqual([])
+  })
+
+  it('requires every scope of the capability group to be granted', () => {
+    const permissionScopeMap = scopeMap({
+      mcp_tools: { upgrade_project: [['project_admin_read', 'database_read']] },
+    })
+
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['database_read'],
+        allGrantedScopes: ['database_read'],
+        permissionScopeMap,
+      })
+    ).toEqual([])
+    expect(
+      getEnabledMcpToolsForCapability({
+        capabilityScopes: ['database_read'],
+        allGrantedScopes: ['database_read', 'project_admin_read'],
+        permissionScopeMap,
+      })
+    ).toEqual(['upgrade_project'])
   })
 })
