@@ -8,9 +8,9 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Switch,
-  ToggleGroup,
-  ToggleGroupItem,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -297,7 +297,7 @@ const LifecyclePolicySection = ({
   )
 }
 
-// ── Both / either mode toggle ────────────────────────────────────────────
+// ── Both / either mode selection ─────────────────────────────────────────
 
 interface ExpirationModeToggleProps {
   mode: ExpirationMode
@@ -305,31 +305,23 @@ interface ExpirationModeToggleProps {
 }
 
 const ExpirationModeToggle = ({ mode, onModeChange }: ExpirationModeToggleProps) => (
-  <div className="flex items-center justify-between gap-x-3 py-1">
-    <p className="text-sm text-foreground-light">Expire when conditions are met</p>
-    <ToggleGroup
-      type="single"
+  <div className="py-1">
+    <RadioGroupStacked
       value={mode}
       onValueChange={(value: ExpirationMode) => {
-        // Radix returns '' when the active item is re-clicked — ignore, we
-        // want the toggle to always land on one of the two modes.
         if (value) onModeChange(value)
       }}
     >
-      <ToggleGroupItem
+      <RadioGroupStackedItem
         value="and"
-        aria-label="Expire when both conditions are met"
-        className="h-7 min-w-14 px-2.5 text-xs data-[state=on]:bg-brand data-[state=on]:text-background-200"
-      >
-        Both
-      </ToggleGroupItem>
-      <ToggleGroupItem
+        label="Both"
+        description="A version expires only when it fails both the age and version-count conditions."
+      />
+      <RadioGroupStackedItem
         value="or"
-        aria-label="Expire when either condition is met"
-        className="h-7 min-w-14 px-2.5 text-xs data-[state=on]:bg-brand data-[state=on]:text-background-200"
-      >
-        Either
-      </ToggleGroupItem>
-    </ToggleGroup>
+        label="Either"
+        description="A version expires as soon as it fails either the age or the version-count condition."
+      />
+    </RadioGroupStacked>
   </div>
 )
