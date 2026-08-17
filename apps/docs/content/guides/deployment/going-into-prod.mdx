@@ -9,13 +9,20 @@ After developing your project and deciding it's production ready, you should run
 - [Is secure](#security)
 - [Won't falter under the expected load](#performance)
 - [Remains available whilst in production](#availability)
-
 ## Security
 
 <Admonition type="note">
 
-Check and review issues in your database using [Security Advisor](/dashboard/project/_/database/security-advisor).
+### Review database privileges
 
+Before going into production, review the table privileges granted to the `anon` and `authenticated` roles.
+
+You can check current table grants using:
+
+```sql
+select *
+from information_schema.role_table_grants
+where grantee in ('anon', 'authenticated');
 </Admonition>
 
 - Ensure you have enabled row level security (RLS) on all tables from the [**Database > Tables**](/dashboard/project/_/database/tables) section of the Supabase Dashboard.
