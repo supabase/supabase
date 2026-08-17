@@ -94,7 +94,7 @@ const Subscription = () => {
                         </Button>
                         {currentPlan && currentPlan.id !== 'free' && (
                           <InitiateCancellationFlowButton variant="danger">
-                            Cancel Subscription
+                            Cancel subscription
                           </InitiateCancellationFlowButton>
                         )}
                       </div>
