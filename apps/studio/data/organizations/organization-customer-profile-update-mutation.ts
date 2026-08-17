@@ -77,15 +77,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
   >({
     mutationFn: (vars) => updateOrganizationCustomerProfile(vars),
     async onSuccess(data, variables, context) {
-      const {
-        address,
-        slug,
-        billing_name,
-        tax_id,
-        email,
-        additional_emails,
-        dry_run,
-      } = variables
+      const { address, slug, billing_name, tax_id, email, additional_emails, dry_run } = variables
 
       if (dry_run) {
         await onSuccess?.(data, variables, context)
@@ -105,9 +97,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
             ...(billing_name !== undefined ? { billing_name } : {}),
             ...(address !== undefined ? { address } : {}),
             ...(email !== undefined ? { email } : {}),
-            ...(additional_emails !== undefined
-              ? { additional_emails: additional_emails }
-              : {}),
+            ...(additional_emails !== undefined ? { additional_emails: additional_emails } : {}),
           }
         }
       )
