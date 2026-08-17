@@ -4,16 +4,30 @@ import { collectChangedFiles, repoRootFrom } from './git.ts'
 
 export type ScopeResult = { pages: string[]; skip: boolean }
 
-export type SuiteConfig = {
+type SuiteBase = {
   root: string
   label: string
   devCommand: string
+  defaultBaseUrl: string
+  project?: string
+}
+
+type ScopedSuite = {
   pagePathsEnv: string
   baseRefEnv: string
-  defaultBaseUrl: string
   resolveScope: (options: { changedFiles: string[]; repoRoot: string }) => Promise<ScopeResult>
   resolveAllPages?: (repoRoot: string) => Promise<string[]>
 }
+
+// A fixed page list resolves nothing from git, so none of the scope plumbing applies.
+type FixedScopeSuite = {
+  pagePathsEnv?: undefined
+  baseRefEnv?: undefined
+  resolveScope?: undefined
+  resolveAllPages?: undefined
+}
+
+export type SuiteConfig = SuiteBase & (ScopedSuite | FixedScopeSuite)
 
 const PREFLIGHT_TIMEOUT_MS = 3_000
 
@@ -30,7 +44,7 @@ async function isBaseUrlReachable(baseUrl: string): Promise<boolean> {
   }
 }
 
-async function resolvePagePaths(config: SuiteConfig): Promise<string[] | null> {
+async function resolvePagePaths(config: SuiteBase & ScopedSuite): Promise<string[] | null> {
   const explicit = process.env[config.pagePathsEnv]?.trim()
   if (explicit) {
     return explicit
@@ -65,14 +79,16 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
   const runAll = rawArgs.includes('--all')
   const playwrightArgs = rawArgs.filter((arg) => arg !== '--all' && arg !== '--')
 
-  let pages: string[] | null
-  if (runAll && config.resolveAllPages) {
-    pages = await config.resolveAllPages(repoRootFrom(config.root))
-    console.error(`Resolved all ${pages.length} in-scope ${config.label} page(s).`)
-  } else {
-    pages = await resolvePagePaths(config)
+  let pages: string[] | null = null
+  if (config.resolveScope) {
+    if (runAll && config.resolveAllPages) {
+      pages = await config.resolveAllPages(repoRootFrom(config.root))
+      console.error(`Resolved all ${pages.length} in-scope ${config.label} page(s).`)
+    } else {
+      pages = await resolvePagePaths(config)
+    }
+    if (pages === null) process.exit(0)
   }
-  if (pages === null) process.exit(0)
 
   const hasMaxFailuresArg = playwrightArgs.some(
     (arg) => arg === '-x' || arg.startsWith('--max-failures')
@@ -91,11 +107,21 @@ export async function runSuite(config: SuiteConfig): Promise<void> {
     process.exit(1)
   }
 
-  const child = spawn('pnpm', ['exec', 'playwright', 'test', ...finalArgs], {
+  // First, so an explicit --project on the command line overrides it.
+  const projectArgs = config.project ? [`--project=${config.project}`] : []
+  const env = { ...process.env }
+  if (config.pagePathsEnv && pages) env[config.pagePathsEnv] = pages.join(',')
+
+  const child = spawn('pnpm', ['exec', 'playwright', 'test', ...projectArgs, ...finalArgs], {
     cwd: config.root,
-    env: { ...process.env, [config.pagePathsEnv]: pages.join(',') },
+    env,
     stdio: 'inherit',
     shell: process.platform === 'win32',
+  })
+
+  child.on('error', (error) => {
+    console.error(`Failed to start Playwright: ${error.message}`)
+    process.exit(1)
   })
 
   child.on('exit', (code, signal) => {

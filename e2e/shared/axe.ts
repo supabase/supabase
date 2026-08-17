@@ -11,6 +11,7 @@ export type ScanOptions = {
   tags?: string[]
   excludeRules?: string[]
   include?: string
+  exclude?: string[]
 }
 
 export async function settleForAxe(page: Page): Promise<void> {
@@ -49,6 +50,7 @@ export async function scan(page: Page, options: ScanOptions): Promise<Result[]> 
   let builder = new AxeBuilder({ page }).setLegacyMode(true)
 
   if (options.include) builder = builder.include(options.include)
+  for (const selector of options.exclude ?? []) builder = builder.exclude(selector)
   if (options.rules) builder = builder.withRules(options.rules)
   else if (options.tags) builder = builder.withTags(options.tags)
   if (options.excludeRules?.length) builder = builder.disableRules(options.excludeRules)

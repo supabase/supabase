@@ -84,6 +84,15 @@ async function main() {
     const latest = await fetchLatestStatus(repository, sha, githubToken, statusContext)
 
     if (latest?.state === 'success') {
+      // A skipped build posts success, but its target_url points at an older
+      // deployment. Resolve no URL rather than test the wrong markup.
+      if (/^skipped/i.test(latest.description ?? '')) {
+        console.error(
+          `Vercel skipped the "${statusContext}" build for ${sha}: ${latest.description}`
+        )
+        return
+      }
+
       if (!latest.target_url) {
         throw new Error(
           `"${statusContext}" commit status succeeded but had no target_url to resolve a deployment from`

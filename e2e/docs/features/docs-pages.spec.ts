@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test'
-import type { TestInfo } from '@playwright/test'
 
 import { parsePagePaths } from '../../shared/paths.ts'
 import {
+  annotate,
   attachScanReport,
   blockingViolations,
   ENFORCED_RULES,
@@ -21,11 +21,6 @@ import {
 } from '../utils/docs-links.js'
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
-
-function annotate(testInfo: TestInfo, description: string) {
-  testInfo.annotations.push({ type: 'warning', description })
-  console.warn(`::warning title=Accessibility::${description}`)
-}
 
 test.describe('Docs owned pages', () => {
   // Without this, every test in this file runs on one worker.
