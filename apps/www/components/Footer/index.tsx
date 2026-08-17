@@ -208,7 +208,7 @@ const Footer = (props: Props) => {
               {footerData.map((segment) => {
                 return (
                   <div key={`footer_${segment.title}`}>
-                    <h6 className="text-foreground overwrite text-base">{segment.title}</h6>
+                    <h3 className="text-foreground overwrite text-base">{segment.title}</h3>
                     <ul className="mt-4 space-y-2">
                       {segment.links.map(({ component: Component, ...link }, idx) => {
                         const children = (

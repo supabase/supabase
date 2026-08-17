@@ -386,7 +386,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 </Link>
               </div>
             )}
-            <main
+            <div
               id="sb-www-event-main-article"
               data-testid="sb-www-event-main-article"
               className="lg:col-span-2"
@@ -397,7 +397,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 </h2>
                 <MDXClient {...content} components={mdxComponents()} />
               </div>
-              <aside className="mt-8">
+              <aside aria-label="Registration" className="mt-8">
                 <Button
                   variant="primary"
                   size="medium"
@@ -420,8 +420,8 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   </Link>
                 </Button>
               </aside>
-            </main>
-            <aside className="order-first lg:order-last">
+            </div>
+            <aside aria-label="Event details" className="order-first lg:order-last">
               {partnersArray && partnersArray.length > 0 && (
                 <div className="flex flex-col gap-4 mb-8">
                   <h2 className="text-foreground-light text-sm font-mono uppercase">Partners</h2>

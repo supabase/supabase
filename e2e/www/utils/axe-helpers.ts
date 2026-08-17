@@ -51,6 +51,8 @@ export async function scanArticle(
 // introduced violation. `document-title`, `html-has-lang`, `html-lang-valid`, and
 // `meta-viewport` are unreachable from an article-scoped scan.
 export const GLOBAL_ELEMENTS_ENFORCED_RULES = [
+  'heading-order',
+  'landmark-unique',
   'aria-allowed-attr',
   'aria-conditional-attr',
   'aria-deprecated-role',
@@ -75,11 +77,10 @@ export const GLOBAL_ELEMENTS_ENFORCED_RULES = [
   'svg-img-alt',
 ]
 
-// Best practice rather than WCAG, so the tag sweep never runs them. Both fire
-// today: `heading-order` on the footer `h6` under a screen-reader-only `h2`, on
-// every page, and `landmark-unique` on the event template's nested `<main>` and
-// its `<aside>`.
-export const GLOBAL_ELEMENTS_EXTRA_REPORTED_RULES = ['heading-order', 'landmark-unique']
+// Best practice rather than WCAG, so the tag sweep never runs them. They need
+// their own pass, and they appear in the enforced set above to reach the
+// blocking filter.
+export const GLOBAL_ELEMENTS_BEST_PRACTICE_RULES = ['heading-order', 'landmark-unique']
 
 // `color-contrast` and the `<html>`-level rules are only reachable once the scan
 // covers the document, so nothing is excluded here.
@@ -98,7 +99,7 @@ export async function scanGlobalElements(
 
   // Both are properties of the whole document, so this pass keeps the article in.
   // Excluding it would hide the event template's nested `<main>`.
-  const extra = await scan(page, { rules: GLOBAL_ELEMENTS_EXTRA_REPORTED_RULES })
+  const extra = await scan(page, { rules: GLOBAL_ELEMENTS_BEST_PRACTICE_RULES })
   const byRule = new Map(
     [...result.violations, ...extra].map((violation) => [violation.id, violation])
   )
