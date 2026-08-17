@@ -24,7 +24,6 @@ const ObservabilityLayoutContent = ({
 }: PropsWithChildren<ObservabilityLayoutProps>) => {
   const { ref } = useParams()
   const pathname = usePathname()
-  const { hasLoaded } = useFeatureFlags()
   const { addBanner, dismissBanner } = useBannerStack()
   const { isIndexAdvisorAvailable, isIndexAdvisorEnabled } = useIndexAdvisorStatus()
 
@@ -33,7 +32,7 @@ const ObservabilityLayoutContent = ({
     false
   )
 
-  const isDatabaseConnectionsEnabled = useIsDatabaseConnectionsEnabled()
+  const { isInitialized, previouslyToggled } = useIsDatabaseConnectionsEnabled()
 
   const [isDatabaseConnectionsBannerDismissed, , { isSuccess: isLocalStorageReady }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''), false)
@@ -42,10 +41,10 @@ const ObservabilityLayoutContent = ({
 
   useEffect(() => {
     if (
-      !hasLoaded ||
+      !isInitialized ||
       !isLocalStorageReady ||
       isDatabaseConnectionsBannerDismissed ||
-      isDatabaseConnectionsEnabled
+      previouslyToggled
     )
       return
 
@@ -56,11 +55,11 @@ const ObservabilityLayoutContent = ({
       content: <BannerDatabaseConnections />,
     })
   }, [
-    hasLoaded,
     addBanner,
     dismissBanner,
+    isInitialized,
     isDatabaseConnectionsBannerDismissed,
-    isDatabaseConnectionsEnabled,
+    previouslyToggled,
     isLocalStorageReady,
   ])
 

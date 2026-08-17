@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useParams } from 'common/hooks'
+import Link from 'next/link'
 import { Badge, Button, WarningIcon } from 'ui'
 
 import { BannerCard } from '../BannerCard'
@@ -12,7 +13,6 @@ export const BannerDatabaseConnections = () => {
   const track = useTrack()
   const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
-  const { selectFeaturePreview } = useFeaturePreviewModal()
 
   const [, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''),
@@ -73,14 +73,18 @@ export const BannerDatabaseConnections = () => {
         </div>
         <div className="flex gap-2">
           <Button
+            asChild
             variant="default"
             size="tiny"
             onClick={() => {
+              setIsDismissed(true)
+              dismissBanner('database-connections-banner')
               track('database_connections_banner_cta_button_clicked', { isEnabled: false })
-              selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS)
             }}
           >
-            Enable Database Connections
+            <Link href={`/project/${ref}/observability/connections`}>
+              Explore Database Connections
+            </Link>
           </Button>
         </div>
       </div>
