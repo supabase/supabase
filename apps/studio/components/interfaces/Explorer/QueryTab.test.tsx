@@ -1,0 +1,171 @@
+import { act, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { HttpResponse } from 'msw'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import { QueryTab } from './QueryTab'
+import type { ReadReplicasData } from '@/data/read-replicas/replicas-query'
+import { explorerQueryState } from '@/state/explorer-query'
+import { createTabsState, TabsStateContext } from '@/state/tabs'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
+
+const testContext = vi.hoisted(() => ({
+  flags: { otelLegacyLogs: true } as Record<string, boolean>,
+  params: { ref: 'default', id: 'query-test' } as { ref?: string; id?: string },
+}))
+
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    IS_PLATFORM: true,
+    useParams: () => testContext.params,
+    useFlag: (flag: string) => testContext.flags[flag] ?? false,
+  }
+})
+
+vi.mock('@/components/ui/CodeEditor/CodeEditor', () => ({
+  CodeEditor: ({ value }: { value: string }) => (
+    <textarea aria-label="SQL editor" value={value} readOnly />
+  ),
+}))
+
+vi.mock('./ExplorerQuerySourceMenu', () => ({ ExplorerQuerySourceMenu: () => null }))
+
+const renderQueryTab = () =>
+  customRender(
+    <TabsStateContext.Provider value={createTabsState('default')}>
+      <QueryTab />
+    </TabsStateContext.Provider>
+  )
+
+const createDraft = (
+  source:
+    | { _tag: 'database'; database_identifier?: string }
+    | {
+        _tag: 'logs'
+        time_range: { _tag: 'relative_time_range'; amount: number; unit: 'hour' }
+      }
+) => {
+  explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
+  explorerQueryState.createDraft({
+    id: 'query-test',
+    projectRef: 'default',
+    sql: 'select 1',
+    source,
+  })
+}
+
+beforeEach(() => {
+  setupSqlEditorMocks()
+  testContext.flags.otelLegacyLogs = true
+  testContext.params = { ref: 'default', id: 'query-test' }
+  explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
+})
+
+afterEach(() => explorerQueryState.flushPendingPersistence())
+
+describe('QueryTab execution', () => {
+  it('keeps loading while dynamic route parameters are unavailable', () => {
+    testContext.params = {}
+
+    renderQueryTab()
+
+    expect(screen.getByRole('status', { name: 'Loading query' })).toBeInTheDocument()
+    expect(screen.queryByText('Query draft not found')).not.toBeInTheDocument()
+  })
+
+  it('records an unavailable error and skips the logs endpoint when the flag is off', async () => {
+    testContext.flags.otelLegacyLogs = false
+    createDraft({
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
+    })
+    const requests: Request[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: ({ request }) => {
+        requests.push(request)
+        return HttpResponse.json({ result: [] })
+      },
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    expect(
+      await screen.findByText("Error: Querying logs isn't available for this project yet.")
+    ).toBeInTheDocument()
+    expect(requests).toHaveLength(0)
+  })
+
+  it('waits for replicas, then fails closed when the selected database is absent', async () => {
+    createDraft({ _tag: 'database', database_identifier: 'missing-replica' })
+    let releaseReplicas: () => void = () => undefined
+    const replicasPending = new Promise<void>((resolve) => {
+      releaseReplicas = resolve
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/databases',
+      response: async () => {
+        await replicasPending
+        return HttpResponse.json<ReadReplicasData>([])
+      },
+    })
+    const requests: Request[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: ({ request }) => {
+        requests.push(request)
+        return HttpResponse.json([])
+      },
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    expect(runButton).toBeDisabled()
+
+    act(() => releaseReplicas())
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+
+    expect(
+      await screen.findByText('Error: Unable to run query: Connection string is missing')
+    ).toBeInTheDocument()
+    expect(requests).toHaveLength(0)
+  })
+
+  it('resolves a relative logs range before sending the request', async () => {
+    createDraft({
+      _tag: 'logs',
+      time_range: { _tag: 'relative_time_range', amount: 2, unit: 'hour' },
+    })
+    const bodies: Array<{ iso_timestamp_start: string; iso_timestamp_end: string }> = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: async ({ request }) => {
+        bodies.push((await request.json()) as (typeof bodies)[number])
+        return HttpResponse.json({ result: [] })
+      },
+    })
+
+    renderQueryTab()
+    const runButton = await screen.findByRole('button', { name: 'Run' })
+    await waitFor(() => expect(runButton).toBeEnabled())
+    await userEvent.click(runButton)
+    await waitFor(() => expect(bodies).toHaveLength(1))
+
+    expect(
+      new Date(bodies[0].iso_timestamp_end).getTime() -
+        new Date(bodies[0].iso_timestamp_start).getTime()
+    ).toBe(2 * 60 * 60 * 1000)
+  })
+})
