@@ -224,8 +224,8 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="primary"
-                      title="Choose token scope"
-                      className="-ml-px rounded-l-none px-[4px] py-[5px] focus-visible:z-10 focus-visible:rounded-l-sm"
+                      aria-label="Choose destination type"
+                      className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                       icon={<ChevronDown />}
                     />
                   </DropdownMenuTrigger>

@@ -46,7 +46,8 @@ export const CreateTableInstructionsDialog = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="primary"
-                className="w-7 rounded-l-none -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                aria-label="More table creation options"
+                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>
