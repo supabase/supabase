@@ -28,7 +28,6 @@ import { AdvancedSection, ComputeSection, DiskSection } from './DiskManagementFo
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog'
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog.hooks'
-import { scrollElementIntoContainer } from './scrollElementIntoContainer'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import {
   DISK_LIMITS,
@@ -41,7 +40,6 @@ import {
   recommendComputeParser,
   subscribeRecommendCompute,
 } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
-import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
@@ -92,14 +90,6 @@ export function DiskManagementForm({
   const storageSettingsRef = useRef<HTMLDivElement>(null)
   const computeSettingsRef = useRef<HTMLDivElement>(null)
   const diskSizeSettingsRef = useRef<HTMLDivElement>(null)
-  const mainScrollContainer = useMainScrollContainer()
-  const mainScrollContainerRef = useRef(mainScrollContainer)
-  mainScrollContainerRef.current = mainScrollContainer
-
-  const scrollToComputeSection = () => {
-    scrollElementIntoContainer(computeSettingsRef.current, mainScrollContainerRef.current)
-    computeSettingsRef.current?.focus({ preventScroll: true })
-  }
 
   const isSpendCapEnabled = org?.plan.id !== 'free' && !org?.usage_billing_enabled
 
@@ -402,7 +392,7 @@ export function DiskManagementForm({
     setRecommendCompute(null)
 
     const timeoutId = setTimeout(() => {
-      scrollToComputeSection()
+      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, RECOMMEND_COMPUTE_SCROLL_DELAY_MS)
 
     return () => clearTimeout(timeoutId)
@@ -417,7 +407,7 @@ export function DiskManagementForm({
       })
       void form.trigger(['provisionedIOPS', 'throughput'])
       window.setTimeout(() => {
-        scrollToComputeSection()
+        computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, RECOMMEND_COMPUTE_SCROLL_DELAY_MS)
     })
   }, [form])
@@ -428,7 +418,7 @@ export function DiskManagementForm({
     if (window.location.hash !== '#compute') return
 
     const timeoutId = setTimeout(() => {
-      scrollToComputeSection()
+      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
 
     return () => clearTimeout(timeoutId)
@@ -458,7 +448,7 @@ export function DiskManagementForm({
     if (!scrollTarget) return
 
     const timeoutId = setTimeout(() => {
-      scrollElementIntoContainer(scrollTarget.current, mainScrollContainerRef.current)
+      scrollTarget.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 100)
 
     return () => clearTimeout(timeoutId)
@@ -466,151 +456,145 @@ export function DiskManagementForm({
 
   return (
     <Form {...form}>
-      {/*
-        ProjectLayout's main is a viewport-tall flex column. If this form is a
-        direct flex item, production builds resolve descendant h-full / flex-1
-        against that main (next dev often does not). Keep a block wrapper so
-        height stays content-sized.
-      */}
-      <div className="w-full">
-        <form id="disk-compute-form" onSubmit={form.handleSubmit(onSubmit)}>
-          <PageContainer size="default" className="pb-16">
-            <div className="pt-12">
+      <form id="disk-compute-form" onSubmit={form.handleSubmit(onSubmit)}>
+        <PageContainer size="default" className="pb-16">
+          <PageSection>
+            <PageSectionContent>
               {overviewExtra}
               <ComputeAndDiskUsageCharts className={cn(overviewExtra && 'mt-6', chartsClassName)} />
+            </PageSectionContent>
+          </PageSection>
+
+          {(isProjectResizing ||
+            isProjectRequestingDiskChanges ||
+            (isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions)) && (
+            <div className="relative flex flex-col gap-10">
+              <DiskMangementRestartRequiredSection
+                visible={isProjectResizing}
+                title="Your project will now automatically restart."
+                description="Your project will be unavailable for up to 2 mins."
+              />
+              <NoticeBar
+                type="default"
+                visible={isProjectRequestingDiskChanges}
+                title="Disk configuration changes have been requested"
+                description="The requested changes will be applied to your disk shortly"
+              />
+              <NoticeBar
+                type="default"
+                visible={isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions}
+                title="You do not have permission to update disk configuration"
+                description="Please contact your organization administrator to update your disk configuration"
+              />
             </div>
+          )}
 
-            {(isProjectResizing ||
-              isProjectRequestingDiskChanges ||
-              (isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions)) && (
-              <div className="relative flex flex-col gap-10">
-                <DiskMangementRestartRequiredSection
-                  visible={isProjectResizing}
-                  title="Your project will now automatically restart."
-                  description="Your project will be unavailable for up to 2 mins."
-                />
-                <NoticeBar
-                  type="default"
-                  visible={isProjectRequestingDiskChanges}
-                  title="Disk configuration changes have been requested"
-                  description="The requested changes will be applied to your disk shortly"
-                />
-                <NoticeBar
-                  type="default"
-                  visible={isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions}
-                  title="You do not have permission to update disk configuration"
-                  description="Please contact your organization administrator to update your disk configuration"
-                />
-              </div>
+          {beforeScaling}
+
+          <PageSection>
+            <PageSectionMeta>
+              <PageSectionSummary>
+                <PageSectionTitle>Scaling</PageSectionTitle>
+              </PageSectionSummary>
+            </PageSectionMeta>
+            {isEntitlementsLoaded && isPlanUpgradeRequired && (
+              <UpgradeToPro
+                featureProposition="configure compute and disk"
+                primaryText="Only available on Pro Plan and above"
+                secondaryText="Upgrade to the Pro Plan to configure compute and disk settings."
+              />
             )}
+            <PageSectionContent>
+              <ComputeSection
+                form={form}
+                settingsRef={computeSettingsRef}
+                showBillingBadge={showComputeBillingBadge}
+                beforePrice={Number(computeSizePrice.oldPrice)}
+                afterPrice={Number(computeSizePrice.newPrice)}
+                disabled={disableComputeInputs}
+              />
 
-            {beforeScaling}
+              <DiskSection
+                form={form}
+                settingsRef={diskSizeSettingsRef}
+                showBillingBadge={showDiskBillingBadge}
+                beforePrice={Number(diskSizePrice.oldPrice)}
+                afterPrice={Number(diskSizePrice.newPrice)}
+                isAws={isAws}
+                isAwsK8s={isAwsK8s}
+                isBranch={isBranch}
+                isNoticeVisible={isDiskNoticeVisible}
+                isReadOnlyMode={!!isReadOnlyMode}
+                usedPercentage={usedPercentage}
+                isWithinCooldownWindow={isWithinCooldownWindow}
+                currentDiskSizeGb={defaultValues.totalSize}
+                disableDiskSizeInput={disableDiskSizeInput}
+              />
 
-            <PageSection>
-              <PageSectionMeta>
-                <PageSectionSummary>
-                  <PageSectionTitle>Scaling</PageSectionTitle>
-                </PageSectionSummary>
-              </PageSectionMeta>
-              {isEntitlementsLoaded && isPlanUpgradeRequired && (
-                <UpgradeToPro
-                  featureProposition="configure compute and disk"
-                  primaryText="Only available on Pro Plan and above"
-                  secondaryText="Upgrade to the Pro Plan to configure compute and disk settings."
+              {isAws && (
+                <AdvancedSection
+                  form={form}
+                  autoscaleSettingsRef={autoscaleSettingsRef}
+                  storageSettingsRef={storageSettingsRef}
+                  showBillingBadge={showAdvancedBillingBadge}
+                  beforePrice={advancedBeforePrice}
+                  afterPrice={advancedAfterPrice}
+                  disableIopsThroughputConfig={disableIopsThroughputConfig}
+                  canUpdateDiskConfiguration={canUpdateDiskConfiguration}
+                  isDiskTooSmallForCustomIops={isDiskTooSmallForCustomIops}
+                  disableDiskInputs={disableDiskInputs}
+                  disableDiskSizeInput={disableDiskSizeInput}
+                  suggestedDiskSizeForCustomIops={suggestedDiskSizeForCustomIops}
                 />
               )}
-              <PageSectionContent>
-                <ComputeSection
-                  form={form}
-                  settingsRef={computeSettingsRef}
-                  showBillingBadge={showComputeBillingBadge}
-                  beforePrice={Number(computeSizePrice.oldPrice)}
-                  afterPrice={Number(computeSizePrice.newPrice)}
-                  disabled={disableComputeInputs}
-                />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
 
-                <DiskSection
-                  form={form}
-                  settingsRef={diskSizeSettingsRef}
-                  showBillingBadge={showDiskBillingBadge}
-                  beforePrice={Number(diskSizePrice.oldPrice)}
-                  afterPrice={Number(diskSizePrice.newPrice)}
-                  isAws={isAws}
-                  isAwsK8s={isAwsK8s}
-                  isBranch={isBranch}
-                  isNoticeVisible={isDiskNoticeVisible}
-                  isReadOnlyMode={!!isReadOnlyMode}
-                  usedPercentage={usedPercentage}
-                  isWithinCooldownWindow={isWithinCooldownWindow}
-                  currentDiskSizeGb={defaultValues.totalSize}
-                  disableDiskSizeInput={disableDiskSizeInput}
-                />
-
-                {isAws && (
-                  <AdvancedSection
-                    form={form}
-                    autoscaleSettingsRef={autoscaleSettingsRef}
-                    storageSettingsRef={storageSettingsRef}
-                    showBillingBadge={showAdvancedBillingBadge}
-                    beforePrice={advancedBeforePrice}
-                    afterPrice={advancedAfterPrice}
-                    disableIopsThroughputConfig={disableIopsThroughputConfig}
-                    canUpdateDiskConfiguration={canUpdateDiskConfiguration}
-                    isDiskTooSmallForCustomIops={isDiskTooSmallForCustomIops}
-                    disableDiskInputs={disableDiskInputs}
-                    disableDiskSizeInput={disableDiskSizeInput}
-                    suggestedDiskSizeForCustomIops={suggestedDiskSizeForCustomIops}
-                  />
+        <AnimatePresence>
+          {isDirty ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.1, delay: 0.2 }}
+              className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
+            >
+              <div
+                className={cn(
+                  'mx-auto w-full max-w-[1200px]',
+                  PADDING_CLASSES,
+                  'flex items-center justify-end gap-3'
                 )}
-              </PageSectionContent>
-            </PageSection>
-          </PageContainer>
-
-          <AnimatePresence>
-            {isDirty ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.1, delay: 0.2 }}
-                className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
               >
-                <div
-                  className={cn(
-                    'mx-auto w-full max-w-[1200px]',
-                    PADDING_CLASSES,
-                    'flex items-center justify-end gap-3'
-                  )}
+                <BillingChangeBadge
+                  show={isDirty}
+                  beforePrice={totalBeforePrice}
+                  afterPrice={totalAfterPrice}
+                />
+                <Button
+                  variant="default"
+                  onClick={() => form.reset()}
+                  disabled={!isDirty}
+                  size="medium"
                 >
-                  <BillingChangeBadge
-                    show={isDirty}
-                    beforePrice={totalBeforePrice}
-                    afterPrice={totalAfterPrice}
-                  />
-                  <Button
-                    variant="default"
-                    onClick={() => form.reset()}
-                    disabled={!isDirty}
-                    size="medium"
-                  >
-                    Cancel
-                  </Button>
-                  <DiskManagementReviewAndSubmitDialog
-                    loading={isUpdatingConfig}
-                    disabled={noPermissions}
-                    form={form}
-                    numReplicas={readReplicas.length}
-                    isDialogOpen={isDialogOpen}
-                    onSubmit={onSubmit}
-                    setIsDialogOpen={setIsDialogOpen}
-                    message={message}
-                  />
-                </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </form>
-      </div>
+                  Cancel
+                </Button>
+                <DiskManagementReviewAndSubmitDialog
+                  loading={isUpdatingConfig}
+                  disabled={noPermissions}
+                  form={form}
+                  numReplicas={readReplicas.length}
+                  isDialogOpen={isDialogOpen}
+                  onSubmit={onSubmit}
+                  setIsDialogOpen={setIsDialogOpen}
+                  message={message}
+                />
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </form>
     </Form>
   )
 }

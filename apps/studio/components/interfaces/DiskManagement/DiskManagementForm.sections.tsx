@@ -68,16 +68,7 @@ export function ComputeSection({
           <DocsButton href={`${DOCS_URL}/guides/platform/compute-and-disk`} />
         </PageSectionAside>
       </PageSectionMeta>
-<<<<<<< HEAD
-      <PageSectionContent ref={settingsRef} className="scroll-mt-24">
-=======
-      <PageSectionContent
-        ref={settingsRef}
-        id="compute"
-        tabIndex={-1}
-        className="scroll-mt-24 outline-hidden"
-      >
->>>>>>> 33f4960eb1 (fix(studio): stop the add-replica sheet restoring focus into the page)
+      <PageSectionContent ref={settingsRef} id="compute" className="scroll-mt-24">
         <ComputeSizeField form={form} disabled={disabled} />
       </PageSectionContent>
     </PageSection>
