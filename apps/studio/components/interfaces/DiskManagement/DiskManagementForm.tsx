@@ -456,9 +456,9 @@ export function DiskManagementForm({
       <form id="disk-compute-form" onSubmit={form.handleSubmit(onSubmit)}>
         <PageContainer size="default" className="pb-16">
           <PageSection>
-            <PageSectionContent className="space-y-6">
+            <PageSectionContent>
               {overviewExtra}
-              <ComputeAndDiskUsageCharts className={chartsClassName} />
+              <ComputeAndDiskUsageCharts className={cn(overviewExtra && 'mt-6', chartsClassName)} />
             </PageSectionContent>
           </PageSection>
 
