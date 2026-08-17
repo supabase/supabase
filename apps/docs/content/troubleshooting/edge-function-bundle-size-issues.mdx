@@ -3,6 +3,8 @@ title = "Edge Function bundle size issues"
 topics = [ "functions" ]
 keywords = [ "bundle", "size", "limit", "dependencies", "edge function", "5MB", "20MB" ]
 database_id = "aaf9e673-64ae-460a-88e0-b83ea4963382"
+summary = "Deployment fails when an Edge Function bundle exceeds the limit for local or server-side bundling."
+diagnostic_sources = [ "client-tracing" ]
 
 [api]
 cli = [ "supabase-functions-deploy" ]
@@ -39,10 +41,10 @@ Instead of importing entire packages, import only the specific modules you need:
 
 ```tsx
 // Good: Import specific submodules
-import { specific } from 'npm:package/specific'
 
 // Avoid: Import entire package
 import * as everything from 'npm:package'
+import { specific } from 'npm:package/specific'
 ```
 
 ### Split large functions
@@ -55,7 +57,7 @@ Research smaller packages that provide the same functionality. Many NPM packages
 
 ## Deploying larger functions
 
-If your function is under 20 MB but exceeds the 5 MB server-side limit, bundle it locally with the Supabase CLI to get the higher limit. Run `supabase functions deploy` with the `--use-docker` flag to force local bundling.
+If your function is under 20 MB but exceeds the 5 MB server-side limit, bundle it locally by running `supabase functions deploy` without the `--use-api` flag. The `--use-api` flag selects server-side bundling.
 
 ## Additional resources
 

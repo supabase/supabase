@@ -1,5 +1,7 @@
 ---
 title = "Error: \"Connection refused\" when trying to connect to Supabase database"
+summary = "Repeated failed password attempts can temporarily ban the source IP, causing new database connections to be refused."
+diagnostic_sources = [ "supavisor-logs", "postgres-logs", "client-tracing", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/14929"
 date_created = "2023-06-09T10:38:06+00:00"
 topics = [ "database", "cli" ]

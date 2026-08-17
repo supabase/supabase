@@ -1,5 +1,7 @@
 ---
 title = "Resolving 42P01: relation does not exist error"
+summary = "Postgres returns `42P01` when the relation is absent, outside the search path, in an unexposed schema, or referenced with incorrect letter casing."
+diagnostic_sources = [ "postgres-logs", "api-logs", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/29577"
 date_created = "2024-09-29T15:52:41+00:00"
 topics = [ "database" ]

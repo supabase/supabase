@@ -3,17 +3,23 @@ title = "Unable to call Edge Function"
 topics = [ "functions" ]
 keywords = [ "invoke", "call", "CORS", "authentication", "JWT", "edge function" ]
 database_id = "cd298838-6f13-4b70-a198-a8bd26b2c0bd"
+summary = "An Edge Function invocation can fail because of CORS handling, authentication, an incorrect URL, or network connectivity."
+diagnostic_sources = [ "edge-function-logs", "client-tracing" ]
 ---
 
-If you're having trouble invoking an Edge Function or experiencing CORS issues, follow these steps to diagnose and resolve the problem.
+## Symptoms
 
-## Diagnose the issue
+An Edge Function invocation fails in the client, returns an authentication error, or works outside the browser but fails there with a CORS error.
+
+## Confirm the cause
 
 1. **Review CORS configuration:** Check out the [CORS guide](/docs/guides/functions/cors) and ensure you've properly configured CORS headers
 2. **Check function logs:** Look for errors in Functions > Logs in the dashboard
 3. **Verify authentication:** Confirm JWT tokens and permissions are correct
 
-## Proper CORS handling
+## Resolve
+
+### Configure CORS handling
 
 Make sure your function handles OPTIONS preflight requests.
 
@@ -71,14 +77,14 @@ Deno.serve(async (req) => {
 })
 ```
 
-## Debugging tools
+### Inspect invocations and logs
 
 Supabase provides two debugging tools for Edge Functions:
 
 - **Invocations:** Shows the Request and Response for each execution
 - **Logs:** Shows platform events, including deployments and errors
 
-Access these tools by navigating to Functions > [Your Function] in the dashboard.
+Access these tools by opening the function in the Supabase Dashboard. Invoke the function again and confirm that **Invocations** records the expected request and response and **Logs** contains no unexpected errors.
 
 ## Common issues
 
@@ -99,6 +105,14 @@ Access these tools by navigating to Functions > [Your Function] in the dashboard
 - Function not deployed
 - Incorrect function URL
 - Network connectivity issues
+
+## Verify
+
+Invoke the function from the affected client and confirm that it returns the expected status and response body without a browser CORS error.
+
+## Escalate
+
+If the request still fails after the invocation reaches the function, [open a support ticket](/dashboard/support/new) with the client error, invocation timestamp, and relevant function logs.
 
 ## Additional resources
 

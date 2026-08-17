@@ -1,5 +1,7 @@
 ---
 title = "How to monitor Postgres and Supavisor connections"
+summary = "Unbounded client pools or mismatched Supavisor settings can consume database connections and increase memory or queueing pressure."
+diagnostic_sources = [ "metrics", "supavisor-logs", "database-inspection", "postgres-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/27141"
 topics = [ "database", "supavisor" ]
 keywords = [ "Grafana", "connections", "performance", "pooler" ]

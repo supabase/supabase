@@ -3,6 +3,8 @@ title = "Edge Function shutdown reasons explained"
 topics = [ "functions" ]
 keywords = [ "shutdown", "termination", "event loop", "wall clock", "cpu time", "memory", "early drop" ]
 database_id = "109b964f-c28c-4554-b059-cd8b165c63f8"
+summary = "Shutdown events distinguish normal isolate retirement from wall-clock, CPU, memory, and platform-requested termination."
+diagnostic_sources = [ "edge-function-logs", "metrics" ]
 
 [[errors]]
 http_status_code = 546
@@ -131,17 +133,7 @@ Each `ShutdownEvent` includes valuable diagnostic information:
 
 ### 1. Design for idempotency
 
-Make your functions safe to run multiple times with the same input. Use execution IDs from metadata to detect duplicate runs and avoid repeating side effects.
-
-```typescript
-// Store execution_id to detect retries
-const executionId = Deno.env.get('EXECUTION_ID')
-const alreadyProcessed = await checkIfProcessed(executionId)
-
-if (alreadyProcessed) {
-  return new Response('Already processed', { status: 200 })
-}
-```
+Make your functions safe to run multiple times with the same input. Pass an application-level idempotency key with the request and store completed keys in durable storage before repeating side effects.
 
 ### 2. Implement checkpointing.
 

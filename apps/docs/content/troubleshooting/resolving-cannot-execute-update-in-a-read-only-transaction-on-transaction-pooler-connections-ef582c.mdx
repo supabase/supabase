@@ -1,5 +1,7 @@
 ---
 title = "Resolving 'cannot execute UPDATE in a read-only transaction' on transaction pooler connections"
+summary = "Session-level `default_transaction_read_only` state can leak through transaction pooling and make a later write use a read-only backend connection."
+diagnostic_sources = [ "supavisor-logs", "postgres-logs", "database-inspection", "client-tracing" ]
 topics = [ "database", "supavisor" ]
 keywords = []
 ---

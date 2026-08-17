@@ -1,5 +1,7 @@
 ---
 title = "error: no pg_hba.conf entry for host \"xx.xxx.xxx.xxx\", user \"postgres\", database \"postgres\", SSL off"
+summary = "A database connection is rejected because SSL enforcement is enabled but the client attempted a non-SSL connection."
+diagnostic_sources = [ "postgres-logs", "client-tracing" ]
 github_url = "https://github.com/orgs/supabase/discussions/21145"
 date_created = "2024-02-09T11:48:08+00:00"
 topics = [ "database", "platform" ]

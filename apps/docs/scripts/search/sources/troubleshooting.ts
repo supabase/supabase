@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto'
-import { BaseLoader, BaseSource } from './base.js'
+
 import {
   getAllTroubleshootingEntriesInternal,
   getArticleSlug,
 } from '../../../features/docs/Troubleshooting.utils.common.mjs'
 import type { ITroubleshootingEntry } from '../../../features/docs/Troubleshooting.utils.js'
+import { BaseLoader, BaseSource } from './base.js'
 
 /**
  * Loader for troubleshooting articles from local MDX files.
@@ -47,17 +48,17 @@ export class TroubleshootingSource extends BaseSource {
   }
 
   async process() {
-    const { title, topics, keywords } = this.entry.data
+    const { title, topics, keywords, summary, diagnostic_sources } = this.entry.data
     const content = this.entry.contentWithoutJsx
 
     // Include title and metadata in checksum so any changes trigger re-indexing.
     // This ensures updates to title, topics, or keywords are picked up even if
     // the main content hasn't changed.
     const checksum = createHash('sha256')
-      .update(JSON.stringify({ title, topics, keywords, content }))
+      .update(JSON.stringify({ title, topics, keywords, summary, diagnostic_sources, content }))
       .digest('base64')
 
-    const meta = { title, topics, keywords }
+    const meta = { title, topics, keywords, summary, diagnostic_sources }
 
     // Troubleshooting articles are single-section pages (no sub-headings indexed).
     // We explicitly set slug to undefined so the database's `get_full_content_url`
@@ -67,7 +68,7 @@ export class TroubleshootingSource extends BaseSource {
       {
         heading: title,
         slug: undefined as string | undefined,
-        content: `# ${title}\n${content}`,
+        content: `# ${title}\n${summary ? `\n${summary}\n` : ''}${content}`,
       },
     ]
 
@@ -83,7 +84,8 @@ export class TroubleshootingSource extends BaseSource {
    * The title is included as a heading to boost its relevance in search results.
    */
   extractIndexedContent(): string {
-    return `# ${this.entry.data.title}\n\n${this.entry.contentWithoutJsx}`
+    const { title, summary } = this.entry.data
+    return `# ${title}\n\n${summary ? `${summary}\n\n` : ''}${this.entry.contentWithoutJsx}`
   }
 }
 

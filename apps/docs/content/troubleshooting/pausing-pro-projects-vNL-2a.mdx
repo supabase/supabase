@@ -1,5 +1,7 @@
 ---
 title = "Pausing Pro-Projects"
+summary = "Paid projects cannot be paused in place, so archiving requires moving an eligible project to a Free organization or exporting its database and Storage data."
+diagnostic_sources = [ "reports", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/27399"
 date_created = "2024-06-19T23:24:18+00:00"
 topics = [ "platform", "cli", "storage" ]
@@ -10,22 +12,22 @@ database_id = "76b2e2b6-8f1d-448a-a3dd-cdf68755d1a9"
 cli = [ "supabase-login", "supabase-link", "supabase-init", "supabase-storage-cp" ]
 ---
 
-Pro-Projects at the moment cannot be paused. However, [You are allowed to have two free organizations](/docs/guides/platform/billing-on-supabase#free-plan) that can support one active project each and an unlimited amount of paused ones.
+Paid projects cannot be paused. Supabase grants two active Free Plan projects across organizations where you are an Owner or Administrator; paused projects do not count toward that limit. See [Free Plan billing](/docs/guides/platform/billing-on-supabase#free-plan).
 
-If a project is under 500MB, you can [transfer it to be under a free organization](/docs/guides/platform/project-transfer). Afterwards, you can initiate a pause.
+To pause a paid project, [transfer it to a Free Plan organization](/docs/guides/platform/project-transfer) that remains within your free-project limit. Moving to a lower plan can remove paid features and briefly interrupt the project, so review the transfer constraints first.
 
 Alternatively, you can download a [daily backup](/dashboard/project/_/database/backups/scheduled) of only your database for archiving. You can also manually download a .SQL file of your database and storage buckets by following this [guide](/docs/guides/platform/migrating-within-supabase/backup-restore).
 
 You can also download your storage buckets with the [Supabase CLI:](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=npx)
 
-```sql
-npx supabase login
+```bash
+supabase login
 
 # link to your project
-npx supabase link
+supabase link --project-ref your-project-ref
 
-npx supabase init
-
-# will download files to current folder
-npx supabase storage cp -r ss://bucket . --experimental
+# download one bucket into the current directory
+supabase storage cp -r ss:///bucket . --experimental
 ```
+
+Repeat the copy command for each bucket and verify the downloaded object count before pausing or transferring the project.

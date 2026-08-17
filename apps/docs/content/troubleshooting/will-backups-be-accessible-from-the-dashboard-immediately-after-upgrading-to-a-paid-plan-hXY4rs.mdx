@@ -1,5 +1,7 @@
 ---
 title = "Will backups be accessible from the dashboard immediately after upgrading to a paid plan?"
+summary = "Upgrading makes paid-plan daily backups available going forward but does not guarantee that historical backups exist from the project's Free Plan period."
+diagnostic_sources = [ "reports", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/22713"
 date_created = "2024-04-14T16:05:26+00:00"
 topics = [ "platform" ]
@@ -7,6 +9,6 @@ keywords = [ "backups", "upgrade", "dashboard" ]
 database_id = "fa5bb840-a5ac-447f-b9bb-e319cbe0797e"
 ---
 
-We are currently taking up to 7 daily backups that will be available for you once you upgrade. Keep in mind that we might no longer make daily backups for free projects in the future.
+The documented daily-backup guarantee applies to paid projects. Pro projects can access the last seven days of daily backups after those backups have been generated and retained.
 
-But at the moment, you'll be able to access them after upgrading.
+Do not rely on an upgrade revealing historical backups from the project's Free Plan period. Check [Database > Backups](/dashboard/project/_/database/backups/scheduled) after upgrading, and maintain your own exports while a project is on the Free Plan. See [Database backups](/docs/guides/platform/backups) for current retention by plan.

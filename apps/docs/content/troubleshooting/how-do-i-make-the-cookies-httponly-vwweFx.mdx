@@ -1,5 +1,7 @@
 ---
 title = "How do I make the cookies HttpOnly?"
+summary = "Supabase browser clients need access to refresh tokens to maintain sessions, so making their session cookies HttpOnly conflicts with the standard client flow."
+diagnostic_sources = [ "client-tracing", "auth-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/18869"
 date_created = "2023-11-10T11:49:06+00:00"
 topics = [ "auth" ]

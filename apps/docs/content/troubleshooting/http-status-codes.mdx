@@ -1,5 +1,7 @@
 ---
 title = "HTTP status codes"
+summary = "Supabase HTTP status codes distinguish successful requests, client mistakes, service restrictions, paused projects, gateway failures, and product-specific server errors."
+diagnostic_sources = [ "api-logs", "logs-explorer" ]
 topics = [ "platform" ]
 keywords = [ "HTTP" ]
 database_id = "b98c7288-8c38-4dc2-8591-d18ea9eb4cbc"
@@ -21,7 +23,7 @@ http_status_code = 546
 message = "Edge Functions resource limit"
 ---
 
-The Supabase platform offers several HTTP APIs for each project. These APIs can use the status codes to indicate the state of the project, and the request being processed. The status codes returned for requests can be access via the [logs explorer](../telemetry/logs#logs-explorer).
+The Supabase platform offers several HTTP APIs for each project. These APIs use status codes to indicate the state of the project and the request being processed. Inspect the returned status codes in [Logs](/docs/guides/monitoring-and-debugging/logs#product-logs).
 
 ## 2XX success
 

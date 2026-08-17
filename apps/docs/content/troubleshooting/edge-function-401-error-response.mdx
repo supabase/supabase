@@ -2,6 +2,8 @@
 title = "Edge Function 401 error response"
 topics = [ "functions" ]
 keywords = ["401", "error", "JWT", "authorization"]
+summary = "A 401 occurs when the platform rejects a missing or invalid authorization token, or when the function code returns 401."
+diagnostic_sources = [ "edge-function-logs", "client-tracing" ]
 
 [[errors]]
 http_status_code = 401
@@ -39,54 +41,29 @@ Go to: [Your function returned a 401](#your-function-returned-a-401)
 
 ### Case 3: Not sure
 
-Run this query in [Log Explorer](/dashboard/project/_/logs/explorer?q=SELECT%0A++++cast%28timestamp+AS+datetime%29++AS+timestamp%2C%0A++++req.pathname+++++++++++++++++AS+function_name%2C%0A%0A++++CASE%0A++++++++WHEN+metadata.execution_id+IS+NOT+NULL%0A++++++++++++THEN+%27your_code_returned_401%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+%28new_auth.prefix+IS+NOT+NULL+OR+legacy_payload.algorithm+<>+%27HS256%27%29%0A++++++++++++THEN+%27incompatible_keys%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A++++++++AND+%0A++++++++++++%28%0A++++++++++++++++%28legacy_auth_data.invalid+IS+NOT+NULL+OR+new_auth.error+IS+NOT+NULL%29%0A++++++++++++++++++++OR%0A++++++++++++++++legacy_payload.algorithm+%3D+%27HS256%27%0A++++++++++++%29%0A++++++++++++THEN+%27invalid_key%27%0A++++++++WHEN+metadata.execution_id+IS+NULL%0A+++++++++AND+legacy_auth_data+++++++IS+NULL%0A+++++++++AND+new_auth.prefix+IS+NULL%0A++++++++++++THEN+%27missing_auth_header%27%0A++++END+AS+cause%0A%0AFROM+function_edge_logs%0A%0A++++--+unnesting+metadata%0A++++CROSS+JOIN+UNNEST%28metadata%29++++++++++AS+metadata%0A++++CROSS+JOIN+UNNEST%28metadata.request%29++AS+req%0A++++CROSS+JOIN+UNNEST%28metadata.response%29+AS+res%0A++++--+unnesting+auth+details%0A++++LEFT+JOIN+UNNEST%28req.sb%29++++++++++++++++++++AS+sb%0A++++LEFT+JOIN+UNNEST%28sb.apikey%29+++++++++++++++++AS+apikey%0A++++LEFT+JOIN+UNNEST%28apikey.authorization%29++++++AS+new_auth%0A++++LEFT+JOIN+UNNEST%28sb.jwt%29++++++++++++++++++++AS+legacy_jwt%0A++++LEFT+JOIN+UNNEST%28legacy_jwt.authorization%29++AS+legacy_auth_data%0A++++LEFT+JOIN+UNNEST%28legacy_auth_data.payload%29++AS+legacy_payload%0A%0AWHERE+res.status_code+%3D+401%0AORDER+BY+timestamp+DESC%0ALIMIT+200) to classify recent 401s:
+Run this query in [Logs Explorer](/dashboard/project/_/logs/explorer) to distinguish 401 responses returned by your code from requests rejected before execution:
 
 ```sql
 select
-  cast(timestamp as datetime) as timestamp,
-  req.pathname as function_name,
+  timestamp,
+  log_attributes['request.pathname'] as function_name,
   case
-    when metadata.execution_id is not null then 'your_code_returned_401'
-    when metadata.execution_id is null
-    and (
-      new_auth.prefix is not null
-      or legacy_payload.algorithm != 'HS256'
-    ) then 'incompatible_keys'
-    when metadata.execution_id is null
-    and (
-      (legacy_auth_data.invalid is not null or new_auth.error is not null)
-      or legacy_payload.algorithm = 'HS256'
-    ) then 'invalid_key'
-    when metadata.execution_id is null
-    and legacy_auth_data is null
-    and new_auth.prefix is null then 'missing_auth_header'
+    when log_attributes['execution_id'] != '' then 'your_code_returned_401'
+    else 'platform_auth_check_failed'
   end as cause
-from
-  function_edge_logs
-  -- unnesting metadata
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(metadata.response) as res
-  -- unnesting auth details
-  left join UNNEST(req.sb) as sb
-  left join UNNEST(sb.apikey) as apikey
-  left join UNNEST(apikey.authorization) as new_auth
-  left join UNNEST(sb.jwt) as legacy_jwt
-  left join UNNEST(legacy_jwt.authorization) as legacy_auth_data
-  left join UNNEST(legacy_auth_data.payload) as legacy_payload
-where res.status_code = 401
+from logs
+where source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 401
 order by timestamp desc
 limit 50;
 ```
 
 Depending on the output, you can use this table to find the appropriate debugging section:
 
-| Value                    | Go to                                                         |
-| ------------------------ | ------------------------------------------------------------- |
-| `your_code_returned_401` | [Your function returned a 401](#your-function-returned-a-401) |
-| `incompatible_keys`      | [Incompatible key format](#incompatible-key-format)           |
-| `invalid_key`            | [Invalid key](#invalid-key)                                   |
-| `missing_auth_header`    | [Missing Authorization header](#missing-authorization-header) |
+| Value                        | Go to                                                         |
+| ---------------------------- | ------------------------------------------------------------- |
+| `your_code_returned_401`     | [Your function returned a 401](#your-function-returned-a-401) |
+| `platform_auth_check_failed` | [Built-in JWT check failures](#built-in-jwt-check-failures)   |
 
 ---
 

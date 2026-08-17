@@ -1,5 +1,6 @@
 ---
 title = "Troubleshoot slow queries"
+summary = "Describe the visible problem, affected operation, and likely cause in one sentence."
 topics = [
   "ai",
   "auth",
@@ -15,20 +16,23 @@ topics = [
   "supavisor",
   "terraform",
 ]
-keywords = [] # any strings (topics are automatically added so no need to duplicate)
+keywords = [] # Topics are added automatically, so don't duplicate them here.
 
-# Optionally, list the endpoints/commands/methods that are affected by this issue.
-#
-# Use the ID, which you can get from the API reference on supabase.com/docs by
-# navigating to the API and copying the last segment of the URL.
-#
-# Delete any sections that are not applicable.
+# List each first-party source that can confirm the cause or verify the fix.
+# Valid IDs: logs-explorer, api-logs, postgres-logs, supavisor-logs, auth-logs,
+# storage-logs, realtime-logs, edge-function-logs, reports, metrics, database-inspection,
+# security-advisor, performance-advisor, client-tracing, and log-drains.
+diagnostic_sources = [ "postgres-logs", "performance-advisor" ]
+
+# Optionally, list the endpoints, commands, or methods affected by this issue.
+# Use the ID from the last segment of its API reference URL.
+# Delete fields and sections that do not apply.
 [api]
 sdk = ["auth-mfa-enroll", "auth-mfa-verify"]
 management_api = ["v1-get-postgres-config"]
 cli = ["supabase-migration-repair"]
 
-# Optionally, list the error messages associated with this issue.
+# Optionally, list exact errors associated with this issue.
 [[errors]]
 http_status_code = 404
 code = "not_found"
@@ -40,9 +44,32 @@ code = "forbidden"
 message = "Not allowed to access this resource"
 ---
 
-Freeform Markdown here. Some suggestions on what to include:
+State what this article helps the reader diagnose and resolve.
 
-- Why the issue occurs
-- How to diagnose it
-- How to fix it
-- How to prevent it
+## Symptoms
+
+List the observable symptoms that distinguish this issue. Include exact error codes, messages, statuses, or unexpected results when they are available.
+
+## Confirm the cause
+
+Give ordered, preferably read-only, checks that distinguish this cause from other causes with the same symptom. Name the diagnostic source and the evidence that confirms the cause.
+
+1. Reproduce the smallest failing operation and record its timestamp with time zone.
+2. Inspect the relevant diagnostic source over a bounded time window.
+3. Confirm the result that identifies this cause.
+
+## Resolve
+
+Give one cause-specific procedure. State prerequisites, risks, approval requirements, and a rollback step when they apply.
+
+1. Record the current state and expected result.
+2. Apply the smallest change that resolves the confirmed cause.
+3. Keep unrelated changes out of the procedure.
+
+## Verify
+
+Repeat the original operation and inspect the same diagnostic source over a new time window. State the exact result that proves the issue is resolved and include a negative test when authorization or data integrity is involved.
+
+## Escalate
+
+State when to stop changing the project and escalate. List the sanitized evidence to include, such as the project reference, timestamp with time zone, error code, request or execution ID, reproduction steps, diagnostic results, and changes attempted.

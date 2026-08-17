@@ -1,6 +1,8 @@
 ---
 title = "Implementing soft deletes with supabase-js"
-topics = []
+summary = "Soft deletes retain rows by marking them with a deletion timestamp and expose active rows through a query or security-invoker view."
+diagnostic_sources = [ "database-inspection", "security-advisor" ]
+topics = [ "database" ]
 keywords = [ "supabase-js", "sdk", "javascript" ]
 github_url = "https://github.com/orgs/supabase/discussions/32523"
 database_id = "c1ca57fb-91ab-4526-987b-65106dc63a2f"
@@ -32,13 +34,16 @@ This column will store the timestamp when a record is "deleted."
 To ensure you only fetch non-deleted records by default, create a Postgres view that filters out rows where `deleted_at` is not null.
 
 ```sql
-create view active_items as
+create view active_items
+with (security_invoker = true) as
   select *
-  from items
+  from public.items
   where deleted_at is null;
 ```
 
 With this view, you can now query `active_items` instead of `items` to get only active (non-deleted) rows.
+
+`security_invoker = true` makes the view use the querying user's permissions and row-level security policies. Without it, a view created by a privileged role can bypass RLS on its underlying table. Keep RLS enabled on `public.items`, and grant access to the view only to roles that should query it.
 
 ## Step 3: Soft delete a record
 
@@ -103,6 +108,6 @@ await supabase.from('items').update({ deleted_at: null }).eq('id', 123)
 
 ## Conclusion
 
-Soft deletes are easy to implement with Supabase and Postgres. By combining a `deleted_at` column with views, you can cleanly separate active and deleted records, keeping your application logic clean and maintainable.
+Implement soft deletes with Supabase and Postgres by combining a `deleted_at` column with views. This separates active and deleted records while keeping the application logic maintainable.
 
 This approach provides the flexibility of retaining data for audits or recovery while keeping your app's interface clean and efficient. Start using soft deletes in your Supabase projects today!

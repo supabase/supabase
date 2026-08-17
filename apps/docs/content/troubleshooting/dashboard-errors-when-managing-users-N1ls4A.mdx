@@ -1,5 +1,7 @@
 ---
 title = "Errors when creating / updating / deleting users"
+summary = "User-management operations return unexpected_failure when custom constraints, triggers, or functions make the underlying Auth database transaction fail."
+diagnostic_sources = [ "auth-logs", "postgres-logs", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/21247"
 date_created = "2024-02-14T04:26:37+00:00"
 topics = [ "auth", "database", "studio" ]

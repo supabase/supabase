@@ -1,5 +1,7 @@
 ---
 title = "Why is my select returning an empty data array and I have data in the table?"
+summary = "A select can return no rows when Row Level Security denies visibility, the request has no matching authenticated session, or filters exclude the data."
+diagnostic_sources = [ "api-logs", "postgres-logs", "security-advisor", "client-tracing" ]
 github_url = "https://github.com/orgs/supabase/discussions/12895"
 date_created = "2023-03-08T16:38:02+00:00"
 topics = [ "database", "auth" ]

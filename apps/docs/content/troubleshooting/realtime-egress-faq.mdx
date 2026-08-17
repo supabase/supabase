@@ -2,6 +2,8 @@
 title = "Realtime Egress FAQ"
 topics = [ "realtime", "platform" ]
 keywords = [ "egress", "bandwidth", "billing", "websocket", "broadcast", "postgres changes", "cloudflare" ]
+summary = "Realtime egress can exceed application payload size because billing includes delivered payloads and protocol overhead."
+diagnostic_sources = [ "reports", "metrics" ]
 ---
 
 Realtime Egress is billed as part of your project's [unified egress](/docs/guides/platform/manage-your-usage/egress#realtime-egress) usage. This FAQ walks through what's counted, what isn't, and how to investigate a gap between the two.

@@ -16,6 +16,7 @@ import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuil
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
+import { AiPrompt } from './markdown-schema/AiPrompt'
 import { AiSkillsIndex } from './markdown-schema/AiSkillsIndex'
 import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
@@ -44,6 +45,7 @@ import {
   type FrontmatterFormat,
   type MarkdownSource,
 } from './markdown-sources'
+import { serializeTroubleshootingIndexEntry } from './troubleshooting-index'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 // The set of guide slugs that have a generated markdown (.md) variant. middleware.ts
@@ -184,6 +186,7 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
 const SCHEMA: ComponentSchema = {
   AccordionItem,
   Admonition,
+  AiPrompt,
   AiSkillsIndex,
   IconCheck,
   IconX,
@@ -262,7 +265,7 @@ async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Pr
       const raw = await fs.readFile(sourceFile, 'utf8')
       const { data } = parseFrontmatter(raw, 'toml')
       const url = `${getInternalLinkBaseUrl()}${withDocsBasePath(`/guides/${slug}`)}`
-      return `- [${data.title}](${url})`
+      return serializeTroubleshootingIndexEntry(data, `${url}.md`)
     })
   )
   const content = `# Troubleshooting guides\n\n${entries.join('\n')}\n`

@@ -4,6 +4,8 @@ date_created = "2026-06-05T00:00:00+00:00"
 topics = [ "realtime" ]
 keywords = [ "broadcast", "realtime.send", "realtime.send_binary", "WarnSendingBroadcastMessage", "partition", "messages", "replication" ]
 database_id = "027fba24-c7bc-4c54-9e6b-6f13ec85ad56"
+summary = "WarnSendingBroadcastMessage appears when database Broadcast cannot find a connected Realtime tenant process to receive the message."
+diagnostic_sources = [ "realtime-logs", "client-tracing" ]
 ---
 
 If you broadcast from the database with `realtime.send` or `realtime.send_binary`, you may see this in your Postgres logs:

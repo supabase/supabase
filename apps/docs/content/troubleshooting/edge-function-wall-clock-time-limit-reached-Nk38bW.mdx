@@ -5,6 +5,8 @@ date_created = "2024-02-15T11:42:58+00:00"
 topics = [ "functions" ]
 keywords = [ "wall clock", "limit", "time", "shutdown" ]
 database_id = "5a3a0125-84c7-463b-a886-ca53edfba5f4"
+summary = "A wall-clock shutdown occurs when an Edge Function isolate reaches its plan-specific lifetime, including time spent waiting for I/O."
+diagnostic_sources = [ "edge-function-logs", "metrics" ]
 
 [[errors]]
 http_status_code = 546
@@ -19,8 +21,8 @@ When this message appears in the context of your edge function, it means that th
 
 **Current Limits Explained**
 
-- Wall Clock Time Limit: Currently set at 400 seconds for the total duration your edge function can run.
-- CPU Execution Time: Limited to 200 milliseconds of active computing.
+- Wall-clock limit: 150 seconds on the Free plan and 400 seconds on paid plans.
+- CPU time: 2 seconds of active computing per request.
 
 This means that if your edge function completes its task within these time constraints, there's no need to be concerned about the "wall clock time limit reached" error message.
 
@@ -33,11 +35,8 @@ If you're facing the "wall clock time limit reached" error with a 546 error code
 
 - Divide Complex Tasks: For functions handling complex or extensive tasks, try breaking them down into smaller, discrete functions. This approach can help manage workloads more effectively and stay within time limits.
 
-- Monitor Execution Time: Use our logging or monitoring tools available to keep an eye on your function's performance. This can pinpoint where optimizations are necessary. To access logs visit: [Supabase Project Functions](https://app.supabase.com/project/_/functions) Select your function and click on Logs.
+- Monitor execution time: Open your function in the [Supabase Dashboard](/dashboard/project/_/functions), select **Logs**, and compare slow requests with shutdown events.
 
 - Check Our Guides: For more tips, refer to our debugging guide here: [Debugging Edge Functions](/docs/guides/functions/logging)
 
-**Future Considerations**
-There are plans to make the wall clock time limit configurable per project in the future. However, currently, the only way to adjust this limit is by self-hosting [Edge Functions](https://github.com/supabase/edge-runtime/).
-
-Stay updated on changes by regularly checking our changelog [here](https://github.com/orgs/supabase/discussions/categories/changelog).
+Hosted limits cannot be configured per project. If you need a different limit, you can [self-host Edge Functions](https://github.com/supabase/edge-runtime/) and configure the runtime.

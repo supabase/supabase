@@ -205,6 +205,10 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
     >
       <button
         tabIndex={0}
+        type="button"
+        aria-label={mobileMenuOpen ? 'Close navigation' : 'Open navigation'}
+        aria-expanded={mobileMenuOpen}
+        aria-controls="docs-main-navigation"
         className={cn(
           'h-8 w-8 flex group items-center justify-center mr-1',
           mobileMenuOpen && 'mt-0.5'
@@ -306,6 +310,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
 
   return (
     <nav
+      id="docs-main-navigation"
       aria-labelledby="main-nav-title"
       className={cn(
         'fixed lg:relative z-40 lg:z-auto',

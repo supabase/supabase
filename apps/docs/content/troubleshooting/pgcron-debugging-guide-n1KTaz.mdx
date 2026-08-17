@@ -1,5 +1,7 @@
 ---
 title = "pg_cron debugging guide"
+summary = "Cron jobs fail when their schedule, extension worker, credentials, SQL, or target connection is invalid or unavailable."
+diagnostic_sources = [ "database-inspection", "postgres-logs", "logs-explorer" ]
 github_url = "https://github.com/orgs/supabase/discussions/30168"
 date_created = "2024-10-29T15:12:11+00:00"
 topics = [ "database" ]
@@ -7,9 +9,14 @@ keywords = [ "pg_cron", "cron", "jobs", "scheduler", "debugging" ]
 database_id = "9a55c946-877f-46ae-8b57-51934e02a36c"
 ---
 
-This is a general guide for debugging pg_cron. Below lists issues and how to debug them
+Use this article to identify why a `pg_cron` job cannot be changed or does not run.
 
-## Cannot create/edit/delete cron jobs
+## Symptoms
+
+- A cron job cannot be created, edited, or deleted.
+- A scheduled job does not run or finishes with an error.
+
+## Resolve creation and editing errors
 
 Cron jobs can only be modified with the respective SQL functions:
 
@@ -23,11 +30,9 @@ If you are trying to make changes, use the cron functions. If the cron functions
 
 ---
 
-## Cron Jobs are not running
+## Confirm the cause of a job failure
 
-> You should consider initiating a software upgrade in the [General Settings](/dashboard/project/_/settings/general) if your Postgres version is below v15.6.1.122. Upgrading will give you access to pg_cron v1.6.4+, which has many bug fixes and auto-revive capabilities.
-
-### Debugging steps:
+Install available database software updates from [Infrastructure Settings](/dashboard/project/_/settings/infrastructure) before investigating behavior that has already been fixed in a later `pg_cron` release.
 
 #### Check to see if `pg_cron scheduler` is active
 
@@ -121,7 +126,7 @@ Go to the [reports page](/dashboard/project/_/observability/database) (or [Supab
 - [Memory](https://github.com/orgs/supabase/discussions/27021)
 - [CPU](https://github.com/orgs/supabase/discussions/27022)
 
-It is important to make sure you are running the latest release of pg_cron (1.6.4) if you're noticing strain. It is the most robust.
+Keep the database software on the latest version available for the project so that the installed `pg_cron` extension includes available fixes.
 
 <br />
 
@@ -131,23 +136,20 @@ Although `pg_cron` records errors in the `cron.job_run_details` table, in rare c
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message,
-  parsed.error_severity,
-  parsed.user_name,
-  parsed.query,
-  parsed.detail,
-  parsed.hint,
-  parsed.sql_state_code,
-  parsed.backend_type,
-  parsed.application_name
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
-where
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-  and regexp_contains(parsed.application_name, 'pg_cron')
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.sql_state_code'] as sql_state_code,
+  log_attributes['parsed.backend_type'] as backend_type,
+  log_attributes['parsed.application_name'] as application_name
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+  and (
+    log_attributes['parsed.application_name'] ilike '%pg_cron%'
+    or event_message ilike '%pg_cron%'
+  )
 order by timestamp desc
 limit 100;
 ```
@@ -188,12 +190,15 @@ You can then search for your custom messages in the [Logs Interface](/dashboard/
 
 <br />
 
-#### Upgrading pg_cron version
+## Verify
 
-The current version of `pg_cron` on Supabase is 1.6.4. It comes with a [few bug fixes](https://github.com/citusdata/pg_cron/releases/tag/v1.6.4). You should consider upgrading to Postgres v15.6.1.122+ in the [General Settings](/dashboard/project/_/settings/general) to get the latest extension.
+1. Run the job command manually with the same database role.
+2. Wait for the next scheduled execution.
+3. Confirm that `cron.job_run_details` records a `succeeded` result.
+4. Confirm that the Postgres logs do not contain a new error for the job.
 
-<br />
+## Escalate
 
-#### Contacting support and the maintainers
+Open a [support ticket](/dashboard/support/new) if the scheduler remains unavailable after a reboot or an available software update. Include the project reference, job ID, schedule, timestamps with time zone, `cron.job_run_details` status, relevant redacted Postgres logs, and steps attempted.
 
-Although Supabase includes the extension, it is maintained by Citus (a Microsoft subsidiary). You can contact Support for more help, but you should also consider creating an issue in the [pg_cron repo](https://github.com/citusdata/pg_cron).
+For reproducible extension behavior that is not specific to the Supabase Platform, consider opening an issue in the [`pg_cron` repository](https://github.com/citusdata/pg_cron).

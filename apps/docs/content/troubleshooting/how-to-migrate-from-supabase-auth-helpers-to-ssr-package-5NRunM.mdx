@@ -1,5 +1,7 @@
 ---
 title = "How to Migrate from Supabase Auth Helpers to SSR package"
+summary = "Deprecated Auth Helpers should be replaced with @supabase/ssr so server and browser clients use the supported cookie-based session flow."
+diagnostic_sources = [ "auth-logs", "client-tracing" ]
 github_url = "https://github.com/orgs/supabase/discussions/27849"
 date_created = "2024-07-07T17:24:30+00:00"
 topics = [ "auth" ]
@@ -11,7 +13,7 @@ The `auth-helpers` packages are deprecated and replaced with the `@supabase/ssr`
 
 Here are the steps for you to migrate your application from the `auth-helpers` package to `@supabase/ssr` package.
 
-Depending on your implementation, you may ignore some parts of this documentation and use your own implementation (i.e. using API routes vs. Server Actions). What's important is you replace the clients provided by `auth-helpers` with the utility functions created using clients provided by `@supabase/ssr`.
+Depending on your implementation, you may ignore some parts of this documentation and use your own implementation (that is, using API routes instead of Server Actions). What's important is you replace the clients provided by `auth-helpers` with the utility functions created using clients provided by `@supabase/ssr`.
 
 ## 1. Uninstall Supabase Auth helpers and install the Supabase SSR package
 

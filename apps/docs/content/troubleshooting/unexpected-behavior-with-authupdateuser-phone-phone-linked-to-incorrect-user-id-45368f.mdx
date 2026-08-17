@@ -1,5 +1,7 @@
 ---
 title = "`Unexpected behavior with 'auth.updateUser({ phone })': Phone linked to incorrect user ID`"
+summary = "Phone verification can attach to an unexpected Auth record when duplicate or inconsistent phone identities already exist in auth.users."
+diagnostic_sources = [ "auth-logs", "database-inspection" ]
 topics = [ "auth" ]
 keywords = []
 ---
@@ -9,9 +11,20 @@ When using `auth.updateUser({ phone: '...' })`, you might observe that a phone n
 **Why does this happen?**
 Supabase phone verification identifies the user by searching for the provided phone number in the `phone_change` column, rather than relying solely on the active session. Unlike the `phone` column, the `phone_change` column does not enforce uniqueness. If multiple `auth.users` records contain the same phone number in `phone_change` due to uncompleted or abandoned verification attempts, the system may update an unintended user's `phone` field upon successful OTP verification. This occurs because the system finds and updates the first matching record in `phone_change`, which might not belong to the currently authenticated user.
 
-**How to prevent/resolve this:**
-To prevent ambiguous lookups from abandoned verification attempts, implement application-level cleanup to remove stale `phone_change` values from your `auth.users` records.
+## Confirm the cause
 
-1.  **Define a grace period:** Establish a reasonable time frame after which an unconfirmed phone verification attempt is considered stale.
-2.  **Identify stale records:** Periodically query `auth.users` to find accounts where `phone_verified` is `false` and the `phone_change` value has been present beyond your defined grace period.
-3.  **Clear `phone_change`:** For identified stale records, clear their `phone_change` value. This ensures that only active and unique `phone_change` entries are considered during verification.
+Correlate the update and verification request in the [Auth logs](/dashboard/project/_/logs/auth-logs). Record the authenticated user ID and the user ID returned after verification. Inspect affected records only to confirm whether more than one row contains the same pending phone value; do not expose phone numbers in logs or support tickets.
+
+## Resolve
+
+Stop the affected phone-change flow and open a [support ticket](/dashboard/support/new). Do not run a scheduled job that edits `auth.users.phone_change` directly: `auth.users` is service-managed, and clearing pending values can invalidate legitimate verification attempts or race with Auth.
+
+After Support confirms the project state, require the affected users to start a new phone-change enrollment. Keep the Auth client and local stack current so the flow uses the latest uniqueness and verification fixes.
+
+## Verify
+
+Start a fresh phone change for a test user, verify the new OTP, and confirm that `getUser()` returns the same user ID before and after verification. Confirm that no other user's phone identity changes.
+
+## Escalate
+
+Include the project reference, timestamps with time zone, SDK version, sanitized Auth log entries, and the affected user IDs. Do not include OTP values, access tokens, or phone numbers.

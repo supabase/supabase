@@ -1,43 +1,61 @@
 ---
 title = "High CPU usage"
+summary = "Database CPU usage remains elevated, which can slow queries, disrupt backups, or make the project unresponsive."
 topics = [ "platform" ]
 keywords = [ "CPU" ]
+diagnostic_sources = [ "reports", "metrics", "database-inspection", "performance-advisor" ]
 database_id = "3d1bb799-453f-4a6c-9fdc-056f15bec88c"
 ---
 
-Learn what high CPU usage could mean for your Supabase instance and what could have caused it.
+Use this article to identify the cause of sustained database CPU usage and decide whether to optimize the database or change its compute size.
 
-## The danger of high CPU usage
+## Symptoms
 
-Every Supabase project runs in its dedicated virtual machine. Your instance will have a different set of hardware provisioned depending on your [compute add-on](/docs/guides/platform/compute-and-disk). Your hardware may not be suitable for the intended workload and may experience high CPU usage.
+High CPU usage can cause:
 
-High CPU usage could come with a range of issues:
+- Queries to respond more slowly
+- Daily backup operations to be disrupted
+- The database to become unresponsive in rare cases
+- Less capacity to absorb a traffic increase
 
-- slower queries
-- disruption of daily backup routines
-- in rare cases, your instance may become unresponsive
+Each Supabase project runs on dedicated compute. The available resources depend on the project's [compute size](/docs/guides/platform/compute-and-disk).
 
-Moreover, your instance might not be able to handle future traffic spikes if it already has a high CPU usage.
+## Confirm the cause
 
-## Monitor your CPU
+1. Open the [Database Health report](/dashboard/project/_/observability/database), select the affected project, and identify when CPU usage increased.
+2. If you collect the project's [Metrics API](/docs/guides/monitoring-and-debugging/metrics), inspect CPU over the same time window. Confirm whether the increase is sustained or limited to a known operation.
+3. Open [Query Performance](/dashboard/project/_/advisors/query-performance?preset=slowest_execution). Look for queries whose execution time or call volume increased during the affected window.
+4. Use [database inspection tools](/docs/guides/database/inspect#query-performance) to check for long-running queries, outliers, sequential scans, and inefficient index usage when you need more detail.
+5. Review the [Performance Advisor](/dashboard/project/_/advisors/performance) for missing indexes and other database findings related to the affected queries.
+6. Compare the evidence with these common causes:
+   - **Slow or frequent queries:** Query execution time or call volume increased with CPU usage.
+   - **Missing indexes:** The Performance Advisor or a query plan shows that a query scans more rows than needed.
+   - **Insufficient compute:** CPU remains elevated after avoidable query and indexing problems have been ruled out, or the increase corresponds to expected traffic and operations.
 
-You can check your CPU usage directly on the Supabase Platform. For this go to database health in the [Observability section](/dashboard/project/_/observability/database) and select your project.
+Do not upgrade compute only because one short spike appears in a report. Confirm that the resource demand is sustained or repeats with the affected operation.
 
-![CPU usage reported on Supabase dashboard](/docs/img/guides/platform/exhaust-cpu-report.png)
+## Resolve
 
-It is also possible to monitor your resources and set up alerts using Prometheus/Grafana. You can find a guide for this [here](/docs/guides/monitoring-and-debugging/metrics).
+Apply the resolution that matches the confirmed cause:
 
-## Common reasons for high CPU usage
+- For slow or frequent queries, use the [query optimization guide](/docs/guides/database/query-optimization) to reduce execution cost or call volume.
+- For a missing index, review the query and create the specific index recommended by your query analysis. Use the [index guide](/docs/guides/database/postgres/indexes) to evaluate the index before adding it to production.
+- For expected demand that exceeds the available resources, change the project's [compute size](/dashboard/project/_/settings/infrastructure).
 
-Everything you do with your Supabase project requires compute. Hence, there can be many reasons for high CPU usage. Here are some common ones:
+Apply one change at a time so that you can measure its effect. Record the previous query, index, or compute configuration before you change it.
 
-- **Query performance:** Queries that take a long time to complete (>1 second) as well as excessive amounts of querying can put a strain on the CPU. Check our guide on [examining query performance](/docs/guides/platform/performance#examining-query-performance).
-- **Missing indexes:** Your database might have to scan through a large amount of data to find the information it needs. Creating indexes helps your database find data faster. Learn more about indexes [here](/docs/guides/database/postgres/indexes).
-- **Unsuitable compute:** The compute size of your Supabase project might not be suitable for your application as you might have more traffic or run resource-intensive operations.
+## Verify
 
-## Solving high CPU usage
+1. Repeat the operation or representative traffic that produced the CPU increase.
+2. Compare CPU usage over an equivalent time window in the Database Health report or your metrics system.
+3. Confirm that affected query latency and call volume meet your expected range in Query Performance.
+4. Check the Performance Advisor again when the resolution addressed a database finding.
+5. Confirm that normal application requests and scheduled operations still succeed.
 
-There are two ways to solve high CPU:
+The issue is resolved when the original operation succeeds and CPU usage returns to the range that your database can sustain.
 
-1. **Optimize performance:** Get more out of your instance's resources by optimizing your usage. Have a look at our [performance tuning guide](/docs/guides/platform/performance#examining-query-performance) and our [production readiness guide](/docs/guides/deployment/going-into-prod#performance).
-2. **Upgrade your compute:** You can get a Compute Add-on for your project. Follow [this link](/dashboard/project/_/settings/infrastructure) and select your project to see your upgrade options.
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if CPU remains elevated after you have ruled out slow queries, excessive query volume, and missing indexes, or if the database remains unresponsive after a compute change.
+
+Include the project reference, timestamps with time zone, screenshots or exported values from the affected window, relevant query identifiers, advisor findings, changes attempted, and verification results. Do not include database credentials or data that has not been redacted.

@@ -3,14 +3,18 @@ title = "Unable to deploy Edge Function"
 topics = [ "functions" ]
 keywords = [ "deploy", "deployment", "edge function", "deno", "syntax", "bundle" ]
 database_id = "68bb6df6-6a07-40fa-ad4d-dfa5e21d7e9c"
+summary = "Deployment can fail because of invalid syntax, unresolved imports, an oversized bundle, or a CLI network error."
+diagnostic_sources = [ "client-tracing" ]
 
 [api]
 cli = [ "supabase-functions-deploy" ]
 ---
 
-If you're having trouble deploying an Edge Function, follow these steps to diagnose and resolve the issue.
+## Symptoms
 
-## Diagnose the issue
+`supabase functions deploy` fails before a new function version becomes active.
+
+## Confirm the cause
 
 1. **Check function syntax:** Run `deno check` on your function files locally
 2. **Review dependencies:** Verify all imports are accessible and compatible with Deno
@@ -24,23 +28,26 @@ deno check ./supabase/functions/your-function/index.ts
 supabase functions deploy your-function --debug
 ```
 
-## Common causes
+## Resolve
 
 - **Syntax errors:** TypeScript or JavaScript syntax issues in your function code
 - **Invalid imports:** Importing modules that don't exist or aren't compatible with Deno
-- **Large bundle size:** Functions have a 10MB source code limit. See [Bundle size issues](./edge-function-bundle-size-issues) for more details
+- **Large bundle size:** Locally bundled functions have a 20 MB limit, while server-side bundled functions have a 5 MB limit. See [Bundle size issues](./edge-function-bundle-size-issues) for details
 - **Network issues:** Problems reaching the Supabase API during deployment
 
-## Before opening a support ticket
+## Verify
 
-Make sure you're using the latest version of the Supabase CLI:
+Run `supabase functions deploy your-function` again and confirm the new version appears in the Supabase Dashboard.
+
+## Escalate
+
+Check your Supabase CLI version and compare it with the [installation guide](/docs/guides/local-development/cli/getting-started) before retrying:
 
 ```bash
 supabase --version
-supabase update
 ```
 
-If these steps don't resolve the issue, open a support ticket via the Supabase Dashboard and include all output from the diagnostic commands.
+If these steps don't resolve the issue, [open a support ticket](/dashboard/support/new) and include all output from the diagnostic commands.
 
 ## Additional resources
 

@@ -5,6 +5,8 @@ date_created = "2025-09-03T23:15:48+00:00"
 topics = [ "storage" ]
 keywords = [ "upload", "file", "size", "restriction" ]
 database_id = "3b0aa0f2-9608-4691-94d6-4fca8a32130e"
+summary = "Uploads are rejected when a file exceeds the global Storage limit or the lower limit configured for its bucket."
+diagnostic_sources = [ "storage-logs", "client-tracing" ]
 ---
 
 You can view the maximum file upload size from the [docs](/docs/guides/storage/uploads/file-limits). It differs based on your plan and on any bucket or global limits you might have already set.
@@ -34,7 +36,8 @@ You won’t be able to set a limit that is greater than the global file upload s
 
 ## File size restrictions
 
-Upload methods impose differing file size restrictions:
+The configured global and bucket limits apply to every upload method. Choose the method based on reliability and where the upload runs:
 
-- [Standard uploads can only transfer up to 5 GBs](/docs/guides/storage/uploads/standard-uploads?queryGroups=language&language=js). However, for files above 6MB, the below methods are more performant and reliable.
-- [Resumable](/docs/guides/storage/uploads/resumable-uploads) and [S3](/docs/guides/storage/uploads/resumable-uploads) uploads can support transfers up to 50GB in size.
+- Use [standard uploads](/docs/guides/storage/uploads/standard-uploads?queryGroups=language&language=js) for files no larger than 6 MB. Larger standard uploads are supported up to the configured limit, but retrying them requires sending the entire file again.
+- Use [resumable uploads](/docs/guides/storage/uploads/resumable-uploads) for larger browser uploads or unreliable networks.
+- Use [S3 uploads](/docs/guides/storage/uploads/s3-uploads) for server-side uploads, including multipart uploads.

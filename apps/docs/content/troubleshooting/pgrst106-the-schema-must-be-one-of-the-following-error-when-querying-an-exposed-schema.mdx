@@ -1,5 +1,7 @@
 ---
 title = "PGRST106: \"The schema must be one of the following...\" error when querying an exposed schema"
+summary = "PGRST106 occurs when the authenticator role's pgrst.db_schemas setting overrides or omits a schema configured for exposure through the Data API."
+diagnostic_sources = [ "api-logs", "database-inspection", "postgres-logs" ]
 topics = [ "auth", "database" ]
 keywords = []
 database_id = "91dda1aa-52f7-4a1c-9248-92fad9f3dec7"
@@ -9,18 +11,38 @@ code = "PGRST106"
 message = "The schema must be one of the following: public, ..."
 ---
 
-You may encounter a `PGRST106` error, stating `{"code":"PGRST106","message":"The schema must be one of the following: public"}`, when attempting to query a schema via the PostgREST API that you've recently exposed.
+## Symptoms
 
-**Why This Happens:**
-This error occurs because the `authenticator` role's `pgrst.db_schemas` setting does not include the desired schema. This creates a conflict, as PostgREST relies on this setting to know which schemas it should expose.
+The Data API returns `PGRST106` and lists schemas that do not include the custom schema selected by the request, even though the schema appears in the Dashboard configuration.
 
-**How to Resolve This:**
-To fix this, you need to update the `pgrst.db_schemas` setting for the `authenticator` role. Connect to your database and execute one of the following SQL commands:
+## Confirm the cause
 
-- **To explicitly add your schema:**
-  If you want to add your specific schema (e.g., `your_schema_name`) alongside existing schemas (like `public`), use the following command. Remember to replace `your_schema_name` with your actual schema name and include all other necessary schemas already defined.
-  `ALTER ROLE authenticator SET pgrst.db_schemas = 'public, your_schema_name';`
+1. Confirm that the schema is listed under [Project Settings > Data API](/dashboard/project/_/integrations/data_api/settings).
+2. Inspect the role-level override:
 
-- **To reset to [dashboard configuration](/dashboard/project/_/settings/api):**
-  Alternatively, you can reset this setting to allow the Supabase dashboard's configuration to take effect automatically.
-  `ALTER ROLE authenticator RESET pgrst.db_schemas;`
+   ```sql
+   select rolconfig
+   from pg_roles
+   where rolname = 'authenticator';
+   ```
+
+3. If `rolconfig` contains `pgrst.db_schemas=...`, that database setting overrides the Dashboard-managed value.
+
+## Resolve
+
+Reset the manual override so the Dashboard configuration can take effect:
+
+```sql
+alter role authenticator reset pgrst.db_schemas;
+notify pgrst, 'reload config';
+```
+
+Then save the intended exposed schemas in [Data API settings](/dashboard/project/_/integrations/data_api/settings). Grant only the schema and object privileges required by the request, and enable RLS on tables exposed through the API.
+
+## Verify
+
+Repeat the request with the same `Accept-Profile` or `Content-Profile` schema selection. Confirm that it no longer returns `PGRST106`, then verify that a schema not configured for exposure remains inaccessible.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the role override is absent and the Data API continues to advertise a schema list that differs from the saved Dashboard configuration. Include the project reference, timestamp, requested schema, sanitized response, and `rolconfig` output.

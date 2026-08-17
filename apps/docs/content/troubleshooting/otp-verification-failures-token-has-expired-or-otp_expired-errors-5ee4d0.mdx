@@ -1,5 +1,7 @@
 ---
 title = "OTP Verification Failures: 'token has expired' or 'otp_expired' errors"
+summary = "OTP links can appear expired immediately when an email security scanner consumes the single-use token before the user opens it."
+diagnostic_sources = [ "auth-logs", "api-logs", "client-tracing" ]
 topics = [ "auth", "cli" ]
 keywords = []
 database_id = "25eddb73-3cca-485b-b87f-7279dd46b7a7"

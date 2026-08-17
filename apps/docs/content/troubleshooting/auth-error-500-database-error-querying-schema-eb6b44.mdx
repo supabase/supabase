@@ -1,5 +1,7 @@
 ---
 title = "Auth error: '500: Database error querying schema'"
+summary = "Auth schema queries fail when manually modified auth tables contain NULL values where the Auth service expects strings."
+diagnostic_sources = [ "auth-logs", "postgres-logs", "database-inspection" ]
 date_created = "2026-07-02T20:04:03+00:00"
 topics = [ "auth", "database" ]
 keywords = []
@@ -9,18 +11,27 @@ message = "Database error querying schema"
 
 ---
 
-If you observe the error message `500: Database error querying schema` in your Auth logs, it typically indicates that the Supabase Auth server has encountered `NULL` values in the `auth.users` table where a valid string or empty string is expected.
+## Symptoms
 
-**Why Does This Happen?**
-This issue usually occurs following manual SQL inserts or updates to the `auth.users` table. The Auth service expects specific columns to contain data or an empty string; when it encounters a `NULL` value instead, it triggers a validation error.
+An Auth request returns HTTP `500`, and the Auth logs contain `Database error querying schema`. This message is a wrapper around a more specific database error; it does not prove that every nullable value in `auth.users` is invalid.
 
-**How to Resolve This:**
-Identify the column containing the `NULL` values (such as `email`) and execute the following command in the [SQL Editor](/dashboard/project/_/sql/new) to convert them to empty strings:
+## Confirm the cause
 
-```sql
-UPDATE auth.users
-SET <column_name> = ''
-WHERE <column_name> IS NULL;
-```
+1. Reproduce the failing Auth operation and record its timestamp.
+2. Inspect the [Auth logs](/dashboard/project/_/logs/auth-logs) and [Postgres logs](/dashboard/project/_/logs/postgres-logs) over the same time window.
+3. Identify the exact column, constraint, trigger, function, and SQLSTATE reported by the database.
+4. Review any SQL, ORM migration, import, or trigger that writes directly to the `auth` schema.
 
-Replace `<column_name>` with the specific column causing the error. To prevent this from recurring, ensure that any future manual modifications to the `auth` schema adhere to the service's requirements.
+## Resolve
+
+Revert the project-owned schema change or data write identified by the logs. Do not run a blanket update that converts every `NULL` in an Auth column to an empty string: some Auth fields are legitimately nullable, and broad updates can create invalid or duplicate identity data.
+
+If the log identifies a known token column that must contain an empty string, follow the article for that exact error, such as [confirmation_token converting NULL to string](/docs/guides/troubleshooting/scan-error-on-column-confirmation_token-converting-null-to-string-is-unsupported-during-auth-login-a0c686). Otherwise, use [Resolving 500 status authentication errors](/docs/guides/troubleshooting/resolving-500-status-authentication-errors-7bU5U8) to match the database evidence to a trigger, constraint, ownership, or service-schema problem.
+
+## Verify
+
+Repeat the original Auth operation and confirm that it succeeds. Check the Auth and Postgres logs over the new time window and verify that the same database error no longer appears.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the failing object is owned by Supabase, the exact database error is not visible, or repairing project-owned changes would require guessing at service-managed Auth data. Include the project reference, timestamp, operation, SQLSTATE, and sanitized log messages.

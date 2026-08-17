@@ -1,5 +1,7 @@
 ---
 title = "PKCE Flow errors: 'cannot parse response' or '#ZgotmplZ' in magic link emails"
+summary = "PKCE magic links fail when Go template URL values are embedded unsafely or the email-to-app redirect skips the browser that holds the code verifier."
+diagnostic_sources = [ "auth-logs", "client-tracing" ]
 topics = [ "auth", "cli" ]
 keywords = []
 database_id = "f9f9842b-e66c-4ea3-a45b-713895d8b7c6"

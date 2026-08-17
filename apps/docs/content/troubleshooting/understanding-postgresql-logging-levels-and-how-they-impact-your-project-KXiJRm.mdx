@@ -1,5 +1,7 @@
 ---
 title = "Understanding Postgres Logging Levels and How They Impact Your Project"
+summary = "Overly verbose Postgres logging can generate excessive IO and disk usage, which can degrade database performance."
+diagnostic_sources = [ "postgres-logs", "logs-explorer", "metrics" ]
 github_url = "https://github.com/orgs/supabase/discussions/29877"
 date_created = "2024-10-14T09:17:02+00:00"
 topics = [ "database" ]
@@ -99,7 +101,7 @@ ALTER ROLE postgres RESET log_min_messages;
 
 ## 5. Conclusion
 
-Postgres logs provide a powerful way to gain valuable insights into your database activity and performance when properly configured, but the key lies in finding the right balance. When set up properly, they can be incredibly useful.
+Postgres logs provide detailed evidence about database activity and performance. Keep the configured scope narrow enough to avoid excessive IO and disk usage.
 
 ## 6. Other resources
 

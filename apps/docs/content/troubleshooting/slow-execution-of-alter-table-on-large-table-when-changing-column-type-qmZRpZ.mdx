@@ -1,5 +1,7 @@
 ---
 title = "Slow Execution of ALTER TABLE on Large Table when changing column type"
+summary = "Changing a column type on a large table can rewrite the table and hold locks for the duration of the operation."
+diagnostic_sources = [ "database-inspection", "postgres-logs", "metrics" ]
 github_url = "https://github.com/orgs/supabase/discussions/19747"
 date_created = "2023-12-14T17:54:46+00:00"
 topics = [ "database" ]
@@ -7,60 +9,58 @@ keywords = [ "alter", "table", "column", "slow", "performance" ]
 database_id = "571d4ad9-b596-44bc-b8a4-a3115b862436"
 ---
 
-If you encounter slow execution of the ALTER TABLE operation on a large table when changing a column data type, consider the following alternative approach.
+Use this article when changing a column type on a large table runs for too long or blocks other queries.
 
-**Alternative Approach:**
+## Symptoms
 
-1. Add a New Column with the New Type:
-   `ALTER TABLE "table_name" ADD COLUMN "new_column_name" new_data_type;`
+- `alter table ... alter column ... type` remains active for longer than expected.
+- Reads or writes wait on the table while the change runs.
+- The statement reaches its timeout before the rewrite completes.
 
-2. Copy Values from the First Column to the Second:
-   `UPDATE "table_name" SET "old_column_name" = "new_column_name"::new_data_type;`
+## Confirm the cause
 
-3. Drop the Old Column:
-   `ALTER TABLE "table_name" DROP COLUMN "old_column_name";`
+1. Check active and blocked queries with [`supabase inspect db long-running-queries`](/docs/reference/cli/usage#supabase-inspect-db-long-running-queries), `blocking`, and `locks`.
+2. Confirm that the `alter table` statement is active or waiting and identify the session that blocks it.
+3. Check the table size and determine whether the conversion requires rewriting existing rows. Many type changes rewrite the whole table; a metadata-only conversion finishes much sooner.
+4. Review database CPU, memory, and disk IO over the same time window. Resource pressure can extend a rewrite, but increasing compute does not remove its lock requirements.
 
-**Why Use This Approach?**
-The long execution time for the ALTER TABLE operation can be attributed to the large size of the table. This segmented approach helps in:
+## Resolve
 
-- Efficiency: The process is more efficient as it avoids prolonged transactions.
-- Minimizing Disruption: Migrating data systematically minimizes the impact on other operations and users.
+For a maintenance window where blocking writes is acceptable, run the direct type change from an external Postgres client with a session timeout that covers the tested duration.
 
-**Additional Recommendations:**
+For a table that must keep serving writes, use an expand-and-contract migration:
 
-- Set session statement_timeout to 0 to prevent potential transaction [timeouts](/docs/guides/database/postgres/configuration).
+1. Add a nullable column with the new type:
 
-- Monitor currently blocked database transactions during the process using the provided script:
+   ```sql
+   alter table public.table_name add column new_column_name new_data_type;
+   ```
 
-```
-create view  public.lock_monitor as
-select
-  coalesce(
-    blockingl.relation::regclass::text,
-    blockingl.locktype
-  ) as locked_item,
-  now() - blockeda.query_start as waiting_duration,
-  [blockeda.pid](http://blockeda.pid/) as blocked_pid,
-  blockeda.query as blocked_query,
-  blockedl.mode as blocked_mode,
-  [blockinga.pid](http://blockinga.pid/) as blocking_pid,
-  blockinga.query as blocking_query,
-  blockingl.mode as blocking_mode
-from
-  pg_locks blockedl
-  join pg_stat_activity blockeda on [blockedl.pid](http://blockedl.pid/) = [blockeda.pid](http://blockeda.pid/)
-  join pg_locks blockingl on (
-    blockingl.transactionid = blockedl.transactionid
-    or blockingl.relation = blockedl.relation
-    and blockingl.locktype = blockedl.locktype
-  )
-  and [blockedl.pid](http://blockedl.pid/) <> [blockingl.pid](http://blockingl.pid/)
-  join pg_stat_activity blockinga on [blockingl.pid](http://blockingl.pid/) = [blockinga.pid](http://blockinga.pid/)
-  and blockinga.datid = blockeda.datid
-where
-  not blockedl.granted
-  and blockinga.datname = current_database();
-```
+2. Update the application or add reviewed database logic to write both the old and new columns during the migration.
+3. Backfill the new column in bounded batches using a stable primary-key range. The assignment direction is from the old column to the new column:
 
-**Notes:**
-Execute these steps during a maintenance window or low-traffic period to minimize disruption.
+   ```sql
+   update public.table_name
+   set new_column_name = old_column_name::new_data_type
+   where id > :batch_start
+     and id <= :batch_end
+     and new_column_name is null;
+   ```
+
+4. Validate the converted values and update reads to use the new column.
+5. Remove the old column and rename the new column in a later maintenance window after dependent views, functions, policies, indexes, and application code have been updated.
+
+Do not run a single unbounded `update` and assume that it avoids a prolonged transaction. Test the cast and batch size on a representative environment, and keep a recoverable backup before the migration.
+
+## Verify
+
+1. Compare non-null row counts and application-level invariants between the old and new columns.
+2. Confirm that the application reads and writes the new type correctly.
+3. Check for blocked queries, conversion errors, and increased resource pressure after each batch.
+4. Confirm that no database object or application code still depends on the old column before dropping it.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the type change remains blocked and the blocking session cannot be identified, or if the database becomes unavailable during the migration.
+
+Include the project reference, table size, source and destination types, timestamps with time zone, relevant redacted lock information, batch size, and steps attempted.

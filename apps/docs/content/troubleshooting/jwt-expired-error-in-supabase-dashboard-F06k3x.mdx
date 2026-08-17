@@ -1,5 +1,7 @@
 ---
 title = "\"JWT Expired\" Error in Supabase Dashboard"
+summary = "Persistent Dashboard JWT-expired errors after signing in again commonly mean the computer clock is far enough out of sync to misjudge token validity."
+diagnostic_sources = [ "client-tracing", "auth-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/21135"
 date_created = "2024-02-09T04:03:23+00:00"
 topics = [ "studio" ]
@@ -10,6 +12,22 @@ database_id = "362840be-a99c-4a98-bf4b-6e44a399af12"
 message = "JWT expired"
 ---
 
-When the Dashboard issues JWT expired errors, it usually means your computer's time is not in sync with the actual time.
+## Symptoms
 
-Go to https://time.is/ to compare your computer's clock with your local time. If your computer's time is inaccurate, sync it to resolve the issue
+The Dashboard repeatedly reports `JWT expired`, including immediately after a fresh sign-in or page reload.
+
+## Confirm the cause
+
+Sign out and sign in again. If a newly issued session is immediately considered expired, compare the computer clock with a trusted time source such as [time.is](https://time.is/). A large clock difference confirms local time drift.
+
+## Resolve
+
+Enable automatic date and time synchronization in the operating system, correct the clock, then sign in again. If the clock is already accurate, clear only the Supabase Dashboard session data or test a fresh browser profile before assuming the token itself is malformed.
+
+## Verify
+
+Reload the Dashboard and perform the action that previously failed. Confirm that the new session remains valid across another reload.
+
+## Escalate
+
+If the clock is synchronized and a fresh browser profile still rejects a newly issued Dashboard token, open a [support ticket](/dashboard/support/new) with the timestamp, browser and operating-system versions, and sanitized error. Do not include the JWT or cookies.

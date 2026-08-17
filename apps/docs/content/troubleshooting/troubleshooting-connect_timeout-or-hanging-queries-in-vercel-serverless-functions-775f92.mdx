@@ -1,5 +1,7 @@
 ---
 title = "Troubleshooting 'CONNECT_TIMEOUT' or hanging queries in Serverless Functions"
+summary = "A frozen serverless runtime can resume with a stale pooled TCP socket, causing connection attempts or queries to hang."
+diagnostic_sources = [ "client-tracing", "supavisor-logs", "postgres-logs", "metrics" ]
 date_created = "2026-06-08T10:04:54+00:00"
 topics = [ "database", "functions", "supavisor" ]
 keywords = []

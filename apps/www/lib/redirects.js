@@ -67,6 +67,49 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/troubleshooting/avoiding-timeouts-in-long-running-queries-6nmbdN',
+    destination: '/docs/guides/database/postgres/timeouts#session-level',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/enabling-ipv4-addon',
+    destination: '/docs/guides/platform/ipv4-address#enabling-the-ipv4-add-on',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/how-do-i-update-connection-pool-settings-in-my-dashboard-wAxTJ_',
+    destination: '/docs/guides/database/connecting-to-postgres#poolers',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/how-to-check-if-my-queries-are-being-blocked-by-other-queries-NSKtR1',
+    destination: '/docs/guides/database/connection-management#diagnosing-stuck-and-blocked-queries',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/memory-and-swap-usage-explained-aPNgm0',
+    destination: '/docs/guides/troubleshooting/exhaust-swap',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/prisma-error-management-Cm5P_o',
+    destination: '/docs/guides/database/prisma/prisma-troubleshooting',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO',
+    destination:
+      '/docs/guides/database/connecting-to-postgres#what-is-the-difference-between-client-connections-and-backend-connections',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/transferring-from-cloud-to-self-host-in-supabase-2oWNvW',
+    destination: '/docs/guides/self-hosting/restore-from-platform',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/hardening-data-api',
     destination: '/docs/guides/api/securing-your-api',
   },
@@ -144,6 +187,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/telemetry/:match*',
     destination: '/docs/guides/monitoring-and-debugging/:match*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/monitoring-and-debugging/resolve-issues',
+    destination: '/docs/guides/monitoring-and-debugging/debugging',
   },
   {
     permanent: false,
@@ -2754,7 +2802,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/database-linter',
-    destination: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/monitoring-and-debugging/advisors',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/database-advisors',
+    destination: '/docs/guides/monitoring-and-debugging/advisors',
   },
   {
     permanent: true,

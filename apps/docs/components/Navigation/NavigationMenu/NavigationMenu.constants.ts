@@ -215,12 +215,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/monitoring-and-debugging' as `/${string}`,
             level: 'telemetry',
           },
-          {
-            label: 'Troubleshooting',
-            icon: 'troubleshooting',
-            href: '/guides/troubleshooting' as `/${string}`,
-            level: 'troubleshooting',
-          },
         ],
       ],
     },
@@ -1150,7 +1144,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Database Advisors',
-          url: '/guides/database/database-advisors' as `/${string}`,
+          url: '/guides/monitoring-and-debugging/advisors' as `/${string}`,
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
         {
@@ -2998,29 +2992,135 @@ export const telemetry: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/monitoring-and-debugging' },
     {
-      name: 'Debugging',
-      url: undefined,
+      name: 'Observe the data',
+      url: '/guides/monitoring-and-debugging/access-data' as `/${string}`,
       items: [
         {
-          name: 'Debugging guide',
-          url: '/guides/monitoring-and-debugging/debugging' as `/${string}`,
+          name: 'What data you can observe',
+          url: '/guides/monitoring-and-debugging/access-data#what-data-you-can-observe' as `/${string}`,
+          items: [
+            {
+              name: 'Logs',
+              url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
+              items: [
+                {
+                  name: 'Query and filter logs',
+                  url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
+                },
+                {
+                  name: 'Logs field reference',
+                  url: '/guides/monitoring-and-debugging/log-field-reference' as `/${string}`,
+                },
+              ],
+            },
+            {
+              name: 'Metrics API',
+              url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
+              items: [
+                {
+                  name: 'Grafana Cloud',
+                  url: '/guides/monitoring-and-debugging/metrics/grafana-cloud' as `/${string}`,
+                },
+                {
+                  name: 'Grafana self-hosted',
+                  url: '/guides/monitoring-and-debugging/metrics/grafana-self-hosted' as `/${string}`,
+                },
+                {
+                  name: 'Datadog',
+                  url: 'https://docs.datadoghq.com/integrations/supabase/',
+                },
+                {
+                  name: 'Elastic',
+                  url: 'https://www.elastic.co/docs/reference/integrations/supabase',
+                },
+                {
+                  name: 'Vendor-agnostic setup',
+                  url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
+                },
+              ],
+            },
+            {
+              name: 'Database',
+              url: '/guides/database/inspect' as `/${string}`,
+            },
+            {
+              name: 'Advisors',
+              url: '/guides/monitoring-and-debugging/advisors' as `/${string}`,
+            },
+          ],
         },
         {
-          name: 'Logging',
-          url: '/guides/monitoring-and-debugging/logs' as `/${string}`,
-        },
-        {
-          name: 'Advanced log filtering',
-          url: '/guides/monitoring-and-debugging/advanced-log-filtering' as `/${string}`,
-        },
-        {
-          name: 'Logs field reference',
-          url: '/guides/monitoring-and-debugging/log-field-reference' as `/${string}`,
+          name: 'Where you can observe it',
+          url: '/guides/monitoring-and-debugging/access-data#access-via' as `/${string}`,
+          items: [
+            {
+              name: 'MCP',
+              url: '/guides/monitoring-and-debugging/access-data#mcp' as `/${string}`,
+            },
+            {
+              name: 'API',
+              url: '/guides/monitoring-and-debugging/access-data#api' as `/${string}`,
+            },
+            {
+              name: 'CLI',
+              url: '/guides/monitoring-and-debugging/access-data#cli' as `/${string}`,
+            },
+            {
+              name: 'Studio',
+              url: '/guides/monitoring-and-debugging/access-data#studio' as `/${string}`,
+              items: [
+                {
+                  name: 'Logs',
+                  url: '/guides/monitoring-and-debugging/logs' as `/${string}`,
+                },
+                {
+                  name: 'Reports',
+                  url: '/guides/monitoring-and-debugging/reports' as `/${string}`,
+                },
+              ],
+            },
+          ],
         },
       ],
     },
     {
-      name: 'Monitoring',
+      name: 'Detect and resolve issues',
+      url: undefined,
+      items: [
+        {
+          name: 'Detecting',
+          url: '/guides/monitoring-and-debugging/debugging' as `/${string}`,
+        },
+        {
+          name: 'Diagnosing',
+          url: '/guides/troubleshooting' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Hire an agent',
+      url: '/guides/monitoring-and-debugging/automate-with-agents' as `/${string}`,
+      items: [
+        {
+          name: 'Doctor',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/health' as `/${string}`,
+        },
+        {
+          name: 'Security officer',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/security' as `/${string}`,
+        },
+        {
+          name: 'Personal trainer',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/performance' as `/${string}`,
+        },
+        {
+          name: 'Accountant',
+          url: '/guides/monitoring-and-debugging/automate-with-agents/usage' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Export',
       url: undefined,
       items: [
         {
@@ -3028,46 +3128,12 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/monitoring-and-debugging/log-drains' as `/${string}`,
         },
         {
-          name: 'Reports',
-          url: '/guides/monitoring-and-debugging/reports' as `/${string}`,
-        },
-        {
-          name: 'Metrics',
-          url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
-          items: [
-            {
-              name: 'Overview',
-              url: '/guides/monitoring-and-debugging/metrics' as `/${string}`,
-            },
-            {
-              name: 'Grafana Cloud',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-cloud' as `/${string}`,
-            },
-            {
-              name: 'Grafana self-hosted',
-              url: '/guides/monitoring-and-debugging/metrics/grafana-self-hosted' as `/${string}`,
-            },
-            {
-              name: 'Datadog',
-              url: 'https://docs.datadoghq.com/integrations/supabase/' as `/${string}`,
-            },
-            {
-              name: 'Elastic',
-              url: 'https://www.elastic.co/docs/reference/integrations/supabase' as `/${string}`,
-            },
-            {
-              name: 'Vendor-agnostic setup',
-              url: '/guides/monitoring-and-debugging/metrics/vendor-agnostic' as `/${string}`,
-            },
-          ],
+          name: 'Client-side tracing',
+          url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
         {
           name: 'Sentry integration',
           url: '/guides/monitoring-and-debugging/sentry-monitoring' as `/${string}`,
-        },
-        {
-          name: 'Tracing with the client SDKs',
-          url: '/guides/monitoring-and-debugging/client-side-tracing' as `/${string}`,
         },
       ],
     },

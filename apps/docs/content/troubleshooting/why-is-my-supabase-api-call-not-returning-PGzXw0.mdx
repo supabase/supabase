@@ -1,5 +1,7 @@
 ---
 title = "Why is my supabase API call not returning?"
+summary = "A Supabase client call can deadlock when another awaited Supabase call runs synchronously inside an onAuthStateChange callback."
+diagnostic_sources = [ "client-tracing", "api-logs", "auth-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/19058"
 date_created = "2023-11-17T22:39:54+00:00"
 topics = [ "auth", "platform" ]
@@ -7,8 +9,34 @@ keywords = [ "deadlock", "hang", "async" ]
 database_id = "0a6f6d33-7331-4b47-87ec-7ade7a6a5924"
 ---
 
-There is currently a bug in supabase-js which results in a deadlock if any async API call is made in `onAuthStateChange` code. If a call is made in the handler then the next Supabase call anywhere using that client will hang and not return.
+## Symptoms
 
-For now a workaround is needed until this is fixed.
+A Supabase JavaScript call never resolves, and the browser network panel shows that no corresponding request was sent. The application has an `async` `onAuthStateChange` callback that awaits another method on the same Supabase client.
 
-https://github.com/supabase/gotrue-js/issues/762#issuecomment-1780006492
+## Confirm the cause
+
+Temporarily remove or make the Auth state-change callback synchronous. If later client calls resolve again, the callback was creating a lock deadlock. A slow server response is a different problem: it still produces a request in the network panel and API logs.
+
+## Resolve
+
+Keep the callback synchronous. If follow-up work must call another Supabase method, defer that work until after the callback returns:
+
+```js
+supabase.auth.onAuthStateChange((event, session) => {
+  setTimeout(async () => {
+    // The Auth callback has returned before this Supabase call starts.
+    const { data, error } = await supabase.from('profiles').select('*')
+    // Handle data and error here.
+  }, 0)
+})
+```
+
+Audit functions called by the callback as well; an indirectly awaited Supabase call can produce the same deadlock. See the [`onAuthStateChange` reference](/docs/reference/javascript/auth-onauthstatechange).
+
+## Verify
+
+Trigger the same Auth event, then repeat the client call that previously hung. Confirm that the promise settles and the expected request appears in the browser network panel and relevant API or Auth logs.
+
+## Escalate
+
+If calls still hang after every state-change callback is synchronous, capture the supabase-js version, browser version, minimal callback, event name, network trace, and whether the problem occurs in a fresh browser profile. Report a reproducible SDK issue without including API keys, JWTs, or user data.

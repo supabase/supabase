@@ -8,6 +8,8 @@
  * as required.
  */
 
+import { readdir, readFile, stat } from 'node:fs/promises'
+import { join, sep } from 'node:path'
 import matter from 'gray-matter'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
@@ -15,8 +17,6 @@ import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
-import { readdir, readFile, stat } from 'node:fs/promises'
-import { join, sep } from 'node:path'
 import { parse } from 'smol-toml'
 import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
@@ -37,6 +37,8 @@ export const TROUBLESHOOTING_DIRECTORY = join(process.cwd(), 'content/troublesho
  * @property {string} title
  * @property {string[]} topics
  * @property {string[]} [keywords]
+ * @property {string} summary
+ * @property {TroubleshootingDiagnosticSource[]} diagnostic_sources
  * @property {Object} [api]
  * @property {string[]} [api.sdk]
  * @property {string[]} [api.management_api]
@@ -54,29 +56,60 @@ export const TROUBLESHOOTING_DIRECTORY = join(process.cwd(), 'content/troublesho
  * @property {string} [message]
  */
 
+/**
+ * @typedef {keyof typeof TROUBLESHOOTING_DIAGNOSTIC_SOURCES} TroubleshootingDiagnosticSource
+ */
+
+export const TROUBLESHOOTING_DIAGNOSTIC_SOURCES = /** @type {const} */ ({
+  'logs-explorer': 'Logs Explorer',
+  'api-logs': 'API logs',
+  'postgres-logs': 'Postgres logs',
+  'supavisor-logs': 'Supavisor logs',
+  'auth-logs': 'Auth logs',
+  'storage-logs': 'Storage logs',
+  'realtime-logs': 'Realtime logs',
+  'edge-function-logs': 'Edge Function logs',
+  metrics: 'Metrics',
+  reports: 'Reports',
+  'security-advisor': 'Security Advisor',
+  'performance-advisor': 'Performance Advisor',
+  'database-inspection': 'Database inspection',
+  'client-tracing': 'Client tracing',
+  'log-drains': 'Log drains',
+})
+
+const TROUBLESHOOTING_DIAGNOSTIC_SOURCE_IDS = /** @type {[
+ *   TroubleshootingDiagnosticSource,
+ *   ...TroubleshootingDiagnosticSource[],
+ * ]} */ (Object.keys(TROUBLESHOOTING_DIAGNOSTIC_SOURCES))
+
 export const TroubleshootingSchema = z
   .object({
     title: z.string(),
-    topics: z.array(
-      z.enum([
-        'ai',
-        'ai-tools',
-        'api',
-        'auth',
-        'branching',
-        'cli',
-        'database',
-        'functions',
-        'platform',
-        'realtime',
-        'self-hosting',
-        'storage',
-        'studio',
-        'supavisor',
-        'terraform',
-      ])
-    ),
+    topics: z
+      .array(
+        z.enum([
+          'ai',
+          'ai-tools',
+          'api',
+          'auth',
+          'branching',
+          'cli',
+          'database',
+          'functions',
+          'platform',
+          'realtime',
+          'self-hosting',
+          'storage',
+          'studio',
+          'supavisor',
+          'terraform',
+        ])
+      )
+      .min(1),
     keywords: z.array(z.string()).optional(),
+    summary: z.string().min(1),
+    diagnostic_sources: z.array(z.enum(TROUBLESHOOTING_DIAGNOSTIC_SOURCE_IDS)).min(1),
     api: z
       .object({
         sdk: z.array(z.string()).optional(),
@@ -130,10 +163,9 @@ export async function getAllTroubleshootingEntriesInternal() {
 
     const parseResult = validateTroubleshootingMetadata(frontmatter)
     if ('error' in parseResult) {
-      throw Error(
-        `Error validating troubleshooting metadata for ${filePath}`,
-        { cause: parseResult.error }
-      )
+      throw Error(`Error validating troubleshooting metadata for ${filePath}`, {
+        cause: parseResult.error,
+      })
     }
 
     const mdxTree = fromMarkdown(content, {

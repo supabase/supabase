@@ -1,5 +1,7 @@
 ---
 title = "PostgREST not recognizing the objects(tables/functions/views) in a schema even after adding it to the exposed schemas"
+summary = "PostgREST resolves unqualified objects against the first exposed schema, so objects in another schema need explicit schema selection."
+diagnostic_sources = [ "api-logs", "postgres-logs", "database-inspection" ]
 topics = [
 "database",
 "platform"

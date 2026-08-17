@@ -1,5 +1,7 @@
 ---
 title = "Disabling Prepared statements"
+summary = "Prepared statements can fail through transaction-mode pooling because successive transactions can use different database connections."
+diagnostic_sources = [ "client-tracing", "supavisor-logs", "postgres-logs", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/28239"
 date_created = "2024-07-28T15:32:23+00:00"
 topics = [ "database", "supavisor" ]
@@ -49,7 +51,7 @@ set the [prepare_threshold](https://www.psycopg.org/psycopg3/docs/api/connection
 
 Follow the recommendation in the [asyncpg docs](https://magicstack.github.io/asyncpg/current/faq.html#why-am-i-getting-prepared-statement-errors)
 
-> disable automatic use of prepared statements by passing `statement_cache_size=0` to [asyncpg.connect()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.connect) and [asyncpg.create_pool()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool) (and, obviously, avoid the use of [Connection.prepare()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.Connection.prepare));
+> Disable automatic use of prepared statements by passing `statement_cache_size=0` to [asyncpg.connect()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.connect) and [asyncpg.create_pool()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.pool.create_pool). Do not use [Connection.prepare()](https://magicstack.github.io/asyncpg/current/api/index.html#asyncpg.connection.Connection.prepare).
 
 ## Rust's Deadpool or `tokio-postgres`:
 

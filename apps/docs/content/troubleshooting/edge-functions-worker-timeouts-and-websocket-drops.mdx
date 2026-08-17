@@ -2,6 +2,8 @@
 title = "Edge Functions worker timeouts and WebSocket drops"
 topics = [ "functions" ]
 keywords = [ "websocket", "timeout", "earlydrop", "wall clock", "cpu limit", "streaming", "cold start" ]
+summary = "WebSockets and streams can end when an isolate appears idle, reaches its wall-clock lifetime, exhausts CPU, or boots too slowly."
+diagnostic_sources = [ "edge-function-logs", "client-tracing" ]
 ---
 
 ## Background

@@ -5,10 +5,14 @@ date_created = "2023-05-12T01:30:31+00:00"
 topics = [ "functions" ]
 keywords = [ "import", "module", "esm" ]
 database_id = "225cb141-f442-47cf-834d-1d82d703748a"
+summary = "Legacy esm.sh imports can fail when the package is not built for Deno or when an outdated package version is used."
+diagnostic_sources = [ "client-tracing" ]
 ---
 
-Try adding `?target=deno` to the import path of the module. For Stripe, the updated import would be:
+Prefer the package's npm specifier instead of an esm.sh compatibility build. For Stripe:
 
+```ts
+import Stripe from 'npm:stripe@22'
 ```
-import Stripe from "https://esm.sh/stripe@11.2.0?target=deno";
-```
+
+If you must keep a legacy esm.sh import, pin the package version and add `?target=deno` to request a Deno-compatible build. New functions should use the npm specifier.

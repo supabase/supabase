@@ -1,5 +1,7 @@
 ---
 title = "Discovering and Interpreting API Errors in the Logs"
+summary = "Database API failures appear in edge and Postgres logs, where status codes and error details identify the rejecting layer."
+diagnostic_sources = [ "logs-explorer", "api-logs", "postgres-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/22849"
 date_created = "2024-04-18T02:38:44+00:00"
 topics = [ "database", "platform" ]
@@ -7,345 +9,75 @@ keywords = [ "logs", "api", "errors", "postgrest", "cloudflare" ]
 database_id = "188986c9-019d-4f26-baaf-6f58cec8fa7a"
 ---
 
-> A complimentary [guide](https://github.com/orgs/supabase/discussions/26224) was made for the Postgres logs
-
-## Navigating the API logs:
-
-The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [Log Explorer](/dashboard/project/_/logs/explorer). These logs are managed through [Logflare](/blog/supabase-logs-self-hosted) and can be queried with a subset of BigQuery SQL syntax.
-
-The log table that contains API requests is `edge_logs`.
-
-Notably, it contains:
-| field | description |
---------|-------------|
-| event_message | the log's message |
-| timestamp | time event was recorded |
-| request metadata | metadata about the REST request |
-| response metadata | metadata about the REST response |
-
-The request and response columns are arrays in the metadata field and must be unnested. This is done with a `cross join`.
-
-**Unnesting example**
-
-```sql
-select
-  -- the event message does not require unnesting
-  event_message,
-  -- unnested status_code column from metadata.response field
-  status_code
-from
-  edge_logs
-  -- Unpack data stored in the 'metadata' field
-  cross join unnest(metadata) as metadata
-  -- After unpacking the 'metadata' field, extract the 'response' field from it
-  cross join unnest(response) as response;
-```
-
-The most useful fields for debugging are:
-
-> NOTE: not every field is included below. For a full list, check the API Edge field reference in the [Log Explorer](/dashboard/project/_/logs/explorer)
-
-### Request object
-
-#### Cloudflare geographic data:
-
-**Suggested use cases:**
-
-- Detecting abuse from a specific region
-- Detecting activity spikes from certain regions
-
-| Column               | Description           | Sample value                                          |
-| -------------------- | --------------------- | ----------------------------------------------------- |
-| request.cf.city      | Requester's city      | Munich                                                |
-| request.cf.country   | Requester's country   | [DE](https://www.iso.org/iso-3166-country-codes.html) |
-| request.cf.continent | Requester's continent | EU                                                    |
-| request.cf.region    | Requester's region    | Bavaria                                               |
-| request.cf.latitudex | Requester's latitude  | 48.10840                                              |
-| request.cf.longitude | Requester's longitude | 11.61020                                              |
-| request.cf.timezone  | Requester's timezone  | Europe/Berlin                                         |
-
-**Unnesting example:**
-
-```sql
-select
-  city
-from
-  edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'cf' from 'request'
-cross join unnest(cf) AS cf;
-```
-
-#### IP and browser/environment data:
-
-**Suggested use cases:**
-
-- Detecting request behavior from IP
-- Detecting abuse by IP
-- Detecting errors by user_agent
-
-| Column                           | Description                            | Sample value                                                                                                    |
-| -------------------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| request.headers.cf_connecting_ip | Requester's IP                         | 80.81.18.138                                                                                                    |
-| request.headers.user_agent       | Requester's browser or app environment | Mozilla/5.0 (Linux; Android 11; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36 |
-
-**Unnesting example:**
-
-```sql
-select
-  cf_connecting_ip
-from
-  edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'headers' from 'request'
-cross join unnest(headers) AS headers;
-```
-
-#### Query type and formatting data:
-
-**Suggested use cases:**
-
-- identify problematic queries
-- identify unusual behavior by authenticated users
-
-| Column                | Description                                               | Sample value                                                                                                              |
-| --------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| request.method        | Request Method (PATCH, GET, PUT...)                       | GET                                                                                                                       |
-| request.url           | Request URL, which contains the PostgREST formatted query | https://yuhplfrsdxxxtldakizi.supabase.co/rest/v1/users?select=username&id=eq.63b6190e-214f-4b8a-b72d-3af6e1921411&limit=1 |
-| request.sb.auth_users | authenticated user's ID                                   | 63b6190e-214f-4b8a-b72d-3af6e1921411                                                                                      |
-
-**Unnesting example:**
-
-```sql
-select
-  method,
-  url,
-  auth_users
-from
-  edge_logs
--- Unpack 'metadata' field
-cross join unnest(metadata) AS metadata
--- unpack 'request' from 'metadata'
-cross join unnest(request) AS request;
--- unpack 'sb' from 'request'
-cross join unnest(sb) AS sb;
-```
-
-### Response object
-
-#### Status code:
-
-**Suggested use cases:**
-
-- detect success/errors
-
-| Column               | Description                             | Sample value |
-| -------------------- | --------------------------------------- | ------------ |
-| response.status_code | Response status code (200, 404, 500...) | 404          |
-
-**Unnesting example:**
-
-```sql
-select
-  status_code
-from
-  edge_logs
-  -- Unpack 'metadata' field
-  cross join unnest(metadata) as metadata
-  -- unpack 'response' from 'metadata'
-  cross join unnest(response) as response;
-```
-
-## Finding errors
-
-### API level errors
-
-The `metadata.request.url` contains PostgREST formatted queries.
-
-For example, the following call to the JS client:
-
-```js
-let { data: countries, error } = await supabase.from('countries').select('name')
-```
-
-translates to calling the following endpoint:
-
-```bash
-https://<project ref>.supabase.co/rest/v1/countries?select=name
-```
-
-You can use regex ([Advanced Regex Guide](https://github.com/orgs/supabase/discussions/22640)) to find the objects related to your query. Try isolating by:
-
-- function names
-- column names
-- table names
-- query methods (select, insert, ...)
-
-Example:
-
-```sql
-select
-  cast(timestamp as datetime) as timestamp,
-  status_code,
-  url,
-  event_message
-from edge_logs
-cross join unnest(metadata) as metadata
-cross join unnest(response) AS request;
-cross join unnest(response) AS response;
-where
-  -- find all errors
-  status_code >= 400
-    and
-  -- find queries featuring the a specific <table_name> and <column_name>
-  (
-    regexp_contains(url, '<table_name>')
-    and
-    regexp_contains(event_message, '<column_name1>|<column_name2>')
-  )
-```
-
-PostgREST has an [error reference table](https://postgrest.org/en/v12/references/errors.html) that you can use to interpret status codes.
-
-### Database-level errors
-
-However, some errors that are reported through the Database API occur at the Postgres level. If it is not clear which error occurred you should reference the timestamp of the error and try to see if you can find it in the Postgres logs.
-
-```sql
-select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
-  error_severity,
-  user_name,
-  query,
-  detail,
-  sql_state_code,
-  event_message
-from postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
-where
-  -- filter only for error events
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-    and
-  -- All DB API requests are registered as the authenticator role
-  parsed.user_name = 'authenticator'
-    and
-  -- find failed queries featuring the function <function_name>
-  regexp_contains(parsed.query, '<function_name>')
-    and
-  -- limit the time of the search to be around the time of the failed API request
-postgres_logs.timestamp between '2024-04-15 10:50:00' AND '2024-04-15 10:50:27'
-order by
- timestamp desc
-limit 100;
-```
-
-Like PostgREST, Postgres has a [reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html) for interpreting error codes.
-
-### PostgREST server and Cloudflare errors
-
-In some cases, errors may emerge because of Cloudflare or PostgREST server errors. For 500 and above errors, you may want to check your [PostgREST](/dashboard/project/_/logs/postgrest-logs) logs and the [Cloudflare docs.](https://developers.cloudflare.com/support/troubleshooting/cloudflare-errors/troubleshooting-cloudflare-5xx-errors/#error-502-bad-gateway-or-error-504-gateway-timeout))
-
-## Practical examples:
-
-**Find All Errors:**
-
-```sql
-select
-  cast(timestamp as datetime) as timestamp,
-  status_code,
-  event_message,
-  path
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(response) as response
-  cross join unnest(request) as request
-where
-  -- find all errors
-  status_code >= 400
-  and regexp_contains(path, '^/rest/v1/');
--- only look at DB API
-```
-
-**Group errors by path and code:**
-
-```sql
-select
-  status_code,
-  path,
-  count(path) as reoccurrence_per_path
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(response) as response
-  cross join unnest(request) as request
-where
-  -- find all errors
-  status_code >= 400
-  and regexp_contains(path, '^/rest/v1/') -- only look at DB API
-group by path, status_code
-order by reoccurrence_per_path;
-```
-
-**Find requests by region:**
-
-```sql
-select
-  path,
-  region,
-  count(region) as region_count
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(request) as request
-  cross join unnest(cf) as cf
-where
-  -- only look at DB API
-  regexp_contains(path, '^/rest/v1/')
-group by region, path
-order by requester_region_count;
-```
-
-**Find total requests by IP:**
-
-```sql
-select
-  cf_connecting_ip as ip,
-  count(cf_connecting_ip) as ip_count
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(request) as request
-  cross join unnest(headers) as headers
-  cross join unnest(cf) as cf
-  cross join unnest(response) as response
-where regexp_contains(path, '^/auth/v1/')
-group by ip
-order by ip_count;
-```
-
-**Search frequented query paths by authenticated user:**
-
-```sql
-select
-  -- only available for front-end clients
-  auth_users,
-  path,
-  count(auth_users) as ip_count
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(request) as request
-  cross join unnest(sb) as sb
-where
-  -- only look at DB API
-  regexp_contains(path, '^/rest/v1/')
-group by auth_users, path;
-```
+Use this article to trace a failed Database API request from the edge to Postgres.
+
+## Symptoms
+
+The Database API returns a `4xx` or `5xx` response, but the client error does not identify whether the request was rejected by the edge network, PostgREST, or Postgres.
+
+## Confirm the cause
+
+1. Record the failed request's timestamp with time zone, HTTP method, path, status code, and request ID when one is available.
+2. Open the [Logs Explorer](/dashboard/project/_/logs/explorer), select a narrow time range around the request, and query API errors:
+
+   ```sql
+   select
+     timestamp,
+     log_attributes['request.method'] as method,
+     log_attributes['request.path'] as path,
+     toInt32OrZero(log_attributes['response.status_code']) as status_code,
+     event_message
+   from logs
+   where source = 'edge_logs'
+     and log_attributes['request.path'] like '/rest/v1/%'
+     and toInt32OrZero(log_attributes['response.status_code']) >= 400
+   order by timestamp desc
+   limit 100;
+   ```
+
+3. Match the status code and message to the failing layer:
+   - A PostgREST error code such as `PGRST116` identifies a Database API request or schema-cache problem. Use the [PostgREST error reference](https://postgrest.org/en/v12/references/errors.html).
+   - A Postgres SQLSTATE such as `42501`, `42P01`, or `23505` identifies a database error. Use the [Postgres error-code reference](https://www.postgresql.org/docs/current/errcodes-appendix.html).
+   - A Cloudflare `5xx` response without a Postgres error can indicate an edge-network or upstream availability problem.
+4. If the API log points to Postgres, query Postgres errors over the same time range:
+
+   ```sql
+   select
+     timestamp,
+     log_attributes['parsed.error_severity'] as error_severity,
+     log_attributes['parsed.sql_state_code'] as sql_state_code,
+     log_attributes['parsed.user_name'] as user_name,
+     event_message
+   from logs
+   where source = 'postgres_logs'
+     and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+     and log_attributes['parsed.user_name'] = 'authenticator'
+   order by timestamp desc
+   limit 100;
+   ```
+
+The Logs Explorer uses ClickHouse. Structured fields are strings in the `log_attributes` map; do not use the deprecated BigQuery `cross join unnest(metadata)` syntax. See [Advanced log filtering](/docs/guides/monitoring-and-debugging/advanced-log-filtering) for field discovery and query syntax.
+
+## Resolve
+
+Apply the resolution for the confirmed layer:
+
+- Correct the client request when its path, filter, body, or authentication is invalid.
+- Correct the Data API configuration when PostgREST cannot resolve the schema or object.
+- Correct the database permission, Row Level Security policy, schema, constraint, or query named by the SQLSTATE.
+- Check [Supabase Status](https://status.supabase.com/) and the relevant Cloudflare error guidance when the edge returned a `5xx` response without a matching database error.
+
+Change one layer at a time. Do not loosen database privileges or Row Level Security only to test whether an error disappears.
+
+## Verify
+
+1. Repeat the same request with the same authenticated role.
+2. Confirm that the request returns the expected status and result.
+3. Query the same API and Postgres log window and confirm that the original error no longer appears for the new request.
+4. Confirm that requests without the required access are still rejected.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) when a repeatable `5xx` response has no corresponding client, PostgREST, or Postgres cause.
+
+Include the project reference, timestamp with time zone, request ID, method, redacted path, status code, and relevant redacted log lines. Do not include access tokens, API keys, or personal information.

@@ -1,0 +1,28 @@
+---
+id: 'automate-with-agents-security'
+title: 'Security officer'
+subtitle: 'Security officer is a read-only security agent. It reviews Security Advisor findings and bounded authentication or authorization failure counts, then proposes changes for a person to apply.'
+description: 'A security review agent that reports advisor findings and authentication or authorization spikes.'
+---
+
+## What it watches
+
+- Security Advisor findings at warning and error level
+- Authentication and authorization failure spikes
+- RLS or privilege issues that advisors already name
+
+It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp). It does not change policies, grants, API keys, or Auth settings.
+
+## When it watches
+
+Run it once per day on a schedule. Run it on demand after you change Auth, RLS, or other access controls.
+
+## What it will output
+
+Security officer reports warning and error advisor findings, grouped authentication or authorization failures, and the least invasive fix for a person to apply. If nothing needs review, it stays silent.
+
+<$Partial path="monitoring_agent_output.mdx" />
+
+## Copy the prompt
+
+<AiPrompt id="monitoring-agent-security" includeInMarkdown />

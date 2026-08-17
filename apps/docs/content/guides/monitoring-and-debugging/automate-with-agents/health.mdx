@@ -1,0 +1,28 @@
+---
+id: 'automate-with-agents-health'
+title: 'Doctor'
+subtitle: 'Doctor is a read-only health agent. It polls logs on a short interval, clusters errors, and reports only when a threshold is crossed.'
+description: 'An on-call triage agent that watches logs for 5xx spikes, Auth failures, and availability issues.'
+---
+
+## What it watches
+
+- API and Auth responses with status `>= 500`
+- Error-rate spikes against a recent baseline
+- Connection pressure when database inspection is available
+
+It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp). It can use `get_advisors` for extra context. It does not change the project.
+
+## When it watches
+
+Run it every 15 minutes on a schedule. Run it on demand after a deployment, or whenever you need a health check outside that interval.
+
+## What it will output
+
+When a threshold is crossed, Doctor reports an incident: grouped errors, a few request IDs, a likely cause, and a troubleshooting link. If nothing crosses the threshold, it stays silent.
+
+<$Partial path="monitoring_agent_output.mdx" />
+
+## Copy the prompt
+
+<AiPrompt id="monitoring-agent-health" includeInMarkdown />

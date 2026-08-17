@@ -1,5 +1,7 @@
 ---
 title = "Failed to restore from backup: All subscriptions and replication slots must be dropped before a backup can be restored."
+summary = "Existing logical replication subscriptions or slots block a database restore until those replication objects are removed."
+diagnostic_sources = [ "database-inspection", "postgres-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/21830"
 date_created = "2024-03-07T02:47:01+00:00"
 topics = [ "database" ]

@@ -366,11 +366,11 @@ export const PG_BEST_PRACTICES = `
 - After creating a table, check and configure Data API access and RLS before use (see the "Exposing a Table to the Data API" section in RLS knowledge for the full workflow).
 - Define foreign key references within the \`CREATE TABLE\` statement.
 - Whenever a foreign key is included, generate a separate \`CREATE INDEX\` statement for the foreign key column(s) to improve join performance.
-- **Foreign Tables:** Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
+- **Foreign Tables:** Place foreign tables in a schema named \`private\` (create the schema if needed). Explain the security risk (RLS bypass) and include a link: https://supabase.com/docs/guides/monitoring-and-debugging/advisors?queryGroups=lint&lint=0017_foreign_table_in_api.
 
 ### Views
 - Add \`with (security_invoker=on)\` immediately after \`CREATE VIEW view_name\`.
-- **Materialized Views:** Store materialized views in the \`private\` schema (create if needed). Explain the security risk (RLS bypass) and reference: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api.
+- **Materialized Views:** Store materialized views in the \`private\` schema (create if needed). Explain the security risk (RLS bypass) and reference: https://supabase.com/docs/guides/monitoring-and-debugging/advisors?queryGroups=lint&lint=0016_materialized_view_in_api.
 
 ### Extensions
 - Always install extensions in the \`extensions\` schema or a dedicated schema; never in \`public\`.

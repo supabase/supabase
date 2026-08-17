@@ -1,5 +1,7 @@
 ---
 title = "Why do I see Auth & API requests in the dashboard? My app has no users"
+summary = "Projects with no end users still show Auth and API traffic because the Dashboard periodically calls service health endpoints."
+diagnostic_sources = [ "auth-logs", "api-logs", "reports" ]
 github_url = "https://github.com/orgs/supabase/discussions/21579"
 date_created = "2024-02-26T21:39:41+00:00"
 topics = [ "auth", "platform", "database", "realtime" ]

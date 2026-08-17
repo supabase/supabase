@@ -1,5 +1,7 @@
 ---
 title = "UNUSED_EXTERNAL_IMPORT build warning with Vite, Rollup, or Nuxt"
+summary = "Bundlers can emit UNUSED_EXTERNAL_IMPORT when supabase-js type re-exports are merged into runtime imports that the generated bundle does not use."
+diagnostic_sources = [ "client-tracing" ]
 topics = [ "platform" ]
 keywords = [ "UNUSED_EXTERNAL_IMPORT", "vite", "rollup", "nuxt", "build warning", "false positive", "bundler", "supabase-js" ]
 database_id = "e3ad9b0e-0533-444b-a998-c8e65171b529"
@@ -12,7 +14,7 @@ When bundling an application that uses `@supabase/supabase-js`, you may see warn
 "FunctionRegion", "FunctionsError", "FunctionsFetchError", "FunctionsHttpError" and "FunctionsRelayError" are imported from external module "@supabase/functions-js" but never used in "...".
 ```
 
-**This is a false positive — your bundle is correct and no code is missing.**
+When the warning names only type or error re-exports, it is a false positive: the bundle is complete and tree-shaking is unaffected.
 
 ## Why this happens
 
@@ -21,12 +23,15 @@ When bundling an application that uses `@supabase/supabase-js`, you may see warn
 ```js
 // dist/index.mjs (simplified)
 import { PostgrestClient, PostgrestError } from '@supabase/postgrest-js'
+
 //       ^ used internally    ^ re-exported for you
 ```
 
 Vite/Rollup checks which names from that import are referenced _in the code body_ and flags `PostgrestError` as unused, because it only appears in an `export` statement — not called or assigned. The export itself is the real usage, but this check doesn't account for re-exports. Tree-shaking and bundle size are unaffected.
 
 ## Suppress the warning
+
+First update `@supabase/supabase-js`. The package corrected its type-only exports in version `2.89.0`, so current versions should not need a broad warning filter. Keep the following workaround only when another dependency pins an affected older version.
 
 ### Vite / Rollup (`vite.config.js` or `rollup.config.js`)
 

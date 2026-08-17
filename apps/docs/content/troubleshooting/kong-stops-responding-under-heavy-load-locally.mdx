@@ -1,5 +1,7 @@
 ---
 title = "Kong stops responding under heavy load in local development"
+summary = "The local Kong gateway drops connections under heavy concurrency when its default single nginx worker cannot serve all in-flight requests."
+diagnostic_sources = [ "api-logs", "client-tracing" ]
 topics = [ "cli", "self-hosting", "storage" ]
 keywords = [ "kong", "local", "workers", "nginx", "worker_processes", "storage", "concurrent", "timeout", "socket" ]
 

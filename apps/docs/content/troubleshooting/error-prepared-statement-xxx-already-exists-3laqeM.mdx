@@ -1,5 +1,7 @@
 ---
 title = "Error: prepared statement \"XXX\" already exists"
+summary = "Transaction-mode pooling reuses database connections, so a client-side prepared-statement name can collide with state left by another transaction."
+diagnostic_sources = [ "supavisor-logs", "postgres-logs", "client-tracing", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/17751"
 date_created = "2023-09-27T09:53:08+00:00"
 topics = [ "database" ]
@@ -10,7 +12,32 @@ database_id = "8688dad6-3dce-4912-9b90-4f128daf79d7"
 message = "prepared statement \"XXX\" already exists"
 ---
 
-This error occurs when you are trying to connect to the database using PgBouncer. PgBouncer does not support prepared statements. If you have prepared statements in use, you will need to use direct connections - port 5432.
+## Symptoms
 
-There is a special parameter in the query string for Prisma to work with PgBouncer
-https://www.prisma.io/docs/guides/performance-and-optimization/connection-management/configure-pg-bouncer
+The database client returns `prepared statement "XXX" already exists` while using the Supavisor transaction pooler on port `6543`.
+
+## Confirm the cause
+
+1. Confirm that the application uses the transaction-mode connection string.
+2. Check the client configuration for named or automatically prepared statements.
+3. Match the error timestamp in Supavisor and Postgres logs.
+
+Transaction mode can assign consecutive transactions to different database connections. It does not preserve the session state that named prepared statements require.
+
+## Resolve
+
+Choose one connection strategy:
+
+- Disable prepared statements in the client when you need transaction-mode pooling. For Prisma, add `pgbouncer=true` to the connection string. See [Prisma troubleshooting](/docs/guides/database/prisma/prisma-troubleshooting#prepared-statement-already-exists).
+- Use the session-mode pooler on port `5432` when the client requires prepared statements and the client pool has a bounded size.
+- Use the direct connection when the environment supports IPv6 or the project has the IPv4 add-on, and when the application can hold a stable, bounded connection pool.
+
+## Verify
+
+1. Restart the application so it discards existing pooled connections.
+2. Repeat the query that produced the error.
+3. Confirm that no new prepared-statement collision appears in Supavisor or Postgres logs.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the error continues after the connection mode and prepared-statement configuration match. Include the project reference, client library and version, connection mode, timestamp with time zone, and redacted log entries.

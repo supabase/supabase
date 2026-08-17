@@ -1,5 +1,7 @@
 ---
 title = "Error: 'invalid byte sequence for encoding 'UTF8': 0x00' when accessing Triggers or Webhooks"
+summary = "Trigger or webhook inspection can fail with an invalid UTF-8 byte error when standard_conforming_strings is disabled and stored definitions contain incompatible escapes."
+diagnostic_sources = [ "postgres-logs", "database-inspection" ]
 topics = [ "cli", "database" ]
 keywords = []
 database_id = "12128731-0af6-4c57-9aa2-66e177f0c3f4"

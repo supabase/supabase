@@ -1,5 +1,7 @@
 ---
 title = "Postgres error 'relation objects does not exist' during Storage uploads"
+summary = "Storage uploads fail with relation objects does not exist when the database search path or Storage schema state prevents the service from resolving storage.objects."
+diagnostic_sources = [ "storage-logs", "postgres-logs", "database-inspection" ]
 date_created = "2026-06-10T15:05:10+00:00"
 topics = [ "auth", "database", "storage" ]
 keywords = []
@@ -12,19 +14,39 @@ http_status_code = 500
 message = "Internal Server Error"
 ---
 
-If authenticated users receive a `500 Internal Server Error` during file uploads and your database logs report `error: relation "objects" does not exist`, it typically indicates the database cannot locate the required internal storage tables.
+## Symptoms
 
-**Why Does This Happen?**
-This error occurs when the `authenticated` role's `search_path` does not include the `storage` schema. Because the schema is missing from the path, the database fails to find the `objects` table (which resides in `storage.objects`) during the upload process.
+An authenticated Storage upload returns HTTP `500`, and the Postgres logs contain SQLSTATE `42P01` with `relation "objects" does not exist`.
 
-**How to Fix:**
-You can resolve this by updating the role configuration via the [SQL Editor](/dashboard/project/_/sql/new):
+## Confirm the cause
 
-1. Execute the following command to append the storage schema to the role's search path:
-   `ALTER ROLE authenticated SET search_path = public, storage;`
-2. Verify that uploads from authenticated users now succeed.
+1. Confirm that the service-managed table exists:
 
-**Best Practices:**
+   ```sql
+   select to_regclass('storage.objects');
+   ```
 
-- To maintain compatibility with default schema permissions, avoid creating custom Postgres roles for application users.
-- Instead, use custom claims within `auth.users.raw_app_meta_data` to manage user-specific logic or permissions.
+2. Inspect custom policies on `storage.objects` for an unqualified `objects` reference:
+
+   ```sql
+   select policyname, qual, with_check
+   from pg_policies
+   where schemaname = 'storage' and tablename = 'objects';
+   ```
+
+3. Inspect project-owned functions called by those policies. A function with a restricted `search_path` must qualify the table as `storage.objects`.
+4. Correlate the failing upload in [Storage logs](/dashboard/project/_/logs/storage-logs) and [Postgres logs](/dashboard/project/_/logs/postgres-logs).
+
+## Resolve
+
+- Replace unqualified references such as `objects` with `storage.objects` in the project-owned policy or function identified by the logs.
+- Do not add the `storage` schema to the global `authenticated` role search path to mask the reference. Schema qualification makes the dependency explicit and avoids changing name resolution for every authenticated request.
+- If `to_regclass('storage.objects')` returns `NULL`, do not recreate the service-managed table manually. Restore the Storage schema from a known-good backup or contact Support.
+
+## Verify
+
+Repeat an upload with the same user, bucket, and object path. Confirm that it succeeds and that neither Storage nor Postgres logs contain a new `42P01` error. Also test an unauthorized path to confirm that its RLS policy still rejects the upload.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if `storage.objects` is missing, a service-owned policy or function contains the unqualified reference, or the error continues after every project-owned reference is schema-qualified. Include the project reference, timestamp, object path with sensitive segments redacted, and relevant Storage and Postgres log messages.

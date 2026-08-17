@@ -1,5 +1,7 @@
 ---
 title = "Inserting into Sequence/Serial Table Causes \"duplicate key violates unique constraint\" Error"
+summary = "A sequence that lags behind existing primary-key values can generate an identifier that already exists after an import or restore."
+diagnostic_sources = [ "postgres-logs", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/21134"
 date_created = "2024-02-09T03:10:39+00:00"
 topics = [ "database" ]

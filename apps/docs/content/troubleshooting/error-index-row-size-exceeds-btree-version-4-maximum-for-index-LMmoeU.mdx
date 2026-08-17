@@ -1,5 +1,7 @@
 ---
 title = "Error: index row size exceeds btree version 4 maximum for index"
+summary = "A B-tree index entry is too large to fit within the Postgres page-size limit, often because the index includes wide values or too many columns."
+diagnostic_sources = [ "postgres-logs", "database-inspection", "performance-advisor" ]
 github_url = "https://github.com/orgs/supabase/discussions/14898"
 date_created = "2023-06-08T11:35:27+00:00"
 topics = [ "database" ]
@@ -24,7 +26,7 @@ B-tree row can be a single attribute or multiple attributes. These cases are bet
 
 ## B-tree is built with multiple attributes
 
-B-tree with multiple attributes will perform better than several only in case the likely SELECT queries use several attributes that include the first attributes that are in the index. I.e. select by 1-st, 2-nd, 3-d but not by 2-nd, 3-d and 5-th index attributes.
+B-tree with multiple attributes performs better than separate indexes only when likely queries use the leading attributes in the index. For example, query by the first, second, and third attributes rather than the second, third, and fifth attributes.
 
 The other case when multiple attributes B-tree is good is when we have INSERT/UPDATE workload that is comparable to SELECT load (generally SELECTS a way more often). Then we can save speed-up updating a single index instead of several at INSERT/UPDATE at cost of SELECT performance decrease.
 
@@ -36,7 +38,7 @@ This can be if the index is built on text, JSON column etc. It's not prohibited 
 
 One of the measures of index efficiency is the ratio of index entries to the width of all possible values space for this datatype. If we have say 100000 distinct values of int32 in the index then the ratio is 1/40000. If we have text with length of 2704 bytes (maximum for B-tree index) we can hardly imagine the number of distinct values that gives us even a comparable ratio. That said indexing of that long values stores much redundancy in the index.
 
-The solution: use some kind of hashing to transfer the values to much narrower space. I.e. md5. Build a functional index (=index by expression):
+The solution is to hash the values into a narrower space, such as with MD5. Build a functional index, also known as an index by expression:
 
 ```sql
 create index on table_name (MD5(column_name));
@@ -48,7 +50,7 @@ instead of:
 create index on table_name (column_name);
 ```
 
-Then you must modify you SELECTs to be using the same function (otherwise the functional index will not be used in SELECT queries). I.e.
+Then modify the queries to use the same function. Otherwise, Postgres cannot use the functional index. For example:
 
 ```sql
 select * from table_name where MD5(column_name) = MD5('search_value');

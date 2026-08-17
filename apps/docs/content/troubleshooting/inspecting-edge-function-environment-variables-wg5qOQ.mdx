@@ -5,6 +5,8 @@ date_created = "2024-06-09T18:44:40+00:00"
 topics = [ "functions", "cli" ]
 keywords = [ "logging", "environment", "variables", "secrets", "docker" ]
 database_id = "f47c9b0e-f537-4908-8d35-5dd3dc4c5627"
+summary = "An Edge Function can read an unexpected environment-variable value when local secrets were not loaded or hosted secrets were not deployed."
+diagnostic_sources = [ "edge-function-logs", "client-tracing" ]
 
 [api]
 cli = [ "supabase-init", "supabase-secrets-set", "supabase-secrets-list" ]
@@ -40,17 +42,13 @@ npx supabase secrets set --env-file ./supabase/.env --project-ref <PROJECT REF>
 npx supabase secrets list
 ```
 
-For security reasons, it is not advised to log secrets, but you can log a truncated version for the reassurance that they're being updated:
+Do not log secret values, including truncated values. Log only whether each variable is configured:
 
 ```typescript
-//logs the function call and the secrets
 console.log('Hello from Functions!')
 
-//custom secret
-console.log('logging custom secret', Deno.env.get('MY_NAME'))
-
-// default secrets
-console.log('logging SUPABASE_URL:', Deno.env.get('SUPABASE_URL').slice(0, 15))
+console.log('MY_NAME configured:', Deno.env.get('MY_NAME') !== undefined)
+console.log('SUPABASE_URL configured:', Deno.env.get('SUPABASE_URL') !== undefined)
 
 Deno.serve(async (req) => {
   const { name } = await req.json()

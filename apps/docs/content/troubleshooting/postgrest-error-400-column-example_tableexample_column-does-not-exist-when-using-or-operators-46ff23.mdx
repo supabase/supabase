@@ -1,5 +1,7 @@
 ---
 title = "PostgREST error: 400 'column example_table.example_column does not exist' when using OR operators"
+summary = "Mutation requests with or filters can report existing columns as missing because PostgREST versions before the fixed release resolved those columns incorrectly."
+diagnostic_sources = [ "api-logs", "database-inspection" ]
 date_created = "2026-06-15T04:04:26+00:00"
 topics = [ "platform", "api" ]
 keywords = [ "postgrest", "column does not exist" ]

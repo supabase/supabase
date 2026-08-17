@@ -3,23 +3,23 @@ title = "Monitoring Edge Function resource usage"
 topics = [ "functions" ]
 keywords = [ "monitoring", "metrics", "CPU", "memory", "performance", "edge function" ]
 database_id = "33e8e407-951b-4f7d-b8b4-8e9085cd4d10"
+summary = "Sustained CPU, memory, or execution-time growth can reveal code paths that are approaching Edge Function runtime limits."
+diagnostic_sources = [ "metrics", "reports", "edge-function-logs" ]
 ---
 
-Learn how to track your Edge Function's performance and identify potential resource issues.
+Use execution metrics and runtime logs together to identify Edge Function performance and resource issues.
 
 ## Accessing metrics
 
-Track your function's performance through the dashboard:
+Open the [Edge Functions observability report](/dashboard/project/_/observability/edge-functions) to review invocations, status codes, regions, and execution time. Open an individual function to inspect its recent errors and runtime logs.
 
-1. Navigate to Edge Functions > [Your Function] > Metrics
-2. Review CPU, memory, and execution time charts
-3. Identify potential problems in resource consumption
+CPU and memory do not have continuous per-function charts. Diagnose those limits from `CPUTime` and `Memory` shutdown events in the function logs.
 
 ## Key metrics to monitor
 
 ### CPU usage
 
-High CPU usage indicates your function is performing intensive computations. Consider:
+Repeated `CPUTime` shutdown events indicate that the function is performing intensive computations. Consider:
 
 - Optimizing algorithms
 - Caching computed results
@@ -27,7 +27,7 @@ High CPU usage indicates your function is performing intensive computations. Con
 
 ### Memory usage
 
-Memory spikes can cause function failures. Watch for:
+Repeated `Memory` shutdown events indicate that the isolate exceeded its memory limit. Check for:
 
 - Large datasets loaded into memory
 - Accumulated objects that aren't garbage collected
@@ -35,7 +35,7 @@ Memory spikes can cause function failures. Watch for:
 
 ### Execution time
 
-Long execution times can lead to timeouts. Monitor for:
+Long execution times can reach the request idle or wall-clock limit. Check for:
 
 - Slow external API calls
 - Inefficient database queries
@@ -47,7 +47,7 @@ Edge Functions have limited resources compared to traditional servers. Optimize 
 
 - **Memory efficiency:** Avoid loading large datasets into memory
 - **CPU optimization:** Minimize complex computations
-- **Execution time:** Keep functions under 60 seconds
+- **Execution time:** Send a response before the 150-second request idle timeout and keep work within the plan-specific wall-clock limit
 
 ## Best practices
 

@@ -4,13 +4,15 @@ date_created = "2026-02-06T00:00:00+00:00"
 topics = [ "realtime" ]
 keywords = [ "suspended", "quota", "abuse", "limits", "connections", "messages", "ban", "RealtimeDisabledForTenant", "disabled" ]
 database_id = "3f5acb57-2ccd-4bd7-86c2-df8e23fe2685"
+summary = "Realtime access is suspended when connections, channels, or messages substantially exceed project quotas or indicate abusive traffic."
+diagnostic_sources = [ "reports", "realtime-logs" ]
 ---
 
 If your project has been suspended due to Realtime usage, it means your project exceeded the quotas for your plan and was flagged for unusually high consumption of Realtime resources.
 
 ## How to know if your project was suspended
 
-When Realtime is disabled for your project, you will see the error code `RealtimeDisabledForTenant` in your [Realtime logs](/dashboard/project/_/database/realtime-logs). On the client side, connections will fail to establish and existing subscriptions will stop receiving events.
+When Realtime is disabled for your project, you will see the error code `RealtimeDisabledForTenant` in your [Realtime logs](/dashboard/project/_/logs/realtime-logs). On the client side, connections will fail to establish and existing subscriptions will stop receiving events.
 
 If you encounter this error, it means Realtime has been explicitly disabled for your project and you should [contact support](/dashboard/support/new) to understand why and resolve the issue.
 
@@ -42,7 +44,7 @@ In most cases, quota overages are accidental rather than intentional:
    - An estimate of your expected concurrent connections and message throughput
    - Any recent changes to your application that may have caused the spike
 
-2. **Review your usage**: While waiting for a response, check the [Realtime reports](/dashboard/project/_/database/realtime-logs) in your project dashboard to understand what drove the elevated usage.
+2. **Review your usage**: While waiting for a response, check the [Realtime observability report](/dashboard/project/_/observability/realtime) to understand what drove the elevated usage.
 
 3. **Identify and fix the root cause**: Common fixes include:
    - Adding proper channel cleanup in your client code
@@ -54,7 +56,7 @@ The Supabase team will review your case to understand whether the usage was acci
 
 ## How to avoid suspension
 
-- Monitor your usage regularly through the [Realtime reports](/dashboard/project/_/database/realtime-logs) page
+- Monitor your usage regularly through the [Realtime observability report](/dashboard/project/_/observability/realtime)
 - Set up alerts if your connections or messages approach your plan limits
 - Follow the [channel management best practices](/docs/guides/troubleshooting/realtime-too-many-channels-error#best-practices-for-channel-management) to avoid resource leaks
 - Review the [Realtime limits](/docs/guides/realtime/limits) for your plan and upgrade before you outgrow them

@@ -1,5 +1,7 @@
 ---
 title = "Steps to improve query performance with indexes"
+summary = "Queries remain slow when their filters and joins lack useful indexes or when existing indexes do not match the access pattern."
+diagnostic_sources = [ "performance-advisor", "database-inspection", "metrics" ]
 github_url = "https://github.com/orgs/supabase/discussions/22449"
 date_created = "2024-04-03T20:10:02+00:00"
 topics = [ "database", "platform", "cli" ]
@@ -66,17 +68,17 @@ npx supabase login
 
 npx supabase link
 
-npx supabase inspect db unused-indexes
+supabase inspect db index-stats --linked
 ```
 
 There is an extension called [index_advisor](/docs/guides/database/extensions/index_advisor) that creates virtual indexes on your queries and then checks which ones increase performance the best. Unlike normal index creation, virtual indexes can be made rapidly, which makes uncovering the most performant solutions fast. The [Query Performance Advisor](/dashboard/project/_/database/query-performance) in the Dashboard is configured to use index_advisor to make optimization suggestions and you should check it out to see where you can improve.
 
-Index_advisor won't test indexes added through extensions nor will it test GIN/GIST indexes. For JSON or ARRAY columns, consider exploring GIN/GIST indexes separately from index_advisor. If you're using pg_vector, it's crucial to use an [HSNW index](https://github.com/orgs/supabase/discussions/21379).
+Index_advisor won't test indexes added through extensions nor will it test GIN/GIST indexes. For JSON or ARRAY columns, consider exploring GIN/GIST indexes separately from index_advisor. If you're using pgvector, evaluate an [HNSW index](/docs/guides/ai/vector-indexes/hnsw-indexes).
 
 Indexes can significantly speed up reads, sometimes boosting performance by 100 times. However, they come with a trade-off: they need to track all column changes, which can slow down data-modifying queries like UPDATEs, DELETEs, and INSERTs.
 
 Generally, indexes offer more benefits. For example, primary key columns automatically have a B-Tree index, enhancing read and join operations without significantly affecting write queries. Nonetheless, it's wise to avoid carelessly adding indexes.
 
-Some indexes may take a long time to build. A [guide](https://github.com/orgs/supabase/discussions/21379) was written for applying HSNW indexes, but it can be generalized and referenced for applying others, too.
+Some indexes may take a long time to build. See the [HNSW index troubleshooting guide](/docs/guides/troubleshooting/increase-vector-lookup-speeds-by-applying-an-hsnw-index-ohLHUM) for preparation steps that also apply to other large index builds.
 
 When building an index, the affected table is locked, preventing write operations. If this poses an issue, use the [`CONCURRENTLY` modifier](https://www.postgresql.org/docs/current/sql-createindex.html). However, reserve this for necessary cases only, as it entails building the index twice, prolonging the process and increasing computational costs.

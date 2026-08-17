@@ -1,7 +1,9 @@
 ---
 title = "Database API 42501 errors"
+summary = "Database API requests return a 401 or 403 response with SQLSTATE 42501 when the request role lacks a required schema, table, column, or row-level security permission."
 topics = [ "database" ]
 github_url = "https://github.com/orgs/supabase/discussions/31293"
+diagnostic_sources = [ "postgres-logs", "api-logs" ]
 database_id = "49b51a3a-9753-4747-a24e-8afcb075792b"
 
 [[errors]]
@@ -13,76 +15,97 @@ http_status_code = 403
 code = "42501"
 ---
 
-[Postgres 42501 errors](https://www.postgresql.org/docs/current/errcodes-appendix.html), often reported by clients as 401 or 403 errors, imply the request lacked adequate privileges. They can be viewed in the [log explorer](/dashboard/project/_/logs/explorer?q=select%0A++++cast%28postgres_logs.timestamp+as+datetime%29+as+timestamp%2C%0A++++event_message%2C%0A++++parsed.error_severity%2C%0A++++parsed.user_name%2C%0A++++parsed.query%2C%0A++++parsed.detail%2C%0A++++parsed.hint%2C%0A++++parsed.sql_state_code%2C%0A++++parsed.backend_type%0Afrom%0A++++postgres_logs%0A++++cross+join+unnest%28metadata%29+as+metadata%0A++++cross+join+unnest%28metadata.parsed%29+as+parsed%0Awhere%0A++++parsed.sql_state_code+%3D+%2742501%27%0Aorder+by%0A++++timestamp+desc%0Alimit+100%3B%0A) by running:
+Use this article to identify which Postgres permission rejected a Database API request and grant only the access that the operation requires.
+
+## Symptoms
+
+The Database API returns an HTTP `401` or `403` response with Postgres error code `42501`. The message might identify a schema, table, column, or row-level security policy that rejected the operation.
+
+## Confirm the cause
+
+1. Reproduce the request and record its timestamp with time zone, HTTP status, operation, table or function, and database role.
+2. Inspect the API logs for the request. Confirm that the response contains SQLSTATE `42501`, and record its request ID when one is available.
+3. Open the [Logs Explorer](/dashboard/project/_/logs/explorer) and run this query over the same time window:
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message,
-  parsed.error_severity,
-  parsed.user_name,
-  parsed.query,
-  parsed.detail,
-  parsed.hint
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
-where
-  regexp_contains(parsed.error_severity, 'ERROR|FATAL|PANIC')
-  and parsed.sql_state_code = '42501'
+  log_attributes['parsed.error_severity'] as error_severity,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.sql_state_code'] as sql_state_code
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] = '42501'
 order by timestamp desc
 limit 100;
 ```
 
-They tend to be caused by one of the following factors.
+4. Use `user_name` and `event_message` to identify the rejected role, resource, and operation.
+5. Match the evidence to one cause:
+   - **Restricted schema:** The request tried to access a protected schema such as `auth` or `vault`.
+   - **Custom schema permission:** The request used a custom schema that is not configured for Database API access or lacks the required grants.
+   - **Table privilege:** The message contains `permission denied for table`, and the role lacks the privilege required by the operation.
+   - **Column privilege:** The request reads or writes a restricted column. A `select *` request also selects restricted columns.
+   - **Row-level security policy:** An `INSERT` or `UPDATE` request reaches the table but does not satisfy a policy for the request role.
 
-## Attempted to access a forbidden schema
+The error is not confirmed as an RLS issue only because the table has RLS enabled. Use the Postgres log detail and the role's grants and policies to distinguish the cause.
 
-API roles cannot access certain schemas, most notably `auth` and `vault`. This restriction extends to Foreign Data Wrappers relying on `vault`. While you can bypass it using a [security definer function](/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker), these schemas are intentionally restricted for security reasons.
+## Resolve
 
-## Attempted to access a custom schema
+Apply the resolution for the confirmed cause.
 
-If you created a custom schema, you will have to give the Database API permission to query it. Follow our [Using Custom Schemas guide](/docs/guides/api/using-custom-schemas) for more directions.
+### Restricted schema
 
-## Missing table-level privileges
+Do not grant `anon` or `authenticated` direct access to protected schemas such as `auth` or `vault`. If your application needs a specific operation, expose only that operation through a carefully reviewed database function. See [security definer and invoker functions](/docs/guides/database/functions?queryGroups=language&language=sql&queryGroups=example-view&example-view=sql#security-definer-vs-invoker).
 
-If you see an error like `permission denied for table your_table`, the querying role may not have the required privilege for the operation.
+### Custom schema permission
 
-By default, tables in the `public` schema are granted `SELECT`, `INSERT`, `UPDATE`, and `DELETE` to the `anon` and `authenticated` roles. However, you can change these privileges in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard or via SQL.
+Follow [Using custom schemas](/docs/guides/api/using-custom-schemas) to expose the intended schema and grant the required permissions. Do not expose schemas or tables that the application does not need.
 
-To check the current privileges on a table:
+### Table privilege
+
+Check the current privileges for the affected table and role:
 
 ```sql
 select grantee, privilege_type
 from information_schema.role_table_grants
-where table_name = 'your_table';
+where table_schema = 'public' and table_name = 'your_table';
 ```
 
-To grant a specific privilege to a role:
+Grant only the privilege required by the operation. For example, this statement grants read access:
 
 ```sql
-grant select on table public.your_table to anon;
+grant select on table public.your_table to authenticated;
 ```
 
-To grant all privileges:
+You can also configure Data API table access from [**Project Settings > Data API**](/dashboard/project/_/integrations/data_api/settings).
 
-```sql
-grant select, insert, update, delete on table public.your_table to anon, authenticated;
-```
+<Admonition type="danger">
 
-<Admonition type="note">
-
-Granting privileges allows access to your table through the Data API, so you should ensure you [enable RLS](/docs/guides/database/postgres/row-level-security) and write appropriate policies to protect your data.
-
-For more information, see [Securing your API](/docs/guides/api/securing-your-api).
+Granting a role access to a table can expose that table through the Data API. Enable row-level security on every table in an exposed schema, and create policies that restrict rows to the intended users. See [Securing your API](/docs/guides/api/securing-your-api).
 
 </Admonition>
 
-## Configured column-level restrictions
+### Column privilege
 
-If you've set column-based access in the [Dashboard](/dashboard/project/_/database/column-privileges) or via SQL, queries will fail with a `42501` error when accessing restricted columns. This includes using `select *`, as it expands to include forbidden columns.
+Select only the columns that the role can read, or update the column privileges when the application requires the restricted column. Review the effective role before broadening column access.
 
-## RLS:
+### Row-level security policy
 
-If the anon or authenticated roles attempt to UPDATE or INSERT values without the necessary RLS permissions, Postgres will return a 42501 error.
+Create or correct a policy for the affected operation and role. An `UPDATE` also needs a matching `SELECT` policy. Use both `USING` and `WITH CHECK` when an update must restrict the existing row and its new values. See [Row Level Security](/docs/guides/database/postgres/row-level-security).
+
+## Verify
+
+1. Repeat the exact API request with the same key, session, database role, operation, and representative data.
+2. Confirm that the response succeeds and returns or changes only the intended data.
+3. Query API and Postgres logs over the new time window. Confirm that the repeated request no longer produces SQLSTATE `42501`.
+4. Repeat a negative test with a role or row that must remain unauthorized. Confirm that the request is still rejected or returns no protected data.
+
+The issue is resolved only when the intended request succeeds and unauthorized access remains blocked.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the Postgres logs show the expected role and permissions but the request continues to return `42501`, or if you cannot identify the rejected permission from the log detail.
+
+Include the project reference, timestamp with time zone, request ID, sanitized API response, Postgres log detail, affected role and operation, relevant grants and policies, changes attempted, and verification results. Do not include API keys, JWTs, passwords, or table data that has not been redacted.

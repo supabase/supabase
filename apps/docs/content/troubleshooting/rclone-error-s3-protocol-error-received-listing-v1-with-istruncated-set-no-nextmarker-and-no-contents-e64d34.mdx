@@ -3,17 +3,30 @@ title = "rclone error: 's3 protocol error: received listing v1 with IsTruncated 
 topics = [ "storage" ]
 keywords = []
 database_id = "0dab3e43-2ba9-4421-9af3-b97e45123069"
+summary = "This rclone listing error occurs because Supabase Storage implements S3 ListObjectsV2 but not the older ListObjectsV1 response shape."
+diagnostic_sources = [ "client-tracing", "storage-logs" ]
 ---
 
-When attempting to list objects from a Supabase bucket using `rclone lsf`, you might encounter the error: `'s3 protocol error: received listing v1 with IsTruncated set, no NextMarker and no Contents'`.
+## Symptoms
 
-## Why this happens
+`rclone lsf` returns `s3 protocol error: received listing v1 with IsTruncated set, no NextMarker and no Contents` while listing a Supabase bucket.
+
+## Confirm the cause
 
 This issue arises because `rclone` defaults to using S3 List API Version 1. This version may not correctly handle large, paginated bucket listings when interacting with Supabase Storage.
 
-## How to resolve this
+## Resolve
 
 To resolve this, explicitly instruct `rclone` to use S3 List API Version 2. This can be done by adding the `--s3-list-version 2` flag to your `rclone lsf` command.
 
-Example:
-`rclone lsf supabase:bucket-name --s3-list-version 2`
+```bash
+rclone lsf supabase:bucket-name --s3-list-version 2
+```
+
+## Verify
+
+Run the command again and confirm that it lists every expected object without the protocol error.
+
+## Escalate
+
+If the error persists, capture the output from `rclone -vv` and include it in a [support ticket](/dashboard/support/new).

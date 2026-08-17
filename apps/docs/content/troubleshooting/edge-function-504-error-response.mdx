@@ -1,61 +1,57 @@
 ---
 title = "Edge Function 504 error response"
+summary = "An Edge Function returns HTTP 504 when it does not start a response before the 150-second request idle timeout."
 topics = [ "functions" ]
 keywords = [ "504" ]
+diagnostic_sources = [ "edge-function-logs", "api-logs" ]
 
 [[errors]]
 http_status_code = 504
 ---
 
-An internal 504 from an Edge Function means the function failed to initiate a response within 150s, [the max execution time](<https://supabase.com/docs/guides/functions/limits#:~:text=Request%20idle%20timeout%3A%20150s%20(If%20an%20Edge%20Function%20doesn%27t%20send%20a%20response%20before%20the%20timeout%2C%20504%20Gateway%20Timeout%20will%20be%20returned)>).
+Use this article to find the operation that prevents an Edge Function from responding before the request idle timeout and reduce or move that work.
 
-As of now, this limit cannot be increased. If your function always needs more time than allowed, skip to [When optimization isn't enough](#when-optimization-is-not-enough) section. Otherwise, follow the steps below to speed up response times.
+## Symptoms
 
-## Step 1: Identifying slow Functions
+An Edge Function request returns HTTP `504 Gateway Timeout`. Supabase did not receive the start of a response before the [150-second request idle timeout](/docs/guides/functions/limits#runtime-limits).
 
-You can filter for 504 events in the Log Explorer with the below [query](/dashboard/project/_/logs/explorer?q=select%0A++cast%28timestamp+as+datetime%29+as+timestamp%2C%0A++req.pathname%2C%0A++res.status_code%2C%0A++metadata.execution_time_ms%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST%28metadata%29+as+metadata%0A++cross+join+UNNEST%28metadata.request%29+as+req%0A++cross+join+UNNEST%28metadata.response%29+as+res%0Awhere+res.status_code+%3D+504%0Alimit+20%3B):
+A `504` identifies a response timeout. Other runtime limits can produce different status codes or shutdown reasons. Check [Edge Function status codes](/docs/guides/functions/status-codes) when the response is not `504`.
 
-```sql
-select
-  cast(timestamp as datetime) as timestamp,
-  req.pathname,
-  res.status_code,
-  metadata.execution_time_ms
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(metadata.response) as res
-where res.status_code = 504
-limit 20;
-```
+## Confirm the cause
 
-You can further explore how much time a specific function takes on average by running the below [query](/dashboard/project/_/logs/explorer?q=select%0A++req.pathname%2C%0A++res.status_code%2C%0A++AVG%28metadata.execution_time_ms%29+AS+avg_runtime_ms%2C%0A++MIN%28metadata.execution_time_ms%29+AS+min_runtime_ms%2C%0A++MAX%28metadata.execution_time_ms%29+AS+max_runtime_ms%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST%28metadata%29+as+metadata%0A++cross+join+UNNEST%28metadata.request%29+as+req%0A++cross+join+UNNEST%28sb%29+as+sb%0A++cross+join+UNNEST%28req.headers%29+as+headers%0A++cross+join+UNNEST%28metadata.response%29+as+res%0Awhere+req.pathname+%3D+%27%2Ffunctions%2Fv1%2FYOUR_FUNCTION_NAME%27+--<---add+your+function+name+or+remove+filter%0Agroup+by+req.pathname%2C+res.status_code%0Alimit+20%3B):
+1. Reproduce the request and record its timestamp with time zone, function path, representative input, and execution ID when one is available.
+2. Open the [Logs Explorer](/dashboard/project/_/logs/explorer) and find recent `504` responses:
 
 ```sql
 select
-  req.pathname,
-  res.status_code,
-  AVG(metadata.execution_time_ms) as avg_runtime_ms,
-  MIN(metadata.execution_time_ms) as min_runtime_ms,
-  MAX(metadata.execution_time_ms) as max_runtime_ms
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(sb) as sb
-  cross join UNNEST(req.headers) as headers
-  cross join UNNEST(metadata.response) as res
-where req.pathname = '/functions/v1/YOUR_FUNCTION_NAME' -- <---add your function name or remove filter
-group by req.pathname, res.status_code
+  timestamp,
+  log_attributes['request.pathname'] as function_path,
+  toInt32OrZero(log_attributes['response.status_code']) as status_code,
+  toFloat64OrZero(log_attributes['execution_time_ms']) as execution_time_ms
+from logs
+where source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 504
+order by timestamp desc
 limit 20;
 ```
 
-Once candidate functions are identified, you can investigate more thoroughly.
+3. Compare the execution time for the affected function path:
 
-## Step 2: Investigating slow Functions
+```sql
+select
+  log_attributes['request.pathname'] as function_path,
+  toInt32OrZero(log_attributes['response.status_code']) as status_code,
+  avg(toFloat64OrZero(log_attributes['execution_time_ms'])) as avg_runtime_ms,
+  min(toFloat64OrZero(log_attributes['execution_time_ms'])) as min_runtime_ms,
+  max(toFloat64OrZero(log_attributes['execution_time_ms'])) as max_runtime_ms
+from logs
+where source = 'function_edge_logs'
+  and log_attributes['request.pathname'] = '/functions/v1/YOUR_FUNCTION_NAME'
+group by function_path, status_code
+limit 20;
+```
 
-Add `console.time` labels around suspicious sections to pinpoint where time is being spent:
+4. Add `console.time` around suspected operations, deploy the instrumentation, and reproduce the request:
 
 ```js
 console.time('fetch-user-data')
@@ -63,99 +59,90 @@ const userData = await fetchUserFromDatabase(id)
 console.timeEnd('fetch-user-data')
 ```
 
-The time response will show up in the [function's dashboard](/dashboard/project/_/functions) under the `Log` tab with the label you assigned it. You can use the label as a keyword to search for the timestamp.
+5. Find the timing labels in the function logs and identify the operation that consumes the response window. You can also step through the function locally with [developer tools](/docs/guides/functions/debugging-tools).
 
-![image](/docs/img/troubleshooting/edge-function-504-timestamp-1.png)
+Common causes include:
 
-For local development, you can also step through execution with [Chrome Dev Tools](/docs/guides/functions/debugging-tools).
+- Independent API calls that run sequentially
+- Slow or unindexed database queries
+- External APIs that throttle requests or respond slowly
+- Loops or blocking operations that do not complete
+- Request payloads that cause substantially more work
 
-Common culprits:
+The cause is confirmed when the function and request logs show that a specific operation prevents the function from starting a response before the timeout.
 
-- Sequential API calls that could run in parallel
-- Unindexed or unoptimized database queries
-- External APIs that are throttling or rate-limiting you
-- Loops without a clear escape condition
+## Resolve
 
-## Step 3: Optimize
+Choose the smallest change that addresses the confirmed slow operation.
 
-The below suggestions are some strategies you can pursue to reduce execution times.
+### Run independent requests concurrently
 
-### Parallelizing requests
-
-If requests are independent of one another, rather than calling them sequentially, you can speed up operations by calling them in parallel with [Promise.all](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all):
+When two requests do not depend on each other, start them together:
 
 ```js
-// Before: sequential: total time = A + B
+// Before: total time is the duration of A plus B.
 const resultA = await fetch('https://api-one.com/data')
 const resultB = await fetch('https://api-two.com/data')
 
-// After: parallel: total time = max(A, B)
+// After: total time is the longer duration of A or B.
 const [resultA, resultB] = await Promise.all([
   fetch('https://api-one.com/data'),
   fetch('https://api-two.com/data'),
 ])
 ```
 
-### Splitting up logic
+Do not run requests concurrently when one operation depends on the result of another or when concurrency would exceed a downstream service's limits.
 
-The Edge Function may be doing more than it needs to. It may be better to split up it's logic into multiple parts that can be called individually and run for shorter periods.
+### Reduce work in the request
 
-### Use background tasks [utilize-background-tasks]
+Split unrelated operations into separate functions or move work that does not affect the response into a [background task](/docs/guides/functions/background-tasks). Background tasks remain subject to Edge Function runtime limits.
 
-You can initiate functions in a background task to be handled independently of the request/response handler. The process is outlined in the [Background Task docs](/docs/guides/functions/background-tasks)
+If the function waits for an external API, configure a timeout and a fallback or error response so that the request does not wait until the platform limit.
 
-### Offload work to the client or an external service
+### Optimize database operations
 
-Instead of managing all operations within the function itself, there may be an external API that can execute jobs faster and then send back results. Alternatively, you may be able to offload some processing to the requester rather than doing everything within the function itself.
+Inspect database calls in [Query Performance](/dashboard/project/_/advisors/query-performance). Use the [Performance Advisor](/dashboard/project/_/advisors/performance) and [index guide](/docs/guides/database/postgres/indexes#index-advisor) when the evidence identifies a slow query or missing index.
 
-### Using alternative libraries
+### Cache repeated reads
 
-Some libraries, may be more optimal than others. It's worth exploring alternative libraries that may execute faster or are lighter weight.
+When the function repeatedly reads data that changes infrequently, use a cache with an expiration and invalidation policy. See the [Upstash Redis example](/docs/guides/functions/examples/upstash-redis).
 
-### Optimizing database operations
+### Limit request size
 
-If you are connecting to Supabase Postgres from your function, you can inspect the speed of your queries in the [performance dashboard](/dashboard/project/_/observability/query-performance). If the operations are slow, you can review [performance](/dashboard/project/_/advisors/performance) and [index advisor](/docs/guides/database/postgres/indexes#index-advisor) for improvement suggestions.
-
-### Implement caching
-
-If you are making requests to the same resource and the return values change irregularly, you may be able to implement an external cache layer, such as [Upstash Redis](/docs/guides/functions/examples/upstash-redis) to reduce wait times.
-
-### Restrict request load
-
-If the function is used to evaluate user submissions, you can restrict load size to reduce computational time. You can use the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=select%0A++req.pathname+as+function_name%2C%0A++res.status_code%2C%0A++AVG%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+avg_content_size_in_bytes%2C%0A++MIN%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+min_content_size_in_bytes%2C%0A++MAX%28COALESCE%28CAST%28headers.content_length+AS+INT%29%2C+0%29%29+AS+max_content_size_in_bytes%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST%28metadata%29+as+metadata%0A++cross+join+UNNEST%28metadata.request%29+as+req%0A++cross+join+UNNEST%28sb%29+as+sb%0A++cross+join+UNNEST%28req.headers%29+as+headers%0A++cross+join+UNNEST%28metadata.response%29+as+res%0Awhere+%0A++++req.pathname+%3D+%27%2Ffunctions%2Fv1%2Finduce-504%27%0AGROUP+BY+req.pathname%2C+res.status_code+++++%0Alimit+10) to filter by the content size in bytes provided by the initial requester:
+If processing time changes with request size, inspect the content length recorded in request headers:
 
 ```sql
 select
-  req.pathname as function_name,
-  res.status_code,
-  AVG(COALESCE(cast(headers.content_length as int), 0)) as avg_content_size_in_bytes,
-  MIN(COALESCE(cast(headers.content_length as int), 0)) as min_content_size_in_bytes,
-  MAX(COALESCE(cast(headers.content_length as int), 0)) as max_content_size_in_bytes
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(sb) as sb
-  cross join UNNEST(req.headers) as headers
-  cross join UNNEST(metadata.response) as res
-where req.pathname = '/functions/v1/induce-504'
-group by req.pathname, res.status_code
+  log_attributes['request.pathname'] as function_name,
+  toInt32OrZero(log_attributes['response.status_code']) as status_code,
+  avg(toInt32OrZero(log_attributes['request.headers.content_length'])) as avg_content_size_in_bytes,
+  min(toInt32OrZero(log_attributes['request.headers.content_length'])) as min_content_size_in_bytes,
+  max(toInt32OrZero(log_attributes['request.headers.content_length'])) as max_content_size_in_bytes
+from logs
+where source = 'function_edge_logs'
+  and log_attributes['request.pathname'] = '/functions/v1/YOUR_FUNCTION_NAME'
+group by function_name, status_code
 limit 10;
 ```
 
-## When optimization is not enough
+Validate the payload and reject inputs that exceed the size or complexity your function is designed to process.
 
-Edge Functions have a hard runtime ceiling that cannot be raised. If your use case genuinely requires more, consider:
+### Move work that cannot fit the runtime
 
-- using a serverless/edge function service, such as [AWS Lambda](https://aws.amazon.com/pm/lambda/), with fewer restrictions
-- [Self-hosting Edge Functions](/docs/reference/self-hosting-functions/introduction) and reconfiguring the runtime constraints
-- refactoring your application to rely on other resources for serverside tasks, such as [Next.js API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes)
+The request idle timeout cannot be increased. If the operation cannot start a response within the limit after optimization, move the long-running work to a service designed for that duration, redesign the operation as a job that the client can poll, or [self-host Edge Functions](/docs/reference/self-hosting-functions/introduction) with runtime limits appropriate for your environment.
 
-## Still stuck?
+## Verify
 
-Here are some further resources you can review
+1. Deploy the change to the same environment that produced the timeout.
+2. Repeat the request with representative input, including the input size that previously failed.
+3. Confirm that the request starts a response before 150 seconds and returns the expected status and body.
+4. Inspect the Edge Function request and function logs over the new time window. Confirm that the new request has no `504` and that the identified operation completes within its expected duration.
+5. Repeat the request enough times to distinguish a consistent improvement from one faster response.
 
-- Review our [guide](/docs/guides/functions/debugging-tools) on local debugging with Chrome Dev Tools
-- Read the [Function Error Handling guide](/docs/guides/functions/error-handling) for best practices on structuring error responses
-- Check the [Supabase GitHub Discussions](https://github.com/orgs/supabase/discussions), [Discord](https://discord.com/channels/839993398554656828/1006358244786196510), and [Reddit page](https://www.reddit.com/r/Supabase/) for similar reports that can help with debugging
-- Open a [support ticket](/dashboard/support/new) from your Dashboard if the problem persists and you believe it is a platform issue
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if requests still return `504` after the function starts a response within the documented timeout, or if the logs do not contain the request or execution evidence needed to identify the slow operation.
+
+Include the project reference, function name, deployment version, timestamps with time zone, execution IDs, sanitized request shape, relevant timing output, changes attempted, and verification results. Do not include API keys, access tokens, or request data that has not been redacted.
+
+For application-level debugging, also review [Edge Function debugging tools](/docs/guides/functions/debugging-tools) and [error handling](/docs/guides/functions/error-handling).

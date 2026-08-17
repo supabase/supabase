@@ -1,0 +1,28 @@
+---
+id: 'automate-with-agents-performance'
+title: 'Personal trainer'
+subtitle: 'Personal trainer is a read-only performance agent. It inspects query statistics, blocking sessions, and Performance Advisor findings, then proposes the next change for a person to apply.'
+description: 'A query health agent that looks for slow queries, lock waits, and performance advisor findings.'
+---
+
+## What it watches
+
+- Slow or regressing queries
+- Lock waits and long-running sessions
+- Unindexed foreign keys and other Performance Advisor findings
+
+It uses `get_advisors` and read-only `execute_sql` on project-scoped [Supabase MCP](/docs/guides/ai-tools/mcp). It does not create indexes, rewrite queries, or cancel sessions.
+
+## When it watches
+
+Run it once per hour on a schedule. Run it on demand after a latency regression or a schema change.
+
+## What it will output
+
+Personal trainer reports slow or regressing queries, lock waits, and Performance Advisor findings, with a verification plan. It can recommend that a person cancel a session. It does not cancel the session or create indexes.
+
+<$Partial path="monitoring_agent_output.mdx" />
+
+## Copy the prompt
+
+<AiPrompt id="monitoring-agent-performance" includeInMarkdown />

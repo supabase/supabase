@@ -1,5 +1,7 @@
 ---
 title = "'Scan error on column confirmation_token: converting NULL to string is unsupported' during Auth login"
+summary = "Auth login returns a scan error when a manually modified auth.users row stores NULL in confirmation_token instead of the expected empty string."
+diagnostic_sources = [ "auth-logs", "postgres-logs", "database-inspection" ]
 topics = [ "auth" ]
 keywords = []
 database_id = "02a26b95-3029-49a1-9319-161cf1c4c21d"
@@ -9,10 +11,36 @@ http_status_code = 500
 message = "error finding user: sql: Scan error on column 'confirmation_token': converting NULL to string is unsupported"
 ---
 
-If you encounter an HTTP 500 error during authentication with the message `error finding user: sql: Scan error on column "confirmation_token": converting NULL to string is unsupported`, this typically indicates that the GoTrue Auth service found a `NULL` value in the `auth.users.confirmation_token` column, where a non-nullable string is expected.
+## Symptoms
 
-To resolve this, update the `confirmation_token` to an empty string where it is `NULL`. You can execute the following SQL query in the [SQL Editor](/dashboard/project/_/sql/new):
+An Auth login returns HTTP `500` with `error finding user: sql: Scan error on column "confirmation_token": converting NULL to string is unsupported`.
+
+## Confirm the cause
+
+Inspect the affected rows before changing them:
+
+```sql
+select id
+from auth.users
+where confirmation_token is null;
+```
+
+This state usually comes from a manual import or write to the service-managed `auth.users` table.
+
+## Resolve
+
+After backing up the affected rows, update only the exact column and rows identified by the error in the [SQL Editor](/dashboard/project/_/sql/new):
 
 ```sql
 update auth.users set confirmation_token = '' where confirmation_token is null;
 ```
+
+Stop any application, migration, or import process that writes `NULL` back to this column. Prefer supported Auth administration APIs over direct writes to `auth.users`.
+
+## Verify
+
+Repeat the login for an affected user and confirm that it succeeds. Check Auth and Postgres logs for the new time window and verify that the scan error no longer appears.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the rows were not created by a project-owned import or direct write, or if the exact scan error continues after the affected values are corrected. Include the project reference, timestamp, affected user IDs, and sanitized log messages; do not include tokens or passwords.

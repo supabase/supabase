@@ -1,5 +1,7 @@
 ---
 title = "High CPU and Slow Queries with `ERROR: must be a superuser to terminate superuser process`"
+summary = "High CPU with a superuser termination error can indicate a wraparound-prevention autovacuum that must finish and cannot be canceled by project roles."
+diagnostic_sources = [ "metrics", "postgres-logs", "performance-advisor", "database-inspection" ]
 topics = [ "cli", "database", "storage" ]
 keywords = []
 database_id = "23668386-7a72-44ff-a412-4cd8a005fa18"

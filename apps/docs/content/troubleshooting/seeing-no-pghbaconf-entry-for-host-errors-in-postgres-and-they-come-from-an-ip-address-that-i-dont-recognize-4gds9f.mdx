@@ -1,5 +1,7 @@
 ---
 title = "Seeing \"no pg_hba.conf entry for host\" errors in Postgres and they come from an IP address that I don't recognize"
+summary = "Unknown internet hosts can generate rejected database-login attempts that appear as `pg_hba.conf` errors without establishing a connection."
+diagnostic_sources = [ "postgres-logs", "client-tracing" ]
 github_url = "https://github.com/orgs/supabase/discussions/26282"
 date_created = "2024-05-14T02:45:41+00:00"
 topics = [ "database", "platform" ]

@@ -1,5 +1,7 @@
 ---
 title = "`pg_cron launcher crashes with 'duplicate key value violates unique constraint'`"
+summary = "The pg_cron launcher hits a duplicate primary key when cron.runid_seq falls behind the maximum run ID already stored in cron.job_run_details."
+diagnostic_sources = [ "postgres-logs", "database-inspection" ]
 topics = [ "platform" ]
 keywords = []
 database_id = "c000b4ea-23e2-4e19-af54-63ccd00c4904"
@@ -11,9 +13,33 @@ The `pg_cron` launcher process crashes approximately every minute, displaying th
 
 This issue occurs when the `cron.runid_seq` sequence is out of sync with the `cron.job_run_details` table. The sequence attempts to generate `runid` values that already exist in the table, leading to a unique key violation. This is typically due to the sequence's last value not being correctly aligned with the maximum `runid` already present in the table.
 
-## How to resolve this
+## Confirm the cause
 
-To resolve this, you need to reset the `cron.job_run_details` table. If data preservation is required, ensure you back up its contents before proceeding.
+Compare the sequence with the greatest stored run ID:
 
-Execute the following SQL command via the [SQL editor](/dashboard/project/_/sql/new):
-`TRUNCATE cron.job_run_details;`
+```sql
+select
+  (select last_value from cron.runid_seq) as sequence_value,
+  (select max(runid) from cron.job_run_details) as maximum_run_id;
+```
+
+The sequence is behind when `sequence_value` is less than or equal to `maximum_run_id`.
+
+## Resolve
+
+Advance the sequence without deleting job history. Run this in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+select
+  setval('cron.runid_seq', coalesce((select max(runid) from cron.job_run_details), 0) + 1, false);
+```
+
+Do not truncate `cron.job_run_details` solely to repair the sequence; truncation permanently deletes the execution history used for diagnosis.
+
+## Verify
+
+Wait for the next scheduled run and confirm that it inserts a new row with a run ID above the previous maximum. Check the Postgres logs and verify that the duplicate-key error does not recur.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the sequence falls behind again without a restore, manual write, or migration that explains the change. Include the project reference, extension version, timestamps, sequence values, and sanitized Postgres log error.

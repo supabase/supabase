@@ -2,17 +2,33 @@
 
 import { useBreakpoint } from 'common'
 import { ChevronDown, RotateCw, Search, X } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
 import { useQueryStates } from 'nuqs'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button_Shadcn_, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Input } from 'ui'
+import {
+  Button_Shadcn_,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {
+  serializeTroubleshootingSearchParams,
   TROUBLESHOOTING_CONTAINER_ID,
   TROUBLESHOOTING_DATA_ATTRIBUTES,
+  troubleshootingEntryMatchesFilter,
   troubleshootingSearchParams,
+  type TroubleshootingGroupBy,
 } from './Troubleshooting.utils.shared'
 
 function useTroubleshootingSearchState() {
@@ -71,32 +87,15 @@ function useTroubleshootingSearchState() {
   }
 }
 
-function entryMatchesFilter(
-  entry: HTMLElement,
-  selectedProducts: string[],
-  selectedErrorCodes: string[],
-  selectedTags: string[],
-  searchState: string
-) {
-  const content = entry.textContent ?? ''
-  const dataKeywords = entry.getAttribute(TROUBLESHOOTING_DATA_ATTRIBUTES.KEYWORDS_LIST_ATTRIBUTE)
-  const dataProducts = entry.getAttribute(TROUBLESHOOTING_DATA_ATTRIBUTES.PRODUCTS_LIST_ATTRIBUTE)
-  const dataErrors = entry.getAttribute('data-errors')?.split(',') ?? []
+function getTroubleshootingEntries() {
+  const container = document.getElementById(TROUBLESHOOTING_CONTAINER_ID)
+  if (!container) return
 
-  const productsMatch =
-    selectedProducts.length === 0 ||
-    selectedProducts.some((product) => dataProducts?.includes(product))
-  const tagsMatch =
-    selectedTags.length === 0 || selectedTags.some((tag) => dataKeywords?.includes(tag))
-  const errorsMatch =
-    selectedErrorCodes.length === 0 ||
-    selectedErrorCodes.some((error) =>
-      dataErrors.some((errorCode) => errorCode.includes(error.toString()))
+  return Array.from(
+    container.querySelectorAll(
+      `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
     )
-  const searchMatch =
-    searchState === '' || content.toLowerCase().includes(searchState.toLowerCase())
-
-  return productsMatch && errorsMatch && tagsMatch && searchMatch
+  ) as HTMLElement[]
 }
 
 interface TroubleshootingFilterProps {
@@ -104,6 +103,7 @@ interface TroubleshootingFilterProps {
   products?: string[]
   errors: ITroubleshootingMetadata['errors']
   keywords: string[]
+  enableGroupBy?: boolean
 }
 
 export function TroubleshootingFilter(props: TroubleshootingFilterProps) {
@@ -154,6 +154,7 @@ function TroubleshootingFilterInternal({
   products,
   errors,
   className,
+  enableGroupBy,
 }: TroubleshootingFilterProps) {
   const {
     selectedProducts,
@@ -168,19 +169,6 @@ function TroubleshootingFilterInternal({
   } = useTroubleshootingSearchState()
 
   const searchInputRef = useRef<HTMLInputElement | null>(null)
-
-  const allEntries = useRef<HTMLElement[]>([])
-  useEffect(() => {
-    const container = document.getElementById(TROUBLESHOOTING_CONTAINER_ID)
-    if (!container) return
-
-    const entries = Array.from(
-      container.querySelectorAll(
-        `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
-      )
-    ) as HTMLElement[]
-    allEntries.current = entries
-  }, [])
 
   const allErrorCodes: string[] = useMemo(
     () =>
@@ -204,10 +192,14 @@ function TroubleshootingFilterInternal({
   return (
     <>
       <h2 className="sr-only">Search and filter</h2>
-      <div className={cn('flex flex-wrap gap-2 items-center', className)}>
+      <div className={cn('flex flex-nowrap gap-2 items-center w-full', className)}>
         {!!products && (
-          <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
-            <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Products" />
+          <MultiSelector
+            className="min-w-0 flex-1 w-full"
+            values={selectedProducts}
+            onValuesChange={setSelectedProducts}
+          >
+            <MultiSelector.Trigger badgeLimit={1} className="w-full min-w-0" label="Products" />
             <MultiSelector.Content>
               <MultiSelector.List>
                 {products?.map((product) => (
@@ -219,8 +211,12 @@ function TroubleshootingFilterInternal({
             </MultiSelector.Content>
           </MultiSelector>
         )}
-        <MultiSelector values={selectedErrorCodes} onValuesChange={setSelectedErrorCodes}>
-          <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Error codes" />
+        <MultiSelector
+          className="min-w-0 flex-1 w-full"
+          values={selectedErrorCodes}
+          onValuesChange={setSelectedErrorCodes}
+        >
+          <MultiSelector.Trigger badgeLimit={1} className="w-full min-w-0" label="Error codes" />
           <MultiSelector.Content>
             <MultiSelector.List>
               {allErrorCodes.map((error) => (
@@ -231,8 +227,12 @@ function TroubleshootingFilterInternal({
             </MultiSelector.List>
           </MultiSelector.Content>
         </MultiSelector>
-        <MultiSelector values={selectedTags} onValuesChange={setSelectedTags}>
-          <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Tags" />
+        <MultiSelector
+          className="min-w-0 flex-1 w-full"
+          values={selectedTags}
+          onValuesChange={setSelectedTags}
+        >
+          <MultiSelector.Trigger badgeLimit={1} className="w-full min-w-0" label="Tags" />
           <MultiSelector.Content>
             <MultiSelector.List>
               {keywords?.map((keyword) => (
@@ -243,13 +243,13 @@ function TroubleshootingFilterInternal({
             </MultiSelector.List>
           </MultiSelector.Content>
         </MultiSelector>
-        <div className="relative">
+        <div className="relative min-w-0 flex-1">
           <Input
             id="troubleshooting-search"
             ref={searchInputRef}
             type="text"
             placeholder="Search by keyword"
-            className="pl-8 pr-8 h-[40px] w-60 rounded-md border-alternative placeholder:text-foreground-light"
+            className="pl-8 pr-8 h-[40px] w-full rounded-md border-alternative placeholder:text-foreground-light"
             value={searchState}
             onChange={(e) => setSearchState(e.target.value)}
           />
@@ -274,14 +274,49 @@ function TroubleshootingFilterInternal({
         </div>
         <Button_Shadcn_
           variant="outline"
-          className="rounded-md text-foreground-light h-[40px] w-[40px] p-0"
+          className="rounded-md text-foreground-light h-[40px] w-[40px] p-0 shrink-0"
           onClick={reset}
         >
           <RotateCw size={16} />
           <span className="sr-only">Reset filters</span>
         </Button_Shadcn_>
+        {enableGroupBy && <TroubleshootingGroupByControl />}
       </div>
     </>
+  )
+}
+
+function TroubleshootingGroupByControl() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [state] = useQueryStates(troubleshootingSearchParams)
+
+  function setGroup(group: TroubleshootingGroupBy) {
+    router.push(
+      serializeTroubleshootingSearchParams(`${pathname}${window.location.search}`, { group })
+    )
+  }
+
+  const selectedGroup: TroubleshootingGroupBy = state.group === 'type' ? 'type' : 'product'
+
+  return (
+    <div className="min-w-0 flex-1">
+      <Select
+        value={selectedGroup}
+        onValueChange={(value) => setGroup(value as TroubleshootingGroupBy)}
+      >
+        <SelectTrigger
+          aria-label="Group by"
+          className="w-full h-[40px] rounded-md border-alternative text-foreground-light"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="product">Group by product</SelectItem>
+          <SelectItem value="type">Group by type</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
   )
 }
 
@@ -294,30 +329,32 @@ export function TroubleshootingFilterEmptyState() {
 }
 
 function TroubleshootingFilterEmptyStateInternal() {
-  const allEntries = useRef<HTMLElement[] | undefined>(undefined)
   const { selectedProducts, selectedErrorCodes, selectedTags, searchState, reset } =
     useTroubleshootingSearchState()
 
   const [numberResults, setNumberResults] = useState<number | undefined>(undefined)
 
   useEffect(() => {
-    const container = document.getElementById(TROUBLESHOOTING_CONTAINER_ID)
-    if (!container) return
+    const updateResultCount = () => {
+      const entries = getTroubleshootingEntries()
+      if (!entries) return
 
-    const entries = Array.from(
-      container.querySelectorAll(
-        `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
-      )
-    ) as HTMLElement[]
+      const numberEntries = entries.filter((entry) =>
+        troubleshootingEntryMatchesFilter(
+          entry,
+          selectedProducts,
+          selectedErrorCodes,
+          selectedTags,
+          searchState
+        )
+      ).length
+      setNumberResults(numberEntries)
+    }
 
-    allEntries.current = entries
-  }, [])
-
-  useEffect(() => {
-    if (!allEntries.current) return
-
-    const numberEntries = allEntries.current.filter((entry) => !entry.hidden).length
-    setNumberResults(numberEntries)
+    updateResultCount()
+    const observer = new MutationObserver(updateResultCount)
+    observer.observe(document.body, { childList: true, subtree: true })
+    return () => observer.disconnect()
   }, [searchState, selectedProducts, selectedErrorCodes, selectedTags])
 
   return numberResults === 0 ? (
@@ -347,44 +384,50 @@ export function TroubleshootingListController() {
 }
 
 function TroubleshootingListControllerInternal() {
-  const allEntries = useRef<HTMLElement[]>([])
-
   const { selectedProducts, selectedErrorCodes, selectedTags, searchState } =
     useTroubleshootingSearchState()
 
   useEffect(() => {
-    const container = document.getElementById(TROUBLESHOOTING_CONTAINER_ID)
-    if (!container) return
+    const updateEntryVisibility = () => {
+      const entries = getTroubleshootingEntries()
+      if (!entries) return
 
-    const entries = Array.from(
-      container.querySelectorAll(
-        `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
+      if (
+        !searchState &&
+        selectedProducts.length === 0 &&
+        selectedErrorCodes.length === 0 &&
+        selectedTags.length === 0
+      ) {
+        entries.forEach((entry) => {
+          entry.hidden = false
+        })
+      } else {
+        entries.forEach((entry) => {
+          entry.hidden = !troubleshootingEntryMatchesFilter(
+            entry,
+            selectedProducts,
+            selectedErrorCodes,
+            selectedTags,
+            searchState
+          )
+        })
+      }
+
+      const groups = document.querySelectorAll<HTMLElement>(
+        `[${TROUBLESHOOTING_DATA_ATTRIBUTES.GROUP_ATTRIBUTE}]`
       )
-    ) as HTMLElement[]
-    allEntries.current = entries
-  }, [])
-
-  useEffect(() => {
-    if (
-      !searchState &&
-      selectedProducts.length === 0 &&
-      selectedErrorCodes.length === 0 &&
-      selectedTags.length === 0
-    ) {
-      allEntries.current.forEach((entry) => {
-        entry.style.removeProperty('display')
-      })
-    } else {
-      allEntries.current.forEach((entry) => {
-        if (
-          entryMatchesFilter(entry, selectedProducts, selectedErrorCodes, selectedTags, searchState)
-        ) {
-          entry.style.removeProperty('display')
-        } else {
-          entry.style.display = 'none'
-        }
+      groups.forEach((group) => {
+        const groupEntries = group.querySelectorAll<HTMLElement>(
+          `[${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE}="${TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_VALUE_ENTRY}"]`
+        )
+        group.hidden = Array.from(groupEntries).every((entry) => entry.hidden)
       })
     }
+
+    updateEntryVisibility()
+    const observer = new MutationObserver(updateEntryVisibility)
+    observer.observe(document.body, { childList: true, subtree: true })
+    return () => observer.disconnect()
   }, [searchState, selectedProducts, selectedErrorCodes, selectedTags])
 
   return null

@@ -1,5 +1,7 @@
 ---
 title = "Using SQLAlchemy with Supabase"
+summary = "SQLAlchemy connection errors and excess connections often come from using a persistent client pool in auto-scaling environments or the wrong Supavisor mode."
+diagnostic_sources = [ "client-tracing", "supavisor-logs", "postgres-logs", "metrics", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/27071"
 date_created = "2024-06-06T16:27:43+00:00"
 topics = [ "database", "supavisor", "self-hosting" ]

@@ -1,5 +1,7 @@
 ---
 title = "Storage error: 403 Forbidden: 'new row violates row-level security policy' on upload"
+summary = "A Storage upload returns 403 when the object INSERT or its required RETURNING read is not permitted by the policies on storage.objects."
+diagnostic_sources = [ "storage-logs", "postgres-logs", "database-inspection" ]
 date_created = "2026-06-19T09:05:11+00:00"
 topics = [ "auth", "database", "storage" ]
 keywords = []
@@ -9,14 +11,27 @@ message = "Forbidden"
 
 ---
 
-If you are observing a 403 Forbidden error with the message 'new row violates row-level security policy' when uploading files, it typically indicates that the database cannot return the metadata for the newly created object. This can happen even if your INSERT policies are correctly defined and the user's JWT is valid.
+## Symptoms
 
-**Why Does This Happen?**
-The Supabase Storage API executes an `INSERT` operation followed by a `RETURNING *` clause to provide object details back to the client. If a **SELECT** RLS policy is missing or does not cover the object being uploaded, the database is unable to return the row metadata. This results in a policy violation that causes the entire transaction to fail.
+A Storage upload returns HTTP `403` with `new row violates row-level security policy`.
 
-**How to Resolve:**
-Add a **SELECT** RLS policy to the `example_schema.example_table` (specifically `storage.objects`) that mirrors your `INSERT` requirements. Ensure the policy allows the authenticated user to read the record they are currently creating.
+## Confirm the cause
 
-- For example, if your INSERT policy is restricted to `auth.uid()`, your SELECT policy must also permit access based on `auth.uid()` or the specific bucket and path.
+1. Confirm that the request includes a valid user session and record the user's ID, bucket, object path, and whether the upload uses `upsert`.
+2. Inspect the [Storage logs](/dashboard/project/_/logs/storage-logs) and [Postgres logs](/dashboard/project/_/logs/postgres-logs) for the same request.
+3. Review the policies on `storage.objects` in the [policy editor](/dashboard/project/_/auth/policies) or query `pg_policies`.
+4. Match the request to the required operation:
+   - A new upload requires an `INSERT` policy whose `WITH CHECK` expression accepts the bucket, path, and user.
+   - Overwriting with `upsert` additionally requires `SELECT` and `UPDATE` policies.
 
-You can manage your RLS policies via the [Dashboard](/dashboard/project/_/auth/policies) or the [SQL editor](/dashboard/project/_/sql/new).
+## Resolve
+
+Create or correct only the policies required by the intended operation. Follow [Storage access control](/docs/guides/storage/security/access-control) and use Storage helper functions to constrain bucket and folder access. Do not add a broad `SELECT` policy to fix a new upload that does not use `upsert`; first correct the rejected `INSERT` expression or the request's session, bucket, and path.
+
+## Verify
+
+Repeat the upload with the same authenticated user and path. Confirm that it succeeds, then test another user or path that should remain unauthorized. For `upsert`, verify both creating a new object and overwriting an existing object.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the logs show the expected role and policy inputs but Postgres evaluates a different identity, bucket, or path. Include the project reference, timestamp, operation, sanitized policy definitions, and redacted object path. Do not include JWTs or Storage credentials.

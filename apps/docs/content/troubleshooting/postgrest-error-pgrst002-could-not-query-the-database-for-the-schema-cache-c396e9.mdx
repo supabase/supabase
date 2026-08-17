@@ -1,5 +1,7 @@
 ---
 title = "PostgREST error: {PGRST002: Could not query the database for the schema cache}"
+summary = "PostgREST cannot rebuild its schema cache when the Data API configuration still names a schema that no longer exists."
+diagnostic_sources = [ "api-logs", "postgres-logs", "database-inspection" ]
 date_created = "2026-05-19T10:04:53+00:00"
 topics = [ "database" ]
 keywords = [ "postgrest" ]

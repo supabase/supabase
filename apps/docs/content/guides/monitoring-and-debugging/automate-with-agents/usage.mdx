@@ -1,0 +1,28 @@
+---
+id: 'automate-with-agents-usage'
+title: 'Accountant'
+subtitle: 'Accountant is a read-only usage agent. It trends API request volume and error rates, then warns before traffic or errors look like a capacity problem.'
+description: 'A capacity agent that tracks API request growth, error rates, and approaching resource ceilings.'
+---
+
+## What it watches
+
+- API request growth against a recent baseline
+- Server-error rate increases
+- Disk, connection, or table growth when database inspection is available
+
+It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai-tools/mcp) and the [Management API usage endpoints](/docs/reference/api/v1-get-project-usage-api-count) when those are already authorized. It does not change billing, compute, or plan settings. MCP does not expose organization billing totals.
+
+## When it watches
+
+Run it once per day on a schedule. Run it on demand after an unexpected traffic change.
+
+## What it will output
+
+Accountant reports request growth, error-rate changes, and resource trends. If a metric looks likely to hit a limit within 14 days, it flags the date and the relevant scaling guide.
+
+<$Partial path="monitoring_agent_output.mdx" />
+
+## Copy the prompt
+
+<AiPrompt id="monitoring-agent-usage" includeInMarkdown />

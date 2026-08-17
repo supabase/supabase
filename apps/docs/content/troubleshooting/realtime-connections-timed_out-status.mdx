@@ -3,16 +3,29 @@ title = "Realtime connections giving `TIMED_OUT` errors"
 topics = [ "realtime" ]
 keywords = []
 database_id = "b99fac0e-09da-4a31-93a1-6375ed8ce041"
+summary = "Realtime connections can time out when the installed client transport is incompatible with the Node.js runtime."
+diagnostic_sources = [ "client-tracing", "realtime-logs" ]
 ---
 
-If your Realtime connections in your application are giving `TIMED_OUT` errors, this often indicates an incompatibility between the version of `realtime-js` being used in your `supabase-js` client library package and your Node.js version. This issue happens when using versions of Node.js older than v22 with more recent versions of `supabase-js`.
+## Symptoms
 
-**Why This Occurs:**
-This happens due to a fundamental change made to fix various issues. See more details on why this change was made and solutions to fix it: https://github.com/orgs/supabase/discussions/37869
+Realtime connections return `TIMED_OUT` when using a recent `@supabase/supabase-js` version on Node.js versions earlier than 22.
 
-**How to Resolve This:**
+## Confirm the cause
 
-There are two primary options to fix this:
+Record the Node.js and `@supabase/supabase-js` versions in the affected environment. If the same client connects on Node.js 22 or later, the transport compatibility is the likely cause. See [GitHub Discussion 37869](https://github.com/orgs/supabase/discussions/37869) for the underlying client change.
 
-1. **Upgrade Node.js**: Upgrade your Node.js version to the latest Long Term Support (LTS) release, such as Node.js v24 as of November 2025.
-2. **Explicitly set the WebSocket transport**: See the linked GitHub discussion above for a detailed guide on doing this.
+## Resolve
+
+Choose one option:
+
+1. Upgrade the runtime to Node.js 22 or later.
+2. Explicitly configure a compatible WebSocket transport as described in [GitHub Discussion 37869](https://github.com/orgs/supabase/discussions/37869).
+
+## Verify
+
+Restart the application and confirm the channel reaches `SUBSCRIBED` without a `TIMED_OUT` status.
+
+## Escalate
+
+If the timeout persists on a supported Node.js version, capture the client logger output and corresponding [Realtime logs](/dashboard/project/_/logs/realtime-logs), then [open a support ticket](/dashboard/support/new).

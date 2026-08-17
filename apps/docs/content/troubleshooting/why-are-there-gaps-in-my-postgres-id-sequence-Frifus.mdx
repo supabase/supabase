@@ -1,5 +1,7 @@
 ---
 title = "Why are there gaps in my Postgres id sequence?"
+summary = "Postgres sequences guarantee unique values but leave gaps after rollbacks, failed inserts, caching, or manual sequence advancement."
+diagnostic_sources = [ "database-inspection", "postgres-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/22299"
 date_created = "2024-03-27T18:04:39+00:00"
 topics = [ "database" ]

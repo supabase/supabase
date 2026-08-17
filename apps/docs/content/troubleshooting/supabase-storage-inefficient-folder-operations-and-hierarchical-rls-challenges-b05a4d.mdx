@@ -3,6 +3,8 @@ title = "Supabase Storage: Inefficient folder operations and hierarchical RLS ch
 topics = [ "storage" ]
 keywords = []
 database_id = "3b52daf2-d78d-4630-8e9f-8bf5d90208bf"
+summary = "Folder-scale Storage operations become expensive because object paths are flat keys and each object is authorized individually through RLS."
+diagnostic_sources = [ "storage-logs", "database-inspection" ]
 ---
 
 Supabase Storage lacks native folder concepts or APIs for batch folder operations, which can lead to inefficient folder operations (move, rename, delete) and difficulties in implementing hierarchical access controls for objects.
@@ -19,7 +21,7 @@ To overcome these limitations and implement robust folder management with hierar
 - **Reference `storage.objects` within your custom metadata.** Store a reference to `storage.objects.id` in your custom table to link files to their respective folders.
 - **Implement RLS policies on `storage.objects`.** These policies must `JOIN` with your custom metadata table to enforce hierarchical access permissions based on your defined folder structure.
 - **Handle batch folder operations via your metadata table.** For operations like moving or renaming folders, update the relevant entries in your custom metadata table. Note that actual file paths in Storage are not directly altered by these operations.
-- **Optimize RLS policies for performance.** `JOIN`s in RLS policies can lead to performance degradation, especially with large datasets. Ensure proper indexing on your custom metadata table and consider using `SECURITY DEFINER` functions to optimize policy execution.
+- **Optimize RLS policies for performance.** `JOIN`s in RLS policies can slow authorization checks on large datasets. Add indexes for columns used by policies and inspect the query plan. Do not add `SECURITY DEFINER` only to bypass a policy error; privileged functions require separate authorization checks and restricted execute permissions.
 
 ## Alternative approach: Using the S3 protocol for bulk operations
 
@@ -38,11 +40,11 @@ aws configure --profile supabase-s3
 Download files from a bucket or prefix:
 
 ```shell
-aws s3 cp s3://bucket-name/folder-name ./download-target
---profile supabase-s3
---endpoint-url https://<project-ref>.supabase.co/storage/v1/s3
---recursive
---region <region>
+aws s3 cp s3://bucket-name/folder-name ./download-target \
+  --profile supabase-s3 \
+  --endpoint-url https://<project-ref>.supabase.co/storage/v1/s3 \
+  --recursive \
+  --region <region>
 ```
 
 - Replace `bucket-name` with your bucket name.
@@ -54,11 +56,11 @@ aws s3 cp s3://bucket-name/folder-name ./download-target
 Move or rename files using the `mv` command. Because folders in Supabase Storage are implemented as prefixes, renaming a folder is effectively moving objects from one prefix to another.
 
 ```shell
-aws s3 mv s3://bucket-name-one/folder-name-one s3://bucket-name-two/folder-name-two
---profile supabase-s3
---endpoint-url https://<project-ref>.supabase.co/storage/v1/s3
---recursive
---region <region>
+aws s3 mv s3://bucket-name-one/folder-name-one s3://bucket-name-two/folder-name-two \
+  --profile supabase-s3 \
+  --endpoint-url https://<project-ref>.supabase.co/storage/v1/s3 \
+  --recursive \
+  --region <region>
 ```
 
 This method is useful for large-scale downloads, migrations, or reorganizing files within a bucket.

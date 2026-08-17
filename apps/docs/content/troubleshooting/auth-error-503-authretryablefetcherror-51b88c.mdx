@@ -1,5 +1,7 @@
 ---
 title = "Auth error: 503 AuthRetryableFetchError"
+summary = "AuthRetryableFetchError with HTTP 503 occurs when the Auth service cannot initialize, most often because it cannot load a valid configuration."
+diagnostic_sources = [ "auth-logs" ]
 date_created = "2026-05-07T09:19:37+00:00"
 topics = [ "auth" ]
 keywords = []
@@ -9,17 +11,20 @@ message = "AuthRetryableFetchError"
 
 ---
 
-A `503` status code accompanied by an `AuthRetryableFetchError` typically indicates that the Auth (GoTrue) service is failing to initialize because it cannot load its configuration.
+## Symptoms
 
-**Why Does This Happen?**
-This issue is most commonly caused by an invalid duration string in the `GOTRUE_SESSIONS_TIMEBOX` setting. This occurs if the configured value:
+Auth requests return HTTP `503` with `AuthRetryableFetchError`, often across multiple sign-in and user operations.
+
+## Confirm the cause
+
+Inspect the [Auth logs](/dashboard/project/_/logs/auth-logs). If service startup reports an invalid session timebox duration, the value corresponding to `GOTRUE_SESSIONS_TIMEBOX` cannot be parsed or exceeds the supported range. Common causes are:
 
 - Exceeds the maximum supported duration (approximately hundreds of years).
 - Uses an incorrect or unsupported time unit format.
 
-When the service encounters an invalid configuration value during startup, it fails to initialize, resulting in fetch errors for all authentication requests.
+If the Auth logs show a different startup error, follow that evidence instead of changing the session timebox.
 
-**How to Resolve:**
+## Resolve
 
 1. Navigate to the [Sessions](/dashboard/project/_/auth/sessions) settings in the dashboard.
 2. Locate the **Timebox** duration field within the **User Sessions** section.
@@ -27,3 +32,11 @@ When the service encounters an invalid configuration value during startup, it fa
 4. Save your changes.
 
 Updating this field triggers a configuration reload, which allows the Auth service to restart and resume normal operation.
+
+## Verify
+
+Repeat an Auth health check and the original user operation. Confirm that both succeed and that the Auth logs no longer contain the configuration parse or startup error.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the timebox is valid or reset to its default and the Auth service still cannot initialize. Include the project reference, timestamp, sanitized `503` response, and Auth startup log message.

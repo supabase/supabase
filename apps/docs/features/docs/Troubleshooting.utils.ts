@@ -6,6 +6,7 @@ import { z } from 'zod'
 import {
   getAllTroubleshootingEntriesInternal,
   getArticleSlug as getArticleSlugInternal,
+  TROUBLESHOOTING_DIAGNOSTIC_SOURCES,
   TROUBLESHOOTING_DIRECTORY,
   TroubleshootingSchema,
 } from './Troubleshooting.utils.common.mjs'
@@ -24,6 +25,13 @@ export interface ITroubleshootingEntry {
 }
 
 export const getArticleSlug = getArticleSlugInternal
+export { TROUBLESHOOTING_DIAGNOSTIC_SOURCES }
+
+export function getTroubleshootingDiagnosticSourceLabel(source: string) {
+  return TROUBLESHOOTING_DIAGNOSTIC_SOURCES[
+    source as keyof typeof TROUBLESHOOTING_DIAGNOSTIC_SOURCES
+  ]
+}
 
 async function getAllTroubleshootingEntriesTyped() {
   const result: ITroubleshootingEntry[] =

@@ -1,5 +1,7 @@
 ---
-title = "Increase vector lookup speeds by applying an HSNW index"
+title = "Increase vector lookup speeds by applying an HNSW index"
+summary = "Vector searches remain slow when the embedding column lacks an HNSW index that matches the query's distance operator."
+diagnostic_sources = [ "database-inspection", "performance-advisor", "metrics" ]
 github_url = "https://github.com/orgs/supabase/discussions/21379"
 date_created = "2024-02-20T05:32:05+00:00"
 topics = [ "database", "ai", "platform" ]
@@ -9,9 +11,9 @@ database_id = "7d755701-747f-4c3a-b8be-236c5518e4eb"
 
 > Although this guide is specifically for HNSW indexes, it can be generalized to work for any index type
 
-> Building an index without the `CONCURRENTLY` modifier will lock the table, but it will also increase build times. For general advice about indexes, check out this [guide](https://github.com/orgs/supabase/discussions/22449).
+> Building an index without the `CONCURRENTLY` modifier blocks writes but usually finishes sooner. `CREATE INDEX CONCURRENTLY` reduces write disruption but takes longer and uses more resources. For general advice, see [Postgres indexes](/docs/guides/database/postgres/indexes).
 
-## **To speed up queries, it is ideal to create an HSNW index on your embedded column**
+## Create an HNSW index on the embedding column
 
 The general structure for creating an HNSW index follows this pattern:
 
@@ -30,9 +32,9 @@ Queries can only use the index if it matches the search type used. If you are un
 
 Applying an index can be slow and computationally expensive, so there are a few preparations that should be made beforehand:
 
-**1. Make sure your pgvector is the latest available version on Supabase.**
+**1. Use an available pgvector version that supports HNSW.**
 
-Versions 0.6 and later have accelerated HNSW build speeds. You can observe your current version in the [Dashboard's Extensions Page](/dashboard/project/_/database/extensions). You can perform a software upgrade in the [General Settings](/dashboard/project/_/settings/general) if necessary.
+Check the installed version on the [Extensions page](/dashboard/project/_/database/extensions). Install available database software updates from [Infrastructure Settings](/dashboard/project/_/settings/infrastructure) before a large build when the installed release lacks a required fix.
 
 **2. Setting up an external connection**
 
@@ -104,7 +106,7 @@ If your task is particularly long, you can speed it up by boosting your computin
 
 **7. Consider increasing disk size (optional)**
 
-HSNW indexes can produce temporary files during their construction that may consume a few GBs worth of disk.
+HNSW indexes can produce temporary files during construction that consume additional disk space.
 Consider increasing the disk size in the [Infrastructure settings](/dashboard/project/_/settings/infrastructure) to accommodate for short-term disk stress.
 
 <img

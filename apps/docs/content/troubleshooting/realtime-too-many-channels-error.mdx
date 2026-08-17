@@ -1,20 +1,22 @@
 ---
-title = "Fixing the TooManyChannels Error"
+title = "Fixing Realtime ChannelRateLimitReached errors"
 date_created = "2025-11-28T00:00:00+00:00"
 topics = [ "realtime" ]
 keywords = [ "channels", "useEffect", "react", "memory leak", "quota", "TooManyChannels", "ChannelRateLimitReached", "unsubscribe", "cleanup" ]
 database_id = "dee93cc3-0ab1-4101-8ad4-31d8682c8844"
+summary = "ChannelRateLimitReached occurs when an application creates or joins channels too quickly, often because it does not remove old channels."
+diagnostic_sources = [ "client-tracing", "realtime-logs" ]
 ---
 
 {/* supa-mdx-lint-disable Rule003Spelling */}
 
-## What is the TooManyChannels error?
+## Symptoms
 
-The TooManyChannels error occurs when your application tries to create more than the allowed number of Realtime channels. When you exceed this limit, you'll see an error with the code `ChannelRateLimitReached`.
+`ChannelRateLimitReached` occurs when your application creates or joins Realtime channels faster than the project limit permits.
 
 This limit exists to protect both your application and Supabase servers from resource exhaustion.
 
-## What causes TooManyChannels errors?
+## Confirm the cause
 
 {/* supa-mdx-lint-enable Rule003Spelling */}
 The most common cause is accidentally creating channels without cleaning them up, especially in React applications. This happens when:
@@ -29,7 +31,7 @@ The most common cause is accidentally creating channels without cleaning them up
 
 Each time you call `supabase.channel('topic').subscribe()`, a new channel is created unless you properly clean it up.
 {/* supa-mdx-lint-disable Rule003Spelling */}
-Here's the most common mistake that might lead to TooManyChannels errors:
+Here's the most common mistake that can lead to `ChannelRateLimitReached` errors:
 {/* supa-mdx-lint-enable Rule003Spelling */}
 
 ```tsx
@@ -60,12 +62,12 @@ Why this fails:
 - No cleanup function to unsubscribe the channel
 - Each render creates a new channel that's never removed
 
-## The correct approach
+## Resolve
 
 ```tsx
 // ✅ CORRECT - Properly manages channel lifecycle
-import { useEffect } from 'react'
 import { createClient } from '@supabase/supabase-js'
+import { useEffect } from 'react'
 
 // Create client outside component (singleton)
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -89,7 +91,7 @@ function ChatRoom() {
 }
 ```
 
-## How to debug channel creation
+## Verify
 
 Check how many channels your app has created:
 
@@ -175,17 +177,9 @@ function GoodExample({ userId }) {
 }
 ```
 
-### 4. Reuse channels when possible
+### 4. Share channel instances when possible
 
-The Supabase client automatically reuses channels with the same topic:
-
-```tsx
-// These return the same channel instance
-const channel1 = supabase.channel('chat')
-const channel2 = supabase.channel('chat') // Same as channel1
-
-console.log(channel1 === channel2) // true
-```
+Each call to `supabase.channel('chat')` creates a channel instance. Create the channel once and share that instance among consumers instead of calling `channel()` repeatedly for the same topic.
 
 ### 5. Handle strict mode in development
 
@@ -244,3 +238,7 @@ function LogoutButton() {
   return <button onClick={handleLogout}>Logout</button>
 }
 ```
+
+## Escalate
+
+If the active channel count remains stable but `ChannelRateLimitReached` continues, capture the client logger output and corresponding [Realtime logs](/dashboard/project/_/logs/realtime-logs), then [open a support ticket](/dashboard/support/new).

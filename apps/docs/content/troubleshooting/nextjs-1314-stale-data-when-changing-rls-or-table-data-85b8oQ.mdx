@@ -1,5 +1,7 @@
 ---
 title = "Next.js 13/14 stale data when changing RLS or table data."
+summary = "Next.js request caching can return stale Supabase query results after table or RLS changes even though the database has the updated data."
+diagnostic_sources = [ "api-logs", "client-tracing" ]
 github_url = "https://github.com/orgs/supabase/discussions/19084"
 date_created = "2023-11-19T19:33:06+00:00"
 topics = [ "auth", "platform" ]

@@ -3,14 +3,18 @@ title = "Issues serving Edge Functions locally"
 topics = [ "functions", "cli" ]
 keywords = [ "local", "serve", "development", "debug", "port", "edge function" ]
 database_id = "1cff12df-7ad6-48c5-b518-5ea468b54bab"
+summary = "Local serving can fail because of a port conflict, dependency-resolution error, or missing environment variable."
+diagnostic_sources = [ "client-tracing" ]
 
 [api]
 cli = [ "supabase-functions-serve" ]
 ---
 
-If `supabase functions serve` fails or you're having trouble running Edge Functions locally, follow these steps to diagnose and resolve the issue.
+## Symptoms
 
-## Debugging steps
+`supabase functions serve` exits, cannot bind a port, cannot resolve a dependency, or starts without the expected environment variables.
+
+## Confirm the cause
 
 ### Use debug mode
 
@@ -34,7 +38,7 @@ lsof -i :8081
 
 If these ports are in use, stop the processes using them or configure different ports.
 
-## Common issues
+## Resolve
 
 ### Port conflicts
 
@@ -56,14 +60,18 @@ deno cache --reload /path/to/function/index.ts
 
 Make sure your `.env` file is properly configured and accessible to the CLI.
 
-## Getting more help
+## Verify
+
+Run `supabase functions serve your-function` again and invoke the local function. Confirm that it returns the expected response without errors in the CLI output.
+
+## Escalate
 
 If the problem persists, search the following repositories for similar error messages:
 
 - [Edge Runtime repository](https://github.com/supabase/edge-runtime)
 - [CLI repository](https://github.com/supabase/cli)
 
-If the output from these commands does not help resolve the issue, open a support ticket via the Supabase Dashboard (by clicking the "Help" button at the top right) and include all output and details about your commands.
+If the output from these commands does not identify the failure, [open a support ticket](/dashboard/support/new) and include the command and its complete output.
 
 ## Additional resources
 

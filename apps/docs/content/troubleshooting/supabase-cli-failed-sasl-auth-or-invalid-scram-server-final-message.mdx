@@ -1,32 +1,44 @@
 ---
 title = "Supabase CLI: \"failed SASL auth\" or \"invalid SCRAM server-final-message\""
+summary = "CLI database commands fail SASL or SCRAM authentication when the supplied database password is missing, stale, or altered by shell interpolation."
+diagnostic_sources = [ "postgres-logs", "client-tracing", "database-inspection" ]
 topics = [ "auth", "cli", "database", "supavisor" ]
 keywords = []
 database_id = "4a32736f-1d7f-4c41-9c96-ab84e35ad394"
 ---
 
-When executing `supabase db push` or `supabase link` or any other authenticated actions from the Supabase CLI, you might encounter an authentication error with messages such as `failed SASL auth (invalid SCRAM server-final-message received from server)`.
+## Symptoms
 
-**Why This Occurs:**
-This typically indicates an authentication failure where the database connection pooler (Supavisor) in certain scenarios may be incorrectly caching credentials for the internal Supabase role `cli_login_postgres` used for password-less flows with the CLI. This can lead to the your IP being temporarily banned from repeated failed attempts to connect.
+`supabase link`, `supabase db push`, or another remote database command returns `failed SASL auth` or `invalid SCRAM server-final-message received from server`.
 
-**To resolve this, consider one of the following solutions:**
+## Confirm the cause
 
-1.  **Check Network Bans:**
-    - Navigate to your project's [Database Settings](/dashboard/project/_/database/settings) page.
-    - Review any listed IP addresses that are blocked. Remove any entries that correspond to your current connection and then try the CLI action again.
+1. Confirm that the CLI is linked to the intended project with `supabase projects list` and `supabase status` for the local stack.
+2. Retry the command and enter the current database password at the prompt. A Management API access token is not the database password.
+3. If authentication repeatedly fails, check [Database Settings](/dashboard/project/_/database/settings) for a temporary network ban affecting your current IP.
+4. If password-based authentication succeeds but passwordless pooler authentication fails, test a direct IPv6 connection with `supabase link --skip-pooler`.
 
-2.  **Use the old Password-Based authentication flow instead:**
-    - Provide your database password directly through an environment variable when running the CLI command.
+## Resolve
 
-    ```bash
-    SUPABASE_DB_PASSWORD=<your-database-password> supabase db push
-    ```
+- Reset the database password when you no longer know the current value, then relink the project.
+- Remove a network ban only after confirming that the listed address is yours and correcting the failed credentials that caused it.
+- For non-interactive environments, supply the database password as documented. Quote the value so the shell does not interpret special characters:
 
-3.  **Skip the Pooler and connect directly to the database with the Supabase CLI (Requires IPv6):**
-    - If your network supports IPv6, you can use the beta CLI version with the `--skip-pooler` flag to bypass the connection pooler to avoid this particular issue. Install options are documented under [Beta channel](/docs/guides/local-development/cli/getting-started#beta-channel) in the CLI getting started guide.
+  ```bash
+  SUPABASE_DB_PASSWORD='your-database-password' supabase db push
+  ```
 
-    ```bash
-    npx supabase@beta link --skip-pooler
-    npx supabase@beta db push
-    ```
+- If your network supports IPv6 and the pooler path is the confirmed cause, link through the direct database connection:
+
+  ```bash
+  supabase link --project-ref your-project-ref --skip-pooler
+  supabase db push
+  ```
+
+## Verify
+
+Repeat the original CLI command. Confirm that it authenticates to the intended project and that the expected migration or inspection completes. Recheck the network-ban list to ensure the corrected workflow is not generating new failed attempts.
+
+## Escalate
+
+If the current password works through one connection path but the CLI still reports SASL or SCRAM failures through another, rerun the command with `--debug --create-ticket` and open a [support ticket](/dashboard/support/new) with the ticket ID. Do not paste passwords, access tokens, or complete connection strings into logs or the ticket.

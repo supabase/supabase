@@ -3,6 +3,8 @@ title = "Edge Function 404 error response"
 topics = [ "functions" ]
 keywords = [ "404", "error" ]
 database_id = "a3cfff33-d640-4395-99bc-a110b7fb637c"
+summary = "A 404 occurs when the requested function name is unknown, its deployment bundle is unavailable, or the function code returns 404."
+diagnostic_sources = [ "edge-function-logs", "client-tracing" ]
 
 [[errors]]
 http_status_code = 404
@@ -80,22 +82,19 @@ Always configure an appropriate time frame when using the log explorer
 
 </Admonition>
 
-You cannot inspect the function dashboard to find platform 404 errors, instead, run the below query in the [log explorer](</dashboard/project/_/logs/explorer?its=&ite=&s=select+distinct%0A++req.pathname+as+function_name,%0A++res.status_code,%0A++CASE+%0A++++WHEN+metadata.execution_id+is+null+THEN+%27FUNCTION_NOT_FOUND%27%0A++++ELSE+%27FUNCTION+RECOGNIZED:+custom+404+message+in+app+logic%27%0A++END+AS+type_of_404%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST(metadata)+as+metadata%0A++cross+join+UNNEST(metadata.request)+as+req%0A++cross+join+UNNEST(metadata.response)+as+res%0Awhere+status_code+=+404%0Alimit+10;>). The results show all requests that reached Supabase but were rejected as unrecognizable.
+The function dashboard does not show platform 404 errors. Run this query in [Logs Explorer](/dashboard/project/_/logs/explorer) to distinguish requests rejected before execution from 404 responses returned by your code:
 
 ```sql
 select distinct
-  req.pathname as function_name,
-  res.status_code,
+  log_attributes['request.pathname'] as function_name,
+  toInt32OrZero(log_attributes['response.status_code']) as status_code,
   case
-    when metadata.execution_id is null then 'FUNCTION_NOT_FOUND'
+    when log_attributes['execution_id'] = '' then 'FUNCTION_NOT_FOUND'
     else 'FUNCTION RECOGNIZED: custom 404 message in app logic'
   end as type_of_404
-from
-  function_edge_logs
-  cross join UNNEST(metadata) as metadata
-  cross join UNNEST(metadata.request) as req
-  cross join UNNEST(metadata.response) as res
-where status_code = 404
+from logs
+where source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) = 404
 limit 10;
 ```
 

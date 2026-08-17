@@ -1,5 +1,7 @@
 ---
 title = "Should I set a shorter Max-Age parameter on the cookies?"
+summary = "Shortening a cookie's Max-Age does not shorten the server-side Auth session because session validity is controlled by refresh-token and sign-out state."
+diagnostic_sources = [ "auth-logs", "client-tracing" ]
 github_url = "https://github.com/orgs/supabase/discussions/18870"
 date_created = "2023-11-10T11:53:00+00:00"
 topics = [ "auth" ]

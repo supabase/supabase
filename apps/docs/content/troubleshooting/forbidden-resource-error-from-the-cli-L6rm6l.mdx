@@ -1,5 +1,7 @@
 ---
 title = "Forbidden resource error from the CLI"
+summary = "The CLI returns Forbidden resource when the authenticated account lacks access to the selected project or protected operation."
+diagnostic_sources = [ "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/21602"
 date_created = "2024-02-27T09:37:38+00:00"
 topics = [ "cli", "platform" ]
@@ -14,14 +16,25 @@ http_status_code = 403
 message = "Forbidden resource error"
 ---
 
-This error typically occurs as a protective measure to prevent unauthorized access to critical operations.
+## Symptoms
 
-To address this issue, we recommend following these troubleshooting steps:
+The CLI returns HTTP `403` with `Forbidden resource` while linking a project or performing a protected project operation.
 
-- Verify Project ID: Ensure the `$PROJECT_REF` variable in your commands contains the correct Project ID. You can find your Reference ID under [Project -> Settings -> General](/dashboard/project/_/settings/general) in your Supabase Dashboard. A Reference ID looks something like `xvljpkujuwroxcuvossw`.
-- Authorization Check: Confirm that you’ve been properly authorized. You can also generate a new Access Token in your dashboard and use it for login. Generate a new token [here](/dashboard/account/tokens) and use it to [log in](/docs/reference/cli/supabase-login).
-- Re-link Project: Try [re-linking](/docs/reference/cli/supabase-link) your project with the newly generated token.
-- Owner/Admin Permissions: Make sure you have [Owner/Admin](/docs/guides/platform/access-control) permissions for the project.
-- CLI Version: Ensure you are using the latest version of the Supabase CLI. If not, update to the most recent version available at [Supabase CLI GitHub](https://github.com/supabase/cli).
+## Confirm the cause
 
-If the issue persists, add a --debug --create-ticket flags to your command and contact [support](/support) with the ticket id and debug logs, which can help in diagnosing the problem further.
+1. Confirm the project reference in the command. Find the reference under [Project Settings > General](/dashboard/project/_/settings/general).
+2. Run `supabase projects list` and confirm that the authenticated account can see the project.
+3. Check that your organization role grants the permission required by the command. See [access control](/docs/guides/platform/access-control).
+4. If the token was revoked or belongs to another account, create an [access token](/dashboard/account/tokens), run [`supabase login`](/docs/reference/cli/supabase-login), and relink the project.
+
+## Resolve
+
+Use the correct project reference and an access token owned by an account with the required project permission. Update the CLI if the same authorized request works in the Dashboard but fails only on an older CLI release.
+
+## Verify
+
+Run `supabase projects list`, relink the intended project, and repeat the original operation. Confirm that the CLI operates on the expected project before applying migrations or other changes.
+
+## Escalate
+
+If the authorized account can perform the operation in the Dashboard but the CLI still returns `403`, rerun the command with `--debug --create-ticket` and open a [support ticket](/dashboard/support/new) with the ticket ID and CLI version. Do not include access tokens, database passwords, or complete connection strings.

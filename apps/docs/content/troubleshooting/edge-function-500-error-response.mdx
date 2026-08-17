@@ -2,6 +2,8 @@
 title = "Edge Function 500 error response"
 topics = [ "functions" ]
 keywords = [ "500", "Internal Server Error" ]
+summary = "A 500 occurs when function code throws an unhandled JavaScript error or deliberately returns an internal-server-error response."
+diagnostic_sources = [ "edge-function-logs" ]
 
 [[errors]]
 http_status_code = 500
@@ -21,35 +23,23 @@ If you received back the below message, then go to the [JavaScript failure](#jav
 Internal Server Error
 ```
 
-If the body contained a custom message, or nothing at all, run the below query in [Log Explorer](</dashboard/project/_/logs/explorer?q=SELECT%0A++fl.event_message,%0A++content.timestamp,%0A++fel.function_name,%0AFROM+function_logs+fl%0ALEFT+JOIN+UNNEST(fl.metadata)+AS+content+ON+TRUE%0ALEFT+JOIN+(%0A++SELECT%0A++++em.execution_id,%0A++++res.status_code,%0A++++req.pathname+AS+function_name%0A++FROM+function_edge_logs%0A++LEFT+JOIN+UNNEST(metadata)+AS+em+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.request)+AS+req+ON+TRUE%0A++LEFT+JOIN+UNNEST(em.response)+AS+res+ON+TRUE%0A)+fel+ON+content.execution_id+=+fel.execution_id%0AWHERE+%0A++fel.status_code+=+500%0A++++AND+%0A++content.level+=+%27error%27%0A++++AND%0A++++(%0A++++++content.event_type+=+%27Log%27%0A++++++++OR%0A++++++content.event_type+=+%27UncaughtException%27%0A++++)%0A++++AND%0A++fl.event_message+LIKE+%27%25Error:%25file:///%25%27%0AORDER+BY+function_name,+timestamp%0ALIMIT+50;&its=&ite=>) after setting the time range:
+If the body contained a custom message, or nothing at all, set the relevant time range and run this query in [Logs Explorer](/dashboard/project/_/logs/explorer):
 
 ```sql
 select
-  console_logs.event_message,
-  cast(invocation_events.timestamp as datetime) as timestamp,
-  invocation_events.function_name
-from
-  function_logs as console_logs
-  left join UNNEST(console_logs.metadata) as metadata on true
-  left join (
-    select
-      timestamp,
-      em.execution_id,
-      res.status_code,
-      req.pathname as function_name
-    from
-      function_edge_logs
-      left join UNNEST(metadata) as em on true
-      left join UNNEST(em.request) as req on true
-      left join UNNEST(em.response) as res on true
-  ) as invocation_events
-    on metadata.execution_id = invocation_events.execution_id
-where
-  invocation_events.status_code = 500
-  and metadata.level = 'error'
-  and metadata.event_type in ('Log', 'UncaughtException')
-  and console_logs.event_message like '%Error:%file:///%'
-order by invocation_events.function_name, invocation_events.timestamp
+  runtime.event_message,
+  runtime.timestamp,
+  invocation.log_attributes['request.pathname'] as function_name
+from logs as runtime
+inner join logs as invocation
+  on runtime.log_attributes['execution_id'] = invocation.log_attributes['execution_id']
+where runtime.source = 'function_logs'
+  and invocation.source = 'function_edge_logs'
+  and toInt32OrZero(invocation.log_attributes['response.status_code']) = 500
+  and runtime.log_attributes['level'] = 'error'
+  and runtime.log_attributes['event_type'] in ('Log', 'UncaughtException')
+  and runtime.event_message like '%Error:%file:///%'
+order by function_name, runtime.timestamp desc
 limit 50;
 ```
 

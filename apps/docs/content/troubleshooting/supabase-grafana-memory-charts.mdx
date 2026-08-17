@@ -1,5 +1,7 @@
 ---
 title = "Interpreting Supabase Grafana Memory Charts"
+summary = "Active memory that displaces database cache or fills swap can increase disk reads and query latency."
+diagnostic_sources = [ "metrics", "reports", "database-inspection" ]
 github_url = "https://github.com/orgs/supabase/discussions/27021"
 topics = [ "database" ]
 keywords = [ "Grafana", "performance", "memory" ]
@@ -35,7 +37,7 @@ npx supabase init
 npx supabase link
 
 # find cache hit rate
-npx supabase inspect db cache-hit --linked
+supabase inspect db db-stats --linked
 
 ```
 

@@ -1,5 +1,7 @@
 ---
 title = "schema \"pg_pgrst_no_exposed_schemas\" does not exist"
+summary = "Disabling the Data API can leave PostgREST looking for its placeholder exposed schema and producing harmless missing-schema log entries."
+diagnostic_sources = [ "api-logs", "postgres-logs", "database-inspection" ]
 topics = [
 "database",
 "platform"

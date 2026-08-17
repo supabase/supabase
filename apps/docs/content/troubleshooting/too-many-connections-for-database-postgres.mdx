@@ -1,27 +1,43 @@
 ---
 title = "Database: \"Error: too many connections for database \"postgres\"\""
+summary = "A non-default `datconnlimit` on the `postgres` database rejects connections even when the server still has connection capacity."
+diagnostic_sources = [ "postgres-logs", "database-inspection", "metrics" ]
 topics = [ "database" ]
 keywords = []
 ---
 
-When getting an error where your connections are overwhelmed `Error: too many connections for database "postgres"`
+## Symptoms
 
-## Why this occurs
+New connections fail with `too many connections for database "postgres"`, even though the server might still have unused connection slots.
 
-This issue occurs when `datconnlimit` gets modified. The default value for `datconnlimit` is -1.
-https://www.postgresql.org/docs/current/catalog-pg-database.html
+## Confirm the cause
 
-## To check and resolve
+Check the per-database connection limit:
 
-1.  **Check the value for `datconnlimit` using the query below**
+```sql
+select datconnlimit
+from pg_database
+where datname = 'postgres';
+```
 
-    ```bash
-    select datconnlimit from pg_database where datname='postgres';
-    ```
+The default `datconnlimit` is `-1`, which means that Postgres does not apply a separate limit to this database. See [`pg_database`](https://www.postgresql.org/docs/current/catalog-pg-database.html).
 
-    - If the value you see is 0 or any other value other than -1, proceed with the next step.
+## Resolve
 
-2.  **Update `datconnlimit` to DEFAULT**
-    ```bash
-    ALTER DATABASE postgres CONNECTION LIMIT DEFAULT;
-    ```
+Reset an unintended non-default limit:
+
+```sql
+alter database postgres connection limit -1;
+```
+
+Do not reset a limit that your organization intentionally uses to isolate a database. If `datconnlimit` is already `-1`, investigate overall server connection use instead.
+
+## Verify
+
+1. Run the inspection query again and confirm that `datconnlimit` is `-1`.
+2. Open a new connection with the affected client.
+3. Confirm that the Postgres logs do not contain a new per-database connection-limit error.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the error continues with `datconnlimit = -1`. Include the project reference, timestamp with time zone, connection mode, compute size, current connection count, and redacted error.

@@ -1,5 +1,7 @@
 ---
 title = "Certain operations are too complex to perform directly using the client libraries."
+summary = "A client-library query cannot express the required database operation, so the logic needs a Postgres function called through RPC."
+diagnostic_sources = [ "client-tracing", "api-logs", "postgres-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/21294"
 date_created = "2024-02-15T12:37:11+00:00"
 topics = [ "database" ]
@@ -8,7 +10,7 @@ database_id = "df9518df-d019-42bb-8d91-918c6d57b452"
 ---
 
 **Solution**
-In cases where operations are overly complex or not feasible to implement directly using the client libraries, it might be beneficial to leverage stored functions within your database.
+When a client library cannot express an operation directly, move the operation into a stored function in your database.
 
 Follow these steps to create and run a stored function:
 

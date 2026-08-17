@@ -1,5 +1,7 @@
 ---
 title = "FDW Wrappers error: 'component verification failed'"
+summary = "Wrappers rejects a Wasm foreign-data wrapper when its configured package version or checksum does not match the downloaded component."
+diagnostic_sources = [ "database-inspection", "postgres-logs" ]
 date_created = "2026-06-09T16:04:36+00:00"
 topics = [ "platform" ]
 keywords = []
@@ -9,12 +11,25 @@ message = "guest fdw error: component verification failed"
 
 ---
 
-If you are observing an `ERROR: HV000: guest fdw error: component verification failed` when querying a wrapper foreign tables, it indicates that the configured Wasm package metadata does not match the downloaded component. As a security measure, the Wrappers extension blocks the module when this mismatch occurs.
+## Symptoms
 
-To resolve this, update your foreign server configuration to use the correct package version and checksum. Details depend on the exact Wrapper and can be found here: https://fdw.dev/catalog/wasm/
+A query against a Wrappers foreign table returns `ERROR: HV000: guest fdw error: component verification failed`.
 
-**How to fix the configuration:**
-Run the following SQL via the [SQL Editor](/dashboard/project/_/sql/new):
+## Confirm the cause
+
+Inspect the foreign server options and compare the configured package URL, version, and checksum with the values published for that wrapper in the [Wrappers catalog](https://fdw.dev/catalog/wasm/):
+
+```sql
+select srvname, unnest(srvoptions) as option
+from pg_foreign_server
+where srvname = 'example_server';
+```
+
+The mismatch is confirmed when at least one configured value differs. Wrappers blocks the Wasm module rather than executing an unverified component.
+
+## Resolve
+
+Update the foreign server through the [SQL Editor](/dashboard/project/_/sql/new), replacing every placeholder with the values for the same published package release:
 
 ```sql
 ALTER SERVER example_server OPTIONS (
@@ -24,8 +39,9 @@ ALTER SERVER example_server OPTIONS (
 );
 ```
 
-**Verify the update:**
-You can confirm the update by inspecting the server options:
+## Verify
+
+Inspect the server options again:
 
 ```sql
 select srvname, unnest(srvoptions) as option
@@ -38,3 +54,9 @@ Test the connection by querying your foreign table:
 ```sql
 select * from example_table limit 1;
 ```
+
+Confirm that the query completes without `HV000` and returns the expected remote data.
+
+## Escalate
+
+If the published URL, version, and checksum match but verification still fails, capture the extension version, wrapper name, server options with credentials removed, and Postgres log error. Report the mismatch to the wrapper maintainer or open a [support ticket](/dashboard/support/new).

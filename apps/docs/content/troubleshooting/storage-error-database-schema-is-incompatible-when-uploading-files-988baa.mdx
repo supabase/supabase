@@ -1,5 +1,7 @@
 ---
 title = "RLS policy causes infinite recursion"
+summary = "A Row Level Security policy recursively queries its own table or a policy chain that returns to the original table."
+diagnostic_sources = [ "postgres-logs", "security-advisor", "database-inspection" ]
 date_created = "2026-06-29T03:04:33+00:00"
 topics = [ "database", "storage" ]
 keywords = ["infinite recursion", "RLS"]

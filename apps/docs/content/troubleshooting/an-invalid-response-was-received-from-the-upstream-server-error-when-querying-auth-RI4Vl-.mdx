@@ -1,5 +1,7 @@
 ---
 title = "An \"invalid response was received from the upstream server\" error when querying auth"
+summary = "Auth can return an invalid upstream response when the service cannot start, commonly because a database migration or schema conflict blocks initialization."
+diagnostic_sources = [ "auth-logs", "postgres-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/20722"
 date_created = "2024-01-25T07:08:43+00:00"
 topics = [ "auth" ]
@@ -15,16 +17,31 @@ message = "running db migrations: error executing migrations/20221208132122_back
 message = "operator does not exist: uuid = text"
 ---
 
-If you are observing an "invalid response was received from the upstream server" error when making requests to Supabase Auth, it could mean that the respective service is down. One way to confirm this is to visit the [logs explorer](/dashboard/project/_/logs/explorer) and look at the auth logs to see if there are any errors with the following lines:
+This upstream error means the API gateway did not receive a valid response from the Auth service. The message does not identify the underlying cause by itself.
 
-- `running db migrations: error executing migrations/20221208132122_backfill_email_last_sign_in_at.up.sql`
+## Symptoms
 
-We're currently investigating an issue where the tables responsible for keeping track of migrations ran by Auth (`auth.schema_migrations`) are not being restored properly, which leads to the service(s) retrying those migrations. In such cases, migrations which are not idempotent will run into issues.
+Requests to an `/auth/v1/*` endpoint fail with `invalid response was received from the upstream server`. Multiple Auth operations might fail at the same time.
 
-We've documented some of the migrations that run into this issue and their corresponding fix here:
+## Confirm the cause
 
-## Auth: `operator does not exist: uuid = text`
+1. Reproduce the request and record its timestamp with time zone and operation.
+2. Open the [Auth logs](/dashboard/project/_/logs/auth-logs) for the same time window.
+3. If the Auth log mentions a database migration, inspect the [Postgres logs](/dashboard/project/_/logs/postgres-logs) for the corresponding SQLSTATE and error detail.
+4. Check [Supabase Status](https://status.supabase.com/) if the logs contain no project-specific error and multiple services are unavailable.
 
-Temporary fix: Run `insert into auth.schema_migrations values ('20221208132122');` via the [SQL editor](/dashboard/project/_/sql/new) to fix the issue.
+An older restore-related failure can mention `20221208132122_backfill_email_last_sign_in_at.up.sql` and `operator does not exist: uuid = text`. This identifies an Auth migration-state problem, not an application JWT or redirect problem.
 
-If the migration error you're seeing looks different, reach out to [supabase.help](https://supabase.help/) for assistance.
+## Resolve
+
+- Fix project-controlled database errors only when the logs identify a trigger, constraint, function, or other customization you own. See [Resolving 500 status authentication errors](/docs/guides/troubleshooting/resolving-500-status-authentication-errors-7bU5U8).
+- If the exact legacy migration error above appears, do not insert rows into `auth.schema_migrations` manually. Changing service-owned migration history can mark a migration as complete when it has not been applied. Open a support ticket so the project state can be checked and repaired safely.
+- If Supabase Status reports an incident, wait for recovery and retry the request.
+
+## Verify
+
+Repeat the same Auth operation and confirm that it succeeds. Check the Auth and Postgres logs over the new time window and verify that the migration or upstream error no longer appears.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) when the Auth service cannot start, a service-owned migration fails, or the logs do not expose the underlying cause. Include the project reference, operation, timestamp with time zone, sanitized response, and relevant Auth and Postgres log messages. Do not include API keys, JWTs, passwords, or raw user data.

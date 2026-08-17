@@ -1,5 +1,7 @@
 ---
 title = "Database Error: remaining connection slots are reserved for non-replication superuser connections"
+summary = "Application connections have consumed the database connection allowance, leaving only reserved Postgres slots."
+diagnostic_sources = [ "database-inspection", "metrics", "postgres-logs" ]
 github_url = "https://github.com/orgs/supabase/discussions/13995"
 date_created = "2023-04-27T10:39:24+00:00"
 topics = [ "database" ]
@@ -10,11 +12,33 @@ database_id = "b3a73631-0b8d-460d-8033-28df88d26d75"
 message = "remaining connection slots are reserved for non-replication superuser connections"
 ---
 
-This error usually occurs when the database reaches the maximum number of connections allowed based on the compute add-on.
+## Symptoms
 
-To overcome this, the connections need to be optimized as mentioned here: https://supabase.com/docs/guides/platform/performance#optimizing-the-number-of-connections
+New direct database connections fail with `remaining connection slots are reserved for non-replication superuser connections`.
 
-Additionally, you can try using the connection pool to help solve this issue:
-https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler
+## Confirm the cause
 
-If you're already using connection pooling and still hitting the maximum connections, then it is suggested to upgrade your compute add-on that allows more connections: https://supabase.com/docs/guides/platform/compute-and-disk
+1. Check connection utilization in the [Database Health report](/dashboard/project/_/observability/database) or Metrics API.
+2. Run `supabase inspect db role-stats --linked` to identify roles that hold the most database connections.
+3. Inspect `pg_stat_activity` for idle, long-running, or repeated application connections.
+4. Confirm that `pg_database.datconnlimit` is `-1` for `postgres`. A non-default per-database limit causes the separate `too many connections for database "postgres"` error.
+
+## Resolve
+
+1. Close leaked or unnecessary application connections and reduce oversized client pools.
+2. Use the [Supavisor connection pooler](/docs/guides/database/connecting-to-postgres#poolers) for auto-scaling or short-lived application instances.
+3. Reduce connection use by background jobs and schedule connection-heavy jobs at different times.
+4. Increase the [compute size](/docs/guides/platform/compute-and-disk) only after removing avoidable connection use.
+
+Do not increase `max_connections` as the first response. Each database connection consumes memory, and a manual value does not resize automatically with compute changes.
+
+## Verify
+
+1. Restart or redeploy clients with the corrected pool limits.
+2. Confirm that new connections succeed.
+3. Confirm that connection utilization remains below the project's sustainable range during representative traffic.
+4. Check Postgres logs for new reserved-slot errors.
+
+## Escalate
+
+Open a [support ticket](/dashboard/support/new) if the reserved-slot error continues after client pools and idle connections have been corrected. Include the project reference, timestamps with time zone, compute size, connection mode, connection counts by role, and relevant redacted logs.

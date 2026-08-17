@@ -1,5 +1,7 @@
 ---
 title = "High swap usage"
+summary = "The operating system moves less-active memory pages to swap; this becomes a problem when memory pressure and disk activity affect database performance."
+diagnostic_sources = [ "metrics", "reports", "database-inspection" ]
 topics = [ "database", "platform" ]
 keywords = [ "swap", "performance" ]
 database_id = "2db43a09-792b-484b-b97d-5d96a405b525"
@@ -23,7 +25,7 @@ Swap can be used even if your instance has plenty of RAM. If this is the case, d
 
 ### When is high swap concerning?
 
-High Swap is concerning if your instance is using all of the available RAM (i.e. consistently using more than 75%).
+High Swap is concerning if your instance is consistently using more than 75% of the available RAM.
 
 High Swap usage can affect your database performance. For example, you might see:
 
