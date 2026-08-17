@@ -4,7 +4,6 @@ import { Circle } from 'lucide-react'
 import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import * as React from 'react'
 
-import { Label } from '../components/shadcn/ui/label'
 import { cn } from '../lib/utils/cn'
 
 const RadioGroupStacked = React.forwardRef<
