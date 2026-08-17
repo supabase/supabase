@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -67,11 +68,6 @@ export const AWSPrivateLinkSection = () => {
     setShowForm(true)
   }
 
-  const onDeleteAccount = (account: AWSAccount) => {
-    setSelectedAccount(account)
-    setShowDeleteModal(true)
-  }
-
   const onConfirmDelete = () => {
     if (selectedAccount && project) {
       deleteAccount({
@@ -96,12 +92,12 @@ export const AWSPrivateLinkSection = () => {
     <>
       <PageSection>
         <PageSectionMeta>
-          <div className="flex flex-1 items-start gap-6">
+          <div className="flex flex-1 items-start gap-5">
             <IntegrationSectionIcon title="aws" />
             <PageSectionSummary>
               <PageSectionTitle>AWS PrivateLink</PageSectionTitle>
               <PageSectionDescription>
-                Connect to this project from your AWS VPC without using the public internet.
+                Private connectivity from a connected AWS VPC, without the public internet.
               </PageSectionDescription>
             </PageSectionSummary>
           </div>
@@ -110,7 +106,7 @@ export const AWSPrivateLinkSection = () => {
           <div className="space-y-6">
             {promptPlanUpgrade && (
               <UpgradeToPro
-                layout="vertical"
+                layout="responsive"
                 primaryText="Available on Team and Enterprise plans"
                 secondaryText="Upgrade to add a PrivateLink connection."
                 buttonText="Upgrade to Team"
@@ -120,7 +116,7 @@ export const AWSPrivateLinkSection = () => {
             <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-foreground">Connections</h3>
-                <Button variant="default" onClick={onAddAccount}>
+                <Button variant="default" icon={<Plus />} onClick={onAddAccount}>
                   Add connection
                 </Button>
               </div>
@@ -130,9 +126,8 @@ export const AWSPrivateLinkSection = () => {
                   {accounts?.map((account) => (
                     <AWSPrivateLinkAccountItem
                       key={`${account.aws_account_id}-${account.database_identifier ?? 'primary'}`}
-                      {...account}
-                      onEdit={() => onEditAccount(account)}
-                      onDelete={() => onDeleteAccount(account)}
+                      account={account}
+                      onView={() => onEditAccount(account)}
                     />
                   ))}
                 </ResourceList>
