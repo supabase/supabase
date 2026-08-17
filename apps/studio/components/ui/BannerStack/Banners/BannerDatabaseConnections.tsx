@@ -23,7 +23,7 @@ export const BannerDatabaseConnections = () => {
     false
   )
 
-  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
+  const { enabled: isEnabled } = useIsDatabaseConnectionsEnabled()
 
   return (
     <BannerCard
@@ -78,7 +78,7 @@ export const BannerDatabaseConnections = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          {isDatabaseConnectionsEnabled ? (
+          {isEnabled ? (
             <Button
               asChild
               variant="default"
@@ -86,7 +86,7 @@ export const BannerDatabaseConnections = () => {
               onClick={() => {
                 setIsDismissed(true)
                 dismissBanner('database-connections-banner')
-                track('database_connections_banner_cta_button_clicked', { isEnabled: false })
+                track('database_connections_banner_cta_button_clicked', { isEnabled })
               }}
             >
               <Link href={`/project/${ref}/observability/connections`}>
