@@ -62,7 +62,7 @@ describe('ReadReplicasSection', () => {
     mockUseIsFeatureEnabled.mockReturnValue({ infrastructureReadReplicas: true })
     addReplicaListMocks()
 
-    customRender(<ReadReplicasSection />)
+    customRender(<ReadReplicasSection onRecommendCompute={vi.fn()} />)
 
     expect(await screen.findByText('Read replicas')).toBeInTheDocument()
     expect(await screen.findByText('No read replicas')).toBeInTheDocument()
@@ -82,7 +82,7 @@ describe('ReadReplicasSection', () => {
       },
     })
 
-    customRender(<ReadReplicasSection />)
+    customRender(<ReadReplicasSection onRecommendCompute={vi.fn()} />)
 
     expect(screen.queryByText('Read replicas')).not.toBeInTheDocument()
     await new Promise((resolve) => setTimeout(resolve, 50))

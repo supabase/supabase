@@ -3,6 +3,7 @@ import { useRef } from 'react'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
 import { ReadReplicaForm } from './ReadReplicaForm'
+import type { RecommendedComputeForReadReplicas } from './recommendCompute'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -10,9 +11,13 @@ import { DOCS_URL } from '@/lib/constants'
 
 interface AddReadReplicaSheetProps {
   onSuccess?: () => void
+  onRecommendCompute: (size: RecommendedComputeForReadReplicas) => void
 }
 
-export const AddReadReplicaSheet = ({ onSuccess }: AddReadReplicaSheetProps) => {
+export const AddReadReplicaSheet = ({
+  onSuccess,
+  onRecommendCompute,
+}: AddReadReplicaSheetProps) => {
   const [addReplica, setAddReplica] = useQueryState(
     'addReplica',
     parseAsBoolean.withDefault(false).withOptions({
@@ -24,6 +29,7 @@ export const AddReadReplicaSheet = ({ onSuccess }: AddReadReplicaSheetProps) => 
 
   const visible = addReplica === true
   const checkIsDirtyRef = useRef<() => boolean>(() => false)
+  const pendingRecommendationRef = useRef<RecommendedComputeForReadReplicas | null>(null)
 
   const onClose = () => {
     checkIsDirtyRef.current = () => false
@@ -35,6 +41,11 @@ export const AddReadReplicaSheet = ({ onSuccess }: AddReadReplicaSheetProps) => 
     onClose,
   })
 
+  const closeWithRecommendation = (size: RecommendedComputeForReadReplicas) => {
+    pendingRecommendationRef.current = size
+    onClose()
+  }
+
   return (
     <>
       <Sheet open={visible} onOpenChange={handleOpenChange}>
@@ -42,9 +53,16 @@ export const AddReadReplicaSheet = ({ onSuccess }: AddReadReplicaSheetProps) => 
           size="lg"
           showClose={false}
           className="max-w-3xl"
-          // Default close restores focus to Add read replica and the browser
-          // scrolls that button into view through nested overflow mains.
-          onCloseAutoFocus={(event) => event.preventDefault()}
+          onCloseAutoFocus={(event) => {
+            const recommendation = pendingRecommendationRef.current
+            if (!recommendation) return
+
+            // The recommendation replaces the trigger as the close destination.
+            // Radix calls this after the close animation has completed.
+            event.preventDefault()
+            pendingRecommendationRef.current = null
+            onRecommendCompute(recommendation)
+          }}
         >
           <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
@@ -65,6 +83,7 @@ export const AddReadReplicaSheet = ({ onSuccess }: AddReadReplicaSheetProps) => 
               onClose={onClose}
               onCancel={confirmOnClose}
               onSuccess={() => onSuccess?.()}
+              onRecommendCompute={closeWithRecommendation}
             />
           </div>
         </SheetContent>

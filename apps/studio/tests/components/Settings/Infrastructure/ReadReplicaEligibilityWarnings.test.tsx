@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ReadReplicaEligibilityWarnings } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm/ReadReplicaEligibilityWarnings'
@@ -37,12 +38,14 @@ const eligibility = (delta: Record<string, unknown>) => ({
 })
 
 describe('ReadReplicaEligibilityWarnings – below small compute', () => {
-  it('shows upgrade CTA when project is on pico, nano, or micro compute', () => {
+  it('recommends Small compute when project is on pico, nano, or micro compute', async () => {
+    const user = userEvent.setup()
+    const onRecommendCompute = vi.fn()
     vi.mocked(useCheckEligibilityDeployReplica).mockReturnValue(
       eligibility({ isBelowSmallCompute: true })
     )
 
-    customRender(<ReadReplicaEligibilityWarnings />)
+    customRender(<ReadReplicaEligibilityWarnings onRecommendCompute={onRecommendCompute} />)
 
     expect(
       screen.getByText('Project required to at least be on a Small compute')
@@ -53,6 +56,8 @@ describe('ReadReplicaEligibilityWarnings – below small compute', () => {
       )
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /change to small compute/i })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /change to small compute/i }))
+    expect(onRecommendCompute).toHaveBeenCalledWith('ci_small')
   })
 })
 
@@ -62,7 +67,7 @@ describe('ReadReplicaEligibilityWarnings – max replicas reached', () => {
       eligibility({ isReachedMaxReplicas: true, maxNumberOfReplicas: 4 })
     )
 
-    customRender(<ReadReplicaEligibilityWarnings />)
+    customRender(<ReadReplicaEligibilityWarnings onRecommendCompute={vi.fn()} />)
 
     expect(
       screen.getByText('You can only deploy up to 4 read replicas at once')
@@ -76,7 +81,7 @@ describe('ReadReplicaEligibilityWarnings – max replicas reached', () => {
       eligibility({ isReachedMaxReplicas: true, maxNumberOfReplicas: READ_REPLICAS_MAX_COUNT })
     )
 
-    customRender(<ReadReplicaEligibilityWarnings />)
+    customRender(<ReadReplicaEligibilityWarnings onRecommendCompute={vi.fn()} />)
 
     expect(
       screen.getByText(`You can only deploy up to ${READ_REPLICAS_MAX_COUNT} read replicas at once`)

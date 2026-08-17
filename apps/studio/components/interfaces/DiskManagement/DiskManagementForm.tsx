@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useQueryState } from 'nuqs'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
@@ -36,10 +35,8 @@ import {
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
-import {
-  recommendComputeParser,
-  subscribeRecommendCompute,
-} from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
+import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
+import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
@@ -67,19 +64,20 @@ import {
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
 
-/** SheetContent close animation is 300ms; sticky review bar mounts at 200ms. */
-const RECOMMEND_COMPUTE_SCROLL_DELAY_MS = 400
-
 export function DiskManagementForm({
   chartsClassName,
   overviewExtra,
   beforeScaling,
+  recommendedCompute,
+  onRecommendedComputeApplied,
 }: {
   chartsClassName?: string
   /** Rendered above usage charts in the overview block (for example topology). */
   overviewExtra?: ReactNode
   /** Rendered between overview and the Scaling section (for example read replicas). */
   beforeScaling?: ReactNode
+  recommendedCompute?: RecommendedComputeForReadReplicas | null
+  onRecommendedComputeApplied?: () => void
 } = {}) {
   const { ref: projectRef } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
@@ -90,6 +88,7 @@ export function DiskManagementForm({
   const storageSettingsRef = useRef<HTMLDivElement>(null)
   const computeSettingsRef = useRef<HTMLDivElement>(null)
   const diskSizeSettingsRef = useRef<HTMLDivElement>(null)
+  const mainScrollContainer = useMainScrollContainer()
 
   const isSpendCapEnabled = org?.plan.id !== 'free' && !org?.usage_billing_enabled
 
@@ -174,11 +173,6 @@ export function DiskManagementForm({
     mode: 'onBlur',
     reValidateMode: 'onChange',
   })
-
-  const [recommendCompute, setRecommendCompute] = useQueryState(
-    'recommendCompute',
-    recommendComputeParser
-  )
 
   const modifiedComputeSize = useWatch({ control: form.control, name: 'computeSize' })
 
@@ -379,38 +373,42 @@ export function DiskManagementForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccess, isDiskAttributesSuccess])
 
-  // From Add read replica eligibility: pre-select compute and scroll to Scaling.
-  // Declared after form.reset so a cold-load with ?recommendCompute= does not get wiped.
+  // Apply the recommendation only after the sheet's close lifecycle has completed.
   useEffect(() => {
-    if (!recommendCompute || !isSuccess) return
+    if (!recommendedCompute || !isSuccess) return
 
-    form.setValue('computeSize', recommendCompute, {
+    form.setValue('computeSize', recommendedCompute, {
       shouldDirty: true,
       shouldValidate: true,
     })
     void form.trigger(['provisionedIOPS', 'throughput'])
-    setRecommendCompute(null)
+    onRecommendedComputeApplied?.()
 
-    const timeoutId = setTimeout(() => {
-      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, RECOMMEND_COMPUTE_SCROLL_DELAY_MS)
+    const element = computeSettingsRef.current
+    if (!element) return
 
-    return () => clearTimeout(timeoutId)
-  }, [form, isSuccess, recommendCompute, setRecommendCompute])
+    element.focus({ preventScroll: true })
 
-  // In-page handoff from the Add read replica sheet (avoids URL write races on unmount).
-  useEffect(() => {
-    return subscribeRecommendCompute((size) => {
-      form.setValue('computeSize', size, {
-        shouldDirty: true,
-        shouldValidate: true,
-      })
-      void form.trigger(['provisionedIOPS', 'throughput'])
-      window.setTimeout(() => {
-        computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, RECOMMEND_COMPUTE_SCROLL_DELAY_MS)
-    })
-  }, [form])
+    if (!mainScrollContainer) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+
+    const scrollMarginTop = Number.parseFloat(getComputedStyle(element).scrollMarginTop) || 0
+    const top =
+      mainScrollContainer.scrollTop +
+      element.getBoundingClientRect().top -
+      mainScrollContainer.getBoundingClientRect().top -
+      scrollMarginTop
+
+    mainScrollContainer.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  }, [
+    form,
+    isSuccess,
+    mainScrollContainer,
+    onRecommendedComputeApplied,
+    recommendedCompute,
+  ])
 
   // Deep links from billing / UpgradePlanButton (e.g. #compute).
   useEffect(() => {
