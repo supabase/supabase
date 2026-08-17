@@ -154,7 +154,7 @@ export const useIsMarketplaceEnabled = () => {
 
 export const useIsDatabaseConnectionsEnabled = () => {
   const { flags, isInitialized } = useFeaturePreviewContext()
-  const [localStorageFlag] = useLocalStorageQuery(
+  const [localStorageFlag] = useLocalStorageQuery<boolean | null>(
     LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
     null
   )
