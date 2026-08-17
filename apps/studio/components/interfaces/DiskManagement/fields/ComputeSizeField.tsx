@@ -179,7 +179,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       value={compute.identifier}
                       className={cn(
                         'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group w-full h-[110px]',
-                        'data-[state=checked]:border-foreground-muted',
                         lockedOption && 'opacity-50'
                       )}
                       disabled={disabled || lockedOption}
