@@ -5,11 +5,11 @@ description: 'Measure and tune Postgres Row Level Security policies.'
 subtitle: 'Measure and tune Postgres Row Level Security policies.'
 ---
 
-This guide explains how to measure the cost of Row Level Security (RLS) and tune policies that are already correct. To learn how to write correct policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
+Measure the cost of Row Level Security (RLS) and tune policies that are already correct. To learn how to write correct policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 Postgres evaluates a policy expression against each candidate row, so the cost scales with the rows a query scans. This matters most for queries that scan every row in a table, like many `select` operations, including those using limit, offset, and ordering.
 
-Three policy rules affect performance enough that they belong with the policy itself rather than here. The RLS guide covers each one, and the [benchmarks](#benchmarks) on this page measure them:
+Three policy rules affect performance enough that they belong with the policy itself rather than here. Apply them first:
 
 - [Index the columns your policies filter on](/docs/guides/database/postgres/row-level-security#add-indexes)
 - [Call functions with `select`](/docs/guides/database/postgres/row-level-security#call-functions-with-select)
@@ -147,22 +147,6 @@ You can also use a [security definer function](/docs/guides/database/postgres/ro
 If the list exceeds 1000 items, a different approach may be needed, or you may need to analyze the approach to ensure that the performance is acceptable.
 
 </Admonition>
-
-## Benchmarks
-
-These numbers come from a series of [tests](https://github.com/GaryAustin1/RLS-Performance) run against a 100,000-row table. Each row links to the test that produced it.
-
-| Test                                                                                                                              | Before (ms) | After (ms) | % Improvement | Change                                                                              |
-| --------------------------------------------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | ----------------------------------------------------------------------------------- |
-| [test1-indexed](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test1-indexed)                                     | 171         | < 0.1      | 99.94%        | No index, then `user_id` indexed                                                    |
-| [test2a-wrappedSQL-uid](<https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2a-wrappedSQL-uid()>)                 | 179         | 9          | 94.97%        | `auth.uid() = user_id`, then `(select auth.uid()) = user_id`                        |
-| [test2b-wrappedSQL-isadmin](<https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2b-wrappedSQL-isadmin()>)         | 11,000      | 7          | 99.94%        | `is_admin()` table join, then `(select is_admin())` table join                      |
-| [test2c-wrappedSQL-two-functions](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2c-wrappedSQL-two-functions) | 11,000      | 10         | 99.91%        | Two bare function calls, then both wrapped in `select`                              |
-| [test2d-wrappedSQL-sd-fun](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2d-wrappedSQL-sd-fun)               | 178,000     | 12         | 99.993%       | `has_role() = role`, then `(select has_role()) = role`                              |
-| [test2e-wrappedSQL-sd-fun-array](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test2e-wrappedSQL-sd-fun-array)   | 173,000     | 16         | 99.991%       | `team_id = any(user_teams())`, then `team_id = any(array(select user_teams()))`     |
-| [test3-addfilter](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test3-addfilter)                                 | 171         | 9          | 94.74%        | No client filter, then `.eq` or `where` on `user_id`                                |
-| [test5-fixed-join](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test5-fixed-join)                               | 9,000       | 20         | 99.78%        | `auth.uid()` in a table join on a column, then the column in a join on `auth.uid()` |
-| [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role)                                     | 170         | < 0.1      | 99.78%        | No `to` clause, then `to authenticated` with `anon` accessing                       |
 
 ## More resources
 
