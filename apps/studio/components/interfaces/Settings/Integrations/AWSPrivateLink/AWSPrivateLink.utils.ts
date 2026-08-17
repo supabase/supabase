@@ -21,20 +21,20 @@ const CONNECTION_STATUS_UI: Record<PrivateLinkConnectionStatus, ConnectionStatus
   READY: {
     title: 'Waiting for the AWS account owner to accept',
     description: 'This request expires after 12 hours.',
-    badge: 'Ready',
-    badgeVariant: 'success',
+    badge: 'Waiting',
+    badgeVariant: 'warning',
   },
   CREATING: {
     title: 'This connection is being created',
     description: '',
     badge: 'Creating',
-    badgeVariant: 'warning',
+    badgeVariant: 'default',
   },
   DELETING: {
     title: 'This connection is being deleted',
     description: '',
     badge: 'Deleting',
-    badgeVariant: 'destructive',
+    badgeVariant: 'warning',
   },
   ASSOCIATION_REQUEST_EXPIRED: {
     title: 'This request has expired',
