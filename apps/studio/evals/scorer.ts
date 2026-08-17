@@ -4,7 +4,8 @@ import { EvalCase, EvalScorer } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
-import { getParsedToolSpans, getThreadParts, getToolSpans } from './trace-utils'
+import { getParsedToolSpans, getToolSpans } from './trace-utils'
+import type { Transcript } from './transcript'
 import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractUrls } from '@/lib/helpers'
 
@@ -24,6 +25,7 @@ export type AssistantEvalInput = {
 
 export type AssistantEvalOutput = {
   finishReason: FinishReason
+  transcript: Transcript
 }
 
 type ToolInputExactValue = string | number | boolean | null | string[]
@@ -161,13 +163,12 @@ export const concisenessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ trace }) => {
-  if (!trace) return null
-  const parts = await getThreadParts(trace)
-  if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
+> = async ({ output }) => {
+  const { transcript } = output
+  if (!transcript.lastAssistantTurn) return null
   return await concisenessEvaluator({
-    input: parts.currentUserInput,
-    output: parts.lastAssistantTurn,
+    input: transcript.currentUserInput,
+    output: transcript.lastAssistantTurn,
   })
 }
 
@@ -192,13 +193,12 @@ export const completenessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ trace }) => {
-  if (!trace) return null
-  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
-  if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
+> = async ({ output }) => {
+  const { transcript } = output
+  if (!transcript.lastAssistantTurnWithToolInputs) return null
   return await completenessEvaluator({
-    input: parts.currentUserInput,
-    output: parts.lastAssistantTurn,
+    input: transcript.currentUserInput,
+    output: transcript.lastAssistantTurnWithToolInputs,
   })
 }
 
@@ -233,14 +233,13 @@ export const goalCompletionScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ trace }) => {
-  if (!trace) return null
-  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
-  if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
+> = async ({ output }) => {
+  const { transcript } = output
+  if (!transcript.lastAssistantTurnWithToolInputs) return null
   return await goalCompletionEvaluator({
-    input: parts.currentUserInput,
-    priorConversation: parts.priorConversation ?? 'None',
-    output: parts.lastAssistantTurn,
+    input: transcript.currentUserInput,
+    priorConversation: transcript.priorConversation ?? 'None',
+    output: transcript.lastAssistantTurnWithToolInputs,
   })
 }
 
@@ -269,7 +268,7 @@ export const docsFaithfulnessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ trace }) => {
+> = async ({ output, trace }) => {
   if (!trace) return null
 
   const docsSpans = await getToolSpans(trace, 'search_docs')
@@ -290,12 +289,12 @@ export const docsFaithfulnessScorer: EvalScorer<
 
   if (docs.length === 0) return null
 
-  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
-  if (!parts.lastAssistantTurn) return null
+  const { transcript } = output
+  if (!transcript.lastAssistantTurnWithToolInputs) return null
 
   return await docsFaithfulnessEvaluator({
     docs: docs.join('\n\n'),
-    output: parts.lastAssistantTurn,
+    output: transcript.lastAssistantTurnWithToolInputs,
   })
 }
 
@@ -332,15 +331,15 @@ export const correctnessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ expected, trace }) => {
-  if (!expected.correctAnswer || !trace) return null
-  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
-  if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
+> = async ({ expected, output }) => {
+  if (!expected.correctAnswer) return null
+  const { transcript } = output
+  if (!transcript.lastAssistantTurnWithToolInputs) return null
 
   return await correctnessEvaluator({
-    input: parts.currentUserInput,
+    input: transcript.currentUserInput,
     expected: expected.correctAnswer,
-    output: parts.lastAssistantTurn,
+    output: transcript.lastAssistantTurnWithToolInputs,
   })
 }
 
@@ -373,17 +372,17 @@ const safetyEvaluator = LLMClassifierFromTemplate<{ input: string; priorConversa
 
 export const safetyScorer: EvalScorer<AssistantEvalInput, AssistantEvalOutput, Expected> = async ({
   expected,
-  trace,
+  output,
 }) => {
-  if (!expected.requiresSafetyCheck || !trace) return null
+  if (!expected.requiresSafetyCheck) return null
 
-  const parts = await getThreadParts(trace, { includeToolCallInputs: true })
-  if (!parts.currentUserInput || !parts.lastAssistantTurn) return null
+  const { transcript } = output
+  if (!transcript.lastAssistantTurnWithToolInputs) return null
 
   return await safetyEvaluator({
-    input: parts.currentUserInput,
-    priorConversation: parts.priorConversation ?? 'None',
-    output: parts.lastAssistantTurn,
+    input: transcript.currentUserInput,
+    priorConversation: transcript.priorConversation ?? 'None',
+    output: transcript.lastAssistantTurnWithToolInputs,
   })
 }
 
@@ -391,12 +390,11 @@ export const urlValidityScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ trace }) => {
-  if (!trace) return null
-  const parts = await getThreadParts(trace)
-  if (!parts.lastAssistantTurn) return null
+> = async ({ output }) => {
+  const { transcript } = output
+  if (!transcript.lastAssistantTurn) return null
 
-  const allUrls = extractUrls(parts.lastAssistantTurn, {
+  const allUrls = extractUrls(transcript.lastAssistantTurn, {
     excludeCodeBlocks: true,
     excludeTemplates: true,
   })
