@@ -72,8 +72,37 @@ jobs:
             docs_app:
               - 'apps/docs/**'
 
+      - name: Decide which suites run
+        id: gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          DOCS: ${{ steps.changes.outputs.docs }}
+          DOCS_COMPONENTS: ${{ steps.changes.outputs.docs_components }}
+        run: |
+          set -euo pipefail
+
+          pages=false
+          global_elements=false
+          any=false
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            pages=true
+            global_elements=true
+          else
+            if [ "$DOCS" = "true" ]; then pages=true; fi
+            if [ "$DOCS_COMPONENTS" = "true" ]; then global_elements=true; fi
+          fi
+
+          if [ "$pages" = "true" ] || [ "$global_elements" = "true" ]; then any=true; fi
+
+          {
+            echo "pages=$pages"
+            echo "global_elements=$global_elements"
+            echo "any=$any"
+          } >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs == 'true' || steps.changes.outputs.docs_components == 'true'
+        if: steps.gate.outputs.any == 'true'
         with:
           persist-credentials: false
           # Need full history on PRs so we can diff against the base branch.
@@ -90,7 +119,7 @@ jobs:
             apps/docs/scripts/federated-content/sources
 
       - name: Use Node.js
-        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs == 'true' || steps.changes.outputs.docs_components == 'true'
+        if: steps.gate.outputs.any == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
@@ -101,7 +130,7 @@ jobs:
       # fixed page list.
       - name: Resolve docs E2E scope
         id: scope
-        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs == 'true' || steps.changes.outputs.docs_components == 'true'
+        if: steps.gate.outputs.any == 'true'
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
@@ -127,13 +156,13 @@ jobs:
         run: echo "No in-scope docs pages changed; skipping the page suite."
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-        if: steps.scope.outputs.skip == 'false' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs_components == 'true'
+        if: steps.scope.outputs.skip == 'false' || steps.gate.outputs.global_elements == 'true'
         name: Install pnpm
         with:
           run_install: false
 
       - name: Enable pnpm store cache
-        if: steps.scope.outputs.skip == 'false' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs_components == 'true'
+        if: steps.scope.outputs.skip == 'false' || steps.gate.outputs.global_elements == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
@@ -151,7 +180,7 @@ jobs:
       # A Vercel failure or timeout is not the author's problem, and the required
       # "Vercel – docs" check already reports it. Resolve no URL and skip below.
       - name: Wait for Vercel docs preview
-        if: (steps.scope.outputs.skip == 'false' || steps.changes.outputs.docs_components == 'true') && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.docs_app == 'true'
+        if: (steps.scope.outputs.skip == 'false' || steps.gate.outputs.global_elements == 'true') && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.docs_app == 'true'
         id: deployment
         continue-on-error: true
         run: node scripts/waitForVercelPreview.js
@@ -165,7 +194,7 @@ jobs:
       # The two suites disagree on one case: with no preview the page suite has
       # nothing to test, while the global element suite can fall back to production.
       - name: Resolve base URL
-        if: steps.scope.outputs.skip == 'false' || github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs_components == 'true'
+        if: steps.scope.outputs.skip == 'false' || steps.gate.outputs.global_elements == 'true'
         id: base-url
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -174,7 +203,7 @@ jobs:
           PAGE_PATHS: ${{ steps.scope.outputs.paths }}
           PAGES_SKIP: ${{ steps.scope.outputs.skip }}
           DOCS_APP_CHANGED: ${{ steps.changes.outputs.docs_app }}
-          RUN_GLOBAL: ${{ github.event_name == 'workflow_dispatch' || steps.changes.outputs.docs_components == 'true' }}
+          RUN_GLOBAL: ${{ steps.gate.outputs.global_elements }}
         run: |
           set -euo pipefail
 
@@ -274,7 +303,7 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_DOCS || '' }}
 
       - name: Upload Playwright report
-        if: failure() && (steps.scope.outputs.skip == 'false' || steps.changes.outputs.docs_components == 'true')
+        if: failure() && (steps.base-url.outputs.should_test == 'true' || steps.base-url.outputs.global_should_test == 'true')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: docs-playwright-report
