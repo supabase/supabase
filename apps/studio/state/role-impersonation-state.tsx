@@ -106,7 +106,10 @@ export type RoleImpersonationState = ReturnType<typeof createRoleImpersonationSt
  * `useRoleImpersonationStateSnapshot`) and `useLocalRoleImpersonationState`, so role-picking
  * components can work against either without knowing which one they got.
  */
-export type RoleImpersonationController = Pick<RoleImpersonationState, 'role' | 'claims' | 'setRole'>
+export type RoleImpersonationController = Pick<
+  RoleImpersonationState,
+  'role' | 'claims' | 'setRole'
+>
 
 export const RoleImpersonationStateContext = createContext<RoleImpersonationState>(
   createRoleImpersonationState('', { current: async () => undefined })

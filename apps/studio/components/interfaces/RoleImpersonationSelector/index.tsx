@@ -8,8 +8,8 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
 import { PostgrestRole } from '@/lib/role-impersonation'
 import {
-  type RoleImpersonationController,
   useRoleImpersonationStateSnapshot,
+  type RoleImpersonationController,
 } from '@/state/role-impersonation-state'
 
 export interface RoleImpersonationSelectorProps {

@@ -2,8 +2,8 @@ import { DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from 
 
 import { RoleImpersonationSelectorInterface } from '@/components/interfaces/RoleImpersonationSelector'
 import {
-  type RoleImpersonationController,
   useRoleImpersonationStateSnapshot,
+  type RoleImpersonationController,
 } from '@/state/role-impersonation-state'
 
 const SERVICE_ROLE_LABEL = 'postgres'
