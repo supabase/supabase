@@ -10,7 +10,9 @@ Debug by evidence, not by guessing. A Supabase error almost always surfaces at o
 
 An AI agent can work through this loop for you, but only if it can read your project's evidence instead of guessing from the error message.
 
-- The [Supabase MCP server](/docs/guides/ai-tools/mcp) provides the tools this guide relies on: `query_logs` to run read-only SQL against your logs for filtering and aggregation, `get_advisors` for security and performance findings, and `execute_sql` to inspect your schema and policies.
+Debugging with an agent needs two things:
+
+- The [Supabase MCP server](/docs/guides/ai-tools/mcp) provides the tools this guide relies on: `get_logs` for a per-service log dump, `query_logs` to run read-only SQL against your logs for filtering and aggregation, `get_advisors` for security and performance findings, and `execute_sql` to inspect your schema and policies.
 - The [Supabase agent skill](/docs/guides/ai-tools/ai-skills) teaches the agent this workflow: locate the failing layer, gather evidence from the matching log source, and verify the fix by re-running the operation that failed.
 
 Install both in one step with the [Supabase plugin for AI coding agents](/docs/guides/ai-tools/plugins). Connecting an agent to your project carries security risks, so read the [MCP security best practices](/docs/guides/ai-tools/mcp#security-risks) first.
