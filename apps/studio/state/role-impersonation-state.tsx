@@ -104,12 +104,6 @@ export function createRoleImpersonationState(
 
 export type RoleImpersonationState = ReturnType<typeof createRoleImpersonationState>
 
-/**
- * The subset of `RoleImpersonationState` a role-picker UI needs: the current selection, its
- * resolved claims, and the setter. Satisfied by both the shared project-wide context (via
- * `useRoleImpersonationStateSnapshot`) and `useLocalRoleImpersonationState`, so role-picking
- * components can work against either without knowing which one they got.
- */
 export type RoleImpersonationController = Pick<
   RoleImpersonationState,
   'role' | 'claims' | 'setRole'
@@ -219,7 +213,7 @@ export function useControlledRoleImpersonationState(
       customAccessTokenHookDetailsRef.current,
       customizeAccessTokenRef.current
     ).then((nextClaims) => {
-      if (!cancelled && nextClaims) setClaims(nextClaims)
+      if (!cancelled) setClaims(nextClaims)
     })
 
     return () => {
@@ -236,6 +230,12 @@ export function useControlledRoleImpersonationState(
       nextRole: ImpersonationRole | undefined,
       customAccessTokenHookDetails?: CustomAccessTokenHookDetails
     ) => {
+      // Captured before the await: if the controlling tab changes while this resolution is
+      // in flight, `onRoleChangeRef.current` will point at a different tab's callback by the
+      // time we get here. Comparing against the captured reference lets us detect that and
+      // discard the result instead of writing this role/claims into the wrong tab.
+      const onRoleChangeAtCallTime = onRoleChangeRef.current
+
       const nextClaims = await resolveRoleClaims(
         projectRef,
         nextRole,
@@ -243,9 +243,11 @@ export function useControlledRoleImpersonationState(
         customizeAccessTokenRef.current
       )
 
+      if (onRoleChangeRef.current !== onRoleChangeAtCallTime) return
+
       skipNextResolveRef.current = true
-      onRoleChangeRef.current(nextRole)
-      if (nextClaims) setClaims(nextClaims)
+      onRoleChangeAtCallTime(nextRole)
+      setClaims(nextClaims)
     },
     [projectRef, customizeAccessTokenRef, customAccessTokenHookDetailsRef, onRoleChangeRef]
   )

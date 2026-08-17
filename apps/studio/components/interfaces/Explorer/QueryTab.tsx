@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Loader2, SquareCode } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
@@ -27,9 +27,12 @@ export const QueryTab = () => {
 
   const roleImpersonationState = useControlledRoleImpersonationState(
     draft?._tag === 'database' ? draft.role : undefined,
-    (role) => {
-      if (id) explorerQueryState.setRole({ id, role })
-    }
+    useCallback(
+      (role) => {
+        if (id) explorerQueryState.setRole({ id, role })
+      },
+      [id]
+    )
   )
 
   useEffect(() => {
