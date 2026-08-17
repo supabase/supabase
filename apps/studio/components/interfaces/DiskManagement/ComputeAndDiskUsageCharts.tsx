@@ -93,7 +93,9 @@ const PERCENTAGE_Y_AXIS_PROPS = {
 
 const getUsageCardClassName = (status: UsageMetricStatus) =>
   cn(
-    'h-full flex flex-col transition-colors',
+    // flex-1 equalises the two cards inside the grid. Avoid h-full: it
+    // resolves against ProjectLayout's viewport-sized main in production.
+    'flex flex-1 flex-col min-h-0 transition-colors',
     status === 'warning' && 'border-warning-400 bg-warning-200/30',
     status === 'negative' && 'border-destructive-400 bg-destructive-200/30'
   )
@@ -164,10 +166,10 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
         className
       )}
     >
-      <div id="cpu" className="scroll-mt-24 h-full min-h-0">
+      <div id="cpu" className="scroll-mt-24 min-h-0 flex flex-col">
         <span id="ram" className="block h-0 scroll-mt-24" aria-hidden />
         <span id="disk_io" className="block h-0 scroll-mt-24" aria-hidden />
-        <Chart isLoading={isLoading} isErrored={isError} className="h-full">
+        <Chart isLoading={isLoading} isErrored={isError} className="flex flex-1 flex-col min-h-0">
           <ChartCard className={getUsageCardClassName(computeUsageStatus)}>
             <ChartHeader align="start" className="min-h-[5.5rem]">
               <ChartMetric
@@ -245,8 +247,8 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
         </Chart>
       </div>
 
-      <div id="disk" className="scroll-mt-24 h-full min-h-0">
-        <Chart isLoading={isLoading} isErrored={isError} className="h-full">
+      <div id="disk" className="scroll-mt-24 min-h-0 flex flex-col">
+        <Chart isLoading={isLoading} isErrored={isError} className="flex flex-1 flex-col min-h-0">
           <ChartCard className={getUsageCardClassName(diskUsageStatus)}>
             <ChartHeader align="start" className="min-h-[5.5rem]">
               <ChartMetric
