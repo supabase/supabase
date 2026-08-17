@@ -22,12 +22,12 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { REPLICA_STATUS } from '../interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
 import {
   getAddReadReplicaPath,
   getInfrastructurePath,
 } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'

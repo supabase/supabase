@@ -31,7 +31,8 @@ export const ReadReplicaEligibilityWarnings = ({
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
-  const isFreePlan = org?.plan?.id === 'free'
+  const planId = org?.plan?.id
+  const isFreePlan = planId === undefined || planId === 'free'
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
