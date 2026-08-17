@@ -32,6 +32,7 @@ import {
   UploadCloud,
   Users,
   UserX,
+  Waypoints,
   Zap,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
@@ -2671,11 +2672,33 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/docs/guides/telemetry/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/monitoring-and-debugging/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client-Side Trace Propagation',
+    subtitle: 'Follow a request from your client into your Supabase logs with a shared trace_id.',
+    description: `
+supabase-js, Swift, Flutter, and Python can now propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id.
+
+## Key benefits
+1. End-to-end debugging: follow a single request from the browser through Supabase's API Gateway and Edge Function logs under one trace_id, instead of matching timestamps by hand.
+2. Works with your existing tracer: any W3C-compliant tracer, including OpenTelemetry, Sentry, Datadog, Honeycomb, and Grafana, picks up the trace server-side.
+3. More value from Log Drains: every log you already export carries the shared trace_id, so it joins your traces in the tool you already run.
+4. Opt-in, zero bundle cost: nothing is added to your app until you turn it on.
+`,
+    icon: Waypoints,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/monitoring-and-debugging/client-side-tracing',
+    slug: 'client-side-trace-propagation',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
     },
   },
   {
