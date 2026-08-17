@@ -388,6 +388,13 @@ export const GitHubIntegrationConnectionForm = ({
     isDeletingConnection ||
     isLoadingRepositoryOptions
 
+  let repositoryDescription = 'Select the repository to connect to your project'
+  if (connection) {
+    repositoryDescription = 'Change the connected repository'
+  } else if (gitHubAuthorization === null) {
+    repositoryDescription = 'Connect GitHub to link a repository to this project'
+  }
+
   return (
     <>
       <Form {...githubSettingsForm}>
@@ -402,13 +409,7 @@ export const GitHubIntegrationConnectionForm = ({
                 name="repositoryId"
                 label="GitHub repository"
                 layout="flex-row-reverse"
-                description={
-                  connection
-                    ? 'Change the connected repository'
-                    : gitHubAuthorization === null
-                      ? 'Connect GitHub to link a repository to this project'
-                      : 'Select the repository to connect to your project'
-                }
+                description={repositoryDescription}
                 disabled={
                   (!connection && !canCreateGitHubConnection) ||
                   (connection && !canUpdateGitHubConnection)

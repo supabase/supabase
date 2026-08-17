@@ -40,6 +40,15 @@ describe('getConnectionTitle', () => {
   it('falls back to the AWS account ID for an unnamed connection', () => {
     expect(getConnectionTitle({ aws_account_id: '123456789012' })).toBe('123456789012')
   })
+
+  it('falls back to the AWS account ID for a blank nickname', () => {
+    expect(
+      getConnectionTitle({
+        account_name: '   ',
+        aws_account_id: '123456789012',
+      })
+    ).toBe('123456789012')
+  })
 })
 
 describe('getConnectionsAttentionCopy', () => {
