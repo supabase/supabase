@@ -165,7 +165,7 @@ export const DeletedFilesList = ({ bucketId, searchString }: DeletedFilesListPro
           description={
             searchString.length > 0
               ? 'No archived files match your search.'
-              : 'Files and their version history appear here once archived (soft-deleted), and can be restored until an expiration policy removes them.'
+              : 'Files and their version history appear here once archived (soft-deleted), and can be restored until a lifecycle policy expires them.'
           }
         />
       </div>

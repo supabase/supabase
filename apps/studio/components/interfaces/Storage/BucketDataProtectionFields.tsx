@@ -179,7 +179,7 @@ export const BucketDataProtectionFields = ({
         )}
 
         {!!planLimits && isVersioningEnabled && (
-          <ExpirationPolicySection
+          <LifecyclePolicySection
             control={control}
             hasDays={hasDays}
             hasVersions={hasVersions}
@@ -195,9 +195,9 @@ export const BucketDataProtectionFields = ({
   )
 }
 
-// ── Expiration policy section ────────────────────────────────────────────
+// ── Lifecycle policy section ─────────────────────────────────────────────
 
-interface ExpirationPolicySectionProps {
+interface LifecyclePolicySectionProps {
   control: ReturnType<typeof useFormContext<BucketProtectionFormValues>>['control']
   hasDays: boolean
   hasVersions: boolean
@@ -208,7 +208,7 @@ interface ExpirationPolicySectionProps {
   onModeChange: (mode: ExpirationMode) => void
 }
 
-const ExpirationPolicySection = ({
+const LifecyclePolicySection = ({
   control,
   hasDays,
   hasVersions,
@@ -217,7 +217,7 @@ const ExpirationPolicySection = ({
   versions,
   mode,
   onModeChange,
-}: ExpirationPolicySectionProps) => {
+}: LifecyclePolicySectionProps) => {
   const { trigger } = useFormContext<BucketProtectionFormValues>()
   const hasNoPolicy = !hasDays && !hasVersions
 
@@ -225,7 +225,7 @@ const ExpirationPolicySection = ({
     <div className="flex flex-col gap-y-4">
       <div>
         <p className="mb-1.5 flex items-center gap-x-1.5 text-sm font-medium text-foreground">
-          Expiration policy
+          Lifecycle policy
           <BroomSparklesIcon size={14} className="text-foreground-lighter" />
         </p>
         <ExpirationSentence
@@ -309,8 +309,8 @@ const ExpirationPolicySection = ({
       {hasNoPolicy && (
         <Admonition
           type="warning"
-          title="No expiration policy"
-          description="All noncurrent versions count toward storage usage and incur ongoing costs. Consider setting an expiration policy to automatically remove outdated versions."
+          title="No lifecycle policy"
+          description="All noncurrent versions count toward storage usage and incur ongoing costs. Consider setting a lifecycle policy to automatically expire outdated versions."
         />
       )}
 
@@ -349,7 +349,7 @@ const ExpirationSentence = ({
   if (!hasDays && !hasVersions) {
     return (
       <p className="text-sm text-foreground-lighter leading-relaxed">
-        No expiration policy configured. Noncurrent versions will be retained indefinitely.
+        No lifecycle policy configured. Noncurrent versions will be retained indefinitely.
       </p>
     )
   }

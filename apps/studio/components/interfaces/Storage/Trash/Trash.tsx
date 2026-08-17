@@ -103,8 +103,7 @@ export const Trash = ({ bucketId }: TrashProps) => {
           <PageSectionContent className="flex flex-col gap-y-4">
             <div className="flex items-center justify-between gap-x-3">
               <p className="text-sm text-foreground-lighter">
-                Deleted versions in this bucket, restorable until their expiration policy removes
-                them
+                Deleted versions in this bucket, restorable until a lifecycle policy expires them
               </p>
               {isSuccess && objects.length > 0 && (
                 <Button variant="danger" icon={<Trash2 />} onClick={() => setShowDeleteAll(true)}>
@@ -119,7 +118,7 @@ export const Trash = ({ bucketId }: TrashProps) => {
               <Admonition
                 type="default"
                 title="No deleted versions"
-                description="Deleted versions appear here and can be restored until an expiration policy removes them."
+                description="Deleted versions appear here and can be restored until a lifecycle policy expires them."
               />
             )}
             {isSuccess && objects.length > 0 && (

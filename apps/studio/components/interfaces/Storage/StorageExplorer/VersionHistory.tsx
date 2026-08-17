@@ -417,7 +417,7 @@ const PolicyRow = ({ cap, expiryDays, mode }: PolicyRowProps) => {
         <TooltipContent side="top" className="max-w-64 space-y-1.5 pt-2.5">
           <div className="flex items-center gap-x-1">
             <BroomSparklesIcon size={16} className="shrink-0 mr-1" />
-            <p className="font-medium text-foreground">Expiration policy</p>
+            <p className="font-medium text-foreground">Lifecycle policy</p>
           </div>
           <p className="text-foreground-light">
             <PolicyFullRule cap={cap} expiryDays={expiryDays} mode={mode} />
