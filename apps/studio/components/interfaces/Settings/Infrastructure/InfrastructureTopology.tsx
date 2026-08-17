@@ -8,7 +8,7 @@ export const InfrastructureTopology = () => {
   if (!infrastructureReadReplicas) return null
 
   return (
-    <div className="w-full h-[400px] border border-muted rounded-md overflow-hidden flex flex-col relative">
+    <div className="w-full h-[400px] shrink-0 border border-muted rounded-md overflow-hidden relative">
       <InstanceConfiguration />
     </div>
   )
