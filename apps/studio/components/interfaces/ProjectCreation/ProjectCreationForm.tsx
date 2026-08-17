@@ -30,6 +30,7 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getAvailableRegions,
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
@@ -284,12 +285,18 @@ export const ProjectCreationForm = ({
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
+  // The geolocated default is only usable if the provider actually offers that region
+  // (e.g. AWS_NIMBUS is restricted to a single region)
+  const isAutoDefaultRegionAvailable = Object.entries(
+    getAvailableRegions(selectedCloudProvider)
+  ).some(([, region]) => region.displayName === autoDefaultRegion)
+  const validatedAutoDefaultRegion = isAutoDefaultRegionAvailable ? autoDefaultRegion : undefined
   const defaultRegion =
     highAvailability && highAvailabilityRegionCode !== undefined
       ? highAvailabilityRegion?.name
       : smartRegionEnabled
         ? recommendedSmartRegion
-        : (autoDefaultRegion ?? fixedDefaultRegion)
+        : (validatedAutoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =

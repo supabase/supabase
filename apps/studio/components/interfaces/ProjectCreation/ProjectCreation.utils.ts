@@ -8,13 +8,16 @@ export function smartRegionToExactRegion(smartOrExactRegion: string) {
   return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
 }
 
-export function getAvailableRegions(cloudProvider: CloudProvider): Region {
+export function getAvailableRegions(
+  cloudProvider: CloudProvider,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+): Region {
   switch (cloudProvider) {
     case 'AWS':
     case 'AWS_K8S':
       return AWS_REGIONS
     case 'AWS_NIMBUS':
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') {
+      if (environment !== 'prod') {
         // Only allow Southeast Asia for Nimbus (local/staging)
         return {
           SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA,

@@ -1,3 +1,4 @@
+import { AWS_REGIONS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -6,8 +7,24 @@ import {
 } from './ProjectCreation.constants'
 import {
   filterHighAvailabilityRegions,
+  getAvailableRegions,
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
+
+describe('getAvailableRegions', () => {
+  it.each(['local', 'staging', 'prod'])('returns all AWS regions for AWS on %s', (environment) => {
+    expect(getAvailableRegions('AWS', environment)).toEqual(AWS_REGIONS)
+    expect(getAvailableRegions('AWS_K8S', environment)).toEqual(AWS_REGIONS)
+  })
+
+  it.each([
+    ['local', { SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA }],
+    ['staging', { SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA }],
+    ['prod', { EAST_US: AWS_REGIONS.EAST_US }],
+  ])('returns the single AWS_NIMBUS region on %s', (environment, expectedRegions) => {
+    expect(getAvailableRegions('AWS_NIMBUS', environment)).toEqual(expectedRegions)
+  })
+})
 
 describe('High Availability project creation constraints', () => {
   it('pins the Alpha Postgres engine and release channel', () => {
