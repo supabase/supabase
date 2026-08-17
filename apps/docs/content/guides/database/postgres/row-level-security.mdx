@@ -639,7 +639,7 @@ using ( (select auth.uid()) = user_id );
 
 This prevents the policy `( (select auth.uid()) = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
 
-These three rules keep policies correct as a table grows. For the measured impact and for tuning beyond them, see [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance).
+These three rules keep policies correct as a table grows. To diagnose whether a policy is still the bottleneck, and to tune beyond these rules, see [Row Level Security performance](/docs/guides/database/postgres/row-level-security-performance).
 
 ### Use security definer functions
 
