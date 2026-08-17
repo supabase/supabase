@@ -57,7 +57,7 @@ export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
   if (pathname.startsWith('/guides/troubleshooting')) {
     return [
       {
-        name: 'Monitoring and Debugging',
+        name: 'Observability',
         url: '/guides/monitoring-and-debugging',
       },
       { name: 'Detect and resolve issues' },

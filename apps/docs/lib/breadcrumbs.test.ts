@@ -6,7 +6,7 @@ describe('resolveBreadcrumbs', () => {
   it('places troubleshooting under detect and resolve', () => {
     expect(resolveBreadcrumbs('/guides/troubleshooting')).toEqual([
       {
-        name: 'Monitoring and Debugging',
+        name: 'Observability',
         url: '/guides/monitoring-and-debugging',
       },
       { name: 'Detect and resolve issues' },
