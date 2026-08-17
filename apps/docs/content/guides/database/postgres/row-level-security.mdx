@@ -39,7 +39,7 @@ RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wiki
 
 [Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) are Postgres's rule engine. Each policy is attached to a table, and the policy is executed every time a table is accessed.
 
-Think of a policy as adding a `WHERE` clause to every query. For example a policy like this ...
+Think of a policy as adding a `WHERE` clause to every query. For example, a policy like this:
 
 ```sql
 create policy "Individuals can view their own todos."
@@ -47,7 +47,7 @@ on todos for select
 using ( (select auth.uid()) = user_id );
 ```
 
-.. would translate to this whenever a user tries to select from the todos table:
+That policy translates to this whenever a user tries to select from the todos table:
 
 ```sql
 select *
