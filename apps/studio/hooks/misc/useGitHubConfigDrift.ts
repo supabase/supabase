@@ -1,106 +1,130 @@
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useCallback, useMemo } from 'react'
 
-import { useGitHubConfigDriftContext } from '@/components/layouts/ProjectLayout/GitHubConfigDriftProvider'
+import type { Branch } from '@/data/branches/branches-query'
+import { useBranchesQuery } from '@/data/branches/branches-query'
+import { useGitHubConfigQuery } from '@/data/config/github-config-query'
+import { projectConfigV2QueryOptions } from '@/data/config/project-config-query'
+import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 import { getConfigDriftSummary } from '@/lib/github-config-drift'
-import {
-  resolveEffectiveGitHubConfigWithLayers,
-  resolveGitHubConfigResponse,
-  type GitHubConfigResolvedLayer,
-} from '@/lib/github-config-effective'
-import type { GitHubConfigResponse } from '@/lib/github-config.types'
 
-const EMPTY_RESOLVED_LAYERS: GitHubConfigResolvedLayer[] = []
-
-export function useSelectedGitHubConfig() {
-  const { gitBranch, target, githubConfigQuery } = useGitHubConfigDriftContext()
-  const resolveConfig = useCallback(
-    (response: GitHubConfigResponse) =>
-      resolveGitHubConfigResponse(response, { target, gitBranch }),
-    [gitBranch, target]
-  )
-  const data = useMemo(
-    () => (githubConfigQuery.data ? resolveConfig(githubConfigQuery.data) : undefined),
-    [githubConfigQuery.data, resolveConfig]
-  )
-
-  return { ...githubConfigQuery, data }
+function getGitBranchName(branch?: Branch): string | undefined {
+  return branch?.git_branch?.trim() || (branch?.is_default ? undefined : branch?.name?.trim())
 }
 
 export function useSelectedGitHubConfigDrift() {
+  const { ref: projectRef } = useParams()
   const {
-    gitBranch,
-    target,
-    shouldLoad,
-    hasConnection,
-    projectQuery,
-    branchesQuery,
-    connectionQuery,
-    projectConfigQuery,
-    githubConfigQuery,
-    refetch,
-  } = useGitHubConfigDriftContext()
+    data: project,
+    isPending: isProjectPending,
+    isFetching: isProjectFetching,
+    isError: isProjectError,
+    error: projectError,
+  } = useSelectedProjectQuery()
+  const parentProjectRef = project?.parentRef ?? projectRef
+  const shouldLoad = IS_PLATFORM && Boolean(projectRef) && Boolean(project)
 
-  const effectiveConfigResult = useMemo(
+  const {
+    data: branches = [],
+    isPending: isBranchesPending,
+    isFetching: isBranchesFetching,
+    isError: isBranchesError,
+    error: branchesError,
+    isSuccess: isBranchesSuccess,
+    refetch: branchesRefetch,
+  } = useBranchesQuery({ projectRef: parentProjectRef }, { enabled: shouldLoad })
+  const {
+    data: connection,
+    isPending: isConnectionPending,
+    isFetching: isConnectionFetching,
+    isError: isConnectionError,
+    error: connectionError,
+    isSuccess: isConnectionSuccess,
+    refetch: connectionRefetch,
+  } = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
+  const hasConnection = connection !== undefined
+  const selectedBranch = branches.find((branch) => branch.project_ref === projectRef)
+  const gitBranch = getGitBranchName(selectedBranch)
+  const queriesEnabled = shouldLoad && isBranchesSuccess && isConnectionSuccess && hasConnection
+
+  const {
+    data: projectConfig,
+    isPending: isProjectConfigPending,
+    isFetching: isProjectConfigFetching,
+    isError: isProjectConfigError,
+    error: projectConfigError,
+    isSuccess: isProjectConfigSuccess,
+    refetch: projectConfigRefetch,
+  } = useQuery({
+    ...projectConfigV2QueryOptions({ projectRef }),
+    enabled: queriesEnabled,
+    staleTime: 30_000,
+  })
+  const {
+    data: effectiveConfigResult,
+    isPending: isGithubConfigPending,
+    isFetching: isGithubConfigFetching,
+    isError: isGithubConfigError,
+    error: githubConfigError,
+    isSuccess: isGithubConfigSuccess,
+    refetch: githubConfigRefetch,
+  } = useGitHubConfigQuery(
+    { connectionId: connection?.id, repository: connection?.repository.name, branch: gitBranch },
+    { enabled: queriesEnabled }
+  )
+
+  const refetch = useCallback(
     () =>
-      githubConfigQuery.data
-        ? resolveEffectiveGitHubConfigWithLayers(githubConfigQuery.data.config, {
-            target,
-            gitBranch,
-          })
-        : undefined,
-    [gitBranch, githubConfigQuery.data, target]
+      Promise.all([
+        branchesRefetch(),
+        connectionRefetch(),
+        projectConfigRefetch(),
+        githubConfigRefetch(),
+      ]),
+    [branchesRefetch, connectionRefetch, projectConfigRefetch, githubConfigRefetch]
   )
 
   const summary = useMemo(
     () =>
       getConfigDriftSummary({
-        dashboardConfig: projectConfigQuery.data?.attributes,
+        dashboardConfig: projectConfig?.attributes,
         githubConfig: effectiveConfigResult?.config,
       }),
-    [projectConfigQuery.data?.attributes, effectiveConfigResult?.config]
+    [projectConfig?.attributes, effectiveConfigResult?.config]
   )
-  const isReady =
-    shouldLoad && hasConnection && projectConfigQuery.isSuccess && githubConfigQuery.isSuccess
-  const source = githubConfigQuery.data?.source
+  const isReady = shouldLoad && hasConnection && isProjectConfigSuccess && isGithubConfigSuccess
+  const source = effectiveConfigResult?.source
   const hasSourceBranchFallback =
     gitBranch !== undefined && source !== undefined && source.branch !== gitBranch
   const issueCount = summary.driftedFields.length
 
   return {
-    gitBranch,
     requestedGitBranch: gitBranch,
     source,
-    resolvedLayers: effectiveConfigResult?.layers ?? EMPTY_RESOLVED_LAYERS,
     hasSourceBranchFallback,
     isReady,
     isPending:
-      projectQuery.isPending ||
+      isProjectPending ||
       (shouldLoad &&
-        (branchesQuery.isPending ||
-          connectionQuery.isPending ||
-          (hasConnection && (projectConfigQuery.isPending || githubConfigQuery.isPending)))),
+        (isBranchesPending ||
+          isConnectionPending ||
+          (hasConnection && (isProjectConfigPending || isGithubConfigPending)))),
     isFetching:
-      projectQuery.isFetching ||
+      isProjectFetching ||
       (shouldLoad &&
-        (branchesQuery.isFetching ||
-          connectionQuery.isFetching ||
-          (hasConnection && (projectConfigQuery.isFetching || githubConfigQuery.isFetching)))),
+        (isBranchesFetching ||
+          isConnectionFetching ||
+          (hasConnection && (isProjectConfigFetching || isGithubConfigFetching)))),
     isError:
-      projectQuery.isError ||
+      isProjectError ||
       (shouldLoad &&
-        (branchesQuery.isError ||
-          connectionQuery.isError ||
-          projectConfigQuery.isError ||
-          githubConfigQuery.isError)),
+        (isBranchesError || isConnectionError || isProjectConfigError || isGithubConfigError)),
     error:
-      projectQuery.error ??
-      branchesQuery.error ??
-      connectionQuery.error ??
-      projectConfigQuery.error ??
-      githubConfigQuery.error,
-    hasDrift: isReady && summary.driftedFields.length > 0,
+      projectError ?? branchesError ?? connectionError ?? projectConfigError ?? githubConfigError,
     hasConfigurationIssues: isReady && issueCount > 0,
-    issueCount,
     unmanagedFields: summary.unmanagedFields,
     summary,
     refetch,
