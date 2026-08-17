@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react'
 
+import { GitHubConfigDriftProvider } from './GitHubConfigDriftProvider'
 import { DatabaseSelectorStateContextProvider } from '@/state/database-selector'
 import { RoleImpersonationStateContextProvider } from '@/state/role-impersonation-state'
 import { SqlEditorSaveCoordinatorProvider } from '@/state/sql-editor/sql-editor-save-coordinator'
@@ -19,7 +20,9 @@ export const ProjectContextProvider = ({
       <TabsStateContextProvider key={`tabs-state-${projectRef}`}>
         <DatabaseSelectorStateContextProvider key={`database-selector-state-${projectRef}`}>
           <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
-            <SqlEditorSaveCoordinatorProvider>{children}</SqlEditorSaveCoordinatorProvider>
+            <SqlEditorSaveCoordinatorProvider>
+              <GitHubConfigDriftProvider>{children}</GitHubConfigDriftProvider>
+            </SqlEditorSaveCoordinatorProvider>
           </RoleImpersonationStateContextProvider>
         </DatabaseSelectorStateContextProvider>
       </TabsStateContextProvider>

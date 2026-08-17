@@ -7,6 +7,7 @@ import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   const router = useRouter()
@@ -47,6 +48,16 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/settings/general`,
         defaultHidden: true,
       },
+      ...(IS_PLATFORM
+        ? [
+            {
+              id: 'nav-project-settings-configuration-drift',
+              name: 'Code configuration',
+              route: `/project/${ref}/settings/configuration-drift`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-project-settings-database',
         name: 'Database Settings',
