@@ -39,6 +39,7 @@ const RadioGroupStackedItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       id={id}
+      aria-labelledby={`${id}-label`}
       {...props}
       className={cn(
         // Base layout and sizing
@@ -82,8 +83,8 @@ const RadioGroupStackedItem = React.forwardRef<
           </div>
         )}
         <div className="flex flex-col gap-0.25 items-start">
-          <Label
-            htmlFor={id}
+          <div
+            id={`${id}-label`}
             className={cn(
               // Base styles
               'block mt-[-0.15rem] text-sm text-left text-light',
@@ -94,7 +95,7 @@ const RadioGroupStackedItem = React.forwardRef<
             )}
           >
             {label}
-          </Label>
+          </div>
           {props.description && (
             <p className="text-left text-sm text-foreground-lighter text-balance">
               {props.description}
