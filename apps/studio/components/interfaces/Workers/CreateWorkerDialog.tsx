@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Lock } from 'lucide-react'
+import { Check, Copy, Lock, Sparkles } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
+  copyToClipboard,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -36,6 +37,7 @@ import {
   WORKER_MIN_INSTANCES,
 } from './Workers.constants'
 import { WorkerSnippetTabs } from './WorkerSnippetTabs'
+import { buildWorkerSnippets } from './workerSnippets'
 import { deployWorker } from '@/state/workers-mock-state'
 
 const FORM_ID = 'create-worker-form'
@@ -77,6 +79,7 @@ interface CreateWorkerDialogProps {
 export const CreateWorkerDialog = ({ open, onOpenChange }: CreateWorkerDialogProps) => {
   const { ref } = useParams()
   const [rejection, setRejection] = useState<string | null>(null)
+  const [isPromptCopied, setIsPromptCopied] = useState(false)
 
   const form = useForm<CreateWorkerForm>({
     resolver: zodResolver(FormSchema),
@@ -94,6 +97,12 @@ export const CreateWorkerDialog = ({ open, onOpenChange }: CreateWorkerDialogPro
     size,
     access,
     instances: Number(instances) || 1,
+  }
+
+  const handleCopyPrompt = () => {
+    setIsPromptCopied(true)
+    copyToClipboard(buildWorkerSnippets(snippetInput).aiPrompt)
+    setTimeout(() => setIsPromptCopied(false), 2000)
   }
 
   const handleClose = () => {
@@ -273,9 +282,25 @@ export const CreateWorkerDialog = ({ open, onOpenChange }: CreateWorkerDialogPro
                 </div>
               </div>
 
-              <div className="space-y-2 pt-2">
-                <p className="text-sm text-foreground-light">Or run it yourself</p>
+              <div className="space-y-3 pt-2">
                 <WorkerSnippetTabs input={snippetInput} tabs={['cli', 'curl', 'config']} />
+
+                <div className="flex items-center justify-between gap-3 rounded-md border border-default bg-surface-100 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles size={14} className="text-foreground-light" />
+                    <p className="text-sm text-foreground-light">
+                      Prefer an agent? Copy a ready-to-paste prompt instead.
+                    </p>
+                  </div>
+                  <Button
+                    variant="default"
+                    size="tiny"
+                    icon={isPromptCopied ? <Check className="text-brand" /> : <Copy />}
+                    onClick={handleCopyPrompt}
+                  >
+                    {isPromptCopied ? 'Copied' : 'Copy AI Prompt'}
+                  </Button>
+                </div>
               </div>
 
               {rejection && (
