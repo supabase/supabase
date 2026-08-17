@@ -8,8 +8,12 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
+import { getConnectionStatusUi } from './AWSPrivateLink.utils'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 
 interface AWSPrivateLinkAccountItemProps {
@@ -17,6 +21,9 @@ interface AWSPrivateLinkAccountItemProps {
   account_name?: string
   database_type?: 'PRIMARY' | 'READ_REPLICA'
   database_identifier?: string
+  resource_access_manager_resource_config_id?: string
+  resource_access_manager_resource_config_arn?: string
+  resource_access_manager_share_arn?: string
   status:
     | 'CREATING'
     | 'READY'
@@ -34,6 +41,9 @@ export const AWSPrivateLinkAccountItem = ({
   account_name,
   database_type,
   database_identifier,
+  resource_access_manager_resource_config_id,
+  resource_access_manager_resource_config_arn,
+  resource_access_manager_share_arn,
   status,
   onEdit,
   onDelete,
@@ -42,35 +52,38 @@ export const AWSPrivateLinkAccountItem = ({
     database_type === 'READ_REPLICA'
       ? `Read replica (ID: ${database_identifier ? formatDatabaseID(database_identifier) : 'Unknown identifier'})`
       : 'Primary database'
-
-  const getStatusBadge = () => {
-    switch (status) {
-      case 'ASSOCIATION_ACCEPTED':
-        return <Badge variant="success">Connected</Badge>
-      case 'READY':
-        return <Badge variant="success">Ready</Badge>
-      case 'CREATING':
-        return <Badge variant="warning">Creating</Badge>
-      case 'DELETING':
-        return <Badge variant="destructive">Deleting</Badge>
-      case 'ASSOCIATION_REQUEST_EXPIRED':
-        return <Badge variant="destructive">Expired</Badge>
-      case 'CREATION_FAILED':
-        return <Badge variant="destructive">Failed</Badge>
-      default:
-        return <Badge>Unknown</Badge>
-    }
-  }
+  const statusUi = getConnectionStatusUi(status)
 
   return (
     <CardContent className="flex items-center justify-between text-sm gap-4">
       <div className="flex-1">
-        <div>{aws_account_id}</div>
-        <div className="text-xs text-foreground-lighter">{databaseTarget}</div>
-        <div className="text-sm text-foreground-lighter">{account_name || 'No description'}</div>
+        {account_name && <div className="font-medium text-foreground">{account_name}</div>}
+        <div className="text-xs text-foreground-lighter">Database: {databaseTarget}</div>
+        <div className="text-xs text-foreground-lighter">Destination account: {aws_account_id}</div>
+        {resource_access_manager_resource_config_id && (
+          <div className="flex items-center gap-x-1 text-xs text-foreground-lighter">
+            <span>Resource configuration:</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="font-mono">{resource_access_manager_resource_config_id}</span>
+              </TooltipTrigger>
+              {(resource_access_manager_resource_config_arn ||
+                resource_access_manager_share_arn) && (
+                <TooltipContent side="bottom" className="max-w-xs break-all">
+                  {resource_access_manager_resource_config_arn && (
+                    <p>Resource config ARN: {resource_access_manager_resource_config_arn}</p>
+                  )}
+                  {resource_access_manager_share_arn && (
+                    <p>Resource share ARN: {resource_access_manager_share_arn}</p>
+                  )}
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </div>
+        )}
       </div>
 
-      {getStatusBadge()}
+      <Badge variant={statusUi.badgeVariant}>{statusUi.badge}</Badge>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -79,12 +92,12 @@ export const AWSPrivateLinkAccountItem = ({
         <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem onClick={onEdit} className="gap-x-2">
             <Edit size={14} />
-            <span>View account</span>
+            <span>View connection</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onDelete} className="gap-x-2">
             <Trash size={14} />
-            <span>Delete account</span>
+            <span>Delete connection</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

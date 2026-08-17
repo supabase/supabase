@@ -34,8 +34,8 @@ It eliminates the need for servers to continuously poll for database changes and
 
 ```sql
 -- Example: enable the "pg_net" extension.
-create extension pg_net;
--- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts.
+create extension pg_net with schema "extensions";
+-- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts. Registering it in the extensions schema avoids exposing it in public and satisfies the Security Advisor check.
 
 -- Example: disable the "pg_net" extension
 drop extension if exists pg_net;

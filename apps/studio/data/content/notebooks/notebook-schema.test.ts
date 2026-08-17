@@ -3,8 +3,10 @@ import { describe, expect, it } from 'vitest'
 
 import {
   agentNotebookSchema,
+  isQueryCell,
   notebookDomainSchema,
   notebookSchema,
+  timeRangeSchema,
   writableNotebookSchema,
 } from './notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
@@ -114,6 +116,116 @@ describe('notebookSchema', () => {
 
     expect(result.success).toBe(false)
   })
+
+  it('accepts an optional database_identifier on a database_cell', () => {
+    const result = notebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'database_cell',
+          id: '1',
+          sql: 'select 1',
+          row_limit: 100,
+          database_identifier: 'replica-1',
+        },
+      ],
+    })
+
+    expect(result.success).toBe(true)
+  })
+
+  it('keeps a chart configured while the table view is selected', () => {
+    const result = notebookSchema.safeParse({
+      schema_version: 1,
+      cells: [
+        {
+          _tag: 'database_cell',
+          id: '1',
+          sql: 'select 1',
+          row_limit: 100,
+          view: 'table',
+          chart: {
+            type: 'bar',
+            x_column: 'day',
+            y_columns: ['signups'],
+            cumulative: false,
+            show_labels: true,
+          },
+        },
+      ],
+    })
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+    expect(result.data.cells[0]).toMatchObject({ view: 'table', chart: { x_column: 'day' } })
+  })
+})
+
+describe('timeRangeSchema', () => {
+  const logCell = (time_range: unknown) => ({
+    schema_version: 1,
+    cells: [{ _tag: 'log_cell', id: '1', sql: 'select 1', time_range }],
+  })
+
+  it('rejects a relative_time_range with a non-positive or fractional amount', () => {
+    expect(
+      timeRangeSchema.safeParse({ _tag: 'relative_time_range', unit: 'hour', amount: 0 }).success
+    ).toBe(false)
+    expect(
+      timeRangeSchema.safeParse({ _tag: 'relative_time_range', unit: 'hour', amount: -1 }).success
+    ).toBe(false)
+    expect(
+      timeRangeSchema.safeParse({ _tag: 'relative_time_range', unit: 'hour', amount: 1.5 }).success
+    ).toBe(false)
+  })
+
+  it('accepts every relative unit the wire schema allows', () => {
+    for (const unit of ['minute', 'hour', 'day', 'week', 'month', 'year']) {
+      expect(
+        timeRangeSchema.safeParse({ _tag: 'relative_time_range', unit, amount: 2 }).success
+      ).toBe(true)
+    }
+  })
+
+  it('rejects an absolute_time_range that does not move forward in time', () => {
+    const equal = timeRangeSchema.safeParse({
+      _tag: 'absolute_time_range',
+      start: '2025-01-01T00:00:00.000Z',
+      end: '2025-01-01T00:00:00.000Z',
+    })
+    expect(equal.success).toBe(false)
+    expect(equal.error?.issues[0].path).toEqual(['end'])
+
+    expect(
+      timeRangeSchema.safeParse({
+        _tag: 'absolute_time_range',
+        start: '2025-01-02T00:00:00.000Z',
+        end: '2025-01-01T00:00:00.000Z',
+      }).success
+    ).toBe(false)
+
+    expect(
+      notebookSchema.safeParse(
+        logCell({
+          _tag: 'absolute_time_range',
+          start: '2025-01-02T00:00:00.000Z',
+          end: '2025-01-01T00:00:00.000Z',
+        })
+      ).success
+    ).toBe(false)
+  })
+
+  it('reports an invalid bound against its own field rather than the ordering rule', () => {
+    const result = timeRangeSchema.safeParse({
+      _tag: 'absolute_time_range',
+      start: 'not-a-date',
+      end: '2025-01-01T00:00:00.000Z',
+    })
+
+    expect(result.success).toBe(false)
+    expect(result.error?.issues).toHaveLength(1)
+    expect(result.error?.issues[0].path).toEqual(['start'])
+  })
 })
 
 describe('agentNotebookSchema', () => {
@@ -209,6 +321,20 @@ describe('writableNotebookSchema', () => {
     })
 
     expect(result.success).toBe(false)
+  })
+})
+
+describe('isQueryCell', () => {
+  it('narrows every runnable cell and excludes content cells', () => {
+    const result = notebookDomainSchema.safeParse(FULL_NOTEBOOK)
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    expect(result.data.cells.map(isQueryCell)).toEqual([false, true, true])
+    expect(result.data.cells.filter(isQueryCell).map((cell) => cell._tag)).toEqual([
+      'database_cell',
+      'log_cell',
+    ])
   })
 })
 

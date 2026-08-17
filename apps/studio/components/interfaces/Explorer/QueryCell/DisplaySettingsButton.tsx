@@ -20,8 +20,9 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ExplorerToolbarAction } from '../ExplorerToolbar'
-import { type QueryChartConfig, type QueryDisplay, type QueryResult } from '../types'
+import { type QueryDisplay, type QueryResult } from '../types'
 import { checkHasNonPositiveValues } from '@/components/ui/QueryBlock/QueryBlock.utils'
+import { type ChartConfig } from '@/data/content/notebooks/notebook-schema'
 
 interface DisplaySettingsButtonProps {
   display: QueryDisplay
@@ -66,7 +67,7 @@ export const DisplaySettingsButton = ({
     onChange({ ...display, view })
   }
 
-  const onUpdateChartConfig = (payload: Partial<QueryChartConfig>) => {
+  const onUpdateChartConfig = (payload: Partial<ChartConfig>) => {
     onChange({
       ...display,
       chart: {

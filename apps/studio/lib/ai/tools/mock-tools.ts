@@ -451,6 +451,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
           name: notebook.name,
           description: notebook.description,
           visibility: notebook.visibility,
+          updated_at: notebook.updated_at,
           cells: notebook.content.cells,
         }
       },
@@ -484,8 +485,14 @@ function createMockNotebookTools(store: MockNotebookStore) {
       ...update_notebook,
       // Same reasoning as create_notebook's override above.
       needsApproval: false,
+      // expected_updated_at is validated by the real inputSchema (spread above) but not
+      // checked here: the in-memory store has no concurrent writers for the eval harness
+      // to race against.
       execute: async (
-        { id, operations }: { id: string; operations: NotebookOperation[] },
+        {
+          id,
+          operations,
+        }: { id: string; expected_updated_at: string; operations: NotebookOperation[] },
         _options: ToolCallOptions
       ) => {
         const notebook = store.get(id)

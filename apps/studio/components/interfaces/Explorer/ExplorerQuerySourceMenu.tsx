@@ -1,7 +1,5 @@
 import { useFlag, useParams } from 'common'
-import dayjs from 'dayjs'
 import { Check, ChevronDown } from 'lucide-react'
-import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -15,25 +13,28 @@ import { DatabaseParametersSubMenu } from '@/components/interfaces/QuerySources/
 import { LogsCustomRangeDialog } from '@/components/interfaces/QuerySources/LogsCustomRangeDialog'
 import { LogsTimeRangeSubMenu } from '@/components/interfaces/QuerySources/LogsTimeRangeSubMenu'
 import { QuerySourceIcon } from '@/components/interfaces/QuerySources/QuerySourceIcon'
-import { maybeShowUpgradePromptIfNotEntitled } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { useLogsCustomRange } from '@/components/interfaces/QuerySources/useLogsCustomRange'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import {
-  createDefaultCellSource,
+  createDefaultSourceBinding,
   QUERY_SOURCE_LABELS,
   QUERY_SOURCES,
-  type CellSource,
+  type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 export type ExplorerQuerySourceMenuProps = {
-  source: CellSource
-  onSourceChange: (source: CellSource) => void
+  source: QuerySourceBinding
+  onSourceChange: (source: QuerySourceBinding) => void
 }
 
 /**
  * Source binding and parameter controls shared by standalone Explorer queries
  * and notebook query-cell toolbars. The consumer owns the binding; this menu
- * only emits complete, validated-by-construction `CellSource` values.
+ * only emits complete, validated-by-construction `QuerySourceBinding` values.
+ *
+ * Selecting a different backend emits that backend's default binding — deciding
+ * what happens to the query body is the consumer's call, since a notebook cell
+ * has SQL to preserve or discard and a fresh draft does not.
  */
 export const ExplorerQuerySourceMenu = ({
   source,
@@ -42,37 +43,22 @@ export const ExplorerQuerySourceMenu = ({
   const { ref } = useParams()
   const isLogsSourceEnabled = useFlag('sqlEditorLogsSource')
   const isOtelLogsEnabled = useFlag('otelLegacyLogs')
-  const [isCustomRangeOpen, setIsCustomRangeOpen] = useState(false)
-  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false)
-  const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
-  const entitledToLogDays = getEntitlementNumericValue()
+  const {
+    isCustomRangeOpen,
+    setIsCustomRangeOpen,
+    showUpgradePrompt,
+    setShowUpgradePrompt,
+    handleApplyCustomRange,
+  } = useLogsCustomRange({
+    onRangeChange: (time_range) => onSourceChange({ _tag: 'logs', time_range }),
+  })
 
   const availableSources = QUERY_SOURCES.filter(
     (candidate) =>
-      candidate.type !== 'logs' ||
+      candidate._tag !== 'logs' ||
       (isLogsSourceEnabled && isOtelLogsEnabled) ||
-      source.type === 'logs'
+      source._tag === 'logs'
   )
-
-  const applyCustomRange = ({ from, to }: { from: Date; to: Date }) => {
-    const fromIso = dayjs(from).startOf('day').toISOString()
-    if (maybeShowUpgradePromptIfNotEntitled(fromIso, entitledToLogDays)) {
-      setShowUpgradePrompt(true)
-      return
-    }
-
-    onSourceChange({
-      id: 'logs',
-      type: 'logs',
-      parameters: {
-        time_range: {
-          type: 'absolute',
-          from: fromIso,
-          to: dayjs(to).endOf('day').toISOString(),
-        },
-      },
-    })
-  }
 
   return (
     <>
@@ -81,56 +67,46 @@ export const ExplorerQuerySourceMenu = ({
           <Button
             variant="text"
             size="tiny"
-            aria-label={`Query source: ${QUERY_SOURCE_LABELS[source.id]}`}
-            icon={<QuerySourceIcon source={source.id} className="text-foreground-light" />}
+            aria-label={`Query source: ${QUERY_SOURCE_LABELS[source._tag]}`}
+            icon={<QuerySourceIcon source={source._tag} className="text-foreground-light" />}
             iconRight={<ChevronDown className="text-foreground-light" />}
           >
-            {QUERY_SOURCE_LABELS[source.id]}
+            {QUERY_SOURCE_LABELS[source._tag]}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
           {availableSources.map((candidate) => (
             <DropdownMenuItem
-              key={candidate.id}
+              key={candidate._tag}
               className="justify-between"
               onSelect={(event) => {
                 event.preventDefault()
-                if (candidate.id !== source.id) {
-                  onSourceChange(createDefaultCellSource(candidate.id))
+                if (candidate._tag !== source._tag) {
+                  onSourceChange(createDefaultSourceBinding(candidate._tag))
                 }
               }}
             >
               <span className="flex items-center gap-x-2">
-                <QuerySourceIcon source={candidate.id} className="text-foreground-light" />
-                {QUERY_SOURCE_LABELS[candidate.id]}
+                <QuerySourceIcon source={candidate._tag} className="text-foreground-light" />
+                {QUERY_SOURCE_LABELS[candidate._tag]}
               </span>
-              {source.id === candidate.id && <Check size={14} />}
+              {source._tag === candidate._tag && <Check size={14} />}
             </DropdownMenuItem>
           ))}
 
           <DropdownMenuSeparator />
 
-          {source.type === 'database' ? (
+          {source._tag === 'database' ? (
             <DatabaseParametersSubMenu
-              identifier={source.parameters.identifier ?? ref}
-              onIdentifierChange={(identifier) =>
-                onSourceChange({
-                  id: 'database',
-                  type: 'database',
-                  parameters: { identifier },
-                })
+              identifier={source.database_identifier ?? ref}
+              onIdentifierChange={(database_identifier) =>
+                onSourceChange({ _tag: 'database', database_identifier })
               }
             />
           ) : (
             <LogsTimeRangeSubMenu
-              range={source.parameters.time_range}
-              onRangeChange={(timeRange) =>
-                onSourceChange({
-                  id: 'logs',
-                  type: 'logs',
-                  parameters: { time_range: timeRange },
-                })
-              }
+              range={source.time_range}
+              onRangeChange={(time_range) => onSourceChange({ _tag: 'logs', time_range })}
               onOpenCustomRange={() => setIsCustomRangeOpen(true)}
               onShowUpgrade={() => setShowUpgradePrompt(true)}
             />
@@ -138,12 +114,12 @@ export const ExplorerQuerySourceMenu = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {source.type === 'logs' && (
+      {source._tag === 'logs' && (
         <>
           <LogsCustomRangeDialog
             open={isCustomRangeOpen}
             onOpenChange={setIsCustomRangeOpen}
-            onApply={applyCustomRange}
+            onApply={handleApplyCustomRange}
           />
           <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
         </>
