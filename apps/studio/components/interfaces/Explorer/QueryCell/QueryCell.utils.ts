@@ -118,6 +118,22 @@ export function setCellSql(cell: Snapshot<QueryCell>, sql: string): QueryCell {
 }
 
 /**
+ * Writes a new row limit onto a database cell. A log cell has no row limit concept, so it
+ * passes through unchanged.
+ */
+export function setCellRowLimit(cell: Snapshot<QueryCell>, rowLimit: number): QueryCell {
+  if (cell._tag === 'log_cell') return cloneQueryCell(cell)
+
+  return {
+    ...copyQueryCellBase(cell),
+    _tag: 'database_cell',
+    unchecked_sql: cell.unchecked_sql,
+    row_limit: rowLimit,
+    database_identifier: cell.database_identifier,
+  }
+}
+
+/**
  * Builds the editor's query model from a cell and the editor's live text buffer. Branding
  * the buffer is the editor boundary the safe-SQL model expects; which brand applies is
  * decided by the cell's tag, so the dialect can't drift from the cell it belongs to.

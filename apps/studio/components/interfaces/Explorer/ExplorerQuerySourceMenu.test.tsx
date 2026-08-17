@@ -44,7 +44,12 @@ describe('ExplorerQuerySourceMenu', () => {
   ) =>
     customRender(
       <FeatureFlagContext.Provider value={{ configcat: flags, posthog: {}, hasLoaded: true }}>
-        <ExplorerQuerySourceMenu source={source} onSourceChange={vi.fn()} />
+        <ExplorerQuerySourceMenu
+          rowLimit={100}
+          onRowLimitChange={vi.fn()}
+          source={source}
+          onSourceChange={vi.fn()}
+        />
       </FeatureFlagContext.Provider>
     )
 
@@ -53,6 +58,8 @@ describe('ExplorerQuerySourceMenu', () => {
 
     customRender(
       <ExplorerQuerySourceMenu
+        rowLimit={100}
+        onRowLimitChange={vi.fn()}
         source={{
           _tag: 'logs',
           time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },
@@ -72,6 +79,8 @@ describe('ExplorerQuerySourceMenu', () => {
 
     customRender(
       <ExplorerQuerySourceMenu
+        rowLimit={100}
+        onRowLimitChange={vi.fn()}
         source={{
           _tag: 'logs',
           time_range: { _tag: 'relative_time_range', amount: 1, unit: 'hour' },

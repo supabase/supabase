@@ -10,6 +10,7 @@ import {
   cloneChartConfig,
   cloneQueryCell,
   getCellDisplay,
+  setCellRowLimit,
   setCellSql,
   toQueryModel,
 } from './QueryCell.utils'
@@ -78,6 +79,9 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
       chart: cloneChartConfig(display.chart),
     }))
 
+  const handleRowLimitChange = (rowLimit: number) =>
+    updateQueryCell((candidate) => setCellRowLimit(candidate, rowLimit))
+
   return (
     <SortableSection
       id={cell.id}
@@ -97,6 +101,7 @@ export const QueryCell = ({ cell }: QueryCellProps) => {
         onSqlCommit={handleSqlCommit}
         onSourceChange={handleSourceChange}
         onResultChange={setResult}
+        onRowLimitChange={handleRowLimitChange}
         onDisplayChange={handleDisplayChange}
       />
     </SortableSection>

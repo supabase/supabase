@@ -6,6 +6,7 @@ import {
   cloneQueryCell,
   DEFAULT_CELL_ROW_LIMIT,
   getCellDisplay,
+  setCellRowLimit,
   setCellSql,
   toQueryModel,
 } from './QueryCell.utils'
@@ -119,6 +120,16 @@ describe('setCellSql', () => {
 
   it('writes the text back onto a log cell without touching its time range', () => {
     expect(setCellSql(LOG_CELL, 'select 2')).toEqual({ ...LOG_CELL, unchecked_sql: 'select 2' })
+  })
+})
+
+describe('setCellRowLimit', () => {
+  it('writes the row limit onto a database cell without touching its query', () => {
+    expect(setCellRowLimit(DATABASE_CELL, 500)).toEqual({ ...DATABASE_CELL, row_limit: 500 })
+  })
+
+  it('leaves a log cell unchanged, since it has no row limit concept', () => {
+    expect(setCellRowLimit(LOG_CELL, 500)).toEqual(LOG_CELL)
   })
 })
 

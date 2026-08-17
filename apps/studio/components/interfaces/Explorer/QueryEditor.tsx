@@ -76,6 +76,7 @@ export type QueryEditorProps = {
   onSqlCommit?: (sql: string) => void
   onSourceChange?: (source: QuerySourceBinding) => void
   onResultChange: (result: QueryResult) => void
+  onRowLimitChange?: (val: number) => void
   onDisplayChange?: (display: QueryDisplay) => void
 }
 
@@ -97,6 +98,7 @@ export const QueryEditor = ({
   onSqlCommit,
   onSourceChange,
   onResultChange,
+  onRowLimitChange,
   onDisplayChange,
 }: QueryEditorProps) => {
   const sql = query.uncheckedSql
@@ -205,6 +207,8 @@ export const QueryEditor = ({
             <ExplorerQuerySourceMenu
               source={toQuerySourceBinding(query)}
               onSourceChange={onSourceChange}
+              rowLimit={rowLimit}
+              onRowLimitChange={onRowLimitChange}
             />
           )}
           {display && onDisplayChange && (
@@ -267,7 +271,7 @@ export const QueryEditor = ({
         {rowLimit && (
           <>
             <p>·</p>
-            <p>Limit {rowLimit} rows</p>
+            <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
           </>
         )}
       </ExplorerQueryFooter>
