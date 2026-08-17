@@ -202,6 +202,38 @@ describe('explorer query drafts', () => {
     expect(persisted[`query-${MAX_PERSISTED_EXPLORER_QUERY_DRAFTS}`]).toBeDefined()
   })
 
+  it('persists and restores a per-draft row limit independently of other drafts', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.createDraft({ id: 'query-2', projectRef: 'project-a' })
+    state.updateDraft({ id: 'query-1', rowLimit: 500 })
+
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 500 })
+    expect(state.drafts['query-2']).toMatchObject({ rowLimit: 100 })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.restoreDraft({ id: 'query-2', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({ rowLimit: 500 })
+    expect(restored.drafts['query-2']).toMatchObject({ rowLimit: 100 })
+  })
+
+  it('defaults the row limit for drafts persisted before row limits existed', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': { name: 'Legacy query', sql: 'select 1', updatedAt: 1 },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
+  })
+
   it('removes the persisted draft and its session result when its tab closes', () => {
     const storage = createMemoryStorage()
     const state = createExplorerQueryState(storage)

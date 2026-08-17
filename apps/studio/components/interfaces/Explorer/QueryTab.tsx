@@ -19,7 +19,6 @@ export const QueryTab = () => {
   const querySnap = useExplorerQueryStateSnapshot()
   const roleImpersonationState = useLocalRoleImpersonationState()
 
-  const [rowLimit, setRowLimit] = useState<number>(100)
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
 
   const stateDraft = id ? querySnap.drafts[id] : undefined
@@ -84,7 +83,7 @@ export const QueryTab = () => {
       : {
           ...toQuerySourceBinding(draft),
           uncheckedSql: draft.uncheckedSql,
-          rowLimit,
+          rowLimit: draft.rowLimit,
         }
 
   return (
@@ -103,7 +102,7 @@ export const QueryTab = () => {
       onSqlChange={(sql) => explorerQueryState.updateDraft({ id, sql })}
       onSourceChange={(source) => explorerQueryState.updateDraft({ id, source })}
       onResultChange={handleResultChange}
-      onRowLimitChange={setRowLimit}
+      onRowLimitChange={(rowLimit) => explorerQueryState.updateDraft({ id, rowLimit })}
     />
   )
 }
