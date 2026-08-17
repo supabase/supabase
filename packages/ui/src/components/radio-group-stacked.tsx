@@ -32,10 +32,13 @@ interface RadioGroupStackedItemProps {
 const RadioGroupStackedItem = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   RadioGroupStackedItemProps & React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ image, label, showIndicator = true, ...props }, ref) => {
+>(({ id: idProp, image, label, showIndicator = true, ...props }, ref) => {
+  const generatedId = React.useId()
+  const id = idProp || generatedId
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
+      id={id}
       {...props}
       className={cn(
         // Base layout and sizing
@@ -80,7 +83,7 @@ const RadioGroupStackedItem = React.forwardRef<
         )}
         <div className="flex flex-col gap-0.25 items-start">
           <Label
-            htmlFor={props.value}
+            htmlFor={id}
             className={cn(
               // Base styles
               'block mt-[-0.15rem] text-sm text-left text-light',
