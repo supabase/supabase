@@ -227,7 +227,7 @@ export async function selectInitialOrgAndProject({
 
 // Chrome blocks scrollIntoView (triggered by .focus()) when overflow-x: hidden and
 // overflow-y: auto are on the same element. Manually scroll the sidebar instead.
-export function scrollToFirstFormError(formId: string, fieldName: string) {
+export function scrollToRequiredField(formId: string, fieldName: string) {
   const form = document.getElementById(formId)
   if (!form) return
 
