@@ -34,6 +34,7 @@ export const ReadReplicaEligibilityWarnings = () => {
     parseAsBoolean.withDefault(false).withOptions({
       history: 'push',
       clearOnDefault: true,
+      scroll: false,
     })
   )
 

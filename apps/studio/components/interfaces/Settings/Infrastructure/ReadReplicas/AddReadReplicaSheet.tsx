@@ -18,6 +18,7 @@ export const AddReadReplicaSheet = ({ onSuccess }: AddReadReplicaSheetProps) => 
     parseAsBoolean.withDefault(false).withOptions({
       history: 'push',
       clearOnDefault: true,
+      scroll: false,
     })
   )
 
@@ -37,7 +38,14 @@ export const AddReadReplicaSheet = ({ onSuccess }: AddReadReplicaSheetProps) => 
   return (
     <>
       <Sheet open={visible} onOpenChange={handleOpenChange}>
-        <SheetContent size="lg" showClose={false} className="max-w-3xl">
+        <SheetContent
+          size="lg"
+          showClose={false}
+          className="max-w-3xl"
+          // Default close restores focus to Add read replica and the browser
+          // scrolls that button into view through nested overflow mains.
+          onCloseAutoFocus={(event) => event.preventDefault()}
+        >
           <div className="flex flex-col h-full min-h-0" tabIndex={-1}>
             <SheetHeader className="flex items-center justify-between">
               <div>

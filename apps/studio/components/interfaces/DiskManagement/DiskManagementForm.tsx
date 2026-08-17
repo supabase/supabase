@@ -98,6 +98,7 @@ export function DiskManagementForm({
 
   const scrollToComputeSection = () => {
     scrollElementIntoContainer(computeSettingsRef.current, mainScrollContainerRef.current)
+    computeSettingsRef.current?.focus({ preventScroll: true })
   }
 
   const isSpendCapEnabled = org?.plan.id !== 'free' && !org?.usage_billing_enabled

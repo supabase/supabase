@@ -33,6 +33,7 @@ export const ReadReplicasSection = () => {
     parseAsBoolean.withDefault(false).withOptions({
       history: 'push',
       clearOnDefault: true,
+      scroll: false,
     })
   )
 
