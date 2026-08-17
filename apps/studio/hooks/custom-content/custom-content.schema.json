@@ -26,7 +26,7 @@
 
     "dashboard_auth:logo_link_url": {
       "type": ["string", "null"],
-      "description": "The URL the logo on the auth pages (sign in, forgot password, etc.) links to. Defaults to https://supabase.com"
+      "description": "The URL for the logo on the auth pages (sign in, forgot password, etc.) links to. Defaults to https://supabase.com"
     },
 
     "docs:row_level_security_guide_path": {
