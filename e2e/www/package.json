@@ -7,6 +7,7 @@
     "e2e:www": "node --experimental-strip-types scripts/run-e2e-www.ts",
     "e2e:www:all": "node --experimental-strip-types scripts/run-e2e-www.ts --all",
     "e2e:www:a11y": "node --experimental-strip-types scripts/run-e2e-www.ts --grep @a11y",
+    "e2e:www:global-elements": "node --experimental-strip-types scripts/run-e2e-www-global-elements.ts",
     "resolve-www-scope": "node --experimental-strip-types scripts/resolve-www-scope.ts"
   },
   "dependencies": {

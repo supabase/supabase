@@ -3,6 +3,7 @@ import type { Result } from 'axe-core'
 
 import {
   blockingViolations as blockingViolationsFor,
+  scanExcluding,
   scanRegion,
   unloadedResult as unloadedResultFor,
   type A11yScanResult,
@@ -46,6 +47,63 @@ export async function scanArticle(
   return { ...result, violations: [...result.violations, ...pageViolations] }
 }
 
+// These are clean across the page list, so enforcing them only catches a newly
+// introduced violation. `document-title`, `html-has-lang`, `html-lang-valid`, and
+// `meta-viewport` are unreachable from an article-scoped scan.
+export const GLOBAL_ELEMENTS_ENFORCED_RULES = [
+  'aria-allowed-attr',
+  'aria-conditional-attr',
+  'aria-deprecated-role',
+  'aria-hidden-body',
+  'aria-prohibited-attr',
+  'aria-required-attr',
+  'aria-roles',
+  'aria-valid-attr',
+  'aria-valid-attr-value',
+  'avoid-inline-spacing',
+  'button-name',
+  'bypass',
+  'document-title',
+  'form-field-multiple-labels',
+  'html-has-lang',
+  'html-lang-valid',
+  'image-alt',
+  'label',
+  'list',
+  'listitem',
+  'meta-viewport',
+  'svg-img-alt',
+]
+
+// Best practice rather than WCAG, so these need their own pass. Reported only:
+// the footer `h6` under the screen-reader-only `h2` is on nearly every page.
+export const GLOBAL_ELEMENTS_EXTRA_REPORTED_RULES = ['heading-order', 'landmark-unique']
+
+// `color-contrast` and the `<html>`-level rules are only reachable once the scan
+// covers the document, so nothing is excluded here.
+export const GLOBAL_ELEMENTS_EXCLUDED_RULES: string[] = []
+
+export async function scanGlobalElements(
+  page: Page,
+  surface: string,
+  exclude: string[]
+): Promise<A11yScanResult> {
+  const result = await scanExcluding(page, {
+    surface,
+    exclude,
+    excludeRules: GLOBAL_ELEMENTS_EXCLUDED_RULES,
+  })
+
+  // Both are properties of the whole document, so this pass keeps the article in.
+  // Excluding it would hide the event template's nested `<main>`.
+  const extra = await scan(page, { rules: GLOBAL_ELEMENTS_EXTRA_REPORTED_RULES })
+  const byRule = new Map(
+    [...result.violations, ...extra].map((violation) => [violation.id, violation])
+  )
+
+  return { ...result, violations: [...byRule.values()] }
+}
+
 export function unloadedResult(
   surface: string,
   url: string,
@@ -53,6 +111,18 @@ export function unloadedResult(
   include: string
 ): A11yScanResult {
   return unloadedResultFor(surface, url, status, include, EXCLUDED_RULES)
+}
+
+export function unloadedGlobalElementsResult(
+  surface: string,
+  url: string,
+  status: number | null
+): A11yScanResult {
+  return unloadedResultFor(surface, url, status, 'document', GLOBAL_ELEMENTS_EXCLUDED_RULES)
+}
+
+export function blockingGlobalElementViolations(result: A11yScanResult): Result[] {
+  return blockingViolationsFor(result, GLOBAL_ELEMENTS_ENFORCED_RULES)
 }
 
 export function blockingViolations(result: A11yScanResult): Result[] {
@@ -63,6 +133,7 @@ export type { A11yScanResult }
 export {
   annotate,
   attachScanReport,
+  dedupeViolations,
   MIN_MEANINGFUL_ELEMENTS,
   scanLooksEmpty,
   shouldEnforceAll,

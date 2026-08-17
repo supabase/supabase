@@ -106,6 +106,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
           )}
         />
         <nav
+          data-testid="sb-www-nav"
           className={cn(
             `relative z-40 border-default border-b backdrop-blur-xs transition-all duration-300`,
             showLaunchWeekNavMode && 'border-muted border-b bg-transparent',

@@ -5,7 +5,7 @@ site content pages.
 
 Use this suite when you change blog posts, events, customer stories, or
 alternatives pages under `apps/www`. It loads each in-scope page, checks that it
-returns a successful status, and scans it for a single accessibility rule.
+returns a successful status, and scans it for accessibility violations.
 
 This page covers:
 
@@ -15,6 +15,8 @@ This page covers:
 - [Override which pages run](#override-which-pages-run) — when the default git
   scope is wrong
 - [What the suite covers](#what-the-suite-covers) — in-scope paths and limits
+- [Accessibility scans](#accessibility-scans) — WCAG coverage and warn mode
+- [Global element scans](#global-element-scans) — nav, footer, and page scaffolding
 - [Debug failures](#debug-failures) — reports and traces
 - [How CI uses this suite](#how-ci-uses-this-suite) — pull request behavior
 
@@ -124,9 +126,13 @@ enforcing it would fail every alternatives pull request.
 
 - Events with `disable_page_build: true`, which return a 404 by design
 - Static marketing routes under `apps/www/pages` and `apps/www/app`
-- Index and listing pages such as `/blog` and `/customers`
+- Index and listing pages such as `/blog` and `/customers`, for the page suite.
+  The global-element suite covers them.
 - Link checking
-- Shared chrome: header, footer, and anything else outside the article wrapper
+
+Shared chrome — the nav, the footer, and everything else outside the article
+wrapper — belongs to the global-element suite described in
+[Global element scans](#global-element-scans).
 
 ### Limits
 
@@ -156,6 +162,34 @@ added.
 **Configuration:** article selectors per template live in `utils/www-selectors.ts`,
 rule lists in `utils/axe-helpers.ts`.
 
+## Global element scans
+
+Global elements are everything outside the article: the nav, the footer, and the rest
+of the page scaffolding.
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:www:global-elements
+```
+
+**Why this is a separate suite:**
+
+- **Attribution.** Global markup renders on every page. Scanning it alongside changed
+  content would report the footer's heading skip on a pull request that only edited an
+  `.mdx` file. That skip is on nearly every www page.
+- **Scope.** These elements don't vary by page, so the scope is a fixed list of one page
+  per layout rather than the changed-files scope the page scan uses. Each element is
+  scanned once instead of once per changed page.
+
+The two suites are separate Playwright projects, so a content pull request never runs
+this one. Its report lands in `playwright-report-global-elements/`.
+
+**Point it at your preview, not production,** when you change global elements. The
+`data-testid` hooks it looks for only exist on branches that carry them.
+
+**Configuration:** the page list, the element list, and which elements to expect at
+each viewport live in `utils/www-global-elements.ts`. Rule lists are in
+`utils/axe-helpers.ts`.
+
 ## Debug failures
 
 1. Open the HTML report after a run:
@@ -164,12 +198,18 @@ rule lists in `utils/axe-helpers.ts`.
    pnpm -C e2e/www exec playwright show-report
    ```
 
-2. Inspect traces and screenshots under `test-results/` for failed runs.
+2. Inspect traces and screenshots under `test-results/` for failed runs. The
+   global-element suite writes to `test-results-global-elements/` and
+   `playwright-report-global-elements/` instead, so the two runs never overwrite
+   each other's output.
 
 ## How CI uses this suite
 
-The workflow at `.github/workflows/www-e2e.yml` runs on pull requests that touch
-owned www content, `e2e/www`, or `e2e/shared`.
+The workflow at `.github/workflows/www-e2e.yml` runs both suites in one job, each
+behind its own paths filter.
+
+The page suite runs on pull requests that touch owned www content, `e2e/www`, or
+`e2e/shared`.
 
 1. Diff the pull request against its base branch and resolve in-scope page paths.
 2. Skip Playwright when nothing in scope changed.
@@ -178,9 +218,20 @@ owned www content, `e2e/www`, or `e2e/shared`.
    than test against production, which does not have pages the pull request adds.
 4. Run the suite with `WWW_E2E_PAGE_PATHS` set to the resolved list.
 
+The global-element suite runs on pull requests that touch `apps/www/components`,
+`apps/www/layouts`, the app shell, or the harness. A content-only pull request
+never reaches it.
+
+1. Reuse the same preview when one resolved.
+2. Fall back to production when no preview resolved and the pull request changes
+   no `apps/www` files. A harness-only change ships no markup, so production is
+   the same surface.
+3. Skip when no preview resolved and the pull request does change `apps/www`,
+   because production would not have those chrome changes.
+
 Draft pull requests stay skipped until you mark them ready for review. Manual
-`workflow_dispatch` runs require a `page_paths` input and accept an optional
-`base_url`, which defaults to production.
+`workflow_dispatch` runs accept an optional `base_url`, which defaults to
+production, and require a `page_paths` input for the page suite only.
 
 ## Shared helpers
 

@@ -56,9 +56,49 @@ jobs:
               - '.github/workflows/www-e2e.yml'
             www_app:
               - 'apps/www/**'
+            www_components:
+              - 'apps/www/components/**'
+              - 'apps/www/layouts/**'
+              - 'apps/www/app/layout.tsx'
+              - 'apps/www/pages/_app.tsx'
+              - 'apps/www/pages/_document.tsx'
+              - 'e2e/www/**'
+              - 'e2e/shared/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/www-e2e.yml'
+
+      # Separate gates, so a content-only pull request never scans chrome.
+      - name: Decide which suites run
+        id: gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WWW: ${{ steps.changes.outputs.www }}
+          WWW_COMPONENTS: ${{ steps.changes.outputs.www_components }}
+        run: |
+          set -euo pipefail
+
+          pages=false
+          global_elements=false
+          any=false
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            pages=true
+            global_elements=true
+          else
+            if [ "$WWW" = "true" ]; then pages=true; fi
+            if [ "$WWW_COMPONENTS" = "true" ]; then global_elements=true; fi
+          fi
+
+          if [ "$pages" = "true" ] || [ "$global_elements" = "true" ]; then any=true; fi
+
+          {
+            echo "pages=$pages"
+            echo "global_elements=$global_elements"
+            echo "any=$any"
+          } >> "$GITHUB_OUTPUT"
 
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.www == 'true'
+        if: steps.gate.outputs.any == 'true'
         with:
           persist-credentials: false
           # String '0' — numeric 0 is falsy in Actions expressions.
@@ -74,14 +114,14 @@ jobs:
             apps/www/_alternatives
 
       - name: Use Node.js
-        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.www == 'true'
+        if: steps.gate.outputs.any == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
 
       - name: Resolve www E2E scope
         id: scope
-        if: github.event_name == 'workflow_dispatch' || steps.changes.outputs.www == 'true'
+        if: steps.gate.outputs.pages == 'true'
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
@@ -107,13 +147,13 @@ jobs:
         run: echo "No in-scope www pages changed; skipping Playwright suite."
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-        if: steps.scope.outputs.skip == 'false'
+        if: steps.gate.outputs.any == 'true'
         name: Install pnpm
         with:
           run_install: false
 
       - name: Enable pnpm store cache
-        if: steps.scope.outputs.skip == 'false'
+        if: steps.gate.outputs.any == 'true'
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: '.nvmrc'
@@ -122,7 +162,7 @@ jobs:
       # Vercel skips the preview when only the harness changed, so wait for one
       # only when apps/www changed. See scripts/waitForVercelPreview.js.
       - name: Wait for Vercel www preview
-        if: steps.scope.outputs.skip == 'false' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.www_app == 'true'
+        if: steps.gate.outputs.any == 'true' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.www_app == 'true'
         id: deployment
         continue-on-error: true
         run: node scripts/waitForVercelPreview.js
@@ -134,7 +174,7 @@ jobs:
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
 
       - name: Resolve base URL
-        if: steps.scope.outputs.skip == 'false'
+        if: steps.gate.outputs.pages == 'true' && steps.scope.outputs.skip == 'false'
         id: base-url
         env:
           EVENT_NAME: ${{ github.event_name }}
@@ -180,12 +220,56 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # Production already serves the fixed page list, so a run without a preview
+      # still tests the right markup when the pull request ships no markup itself.
+      - name: Resolve global element base URL
+        if: steps.gate.outputs.global_elements == 'true'
+        id: ge-url
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_URL_INPUT: ${{ inputs.base_url }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+          WWW_APP: ${{ steps.changes.outputs.www_app }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            printf 'url=%s\n' "$BASE_URL_INPUT" >> "$GITHUB_OUTPUT"
+            if [ "$BASE_URL_INPUT" = "https://supabase.com" ]; then
+              echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            fi
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -n "$DEPLOYMENT_URL" ]; then
+            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "$WWW_APP" != "true" ]; then
+            echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+            echo "should_test=true" >> "$GITHUB_OUTPUT"
+            echo "No preview, but this pull request changes no www markup, so production is the same surface."
+            exit 0
+          fi
+
+          echo "url=" >> "$GITHUB_OUTPUT"
+          echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          echo "should_test=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::No Vercel www preview URL for this pull request. Skipping the global element suite rather than scanning production, which does not have the chrome changes this pull request makes."
+
       - name: Install dependencies
-        if: steps.base-url.outputs.should_test == 'true'
+        if: steps.base-url.outputs.should_test == 'true' || steps.ge-url.outputs.should_test == 'true'
         run: pnpm install --frozen-lockfile --filter=e2e-www...
 
       - name: Install Playwright Chromium
-        if: steps.base-url.outputs.should_test == 'true'
+        if: steps.base-url.outputs.should_test == 'true' || steps.ge-url.outputs.should_test == 'true'
         run: pnpm -C e2e/www exec playwright install chromium --with-deps --only-shell
 
       - name: Run www E2E
@@ -197,13 +281,23 @@ jobs:
           WWW_E2E_PAGE_PATHS: ${{ steps.scope.outputs.paths }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_WWW || '' }}
 
+      - name: Run www global element E2E
+        if: steps.ge-url.outputs.should_test == 'true'
+        working-directory: e2e/www
+        run: pnpm run e2e:www:global-elements
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.ge-url.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.ge-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_WWW || '' }}
+
       - name: Upload Playwright report
         # Findings only reach a reviewer through this artifact, so upload on green too.
-        if: always() && steps.base-url.outputs.should_test == 'true'
+        if: always() && (steps.base-url.outputs.should_test == 'true' || steps.ge-url.outputs.should_test == 'true')
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: www-playwright-report
           path: |
             e2e/www/playwright-report/
             e2e/www/test-results/
+            e2e/www/playwright-report-global-elements/
+            e2e/www/test-results-global-elements/
           retention-days: 7

@@ -10,6 +10,7 @@ const HamburgerButton = (props: HamburgerButtonProps) => (
   <div className="inset-y-0 flex items-center lg:hidden" onClick={() => props.toggleFlyOut()}>
     <button
       tabIndex={0}
+      data-testid="sb-www-mobile-menu-trigger"
       className={cn(
         'text-foreground-lighter bg-transparent hover:text-foreground-light hover:bg-overlay inline-flex items-center justify-center rounded-md p-2 focus-ring'
       )}
