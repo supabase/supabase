@@ -44,6 +44,7 @@ const PROJECT: ProjectDetailResponse = {
   cloud_provider: 'AWS',
   connectionString: 'postgresql://postgres:password@db.project-ref.supabase.co:5432/postgres',
   db_host: 'db.project-ref.supabase.co',
+  dbVersion: 'supabase-postgres-15.1.0',
   high_availability: false,
   id: 1,
   infra_compute_size: 'micro',
@@ -336,6 +337,18 @@ describe('/project/[ref]/settings/infrastructure', () => {
     await waitFor(() => {
       expect(screen.queryByRole('button', { name: 'Review changes' })).not.toBeInTheDocument()
     })
+  })
+
+  test('focuses the recommended compute option after closing the add replica sheet', async () => {
+    const user = userEvent.setup()
+    renderInfrastructurePage()
+
+    await user.click(await screen.findByRole('button', { name: 'Add read replica' }))
+    await user.click(await screen.findByRole('button', { name: 'Change to Small compute' }))
+
+    const smallCompute = await screen.findByRole('radio', { name: /Small/ })
+    await waitFor(() => expect(smallCompute).toHaveFocus())
+    expect(smallCompute).toBeChecked()
   })
 
   test('reviews and confirms a compute resize through the add-on API', async () => {

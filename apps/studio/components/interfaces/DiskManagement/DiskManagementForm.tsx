@@ -390,7 +390,9 @@ export function DiskManagementForm({
     const element = computeSettingsRef.current
     if (!element) return
 
-    element.focus({ preventScroll: true })
+    element
+      .querySelector<HTMLElement>(`[id="${recommendedCompute}"]`)
+      ?.focus({ preventScroll: true })
 
     if (!mainScrollContainer) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
