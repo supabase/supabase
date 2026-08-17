@@ -53,6 +53,8 @@ export interface RuntimeMeta {
   entrypoint: string
   /** Tailwind text color for the runtime swatch */
   swatchClassName: string
+  /** Not yet available for Private Alpha — shown disabled with a "Coming soon" badge */
+  comingSoon?: boolean
 }
 
 export const RUNTIMES: RuntimeMeta[] = [
@@ -73,12 +75,21 @@ export const RUNTIMES: RuntimeMeta[] = [
     swatchClassName: 'bg-[#70FFAF]',
   },
   {
+    value: 'dockerfile',
+    label: 'Dockerfile',
+    cli: 'dockerfile',
+    baseImage: 'From ./Dockerfile',
+    entrypoint: 'CMD from Dockerfile',
+    swatchClassName: 'bg-[#2496ED]',
+  },
+  {
     value: 'bun',
     label: 'Bun 1',
     cli: 'bun',
     baseImage: 'oven/bun:latest',
     entrypoint: 'bun run index.ts',
     swatchClassName: 'bg-[#FBF0DF]',
+    comingSoon: true,
   },
   {
     value: 'python',
@@ -87,14 +98,7 @@ export const RUNTIMES: RuntimeMeta[] = [
     baseImage: 'python:3.14-slim',
     entrypoint: 'python main.py',
     swatchClassName: 'bg-[#3776AB]',
-  },
-  {
-    value: 'dockerfile',
-    label: 'Dockerfile',
-    cli: 'dockerfile',
-    baseImage: 'From ./Dockerfile',
-    entrypoint: 'CMD from Dockerfile',
-    swatchClassName: 'bg-[#2496ED]',
+    comingSoon: true,
   },
 ]
 

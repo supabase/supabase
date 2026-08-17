@@ -173,8 +173,15 @@ export const CreateWorkerDialog = ({ open, onOpenChange }: CreateWorkerDialogPro
                       </FormControl>
                       <SelectContent>
                         {RUNTIMES.map((r) => (
-                          <SelectItem key={r.value} value={r.value}>
-                            {r.label}
+                          <SelectItem key={r.value} value={r.value} disabled={r.comingSoon}>
+                            <span className="flex items-center gap-2">
+                              {r.label}
+                              {r.comingSoon && (
+                                <span className="rounded-full border border-strong px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-foreground-lighter">
+                                  Coming soon
+                                </span>
+                              )}
+                            </span>
                           </SelectItem>
                         ))}
                       </SelectContent>
