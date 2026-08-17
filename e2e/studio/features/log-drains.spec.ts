@@ -1,7 +1,9 @@
 import { expect } from '@playwright/test'
+
+import { env } from '../env.config.js'
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import { env } from '../env.config.js'
 
 const LOG_DRAIN_OPTIONS = [
   {
@@ -32,7 +34,7 @@ test.describe('Log Drains Settings', () => {
   })
 
   for (const option of LOG_DRAIN_OPTIONS) {
-    test(`Opens ${option.name} panel when clicked`, async ({ page }) => {
+    test(`Opens ${option.name} panel when clicked`, async ({ page }, testInfo) => {
       // Click on the log drain option button
       const optionButton = page.getByRole('button', { name: option.buttonText })
       await expect(optionButton, {
@@ -51,6 +53,11 @@ test.describe('Log Drains Settings', () => {
       await expect(dialog.getByRole('heading', { name: 'Add destination', level: 2 }), {
         message: 'Dialog heading should be visible',
       }).toBeVisible()
+
+      // Every option opens the same dialog, so one scan covers it.
+      if (option === LOG_DRAIN_OPTIONS[0]) {
+        await runCheckpointScan(page, testInfo, 'Log Drains - Add Destination Dialog')
+      }
 
       // Verify that the Type field shows the correct option
       const typeCombobox = dialog.getByRole('combobox').first()

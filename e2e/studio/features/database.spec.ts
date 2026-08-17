@@ -1,6 +1,7 @@
 import { expect, type Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { MENU_SELECTOR, runCheckpointScan } from '../utils/axe-helpers.ts'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { createTable, dropTable, query } from '../utils/db/index.js'
 import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
@@ -16,7 +17,7 @@ async function focusTableInVisualizer(page: Page, tableName: string) {
 
 test.describe('Database', () => {
   test.describe('Schema Visualizer', () => {
-    test('actions works as expected', async ({ page, ref }) => {
+    test('actions works as expected', async ({ page, ref }, testInfo) => {
       const databaseTableName = 'pw_database_schema_table'
       const databaseColumnName = 'pw_database_schema_column'
       await using _ = await withSetupCleanup(
@@ -72,6 +73,7 @@ test.describe('Database', () => {
       // downloads schema diagram when export is triggered
       const downloadPromise = page.waitForEvent('download')
       await page.getByRole('button', { name: 'Export options' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Export Options Menu', MENU_SELECTOR)
       await page.getByRole('menuitem', { name: 'Download as PNG' }).click()
       const download = await downloadPromise
       expect(download.suggestedFilename()).toContain('.png')
@@ -95,7 +97,7 @@ test.describe('Database', () => {
       }
     })
 
-    test('table actions work as expected', async ({ page, ref }) => {
+    test('table actions work as expected', async ({ page, ref }, testInfo) => {
       const databaseTableName = 'pw_database_schema_table_actions'
       const databaseColumnName = 'pw_database_schema_column_table_actions'
       await using _ = await withSetupCleanup(
@@ -129,6 +131,7 @@ test.describe('Database', () => {
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()
       await expect(dialog.getByText('timestamptz')).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Edit Table Dialog')
       // FIXME: For some reason, the dialog is not stable and rerenders, sometimes preventing the description to be filled
       await page.waitForTimeout(500)
       await page.getByLabel('Description').fill('Bazinga')
@@ -149,6 +152,7 @@ test.describe('Database', () => {
       await tableActionsButton.click()
       const copyTableNameMenuItem = page.getByRole('menuitem', { name: 'Copy name' })
       await expect(copyTableNameMenuItem).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Table Actions Menu', MENU_SELECTOR)
       await copyTableNameMenuItem.press('Enter')
       await expect(copyTableNameMenuItem).not.toBeVisible()
       await expectClipboardValue({ page, value: databaseTableName, exact: true })
@@ -163,7 +167,7 @@ test.describe('Database', () => {
       await expect(page.getByRole('tab', { name: databaseTableName })).toBeVisible()
     })
 
-    test('columns actions work as expected', async ({ page, ref }) => {
+    test('columns actions work as expected', async ({ page, ref }, testInfo) => {
       const databaseTableName = 'pw_database_schema_columns_actions'
       const databaseColumnName = 'pw_database_schema_column_actions'
       await using _ = await withSetupCleanup(
@@ -194,6 +198,7 @@ test.describe('Database', () => {
       const editColumnMenuItem = page.getByRole('menuitem', { name: 'Edit column' })
       await expect(editColumnMenuItem).toBeVisible()
       await editColumnMenuItem.press('Enter')
+      await runCheckpointScan(page, testInfo, 'Database - Edit Column Dialog')
       await page.getByLabel('Description').fill('Bazinga')
       await page.getByRole('button', { name: 'Save' }).click()
       await expect(
@@ -271,7 +276,7 @@ test.describe('Database', () => {
       await expect(page.getByText('mfa_factors')).toBeVisible()
     })
 
-    test('CRUD operations and copy works as expected', async ({ page, ref }) => {
+    test('CRUD operations and copy works as expected', async ({ page, ref }, testInfo) => {
       const databaseTableName = 'pw_database_table_crud_table'
       const databaseTableNameNew = 'pw_database_table_crud_new'
       const databaseTableNameUpdated = 'pw_database_table_crud_updated'
@@ -303,6 +308,7 @@ test.describe('Database', () => {
       // create a new table
       await page.getByRole('button', { name: 'New table' }).click()
       await expect(page.getByRole('dialog')).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Create Table Dialog')
       await page.getByLabel('Name', { exact: true }).fill(databaseTableNameNew)
       const createTableWait = createApiResponseWaiter(
         page,
@@ -328,6 +334,7 @@ test.describe('Database', () => {
       await page.getByRole('menuitem', { name: 'Edit table' }).click()
       await expect(page.getByRole('dialog')).toBeVisible()
       await expect(page.getByText(`Update table ${databaseTableNameNew}`)).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Edit Table Dialog (Tables List)')
       // Ensure table data is loaded
       await expect(page.getByLabel('Name', { exact: true })).toHaveValue(databaseTableNameNew)
       await page.getByLabel('Name', { exact: true }).fill(databaseTableNameUpdated)
@@ -356,6 +363,7 @@ test.describe('Database', () => {
         .click()
       await page.getByRole('menuitem', { name: 'Duplicate Table' }).click()
       await expect(page.getByRole('dialog')).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Duplicate Table Dialog')
       await page.getByLabel('Name').fill(databaseTableNameDuplicate)
       await page.getByLabel('Description').fill('')
       const duplicateTableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=')
@@ -380,6 +388,7 @@ test.describe('Database', () => {
         .click()
       await page.getByRole('menuitem', { name: 'Delete table' }).click()
       await expect(page.getByRole('dialog')).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Delete Table Confirmation')
       await page.getByRole('checkbox', { name: 'Drop table with cascade?' }).check()
       const deleteDuplicateWait = createApiResponseWaiter(
         page,
@@ -416,7 +425,10 @@ test.describe('Database', () => {
   })
 
   test.describe('Tables columns', () => {
-    test('can view, create, update, delete, and filter table columns', async ({ page, ref }) => {
+    test('can view, create, update, delete, and filter table columns', async ({
+      page,
+      ref,
+    }, testInfo) => {
       const databaseTableName = 'pw_database_columns_table'
       const databaseColumnName = 'pw_database_column_crud'
       const databaseColumnName2 = 'pw_database_column_crud_2'
@@ -455,6 +467,7 @@ test.describe('Database', () => {
       // create a new table column
       await page.getByRole('button', { name: 'New column' }).click()
       await expect(page.getByRole('dialog')).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - New Column Dialog')
       await page.getByLabel('name').fill(databaseColumnName2)
       await page.getByText('Choose a column type...').click()
       await page.getByText('numeric', { exact: true }).click()
@@ -484,6 +497,7 @@ test.describe('Database', () => {
       // update table column
       await columnDatabase2Row.getByRole('button', { name: 'Edit' }).click()
       await expect(page.getByRole('dialog')).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Edit Column Dialog (Columns List)')
       await page.getByLabel('name').fill(databaseColumnName3)
       const columnUpdateWait = createApiResponseWaiter(
         page,
@@ -508,6 +522,7 @@ test.describe('Database', () => {
       const columnDatabase3Row = page.getByRole('row', { name: databaseColumnName3 })
       await columnDatabase3Row.getByRole('button').last().click()
       await page.getByRole('menuitem', { name: 'Delete column' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Delete Column Confirmation')
       await page.getByRole('checkbox', { name: 'Drop column with cascade?' }).check()
       const columnDeleteWait = createApiResponseWaiter(
         page,
@@ -563,7 +578,7 @@ test.describe('Database', () => {
       await expect(page.getByText('tr_check_filters')).not.toBeVisible()
     })
 
-    test('CRUD operations works as expected', async ({ page, ref }) => {
+    test('CRUD operations works as expected', async ({ page, ref }, testInfo) => {
       const databaseTableName = 'pw_database_trigger_table'
       const databaseColumnName = 'pw_database_column_trigger'
       const databaseTriggerName = 'pw_database_trigger'
@@ -595,6 +610,7 @@ test.describe('Database', () => {
 
       // create new trigger
       await page.getByRole('button', { name: 'New trigger' }).first().click()
+      await runCheckpointScan(page, testInfo, 'Database - Create Trigger Dialog')
       await page.getByRole('textbox', { name: 'Name of trigger' }).fill(databaseTriggerName)
       await page.getByRole('combobox').first().click()
       await page.getByRole('option', { name: `public.${databaseTableName}`, exact: true }).click()
@@ -626,6 +642,7 @@ test.describe('Database', () => {
       // update trigger
       await triggerRow.getByRole('button', { name: /actions$/i }).click()
       await page.getByRole('menuitem', { name: 'Edit trigger' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Edit Trigger Dialog')
       await page.getByRole('textbox', { name: 'Name of trigger' }).fill(databaseTriggerNameUpdated)
       const triggerUpdateWait = createApiResponseWaiter(
         page,
@@ -650,6 +667,7 @@ test.describe('Database', () => {
       // delete trigger
       await updatedTriggerRow.getByRole('button', { name: /actions$/i }).click()
       await page.getByRole('menuitem', { name: 'Delete trigger' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Delete Trigger Confirmation')
       await page.getByPlaceholder('Type in name of trigger').fill(databaseTriggerNameUpdated)
       await page
         .getByRole('button', { name: `Delete trigger ${databaseTriggerNameUpdated}` })
@@ -664,7 +682,7 @@ test.describe('Database', () => {
   })
 
   test.describe('Database Indexes', () => {
-    test('actions works as expected', async ({ page, ref }) => {
+    test('actions works as expected', async ({ page, ref }, testInfo) => {
       const indexesLoadWait = createApiResponseWaiter(
         page,
         'pg-meta',
@@ -712,9 +730,10 @@ test.describe('Database', () => {
           `CREATE UNIQUE INDEX confirmation_token_idx ON auth.users USING btree (confirmation_token) WHERE ((confirmation_token)::text !~ '^[0-9 ]*$'::text)`
         )
       ).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Index Definition Popover')
     })
 
-    test('CRUD operations works as expected', async ({ page, ref }) => {
+    test('CRUD operations works as expected', async ({ page, ref }, testInfo) => {
       const databaseTableName = 'pw_database_indexes_table'
       const databaseColumnName = 'pw_database_column_index'
       const databaseIndexName = 'pw_database_index'
@@ -736,6 +755,7 @@ test.describe('Database', () => {
 
       // create new index
       await page.getByRole('button', { name: 'Create index' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Create Index Dialog')
       await page.getByRole('button', { name: 'Select a table' }).click()
 
       const columnsWait = waitForApiResponse(
@@ -768,10 +788,12 @@ test.describe('Database', () => {
           `CREATE INDEX ${databaseTableName}_${databaseColumnName}_idx ON public.${databaseTableName} USING btree (${databaseColumnName})`
         )
       ).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'Database - Index Definition Popover')
       await page.getByRole('button', { name: 'Cancel' }).click()
 
       // delete the index
       await newIndexRow.getByRole('button', { name: 'Delete index' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Delete Index Confirmation')
       const indexDeleteWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=indexes')
       await page.getByRole('button', { name: 'Confirm delete' }).click()
       await indexDeleteWait
@@ -806,7 +828,7 @@ test.describe('Database', () => {
       await expect(page.getByRole('button', { name: 'authenticator' })).not.toBeVisible()
     })
 
-    test('CRUD operations works as expected', async ({ page, ref }) => {
+    test('CRUD operations works as expected', async ({ page, ref }, testInfo) => {
       const databaseRoleName = 'pw_database_role'
       const databaseRolesWait = createApiResponseWaiter(
         page,
@@ -833,6 +855,7 @@ test.describe('Database', () => {
 
       // create new role
       await page.getByRole('button', { name: 'Add role' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Add Role Dialog')
       await page.getByRole('textbox', { name: 'Name' }).fill(databaseRoleName)
       await page.getByRole('switch').nth(0).click()
       await page.getByRole('switch').nth(1).click()
@@ -846,6 +869,7 @@ test.describe('Database', () => {
       // delete a role
       await page.getByRole('button', { name: `${databaseRoleName} actions` }).click()
       await page.getByRole('menuitem', { name: 'Delete' }).click()
+      await runCheckpointScan(page, testInfo, 'Database - Delete Role Confirmation')
       const roleDeleteWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=roles-delete')
       await page.getByRole('button', { name: 'Submit' }).click()
       await roleDeleteWait
@@ -862,7 +886,7 @@ test.describe('Database Extensions', () => {
 
   const EXTENSION_NAME = 'pgtap'
 
-  test('can enable an extension', async ({ page, ref }) => {
+  test('can enable an extension', async ({ page, ref }, testInfo) => {
     await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
 
     const extensionsWait = createApiResponseWaiter(
@@ -887,6 +911,7 @@ test.describe('Database Extensions', () => {
       dialog.getByText(`Enable ${EXTENSION_NAME}`),
       'Dialog title should match extension name'
     ).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Database - Enable Extension Dialog')
 
     const enableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=extension-create')
     const refetchWait = createApiResponseWaiter(
@@ -910,7 +935,7 @@ test.describe('Database Extensions', () => {
     ).toBeChecked()
   })
 
-  test('can disable an extension', async ({ page, ref }) => {
+  test('can disable an extension', async ({ page, ref }, testInfo) => {
     const extensionsWait = createApiResponseWaiter(
       page,
       'pg-meta',
@@ -933,6 +958,7 @@ test.describe('Database Extensions', () => {
       dialog.getByText('Confirm to disable extension'),
       'Dialog title should be correct'
     ).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Database - Disable Extension Confirmation')
 
     const disableWait = createApiResponseWaiter(
       page,
@@ -961,7 +987,10 @@ test.describe('Database Extensions', () => {
     ).not.toBeChecked()
   })
 
-  test('can enable an extension in a different existing schema', async ({ page, ref }) => {
+  test('can enable an extension in a different existing schema', async ({
+    page,
+    ref,
+  }, testInfo) => {
     await query(`DROP EXTENSION IF EXISTS ${EXTENSION_NAME} CASCADE;`)
 
     const extensionsWait = createApiResponseWaiter(
@@ -981,6 +1010,10 @@ test.describe('Database Extensions', () => {
 
     const dialog = page.getByRole('dialog')
     await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
+
+    // Scanned before the select opens: its listbox portals out of the dialog and
+    // aria-hides what is behind it, so the open state has nothing left to scan.
+    await runCheckpointScan(page, testInfo, 'Database - Extension Schema Selector')
 
     // Change schema to 'public'
     await dialog.getByRole('combobox').click()
@@ -1145,7 +1178,7 @@ test.describe('Database Enumerated Types', () => {
     await expect(page.getByText('code_challenge_method')).toBeVisible()
   })
 
-  test('CRUD operations works as expected', async ({ page, ref }) => {
+  test('CRUD operations works as expected', async ({ page, ref }, testInfo) => {
     const databaseEnumName = 'pw_database_enum'
     const databaseEnumValue1Name = 'pw_database_value1'
     const databaseEnumValue2Name = 'pw_database_value2'
@@ -1190,6 +1223,7 @@ test.describe('Database Enumerated Types', () => {
 
     // create a new enum
     await page.getByRole('button', { name: 'Create type' }).click()
+    await runCheckpointScan(page, testInfo, 'Database - Create Enum Type Dialog')
     await page.getByRole('textbox', { name: 'Name' }).fill(databaseEnumName)
     await page.getByRole('button', { name: 'Create type' }).click()
     await page.locator('input[name="values.0.value"]').fill(databaseEnumValue1Name)
@@ -1207,6 +1241,7 @@ test.describe('Database Enumerated Types', () => {
     // update enum
     await enumRow.getByRole('button').click()
     await page.getByRole('menuitem', { name: 'Update type' }).click()
+    await runCheckpointScan(page, testInfo, 'Database - Update Enum Type Dialog')
     await page.getByRole('button', { name: 'Add value' }).click()
     await page.locator('input[name="values.2.updatedValue"]').fill(databaseEnumValue3Name)
     await page.getByRole('button', { name: 'Update type' }).click()
@@ -1218,6 +1253,7 @@ test.describe('Database Enumerated Types', () => {
     // delete enum
     await updatedEnumRow.getByRole('button').click()
     await page.getByRole('menuitem', { name: 'Delete type' }).click()
+    await runCheckpointScan(page, testInfo, 'Database - Delete Enum Type Confirmation')
     await page.getByRole('heading', { name: 'Confirm to delete enumerated' }).click()
     await page.getByRole('button', { name: 'Confirm delete' }).click()
     await expect(page.getByText(`Successfully deleted type "${databaseEnumName}"`)).toBeVisible({
@@ -1287,7 +1323,7 @@ test.describe('Database Functions', () => {
     await expect(page.getByText('jwt')).not.toBeVisible()
   })
 
-  test('CRUD operations works as expected', async ({ page, ref }) => {
+  test('CRUD operations works as expected', async ({ page, ref }, testInfo) => {
     const databaseFunctionName = 'pw_database_function'
     const databaseFunctionNameUpdated = 'pw_database_function_updated'
 
@@ -1313,6 +1349,7 @@ test.describe('Database Functions', () => {
     await editor.click()
     await page.keyboard.type(`BEGIN\nEND;`)
     await expect(page.getByRole('presentation')).toHaveText(`BEGINEND;`)
+    await runCheckpointScan(page, testInfo, 'Database - Create Function Dialog')
     const functionCreateWait = createApiResponseWaiter(
       page,
       'pg-meta',
@@ -1342,6 +1379,7 @@ test.describe('Database Functions', () => {
     // update function
     await functionRow.getByRole('button', { name: /actions$/i }).click()
     await page.getByRole('menuitem', { name: 'Edit function', exact: true }).click()
+    await runCheckpointScan(page, testInfo, 'Database - Edit Function Dialog')
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionNameUpdated)
     const functionUpdateWait = createApiResponseWaiter(
       page,
@@ -1365,6 +1403,7 @@ test.describe('Database Functions', () => {
     // delete function
     await updatedFunctionRow.getByRole('button', { name: /actions$/i }).click()
     await page.getByRole('menuitem', { name: 'Delete function' }).click()
+    await runCheckpointScan(page, testInfo, 'Database - Delete Function Confirmation')
     await page.getByPlaceholder('Type in name of function').fill(databaseFunctionNameUpdated)
     const functionDeleteWait = createApiResponseWaiter(
       page,

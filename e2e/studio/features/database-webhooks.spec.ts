@@ -1,5 +1,6 @@
-import { expect, Page } from '@playwright/test'
+import { expect, Page, TestInfo } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { createTable, dropTable } from '../utils/db/index.js'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
@@ -61,7 +62,7 @@ const addCustomHeader = async (page: Page, name: string, value: string) => {
   await page.getByPlaceholder('Header value').last().fill(value)
 }
 
-const deleteWebhookViaUI = async (page: Page, name: string) => {
+const deleteWebhookViaUI = async (page: Page, name: string, testInfo: TestInfo) => {
   const webhookText = page.getByText(name, { exact: true })
   const webhookRow = page.locator('tr').filter({ has: webhookText })
   await webhookRow.getByRole('button').click()
@@ -69,6 +70,9 @@ const deleteWebhookViaUI = async (page: Page, name: string) => {
   await page.getByRole('menuitem', { name: 'Delete hook' }).click()
 
   await expect(page.getByRole('heading', { name: 'Delete database webhook' })).toBeVisible()
+
+  await runCheckpointScan(page, testInfo, 'Database Webhooks - Delete Confirmation')
+
   await page.getByPlaceholder('Type in name of webhook').fill(name)
   await page.getByRole('button', { name: `Delete ${name}` }).click()
 
@@ -95,7 +99,7 @@ test.describe('Database Webhooks', () => {
     await expect(page.getByRole('button', { name: 'Create a new hook' })).toBeVisible()
   })
 
-  test('can create a new webhook with correct toast message', async ({ page, ref }) => {
+  test('can create a new webhook with correct toast message', async ({ page, ref }, testInfo) => {
     const { table, hook } = uniqueNames('create')
     await setupTable(table)
 
@@ -105,6 +109,8 @@ test.describe('Database Webhooks', () => {
 
       await page.getByRole('button', { name: 'Create a new hook' }).click()
       await expect(page.getByText('Create a new database webhook')).toBeVisible({ timeout: 10000 })
+
+      await runCheckpointScan(page, testInfo, 'Database Webhooks - Create Dialog')
 
       await page.locator('input[name="name"]').fill(hook)
       await page.getByRole('combobox').filter({ hasText: 'Select a table' }).click()
@@ -126,7 +132,7 @@ test.describe('Database Webhooks', () => {
     }
   })
 
-  test('can edit a webhook with correct toast message', async ({ page, ref }) => {
+  test('can edit a webhook with correct toast message', async ({ page, ref }, testInfo) => {
     const { table, hook } = uniqueNames('edit')
     await setupTable(table)
 
@@ -142,6 +148,8 @@ test.describe('Database Webhooks', () => {
       await page.getByRole('menuitem', { name: 'Edit hook' }).click()
 
       await expect(page.getByText(`Update webhook ${hook}`)).toBeVisible({ timeout: 10000 })
+
+      await runCheckpointScan(page, testInfo, 'Database Webhooks - Edit Dialog')
 
       const urlInput = page.getByPlaceholder('http://api.com/path/resource')
       await urlInput.clear()
@@ -159,7 +167,10 @@ test.describe('Database Webhooks', () => {
     }
   })
 
-  test('preserves webhook URL path and custom headers after editing', async ({ page, ref }) => {
+  test('preserves webhook URL path and custom headers after editing', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const { table, hook } = uniqueNames('edit_persist')
     const originalUrl = 'http://localhost:3000/test-webhook'
     const updatedUrl = 'http://localhost:3000/test-webhook-updated/path'
@@ -199,12 +210,14 @@ test.describe('Database Webhooks', () => {
       await expect(page.getByPlaceholder('http://api.com/path/resource')).toHaveValue(updatedUrl)
       await expect(page.getByPlaceholder('Header name').last()).toHaveValue(headerName)
       await expect(page.getByPlaceholder('Header value').last()).toHaveValue(headerValue)
+
+      await runCheckpointScan(page, testInfo, 'Database Webhooks - Custom Headers Input')
     } finally {
       await dropTable(table)
     }
   })
 
-  test('can delete a webhook with correct toast message', async ({ page, ref }) => {
+  test('can delete a webhook with correct toast message', async ({ page, ref }, testInfo) => {
     const { table, hook } = uniqueNames('delete')
     await setupTable(table)
 
@@ -213,7 +226,7 @@ test.describe('Database Webhooks', () => {
       await navigateToWebhooksList(page, ref)
       await createWebhookViaUI(page, hook, table)
 
-      await deleteWebhookViaUI(page, hook)
+      await deleteWebhookViaUI(page, hook, testInfo)
 
       await expect(page.getByText(`Successfully deleted ${hook}`)).toBeVisible({ timeout: 10000 })
 

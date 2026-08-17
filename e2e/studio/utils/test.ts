@@ -3,6 +3,7 @@ import { test as base } from '@playwright/test'
 import dotenv from 'dotenv'
 
 import { env } from '../env.config.js'
+import { SCAN_THEME, THEME_STORAGE_KEY } from './axe-helpers.ts'
 
 dotenv.config({
   path: path.resolve(import.meta.dirname, '../.env.local'),
@@ -21,13 +22,19 @@ export const test = base.extend<TestOptions>({
   apiUrl: env.API_URL,
   page: async ({ page }, use) => {
     const ref = env.PROJECT_REF ?? 'default'
-    await page.addInitScript((ref) => {
-      localStorage.setItem(
-        `table-editor-queue-operations-banner-dismissed-${ref}`,
-        JSON.stringify(true)
-      )
-      localStorage.setItem(`terms-of-service-update-2026-08-01`, JSON.stringify(true))
-    }, ref)
+    await page.addInitScript(
+      ({ ref, themeKey, theme }) => {
+        localStorage.setItem(
+          `table-editor-queue-operations-banner-dismissed-${ref}`,
+          JSON.stringify(true)
+        )
+        localStorage.setItem(`terms-of-service-update-2026-08-01`, JSON.stringify(true))
+        // Any spec can host an a11y checkpoint and contrast findings are
+        // theme-specific, so every spec renders the theme the baseline was captured in.
+        localStorage.setItem(themeKey, theme)
+      },
+      { ref, themeKey: THEME_STORAGE_KEY, theme: SCAN_THEME }
+    )
     await use(page)
   },
 })

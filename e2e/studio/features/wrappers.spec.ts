@@ -1,13 +1,14 @@
 import { expect } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { query } from '../utils/db/client.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
 const testRunner = env.IS_PLATFORM ? test.describe.serial : test.describe
 testRunner('Stripe', () => {
-  test('can create a stripe wrapper with schema', async ({ page, ref }) => {
+  test('can create a stripe wrapper with schema', async ({ page, ref }, testInfo) => {
     const wrapperName = 'stripe_schema'
     const schemaName = 'stripe'
 
@@ -40,15 +41,17 @@ testRunner('Stripe', () => {
 
     await page.getByRole('textbox', { name: 'Wrapper Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Stripe Secret Key' }).fill('my secret')
+    await runCheckpointScan(page, testInfo, 'Wrappers - Stripe Creation Form')
     await page.getByRole('radio', { name: 'Schema' }).click()
     await page
       .getByRole('textbox', { name: 'Specify a new schema to create all wrapper tables in' })
       .fill(schemaName)
+    await runCheckpointScan(page, testInfo, 'Wrappers - Schema/Table Selection')
     await page.getByRole('button', { name: 'Create wrapper' }).click()
     await expect(page.getByText('Successfully created Stripe foreign data wrapper')).toBeVisible()
   })
 
-  test('can create a stripe wrapper with tables', async ({ page, ref }) => {
+  test('can create a stripe wrapper with tables', async ({ page, ref }, testInfo) => {
     const wrapperName = 'stripe_tables'
     const tableName = 'stripe_accounts'
 
@@ -82,6 +85,7 @@ testRunner('Stripe', () => {
     await page.getByRole('textbox', { name: 'Wrapper Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Stripe Secret Key' }).fill('my secret')
     await page.getByRole('button', { name: 'Add foreign table' }).click()
+    await runCheckpointScan(page, testInfo, 'Wrappers - Add Foreign Table')
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'Accounts List of accounts on' }).click()
     await page.getByRole('textbox', { name: 'Table name' }).fill(tableName)
@@ -92,7 +96,7 @@ testRunner('Stripe', () => {
 })
 
 testRunner('S3 Wrapper', () => {
-  test('can create an S3 wrapper', async ({ page, ref }) => {
+  test('can create an S3 wrapper', async ({ page, ref }, testInfo) => {
     const wrapperName = 'test_s3_wrapper'
     const tableName = 'test_s3_wrapper_table'
     await using _ = await withSetupCleanup(
@@ -126,6 +130,7 @@ testRunner('S3 Wrapper', () => {
     await page.getByRole('textbox', { name: 'Wrapper Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Access Key ID' }).fill('s3 access id')
     await page.getByRole('textbox', { name: 'Access Key Secret' }).fill('s3 access secret')
+    await runCheckpointScan(page, testInfo, 'Wrappers - S3 Creation Form')
     await page.getByRole('button', { name: 'Add foreign table' }).click()
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'S3 File' }).click()
@@ -135,6 +140,7 @@ testRunner('S3 Wrapper', () => {
     // FIXME: Necessary because this component is somehow remounted
     await page.waitForTimeout(500)
     await page.getByRole('textbox', { name: 'Name', exact: true }).fill('s3_column')
+    await runCheckpointScan(page, testInfo, 'Wrappers - S3 Add Column')
     await page.getByRole('button', { name: 'Save' }).click()
     await page.getByRole('button', { name: 'Create wrapper' }).click()
     await expect(page.getByText('Successfully created S3 foreign data wrapper')).toBeVisible()

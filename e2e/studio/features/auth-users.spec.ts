@@ -1,6 +1,7 @@
 import { expect, Page } from '@playwright/test'
 
 import { createUserViaUI, deleteUserViaUI, navigateToAuthUsers } from '../utils/auth-helpers.js'
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 import { waitForApiResponse } from '../utils/wait-for-response.js'
@@ -10,7 +11,10 @@ test.describe('auth users list refresh', () => {
     await navigateToAuthUsers(page, ref)
   })
 
-  test('should automatically refresh users list after creating a user', async ({ page, ref }) => {
+  test('should automatically refresh users list after creating a user', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const testEmail = `test-create-${Date.now()}@example.com`
     const testPassword = 'testpassword123'
 
@@ -24,6 +28,32 @@ test.describe('auth users list refresh', () => {
 
     // Clean up: delete the user - this verifies the user is removed from the table
     await deleteUserViaUI(page, ref, testEmail)
+
+    // The helpers above open and close both dialogs, so the scans happen here.
+    await page.getByRole('button', { name: 'Add user' }).click()
+    await page.getByRole('menuitem', { name: 'Create new user' }).click()
+    await expect(page.getByRole('dialog', { name: 'Create a new user' })).toBeVisible()
+
+    await runCheckpointScan(page, testInfo, 'Auth Users - Create User Dialog')
+
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog', { name: 'Create a new user' })).not.toBeVisible()
+
+    // The delete confirmation needs a selected row, so it gets a throwaway user.
+    const scanEmail = `test-scan-${Date.now()}@example.com`
+    await createUserViaUI(page, ref, scanEmail, testPassword)
+
+    const scanRow = page.getByRole('row').filter({ hasText: scanEmail })
+    await scanRow.getByRole('checkbox').first().click()
+    await page.getByRole('button', { name: 'Delete 1 users' }).click()
+
+    const deleteDialog = page.getByRole('dialog', { name: 'Confirm to delete 1 user' })
+    await expect(deleteDialog).toBeVisible()
+
+    await runCheckpointScan(page, testInfo, 'Auth Users - Delete User Confirmation')
+
+    await deleteDialog.getByRole('button', { name: 'Delete', exact: true }).click()
+    await expect(scanRow).toHaveCount(0, { timeout: 10_000 })
   })
 
   test('should automatically refresh users list after creating multiple users', async ({

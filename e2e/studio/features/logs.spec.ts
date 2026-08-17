@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
@@ -44,7 +45,7 @@ test.beforeEach(async ({ context }) => {
 
 test.describe('Logs', () => {
   for (const logPage of LOGS_PAGES) {
-    test(`${logPage.label} logs page`, async ({ page, ref }) => {
+    test(`${logPage.label} logs page`, async ({ page, ref }, testInfo) => {
       /**
        * Navigates to Logs
        */
@@ -84,6 +85,17 @@ test.describe('Logs', () => {
       await expect(tabPanel, {
         message: 'Log selection panel should be visible after clicking a log',
       }).toBeVisible()
+
+      // The details panel renders inline in the logs page, not in a portal, and
+      // both log pages render the same panel, so one scan covers it.
+      if (logPage === LOGS_PAGES[0]) {
+        await runCheckpointScan(
+          page,
+          testInfo,
+          'Logs - Log Details Panel',
+          '[data-testid="log-selection"]'
+        )
+      }
 
       // Assert known fixed values instead of extracting text
       await expect(tabPanel, {

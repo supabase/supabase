@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test'
 
+import { ALERT_DIALOG_SELECTOR, runCheckpointScan } from '../utils/axe-helpers.ts'
 import { createTableWithRLS, dropTable } from '../utils/db/queries.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
@@ -95,7 +96,7 @@ test.describe('RLS Policies', () => {
     test('shows Unrestricted badge when RLS is disabled for public table', async ({
       page,
       ref,
-    }) => {
+    }, testInfo) => {
       const policyTableName = 'pw_rls_policy_unrestricted_table'
       await using _ = await withSetupCleanup(
         async () => {
@@ -145,6 +146,12 @@ test.describe('RLS Policies', () => {
           'href',
           'https://supabase.com/docs/guides/database/postgres/row-level-security'
         )
+        await runCheckpointScan(
+          page,
+          testInfo,
+          'RLS Policies - Disable RLS Confirmation',
+          ALERT_DIALOG_SELECTOR
+        )
 
         // Confirm disabling RLS
         await page.getByRole('button', { name: 'Disable RLS' }).click()
@@ -183,7 +190,7 @@ test.describe('RLS Policies', () => {
   })
 
   test.describe('Create RLS Policy', () => {
-    test('should create a SELECT policy successfully', async ({ page, ref }) => {
+    test('should create a SELECT policy successfully', async ({ page, ref }, testInfo) => {
       const policyTableName = 'pw_rls_policy_select_table'
       const policySelectName = 'pw_test_select_policy'
       await using _ = await withSetupCleanup(
@@ -204,6 +211,7 @@ test.describe('RLS Policies', () => {
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' }),
         'Policy creation dialog should open'
       ).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Create Policy Dialog')
 
       // Hide the sidebar tools
       await page.getByText('Hide tools').click()
@@ -220,6 +228,7 @@ test.describe('RLS Policies', () => {
       // Fill in USING clause - allow all access
       await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Using/With Check Editors')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()
@@ -239,7 +248,10 @@ test.describe('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^public$/ })).toBeVisible()
     })
 
-    test('should create an INSERT policy with authenticated role', async ({ page, ref }) => {
+    test('should create an INSERT policy with authenticated role', async ({
+      page,
+      ref,
+    }, testInfo) => {
       const policyTableName = 'pw_rls_policy_insert_table'
       const policyInsertName = 'pw_test_insert_policy'
       await using _ = await withSetupCleanup(
@@ -258,6 +270,7 @@ test.describe('RLS Policies', () => {
       await expect(
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' })
       ).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Create Policy Dialog')
 
       // Hide the sidebar tools
       await page.getByText('Hide tools').click()
@@ -267,10 +280,12 @@ test.describe('RLS Policies', () => {
 
       // Select INSERT command
       await page.getByRole('radio', { name: 'INSERT' }).click()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Command Selection')
 
       // Select target role - authenticated
       await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Target Roles Selector')
 
       // Close the dropdown
       await page.keyboard.press('Escape')
@@ -278,6 +293,7 @@ test.describe('RLS Policies', () => {
       // Fill in WITH CHECK clause - allow all inserts
       await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Using/With Check Editors')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()
@@ -294,7 +310,10 @@ test.describe('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^authenticated$/ })).toBeVisible()
     })
 
-    test('should create an UPDATE policy with custom condition', async ({ page, ref }) => {
+    test('should create an UPDATE policy with custom condition', async ({
+      page,
+      ref,
+    }, testInfo) => {
       const policyTableName = 'pw_rls_policy_update_table'
       const policyUpdateName = 'pw_test_update_policy'
       await using _ = await withSetupCleanup(
@@ -313,6 +332,7 @@ test.describe('RLS Policies', () => {
       await expect(
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' })
       ).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Create Policy Dialog')
 
       // Hide the sidebar tools
       await page.getByText('Hide tools').click()
@@ -322,10 +342,12 @@ test.describe('RLS Policies', () => {
 
       // Select UPDATE command
       await page.getByRole('radio', { name: 'UPDATE' }).click()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Command Selection')
 
       // Select authenticated role
       await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Target Roles Selector')
       await page.keyboard.press('Escape')
 
       await page
@@ -339,6 +361,7 @@ test.describe('RLS Policies', () => {
         .nth(1)
         .focus()
       await page.keyboard.type('true')
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Using/With Check Editors')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()
@@ -354,7 +377,7 @@ test.describe('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^UPDATE$/ })).toBeVisible()
     })
 
-    test('should create a DELETE policy', async ({ page, ref }) => {
+    test('should create a DELETE policy', async ({ page, ref }, testInfo) => {
       const policyTableName = 'pw_rls_policy_delete_table'
       const policyDeleteName = 'pw_test_delete_policy'
       await using _ = await withSetupCleanup(
@@ -373,6 +396,7 @@ test.describe('RLS Policies', () => {
       await expect(
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' })
       ).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Create Policy Dialog')
 
       // Hide the sidebar tools
       await page.getByText('Hide tools').click()
@@ -382,15 +406,18 @@ test.describe('RLS Policies', () => {
 
       // Select DELETE command
       await page.getByRole('radio', { name: 'DELETE' }).click()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Command Selection')
 
       // Select authenticated role
       await page.getByRole('combobox', { name: 'Target Roles' }).click()
       await page.getByRole('option', { name: 'authenticated' }).click()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Target Roles Selector')
       await page.keyboard.press('Escape')
 
       // Fill in USING clause
       await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.type('true')
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Using/With Check Editors')
 
       // Save policy
       await page.getByRole('button', { name: 'Save policy' }).click()
@@ -406,7 +433,7 @@ test.describe('RLS Policies', () => {
       await expect(policyRow.locator('code').filter({ hasText: /^DELETE$/ })).toBeVisible()
     })
 
-    test('should cancel policy creation', async ({ page, ref }) => {
+    test('should cancel policy creation', async ({ page, ref }, testInfo) => {
       const policyTableName = 'pw_rls_policy_cancel_table'
       await using _ = await withSetupCleanup(
         async () => {
@@ -424,6 +451,7 @@ test.describe('RLS Policies', () => {
       await expect(
         page.getByRole('heading', { name: 'Create a new Row Level Security policy' })
       ).toBeVisible()
+      await runCheckpointScan(page, testInfo, 'RLS Policies - Create Policy Dialog')
 
       // Fill in some data
       await page.getByRole('textbox', { name: 'Policy Name' }).fill('policy_to_cancel')

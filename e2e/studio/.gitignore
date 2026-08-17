@@ -2,6 +2,7 @@ node_modules/
 /test-results/
 /playwright-report/
 /blob-report/
+/axe-results/
 /playwright/.cache/
 /playwright/.auth/
 .env.staging

@@ -1,10 +1,14 @@
 import { expect } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
 test.describe('Connect', async () => {
-  test('ConnectSheet opens when showConnect=true query param is present', async ({ page, ref }) => {
+  test('ConnectSheet opens when showConnect=true query param is present', async ({
+    page,
+    ref,
+  }, testInfo) => {
     // Navigate to project page with showConnect=true query param
     await page.goto(toUrl(`/project/${ref}?showConnect=true`))
 
@@ -12,9 +16,11 @@ test.describe('Connect', async () => {
     await expect(page.getByRole('heading', { name: 'Connect to your project' })).toBeVisible({
       timeout: 30000,
     })
+
+    await runCheckpointScan(page, testInfo, 'Connect - Sheet Opened')
   })
 
-  test('ConnectSheet closes when dismissed', async ({ page, ref }) => {
+  test('ConnectSheet closes when dismissed', async ({ page, ref }, testInfo) => {
     // Navigate to project page with showConnect=true query param
     await page.goto(toUrl(`/project/${ref}?showConnect=true`))
 
@@ -22,6 +28,8 @@ test.describe('Connect', async () => {
     await expect(page.getByRole('heading', { name: 'Connect to your project' })).toBeVisible({
       timeout: 30000,
     })
+
+    await runCheckpointScan(page, testInfo, 'Connect - Sheet Opened')
 
     // Close the sheet by pressing Escape
     await page.keyboard.press('Escape')
@@ -35,7 +43,7 @@ test.describe('Connect', async () => {
     await expect(page).not.toHaveURL(/showConnect=true/)
   })
 
-  test('Connect button in header opens the ConnectSheet', async ({ page, ref }) => {
+  test('Connect button in header opens the ConnectSheet', async ({ page, ref }, testInfo) => {
     // Navigate to project page without the query param
     await page.goto(toUrl(`/project/${ref}`))
 
@@ -50,13 +58,15 @@ test.describe('Connect', async () => {
       timeout: 30000,
     })
 
+    await runCheckpointScan(page, testInfo, 'Connect - Sheet Opened')
+
     // Verify the URL has the showConnect query param
     await expect(page).toHaveURL(/showConnect=true/)
   })
 })
 
 test.describe('Connect Sheet deep linking', async () => {
-  test('pre-selects framework and variant from URL params', async ({ page, ref }) => {
+  test('pre-selects framework and variant from URL params', async ({ page, ref }, testInfo) => {
     await page.goto(
       toUrl(`/project/${ref}?showConnect=true&connectTab=framework&framework=nextjs&using=pages`)
     )
@@ -71,10 +81,14 @@ test.describe('Connect Sheet deep linking', async () => {
       'Framework select should show Next.js'
     ).toBeVisible()
 
+    await runCheckpointScan(page, testInfo, 'Connect - Framework Selector Dropdown')
+
     await expect(
       page.getByRole('combobox').filter({ hasText: 'Pages Router' }),
       'Variant select should show Pages Router'
     ).toBeVisible()
+
+    await runCheckpointScan(page, testInfo, 'Connect - Variant Selector Dropdown')
   })
 
   test('supports legacy frameworks tab alias', async ({ page, ref }) => {
@@ -93,7 +107,7 @@ test.describe('Connect Sheet deep linking', async () => {
     ).toBeVisible()
   })
 
-  test('pre-selects ORM from URL params', async ({ page, ref }) => {
+  test('pre-selects ORM from URL params', async ({ page, ref }, testInfo) => {
     // Use drizzle (non-default) to verify the param takes effect
     await page.goto(toUrl(`/project/${ref}?showConnect=true&connectTab=orm&framework=drizzle`))
 
@@ -106,9 +120,11 @@ test.describe('Connect Sheet deep linking', async () => {
       page.locator('[data-state="checked"]').filter({ hasText: 'Drizzle' }),
       'Drizzle radio should be selected'
     ).toBeVisible()
+
+    await runCheckpointScan(page, testInfo, 'Connect - ORM Selector Radios')
   })
 
-  test('pre-selects MCP client from URL params', async ({ page, ref }) => {
+  test('pre-selects MCP client from URL params', async ({ page, ref }, testInfo) => {
     await page.goto(toUrl(`/project/${ref}?showConnect=true&connectTab=mcp&mcpClient=goose`))
 
     await expect(
@@ -120,9 +136,11 @@ test.describe('Connect Sheet deep linking', async () => {
       page.getByRole('combobox').filter({ hasText: 'Goose' }),
       'MCP client select should show Goose'
     ).toBeVisible()
+
+    await runCheckpointScan(page, testInfo, 'Connect - MCP Client Dropdown')
   })
 
-  test('pre-selects direct connection method from URL params', async ({ page, ref }) => {
+  test('pre-selects direct connection method from URL params', async ({ page, ref }, testInfo) => {
     await page.goto(toUrl(`/project/${ref}?showConnect=true&connectTab=direct&method=transaction`))
 
     await expect(
@@ -134,6 +152,8 @@ test.describe('Connect Sheet deep linking', async () => {
       page.locator('[data-state="checked"]').filter({ hasText: 'Transaction pooler' }),
       'Transaction pooler radio should be selected'
     ).toBeVisible()
+
+    await runCheckpointScan(page, testInfo, 'Connect - Direct Connection Method Radios')
   })
 
   test('closing the sheet clears all deep-link params from URL', async ({ page, ref }) => {

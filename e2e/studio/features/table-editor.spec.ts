@@ -3,6 +3,12 @@ import path from 'path'
 import { expect, Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import {
+  ALERT_DIALOG_SELECTOR,
+  LISTBOX_SELECTOR,
+  MENU_SELECTOR,
+  runCheckpointScan,
+} from '../utils/axe-helpers.ts'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { dropTable, query } from '../utils/db/index.js'
 import { createTable, createTableWithRLS } from '../utils/db/queries.js'
@@ -16,6 +22,9 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+
+// The definition tab renders inside Monaco in the main pane, not an overlay.
+const DEFINITION_SELECTOR = '.monaco-editor'
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
   const viewLocator = page.getByLabel(`View ${tableName}`)
@@ -128,7 +137,7 @@ testRunner('table editor', () => {
     ).toBeVisible()
   })
 
-  test('switching schemas work as expected', async ({ page, ref }) => {
+  test('switching schemas work as expected', async ({ page, ref }, testInfo) => {
     const authTableSso = 'identities'
     const authTableMfa = 'mfa_factors'
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
@@ -136,6 +145,7 @@ testRunner('table editor', () => {
     // change schema from public to auth
     await page.getByTestId('schema-selector').click()
     await page.getByPlaceholder('Find schema...').fill('auth')
+    await runCheckpointScan(page, testInfo, 'Table Editor - Schema Selector Dropdown')
 
     // Set up the waiter BEFORE clicking to avoid race condition
     const tableLoadPromise = waitForTableToLoad(page, ref, 'auth')
@@ -155,7 +165,10 @@ testRunner('table editor', () => {
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
   })
 
-  test('protected schema empty tables do not expose CSV import actions', async ({ page, ref }) => {
+  test('protected schema empty tables do not expose CSV import actions', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const emptyAuthTables = await query<{ relname: string }>(`
       select relname
       from pg_stat_user_tables
@@ -172,6 +185,7 @@ testRunner('table editor', () => {
 
     await page.getByTestId('schema-selector').click()
     await page.getByPlaceholder('Find schema...').fill('auth')
+    await runCheckpointScan(page, testInfo, 'Table Editor - Schema Selector Dropdown')
 
     const tableLoadPromise = waitForTableToLoad(page, ref, 'auth')
     await page.getByRole('option', { name: 'auth' }).click()
@@ -186,7 +200,7 @@ testRunner('table editor', () => {
     await expect(page.getByText('or drag and drop a CSV file here')).not.toBeVisible()
   })
 
-  test('should show rls accordingly', async ({ page, ref }) => {
+  test('should show rls accordingly', async ({ page, ref }, testInfo) => {
     const tableNameRlsEnabled = 'pw_table_rls_enabled'
     const tableNameRlsDisabled = 'pw_table_rls_disabled'
 
@@ -215,10 +229,16 @@ testRunner('table editor', () => {
         'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
       )
     ).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor - RLS Enable Confirmation',
+      ALERT_DIALOG_SELECTOR
+    )
     await page.getByRole('button', { name: 'Cancel' }).click()
   })
 
-  test('add enums and show enums on table', async ({ page, ref }) => {
+  test('add enums and show enums on table', async ({ page, ref }, testInfo) => {
     const tableNameEnum = 'pw_table_enum'
     const columnNameEnum = 'pw_column_enum'
     const enum_name = 'pw_enum'
@@ -262,6 +282,7 @@ testRunner('table editor', () => {
 
     await page.getByRole('button', { name: 'New table', exact: true }).click()
     await page.getByTestId('table-name-input').fill(tableNameEnum)
+    await runCheckpointScan(page, testInfo, 'Table Editor - New Table Panel')
     await page.getByTestId('created_at-extra-options').click()
     await page.getByText('Is Nullable').click()
     await page.getByTestId('created_at-extra-options').click()
@@ -269,6 +290,7 @@ testRunner('table editor', () => {
     await page.getByLabel('Column name').nth(2).fill(columnNameEnum)
     await page.getByRole('combobox').filter({ hasText: 'Choose a column type...' }).click()
     await page.getByPlaceholder('Search types...').fill(enum_name)
+    await runCheckpointScan(page, testInfo, 'Table Editor - Column Type Combobox')
     // wait for response, then click
     await page.getByRole('option', { name: enum_name }).click()
     await page.getByRole('button', { name: 'Save' }).click()
@@ -289,6 +311,7 @@ testRunner('table editor', () => {
     // insert row with enum value
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByText('Insert row').click()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Insert Row Panel')
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'value1' }).click()
     await page.getByTestId('action-bar-save-row').click()
@@ -313,7 +336,7 @@ testRunner('table editor', () => {
     shouldCleanup = false
   })
 
-  test('Grid editor exporting works as expected', async ({ page, ref }) => {
+  test('Grid editor exporting works as expected', async ({ page, ref }, testInfo) => {
     const tableNameGridEditor = ' pw_table_grid_editor'
     const tableNameUpdated = 'pw_table_updated'
     const columnNameUpdated = 'pw_column_updated'
@@ -357,6 +380,7 @@ testRunner('table editor', () => {
       .click()
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
     await page.getByTestId('table-name-input').fill(tableNameUpdated)
+    await runCheckpointScan(page, testInfo, 'Table Editor - Edit Table Panel')
     await page.getByLabel('Column name').nth(2).fill(columnNameUpdated)
     const updateTablePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=column-update', {
       method: 'POST',
@@ -383,6 +407,7 @@ testRunner('table editor', () => {
     await exportDataItemCsv.hover()
     await expect(exportDataItemCsv).toHaveAttribute('data-state', /open/)
     await expect(page.getByRole('menuitem', { name: 'Export table as CSV' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Export Submenu', MENU_SELECTOR)
     const [downloadCsv] = await Promise.all([
       page.waitForEvent('download'),
       page.getByRole('menuitem', { name: 'Export table as CSV' }).click(),
@@ -459,10 +484,11 @@ testRunner('table editor', () => {
     await expect(page.getByRole('menuitem', { name: 'Export table via CLI' })).toBeVisible()
     await page.getByRole('menuitem', { name: 'Export table via CLI' }).click()
     await expect(page.getByRole('heading', { name: 'Export table data via CLI' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Export Via CLI Dialog')
     await page.getByRole('button', { name: 'Close' }).first().click()
   })
 
-  test('view table definition works as expected', async ({ page, ref }) => {
+  test('view table definition works as expected', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_definition'
     const colName = 'pw_column'
 
@@ -483,12 +509,18 @@ testRunner('table editor', () => {
     await expect(page.locator('.view-lines')).toContainText(
       `create table public.${tableName} (  id bigint generated by default as identity not null,  created_at timestamp with time zone null default now(),  ${colName} text null,  constraint ${tableName}_pkey primary key (id)) TABLESPACE pg_default;`
     )
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor - Type Definition View',
+      DEFINITION_SELECTOR
+    )
   })
 
   test('view definition preserves security_invoker for security invoker views', async ({
     page,
     ref,
-  }) => {
+  }, testInfo) => {
     const tableName = `pw_view_def_source_${test.info().parallelIndex}`
     const viewName = `pw_view_def_invoker_${test.info().parallelIndex}`
 
@@ -539,6 +571,12 @@ testRunner('table editor', () => {
 
     await expect(page.locator('.view-lines')).toContainText(`create view public.${viewName}`)
     await expect(page.locator('.view-lines')).toContainText(`security_invoker = true`)
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor - Type Definition View',
+      DEFINITION_SELECTOR
+    )
 
     const openInSqlEditorLink = page.getByRole('link', { name: 'Open in SQL Editor' })
     // Accept either percent-encoded (`%20`) or form-encoded (`+`) spaces —
@@ -554,7 +592,7 @@ testRunner('table editor', () => {
     await expect(page.locator('.view-lines')).toContainText(`security_invoker = true`)
   })
 
-  test('sorting rows works as expected', async ({ page, ref }) => {
+  test('sorting rows works as expected', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_sorting'
     const colName = 'pw_column'
 
@@ -584,6 +622,7 @@ testRunner('table editor', () => {
     await page.getByRole('button', { name: 'Sort', exact: true }).click()
     await page.getByRole('button', { name: 'Pick a column to sort by' }).click()
     await page.getByRole('menuitem', { name: colName }).click()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Sort Configuration Panel')
     const waitForSortingApply = createApiResponseWaiter(
       page,
       'pg-meta',
@@ -601,7 +640,7 @@ testRunner('table editor', () => {
     expect(await page.getByRole('gridcell').nth(13).textContent()).toBe('789')
   })
 
-  test('column actions works as expected', async ({ page, ref }) => {
+  test('column actions works as expected', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_column_menu'
     const colName = 'pw_column'
 
@@ -623,6 +662,7 @@ testRunner('table editor', () => {
       .getByRole('columnheader', { name: colName })
       .getByRole('button', { name: `Column ${colName} actions` })
       .click()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Column Context Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Copy name' }).click()
 
     await expectClipboardValue({
@@ -632,7 +672,10 @@ testRunner('table editor', () => {
     })
   })
 
-  test('importing, pagination and large data actions works as expected', async ({ page, ref }) => {
+  test('importing, pagination and large data actions works as expected', async ({
+    page,
+    ref,
+  }, testInfo) => {
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     const tableNameDataActions = 'pw_table_data'
 
@@ -655,6 +698,7 @@ testRunner('table editor', () => {
     await page.getByRole('tab', { name: 'Upload CSV' }).click()
     await page.setInputFiles('input[type="file"]', csvFilePath)
     await expect(page.getByText('A total of 50 rows will be')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - CSV Import Upload Tab')
     const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
@@ -671,6 +715,7 @@ testRunner('table editor', () => {
     await page.getByRole('tab', { name: 'Paste text' }).click()
     await page.getByRole('textbox').fill(fileContent)
     await expect(page.getByText('A total of 51 rows will be')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - CSV Import Paste Text Tab')
     const waitForPasteInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
@@ -690,6 +735,12 @@ testRunner('table editor', () => {
 
     // change pagination size (100 -> 500)
     await page.getByRole('button', { name: '100 rows' }).click()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor - Pagination Size Dropdown',
+      MENU_SELECTOR
+    )
     const waitForPaginationChange = createApiResponseWaiter(
       page,
       'pg-meta',
@@ -713,6 +764,7 @@ testRunner('table editor', () => {
     await page.getByRole('row', { name: 'value 3 to delete' }).getByRole('checkbox').click()
     await page.getByRole('button', { name: 'Delete 3 rows' }).click()
     await expect(page.getByText('delete the selected 3 rows')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Delete Rows Confirmation')
     const waitForDeleteRows = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
     })
@@ -726,6 +778,12 @@ testRunner('table editor', () => {
     await page.getByRole('row', { name: 'value 6 to export' }).getByRole('checkbox').click()
 
     await page.getByRole('button', { name: 'Export' }).click()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor - Multiple Rows Export Menu',
+      MENU_SELECTOR
+    )
     const [downloadSql] = await Promise.all([
       page.waitForEvent('download'),
       page.getByRole('menuitem', { name: 'Export as SQL' }).click(),
@@ -807,7 +865,7 @@ testRunner('table editor', () => {
     await expect(page.getByRole('gridcell', { name: 'value 101' })).not.toBeVisible()
   })
 
-  test('copying cell values from first and second row works', async ({ page, ref }) => {
+  test('copying cell values from first and second row works', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_copy_rows'
     const colName = 'pw_column'
 
@@ -851,6 +909,7 @@ testRunner('table editor', () => {
     const firstRowCell = page.getByRole('gridcell', { name: 'first_row_value' })
     await expect(firstRowCell).toBeVisible()
     await firstRowCell.click({ button: 'right' })
+    await runCheckpointScan(page, testInfo, 'Table Editor - Row Context Menu', MENU_SELECTOR)
 
     // Click "Copy cell" from context menu
     await page.getByRole('menuitem', { name: 'Copy cell' }).click()
@@ -924,7 +983,7 @@ testRunner('table editor', () => {
     await expectClipboardValue({ page, value: 'true', exact: true })
   })
 
-  test('boolean fields can be edited correctly', async ({ page, ref }) => {
+  test('boolean fields can be edited correctly', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_boolean_edits'
     const boolColName = 'is_active'
 
@@ -949,8 +1008,10 @@ testRunner('table editor', () => {
     // Add boolean column
     await page.getByRole('button', { name: 'Add column' }).click()
     await page.getByLabel('Column name').nth(3).fill(boolColName)
+    await runCheckpointScan(page, testInfo, 'Table Editor - Edit Table Panel')
     await page.getByText('Choose a column type...').click()
     await page.getByPlaceholder('Search types...').fill('bool')
+    await runCheckpointScan(page, testInfo, 'Table Editor - Column Type Combobox')
     await page.getByRole('option', { name: 'bool' }).first().click()
 
     await page.getByRole('button', { name: 'Save' }).click()
@@ -966,6 +1027,7 @@ testRunner('table editor', () => {
     // Insert a row with TRUE value via side panel
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row' }).click()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Insert Row Panel')
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'TRUE' }).click()
     const insertTruePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -1009,6 +1071,12 @@ testRunner('table editor', () => {
       method: 'POST',
     })
     await booleanEditor.click()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor - Boolean Cell Editor Dropdown',
+      LISTBOX_SELECTOR
+    )
     await page.getByRole('option', { name: 'true' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateTrueResponse
@@ -1041,7 +1109,7 @@ testRunner('table editor', () => {
     ).toBeVisible()
   })
 
-  test('nullable boolean fields support NULL values', async ({ page, ref }) => {
+  test('nullable boolean fields support NULL values', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_boolean_nullable'
     const boolColName = 'is_enabled'
 
@@ -1065,8 +1133,10 @@ testRunner('table editor', () => {
     // Add nullable boolean column
     await page.getByRole('button', { name: 'Add column' }).click()
     await page.getByLabel('Column name').nth(3).fill(boolColName)
+    await runCheckpointScan(page, testInfo, 'Table Editor - Edit Table Panel')
     await page.getByText('Choose a column type...').click()
     await page.getByPlaceholder('Search types...').fill('bool')
+    await runCheckpointScan(page, testInfo, 'Table Editor - Column Type Combobox')
     await page.getByRole('option', { name: 'bool' }).first().click()
 
     await page.getByRole('button', { name: 'Save' }).click()
@@ -1087,6 +1157,7 @@ testRunner('table editor', () => {
     // Insert a row with TRUE value
     await page.getByTestId('table-editor-insert-new-row').click()
     await page.getByRole('menuitem', { name: 'Insert row' }).click()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Insert Row Panel')
     await page.getByRole('combobox').click()
     await page.getByRole('option', { name: 'TRUE' }).click()
     const insertTruePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -1127,6 +1198,12 @@ testRunner('table editor', () => {
       method: 'POST',
     })
     await booleanEditor.click()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor - Boolean Cell Editor Dropdown',
+      LISTBOX_SELECTOR
+    )
     await page.getByRole('option', { name: 'null' }).click()
     await page.getByRole('columnheader', { name: 'id' }).click()
     await updateNullResponse
@@ -1212,7 +1289,10 @@ testRunner('table editor', () => {
     ).not.toBeVisible()
   })
 
-  test('can create and remove foreign key with column selection', async ({ page, ref }) => {
+  test('can create and remove foreign key with column selection', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const sourceTableName = 'pw_table_fk_source'
     const targetTableName = 'pw_table_fk_target'
 
@@ -1237,6 +1317,7 @@ testRunner('table editor', () => {
       .locator('button[aria-haspopup="menu"]')
       .click()
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Edit Table Panel')
 
     // Select target table
     const tableQueryPromise = waitForApiResponseWithTimeout(page, (response) =>
@@ -1248,6 +1329,7 @@ testRunner('table editor', () => {
 
     // Select schema (should default to public)
     await expect(page.getByRole('combobox', { name: 'Select a schema' })).toContainText('public')
+    await runCheckpointScan(page, testInfo, 'Table Editor - Foreign Key Relationship Dialog')
 
     await page.getByRole('combobox', { name: 'Select a table to reference to' }).click()
     await page.getByRole('option', { name: `public ${targetTableName}` }).click()
@@ -1345,7 +1427,7 @@ testRunner('table editor', () => {
     await expect(page.getByTestId('table-editor-side-panel')).not.toBeVisible()
   })
 
-  test('shortcut saves fk before column update', async ({ page, ref }) => {
+  test('shortcut saves fk before column update', async ({ page, ref }, testInfo) => {
     const runId = `${test.info().parallelIndex}_${test.info().repeatEachIndex}`
     const sourceTableName = `pw_column_fk_shortcut_source_${runId}`
     const targetTableName = `pw_column_fk_shortcut_target_${runId}`
@@ -1393,9 +1475,11 @@ testRunner('table editor', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await openColumnEditor()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Edit Column Dialog')
 
     await columnEditor.getByRole('button', { name: 'Add foreign key' }).click()
     await expect(foreignKeySchemaSelect).toContainText('public')
+    await runCheckpointScan(page, testInfo, 'Table Editor - Foreign Key Relationship Dialog')
 
     const tableQueryPromise = waitForApiResponseWithTimeout(page, (response) =>
       response.url().includes(`table-public-${targetTableName}`)
@@ -1430,7 +1514,7 @@ testRunner('table editor', () => {
     await expect(foreignKeyLink).toBeVisible()
   })
 
-  test('CSV drag and drop imports data on empty table', async ({ page, ref }) => {
+  test('CSV drag and drop imports data on empty table', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_csv_drag_drop'
 
     await using _ = await withSetupCleanup(
@@ -1479,6 +1563,7 @@ testRunner('table editor', () => {
       page.getByText('A total of 3 rows will be'),
       'Import dialog should show correct row count from CSV'
     ).toBeVisible({ timeout: 10_000 })
+    await runCheckpointScan(page, testInfo, 'Table Editor - CSV Import Upload Tab')
 
     const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -1545,7 +1630,10 @@ testRunner('table editor', () => {
     await expect(page.getByRole('gridcell', { name: 'value 1' })).toBeVisible()
   })
 
-  test('CSV import syncs custom owned sequences before the next insert', async ({ page, ref }) => {
+  test('CSV import syncs custom owned sequences before the next insert', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const tableName = 'pw_table_csv_sequence_sync'
     const sequenceName = 'pw_table_csv_import_owned_seq'
 
@@ -1582,6 +1670,7 @@ testRunner('table editor', () => {
     await page.getByRole('tab', { name: 'Upload CSV' }).click()
     await page.setInputFiles('input[type="file"]', csvFilePath)
     await expect(page.getByText('A total of 3 rows will be')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - CSV Import Upload Tab')
 
     const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -1628,7 +1717,7 @@ testRunner('table editor', () => {
   test('pasted CSV text syncs custom owned sequences before the next insert', async ({
     page,
     ref,
-  }) => {
+  }, testInfo) => {
     const tableName = 'pw_table_paste_sequence_sync'
     const sequenceName = 'pw_table_paste_import_owned_seq'
 
@@ -1661,6 +1750,7 @@ testRunner('table editor', () => {
     await page.getByRole('tab', { name: 'Paste text' }).click()
     await page.getByRole('textbox').fill(csvText)
     await expect(page.getByText('A total of 3 rows will be')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - CSV Import Paste Text Tab')
 
     const waitForCsvInsert = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=', {
       method: 'POST',
@@ -1760,7 +1850,7 @@ testRunner('table editor', () => {
     ).not.toBeVisible()
   })
 
-  test('row edit via side panel saves immediately', async ({ page, ref }) => {
+  test('row edit via side panel saves immediately', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_row_edit'
     const columnName = 'name'
 
@@ -1790,11 +1880,13 @@ testRunner('table editor', () => {
     // Right-click to open context menu and edit the row
     const cell = page.getByRole('gridcell', { name: 'original value' })
     await cell.click({ button: 'right' })
+    await runCheckpointScan(page, testInfo, 'Table Editor - Row Context Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Edit row' }).click()
 
     // Update the value in the side panel
     const input = page.getByTestId(`${columnName}-input`)
     await expect(input).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Edit Row Panel')
     await input.clear()
     await input.fill('updated value')
 
@@ -1824,7 +1916,10 @@ testRunner('table editor', () => {
     ).not.toBeVisible()
   })
 
-  test('editing multiple columns via side panel saves all changes', async ({ page, ref }) => {
+  test('editing multiple columns via side panel saves all changes', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const tableName = 'pw_table_multi_col_edit'
 
     await using _ = await withSetupCleanup(
@@ -1865,11 +1960,13 @@ testRunner('table editor', () => {
     // Right-click to open context menu and edit the row
     const cell = page.getByRole('gridcell', { name: 'Alice' })
     await cell.click({ button: 'right' })
+    await runCheckpointScan(page, testInfo, 'Table Editor - Row Context Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Edit row' }).click()
 
     // Update both columns in the side panel
     const firstNameInput = page.getByTestId('first_name-input')
     await expect(firstNameInput).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Edit Row Panel')
     await firstNameInput.clear()
     await firstNameInput.fill('Bob')
 
@@ -1905,7 +2002,7 @@ testRunner('table editor', () => {
     ).not.toBeVisible()
   })
 
-  test('row delete via context menu shows confirmation dialog', async ({ page, ref }) => {
+  test('row delete via context menu shows confirmation dialog', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_row_delete'
     const columnName = 'name'
 
@@ -1943,6 +2040,7 @@ testRunner('table editor', () => {
       confirmDialog,
       'Confirmation dialog should appear for non-queue row deletion'
     ).toBeVisible({ timeout: 10000 })
+    await runCheckpointScan(page, testInfo, 'Table Editor - Delete Rows Confirmation')
 
     // Confirm the deletion
     const deletePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -1970,7 +2068,7 @@ testRunner('table editor', () => {
     ).not.toBeVisible()
   })
 
-  test('create a table in a single transaction', async ({ page, ref }) => {
+  test('create a table in a single transaction', async ({ page, ref }, testInfo) => {
     const tableName = 'pw_table_create_transaction'
 
     await using _ = await withSetupCleanup(
@@ -1984,6 +2082,7 @@ testRunner('table editor', () => {
     await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
     await page.getByRole('button', { name: 'New table' }).click()
     await page.getByLabel('Name', { exact: true }).fill(tableName)
+    await runCheckpointScan(page, testInfo, 'Table Editor - New Table Panel')
     await page.getByRole('button', { name: 'Add column' }).click()
     await page.getByLabel('Column name').nth(2).fill('pw_column')
     await page.getByRole('combobox').filter({ hasText: 'Choose a column type...' }).click()
@@ -2081,7 +2180,7 @@ testRunner('table editor', () => {
   test('copying cell content from referencing record peek copies the correct value', async ({
     page,
     ref,
-  }) => {
+  }, testInfo) => {
     const targetTable = 'pw_fk_peek_target'
     const sourceTable = 'pw_fk_peek_source'
 
@@ -2126,6 +2225,7 @@ testRunner('table editor', () => {
 
     const popoverContent = page.locator('[data-radix-popper-content-wrapper]')
     await expect(popoverContent.getByRole('gridcell', { name: 'target_value' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor - Referencing Record Peek Popover')
 
     // Right-click on the target_value cell inside the popover to open the peek context menu.
     // Before the fix, this would trigger the main grid's context menu via React portal

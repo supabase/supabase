@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { dropTable, query } from '../utils/db/index.js'
 import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { openTableContextMenu } from '../utils/table-helpers.js'
@@ -85,7 +86,7 @@ test.describe('API Access Toggle', () => {
     await loadPromise
   })
 
-  test('API access is default on for a new table', async ({ page, ref }) => {
+  test('API access is default on for a new table', async ({ page, ref }, testInfo) => {
     const tableName = `${TABLE_NAME_PREFIX}_default_on`
     await using _ = await withSetupCleanup(
       async () => {
@@ -105,6 +106,7 @@ test.describe('API Access Toggle', () => {
     // Verify the toggle is checked by default
     const toggle = getApiAccessSwitch(page)
     await expect(toggle).toBeChecked()
+    await runCheckpointScan(page, testInfo, 'API Access Toggle - New Table Panel')
 
     // Create the table
     const createTablePromise = createApiResponseWaiter(
@@ -140,7 +142,7 @@ test.describe('API Access Toggle', () => {
     })
   })
 
-  test('can toggle API access off for a new table', async ({ page, ref }) => {
+  test('can toggle API access off for a new table', async ({ page, ref }, testInfo) => {
     const tableName = `${TABLE_NAME_PREFIX}_toggle_off`
     await using _ = await withSetupCleanup(
       async () => {
@@ -163,6 +165,7 @@ test.describe('API Access Toggle', () => {
     await expect(toggle).toBeChecked()
     await toggle.click()
     await expect(toggle, 'Toggle should be unchecked after clicking').not.toBeChecked()
+    await runCheckpointScan(page, testInfo, 'API Access Toggle - New Table Panel')
 
     // Create the table
     const createTablePromise = createApiResponseWaiter(
@@ -198,7 +201,10 @@ test.describe('API Access Toggle', () => {
     })
   })
 
-  test('shows Manage access link when editing an existing table', async ({ page, ref }) => {
+  test('shows Manage access link when editing an existing table', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const tableName = `${TABLE_NAME_PREFIX}_edit`
     await using _ = await withSetupCleanup(
       async () => {
@@ -251,12 +257,13 @@ test.describe('API Access Toggle', () => {
       manageAccessLink,
       'Manage access link should be visible in edit mode'
     ).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'API Access Toggle - Edit Table Panel')
   })
 
   test('preserves API grants when editing non-privilege table properties', async ({
     page,
     ref,
-  }) => {
+  }, testInfo) => {
     const tableName = `${TABLE_NAME_PREFIX}_preserve_grants`
     await using _ = await withSetupCleanup(
       async () => {
@@ -274,6 +281,7 @@ test.describe('API Access Toggle', () => {
     // Verify toggle is on by default
     const toggle = getApiAccessSwitch(page)
     await expect(toggle).toBeChecked()
+    await runCheckpointScan(page, testInfo, 'API Access Toggle - New Table Panel')
 
     let createPromise = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-create')
     await page.getByRole('button', { name: 'Save' }).click()
@@ -304,6 +312,7 @@ test.describe('API Access Toggle', () => {
     await openTableContextMenu(page, tableName)
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
     await expect(page.getByTestId('table-editor-side-panel')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'API Access Toggle - Edit Table Panel')
 
     const descriptionInput = page
       .getByTestId('table-editor-side-panel')

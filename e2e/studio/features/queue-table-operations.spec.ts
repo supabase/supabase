@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test'
 
+import { ALERT_DIALOG_SELECTOR, MENU_SELECTOR, runCheckpointScan } from '../utils/axe-helpers.ts'
 import { createTable, dropTable, query } from '../utils/db/index.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
@@ -57,7 +58,7 @@ test.describe('Queue Table Operations', () => {
     await reloadWait
   })
 
-  test('cell edits are queued and can be saved', async ({ page, ref }) => {
+  test('cell edits are queued and can be saved', async ({ page, ref }, testInfo) => {
     const tableName = `${tableNamePrefix}_cell_edit`
     const columnName = 'name'
 
@@ -100,6 +101,7 @@ test.describe('Queue Table Operations', () => {
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Pending Changes Panel')
     await expect(sidePanel.getByText('1 cell edit')).toBeVisible()
     await expect(sidePanel.getByTitle('original value')).toBeVisible()
     await expect(sidePanel.getByTitle('edited value')).toBeVisible()
@@ -111,7 +113,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'original value' })).not.toBeVisible()
   })
 
-  test('cell edits can be cancelled', async ({ page, ref }) => {
+  test('cell edits can be cancelled', async ({ page, ref }, testInfo) => {
     const tableName = `${tableNamePrefix}_cell_cancel`
     const columnName = 'name'
 
@@ -152,6 +154,12 @@ test.describe('Queue Table Operations', () => {
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Queue Table Ops - Discard Changes Confirmation',
+      ALERT_DIALOG_SELECTOR
+    )
     await confirmDialog.getByRole('button', { name: 'Discard changes' }).click()
 
     await expect(page.getByRole('gridcell', { name: 'keep this value' })).toBeVisible()
@@ -160,7 +168,10 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByText('pending change')).not.toBeVisible()
   })
 
-  test('revert can be cancelled via discard confirmation dialog', async ({ page, ref }) => {
+  test('revert can be cancelled via discard confirmation dialog', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const tableName = `${tableNamePrefix}_discard_cancel`
     const columnName = 'name'
 
@@ -199,12 +210,18 @@ test.describe('Queue Table Operations', () => {
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Queue Table Ops - Discard Changes Confirmation',
+      ALERT_DIALOG_SELECTOR
+    )
     await confirmDialog.getByRole('button', { name: 'Keep editing' }).click()
 
     await expect(page.getByText('1 pending change')).toBeVisible()
   })
 
-  test('row inserts are queued and can be saved', async ({ page, ref }) => {
+  test('row inserts are queued and can be saved', async ({ page, ref }, testInfo) => {
     const tableName = `${tableNamePrefix}_row_insert`
     const columnName = 'name'
 
@@ -232,6 +249,7 @@ test.describe('Queue Table Operations', () => {
     await page.waitForURL(/\/editor\/\d+\?schema=public$/)
 
     await page.getByTestId('table-editor-insert-new-row').click()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Insert Row Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Insert row' }).click()
     await page.getByTestId(`${columnName}-input`).fill('new row value')
     await page.getByTestId('action-bar-save-row').click()
@@ -244,6 +262,7 @@ test.describe('Queue Table Operations', () => {
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Pending Changes Panel')
     await expect(sidePanel.getByText('1 row addition')).toBeVisible()
     await expect(sidePanel.getByText('New row', { exact: true })).toBeVisible()
 
@@ -585,7 +604,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'row to keep' })).toBeVisible()
   })
 
-  test('row deletes via context menu are queued', async ({ page, ref }) => {
+  test('row deletes via context menu are queued', async ({ page, ref }, testInfo) => {
     const tableName = `${tableNamePrefix}_row_delete`
     const columnName = 'name'
 
@@ -625,6 +644,7 @@ test.describe('Queue Table Operations', () => {
 
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('Pending changes')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Pending Changes Panel')
     await expect(sidePanel.getByText('1 row deletion')).toBeVisible()
     await expect(sidePanel.getByText('Delete row', { exact: true })).toBeVisible()
 
@@ -635,7 +655,7 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByText('0 records')).toBeVisible()
   })
 
-  test('row deletes can be cancelled', async ({ page, ref }) => {
+  test('row deletes can be cancelled', async ({ page, ref }, testInfo) => {
     const tableName = `${tableNamePrefix}_delete_cancel`
     const columnName = 'name'
 
@@ -672,13 +692,19 @@ test.describe('Queue Table Operations', () => {
 
     const confirmDialog = page.getByRole('alertdialog')
     await expect(confirmDialog.getByRole('heading', { name: 'Unsaved changes' })).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Queue Table Ops - Discard Changes Confirmation',
+      ALERT_DIALOG_SELECTOR
+    )
     await confirmDialog.getByRole('button', { name: 'Discard changes' }).click()
 
     await expect(page.getByRole('gridcell', { name: 'should not be deleted' })).toBeVisible()
     await expect(page.getByText('pending change')).not.toBeVisible()
   })
 
-  test('mixed operations (add, edit, delete) can be batched', async ({ page, ref }) => {
+  test('mixed operations (add, edit, delete) can be batched', async ({ page, ref }, testInfo) => {
     const tableName = `${tableNamePrefix}_mixed_ops`
     const columnName = 'name'
     await using _ = await withSetupCleanup(
@@ -727,6 +753,7 @@ test.describe('Queue Table Operations', () => {
     await clickReview(page)
     const sidePanel = page.getByRole('dialog')
     await expect(sidePanel.getByText('3 operations')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Pending Changes Panel')
     await expect(sidePanel.getByText('1 row deletion')).toBeVisible()
     await expect(sidePanel.getByText('1 row addition')).toBeVisible()
     await expect(sidePanel.getByText('1 cell edit')).toBeVisible()
@@ -965,7 +992,10 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByText('pending change')).not.toBeVisible()
   })
 
-  test('editing multiple columns via side panel queues all changes', async ({ page, ref }) => {
+  test('editing multiple columns via side panel queues all changes', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const tableName = `${tableNamePrefix}_multi_col`
 
     await using _ = await withSetupCleanup(
@@ -1013,6 +1043,7 @@ test.describe('Queue Table Operations', () => {
     // Update both columns in the side panel
     const firstNameInput = page.getByTestId('first_name-input')
     await expect(firstNameInput).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Row Editor Panel')
     await firstNameInput.clear()
     await firstNameInput.fill('Bob')
 
@@ -1048,7 +1079,10 @@ test.describe('Queue Table Operations', () => {
 })
 
 test.describe('Queue Table Operations - queue identity fixes', () => {
-  test('primary-key and column edits to the same row are saved together', async ({ page, ref }) => {
+  test('primary-key and column edits to the same row are saved together', async ({
+    page,
+    ref,
+  }, testInfo) => {
     const tableName = `${tableNamePrefix}_pk_col_edit`
 
     await using _ = await withSetupCleanup(
@@ -1083,6 +1117,7 @@ test.describe('Queue Table Operations - queue identity fixes', () => {
 
     const rowEditor = page.getByTestId('side-panel-row-editor')
     await expect(rowEditor, 'Row editor should open for the selected row').toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Row Editor Panel')
 
     await rowEditor.getByTestId('id-input').fill('13002')
     await rowEditor.getByTestId('name-input').fill('updated pk row')
@@ -1135,7 +1170,7 @@ test.describe('Queue Table Operations - queue identity fixes', () => {
     await expect(page.getByRole('gridcell', { name: 'original pk row' })).not.toBeVisible()
   })
 
-  test('primary-key edits can be reverted before saving', async ({ page, ref }) => {
+  test('primary-key edits can be reverted before saving', async ({ page, ref }, testInfo) => {
     const tableName = `${tableNamePrefix}_pk_revert`
 
     await using _ = await withSetupCleanup(
@@ -1167,6 +1202,7 @@ test.describe('Queue Table Operations - queue identity fixes', () => {
 
     const rowEditor = page.getByTestId('side-panel-row-editor')
     await expect(rowEditor, 'Row editor should open for the selected row').toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queue Table Ops - Row Editor Panel')
     await rowEditor.getByTestId('id-input').fill('14002')
     await page.getByTestId('action-bar-save-row').click()
 

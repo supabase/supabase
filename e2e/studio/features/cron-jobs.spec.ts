@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { query } from '../utils/db/client.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { test, withSetupCleanup } from '../utils/test.js'
@@ -111,7 +112,7 @@ test.describe('Cron Jobs', () => {
         await expect(page.getByPlaceholder('Search for a job')).toBeVisible()
       })
 
-      test('can create a new cron job', async ({ page, ref }) => {
+      test('can create a new cron job', async ({ page, ref }, testInfo) => {
         const cronJobName = 'pw_cron_create_job'
         await navigateToCronJobsPage(page, ref)
         await using _ = await withSetupCleanup(
@@ -128,6 +129,8 @@ test.describe('Cron Jobs', () => {
 
         // Wait for the dialog to open
         await expect(page.getByRole('heading', { name: 'Create a new cron job' })).toBeVisible()
+
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - Create Dialog')
 
         // Fill in job name using the input name attribute
         await page.locator('input[name="name"]').fill(cronJobName)
@@ -183,7 +186,7 @@ test.describe('Cron Jobs', () => {
         await searchInput.press('Enter')
       })
 
-      test('can edit a cron job', async ({ page, ref }) => {
+      test('can edit a cron job', async ({ page, ref }, testInfo) => {
         const cronJobName = 'pw_cron_edit_job'
         await using _ = await withSetupCleanup(
           async () => {
@@ -205,6 +208,8 @@ test.describe('Cron Jobs', () => {
         // Wait for the edit sheet to open
         await expect(page.getByRole('heading', { name: `Edit ${cronJobName}` })).toBeVisible()
 
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - Edit Job Panel')
+
         // Note: Job names cannot be changed after creation, so we'll verify we can change the schedule
         // Click a different schedule preset
         await page.getByRole('button', { name: 'Every 5 minutes' }).click()
@@ -224,7 +229,7 @@ test.describe('Cron Jobs', () => {
       test('editing an unnamed cron job updates it in place instead of creating a new job', async ({
         page,
         ref,
-      }) => {
+      }, testInfo) => {
         // Unique command so we can reliably find this job (it has no name to search by)
         const command = `select 'pw_unnamed_edit_job';`
         let jobId: number | undefined
@@ -248,6 +253,8 @@ test.describe('Cron Jobs', () => {
           'Edit sheet should open for the unnamed job'
         ).toBeVisible({ timeout: 30000 })
 
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - Edit Job Panel')
+
         // Change the schedule and save
         await page.getByRole('button', { name: 'Every 5 minutes' }).click()
         await page.getByRole('button', { name: 'Save cron job' }).click()
@@ -266,7 +273,7 @@ test.describe('Cron Jobs', () => {
         expect(jobs[0].schedule, 'The schedule should have been updated').toBe('*/5 * * * *')
       })
 
-      test('can delete a cron job', async ({ page, ref }) => {
+      test('can delete a cron job', async ({ page, ref }, testInfo) => {
         const cronJobName = 'pw_cron_delete_job'
         let shouldCleanup = true
         await using _ = await withSetupCleanup(
@@ -289,6 +296,9 @@ test.describe('Cron Jobs', () => {
 
         // The modal requires typing the job name - fill it in
         await expect(page.getByRole('heading', { name: 'Delete this cron job' })).toBeVisible()
+
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - Delete Confirmation')
+
         await page.getByPlaceholder('Type in name of cron job').fill(cronJobName)
 
         // Click the delete button
@@ -377,7 +387,7 @@ test.describe('Cron Jobs', () => {
       test('schedules the cleanup job and reappears after the job is deleted', async ({
         page,
         ref,
-      }) => {
+      }, testInfo) => {
         await using _ = await withSetupCleanup(
           async () => {
             await unscheduleCleanupJobIfExists(page, ref)
@@ -431,6 +441,9 @@ test.describe('Cron Jobs', () => {
         await jobRow.click({ button: 'right' })
         await page.getByRole('menuitem', { name: 'Delete job' }).click()
         await expect(page.getByRole('heading', { name: 'Delete this cron job' })).toBeVisible()
+
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - Delete Confirmation')
+
         await page.getByPlaceholder('Type in name of cron job').fill(CLEANUP_JOB_NAME)
         await page.getByRole('button', { name: `Delete cron job ${CLEANUP_JOB_NAME}` }).click()
 
@@ -513,7 +526,7 @@ test.describe('Cron Jobs', () => {
         await page.unroute('**/pg-meta/*/query**')
       })
 
-      test('Learn more dialog shows cleanup options', async ({ page, ref }) => {
+      test('Learn more dialog shows cleanup options', async ({ page, ref }, testInfo) => {
         // Set up the mock again for this test
         await page.route('**/pg-meta/*/query**', async (route) => {
           const request = route.request()
@@ -573,11 +586,16 @@ test.describe('Cron Jobs', () => {
           page.getByText('Complete step 1 to enable scheduling a daily cleanup job')
         ).toBeVisible()
 
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - High Cost Cleanup Dialog')
+
         // Remove the route mock
         await page.unroute('**/pg-meta/*/query**')
       })
 
-      test('cleanup workflow: delete rows and schedule cleanup job', async ({ page, ref }) => {
+      test('cleanup workflow: delete rows and schedule cleanup job', async ({
+        page,
+        ref,
+      }, testInfo) => {
         // This flow schedules the delete-job-run-details job; remove it afterwards so tests
         // that depend on the job's absence (Enable Cleanup Button) start clean. Deleting via
         // the UI here causes pointer events issues with Radix dialogs, hence via SQL.
@@ -636,6 +654,8 @@ test.describe('Cron Jobs', () => {
           timeout: 30000,
         })
 
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - Cleanup Step Delete Rows')
+
         // Step 2 should now be enabled - the "Schedule cleanup job" button should be visible
         await expect(page.getByRole('button', { name: 'Schedule cleanup job' })).toBeVisible()
 
@@ -649,6 +669,8 @@ test.describe('Cron Jobs', () => {
         await expect(page.getByText('Daily cleanup job scheduled successfully')).toBeVisible({
           timeout: 15000,
         })
+
+        await runCheckpointScan(page, testInfo, 'Cron Jobs - Cleanup Step Schedule Job')
 
         // Clean up: remove the route mock; the scheduled delete-job-run-details job is
         // removed by the withSetupCleanup teardown at the top of this test.

@@ -1,9 +1,14 @@
 import { expect } from '@playwright/test'
+
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { test } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
 
 test.describe('AI Assistant', async () => {
-  test('Can send a message to the assistant and receive a response', async ({ page, ref }) => {
+  test('Can send a message to the assistant and receive a response', async ({
+    page,
+    ref,
+  }, testInfo) => {
     // Skip the test if the OPENAI_API_KEY is not set
     test.skip(!process.env.OPENAI_API_KEY, 'OPENAI_API_KEY is not set')
 
@@ -17,6 +22,10 @@ test.describe('AI Assistant', async () => {
 
     // Wait for the assistant panel to be visible
     await expect(page.getByRole('heading', { name: 'How can I assist you?' })).toBeVisible()
+
+    // The assistant renders in the layout's resizable side panel, which is not a
+    // dialog. `LayoutSidebar` gives that panel the `panel-side` id.
+    await runCheckpointScan(page, testInfo, 'Assistant - Chat Panel', '#panel-side')
 
     // Type "hello" in the chat input
     const chatInput = page.getByRole('textbox', { name: 'Chat to Postgres...' })

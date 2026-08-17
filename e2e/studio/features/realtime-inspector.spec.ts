@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import {
   getMessageCount,
   joinChannel,
@@ -34,22 +35,33 @@ test.describe('Realtime Inspector', () => {
       await expect(page.getByText('Create realtime experiences')).toBeVisible()
     })
 
-    test('channel selection popover opens and works', async ({ page }) => {
+    test('channel selection popover opens and works', async ({ page }, testInfo) => {
       await page.getByRole('button', { name: 'Join a channel' }).click()
 
       await expect(page.getByPlaceholder('Enter a channel name')).toBeVisible({ timeout: 5000 })
       await expect(page.getByRole('button', { name: 'Listen to channel' })).toBeVisible()
       await expect(page.getByText('Is channel private?')).toBeVisible()
 
+      await runCheckpointScan(page, testInfo, 'Realtime Inspector - Join Channel Popover')
+
       await page.keyboard.press('Escape')
     })
 
-    test('can join and leave a channel', async ({ page }) => {
+    test('can join and leave a channel', async ({ page }, testInfo) => {
       const testChannelName = 'pw_realtime_test_channel_join_leave'
       await joinChannel(page, testChannelName)
 
       await expect(page.getByText('Listening', { exact: true })).toBeVisible({ timeout: 10000 })
       await expect(page.getByRole('button', { name: `Channel: ${testChannelName}` })).toBeVisible()
+
+      // The popover only renders while a channel is joined, and `leaveChannel` opens
+      // and closes it itself.
+      await page.getByRole('button', { name: `Channel: ${testChannelName}` }).click()
+      await expect(page.getByRole('button', { name: 'Leave channel' })).toBeVisible({
+        timeout: 5000,
+      })
+      await runCheckpointScan(page, testInfo, 'Realtime Inspector - Channel Info Popover')
+      await page.keyboard.press('Escape')
 
       await leaveChannel(page)
 
@@ -99,7 +111,7 @@ test.describe('Realtime Inspector', () => {
       await leaveChannel(page)
     })
 
-    test('clicking broadcast message shows detail panel', async ({ page }) => {
+    test('clicking broadcast message shows detail panel', async ({ page }, testInfo) => {
       const testChannelName = 'pw_realtime_test_channel_broadcast_details'
       await joinChannel(page, testChannelName)
 
@@ -124,14 +136,25 @@ test.describe('Realtime Inspector', () => {
 
       await expect(page.getByText('Timestamp')).toBeVisible()
 
+      // `MessageSelection` renders inline beside the messages grid rather than in
+      // a portal, so the scan targets that container's classes.
+      await runCheckpointScan(
+        page,
+        testInfo,
+        'Realtime Inspector - Message Detail Panel',
+        'div.border-l.overflow-y-scroll.bg-200'
+      )
+
       await leaveChannel(page)
     })
 
-    test('broadcast modal validates JSON payload', async ({ page }) => {
+    test('broadcast modal validates JSON payload', async ({ page }, testInfo) => {
       const testChannelName = 'pw_realtime_test_channel_broadcast_json'
       await joinChannel(page, testChannelName)
 
       await openBroadcastModal(page)
+
+      await runCheckpointScan(page, testInfo, 'Realtime Inspector - Broadcast Message Modal')
 
       await page.getByRole('textbox', { name: /Editor content/i }).focus()
       await page.keyboard.press('ControlOrMeta+KeyA')

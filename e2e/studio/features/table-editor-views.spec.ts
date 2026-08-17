@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import { expect, Page } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import {
   createMaterializedView,
@@ -116,7 +117,10 @@ test.describe('table editor — view context menu', () => {
     expect(clipboardText.toLowerCase()).toContain(fixture.viewName.toLowerCase())
   })
 
-  test('export view as CSV shows confirmation reason and downloads', async ({ page, ref }) => {
+  test('export view as CSV shows confirmation reason and downloads', async ({
+    page,
+    ref,
+  }, testInfo) => {
     await using fixture = await setupViewFixture()
     await goToTableEditor(page, ref)
 
@@ -136,6 +140,7 @@ test.describe('table editor — view context menu', () => {
       page.getByText(/Exporting a view may cause consistency issues/i),
       'confirmation reason text should be visible inside the modal'
     ).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Table Editor Views - Export View Confirmation')
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
@@ -167,7 +172,10 @@ test.describe('table editor — view context menu', () => {
     expect(download.suggestedFilename()).toContain('.sql')
   })
 
-  test('delete view runs DROP VIEW and removes it from the sidebar', async ({ page, ref }) => {
+  test('delete view runs DROP VIEW and removes it from the sidebar', async ({
+    page,
+    ref,
+  }, testInfo) => {
     await using fixture = await setupViewFixture([{ note: 'alpha' }])
     await goToTableEditor(page, ref)
 
@@ -178,6 +186,7 @@ test.describe('table editor — view context menu', () => {
       page.getByRole('heading', { name: `Confirm deletion of view "${fixture.viewName}"` }),
       'confirm dialog title should include the view name'
     ).toBeVisible({ timeout: 15000 })
+    await runCheckpointScan(page, testInfo, 'Table Editor Views - Delete View Confirmation')
 
     const deletePromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=view-delete-', {
       method: 'POST',
@@ -233,7 +242,7 @@ test.describe('table editor — materialized view context menu', () => {
   test('export materialized view as CSV shows confirmation and downloads', async ({
     page,
     ref,
-  }) => {
+  }, testInfo) => {
     await using fixture = await setupMaterializedViewFixture()
     await goToTableEditor(page, ref)
 
@@ -248,6 +257,11 @@ test.describe('table editor — materialized view context menu', () => {
       page.getByText(/Exporting a materialized view may cause performance issues/i),
       'materialized view-specific confirmation reason should appear'
     ).toBeVisible({ timeout: 15000 })
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor Views - Export Materialized View Confirmation'
+    )
 
     const [download] = await Promise.all([
       page.waitForEvent('download'),
@@ -259,7 +273,7 @@ test.describe('table editor — materialized view context menu', () => {
   test('delete materialized view runs DROP and removes it from the sidebar', async ({
     page,
     ref,
-  }) => {
+  }, testInfo) => {
     await using fixture = await setupMaterializedViewFixture()
     await goToTableEditor(page, ref)
 
@@ -271,6 +285,11 @@ test.describe('table editor — materialized view context menu', () => {
         name: `Confirm deletion of materialized view "${fixture.mvName}"`,
       })
     ).toBeVisible({ timeout: 15000 })
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'Table Editor Views - Delete Materialized View Confirmation'
+    )
 
     const deletePromise = waitForApiResponse(
       page,

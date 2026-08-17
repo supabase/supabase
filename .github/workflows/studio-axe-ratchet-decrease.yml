@@ -1,0 +1,110 @@
+name: Decrease studio axe ratchet baselines
+
+on:
+  schedule:
+    - cron: '0 0 * * SUN'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  decrease-baselines:
+    # The axe baseline can only be recomputed from a fresh scan, and one runner
+    # covers the whole suite that the PR job shards.
+    timeout-minutes: 120
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    env:
+      STUDIO_FRAMEWORK: next
+
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Browsers
+        run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
+
+      - name: Start supabase
+        run: SKIP_ASSET_UPLOAD=1 pnpm run e2e:setup:cli
+
+      - name: Build studio
+        run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test MODE=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
+
+      - name: Run accessibility scan
+        continue-on-error: true
+        run: pnpm -C e2e/studio exec playwright test --grep @a11y --workers=1 --retries=0 --max-failures=0
+
+      # The checkpoint scans live inside the feature specs. Without this step every
+      # checkpoint reports zero and the decrease erases its baseline.
+      - name: Run feature specs for checkpoint scans
+        continue-on-error: true
+        run: pnpm -C e2e/studio exec playwright test --grep-invert @a11y --retries=0 --max-failures=0
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.GH_AUTOFIX_APP_CLIENT_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - name: Decrease axe ratchet baselines and open PR
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -eo pipefail
+          DEFAULT_BRANCH=${DEFAULT_BRANCH:-master}
+
+          BRANCH="bot/decrease-axe-ratchet-baselines"
+
+          git fetch origin "$DEFAULT_BRANCH" --depth=1
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
+            git fetch origin "$BRANCH":"$BRANCH" --depth=1
+            git switch "$BRANCH"
+            git reset --hard "origin/$DEFAULT_BRANCH"
+          else
+            git switch --create "$BRANCH" "origin/$DEFAULT_BRANCH"
+          fi
+
+          pnpm --filter studio run axe:ratchet --decrease-baselines
+
+          if git diff --quiet; then
+            echo "No baseline updates detected."
+            exit 0
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          git add apps/studio/.github/axe-rule-baselines.json
+          git commit --message "chore: decrease axe ratchet baselines"
+          git -c credential.helper= push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH}"
+
+          pr_url=$(gh pr list --state open --head "$BRANCH" --json url --jq '.[0].url // ""' 2>/dev/null || echo "")
+          if [ -z "$pr_url" ]; then
+            gh pr create \
+              --title "[bot] Decrease axe ratchet baselines" \
+              --body "Automated weekly decrease of axe ratchet baselines." \
+              --base "$DEFAULT_BRANCH" \
+              --head "$BRANCH"
+          else
+            gh pr comment "$pr_url" --body "Updated axe ratchet baselines with the latest weekly decreases."
+          fi

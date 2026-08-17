@@ -126,7 +126,25 @@ jobs:
       - name: 🚀 Run Playwright tests against local studio build
         if: steps.filter.outputs.studio == 'true'
         id: playwright
-        run: PWTEST_SHARD_WEIGHTS=62:38 pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        # The a11y specs run once in their own step below, so the shards skip them.
+        run: PWTEST_SHARD_WEIGHTS=62:38 pnpm e2e --grep-invert @a11y --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
+      # One leg only: the shell and routes are the same on both runtimes, and
+      # `routes/**` re-exports `pages/**`.
+      - name: ♿ Run accessibility scan
+        if: steps.filter.outputs.studio == 'true' && matrix.framework == 'next' && matrix.shardIndex == 1
+        continue-on-error: true
+        run: pnpm -C e2e/studio exec playwright test --grep @a11y --workers=1 --retries=0 --max-failures=0
+
+      # Both next shards, because the checkpoint scans ride along inside the feature
+      # specs. Surface names are unique, so the merged files never collide.
+      - name: Upload axe results to GitHub Actions Artifacts
+        if: always() && steps.filter.outputs.studio == 'true' && matrix.framework == 'next'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: axe-results-${{ matrix.shardIndex }}
+          path: e2e/studio/axe-results
+          retention-days: 7
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: always() && steps.filter.outputs.studio == 'true'
@@ -188,6 +206,52 @@ jobs:
         with:
           report-file: e2e/studio/test-results/test-results.json
           comment-title: '🎭 Playwright Test Results (${{ matrix.framework }})'
+
+  axe-ratchet:
+    name: 'Axe ratchet'
+    # Compares the scan artifact only, so it needs neither docker nor a build.
+    if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
+    needs: [test]
+    # Reports a regression as a warning annotation instead of failing the run.
+    # `merge-results` fans in `test` alone, so nothing here reaches a required check.
+    continue-on-error: true
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github
+            apps/studio
+            e2e/studio
+            packages
+            patches
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Download axe results
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: axe-results-*
+          path: e2e/studio/axe-results
+          merge-multiple: true
+
+      - name: Run axe ratchet
+        run: pnpm --filter studio run axe:ratchet
 
   merge-results:
     name: 'E2E results'

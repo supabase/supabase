@@ -2067,16 +2067,25 @@ importers:
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
+      e2e-shared:
+        specifier: workspace:*
+        version: link:../shared
       otpauth:
         specifier: ^9.4.1
         version: 9.4.1
     devDependencies:
+      '@axe-core/playwright':
+        specifier: ^4.12.1
+        version: 4.12.1(playwright-core@1.59.1)
       '@faker-js/faker':
         specifier: ^9.9.0
         version: 9.9.0
       api-types:
         specifier: workspace:*
         version: link:../../packages/api-types
+      axe-core:
+        specifier: ^4.12.1
+        version: 4.12.1
       tsx:
         specifier: 'catalog:'
         version: 4.22.4

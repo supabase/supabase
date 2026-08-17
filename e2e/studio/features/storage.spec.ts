@@ -2,6 +2,7 @@ import path from 'path'
 import { expect } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { MENU_SELECTOR, runCheckpointScan } from '../utils/axe-helpers.ts'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import {
   createBucket,
@@ -39,7 +40,7 @@ test.describe('Storage', () => {
     await expect(page).toHaveURL(new RegExp(`/project/${ref}/storage/files`))
   })
 
-  test('can create a private bucket', async ({ page, ref }) => {
+  test('can create a private bucket', async ({ page, ref }, testInfo) => {
     const bucketName = `${bucketNamePrefix}_private`
 
     await deleteBucketViaApi(bucketName)
@@ -52,6 +53,11 @@ test.describe('Storage', () => {
       bucketRow.getByText('Public'),
       'Private bucket should not have Public badge'
     ).not.toBeVisible()
+
+    // The create helper closes the dialog on submit, so reopen it to scan it.
+    await page.getByRole('button', { name: 'New bucket' }).click()
+    await expect(page.getByRole('textbox', { name: 'Bucket name' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Storage - Create Bucket Dialog')
   })
 
   test('can create a public bucket', async ({ page, ref }) => {
@@ -71,7 +77,7 @@ test.describe('Storage', () => {
     ).toBeVisible()
   })
 
-  test('can edit bucket settings', async ({ page, ref }) => {
+  test('can edit bucket settings', async ({ page, ref }, testInfo) => {
     const bucketName = `${bucketNamePrefix}_edit`
 
     // Create a fresh private bucket via API
@@ -89,6 +95,7 @@ test.describe('Storage', () => {
     // Toggle public setting
     const publicToggle = page.getByRole('switch', { name: 'Public bucket' })
     await expect(publicToggle, 'Public toggle should be visible').toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Storage - Bucket Settings Dialog')
     await publicToggle.click()
 
     // Save changes
@@ -103,6 +110,12 @@ test.describe('Storage', () => {
       page.getByText('Public').first(),
       'Bucket should now be marked as Public'
     ).toBeVisible()
+
+    // Scanned without confirming the delete.
+    await page.getByRole('button', { name: 'Edit bucket' }).click()
+    await page.getByRole('menuitem', { name: 'Delete bucket' }).click()
+    await expect(page.getByPlaceholder('Type bucket name')).toBeVisible({ timeout: 15_000 })
+    await runCheckpointScan(page, testInfo, 'Storage - Delete Bucket Confirmation')
   })
 
   test('can delete a bucket', async ({ page, ref }) => {
@@ -191,7 +204,7 @@ test.describe('Storage', () => {
     await createFolder(page, folderName)
   })
 
-  test('can rename a file', async ({ page, ref }) => {
+  test('can rename a file', async ({ page, ref }, testInfo) => {
     const bucketName = `${bucketNamePrefix}_rename_file`
     const fileName = 'test-file.txt'
     const newFileName = 'renamed-file.txt'
@@ -207,6 +220,14 @@ test.describe('Storage', () => {
 
     // Rename the file
     await renameItem(page, fileName, newFileName)
+
+    // Scanned without confirming the delete.
+    await page.getByTitle(newFileName).click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Delete' }).click()
+    await expect(
+      page.getByRole('heading', { name: `Confirm deletion of ${newFileName}` })
+    ).toBeVisible({ timeout: 15_000 })
+    await runCheckpointScan(page, testInfo, 'Storage - Delete File/Folder Confirmation')
   })
 
   test('can rename a folder', async ({ page, ref }) => {
@@ -226,7 +247,7 @@ test.describe('Storage', () => {
     await renameItem(page, folderName, newFolderName)
   })
 
-  test('can copy a file url regardless of the opened folders', async ({ page, ref }) => {
+  test('can copy a file url regardless of the opened folders', async ({ page, ref }, testInfo) => {
     const bucketName = `${bucketNamePrefix}_urls`
     const folderName = 'test_folder'
     const rootFileName = 'test-file.txt'
@@ -249,6 +270,7 @@ test.describe('Storage', () => {
     // Right-click on the folder file to open context menu
     const folderFile = page.getByTitle(folderFileName)
     await folderFile.click({ button: 'right' })
+    await runCheckpointScan(page, testInfo, 'Storage - File/Folder Context Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Get URL' }).click()
     await expectClipboardValue({
       page,
@@ -268,6 +290,7 @@ test.describe('Storage', () => {
 
     // Click the actions button on the folder file to open dropdown menu
     await page.getByRole('button', { name: `${folderFileName} actions` }).click()
+    await runCheckpointScan(page, testInfo, 'Storage - File/Folder Actions Dropdown', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Get URL' }).click()
     await expectClipboardValue({
       page,

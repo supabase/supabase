@@ -2,6 +2,7 @@ import fs from 'fs'
 import { expect, Page } from '@playwright/test'
 
 import { env } from '../env.config.js'
+import { ALERT_DIALOG_SELECTOR, MENU_SELECTOR, runCheckpointScan } from '../utils/axe-helpers.ts'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { dropTable, query } from '../utils/db/index.js'
 import { isCLI } from '../utils/is-cli.js'
@@ -19,6 +20,9 @@ const sqlSnippetNameShare = 'pw_sql_snippet_share'
 const sqlFolderName = 'pw_sql_folder'
 const sqlFolderNameUpdated = 'pw_sql_folder_updated'
 const newSqlSnippetName = 'Untitled query'
+
+// The new folder name field renders inline in the sidebar tree, not in a dialog.
+const PRIVATE_SNIPPETS_TREE_SELECTOR = '[role="tree"][aria-label="private-snippets"]'
 
 /**
  * Due to how sql editor is created, it's very annoying to test SQL editor in staging, I've created various workarounds to help mitigate flaky tests as much as possible.
@@ -126,7 +130,7 @@ test.describe('SQL Editor', () => {
     }
   })
 
-  test('should check if SQL editor is working as expected', async ({ ref }) => {
+  test('should check if SQL editor is working as expected', async ({ ref }, testInfo) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
@@ -164,6 +168,12 @@ test.describe('SQL Editor', () => {
     // verify warning modal is visible
     await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
     await expect(page.getByText('This query includes destructive operations')).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'SQL Editor - Potential Issue Modal (Destructive Op)',
+      ALERT_DIALOG_SELECTOR
+    )
     await page.getByRole('button', { name: 'Cancel' }).click()
 
     // clear SQL snippet
@@ -174,7 +184,9 @@ test.describe('SQL Editor', () => {
     }
   })
 
-  test('should block execution for alter database connection limit 0', async ({ ref }) => {
+  test('should block execution for alter database connection limit 0', async ({
+    ref,
+  }, testInfo) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
@@ -198,6 +210,12 @@ test.describe('SQL Editor', () => {
     // verify warning modal blocks execution
     await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
     await expect(page.getByText('This query may prevent new database connections')).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'SQL Editor - Potential Issue Modal (Connection Limit)',
+      ALERT_DIALOG_SELECTOR
+    )
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -214,7 +232,9 @@ test.describe('SQL Editor', () => {
     }
   })
 
-  test('should block execution for alter database allow_connections false', async ({ ref }) => {
+  test('should block execution for alter database allow_connections false', async ({
+    ref,
+  }, testInfo) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
@@ -238,6 +258,12 @@ test.describe('SQL Editor', () => {
     // verify warning modal blocks execution
     await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
     await expect(page.getByText('This query may prevent new database connections')).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'SQL Editor - Potential Issue Modal (Allow Connections False)',
+      ALERT_DIALOG_SELECTOR
+    )
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -254,7 +280,7 @@ test.describe('SQL Editor', () => {
     }
   })
 
-  test('should block execution for update without where clause', async ({ ref }) => {
+  test('should block execution for update without where clause', async ({ ref }, testInfo) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
@@ -278,6 +304,12 @@ test.describe('SQL Editor', () => {
     // verify warning modal blocks execution
     await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
     await expect(page.getByText(/This query runs an UPDATE without a WHERE clause/)).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'SQL Editor - Potential Issue Modal (Update Without Where)',
+      ALERT_DIALOG_SELECTOR
+    )
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -294,7 +326,9 @@ test.describe('SQL Editor', () => {
     }
   })
 
-  test('warns on CREATE TABLE without RLS and "Run and enable RLS" enables it', async ({ ref }) => {
+  test('warns on CREATE TABLE without RLS and "Run and enable RLS" enables it', async ({
+    ref,
+  }, testInfo) => {
     // Suffix with parallel worker index so parallel workers don't collide
     // on the same table name — when they do, one worker's `dropTable`
     // races another's "Run and enable RLS" and the post-action query
@@ -322,6 +356,12 @@ test.describe('SQL Editor', () => {
         page.getByText('This query creates a table without enabling Row Level Security'),
         'Modal should mention Row Level Security'
       ).toBeVisible()
+      await runCheckpointScan(
+        page,
+        testInfo,
+        'SQL Editor - Potential Issue Modal (Create Table Without RLS)',
+        ALERT_DIALOG_SELECTOR
+      )
 
       // Click "Run and enable RLS" — query runs with appended ALTER
       const sqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
@@ -406,7 +446,9 @@ test.describe('SQL Editor', () => {
     }
   })
 
-  test('destructive query warning modal: confirm re-runs the forced query', async ({ ref }) => {
+  test('destructive query warning modal: confirm re-runs the forced query', async ({
+    ref,
+  }, testInfo) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
@@ -429,6 +471,12 @@ test.describe('SQL Editor', () => {
 
     // Destructive query -> confirmation modal, and no query is sent yet.
     await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'SQL Editor - Potential Issue Modal (Destructive Op)',
+      ALERT_DIALOG_SELECTOR
+    )
     expect(queryDispatched).toBe(false)
 
     // Confirming forces the (same) destructive query to actually run.
@@ -509,7 +557,7 @@ test.describe('SQL Editor', () => {
     }
   })
 
-  test('exporting works as expected', async ({ ref }) => {
+  test('exporting works as expected', async ({ ref }, testInfo) => {
     await expect(page.getByText('Loading...')).not.toBeVisible()
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
@@ -518,6 +566,7 @@ test.describe('SQL Editor', () => {
 
     // export as Markdown
     await page.getByRole('button', { name: 'Export' }).click()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Export Dropdown Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Copy as Markdown' }).click()
     // Make sure the dropdown has closed otherwise it would make the other assertions unstable
     await expect(page.getByRole('menuitem', { name: 'Copy as Markdown' })).not.toBeVisible()
@@ -531,6 +580,7 @@ test.describe('SQL Editor', () => {
 
     // export as JSON
     await page.getByRole('button', { name: 'Export' }).click()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Export Dropdown Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Copy as JSON' }).click()
     await expect(page.getByRole('menuitem', { name: 'Copy as JSON' })).not.toBeVisible()
     await expectClipboardValue({
@@ -546,6 +596,7 @@ test.describe('SQL Editor', () => {
     // export as CSV
     const downloadPromise = page.waitForEvent('download')
     await page.getByRole('button', { name: 'Export' }).click()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Export Dropdown Menu', MENU_SELECTOR)
     await page.getByRole('menuitem', { name: 'Download CSV' }).click()
     await expect(page.getByRole('menuitem', { name: 'Download CSV' })).not.toBeVisible()
     const download = await downloadPromise
@@ -564,7 +615,7 @@ hello world`)
     }
   })
 
-  test('snippet favourite works as expected', async ({ ref }) => {
+  test('snippet favourite works as expected', async ({ ref }, testInfo) => {
     test.skip(isCLI(), 'This test does not work in self-hosted environments.')
 
     // clean up private snippets and snippets shared with the team
@@ -595,6 +646,7 @@ hello world`)
     await privateSnippetSection.getByText(newSqlSnippetName).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Rename Query Dialog')
     await page.getByRole('textbox', { name: 'Name' }).fill(sqlSnippetNameFavorite)
     await page.getByRole('button', { name: 'Rename query', exact: true }).click()
     await waitForApiResponse(page, 'projects', ref, 'content', { method: 'PUT' })
@@ -631,7 +683,7 @@ hello world`)
     }
   })
 
-  test('share with team works as expected', async ({ ref }) => {
+  test('share with team works as expected', async ({ ref }, testInfo) => {
     test.skip(isCLI(), 'Sharing and unsharing SQL snippet has issues in staging')
 
     // clean up private snippets and snippets shared with the team
@@ -681,6 +733,7 @@ hello world`)
     await privateSnippetSection.getByText(newSqlSnippetName).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Rename Query Dialog')
     await page.getByRole('textbox', { name: 'Name' }).fill(sqlSnippetNameShare)
     await page.getByRole('button', { name: 'Rename query', exact: true }).click()
     await waitForApiResponse(page, 'projects', ref, 'content', { method: 'PUT' })
@@ -697,6 +750,7 @@ hello world`)
     await snippet.click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Share query with team' }).click()
     await expect(page.getByRole('heading', { name: 'Confirm to share query' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Share Query Confirmation')
     await page.waitForTimeout(1000)
     await page.getByRole('button', { name: 'Share query', exact: true }).click()
     await waitForApiResponse(page, 'projects', ref, 'content', { method: 'PUT' })
@@ -709,6 +763,7 @@ hello world`)
     await sharedSnippet.getByText(sqlSnippetNameShare).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Unshare query with team' }).click()
     await expect(page.getByRole('heading', { name: 'Confirm to unshare query:' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Unshare Query Confirmation')
 
     const unsharePromise = waitForApiResponse(page, 'projects', ref, 'content', { method: 'PUT' })
     await page.getByRole('button', { name: 'Unshare query', exact: true }).click()
@@ -724,7 +779,7 @@ hello world`)
     }
   })
 
-  test('folders works as expected', async ({ ref }) => {
+  test('folders works as expected', async ({ ref }, testInfo) => {
     test.skip(isCLI(), 'This test does not work in self-hosted environments.')
     // clean up folders and snippets
     await waitForApiResponseWithTimeout(
@@ -753,6 +808,7 @@ hello world`)
     await privateSnippetSection.getByText(newSqlSnippetName).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Rename Query Dialog')
     await page.getByRole('textbox', { name: 'Name' }).fill(sqlSnippetNameFolder)
     await page.getByRole('button', { name: 'Rename query', exact: true }).click()
     await waitForApiResponse(page, 'projects', ref, 'content', { method: 'PUT' })
@@ -765,6 +821,12 @@ hello world`)
     await page.getByTestId('sql-editor-new-query-button').click()
     await page.getByRole('menuitem', { name: 'Create a new folder' }).click()
     await page.getByRole('tree', { name: 'private-snippets' }).getByRole('textbox').click()
+    await runCheckpointScan(
+      page,
+      testInfo,
+      'SQL Editor - Create Folder Input',
+      PRIVATE_SNIPPETS_TREE_SELECTOR
+    )
     await page
       .getByRole('tree', { name: 'private-snippets' })
       .getByRole('textbox')
@@ -788,6 +850,7 @@ hello world`)
     // move sql snippet into folder
     await privateSnippetSection.getByText(sqlSnippetNameFolder).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Move query' }).click()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Move Query Dialog')
     await page.getByRole('button', { name: 'Root of the editor (Current)' }).click()
     await page.getByRole('option', { name: sqlFolderNameUpdated, exact: true }).click()
     await page.getByRole('button', { name: 'Move file' }).click()
@@ -802,6 +865,7 @@ hello world`)
       .click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Delete folder' }).click()
     await expect(page.getByRole('heading', { name: 'Confirm to delete folder' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Delete Folder Confirmation')
     await page.getByRole('button', { name: 'Delete folder' }).click()
     await waitForApiResponse(page, 'projects', ref, 'content/folders', {
       method: 'DELETE',
@@ -813,7 +877,7 @@ hello world`)
     await expect(privateSnippetSection.getByText(sqlSnippetNameFolder)).not.toBeVisible()
   })
 
-  test('other SQL snippets actions work as expected', async ({ ref }) => {
+  test('other SQL snippets actions work as expected', async ({ ref }, testInfo) => {
     test.skip(isCLI(), 'This test does not work in self-hosted environments.')
     // clean up 'Untitled query', 'pw_sql_snippet' and 'pw_sql_snippet (Duplicate)' snippets if exists
     await waitForApiResponseWithTimeout(
@@ -844,6 +908,7 @@ hello world`)
     await privateSnippetSection.getByText(newSqlSnippetName).click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Rename query', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Rename' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Rename Query Dialog')
     await page.getByRole('textbox', { name: 'Name' }).fill(sqlSnippetName)
     await page.getByRole('button', { name: 'Rename query', exact: true }).click()
     await waitForApiResponse(page, 'projects', ref, 'content', { method: 'PUT' })
@@ -874,6 +939,7 @@ hello world`)
       .click({ button: 'right' })
     await page.getByRole('menuitem', { name: 'Export query' }).click()
     await expect(page.getByText('supabase migration new')).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'SQL Editor - Export Query Modal')
     await page.getByRole('button', { name: 'Close' }).click()
 
     // delete all files used in this test

@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { query } from '../utils/db/client.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
 import { test, withSetupCleanup } from '../utils/test.js'
@@ -94,7 +95,7 @@ test.describe('Queues Integration', () => {
     await expect(page.getByPlaceholder('Search for a queue')).toBeVisible()
   })
 
-  test('can create a new queue', async ({ page, ref }) => {
+  test('can create a new queue', async ({ page, ref }, testInfo) => {
     const queueName = 'pw_queue_create'
     await navigateToQueuesPage(page, ref)
     await using _ = await withSetupCleanup(
@@ -110,6 +111,7 @@ test.describe('Queues Integration', () => {
 
     const dialog = page.getByRole('dialog')
     await expect(dialog.getByRole('heading', { name: 'Create a new queue' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queues - Create Dialog')
 
     await dialog.getByRole('textbox').fill(queueName)
 
@@ -120,7 +122,7 @@ test.describe('Queues Integration', () => {
     await expectQueueCreated(page, queueName)
   })
 
-  test('can create an unlogged queue', async ({ page, ref }) => {
+  test('can create an unlogged queue', async ({ page, ref }, testInfo) => {
     const queueName = 'pw_queue_create_unlogged'
     await navigateToQueuesPage(page, ref)
     await using _ = await withSetupCleanup(
@@ -136,9 +138,11 @@ test.describe('Queues Integration', () => {
 
     const dialog = page.getByRole('dialog')
     await expect(dialog.getByRole('heading', { name: 'Create a new queue' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queues - Create Dialog')
 
     await dialog.getByRole('textbox').fill(queueName)
     await dialog.getByText('Unlogged queue', { exact: true }).click()
+    await runCheckpointScan(page, testInfo, 'Queues - Unlogged Option')
 
     await dialog.getByRole('button', { name: 'Create queue' }).click()
 
@@ -147,7 +151,7 @@ test.describe('Queues Integration', () => {
     await expectQueueCreated(page, queueName)
   })
 
-  test('can delete a queue', async ({ page, ref }) => {
+  test('can delete a queue', async ({ page, ref }, testInfo) => {
     const queueName = 'pw_queue_delete'
     let shouldCleanup = true
     await using _ = await withSetupCleanup(
@@ -163,6 +167,7 @@ test.describe('Queues Integration', () => {
 
     await page.getByRole('button', { name: 'Delete queue' }).click()
     await expect(page.getByRole('heading', { name: 'Delete this queue' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queues - Delete Confirmation')
     await page.getByPlaceholder('Type in name of queue').fill(queueName)
     await page.getByRole('button', { name: `Delete queue ${queueName}` }).click()
 
@@ -171,7 +176,7 @@ test.describe('Queues Integration', () => {
     shouldCleanup = false
   })
 
-  test('can purge messages from a queue', async ({ page, ref }) => {
+  test('can purge messages from a queue', async ({ page, ref }, testInfo) => {
     const queueName = 'pw_queue_purge'
     await using _ = await withSetupCleanup(
       async () => {
@@ -187,13 +192,14 @@ test.describe('Queues Integration', () => {
 
     await page.getByRole('button', { name: 'Purge messages' }).click()
     await expect(page.getByRole('heading', { name: 'Purge this queue' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queues - Purge Confirmation')
     await page.getByPlaceholder('Type in name of queue').fill(queueName)
     await page.getByRole('button', { name: `Purge queue ${queueName}` }).click()
 
     await expect(page.getByText(/Successfully purged queue/)).toBeVisible({ timeout: 10000 })
   })
 
-  test('can send a test message to a queue', async ({ page, ref }) => {
+  test('can send a test message to a queue', async ({ page, ref }, testInfo) => {
     const queueName = 'pw_queue_send_msg'
     await using _ = await withSetupCleanup(
       async () => {
@@ -209,6 +215,7 @@ test.describe('Queues Integration', () => {
 
     const dialog = page.getByRole('dialog')
     await expect(dialog.getByRole('heading', { name: 'Add a message to the queue' })).toBeVisible()
+    await runCheckpointScan(page, testInfo, 'Queues - Add Message Dialog')
 
     // Submit with default payload '{}' and delay
     await dialog.getByRole('button', { name: 'Add' }).click()

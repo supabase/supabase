@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 
+import { runCheckpointScan } from '../utils/axe-helpers.ts'
 import { query } from '../utils/db/client.js'
 import { createTable, dropTable } from '../utils/db/queries.js'
 import { releaseFileOnceCleanup, withFileOnceSetup } from '../utils/once-per-file.js'
@@ -70,7 +71,7 @@ test.describe('Index Advisor', () => {
     })
   })
 
-  test('should show Index Advisor warnings in Table Editor', async ({ page, ref }) => {
+  test('should show Index Advisor warnings in Table Editor', async ({ page, ref }, testInfo) => {
     const TEST_TABLE_NAME = 'pw_test_index_advisor_editor'
     await using _ = await withSetupCleanup(
       async () => {
@@ -101,5 +102,7 @@ test.describe('Index Advisor', () => {
     await page.waitForLoadState('networkidle')
     await page.getByRole('button', { name: `View name index suggestion`, exact: true }).click()
     await expect(page.getByRole('dialog', { name: 'Index Recommendation' })).toBeVisible()
+
+    await runCheckpointScan(page, testInfo, 'Index Advisor - Recommendation Dialog')
   })
 })
