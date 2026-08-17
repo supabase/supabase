@@ -160,6 +160,43 @@ export const getConnectionMetrics = (activities: DatabaseActivity[]): Connection
   }
 }
 
+export type ActivityFilters = {
+  search: string
+  states: string[]
+  applications: string[]
+  roles: string[]
+  view: string
+}
+
+// Applies the Sessions table's filters to the raw pg_stat_activity rows. Shared so that anything
+// selecting a pid (e.g. the Overview metric cards) can check whether that pid would actually be
+// visible under the current filters, without duplicating this predicate.
+export const filterActivities = (
+  activities: DatabaseActivity[],
+  filters: ActivityFilters
+): DatabaseActivity[] => {
+  const { search, states, applications, roles, view } = filters
+
+  // Pids referenced in some other activity's blocked_by - i.e. they are blocking something
+  const blockingPids = new Set(activities.flatMap((x) => x.blocked_by))
+
+  return activities.filter((activity) => {
+    const matchesState =
+      states.length === 0 || (activity.state !== null && states.includes(activity.state))
+    const matchesRole = roles.length === 0 || roles.includes(activity.role_name)
+    const matchesApplication =
+      applications.length === 0 || applications.includes(activity.application_name)
+    // In the blocked view, only show root blockers - activities blocking others while not
+    // themselves blocked. Everything they block is shown nested under them instead.
+    const matchesView =
+      view !== 'blockers' || (activity.blocked_by.length === 0 && blockingPids.has(activity.pid))
+    const matchesSearch =
+      !search || (activity.query?.toLowerCase().includes(search.toLowerCase()) ?? false)
+
+    return matchesState && matchesRole && matchesApplication && matchesView && matchesSearch
+  })
+}
+
 export const getBlockChain = (pid: number, activities: DatabaseActivity[]) => {
   const chain = [pid]
   const visited = new Set([pid])
