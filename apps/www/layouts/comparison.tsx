@@ -82,7 +82,11 @@ const LayoutComparison = ({ components, props }: Props) => {
         }}
       />
       <DefaultLayout>
-        <article className="mx-auto max-w-5xl px-8 py-16 sm:px-16 xl:px-20">
+        <article
+          id="sb-www-alternative-main-article"
+          data-testid="sb-www-alternative-main-article"
+          className="mx-auto max-w-5xl px-8 py-16 sm:px-16 xl:px-20"
+        >
           {/* Title and description */}
           <div className="mb-16 max-w-5xl space-y-8">
             <div className="space-y-4">

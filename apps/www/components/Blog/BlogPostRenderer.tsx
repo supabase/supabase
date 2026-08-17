@@ -200,7 +200,7 @@ const BlogPostRenderer = async ({
                     </div>
                   )}
 
-                  <article>
+                  <article id="sb-www-blog-main-article" data-testid="sb-www-blog-main-article">
                     <div className="prose prose-docs">
                       {blogMetaData.youtubeHero ? (
                         <iframe

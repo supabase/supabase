@@ -198,7 +198,8 @@ jobs:
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_WWW || '' }}
 
       - name: Upload Playwright report
-        if: failure() && steps.scope.outputs.skip == 'false'
+        # Findings only reach a reviewer through this artifact, so upload on green too.
+        if: always() && steps.base-url.outputs.should_test == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: www-playwright-report

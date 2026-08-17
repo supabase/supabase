@@ -110,23 +110,23 @@ Slugs come from the filename, matching `getAllPostSlugs` in
 `apps/www/lib/posts.tsx`. Blog and event filenames drop their `YYYY-MM-DD-`
 prefix; customers and alternatives use the filename as-is.
 
-Each page gets one test: it must return a successful status, and an axe scan
-must report no `page-has-heading-one` violations. That is the only rule enforced
-today — add more to `ENFORCED_RULES` in `features/www-pages.spec.ts` once a class
-of issue reaches zero across the site.
+Each page gets one test: it must return a successful status, and an axe scan must
+report no `page-has-heading-one` violations. That rule passes on all four
+templates today, so enforcing it catches a new violation without failing on
+existing debt.
 
-`ENFORCED_RULES` is deliberately separate from the docs suite's list. Docs
-enforces `heading-order` as well; www cannot yet. A full-site scan found
-`heading-order` violations on the large majority of content pages, almost all
-from the same two shared components — the related-posts card (`h4` under an `h2`)
-and a trailing `h6`. Enforcing it here would fail nearly every pull request.
+It runs against the page landmark rather than the article, since every template
+renders its `<h1>` outside the article wrapper. `heading-order` runs against the
+article and is reported only: the alternatives template already violates it, so
+enforcing it would fail every alternatives pull request.
 
 ### Out of scope
 
 - Events with `disable_page_build: true`, which return a 404 by design
 - Static marketing routes under `apps/www/pages` and `apps/www/app`
 - Index and listing pages such as `/blog` and `/customers`
-- Link checking, and every accessibility rule other than the one above
+- Link checking
+- Shared chrome: header, footer, and anything else outside the article wrapper
 
 ### Limits
 
@@ -134,6 +134,27 @@ Resolved scope is capped at 20 pages so a large content drop cannot explode
 runtime. If a change resolves to more pages than that, only the first 20 in
 sorted order are tested. To test beyond the cap, use `pnpm e2e:www:all` or set
 `WWW_E2E_PAGE_PATHS` explicitly.
+
+## Accessibility scans
+
+The `@a11y`-tagged test scans each in-scope page for WCAG 2.1 A/AA violations, limited
+to the article wrapper for that template.
+
+```bash
+PLAYWRIGHT_BASE_URL=https://supabase.com pnpm e2e:www:a11y
+```
+
+**Warn mode.** Only `ENFORCED_RULES` in `utils/axe-helpers.ts` fails the build, and it
+holds rules that pass today, so it cannot fail on existing debt. Everything else lands
+as a warning annotation and in the run's `axe-results.json` attachment. Set
+`A11Y_ENFORCE_ALL=1` to make every finding blocking for a local triage run.
+
+**Scan your own preview.** The page list comes from your branch, but the content comes
+from whatever `PLAYWRIGHT_BASE_URL` points at. Production 404s on a page you just
+added.
+
+**Configuration:** article selectors per template live in `utils/www-selectors.ts`,
+rule lists in `utils/axe-helpers.ts`.
 
 ## Debug failures
 

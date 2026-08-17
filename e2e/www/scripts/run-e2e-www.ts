@@ -12,6 +12,7 @@ runSuite({
   pagePathsEnv: 'WWW_E2E_PAGE_PATHS',
   baseRefEnv: 'WWW_E2E_BASE_REF',
   defaultBaseUrl: 'http://localhost:3000',
+  project: 'pages',
   resolveScope: resolveWwwScope,
   resolveAllPages: resolveAllWwwPages,
 }).catch((error) => {

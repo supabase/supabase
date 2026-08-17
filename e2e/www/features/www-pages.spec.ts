@@ -1,9 +1,20 @@
 import { expect, test } from '@playwright/test'
 
-import { formatViolations, scan, violationIds } from '../../shared/axe.ts'
 import { parsePagePaths } from '../../shared/paths.ts'
-
-const ENFORCED_RULES = ['page-has-heading-one']
+import {
+  annotate,
+  attachScanReport,
+  blockingViolations,
+  ENFORCED_RULES,
+  formatViolations,
+  scanArticle,
+  scanLooksEmpty,
+  settleForAxe,
+  shouldEnforceAll,
+  unloadedResult,
+  violationIds,
+} from '../utils/axe-helpers.ts'
+import { wwwArticleSelectorForPagePath } from '../utils/www-selectors.ts'
 
 const pagePaths = parsePagePaths(process.env.WWW_E2E_PAGE_PATHS)
 
@@ -17,19 +28,70 @@ test.describe('WWW content pages', () => {
   })
 
   for (const pagePath of pagePaths) {
-    test(`${pagePath} loads and passes enforced a11y rules @a11y`, async ({ page }) => {
-      const response = await page.goto(pagePath)
-      expect(
-        response?.ok(),
-        `${pagePath} should return a successful status, got ${response?.status()}`
-      ).toBeTruthy()
+    test(`${pagePath} has no blocking accessibility violations @a11y`, async ({
+      page,
+    }, testInfo) => {
+      test.setTimeout(120_000)
 
-      const violations = await scan(page, { rules: ENFORCED_RULES })
+      const include = wwwArticleSelectorForPagePath(pagePath)
+
+      let response
+      try {
+        response = await page.goto(pagePath)
+      } catch (error) {
+        await attachScanReport(testInfo, unloadedResult(pagePath, pagePath, null, include))
+        throw error
+      }
+
+      const status = response?.status() ?? null
+
+      if (!response?.ok()) {
+        await attachScanReport(testInfo, unloadedResult(pagePath, page.url(), status, include))
+        expect(
+          response?.ok(),
+          `Expected a successful response for ${pagePath}, got ${status}`
+        ).toBeTruthy()
+        return
+      }
+
+      await settleForAxe(page)
+
+      await expect(
+        page.locator(include),
+        `No article matching "${include}" on ${pagePath}. This suite covers blog posts, ` +
+          'events, customer stories, and alternatives; other routes have no article element to scan.'
+      ).toBeVisible()
+
+      const result = await scanArticle(page, pagePath, include)
+      result.status = status
+
+      await attachScanReport(testInfo, result)
+
+      if (scanLooksEmpty(result)) {
+        annotate(
+          testInfo,
+          `${pagePath} scanned only ${result.elementCount} element(s) in ${include}, so a clean ` +
+            'result here proves nothing. Either the page had not finished rendering, or this ' +
+            'template renders a short article.'
+        )
+      }
+
+      const blocking = blockingViolations(result)
+
+      const reported = result.violations.filter((violation) => !blocking.includes(violation))
+      if (reported.length) {
+        annotate(
+          testInfo,
+          `${pagePath} has ${reported.length} non-blocking accessibility finding(s): ` +
+            reported.map((v) => `${v.id} (${v.nodes.length})`).join(', ')
+        )
+      }
+
+      const enforced = shouldEnforceAll() ? 'all WCAG 2.1 A/AA rules' : ENFORCED_RULES.join(', ')
 
       expect(
-        violationIds(violations),
-        `${pagePath} violates enforced a11y rules (${ENFORCED_RULES.join(', ')}):\n` +
-          formatViolations(violations)
+        violationIds(blocking),
+        `${pagePath} has blocking a11y violations (${enforced}):\n${formatViolations(blocking)}`
       ).toEqual([])
     })
   }

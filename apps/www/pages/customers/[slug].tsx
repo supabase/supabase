@@ -145,7 +145,11 @@ function CaseStudyPage(props: any) {
 
             <div className="col-span-12 lg:col-span-8">
               <div>
-                <article className="flex flex-col gap-8">
+                <article
+                  id="sb-www-customer-main-article"
+                  data-testid="sb-www-customer-main-article"
+                  className="flex flex-col gap-8"
+                >
                   <div className="flex flex-col gap-4 sm:gap-8 max-w-xxl">
                     <Link
                       href="/customers"

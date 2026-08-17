@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "e2e:www": "node --experimental-strip-types scripts/run-e2e-www.ts",
-    "e2e:www:all": "node --experimental-strip-types scripts/run-e2e-www.ts --all"
+    "e2e:www:all": "node --experimental-strip-types scripts/run-e2e-www.ts --all",
+    "e2e:www:a11y": "node --experimental-strip-types scripts/run-e2e-www.ts --grep @a11y",
+    "resolve-www-scope": "node --experimental-strip-types scripts/resolve-www-scope.ts"
   },
   "dependencies": {
     "@playwright/test": "^1.59.1",

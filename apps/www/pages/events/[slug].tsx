@@ -386,7 +386,11 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                 </Link>
               </div>
             )}
-            <main className="lg:col-span-2">
+            <main
+              id="sb-www-event-main-article"
+              data-testid="sb-www-event-main-article"
+              className="lg:col-span-2"
+            >
               <div className="prose prose-docs">
                 <h2 className="text-foreground-light text-sm font-mono uppercase">
                   About this event

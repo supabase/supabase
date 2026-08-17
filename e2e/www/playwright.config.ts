@@ -34,6 +34,13 @@ export default defineConfig({
         }
       : undefined,
   },
+  projects: [
+    {
+      name: 'pages',
+      testDir: './features',
+      testMatch: /.*\.spec\.ts/,
+    },
+  ],
   reporter: [['list'], ['html', { open: 'never', outputFolder: './playwright-report' }]],
   outputDir: './test-results',
 })
