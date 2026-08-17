@@ -80,7 +80,7 @@ export default function ChartComposedActions() {
                   showYAxis={true}
                   YAxisProps={{
                     tickFormatter: (value) => `${value}k`,
-                    width: 36,
+                    width: 80,
                   }}
                   isFullHeight={true}
                 />
@@ -92,7 +92,7 @@ export default function ChartComposedActions() {
                   showYAxis={true}
                   YAxisProps={{
                     tickFormatter: (value) => `${value}k`,
-                    width: 36,
+                    width: 80,
                   }}
                   isFullHeight={true}
                 />

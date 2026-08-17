@@ -93,7 +93,7 @@ export default function ComposedChartBasic() {
                 showYAxis={true}
                 YAxisProps={{
                   tickFormatter: (value) => `${value}k`,
-                  width: 36,
+                  width: 80,
                 }}
                 isFullHeight={true}
               />
@@ -129,7 +129,7 @@ export default function ComposedChartBasic() {
                 showYAxis={true}
                 YAxisProps={{
                   tickFormatter: (value) => `${value}k`,
-                  width: 36,
+                  width: 80,
                 }}
                 isFullHeight={true}
               />
