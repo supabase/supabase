@@ -73,6 +73,11 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
   const readReplicas = databases.filter((database) => database.identifier !== project?.ref)
   const showDatabaseTarget = showPrivateLinkReadReplica || !isNew
   const statusUi = getConnectionStatusUi(account?.status)
+  const formValues: FormValues = {
+    awsAccountId: account?.aws_account_id ?? '',
+    databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
+    accountName: account?.account_name ?? '',
+  }
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -81,11 +86,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
       databaseIdentifier: '',
       accountName: '',
     },
-    values: {
-      awsAccountId: account?.aws_account_id ?? '',
-      databaseIdentifier: account?.database_identifier ?? project?.ref ?? '',
-      accountName: account?.account_name ?? '',
-    },
+    values: formValues,
     resetOptions: { keepDirtyValues: true },
   })
 
@@ -104,7 +105,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
         },
         {
           onSuccess: () => {
-            form.reset()
+            form.reset(formValues)
             toast.success('Connection added')
             onOpenChange(false)
           },
@@ -114,7 +115,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) form.reset()
+    if (!nextOpen) form.reset(formValues)
     onOpenChange(nextOpen)
   }
 
