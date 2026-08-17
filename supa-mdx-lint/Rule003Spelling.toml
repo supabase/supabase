@@ -217,6 +217,7 @@ allow_list = [
     "Datadog",
     "Deadpool",
     "Dependabot",
+    "DepthFirst",
     "DDoS",
     "Deno",
     "Dependabot",

@@ -443,13 +443,9 @@ export const ProjectCreationForm = ({
       extractPostgresVersionDetails(postgresVersionSelection)
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion =
-      highAvailability && highAvailabilityRegionCode !== undefined
-        ? specific.find((region) => region.code === highAvailabilityRegionCode)
-        : smartRegionEnabled
-          ? (smartGroup.find((x) => x.name === dbRegion) ??
-            specific.find((x) => x.name === dbRegion))
-          : undefined
+    const selectedRegion = smartRegionEnabled
+      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
+      : undefined
 
     if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
       return toast.error(
