@@ -33,6 +33,41 @@ export function getAvailableRegions(
   }
 }
 
+type ResolveDefaultDbRegionArgs = {
+  cloudProvider: CloudProvider
+  isHighAvailabilityRestricted: boolean
+  highAvailabilityRegionName: string | undefined
+  isSmartRegionEnabled: boolean
+  recommendedSmartRegion: string | undefined
+  autoDefaultRegion: string | undefined
+  fixedDefaultRegion: string
+  environment?: string
+}
+
+export function resolveDefaultDbRegion({
+  cloudProvider,
+  isHighAvailabilityRestricted,
+  highAvailabilityRegionName,
+  isSmartRegionEnabled,
+  recommendedSmartRegion,
+  autoDefaultRegion,
+  fixedDefaultRegion,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT,
+}: ResolveDefaultDbRegionArgs): string | undefined {
+  if (isHighAvailabilityRestricted) return highAvailabilityRegionName
+  if (isSmartRegionEnabled) return recommendedSmartRegion
+
+  // The geolocated default is only usable if the provider actually offers that region
+  // (e.g. AWS_NIMBUS is restricted to a single region)
+  const isAutoDefaultRegionAvailable = Object.entries(
+    getAvailableRegions(cloudProvider, environment)
+  ).some(([, region]) => region.displayName === autoDefaultRegion)
+
+  return isAutoDefaultRegionAvailable && autoDefaultRegion !== undefined
+    ? autoDefaultRegion
+    : fixedDefaultRegion
+}
+
 /**
  * When launching new projects, they only get assigned a compute size once successfully launched,
  * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.
