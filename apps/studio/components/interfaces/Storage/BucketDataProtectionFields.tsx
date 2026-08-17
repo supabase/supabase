@@ -305,23 +305,29 @@ interface ExpirationModeToggleProps {
 }
 
 const ExpirationModeToggle = ({ mode, onModeChange }: ExpirationModeToggleProps) => (
-  <div className="py-1">
-    <RadioGroupStacked
-      value={mode}
-      onValueChange={(value: ExpirationMode) => {
-        if (value) onModeChange(value)
-      }}
-    >
-      <RadioGroupStackedItem
-        value="and"
-        label="Both"
-        description="A version expires only when it fails both the age and version-count conditions."
-      />
-      <RadioGroupStackedItem
-        value="or"
-        label="Either"
-        description="A version expires as soon as it fails either the age or the version-count condition."
-      />
-    </RadioGroupStacked>
-  </div>
+  <FormItemLayout
+    name="expiration_mode"
+    label="Expire when"
+    layout="flex-row-reverse"
+  >
+    <FormControl>
+      <RadioGroupStacked
+        value={mode}
+        onValueChange={(value: ExpirationMode) => {
+          if (value) onModeChange(value)
+        }}
+      >
+        <RadioGroupStackedItem
+          value="and"
+          label="Both conditions are met"
+          description="A version expires only when it fails both the age and version-count conditions."
+        />
+        <RadioGroupStackedItem
+          value="or"
+          label="Either condition is met"
+          description="A version expires as soon as it fails either the age or the version-count condition."
+        />
+      </RadioGroupStacked>
+    </FormControl>
+  </FormItemLayout>
 )
