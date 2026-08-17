@@ -447,7 +447,15 @@ export const ProjectCreationForm = ({
       ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
       : undefined
 
-    if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
+    // Only meaningful when smart regions are in play. For AWS_NIMBUS `selectedRegion` is
+    // intentionally left undefined and the payload sends `dbRegion` instead, so without this
+    // the guard would reject every high availability NIMBUS project.
+    if (
+      smartRegionEnabled &&
+      highAvailability &&
+      highAvailabilityRegionCode !== undefined &&
+      !selectedRegion
+    ) {
       return toast.error(
         `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
       )
