@@ -247,11 +247,6 @@ const LifecyclePolicySection = ({
         )}
       />
 
-      {/* Join-mode toggle only makes sense when both conditions are set —
-          with a single condition there's nothing to combine. Sits between
-          the two inputs so it visually joins them. */}
-      {hasBothConditions && <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />}
-
       <FormField
         name="max_noncurrent_versions"
         control={control}
@@ -285,6 +280,12 @@ const LifecyclePolicySection = ({
         )}
       />
 
+      {/* Join-mode selection only makes sense when both conditions are set —
+          with a single condition there's nothing to combine. Vertical layout
+          lets the two-line option descriptions span the full section width
+          rather than getting squeezed into the number-input column. */}
+      {hasBothConditions && <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />}
+
       {hasNoPolicy && (
         <Admonition
           type="warning"
@@ -305,11 +306,7 @@ interface ExpirationModeToggleProps {
 }
 
 const ExpirationModeToggle = ({ mode, onModeChange }: ExpirationModeToggleProps) => (
-  <FormItemLayout
-    name="expiration_mode"
-    label="Expire when"
-    layout="flex-row-reverse"
-  >
+  <FormItemLayout name="expiration_mode" label="Expire a noncurrent version when">
     <FormControl>
       <RadioGroupStacked
         value={mode}
@@ -320,12 +317,12 @@ const ExpirationModeToggle = ({ mode, onModeChange }: ExpirationModeToggleProps)
         <RadioGroupStackedItem
           value="and"
           label="Both conditions are met"
-          description="A version expires only when it fails both the age and version-count conditions."
+          description="It exceeds both the age limit and the retained-versions cap."
         />
         <RadioGroupStackedItem
           value="or"
           label="Either condition is met"
-          description="A version expires as soon as it fails either the age or the version-count condition."
+          description="It exceeds either the age limit or the retained-versions cap."
         />
       </RadioGroupStacked>
     </FormControl>
