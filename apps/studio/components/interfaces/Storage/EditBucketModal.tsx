@@ -25,6 +25,7 @@ import {
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -175,8 +176,19 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   const isMakingBucketPrivate = bucket?.public && !isPublicBucket
   const isMakingBucketPublic = !bucket?.public && isPublicBucket
 
+  // Suspending a live-versioning bucket is the one action here that needs a
+  // second confirmation — the switch alone doesn't communicate that
+  // "already-retained data stays, no new versions get created" nuance
+  // (the inline admonition is intentionally sparse per the redesign), so we
+  // put the full picture in a follow-up AlertDialog and only actually save
+  // when the user confirms it. Values are stashed at submit time; confirming
+  // replays the write, cancelling bails.
+  const [pendingSuspendedValues, setPendingSuspendedValues] =
+    useState<z.infer<typeof bucketSchema>>()
+
   const closeModal = () => {
     form.reset()
+    setPendingSuspendedValues(undefined)
     onClose()
   }
 
@@ -203,6 +215,20 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
         })
       }
     }
+
+    // Suspending versioning is the one path that needs a second look — stash
+    // the resolved values and hand off to the AlertDialog; it'll call
+    // persistChanges once the user confirms.
+    if (bucketProtection.versioning === 'enabled' && !values.enable_versioning) {
+      setPendingSuspendedValues(values)
+      return
+    }
+
+    persistChanges(values)
+  }
+
+  const persistChanges = (values: z.infer<typeof bucketSchema>) => {
+    if (bucket === undefined || ref === undefined) return
 
     // [Prototype] Object versioning has no platform API yet — persist it to
     // the in-memory mock store so the buckets list reflects it right away.
@@ -267,13 +293,14 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   }, [visible, bucket, form])
 
   return (
-    <Dialog
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) closeModal()
-      }}
-    >
-      <DialogContent>
+    <>
+      <Dialog
+        open={visible}
+        onOpenChange={(open) => {
+          if (!open) closeModal()
+        }}
+      >
+        <DialogContent>
         <DialogHeader>
           <DialogTitle>{`Edit bucket “${bucket?.name}”`}</DialogTitle>
         </DialogHeader>
@@ -514,15 +541,36 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
           </form>
         </Form>
 
-        <DialogFooter>
-          <Button variant="default" disabled={isUpdating} onClick={closeModal}>
-            Cancel
-          </Button>
-          <Button form={formId} type="submit" loading={isUpdating}>
-            Save
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter>
+            <Button variant="default" disabled={isUpdating} onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button form={formId} type="submit" loading={isUpdating}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmationModal
+        variant="warning"
+        visible={pendingSuspendedValues !== undefined}
+        title="Suspend versioning?"
+        confirmLabel="Suspend versioning"
+        confirmLabelLoading="Saving..."
+        loading={isUpdating}
+        onCancel={() => setPendingSuspendedValues(undefined)}
+        onConfirm={() => {
+          if (pendingSuspendedValues) persistChanges(pendingSuspendedValues)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          New noncurrent versions won't be created and archived files won't accumulate. Every
+          version and archived file this bucket is already retaining stays exactly where it is
+          until it's deleted or a lifecycle policy expires it. You can re-enable versioning at any
+          time.
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }

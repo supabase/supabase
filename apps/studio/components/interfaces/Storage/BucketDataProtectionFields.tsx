@@ -1,10 +1,5 @@
-import { ChevronRight } from 'lucide-react'
-import { useState } from 'react'
 import { useFormContext, useWatch } from 'react-hook-form'
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   DialogSection,
   DialogSectionSeparator,
   FormControl,
@@ -14,7 +9,8 @@ import {
   InputGroupAddon,
   InputGroupText,
   Switch,
-  cn,
+  ToggleGroup,
+  ToggleGroupItem,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -22,7 +18,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
-import { BroomSparklesIcon } from './BroomSparklesIcon'
 import { type BucketProtectionFormValues } from './BucketDataProtectionFields.schema'
 import {
   getVersioningPlanLimits,
@@ -88,14 +83,13 @@ export const BucketDataProtectionFields = ({
     nextMaxVersions < initialMaxVersions
   const isTightening = isTighteningRetention || isTighteningMaxVersions
 
-  // Derived state for the sentence builder and collapsible
   const hasDays = typeof retentionDaysRaw === 'number' && retentionDaysRaw > 0
   const hasVersions = typeof maxVersionsRaw === 'number' && maxVersionsRaw > 0
-  const hasBothConditions = hasDays && hasVersions
 
   // Turning versioning off never deletes anything by itself — a bucket that's
   // ever had it enabled can only be suspended, not returned to a plain
-  // "disabled" state, so nothing needs a destructive confirmation here.
+  // "disabled" state. Suspension is confirmed via an AlertDialog on save
+  // (see EditBucketModal), so the toggle itself just flips the value.
   // The two expiration fields come prefilled with sensible starter values
   // (see CreateBucketModal / EditBucketModal defaults) — clearing a field
   // removes that condition from the policy.
@@ -137,6 +131,9 @@ export const BucketDataProtectionFields = ({
         />
 
         {!isVersioningEnabled && wasEverVersioned && (
+          // Full-detail explanation moved to the AlertDialog that confirms
+          // the save; the inline note is just a heads-up that the switch
+          // did something non-obvious.
           <Admonition
             type="default"
             title={
@@ -144,7 +141,7 @@ export const BucketDataProtectionFields = ({
                 ? 'Versioning will be suspended once saved'
                 : 'Versioning is suspended on this bucket'
             }
-            description="New noncurrent versions won't be created, but every version and soft-deleted file this bucket is already retaining stays exactly where it is until it's deleted or a lifecycle policy expires it. You can re-enable versioning at any time."
+            description="Existing versions and archived files stay put. Re-enable versioning any time."
           />
         )}
 
@@ -183,9 +180,6 @@ export const BucketDataProtectionFields = ({
             control={control}
             hasDays={hasDays}
             hasVersions={hasVersions}
-            hasBothConditions={hasBothConditions}
-            days={hasDays ? (retentionDaysRaw as number) : 0}
-            versions={hasVersions ? (maxVersionsRaw as number) : 0}
             mode={expirationMode}
             onModeChange={handleModeChange}
           />
@@ -201,9 +195,6 @@ interface LifecyclePolicySectionProps {
   control: ReturnType<typeof useFormContext<BucketProtectionFormValues>>['control']
   hasDays: boolean
   hasVersions: boolean
-  hasBothConditions: boolean
-  days: number
-  versions: number
   mode: ExpirationMode
   onModeChange: (mode: ExpirationMode) => void
 }
@@ -212,329 +203,133 @@ const LifecyclePolicySection = ({
   control,
   hasDays,
   hasVersions,
-  hasBothConditions,
-  days,
-  versions,
   mode,
   onModeChange,
 }: LifecyclePolicySectionProps) => {
   const { trigger } = useFormContext<BucketProtectionFormValues>()
   const hasNoPolicy = !hasDays && !hasVersions
+  const hasBothConditions = hasDays && hasVersions
 
   return (
-    <div className="flex flex-col gap-y-4">
-      <div>
-        <p className="mb-1.5 flex items-center gap-x-1.5 text-sm font-medium text-foreground">
-          Lifecycle policy
-          <BroomSparklesIcon size={14} className="text-foreground-lighter" />
-        </p>
-        <ExpirationSentence
-          hasDays={hasDays}
-          hasVersions={hasVersions}
-          days={days}
-          versions={versions}
-          mode={mode}
-          onModeChange={onModeChange}
-        />
-      </div>
+    <div className="flex flex-col gap-y-2">
+      <p className="text-sm font-medium text-foreground">Lifecycle policy</p>
 
-      <div className="flex flex-col gap-y-2">
-        <FormField
-          name="version_expiry_days"
-          control={control}
-          render={({ field }) => (
-            <FormItemLayout
-              name="version_expiry_days"
-              label="Noncurrent version expiration"
-              layout="flex-row-reverse"
-            >
-              <FormControl>
-                <InputGroup>
-                  <FormInputGroupInput
-                    {...field}
-                    id={field.name}
-                    type="number"
-                    inputMode="numeric"
-                    placeholder="—"
-                    value={field.value === '' ? '' : field.value}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/[^0-9]/g, '')
-                      field.onChange(raw === '' ? '' : Number(raw))
-                      trigger('version_expiry_days')
-                    }}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>days</InputGroupText>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
+      <FormField
+        name="version_expiry_days"
+        control={control}
+        render={({ field }) => (
+          <FormItemLayout
+            name="version_expiry_days"
+            label="Noncurrent version expiration"
+            layout="flex-row-reverse"
+          >
+            <FormControl>
+              <InputGroup>
+                <FormInputGroupInput
+                  {...field}
+                  id={field.name}
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="—"
+                  value={field.value === '' ? '' : field.value}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9]/g, '')
+                    field.onChange(raw === '' ? '' : Number(raw))
+                    trigger('version_expiry_days')
+                  }}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>days</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
 
-        <FormField
-          name="max_noncurrent_versions"
-          control={control}
-          render={({ field }) => (
-            <FormItemLayout
-              name="max_noncurrent_versions"
-              label="Retained noncurrent versions"
-              layout="flex-row-reverse"
-            >
-              <FormControl>
-                <InputGroup>
-                  <FormInputGroupInput
-                    {...field}
-                    id={field.name}
-                    type="number"
-                    inputMode="numeric"
-                    placeholder="—"
-                    value={field.value === '' ? '' : field.value}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/[^0-9]/g, '')
-                      field.onChange(raw === '' ? '' : Number(raw))
-                      trigger('max_noncurrent_versions')
-                    }}
-                  />
-                  <InputGroupAddon align="inline-end">
-                    <InputGroupText>versions</InputGroupText>
-                  </InputGroupAddon>
-                </InputGroup>
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-      </div>
+      {/* Join-mode toggle only makes sense when both conditions are set —
+          with a single condition there's nothing to combine. Sits between
+          the two inputs so it visually joins them. */}
+      {hasBothConditions && <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />}
+
+      <FormField
+        name="max_noncurrent_versions"
+        control={control}
+        render={({ field }) => (
+          <FormItemLayout
+            name="max_noncurrent_versions"
+            label="Retained noncurrent versions"
+            layout="flex-row-reverse"
+          >
+            <FormControl>
+              <InputGroup>
+                <FormInputGroupInput
+                  {...field}
+                  id={field.name}
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="—"
+                  value={field.value === '' ? '' : field.value}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/[^0-9]/g, '')
+                    field.onChange(raw === '' ? '' : Number(raw))
+                    trigger('max_noncurrent_versions')
+                  }}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupText>versions</InputGroupText>
+                </InputGroupAddon>
+              </InputGroup>
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
 
       {hasNoPolicy && (
         <Admonition
           type="warning"
+          className="mt-2"
           title="No lifecycle policy"
           description="All noncurrent versions count toward storage usage and incur ongoing costs. Consider setting a lifecycle policy to automatically expire outdated versions."
-        />
-      )}
-
-      {!hasNoPolicy && (
-        <ExpirationExplainer
-          hasDays={hasDays}
-          hasVersions={hasVersions}
-          days={days}
-          versions={versions}
-          mode={mode}
         />
       )}
     </div>
   )
 }
 
-// ── Sentence builder ─────────────────────────────────────────────────────
+// ── Both / either mode toggle ────────────────────────────────────────────
 
-interface ExpirationSentenceProps {
-  hasDays: boolean
-  hasVersions: boolean
-  days: number
-  versions: number
+interface ExpirationModeToggleProps {
   mode: ExpirationMode
   onModeChange: (mode: ExpirationMode) => void
 }
 
-const ExpirationSentence = ({
-  hasDays,
-  hasVersions,
-  days,
-  versions,
-  mode,
-  onModeChange,
-}: ExpirationSentenceProps) => {
-  if (!hasDays && !hasVersions) {
-    return (
-      <p className="text-sm text-foreground-lighter leading-relaxed">
-        No lifecycle policy configured. Noncurrent versions will be retained indefinitely.
-      </p>
-    )
-  }
-
-  if (hasDays && !hasVersions) {
-    return (
-      <p className="text-sm text-foreground-lighter leading-relaxed">
-        Remove noncurrent versions older than{' '}
-        <span className="text-foreground font-medium">{days} days</span>. No version count limit.
-      </p>
-    )
-  }
-
-  if (!hasDays && hasVersions) {
-    return (
-      <p className="text-sm text-foreground-lighter leading-relaxed">
-        Keep the newest <span className="text-foreground font-medium">{versions}</span> noncurrent
-        versions per object. No age limit.
-      </p>
-    )
-  }
-
-  return (
-    <p className="text-sm text-foreground-lighter leading-[1.7]">
-      Remove noncurrent versions when <InlineModeToggle mode={mode} onModeChange={onModeChange} />{' '}
-      conditions are met: older than{' '}
-      <span className="text-foreground font-medium">{days} days</span> and more than{' '}
-      <span className="text-foreground font-medium">{versions}</span> versions.
-    </p>
-  )
-}
-
-// ── Inline both/either toggle ────────────────────────────────────────────
-
-interface InlineModeToggleProps {
-  mode: ExpirationMode
-  onModeChange: (mode: ExpirationMode) => void
-}
-
-const InlineModeToggle = ({ mode, onModeChange }: InlineModeToggleProps) => {
-  const isBoth = mode === 'and'
-
-  return (
-    <button
-      type="button"
-      className="inline-flex items-center rounded border border-strong bg-surface-200 p-px align-baseline"
-      onClick={() => onModeChange(isBoth ? 'or' : 'and')}
+const ExpirationModeToggle = ({ mode, onModeChange }: ExpirationModeToggleProps) => (
+  <div className="flex items-center justify-between gap-x-3 py-1">
+    <p className="text-sm text-foreground-light">Expire when conditions are met</p>
+    <ToggleGroup
+      type="single"
+      value={mode}
+      onValueChange={(value: ExpirationMode) => {
+        // Radix returns '' when the active item is re-clicked — ignore, we
+        // want the toggle to always land on one of the two modes.
+        if (value) onModeChange(value)
+      }}
     >
-      <span
-        className={cn(
-          'rounded-sm px-1.5 py-px text-xs font-medium transition-colors',
-          isBoth ? 'bg-brand text-background-200' : 'text-foreground-muted'
-        )}
+      <ToggleGroupItem
+        value="and"
+        aria-label="Expire when both conditions are met"
+        className="h-7 min-w-14 px-2.5 text-xs data-[state=on]:bg-brand data-[state=on]:text-background-200"
       >
-        both
-      </span>
-      <span
-        className={cn(
-          'rounded-sm px-1.5 py-px text-xs font-medium transition-colors',
-          !isBoth ? 'bg-brand text-background-200' : 'text-foreground-muted'
-        )}
+        Both
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="or"
+        aria-label="Expire when either condition is met"
+        className="h-7 min-w-14 px-2.5 text-xs data-[state=on]:bg-brand data-[state=on]:text-background-200"
       >
-        either
-      </span>
-    </button>
-  )
-}
-
-// ── Collapsible explainer ────────────────────────────────────────────────
-
-interface ExpirationExplainerProps {
-  hasDays: boolean
-  hasVersions: boolean
-  days: number
-  versions: number
-  mode: ExpirationMode
-}
-
-const ExpirationExplainer = ({
-  hasDays,
-  hasVersions,
-  days,
-  versions,
-  mode,
-}: ExpirationExplainerProps) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const hasBothConditions = hasDays && hasVersions
-
-  return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger asChild>
-        <button
-          type="button"
-          className="flex items-center gap-1.5 text-foreground-muted hover:text-foreground-lighter transition-colors"
-        >
-          <ChevronRight size={12} className={cn('transition-transform', isOpen && 'rotate-90')} />
-          <span className="text-xs">See how this works</span>
-        </button>
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className="mt-2.5 rounded-md border border-default bg-surface-100 p-3">
-          <p className="mb-1.5 text-xs font-medium uppercase tracking-wider text-foreground-muted">
-            Example
-          </p>
-          <p className="text-xs leading-relaxed text-foreground-lighter">
-            <ExpirationExplainerBody
-              hasDays={hasDays}
-              hasVersions={hasVersions}
-              hasBothConditions={hasBothConditions}
-              days={days}
-              versions={versions}
-              mode={mode}
-            />
-          </p>
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  )
-}
-
-const ExpirationExplainerBody = ({
-  hasDays,
-  hasVersions,
-  hasBothConditions,
-  days,
-  versions,
-  mode,
-}: {
-  hasDays: boolean
-  hasVersions: boolean
-  hasBothConditions: boolean
-  days: number
-  versions: number
-  mode: ExpirationMode
-}) => {
-  if (hasDays && !hasVersions) {
-    return (
-      <>
-        A noncurrent version aged <span className="text-foreground-light">{days + 1} days</span>{' '}
-        exceeds the {days}-day limit, so the system permanently deletes it. A version at{' '}
-        <span className="text-foreground-light">{Math.max(1, days - 1)} days</span> stays within the
-        limit, so the system keeps it.
-      </>
-    )
-  }
-
-  if (!hasDays && hasVersions) {
-    return (
-      <>
-        When a file accumulates{' '}
-        <span className="text-foreground-light">{versions + 1} noncurrent versions</span>, the
-        system keeps the newest {versions} and permanently deletes the oldest one regardless of its
-        age.
-      </>
-    )
-  }
-
-  if (hasBothConditions) {
-    const isBoth = mode === 'and'
-
-    if (isBoth) {
-      return (
-        <>
-          With <span className="text-foreground-light">{versions + 1} noncurrent versions</span> and
-          the oldest at <span className="text-foreground-light">{days + 1} days</span>, the system
-          permanently deletes it because it exceeds both the {versions}-version cap and the {days}
-          -day limit. If the oldest version were only{' '}
-          <span className="text-foreground-light">{Math.max(1, days - 1)} days</span> old, the
-          system would keep it because both conditions must be met before a version is removed.
-        </>
-      )
-    }
-
-    return (
-      <>
-        With <span className="text-foreground-light">{versions + 1} noncurrent versions</span> and
-        the oldest at <span className="text-foreground-light">{Math.max(1, days - 1)} days</span>,
-        the system permanently deletes it because it exceeds the {versions}-version cap, even though
-        it is within the {days}-day limit. Similarly, a file with only{' '}
-        <span className="text-foreground-light">{versions} versions</span> where the oldest is{' '}
-        <span className="text-foreground-light">{days + 1} days</span> old also has that version
-        deleted because it exceeds the age limit. Either condition alone triggers removal.
-      </>
-    )
-  }
-
-  return null
-}
+        Either
+      </ToggleGroupItem>
+    </ToggleGroup>
+  </div>
+)
