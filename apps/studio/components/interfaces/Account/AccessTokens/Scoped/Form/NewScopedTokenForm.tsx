@@ -187,7 +187,7 @@ export const NewScopedTokenForm = ({
         ) : (
           <StepIndicator step={step === 'form' ? 1 : 2} total={2} label="Configure" />
         )}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {step === 'review' && (
             <>
               <span className="text-xs text-foreground-lighter">
