@@ -7,7 +7,7 @@ import { customRender } from '@/tests/lib/custom-render'
 
 vi.mock('@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicaForm', () => ({
   ReadReplicaForm: ({ onRecommendCompute }: { onRecommendCompute: (size: 'ci_small') => void }) => (
-      <button type="button" tabIndex={0} onClick={() => onRecommendCompute('ci_small')}>
+    <button type="button" tabIndex={0} onClick={() => onRecommendCompute('ci_small')}>
       Change to Small compute
     </button>
   ),
