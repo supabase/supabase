@@ -181,9 +181,7 @@ export const RegionSelector = ({
           const selectedRegionLabel = selectedRegion?.name
             ? getDisplayNameForSmartRegion(selectedRegion.name)
             : dbRegion
-          const triggerLabel = isLoadingAvailableRegions
-            ? 'Loading available regions...'
-            : selectedRegionLabel
+          const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
 
           const affectingIncidents = incidents.filter((incident) => {
             const affectedRegions = incident.cache?.affected_regions ?? []
@@ -247,9 +245,7 @@ export const RegionSelector = ({
                       >
                         {dbRegion !== undefined && (
                           <div className="flex items-center gap-x-3">
-                            {isLoadingAvailableRegions && (
-                              <Loader2 size={14} className="animate-spin" />
-                            )}
+                            {isLoading && <Loader2 size={14} className="animate-spin" />}
                             {selectedRegion?.code && (
                               // For some reason, Safari considered the empty string alt text on this icon as misspelled (with VoiceOver)
                               // Only way to fix it is to set the role. Not needed for the combobox options
