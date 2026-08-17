@@ -49,7 +49,7 @@ describe('ReadReplicaEligibilityWarnings – below small compute', () => {
     ).toBeInTheDocument()
     expect(
       screen.getByText(
-        "This is to ensure that read replicas can keep up with the primary database’s activities."
+        'This is to ensure that read replicas can keep up with the primary database’s activities.'
       )
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /change to small compute/i })).toBeInTheDocument()
