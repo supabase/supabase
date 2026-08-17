@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useFeatureFlags, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef } from 'react'
 

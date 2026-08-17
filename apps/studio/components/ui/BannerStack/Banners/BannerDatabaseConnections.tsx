@@ -5,7 +5,10 @@ import { Badge, Button, WarningIcon } from 'ui'
 
 import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
-import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useFeaturePreviewModal,
+  useIsDatabaseConnectionsEnabled,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -13,11 +16,14 @@ export const BannerDatabaseConnections = () => {
   const track = useTrack()
   const { ref } = useParams()
   const { dismissBanner } = useBannerStack()
+  const { selectFeaturePreview } = useFeaturePreviewModal()
 
   const [, setIsDismissed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.DATABASE_CONNECTIONS_BANNER_DISMISSED(ref ?? ''),
     false
   )
+
+  const { enabled: isDatabaseConnectionsEnabled } = useIsDatabaseConnectionsEnabled()
 
   return (
     <BannerCard
@@ -72,20 +78,33 @@ export const BannerDatabaseConnections = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            asChild
-            variant="default"
-            size="tiny"
-            onClick={() => {
-              setIsDismissed(true)
-              dismissBanner('database-connections-banner')
-              track('database_connections_banner_cta_button_clicked', { isEnabled: false })
-            }}
-          >
-            <Link href={`/project/${ref}/observability/connections`}>
-              Explore Database Connections
-            </Link>
-          </Button>
+          {isDatabaseConnectionsEnabled ? (
+            <Button
+              asChild
+              variant="default"
+              size="tiny"
+              onClick={() => {
+                setIsDismissed(true)
+                dismissBanner('database-connections-banner')
+                track('database_connections_banner_cta_button_clicked', { isEnabled: false })
+              }}
+            >
+              <Link href={`/project/${ref}/observability/connections`}>
+                Explore Database Connections
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="default"
+              size="tiny"
+              onClick={() => {
+                selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS)
+                track('database_connections_banner_cta_button_clicked', { isEnabled: false })
+              }}
+            >
+              Enable Database Connections
+            </Button>
+          )}
         </div>
       </div>
     </BannerCard>
