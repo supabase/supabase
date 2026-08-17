@@ -42,7 +42,7 @@ const LayoutComparison = ({ components, props }: Props) => {
                 <p className="text-muted text-sm">{label}</p>
               </div>
               <div>
-                <h4 className="text-foreground text-lg">{post.title}</h4>
+                <h2 className="text-foreground text-lg">{post.title}</h2>
                 <p className="small">{post.date}</p>
               </div>
             </div>

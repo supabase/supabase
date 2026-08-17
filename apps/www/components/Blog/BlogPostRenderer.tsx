@@ -39,9 +39,9 @@ const NextCard = (props: NextCardProps) => {
             </div>
             <div className="flex flex-col gap-2">
               {'title' in post && (
-                <h4 className="text-foreground text-lg text-balance">
+                <h2 className="text-foreground text-lg text-balance">
                   {(post as { title?: string }).title}
-                </h4>
+                </h2>
               )}
               {'formattedDate' in post && (
                 <p className="small">{(post as { formattedDate?: string }).formattedDate}</p>
