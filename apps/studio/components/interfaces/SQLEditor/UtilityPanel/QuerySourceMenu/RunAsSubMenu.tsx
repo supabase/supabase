@@ -17,13 +17,7 @@ type RunAsSubMenuProps =
       state: RoleImpersonationController
     }
 
-const orientation = 'vertical'
-const header = 'Run SQL query as a role'
-
 export const RunAsSubMenu = (props: RunAsSubMenuProps) => {
-  // valtio's Snapshot<> type is deep-readonly (incl. nested arrays), which isn't
-  // structurally assignable to RoleImpersonationController's plain array fields — same
-  // rationale as the cast in useGetImpersonatedRoleState.
   const globalState = useRoleImpersonationStateSnapshot() as unknown as RoleImpersonationController
   const state = props.controlled ? props.state : globalState
   const currentRole = state.role?.role ?? SERVICE_ROLE_LABEL
@@ -40,8 +34,8 @@ export const RunAsSubMenu = (props: RunAsSubMenuProps) => {
       dropdown's typeahead. */}
       <DropdownMenuSubContent className="w-80 p-0" onKeyDown={(e) => e.stopPropagation()}>
         <RoleImpersonationSelectorInterface
-          orientation={orientation}
-          header={header}
+          orientation="vertical"
+          header="Run SQL query as a role"
           serviceRoleLabel={SERVICE_ROLE_LABEL}
           state={state}
         />
