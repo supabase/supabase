@@ -28,6 +28,7 @@ import { AdvancedSection, ComputeSection, DiskSection } from './DiskManagementFo
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog'
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog/DiskManagementReviewAndSubmitDialog.hooks'
+import { scrollElementIntoContainer } from './scrollElementIntoContainer'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import {
   DISK_LIMITS,
@@ -40,6 +41,7 @@ import {
   recommendComputeParser,
   subscribeRecommendCompute,
 } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
+import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
@@ -67,6 +69,9 @@ import {
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
 
+/** SheetContent close animation is 300ms; sticky review bar mounts at 200ms. */
+const RECOMMEND_COMPUTE_SCROLL_DELAY_MS = 400
+
 export function DiskManagementForm({
   chartsClassName,
   overviewExtra,
@@ -87,6 +92,13 @@ export function DiskManagementForm({
   const storageSettingsRef = useRef<HTMLDivElement>(null)
   const computeSettingsRef = useRef<HTMLDivElement>(null)
   const diskSizeSettingsRef = useRef<HTMLDivElement>(null)
+  const mainScrollContainer = useMainScrollContainer()
+  const mainScrollContainerRef = useRef(mainScrollContainer)
+  mainScrollContainerRef.current = mainScrollContainer
+
+  const scrollToComputeSection = () => {
+    scrollElementIntoContainer(computeSettingsRef.current, mainScrollContainerRef.current)
+  }
 
   const isSpendCapEnabled = org?.plan.id !== 'free' && !org?.usage_billing_enabled
 
@@ -389,8 +401,8 @@ export function DiskManagementForm({
     setRecommendCompute(null)
 
     const timeoutId = setTimeout(() => {
-      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 150)
+      scrollToComputeSection()
+    }, RECOMMEND_COMPUTE_SCROLL_DELAY_MS)
 
     return () => clearTimeout(timeoutId)
   }, [form, isSuccess, recommendCompute, setRecommendCompute])
@@ -404,8 +416,8 @@ export function DiskManagementForm({
       })
       void form.trigger(['provisionedIOPS', 'throughput'])
       window.setTimeout(() => {
-        computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 150)
+        scrollToComputeSection()
+      }, RECOMMEND_COMPUTE_SCROLL_DELAY_MS)
     })
   }, [form])
 
@@ -415,7 +427,7 @@ export function DiskManagementForm({
     if (window.location.hash !== '#compute') return
 
     const timeoutId = setTimeout(() => {
-      computeSettingsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      scrollToComputeSection()
     }, 100)
 
     return () => clearTimeout(timeoutId)
@@ -445,7 +457,7 @@ export function DiskManagementForm({
     if (!scrollTarget) return
 
     const timeoutId = setTimeout(() => {
-      scrollTarget.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      scrollElementIntoContainer(scrollTarget.current, mainScrollContainerRef.current)
     }, 100)
 
     return () => clearTimeout(timeoutId)

@@ -160,7 +160,7 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
   return (
     <div
       className={cn(
-        'grid grid-cols-1 gap-4 @[680px]:grid-cols-2 @[680px]:items-stretch',
+        'grid grid-cols-1 gap-4 @[680px]:grid-cols-2 @[680px]:items-stretch [overflow-anchor:none]',
         className
       )}
     >
