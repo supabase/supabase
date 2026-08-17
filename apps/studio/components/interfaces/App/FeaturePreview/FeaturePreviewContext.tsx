@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -152,9 +153,18 @@ export const useIsMarketplaceEnabled = () => {
 }
 
 export const useIsDatabaseConnectionsEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  const isDatabaseConnectionsEnabled = useFlag('topForPostgres')
-  return isDatabaseConnectionsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS]
+  const { flags, isInitialized } = useFeaturePreviewContext()
+  const [localStorageFlag] = useLocalStorageQuery<boolean | null>(
+    LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS,
+    null
+  )
+  const previouslyToggled = localStorageFlag !== null
+
+  return {
+    enabled: flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_DATABASE_CONNECTIONS],
+    isInitialized,
+    previouslyToggled,
+  }
 }
 
 export const useFeaturePreviewModal = () => {
