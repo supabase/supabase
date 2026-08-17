@@ -30,6 +30,7 @@ const RadioGroupCardItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       id={id}
+      aria-labelledby={`${id}-label`}
       {...props}
       className={cn(
         'flex flex-col gap-2',
@@ -48,7 +49,7 @@ const RadioGroupCardItem = React.forwardRef<
       )}
     >
       {children}
-      <label className="flex gap-2 w-full" htmlFor={id}>
+      <div className="flex gap-2 w-full" id={`${id}-label`}>
         {showIndicator && (
           <div
             className="
@@ -81,7 +82,7 @@ const RadioGroupCardItem = React.forwardRef<
         >
           {label}
         </div>
-      </label>
+      </div>
     </RadioGroupPrimitive.Item>
   )
 })
