@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
+import { Lock } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -28,6 +29,7 @@ import { z } from 'zod'
 
 import {
   ACCESS_OPTIONS,
+  LOCKED_WORKER_PROPERTIES,
   RUNTIMES,
   SIZES,
   WORKER_MAX_INSTANCES,
@@ -244,6 +246,24 @@ export const CreateWorkerDialog = ({ open, onOpenChange }: CreateWorkerDialogPro
                     </FormItemLayout>
                   )}
                 />
+              </div>
+
+              <div className="space-y-2 pt-2">
+                <p className="text-sm text-foreground-light">
+                  Also applied to every worker{' '}
+                  <span className="text-foreground-lighter">— not configurable at alpha</span>
+                </p>
+                <div className="grid grid-cols-2 gap-px overflow-hidden rounded-md border border-default bg-border sm:grid-cols-3">
+                  {LOCKED_WORKER_PROPERTIES.map((property) => (
+                    <div key={property.label} className="space-y-1 bg-surface-100 p-3">
+                      <div className="flex items-center gap-1.5 text-xs text-foreground-lighter">
+                        <Lock size={11} />
+                        {property.label}
+                      </div>
+                      <p className="text-sm text-foreground-light">{property.value}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2 pt-2">

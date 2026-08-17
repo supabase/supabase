@@ -17,6 +17,25 @@ export const WORKERS_REGION_SHORT = 'US West'
 /** Public gateway URL pattern. Both public and private workers share this shape. */
 export const workerGatewayUrl = (name: string) => `https://workers.supabase.co/v1/${name}`
 
+export interface LockedWorkerProperty {
+  label: string
+  value: string
+}
+
+/**
+ * Properties every worker gets that aren't configurable during Private Alpha —
+ * shown on the create dialog so users know what's fixed vs. what they're
+ * choosing. Source: Private Alpha requirements doc.
+ */
+export const LOCKED_WORKER_PROPERTIES: LockedWorkerProperty[] = [
+  { label: 'Region', value: `${WORKERS_REGION_LABEL} (locked)` },
+  { label: 'Persistent disk', value: 'None — stateless' },
+  { label: 'Load balancing', value: 'Off' },
+  { label: 'Max runtime', value: 'No limit (graceful drain)' },
+  { label: 'Logs', value: 'Logflare' },
+  { label: 'SSH access', value: 'Not supported' },
+]
+
 /** Per-project instance cap enforced at deploy time (mocked). */
 export const WORKERS_INSTANCE_CAP = 100
 export const WORKER_MIN_INSTANCES = 1
