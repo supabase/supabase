@@ -13,8 +13,6 @@ import { PAGE_SELECTOR } from './www-selectors.ts'
 // Outside the wcag2a/wcag2aa tag sweep, so it needs its own pass.
 export const EXTRA_REPORTED_RULES = ['heading-order']
 
-// Every template renders its `<h1>` outside the article wrapper, so this runs
-// against the page landmark. It passes on all four templates today.
 export const ENFORCED_RULES = ['page-has-heading-one']
 
 export const EXCLUDED_RULES = [
