@@ -62,6 +62,27 @@ describe('serializeContentListingGroupToMarkdown', () => {
     )
   })
 
+  it('includes a subtitle before the description', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'hire-agent',
+        items: [
+          {
+            title: 'Doctor',
+            href: '/guides/monitoring-and-debugging/automate-with-agents/health',
+            subtitle: 'Every 15 minutes',
+            description: 'Watch logs for 5xx spikes and Auth failures.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '**[Doctor](https://supabase.com/docs/guides/monitoring-and-debugging/automate-with-agents/health):** Every 15 minutes. Watch logs for 5xx spikes and Auth failures.'
+    )
+  })
+
   it('preserves external hrefs in markdown export', () => {
     const markdown = serializeContentListingGroupToMarkdown(
       {
@@ -260,6 +281,14 @@ describe('contentListingItemSchema icon', () => {
     href: '/guides/monitoring-and-debugging/log-drains#datadog',
     description: 'Stream logs directly into Datadog for monitoring and analysis.',
   }
+
+  it('accepts an optional subtitle', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      subtitle: 'Every 15 minutes',
+    })
+    expect(result.success).toBe(true)
+  })
 
   it('accepts a plain string icon path', () => {
     const result = contentListingItemSchema.safeParse({

@@ -5,6 +5,15 @@ subtitle: 'Accountant is a read-only usage agent. It trends API request volume a
 description: 'A capacity agent that tracks API request growth, error rates, and approaching resource ceilings.'
 ---
 
+```mermaid
+flowchart TD
+  Schedule([Once each morning]) --> Inspect[query_logs and usage APIs]
+  Inspect --> Signals["Request growth, error rates, resource trends"]
+  Signals --> Limit{Likely to hit a limit?}
+  Limit -->|Yes| Report["Trend, projected date, scaling guide"]
+  Limit -->|No| Silent[Stay silent]
+```
+
 ## What it watches
 
 - API request growth against a recent baseline
@@ -15,7 +24,7 @@ It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai
 
 ## When it watches
 
-Run it once per day on a schedule. Run it on demand after an unexpected traffic change.
+<AgentWatchSchedule id="usage" />
 
 ## What it will output
 
@@ -23,6 +32,6 @@ Accountant reports request growth, error-rate changes, and resource trends. If a
 
 <$Partial path="monitoring_agent_output.mdx" />
 
-## Copy the prompt
+## Set up the agent
 
-<AiPrompt id="monitoring-agent-usage" includeInMarkdown />
+<AgentSetup id="usage" />

@@ -5,6 +5,15 @@ subtitle: 'Security officer is a read-only security agent. It reviews Security A
 description: 'A security review agent that reports advisor findings and authentication or authorization spikes.'
 ---
 
+```mermaid
+flowchart TD
+  Schedule([Once per day]) --> Inspect[get_advisors and query_logs]
+  Inspect --> Signals[Advisor warnings and auth failures]
+  Signals --> Review{Needs review?}
+  Review -->|Yes| Report[Findings and proposed fix]
+  Review -->|No| Silent[Stay silent]
+```
+
 ## What it watches
 
 - Security Advisor findings at warning and error level
@@ -15,7 +24,7 @@ It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase M
 
 ## When it watches
 
-Run it once per day on a schedule. Run it on demand after you change Auth, RLS, or other access controls.
+<AgentWatchSchedule id="security" />
 
 ## What it will output
 
@@ -23,6 +32,6 @@ Security officer reports warning and error advisor findings, grouped authenticat
 
 <$Partial path="monitoring_agent_output.mdx" />
 
-## Copy the prompt
+## Set up the agent
 
-<AiPrompt id="monitoring-agent-security" includeInMarkdown />
+<AgentSetup id="security" />

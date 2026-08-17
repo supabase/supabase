@@ -1,3 +1,5 @@
+import { monitoringAgents } from '~/data/monitoring-agents.data'
+import { getScheduleLabel } from '~/data/monitoring-agents.utils'
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const telemetryAccessWhat: ContentListingGroup = {
@@ -73,8 +75,7 @@ export const telemetryDetectResolve: ContentListingGroup = {
     {
       title: 'Detecting',
       href: '/guides/monitoring-and-debugging/debugging',
-      description:
-        'If you are observing, run a few checks to see whether something is wrong.',
+      description: 'If you are observing, run a few checks to see whether something is wrong.',
     },
     {
       title: 'Diagnosing',
@@ -92,21 +93,25 @@ export const telemetryHireAgent: ContentListingGroup = {
     {
       title: 'Doctor',
       href: '/guides/monitoring-and-debugging/automate-with-agents/health',
+      subtitle: getScheduleLabel(monitoringAgents.health),
       description: 'Watch logs for 5xx spikes and Auth failures.',
     },
     {
       title: 'Security officer',
       href: '/guides/monitoring-and-debugging/automate-with-agents/security',
+      subtitle: getScheduleLabel(monitoringAgents.security),
       description: 'Review advisor findings and authorization failures.',
     },
     {
       title: 'Personal trainer',
       href: '/guides/monitoring-and-debugging/automate-with-agents/performance',
+      subtitle: getScheduleLabel(monitoringAgents.performance),
       description: 'Find slow queries, lock waits, and missing indexes.',
     },
     {
       title: 'Accountant',
       href: '/guides/monitoring-and-debugging/automate-with-agents/usage',
+      subtitle: getScheduleLabel(monitoringAgents.usage),
       description: 'Track request growth, error rates, and approaching limits.',
     },
   ],

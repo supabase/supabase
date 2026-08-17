@@ -40,6 +40,8 @@ import SqlToRest from 'ui-patterns/SqlToRest'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AgentSetup } from '../ui/AgentSetup'
+import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
 import { AiPrompt } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
@@ -70,6 +72,8 @@ const components = {
   AccordionItem,
   Admonition: AdmonitionWithMargin,
   AgentPluginsPanel,
+  AgentSetup,
+  AgentWatchSchedule,
   AiPrompt,
   AiPromptsIndex,
   AiSkillsIndex,

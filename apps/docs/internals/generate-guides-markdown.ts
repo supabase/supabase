@@ -16,6 +16,8 @@ import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuil
 import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
+import { AgentSetup } from './markdown-schema/AgentSetup'
+import { AgentWatchSchedule } from './markdown-schema/AgentWatchSchedule'
 import { AiPrompt } from './markdown-schema/AiPrompt'
 import { AiSkillsIndex } from './markdown-schema/AiSkillsIndex'
 import { AuthProviders } from './markdown-schema/AuthProviders'
@@ -186,6 +188,8 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
 const SCHEMA: ComponentSchema = {
   AccordionItem,
   Admonition,
+  AgentSetup,
+  AgentWatchSchedule,
   AiPrompt,
   AiSkillsIndex,
   IconCheck,

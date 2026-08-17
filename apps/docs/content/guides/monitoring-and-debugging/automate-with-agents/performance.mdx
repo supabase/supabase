@@ -5,6 +5,15 @@ subtitle: 'Personal trainer is a read-only performance agent. It inspects query 
 description: 'A query health agent that looks for slow queries, lock waits, and performance advisor findings.'
 ---
 
+```mermaid
+flowchart TD
+  Schedule([Once per hour]) --> Inspect[get_advisors and execute_sql]
+  Inspect --> Signals["Slow queries, lock waits, advisor findings"]
+  Signals --> Review{Needs a change?}
+  Review -->|Yes| Report[Finding and verification plan]
+  Review -->|No| Silent[Stay silent]
+```
+
 ## What it watches
 
 - Slow or regressing queries
@@ -15,7 +24,7 @@ It uses `get_advisors` and read-only `execute_sql` on project-scoped [Supabase M
 
 ## When it watches
 
-Run it once per hour on a schedule. Run it on demand after a latency regression or a schema change.
+<AgentWatchSchedule id="performance" />
 
 ## What it will output
 
@@ -23,6 +32,6 @@ Personal trainer reports slow or regressing queries, lock waits, and Performance
 
 <$Partial path="monitoring_agent_output.mdx" />
 
-## Copy the prompt
+## Set up the agent
 
-<AiPrompt id="monitoring-agent-performance" includeInMarkdown />
+<AgentSetup id="performance" />

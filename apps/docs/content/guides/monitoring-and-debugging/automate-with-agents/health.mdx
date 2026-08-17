@@ -5,6 +5,15 @@ subtitle: 'Doctor is a read-only health agent. It polls logs on a short interval
 description: 'An on-call triage agent that watches logs for 5xx spikes, Auth failures, and availability issues.'
 ---
 
+```mermaid
+flowchart TD
+  Schedule([Every 15 minutes]) --> Inspect[query_logs]
+  Inspect --> Signals["5xx, Auth failures, error-rate spikes"]
+  Signals --> Threshold{Threshold crossed?}
+  Threshold -->|Yes| Report[Incident report]
+  Threshold -->|No| Silent[Stay silent]
+```
+
 ## What it watches
 
 - API and Auth responses with status `>= 500`
@@ -15,7 +24,7 @@ It uses `query_logs` on project-scoped, read-only [Supabase MCP](/docs/guides/ai
 
 ## When it watches
 
-Run it every 15 minutes on a schedule. Run it on demand after a deployment, or whenever you need a health check outside that interval.
+<AgentWatchSchedule id="health" />
 
 ## What it will output
 
@@ -23,6 +32,6 @@ When a threshold is crossed, Doctor reports an incident: grouped errors, a few r
 
 <$Partial path="monitoring_agent_output.mdx" />
 
-## Copy the prompt
+## Set up the agent
 
-<AiPrompt id="monitoring-agent-health" includeInMarkdown />
+<AgentSetup id="health" />
