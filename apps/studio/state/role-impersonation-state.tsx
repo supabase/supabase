@@ -6,11 +6,15 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { CustomAccessTokenHookDetails } from '../hooks/misc/useCustomAccessTokenHookDetails'
+import {
+  CustomAccessTokenHookDetails,
+  useCustomAccessTokenHookDetails,
+} from '../hooks/misc/useCustomAccessTokenHookDetails'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -141,6 +145,9 @@ export function useRoleImpersonationStateSnapshot(options?: Parameters<typeof us
  * A role impersonation controller scoped to a single component instance instead of the
  * shared project-wide context — for surfaces (e.g. a notebook query cell) that need their
  * own independent "run as" selection rather than sharing the one global impersonation state.
+ *
+ * [Joshen] FWIW we might deprecate this method after hooking things up E2E since QueryCell's
+ * role impersonation likely needs to be persisted also
  */
 export function useLocalRoleImpersonationState(): RoleImpersonationController {
   const { data: project } = useSelectedProjectQuery()
@@ -167,6 +174,80 @@ export function useLocalRoleImpersonationState(): RoleImpersonationController {
       if (nextClaims) setClaims(nextClaims)
     },
     [projectRef, customizeAccessTokenRef]
+  )
+
+  return { role, claims, setRole }
+}
+
+/**
+ * Like `useLocalRoleImpersonationState`, but the role selection is controlled externally
+ * (e.g. persisted per query tab) instead of held in local component state — for surfaces
+ * where the selection needs to survive beyond this component instance's lifetime. Claims
+ * stay local regardless: they're derived, time-bound tokens, so they're recomputed whenever
+ * the controlled role changes rather than persisted alongside it.
+ */
+export function useControlledRoleImpersonationState(
+  role: ImpersonationRole | undefined,
+  onRoleChange: (role: ImpersonationRole | undefined) => void
+): RoleImpersonationController {
+  const { data: project } = useSelectedProjectQuery()
+  const customizeAccessToken = useCustomizeAccessToken(project?.ref, project?.connectionString)
+  const customizeAccessTokenRef = useLatest(customizeAccessToken)
+  const customAccessTokenHookDetails = useCustomAccessTokenHookDetails(project?.ref)
+  const customAccessTokenHookDetailsRef = useLatest(customAccessTokenHookDetails)
+  const onRoleChangeRef = useLatest(onRoleChange)
+  const projectRef = project?.ref ?? ''
+
+  const [claims, setClaims] = useState<PostgrestClaims | undefined>(undefined)
+
+  // Guards against re-resolving claims for a role change that `setRole` below just resolved
+  // itself — without it, every selection would re-run the (possibly RPC-backed) resolution
+  // twice: once eagerly in `setRole`, once again here once `role` updates on the next render.
+  const skipNextResolveRef = useRef(false)
+
+  useEffect(() => {
+    if (skipNextResolveRef.current) {
+      skipNextResolveRef.current = false
+      return
+    }
+
+    let cancelled = false
+
+    resolveRoleClaims(
+      projectRef,
+      role,
+      customAccessTokenHookDetailsRef.current,
+      customizeAccessTokenRef.current
+    ).then((nextClaims) => {
+      if (!cancelled && nextClaims) setClaims(nextClaims)
+    })
+
+    return () => {
+      cancelled = true
+    }
+    // Resolves only when the controlled role identity changes (e.g. switching tabs) — hook
+    // details and the customize-access-token callback are read from refs so they don't
+    // trigger a redundant resolution on their own.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectRef, role])
+
+  const setRole = useCallback(
+    async (
+      nextRole: ImpersonationRole | undefined,
+      customAccessTokenHookDetails?: CustomAccessTokenHookDetails
+    ) => {
+      const nextClaims = await resolveRoleClaims(
+        projectRef,
+        nextRole,
+        customAccessTokenHookDetails ?? customAccessTokenHookDetailsRef.current,
+        customizeAccessTokenRef.current
+      )
+
+      skipNextResolveRef.current = true
+      onRoleChangeRef.current(nextRole)
+      if (nextClaims) setClaims(nextClaims)
+    },
+    [projectRef, customizeAccessTokenRef, customAccessTokenHookDetailsRef, onRoleChangeRef]
   )
 
   return { role, claims, setRole }

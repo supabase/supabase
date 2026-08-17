@@ -234,6 +234,70 @@ describe('explorer query drafts', () => {
     expect(state.drafts['query-1']).toMatchObject({ rowLimit: 100 })
   })
 
+  it('persists and restores a per-draft impersonated role independently of other drafts', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.createDraft({ id: 'query-2', projectRef: 'project-a' })
+    state.setRole({ id: 'query-1', role: { type: 'postgrest', role: 'anon' } })
+
+    expect(state.drafts['query-1']).toMatchObject({ role: { type: 'postgrest', role: 'anon' } })
+    expect(state.drafts['query-2']).toMatchObject({ role: undefined })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.restoreDraft({ id: 'query-2', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({
+      role: { type: 'postgrest', role: 'anon' },
+    })
+    expect(restored.drafts['query-2']).toMatchObject({ role: undefined })
+  })
+
+  it('clears a persisted role when set back to undefined', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a' })
+    state.setRole({ id: 'query-1', role: { type: 'postgrest', role: 'service_role' } })
+    state.setRole({ id: 'query-1', role: undefined })
+
+    expect(state.drafts['query-1']).toMatchObject({ role: undefined })
+
+    const restored = createExplorerQueryState(storage)
+    expect(restored.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(restored.drafts['query-1']).toMatchObject({ role: undefined })
+  })
+
+  it('drops a malformed persisted role rather than failing to restore the draft', () => {
+    const storage = createMemoryStorage()
+    storage.setItem(
+      LOCAL_STORAGE_KEYS.EXPLORER_QUERY_DRAFTS('project-a'),
+      JSON.stringify({
+        'query-1': {
+          name: 'Query with bad role',
+          sql: 'select 1',
+          updatedAt: 1,
+          role: { type: 'postgrest', role: 'not-a-real-role' },
+        },
+      })
+    )
+
+    const state = createExplorerQueryState(storage)
+    expect(state.restoreDraft({ id: 'query-1', projectRef: 'project-a' })).toBe(true)
+    expect(state.drafts['query-1']).toMatchObject({ role: undefined })
+  })
+
+  it('ignores role updates for logs drafts', () => {
+    const storage = createMemoryStorage()
+    const state = createExplorerQueryState(storage)
+
+    state.createDraft({ id: 'query-1', projectRef: 'project-a', source: LOGS_SOURCE })
+    state.setRole({ id: 'query-1', role: { type: 'postgrest', role: 'anon' } })
+
+    expect(state.drafts['query-1']).not.toHaveProperty('role')
+  })
+
   it('removes the persisted draft and its session result when its tab closes', () => {
     const storage = createMemoryStorage()
     const state = createExplorerQueryState(storage)

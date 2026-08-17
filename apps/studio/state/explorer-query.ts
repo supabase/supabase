@@ -16,6 +16,7 @@ import {
   toQuerySourceBinding,
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
+import { impersonationRoleSchema, type ImpersonationRole } from '@/lib/role-impersonation'
 
 type ExplorerQueryDraftBase = {
   id: string
@@ -35,6 +36,7 @@ export type DatabaseQueryDraft = ExplorerQueryDraftBase &
     _tag: 'database'
     uncheckedSql: UntrustedSqlFragment
     rowLimit: number
+    role?: ImpersonationRole
   }
 
 export type LogsQueryDraft = ExplorerQueryDraftBase &
@@ -60,6 +62,7 @@ type PersistedExplorerQueryDraft = {
   sql: string
   updatedAt: number
   rowLimit?: number
+  role?: ImpersonationRole
 }
 
 type PersistedExplorerQueryDrafts = Record<string, PersistedExplorerQueryDraft>
@@ -76,6 +79,7 @@ const persistedDraftSchema = z.object({
   updatedAt: z.number(),
   source: z.unknown().optional(),
   rowLimit: z.number().optional(),
+  role: z.unknown().optional(),
 })
 
 /**
@@ -109,6 +113,7 @@ const toDraft = ({
     database_identifier: persisted.source.database_identifier,
     uncheckedSql: untrustedSql(persisted.sql),
     rowLimit: persisted.rowLimit ?? DEFAULT_CELL_ROW_LIMIT,
+    role: persisted.role,
   }
 }
 
@@ -130,6 +135,9 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
           ? parsedSource.data
           : createDefaultSourceBinding('database')
 
+        const parsedRole = impersonationRoleSchema.safeParse(draft.data.role)
+        const role = parsedRole.success ? parsedRole.data : undefined
+
         return [
           [
             id,
@@ -139,6 +147,7 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
               sql: draft.data.sql,
               updatedAt: draft.data.updatedAt,
               rowLimit: draft.data.rowLimit,
+              role,
             },
           ],
         ]
@@ -179,6 +188,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       sql: draft.uncheckedSql,
       updatedAt: draft.updatedAt,
       rowLimit: draft._tag === 'database' ? draft.rowLimit : undefined,
+      role: draft._tag === 'database' ? draft.role : undefined,
     }
     writePersistedDrafts(storage, draft.projectRef, persisted)
   }
@@ -262,6 +272,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       if (nextSource !== undefined && nextSource._tag !== draft._tag) delete state.results[id]
 
       const currentRowLimit = draft._tag === 'database' ? draft.rowLimit : undefined
+      const currentRole = draft._tag === 'database' ? draft.role : undefined
 
       state.drafts[id] = toDraft({
         id,
@@ -272,6 +283,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           sql: sql ?? draft.uncheckedSql,
           updatedAt: Date.now(),
           rowLimit: rowLimit ?? currentRowLimit,
+          role: currentRole,
         },
       })
 
@@ -319,6 +331,21 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
 
     setResult: ({ id, result }: { id: string; result: ExplorerQueryResult }) => {
       state.results[id] = ref(result)
+    },
+
+    /**
+     * Separate from `updateDraft` because `undefined` is a meaningful value here (clearing
+     * the impersonated role), whereas `updateDraft`'s optional fields all use `undefined`
+     * to mean "leave unchanged." Logs drafts have no impersonation concept, so this is a
+     * no-op for them.
+     */
+    setRole: ({ id, role }: { id: string; role: ImpersonationRole | undefined }) => {
+      const draft = state.drafts[id]
+      if (!draft || draft._tag !== 'database') return
+
+      const updatedDraft: DatabaseQueryDraft = { ...draft, role, updatedAt: Date.now() }
+      state.drafts[id] = updatedDraft
+      persistDraft(updatedDraft)
     },
   })
 
