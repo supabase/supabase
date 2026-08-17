@@ -75,8 +75,10 @@ export const GLOBAL_ELEMENTS_ENFORCED_RULES = [
   'svg-img-alt',
 ]
 
-// Best practice rather than WCAG, so these need their own pass. Reported only:
-// the footer `h6` under the screen-reader-only `h2` is on nearly every page.
+// Best practice rather than WCAG, so the tag sweep never runs them. Both fire
+// today: `heading-order` on the footer `h6` under a screen-reader-only `h2`, on
+// every page, and `landmark-unique` on the event template's nested `<main>` and
+// its `<aside>`.
 export const GLOBAL_ELEMENTS_EXTRA_REPORTED_RULES = ['heading-order', 'landmark-unique']
 
 // `color-contrast` and the `<html>`-level rules are only reachable once the scan
