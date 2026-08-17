@@ -43,6 +43,8 @@ fi
 # Read keys from .env
 ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
+SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
+SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
 DASHBOARD_USERNAME=$(grep '^DASHBOARD_USERNAME=' .env | cut -d= -f2-)
 DASHBOARD_PASSWORD=$(grep '^DASHBOARD_PASSWORD=' .env | cut -d= -f2-)
 
@@ -440,10 +442,10 @@ echo ""
 echo "--- Edge Functions ---"
 fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -X POST \
-    -H "Authorization: Bearer $ANON_KEY" \
+    -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
     -H "Content-Type: application/json" \
     -d '{}')
-check "Call hello function" '"Hello from Edge Functions!"' "$fn_resp"
+check "Call hello function" '{"message":"Hello from Edge Functions!"}' "$fn_resp"
 
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)

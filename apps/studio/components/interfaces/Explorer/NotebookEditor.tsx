@@ -27,6 +27,7 @@ import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { useCurrentNotebook, useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -112,15 +113,13 @@ export const NotebookEditor = () => {
                   strategy={verticalListSortingStrategy}
                 >
                   <div className="flex flex-col gap-y-4">
-                    {cells.map((cell) => {
-                      switch (cell._tag) {
-                        case 'markdown_cell':
-                          return <MarkdownCell key={cell.id} cell={cell} />
-                        case 'database_cell':
-                        case 'log_cell':
-                          return <QueryCell key={cell.id} cell={cell} />
-                      }
-                    })}
+                    {cells.map((cell) =>
+                      isQueryCell(cell) ? (
+                        <QueryCell key={cell.id} cell={cell} />
+                      ) : (
+                        <MarkdownCell key={cell.id} cell={cell} />
+                      )
+                    )}
                   </div>
                 </SortableContext>
               </DndContext>
