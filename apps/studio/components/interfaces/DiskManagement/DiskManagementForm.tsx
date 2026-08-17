@@ -375,14 +375,17 @@ export function DiskManagementForm({
 
   // Apply the recommendation only after the sheet's close lifecycle has completed.
   useEffect(() => {
-    if (!recommendedCompute || !isSuccess) return
+    // The compute add-on supplies the option. Keep the recommendation pending
+    // until disk attributes have initialised the form, so a later reset cannot
+    // overwrite it. Other infrastructure requests are unrelated to this handoff.
+    if (!recommendedCompute || !isAddonsSuccess) return
 
     form.setValue('computeSize', recommendedCompute, {
       shouldDirty: true,
       shouldValidate: true,
     })
     void form.trigger(['provisionedIOPS', 'throughput'])
-    onRecommendedComputeApplied?.()
+    if (isDiskAttributesSuccess) onRecommendedComputeApplied?.()
 
     const element = computeSettingsRef.current
     if (!element) return
@@ -404,7 +407,8 @@ export function DiskManagementForm({
     mainScrollContainer.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
   }, [
     form,
-    isSuccess,
+    isAddonsSuccess,
+    isDiskAttributesSuccess,
     mainScrollContainer,
     onRecommendedComputeApplied,
     recommendedCompute,
