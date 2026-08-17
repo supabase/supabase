@@ -5,11 +5,6 @@ export type Transcript = {
   currentUserInput: string
   /**
    * Serialized prior conversation before the current turn, or null.
-   * Always null today: every case in dataset.ts is a single-turn conversation
-   * (see assistant.eval.ts's `messages` array, which always has exactly one user message).
-   * Kept as a field for forward compatibility if multi-turn cases are added later —
-   * if that happens, this needs to be built from those earlier turns the same way
-   * lastAssistantTurn is built below, not left null.
    */
   priorConversation: string | null
   /** Text-only serialization of the assistant's turn: prose only, no tool call markers. */

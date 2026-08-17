@@ -1,10 +1,10 @@
 import { FinishReason } from 'ai'
 import { LLMClassifierFromTemplate } from 'autoevals'
-import { EvalCase, EvalScorer } from 'braintrust'
+import { EvalCase, EvalScorer, type Trace } from 'braintrust'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
-import { getParsedToolSpans, getToolSpans } from './trace-utils'
+import { getParsedToolSpans, getThreadParts, getToolSpans } from './trace-utils'
 import type { Transcript } from './transcript'
 import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractUrls } from '@/lib/helpers'
@@ -25,7 +25,14 @@ export type AssistantEvalInput = {
 
 export type AssistantEvalOutput = {
   finishReason: FinishReason
-  transcript: Transcript
+  /**
+   * Only populated by the offline eval task (assistant.eval.ts), which has the
+   * full generation in memory. Online scorers run against live production
+   * traces with no such task, so this is absent there — those scorers fall
+   * back to deriving an equivalent Transcript from `trace` via getThreadParts.
+   * See resolveTranscript below.
+   */
+  transcript?: Transcript
 }
 
 type ToolInputExactValue = string | number | boolean | null | string[]
@@ -63,6 +70,20 @@ export type AssistantEvalCase = EvalCase<AssistantEvalInput, Expected, Assistant
 const mcpTextContentSpanOutputSchema = z.object({
   content: z.array(z.object({ type: z.literal('text').optional(), text: z.string() })),
 })
+
+/**
+ * Prefers the offline eval task's in-memory transcript (untruncated); falls
+ * back to deriving one from the live trace for online scorers, which have no
+ * such task output to read.
+ */
+async function resolveTranscript(
+  output: AssistantEvalOutput,
+  trace: Trace | undefined
+): Promise<Transcript | null> {
+  if (output.transcript) return output.transcript
+  if (!trace) return null
+  return getThreadParts(trace)
+}
 
 // --- Scorers ---
 
@@ -163,9 +184,9 @@ export const concisenessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  const { transcript } = output
-  if (!transcript.lastAssistantTurn) return null
+> = async ({ output, trace }) => {
+  const transcript = await resolveTranscript(output, trace)
+  if (!transcript?.lastAssistantTurn) return null
   return await concisenessEvaluator({
     input: transcript.currentUserInput,
     output: transcript.lastAssistantTurn,
@@ -193,9 +214,9 @@ export const completenessScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  const { transcript } = output
-  if (!transcript.lastAssistantTurnWithToolInputs) return null
+> = async ({ output, trace }) => {
+  const transcript = await resolveTranscript(output, trace)
+  if (!transcript?.lastAssistantTurnWithToolInputs) return null
   return await completenessEvaluator({
     input: transcript.currentUserInput,
     output: transcript.lastAssistantTurnWithToolInputs,
@@ -233,9 +254,9 @@ export const goalCompletionScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  const { transcript } = output
-  if (!transcript.lastAssistantTurnWithToolInputs) return null
+> = async ({ output, trace }) => {
+  const transcript = await resolveTranscript(output, trace)
+  if (!transcript?.lastAssistantTurnWithToolInputs) return null
   return await goalCompletionEvaluator({
     input: transcript.currentUserInput,
     priorConversation: transcript.priorConversation ?? 'None',
@@ -289,8 +310,8 @@ export const docsFaithfulnessScorer: EvalScorer<
 
   if (docs.length === 0) return null
 
-  const { transcript } = output
-  if (!transcript.lastAssistantTurnWithToolInputs) return null
+  const transcript = await resolveTranscript(output, trace)
+  if (!transcript?.lastAssistantTurnWithToolInputs) return null
 
   return await docsFaithfulnessEvaluator({
     docs: docs.join('\n\n'),
@@ -334,7 +355,7 @@ export const correctnessScorer: EvalScorer<
 > = async ({ expected, output }) => {
   if (!expected.correctAnswer) return null
   const { transcript } = output
-  if (!transcript.lastAssistantTurnWithToolInputs) return null
+  if (!transcript?.lastAssistantTurnWithToolInputs) return null
 
   return await correctnessEvaluator({
     input: transcript.currentUserInput,
@@ -373,11 +394,12 @@ const safetyEvaluator = LLMClassifierFromTemplate<{ input: string; priorConversa
 export const safetyScorer: EvalScorer<AssistantEvalInput, AssistantEvalOutput, Expected> = async ({
   expected,
   output,
+  trace,
 }) => {
   if (!expected.requiresSafetyCheck) return null
 
-  const { transcript } = output
-  if (!transcript.lastAssistantTurnWithToolInputs) return null
+  const transcript = await resolveTranscript(output, trace)
+  if (!transcript?.lastAssistantTurnWithToolInputs) return null
 
   return await safetyEvaluator({
     input: transcript.currentUserInput,
@@ -390,9 +412,9 @@ export const urlValidityScorer: EvalScorer<
   AssistantEvalInput,
   AssistantEvalOutput,
   Expected
-> = async ({ output }) => {
-  const { transcript } = output
-  if (!transcript.lastAssistantTurn) return null
+> = async ({ output, trace }) => {
+  const transcript = await resolveTranscript(output, trace)
+  if (!transcript?.lastAssistantTurn) return null
 
   const allUrls = extractUrls(transcript.lastAssistantTurn, {
     excludeCodeBlocks: true,
