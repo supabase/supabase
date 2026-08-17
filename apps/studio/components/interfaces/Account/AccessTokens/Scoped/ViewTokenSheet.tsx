@@ -9,6 +9,11 @@ import { scopesToSelection, type ResourceAccessMode } from '../AccessToken.permi
 import { useCapabilitySummary } from '../hooks/useCapabilitySummary'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
 import { useTokenAccessEvaluation } from '../hooks/useTokenAccessEvaluation'
+import {
+  ResourceAccessPills,
+  useResourceAccessWrap,
+  type ResourceAccessPillItem,
+} from './ResourceAccessPills'
 import { CapabilitiesSection } from './TokenCapabilities/CapabilitiesSection'
 import { CapabilityLevelToggle } from './TokenCapabilities/CapabilityLevelToggle'
 import { RiskBanner } from './TokenCapabilities/RiskBanner'
@@ -17,12 +22,6 @@ import {
   getCapabilityDensityTier,
   type CapabilityLevelFilter,
 } from './TokenCapabilities/TokenCapabilities.utils'
-import {
-  ResourceAccessPills,
-  TokenSummaryList,
-  type ResourceAccessPillItem,
-  type TokenSummaryRow,
-} from './TokenSummaryList'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useGetEnabledEndpointsForCapability } from '@/data/scoped-access-tokens/permission-scope-map-query'
 import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
@@ -157,61 +156,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     access.inaccessibleOrgSlugs,
   ])
 
-  const rows: TokenSummaryRow[] = token
-    ? [
-        {
-          key: 'created',
-          label: 'Created',
-          value: token.created_at ? (
-            <TimestampInfo
-              utcTimestamp={token.created_at}
-              label={dayjs(token.created_at).fromNow()}
-              className="text-sm"
-            />
-          ) : (
-            <span className="text-foreground-lighter">Unknown</span>
-          ),
-        },
-        {
-          key: 'last-used',
-          label: 'Last used',
-          value: token.last_used_at ? (
-            <TimestampInfo
-              utcTimestamp={token.last_used_at}
-              label={dayjs(token.last_used_at).fromNow()}
-              className="text-sm"
-            />
-          ) : (
-            <span className="text-foreground-lighter">Never</span>
-          ),
-        },
-        {
-          key: 'expires',
-          label: 'Expires',
-          value: token.expires_at ? (
-            <TimestampInfo
-              utcTimestamp={token.expires_at}
-              label={dayjs(token.expires_at).fromNow()}
-              className="text-sm"
-            />
-          ) : (
-            <span className="text-foreground-lighter">Never</span>
-          ),
-        },
-        {
-          key: 'resource-access',
-          label: 'Resource access',
-          isWrappable: true,
-          value: (
-            <ResourceAccessPills
-              resourceAccess={resourceAccess}
-              items={resourceItems}
-              emptyText={hasNoBoundResources ? boundResourcesDeletedText : '-'}
-            />
-          ),
-        },
-      ]
-    : []
+  const { containerRef: pillsRef, isWrapped: isResourceAccessWrapped } = useResourceAccessWrap()
 
   return (
     <Sheet open={visible} onOpenChange={() => onClose()}>
@@ -288,7 +233,70 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
 
                 <div className="flex flex-col gap-3">
                   <h3 className="text-sm">Token summary</h3>
-                  <TokenSummaryList rows={rows} />
+                  <dl className="divide-y rounded-md border bg-surface-300">
+                    <div className="flex items-center justify-between gap-4 px-4 py-3">
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Created</dt>
+                      <dd className="text-sm text-foreground">
+                        {token.created_at ? (
+                          <TimestampInfo
+                            utcTimestamp={token.created_at}
+                            label={dayjs(token.created_at).fromNow()}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <span className="text-foreground-lighter">Unknown</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 px-4 py-3">
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Last used</dt>
+                      <dd className="text-sm text-foreground">
+                        {token.last_used_at ? (
+                          <TimestampInfo
+                            utcTimestamp={token.last_used_at}
+                            label={dayjs(token.last_used_at).fromNow()}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <span className="text-foreground-lighter">Never</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="flex items-center justify-between gap-4 px-4 py-3">
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Expires</dt>
+                      <dd className="text-sm text-foreground">
+                        {token.expires_at ? (
+                          <TimestampInfo
+                            utcTimestamp={token.expires_at}
+                            label={dayjs(token.expires_at).fromNow()}
+                            className="text-sm"
+                          />
+                        ) : (
+                          <span className="text-foreground-lighter">Never</span>
+                        )}
+                      </dd>
+                    </div>
+                    <div
+                      className={cn(
+                        'flex flex-col items-start justify-between gap-4 px-4 py-3 sm:flex-row',
+                        isResourceAccessWrapped ? 'sm:items-start' : 'sm:items-center'
+                      )}
+                    >
+                      <dt className="shrink-0 text-sm text-foreground-lighter">Resource access</dt>
+                      <dd className="w-full min-w-0 text-sm text-foreground sm:w-auto sm:flex-1">
+                        <div
+                          ref={pillsRef}
+                          className="flex flex-wrap justify-start gap-1.5 sm:justify-end"
+                        >
+                          <ResourceAccessPills
+                            resourceAccess={resourceAccess}
+                            items={resourceItems}
+                            emptyText={hasNoBoundResources ? boundResourcesDeletedText : '-'}
+                          />
+                        </div>
+                      </dd>
+                    </div>
+                  </dl>
                 </div>
 
                 <div className="flex flex-col gap-3">

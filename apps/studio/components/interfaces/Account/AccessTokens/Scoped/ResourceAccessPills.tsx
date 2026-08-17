@@ -1,21 +1,8 @@
 import { Box, Boxes } from 'lucide-react'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 import type { ResourceAccessMode } from '../AccessToken.permissions'
-
-/**
- * Shared "Token summary" presentation for the token view sheet and the creation review step, so
- * reviewing a token before creating it looks identical to viewing it afterwards.
- */
-
-export interface TokenSummaryRow {
-  key: string
-  label: string
-  value: ReactNode
-  /** Badge-list values that can wrap onto multiple lines — the row top-aligns once wrapped. */
-  isWrappable?: boolean
-}
 
 export interface ResourceAccessPillItem {
   key: string
@@ -30,6 +17,7 @@ interface ResourceAccessPillsProps {
   emptyText?: string
 }
 
+/** The org/project badges in a token summary's "Resource access" row. */
 export const ResourceAccessPills = ({
   resourceAccess,
   items,
@@ -63,13 +51,16 @@ export const ResourceAccessPills = ({
   )
 }
 
-const WrappableSummaryRow = ({ label, children }: { label: string; children: ReactNode }) => {
+/**
+ * Whether the pill container has wrapped onto multiple lines. Vertically centering the row only
+ * reads right when its badges fit on a single line — with wrapped badges the label should sit at
+ * the top instead. Measured, not guessed from item count, since wrapping depends on the sheet's
+ * width and each badge's label length.
+ */
+export const useResourceAccessWrap = () => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isWrapped, setIsWrapped] = useState(false)
 
-  // Vertically centering the row only reads right when its badges fit on a single line — with
-  // wrapped badges the label should sit at the top instead. Measured, not guessed from item count,
-  // since wrapping depends on the sheet's width and each badge's label length.
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -85,36 +76,5 @@ const WrappableSummaryRow = ({ label, children }: { label: string; children: Rea
     return () => observer.disconnect()
   }, [])
 
-  return (
-    <div
-      className={cn(
-        'flex flex-col items-start justify-between gap-4 px-4 py-3 sm:flex-row',
-        isWrapped ? 'sm:items-start' : 'sm:items-center'
-      )}
-    >
-      <dt className="shrink-0 text-sm text-foreground-lighter">{label}</dt>
-      <dd className="w-full min-w-0 text-sm text-foreground sm:w-auto sm:flex-1">
-        <div ref={containerRef} className="flex flex-wrap justify-start gap-1.5 sm:justify-end">
-          {children}
-        </div>
-      </dd>
-    </div>
-  )
+  return { containerRef, isWrapped }
 }
-
-export const TokenSummaryList = ({ rows }: { rows: TokenSummaryRow[] }) => (
-  <dl className="divide-y rounded-md border bg-surface-300">
-    {rows.map((row) =>
-      row.isWrappable ? (
-        <WrappableSummaryRow key={row.key} label={row.label}>
-          {row.value}
-        </WrappableSummaryRow>
-      ) : (
-        <div key={row.key} className="flex items-center justify-between gap-4 px-4 py-3">
-          <dt className="shrink-0 text-sm text-foreground-lighter">{row.label}</dt>
-          <dd className="text-sm text-foreground">{row.value}</dd>
-        </div>
-      )
-    )}
-  </dl>
-)

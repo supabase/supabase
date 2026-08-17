@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
 import { useMemo, useState } from 'react'
+import { cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { PERMISSION_MODE_LABEL, selectionToScopes } from '../../AccessToken.permissions'
@@ -11,6 +12,11 @@ import {
 import { useCapabilitySummary } from '../../hooks/useCapabilitySummary'
 import { useOrgAndProjectData } from '../../hooks/useOrgAndProjectData'
 import { failingResourceLine } from '../ExceedsRoleBadge'
+import {
+  ResourceAccessPills,
+  useResourceAccessWrap,
+  type ResourceAccessPillItem,
+} from '../ResourceAccessPills'
 import { CapabilitiesSection } from '../TokenCapabilities/CapabilitiesSection'
 import { CapabilityLevelToggle } from '../TokenCapabilities/CapabilityLevelToggle'
 import { RiskBanner } from '../TokenCapabilities/RiskBanner'
@@ -19,12 +25,6 @@ import {
   getCapabilityDensityTier,
   type CapabilityLevelFilter,
 } from '../TokenCapabilities/TokenCapabilities.utils'
-import {
-  ResourceAccessPills,
-  TokenSummaryList,
-  type ResourceAccessPillItem,
-  type TokenSummaryRow,
-} from '../TokenSummaryList'
 import { EXPIRY_OPTIONS, type TokenFormValues } from './NewScopedTokenForm.utils'
 import { PermissionScopeMap } from '@/data/scoped-access-tokens/permission-scope-map-query'
 
@@ -97,20 +97,7 @@ export const NewScopedTokenFormReview = ({
   const capabilityTier = getCapabilityDensityTier(capabilities.length)
   const [levelFilter, setLevelFilter] = useState<CapabilityLevelFilter>('all')
 
-  const rows: TokenSummaryRow[] = [
-    {
-      key: 'name',
-      label: 'Name',
-      value: values.tokenName || <span className="text-foreground-lighter">Untitled token</span>,
-    },
-    { key: 'expires', label: 'Expires', value: expiresSummary },
-    {
-      key: 'resource-access',
-      label: 'Resource access',
-      isWrappable: true,
-      value: <ResourceAccessPills resourceAccess={values.resourceAccess} items={resourceItems} />,
-    },
-  ]
+  const { containerRef: pillsRef, isWrapped: isResourceAccessWrapped } = useResourceAccessWrap()
 
   return (
     <div className="space-y-6 px-5 sm:px-6 py-6">
@@ -149,7 +136,31 @@ export const NewScopedTokenFormReview = ({
 
       <div className="flex flex-col gap-3">
         <h3 className="text-sm">Token summary</h3>
-        <TokenSummaryList rows={rows} />
+        <dl className="divide-y rounded-md border bg-surface-300">
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <dt className="shrink-0 text-sm text-foreground-lighter">Name</dt>
+            <dd className="text-sm text-foreground">
+              {values.tokenName || <span className="text-foreground-lighter">Untitled token</span>}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 px-4 py-3">
+            <dt className="shrink-0 text-sm text-foreground-lighter">Expires</dt>
+            <dd className="text-sm text-foreground">{expiresSummary}</dd>
+          </div>
+          <div
+            className={cn(
+              'flex flex-col items-start justify-between gap-4 px-4 py-3 sm:flex-row',
+              isResourceAccessWrapped ? 'sm:items-start' : 'sm:items-center'
+            )}
+          >
+            <dt className="shrink-0 text-sm text-foreground-lighter">Resource access</dt>
+            <dd className="w-full min-w-0 text-sm text-foreground sm:w-auto sm:flex-1">
+              <div ref={pillsRef} className="flex flex-wrap justify-start gap-1.5 sm:justify-end">
+                <ResourceAccessPills resourceAccess={values.resourceAccess} items={resourceItems} />
+              </div>
+            </dd>
+          </div>
+        </dl>
       </div>
 
       <div className="flex flex-col gap-3">
