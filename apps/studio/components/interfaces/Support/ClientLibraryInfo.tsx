@@ -35,7 +35,7 @@ export function ClientLibraryInfo({ form, category, library }: ClientLibraryInfo
   if (category !== 'Problem') return null
 
   return (
-    <div className="flex flex-col gap-y-1">
+    <div data-support-field="library" className="flex flex-col gap-y-1">
       <FormField
         name="library"
         control={form.control}

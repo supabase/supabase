@@ -36,6 +36,7 @@ import {
   getOrgSubscriptionPlan,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
+  scrollToFirstFormError,
 } from './SupportForm.utils'
 import { SupportFormDirectEmailContent } from './SupportFormDirectEmailInfo'
 import { getProjectAuthConfig } from '@/data/auth/auth-config-query'
@@ -148,6 +149,8 @@ export const SupportFormV3 = ({
         type: 'manual',
         message: "Please select the library that you're facing issues with",
       })
+      // setError triggers a re-render; wait for it before querying aria-invalid
+      requestAnimationFrame(() => scrollToFirstFormError('support-form', 'library'))
       return
     }
 
@@ -223,7 +226,9 @@ export const SupportFormV3 = ({
     submitSupportTicket(payload)
   }
 
-  const handleFormSubmit = form.handleSubmit(onSubmit)
+  const handleFormSubmit = form.handleSubmit(onSubmit, (errors) => {
+    scrollToFirstFormError('support-form', Object.keys(errors)[0])
+  })
 
   const handleSubmitButtonClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     handleFormSubmit(event)

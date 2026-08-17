@@ -43,6 +43,7 @@ export function CategoryAndSeverityInfo({
 }: CategoryAndSeverityInfoProps) {
   return (
     <div
+      data-support-field="category"
       className={cn(
         'grid sm:grid-rows-1 gap-4 grid-cols-1 grid-rows-2',
         showSeverity ? 'sm:grid-cols-2' : 'sm:grid-cols-1'
